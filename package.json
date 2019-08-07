@@ -1,19 +1,12 @@
 {
   "name": "angular-electron",
   "version": "6.0.1",
-  "description": "Angular 8 with Electron (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/maximegris/angular-electron",
+  "description": "Sistema inventario y facturacion ADM agroindustrial",
   "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
+    "name": "Victor Vasquez",
+    "email": "vjose1903@outlook.es"
   },
-  "keywords": [
-    "angular",
-    "angular 8",
-    "electron",
-    "typescript",
-    "sass"
-  ],
+  "keywords": [ ],
   "main": "main.js",
   "private": true,
   "scripts": {
@@ -83,5 +76,9 @@
   },
   "engines": {
     "node": ">=10.9.0"
+  },
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "ngx-bootstrap": "^5.1.1"
   }
 }
