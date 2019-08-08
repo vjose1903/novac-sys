@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  loginForm:FormGroup
+  constructor(private fb: FormBuilder,
+              private router: Router 
+              ) { }
 
   ngOnInit() {
+    this.loginForm = this.fb.group({
+      'usuario': null,
+      'password': null
+    })
+    
   }
 
 }

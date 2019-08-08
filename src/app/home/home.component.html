@@ -1,19 +1,19 @@
 <div class="row">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="col-12 logo-img">
+      <div class="logo-img">
         <img src="" alt="Logo">
       </div>
 
-      <form class="col-12" action="validar.php" method="post">
+      <form [formGroup]="loginForm" class=""  method="post">
 
         <div class="form-group" id="user-group">
-          <input type="text" class="form-control" name="user">
+          <input type="text" class="form-control" formControlName="usuario">
           <label for="" class="formulario__label">Usuario:</label>
         </div>
 
         <div class="form-group" id="password-group">
-          <input type="password" class="form-control" name="password" id="Tuser">
+          <input type="password" class="form-control" formControlName="password" id="Tuser">
           <label for="" class="formulario__label">Contraseña:</label>
         </div>
 
