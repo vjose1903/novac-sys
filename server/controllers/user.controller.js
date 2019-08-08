@@ -11,14 +11,13 @@ ControladorUsuario.register = (req, res, next) => {
     var user = new User();
     user.nombre=req.body.nombre,
     user.apellido=req.body.apellido,
-    user.usuario=req.body.usuario,
     user.fotoPerfil=req.body.fotoPerfil,
     user.telefono=req.body.telefono,
     user.email=req.body.email,
     user.fechaN=req.body.fechaN,
     user.password=req.body.password,
     user.estado=true,
-    user.tipo_usuario='U',
+    user.role='U',
 
     user.save((err, doc) => {
         if (!err)
@@ -51,7 +50,7 @@ ControladorUsuario.userProfile = (req, res, next) =>{
             if (!user)
                 return res.status(404).json({ status: false, message: 'Usuario no existe' });
             else
-                return res.status(200).json({ status: true, user : _.pick(user,['tipo_usuario','_id']) });
+                return res.status(200).json({ status: true, user : _.pick(user,['role','_id']) });
         }
     );
 }
@@ -109,13 +108,11 @@ ControladorUsuario.UpdateUser = async (req, res) => {
     const usuario={
         nombre: req.body.nombre,
         apellido: req.body.apellido,
-        usuario: req.body.usuario,
         fotoPerfil: req.body.fotoPerfil,
         telefono: req.body.telefono,
         email: req.body.email,
         fechaN: req.body.fechaN,
-        // contrasena: bcrypt.hashSync(req.body.contrasena),
-        tipo_usuario: req.body.tipo_usuario
+        role: req.body.role
     };
     await User.findByIdAndUpdate(req.params.id, {$set:usuario},{new: true}, function(err, model) {
         if (!err)
@@ -142,11 +139,6 @@ ControladorUsuario.DeleteUser = async (req, res) => {
             }
         });
     }
-
-// ControladorUsuario.DeleteUser = async (req, res) => {
-//     await User.findByIdAndRemove(req.params.id);
-//     res.json({status:'usuario eliminado'});
-// }
 
 
 module.exports = ControladorUsuario; 

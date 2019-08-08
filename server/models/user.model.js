@@ -5,13 +5,12 @@ const jwt = require('jsonwebtoken');
 var userSchema = new mongoose.Schema({
     nombre: { type: String, required: true, trim: true },
     apellido: { type: String, required: true, trim: true },
-    usuario: { type: String, required: true, trim: true, unique: true },
     telefono: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true },
     fechaN: { type: Date, required: true, trim: true },
     password: { type: String, required: true, trim: true },
     estado: { type: Boolean, required: true, trim: true },
-    tipo_usuario: { type: String, required: true, trim: true },
+    role: { type: String, required: true, trim: true },
     fotoPerfil: { type: String, trim: true },
     saltSecret: String
 
@@ -47,7 +46,7 @@ userSchema.methods.verifyPassword = function(password) {
 };
 
 userSchema.methods.generateJwt = function() {
-    return jwt.sign({ _id: this._id, tipo_usuario: this.tipo_usuario },
+    return jwt.sign({ _id: this._id, rol: this.rol },
         process.env.JWT_SECRET, {
             expiresIn: process.env.JWT_EXP
         });

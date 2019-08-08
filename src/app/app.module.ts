@@ -18,6 +18,7 @@ import { HomeModule } from './home/home.module';
 
 import { AppComponent } from './app.component';
 import { AngularModule } from './modules/angular.module';
+import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -41,7 +42,8 @@ export function HttpLoaderFactory(http: HttpClient) {
         deps: [HttpClient]
       }
     }),
-    AngularModule
+    AngularModule,
+    MDBBootstrapModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

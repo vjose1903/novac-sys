@@ -12,10 +12,9 @@ const path = require('path');
 //rutas
 const rtsIndex = require('./routes/usuarios.routes');
 const rtsPhotos = require('./routes/photos.routes');
-const rtsCentros = require('./routes/centros.routes');
 const rtsSupli = require('./routes/suplidores.routes');
-const rtsTipoCentros = require('./routes/tipoCentros.routes');
-const rtsofertas = require('./routes/ofertas.routes');
+const rtsCliente = require('./routes/clientes.routes');
+
 
 var app = express();
 
@@ -27,10 +26,8 @@ app.use(passport.initialize());
 
 app.use('/api/usuarios', rtsIndex);
 app.use('/api/photos', rtsPhotos);
-app.use('/api/centros', rtsCentros);
-app.use('/api/tipoCentros', rtsTipoCentros);
 app.use('/api/supli', rtsSupli);
-app.use('/api/ofertas', rtsofertas);
+app.use('/api/cliente', rtsCliente);
 
 
 // error handler

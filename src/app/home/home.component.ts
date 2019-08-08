@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ButtonsModule, WavesModule } from 'angular-bootstrap-md'
 
 @Component({
   selector: 'app-home',
@@ -16,10 +17,15 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.loginForm = this.fb.group({
-      'usuario': null,
       'password': null
     })
     
   }
 
+  //=================================================================
+  // LOGIN
+  //=================================================================
+  login(form: any){
+    console.log(form.value)
+  }
 }

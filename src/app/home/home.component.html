@@ -1,26 +1,35 @@
-<div class="row">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="logo-img">
-        <img src="" alt="Logo">
+<div class="home">
+  <div class="col-md-4">
+    <!--Card-->
+    <mdb-card cascade="true" narrower="true">
+  
+      <!--Card image-->
+      <div class="view view-cascade overlay waves-light" mdbWavesEffect>
+        <mdb-card-img src="https://mdbootstrap.com/img/Photos/Lightbox/Thumbnail/img%20(147).jpg"></mdb-card-img>
+        <a>
+          <div class="mask rgba-white-slight"></div>
+        </a>
       </div>
-
-      <form [formGroup]="loginForm" class=""  method="post">
-
-        <div class="form-group" id="user-group">
-          <input type="text" class="form-control" formControlName="usuario">
-          <label for="" class="formulario__label">Usuario:</label>
-        </div>
-
-        <div class="form-group" id="password-group">
-          <input type="password" class="form-control" formControlName="password" id="Tuser">
-          <label for="" class="formulario__label">Contraseña:</label>
-        </div>
-
-        <button class="btn btn-primary text-center"><i class="fas fa-sign-in-alt"></i> Ingresar
-        </button>
-
-      </form>
-    </div>
+      <!--/Card image-->
+      <mdb-card-body cascade="true" class="">
+        <form [formGroup]="loginForm" (ngSubmit)="login(loginForm)" class="d-flex justify-content-center"  method="post">
+  
+          <div class="form-group " id="password-group">
+            <label for="" class="formulario__label d-block">Contraseña:</label>
+            <input type="password" class="form-control" formControlName="password" id="Ipassword" autofocus>
+          </div>
+  
+          <button mdbBtn class="waves-light" mdbWavesEffect class="btn btn-primary text-center"><i class="fas fa-sign-in-alt"></i> Ingresar
+          </button>
+  
+        </form>
+  
+      </mdb-card-body>
+      <!--/.Card content-->
+  
+    </mdb-card>
+    <!--/.Card-->
   </div>
+
 </div>
+
