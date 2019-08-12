@@ -1,12 +1,25 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { PageNotFoundComponent } from './shared/components';
+import { PageNotFoundComponent } from './shared/components/page-not-found/page-not-found.component';
+
+// admin
+import { HomeAdminComponent } from './admin/home/homeAdmin.component';
+
+// home
+import { HomeComponent } from './home/home.component';
 
 const routes: Routes = [
   {
+    path: 'admin',
+    component: HomeAdminComponent
+  },
+  {
+    path: 'user',
+    component: HomeAdminComponent
+  },
+  {
     path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
+    component: HomeComponent
   },
   {
     path: '**',

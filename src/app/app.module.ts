@@ -14,11 +14,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { HomeModule } from './home/home.module';
 
 import { AppComponent } from './app.component';
 import { AngularModule } from './modules/angular.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
+
+// modulos
+import { HomeModule } from './home/home.module';
+import { AdminModule } from './admin/admin.module';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -44,6 +47,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     }),
     AngularModule,
     MDBBootstrapModule,
+    AdminModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
