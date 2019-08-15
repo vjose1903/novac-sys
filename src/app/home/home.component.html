@@ -7,16 +7,19 @@
       <div class="view view-cascade overlay waves-light" mdbWavesEffect>
         <mdb-card-img src="https://mdbootstrap.com/img/Photos/Lightbox/Thumbnail/img%20(147).jpg"></mdb-card-img>
         <a>
-          <div class="mask rgba-white-slight"></div>
+          <div class="mask rgba-white-slight"> </div>
         </a>
       </div>
       <!--/Card image-->
       <mdb-card-body cascade="true" class="">
         <form [formGroup]="loginForm" (ngSubmit)="login(loginForm)" class="d-flex justify-content-center"  method="post">
-  
+          
+          <input type="hidden" formControlName="usuario" id="Iuser" >
+
           <div class="form-group " id="password-group">
             <label for="" class="formulario__label d-block">Contraseña:</label>
             <input type="password" class="form-control" formControlName="password" id="Ipassword" autofocus>
+            <span class="error text-danger mt-0">{{errorC}}</span>
           </div>
   
           <button mdbBtn class="waves-light" mdbWavesEffect class="btn btn-primary text-center"><i class="fas fa-sign-in-alt"></i> Ingresar

@@ -1,0 +1,79 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="(isHandset$ | async) === false">
+    <mat-toolbar> Menu </mat-toolbar>
+    <mat-nav-list class="" >
+        <ul>
+          <li class="menuList menuList1">
+            <img class="iconosMenu" src="../../../assets/img/factura.png" alt=""> 
+            <h5 class="tituloMenu1"> <strong>Facturacion</strong> </h5>
+          </li>
+
+          <li class="menuList menuList2">
+            <img class="iconosMenu" src="../../../assets/img/inventario.png" alt=""> 
+            <h5 class="tituloMenu2"> <strong>Inventario</strong>  </h5>
+          </li>
+
+          <li class="menuList menuList3">
+            <img class="iconosMenu" src="../../../assets/img/registro.png" alt=""> 
+            <h5 class="tituloMenu3"> <strong>Registros</strong> </h5>
+          </li>
+        </ul>
+
+      
+    </mat-nav-list>
+  </mat-sidenav>
+
+
+  <mat-sidenav-content>
+    <mat-toolbar>
+      <button 
+        type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async"> <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <span>ADM Agroindustrial</span>
+
+      <!-- ============================================================================================ -->
+          <!--DROP DOWN DE LA CUENTA -->
+      <!-- ============================================================================================ -->
+
+      <div class="right">
+        <div class="btn-group" dropdown>
+            <a id="button-basic" dropdownToggle class="dropdown-toggle" aria-controls="dropdown-basic">
+            <img class="rounded-circle" src="http://localhost:3000/api/photos/{{this.usuariosServices.profile.fotoPerfil}}" alt="Admin">
+            Cuenta <span class="caret"></span>
+            </a>
+
+            <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+              <div class="dropdown-header">
+                <h2>{{usuariosServices.profile.nombre}}</h2>
+                <p>{{usuariosServices.profile.email}}</p>
+              </div>  
+              <!-- <li role="menuitem"><a class="dropdown-item" href="#">Nombre admin</a> admin@gmail.com </li> -->
+              <li class="divider dropdown-divider"></li>
+              <li role="menuitem" [routerLink]="['/admin/cuenta']"><a class="dropdown-item" id="dropdown-item" ><i class="fas fa-address-card"></i>Perfil</a></li>
+              <li role="menuitem" [routerLink]="['/admin/']"><a class="dropdown-item"id="dropdown-item" ><i class="fas fa-chart-bar"></i>Cuenta</a></li>
+              <li class="divider dropdown-divider"></li>
+              <li role="menuitem"><a class="dropdown-item" id="dropdown-item" (click)="logOut()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
+              </li>
+            </ul>
+          </div>
+      </div>
+<!--       
+      PARA PONER LOS LI EN FOR
+      <li *ngFor="let choice of items">
+          <a class="dropdown-item" href="#">{{choice}}</a>
+        </li> -->
+
+    </mat-toolbar>
+    
+    
+    <div class="" style="padding: 30px 80px 0px 80px">
+      <router-outlet></router-outlet> <!-- rutas -->
+      
+    </div>
+
+    </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatExpansionModule, MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTabsModule } from '@angular/material';
-import { MatCardModule } from '@angular/material';
+import { MatExpansionModule, MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTabsModule, MatCardModule } from '@angular/material';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';

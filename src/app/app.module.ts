@@ -16,12 +16,14 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 
 import { AppComponent } from './app.component';
-import { AngularModule } from './modules/angular.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
 // modulos
 import { HomeModule } from './home/home.module';
 import { AdminModule } from './admin/admin.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxBootstrapModule } from './modules/ngx-bootstrap.module';
+import { AngularModule } from './modules/angular.module';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -45,9 +47,20 @@ export function HttpLoaderFactory(http: HttpClient) {
         deps: [HttpClient]
       }
     }),
+
+    //modulos
     AngularModule,
     MDBBootstrapModule,
     AdminModule,
+    BrowserAnimationsModule,
+    NgxBootstrapModule
+  ],
+  exports:[
+    AngularModule,
+    MDBBootstrapModule,
+    AdminModule,
+    BrowserAnimationsModule,
+    NgxBootstrapModule
   ],
   providers: [],
   bootstrap: [AppComponent]

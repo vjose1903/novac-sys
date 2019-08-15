@@ -7,14 +7,21 @@ import { HomeAdminComponent } from './admin/home/homeAdmin.component';
 
 // home
 import { HomeComponent } from './home/home.component';
+import { NavbarAComponent } from './admin/navbar-a/navbar-a.component';
 
 const routes: Routes = [
   {
     path: 'admin',
-    component: HomeAdminComponent
+    component: NavbarAComponent,
+    children:[
+      {
+        path: '',
+        component: HomeAdminComponent
+      },
+    ]
   },
   {
-    path: 'user',
+    path: 'usuario',
     component: HomeAdminComponent
   },
   {
