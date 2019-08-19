@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { CarouselModule,  TabsModule ,ModalModule, ButtonsModule, BsDropdownModule , AlertModule, BsDatepickerModule, DatepickerModule, } from 'ngx-bootstrap';
 import { ToastrModule} from 'ngx-toastr';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { AccordionModule } from 'ngx-bootstrap';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
     DatepickerModule,
     TabsModule.forRoot(),
     ToastrModule.forRoot(),
-    NgxPaginationModule
+    NgxPaginationModule,
+    AccordionModule.forRoot(),
   ],
   exports:[
     CarouselModule,
@@ -30,7 +32,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
     BsDatepickerModule,
     DatepickerModule,
     TabsModule,
-    ToastrModule
+    ToastrModule,
+    AccordionModule
   ]
 
 })

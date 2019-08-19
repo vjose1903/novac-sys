@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 // MDB Angular Pro
 import { ButtonsModule, WavesModule } from 'angular-bootstrap-md'
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
+import { CollapseModule } from 'angular-bootstrap-md'
+
 
 @NgModule({
   declarations: [],
@@ -10,13 +12,16 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
     CommonModule,
     ButtonsModule, 
     WavesModule,
-    MDBBootstrapModule
+    MDBBootstrapModule,
+    CollapseModule
 
   ],
   exports:[
     CommonModule,
     ButtonsModule, 
     WavesModule,
+    CollapseModule
+
   ]
 })
 export class MdBootstrapModule { }

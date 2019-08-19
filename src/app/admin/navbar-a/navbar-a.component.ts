@@ -5,7 +5,10 @@ import { map } from 'rxjs/operators';
 
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
 import { UsuariosService } from '../../core/services/usuarios.service';
+import { UsuariosI } from '../../core/models/usuario.model';
+import { profile } from '../../core/services/GLOBAL';
 
+const { dialog } = require('electron').remote
 
 @Component({
   selector: 'app-navbar-a',
@@ -13,8 +16,13 @@ import { UsuariosService } from '../../core/services/usuarios.service';
   styleUrls: ['./navbar-a.component.scss']
 })
 export class NavbarAComponent implements OnInit, OnDestroy{
+
+  
+
   mantenimiento:boolean
   sub =new Subscription()
+  
+  actualTab:any
 
   showLoading=true
   constructor( private breakpointObserver: BreakpointObserver, public usuariosServices: UsuariosService, private router:Router) {
@@ -40,23 +48,27 @@ export class NavbarAComponent implements OnInit, OnDestroy{
     );
     
     ngOnInit() {
-      this.mantenimiento=false
+      this.mantenimiento=true
 
       var userPayload= this.usuariosServices.getUserPayload()
-      // this.usuariosServices.getUser(userPayload._id).subscribe(
-      //   res=>{
-      //     var data =res as UsuariosI;
-      //       profile.next(data)
-      //   })
+      this.usuariosServices.getUser(userPayload._id).subscribe(
+        res=>{
+          var data =res as UsuariosI;
+            profile.next(data)
+        })
 
-      // this.sub = profile.subscribe(
-      //   res=>{
-      //     this.usuariosServices.profile= res;
-      //   }
-      // );
+      this.sub = profile.subscribe(
+        res=>{
+          this.usuariosServices.profile= res;
+        }
+      );
     }  
     ngOnDestroy() {
       this.sub.unsubscribe();
+    }
+
+    prueba1(hi:any){
+      console.log(hi._animationState)
     }
 
     onHidden(): void {
@@ -92,6 +104,39 @@ export class NavbarAComponent implements OnInit, OnDestroy{
         this.router.navigate(['/admin/mantCentro','INS']);
       }
     }
+    // =================================================================================
+    // NAVEGAR 
+    // =================================================================================
+    navegar(lugar:any){
+      switch (lugar) {
+        case 1:
+            this.actualTab='home'
+           this.router.navigateByUrl("/admin")
+           break;
 
+        case 2:
+          this.actualTab='factura'
+          this.router.navigateByUrl("/admin/factura")   
+          break;
+
+        case 3:
+          this.actualTab='registro'
+          // this.router.navigateByUrl("/admin/factura")   
+          break;
+          
+        case 4:
+          this.actualTab='inventario'
+          // this.router.navigateByUrl("/admin/factura")   
+        break;
+
+        case 5:
+          this.actualTab='reporte'
+          // this.router.navigateByUrl("/admin/factura")   
+        break;
+      
+        default:
+          break;
+      }
+    }
 
 }

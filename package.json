@@ -1,5 +1,5 @@
 {
-  "name": "angular-electron",
+  "name": "ADM-agroindustrial",
   "version": "6.0.1",
   "description": "Sistema inventario y facturacion ADM agroindustrial",
   "author": {
@@ -94,6 +94,7 @@
     "ngx-bootstrap": "^5.1.1",
     "ngx-pagination": "^4.1.0",
     "ngx-toastr": "^10.0.4",
-    "npm-registry-client": "^8.6.0"
+    "npm-registry-client": "^8.6.0",
+    "sass-google-fonts": "^1.0.1"
   }
 }

@@ -3,24 +3,33 @@
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false">
-    <mat-toolbar> Menu </mat-toolbar>
-    <mat-nav-list class="" >
-        <ul>
-          <li class="menuList menuList1">
-            <img class="iconosMenu" src="../../../assets/img/factura.png" alt=""> 
-            <h5 class="tituloMenu1"> <strong>Facturacion</strong> </h5>
-          </li>
+    <mat-toolbar > <h5 (click)="navegar(1)" > Menu </h5> </mat-toolbar>
+    <mat-nav-list class="text-center">
 
-          <li class="menuList menuList2">
-            <img class="iconosMenu" src="../../../assets/img/inventario.png" alt=""> 
-            <h5 class="tituloMenu2"> <strong>Inventario</strong>  </h5>
-          </li>
+          <div class="menuList menuList1">
+            <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="http://localhost:3000/api/photos/factura.png" alt="" (click)="navegar(2)"> 
+            <h5 [ngClass]="actualTab == 'factura' ? 'tituloMenu1A' : 'tituloMenu1'" > <strong>Facturacion</strong> </h5>
+          </div>
 
-          <li class="menuList menuList3">
-            <img class="iconosMenu" src="../../../assets/img/registro.png" alt=""> 
-            <h5 class="tituloMenu3"> <strong>Registros</strong> </h5>
-          </li>
-        </ul>
+          <div class="menuList menuList2">
+            <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'"   src="http://localhost:3000/api/photos/registro.png" alt="" (click)="navegar(3)"> 
+            <h5  [ngClass]="actualTab == 'registro' ? 'tituloMenu2A' : 'tituloMenu2'"> <strong>Registros</strong> </h5>
+
+            <div [ngClass]="actualTab == 'registro' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
+              <h4 class="Registro" >Empleados</h4>
+              <h4 class="Registro" >Articulos</h4>
+            </div>
+          </div>
+
+          <div class="menuList menuList3">
+            <img [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'"    src="http://localhost:3000/api/photos/inventario.png" alt="" (click)="navegar(4)"> 
+            <h5  [ngClass]="actualTab == 'inventario' ? 'tituloMenu3A' : 'tituloMenu3'"> <strong>Inventario</strong>  </h5>
+          </div>
+
+          <div class="menuList menuList4">
+            <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'"    src="http://localhost:3000/api/photos/reporte.png" alt="" (click)="navegar(5)"> 
+            <h5  [ngClass]="actualTab == 'reporte' ? 'tituloMenu4A' : 'tituloMenu4'"> <strong>Reporte</strong>  </h5>
+          </div>
 
       
     </mat-nav-list>
@@ -28,12 +37,15 @@
 
 
   <mat-sidenav-content>
-    <mat-toolbar>
-      <button 
+    <mat-toolbar class="d-flex justify-content-between" >
+      <div class="">
+        <div id="botonMenu" *ngIf="drawer._animationState=='void'" title="Mostrar Menu" data-toggle="Tooltip" (click)="drawer.toggle()"> <i class="fas fa-bars"></i> </div>
+      </div>
+      <!-- <button 
         type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()"
         *ngIf="isHandset$ | async"> <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-      </button>
-      <span>ADM Agroindustrial</span>
+      </button> -->
+      <!-- <span>ADM Agroindustrial</span> -->
 
       <!-- ============================================================================================ -->
           <!--DROP DOWN DE LA CUENTA -->
@@ -45,7 +57,6 @@
             <img class="rounded-circle" src="http://localhost:3000/api/photos/{{this.usuariosServices.profile.fotoPerfil}}" alt="Admin">
             Cuenta <span class="caret"></span>
             </a>
-
             <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
               <div class="dropdown-header">
                 <h2>{{usuariosServices.profile.nombre}}</h2>
@@ -75,5 +86,7 @@
       
     </div>
 
+    
     </mat-sidenav-content>
 </mat-sidenav-container>
+<!-- <div class="footer"></div> -->

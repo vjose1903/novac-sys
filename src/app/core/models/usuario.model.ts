@@ -5,6 +5,7 @@ export class UsuariosI {
     _id: string;
     nombre: String;
     apellido: String;
+    sexo: String;
     fotoPerfil: String;
     usuario: String;
     telefono: String;

@@ -11,6 +11,7 @@ ControladorUsuario.register = (req, res, next) => {
     var user = new User();
     user.nombre=req.body.nombre,
     user.apellido=req.body.apellido,
+    user.sexo=req.body.sexo,
     user.fotoPerfil=req.body.fotoPerfil,
     user.telefono=req.body.telefono,
     user.email=req.body.email,
@@ -108,6 +109,7 @@ ControladorUsuario.UpdateUser = async (req, res) => {
     const usuario={
         nombre: req.body.nombre,
         apellido: req.body.apellido,
+        sexo: req.body.sexo,
         fotoPerfil: req.body.fotoPerfil,
         telefono: req.body.telefono,
         email: req.body.email,
