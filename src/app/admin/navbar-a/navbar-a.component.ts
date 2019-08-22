@@ -133,6 +133,10 @@ export class NavbarAComponent implements OnInit, OnDestroy{
           this.actualTab='reporte'
           // this.router.navigateByUrl("/admin/factura")   
         break;
+        case 'articulos':
+          this.actualTab='home'
+          this.router.navigate(["/admin/articulos"])   
+        break;
       
         default:
           break;

@@ -9,6 +9,7 @@ import { HomeAdminComponent } from './admin/home/homeAdmin.component';
 import { HomeComponent } from './home/home.component';
 import { NavbarAComponent } from './admin/navbar-a/navbar-a.component';
 import { FacturacionComponent } from './admin/facturacion/facturacion.component';
+import { RegistroArticulosComponent } from './admin/registros/articulos/registro-articulos.component';
 
 const routes: Routes = [
   {
@@ -23,10 +24,10 @@ const routes: Routes = [
         path: 'factura',
         component: FacturacionComponent
       },
-      // {
-      //   path: '',
-      //   component: HomeAdminComponent
-      // },
+      {
+        path: 'articulos',
+        component: RegistroArticulosComponent
+      },
       // {
       //   path: '',
       //   component: HomeAdminComponent
