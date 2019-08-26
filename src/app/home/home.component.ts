@@ -14,6 +14,7 @@ export class HomeComponent implements OnInit {
 
   loginForm:FormGroup
   errorC=''
+  errorU=''
   constructor(private fb: FormBuilder,
               private router: Router,
               private usuariosServices:UsuariosService
@@ -21,7 +22,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.loginForm = this.fb.group({
-      'usuario': 'ADM-user',
+      'usuario': null,
       'password': null
     })
     
@@ -39,22 +40,28 @@ export class HomeComponent implements OnInit {
       this.usuariosServices.getUser(userPayload._id).subscribe(
         res=>{          
           var data =res as UsuariosI;
-          if(data.role=="A"){
               this.router.navigateByUrl('/admin');
-            }else if(data.role=="U"){
-              this.router.navigateByUrl('/usuario');
-          }else{
-              this.router.navigateByUrl('/');          
-          }
+          
+          // if(data.role=="A"){
+          //     this.router.navigateByUrl('/admin');
+          //   }else if(data.role=="U"){
+          //     this.router.navigateByUrl('/usuario');
+          // }else{
+          //     this.router.navigateByUrl('/');          
+          // }
         })
-
-      
       this.errorC=""
+      this.errorU=""
     },
     err=>{
-      if(err.error.mensaje=="Contraseña incorrecta"){
+      if(err.error.mensaje=="El usuario introducido no existe"){
+        this.errorU="usuario no existe."
         
-        this.errorC="contraseña invalida"
+      }else{
+        this.errorU=""
+        if(err.error.mensaje=="Contraseña incorrecta"){
+          this.errorC="contraseña invalida"
+        }
       }
     }
     )

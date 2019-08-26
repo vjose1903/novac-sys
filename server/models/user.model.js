@@ -4,10 +4,11 @@ const jwt = require('jsonwebtoken');
 
 var userSchema = new mongoose.Schema({
     nombre: { type: String, required: true, trim: true },
+    usuario: { type: String, trim: true },
     apellido: { type: String, required: true, trim: true },
     sexo: { type: String, required: true, trim: true },
     telefono: { type: String, required: true, trim: true },
-    email: { type: String, required: true, trim: true },
+    email: { type: String, trim: true },
     fechaN: { type: Date, required: true, trim: true },
     password: { type: String, required: true, trim: true },
     estado: { type: Boolean, required: true, trim: true },
@@ -47,7 +48,7 @@ userSchema.methods.verifyPassword = function(password) {
 };
 
 userSchema.methods.generateJwt = function() {
-    return jwt.sign({ _id: this._id, rol: this.rol },
+    return jwt.sign({ _id: this._id, role: this.role },
         process.env.JWT_SECRET, {
             expiresIn: process.env.JWT_EXP
         });

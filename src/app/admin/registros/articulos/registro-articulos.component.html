@@ -1,21 +1,133 @@
-<h1>Registro de articulos:</h1>
-<div class="card" style="padding: 2rem">
-  <form [formGroup]="form">
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-          <div class="form-group">
-              <label class="control-label">Nombre <span style="color: red">*</span></label>
-              <input type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control"autocomplete="off">
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty ||form.controls['nombre'].touched)">Este Campo es obligatorio</div>
-          </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-          <div class="from-group">
-              <label class="control-label">Pais <span style="color: red">*</span></label>
-             
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['pais'].valid &&  (form.controls['pais'].dirty ||form.controls['pais'].touched)">Este Campo es obligatorio</div>
-          </div>	
-      </div>
-  </div>
-  </form>
+<h1>{{titulo}}</h1>
+<div class="card">
+    <form [formGroup]="form">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                <div class="form-group">
+                    <label class="control-label">Nombre: <span style="color: red">*</span></label>
+                    <input type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control"
+                        autocomplete="off">
+                    <div class="alerta text-danger ml-1" style="font-size: 12px"
+                        *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty ||form.controls['nombre'].touched)">
+                        Este Campo es obligatorio</div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                <div class="form-group">
+                    <label class="control-label">Tipo: <span style="color: red">*</span></label>
+                    <select formControlName="tipo" class="form-control" value="">
+                        <option value="" disabled selected hidden>Tipo de articulo</option>
+                        <option value="Producto terminad">Producto terminado</option>
+                        <option value="Materia prima">Materia prima</option>
+                        <option value="Veterinaria">Veterinaria</option>
+                    </select>
+                    <div class="alerta text-danger ml-1" style="font-size: 12px"
+                        *ngIf="!form.controls['tipo'].valid && (form.controls['tipo'].dirty ||form.controls['tipo'].touched)">
+                        Debe
+                        de seleccionar tipo de articulo</div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+                <div class="from-group">
+                    <label class="control-label">Venderse por: <span style="color: red">*</span></label>
+                    <select formControlName="medida" class="form-control" value="">
+                        <option value="" disabled selected hidden>Seleccione tipo</option>
+                        <option value="Quintal">Quintal</option>
+                        <option value="Libra">Libra</option>
+                        <option value="Caja">Caja</option>
+                        <option value="Unidad">Unidad</option>
+                        <option value="Sobre">Sobre</option>
+                    </select>
+                    <div class="alerta text-danger ml-1" style="font-size: 12px"
+                        *ngIf="!form.controls['medida'].valid &&  (form.controls['medida'].dirty ||form.controls['medida'].touched)">
+                        Seleccione una opcion</div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+                <div class="from-group">
+                    <label class="control-label">costo: <span style="color: red">*</span></label>
+                    <input type="number" formControlName="costo" placeholder="Introduzca costo" class="form-control"
+                        autocomplete="off">
+                    <div class="alerta text-danger ml-1" style="font-size: 12px"
+                        *ngIf="!form.controls['costo'].valid &&  (form.controls['costo'].dirty ||form.controls['costo'].touched)">
+                        Este Campo es obligatorio</div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+                <div class="from-group">
+                    <label class="control-label">precio: <span style="color: red">*</span></label>
+                    <input type="number" formControlName="precio" placeholder="Introduzca precio" class="form-control"
+                        autocomplete="off">
+                    <div class="alerta text-danger ml-1" style="font-size: 12px"
+                        *ngIf="!form.controls['precio'].valid &&  (form.controls['precio'].dirty ||form.controls['precio'].touched)">
+                        Este Campo es obligatorio</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2">
+                <div class="form-group">
+                    <label class="form-check-label" for="materialUnchecked">Detallable:</label>
+                    <input type="checkbox" formControlName="detallable" (click)="isDetallable()"
+                        class="form-check-input" style="width: 15px; height: 15px; margin: 6px 0px 0px 5px;"
+                        id="materialUnchecked">
+                </div>
+            </div>
+        </div>
+
+        <div class="areaDetalle" *ngIf="isDetallable">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+                    <div class="from-group">
+                        <label class="control-label">Detallarse por: <span style="color: red">*</span></label>
+                        <select formControlName="" class="form-control" value="">
+                            <option value="" disabled selected hidden>Seleccione tipo</option>
+                            <option value="Quintal">Quintal</option>
+                            <option value="Libra">Libra</option>
+                            <option value="Caja">Caja</option>
+                            <option value="Unidad">Unidad</option>
+                            <option value="Sobre">Sobre</option>
+                        </select>
+                        <div class="alerta text-danger ml-1" style="font-size: 12px"
+                            *ngIf="!form.controls['medida'].valid &&  (form.controls['medida'].dirty ||form.controls['medida'].touched)">
+                            Seleccione una opcion</div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+                    <div class="from-group">
+                        <label class="control-label">costo: <span style="color: red">*</span></label>
+                        <input type="number" formControlName="costo" placeholder="Introduzca costo" class="form-control"
+                            autocomplete="off">
+                        <div class="alerta text-danger ml-1" style="font-size: 12px"
+                            *ngIf="!form.controls['costo'].valid &&  (form.controls['costo'].dirty ||form.controls['costo'].touched)">
+                            Este Campo es obligatorio</div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+                    <div class="from-group">
+                        <label class="control-label">precio: <span style="color: red">*</span></label>
+                        <input type="number" formControlName="precio" placeholder="Introduzca precio"
+                            class="form-control" autocomplete="off">
+                        <div class="alerta text-danger ml-1" style="font-size: 12px"
+                            *ngIf="!form.controls['precio'].valid &&  (form.controls['precio'].dirty ||form.controls['precio'].touched)">
+                            Este Campo es obligatorio</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class=" col-md-8  col-sm8  col-lg-8  col-xs-12 ">
+                <div class="from-group">
+                    <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a>
+                    <input [disabled]="!form.valid" type="submit" class="btn" value="{{boton}}" id="btn-verde">
+                </div>
+            </div>
+        </div>
+    </form>
 </div>

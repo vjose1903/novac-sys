@@ -1,0 +1,122 @@
+<h1>{{titulo}}</h1>
+<div class="card">
+  <form [formGroup]="form" (ngSubmit)="submit(form)">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+        <div class="form-group">
+          <label class="control-label">Nombre: <span style="color: red">*</span></label>
+          <input type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control"
+            autocomplete="off">
+          <div class="alerta text-danger ml-1" style="font-size: 12px"
+            *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty ||form.controls['nombre'].touched)">
+            Este Campo es obligatorio</div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+        <div class="from-group">
+          <label class="control-label">Apellido: <span style="color: red">*</span></label>
+          <input type="text" formControlName="apellido" placeholder="Introduzca apellido" class="form-control"
+            autocomplete="off">
+          <div class="alerta text-danger ml-1" style="font-size: 12px"
+            *ngIf="!form.controls['apellido'].valid &&  (form.controls['apellido'].dirty ||form.controls['apellido'].touched)">
+            Este Campo es obligatorio</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-5">
+        <div class="from-group">
+          <label class="control-label">Usuario: <span style="color: red">*</span></label>
+          <input type="text" formControlName="usuario" placeholder="Introduzca usuario" class="form-control"
+            autocomplete="off">
+          <div class="alerta text-danger ml-1" style="font-size: 12px"
+            *ngIf="!form.controls['usuario'].valid &&  (form.controls['usuario'].dirty ||form.controls['usuario'].touched)">
+            Introduzca un usuario</div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3">
+        <div class="form-group">
+          <label class="control-label">Sexo: <span style="color: red">*</span></label>
+          <select formControlName="sexo" class="form-control   ">
+            <option value="" disabled selected hidden>Sexo</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+          </select>
+          <div class="alerta text-danger ml-1" style="font-size: 12px"
+            *ngIf="!form.controls['sexo'].valid && (form.controls['sexo'].dirty ||form.controls['sexo'].touched)">Debe
+            de seleccionar el sexo</div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+        <div class="from-group">
+          <label class="control-label">Telefono: <span style="color: red">*</span></label>
+          <input type="text" class="form-control" [textMask]="{mask: phoneMask}" formControlName="telefono"
+            placeholder="(___)___-____" autocomplete="off">
+          <div class="alerta text-danger ml-1" style="font-size: 12px"
+            *ngIf="!form.controls['telefono'].valid && (form.controls['telefono'].dirty ||form.controls['telefono'].touched)">
+            Introduzca el numero de telefono</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="form-group">
+          <label class="control-label">Email:</label>
+          <input type="text" formControlName="email" placeholder="Introduzca email" class="form-control"
+            autocomplete="off">
+          <div class="alerta text-danger ml-1" style="font-size: 12px"
+            *ngIf="!form.controls['email'].valid && (form.controls['email'].dirty ||form.controls['email'].touched)">
+            Introduzca un email valido</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-5">
+        <label for="" class="formulario__label">Fecha nacimiento: <span style="color: red">*</span> </label>
+        <input type="text" [bsConfig]='dpConfig' placeholder="mm/dd/aaaa" class="form-control" formControlName="fechaN"
+          #dp="bsDatepicker" placement="top" bsDatepicker>
+        <div class="alerta text-danger ml-1" style="font-size: 12px"
+          *ngIf="!form.controls['fechaN'].valid && (form.controls['fechaN'].dirty ||form.controls['fechaN'].touched)">
+          Este campo es obligatorio</div>
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3">
+        <div class="form-group">
+          <label class="control-label">Role: <span style="color: red">*</span></label>
+          <select formControlName="role" class="form-control   ">
+            <option value="" disabled selected hidden>Role</option>
+            <option value="A">Administrador</option>
+            <option value="U">Usuario</option>
+          </select>
+          <div class="alerta text-danger ml-1" style="font-size: 12px"
+            *ngIf="!form.controls['role'].valid && (form.controls['role'].dirty ||form.controls['role'].touched)">Debe
+            de seleccionar el role</div>
+        </div>
+      </div>
+
+
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+        <div class="from-group">
+          <label class="control-label">Contraseña: <span style="color: red">*</span></label>
+          <input type="password" formControlName="password" placeholder="Introduzca contraseña" class="form-control"
+            autocomplete="off">
+          <div class="alerta text-danger ml-1" style="font-size: 12px"
+            *ngIf="!form.controls['password'].valid && (form.controls['password'].dirty ||form.controls['password'].touched)">
+            Introduzca el numero de telefono</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class=" col-md-8  col-sm8  col-lg-8  col-xs-12 ">
+        <div class="from-group">
+          <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a>
+          <input [disabled]="!form.valid" type="submit" class="btn" value="{{boton}}" id="btn-verde">
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

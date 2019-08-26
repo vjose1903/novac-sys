@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RegistroArticulosComponent } from './registro-articulos.component';
 
-import { RegistroArticulosComponent ./registro-articulos.componentomponent';
+
 
 describe('RegistroArticulosComponent', () => {
   let component: RegistroArticulosComponent;

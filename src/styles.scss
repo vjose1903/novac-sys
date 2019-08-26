@@ -5,3 +5,62 @@ html, body {
 
   height: 100%;
 }
+
+
+// ========================================================
+// CARDS
+// ========================================================
+
+.card{
+  padding: 2rem 6rem 2rem 6rem; 
+  border-radius: 1rem!important;
+}
+
+
+
+// ========================================================
+// BOTONES
+// ======================================================== 
+
+#btn-gris{
+  background-color: gray;
+  color:white;
+  &:hover{
+    background-color: rgb(91, 89, 89);
+    color:white;
+  }
+}
+#btn-verde{
+  background-color: rgb(30, 176, 55);
+  color:white;
+  &:hover{
+    background-color: rgb(25, 135, 43);
+    color:white;
+  }
+}
+
+
+
+/* ====================================================== */
+/* RESPONSIVE */
+/* ====================================================== */
+@media (min-width: 991px){  /*pantallas lg*/
+
+}
+
+@media (max-width: 991px){  /*pantallas md*/
+  .card{
+      padding: 2rem 6rem 2rem 6rem; 
+  }
+}
+
+@media (max-width: 767px){  /*pantallas sm*/
+  .card{
+      padding: 2rem 2rem 2rem 2rem; 
+  }
+}
+
+
+
+
+

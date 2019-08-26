@@ -9,8 +9,10 @@ const ControladorUsuario = {}
 
 ControladorUsuario.register = (req, res, next) => {
     var user = new User();
+
     user.nombre=req.body.nombre,
     user.apellido=req.body.apellido,
+    user.usuario=req.body.usuario,
     user.sexo=req.body.sexo,
     user.fotoPerfil=req.body.fotoPerfil,
     user.telefono=req.body.telefono,
@@ -25,7 +27,7 @@ ControladorUsuario.register = (req, res, next) => {
             res.json({titulo:'Operacion exitosa.',contenido:'Usuario registrado.'});
         else {
             if (err.code == 11000)
-                res.status(422).json({titulo:'Operacion nula.',contenido:'Usuario introducido ya existe.'})
+                res.status(422).json({titulo:'Operacion nula.',contenido:'Usuario introducido ya existe.', error : 'el error es: '+err})
             else
                 res.json({titulo:'Operacion nula.',contenido:'Error del servidor.'})
         }

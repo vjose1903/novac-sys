@@ -4,12 +4,13 @@ import { PageNotFoundComponent } from './shared/components/page-not-found/page-n
 
 // admin
 import { HomeAdminComponent } from './admin/home/homeAdmin.component';
+import { FacturacionComponent } from './admin/facturacion/facturacion.component';
+import { RegistroArticulosComponent } from './admin/registros/articulos/registro-articulos.component';
+import { RegistroEmpleadosComponent } from './admin/registros/registro-empleados/registro-empleados.component';
+import { NavbarAComponent } from './admin/navbar-a/navbar-a.component';
 
 // home
 import { HomeComponent } from './home/home.component';
-import { NavbarAComponent } from './admin/navbar-a/navbar-a.component';
-import { FacturacionComponent } from './admin/facturacion/facturacion.component';
-import { RegistroArticulosComponent } from './admin/registros/articulos/registro-articulos.component';
 
 const routes: Routes = [
   {
@@ -25,8 +26,12 @@ const routes: Routes = [
         component: FacturacionComponent
       },
       {
-        path: 'articulos',
+        path: 'articulos/:accion',
         component: RegistroArticulosComponent
+      },
+      {
+        path: 'empleados/:accion',
+        component: RegistroEmpleadosComponent
       },
       // {
       //   path: '',

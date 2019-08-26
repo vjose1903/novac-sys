@@ -13,6 +13,8 @@ import { NavbarAComponent } from './navbar-a/navbar-a.component';
 import { FacturacionComponent } from './facturacion/facturacion.component';
 import { InventarioComponent } from './inventario/inventario.component';
 import { RegistroArticulosComponent } from './registros/articulos/registro-articulos.component';
+import { RegistroEmpleadosComponent } from './registros/registro-empleados/registro-empleados.component'
+
 
 
 @NgModule({
@@ -21,15 +23,16 @@ import { RegistroArticulosComponent } from './registros/articulos/registro-artic
     NavbarAComponent,
     FacturacionComponent,
     InventarioComponent,
-    RegistroArticulosComponent  
+    RegistroArticulosComponent,
+    RegistroEmpleadosComponent,
+  
   ],
   imports: [
     CommonModule,
     AppRoutingModule,
     AngularModule,
     NgxBootstrapModule,
-    MdBootstrapModule,
-    
+    MdBootstrapModule
   ],
   exports:[
   ]
