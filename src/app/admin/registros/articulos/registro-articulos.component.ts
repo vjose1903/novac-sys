@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder,  FormArray } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -11,25 +11,31 @@ export class RegistroArticulosComponent implements OnInit {
   titulo=''
   boton=''
   form:FormGroup
-  isDetallabe= false
+  detallableArray:FormArray
+
+  isDetallable= false
   constructor(private fb: FormBuilder,
               private route:ActivatedRoute
-              ) {
-    this.form= this.fb.group({
-      nombre:[],
-      tipo:[""],
-      medida:[""],
-      costo:[],  
-      precio:[],
-      detallable:[this.isDetallabe],
-      
-    })
-   }
+              ) {   }
+
+
   ngOnInit() {
     this.route.paramMap.subscribe(params=>{
       if(params.get("accion")=="INS"){
         this.titulo="Registro de articulos"
         this.boton="Registrar"
+
+        this.form= this.fb.group({
+          nombre:[],
+          tipo:[""],
+          medida:[""],
+          costo:[],  
+          precio:[],
+          Isdetallable:[this.isDetallable],
+          detallableArray:this.fb.array([ this.createItem() ])
+          
+        })
+
 
       }else{
         this.titulo="Actualizar articulos"
@@ -37,6 +43,25 @@ export class RegistroArticulosComponent implements OnInit {
       }
     })
   }
+  // =============================================
+  //  CREAR MAS INPUTS PARA DETALLE
+  // =============================================
+
+  createItem(): FormGroup {
+    return this.fb.group({
+      medidaDetalle: '',
+      costoDetalle: '',
+      precioDetalle: ''
+    });
+  }
+
+  addItem(): void {
+    this.detallableArray = this.form.get('detallableArray') as FormArray;
+    this.detallableArray.push(this.createItem());
+  }
+
+
+
 // =============================================
 //  BOTON ATRAS
 // =============================================
@@ -47,8 +72,7 @@ atras(){
 // =============================================
 //  CHECK DETALLABLE
 // =============================================
-  isDetallable(){
-    this.isDetallabe=!this.isDetallabe
-  
+isDetallableClick(){
+    this.isDetallable=!this.isDetallable
   }
 }
