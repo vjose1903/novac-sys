@@ -2,3 +2,11 @@
     background-color: rgba(69, 228, 101, 0.521);
     padding: 1.5rem 2.5rem 2rem 1rem;
 }
+#btnMasInput{
+    color:white;
+    transform: translate(30px, 0px);
+    &:hover{
+        cursor: pointer;
+        text-shadow: 1px 1px 4px #3f403dd6;
+    }
+}

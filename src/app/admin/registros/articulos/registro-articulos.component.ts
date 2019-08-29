@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
+import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -14,7 +14,12 @@ export class RegistroArticulosComponent implements OnInit {
   detallableArray: FormArray;
 
   isDetallable = false;
-  constructor(private fb: FormBuilder, private route: ActivatedRoute) {}
+  constructor(private fb: FormBuilder, private route: ActivatedRoute) {
+    this.detallableArray = new FormArray([
+      new FormControl()
+    ]);
+
+  }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
