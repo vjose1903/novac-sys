@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { invalid } from '@angular/compiler/src/render3/view/util';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -28,13 +29,13 @@ export class RegistroArticulosComponent implements OnInit {
         this.boton = 'Registrar';
 
         this.form = this.fb.group({
-          nombre: [],
+          nombre: ['', Validators.required],
           tipo: [''],
           medida: [''],
           costo: [],
           precio: [],
           Isdetallable: [this.isDetallable],
-          detallableArray: this.fb.array([this.createItem()])
+          detallableArray: this.fb.array([])
         });
       } else {
         this.titulo = 'Actualizar articulos';
@@ -47,15 +48,21 @@ export class RegistroArticulosComponent implements OnInit {
   // =============================================
   createItem(): FormGroup {
     return this.fb.group({
-      medidaDetalle: '',
-      costoDetalle: '',
-      precioDetalle: ''
+      medidaDetalle: ["0", Validators.required],
+      costoDetalle: ['', Validators.required],
+      precioDetalle: ['', Validators.required]
     });
   }
 
   addItem(): void {
+
     this.detallableArray = this.form.get('detallableArray') as FormArray;
     this.detallableArray.push(this.createItem());
+  }
+
+  removeItem(i: number) {
+    const control = <FormArray>this.form.controls['detallableArray'];
+    control.removeAt(i);
   }
 
   // =============================================
@@ -69,6 +76,16 @@ export class RegistroArticulosComponent implements OnInit {
   //  CHECK DETALLABLE
   // =============================================
   isDetallableClick() {
+    var array = this.form.get('detallableArray') as FormArray
+    if (array.length == 0) {
+      this.addItem()
+    } else {
+      var array = this.form.get('detallableArray') as FormArray
+      if (array.length == 1 && array.valid == false) {
+        this.removeItem(0);
+      }
+    }
+
     this.isDetallable = !this.isDetallable;
   }
 

@@ -82,52 +82,55 @@
 
         <div class="areaDetalle" *ngIf="isDetallable">
             <div formArrayName="detallableArray" *ngFor="let item of detallableArray.controls; let i = index;">
-                <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-                        <div class="from-group">
-                            <label class="control-label">Detallarse por: <span style="color: red">*</span></label>
-                            <select formControlName="medidaDetalle" class="form-control" value="">
-                                <option value="" disabled selected hidden>Seleccione tipo</option>
-                                <option value="Quintal">Quintal</option>
-                                <option value="Libra">Libra</option>
-                                <option value="Caja">Caja</option>
-                                <option value="Unidad">Unidad</option>
-                                <option value="Sobre">Sobre</option>
-                            </select>
-                            <div class="alerta text-danger ml-1" style="font-size: 12px"
-                                *ngIf="!form.controls['medida'].valid &&  (form.controls['medida'].dirty ||form.controls['medida'].touched)">
-                                Seleccione una opcion</div>
+                <div [formGroupName]="i">
+                    <hr *ngIf="i > 0" style="margin-right: .9rem;">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-5">
+                            <div class="from-group">
+                                <label class="control-label">Detallarse por: <span style="color: red">*</span></label>
+                                <select formControlName="medidaDetalle" class="form-control" value="">
+                                    <option value="0" disabled selected hidden>Seleccione tipo</option>
+                                    <option value="Quintal">Quintal</option>
+                                    <option value="Libra">Libra</option>
+                                    <option value="Caja">Caja</option>
+                                    <option value="Unidad">Unidad</option>
+                                    <option value="Sobre">Sobre</option>
+                                </select>
+                                <!-- <div *ngIf="this.form.get('detallableArray').controls['medidaDetalle'].valid" >funciona</div> -->
+                                <!-- <div class="alerta text-danger ml-1" style="font-size: 12px"
+                                    *ngIf="!this.form.get('detallableArray').controls['medidaDetalle'].valid &&  (this.form.get('detallableArray').controls['medidaDetalle'].dirty ||this.form.get('detallableArray').controls['medidaDetalle'].touched)">
+                                    Seleccione una opcion</div> -->
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3">
-                        <div class="from-group">
-                            <label class="control-label">costo: <span style="color: red">*</span></label>
-                            <input type="number" formControlName="costoDetalle" placeholder="Introduzca costo"
-                                class="form-control" autocomplete="off">
-                            <div class="alerta text-danger ml-1" style="font-size: 12px"
-                                *ngIf="!form.controls['costoDetalle'].valid &&  (form.controls['costoDetalle'].dirty ||form.controls['costoDetalle'].touched)">
-                                Este Campo es obligatorio</div>
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                            <div class="from-group">
+                                <label class="control-label">costo: <span style="color: red">*</span></label>
+                                <input type="number" formControlName="costoDetalle" placeholder="Costo"
+                                    class="form-control" autocomplete="off">
+                                <!-- <div class="alerta text-danger ml-1" style="font-size: 12px"
+                                    *ngIf="!this.form.get('detallableArray').controls['medidaDetalle'].valid &&  (this.form.get('detallableArray').controls['medidaDetalle'].dirty ||this.form.get('detallableArray').controls['medidaDetalle'].touched)">
+                                    Este Campo es obligatorio</div> -->
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3">
-                        <div class="from-group">
-                            <label class="control-label">precio: <span style="color: red">*</span></label>
-                            <input type="number" formControlName="precioDetalle" placeholder="Introduzca precio"
-                                class="form-control" autocomplete="off">
-                            <div class="alerta text-danger ml-1" style="font-size: 12px"
-                                *ngIf="!form.controls['precioDetalle'].valid &&  (form.controls['precioDetalle'].dirty ||form.controls['precioDetalle'].touched)">
-                                Este Campo es obligatorio</div>
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                            <div class="from-group">
+                                <label class="control-label">precio: <span style="color: red">*</span></label>
+                                <input type="number" formControlName="precioDetalle" placeholder="Precio"
+                                    class="form-control" autocomplete="off">
+                                <!-- <div class="alerta text-danger ml-1" style="font-size: 12px"
+                                    *ngIf="!this.form.get('detallableArray').controls['medidaDetalle'].valid &&  (this.form.get('detallableArray').controls['medidaDetalle'].dirty ||this.form.get('detallableArray').controls['medidaDetalle'].touched)">
+                                    Este Campo es obligatorio</div> -->
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2">
-                        <h1>{{i}}</h1>
-                        <span *ngIf="i==0" id="btnMasInput" (click)="addItem()"> <i class="fas fa-plus-circle"></i> </span>
-                        <span  *ngIf="i<0" id="btnMenusInput" > <i class="fas fa-minus-circle"></i> </span>
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-1" style="padding: 2.4rem 0rem 0rem 0rem;">
+                            <button [disabled]="!this.form.get('detallableArray').valid" *ngIf="i==0" id="btnMasInput" (click)="addItem()"> <i class="fas fa-plus-circle"></i> </button>
+                            <span  *ngIf="i > 0" id="btnMenusInput" (click)="removeItem(i)" > <i class="fas fa-minus-circle"></i> </span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <p>{{form.value | json}}</p>
+        <p >{{form.value | json}}</p>
         <div class="row">
             <div class=" col-md-8  col-sm8  col-lg-8  col-xs-12 mt-3">
                 <div class="from-group">

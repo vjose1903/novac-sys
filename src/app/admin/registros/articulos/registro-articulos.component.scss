@@ -1,12 +1,29 @@
 .areaDetalle{
     background-color: rgba(69, 228, 101, 0.521);
-    padding: 1.5rem 2.5rem 2rem 1rem;
+    padding: 1.5rem .1rem 2rem 1rem;
+    border-radius: 12px;
 }
-#btnMasInput{
+#btnMenusInput{
     color:white;
     transform: translate(30px, 0px);
     &:hover{
         cursor: pointer;
         text-shadow: 1px 1px 4px #3f403dd6;
+    }
+}
+#btnMasInput{
+    color:white;
+    border: none;
+    background-color: transparent;
+    padding: 0;
+    &:hover {
+        cursor: pointer;
+        text-shadow: 1px 1px 4px #3f403dd6;
+    }
+    &:disabled{
+        color: rgba(236, 143, 143, 0.764);
+        :hover{
+            cursor: no-drop !important;
+        }
     }
 }
