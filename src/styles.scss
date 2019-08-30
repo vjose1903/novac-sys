@@ -11,7 +11,7 @@ html, body {
 // CARDS
 // ========================================================
 
-.card{
+.card-fondo{
   padding: 2rem 6rem 2rem 6rem; 
   border-radius: 1rem!important;
 }
@@ -49,13 +49,13 @@ html, body {
 }
 
 @media (max-width: 991px){  /*pantallas md*/
-  .card{
+  .card-fondo{
       padding: 2rem 6rem 2rem 6rem; 
   }
 }
 
 @media (max-width: 767px){  /*pantallas sm*/
-  .card{
+  .card-fondo{
       padding: 2rem 2rem 2rem 2rem; 
   }
 }

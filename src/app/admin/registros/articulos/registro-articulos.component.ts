@@ -85,8 +85,27 @@ export class RegistroArticulosComponent implements OnInit {
         this.removeItem(0);
       }
     }
-
+    
     this.isDetallable = !this.isDetallable;
+  }
+  
+  
+  // =============================================
+  //  Calculate price
+  // =============================================
+  calculatePrice(){
+    var costo = this.form.value.costo
+    console.log('costo sin calcular');
+    console.log(costo)
+    console.log('============================');
+    
+    if(costo > 0 || costo != null || costo){
+      this.form = this.fb.control()
+      this.form.value.precio = (costo / 0.9)
+      console.log('precio calculado');
+      
+      console.log(Math.fround(costo / 0.9))
+    }
   }
 
 }

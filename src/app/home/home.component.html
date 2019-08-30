@@ -1,17 +1,16 @@
 <div class="home">
   <div class="col-md-4">
-    <!--Card-->
+
     <mdb-card cascade="true" narrower="true">
-  
-      <!--Card image-->
+
       <div class="view view-cascade overlay waves-light" mdbWavesEffect>
         <mdb-card-img src="https://mdbootstrap.com/img/Photos/Lightbox/Thumbnail/img%20(147).jpg"></mdb-card-img>
         <a>
           <div class="mask rgba-white-slight"> </div>
         </a>
       </div>
-      <!--/Card image-->
-      <mdb-card-body cascade="true" class="">
+
+      <mdb-card-body cascade="true" class="px-5">
         <form [formGroup]="loginForm" (ngSubmit)="login(loginForm)" class=""  method="post">
           
           <div class="form-group " id="usuario-group">
@@ -35,10 +34,10 @@
         </form>
   
       </mdb-card-body>
-      <!--/.Card content-->
+
   
     </mdb-card>
-    <!--/.Card-->
+
   </div>
 
 </div>
