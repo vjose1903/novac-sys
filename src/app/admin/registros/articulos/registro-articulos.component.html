@@ -89,17 +89,16 @@
                             <div class="from-group">
                                 <label class="control-label">Detallarse por: <span style="color: red">*</span></label>
                                 <select formControlName="medidaDetalle" class="form-control" value="">
-                                    <option value="0" disabled selected hidden>Seleccione tipo</option>
+                                    <option value="" disabled selected hidden>Seleccione tipo</option>
                                     <option value="Quintal">Quintal</option>
                                     <option value="Libra">Libra</option>
                                     <option value="Caja">Caja</option>
                                     <option value="Unidad">Unidad</option>
                                     <option value="Sobre">Sobre</option>
                                 </select>
-                                <!-- <div *ngIf="this.form.get('detallableArray').controls['medidaDetalle'].valid" >funciona</div> -->
-                                <!-- <div class="alerta text-danger ml-1" style="font-size: 12px"
-                                    *ngIf="!this.form.get('detallableArray').controls['medidaDetalle'].valid &&  (this.form.get('detallableArray').controls['medidaDetalle'].dirty ||this.form.get('detallableArray').controls['medidaDetalle'].touched)">
-                                    Seleccione una opcion</div> -->
+                                <div class="alerta text-danger ml-1" style="font-size: 12px"
+                                    *ngIf="getvalidateControlArray(i,'medidaDetalle') ">
+                                    Seleccione una opcion</div>
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
@@ -107,9 +106,9 @@
                                 <label class="control-label">costo: <span style="color: red">*</span></label>
                                 <input type="number" formControlName="costoDetalle" (blur)="calculatePrice()" placeholder="Costo"
                                     class="form-control" autocomplete="off">
-                                <!-- <div class="alerta text-danger ml-1" style="font-size: 12px"
-                                    *ngIf="!this.form.get('detallableArray').controls['medidaDetalle'].valid &&  (this.form.get('detallableArray').controls['medidaDetalle'].dirty ||this.form.get('detallableArray').controls['medidaDetalle'].touched)">
-                                    Este Campo es obligatorio</div> -->
+                                <div class="alerta text-danger ml-1" style="font-size: 12px"
+                                *ngIf="getvalidateControlArray(i,'costoDetalle') ">
+                                    Este Campo es obligatorio</div>
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
@@ -117,9 +116,9 @@
                                 <label class="control-label">precio: <span style="color: red">*</span></label>
                                 <input type="number" formControlName="precioDetalle" placeholder="Precio"
                                     class="form-control" autocomplete="off">
-                                <!-- <div class="alerta text-danger ml-1" style="font-size: 12px"
-                                    *ngIf="!this.form.get('detallableArray').controls['medidaDetalle'].valid &&  (this.form.get('detallableArray').controls['medidaDetalle'].dirty ||this.form.get('detallableArray').controls['medidaDetalle'].touched)">
-                                    Este Campo es obligatorio</div> -->
+                                <div class="alerta text-danger ml-1" style="font-size: 12px"
+                                *ngIf="getvalidateControlArray(i,'precioDetalle') ">
+                                    Este Campo es obligatorio</div>
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-1" style="padding: 2.4rem 0rem 0rem 0rem;">
