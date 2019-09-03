@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { invalid } from '@angular/compiler/src/render3/view/util';
+import { DecimalPipe } from '@angular/common';
+
 
 @Component({
   selector: 'app-registro-articulos',
@@ -89,23 +90,21 @@ export class RegistroArticulosComponent implements OnInit {
     this.isDetallable = !this.isDetallable;
   }
   
-  
+  per
   // =============================================
   //  Calculate price
   // =============================================
   calculatePrice(){
     var costo = this.form.value.costo
-    console.log('costo sin calcular');
-    console.log(costo)
-    console.log('============================');
+    var pipe = new DecimalPipe('en')
     
     if(costo > 0 || costo != null || costo){
-      this.form = this.fb.control()
-      this.form.value.precio = (costo / 0.9)
-      console.log('precio calculado');
       
-      console.log(Math.fround(costo / 0.9))
+      var precio =(costo / 0.9)
+      this.form.controls.precio.setValue( pipe.transform(precio , '0.2-2' )  )
+      this.per = pipe.transform(precio) 
     }
   }
 
 }
+
