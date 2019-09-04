@@ -12,7 +12,7 @@ import { CollapseModule } from 'angular-bootstrap-md'
     CommonModule,
     ButtonsModule, 
     WavesModule,
-    MDBBootstrapModule,
+    MDBBootstrapModule.forRoot(),
     CollapseModule
 
   ],

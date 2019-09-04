@@ -1,82 +1,200 @@
-.areaDetalle{
-    background-color: rgba(69, 228, 101, 0.521);
-    padding: 1.5rem .1rem 2rem 1rem;
-    border-radius: 12px;
+.areaDetalle {
+  background-color: rgba(69, 228, 101, 0.521);
+  padding: 1.5rem 0.1rem 2rem 1rem;
+  border-radius: 12px;
 }
-#btnMenusInput{
-    color:white;
-    transform: translate(30px, 0px);
-    &:hover{
-        cursor: pointer;
-        text-shadow: 1px 1px 4px #3f403dd6;
-    }
+#btnMenusInput {
+  color: white;
+  transform: translate(30px, 0px);
+  &:hover {
+    cursor: pointer;
+    text-shadow: 1px 1px 4px #3f403dd6;
+  }
 }
-#btnMasInput{
-    color:white;
-    border: none;
-    background-color: transparent;
-    padding: 0;
-    &:hover {
-        cursor: pointer;
-        text-shadow: 1px 1px 4px #3f403dd6;
+#btnMasInput {
+  color: white;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  &:hover {
+    cursor: pointer;
+    text-shadow: 1px 1px 4px #3f403dd6;
+  }
+  &:disabled {
+    color: rgba(236, 143, 143, 0.764);
+    :hover {
+      cursor: no-drop !important;
     }
-    &:disabled{
-        color: rgba(236, 143, 143, 0.764);
-        :hover{
-            cursor: no-drop !important;
-        }
-    }
+  }
+}
+
+/* ============================================== */
+/*        Apple switch                            */
+/* ============================================== */
+.custom-control.custom-switch.div-form-dynamic.form-check{
+    input {
+        position: absolute;
+        margin: 8px 0 0 16px;
+      }
+      input + label {
+        position: relative;
+        padding: 5px 0 0 50px;
+        line-height: 2em;
+      }
+      input + label:before {
+        content: '';
+        position: absolute;
+        display: block;
+        left: 0;
+        top: 8px;
+        width: 40px; /* x*5 */
+        height: 24px; /* x*3 */
+        border-radius: 16px; /* x*2 */
+        background: #fff;
+        border: 1px solid #d9d9d9;
+        -webkit-transition: all 0.3s;
+        transition: all 0.3s;
+      }
+      input + label:after {
+        content: '';
+        position: absolute;
+        display: block;
+        left: 0px;
+        top: 8px;
+        width: 24px; /* x*3 */
+        height: 24px; /* x*3 */
+        border-radius: 16px; /* x*2 */
+        background: #fff;
+        border: 1px solid #d9d9d9;
+        -webkit-transition: all 0.3s;
+        transition: all 0.3s;
+      }
+      input + label:hover:after {
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      }
+      input:checked + label:after {
+        margin-left: 16px;
+      }
+      input:checked + label:before {
+        background: #55d069;
+      }
 }
 
 
-  
-    /* ============================================== */
-    /*        Apple switch                            */
-    /* ============================================== */
 
-    input[type="checkbox"].ios8-switch {
-      position: absolute;
-      margin: 8px 0 0 16px;    
+
+/* ============================================== */
+/*        Apple switch                            */
+/* ============================================== */
+
+// input[type='checkbox'].ios8-switch {
+//   position: absolute;
+//   margin: 8px 0 0 16px;
+// }
+// input[type='checkbox'].ios8-switch + label {
+//   position: relative;
+//   padding: 5px 0 0 50px;
+//   line-height: 2em;
+// }
+// input[type='checkbox'].ios8-switch + label:before {
+//   content: '';
+//   position: absolute;
+//   display: block;
+//   left: 0;
+//   top: 8px;
+//   width: 40px; /* x*5 */
+//   height: 24px; /* x*3 */
+//   border-radius: 16px; /* x*2 */
+//   background: #fff;
+//   border: 1px solid #d9d9d9;
+//   -webkit-transition: all 0.3s;
+//   transition: all 0.3s;
+// }
+// input[type='checkbox'].ios8-switch + label:after {
+//   content: '';
+//   position: absolute;
+//   display: block;
+//   left: 0px;
+//   top: 8px;
+//   width: 24px; /* x*3 */
+//   height: 24px; /* x*3 */
+//   border-radius: 16px; /* x*2 */
+//   background: #fff;
+//   border: 1px solid #d9d9d9;
+//   -webkit-transition: all 0.3s;
+//   transition: all 0.3s;
+// }
+// input[type='checkbox'].ios8-switch + label:hover:after {
+//   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+// }
+// input[type='checkbox'].ios8-switch:checked + label:after {
+//   margin-left: 16px;
+// }
+// input[type='checkbox'].ios8-switch:checked + label:before {
+//   background: #55d069;
+// }
+
+/* ============================================== */
+/*       MDBOOTSTRAP APPLE SWICTH                 */
+/* ============================================== */
+
+mdb-checkbox .form-check{
+  &input[type='checkbox'].ios8-switch {
+    position: absolute;
+    margin: 8px 0 0 16px;
   }
-  input[type="checkbox"].ios8-switch + label {
-      position: relative;
-      padding: 5px 0 0 50px;
-      line-height: 2.0em;
+}
+mdb-checkbox .form-check{
+  &input[type='checkbox'].ios8-switch + label {
+    position: relative;
+    padding: 5px 0 0 50px;
+    line-height: 2em;
   }
-  input[type="checkbox"].ios8-switch + label:before {
-      content: "";
-      position: absolute;
-      display: block;
-      left: 0;
-      top: 8px;
-      width: 40px; /* x*5 */
-      height: 24px; /* x*3 */
-      border-radius: 16px; /* x*2 */
-      background: #fff;
-      border: 1px solid #d9d9d9;
-      -webkit-transition: all 0.3s;
-      transition: all 0.3s;
+}
+mdb-checkbox .form-check{
+  &input[type='checkbox'].ios8-switch + label:before {
+    content: '';
+    position: absolute;
+    display: block;
+    left: 0;
+    top: 8px;
+    width: 40px; /* x*5 */
+    height: 24px; /* x*3 */
+    border-radius: 16px; /* x*2 */
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
   }
-  input[type="checkbox"].ios8-switch + label:after {
-      content: "";
-      position: absolute;
-      display: block;
-      left: 0px;
-      top: 8px;
-      width: 24px; /* x*3 */
-      height: 24px; /* x*3 */
-      border-radius: 16px; /* x*2 */
-      background: #fff;
-      border: 1px solid #d9d9d9;
-      -webkit-transition: all 0.3s;
-      transition: all 0.3s;
+}
+mdb-checkbox .form-check{
+  &input[type='checkbox'].ios8-switch + label:after {
+    content: '';
+    position: absolute;
+    display: block;
+    left: 0px;
+    top: 8px;
+    width: 24px; /* x*3 */
+    height: 24px; /* x*3 */
+    border-radius: 16px; /* x*2 */
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
   }
-  input[type="checkbox"].ios8-switch + label:hover:after {
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+mdb-checkbox .form-check{
+  &input[type='checkbox'].ios8-switch + label:hover:after {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   }
-  input[type="checkbox"].ios8-switch:checked + label:after {
-      margin-left: 16px;
+}
+mdb-checkbox .form-check{
+  &input[type='checkbox'].ios8-switch:checked + label:after {
+    margin-left: 16px;
   }
-  input[type="checkbox"].ios8-switch:checked + label:before {
-      background: #55D069;
+}
+mdb-checkbox .form-check{
+  &input[type='checkbox'].ios8-switch:checked + label:before {
+    background: #55d069;
   }
+}

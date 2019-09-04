@@ -6,16 +6,13 @@ import { NgxBootstrapModule } from '../modules/ngx-bootstrap.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { MdBootstrapModule } from '../modules/md-bootstrap.module';
 
-
 //componentes
 import { HomeAdminComponent } from './home/homeAdmin.component';
 import { NavbarAComponent } from './navbar-a/navbar-a.component';
 import { FacturacionComponent } from './facturacion/facturacion.component';
 import { InventarioComponent } from './inventario/inventario.component';
 import { RegistroArticulosComponent } from './registros/articulos/registro-articulos.component';
-import { RegistroEmpleadosComponent } from './registros/registro-empleados/registro-empleados.component'
-
-
+import { RegistroEmpleadosComponent } from './registros/registro-empleados/registro-empleados.component';
 
 @NgModule({
   declarations: [
@@ -25,16 +22,15 @@ import { RegistroEmpleadosComponent } from './registros/registro-empleados/regis
     InventarioComponent,
     RegistroArticulosComponent,
     RegistroEmpleadosComponent,
-  
   ],
   imports: [
     CommonModule,
     AppRoutingModule,
     AngularModule,
     NgxBootstrapModule,
-    MdBootstrapModule
+    // MdBootstrapModule
+    MDBBootstrapModule.forRoot(),
   ],
-  exports:[
-  ]
+  exports: [],
 })
-export class AdminModule { }
+export class AdminModule {}
