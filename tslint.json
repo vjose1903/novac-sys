@@ -17,7 +17,8 @@
     "indent": [true, "spaces"],
     "interface-over-type-literal": true,
     "label-position": true,
-    "max-line-length": [true, 140],
+    "max-line-length": [true, 187],
+    "no-shadowed-variable":false,
     "member-access": false,
     "member-ordering": [
       true,
@@ -48,7 +49,6 @@
     "no-output-on-prefix": true,
     "no-output-rename": true,
     "no-outputs-metadata-property": true,
-    "no-shadowed-variable": true,
     "no-string-literal": false,
     "no-string-throw": true,
     "no-switch-case-fall-through": true,

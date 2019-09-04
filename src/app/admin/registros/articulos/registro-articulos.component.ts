@@ -1,14 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormGroup,
-  FormBuilder,
-  FormArray,
-  FormControl,
-  Validators,
-} from '@angular/forms';
+import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
-
 
 @Component({
   selector: 'app-registro-articulos',
@@ -71,7 +64,9 @@ export class RegistroArticulosComponent implements OnInit {
     const control = <FormArray>this.form.controls['detallableArray'];
     control.removeAt(i);
   }
-
+  // =============================================
+  //  VALIDACIONES DE ARRAY
+  // =============================================
   getvalidateControlArray(i, campo) {
     const control = <FormArray>this.form.controls['detallableArray'];
     if ((control.controls[i] as any).controls[campo].status === 'INVALID' && (control.controls[i] as any).controls[campo].touched) {
@@ -92,33 +87,37 @@ export class RegistroArticulosComponent implements OnInit {
   //  CHECK DETALLABLE
   // =============================================
   isDetallableClick() {
-    var array = this.form.get('detallableArray') as FormArray;
-    if (array.length == 0) {
+    const array = this.form.get('detallableArray') as FormArray;
+    if (array.length === 0) {
       this.addItem();
     } else {
-      var array = this.form.get('detallableArray') as FormArray;
-      if (array.length == 1 && array.valid == false) {
+      const array = this.form.get('detallableArray') as FormArray;
+      if (array.length === 1 && array.valid === false) {
         this.removeItem(0);
       }
     }
 
     this.isDetallable = !this.isDetallable;
   }
-  
-  per
   // =============================================
   //  Calculate price
   // =============================================
-  calculatePrice(){
-    var costo = this.form.value.costo
-    var pipe = new DecimalPipe('en')
-    
-    if(costo > 0 || costo != null || costo){
-      
-      var precio =(costo / 0.9)
-      this.form.controls.precio.setValue( pipe.transform(precio , '0.2-2' )  )
-      this.per = pipe.transform(precio) 
+  calculatePrice(i?: number) {
+    const pipe = new DecimalPipe('en');
+
+    if (i !== undefined) {
+      const control = <FormArray>this.form.controls['detallableArray'];
+      const costo = (control.controls[i] as any).controls['costoDetalle'].value;
+      if (costo > 0 || costo != null || costo) {
+        const precio = costo / 0.9;
+        (control.controls[i] as any).controls['precioDetalle'].setValue(pipe.transform(precio, '0.2-2'));
+      }
+    } else {
+      const costo = this.form.value.costo;
+      if (costo > 0 || costo != null || costo) {
+        const precio = costo / 0.9;
+        this.form.controls.precio.setValue(pipe.transform(precio, '0.2-2'));
+      }
     }
   }
 }
-
