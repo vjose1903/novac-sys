@@ -8,7 +8,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class SharedService {
-  url = 'http://localhost:3000/api/usuarios';
+  url = 'http://localhost:3000/api';
   constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}
   peticion(ruta: string, metodo: string, json?: string): Observable<any> {
     if (metodo === 'get' || metodo === 'delete') {
@@ -38,7 +38,7 @@ export class SharedService {
   }
 
   login(arg): Observable<any> {
-    return this.peticion('authenticate', 'post', arg).pipe(
+    return this.peticion('usuarios/authenticate', 'post', arg).pipe(
       map(val => {
         if (val.resource && val.token) {
           this.saveAuthUser(val.resource, val.token);
@@ -47,5 +47,14 @@ export class SharedService {
         return val;
       }),
     );
+  }
+
+  // =====================================================================
+  // ARTICULOS
+  // =====================================================================
+
+  createArticulo(arg) {
+    return this.peticion('articulo/register', 'post', arg).subscribe(
+      res => console.log);
   }
 }

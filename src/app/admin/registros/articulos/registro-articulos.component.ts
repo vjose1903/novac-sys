@@ -120,4 +120,15 @@ export class RegistroArticulosComponent implements OnInit {
       }
     }
   }
+
+  // =============================================
+  //  Crear articulo
+  // =============================================
+  submit(form) {
+    const obj = JSON.parse(JSON.stringify(form.value));
+    obj.costo = parseFloat(obj.costo);
+    obj.precio = parseFloat(obj.precio);
+    console.log (obj.detallableArray)
+    // console.log(obj);
+  }
 }

@@ -14,6 +14,7 @@ const rtsIndex = require('./routes/usuarios.routes');
 const rtsPhotos = require('./routes/photos.routes');
 const rtsSupli = require('./routes/suplidores.routes');
 const rtsCliente = require('./routes/clientes.routes');
+const rtsArticulo = require('./routes/articulos.routes');
 
 
 var app = express();
@@ -28,6 +29,7 @@ app.use('/api/usuarios', rtsIndex);
 app.use('/api/photos', rtsPhotos);
 app.use('/api/supli', rtsSupli);
 app.use('/api/cliente', rtsCliente);
+app.use('/api/articulo', rtsArticulo);
 
 
 // error handler

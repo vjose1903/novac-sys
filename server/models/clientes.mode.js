@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+
 
 var clientesSchema = new mongoose.Schema({
     nombre: { type: String, required: true, trim: true },
@@ -18,3 +17,4 @@ var clientesSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 mongoose.model('clientes', clientesSchema);
+module.exports = ModeloPhotos
