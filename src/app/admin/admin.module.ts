@@ -13,6 +13,7 @@ import { FacturacionComponent } from './facturacion/facturacion.component';
 import { InventarioComponent } from './inventario/inventario.component';
 import { RegistroArticulosComponent } from './registros/articulos/registro-articulos.component';
 import { RegistroEmpleadosComponent } from './registros/registro-empleados/registro-empleados.component';
+import { TablasComponent } from '../components/tablas/tablas.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { RegistroEmpleadosComponent } from './registros/registro-empleados/regis
     InventarioComponent,
     RegistroArticulosComponent,
     RegistroEmpleadosComponent,
+    TablasComponent
   ],
   imports: [
     CommonModule,

@@ -1,0 +1,33 @@
+<div class="searchDiv">
+  <label class="search-label" for="search">Busqueda </label>
+  <input [(ngModel)]="searchText" id="search" class="search-input" />
+</div>
+
+<div class="scroll-container">
+  <table #consorciosTable="mdbTable" mdbTable class="table" hover="true" small="true">
+    <thead class="text-center head-table">
+      <tr>
+        <th *ngFor="let titulo of tituloList">{{ titulo }}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr mdbTableCol *ngFor="let item of data; let i = index" class="text-center" [ngClass]="{ danger: !item.activo, warning: item.panico > 0 }" style="cursor: pointer;">
+        <td scope="row">{{ item.id }}</td>
+
+        <td>{{ item.nombre }}</td>
+
+        <td class="btnAccion">
+          <span mdbTooltip="Editar' " placement="top" *ngIf="true">
+            <i class="fas fa-pencil-alt"></i>
+          </span>
+
+          <span mdbTooltip="Borrar' " placement="top" *ngIf="true">
+            <i class="far fa-trash-alt"></i>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot class="grey lighten-5 w-100"></tfoot>
+  </table>
+</div>
