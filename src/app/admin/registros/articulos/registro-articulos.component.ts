@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import * as _ from 'lodash';
+import { SharedService } from '../../../core/services/shared.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -18,7 +20,7 @@ export class RegistroArticulosComponent implements OnInit {
 
   medida: boolean;
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
 
@@ -103,20 +105,18 @@ export class RegistroArticulosComponent implements OnInit {
   //  Calculate price
   // =============================================
   calculatePrice(i?: number) {
-    const pipe = new DecimalPipe('en');
-
     if (i !== undefined) {
       const control = <FormArray>this.form.controls['detallableArray'];
       const costo = (control.controls[i] as any).controls['costoDetalle'].value;
       if (costo > 0 || costo != null || costo) {
         const precio = costo / 0.9;
-        (control.controls[i] as any).controls['precioDetalle'].setValue(pipe.transform(precio, '0.2-2'));
+        (control.controls[i] as any).controls['precioDetalle'].setValue(_.round(precio, 2));
       }
     } else {
       const costo = this.form.value.costo;
       if (costo > 0 || costo != null || costo) {
         const precio = costo / 0.9;
-        this.form.controls.precio.setValue(pipe.transform(precio, '0.2-2'));
+        this.form.controls.precio.setValue(_.round(precio, 2));
       }
     }
   }
@@ -126,9 +126,14 @@ export class RegistroArticulosComponent implements OnInit {
   // =============================================
   submit(form) {
     const obj = JSON.parse(JSON.stringify(form.value));
-    obj.costo = parseFloat(obj.costo);
-    obj.precio = parseFloat(obj.precio);
-    console.log (obj.detallableArray)
-    // console.log(obj);
+    this.shServ.createArticulo(obj).subscribe(
+      res => {
+        this.shServ.toastSuccess(res.titulo, res.contenido);
+      },
+      err => {
+        console.log(err);
+        // this.shServ.toastError(err.titulo, err.contenido);
+      },
+    );
   }
 }

@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit {
   login(form: any) {
     this.shServ.login(form.value).subscribe(
       res => {
-        this.toastSuccess('', 'Correcto');
+        this.shServ.toastSuccess('', 'Correcto');
         this.errorC = '';
         this.errorU = '';
       },
@@ -46,16 +46,5 @@ export class HomeComponent implements OnInit {
         }
       },
     );
-  }
-
-  // TOASTS
-  toastSuccess(title?, msg?) {
-    this.toastr.success(title, msg || '');
-  }
-  toastError(title?, msg?) {
-    this.toastr.error(title, msg || '');
-  }
-  toastWarning(title?, msg?) {
-    this.toastr.warning(title, msg || '');
   }
 }

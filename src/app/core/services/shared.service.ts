@@ -54,7 +54,19 @@ export class SharedService {
   // =====================================================================
 
   createArticulo(arg) {
-    return this.peticion('articulo/register', 'post', arg).subscribe(
-      res => console.log);
+    return this.peticion('articulo/register', 'post', JSON.stringify(arg));
+  }
+
+  // =====================================================================
+  // TOASTS
+  // =====================================================================
+  toastSuccess(title?, msg?) {
+    this.toastr.success(title, msg || '');
+  }
+  toastError(title?, msg?) {
+    this.toastr.error(title, msg || '');
+  }
+  toastWarning(title?, msg?) {
+    this.toastr.warning(title, msg || '');
   }
 }
