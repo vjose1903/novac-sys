@@ -1,69 +1,61 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonsModule, WavesModule } from 'angular-bootstrap-md'
+import { ButtonsModule, WavesModule } from 'angular-bootstrap-md';
 import { UsuariosService } from '../core/services/usuarios.service';
 import { UsuariosI } from '../core/models/usuario.model';
+import { SharedService } from '../core/services/shared.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-
-  loginForm:FormGroup
-  errorC=''
-  errorU=''
-  constructor(private fb: FormBuilder,
-              private router: Router,
-              private usuariosServices:UsuariosService
-              ) { }
+  loginForm: FormGroup;
+  errorC = '';
+  errorU = '';
+  constructor(private shServ: SharedService, private toastr: ToastrService, private fb: FormBuilder, private router: Router, private usuariosServices: UsuariosService) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({
-      'usuario': null,
-      'password': null
-    })
-    
+      usuario: null,
+      password: null,
+    });
   }
 
-  //=================================================================
+  // =================================================================
   // LOGIN
-  //=================================================================
-  login(form: any){
-
-    this.usuariosServices.login(form.value).subscribe(
-      res=>{
-      this.usuariosServices.setToken(res['token']);
-      var userPayload= this.usuariosServices.getUserPayload()
-      this.usuariosServices.getUser(userPayload._id).subscribe(
-        res=>{          
-          var data =res as UsuariosI;
-              this.router.navigateByUrl('/admin');
-          
-          // if(data.role=="A"){
-          //     this.router.navigateByUrl('/admin');
-          //   }else if(data.role=="U"){
-          //     this.router.navigateByUrl('/usuario');
-          // }else{
-          //     this.router.navigateByUrl('/');          
-          // }
-        })
-      this.errorC=""
-      this.errorU=""
-    },
-    err=>{
-      if(err.error.mensaje=="El usuario introducido no existe"){
-        this.errorU="usuario no existe."
-        
-      }else{
-        this.errorU=""
-        if(err.error.mensaje=="Contraseña incorrecta"){
-          this.errorC="contraseña invalida"
+  // =================================================================
+  login(form: any) {
+    this.shServ.login(form.value).subscribe(
+      res => {
+        this.toastSuccess('', 'Correcto');
+        this.errorC = '';
+        this.errorU = '';
+      },
+      err => {
+        if (err.error.mensaje === 'El usuario introducido no existe') {
+          this.errorU = 'usuario no existe.';
+        } else {
+          this.errorU = '';
+          if (err.error.mensaje === 'Contraseña incorrecta') {
+            this.errorC = 'contraseña invalida';
+          }
         }
-      }
-    }
-    )
+      },
+    );
+  }
+
+  // TOASTS
+  toastSuccess(title?, msg?) {
+    this.toastr.success(title, msg || '');
+  }
+  toastError(title?, msg?) {
+    this.toastr.error(title, msg || '');
+  }
+  toastWarning(title?, msg?) {
+    this.toastr.warning(title, msg || '');
   }
 }

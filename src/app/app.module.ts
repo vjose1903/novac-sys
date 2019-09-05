@@ -25,6 +25,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxBootstrapModule } from './modules/ngx-bootstrap.module';
 import { AngularModule } from './modules/angular.module';
 
+import { ToastrModule } from 'ngx-toastr';
+
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -40,6 +42,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CoreModule,
     SharedModule,
     HomeModule,
+    ToastrModule.forRoot(),
     AppRoutingModule,
     TranslateModule.forRoot({
       loader: {

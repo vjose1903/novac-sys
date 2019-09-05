@@ -72,16 +72,16 @@
       
       .subMenuRegistrosA{
         transform: scale(1) ;
-        background-color: #0bb272;
+        background-color: #23be69;
         color:white;
       }
       .Registro{
         padding: 0.5rem;
-        background-color: #0bb272;
+        background-color: #23be69;
       }
       .Registro:hover{
         width: 100%;
-        background-color: #0b9c64;
+        background-color: #1aa056;
         cursor: pointer;
       }
     }
@@ -139,7 +139,7 @@
     }
 
     mat-nav-list{
-      background-color: #0ed88a;
+      background-color: #45e46585;
       overflow: none;
       height: 94.6vh;
     }
