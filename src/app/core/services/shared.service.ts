@@ -56,6 +56,12 @@ export class SharedService {
   createArticulo(arg) {
     return this.peticion('articulo/register', 'post', JSON.stringify(arg));
   }
+  getArticulos() {
+    return this.peticion('articulo', 'get');
+  }
+  CountArticulos() {
+    return this.peticion('articulo/cant', 'get');
+  }
 
   // =====================================================================
   // TOASTS

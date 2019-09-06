@@ -1,23 +1,23 @@
 const mongoose = require('mongoose');
-const _ = require('lodash');
 
-const ARTICULO = require('../models/articulo.model');
 
-// const ARTICULO = mongoose.model('articulos');
+const MODEL_SCHEMA = require('../models/articulo.model');
 
-const ControladorArticulo = {}
+// const MODEL_SCHEMA = mongoose.model('articulos');
 
-ControladorArticulo.register = (req, res, next) => {
-    var articulo = new ARTICULO();
-    articulo.nombre= req.body.nombre,
-    articulo.costo= req.body.costo,
-    articulo.precio= req.body.precio,
-    articulo.tipo= req.body.tipo,
-    articulo.medida= req.body.medida,
-    articulo.Isdetallable= req.body.Isdetallable,
-    articulo.detallableArray= req.body.detallableArray,
+const Controlador = {}
 
-    articulo.save((err, doc) => {
+Controlador.register = (req, res, next) => {
+    var item = new MODEL_SCHEMA();
+    item.nombre= req.body.nombre,
+    item.costo= req.body.costo,
+    item.precio= req.body.precio,
+    item.tipo= req.body.tipo,
+    item.medida= req.body.medida,
+    item.Isdetallable= req.body.Isdetallable,
+    item.detallableArray= req.body.detallableArray,
+
+    item.save((err, doc) => {
         if (!err)
             res.json({titulo:'Operacion exitosa.',contenido:'Articulo registrado.'});
         else {
@@ -31,14 +31,15 @@ ControladorArticulo.register = (req, res, next) => {
 
 
 
-ControladorArticulo.getClientes = async (req, res) => {
-    const clientes = await ARTICULO.find({"estado":true});
-    res.json(clientes); 
+Controlador.getAllItems = async (req, res) => {
+    // const item = await MODEL_SCHEMA.find({"estado":true});
+    const item = await MODEL_SCHEMA.find();
+    res.json(item); 
 }
 
-ControladorArticulo.getCliente = async (req, res, err) => {
+Controlador.getItemById = async (req, res, err) => {
 
-    const cliente = await ARTICULO.findById((req.params.id) ,(err, user)=> { 
+    const cliente = await MODEL_SCHEMA.findById((req.params.id) ,(err, user)=> { 
         if (err) return res.status(500).send('Error del Servidor!');
         if(!user){
             res.status(409).json({mensaje: 'cliente no existe'});//cliente no existe
@@ -47,14 +48,14 @@ ControladorArticulo.getCliente = async (req, res, err) => {
     res.json(cliente);
 }
 
-ControladorArticulo.CountClientes =async (req, res) => {
-    const cliente = await ARTICULO.find({"estado":true}).count();
-    res.json(cliente);
+Controlador.CountItems =async (req, res) => {
+    const item = await MODEL_SCHEMA.find().count();
+    res.json(item);
 }
 
 
 
-ControladorArticulo.UpdateCliente = async (req, res) => {
+Controlador.UpdateCliente = async (req, res) => {
     const cliente={
         nombre: req.body.nombre,
         apellido: req.body.apellido,
@@ -66,7 +67,7 @@ ControladorArticulo.UpdateCliente = async (req, res) => {
         cedula:req.body.cedula,
         direccion:req.body.direccion,
     };
-    await ARTICULO.findByIdAndUpdate(req.params.id, {$set:cliente},{new: true}, function(err, model) {
+    await MODEL_SCHEMA.findByIdAndUpdate(req.params.id, {$set:cliente},{new: true}, function(err, model) {
         if (!err)
             res.json({titulo:'Operacion exitosa.',contenido:'Cliente actualizado.'});
         else {
@@ -79,11 +80,11 @@ ControladorArticulo.UpdateCliente = async (req, res) => {
     
 }
 
-ControladorArticulo.DeleteCliente = async (req, res) => {
+Controlador.DeleteCliente = async (req, res) => {
     const cliente={
         estado: false,
     };
-    await ARTICULO.findByIdAndUpdate(req.params.id, {$set:cliente},{new: true}, function(err, model) {
+    await MODEL_SCHEMA.findByIdAndUpdate(req.params.id, {$set:cliente},{new: true}, function(err, model) {
         if (!err)
             res.json({titulo:'Operacion exitosa.',contenido:'Cliente eliminado.'});
         else {
@@ -93,4 +94,4 @@ ControladorArticulo.DeleteCliente = async (req, res) => {
     }
 
 
-module.exports = ControladorArticulo; 
+module.exports = Controlador; 

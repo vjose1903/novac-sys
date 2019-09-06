@@ -1,4 +1,4 @@
-import { Component, OnInit,  } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
@@ -17,14 +17,8 @@ export class RegistroArticulosComponent implements OnInit {
   isDetallable = false;
   medida: boolean;
 
-
-
-
-  constructor(
-              private shServ: SharedService,
-              private fb: FormBuilder,
-              private route: ActivatedRoute) {
-
+  listaArticulos = [];
+  constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
 
@@ -47,6 +41,10 @@ export class RegistroArticulosComponent implements OnInit {
         this.titulo = 'Actualizar articulos';
         this.boton = 'Actualizar';
       }
+    });
+
+    this.shServ.getArticulos().subscribe(res => {
+      this.listaArticulos = res;
     });
   }
   // =============================================
@@ -145,5 +143,6 @@ export class RegistroArticulosComponent implements OnInit {
   //  TABLAS
   // =============================================
 
-  listaTitulos=['Cod.','Articulo','Medida','Precio']
+  listaTitulos = ['Cod.', 'Articulo', 'Medida', 'Precio'];
+  listaKeys =[]
 }

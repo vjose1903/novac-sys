@@ -17,6 +17,7 @@ export class TablasComponent implements OnInit, AfterViewInit {
   previous: any = [];
   searchText = '';
   @Input() data = [];
+  @Input() dataKeys = [];
   @Input() tituloList = [];
   constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
 
