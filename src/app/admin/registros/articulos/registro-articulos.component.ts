@@ -143,6 +143,24 @@ export class RegistroArticulosComponent implements OnInit {
   //  TABLAS
   // =============================================
 
-  listaTitulos = ['Cod.', 'Articulo', 'Medida', 'Precio'];
-  listaKeys =[]
+  // listaTitulos = ['Cod.', 'Articulo', 'Medida', 'Precio'];
+  // listaKeys = [];
+  info = [
+    {
+      titulo: 'Cod.',
+      key: 'code',
+    },
+    {
+      titulo: 'Articulo',
+      key: 'nombre',
+    },
+    {
+      titulo: 'Medida',
+      key: 'medida',
+    },
+    {
+      titulo: 'Precio',
+      key: 'precio',
+    },
+  ];
 }
