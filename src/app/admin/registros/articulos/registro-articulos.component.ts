@@ -131,6 +131,7 @@ export class RegistroArticulosComponent implements OnInit {
     this.shServ.createArticulo(obj).subscribe(
       res => {
         this.shServ.toastSuccess(res.titulo, res.contenido);
+        // this.listaArticulos.push(res);
       },
       err => {
         console.log(err);
@@ -143,8 +144,6 @@ export class RegistroArticulosComponent implements OnInit {
   //  TABLAS
   // =============================================
 
-  // listaTitulos = ['Cod.', 'Articulo', 'Medida', 'Precio'];
-  // listaKeys = [];
   info = [
     {
       titulo: 'Cod.',

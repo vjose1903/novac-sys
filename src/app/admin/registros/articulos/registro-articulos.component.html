@@ -150,10 +150,9 @@
   <div class="col-xs-12 col-md-6">
     <div class="card card-fondo">
 
-      <app-tablas 
-      [tituloList]="info"
+      <app-tablas *ngIf="listaArticulos"
+      [info]="info"
       [data]="listaArticulos"
-      [dataKeys]=""
       ></app-tablas>
 
     </div>

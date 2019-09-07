@@ -4,25 +4,24 @@
 </div>
 
 <div class="scroll-container">
-  <table #consorciosTable="mdbTable" mdbTable class="table" hover="true" small="true">
+  <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" hover="true" small="true">
     <thead class="text-center head-table">
       <tr>
-        <th *ngFor="let titulo of tituloList">{{ titulo.titulo }}</th>
-        <th> </th>
+        <th *ngFor="let titulo of info">{{ titulo.titulo }}</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
-      <tr mdbTableCol *ngFor="let item of data; let i = index" class="text-center" [ngClass]="{ danger: !item.activo, warning: item.panico > 0 }" style="cursor: pointer;">
-        <!-- <td scope="row">{{ item.id }}</td> -->
+      <tr mdbTableCol *ngFor="let row of data; let i = index" class="text-center" style="cursor: pointer;">
 
-        <td *ngFor="let key of item.key" >{{ key}}</td>
+        <td *ngFor="let column of info">{{ row[column.key] }}</td>
 
         <td class="btnAccion">
-          <span mdbTooltip="Editar' " placement="top" *ngIf="true">
+          <span mdbTooltip="Editar" placement="top" *ngIf="true">
             <i class="fas fa-pencil-alt"></i>
           </span>
 
-          <span mdbTooltip="Borrar' " placement="top" *ngIf="true">
+          <span mdbTooltip="Borrar " placement="top" *ngIf="true">
             <i class="far fa-trash-alt"></i>
           </span>
         </td>

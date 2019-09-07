@@ -14,14 +14,21 @@ export class TablasComponent implements OnInit, AfterViewInit {
   mdbTablePagination: MdbTablePaginationComponent;
 
   @ViewChild(MdbTableDirective, { static: true }) mdbTable: MdbTableDirective;
+
+  @HostListener('input') oninput() {
+    this.searchItems();
+  }
   previous: any = [];
   searchText = '';
-  @Input() data = [];
-  @Input() dataKeys = [];
-  @Input() tituloList = [];
+  @Input() data: Array<any>;
+  @Input() info: Array<any>;
   constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.mdbTable.setDataSource(this.data);
+    this.data = this.mdbTable.getDataSource();
+    this.previous = this.mdbTable.getDataSource();
+  }
 
   searchItems() {
     const prev = this.mdbTable.getDataSource();
@@ -42,10 +49,6 @@ export class TablasComponent implements OnInit, AfterViewInit {
     // this.mdbTablePagination.calculateFirstItemIndex();
     // this.mdbTablePagination.calculateLastItemIndex();
     this.cdRef.detectChanges();
-  }
-
-  @HostListener('input') oninput() {
-    this.searchItems();
   }
 
   changeVisibleItems(items) {
