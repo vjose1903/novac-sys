@@ -10,11 +10,12 @@ const morgan = require('morgan');
 const path = require('path');
 
 //rutas
-const rtsIndex = require('./routes/usuarios.routes');
+const rtsEmpleados = require('./routes/empleados.routes');
 const rtsPhotos = require('./routes/photos.routes');
 const rtsSupli = require('./routes/suplidores.routes');
 const rtsCliente = require('./routes/clientes.routes');
 const rtsArticulo = require('./routes/articulos.routes');
+
 
 
 var app = express();
@@ -25,7 +26,7 @@ app.use(bodyParser.json());
 app.use(cors({origin: 'http://localhost:4200'}));
 app.use(passport.initialize());
 
-app.use('/api/usuarios', rtsIndex);
+app.use('/api/empleados', rtsEmpleados);
 app.use('/api/photos', rtsPhotos);
 app.use('/api/supli', rtsSupli);
 app.use('/api/cliente', rtsCliente);

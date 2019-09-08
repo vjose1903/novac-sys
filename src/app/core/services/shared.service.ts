@@ -38,7 +38,7 @@ export class SharedService {
   }
 
   login(arg): Observable<any> {
-    return this.peticion('usuarios/authenticate', 'post', arg).pipe(
+    return this.peticion('empleados/authenticate', 'post', arg).pipe(
       map(val => {
         if (val.resource && val.token) {
           this.saveAuthUser(val.resource, val.token);
@@ -47,6 +47,14 @@ export class SharedService {
         return val;
       }),
     );
+  }
+
+  // =====================================================================
+  // USUARIOS
+  // =====================================================================
+  getEmpleados() {}
+  createEmpleados(arg) {
+    return this.peticion('empleados/register', 'post', JSON.stringify(arg));
   }
 
   // =====================================================================

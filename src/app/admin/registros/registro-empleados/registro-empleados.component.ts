@@ -3,7 +3,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { parseDate, BsDatepickerConfig } from 'ngx-bootstrap';
 import { PhotosService } from '../../../core/services/photos.service';
 import { ActivatedRoute } from '@angular/router';
-import { UsuariosI } from '../../../core/models/usuario.model';
+
+import { SharedService } from '../../../core/services/shared.service';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -17,7 +18,7 @@ export class RegistroEmpleadosComponent implements OnInit {
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
-  constructor(private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private shServ: SharedService) {
     this.form = this.fb.group({
       nombre: [null, Validators.required],
       apellido: [null, Validators.required],
@@ -72,7 +73,7 @@ export class RegistroEmpleadosComponent implements OnInit {
   }
 
   submit(form) {
-    const obj = JSON.parse(form);
+    const obj = JSON.parse(JSON.stringify(form.value));
 
     this.route.paramMap.subscribe(params => {
       if (params.get('accion') === 'INS') {
@@ -81,7 +82,16 @@ export class RegistroEmpleadosComponent implements OnInit {
         } else {
           obj.fotoPerfil = 'userM.png';
         }
-        console.log(obj);
+        this.shServ.createEmpleados(obj).subscribe(
+          res => {
+            this.shServ.toastSuccess('Usuario Creado', 'Correcto');
+          },
+          err => {
+            console.log(err);
+
+            this.shServ.toastError('', 'Error');
+          },
+        );
       } else {
       }
     });

@@ -12,7 +12,7 @@ export class UsuariosService {
   selectedUsuario: UsuariosI;
   profile: UsuariosI;
   array_Usuarios: UsuariosI[] = [];
-  readonly URL_API = 'http://localhost:3000/api/usuarios';
+  readonly URL_API = 'http://localhost:3000/api/empleados';
 
   noAuthHeader = { headers: new HttpHeaders({ NoAuth: 'true' }) };
 
