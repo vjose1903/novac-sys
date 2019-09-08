@@ -25,7 +25,7 @@ Controlador.register = (req, res, next) => {
     user.save((err, doc) => {
       if (!err) res.json({ titulo: 'Operacion exitosa.', contenido: 'Usuario registrado.' });
       else {
-        if (err.code == 11000) res.status(422).json({ titulo: 'Operacion nula.', contenido: 'Usuario introducido ya existe.', error: 'el error es: ' + err });
+        if (err.code == 11000) res.status(422).json({ titulo: 'Operacion nula.', contenido: err.keyValue });
         else res.json({ titulo: 'Operacion nula.', contenido: 'Error del servidor.' });
       }
     });

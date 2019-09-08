@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 var empleadoSchema = new mongoose.Schema(
   {
     nombre: { type: String, required: true, trim: true },
-    usuario: { type: String, required: false, trim: true },
-    cedula: { type: String, trim: true, required: false },
+    usuario: { type: String, required: false, trim: true, unique: true },
+    cedula: { type: String, trim: true, required: false, unique: true },
     apellido: { type: String, required: true, trim: true },
     sexo: { type: String, required: true, trim: true },
     telefono: { type: String, required: true, trim: true },

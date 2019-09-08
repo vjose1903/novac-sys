@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { parseDate, BsDatepickerConfig } from 'ngx-bootstrap';
 import { PhotosService } from '../../../core/services/photos.service';
 import { ActivatedRoute } from '@angular/router';
+import * as _ from 'lodash';
 
 import { SharedService } from '../../../core/services/shared.service';
 @Component({
@@ -87,9 +88,7 @@ export class RegistroEmpleadosComponent implements OnInit {
             this.shServ.toastSuccess('Usuario Creado', 'Correcto');
           },
           err => {
-            console.log(err);
-
-            this.shServ.toastError('', 'Error');
+            this.shServ.toastError( _.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
           },
         );
       } else {
