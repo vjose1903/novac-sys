@@ -15,13 +15,18 @@ Controlador.register = (req, res, next) => {
     (user.usuario = req.body.usuario),
     (user.cedula = req.body.cedula),
     (user.sexo = req.body.sexo),
-    (user.fotoPerfil = req.body.fotoPerfil),
     (user.telefono = req.body.telefono),
     (user.email = req.body.email),
     (user.fechaN = req.body.fechaN),
     (user.password = req.body.password),
     (user.estado = true),
-    (user.role = 'U'),
+    (user.role = 'U')
+
+    if (user.sexo === 'M') {
+      user.fotoPerfil = 'userH.png';
+    } else {
+      user.fotoPerfil = 'userM.png';
+    }
     user.save((err, doc) => {
       if (!err) res.json({ titulo: 'Operacion exitosa.', contenido: 'Usuario registrado.' });
       else {

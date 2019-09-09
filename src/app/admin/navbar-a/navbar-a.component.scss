@@ -139,9 +139,9 @@
     }
 
     mat-nav-list{
-      background-color: #45e46585;
+      background-color: #95f0a7;
       overflow: none;
-      height: 94.6vh;
+      height: calc(100% - 50px);
     }
     mat-list-item{
       margin: 2rem 0rem 2rem 0rem

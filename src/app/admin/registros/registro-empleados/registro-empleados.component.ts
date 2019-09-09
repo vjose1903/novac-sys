@@ -78,11 +78,6 @@ export class RegistroEmpleadosComponent implements OnInit {
 
     this.route.paramMap.subscribe(params => {
       if (params.get('accion') === 'INS') {
-        if (form.controls.sexo.value === 'M') {
-          obj.fotoPerfil = 'userH.png';
-        } else {
-          obj.fotoPerfil = 'userM.png';
-        }
         this.shServ.createEmpleados(obj).subscribe(
           res => {
             this.shServ.toastSuccess('Usuario Creado', 'Correcto');
