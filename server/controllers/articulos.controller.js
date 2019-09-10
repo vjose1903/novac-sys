@@ -16,7 +16,7 @@ Controlador.register = (req, res, next) => {
     (item.Isdetallable = req.body.Isdetallable),
     (item.detallableArray = req.body.detallableArray),
     item.save((err, doc) => {
-      if (!err) res.json({ titulo: 'Operacion exitosa.', contenido: 'Articulo registrado.' });
+      if (!err) res.json({ titulo: 'Operacion exitosa.', contenido: 'Articulo registrado.', body: doc });
       else {
         if (err.code == 11000) res.status(422).json({ titulo: 'Operacion nula.', contenido: 'Articulo introducido ya existe.' });
         else res.json({ titulo: 'Operacion nula.', contenido: 'Error del servidor.' });

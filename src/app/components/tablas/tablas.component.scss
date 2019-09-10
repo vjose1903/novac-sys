@@ -1,0 +1,10 @@
+.scroll-container {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 32vh);
+  min-width: 100px;
+  overflow: auto;
+}
+.head-table{
+    background-color: #45e46585;
+}

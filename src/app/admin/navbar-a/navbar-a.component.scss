@@ -1,4 +1,18 @@
 /* ============================================== */
+/*        FOOTER                                  */
+/* ============================================== */
+.footerCustom{
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 30px;
+  background-color: #586458;
+  color:white;
+  padding: 0rem 2rem 0rem 0rem;
+
+}
+/* ============================================== */
 /*        LOADER                                  */
 /* ============================================== */
 .loader{
@@ -253,16 +267,6 @@
     }
     .fas{
       margin-right: 1rem;
-    }
-    
-    /* ============================================== */
-    /*        footer                                  */
-    /* ============================================== */
-    .footer{
-      background-color: #04603d;
-      width: 100%;
-      height: 20px;
-      z-index: 9999;
     }
     
   

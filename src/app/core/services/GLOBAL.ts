@@ -1,37 +1,36 @@
-import { BehaviorSubject } from "rxjs/internal/BehaviorSubject";
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { UsuariosI } from '../models/usuario.model';
-
 
 // ===========================================================================
 // PARA MOSTRAR EL LOADING
 // ===========================================================================
-export const  showLoadin = new BehaviorSubject<boolean>(false);
+export const showLoadin = new BehaviorSubject<boolean>(false);
 
-
+// ===========================================================================
+// LISTA DE EMPLEADOS Y DE ARTICULOS
+// ===========================================================================
+export const LISTA_ARTICULOS = new BehaviorSubject<any>({});
+export const LISTA_EMPLEADOS = new BehaviorSubject<any>({});
 
 // ===========================================================================
 // PARA MOSTRAR MODAL DE INICIAR SESION
 // ===========================================================================
-export const  showModalHome = new BehaviorSubject<boolean>(false);
-
-
+export const showModalHome = new BehaviorSubject<boolean>(false);
 
 // ===========================================================================
 // PARA LOS DATOS DE SESIONAMIENTO
 // ===========================================================================
-export const  profile = new BehaviorSubject<UsuariosI>(
-    {
-        _id: ' ',
-        nombre: ' ' ,
-        apellido: ' ',
-        sexo: ' ',
-        fotoPerfil: ' ',
-        usuario: ' ',
-        telefono: ' ',
-        email: ' ',
-        fechaN: ' ',
-        password: ' ',
-        estado: true,
-        role: ' '
-    });
-    
+export const profile = new BehaviorSubject<UsuariosI>({
+  _id: ' ',
+  nombre: ' ',
+  apellido: ' ',
+  sexo: ' ',
+  fotoPerfil: ' ',
+  usuario: ' ',
+  telefono: ' ',
+  email: ' ',
+  fechaN: ' ',
+  password: ' ',
+  estado: true,
+  role: ' ',
+});

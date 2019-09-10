@@ -1,21 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { SharedService } from '../../../core/services/shared.service';
+import { Subscription } from 'rxjs';
+import { LISTA_ARTICULOS } from '../../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-registro-articulos',
   templateUrl: './registro-articulos.component.html',
   styleUrls: ['./registro-articulos.component.scss'],
 })
-export class RegistroArticulosComponent implements OnInit {
+export class RegistroArticulosComponent implements OnInit, OnDestroy {
   titulo = '';
   boton = '';
   form: FormGroup;
   detallableArray: FormArray;
   isDetallable = false;
   medida: boolean;
+  sub: Subscription;
 
   listaArticulos = [];
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
@@ -42,10 +45,16 @@ export class RegistroArticulosComponent implements OnInit {
         this.boton = 'Actualizar';
       }
     });
-
-    this.shServ.getArticulos().subscribe(res => {
+    this.sub = LISTA_ARTICULOS.subscribe(res => {
       this.listaArticulos = res;
     });
+    this.shServ.getArticulos().subscribe(res => {
+      LISTA_ARTICULOS.next(res);
+    });
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
   // =============================================
   //  CREAR MAS INPUTS PARA DETALLE
@@ -131,7 +140,8 @@ export class RegistroArticulosComponent implements OnInit {
     this.shServ.createArticulo(obj).subscribe(
       res => {
         this.shServ.toastSuccess(res.titulo, res.contenido);
-        // this.listaArticulos.push(res);
+        LISTA_ARTICULOS.next(_.concat(this.listaArticulos, res.body));
+        // console.log(res);
       },
       err => {
         console.log(err);

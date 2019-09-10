@@ -23,7 +23,7 @@ import { TablasComponent } from '../components/tablas/tablas.component';
     InventarioComponent,
     RegistroArticulosComponent,
     RegistroEmpleadosComponent,
-    TablasComponent
+    TablasComponent,
   ],
   imports: [
     CommonModule,

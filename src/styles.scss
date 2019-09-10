@@ -1,41 +1,53 @@
 /* You can add global styles to this file, and also import other style files */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
 
   height: 100%;
 }
 
-
 // ========================================================
 // CARDS
 // ========================================================
 
-.card-fondo{
-  padding: 2rem 2rem 2rem 2rem; 
-  border-radius: 1rem!important;
+.card-fondo {
+  padding: 2rem 2rem 2rem 2rem;
+  border-radius: 1rem !important;
+}
+.cardPrincipal {
+  padding: 2rem 2rem 2rem 2rem;
+  border-radius: 1rem !important;
+  max-height: calc(100% - 2rem);
+  min-height: calc(100% - 2rem);
+}
+
+.contenedorRegistro{
+  display: flex;
+  align-items: center;
+  height: calc(100% - 50px);
 }
 
 
 
 // ========================================================
 // BOTONES
-// ======================================================== 
+// ========================================================
 
-#btn-gris{
+#btn-gris {
   background-color: gray;
-  color:white;
-  &:hover{
+  color: white;
+  &:hover {
     background-color: rgb(91, 89, 89);
-    color:white;
+    color: white;
   }
 }
-#btn-verde{
+#btn-verde {
   background-color: rgb(30, 176, 55);
-  color:white;
-  &:hover{
+  color: white;
+  &:hover {
     background-color: rgb(25, 135, 43);
-    color:white;
+    color: white;
   }
 }
 
@@ -43,8 +55,8 @@ html, body {
 /* INPUT BUSCAR */
 /* ====================================================== */
 
-.searchDiv{
-  .search-input{
+.searchDiv {
+  .search-input {
     margin-bottom: 1rem;
     height: calc(1.5em + 0.75rem + 2px);
     padding: 0.375rem 0.75rem;
@@ -58,31 +70,26 @@ html, body {
     border-radius: 0.25rem;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   }
-
 }
-
 
 /* ====================================================== */
 /* RESPONSIVE */
 /* ====================================================== */
-@media (min-width: 991px){  /*pantallas lg*/
-
+@media (min-width: 991px) {
+  /*pantallas lg*/
 }
 
-@media (max-width: 991px){  /*pantallas md*/
-  .card-fondo{
-      padding: 2rem 1rem 2rem 1rem; 
+@media (max-width: 991px) {
+  /*pantallas md*/
+  .card-fondo {
+    padding: 2rem 1rem 2rem 1rem;
   }
 }
 
-@media (max-width: 767px){  /*pantallas sm*/
-  .card-fondo{
-      padding: 2rem 1rem 2rem 1rem; 
-      margin-top: 0.5rem;
+@media (max-width: 767px) {
+  /*pantallas sm*/
+  .card-fondo {
+    padding: 2rem 1rem 2rem 1rem;
+    margin-top: 0.5rem;
   }
 }
-
-
-
-
-

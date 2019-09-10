@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { MdbTablePaginationComponent, MdbTableDirective } from 'angular-bootstrap-md';
 import { SharedService } from '../../core/services/shared.service';
 import { FormBuilder } from '@angular/forms';
@@ -18,10 +18,18 @@ export class TablasComponent implements OnInit, AfterViewInit {
   @HostListener('input') oninput() {
     this.searchItems();
   }
+  // variables
   previous: any = [];
   searchText = '';
+
+  // inputs
   @Input() data: Array<any>;
   @Input() info: Array<any>;
+
+  // output
+  @Output() actualizarData = new EventEmitter<boolean>();
+
+
   constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
 
   ngOnInit() {
