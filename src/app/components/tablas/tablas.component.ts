@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { MdbTablePaginationComponent, MdbTableDirective } from 'angular-bootstrap-md';
 import { SharedService } from '../../core/services/shared.service';
 import { FormBuilder } from '@angular/forms';
@@ -8,6 +8,7 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'app-tablas',
   templateUrl: './tablas.component.html',
   styleUrls: ['./tablas.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TablasComponent implements OnInit, AfterViewInit {
   @ViewChild(MdbTablePaginationComponent, { static: true })
@@ -29,14 +30,14 @@ export class TablasComponent implements OnInit, AfterViewInit {
   // output
   @Output() actualizarData = new EventEmitter<boolean>();
 
-
-  constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
+  constructor( private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.mdbTable.setDataSource(this.data);
     this.data = this.mdbTable.getDataSource();
     this.previous = this.mdbTable.getDataSource();
   }
+
 
   searchItems() {
     const prev = this.mdbTable.getDataSource();

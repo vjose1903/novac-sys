@@ -7,12 +7,6 @@ import { UsuariosI } from '../models/usuario.model';
 export const showLoadin = new BehaviorSubject<boolean>(false);
 
 // ===========================================================================
-// LISTA DE EMPLEADOS Y DE ARTICULOS
-// ===========================================================================
-export const LISTA_ARTICULOS = new BehaviorSubject<any>({});
-export const LISTA_EMPLEADOS = new BehaviorSubject<any>({});
-
-// ===========================================================================
 // PARA MOSTRAR MODAL DE INICIAR SESION
 // ===========================================================================
 export const showModalHome = new BehaviorSubject<boolean>(false);

@@ -3,8 +3,6 @@ import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@ang
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { SharedService } from '../../../core/services/shared.service';
-import { Subscription } from 'rxjs';
-import { LISTA_ARTICULOS } from '../../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -18,7 +16,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   detallableArray: FormArray;
   isDetallable = false;
   medida: boolean;
-  sub: Subscription;
 
   listaArticulos = [];
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
@@ -45,17 +42,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
         this.boton = 'Actualizar';
       }
     });
-    this.sub = LISTA_ARTICULOS.subscribe(res => {
-      this.listaArticulos = res;
-    });
+
     this.shServ.getArticulos().subscribe(res => {
-      LISTA_ARTICULOS.next(res);
+      this.listaArticulos = res;
+      // LISTA_ARTICULOS.next(res);
     });
   }
 
-  ngOnDestroy() {
-    this.sub.unsubscribe();
-  }
+  ngOnDestroy() {}
   // =============================================
   //  CREAR MAS INPUTS PARA DETALLE
   // =============================================
@@ -140,8 +134,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     this.shServ.createArticulo(obj).subscribe(
       res => {
         this.shServ.toastSuccess(res.titulo, res.contenido);
-        LISTA_ARTICULOS.next(_.concat(this.listaArticulos, res.body));
-        // console.log(res);
+        this.listaArticulos = [...this.listaArticulos, res.body];
       },
       err => {
         console.log(err);
