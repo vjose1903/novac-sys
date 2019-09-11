@@ -1,3 +1,54 @@
-<p>
-  facturacion works!
-</p>
+<div class="row" style="height: calc(100% - 80px)">
+  <div class="col-xs-12 col-md-12">
+    <h1>Facturación</h1>
+    <div class="card cardPrincipal sinPadding">
+      <div class="cabezaFactura">
+        <div class="row">
+          <div class="col-xs-12 col-md-2">
+            <h5>Tipo:</h5>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked />
+              <label class="form-check-label" for="exampleRadios1">Consumidor final </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2" />
+              <label class="form-check-label" for="exampleRadios2"> Valor fiscal </label>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-10">
+            <form [formGroup]="form">
+              <h5>Cliente:</h5>
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                  <div class="form-group d-flex">
+                    <label class="control-label mr-2">Nombre:</label>
+                    <input type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control mb-4 w-50" autocomplete="off" />
+                    <div
+                      class="alerta text-danger ml-1"
+                      style="font-size: 12px"
+                      *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
+                      Este Campo es obligatorio
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                  <div class="form-group d-flex">
+                    <label class="control-label mr-2">Direccion:</label>
+                    <input type="text" formControlName="direccion" placeholder="Introduzca direccion" class="form-control mb-4 w-50" autocomplete="off" />
+                    <div
+                      class="alerta text-danger ml-1"
+                      style="font-size: 12px"
+                      *ngIf="!form.controls['direccion'].valid && (form.controls['direccion'].dirty || form.controls['direccion'].touched)">
+                      Este Campo es obligatorio
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="cuerpoFactura"></div>
+    </div>
+  </div>
+</div>

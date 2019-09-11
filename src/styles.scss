@@ -11,7 +11,7 @@ body {
 // CARDS
 // ========================================================
 
-.card-fondo {
+.card-padding {
   padding: 2rem 2rem 2rem 2rem;
   border-radius: 1rem !important;
 }
@@ -26,6 +26,10 @@ body {
   display: flex;
   align-items: center;
   height: calc(100% - 50px);
+}
+
+.sinPadding{
+  padding: 0!important;
 }
 
 
@@ -81,14 +85,14 @@ body {
 
 @media (max-width: 991px) {
   /*pantallas md*/
-  .card-fondo {
+  .card-padding {
     padding: 2rem 1rem 2rem 1rem;
   }
 }
 
 @media (max-width: 767px) {
   /*pantallas sm*/
-  .card-fondo {
+  .card-padding {
     padding: 2rem 1rem 2rem 1rem;
     margin-top: 0.5rem;
   }
