@@ -1,0 +1,83 @@
+.inputFact {
+  width: 100%;
+  padding: 0;
+  height: 2rem;
+}
+// ====================================================
+// TAMAÑO DE LOS TITULOS
+// ====================================================
+.COD {
+  max-width: 2.4rem;
+}
+.CAN {
+  max-width: 1.7rem;
+}
+.DES {
+  max-width: 7rem;
+}
+.UNI {
+  max-width: 1.7rem;
+}
+.PRE {
+  max-width: 2rem;
+}
+.TOT {
+  max-width: 2rem;
+}
+
+// ====================================================
+// TAMAÑO DE LAS FILAS
+// ====================================================
+
+.inCOD {
+  max-width: 9.55rem;
+  min-width: 9.55rem;
+}
+.inCAN {
+  max-width: 6.91rem;
+  min-width: 6.91rem;
+}
+.inDES {
+  max-width: 21.1rem;
+  min-width: 21.1rem;
+}
+
+.inUNI {
+  max-width: 6.91rem;
+  min-width: 6.91rem;
+}
+.inPRE {
+  max-width: 8rem;
+  min-width: 8rem;
+}
+.inTOT {
+  max-width: 8rem;
+  min-width: 8rem;
+}
+
+.inDES,
+.inUNI,
+.inPRE,
+.inTOT {
+  &:hover {
+    cursor: default;
+  }
+}
+
+.inDES:active,
+.inPRE:active,
+.inUNI:active,
+.inTOT:active,
+.inDES:focus,
+.inPRE:focus,
+.inUNI:focus,
+.inTOT:focus,
+.inDES.active,
+.inPRE.active,
+.inUNI.active,
+.inTOT.active {
+  background-image: none;
+  outline: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}

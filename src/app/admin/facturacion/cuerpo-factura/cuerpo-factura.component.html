@@ -1,0 +1,50 @@
+<table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
+  <thead>
+    <tr class="text-center">
+      <th class="COD">Codigo</th>
+      <th class="CAN">Cantidad</th>
+      <th class="DES">Descripcion</th>
+      <th class="UNI">Unidad</th>
+      <th class="PRE">Precio</th>
+      <th class="TOT">Total</th>
+    </tr>
+  </thead>
+  <!-- <tbody>
+    <tr>
+      <td class="COD"></td>
+      <td class="CAN"></td>
+      <td class="DES"></td>
+      <td class="UNI"></td>
+      <td class="PRE"></td>
+      <td class="TOT"></td>
+    </tr>
+  </tbody> -->
+</table>
+
+<form [formGroup]="form">
+  <input type="hidden" formControlName="hide" />
+  <div formArrayName="rowFactura" *ngFor="let item of rowFactura.controls; let i = index">
+    <div [formGroupName]="i">
+      <div class="d-inline-flex">
+        <div class="from-group">
+          <input type="text" class="inputFact inCOD" formControlName="cod"  />
+        </div>
+        <div class="from-group">
+          <input type="text" class="inputFact inCAN" formControlName="can" />
+        </div>
+        <div class="from-group">
+          <input type="text" class="inputFact inDES" formControlName="des" readonly="true" />
+        </div>
+        <div class="from-group">
+          <input type="text" class="inputFact inUNI" formControlName="uni" readonly="true" />
+        </div>
+        <div class="from-group">
+          <input type="text" class="inputFact inPRE" formControlName="pre"  readonly="true"/>
+        </div>
+        <div class="from-group">
+          <input type="text" class="inputFact inTOT" formControlName="tot"  readonly="true"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

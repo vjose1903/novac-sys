@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { SharedService } from '../../core/services/shared.service';
+import { ActivatedRoute } from '@angular/router';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-facturacion',
@@ -8,7 +11,17 @@ import { FormGroup } from '@angular/forms';
 })
 export class FacturacionComponent implements OnInit {
   form: FormGroup;
-  constructor() {}
+  numFac = 0;
+  fecha;
+  constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
+    this.form = this.fb.group({
+      nombre: [],
+      direccion: [],
+      telefono: [],
+    });
+  }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.fecha = moment().format('L');
+  }
 }
