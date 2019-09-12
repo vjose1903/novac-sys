@@ -1,7 +1,13 @@
-.inputFact {
-  width: 100%;
-  padding: 0;
-  height: 2rem;
+.entrada {
+  border-radius: 0;
+}
+.columna0padding,
+.td0padding {
+  padding: 0 !important;
+}
+.filaFact {
+  padding: 0rem 0.9rem;
+  width: 100vw;
 }
 // ====================================================
 // TAMAÑO DE LOS TITULOS
@@ -29,30 +35,24 @@
 // TAMAÑO DE LAS FILAS
 // ====================================================
 
-.inCOD {
-  max-width: 9.55rem;
-  min-width: 9.55rem;
+.tiCOD {
+  max-width: 2rem;
 }
-.inCAN {
-  max-width: 6.91rem;
-  min-width: 6.91rem;
+.tiCAN {
+  max-width: 0.99rem;
 }
-.inDES {
-  max-width: 21.1rem;
-  min-width: 21.1rem;
+.tiDES {
+  max-width: 7rem;
 }
 
-.inUNI {
-  max-width: 6.91rem;
-  min-width: 6.91rem;
+.tiUNI {
+  max-width: 1.7rem;
 }
-.inPRE {
-  max-width: 8rem;
-  min-width: 8rem;
+.tiPRE {
+  max-width: 1rem;
 }
-.inTOT {
-  max-width: 8rem;
-  min-width: 8rem;
+.tiTOT {
+  max-width: 1.7rem;
 }
 
 .inDES,

@@ -1,50 +1,123 @@
-<table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
+<table #tituloFactTable="mdbTable" mdbTable class="table m-auto" small="true">
   <thead>
     <tr class="text-center">
-      <th class="COD">Codigo</th>
-      <th class="CAN">Cantidad</th>
-      <th class="DES">Descripcion</th>
-      <th class="UNI">Unidad</th>
-      <th class="PRE">Precio</th>
-      <th class="TOT">Total</th>
+      <th class="tiCOD">Codigo</th>
+      <th class="tiCAN">Cantidad</th>
+      <th class="tiUNI">Unidad</th>
+      <th class="tiDES">Descripcion</th>
+      <th class="tiPRE">Precio</th>
+      <th class="tiTOT">Total</th>
     </tr>
   </thead>
-  <!-- <tbody>
+  <tbody>
     <tr>
-      <td class="COD"></td>
-      <td class="CAN"></td>
-      <td class="DES"></td>
-      <td class="UNI"></td>
-      <td class="PRE"></td>
-      <td class="TOT"></td>
+      <td class="COD td0padding"></td>
+
+      <td class="CAN td0padding"></td>
+
+      <td class="UNI td0padding"></td>
+
+      <td class="DES td0padding"></td>
+
+      <td class="PRE td0padding"></td>
+
+      <td class="TOT td0padding"></td>
     </tr>
-  </tbody> -->
+  </tbody>
 </table>
 
-<form [formGroup]="form">
+<form [formGroup]="form" action="">
+  <div formArrayName="rowFactura" *ngFor="let item of rowFactura.controls; let i = index">
+    <div [formGroupName]="i">
+      <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
+        <tbody>
+          <tr>
+            <td class="COD td0padding">
+              <div class="from-group">
+                <input type="text" class="form-control entrada " formControlName="cod" />
+              </div>
+            </td>
+
+            <td class="CAN td0padding">
+              <div class="from-group">
+                <input type="text" class="form-control entrada " formControlName="can" />
+              </div>
+            </td>
+
+            <td class="UNI td0padding">
+              <div class="from-group">
+                <input type="text" class="form-control entrada " formControlName="uni" />
+              </div>
+            </td>
+
+            <td class="DES td0padding">
+              <div class="from-group">
+                <input type="text" class="form-control entrada " formControlName="des" readonly="true" />
+              </div>
+            </td>
+
+            <td class="PRE td0padding">
+              <div class="from-group">
+                <input type="text" class="form-control entrada " formControlName="pre" readonly="true" />
+              </div>
+            </td>
+
+            <td class="TOT td0padding">
+              <div class="from-group">
+                <input type="text" class="form-control entrada " formControlName="tot" readonly="true" />
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</form>
+
+<button (click)="addItem()">
+  mas
+</button>
+
+<!-- <form [formGroup]="form">
   <input type="hidden" formControlName="hide" />
   <div formArrayName="rowFactura" *ngFor="let item of rowFactura.controls; let i = index">
     <div [formGroupName]="i">
-      <div class="d-inline-flex">
-        <div class="from-group">
-          <input type="text" class="inputFact inCOD" formControlName="cod"  />
+      <div class="row filaFact">
+        <div class="col-2 columna0padding inCOD">
+          <div class="from-group">
+            <input type="text" class="form-control entrada " formControlName="cod" />
+          </div>
         </div>
-        <div class="from-group">
-          <input type="text" class="inputFact inCAN" formControlName="can" />
+
+        <div class="col-1 columna0padding inCAN">
+          <div class="from-group">
+            <input type="text" class="form-control entrada " formControlName="can" />
+          </div>
         </div>
-        <div class="from-group">
-          <input type="text" class="inputFact inDES" formControlName="des" readonly="true" />
+        <div class="col-4 columna0padding inDES">
+          <div class="from-group">
+            <input type="text" class="form-control entrada " formControlName="des" readonly="true" />
+          </div>
         </div>
-        <div class="from-group">
-          <input type="text" class="inputFact inUNI" formControlName="uni" readonly="true" />
+
+        <div class="col-1 columna0padding inUNI">
+          <div class="from-group">
+            <input type="text" class="form-control entrada " formControlName="uni" readonly="true" />
+          </div>
         </div>
-        <div class="from-group">
-          <input type="text" class="inputFact inPRE" formControlName="pre"  readonly="true"/>
+
+        <div class="col-2 columna0padding inPRE">
+          <div class="from-group">
+            <input type="text" class="form-control entrada " formControlName="pre" readonly="true" />
+          </div>
         </div>
-        <div class="from-group">
-          <input type="text" class="inputFact inTOT" formControlName="tot"  readonly="true"/>
+
+        <div class="col-2 columna0padding inTOT">
+          <div class="from-group">
+            <input type="text" class="form-control entrada " formControlName="tot" readonly="true" />
+          </div>
         </div>
       </div>
     </div>
   </div>
-</form>
+</form> -->
