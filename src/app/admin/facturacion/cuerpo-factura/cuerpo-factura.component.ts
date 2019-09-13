@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChildren, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { SharedService } from '../../../core/services/shared.service';
 import { ActivatedRoute } from '@angular/router';
@@ -21,9 +21,14 @@ export class CuerpoFacturaComponent implements OnInit {
       hide: [''],
       rowFactura: this.fb.array([this.createItem()]),
     });
+
+    for (let index = 0; index <= 9; index++) {
+      this.addItem();
+    }
   }
+
   // =============================================
-  //  CREAR MAS INPUTS PARA DETALLE
+  //  CREAR MAS INPUTS PARA FACTURA
   // =============================================
 
   createItem(): FormGroup {
@@ -46,6 +51,7 @@ export class CuerpoFacturaComponent implements OnInit {
     const control = <FormArray>this.form.controls['rowFactura'];
     control.removeAt(i);
   }
+
   // =============================================
   //  VALIDACIONES DE ARRAY
   // =============================================

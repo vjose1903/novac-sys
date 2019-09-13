@@ -26,57 +26,60 @@
   </tbody>
 </table>
 
-<form [formGroup]="form" action="">
-  <div formArrayName="rowFactura" *ngFor="let item of rowFactura.controls; let i = index">
-    <div [formGroupName]="i">
-      <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
-        <tbody>
-          <tr>
-            <td class="COD td0padding">
-              <div class="from-group">
-                <input type="text" class="form-control entrada " formControlName="cod" />
-              </div>
-            </td>
+<div class="cuadro" #cuadro>
+  <form [formGroup]="form" action="">
+    <div formArrayName="rowFactura" *ngFor="let item of rowFactura.controls; let i = index">
+      <div [formGroupName]="i">
+        <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
+          <tbody>
+            <tr>
+              <td class="COD td0padding">
+                <div class="from-group">
+                  <input type="text" class="form-control entrada " formControlName="cod" />
+                </div>
+              </td>
 
-            <td class="CAN td0padding">
-              <div class="from-group">
-                <input type="text" class="form-control entrada " formControlName="can" />
-              </div>
-            </td>
+              <td class="CAN td0padding">
+                <div class="from-group">
+                  <input type="text" class="form-control entrada " formControlName="can" />
+                </div>
+              </td>
 
-            <td class="UNI td0padding">
-              <div class="from-group">
-                <input type="text" class="form-control entrada " formControlName="uni" />
-              </div>
-            </td>
+              <td class="UNI td0padding">
+                <div class="from-group">
+                  <input type="text" class="form-control entrada " formControlName="uni" />
+                </div>
+              </td>
 
-            <td class="DES td0padding">
-              <div class="from-group">
-                <input type="text" class="form-control entrada " formControlName="des" readonly="true" />
-              </div>
-            </td>
+              <td class="DES td0padding">
+                <div class="from-group">
+                  <input type="text" class="form-control entrada inDES " formControlName="des" readonly="true" />
+                </div>
+              </td>
 
-            <td class="PRE td0padding">
-              <div class="from-group">
-                <input type="text" class="form-control entrada " formControlName="pre" readonly="true" />
-              </div>
-            </td>
+              <td class="PRE td0padding">
+                <div class="from-group">
+                  <input type="text" class="form-control entrada inPRE " formControlName="pre" readonly="true" />
+                </div>
+              </td>
 
-            <td class="TOT td0padding">
-              <div class="from-group">
-                <input type="text" class="form-control entrada " formControlName="tot" readonly="true" />
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <td class="TOT td0padding">
+                <div class="from-group">
+                  <input type="text" class="form-control entrada inTOT " formControlName="tot" readonly="true" />
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</form>
+  </form>
+</div>
 
 <button (click)="addItem()">
   mas
 </button>
+<p>{{ rowFactura.value | json }}</p>
 
 <!-- <form [formGroup]="form">
   <input type="hidden" formControlName="hide" />

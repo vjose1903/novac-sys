@@ -19,6 +19,8 @@ export class TablasComponent implements OnInit, AfterViewInit {
   @HostListener('input') oninput() {
     this.searchItems();
   }
+
+  
   // variables
   previous: any = [];
   searchText = '';
