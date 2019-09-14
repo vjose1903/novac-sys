@@ -1,10 +1,9 @@
-<div class="searchDiv">
-  <label class="search-label" for="search">Busqueda </label>
-  <input [(ngModel)]="searchText" id="search" class="search-input" />
-</div>
+<label class="search-label" for="search">Busqueda</label>
+<input [(ngModel)]="searchText" id="search" class="search-input" />
 
+{{ searchText | json }}
 <div class="scroll-container" style="border-radius: 10px 10px 0px 0px">
-  <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" hover="true" small="true">
+  <table #consorciosTable="mdbTable" mdbTable class="table" small="true">
     <thead class="text-center head-table ">
       <tr>
         <th *ngFor="let titulo of info">{{ titulo.titulo }}</th>
@@ -13,7 +12,6 @@
     </thead>
     <tbody>
       <tr mdbTableCol *ngFor="let row of data; let i = index" class="text-center" style="cursor: pointer;">
-
         <td *ngFor="let column of info">{{ row[column.key] }}</td>
 
         <td class="btnAccion">

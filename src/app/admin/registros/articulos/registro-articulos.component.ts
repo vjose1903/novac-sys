@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@ang
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { SharedService } from '../../../core/services/shared.service';
+import { TABLA } from '../../../components/tablas/tabla';
 
 @Component({
   selector: 'app-registro-articulos',
