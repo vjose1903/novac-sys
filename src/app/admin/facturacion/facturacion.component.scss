@@ -1,5 +1,19 @@
-.cabezaFactura{
-    background-color: #eaffe4;
-    border-radius: 1rem 1rem 0rem 0rem!important;
-    padding: 1rem;
+.cabezaFactura {
+  background-color: #eaffe4;
+  border-radius: 1rem 1rem 0rem 0rem !important;
+  padding: 1rem;
+}
+#inputTelefono {
+  &:hover {
+    cursor: default;
+  }
+}
+
+#inputTelefono:active,
+#inputTelefono:focus,
+#inputTelefono.active {
+  outline: 0px;
+  // -webkit-box-shadow: 0px solid rgb(177, 177, 177) !important;
+  border-color: #d4d4d4 !important;
+  box-shadow: 0px 0px #d4d4d4 !important;
 }

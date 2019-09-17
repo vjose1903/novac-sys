@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { MdbTablePaginationComponent, MdbTableDirective, MdbTableService } from 'angular-bootstrap-md';
+import { MdbTablePaginationComponent, MdbTableDirective } from 'angular-bootstrap-md';
 import { SharedService } from '../../core/services/shared.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -10,7 +10,6 @@ import { TablasService } from './tablas.service';
   selector: 'app-tablas',
   templateUrl: './tablas.component.html',
   styleUrls: ['./tablas.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TablasComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MdbTablePaginationComponent, { static: true }) mdbTablePagination: MdbTablePaginationComponent;
@@ -33,44 +32,37 @@ export class TablasComponent implements OnInit, AfterViewInit, OnDestroy {
     private taServ: TablasService,
     private shServ: SharedService,
     private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private tableService: MdbTableService,
+    private route: ActivatedRoute, // private tableService: MdbTableService,
   ) {}
   // variables
   elements: any[] = [];
   previous: any[] = [];
-  searchText: string = '';
+  searchText = '';
 
-  ngOnInit() {
-    // this.mdbTable.setDataSource(this.elements);
-    // this.elements = this.mdbTable.getDataSource();
-    // this.previous = this.mdbTable.getDataSource();
-  }
+  ngOnInit() {}
   ngOnDestroy() {}
 
   searchItems() {
-    const prev = this.tableService.getDataSource();
-
     if (!this.searchText) {
-      this.tableService.setDataSource(this.previous);
-      this.elements = this.tableService.getDataSource();
-      // this.previous = this.tableService.getDataSource();
+      this.mdbTable.setDataSource(this.previous);
+      this.elements = this.mdbTable.getDataSource();
     }
 
     if (this.searchText) {
-      this.elements = this.tableService.searchLocalDataBy(this.searchText);
-      this.tableService.setDataSource(prev);
+      this.data = this.mdbTable.searchLocalDataBy(this.searchText);
+      this.mdbTable.setDataSource(this.elements);
     }
   }
 
   setDATATABLE() {
     this.data.forEach(element => {
       this.elements.push(element);
+      this.previous.push(element);
     });
 
-    // this.tableService.setDataSource(this.elements);
-    // this.elements = this.tableService.getDataSource();
-    // this.previous = this.tableService.getDataSource();
+    this.mdbTable.setDataSource(this.elements);
+    this.elements = this.mdbTable.getDataSource();
+    this.previous = this.mdbTable.getDataSource();
   }
 
   ngAfterViewInit() {
@@ -83,6 +75,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   changeVisibleItems(items) {
-    this.mdbTablePagination.setMaxVisibleItemsNumberTo(items);
+    // this.mdbTablePagination.setMaxVisibleItemsNumberTo(items);
   }
 }
