@@ -35,19 +35,19 @@
             <tr>
               <td class="COD td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada " #cod (keydown.enter)="saltar($event, 'can', i , this)" formControlName="cod" />
+                  <input type="text" class="form-control entrada " id="cod-{{ i }}" (keydown.enter)="saltar($event, 'can-', i , this)" formControlName="cod" />
                 </div>
               </td>
 
               <td class="CAN td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada " #can (keydown.enter)="saltar($event, 'uni', i , this)" formControlName="can" />
+                  <input type="text" class="form-control entrada " id="can-{{ i }}" (keydown.enter)="saltar($event, 'uni-', i , this)" formControlName="can" />
                 </div>
               </td>
 
               <td class="UNI td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada " #uni (keydown.enter)="saltar($event, 'cod', i + 1 , this)" formControlName="uni" />
+                  <input type="text" class="form-control entrada " id="uni-{{ i }}" (keydown.enter)="saltar($event, 'cod-', i + 1 , this)" formControlName="uni" />
                 </div>
               </td>
 
@@ -75,10 +75,10 @@
     </div>
   </form>
 </div>
-
+<!-- 
 <button (click)="addItem()">
   mas
-</button>
+</button> -->
 <p>{{ rowFactura.value | json }}</p>
 
 <!-- <form [formGroup]="form">

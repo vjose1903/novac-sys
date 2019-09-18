@@ -71,16 +71,14 @@ export class CuerpoFacturaComponent implements OnInit {
     window.history.back();
   }
 
-  saltar(e, input, i) {
-    // console.log(e, 'evento');
-    // console.log(input, 'input');
-    // console.log(i, 'i');
+  element: HTMLElement;
+  saltar(e, input, i, elemento) {
+    if (i >= 10 && input === 'cod-') {
+      this.addItem();
+    }
 
-    const control = <FormArray>this.form.controls['rowFactura'];
-
-    console.log((control.controls[i] as any).controls[input].value);
-    // (control.controls[i] as any).controls[input].setValue('siguiente');
-    (control.controls[i] as any).controls[input].setFocus();
-    // (control.controls[i] as any).controls[input].scrollIntoView();
+    const obj = input + i;
+    this.element = document.getElementById(obj) as HTMLElement;
+    this.element.focus();
   }
 }
