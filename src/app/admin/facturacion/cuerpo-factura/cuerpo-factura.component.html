@@ -53,19 +53,19 @@
 
               <td class="DES td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada inDES " formControlName="des" readonly="true" />
+                  <input type="text" class="form-control entrada inDES " id="des-{{ i }}" formControlName="des" readonly="true" />
                 </div>
               </td>
 
               <td class="PRE td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada inPRE " formControlName="pre" readonly="true" />
+                  <input type="text" class="form-control entrada inPRE " id="pre-{{ i }}" formControlName="pre" readonly="true" />
                 </div>
               </td>
 
               <td class="TOT td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada inTOT " formControlName="tot" readonly="true" />
+                  <input type="text" class="form-control entrada inTOT " id="tot-{{ i }}" formControlName="tot" readonly="true" />
                 </div>
               </td>
             </tr>
@@ -75,52 +75,4 @@
     </div>
   </form>
 </div>
-<!-- 
-<button (click)="addItem()">
-  mas
-</button> -->
 <p>{{ rowFactura.value | json }}</p>
-
-<!-- <form [formGroup]="form">
-  <input type="hidden" formControlName="hide" />
-  <div formArrayName="rowFactura" *ngFor="let item of rowFactura.controls; let i = index">
-    <div [formGroupName]="i">
-      <div class="row filaFact">
-        <div class="col-2 columna0padding inCOD">
-          <div class="from-group">
-            <input type="text" class="form-control entrada " formControlName="cod" />
-          </div>
-        </div>
-
-        <div class="col-1 columna0padding inCAN">
-          <div class="from-group">
-            <input type="text" class="form-control entrada " formControlName="can" />
-          </div>
-        </div>
-        <div class="col-4 columna0padding inDES">
-          <div class="from-group">
-            <input type="text" class="form-control entrada " formControlName="des" readonly="true" />
-          </div>
-        </div>
-
-        <div class="col-1 columna0padding inUNI">
-          <div class="from-group">
-            <input type="text" class="form-control entrada " formControlName="uni" readonly="true" />
-          </div>
-        </div>
-
-        <div class="col-2 columna0padding inPRE">
-          <div class="from-group">
-            <input type="text" class="form-control entrada " formControlName="pre" readonly="true" />
-          </div>
-        </div>
-
-        <div class="col-2 columna0padding inTOT">
-          <div class="from-group">
-            <input type="text" class="form-control entrada " formControlName="tot" readonly="true" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</form> -->

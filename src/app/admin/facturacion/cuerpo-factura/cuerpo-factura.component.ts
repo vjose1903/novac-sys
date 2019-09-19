@@ -11,6 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 export class CuerpoFacturaComponent implements OnInit {
   form: FormGroup;
   rowFactura: FormArray;
+  ListArticulos: any;
 
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.rowFactura = new FormArray([new FormControl()]);
@@ -25,6 +26,10 @@ export class CuerpoFacturaComponent implements OnInit {
     for (let index = 0; index <= 9; index++) {
       this.addItem();
     }
+
+    this.shServ.getArticulos().subscribe(res => {
+      this.ListArticulos = res;
+    });
   }
 
   // =============================================
@@ -53,18 +58,6 @@ export class CuerpoFacturaComponent implements OnInit {
   }
 
   // =============================================
-  //  VALIDACIONES DE ARRAY
-  // =============================================
-  getvalidateControlArray(i, campo) {
-    const control = <FormArray>this.form.controls['rowFactura'];
-    if ((control.controls[i] as any).controls[campo].status === 'INVALID' && (control.controls[i] as any).controls[campo].touched) {
-      return true;
-    }
-
-    return false;
-  }
-
-  // =============================================
   //  BOTON ATRAS
   // =============================================
   atras() {
@@ -72,11 +65,15 @@ export class CuerpoFacturaComponent implements OnInit {
   }
 
   element: HTMLElement;
+
   saltar(e, input, i, elemento) {
     if (i >= 10 && input === 'cod-') {
       this.addItem();
     }
 
+    if (input === 'cant-') {
+      
+    }
     const obj = input + i;
     this.element = document.getElementById(obj) as HTMLElement;
     this.element.focus();
