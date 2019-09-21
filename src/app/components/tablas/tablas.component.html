@@ -1,29 +1,48 @@
-<label class="search-label" for="search">Busqueda</label>
-<input [(ngModel)]="searchText" id="search" class="search-input" />
+<div class="searchDiv">
+  <label class="search-label" for="search">Busqueda </label>
+  <input [(ngModel)]="searchText" id="search" class="search-input" />
+</div>
 
-<div class="scroll-container" style="border-radius: 10px 10px 0px 0px">
-  <table #TABLA="mdbTable" mdbTable class="table" small="true">
+<div class="{{ scrollContainer }}" style="border-radius: 10px 10px 0px 0px">
+  <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" hover="true" small="true">
     <thead class="text-center head-table ">
       <tr>
-        <th *ngFor="let titulo of info">{{ titulo.titulo }}</th>
-        <th></th>
+        <th *ngFor="let row of info">{{ row.titulo }}</th>
+        <th *ngIf="botones.titulo">Acciones</th>
       </tr>
     </thead>
     <tbody>
-      <tr mdbTableCol *ngFor="let row of data; let i = index" class="text-center" style="cursor: pointer;">
-        <td *ngFor="let column of info">{{ row[column.key] }}</td>
-
-        <td class="btnAccion">
-          <span mdbTooltip="Editar" placement="top" *ngIf="true">
-            <i class="fas fa-pencil-alt"></i>
+      <tr
+        mdbTableCol
+        *ngFor="let row of data; let i = index"
+        class="text-center"
+        [ngClass]="{
+          danger: !row.activo && colores,
+          warning: row.panico > 0 && colores,
+          'bg-light': seleccionado == row.id
+        }"
+        style="cursor: pointer;"
+      >
+        <td *ngIf="filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')" (click)="clickROW(row)">
+          <span *ngFor="let column of info" style="width: 100%">
+            {{ row[column.key] }}
           </span>
-
-          <span mdbTooltip="Borrar " placement="top" *ngIf="true">
-            <i class="far fa-trash-alt"></i>
+        </td>
+        <td *ngFor="let column of info" (click)="clickROW(row)">
+          <span *ngIf="!filtroSelect" style="width: 100%">
+            {{ row[column.key] }}
           </span>
+        </td>
+
+        <td class="btnAccion" *ngIf="filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
+          <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)" (panicoBTN)="changePanico($event)"></app-btnacciones>
+        </td>
+        <td class="btnAccion" *ngIf="!filtroSelect">
+          <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)" (panicoBTN)="changePanico($event)"></app-btnacciones>
         </td>
       </tr>
     </tbody>
     <tfoot class="grey lighten-5 w-100"></tfoot>
   </table>
 </div>
+<!-- {key:"nombre"} {"nombre":''}[{key:"nombre"}] -->

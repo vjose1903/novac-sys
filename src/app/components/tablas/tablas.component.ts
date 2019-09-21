@@ -11,40 +11,50 @@ import { TablasService } from './tablas.service';
   templateUrl: './tablas.component.html',
   styleUrls: ['./tablas.component.scss'],
 })
-export class TablasComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MdbTablePaginationComponent, { static: true }) mdbTablePagination: MdbTablePaginationComponent;
+export class TablasComponent implements OnInit, AfterViewInit {
+  @ViewChild(MdbTablePaginationComponent, { static: true })
+  mdbTablePagination: MdbTablePaginationComponent;
 
-  @ViewChild(MdbTableDirective, { static: true }) mdbTable: MdbTableDirective;
+  @ViewChild(MdbTableDirective, { static: false }) mdbTable: MdbTableDirective;
 
   @HostListener('input') oninput() {
     this.searchItems();
   }
 
-  // inputs
-  @Input() data: any[] = [];
-  @Input() info: Array<any>;
-
-  // output
-  @Output() actualizarData = new EventEmitter<boolean>();
-
-  constructor(
-    private cdRef: ChangeDetectorRef,
-    private taServ: TablasService,
-    private shServ: SharedService,
-    private fb: FormBuilder,
-    private route: ActivatedRoute, // private tableService: MdbTableService,
-  ) {}
   // variables
   elements: any[] = [];
-  previous: any[] = [];
+  previous: any = [];
   searchText = '';
 
+  // inputs
+  // @Input() data: Array<any>;
+  @Input() info: Array<any>;
+  @Input() botones = {
+    titulo: false,
+    borrar: false,
+    editar: false,
+    panico: false,
+    mostrar: false,
+  };
+
+  @Input() seleccionado: any;
+  @Input() filtroSelect: any;
+  @Input() data: any[] = [];
+  @Input() scrollContainer;
+  @Input() colores: boolean = false;
+
+  // output
+  @Output() panico = new EventEmitter<any>();
+  @Output() clickRow = new EventEmitter<any>();
+  @Output() DevolverInfo = new EventEmitter<any>();
+  @Output() DELETE = new EventEmitter<any>();
+  constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
+
   ngOnInit() {}
-  ngOnDestroy() {}
 
   searchItems() {
     if (!this.searchText) {
-      this.mdbTable.setDataSource(this.previous);
+      this.mdbTable.setDataSource(this.data);
       this.elements = this.mdbTable.getDataSource();
     }
 
@@ -64,17 +74,33 @@ export class TablasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.elements = this.mdbTable.getDataSource();
     this.previous = this.mdbTable.getDataSource();
   }
-
   ngAfterViewInit() {
     this.setDATATABLE();
     // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
     // this.mdbTablePagination.calculateFirstItemIndex();
     // this.mdbTablePagination.calculateLastItemIndex();
-
     this.cdRef.detectChanges();
   }
 
   changeVisibleItems(items) {
-    // this.mdbTablePagination.setMaxVisibleItemsNumberTo(items);
+    this.mdbTablePagination.setMaxVisibleItemsNumberTo(items);
+  }
+
+  clickROW(arg) {
+    this.seleccionado = arg.id;
+    this.clickRow.emit(arg);
+    // console.log(arg);
+  }
+
+  changePanico(arg) {
+    this.panico.emit(arg);
+  }
+
+  devolverInfo(arg) {
+    this.DevolverInfo.emit(arg);
+  }
+
+  delete(arg) {
+    this.DELETE.emit(arg);
   }
 }

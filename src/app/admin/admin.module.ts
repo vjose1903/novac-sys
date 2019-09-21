@@ -13,21 +13,13 @@ import { FacturacionComponent } from './facturacion/facturacion.component';
 import { InventarioComponent } from './inventario/inventario.component';
 import { RegistroArticulosComponent } from './registros/articulos/registro-articulos.component';
 import { RegistroEmpleadosComponent } from './registros/registro-empleados/registro-empleados.component';
-import { TablasComponent } from '../components/tablas/tablas.component';
 import { CuerpoFacturaComponent } from './facturacion/cuerpo-factura/cuerpo-factura.component';
+import { TablasModule } from '../components/tablas/tablas.module';
 
 @NgModule({
-  declarations: [
-    HomeAdminComponent,
-    NavbarAComponent,
-    FacturacionComponent,
-    InventarioComponent,
-    RegistroArticulosComponent,
-    RegistroEmpleadosComponent,
-    TablasComponent,
-    CuerpoFacturaComponent,
-  ],
+  declarations: [HomeAdminComponent, NavbarAComponent, FacturacionComponent, InventarioComponent, RegistroArticulosComponent, RegistroEmpleadosComponent, CuerpoFacturaComponent],
   imports: [
+    TablasModule,
     CommonModule,
     AppRoutingModule,
     AngularModule,

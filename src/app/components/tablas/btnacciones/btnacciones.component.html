@@ -1,0 +1,11 @@
+<span mdbTooltip="Mostrar" (click)="devolverInfo(row, 'mostrar')" placement="top" *ngIf="botones.mostrar">
+  <i class="far fa-eye"></i>
+</span>
+
+<span mdbTooltip="Editar" (click)="devolverInfo(row, 'editar')" placement="top" *ngIf="botones.editar">
+  <i class="fas fa-pencil-alt"></i>
+</span>
+
+<span mdbTooltip="Borrar" (click)="delete(row)" placement="top" *ngIf="botones.borrar">
+  <i class="far fa-trash-alt"></i>
+</span>

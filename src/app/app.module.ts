@@ -14,7 +14,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-
 import { AppComponent } from './app.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
@@ -26,7 +25,7 @@ import { NgxBootstrapModule } from './modules/ngx-bootstrap.module';
 import { AngularModule } from './modules/angular.module';
 
 import { ToastrModule } from 'ngx-toastr';
-
+import { TablasModule } from './components/tablas/tablas.module';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -44,12 +43,13 @@ export function HttpLoaderFactory(http: HttpClient) {
     HomeModule,
     ToastrModule.forRoot(),
     AppRoutingModule,
+    TablasModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
+        deps: [HttpClient],
+      },
     }),
 
     //modulos
@@ -57,17 +57,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     MDBBootstrapModule,
     AdminModule,
     BrowserAnimationsModule,
-    NgxBootstrapModule
+    NgxBootstrapModule,
   ],
-  exports:[
-    AngularModule,
-    MDBBootstrapModule,
-    AdminModule,
-    BrowserAnimationsModule,
-    NgxBootstrapModule
-  ],
+  exports: [AngularModule, MDBBootstrapModule, AdminModule, BrowserAnimationsModule, NgxBootstrapModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}
-

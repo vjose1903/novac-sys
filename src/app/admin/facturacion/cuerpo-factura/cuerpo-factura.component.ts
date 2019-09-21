@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChildren, OnChanges, SimpleChanges } from '@angu
 import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { SharedService } from '../../../core/services/shared.service';
 import { ActivatedRoute } from '@angular/router';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -67,15 +68,26 @@ export class CuerpoFacturaComponent implements OnInit {
   element: HTMLElement;
 
   saltar(e, input, i, elemento) {
+    const sigInput = input + i;
+    this.element = document.getElementById(sigInput) as HTMLElement;
+    this.element.focus();
+
+    const control = <FormArray>this.form.controls['rowFactura'];
+    let codigo = (control.controls[i] as any).controls['cod'].value;
+
     if (i >= 10 && input === 'cod-') {
       this.addItem();
     }
 
-    if (input === 'cant-') {
-      
+    if (input === 'can-') {
+      codigo = _.parseInt(codigo);
+
+      if (_.isInteger(codigo)) {
+        // console.log('es un codigo');
+      } else {
+        codigo = (control.controls[i] as any).controls['cod'].value;
+        // console.log('debe de filtrar');
+      }
     }
-    const obj = input + i;
-    this.element = document.getElementById(obj) as HTMLElement;
-    this.element.focus();
   }
 }
