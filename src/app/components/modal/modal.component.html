@@ -20,12 +20,22 @@
   *ngIf="ModalShearch && seleccionModal && infoArticulos"
   header="Buscar articulo"
   [(visible)]="showModal"
+  [focusTrap]="true"
   [focusOnShow]="true"
   [modal]="false"
   [responsive]="true"
   [style]="{ width: '600px', minWidth: '400px' }"
   [minY]="70"
   (onHide)="reinicioModal()"
+  (onShow)="prueba()"
 >
-  <app-tablas *ngIf="listaArticulos.length > 0 && paraFiltroArticulos" [paraFiltroArticulos]="paraFiltroArticulos" (clickRow)="devolverCLick($event)" [info]="infoArticulos" [data]="listaArticulos"></app-tablas>
+  <app-tablas
+    id="tablaSearch"
+    *ngIf="listaArticulos.length > 0 && paraFiltroArticulos"
+    [focusRow]="true"
+    [paraFiltroArticulos]="paraFiltroArticulos"
+    (clickRow)="devolverCLick($event)"
+    [info]="infoArticulos"
+    [data]="listaArticulos"
+  ></app-tablas>
 </p-dialog>

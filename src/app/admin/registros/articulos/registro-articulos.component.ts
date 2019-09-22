@@ -151,7 +151,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   info = [
     {
       titulo: 'Cod.',
-      key: 'code',
+      key: 'codigo',
     },
     {
       titulo: 'Articulo',

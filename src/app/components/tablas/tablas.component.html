@@ -4,7 +4,7 @@
 </div>
 
 <div class="{{ scrollContainer }}" style="border-radius: 10px 10px 0px 0px">
-  <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" hover="true" small="true">
+  <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" hover="true" small="true" id="VICtablas">
     <thead class="text-center head-table ">
       <tr>
         <th *ngFor="let row of info">{{ row.titulo }}</th>
@@ -17,16 +17,20 @@
         *ngFor="let row of data; let i = index"
         class="text-center"
         [ngClass]="{
-          'bg-light': seleccionado == row.id
+          'bg-light': seleccionado == row.id,
+          'bg-light': RowElement.id == IDrow
         }"
         style="cursor: pointer;"
+        id="row-{{ i }}"
+        #RowElement
+        (click)="clickROW(row)"
       >
-        <td *ngIf="filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')" (click)="clickROW(row)">
-          <span *ngFor="let column of info" style="width: 100%">
+        <td *ngIf="filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
+          <span *ngFor="let column of info; let i = index" style="width: 100%">
             {{ row[column.key] }}
           </span>
         </td>
-        <td *ngFor="let column of info" (click)="clickROW(row)">
+        <td *ngFor="let column of info">
           <span *ngIf="!filtroSelect" style="width: 100%">
             {{ row[column.key] }}
           </span>

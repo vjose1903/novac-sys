@@ -21,13 +21,18 @@ export class TablasComponent implements OnInit, AfterViewInit {
     this.searchItems();
   }
 
+  @HostListener('VICtablas') onkeypress() {
+    this.prueba();
+  }
+
   // variables
   elements: any[] = [];
   previous: any = [];
   searchText = '';
+  IDrow = 'row-0';
+  // element: HTMLElement;
 
   // inputs
-  // @Input() data: Array<any>;
   @Input() paraFiltroArticulos;
   @Input() info: Array<any>;
   @Input() botones = {
@@ -38,6 +43,7 @@ export class TablasComponent implements OnInit, AfterViewInit {
   };
 
   @Input() seleccionado = -1;
+  @Input() focusRow = false;
   @Input() filtroSelect: any;
   @Input() data: any[] = [];
   @Input() scrollContainer;
@@ -50,7 +56,10 @@ export class TablasComponent implements OnInit, AfterViewInit {
   @Output() DELETE = new EventEmitter<any>();
   constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    // this.element = document.getElementById('VICtablas') as HTMLElement;
+    // console.log(this.element);
+  }
 
   searchItems() {
     if (!this.searchText) {
@@ -74,6 +83,7 @@ export class TablasComponent implements OnInit, AfterViewInit {
     this.elements = this.mdbTable.getDataSource();
     this.previous = this.mdbTable.getDataSource();
   }
+
   ngAfterViewInit() {
     this.setDATATABLE();
 
@@ -82,6 +92,13 @@ export class TablasComponent implements OnInit, AfterViewInit {
       setTimeout(() => {
         this.searchItems();
       }, 50);
+    }
+
+    if (this.focusRow) {
+      this.IDrow = 'row-0';
+
+      // this.element = document.getElementById(this.IDrow) as HTMLElement;
+      // this.element.focus();
     }
     // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
     // this.mdbTablePagination.calculateFirstItemIndex();
@@ -98,6 +115,7 @@ export class TablasComponent implements OnInit, AfterViewInit {
       this.seleccionado = arg.id;
     }
     this.clickRow.emit(arg);
+
     // console.log(arg);
   }
 
@@ -111,5 +129,9 @@ export class TablasComponent implements OnInit, AfterViewInit {
 
   delete(arg) {
     this.DELETE.emit(arg);
+  }
+
+  prueba() {
+    console.log('algo');
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, OnChanges, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-modal',
@@ -28,6 +28,7 @@ export class ModalComponent implements OnInit, OnChanges {
   paraFiltroArticulos;
   constructor() {}
 
+  element: HTMLElement;
   ngOnInit() {}
 
   ngOnChanges() {
@@ -35,6 +36,7 @@ export class ModalComponent implements OnInit, OnChanges {
       this.paraFiltroArticulos = this.seleccionModal;
     }
   }
+
   accion(arg) {
     this.btnInsideClick.emit(arg);
     this.showModal = false;
@@ -46,5 +48,12 @@ export class ModalComponent implements OnInit, OnChanges {
 
   devolverCLick(arg) {
     this.clickRowModal.emit(arg);
+  }
+  prueba() {
+    console.log('algo');
+    if (this.ModalShearch) {
+      this.element = document.getElementById('tablaSearch') as HTMLElement;
+      this.element.focus();
+    }
   }
 }
