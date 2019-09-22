@@ -28,6 +28,7 @@ export class TablasComponent implements OnInit, AfterViewInit {
 
   // inputs
   // @Input() data: Array<any>;
+  @Input() paraFiltroArticulos;
   @Input() info: Array<any>;
   @Input() botones = {
     titulo: false,
@@ -75,6 +76,12 @@ export class TablasComponent implements OnInit, AfterViewInit {
     this.previous = this.mdbTable.getDataSource();
   }
   ngAfterViewInit() {
+    if (this.paraFiltroArticulos) {
+      this.searchText = this.paraFiltroArticulos;
+      setTimeout(() => {
+        this.searchItems();
+      }, 50);
+    }
     this.setDATATABLE();
     // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
     // this.mdbTablePagination.calculateFirstItemIndex();

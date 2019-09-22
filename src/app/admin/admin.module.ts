@@ -4,7 +4,7 @@ import { AppRoutingModule } from '../app-routing.module';
 import { AngularModule } from '../modules/angular.module';
 import { NgxBootstrapModule } from '../modules/ngx-bootstrap.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
-import { MdBootstrapModule } from '../modules/md-bootstrap.module';
+import { DialogModule } from 'primeng/dialog';
 
 //componentes
 import { HomeAdminComponent } from './home/homeAdmin.component';
@@ -15,10 +15,21 @@ import { RegistroArticulosComponent } from './registros/articulos/registro-artic
 import { RegistroEmpleadosComponent } from './registros/registro-empleados/registro-empleados.component';
 import { CuerpoFacturaComponent } from './facturacion/cuerpo-factura/cuerpo-factura.component';
 import { TablasModule } from '../components/tablas/tablas.module';
+import { ModalComponent } from '../components/modal/modal.component';
 
 @NgModule({
-  declarations: [HomeAdminComponent, NavbarAComponent, FacturacionComponent, InventarioComponent, RegistroArticulosComponent, RegistroEmpleadosComponent, CuerpoFacturaComponent],
+  declarations: [
+    HomeAdminComponent,
+    ModalComponent,
+    NavbarAComponent,
+    FacturacionComponent,
+    InventarioComponent,
+    RegistroArticulosComponent,
+    RegistroEmpleadosComponent,
+    CuerpoFacturaComponent,
+  ],
   imports: [
+    DialogModule,
     TablasModule,
     CommonModule,
     AppRoutingModule,

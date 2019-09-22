@@ -12,7 +12,11 @@ import * as _ from 'lodash';
 export class CuerpoFacturaComponent implements OnInit {
   form: FormGroup;
   rowFactura: FormArray;
-  ListArticulos: any;
+  listaArticulos: any;
+
+  seleccionModal;
+  showModal: boolean = false;
+  modalSearch: boolean = true;
 
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.rowFactura = new FormArray([new FormControl()]);
@@ -29,7 +33,7 @@ export class CuerpoFacturaComponent implements OnInit {
     }
 
     this.shServ.getArticulos().subscribe(res => {
-      this.ListArticulos = res;
+      this.listaArticulos = res;
     });
   }
 
@@ -86,8 +90,27 @@ export class CuerpoFacturaComponent implements OnInit {
         // console.log('es un codigo');
       } else {
         codigo = (control.controls[i] as any).controls['cod'].value;
+        this.filtrarArticulo(codigo);
         // console.log('debe de filtrar');
       }
     }
+  }
+
+  // =============================================
+  //  MODAL PARA FILTRAR ARTICULOS
+  // =============================================
+  abrirModal(arg) {
+    this.seleccionModal = arg;
+    this.showModal = true;
+  }
+  
+  filtrarArticulo(arg) {
+    this.abrirModal(arg);
+    this.modalSearch = true;
+  }
+
+  reinicarVarModal() {
+    this.modalSearch = false;
+    this.showModal = false;
   }
 }

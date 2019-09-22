@@ -1,3 +1,11 @@
+<app-modal
+  [ModalShearch]="modalSearch"
+  [seleccionModal]="seleccionModal"
+  [listaArticulos]="listaArticulos"
+  (reinicioVariablesModal)="reinicarVarModal()"
+  [(showModal)]="showModal"
+></app-modal>
+
 <table #tituloFactTable="mdbTable" mdbTable class="table m-auto" small="true">
   <thead>
     <tr class="text-center">

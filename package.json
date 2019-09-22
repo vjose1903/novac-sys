@@ -99,6 +99,8 @@
     "ngx-toastr": "^10.0.4",
     "npm-registry-client": "^8.6.0",
     "popper.js": "^1.15.0",
+    "primeicons": "^2.0.0",
+    "primeng": "^8.0.3",
     "sass-google-fonts": "^1.0.1"
   }
 }
