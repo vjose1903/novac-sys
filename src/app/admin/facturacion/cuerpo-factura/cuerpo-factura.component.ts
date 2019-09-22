@@ -75,13 +75,12 @@ export class CuerpoFacturaComponent implements OnInit {
     const sigInput = input + i;
     this.element = document.getElementById(sigInput) as HTMLElement;
     this.element.focus();
-
-    const control = <FormArray>this.form.controls['rowFactura'];
-    let codigo = (control.controls[i] as any).controls['cod'].value;
-
     if (i >= 10 && input === 'cod-') {
       this.addItem();
     }
+
+    const control = <FormArray>this.form.controls['rowFactura'];
+    let codigo = (control.controls[i] as any).controls['cod'].value;
 
     if (input === 'can-') {
       codigo = _.parseInt(codigo);

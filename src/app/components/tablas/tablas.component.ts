@@ -1,17 +1,33 @@
-import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  AfterViewInit,
+  HostListener,
+  ChangeDetectorRef,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  OnDestroy,
+  OnChanges,
+  ElementRef,
+} from '@angular/core';
 import { MdbTablePaginationComponent, MdbTableDirective } from 'angular-bootstrap-md';
 import { SharedService } from '../../core/services/shared.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
+import { idLocale } from 'ngx-bootstrap';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-tablas',
   templateUrl: './tablas.component.html',
   styleUrls: ['./tablas.component.scss'],
 })
-export class TablasComponent implements OnInit, AfterViewInit {
+export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   @ViewChild(MdbTablePaginationComponent, { static: true })
   mdbTablePagination: MdbTablePaginationComponent;
 
@@ -21,16 +37,35 @@ export class TablasComponent implements OnInit, AfterViewInit {
     this.searchItems();
   }
 
-  @HostListener('VICtablas') onkeypress() {
-    this.prueba();
+  key;
+  element: HTMLElement;
+  entrar = 0;
+  @HostListener('window:keyup', ['$event'])
+  handleKeyboardEvent(event: any) {
+    // arriba 38
+    // abajo 40
+
+    setTimeout(() => {
+      if (this.focusRow) {
+        this.key = event.keyCode;
+        if (this.key === 38) {
+          this.ARRIBA();
+        } else if (this.key === 40) {
+          this.ABAJO();
+        } else if (this.key === 13 && this.entrar > 0) {
+          this.ENTER(this.IDROW);
+        }
+      }
+    }, 50);
   }
 
   // variables
   elements: any[] = [];
   previous: any = [];
   searchText = '';
-  IDrow = 'row-0';
-  // element: HTMLElement;
+  ROW = 'row-';
+  NUM = 0;
+  IDROW = this.ROW + _.toString(this.NUM);
 
   // inputs
   @Input() paraFiltroArticulos;
@@ -50,18 +85,17 @@ export class TablasComponent implements OnInit, AfterViewInit {
   @Input() colores = false;
 
   // output
-  @Output() panico = new EventEmitter<any>();
   @Output() clickRow = new EventEmitter<any>();
   @Output() DevolverInfo = new EventEmitter<any>();
   @Output() DELETE = new EventEmitter<any>();
+  @Output() moverFoco = new EventEmitter<any>();
   constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
 
-  ngOnInit() {
-    // this.element = document.getElementById('VICtablas') as HTMLElement;
-    // console.log(this.element);
-  }
+  ngOnInit() {}
 
+  ngOnChanges() {}
   searchItems() {
+    this.NUM = 0;
     if (!this.searchText) {
       this.mdbTable.setDataSource(this.data);
       this.elements = this.mdbTable.getDataSource();
@@ -95,10 +129,7 @@ export class TablasComponent implements OnInit, AfterViewInit {
     }
 
     if (this.focusRow) {
-      this.IDrow = 'row-0';
-
-      // this.element = document.getElementById(this.IDrow) as HTMLElement;
-      // this.element.focus();
+      this.IDROW = 'row-0';
     }
     // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
     // this.mdbTablePagination.calculateFirstItemIndex();
@@ -115,12 +146,6 @@ export class TablasComponent implements OnInit, AfterViewInit {
       this.seleccionado = arg.id;
     }
     this.clickRow.emit(arg);
-
-    // console.log(arg);
-  }
-
-  changePanico(arg) {
-    this.panico.emit(arg);
   }
 
   devolverInfo(arg) {
@@ -131,7 +156,30 @@ export class TablasComponent implements OnInit, AfterViewInit {
     this.DELETE.emit(arg);
   }
 
-  prueba() {
-    console.log('algo');
+  // ========================================================================
+  //  FUNCIONES DE LAS TECLAS DE LAS FECHAS
+  // ========================================================================
+
+  ARRIBA() {
+    if (this.NUM === 0) {
+      this.NUM = this.data.length;
+    }
+    this.NUM = this.NUM - 1;
+    this.IDROW = this.ROW + _.toString(this.NUM);
+    this.entrar++;
+  }
+  ABAJO() {
+    if (this.NUM === this.data.length - 1) {
+      this.NUM = -1;
+    }
+    this.NUM = this.NUM + 1;
+    this.IDROW = this.ROW + _.toString(this.NUM);
+    this.entrar++;
+  }
+  ENTER(arg) {
+    this.element = document.getElementById(arg) as HTMLElement;
+    console.log(this.element);
+
+    this.moverFoco.emit();
   }
 }

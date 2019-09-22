@@ -49,8 +49,8 @@ export class ModalComponent implements OnInit, OnChanges {
   devolverCLick(arg) {
     this.clickRowModal.emit(arg);
   }
+
   prueba() {
-    console.log('algo');
     if (this.ModalShearch) {
       this.element = document.getElementById('tablaSearch') as HTMLElement;
       this.element.focus();

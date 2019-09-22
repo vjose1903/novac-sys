@@ -18,7 +18,7 @@
         class="text-center"
         [ngClass]="{
           'bg-light': seleccionado == row.id,
-          'bg-light': RowElement.id == IDrow
+          'bg-light': RowElement.id == IDROW
         }"
         style="cursor: pointer;"
         id="row-{{ i }}"
@@ -37,10 +37,10 @@
         </td>
 
         <td class="btnAccion" *ngIf="botones.titulo && filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
-          <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)" (panicoBTN)="changePanico($event)"></app-btnacciones>
+          <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
         </td>
         <td class="btnAccion" *ngIf="botones.titulo && !filtroSelect">
-          <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)" (panicoBTN)="changePanico($event)"></app-btnacciones>
+          <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
         </td>
       </tr>
     </tbody>
