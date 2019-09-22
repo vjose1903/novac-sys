@@ -22,7 +22,8 @@ export class ModalComponent implements OnInit, OnChanges {
 
   // Outputs
   @Output() btnInsideClick = new EventEmitter<boolean>();
-  @Output() reinicioVariablesModal = new EventEmitter<boolean>();
+  @Output() reinicioVariablesModal = new EventEmitter<any>();
+  @Output() clickRowModal = new EventEmitter<any>();
 
   paraFiltroArticulos;
   constructor() {}
@@ -41,5 +42,9 @@ export class ModalComponent implements OnInit, OnChanges {
 
   reinicioModal() {
     this.reinicioVariablesModal.emit();
+  }
+
+  devolverCLick(arg) {
+    this.clickRowModal.emit(arg);
   }
 }

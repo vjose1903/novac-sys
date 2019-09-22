@@ -20,18 +20,12 @@
   *ngIf="ModalShearch && seleccionModal && infoArticulos"
   header="Buscar articulo"
   [(visible)]="showModal"
+  [focusOnShow]="true"
   [modal]="false"
   [responsive]="true"
-  [style]="{ width: '500px', minWidth: '400px' }"
+  [style]="{ width: '600px', minWidth: '400px' }"
   [minY]="70"
-  [baseZIndex]="1000000"
   (onHide)="reinicioModal()"
 >
-  <app-tablas *ngIf="listaArticulos.length > 0 && paraFiltroArticulos" [paraFiltroArticulos]="paraFiltroArticulos" [info]="infoArticulos" [data]="listaArticulos"></app-tablas>
-  <!-- <p>Desea eliminar {{ seleccionModal.nombre }}</p> -->
-
-  <!-- <p-footer>
-    <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-    <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
-  </p-footer> -->
+  <app-tablas *ngIf="listaArticulos.length > 0 && paraFiltroArticulos" [paraFiltroArticulos]="paraFiltroArticulos" (clickRow)="devolverCLick($event)" [info]="infoArticulos" [data]="listaArticulos"></app-tablas>
 </p-dialog>

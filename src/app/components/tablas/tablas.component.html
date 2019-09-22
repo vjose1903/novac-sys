@@ -17,8 +17,6 @@
         *ngFor="let row of data; let i = index"
         class="text-center"
         [ngClass]="{
-          danger: !row.activo && colores,
-          warning: row.panico > 0 && colores,
           'bg-light': seleccionado == row.id
         }"
         style="cursor: pointer;"
@@ -34,10 +32,10 @@
           </span>
         </td>
 
-        <td class="btnAccion" *ngIf="filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
+        <td class="btnAccion" *ngIf="botones.titulo && filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
           <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)" (panicoBTN)="changePanico($event)"></app-btnacciones>
         </td>
-        <td class="btnAccion" *ngIf="!filtroSelect">
+        <td class="btnAccion" *ngIf="botones.titulo && !filtroSelect">
           <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)" (panicoBTN)="changePanico($event)"></app-btnacciones>
         </td>
       </tr>

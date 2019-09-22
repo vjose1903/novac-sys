@@ -103,7 +103,7 @@ export class CuerpoFacturaComponent implements OnInit {
     this.seleccionModal = arg;
     this.showModal = true;
   }
-  
+
   filtrarArticulo(arg) {
     this.abrirModal(arg);
     this.modalSearch = true;
@@ -112,5 +112,9 @@ export class CuerpoFacturaComponent implements OnInit {
   reinicarVarModal() {
     this.modalSearch = false;
     this.showModal = false;
+  }
+
+  clickRowModal(arg) {
+    console.log(arg);
   }
 }

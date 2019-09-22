@@ -4,6 +4,7 @@
   [listaArticulos]="listaArticulos"
   (reinicioVariablesModal)="reinicarVarModal()"
   [(showModal)]="showModal"
+  (clickRowModal)="clickRowModal($event)"
 ></app-modal>
 
 <table #tituloFactTable="mdbTable" mdbTable class="table m-auto" small="true">

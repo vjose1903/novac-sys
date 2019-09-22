@@ -34,15 +34,14 @@ export class TablasComponent implements OnInit, AfterViewInit {
     titulo: false,
     borrar: false,
     editar: false,
-    panico: false,
     mostrar: false,
   };
 
-  @Input() seleccionado: any;
+  @Input() seleccionado = -1;
   @Input() filtroSelect: any;
   @Input() data: any[] = [];
   @Input() scrollContainer;
-  @Input() colores: boolean = false;
+  @Input() colores = false;
 
   // output
   @Output() panico = new EventEmitter<any>();
@@ -76,13 +75,14 @@ export class TablasComponent implements OnInit, AfterViewInit {
     this.previous = this.mdbTable.getDataSource();
   }
   ngAfterViewInit() {
+    this.setDATATABLE();
+
     if (this.paraFiltroArticulos) {
       this.searchText = this.paraFiltroArticulos;
       setTimeout(() => {
         this.searchItems();
       }, 50);
     }
-    this.setDATATABLE();
     // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
     // this.mdbTablePagination.calculateFirstItemIndex();
     // this.mdbTablePagination.calculateLastItemIndex();
@@ -94,7 +94,9 @@ export class TablasComponent implements OnInit, AfterViewInit {
   }
 
   clickROW(arg) {
-    this.seleccionado = arg.id;
+    if (arg.id) {
+      this.seleccionado = arg.id;
+    }
     this.clickRow.emit(arg);
     // console.log(arg);
   }
