@@ -36,5 +36,8 @@
     (clickRow)="devolverCLick($event)"
     [info]="infoArticulos"
     [data]="listaArticulos"
+    [search]="false"
+    (noArticulo)="noArticulo()"
+    (moverFoco)="moverFoco()"
   ></app-tablas>
 </p-dialog>

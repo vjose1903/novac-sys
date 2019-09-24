@@ -29,15 +29,23 @@ Controlador.getAllItems = async (req, res) => {
   const item = await MODEL_SCHEMA.find();
   res.json(item);
 };
+Controlador.getItemByCodigo = async (req, res) => {
+  const item = await MODEL_SCHEMA.find({ codigo: req.params.codigo });
+  if (item.length == 0) {
+    res.status(409).json({ mensaje: 'Codigo no existe' });
+  }
+
+  res.json(item[0]);
+};
 
 Controlador.getItemById = async (req, res, err) => {
-  const cliente = await MODEL_SCHEMA.findById(req.params.id, (err, user) => {
+  const item = await MODEL_SCHEMA.findById(req.params.id, (err, user) => {
     if (err) return res.status(500).send('Error del Servidor!');
     if (!user) {
-      res.status(409).json({ mensaje: 'cliente no existe' }); //cliente no existe
+      res.status(409).json({ mensaje: 'Articulo no existe' });
     }
   });
-  res.json(cliente);
+  res.json(item);
 };
 
 Controlador.CountItems = async (req, res) => {

@@ -24,6 +24,7 @@ export class ModalComponent implements OnInit, OnChanges {
   @Output() btnInsideClick = new EventEmitter<boolean>();
   @Output() reinicioVariablesModal = new EventEmitter<any>();
   @Output() clickRowModal = new EventEmitter<any>();
+  @Output() noArticuloEncontrado = new EventEmitter<any>();
 
   paraFiltroArticulos;
   constructor() {}
@@ -33,7 +34,7 @@ export class ModalComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     if (this.ModalShearch === true) {
-      this.paraFiltroArticulos = this.seleccionModal;
+      this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
     }
   }
 
@@ -47,7 +48,20 @@ export class ModalComponent implements OnInit, OnChanges {
   }
 
   devolverCLick(arg) {
-    this.clickRowModal.emit(arg);
+    const obj = JSON.parse(JSON.stringify(arg));
+    if (this.ModalShearch === true) {
+      obj.index = this.seleccionModal.index;
+    }
+
+    this.clickRowModal.emit(obj);
+  }
+
+  moverFoco() {
+    this.showModal = false;
+  }
+  noArticulo() {
+    this.showModal = false;
+    this.noArticuloEncontrado.emit(this.seleccionModal.index);
   }
 
   prueba() {

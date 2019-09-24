@@ -1,4 +1,4 @@
-<div class="searchDiv">
+<div *ngIf="search" class="searchDiv">
   <label class="search-label" for="search">Busqueda </label>
   <input [(ngModel)]="searchText" id="search" class="search-input" />
 </div>

@@ -67,6 +67,12 @@ export class SharedService {
   getArticulos() {
     return this.peticion('articulo', 'get');
   }
+  getOneArticulo(id: number | string) {
+    return this.peticion(`articulo/${id}`, 'get');
+  }
+  getOneArticuloByCodigo(codigo: number | string) {
+    return this.peticion(`articulo/codigo/${codigo}`, 'get');
+  }
   CountArticulos() {
     return this.peticion('articulo/cant', 'get');
   }

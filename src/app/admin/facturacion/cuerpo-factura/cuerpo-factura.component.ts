@@ -86,10 +86,23 @@ export class CuerpoFacturaComponent implements OnInit {
       codigo = _.parseInt(codigo);
 
       if (_.isInteger(codigo)) {
-        // console.log('es un codigo');
-      } else {
         codigo = (control.controls[i] as any).controls['cod'].value;
-        this.filtrarArticulo(codigo);
+        this.shServ.getOneArticuloByCodigo(codigo).subscribe(
+          res => {
+            (control.controls[i] as any).controls['des'].setValue(res.nombre);
+            (control.controls[i] as any).controls['pre'].setValue(res.precio);
+          },
+          err => {
+            this.shServ.toastError(err.error.mensaje, 'ERROR');
+            this.element = document.getElementById('cod-' + i) as HTMLElement;
+            this.element.focus();
+          },
+        );
+      } else {
+        this.element.blur();
+        codigo = (control.controls[i] as any).controls['cod'].value;
+        const obj = { filtrar: codigo, index: i };
+        this.filtrarArticulo(obj);
         // console.log('debe de filtrar');
       }
     }
@@ -114,6 +127,18 @@ export class CuerpoFacturaComponent implements OnInit {
   }
 
   clickRowModal(arg) {
-    console.log(arg);
+    const control = <FormArray>this.form.controls['rowFactura'];
+    (control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
+    (control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
+    (control.controls[arg.index] as any).controls['pre'].setValue(arg.precio);
+
+    const sigInput = 'can-' + arg.index;
+    this.element = document.getElementById(sigInput) as HTMLElement;
+    this.element.focus();
+  }
+  noArticuloEncontrado(arg) {
+    this.shServ.toastError('Articulo no existe', 'ERROR');
+    this.element = document.getElementById('cod-' + arg) as HTMLElement;
+    this.element.focus();
   }
 }

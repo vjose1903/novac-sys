@@ -52,7 +52,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
           this.ARRIBA();
         } else if (this.key === 40) {
           this.ABAJO();
-        } else if (this.key === 13 && this.entrar > 0) {
+        } else if (this.key === 13) {
           this.ENTER(this.IDROW);
         }
       }
@@ -70,6 +70,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   // inputs
   @Input() paraFiltroArticulos;
   @Input() info: Array<any>;
+  @Input() search = true;
   @Input() botones = {
     titulo: false,
     borrar: false,
@@ -89,6 +90,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   @Output() DevolverInfo = new EventEmitter<any>();
   @Output() DELETE = new EventEmitter<any>();
   @Output() moverFoco = new EventEmitter<any>();
+  @Output() noArticulo = new EventEmitter<any>();
   constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
 
   ngOnInit() {}
@@ -125,9 +127,12 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
       this.searchText = this.paraFiltroArticulos;
       setTimeout(() => {
         this.searchItems();
+        console.log(this.data.length, 'longitud data');
+        if (this.data.length === 0) {
+          this.noArticulo.emit();
+        }
       }, 50);
     }
-
     if (this.focusRow) {
       this.IDROW = 'row-0';
     }
@@ -177,9 +182,11 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     this.entrar++;
   }
   ENTER(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    console.log(this.element);
-
-    this.moverFoco.emit();
+    this.entrar++;
+    if (this.entrar > 1) {
+      this.element = document.getElementById(arg) as HTMLElement;
+      this.element.click();
+      this.moverFoco.emit();
+    }
   }
 }
