@@ -15,8 +15,16 @@ export class CuerpoFacturaComponent implements OnInit {
   listaArticulos: any;
 
   seleccionModal;
-  showModal: boolean = false;
-  modalSearch: boolean = true;
+  showModal = false;
+  modalSearch = true;
+  UnidadesArticulo = [];
+  drop = false;
+
+  indiceDetalle;
+  precioDetalle;
+  TOTAL;
+  ITBIS;
+  rowActual;
 
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.rowFactura = new FormArray([new FormControl()]);
@@ -75,6 +83,7 @@ export class CuerpoFacturaComponent implements OnInit {
     const sigInput = input + i;
     this.element = document.getElementById(sigInput) as HTMLElement;
     this.element.focus();
+
     if (i >= 10 && input === 'cod-') {
       this.addItem();
     }
@@ -82,15 +91,37 @@ export class CuerpoFacturaComponent implements OnInit {
     const control = <FormArray>this.form.controls['rowFactura'];
     let codigo = (control.controls[i] as any).controls['cod'].value;
 
-    if (input === 'can-') {
+    if (input === 'cod-') {
+      this.UnidadesArticulo = [];
+      // this.indiceDetalle = _.indexOf(this.listaArticulos, '');
+      // (control.controls[i] as any).controls['pre'].setValue(res.precio);
+    }
+    if (codigo === '') {
+      this.element = document.getElementById('cod-' + i) as HTMLElement;
+      this.element.focus();
+    }
+    if (input === 'can-' && codigo !== '') {
       codigo = _.parseInt(codigo);
 
       if (_.isInteger(codigo)) {
         codigo = (control.controls[i] as any).controls['cod'].value;
         this.shServ.getOneArticuloByCodigo(codigo).subscribe(
           res => {
+            this.rowActual = res;
             (control.controls[i] as any).controls['des'].setValue(res.nombre);
-            (control.controls[i] as any).controls['pre'].setValue(res.precio);
+
+            if (res.Isdetallable) {
+              this.drop = true;
+              this.UnidadesArticulo = [];
+              this.UnidadesArticulo.push({ value: res.medida, precio: res.precio });
+              res.detallableArray.forEach(element => {
+                this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
+              });
+            } else {
+              (control.controls[i] as any).controls['uni'].setValue(res.medida);
+              (control.controls[i] as any).controls['pre'].setValue(res.precio);
+              this.drop = true;
+            }
           },
           err => {
             this.shServ.toastError(err.error.mensaje, 'ERROR');
@@ -106,6 +137,23 @@ export class CuerpoFacturaComponent implements OnInit {
         // console.log('debe de filtrar');
       }
     }
+  }
+
+  selectMedidaChange(arg, i) {
+    // console.log(arg);
+    const control = <FormArray>this.form.controls['rowFactura'];
+    console.log(arg);
+
+    this.indiceDetalle = _.findIndex(this.UnidadesArticulo, function(o) {
+      return o.value === arg;
+    });
+
+    // console.log(this.rowActual, 'se supone que es el articulo seleccionado');
+    // console.log(this.UnidadesArticulo, 'se supone que es el el array detallable');
+    // console.log(this.indiceDetalle, 'se supone que es el indice');
+    // console.log(this.UnidadesArticulo[this.indiceDetalle], 'se supone que es el precio');
+    this.precioDetalle = this.UnidadesArticulo[this.indiceDetalle].precio;
+    (control.controls[i] as any).controls['pre'].setValue(this.precioDetalle);
   }
 
   // =============================================
@@ -130,7 +178,19 @@ export class CuerpoFacturaComponent implements OnInit {
     const control = <FormArray>this.form.controls['rowFactura'];
     (control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
     (control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
-    (control.controls[arg.index] as any).controls['pre'].setValue(arg.precio);
+    this.rowActual = arg;
+    if (arg.Isdetallable) {
+      this.drop = true;
+      this.UnidadesArticulo = [];
+      this.UnidadesArticulo.push({ value: arg.medida, precio: arg.precio });
+      arg.detallableArray.forEach(element => {
+        this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
+      });
+    } else {
+      (control.controls[arg.index] as any).controls['uni'].setValue(arg.medida);
+      (control.controls[arg.index] as any).controls['pre'].setValue(arg.precio);
+      this.drop = false;
+    }
 
     const sigInput = 'can-' + arg.index;
     this.element = document.getElementById(sigInput) as HTMLElement;

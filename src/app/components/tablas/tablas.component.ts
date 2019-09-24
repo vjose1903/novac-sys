@@ -127,7 +127,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
       this.searchText = this.paraFiltroArticulos;
       setTimeout(() => {
         this.searchItems();
-        console.log(this.data.length, 'longitud data');
         if (this.data.length === 0) {
           this.noArticulo.emit();
         }

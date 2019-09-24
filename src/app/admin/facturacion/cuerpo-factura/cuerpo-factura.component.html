@@ -57,7 +57,19 @@
 
               <td class="UNI td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada " id="uni-{{ i }}" (keydown.enter)="saltar($event, 'cod-', i + 1 , this)" formControlName="uni" />
+                  <input *ngIf="!drop" type="text" class="form-control entrada " id="uni-{{ i }}" (keydown.enter)="saltar($event, 'cod-', i + 1 , this)" formControlName="uni" />
+                  <div *ngIf="drop">
+                    <select
+                      formControlName="uni"
+                      (change)="selectMedidaChange($event.target.value, i)"
+                      class="form-control  entrada"
+                      style="border-radius:0 "
+                      id="uni-{{ i }}"
+                      (keydown.enter)="saltar($event, 'cod-', i + 1 , this)"
+                    >
+                      <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
+                    </select>
+                  </div>
                 </div>
               </td>
 
