@@ -69,7 +69,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
 
   // inputs
   @Input() paraFiltroArticulos;
-  @Input() info: Array<any>;
+  @Input() info;
   @Input() search = true;
   @Input() botones = {
     titulo: false,

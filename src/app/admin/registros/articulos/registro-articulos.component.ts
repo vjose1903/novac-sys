@@ -130,16 +130,24 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   // =============================================
   //  Crear articulo
   // =============================================
+
+  element: HTMLElement;
   submit(form) {
     const obj = JSON.parse(JSON.stringify(form.value));
+    // console.log(obj);
+
     this.shServ.createArticulo(obj).subscribe(
       res => {
         this.shServ.toastSuccess(res.titulo, res.contenido);
+
         this.listaArticulos = [...this.listaArticulos, res.body];
+        this.form.reset();
+        this.element = document.getElementById('campoNombre') as HTMLElement;
+        this.element.focus();
       },
       err => {
         console.log(err);
-        // this.shServ.toastError(err.titulo, err.contenido);
+        this.shServ.toastError(err.titulo, err.contenido);
       },
     );
   }

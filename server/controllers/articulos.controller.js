@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const mongoose = require('mongoose');
 
 const MODEL_SCHEMA = require('../models/articulo.model');
@@ -6,20 +7,44 @@ const MODEL_SCHEMA = require('../models/articulo.model');
 
 const Controlador = {};
 
-Controlador.register = (req, res, next) => {
+Controlador.register = async (req, res, next) => {
   var item = new MODEL_SCHEMA();
+  // let cod = await MODEL_SCHEMA.countDocuments();
+  // let cod = await MODEL_SCHEMA.find()
+  //   .sort({ $natural: -1 })
+  //   .limit(1);
+  let cod = await MODEL_SCHEMA.find({})
+    .sort({ _id: -1 })
+    .limit(1);
+
+  var secu = _.parseInt(cod[0].secuencia) + 1;
+
+  if (secu <= 9) {
+    var codigo = '0000' + secu;
+  } else if (secu >= 10 && secu <= 99) {
+    var codigo = '000' + secu;
+  } else if (secu >= 100 && secu <= 999) {
+    var codigo = '00' + secu;
+  } else if (secu >= 1000 && secu <= 9999) {
+    var codigo = '0' + secu;
+  } else if (secu >= 10000 && secu <= 99998) {
+    var codigo = secu;
+  }
+
   (item.nombre = req.body.nombre),
+    (item.codigo = codigo),
+    (item.secuencia = secu),
     (item.costo = req.body.costo),
     (item.precio = req.body.precio),
     (item.tipo = req.body.tipo),
     (item.medida = req.body.medida),
     (item.Isdetallable = req.body.Isdetallable),
     (item.detallableArray = req.body.detallableArray),
-    item.save((err, doc) => {
+    await item.save((err, doc) => {
       if (!err) res.json({ titulo: 'Operacion exitosa.', contenido: 'Articulo registrado.', body: doc });
       else {
         if (err.code == 11000) res.status(422).json({ titulo: 'Operacion nula.', contenido: 'Articulo introducido ya existe.' });
-        else res.json({ titulo: 'Operacion nula.', contenido: 'Error del servidor.' });
+        else res.status(500).json({ titulo: 'Operacion nula.', contenido: 'Error del servidor.' });
       }
     });
 };

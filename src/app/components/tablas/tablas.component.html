@@ -17,7 +17,6 @@
         *ngFor="let row of data; let i = index"
         class="text-center"
         [ngClass]="{
-          'bg-light': seleccionado == row.id,
           'bg-light': RowElement.id == IDROW
         }"
         style="cursor: pointer;"
@@ -25,21 +24,21 @@
         #RowElement
         (click)="clickROW(row)"
       >
-        <td *ngIf="filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
+        <!-- <td *ngIf="filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
           <span *ngFor="let column of info; let i = index" style="width: 100%">
             {{ row[column.key] }}
           </span>
-        </td>
+        </td> -->
         <td *ngFor="let column of info">
-          <span *ngIf="!filtroSelect" style="width: 100%">
+          <span style="width: 100%">
             {{ row[column.key] }}
           </span>
         </td>
 
-        <td class="btnAccion" *ngIf="botones.titulo && filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
+        <!-- <td class="btnAccion" *ngIf="botones.titulo && filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
           <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
-        </td>
-        <td class="btnAccion" *ngIf="botones.titulo && !filtroSelect">
+        </td> -->
+        <td class="btnAccion" *ngIf="botones.titulo">
           <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
         </td>
       </tr>

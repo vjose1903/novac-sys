@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 var articuloSchema = new mongoose.Schema(
   {
+    codigo: { type: String, required: true, trim: true, unique: true },
+    secuencia: { type: Number, required: true, trim: true },
     nombre: { type: String, required: true, trim: true },
     costo: { type: Number, required: true, trim: true },
     precio: { type: Number, required: true, trim: true },
