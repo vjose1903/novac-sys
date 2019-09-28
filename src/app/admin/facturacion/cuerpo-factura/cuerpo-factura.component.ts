@@ -9,7 +9,7 @@ import * as _ from 'lodash';
   templateUrl: './cuerpo-factura.component.html',
   styleUrls: ['./cuerpo-factura.component.scss'],
 })
-export class CuerpoFacturaComponent implements OnInit {
+export class CuerpoFacturaComponent implements OnInit, OnChanges {
   form: FormGroup;
   rowFactura: FormArray;
   listaArticulos: any;
@@ -25,6 +25,10 @@ export class CuerpoFacturaComponent implements OnInit {
   TOTAL;
   ITBIS;
   rowActual;
+
+  secuencia = 0;
+  inputSecuencia = 'cod-0';
+  inputDrop = 'uni-0';
 
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.rowFactura = new FormArray([new FormControl()]);
@@ -43,6 +47,11 @@ export class CuerpoFacturaComponent implements OnInit {
     this.shServ.getArticulos().subscribe(res => {
       this.listaArticulos = res;
     });
+  }
+
+  ngOnChanges() {
+    this.inputSecuencia = 'cod-' + this.secuencia;
+    this.inputDrop = 'uni-' + this.secuencia;
   }
 
   // =============================================
@@ -95,6 +104,8 @@ export class CuerpoFacturaComponent implements OnInit {
       this.UnidadesArticulo = [];
       // this.indiceDetalle = _.indexOf(this.listaArticulos, '');
       // (control.controls[i] as any).controls['pre'].setValue(res.precio);
+      this.secuencia++;
+      console.log(this.secuencia, '##############');
     }
     if (codigo === '') {
       this.element = document.getElementById('cod-' + i) as HTMLElement;
@@ -120,7 +131,7 @@ export class CuerpoFacturaComponent implements OnInit {
             } else {
               (control.controls[i] as any).controls['uni'].setValue(res.medida);
               (control.controls[i] as any).controls['pre'].setValue(res.precio);
-              this.drop = true;
+              this.drop = false;
             }
           },
           err => {
@@ -139,6 +150,11 @@ export class CuerpoFacturaComponent implements OnInit {
     }
   }
 
+  mostrarVerificador(arg) {
+    console.log(this.inputDrop);
+    console.log(this.secuenciaDelDrop(arg));
+  }
+
   selectMedidaChange(arg, i) {
     // console.log(arg);
     const control = <FormArray>this.form.controls['rowFactura'];
@@ -153,7 +169,18 @@ export class CuerpoFacturaComponent implements OnInit {
     // console.log(this.indiceDetalle, 'se supone que es el indice');
     // console.log(this.UnidadesArticulo[this.indiceDetalle], 'se supone que es el precio');
     this.precioDetalle = this.UnidadesArticulo[this.indiceDetalle].precio;
+    const unidad = this.UnidadesArticulo[this.indiceDetalle].value;
+
+    (control.controls[i] as any).controls['uni'].setValue(unidad);
     (control.controls[i] as any).controls['pre'].setValue(this.precioDetalle);
+  }
+
+  verificarSecuencia() {
+    this.element = document.getElementById(this.inputSecuencia) as HTMLElement;
+    this.element.focus();
+  }
+  secuenciaDelDrop(arg) {
+    return 'uni-' + arg;
   }
 
   // =============================================

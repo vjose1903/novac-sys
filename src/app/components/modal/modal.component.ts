@@ -33,8 +33,10 @@ export class ModalComponent implements OnInit, OnChanges {
   ngOnInit() {}
 
   ngOnChanges() {
-    if (this.ModalShearch === true) {
-      this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
+    if (this.seleccionModal) {
+      if (this.ModalShearch === true) {
+        this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
+      }
     }
   }
 
