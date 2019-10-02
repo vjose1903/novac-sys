@@ -97,6 +97,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
     if (i >= 10 && input === 'cod-') {
       this.addItem();
     }
+    
 
     let codigo = (this.control.controls[i] as any).controls['cod'].value;
 
