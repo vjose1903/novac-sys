@@ -107,6 +107,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
       this.data = this.mdbTable.searchLocalDataBy(this.searchText);
       this.mdbTable.setDataSource(this.elements);
     }
+    this.cdRef.detectChanges();
   }
 
   setDATATABLE() {
@@ -118,6 +119,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     this.mdbTable.setDataSource(this.elements);
     this.elements = this.mdbTable.getDataSource();
     this.previous = this.mdbTable.getDataSource();
+    this.cdRef.detectChanges();
   }
 
   ngAfterViewInit() {
