@@ -97,7 +97,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
     if (i >= 10 && input === 'cod-') {
       this.addItem();
     }
-    
 
     let codigo = (this.control.controls[i] as any).controls['cod'].value;
 
@@ -122,7 +121,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
     }
     if (input === 'can-' && codigo !== '') {
       codigo = _.parseInt(codigo);
-
       if (_.isInteger(codigo)) {
         codigo = (this.control.controls[i] as any).controls['cod'].value;
         this.shServ.getOneArticuloByCodigo(codigo).subscribe(
