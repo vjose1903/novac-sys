@@ -90,9 +90,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
 
   saltar(e, input, i, elemento) {
     const sigInput = input + i;
-    this.seleccinarElemento(sigInput);
-    // this.element = document.getElementById(sigInput) as HTMLElement;
-    // this.element.focus();
+    this.enfocarInput(sigInput);
 
     if (i >= 10 && input === 'cod-') {
       this.addItem();
@@ -105,49 +103,21 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
       this.aumentarSecuencia();
 
       const medida = (this.control.controls[i] as any).controls['uni'].value;
-      console.log('esta es la medida ', medida);
 
       if (medida === '' || medida === null) {
-        console.log('continuar');
-        this.seleccinarElemento('uni-' + (i - 1));
+        this.enfocarInput('uni-' + (i - 1));
       } else {
-        console.log('siguiente');
       }
     }
     if (codigo === '') {
-      this.seleccinarElemento('cod-' + i);
-      // this.element = document.getElementById('cod-' + i) as HTMLElement;
-      // this.element.focus();
+      this.enfocarInput('cod-' + i);
+
     }
     if (input === 'can-' && codigo !== '') {
       codigo = _.parseInt(codigo);
       if (_.isInteger(codigo)) {
         codigo = (this.control.controls[i] as any).controls['cod'].value;
-        this.shServ.getOneArticuloByCodigo(codigo).subscribe(
-          res => {
-            this.rowActual = res;
-            (this.control.controls[i] as any).controls['des'].setValue(res.nombre);
-
-            if (res.Isdetallable) {
-              this.drop = true;
-              this.UnidadesArticulo = [];
-              this.UnidadesArticulo.push({ value: res.medida, precio: res.precio });
-              res.detallableArray.forEach(element => {
-                this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
-              });
-            } else {
-              (this.control.controls[i] as any).controls['uni'].setValue(res.medida);
-              (this.control.controls[i] as any).controls['pre'].setValue(res.precio);
-              this.drop = false;
-            }
-          },
-          err => {
-            this.shServ.toastError(err.error.mensaje, 'ERROR');
-            this.seleccinarElemento('cod-' + i);
-            // this.element = document.getElementById('cod-' + i) as HTMLElement;
-            // this.element.focus();
-          },
-        );
+        this.buscarArticuloPorCodigo(i, codigo);
       } else {
         this.element.blur();
         codigo = (this.control.controls[i] as any).controls['cod'].value;
@@ -157,6 +127,34 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
     }
   }
 
+  buscarArticuloPorCodigo(i, codigo) {
+    // console.log(codigo);
+
+    this.shServ.getOneArticuloByCodigo(codigo).subscribe(
+      res => {
+        this.rowActual = res;
+        (this.control.controls[i] as any).controls['des'].setValue(res.nombre);
+
+        if (res.Isdetallable) {
+          this.drop = true;
+          this.UnidadesArticulo = [];
+          this.UnidadesArticulo.push({ value: res.medida, precio: res.precio });
+          res.detallableArray.forEach(element => {
+            this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
+          });
+        } else {
+          (this.control.controls[i] as any).controls['uni'].setValue(res.medida);
+          (this.control.controls[i] as any).controls['pre'].setValue(res.precio);
+          this.drop = false;
+        }
+      },
+      err => {
+        this.shServ.toastError(err.error.mensaje, 'ERROR');
+        this.enfocarInput('cod-' + i);
+      },
+    );
+  }
+
   aumentarSecuencia() {
     this.secuencia++;
     this.inputSecuencia = 'cod-' + this.secuencia;
@@ -164,9 +162,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
     this.drop = false;
   }
 
-  mostrarVerificador(arg) {
-    console.log(this.inputDrop);
-    console.log(this.secuenciaDelDrop(arg));
+  verificarRow(arg) {
+    this.inputDrop = 'uni-' + arg;
   }
 
   selectMedidaChange(arg, i) {
@@ -183,18 +180,20 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
     (this.control.controls[i] as any).controls['pre'].setValue(this.precioDetalle);
   }
 
-  seleccinarElemento(arg) {
+  enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
   }
 
-  mostarDrop(i) {}
-
-  verificarSecuencia(i) {
+  verificarSecuencia(i, input?) {
     if (this.secuencia < i) {
-      this.seleccinarElemento(this.inputSecuencia);
-      // this.element = document.getElementById(this.inputSecuencia) as HTMLElement;
-      // this.element.focus();
+      this.enfocarInput(this.inputSecuencia);
+    }
+
+    const codigo = (this.control.controls[i] as any).controls['cod'].value;
+    if (input === 'unidad' && codigo !== '') {
+      this.verificarRow(i);
+      this.buscarArticuloPorCodigo(i, codigo);
     }
   }
 
@@ -239,13 +238,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
     }
 
     const sigInput = 'can-' + arg.index;
-    this.seleccinarElemento(sigInput);
+    this.enfocarInput(sigInput);
     // this.element = document.getElementById(sigInput) as HTMLElement;
     // this.element.focus();
   }
   noArticuloEncontrado(arg) {
     this.shServ.toastError('Articulo no existe', 'ERROR');
-    this.seleccinarElemento('cod-' + arg);
+    this.enfocarInput('cod-' + arg);
     // this.element = document.getElementById('cod-' + arg) as HTMLElement;
     // this.element.focus();
   }

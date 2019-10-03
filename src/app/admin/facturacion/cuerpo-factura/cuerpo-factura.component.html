@@ -43,6 +43,7 @@
         <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
           <tbody>
             <tr>
+              <!--  ::::::::::::  CODIGO  ::::::::::::  -->
               <td class="COD td0padding">
                 <div class="from-group">
                   <input
@@ -56,6 +57,7 @@
                 </div>
               </td>
 
+              <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
               <td class="CAN td0padding">
                 <div class="from-group">
                   <input
@@ -69,6 +71,7 @@
                 </div>
               </td>
 
+              <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
               <td class="UNI td0padding">
                 <div class="from-group">
                   <input
@@ -76,14 +79,14 @@
                     type="text"
                     class="form-control entrada "
                     id="uni-{{ i }}"
-                    (click)="verificarSecuencia(i)"
+                    (click)="verificarSecuencia(i, 'unidad')"
                     (keydown.enter)="saltar($event, 'cod-', i + 1 , this)"
                     formControlName="uni"
                   />
 
                   <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
                     <select
-                      (focus)="mostrarVerificador(i)"
+                      (focus)="verificarRow(i)"
                       formControlName="uni"
                       (change)="selectMedidaChange($event.target.value, i)"
                       class="form-control  entrada"
