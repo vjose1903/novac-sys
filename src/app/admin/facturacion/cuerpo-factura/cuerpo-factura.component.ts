@@ -105,13 +105,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
       const medida = (this.control.controls[i] as any).controls['uni'].value;
 
       if (medida === '' || medida === null) {
-        this.enfocarInput('uni-' + (i - 1));
+        // this.enfocarInput('uni-' + (i - 1));
       } else {
       }
     }
     if (codigo === '') {
       this.enfocarInput('cod-' + i);
-
     }
     if (input === 'can-' && codigo !== '') {
       codigo = _.parseInt(codigo);
@@ -128,7 +127,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
   }
 
   buscarArticuloPorCodigo(i, codigo) {
-    // console.log(codigo);
+    this.inputDrop = 'uni-' + i;
 
     this.shServ.getOneArticuloByCodigo(codigo).subscribe(
       res => {
@@ -188,6 +187,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
   verificarSecuencia(i, input?) {
     if (this.secuencia < i) {
       this.enfocarInput(this.inputSecuencia);
+    }
+
+    if (!input) {
+      this.drop = false;
     }
 
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
