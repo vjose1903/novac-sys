@@ -53,6 +53,7 @@
                     (click)="verificarSecuencia(i)"
                     (keydown.enter)="saltar($event, 'can-', i , this)"
                     formControlName="cod"
+                    (blur)="verificarRow(i)"
                   />
                 </div>
               </td>
@@ -67,7 +68,7 @@
                     (click)="verificarSecuencia(i)"
                     (keydown.enter)="saltar($event, 'uni-', i , this)"
                     formControlName="can"
-                    (blur)="calcularTotalRow(i)"
+                    (blur)="calcularTotalRow(i) && verificarRow(i)"
                   />
                 </div>
               </td>
@@ -83,7 +84,7 @@
                     (click)="verificarSecuencia(i, 'unidad')"
                     (keydown.enter)="saltar($event, 'cod-', i + 1 , this)"
                     formControlName="uni"
-                    (blur)="calcularTotalRow(i)"
+                    (blur)="calcularTotalRow(i) && verificarRow(i)"
                   />
 
                   <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
@@ -95,6 +96,7 @@
                       style="border-radius:0 "
                       id="uni-{{ i }}"
                       (keydown.enter)="saltar($event, 'cod-', i + 1 , this)"
+                      (blur)="calcularTotalRow(i) && verificarRow(i)"
                     >
                       <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
                     </select>
