@@ -25,10 +25,27 @@
   align-items: center;
   margin: auto;
   height: 5rem;
-  width: 16rem;
+  width: 20vw;
   background-color: #21573c;
   border-radius: 0.5rem;
   font-family: 'Orbitron', sans-serif;
   font-size: 2rem;
   color: white;
+  position: absolute;
+  bottom: 1rem;
+  right: 2rem;
+}
+
+.encabezadoRigth {
+  position: absolute;
+  right: 4rem;
+}
+
+.fecha {
+  top: 0.2rem;
+  font-size: 1.3rem;
+}
+.numFac {
+  top: 2rem;
+  font-size: 1.3rem;
 }

@@ -13,6 +13,8 @@ export class FacturacionComponent implements OnInit {
   form: FormGroup;
   numFac = 0;
   fecha;
+  TOTAL;
+  ITBIS;
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.form = this.fb.group({
       nombre: [],
@@ -20,8 +22,25 @@ export class FacturacionComponent implements OnInit {
       telefono: [],
     });
   }
+  formatearNumero(nStr) {
+    if (nStr !== undefined) {
+      nStr += '';
+      const x = nStr.split('.');
+      let x1 = x[0];
+      const x2 = x.length > 1 ? '.' + x[1] : '';
+      const rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+    }
+  }
 
   ngOnInit() {
     this.fecha = moment().format('L');
+  }
+  getCalculos(arg) {
+    this.TOTAL = arg.Total;
+    console.log(arg);
   }
 }

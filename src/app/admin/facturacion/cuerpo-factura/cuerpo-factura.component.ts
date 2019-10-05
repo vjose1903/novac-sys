@@ -1,4 +1,18 @@
-import { Component, OnInit, ViewChildren, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  AfterViewInit,
+  HostListener,
+  ChangeDetectorRef,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  OnDestroy,
+  OnChanges,
+  ElementRef,
+} from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { SharedService } from '../../../core/services/shared.service';
 import { ActivatedRoute } from '@angular/router';
@@ -22,14 +36,17 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
 
   indiceDetalle;
   precioDetalle;
-  TOTAL;
-  ITBIS;
+  TOTAL = 0;
+  ITBIS = 0;
   rowActual;
 
   secuencia = 0;
   inputSecuencia = 'cod-0';
   inputDrop = 'uni-0';
   control;
+
+  @Output() sendCalculos = new EventEmitter<any>();
+
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.rowFactura = new FormArray([new FormControl()]);
   }
@@ -51,8 +68,45 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
   ngAfterViewInit() {
     this.control = <FormArray>this.form.controls['rowFactura'];
   }
-
   ngOnChanges() {}
+
+  // =============================================
+  //  FORMATEAR LOS NUMEROS
+  // =============================================
+
+  formatearNumero(nStr) {
+    if (nStr !== undefined) {
+      nStr += '';
+      // console.log(nStr, '=======');
+
+      const x = nStr.split('.');
+      let x1 = x[0];
+      const x2 = x.length > 1 ? '.' + x[1] : '';
+      const rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      const formateado = x1 + x2;
+      return formateado;
+    }
+  }
+
+  desformatear(sTnum) {
+    let temp = 0;
+    if (sTnum !== undefined) {
+      const x = sTnum.split(',');
+      if (x.length === 1) {
+        temp += parseFloat(x[0]);
+        return temp;
+      } else if (x.length >= 2) {
+        let joined = '';
+
+        joined = _.join(x, '');
+        temp += parseFloat(joined);
+        return temp;
+      }
+    }
+  }
 
   // =============================================
   //  CREAR MAS INPUTS PARA FACTURA
@@ -75,7 +129,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
   }
 
   removeItem(i: number) {
-    this.control = <FormArray>this.form.controls['rowFactura'];
     this.control.removeAt(i);
   }
 
@@ -136,6 +189,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
 
         if (res.Isdetallable) {
           this.drop = true;
+          this.verificarRow(i);
           this.UnidadesArticulo = [];
           this.UnidadesArticulo.push({ value: res.medida, precio: res.precio });
           res.detallableArray.forEach(element => {
@@ -143,7 +197,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
           });
         } else {
           (this.control.controls[i] as any).controls['uni'].setValue(res.medida);
-          (this.control.controls[i] as any).controls['pre'].setValue(res.precio);
+          (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(res.precio));
           this.drop = false;
         }
       },
@@ -166,8 +220,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
   }
 
   selectMedidaChange(arg, i) {
-    this.control = <FormArray>this.form.controls['rowFactura'];
-
     this.indiceDetalle = _.findIndex(this.UnidadesArticulo, function(o) {
       return o.value === arg;
     });
@@ -176,7 +228,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
     const unidad = this.UnidadesArticulo[this.indiceDetalle].value;
 
     (this.control.controls[i] as any).controls['uni'].setValue(unidad);
-    (this.control.controls[i] as any).controls['pre'].setValue(this.precioDetalle);
+    (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(this.precioDetalle));
+    this.calcularTotalRow(i);
   }
 
   enfocarInput(arg) {
@@ -204,6 +257,39 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
     return 'uni-' + arg;
   }
 
+  calcularTotalRow(i) {
+    const precio = (this.control.controls[i] as any).controls['pre'].value;
+    const cantidad = (this.control.controls[i] as any).controls['can'].value;
+
+    if (precio !== '' && precio !== null) {
+      const tot = precio * cantidad;
+      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(_.round(tot, 2)));
+      this.calculosTotalesGenerales();
+    }
+  }
+
+  calculosTotalesGenerales() {
+    let temp = 0;
+
+    for (let index = 0; index < this.control.length; index++) {
+      const acu = (this.control.controls[index] as any).controls['tot'].value;
+      if (acu) {
+        temp += this.desformatear(acu);
+      }
+    }
+
+    if (temp !== this.TOTAL) {
+      this.TOTAL = temp;
+
+      const obj = {
+        Total: _.round(this.TOTAL, 2),
+        ITBIS: '',
+      };
+
+      this.sendCalculos.emit(obj);
+    }
+  }
+
   // =============================================
   //  MODAL PARA FILTRAR ARTICULOS
   // =============================================
@@ -223,7 +309,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
   }
 
   clickRowModal(arg) {
-    this.control = <FormArray>this.form.controls['rowFactura'];
     (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
     (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
     this.rowActual = arg;
@@ -236,7 +321,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
       });
     } else {
       (this.control.controls[arg.index] as any).controls['uni'].setValue(arg.medida);
-      (this.control.controls[arg.index] as any).controls['pre'].setValue(arg.precio);
+      (this.control.controls[arg.index] as any).controls['pre'].setValue(this.formatearNumero(arg.precio));
       this.drop = false;
     }
 

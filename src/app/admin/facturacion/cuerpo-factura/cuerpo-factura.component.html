@@ -67,6 +67,7 @@
                     (click)="verificarSecuencia(i)"
                     (keydown.enter)="saltar($event, 'uni-', i , this)"
                     formControlName="can"
+                    (blur)="calcularTotalRow(i)"
                   />
                 </div>
               </td>
@@ -82,6 +83,7 @@
                     (click)="verificarSecuencia(i, 'unidad')"
                     (keydown.enter)="saltar($event, 'cod-', i + 1 , this)"
                     formControlName="uni"
+                    (blur)="calcularTotalRow(i)"
                   />
 
                   <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">

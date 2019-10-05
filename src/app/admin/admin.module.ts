@@ -6,7 +6,7 @@ import { NgxBootstrapModule } from '../modules/ngx-bootstrap.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { DialogModule } from 'primeng/dialog';
 
-//componentes
+// componentes
 import { HomeAdminComponent } from './home/homeAdmin.component';
 import { NavbarAComponent } from './navbar-a/navbar-a.component';
 import { FacturacionComponent } from './facturacion/facturacion.component';

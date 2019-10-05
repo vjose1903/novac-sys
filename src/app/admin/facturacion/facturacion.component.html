@@ -5,7 +5,7 @@
       <div class="cabezaFactura">
         <div class="row">
           <div class="col-xs-12 col-md-2">
-            <h5>Tipo:</h5>
+            <h5><strong>Tipo:</strong></h5>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked />
               <label class="form-check-label" for="exampleRadios1">Consumidor final </label>
@@ -14,10 +14,17 @@
               <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2" />
               <label class="form-check-label" for="exampleRadios2"> Valor fiscal </label>
             </div>
+            <h5 class="mt-2"><strong>Condición :</strong></h5>
+            <select class="form-control " name="condicionSelect">
+              <option value="Credito">Credito</option>
+              <option value="Contado">Contado</option>
+            </select>
           </div>
+          <!-- ======================================================================================================================================================================== -->
+          <!-- ======================================================================================================================================================================== -->
           <div class="col-xs-12 col-md-6">
             <form [formGroup]="form">
-              <h5>Cliente:</h5>
+              <h5><strong>Cliente:</strong></h5>
               <div class="row">
                 <div class="col-xs-12 col-md-7">
                   <label class="control-label mr-2">Nombre:</label>
@@ -64,22 +71,20 @@
           <!-- ======================================================================================================================================================================== -->
           <!-- ======================================================================================================================================================================== -->
           <div class="col-xs-12 col-md-4">
-            <div class="d-inline-block">
-              <div class="float-right mr-3">
+            <div class="d-flex flex-column">
+              <div class=" encabezadoRigth fecha">
                 Fecha : <strong> {{ fecha }}</strong>
               </div>
-              <div class="float-right mr-3">
+              <div class=" encabezadoRigth numFac">
                 Numero Fac. : <strong> 0000000{{ numFac }}</strong>
               </div>
             </div>
-            <div class="cuadroTotal">
-              RD$ 0001
-            </div>
+            <div class="cuadroTotal">RD$ {{ formatearNumero(TOTAL) }}</div>
           </div>
         </div>
       </div>
       <div class="cuerpoFactura">
-        <app-cuerpo-factura></app-cuerpo-factura>
+        <app-cuerpo-factura (sendCalculos)="getCalculos($event)"></app-cuerpo-factura>
       </div>
     </div>
   </div>
