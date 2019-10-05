@@ -10,7 +10,8 @@ export class ModalComponent implements OnInit, OnChanges {
   @Input() showModal = false;
   @Input() seleccionModal: any;
   @Input() ModalEliminar = false;
-  @Input() ModalShearch = false;
+
+  @Input() tipoModal = '';
 
   @Input() listaArticulos: any;
   infoArticulos = [
@@ -30,11 +31,13 @@ export class ModalComponent implements OnInit, OnChanges {
   constructor() {}
 
   element: HTMLElement;
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('entro en Modal');
+  }
 
   ngOnChanges() {
     if (this.seleccionModal) {
-      if (this.ModalShearch === true) {
+      if (this.tipoModal === 'buscar') {
         this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
       }
     }
@@ -51,7 +54,7 @@ export class ModalComponent implements OnInit, OnChanges {
 
   devolverCLick(arg) {
     const obj = JSON.parse(JSON.stringify(arg));
-    if (this.ModalShearch === true) {
+    if (this.tipoModal === 'buscar') {
       obj.index = this.seleccionModal.index;
     }
 
@@ -67,7 +70,7 @@ export class ModalComponent implements OnInit, OnChanges {
   }
 
   prueba() {
-    if (this.ModalShearch) {
+    if (this.tipoModal === 'buscar') {
       this.element = document.getElementById('tablaSearch') as HTMLElement;
       this.element.focus();
     }

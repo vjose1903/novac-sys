@@ -15,6 +15,14 @@ export class FacturacionComponent implements OnInit {
   fecha;
   TOTAL;
   ITBIS;
+  seleccionModal: any;
+  showModal = false;
+  modalSearch: boolean;
+  control: any;
+  rowActual: any;
+  drop: boolean;
+  UnidadesArticulo: any[];
+  tipoModal: string;
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.form = this.fb.group({
       nombre: [],
@@ -43,4 +51,26 @@ export class FacturacionComponent implements OnInit {
     this.TOTAL = arg.Total;
     console.log(arg);
   }
+
+  cancelarFactura() {
+    this.tipoModal = 'cancelar';
+    this.abrirModal();
+  }
+
+  // =============================================
+  //  MODAL PARA FILTRAR ARTICULOS
+  // =============================================
+  abrirModal(arg?) {
+    if (arg) {
+      this.seleccionModal = arg;
+    }
+    this.showModal = true;
+  }
+
+  reinicarVarModal() {
+    this.modalSearch = false;
+    this.showModal = false;
+  }
+
+  clickRowModal(arg) {}
 }

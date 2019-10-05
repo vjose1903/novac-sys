@@ -16,6 +16,7 @@ import { RegistroEmpleadosComponent } from './registros/registro-empleados/regis
 import { CuerpoFacturaComponent } from './facturacion/cuerpo-factura/cuerpo-factura.component';
 import { TablasModule } from '../components/tablas/tablas.module';
 import { ModalComponent } from '../components/modal/modal.component';
+import { BTNcircularComponent } from '../components/btncircular/btncircular.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { ModalComponent } from '../components/modal/modal.component';
     RegistroArticulosComponent,
     RegistroEmpleadosComponent,
     CuerpoFacturaComponent,
+    BTNcircularComponent
   ],
   imports: [
     DialogModule,

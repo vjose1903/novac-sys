@@ -1,0 +1,23 @@
+.contenedor {
+  display: grid;
+}
+.labelBtn {
+  margin: auto;
+  transition: all 0.2s;
+}
+.imgBtn {
+  ~ .labelBtn {
+    transform: translate(0.2rem, -3rem) scale(0);
+  }
+
+  filter: grayscale(50%);
+  &:hover {
+    filter: grayscale(0%);
+    cursor: pointer;
+    ~ .labelBtn {
+      transform: translate(0.2rem, 0rem) scale(1);
+    }
+  }
+
+//   margin: auto auto;
+}

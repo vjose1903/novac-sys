@@ -1,8 +1,14 @@
+<app-modal
+  [tipoModal]="tipoModal"
+  (reinicioVariablesModal)="reinicarVarModal()"
+  [(showModal)]="showModal"
+></app-modal>
+
 <div class="row" style="height: calc(100% - 80px)">
   <div class="col-xs-12 col-md-12">
     <h1>Facturación</h1>
     <div class="card cardPrincipal sinPadding">
-      <div class="cabezaFactura">
+      <div class="cabezaFactura ">
         <div class="row">
           <div class="col-xs-12 col-md-2">
             <h5><strong>Tipo:</strong></h5>
@@ -16,8 +22,8 @@
             </div>
             <h5 class="mt-2"><strong>Condición :</strong></h5>
             <select class="form-control " name="condicionSelect">
-              <option value="Credito">Credito</option>
               <option value="Contado">Contado</option>
+              <option value="Credito">Credito</option>
             </select>
           </div>
           <!-- ======================================================================================================================================================================== -->
@@ -83,8 +89,19 @@
           </div>
         </div>
       </div>
-      <div class="cuerpoFactura">
+      <div class="cuerpoFactura mb-4">
         <app-cuerpo-factura (sendCalculos)="getCalculos($event)"></app-cuerpo-factura>
+      </div>
+      <div class="pieFactura">
+        <div class="row">
+          <div class="col-2 ">
+            <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'" ></app-btncircular>
+          </div>
+          <div class="col-2">
+            <app-btncircular [alto]="'100px'" [accion]="'Cancelar Factura'" [nombreImg]="'cancelar'"  (click)="cancelarFactura()"></app-btncircular>
+          </div>
+          <div class=" col-8"></div>
+        </div>
       </div>
     </div>
   </div>
