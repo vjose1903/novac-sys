@@ -6,7 +6,9 @@ import { map } from 'rxjs/operators';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
 import { UsuariosService } from '../../core/services/usuarios.service';
 import { UsuariosI } from '../../core/models/usuario.model';
-import { profile } from '../../core/services/GLOBAL';
+import { profile, TIPOMODAL, SHOWMODAL, SELECCIONMODAL, DECISIONMODAL, INDEXTOFOCUS, OBJDEVUELTO } from '../../core/services/GLOBAL';
+import { get } from 'http';
+import { SharedService } from '../../core/services/shared.service';
 
 const { dialog } = require('electron').remote;
 
@@ -17,12 +19,19 @@ const { dialog } = require('electron').remote;
 })
 export class NavbarAComponent implements OnInit, OnDestroy {
   mantenimiento: boolean;
+  subShowModal = new Subscription();
+  subTipoModal = new Subscription();
+  subSeleccionModal = new Subscription();
   sub = new Subscription();
 
   actualTab: any;
 
   showLoading = true;
-  constructor(private breakpointObserver: BreakpointObserver, public usuariosServices: UsuariosService, private router: Router) {
+
+  showModal;
+  tipoModal: any;
+  seleccionModal: any;
+  constructor(private shServ: SharedService, private breakpointObserver: BreakpointObserver, public usuariosServices: UsuariosService, private router: Router) {
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
@@ -42,18 +51,32 @@ export class NavbarAComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.mantenimiento = true;
 
-    var userPayload = this.usuariosServices.getUserPayload();
+    const userPayload = this.usuariosServices.getUserPayload();
     this.usuariosServices.getUser(userPayload._id).subscribe(res => {
-      var data = res as UsuariosI;
+      const data = res as UsuariosI;
       profile.next(data);
     });
 
     this.sub = profile.subscribe(res => {
       this.usuariosServices.profile = res;
     });
+
+    this.subShowModal = SHOWMODAL.subscribe(res => {
+      this.showModal = res;
+    });
+
+    this.subTipoModal = TIPOMODAL.subscribe(res => {
+      this.tipoModal = res;
+    });
+    this.subSeleccionModal = SELECCIONMODAL.subscribe(res => {
+      this.seleccionModal = res;
+    });
   }
   ngOnDestroy() {
     this.sub.unsubscribe();
+    this.subShowModal.unsubscribe();
+    this.subTipoModal.unsubscribe();
+    this.subSeleccionModal.unsubscribe();
   }
 
   prueba1(hi: any) {
@@ -134,5 +157,28 @@ export class NavbarAComponent implements OnInit, OnDestroy {
       default:
         break;
     }
+  }
+
+  // ===========================================================================
+  // MODAL
+  // ===========================================================================
+
+  reiniciarVarModal() {
+    TIPOMODAL.next('');
+    SHOWMODAL.next(false);
+    SELECCIONMODAL.next({});
+  }
+
+  BtnModal(arg) {
+    DECISIONMODAL.next(arg);
+    this.reiniciarVarModal();
+  }
+
+  clickRowModal(arg) {
+    OBJDEVUELTO.next(arg);
+  }
+
+  noArticuloEncontrado(arg) {
+    INDEXTOFOCUS.next(arg);
   }
 }

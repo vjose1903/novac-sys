@@ -87,3 +87,14 @@
   </mat-sidenav-content>
 </mat-sidenav-container>
 <!-- <div class="footer"></div> -->
+<app-modal
+  *ngIf="(seleccionModal && tipoModal && showModal) || (tipoModal && showModal)"
+  [tipoModal]="tipoModal"
+  [seleccionModal]="seleccionModal"
+  [(showModal)]="showModal"
+  (btnInsideClick)="BtnModal($event)"
+  (reinicioVariablesModal)="reiniciarVarModal()"
+  (clickRowModal)="clickRowModal($event)"
+  [listaArticulos]="seleccionModal.listaArticulos"
+  (noArticuloEncontrado)="noArticuloEncontrado()"
+></app-modal>

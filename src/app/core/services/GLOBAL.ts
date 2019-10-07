@@ -18,6 +18,16 @@ export class FORMATEAR {
 }
 
 // ===========================================================================
+// PARA MODAL
+// ===========================================================================
+export const TIPOMODAL = new BehaviorSubject<any>('');
+export const SHOWMODAL = new BehaviorSubject<boolean>(false);
+export const SELECCIONMODAL = new BehaviorSubject<any>({});
+export const DECISIONMODAL = new BehaviorSubject<any>(false);
+export const OBJDEVUELTO = new BehaviorSubject<any>({});
+export const INDEXTOFOCUS = new BehaviorSubject<any>(0);
+
+// ===========================================================================
 // PARA MOSTRAR EL LOADING
 // ===========================================================================
 export const showLoadin = new BehaviorSubject<boolean>(false);

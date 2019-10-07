@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input, OnChanges, ElementRef } from '@angular/core';
+import { TIPOMODAL, SHOWMODAL, SELECCIONMODAL, DECISIONMODAL, INDEXTOFOCUS } from '../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-modal',
@@ -11,7 +12,7 @@ export class ModalComponent implements OnInit, OnChanges {
   @Input() seleccionModal: any;
   @Input() ModalEliminar = false;
 
-  @Input() tipoModal = '';
+  @Input() tipoModal;
 
   @Input() listaArticulos: any;
   infoArticulos = [
@@ -31,9 +32,7 @@ export class ModalComponent implements OnInit, OnChanges {
   constructor() {}
 
   element: HTMLElement;
-  ngOnInit() {
-    console.log('entro en Modal');
-  }
+  ngOnInit() {}
 
   ngOnChanges() {
     if (this.seleccionModal) {
@@ -49,7 +48,11 @@ export class ModalComponent implements OnInit, OnChanges {
   }
 
   reinicioModal() {
-    this.reinicioVariablesModal.emit();
+    console.log('reinicio variables modal');
+
+    TIPOMODAL.next('');
+    SHOWMODAL.next(false);
+    SELECCIONMODAL.next({});
   }
 
   devolverCLick(arg) {
@@ -63,12 +66,18 @@ export class ModalComponent implements OnInit, OnChanges {
 
   moverFoco() {
     this.showModal = false;
+    SHOWMODAL.next(false);
   }
+
   noArticulo() {
     this.showModal = false;
+    SHOWMODAL.next(false);
     this.noArticuloEncontrado.emit(this.seleccionModal.index);
   }
 
+  prueba2() {
+    console.log('entro prueba 2');
+  }
   prueba() {
     if (this.tipoModal === 'buscar') {
       this.element = document.getElementById('tablaSearch') as HTMLElement;

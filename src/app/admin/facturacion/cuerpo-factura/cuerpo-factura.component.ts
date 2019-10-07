@@ -17,13 +17,15 @@ import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { SharedService } from '../../../core/services/shared.service';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
+import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL, OBJDEVUELTO, INDEXTOFOCUS } from '../../../core/services/GLOBAL';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-cuerpo-factura',
   templateUrl: './cuerpo-factura.component.html',
   styleUrls: ['./cuerpo-factura.component.scss'],
 })
-export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit {
+export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   form: FormGroup;
   rowFactura: FormArray;
   listaArticulos: any;
@@ -45,6 +47,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
   inputDrop = 'uni-0';
   control;
 
+  subObjDevueltoModal: Subscription;
+  subIndexToFocusModal: Subscription;
   @Output() sendCalculos = new EventEmitter<any>();
 
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
@@ -64,6 +68,18 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
     this.shServ.getArticulos().subscribe(res => {
       this.listaArticulos = res;
     });
+
+    this.subObjDevueltoModal = OBJDEVUELTO.subscribe(res => {
+      this.clickRowModal(res);
+    });
+    this.subIndexToFocusModal = INDEXTOFOCUS.subscribe(res => {
+      this.noArticuloEncontrado(res);
+    });
+  }
+
+  ngOnDestroy() {
+    this.subObjDevueltoModal.unsubscribe();
+    this.subIndexToFocusModal.unsubscribe();
   }
   ngAfterViewInit() {
     this.control = <FormArray>this.form.controls['rowFactura'];
@@ -294,13 +310,17 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
   //  MODAL PARA FILTRAR ARTICULOS
   // =============================================
   abrirModal(arg) {
-    this.seleccionModal = arg;
-    this.showModal = true;
+    const obj = arg;
+    obj.listaArticulos = this.listaArticulos;
+    TIPOMODAL.next('buscar');
+    SELECCIONMODAL.next(obj);
+    SHOWMODAL.next(true);
+    // this.seleccionModal = arg;
+    // this.showModal = true;
   }
 
   filtrarArticulo(arg) {
     this.abrirModal(arg);
-    this.modalSearch = true;
   }
 
   reinicarVarModal() {
@@ -327,9 +347,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit 
 
     const sigInput = 'can-' + arg.index;
     this.enfocarInput(sigInput);
-    // this.element = document.getElementById(sigInput) as HTMLElement;
-    // this.element.focus();
   }
+
   noArticuloEncontrado(arg) {
     this.shServ.toastError('Articulo no existe', 'ERROR');
     this.enfocarInput('cod-' + arg);

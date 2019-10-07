@@ -89,7 +89,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   @Output() clickRow = new EventEmitter<any>();
   @Output() DevolverInfo = new EventEmitter<any>();
   @Output() DELETE = new EventEmitter<any>();
-  @Output() moverFoco = new EventEmitter<any>();
+  @Output() reinicioModal = new EventEmitter<any>();
   @Output() noArticulo = new EventEmitter<any>();
   constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
 
@@ -182,12 +182,13 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     this.IDROW = this.ROW + _.toString(this.NUM);
     this.entrar++;
   }
+
   ENTER(arg) {
     this.entrar++;
     if (this.entrar > 1) {
       this.element = document.getElementById(arg) as HTMLElement;
       this.element.click();
-      this.moverFoco.emit();
+      this.reinicioModal.emit();
     }
   }
 }

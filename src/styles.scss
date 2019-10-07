@@ -22,17 +22,15 @@ body {
   min-height: calc(100% - 2rem);
 }
 
-.contenedorRegistro{
+.contenedorRegistro {
   display: flex;
   align-items: center;
   height: calc(100% - 50px);
 }
 
-.sinPadding{
-  padding: 0!important;
+.sinPadding {
+  padding: 0 !important;
 }
-
-
 
 // ========================================================
 // BOTONES
@@ -96,4 +94,20 @@ body {
     padding: 2rem 1rem 2rem 1rem;
     margin-top: 0.5rem;
   }
+}
+/* ====================================================== */
+/* MODAL */
+/* ====================================================== */
+body .ui-dialog {
+  z-index: 99999999 !important;
+}
+
+body .ui-dialog .ui-dialog-titlebar {
+  background-color: #94e6aa !important;
+  z-index: 100001 !important;
+}
+
+body .ui-widget-overlay {
+  z-index: 1 !important;
+  background-color: rgba(0, 0, 0, 0.4);
 }

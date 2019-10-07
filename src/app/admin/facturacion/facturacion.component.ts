@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { SharedService } from '../../core/services/shared.service';
 import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
+import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL } from '../../core/services/GLOBAL';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-facturacion',
   templateUrl: './facturacion.component.html',
   styleUrls: ['./facturacion.component.scss'],
 })
-export class FacturacionComponent implements OnInit {
+export class FacturacionComponent implements OnInit, OnDestroy {
   form: FormGroup;
   numFac = 0;
   fecha;
@@ -23,6 +25,10 @@ export class FacturacionComponent implements OnInit {
   drop: boolean;
   UnidadesArticulo: any[];
   tipoModal: string;
+
+  subDecisionBtnModal: Subscription;
+  subObjDevueltoModal: Subscription;
+  // subIndexToFocusModal: Subscription;
   constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.form = this.fb.group({
       nombre: [],
@@ -46,6 +52,14 @@ export class FacturacionComponent implements OnInit {
 
   ngOnInit() {
     this.fecha = moment().format('L');
+    this.subDecisionBtnModal = DECISIONMODAL.subscribe(res => {
+      this.decisionModal(res);
+    });
+    // this.subObjDevueltoModal=;
+  }
+
+  ngOnDestroy(): void {
+    this.subDecisionBtnModal.unsubscribe();
   }
   getCalculos(arg) {
     this.TOTAL = arg.Total;
@@ -53,7 +67,8 @@ export class FacturacionComponent implements OnInit {
   }
 
   cancelarFactura() {
-    this.tipoModal = 'cancelar';
+    TIPOMODAL.next('cancelar');
+    // this.tipoModal = 'cancelar';
     this.abrirModal();
   }
 
@@ -62,15 +77,27 @@ export class FacturacionComponent implements OnInit {
   // =============================================
   abrirModal(arg?) {
     if (arg) {
-      this.seleccionModal = arg;
+      // this.seleccionModal = arg;
+      SELECCIONMODAL.next(arg);
     }
-    this.showModal = true;
+    // this.showModal = true;
+    SHOWMODAL.next(true);
   }
 
   reinicarVarModal() {
-    this.modalSearch = false;
-    this.showModal = false;
+    // this.showModal = false;
+    SHOWMODAL.next(false);
   }
 
-  clickRowModal(arg) {}
+  decisionModal(arg) {
+    const decision = arg;
+
+    console.log(decision, 'desde el componente factura');
+  }
+
+  // clickRowModal(arg) {
+  //   const decision = DECISIONMODAL.getValue();
+  //   console.log(DECISIONMODAL.getValue());
+
+  // }
 }

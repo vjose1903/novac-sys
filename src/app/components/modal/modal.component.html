@@ -1,73 +1,74 @@
 <!-- ================================================================================================================================ -->
 <!-- ELIMINAR -->
 <!-- ================================================================================================================================ -->
+<div *ngIf="showModal" class="overlay">
+  <p-dialog
+    *ngIf="tipoModal === 'borrar' && seleccionModal"
+    header="Confirmar"
+    [(visible)]="showModal"
+    [modal]="true"
+    [responsive]="true"
+    [style]="{ width: '350px', minWidth: '200px' }"
+    [minY]="70"
+    [baseZIndex]="10000"
+    (onHide)="reinicioModal()"
+  >
+    <p>Desea eliminar {{ seleccionModal.nombre }}</p>
+    <p-footer>
+      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
+      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+    </p-footer>
+  </p-dialog>
 
-<p-dialog
-  *ngIf="tipoModal === 'borrar' && seleccionModal"
-  header="Confirmar"
-  [(visible)]="showModal"
-  [modal]="true"
-  [responsive]="true"
-  [style]="{ width: '350px', minWidth: '200px' }"
-  [minY]="70"
-  [baseZIndex]="10000"
-  (onHide)="reinicioModal()"
->
-  <p>Desea eliminar {{ seleccionModal.nombre }}</p>
-  <p-footer>
-    <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-    <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
-  </p-footer>
-</p-dialog>
+  <!-- ================================================================================================================================ -->
+  <!--  CANCELAR  FACTURA-->
+  <!-- ================================================================================================================================ -->
 
-<!-- ================================================================================================================================ -->
-<!--  CANCELAR  FACTURA-->
-<!-- ================================================================================================================================ -->
+  <p-dialog
+    *ngIf="tipoModal === 'cancelar'"
+    header="Confirmar"
+    [(visible)]="showModal"
+    [modal]="false"
+    [responsive]="true"
+    [style]="{ width: '350px', minWidth: '200px' }"
+    [minY]="70"
+    [baseZIndex]="10000"
+    (onHide)="prueba2()"
+  >
+    <p>Seguro que desea cancelar la factura</p>
+    <p-footer>
+      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
+      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+    </p-footer>
+  </p-dialog>
 
-<p-dialog
-  *ngIf="tipoModal === 'cancelar'"
-  header="Confirmar"
-  [(visible)]="showModal"
-  [modal]="true"
-  [responsive]="true"
-  [style]="{ width: '350px', minWidth: '200px' }"
-  [minY]="70"
-  [baseZIndex]="10000"
-  (onHide)="reinicioModal()"
->
-  <p>Desea Cancelar la Factura</p>
-  <p-footer>
-    <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-    <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
-  </p-footer>
-</p-dialog>
+  <!-- ================================================================================================================================ -->
+  <!-- FILTRAR ARTICULO -->
+  <!-- ================================================================================================================================ -->
 
-<!-- ================================================================================================================================ -->
-<!-- FILTRAR ARTICULO -->
-<!-- ================================================================================================================================ -->
-
-<p-dialog
-  *ngIf="tipoModal === 'buscar' && seleccionModal && infoArticulos"
-  header="Buscar articulo"
-  [(visible)]="showModal"
-  [focusTrap]="true"
-  [focusOnShow]="true"
-  [modal]="false"
-  [responsive]="true"
-  [style]="{ width: '600px', minWidth: '400px' }"
-  [minY]="70"
-  (onHide)="reinicioModal()"
->
-  <app-tablas
-    id="tablaSearch"
-    *ngIf="listaArticulos.length > 0 && paraFiltroArticulos"
-    [focusRow]="true"
-    [paraFiltroArticulos]="paraFiltroArticulos"
-    (clickRow)="devolverCLick($event)"
-    [info]="infoArticulos"
-    [data]="listaArticulos"
-    [search]="false"
-    (noArticulo)="noArticulo()"
-    (moverFoco)="moverFoco()"
-  ></app-tablas>
-</p-dialog>
+  <p-dialog
+    *ngIf="tipoModal === 'buscar' && seleccionModal && infoArticulos"
+    header="Buscar articulo"
+    [(visible)]="showModal"
+    [focusTrap]="true"
+    [focusOnShow]="true"
+    [modal]="false"
+    [responsive]="true"
+    [style]="{ width: '600px', minWidth: '400px' }"
+    [minY]="70"
+    (onHide)="reinicioModal()"
+  >
+    <app-tablas
+      id="tablaSearch"
+      *ngIf="listaArticulos.length > 0 && paraFiltroArticulos"
+      [focusRow]="true"
+      [paraFiltroArticulos]="paraFiltroArticulos"
+      (clickRow)="devolverCLick($event)"
+      [info]="infoArticulos"
+      [data]="listaArticulos"
+      [search]="false"
+      (noArticulo)="noArticulo()"
+      (reinicioModal)="reinicioModal()"
+    ></app-tablas>
+  </p-dialog>
+</div>
