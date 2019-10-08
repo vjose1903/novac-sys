@@ -17,8 +17,9 @@ import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { SharedService } from '../../../core/services/shared.service';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL, OBJDEVUELTO, INDEXTOFOCUS } from '../../../core/services/GLOBAL';
+// import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL, OBJDEVUELTO, INDEXTOFOCUS } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
+import { ModalService } from '../../../components/modal/modal.service';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -47,11 +48,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   inputDrop = 'uni-0';
   control;
 
-  subObjDevueltoModal: Subscription;
-  subIndexToFocusModal: Subscription;
+  // subObjDevueltoModal: Subscription;
+  // subIndexToFocusModal: Subscription;
+
   @Output() sendCalculos = new EventEmitter<any>();
 
-  constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private mServ: ModalService, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.rowFactura = new FormArray([new FormControl()]);
   }
 
@@ -69,18 +71,20 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.listaArticulos = res;
     });
 
-    this.subObjDevueltoModal = OBJDEVUELTO.subscribe(res => {
-      this.clickRowModal(res);
+    this.mServ.OBJDEVUELTO.subscribe(res => {
+      if (res !== undefined) {
+        this.clickRowModal(res);
+      }
     });
-    this.subIndexToFocusModal = INDEXTOFOCUS.subscribe(res => {
-      this.noArticuloEncontrado(res);
+
+    this.mServ.INDEXTOFOCUS.subscribe(res => {
+      if (res !== undefined) {
+        this.noArticuloEncontrado(res);
+      }
     });
   }
 
-  ngOnDestroy() {
-    this.subObjDevueltoModal.unsubscribe();
-    this.subIndexToFocusModal.unsubscribe();
-  }
+  ngOnDestroy() {}
   ngAfterViewInit() {
     this.control = <FormArray>this.form.controls['rowFactura'];
   }
@@ -93,7 +97,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   formatearNumero(nStr) {
     if (nStr !== undefined) {
       nStr += '';
-      // console.log(nStr, '=======');
 
       const x = nStr.split('.');
       let x1 = x[0];
@@ -168,14 +171,15 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     let codigo = (this.control.controls[i] as any).controls['cod'].value;
 
     if (input === 'cod-') {
-      this.UnidadesArticulo = [];
-      this.aumentarSecuencia();
+      const unidad = (this.control.controls[i - 1] as any).controls['uni'].value;
 
-      const medida = (this.control.controls[i] as any).controls['uni'].value;
-
-      if (medida === '' || medida === null) {
-        // this.enfocarInput('uni-' + (i - 1));
+      if (unidad === '') {
+        setTimeout(() => {
+          this.enfocarInput('uni-' + (i - 1));
+        }, 1);
       } else {
+        this.UnidadesArticulo = [];
+        this.aumentarSecuencia();
       }
     }
     if (codigo === '') {
@@ -212,6 +216,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
           });
         } else {
+          this.enfocarInput('cod-' + this.secuencia);
           (this.control.controls[i] as any).controls['uni'].setValue(res.medida);
           (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(res.precio));
           this.drop = false;
@@ -301,7 +306,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         Total: _.round(this.TOTAL, 2),
         ITBIS: '',
       };
-
       this.sendCalculos.emit(obj);
     }
   }
@@ -312,11 +316,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   abrirModal(arg) {
     const obj = arg;
     obj.listaArticulos = this.listaArticulos;
-    TIPOMODAL.next('buscar');
-    SELECCIONMODAL.next(obj);
-    SHOWMODAL.next(true);
-    // this.seleccionModal = arg;
-    // this.showModal = true;
+    this.mServ.modalTipo('buscar');
+    this.mServ.ModalSeleccion(obj);
+    this.mServ.mostrarModal(true);
   }
 
   filtrarArticulo(arg) {

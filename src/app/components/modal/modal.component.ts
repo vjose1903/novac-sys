@@ -1,18 +1,16 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnChanges, ElementRef } from '@angular/core';
-import { TIPOMODAL, SHOWMODAL, SELECCIONMODAL, DECISIONMODAL, INDEXTOFOCUS } from '../../core/services/GLOBAL';
+import { Component, OnInit, Output, EventEmitter, Input, OnChanges, ElementRef, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { ModalService } from './modal.service';
 
 @Component({
   selector: 'app-modal',
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
 })
-export class ModalComponent implements OnInit, OnChanges {
-  // Inputs
-  @Input() showModal = false;
-  @Input() seleccionModal: any;
-  @Input() ModalEliminar = false;
-
-  @Input() tipoModal;
+export class ModalComponent implements OnInit, OnChanges, OnDestroy {
+  showModal = false;
+  seleccionModal: any;
+  tipoModal;
 
   @Input() listaArticulos: any;
   infoArticulos = [
@@ -22,17 +20,31 @@ export class ModalComponent implements OnInit, OnChanges {
     },
   ];
 
-  // Outputs
-  @Output() btnInsideClick = new EventEmitter<boolean>();
-  @Output() reinicioVariablesModal = new EventEmitter<any>();
-  @Output() clickRowModal = new EventEmitter<any>();
-  @Output() noArticuloEncontrado = new EventEmitter<any>();
-
   paraFiltroArticulos;
-  constructor() {}
+
+  constructor(private mServ: ModalService) {}
 
   element: HTMLElement;
-  ngOnInit() {}
+  ngOnInit() {
+    this.mServ.SHOWMODAL.subscribe(res => {
+      if (res !== undefined) {
+        this.showModal = res;
+      }
+    });
+    this.mServ.TIPOMODAL.subscribe(res => {
+      if (res !== undefined) {
+        this.tipoModal = res;
+      }
+    });
+    this.mServ.SELECCIONMODAL.subscribe(res => {
+      if (res !== undefined) {
+        this.seleccionModal = res;
+        this.paraFiltroArticulos = res.filtrar;
+      }
+    });
+  }
+
+  ngOnDestroy() {}
 
   ngOnChanges() {
     if (this.seleccionModal) {
@@ -43,16 +55,14 @@ export class ModalComponent implements OnInit, OnChanges {
   }
 
   accion(arg) {
-    this.btnInsideClick.emit(arg);
-    this.showModal = false;
+    this.mServ.ModalDecision(arg);
+    this.reinicioModal();
   }
 
   reinicioModal() {
-    console.log('reinicio variables modal');
-
-    TIPOMODAL.next('');
-    SHOWMODAL.next(false);
-    SELECCIONMODAL.next({});
+    this.mServ.modalTipo(undefined);
+    this.mServ.mostrarModal(false);
+    this.mServ.ModalSeleccion(undefined);
   }
 
   devolverCLick(arg) {
@@ -61,23 +71,15 @@ export class ModalComponent implements OnInit, OnChanges {
       obj.index = this.seleccionModal.index;
     }
 
-    this.clickRowModal.emit(obj);
-  }
-
-  moverFoco() {
-    this.showModal = false;
-    SHOWMODAL.next(false);
+    this.mServ.ModalObj(obj);
   }
 
   noArticulo() {
-    this.showModal = false;
-    SHOWMODAL.next(false);
-    this.noArticuloEncontrado.emit(this.seleccionModal.index);
+    this.reinicioModal();
+    this.mServ.ModalIndex(this.seleccionModal.index);
+    // this.noArticuloEncontrado.emit(this.seleccionModal.index);
   }
 
-  prueba2() {
-    console.log('entro prueba 2');
-  }
   prueba() {
     if (this.tipoModal === 'buscar') {
       this.element = document.getElementById('tablaSearch') as HTMLElement;

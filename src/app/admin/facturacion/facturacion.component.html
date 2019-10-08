@@ -1,9 +1,3 @@
-<!-- <app-modal
-  [tipoModal]="tipoModal"
-  (reinicioVariablesModal)="reinicarVarModal()"
-  [(showModal)]="showModal"
-></app-modal> -->
-
 <div class="row" style="height: calc(100% - 80px)">
   <div class="col-xs-12 col-md-12">
     <h1>Facturación</h1>
@@ -95,10 +89,10 @@
       <div class="pieFactura">
         <div class="row">
           <div class="col-2 ">
-            <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'" ></app-btncircular>
+            <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'"></app-btncircular>
           </div>
           <div class="col-2">
-            <app-btncircular [alto]="'100px'" [accion]="'Cancelar Factura'" [nombreImg]="'cancelar'"  (click)="cancelarFactura()"></app-btncircular>
+            <app-btncircular [alto]="'100px'" [accion]="'Cancelar Factura'" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
           </div>
           <div class=" col-8"></div>
         </div>

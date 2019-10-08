@@ -5,6 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
+import { ModalService } from '../../components/modal/modal.service';
+import { isUndefined } from 'ngx-bootstrap/chronos/utils/type-checks';
 
 @Component({
   selector: 'app-facturacion',
@@ -26,10 +28,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   UnidadesArticulo: any[];
   tipoModal: string;
 
-  subDecisionBtnModal: Subscription;
-  subObjDevueltoModal: Subscription;
-  // subIndexToFocusModal: Subscription;
-  constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private mServ: ModalService, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.form = this.fb.group({
       nombre: [],
       direccion: [],
@@ -52,23 +51,21 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.fecha = moment().format('L');
-    this.subDecisionBtnModal = DECISIONMODAL.subscribe(res => {
-      this.decisionModal(res);
+
+    this.mServ.DECISIONMODAL.subscribe(res => {
+      if (res !== undefined) {
+        this.decisionModal(res);
+      }
     });
-    // this.subObjDevueltoModal=;
   }
 
-  ngOnDestroy(): void {
-    this.subDecisionBtnModal.unsubscribe();
-  }
+  ngOnDestroy(): void {}
   getCalculos(arg) {
     this.TOTAL = arg.Total;
-    console.log(arg);
   }
 
   cancelarFactura() {
-    TIPOMODAL.next('cancelar');
-    // this.tipoModal = 'cancelar';
+    this.mServ.modalTipo('cancelar');
     this.abrirModal();
   }
 
@@ -77,27 +74,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   // =============================================
   abrirModal(arg?) {
     if (arg) {
-      // this.seleccionModal = arg;
-      SELECCIONMODAL.next(arg);
+      this.mServ.ModalSeleccion(arg);
     }
-    // this.showModal = true;
-    SHOWMODAL.next(true);
+    this.mServ.mostrarModal(true);
   }
-
-  reinicarVarModal() {
-    // this.showModal = false;
-    SHOWMODAL.next(false);
-  }
-
   decisionModal(arg) {
     const decision = arg;
-
     console.log(decision, 'desde el componente factura');
   }
-
-  // clickRowModal(arg) {
-  //   const decision = DECISIONMODAL.getValue();
-  //   console.log(DECISIONMODAL.getValue());
-
-  // }
 }

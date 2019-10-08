@@ -19,9 +19,7 @@ const { dialog } = require('electron').remote;
 })
 export class NavbarAComponent implements OnInit, OnDestroy {
   mantenimiento: boolean;
-  subShowModal = new Subscription();
-  subTipoModal = new Subscription();
-  subSeleccionModal = new Subscription();
+
   sub = new Subscription();
 
   actualTab: any;
@@ -60,23 +58,9 @@ export class NavbarAComponent implements OnInit, OnDestroy {
     this.sub = profile.subscribe(res => {
       this.usuariosServices.profile = res;
     });
-
-    this.subShowModal = SHOWMODAL.subscribe(res => {
-      this.showModal = res;
-    });
-
-    this.subTipoModal = TIPOMODAL.subscribe(res => {
-      this.tipoModal = res;
-    });
-    this.subSeleccionModal = SELECCIONMODAL.subscribe(res => {
-      this.seleccionModal = res;
-    });
   }
   ngOnDestroy() {
     this.sub.unsubscribe();
-    this.subShowModal.unsubscribe();
-    this.subTipoModal.unsubscribe();
-    this.subSeleccionModal.unsubscribe();
   }
 
   prueba1(hi: any) {

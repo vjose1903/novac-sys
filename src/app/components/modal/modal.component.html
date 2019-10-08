@@ -33,7 +33,6 @@
     [style]="{ width: '350px', minWidth: '200px' }"
     [minY]="70"
     [baseZIndex]="10000"
-    (onHide)="prueba2()"
   >
     <p>Seguro que desea cancelar la factura</p>
     <p-footer>
@@ -60,12 +59,12 @@
   >
     <app-tablas
       id="tablaSearch"
-      *ngIf="listaArticulos.length > 0 && paraFiltroArticulos"
+      *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos"
       [focusRow]="true"
       [paraFiltroArticulos]="paraFiltroArticulos"
       (clickRow)="devolverCLick($event)"
       [info]="infoArticulos"
-      [data]="listaArticulos"
+      [data]="seleccionModal.listaArticulos"
       [search]="false"
       (noArticulo)="noArticulo()"
       (reinicioModal)="reinicioModal()"
