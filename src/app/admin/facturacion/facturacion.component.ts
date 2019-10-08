@@ -48,7 +48,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       return x1 + x2;
     }
   }
-
+  
   ngOnInit() {
     this.fecha = moment().format('L');
 
