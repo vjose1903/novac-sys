@@ -1,4 +1,10 @@
-
 <div class="cuerpo">
-  <h1 class="titulo">ADM Agroindustrial</h1>
+  <!-- <h1 class="titulo">ADM Agroindustrial</h1> -->
+
+  <button (click)="subirIMG()">subir</button>
+  <input required type="file" class="custom-file-input" id="input-custom-file" (change)="onFileChange($event)" accept=".jpg, .png, .jpeg, .svg" />
+  <label class="form-control" for="input-custom-file">{{ nameFile }}</label>
+  <div class="col-md-6 d-flex justify-content-center mt-3">
+    <img class="img-fluid" id="blah" [src]="imageSrc || fotoActual" alt="your image" />
+  </div>
 </div>

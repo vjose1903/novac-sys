@@ -40,7 +40,7 @@ export class NavbarAComponent implements OnInit, OnDestroy {
     });
   }
 
-  imagenCuenta = 'http://localhost:3000/api/photos/this.usuariosServices.profile.fotoPerfil';
+  // imagenCuenta = 'http://localhost:3000/api/photos/this.usuariosServices.profile.fotoPerfil';
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
 
@@ -49,18 +49,18 @@ export class NavbarAComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.mantenimiento = true;
 
-    const userPayload = this.usuariosServices.getUserPayload();
-    this.usuariosServices.getUser(userPayload._id).subscribe(res => {
-      const data = res as UsuariosI;
-      profile.next(data);
-    });
+    // const userPayload = this.usuariosServices.getUserPayload();
+    // this.usuariosServices.getUser(userPayload._id).subscribe(res => {
+    //   const data = res as UsuariosI;
+    //   profile.next(data);
+    // });
 
-    this.sub = profile.subscribe(res => {
-      this.usuariosServices.profile = res;
-    });
+    // this.sub = profile.subscribe(res => {
+    //   this.usuariosServices.profile = res;
+    // });
   }
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    // this.sub.unsubscribe();
   }
 
   prueba1(hi: any) {

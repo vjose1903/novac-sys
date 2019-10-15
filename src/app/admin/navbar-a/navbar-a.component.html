@@ -10,12 +10,12 @@
     <mat-toolbar> <h5 (click)="navegar(1)">Menu</h5> </mat-toolbar>
     <mat-nav-list class="text-center">
       <div class="menuList menuList1">
-        <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="http://localhost:3000/api/photos/factura.png" alt="" (click)="navegar(2)" />
+        <!-- <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="http://localhost:3000/api/photos/factura.png" alt="" (click)="navegar(2)" /> -->
         <h5 [ngClass]="actualTab == 'factura' ? 'tituloMenu1A' : 'tituloMenu1'"><strong>Facturacion</strong></h5>
       </div>
 
       <div class="menuList menuList2">
-        <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'" src="http://localhost:3000/api/photos/registro.png" alt="" (click)="navegar(3)" />
+        <!-- <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'" src="http://localhost:3000/api/photos/registro.png" alt="" (click)="navegar(3)" /> -->
         <h5 [ngClass]="actualTab == 'registro' ? 'tituloMenu2A' : 'tituloMenu2'"><strong>Registros</strong></h5>
 
         <div [ngClass]="actualTab == 'registro' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
@@ -25,12 +25,12 @@
       </div>
 
       <div class="menuList menuList3">
-        <img [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'" src="http://localhost:3000/api/photos/inventario.png" alt="" (click)="navegar(4)" />
+        <!-- <img [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'" src="http://localhost:3000/api/photos/inventario.png" alt="" (click)="navegar(4)" /> -->
         <h5 [ngClass]="actualTab == 'inventario' ? 'tituloMenu3A' : 'tituloMenu3'"><strong>Inventario</strong></h5>
       </div>
 
       <div class="menuList menuList4">
-        <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" src="http://localhost:3000/api/photos/reporte.png" alt="" (click)="navegar(5)" />
+        <!-- <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" src="http://localhost:3000/api/photos/reporte.png" alt="" (click)="navegar(5)" /> -->
         <h5 [ngClass]="actualTab == 'reporte' ? 'tituloMenu4A' : 'tituloMenu4'"><strong>Reporte</strong></h5>
       </div>
     </mat-nav-list>
@@ -49,7 +49,7 @@
       <div class="right">
         <div class="btn-group" dropdown>
           <a id="button-basic" dropdownToggle class="dropdown-toggle" aria-controls="dropdown-basic">
-            <img class="rounded-circle" src="http://localhost:3000/api/photos/{{ this.usuariosServices.profile.fotoPerfil }}" alt="Admin" />
+            <!-- <img class="rounded-circle" src="http://localhost:3000/api/photos/{{ this.usuariosServices.profile.fotoPerfil }}" alt="Admin" /> -->
             Cuenta <span class="caret"></span>
           </a>
           <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
