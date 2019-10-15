@@ -40,6 +40,8 @@ function createWindow() {
 
   if (serve) {
     win.webContents.openDevTools();
+    process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
+    process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
   }
 
   // Emitted when the window is closed.
