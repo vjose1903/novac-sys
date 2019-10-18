@@ -62,7 +62,7 @@ export class DBservice {
   // =====================================================================
 
   subirFoto(arg) {
-    return this.peticion('rails/active_storage/direct_uploads', 'post', JSON.stringify(arg));
+    return this.peticion('imagenes', 'post', JSON.stringify(arg));
   }
   // =====================================================================
   // ARTICULOS
