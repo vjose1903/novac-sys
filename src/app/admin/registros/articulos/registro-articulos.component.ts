@@ -22,6 +22,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
 
   vendersePorSelected;
   listaArticulos = [];
+  FORM: any;
   constructor(private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
@@ -32,7 +33,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       // LISTA_ARTICULOS.next(res);
     });
     this.createForm();
-
+    this.FORM = this.form.controls;
     this.route.paramMap.subscribe(params => {
       if (params.get('accion') === 'INS') {
         this.titulo = 'Registro de articulos';
@@ -54,15 +55,21 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       is_detallable: [this.articuloSelected ? this.articuloSelected.is_detallable : this.isDetallable],
       fecha_ingreso: [this.articuloSelected ? this.articuloSelected.fecha_ingreso : new Date()],
       existencia: [this.articuloSelected ? this.articuloSelected.existencia : 0],
-      medida_contenido: null,
+
       cantidad_contenido_padre: null,
+      medida_contenido_padre: null,
+
       medida_contenido_hijo: null,
-
-      contenido_articulos_attributes: null,
-      imagen_attributes: null,
-
+      cantidad_contenido_hijo: null,
       // detallableArray: this.fb.array([]),
     });
+  }
+
+  resetCompradoEn() {
+    this.FORM.medida_contenido_padre.value = null;
+    this.FORM.medida_contenido_hijo.value = null;
+    this.FORM.cantidad_contenido_padre.value = null;
+    this.FORM.cantidad_contenido_hijo.value = null;
   }
 
   ngOnDestroy() {}
