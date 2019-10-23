@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { SharedService } from '../../../core/services/shared.service';
 import { TABLA } from '../../../components/tablas/tabla';
+import { DBservice } from '../../../core/services/bdservice.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -18,35 +18,50 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   isDetallable = false;
   medida: boolean;
 
+  articuloSelected;
+
+  vendersePorSelected;
   listaArticulos = [];
-  constructor(private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
 
   ngOnInit() {
+    this.dbServ.getArticulos().subscribe(res => {
+      this.listaArticulos = res;
+      // LISTA_ARTICULOS.next(res);
+    });
+    this.createForm();
+
     this.route.paramMap.subscribe(params => {
       if (params.get('accion') === 'INS') {
         this.titulo = 'Registro de articulos';
         this.boton = 'Registrar';
-
-        this.form = this.fb.group({
-          nombre: ['', Validators.required],
-          tipo: [''],
-          medida: ['', Validators.required],
-          costo: [],
-          precio: [],
-          Isdetallable: [this.isDetallable],
-          detallableArray: this.fb.array([]),
-        });
       } else {
         this.titulo = 'Actualizar articulos';
         this.boton = 'Actualizar';
       }
     });
+  }
 
-    this.shServ.getArticulos().subscribe(res => {
-      this.listaArticulos = res;
-      // LISTA_ARTICULOS.next(res);
+  createForm() {
+    this.form = this.fb.group({
+      nombre: [this.articuloSelected ? this.articuloSelected.nombre : '', Validators.required],
+      tipo_articulo_id: [this.articuloSelected ? this.articuloSelected.tipo_articulo_id : ''],
+      medida: [this.articuloSelected ? this.articuloSelected.medida : '', Validators.required],
+      costo_principal: [this.articuloSelected ? this.articuloSelected.costo_principal : null],
+      precio_principal: [this.articuloSelected ? this.articuloSelected.precio_principal : null],
+      is_detallable: [this.articuloSelected ? this.articuloSelected.is_detallable : this.isDetallable],
+      fecha_ingreso: [this.articuloSelected ? this.articuloSelected.fecha_ingreso : new Date()],
+      existencia: [this.articuloSelected ? this.articuloSelected.existencia : 0],
+      medida_contenido: null,
+      cantidad_contenido_padre: null,
+      medida_contenido_hijo: null,
+
+      contenido_articulos_attributes: null,
+      imagen_attributes: null,
+
+      // detallableArray: this.fb.array([]),
     });
   }
 
@@ -136,9 +151,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     const obj = JSON.parse(JSON.stringify(form.value));
     // console.log(obj);
 
-    this.shServ.createArticulo(obj).subscribe(
+    this.dbServ.createArticulo(obj).subscribe(
       res => {
-        this.shServ.toastSuccess(res.titulo, res.contenido);
+        this.dbServ.toastSuccess(res.titulo, res.contenido);
 
         this.listaArticulos = [...this.listaArticulos, res.body];
         this.form.reset();
@@ -147,7 +162,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       },
       err => {
         console.log(err);
-        this.shServ.toastError(err.titulo, err.contenido);
+        this.dbServ.toastError(err.titulo, err.contenido);
       },
     );
   }
@@ -171,7 +186,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     },
     {
       titulo: 'Precio',
-      key: 'precio',
+      key: 'precio_principal',
     },
   ];
 }

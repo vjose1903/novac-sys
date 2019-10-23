@@ -69,10 +69,10 @@ export class DBservice {
   // =====================================================================
 
   createArticulo(arg) {
-    return this.peticion('articulo/register', 'post', JSON.stringify(arg));
+    return this.peticion('articulos', 'post', JSON.stringify(arg));
   }
   getArticulos() {
-    return this.peticion('articulo', 'get');
+    return this.peticion('articulos', 'get');
   }
   getOneArticulo(id: number | string) {
     return this.peticion(`articulo/${id}`, 'get');

@@ -26,6 +26,7 @@ import { AngularModule } from './modules/angular.module';
 
 import { ToastrModule } from 'ngx-toastr';
 import { TablasModule } from './components/tablas/tablas.module';
+import { UploadImgComponent } from './components/upload-img/upload-img.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -33,7 +34,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 }
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, UploadImgComponent],
   imports: [
     BrowserModule,
     FormsModule,
