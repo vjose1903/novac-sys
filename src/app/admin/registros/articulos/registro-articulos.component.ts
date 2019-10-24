@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { TABLA } from '../../../components/tablas/tabla';
 import { DBservice } from '../../../core/services/bdservice.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -23,6 +24,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   vendersePorSelected;
   listaArticulos = [];
   FORM: any;
+  listaTipoArticulos: any;
   constructor(private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
@@ -32,6 +34,10 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       this.listaArticulos = res;
       // LISTA_ARTICULOS.next(res);
     });
+    this.dbServ.getTipoArticulos().subscribe(res => {
+      this.listaTipoArticulos = res;
+    });
+
     this.createForm();
     this.FORM = this.form.controls;
     this.route.paramMap.subscribe(params => {
@@ -54,13 +60,15 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       precio_principal: [this.articuloSelected ? this.articuloSelected.precio_principal : null],
       is_detallable: [this.articuloSelected ? this.articuloSelected.is_detallable : this.isDetallable],
       fecha_ingreso: [this.articuloSelected ? this.articuloSelected.fecha_ingreso : new Date()],
-      existencia: [this.articuloSelected ? this.articuloSelected.existencia : 0],
-
+      // existencia: [this.articuloSelected ? this.articuloSelected.existencia : 0],
       cantidad_contenido_padre: null,
       medida_contenido_padre: null,
+      precio_padre: null,
+      precio_libra: null,
 
       medida_contenido_hijo: null,
       cantidad_contenido_hijo: null,
+      precio_hijo: null,
       // detallableArray: this.fb.array([]),
     });
   }
@@ -132,20 +140,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   // =============================================
   //  Calculate price
   // =============================================
-  calculatePrice(i?: number) {
-    if (i !== undefined) {
-      const control = <FormArray>this.form.controls['detallableArray'];
-      const costo = (control.controls[i] as any).controls['costoDetalle'].value;
-      if (costo > 0 || costo != null || costo) {
-        const precio = costo / 0.9;
-        (control.controls[i] as any).controls['precioDetalle'].setValue(_.round(precio, 2));
-      }
-    } else {
-      const costo = this.form.value.costo;
-      if (costo > 0 || costo != null || costo) {
-        const precio = costo / 0.9;
-        this.form.controls.precio.setValue(_.round(precio, 2));
-      }
+  calculatePrice() {
+    const costo = this.form.value.costo_principal;
+    if (costo > 0 || costo != null || costo) {
+      const precio = costo / 0.9;
+      this.form.controls.precio_principal.setValue(_.round(precio, 2));
     }
   }
 
@@ -155,23 +154,63 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
 
   element: HTMLElement;
   submit(form) {
-    const obj = JSON.parse(JSON.stringify(form.value));
-    // console.log(obj);
+    const x = JSON.parse(JSON.stringify(form.value));
+    console.log(x);
+    let contenido = [];
+    if (x.medida === 'Caja') {
+      contenido = [
+        {
+          costo: null,
+          precio: x.precio_padre,
+          cantidad: x.cantidad_contenido_padre,
+          medida: x.medida_contenido_padre,
+        },
+        {
+          costo: null,
+          precio: x.precio_hijo,
+          cantidad: x.cantidad_contenido_hijo,
+          medida: x.medida_contenido_hijo,
+        },
+      ];
+    } else {
+      contenido = [
+        {
+          costo: null,
+          precio: x.precio_libra,
+          cantidad: 100,
+          medida: 'Libra',
+        },
+      ];
+    }
 
-    this.dbServ.createArticulo(obj).subscribe(
-      res => {
-        this.dbServ.toastSuccess(res.titulo, res.contenido);
+    const obj = {
+      tipo_articulo_id: _.parseInt(x.tipo_articulo_id),
+      nombre: x.nombre,
+      costo_principal: x.costo_principal,
+      precio_principal: x.precio_principal,
+      // existencia: '',
+      fecha_ingreso: moment().format('DD/MM/YYYY'),
+      medida: x.medida,
+      is_detallable: x.is_detallable,
+      contenido_articulos_attributes: contenido,
+    };
 
-        this.listaArticulos = [...this.listaArticulos, res.body];
-        this.form.reset();
-        this.element = document.getElementById('campoNombre') as HTMLElement;
-        this.element.focus();
-      },
-      err => {
-        console.log(err);
-        this.dbServ.toastError(err.titulo, err.contenido);
-      },
-    );
+    console.log(obj);
+
+    // this.dbServ.createArticulo(obj).subscribe(
+    //   res => {
+    //     this.dbServ.toastSuccess(res.titulo, res.contenido);
+
+    //     this.listaArticulos = [...this.listaArticulos, res.body];
+    //     this.form.reset();
+    //     this.element = document.getElementById('campoNombre') as HTMLElement;
+    //     this.element.focus();
+    //   },
+    //   err => {
+    //     console.log(err);
+    //     this.dbServ.toastError(err.titulo, err.contenido);
+    //   },
+    // );
   }
 
   // =============================================
