@@ -73,11 +73,19 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     });
   }
 
-  resetCompradoEn() {
+  resetCompradoEn(value) {
     this.FORM.medida_contenido_padre.value = null;
     this.FORM.medida_contenido_hijo.value = null;
     this.FORM.cantidad_contenido_padre.value = null;
     this.FORM.cantidad_contenido_hijo.value = null;
+
+    this.FORM.precio_padre.value = null;
+    this.FORM.precio_libra.value = null;
+    this.FORM.precio_hijo.value = null;
+
+    if (value === 'Quintal') {
+      this.calculatePrice();
+    }
   }
 
   ngOnDestroy() {}
@@ -144,7 +152,27 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     const costo = this.form.value.costo_principal;
     if (costo > 0 || costo != null || costo) {
       const precio = costo / 0.9;
+      const precioLibra = precio / 100;
       this.form.controls.precio_principal.setValue(_.round(precio, 2));
+      this.form.controls.precio_libra.setValue(_.round(precioLibra, 2));
+    }
+  }
+
+  calculatePricePadre() {
+    const Precio = this.form.value.precio_principal;
+    const cantidadPadre = this.form.value.cantidad_contenido_padre;
+
+    if (Precio > 0 || Precio != null || Precio) {
+      const PrecioPadre = Precio / cantidadPadre;
+      this.form.controls.precio_padre.setValue(_.round(PrecioPadre, 2));
+    }
+  }
+  calculatePriceHijo() {
+    const PrecioPadre = this.form.value.precio_padre;
+    const cantidadHijo = this.form.value.cantidad_contenido_hijo;
+    if (PrecioPadre > 0 || PrecioPadre != null || PrecioPadre) {
+      const PrecioHijo = PrecioPadre / cantidadHijo;
+      this.form.controls.precio_hijo.setValue(_.round(PrecioHijo, 2));
     }
   }
 
@@ -155,7 +183,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   element: HTMLElement;
   submit(form) {
     const x = JSON.parse(JSON.stringify(form.value));
-    console.log(x);
+
     let contenido = [];
     if (x.medida === 'Caja') {
       contenido = [
@@ -201,10 +229,10 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     //   res => {
     //     this.dbServ.toastSuccess(res.titulo, res.contenido);
 
-    //     this.listaArticulos = [...this.listaArticulos, res.body];
-    //     this.form.reset();
-    //     this.element = document.getElementById('campoNombre') as HTMLElement;
-    //     this.element.focus();
+    //     // this.listaArticulos = [...this.listaArticulos, res.body];
+    //     // this.form.reset();
+    //     // this.element = document.getElementById('campoNombre') as HTMLElement;
+    //     // this.element.focus();
     //   },
     //   err => {
     //     console.log(err);
