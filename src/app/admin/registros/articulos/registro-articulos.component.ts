@@ -54,21 +54,21 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   createForm() {
     this.form = this.fb.group({
       nombre: [this.articuloSelected ? this.articuloSelected.nombre : '', Validators.required],
-      tipo_articulo_id: [this.articuloSelected ? this.articuloSelected.tipo_articulo_id : ''],
+      tipo_articulo_id: [this.articuloSelected ? this.articuloSelected.tipo_articulo_id : '', Validators.required],
       medida: [this.articuloSelected ? this.articuloSelected.medida : '', Validators.required],
-      costo_principal: [this.articuloSelected ? this.articuloSelected.costo_principal : null],
-      precio_principal: [this.articuloSelected ? this.articuloSelected.precio_principal : null],
+      costo_principal: [this.articuloSelected ? this.articuloSelected.costo_principal : null, Validators.required],
+      precio_principal: [this.articuloSelected ? this.articuloSelected.precio_principal : null, Validators.required],
       is_detallable: [this.articuloSelected ? this.articuloSelected.is_detallable : this.isDetallable],
       fecha_ingreso: [this.articuloSelected ? this.articuloSelected.fecha_ingreso : new Date()],
       // existencia: [this.articuloSelected ? this.articuloSelected.existencia : 0],
-      cantidad_contenido_padre: null,
-      medida_contenido_padre: null,
-      precio_padre: null,
-      precio_libra: null,
+      cantidad_contenido_padre: [null],
+      medida_contenido_padre: [null],
+      precio_padre: [null],
+      precio_libra: [null],
 
-      medida_contenido_hijo: null,
-      cantidad_contenido_hijo: null,
-      precio_hijo: null,
+      medida_contenido_hijo: [null],
+      cantidad_contenido_hijo: [null],
+      precio_hijo: [null],
       // detallableArray: this.fb.array([]),
     });
   }
@@ -223,22 +223,31 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       contenido_articulos_attributes: contenido,
     };
 
-    console.log(obj);
+    // console.log(obj);
 
-    // this.dbServ.createArticulo(obj).subscribe(
-    //   res => {
-    //     this.dbServ.toastSuccess(res.titulo, res.contenido);
+    this.dbServ.createArticulo(obj).subscribe(
+      res => {
+        this.listaArticulos = [...this.listaArticulos, res];
+        this.form.reset();
+        this.element = document.getElementById('campoNombre') as HTMLElement;
+        this.element.focus();
+        this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
+      },
+      err => {
+        console.log(err);
+        this.mostrarErrores(err.error);
+        // this.dbServ.toastError(err.error, 'Error');
+      },
+    );
+  }
 
-    //     // this.listaArticulos = [...this.listaArticulos, res.body];
-    //     // this.form.reset();
-    //     // this.element = document.getElementById('campoNombre') as HTMLElement;
-    //     // this.element.focus();
-    //   },
-    //   err => {
-    //     console.log(err);
-    //     this.dbServ.toastError(err.titulo, err.contenido);
-    //   },
-    // );
+  mostrarErrores(arg) {
+    for (const error in arg) {
+      if (arg.hasOwnProperty(error)) {
+        const element = arg[error];
+        this.dbServ.toastError(element, 'Error');
+      }
+    }
   }
 
   // =============================================
