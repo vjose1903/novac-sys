@@ -28,7 +28,7 @@
 
 <div class="cuadro" #cuadro>
   <form [formGroup]="form" action="">
-    <div formArrayName="rowFactura" *ngFor="let item of rowFactura.controls; let i = index">
+    <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWFACTURAS.controls; let i = index">
       <div [formGroupName]="i">
         <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
           <tbody>
@@ -77,7 +77,6 @@
                     (blur)="calcularTotalRow(i) && verificarRow(i)"
                   />
 
-                  
                   <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
                     <select
                       (focus)="verificarRow(i)"

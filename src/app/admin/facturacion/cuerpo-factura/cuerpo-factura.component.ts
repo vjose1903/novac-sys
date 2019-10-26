@@ -20,6 +20,7 @@ import * as _ from 'lodash';
 // import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL, OBJDEVUELTO, INDEXTOFOCUS } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../../components/modal/modal.service';
+import { DBservice } from '../../../core/services/bdservice.service';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -28,7 +29,7 @@ import { ModalService } from '../../../components/modal/modal.service';
 })
 export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   form: FormGroup;
-  rowFactura: FormArray;
+  ARRAY_ROWFACTURAS;
   listaArticulos: any;
 
   seleccionModal;
@@ -53,8 +54,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   @Output() sendCalculos = new EventEmitter<any>();
 
-  constructor(private mServ: ModalService, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
-    this.rowFactura = new FormArray([new FormControl()]);
+  constructor(private dbServ: DBservice, private mServ: ModalService, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
+    // this.rowFactura = new FormArray([new FormControl()]);
   }
 
   ngOnInit() {
@@ -63,11 +64,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       rowFactura: this.fb.array([this.createItem()]),
     });
 
+    this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
+
     for (let index = 0; index <= 9; index++) {
       this.addItem();
     }
 
-    this.shServ.getArticulos().subscribe(res => {
+    this.dbServ.getArticulos().subscribe(res => {
       this.listaArticulos = res;
     });
 
@@ -143,8 +146,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   addItem(): void {
-    this.rowFactura = this.form.get('rowFactura') as FormArray;
-    this.rowFactura.push(this.createItem());
+    this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as FormArray;
+    this.ARRAY_ROWFACTURAS.push(this.createItem());
   }
 
   removeItem(i: number) {
@@ -201,32 +204,55 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   buscarArticuloPorCodigo(i, codigo) {
     this.inputDrop = 'uni-' + i;
+    // const ls = this.TodosLosSorteos.filter(val => val.loteria_id === idLoteria);
+    const ARTICULO = this.listaArticulos.filter(articulo => articulo.codigo === codigo);
+    if (ARTICULO[0] === undefined) {
+      this.shServ.toastError('El codigo introducido no existe', 'ERROR');
+      this.enfocarInput('cod-' + i);
+    } else {
+      (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
+      if (ARTICULO[0].Isdetallable) {
+        this.drop = true;
+        this.verificarRow(i);
+        this.UnidadesArticulo = [];
+        this.UnidadesArticulo.push({ value: ARTICULO[0].medida, precio: ARTICULO[0].precio_principal });
+        ARTICULO[0].detallableArray.forEach(element => {
+          this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
+        });
+      } else {
+        this.enfocarInput('cod-' + this.secuencia);
+        (this.control.controls[i] as any).controls['uni'].setValue(ARTICULO[0].medida);
+        (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(ARTICULO[0].precio_principal));
+        this.drop = false;
+      }
+    }
+    console.log(ARTICULO[0]);
 
-    this.shServ.getOneArticuloByCodigo(codigo).subscribe(
-      res => {
-        this.rowActual = res;
-        (this.control.controls[i] as any).controls['des'].setValue(res.nombre);
+    // this.shServ.getOneArticuloByCodigo(codigo).subscribe(
+    //   res => {
+    //     this.rowActual = res;
+    //     (this.control.controls[i] as any).controls['des'].setValue(res.nombre);
 
-        if (res.Isdetallable) {
-          this.drop = true;
-          this.verificarRow(i);
-          this.UnidadesArticulo = [];
-          this.UnidadesArticulo.push({ value: res.medida, precio: res.precio });
-          res.detallableArray.forEach(element => {
-            this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
-          });
-        } else {
-          this.enfocarInput('cod-' + this.secuencia);
-          (this.control.controls[i] as any).controls['uni'].setValue(res.medida);
-          (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(res.precio));
-          this.drop = false;
-        }
-      },
-      err => {
-        this.shServ.toastError(err.error.mensaje, 'ERROR');
-        this.enfocarInput('cod-' + i);
-      },
-    );
+    //     if (res.Isdetallable) {
+    //       this.drop = true;
+    //       this.verificarRow(i);
+    //       this.UnidadesArticulo = [];
+    //       this.UnidadesArticulo.push({ value: res.medida, precio: res.precio });
+    //       res.detallableArray.forEach(element => {
+    //         this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
+    //       });
+    //     } else {
+    //       this.enfocarInput('cod-' + this.secuencia);
+    //       (this.control.controls[i] as any).controls['uni'].setValue(res.medida);
+    //       (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(res.precio));
+    //       this.drop = false;
+    //     }
+    //   },
+    //   err => {
+    //     this.shServ.toastError(err.error.mensaje, 'ERROR');
+    //     this.enfocarInput('cod-' + i);
+    //   },
+    // );
   }
 
   aumentarSecuencia() {

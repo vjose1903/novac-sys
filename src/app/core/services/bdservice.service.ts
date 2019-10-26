@@ -78,7 +78,7 @@ export class DBservice {
     return this.peticion('tipo_articulos', 'get');
   }
   getOneArticulo(id: number | string) {
-    return this.peticion(`articulo/${id}`, 'get');
+    return this.peticion(`articulos/${id}`, 'get');
   }
   getOneArticuloByCodigo(codigo: number | string) {
     return this.peticion(`articulo/codigo/${codigo}`, 'get');

@@ -38,7 +38,7 @@ body {
 // ========================================================
 // TEXT_COLOR
 // ========================================================
-.control-label{
+.control-label {
   font-weight: bold;
 }
 .text-green {
@@ -126,4 +126,42 @@ body .ui-dialog .ui-dialog-titlebar {
 body .ui-widget-overlay {
   z-index: 1 !important;
   background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* ====================================================== */
+/* CHECK APPLE */
+/* ====================================================== */
+
+input.apple-switch {
+  position: relative;
+  appearance: none;
+  outline: none;
+  width: 40px;
+  height: 26px;
+  background-color: #ffffff;
+  border: 1px solid #d9dadc;
+  border-radius: 50px;
+  box-shadow: inset -20px 0 0 0 #ffffff;
+  transition-duration: 500ms;
+}
+input.apple-switch:after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 21.5px;
+  height: 21.5px;
+  background-color: transparent;
+  border-radius: 50%;
+  box-shadow: 1px 1px 6px #48484833;
+  transition-duration: 500ms;
+}
+
+input.apple-switch:checked {
+  border-color: #55d069;
+  box-shadow: inset 15px 0px 0 0 #55d069;
+}
+input.apple-switch:checked:after {
+  left: 16px;
+  box-shadow: 1px 4px 1px #0000000f;
 }

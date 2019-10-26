@@ -5,6 +5,12 @@
     <div class="card card-padding">
       <form [formGroup]="form" (submit)="submit(form)">
         <div class="row">
+          <div class=" col-12 ">
+            <div class="from-group mb-2">
+              <input formControlName="is_detallable" class="apple-switch ml-2" type="checkbox" />
+              <span class="ml-2">Detallable</span>
+            </div>
+          </div>
           <div class=" col-sm-12 col-md-6 col-lg-6">
             <div class="form-group">
               <label class="control-label">Nombre: <span style="color: red">*</span></label>
