@@ -23,7 +23,7 @@ var app = express();
 // middleware
 app.use(morgan('dev'));
 app.use(bodyParser.json());
-app.use(cors({origin: 'http://localhost:4200'}));
+app.use(cors({origin: 'http://localhost:5200'}));
 app.use(passport.initialize());
 
 app.use('/api/empleados', rtsEmpleados);
