@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import { TABLA } from '../../../components/tablas/tabla';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as moment from 'moment';
+import { ArticulosService } from '../../../core/services/articulos.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -25,15 +26,15 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   listaArticulos = [];
   FORM: any;
   listaTipoArticulos: any;
-  constructor(private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private artServ: ArticulosService, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
 
   ngOnInit() {
-    this.dbServ.getArticulos().subscribe(res => {
+    this.artServ.ARTICULOS.subscribe(res => {
       this.listaArticulos = res;
-      // LISTA_ARTICULOS.next(res);
     });
+
     this.dbServ.getTipoArticulos().subscribe(res => {
       this.listaTipoArticulos = res;
     });
@@ -227,7 +228,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
 
     this.dbServ.createArticulo(obj).subscribe(
       res => {
-        this.listaArticulos = [...this.listaArticulos, res];
+        // this.listaArticulos = [...this.listaArticulos, res];
+        this.artServ.next_articulo([...this.listaArticulos, res]);
         this.form.reset();
         this.element = document.getElementById('campoNombre') as HTMLElement;
         this.element.focus();

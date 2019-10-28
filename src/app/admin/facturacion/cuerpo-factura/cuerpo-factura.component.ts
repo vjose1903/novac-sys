@@ -21,6 +21,7 @@ import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../../components/modal/modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
+import { ArticulosService } from '../../../core/services/articulos.service';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -54,7 +55,14 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   @Output() sendCalculos = new EventEmitter<any>();
 
-  constructor(private dbServ: DBservice, private mServ: ModalService, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(
+    private artServ: ArticulosService,
+    private dbServ: DBservice,
+    private mServ: ModalService,
+    private shServ: SharedService,
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+  ) {
     // this.rowFactura = new FormArray([new FormControl()]);
   }
 
@@ -70,7 +78,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.addItem();
     }
 
-    this.dbServ.getArticulos().subscribe(res => {
+    this.artServ.ARTICULOS.subscribe(res => {
       this.listaArticulos = res;
     });
 
