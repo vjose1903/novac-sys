@@ -219,19 +219,27 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.enfocarInput('cod-' + i);
     } else {
       (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
-      if (ARTICULO[0].Isdetallable) {
+      this.verificarRow(i);
+      if (ARTICULO[0].is_detallable) {
         this.drop = true;
-        this.verificarRow(i);
         this.UnidadesArticulo = [];
         this.UnidadesArticulo.push({ value: ARTICULO[0].medida, precio: ARTICULO[0].precio_principal });
-        ARTICULO[0].detallableArray.forEach(element => {
-          this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
+        ARTICULO[0].contenido_articulos.forEach(element => {
+          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
         });
       } else {
-        this.enfocarInput('cod-' + this.secuencia);
-        (this.control.controls[i] as any).controls['uni'].setValue(ARTICULO[0].medida);
-        (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(ARTICULO[0].precio_principal));
-        this.drop = false;
+        this.drop = true;
+        this.UnidadesArticulo = [];
+        this.UnidadesArticulo.push({ value: ARTICULO[0].medida, precio: ARTICULO[0].precio_principal });
+        ARTICULO[0].contenido_articulos.forEach(element => {
+          if (element.referencia === null) {
+            this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
+          }
+        });
+        // this.enfocarInput('cod-' + this.secuencia);
+        // (this.control.controls[i] as any).controls['uni'].setValue(ARTICULO[0].medida);
+        // (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(ARTICULO[0].precio_principal));
+        // this.drop = false;
       }
     }
     console.log(ARTICULO[0]);
@@ -316,7 +324,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const precio = (this.control.controls[i] as any).controls['pre'].value;
     const cantidad = (this.control.controls[i] as any).controls['can'].value;
 
-    if (precio !== '' && precio !== null) {
+    if (precio !== '' && precio !== null && cantidad !== '' && cantidad != null) {
       const tot = precio * cantidad;
       (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(_.round(tot, 2)));
       this.calculosTotalesGenerales();
@@ -368,17 +376,25 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
     (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
     this.rowActual = arg;
-    if (arg.Isdetallable) {
+    if (arg.is_detallable) {
       this.drop = true;
       this.UnidadesArticulo = [];
-      this.UnidadesArticulo.push({ value: arg.medida, precio: arg.precio });
-      arg.detallableArray.forEach(element => {
-        this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
+      this.UnidadesArticulo.push({ value: arg.medida, precio: arg.precio_principal });
+      arg.contenido_articulos.forEach(element => {
+        this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
       });
     } else {
-      (this.control.controls[arg.index] as any).controls['uni'].setValue(arg.medida);
-      (this.control.controls[arg.index] as any).controls['pre'].setValue(this.formatearNumero(arg.precio));
-      this.drop = false;
+      this.drop = true;
+      this.UnidadesArticulo = [];
+      this.UnidadesArticulo.push({ value: arg.medida, precio: arg.precio_principal });
+      arg.contenido_articulos.forEach(element => {
+        if (element.referencia === null) {
+          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
+        }
+      });
+      // (this.control.controls[arg.index] as any).controls['uni'].setValue(arg.medida);
+      // (this.control.controls[arg.index] as any).controls['pre'].setValue(this.formatearNumero(arg.precio));
+      // this.drop = false;
     }
 
     const sigInput = 'can-' + arg.index;

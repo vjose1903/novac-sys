@@ -11,6 +11,7 @@ export class ArticulosService {
   constructor() {}
 
   next_articulo(nextValue) {
+    const obj = JSON.parse(JSON.stringify(nextValue));
     this.articulos.next(nextValue);
   }
 }
