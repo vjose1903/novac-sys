@@ -45,27 +45,24 @@ export class RegistroEmpleadosComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
-      if (params.get('accion') === 'INS') {
-        this.titulo = 'Registro de empleados';
-        this.boton = 'Registrar';
-      } else {
-        this.titulo = 'Actualizar empleado';
-        this.boton = 'Actualizar';
+    this.titulo = 'Registro de empleados';
+    this.boton = 'Registrar';
 
-        this.form = this.fb.group({
-          nombre: [null, Validators.required],
-          apellido: [null, Validators.required],
-          usuario: [null, Validators.compose([Validators.required])],
-          sexo: ['', Validators.required],
-          telefono: [null, Validators.required],
-          email: [null, Validators.compose([Validators.pattern(/^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+$/)])],
-          fechaN: [null, Validators.required],
-          password: [null, Validators.required],
-          estado: [true],
-          role: [null, Validators.required],
-        });
-      }
+    // this.titulo = 'Actualizar empleado';
+    // this.boton = 'Actualizar';
+
+    this.form = this.fb.group({
+      nombre: [null, Validators.required],
+      apellido: [null, Validators.required],
+      usuario: [null, Validators.compose([Validators.required])],
+      sexo: ['', Validators.required],
+      cedula: [''],
+      telefono: [null, Validators.required],
+      email: [null, Validators.compose([Validators.pattern(/^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+$/)])],
+      fechaN: [null, Validators.required],
+      password: [null, Validators.required],
+      estado: [true],
+      role: [null, Validators.required],
     });
   }
 
@@ -83,7 +80,7 @@ export class RegistroEmpleadosComponent implements OnInit {
             this.shServ.toastSuccess('Usuario Creado', 'Correcto');
           },
           err => {
-            this.shServ.toastError( _.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
+            this.shServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
           },
         );
       } else {

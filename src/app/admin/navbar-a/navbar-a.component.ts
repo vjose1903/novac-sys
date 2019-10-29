@@ -130,12 +130,17 @@ export class NavbarAComponent implements OnInit, OnDestroy {
 
       case 'articulos':
         this.actualTab = 'home';
-        this.router.navigate(['/admin/articulos/INS']);
+        this.router.navigate(['/admin/articulos']);
         break;
 
       case 'empleados':
         this.actualTab = 'home';
-        this.router.navigate(['/admin/empleados/INS']);
+        this.router.navigate(['/admin/empleados']);
+        break;
+
+      case 'clientes':
+        this.actualTab = 'home';
+        this.router.navigate(['/admin/clientes']);
         break;
 
       default:

@@ -11,6 +11,7 @@ export class ModalService {
   private decisionModal = new BehaviorSubject<any>(undefined);
   private ObjDevuelto = new BehaviorSubject<any>(undefined);
   private indexToFocus = new BehaviorSubject<any>(undefined);
+  private press_Esc = new BehaviorSubject<any>(undefined);
 
   TIPOMODAL = this.tipoModal.asObservable();
   SHOWMODAL = this.showModal.asObservable();
@@ -18,6 +19,7 @@ export class ModalService {
   DECISIONMODAL = this.decisionModal.asObservable();
   OBJDEVUELTO = this.ObjDevuelto.asObservable();
   INDEXTOFOCUS = this.indexToFocus.asObservable();
+  PRESSESC = this.press_Esc.asObservable();
 
   constructor() {}
 
@@ -41,5 +43,9 @@ export class ModalService {
 
   ModalIndex(nextValue) {
     this.indexToFocus.next(nextValue);
+  }
+
+  pressEsc(nextValue) {
+    this.press_Esc.next(nextValue);
   }
 }

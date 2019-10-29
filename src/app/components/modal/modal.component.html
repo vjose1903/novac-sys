@@ -1,7 +1,7 @@
 <!-- ================================================================================================================================ -->
 <!-- ELIMINAR -->
 <!-- ================================================================================================================================ -->
-<div *ngIf="showModal" class="overlay">
+<div *ngIf="showModal" class="overlay" (keypress)="prueba($event)">
   <p-dialog
     *ngIf="tipoModal === 'borrar' && seleccionModal"
     header="Confirmar"
@@ -33,6 +33,7 @@
     [style]="{ width: '350px', minWidth: '200px' }"
     [minY]="70"
     [baseZIndex]="10000"
+    (onHide)="reinicioModal()"
   >
     <p>Seguro que desea cancelar la factura</p>
     <p-footer>

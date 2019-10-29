@@ -11,50 +11,55 @@ import { NavbarAComponent } from './admin/navbar-a/navbar-a.component';
 
 // home
 import { HomeComponent } from './home/home.component';
+import { RegistroClientesComponent } from './admin/registros/registro-clientes/registro-clientes.component';
 
 const routes: Routes = [
   {
     path: 'admin',
     component: NavbarAComponent,
-    children:[
+    children: [
       {
         path: '',
-        component: HomeAdminComponent
+        component: HomeAdminComponent,
       },
       {
         path: 'factura',
-        component: FacturacionComponent
+        component: FacturacionComponent,
       },
       {
-        path: 'articulos/:accion',
-        component: RegistroArticulosComponent
+        path: 'articulos',
+        component: RegistroArticulosComponent,
       },
       {
-        path: 'empleados/:accion',
-        component: RegistroEmpleadosComponent
+        path: 'empleados',
+        component: RegistroEmpleadosComponent,
+      },
+      {
+        path: 'clientes',
+        component: RegistroClientesComponent,
       },
       // {
       //   path: '',
       //   component: HomeAdminComponent
       // },
-    ]
+    ],
   },
   {
     path: 'usuario',
-    component: HomeAdminComponent
+    component: HomeAdminComponent,
   },
   {
     path: '',
-    component: HomeComponent
+    component: HomeComponent,
   },
   {
     path: '**',
-    component: PageNotFoundComponent
-  }
+    component: PageNotFoundComponent,
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, { useHash: true })],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule {}

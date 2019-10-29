@@ -19,6 +19,7 @@
         <h5 [ngClass]="actualTab == 'registro' ? 'tituloMenu2A' : 'tituloMenu2'"><strong>Registros</strong></h5>
 
         <div [ngClass]="actualTab == 'registro' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
+          <h4 class="Registro" (click)="navegar('clientes')">Clientes</h4>
           <h4 class="Registro" (click)="navegar('empleados')">Empleados</h4>
           <h4 class="Registro" (click)="navegar('articulos')">Articulos</h4>
         </div>

@@ -41,15 +41,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
 
     this.createForm();
     this.FORM = this.form.controls;
-    this.route.paramMap.subscribe(params => {
-      if (params.get('accion') === 'INS') {
-        this.titulo = 'Registro de articulos';
-        this.boton = 'Registrar';
-      } else {
-        this.titulo = 'Actualizar articulos';
-        this.boton = 'Actualizar';
-      }
-    });
+
+    this.titulo = 'Registro de articulos';
+    this.boton = 'Registrar';
   }
 
   createForm() {
@@ -187,20 +181,31 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
 
     let contenido = [];
     if (x.medida === 'Caja') {
-      contenido = [
-        {
-          costo: null,
-          precio: x.precio_padre,
-          cantidad: x.cantidad_contenido_padre,
-          medida: x.medida_contenido_padre,
-        },
-        {
-          costo: null,
-          precio: x.precio_hijo,
-          cantidad: x.cantidad_contenido_hijo,
-          medida: x.medida_contenido_hijo,
-        },
-      ];
+      if (x.medida_contenido_hijo === null) {
+        contenido = [
+          {
+            costo: null,
+            precio: x.precio_padre,
+            cantidad: x.cantidad_contenido_padre,
+            medida: x.medida_contenido_padre,
+          },
+        ];
+      } else {
+        contenido = [
+          {
+            costo: null,
+            precio: x.precio_padre,
+            cantidad: x.cantidad_contenido_padre,
+            medida: x.medida_contenido_padre,
+          },
+          {
+            costo: null,
+            precio: x.precio_hijo,
+            cantidad: x.cantidad_contenido_hijo,
+            medida: x.medida_contenido_hijo,
+          },
+        ];
+      }
     } else {
       contenido = [
         {

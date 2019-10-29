@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnChanges, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, OnChanges, ElementRef, OnDestroy, HostListener } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
 
@@ -11,6 +11,17 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   showModal = false;
   seleccionModal: any;
   tipoModal;
+
+  @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+    if (this.showModal) {
+      if (this.tipoModal === 'buscar') {
+        this.mServ.pressEsc(this.seleccionModal.index);
+        setTimeout(() => {
+          this.mServ.pressEsc(undefined);
+        }, 1000);
+      }
+    }
+  }
 
   @Input() listaArticulos: any;
   infoArticulos = [
@@ -47,11 +58,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   ngOnDestroy() {}
 
   ngOnChanges() {
-    if (this.seleccionModal) {
-      if (this.tipoModal === 'buscar') {
-        this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
-      }
-    }
+    // if (this.seleccionModal) {
+    //   if (this.tipoModal === 'buscar') {
+    //     this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
+    //   }
+    // }
   }
 
   accion(arg) {
@@ -77,13 +88,14 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   noArticulo() {
     this.reinicioModal();
     this.mServ.ModalIndex(this.seleccionModal.index);
-    // this.noArticuloEncontrado.emit(this.seleccionModal.index);
   }
 
-  prueba() {
-    if (this.tipoModal === 'buscar') {
-      this.element = document.getElementById('tablaSearch') as HTMLElement;
-      this.element.focus();
-    }
+  prueba(arg) {
+    console.log(arg);
+
+    //   if (this.tipoModal === 'buscar') {
+    //     this.element = document.getElementById('tablaSearch') as HTMLElement;
+    //     this.element.focus();
+    //   }
   }
 }

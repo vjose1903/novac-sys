@@ -88,6 +88,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
     });
 
+    this.mServ.PRESSESC.subscribe(res => {
+      if (res !== undefined) {
+        this.enfocarInput('cod-' + res);
+      }
+    });
+
     this.mServ.INDEXTOFOCUS.subscribe(res => {
       if (res !== undefined) {
         this.noArticuloEncontrado(res);
@@ -243,32 +249,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
     }
     console.log(ARTICULO[0]);
-
-    // this.shServ.getOneArticuloByCodigo(codigo).subscribe(
-    //   res => {
-    //     this.rowActual = res;
-    //     (this.control.controls[i] as any).controls['des'].setValue(res.nombre);
-
-    //     if (res.Isdetallable) {
-    //       this.drop = true;
-    //       this.verificarRow(i);
-    //       this.UnidadesArticulo = [];
-    //       this.UnidadesArticulo.push({ value: res.medida, precio: res.precio });
-    //       res.detallableArray.forEach(element => {
-    //         this.UnidadesArticulo.push({ value: element.medidaDetalle, precio: element.precioDetalle });
-    //       });
-    //     } else {
-    //       this.enfocarInput('cod-' + this.secuencia);
-    //       (this.control.controls[i] as any).controls['uni'].setValue(res.medida);
-    //       (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(res.precio));
-    //       this.drop = false;
-    //     }
-    //   },
-    //   err => {
-    //     this.shServ.toastError(err.error.mensaje, 'ERROR');
-    //     this.enfocarInput('cod-' + i);
-    //   },
-    // );
   }
 
   aumentarSecuencia() {

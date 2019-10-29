@@ -17,6 +17,7 @@ import { CuerpoFacturaComponent } from './facturacion/cuerpo-factura/cuerpo-fact
 import { TablasModule } from '../components/tablas/tablas.module';
 import { ModalComponent } from '../components/modal/modal.component';
 import { BTNcircularComponent } from '../components/btncircular/btncircular.component';
+import { RegistroClientesComponent } from './registros/registro-clientes/registro-clientes.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { BTNcircularComponent } from '../components/btncircular/btncircular.comp
     RegistroArticulosComponent,
     RegistroEmpleadosComponent,
     CuerpoFacturaComponent,
-    BTNcircularComponent
+    BTNcircularComponent,
+    RegistroClientesComponent
   ],
   imports: [
     DialogModule,
