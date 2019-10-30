@@ -50,6 +50,15 @@ export class DBservice {
   }
 
   // =====================================================================
+  // CLIENTES
+  // =====================================================================
+  getClientes() {
+    return this.peticion('clientes', 'get');
+  }
+  createCliente(arg) {
+    return this.peticion('clientes', 'post', JSON.stringify(arg));
+  }
+  // =====================================================================
   // USUARIOS
   // =====================================================================
   getEmpleados() {}
