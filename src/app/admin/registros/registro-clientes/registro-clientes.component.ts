@@ -3,7 +3,7 @@ import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { ArticulosService } from '../../../core/services/articulos.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute } from '@angular/router';
-
+import * as _ from 'lodash';
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
@@ -31,6 +31,8 @@ export class RegistroClientesComponent implements OnInit {
   rncMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   PhotoData: any;
   doc_principal: any;
+
+  element: HTMLElement;
   constructor(private artServ: ArticulosService, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {}
 
   ngOnInit() {
@@ -62,6 +64,8 @@ export class RegistroClientesComponent implements OnInit {
     const documentos_identidad = [];
     const temp_documentos_identidad = [{ doc: temp.cedula, descripcion: 'cedula' }, { doc: temp.rnc, descripcion: 'rnc' }];
 
+    temp.documentos_identidad_attributes = null;
+
     temp_documentos_identidad.forEach(element => {
       if (element.doc !== null && element.doc !== ' ' && element.doc !== '') {
         documentos_identidad.push({
@@ -72,10 +76,31 @@ export class RegistroClientesComponent implements OnInit {
       }
     });
 
-    console.log(documentos_identidad);
-    temp.imagen_attributes = null;
-    temp.documentos_identidad_attributes = null;
-    // console.log(obj);
+    temp.documentos_de_identidad_attributes = documentos_identidad;
+
+    if (this.PhotoData !== undefined) {
+      temp.imagen_attributes = null;
+      temp.imagen_attributes = this.PhotoData;
+    }
+
+    const obj = _.omit(temp, ['cedula', 'rnc']);
+
+    console.log(obj);
+
+    this.dbServ.createCliente(obj).subscribe(
+      res => {
+        this.listaClientes = [...this.listaClientes, res];
+
+        this.form.reset();
+        this.element = document.getElementById('campoNombre') as HTMLElement;
+        this.element.focus();
+        this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
+      },
+      err => {
+        console.log(err);
+        this.mostrarErrores(err.error);
+      },
+    );
   }
   atras(temp) {}
 
@@ -85,6 +110,15 @@ export class RegistroClientesComponent implements OnInit {
 
   setDocumentoPrincipal(doc) {
     this.doc_principal = doc;
+  }
+
+  mostrarErrores(arg) {
+    for (const error in arg) {
+      if (arg.hasOwnProperty(error)) {
+        const element = arg[error];
+        this.dbServ.toastError(element, 'Error');
+      }
+    }
   }
 
   // =============================================

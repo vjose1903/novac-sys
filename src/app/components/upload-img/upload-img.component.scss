@@ -31,9 +31,9 @@
     overflow: hidden;
 
     &::before {
-      color: #fff;
       font-family: 'Font Awesome 5 Free';
-      content: '\f382';
+      color: #fff;
+      content: '\f093' !important;
       font-size: 1.5rem;
       height: 25%;
       right: 130%;
@@ -47,11 +47,13 @@
       background-color: darken(#99c793, 30%);
 
       &::before {
+        top: 0;
         right: 5%;
       }
     }
   }
 }
+
 .noContainer {
   background: #ebebeb00 !important;
   border: 4px solid #9d9d9d00 !important;
