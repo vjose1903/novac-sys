@@ -18,6 +18,7 @@ import { TablasModule } from '../components/tablas/tablas.module';
 import { ModalComponent } from '../components/modal/modal.component';
 import { BTNcircularComponent } from '../components/btncircular/btncircular.component';
 import { RegistroClientesComponent } from './registros/registro-clientes/registro-clientes.component';
+import { UploadImgComponent } from '../components/upload-img/upload-img.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { RegistroClientesComponent } from './registros/registro-clientes/registr
     RegistroEmpleadosComponent,
     CuerpoFacturaComponent,
     BTNcircularComponent,
-    RegistroClientesComponent
+    RegistroClientesComponent,
+    UploadImgComponent,
   ],
   imports: [
     DialogModule,

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { DBservice } from '../../core/services/bdservice.service';
 
 @Component({
@@ -14,10 +14,18 @@ export class UploadImgComponent implements OnInit {
   BASE_64;
   FILE_NAME;
 
+  @Output() getPhotoData = new EventEmitter<any>();
+
   constructor(private dbServ: DBservice) {}
 
   ngOnInit() {}
 
+  borrar() {
+    this.imageSrc = null;
+    this.BASE_64 = null;
+    this.FILE_NAME = null;
+    this.getPhotoData.emit(null);
+  }
   subirIMG() {
     if (this.BASE_64 && this.FILE_NAME) {
       const obj = {
@@ -53,5 +61,10 @@ export class UploadImgComponent implements OnInit {
         this.imageSrc = reader.result;
       };
     }
+    const img = {
+      fileName: this.FILE_NAME,
+      base_64: this.BASE_64,
+    };
+    this.getPhotoData.emit(img);
   }
 }

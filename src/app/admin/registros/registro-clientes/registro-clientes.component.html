@@ -5,31 +5,36 @@
     <div class="card card-padding">
       <form [formGroup]="form" (ngSubmit)="submit(form)">
         <div class="row">
-          <div class=" col-sm-12 col-md-6 col-lg-6">
-            <div class="form-group">
-              <label class="control-label">Nombre: <span style="color: red">*</span></label>
-              <input type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control" autocomplete="off" autofocus />
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
-                Este Campo es obligatorio
+          <div class="col-6">
+            <app-upload-img (getPhotoData)="getPhotoData($event)"></app-upload-img>
+          </div>
+          <div class="col-6">
+            <div class=" col-12">
+              <div class="form-group">
+                <label class="control-label">Nombre: <span style="color: red">*</span></label>
+                <input type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control" autocomplete="off" autofocus />
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
+                  Este Campo es obligatorio
+                </div>
               </div>
             </div>
-          </div>
-          <div class=" col-sm-12 col-md-6 col-lg-6">
-            <div class="from-group">
-              <label class="control-label">Apellido: <span style="color: red">*</span></label>
-              <input type="text" formControlName="apellido" placeholder="Introduzca apellido" class="form-control" autocomplete="off" />
-              <div
-                class="alerta text-danger ml-1"
-                style="font-size: 12px"
-                *ngIf="!form.controls['apellido'].valid && (form.controls['apellido'].dirty || form.controls['apellido'].touched)"
-              >
-                Este Campo es obligatorio
+            <div class=" col-12">
+              <div class="from-group">
+                <label class="control-label">Apellido: <span style="color: red">*</span></label>
+                <input type="text" formControlName="apellido" placeholder="Introduzca apellido" class="form-control" autocomplete="off" />
+                <div
+                  class="alerta text-danger ml-1"
+                  style="font-size: 12px"
+                  *ngIf="!form.controls['apellido'].valid && (form.controls['apellido'].dirty || form.controls['apellido'].touched)"
+                >
+                  Este Campo es obligatorio
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="row">
+        <div class="row mt-4">
           <div class=" col-sm-12 col-md-4 ">
             <div class="form-group">
               <label class="control-label">Sexo: <span style="color: red">*</span></label>
@@ -61,28 +66,54 @@
           <div class="col-xs-12 col-sm-12 col-md-4">
             <div>
               <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" (click)="changeIdent(true)" checked="true" />Cedula</label>
-              <label> <input type="radio" value="1" name="identificacion" class="mr-1" (click)="changeIdent(false)" />Rnc</label>
+              <label> <input type="radio" value="1" name="identificacion" class="mr-1" (click)="changeIdent(false)" />Rnc <span style="color: red">*</span> </label>
             </div>
 
             <div *ngIf="documento_identidad" class="from-group">
-              <input type="text" [textMask]="{ mask: cedulaMask }" class="form-control" formControlName="cedula" placeholder="___-_______-_" autocomplete="off" />
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['cedula'].valid && (form.controls['cedula'].dirty || form.controls['cedula'].touched)">
-                Este Campo es obligatorio
+              <div class="input-group">
+                <input type="text" [textMask]="{ mask: cedulaMask }" class="form-control" formControlName="cedula" placeholder="___-_______-_" autocomplete="off" />
+                <!-- <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['cedula'].valid && (form.controls['cedula'].dirty || form.controls['cedula'].touched)">
+                  Este Campo es obligatorio
+                </div> -->
+
+                <div
+                  (click)="setDocumentoPrincipal('cedula')"
+                  class="input-group-append"
+                  mdbTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}"
+                  placement="right"
+                >
+                  <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star' : 'far fa-square' }}"></i></span>
+                  <!-- <i class="far fa-square"></i> -->
+                </div>
               </div>
             </div>
 
             <div *ngIf="!documento_identidad" class="from-group">
-              <input type="text" class="form-control" [textMask]="{ mask: rncMask }" formControlName="rnc" placeholder="___-_____-_" autocomplete="off" />
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['rnc'].valid && (form.controls['rnc'].dirty || form.controls['rnc'].touched)">
-                Este Campo es obligatorio
+              <div class="input-group">
+                <input type="text" class="form-control" [textMask]="{ mask: rncMask }" formControlName="rnc" placeholder="___-_____-_" autocomplete="off" />
+                <!-- <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['rnc'].valid && (form.controls['rnc'].dirty || form.controls['rnc'].touched)">
+                  Este Campo es obligatorio
+                </div> -->
+
+                <div
+                  (click)="setDocumentoPrincipal('rnc')"
+                  class="input-group-append"
+                  mdbTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}"
+                  placement="right"
+                >
+                  <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star' : 'far fa-square' }}"></i></span>
+                  <!-- <i class="far fa-square"></i> -->
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="row">
-          <label class="control-label">Direccion </label>
-          <textarea formControlName="direccion" class="form-control" cols="30" rows="3"></textarea>
+          <div class="col-12 ">
+            <label class="control-label">Direccion <span style="color: red">*</span></label>
+            <textarea formControlName="direccion" class="form-control" cols="30" rows="3"></textarea>
+          </div>
         </div>
 
         <div class="row">

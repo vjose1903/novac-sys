@@ -34,7 +34,10 @@ export function HttpLoaderFactory(http: HttpClient) {
 }
 
 @NgModule({
-  declarations: [AppComponent, UploadImgComponent],
+  declarations: [
+    AppComponent,
+    //  UploadImgComponent
+  ],
   imports: [
     BrowserModule,
     FormsModule,
@@ -64,6 +67,4 @@ export function HttpLoaderFactory(http: HttpClient) {
   providers: [],
   bootstrap: [AppComponent],
 })
-
-
 export class AppModule {}

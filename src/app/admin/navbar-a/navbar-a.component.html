@@ -7,7 +7,10 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="(isHandset$ | async) === false"
   >
-    <mat-toolbar> <h5 (click)="navegar(1)">Menu</h5> </mat-toolbar>
+    <mat-toolbar>
+      <h5 class="titulo" (click)="navegar(1)" >Menu</h5> 
+      <!-- <img src="../../assets/img/logoADM.png" class="img-fluid" /> -->
+    </mat-toolbar>
     <mat-nav-list class="text-center">
       <div class="menuList menuList1">
         <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="../../../assets/img/factura.png" alt="" (click)="navegar(2)" />

@@ -29,6 +29,8 @@ export class RegistroClientesComponent implements OnInit {
   phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   rncMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
+  PhotoData: any;
+  doc_principal: any;
   constructor(private artServ: ArticulosService, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {}
 
   ngOnInit() {
@@ -48,11 +50,41 @@ export class RegistroClientesComponent implements OnInit {
       cedula: [null],
     });
   }
-  submit() {}
-  atras() {}
+  getPhotoData(img) {
+    this.PhotoData = img;
+  }
+  submit(arg) {
+    if (this.doc_principal === undefined || this.doc_principal === null || this.doc_principal === ' ' || this.doc_principal === '') {
+      this.dbServ.toastError('Debe de seleccionar un documento de identidad como principal', 'ERROR');
+    } else {
+    }
+    const temp = arg.value;
+    const documentos_identidad = [];
+    const temp_documentos_identidad = [{ doc: temp.cedula, descripcion: 'cedula' }, { doc: temp.rnc, descripcion: 'rnc' }];
+
+    temp_documentos_identidad.forEach(element => {
+      if (element.doc !== null && element.doc !== ' ' && element.doc !== '') {
+        documentos_identidad.push({
+          descripcion: element.descripcion,
+          documento: element.doc,
+          principal: element.descripcion === this.doc_principal ? true : false,
+        });
+      }
+    });
+
+    console.log(documentos_identidad);
+    temp.imagen_attributes = null;
+    temp.documentos_identidad_attributes = null;
+    // console.log(obj);
+  }
+  atras(temp) {}
 
   changeIdent(arg) {
     this.documento_identidad = arg;
+  }
+
+  setDocumentoPrincipal(doc) {
+    this.doc_principal = doc;
   }
 
   // =============================================
