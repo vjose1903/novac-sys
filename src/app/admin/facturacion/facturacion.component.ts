@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
 import { isUndefined } from 'ngx-bootstrap/chronos/utils/type-checks';
 import { DBservice } from '../../core/services/bdservice.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-facturacion',
@@ -67,9 +68,25 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.decisionModal(res);
       }
     });
-    this.dbServ.getClientes().subscribe(res => {
-      this.listaClientes = res;
-    });
+    this.dbServ
+      .getClientes()
+      .pipe(
+        map(
+          cliente =>
+            (cliente = cliente.map(cli => {
+              cli.documentos_de_identidad.map(docu => {
+                if (docu.principal) {
+                  cli.documento_identidad = docu.documento;
+                }
+              });
+
+              return cli;
+            })),
+        ),
+      )
+      .subscribe(res => {
+        this.listaClientes = res;
+      });
     this.enfocarInput('nom');
   }
 

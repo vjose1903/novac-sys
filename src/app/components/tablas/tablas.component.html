@@ -16,12 +16,12 @@
         mdbTableCol
         *ngFor="let row of data; let i = index"
         class="text-center"
+        id="row-{{ i }}"
         [ngClass]="{
-          'bg-light': RowElement.id == IDROW
-          
+          'bg-light': focusRow && RowElement.id == IDROW,
+          'bg-light': !focusRow && seleccionado == row.id
         }"
         style="cursor: pointer;"
-        id="row-{{ i }}"
         #RowElement
         (click)="clickROW(row)"
       >

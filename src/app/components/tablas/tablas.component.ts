@@ -66,7 +66,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   searchText = '';
   ROW = 'row-';
   NUM = 0;
-  IDROW = this.ROW + _.toString(this.NUM);
+  IDROW;
 
   // inputs
   @Input() paraFiltroArticulos;
@@ -95,7 +95,11 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   @Output() noArticulo = new EventEmitter<any>();
   constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    if (this.focusRow) {
+      this.IDROW = this.ROW + _.toString(this.NUM);
+    }
+  }
 
   ngOnChanges() {}
   searchItems() {

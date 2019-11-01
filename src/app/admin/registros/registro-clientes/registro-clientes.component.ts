@@ -4,6 +4,7 @@ import { ArticulosService } from '../../../core/services/articulos.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
+import { map } from 'rxjs/operators';
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
@@ -38,9 +39,26 @@ export class RegistroClientesComponent implements OnInit {
   ngOnInit() {
     this.boton = 'Guardar';
     this.titulo = 'Registro de clientes';
-    this.dbServ.getClientes().subscribe(res => {
-      this.listaClientes = res;
-    });
+    this.dbServ
+      .getClientes()
+      .pipe(
+        map(
+          cliente =>
+            (cliente = cliente.map(cli => {
+              cli.documentos_de_identidad.map(docu => {
+                if (docu.principal) {
+                  cli.documento_identidad = docu.documento;
+                }
+              });
+
+              return cli;
+            })),
+        ),
+      )
+      .subscribe(res => {
+        this.listaClientes = res;
+        console.log(this.listaClientes);
+      });
 
     this.form = this.fb.group({
       nombre: [null, Validators.required],
@@ -56,10 +74,10 @@ export class RegistroClientesComponent implements OnInit {
     this.PhotoData = img;
   }
   submit(arg) {
-    if (this.doc_principal === undefined || this.doc_principal === null || this.doc_principal === ' ' || this.doc_principal === '') {
-      this.dbServ.toastError('Debe de seleccionar un documento de identidad como principal', 'ERROR');
-    } else {
-    }
+    let devolver = false;
+
+    const documentosFail = [];
+
     const temp = arg.value;
     const documentos_identidad = [];
     const temp_documentos_identidad = [{ doc: temp.cedula, descripcion: 'cedula' }, { doc: temp.rnc, descripcion: 'rnc' }];
@@ -67,6 +85,12 @@ export class RegistroClientesComponent implements OnInit {
     temp.documentos_identidad_attributes = null;
 
     temp_documentos_identidad.forEach(element => {
+      //  esto es para saber si el documento de identidad esta mal escrito
+      if (_.endsWith(element.doc, '_')) {
+        documentosFail.push(element.descripcion);
+        devolver = true;
+      }
+      // haciendo la estructura para mandar los documentos a la base de datos
       if (element.doc !== null && element.doc !== ' ' && element.doc !== '') {
         documentos_identidad.push({
           descripcion: element.descripcion,
@@ -75,32 +99,44 @@ export class RegistroClientesComponent implements OnInit {
         });
       }
     });
+    // entra aqui si el formato de un documento de identidad esta mal
+    if (devolver) {
+      documentosFail.forEach(doc => {
+        this.dbServ.toastError('Formato de ' + doc + ' incorrecto', 'ERROR');
+      });
+      // entra aqui si pasa la validacion de documento de identidad
+    } else {
+      // entra aqui si no selecciono un documento como principal
+      if (this.doc_principal === undefined || this.doc_principal === null || this.doc_principal === ' ' || this.doc_principal === '') {
+        this.dbServ.toastError('Debe de seleccionar un documento de identidad como principal', 'ERROR');
 
-    temp.documentos_de_identidad_attributes = documentos_identidad;
+        // paso todas las validaciones
+      } else {
+        temp.documentos_de_identidad_attributes = documentos_identidad;
 
-    if (this.PhotoData !== undefined) {
-      temp.imagen_attributes = null;
-      temp.imagen_attributes = this.PhotoData;
+        if (this.PhotoData !== undefined) {
+          temp.imagen_attributes = null;
+          temp.imagen_attributes = this.PhotoData;
+        }
+
+        const obj = _.omit(temp, ['cedula', 'rnc']);
+
+        this.dbServ.createCliente(obj).subscribe(
+          res => {
+            this.listaClientes = [...this.listaClientes, res];
+
+            this.form.reset();
+            this.element = document.getElementById('campoNombre') as HTMLElement;
+            this.element.focus();
+            this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
+          },
+          err => {
+            console.log(err);
+            this.mostrarErrores(err.error);
+          },
+        );
+      }
     }
-
-    const obj = _.omit(temp, ['cedula', 'rnc']);
-
-    console.log(obj);
-
-    this.dbServ.createCliente(obj).subscribe(
-      res => {
-        this.listaClientes = [...this.listaClientes, res];
-
-        this.form.reset();
-        this.element = document.getElementById('campoNombre') as HTMLElement;
-        this.element.focus();
-        this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
-      },
-      err => {
-        console.log(err);
-        this.mostrarErrores(err.error);
-      },
-    );
   }
   atras(temp) {}
 
@@ -136,7 +172,7 @@ export class RegistroClientesComponent implements OnInit {
     },
     {
       titulo: 'Doc. identidad',
-      key: 'medida', // ojo
+      key: 'documento_identidad', // ojo
     },
   ];
 }
