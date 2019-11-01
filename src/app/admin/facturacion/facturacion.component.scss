@@ -49,3 +49,21 @@
   top: 2rem;
   font-size: 1.3rem;
 }
+
+.tamano {
+  height: calc(100% - 4rem) !important;
+}
+
+.botonBuscar {
+  border: 1px solid #495b49;
+  border-radius: 5px;
+  padding: 4px 3px 2px 4px;
+  background-color: #74b98c;
+  &:hover {
+    cursor: pointer;
+    background-color: #568566;
+  }
+  &:active {
+    background-color: #40654c;
+  }
+}

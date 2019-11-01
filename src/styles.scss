@@ -21,8 +21,9 @@ body {
 .cardPrincipal {
   padding: 2rem 2rem 2rem 2rem;
   border-radius: 1rem !important;
-  max-height: calc(100% - 2rem);
-  min-height: calc(100% - 2rem);
+  height: calc(100% - 14vh);
+  // max-height: calc(100% - 2rem);
+  // min-height: calc(100% - 2rem);
 }
 
 .contenedorRegistro {

@@ -83,7 +83,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     });
 
     this.mServ.OBJDEVUELTO.subscribe(res => {
-      if (res !== undefined) {
+      if (res !== undefined && res.tipoModal !== 'buscarCliente') {
         this.clickRowModal(res);
       }
     });
@@ -179,6 +179,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   saltar(e, input, i, elemento) {
     const sigInput = input + i;
+
     this.enfocarInput(sigInput);
 
     if (i >= 10 && input === 'cod-') {
@@ -208,6 +209,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         codigo = (this.control.controls[i] as any).controls['cod'].value;
         this.buscarArticuloPorCodigo(i, codigo);
       } else {
+        this.element = document.getElementById('can-' + i) as HTMLElement;
         this.element.blur();
         codigo = (this.control.controls[i] as any).controls['cod'].value;
         const obj = { filtrar: codigo, index: i };

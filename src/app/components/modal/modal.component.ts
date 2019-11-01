@@ -11,6 +11,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   showModal = false;
   seleccionModal: any;
   tipoModal;
+  paraFiltroClientes: any;
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
@@ -33,6 +34,20 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
 
   paraFiltroArticulos;
 
+  infoCliente = [
+    {
+      titulo: 'Nombre',
+      key: 'nombre',
+    },
+    {
+      titulo: 'Telefono',
+      key: 'telefono',
+    },
+    {
+      titulo: 'Doc. identidad',
+      key: 'medida', // ojo
+    },
+  ];
   constructor(private mServ: ModalService) {}
 
   element: HTMLElement;
@@ -81,6 +96,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     if (this.tipoModal === 'buscar') {
       obj.index = this.seleccionModal.index;
     }
+    obj.tipoModal = this.tipoModal;
 
     this.mServ.ModalObj(obj);
   }
@@ -90,12 +106,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     this.mServ.ModalIndex(this.seleccionModal.index);
   }
 
-  prueba(arg) {
-    console.log(arg);
-
-    //   if (this.tipoModal === 'buscar') {
-    //     this.element = document.getElementById('tablaSearch') as HTMLElement;
-    //     this.element.focus();
-    //   }
+  prueba() {
+    if (this.tipoModal === 'buscar') {
+      this.element = document.getElementById('tablaSearch');
+      setTimeout(() => {
+        this.element.focus();
+        this.element.click();
+      }, 5);
+    }
   }
 }

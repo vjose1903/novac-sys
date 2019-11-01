@@ -18,26 +18,18 @@
         class="text-center"
         [ngClass]="{
           'bg-light': RowElement.id == IDROW
+          
         }"
         style="cursor: pointer;"
         id="row-{{ i }}"
         #RowElement
         (click)="clickROW(row)"
       >
-        <!-- <td *ngIf="filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
-          <span *ngFor="let column of info; let i = index" style="width: 100%">
-            {{ row[column.key] }}
-          </span>
-        </td> -->
         <td *ngFor="let column of info">
           <span style="width: 100%">
             {{ row[column.key] }}
           </span>
         </td>
-
-        <!-- <td class="btnAccion" *ngIf="botones.titulo && filtroSelect && (row[filtroSelect.key] == filtroSelect.valor || filtroSelect.valor == 'todos')">
-          <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
-        </td> -->
         <td class="btnAccion" *ngIf="botones.titulo">
           <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
         </td>

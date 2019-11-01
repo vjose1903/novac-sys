@@ -49,6 +49,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
       if (this.focusRow) {
         this.key = event.keyCode;
         if (this.key === 38) {
+          event.stopPropagation();
           this.ARRIBA();
         } else if (this.key === 40) {
           this.ABAJO();
@@ -69,6 +70,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
 
   // inputs
   @Input() paraFiltroArticulos;
+  @Input() paraFiltroClientes;
   @Input() info;
   @Input() search = true;
   @Input() botones = {
@@ -152,6 +154,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
       this.seleccionado = arg.id;
     }
     this.clickRow.emit(arg);
+    this.reinicioModal.emit();
   }
 
   devolverInfo(arg) {

@@ -57,9 +57,10 @@
     [style]="{ width: '600px', minWidth: '400px' }"
     [minY]="70"
     (onHide)="reinicioModal()"
+    id="tablaSearch"
+    (onShow)="prueba()"
   >
     <app-tablas
-      id="tablaSearch"
       *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos"
       [focusRow]="true"
       [paraFiltroArticulos]="paraFiltroArticulos"
@@ -68,6 +69,34 @@
       [data]="seleccionModal.listaArticulos"
       [search]="false"
       (noArticulo)="noArticulo()"
+      (reinicioModal)="reinicioModal()"
+    ></app-tablas>
+  </p-dialog>
+
+  <!-- ================================================================================================================================ -->
+  <!-- FILTRAR CLIENTE -->
+  <!-- ================================================================================================================================ -->
+
+  <p-dialog
+    *ngIf="tipoModal === 'buscarCliente' && seleccionModal && infoCliente"
+    header="Buscar cliente"
+    [(visible)]="showModal"
+    [focusTrap]="true"
+    [focusOnShow]="true"
+    [modal]="false"
+    [responsive]="true"
+    [style]="{ width: '600px', minWidth: '400px' }"
+    [minY]="70"
+    (onHide)="reinicioModal()"
+    (onShow)="prueba()"
+  >
+    <app-tablas
+      *ngIf="seleccionModal"
+      [focusRow]="true"
+      (clickRow)="devolverCLick($event)"
+      [info]="infoCliente"
+      [data]="seleccionModal"
+      [search]="true"
       (reinicioModal)="reinicioModal()"
     ></app-tablas>
   </p-dialog>
