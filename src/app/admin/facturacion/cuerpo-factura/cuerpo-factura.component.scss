@@ -85,3 +85,14 @@
   max-height: 36vh;
   overflow: auto;
 }
+
+.Overlay {
+  bottom: 0;
+  left: 0;
+  background: #00000050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100% - 37.2vh)!important;
+  transform: translate(0px, -153px);
+}

@@ -18,8 +18,8 @@
         class="text-center"
         id="row-{{ i }}"
         [ngClass]="{
-          'bg-light': focusRow && RowElement.id == IDROW,
-          'bg-light': !focusRow && seleccionado == row.id
+          'bg-selected': !focusRow && row.id == seleccionado,
+          'bg-light': focusRow && RowElement.id == IDROW
         }"
         style="cursor: pointer;"
         #RowElement

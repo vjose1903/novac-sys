@@ -1,121 +1,124 @@
-<table #tituloFactTable="mdbTable" mdbTable class="table m-auto" small="true">
-  <thead>
-    <tr class="text-center">
-      <th class="tiCOD">Codigo</th>
-      <th class="tiCAN">Cantidad</th>
-      <th class="tiUNI">Unidad</th>
-      <th class="tiDES">Descripcion</th>
-      <th class="tiPRE">Precio</th>
-      <th class="tiTOT">Total</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="COD td0padding"></td>
+<div>
+  <table #tituloFactTable="mdbTable" mdbTable class="table m-auto" small="true">
+    <thead>
+      <tr class="text-center">
+        <th class="tiCOD">Codigo</th>
+        <th class="tiCAN">Cantidad</th>
+        <th class="tiUNI">Unidad</th>
+        <th class="tiDES">Descripcion</th>
+        <th class="tiPRE">Precio</th>
+        <th class="tiTOT">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="COD td0padding"></td>
 
-      <td class="CAN td0padding"></td>
+        <td class="CAN td0padding"></td>
 
-      <td class="UNI td0padding"></td>
+        <td class="UNI td0padding"></td>
 
-      <td class="DES td0padding"></td>
+        <td class="DES td0padding"></td>
 
-      <td class="PRE td0padding"></td>
+        <td class="PRE td0padding"></td>
 
-      <td class="TOT td0padding"></td>
-    </tr>
-  </tbody>
-</table>
+        <td class="TOT td0padding"></td>
+      </tr>
+    </tbody>
+  </table>
 
-<div class="cuadro" #cuadro>
-  <form [formGroup]="form" action="">
-    <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWFACTURAS.controls; let i = index">
-      <div [formGroupName]="i">
-        <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
-          <tbody>
-            <tr>
-              <!--  ::::::::::::  CODIGO  ::::::::::::  -->
-              <td class="COD td0padding">
-                <div class="from-group">
-                  <input
-                    type="text"
-                    class="form-control entrada "
-                    id="cod-{{ i }}"
-                    (click)="verificarSecuencia(i)"
-                    (keydown.enter)="saltar($event, 'can-', i , this)"
-                    formControlName="cod"
-                    (blur)="verificarRow(i)"
-                  />
-                </div>
-              </td>
-
-              <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
-              <td class="CAN td0padding">
-                <div class="from-group">
-                  <input
-                    type="number"
-                    class="form-control entrada "
-                    id="can-{{ i }}"
-                    (click)="verificarSecuencia(i)"
-                    (keydown.enter)="saltar($event, 'uni-', i , this)"
-                    formControlName="can"
-                    (blur)="calcularTotalRow(i) && verificarRow(i)"
-                  />
-                </div>
-              </td>
-
-              <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
-              <td class="UNI td0padding">
-                <div class="from-group">
-                  <input
-                    *ngIf="(drop && inputDrop !== secuenciaDelDrop(i)) || (!drop && inputDrop === secuenciaDelDrop(i)) || !drop"
-                    type="text"
-                    class="form-control entrada "
-                    id="uni-{{ i }}"
-                    (click)="verificarSecuencia(i, 'unidad')"
-                    (keydown.enter)="saltar($event, 'cod-', i + 1 , this)"
-                    formControlName="uni"
-                    (blur)="calcularTotalRow(i) && verificarRow(i)"
-                  />
-
-                  <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
-                    <select
-                      (focus)="verificarRow(i)"
-                      formControlName="uni"
-                      (change)="selectMedidaChange($event.target.value, i)"
-                      class="form-control  entrada"
-                      style="border-radius:0 "
-                      id="uni-{{ i }}"
-                      (keydown.enter)="saltar($event, 'cod-', i + 1 , this)"
-                      (blur)="calcularTotalRow(i) && verificarRow(i)"
-                    >
-                      <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
-                    </select>
+  <div class="cuadro" #cuadro>
+    <form [formGroup]="form" action="">
+      <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWFACTURAS.controls; let i = index">
+        <div [formGroupName]="i">
+          <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
+            <tbody>
+              <tr>
+                <!--  ::::::::::::  CODIGO  ::::::::::::  -->
+                <td class="COD td0padding">
+                  <div class="from-group">
+                    <input
+                      type="text"
+                      class="form-control entrada "
+                      id="cod-{{ i }}"
+                      (click)="verificarSecuencia(i)"
+                      (keydown.enter)="saltar($event, 'can-', i , this)"
+                      formControlName="cod"
+                      (blur)="verificarRow(i)"
+                    />
                   </div>
-                </div>
-              </td>
+                </td>
 
-              <td class="DES td0padding">
-                <div class="from-group">
-                  <input type="text" class="form-control entrada inDES " id="des-{{ i }}" formControlName="des" readonly="true" />
-                </div>
-              </td>
+                <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
+                <td class="CAN td0padding">
+                  <div class="from-group">
+                    <input
+                      type="number"
+                      class="form-control entrada "
+                      id="can-{{ i }}"
+                      (click)="verificarSecuencia(i)"
+                      (keydown.enter)="saltar($event, 'uni-', i , this)"
+                      formControlName="can"
+                      (blur)="calcularTotalRow(i) && verificarRow(i)"
+                    />
+                  </div>
+                </td>
 
-              <td class="PRE td0padding">
-                <div class="from-group">
-                  <input type="text" class="form-control entrada inPRE " id="pre-{{ i }}" formControlName="pre" readonly="true" />
-                </div>
-              </td>
+                <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
+                <td class="UNI td0padding">
+                  <div class="from-group">
+                    <input
+                      *ngIf="(drop && inputDrop !== secuenciaDelDrop(i)) || (!drop && inputDrop === secuenciaDelDrop(i)) || !drop"
+                      type="text"
+                      class="form-control entrada "
+                      id="uni-{{ i }}"
+                      (click)="verificarSecuencia(i, 'unidad')"
+                      (keydown.enter)="saltar($event, 'cod-', i + 1 , this)"
+                      formControlName="uni"
+                      (blur)="calcularTotalRow(i) && verificarRow(i)"
+                    />
 
-              <td class="TOT td0padding">
-                <div class="from-group">
-                  <input type="text" class="form-control entrada inTOT " id="tot-{{ i }}" formControlName="tot" readonly="true" />
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                    <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
+                      <select
+                        (focus)="verificarRow(i)"
+                        formControlName="uni"
+                        (change)="selectMedidaChange($event.target.value, i)"
+                        class="form-control  entrada"
+                        style="border-radius:0 "
+                        id="uni-{{ i }}"
+                        (keydown.enter)="saltar($event, 'cod-', i + 1 , this)"
+                        (blur)="calcularTotalRow(i) && verificarRow(i)"
+                      >
+                        <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
+                      </select>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="DES td0padding">
+                  <div class="from-group">
+                    <input type="text" class="form-control entrada inDES " id="des-{{ i }}" formControlName="des" readonly="true" />
+                  </div>
+                </td>
+
+                <td class="PRE td0padding">
+                  <div class="from-group">
+                    <input type="text" class="form-control entrada inPRE " id="pre-{{ i }}" formControlName="pre" readonly="true" />
+                  </div>
+                </td>
+
+                <td class="TOT td0padding">
+                  <div class="from-group">
+                    <input type="text" class="form-control entrada inTOT " id="tot-{{ i }}" formControlName="tot" readonly="true" />
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
+  <!-- <p>{{ rowFactura.value | json }}</p> -->
+  <div *ngIf="!propietario" class="Overlay position-absolute w-100  "></div>
 </div>
-<!-- <p>{{ rowFactura.value | json }}</p> -->

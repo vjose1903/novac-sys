@@ -15,7 +15,7 @@ export class RegistroEmpleadosComponent implements OnInit {
   form: FormGroup;
   titulo = '';
   boton = '';
-  phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+  phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];

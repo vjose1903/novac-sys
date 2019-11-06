@@ -50,6 +50,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   inputDrop = 'uni-0';
   control;
 
+  @Input() propietario;
+
   // subObjDevueltoModal: Subscription;
   // subIndexToFocusModal: Subscription;
 
@@ -74,7 +76,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
 
-    for (let index = 0; index <= 9; index++) {
+    for (let index = 0; index <= 7; index++) {
       this.addItem();
     }
 

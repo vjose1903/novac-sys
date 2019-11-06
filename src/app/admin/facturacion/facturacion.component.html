@@ -100,7 +100,7 @@
     </div>
   </div>
   <div class="cuerpoFactura mb-4">
-    <app-cuerpo-factura (sendCalculos)="getCalculos($event)"></app-cuerpo-factura>
+    <app-cuerpo-factura [propietario]="propietario_factura" (sendCalculos)="getCalculos($event)"></app-cuerpo-factura>
   </div>
   <div class="pieFactura">
     <div class="row">

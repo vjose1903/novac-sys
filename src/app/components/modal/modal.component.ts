@@ -45,7 +45,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     },
     {
       titulo: 'Doc. identidad',
-      key: 'documento_identidad', // ojo
+      key: 'documento_identidad',
+    },
+    {
+      titulo: 'Direccion',
+      key: 'direccion',
     },
   ];
   constructor(private mServ: ModalService) {}

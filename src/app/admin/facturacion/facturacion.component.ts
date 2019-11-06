@@ -60,7 +60,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res !== undefined && res.tipoModal === 'buscarCliente') {
         this.propietario_factura = res;
-        console.log(this.propietario_factura);
+        this.form.patchValue(this.propietario_factura);
+        this.enfocarInput('cod-0');
       }
     });
     this.mServ.DECISIONMODAL.subscribe(res => {
@@ -102,6 +103,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     if (campo === 'cod-0' && nombre !== null) {
       this.enfocarInput(campo);
+      this.propietario_factura = {
+        nombre: this.form.controls.nombre.value,
+        direccion: this.form.controls.direccion.value,
+        telefono: this.form.controls.telefono.value,
+      };
     }
   }
 
@@ -125,7 +131,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   // =============================================
-  //  MODAL PARA FILTRAR ARTICULOS
+  //  MODAL
   // =============================================
   abrirModal(arg?) {
     if (arg) {

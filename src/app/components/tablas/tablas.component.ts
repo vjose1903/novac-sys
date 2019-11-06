@@ -46,6 +46,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     // abajo 40
 
     setTimeout(() => {
+      console.log('entro');
+
       if (this.focusRow) {
         this.key = event.keyCode;
         if (this.key === 38) {
@@ -99,30 +101,51 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     if (this.focusRow) {
       this.IDROW = this.ROW + _.toString(this.NUM);
     }
+    if (this.search) {
+      setTimeout(() => {
+        this.element = document.getElementById('search') as HTMLElement;
+        this.element.focus();
+      }, 5);
+    }
   }
 
   ngOnChanges() {}
+
+  // searchItems() {
+  //   this.NUM = 0;
+  //   if (!this.searchText) {
+  //     this.mdbTable.setDataSource(JSON.parse(JSON.stringify(this.elements)));
+  //     this.elements = this.mdbTable.getDataSource();
+  //   }
+
+  //   if (this.searchText) {
+  //     this.data = this.mdbTable.searchLocalDataBy(this.searchText);
+  //     this.mdbTable.setDataSource(JSON.parse(JSON.stringify(this.elements)));
+  //   }
+  //   this.cdRef.detectChanges();
+  // }
   searchItems() {
-    this.NUM = 0;
+    const prev = this.mdbTable.getDataSource();
+
     if (!this.searchText) {
-      this.mdbTable.setDataSource(this.data);
-      this.elements = this.mdbTable.getDataSource();
+      this.NUM = 0;
+      this.mdbTable.setDataSource(this.previous);
+      this.data = this.mdbTable.getDataSource();
     }
 
     if (this.searchText) {
       this.data = this.mdbTable.searchLocalDataBy(this.searchText);
-      this.mdbTable.setDataSource(this.elements);
+      this.mdbTable.setDataSource(prev);
     }
     this.cdRef.detectChanges();
   }
-
   setDATATABLE() {
     this.data.forEach(element => {
       this.elements.push(element);
       this.previous.push(element);
     });
 
-    this.mdbTable.setDataSource(this.elements);
+    this.mdbTable.setDataSource(JSON.parse(JSON.stringify(this.elements)));
     this.elements = this.mdbTable.getDataSource();
     this.previous = this.mdbTable.getDataSource();
     this.cdRef.detectChanges();
