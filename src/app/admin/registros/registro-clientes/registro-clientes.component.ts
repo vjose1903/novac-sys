@@ -5,6 +5,8 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
+import { ValidateRayaAbajo } from '../../../directives/validaciones';
+
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
@@ -66,28 +68,41 @@ export class RegistroClientesComponent implements OnInit {
       direccion: [null, Validators.required],
       sexo: ['', Validators.required],
       telefono: [null, Validators.required],
-      rnc: [null],
-      cedula: [null],
+      rnc: [null, ValidateRayaAbajo.verificarRayaAbajo],
+      cedula: [null, ValidateRayaAbajo.verificarRayaAbajo],
     });
   }
   getPhotoData(img) {
     this.PhotoData = img;
   }
+  validarRayaAbajo(input) {
+    const form = this.form.controls;
+    if (form[input] && form[input].value !== null) {
+      if (_.endsWith(form[input].value, '_')) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
   submit(arg) {
     let devolver = false;
 
-    const documentosFail = [];
+    const Fail = [];
 
-    const temp = arg.value;
+    const temp = JSON.parse(JSON.stringify(arg.value));
     const documentos_identidad = [];
     const temp_documentos_identidad = [{ doc: temp.cedula, descripcion: 'cedula' }, { doc: temp.rnc, descripcion: 'rnc' }];
 
     temp.documentos_identidad_attributes = null;
-
+    if (this.validarRayaAbajo('telefono')) {
+      Fail.push('Telefono');
+      devolver = true;
+    }
     temp_documentos_identidad.forEach(element => {
       //  esto es para saber si el documento de identidad esta mal escrito
-      if (_.endsWith(element.doc, '_')) {
-        documentosFail.push(element.descripcion);
+      if (this.validarRayaAbajo(element.descripcion)) {
+        Fail.push(element.descripcion);
         devolver = true;
       }
       // haciendo la estructura para mandar los documentos a la base de datos
@@ -101,7 +116,7 @@ export class RegistroClientesComponent implements OnInit {
     });
     // entra aqui si el formato de un documento de identidad esta mal
     if (devolver) {
-      documentosFail.forEach(doc => {
+      Fail.forEach(doc => {
         this.dbServ.toastError('Formato de ' + doc + ' incorrecto', 'ERROR');
       });
       // entra aqui si pasa la validacion de documento de identidad
@@ -123,12 +138,18 @@ export class RegistroClientesComponent implements OnInit {
 
         this.dbServ.createCliente(obj).subscribe(
           res => {
-            this.listaClientes = [...this.listaClientes, res];
+            const obj = JSON.parse(JSON.stringify(res));
+            obj.documentos_de_identidad.map(docu => {
+              if (docu.principal) {
+                obj.documento_identidad = docu.documento;
+              }
+            });
+            this.listaClientes = [...this.listaClientes, obj];
 
             this.form.reset();
+            this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
             this.element = document.getElementById('campoNombre') as HTMLElement;
             this.element.focus();
-            this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
           },
           err => {
             console.log(err);

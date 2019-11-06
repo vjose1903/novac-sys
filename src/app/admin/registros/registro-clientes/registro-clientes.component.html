@@ -12,7 +12,8 @@
             <div class=" col-12">
               <div class="form-group">
                 <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                <input type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control" autocomplete="off" autofocus />
+                <input id="campoNombre" type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control" autocomplete="off" autofocus />
+                <!-- <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].sinRayas && (form.controls['nombre'].dirty || form.controls['nombre'].touched)"> -->
                 <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
                   Este Campo es obligatorio
                 </div>
@@ -60,6 +61,9 @@
               >
                 Introduzca el numero de telefono
               </div>
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="validarRayaAbajo('telefono') && form.controls['telefono'].dirty">
+                Telefono incompleto
+              </div>
             </div>
           </div>
 
@@ -71,10 +75,15 @@
 
             <div *ngIf="documento_identidad" class="from-group">
               <div class="input-group">
-                <input type="text" [textMask]="{ mask: cedulaMask }" class="form-control" formControlName="cedula" placeholder="___-_______-_" autocomplete="off" />
-                <!-- <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['cedula'].valid && (form.controls['cedula'].dirty || form.controls['cedula'].touched)">
-                  Este Campo es obligatorio
-                </div> -->
+                <input
+                  type="text"
+                  [textMask]="{ mask: cedulaMask }"
+                  (keyup)="validarRayaAbajo()"
+                  class="form-control"
+                  formControlName="cedula"
+                  placeholder="___-_______-_"
+                  autocomplete="off"
+                />
 
                 <div
                   (click)="setDocumentoPrincipal('cedula')"
@@ -84,6 +93,9 @@
                 >
                   <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                   <!-- <i class="far fa-square"></i> -->
+                </div>
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="validarRayaAbajo('cedula') && form.controls['cedula'].dirty">
+                  Cedula incompleta
                 </div>
               </div>
             </div>
@@ -102,7 +114,9 @@
                   placement="right"
                 >
                   <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
-                  <!-- <i class="far fa-square"></i> -->
+                </div>
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="validarRayaAbajo('rnc') && form.controls['rnc'].dirty">
+                  rnc incompleto
                 </div>
               </div>
             </div>

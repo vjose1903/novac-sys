@@ -19,6 +19,7 @@ import { ModalComponent } from '../components/modal/modal.component';
 import { BTNcircularComponent } from '../components/btncircular/btncircular.component';
 import { RegistroClientesComponent } from './registros/registro-clientes/registro-clientes.component';
 import { UploadImgComponent } from '../components/upload-img/upload-img.component';
+import { ValidateRayaAbajo } from '../directives/validaciones';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { UploadImgComponent } from '../components/upload-img/upload-img.componen
     BTNcircularComponent,
     RegistroClientesComponent,
     UploadImgComponent,
+    ValidateRayaAbajo,
   ],
   imports: [
     DialogModule,
