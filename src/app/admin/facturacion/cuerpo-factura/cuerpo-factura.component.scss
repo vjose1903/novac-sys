@@ -93,6 +93,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100% - 37.2vh)!important;
+  height: calc(100% - 37.2vh) !important;
   transform: translate(0px, -153px);
+}
+
+.cuerpoFact {
+  display: contents;
 }

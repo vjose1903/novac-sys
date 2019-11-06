@@ -76,7 +76,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
 
-    for (let index = 0; index <= 7; index++) {
+    for (let index = 0; index <= 9; index++) {
       this.addItem();
     }
 

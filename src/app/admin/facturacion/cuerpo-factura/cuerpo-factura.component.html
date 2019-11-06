@@ -1,4 +1,4 @@
-<div>
+<div class="cuerpoFact">
   <table #tituloFactTable="mdbTable" mdbTable class="table m-auto" small="true">
     <thead>
       <tr class="text-center">
@@ -38,6 +38,7 @@
                 <td class="COD td0padding">
                   <div class="from-group">
                     <input
+                    [readOnly]="!propietario"
                       type="text"
                       class="form-control entrada "
                       id="cod-{{ i }}"
@@ -53,6 +54,7 @@
                 <td class="CAN td0padding">
                   <div class="from-group">
                     <input
+                    [readOnly]="!propietario"
                       type="number"
                       class="form-control entrada "
                       id="can-{{ i }}"
@@ -68,6 +70,7 @@
                 <td class="UNI td0padding">
                   <div class="from-group">
                     <input
+                    [readOnly]="!propietario"
                       *ngIf="(drop && inputDrop !== secuenciaDelDrop(i)) || (!drop && inputDrop === secuenciaDelDrop(i)) || !drop"
                       type="text"
                       class="form-control entrada "
@@ -120,5 +123,5 @@
     </form>
   </div>
   <!-- <p>{{ rowFactura.value | json }}</p> -->
-  <div *ngIf="!propietario" class="Overlay position-absolute w-100  "></div>
+  
 </div>
