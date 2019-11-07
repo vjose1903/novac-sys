@@ -9,6 +9,7 @@ import { ModalService } from '../../components/modal/modal.service';
 import { isUndefined } from 'ngx-bootstrap/chronos/utils/type-checks';
 import { DBservice } from '../../core/services/bdservice.service';
 import { map } from 'rxjs/operators';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-facturacion',
@@ -39,6 +40,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     '<div style=" max-width: 21rem;" ><span>01 Valor fiscal</span><br><span>02 Factura de consumo</span><br><span>03 Nota de debito</span><br><span>04 Nota de credito</span><br><span>11 Comprobante de compras</span><br><span>12 Registro de unico ingreso</span><br> <span>13 Comprobante para gastos menores</span><br> <span>14 Comprobante de regimen especiales</span><br> <span>15 Comprobante gubernamental</span><br> <span>16 Comprobante para exportaciones</span><br> <span>17 Comprobantes para pago al exterior</span><br></div>';
   showTipos: boolean;
   tipoFactura: any;
+  CuerpoPactura = [];
   constructor(private mServ: ModalService, private dbServ: DBservice, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.form = this.fb.group({
       nombre: ['Cliente contado', Validators.required],
@@ -156,6 +158,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   // =============================================
   cancelarFactura() {
     this.mServ.modalTipo('cancelar');
+    this.tipoModal = 'cancelar';
     this.abrirModal();
   }
   // =============================================
@@ -163,16 +166,48 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   // =============================================
   imprimirFactura() {
     this.mServ.modalTipo('imprimir');
+    this.tipoModal = 'imprimir';
     this.abrirModal();
   }
 
   abrirModal(arg?) {
     if (arg) {
       this.mServ.ModalSeleccion(arg);
-      this.mServ.mostrarModal(true);
     }
+    this.mServ.mostrarModal(true);
   }
   decisionModal(arg) {
-    const decision = arg;
+    if (arg) {
+      if (this.tipoModal === 'imprimir') {
+        this.IMPRIMIR();
+      }
+    }
+    this.tipoModal = '';
+  }
+
+  // =============================================
+  //  OBTENER LA DATA DEL CUERPO
+  // =============================================
+
+  isPart(obj) {
+    const x = _.findIndex(this.CuerpoPactura, o => {
+      return o.juego_id === obj.cod;
+    });
+
+    return x === -1 ? false : true;
+  }
+  getCuerpoFactura(arg) {
+    const obj = JSON.parse(arg);
+    obj.forEach(fila => {
+      if (fila.tot !== null) {
+        if (!this.isPart(fila)) {
+          this.CuerpoPactura.push(fila);
+        }
+      }
+    });
+  }
+
+  IMPRIMIR() {
+    console.log(this.CuerpoPactura);
   }
 }

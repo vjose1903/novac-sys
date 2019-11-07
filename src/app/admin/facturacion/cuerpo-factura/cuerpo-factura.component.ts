@@ -56,6 +56,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   // subIndexToFocusModal: Subscription;
 
   @Output() sendCalculos = new EventEmitter<any>();
+  @Output() getCuerpoFactura = new EventEmitter<any>();
 
   constructor(
     private artServ: ArticulosService,
@@ -70,7 +71,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   ngOnInit() {
     this.form = this.fb.group({
-      hide: [''],
       rowFactura: this.fb.array([this.createItem()]),
     });
 
@@ -99,6 +99,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.mServ.INDEXTOFOCUS.subscribe(res => {
       if (res !== undefined) {
         this.noArticuloEncontrado(res);
+      }
+    });
+
+    this.form.valueChanges.subscribe(res => {
+      if (res !== undefined) {
+        this.getCuerpoFactura.emit(JSON.stringify(res.rowFactura));
       }
     });
   }
@@ -152,13 +158,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   createItem(): FormGroup {
     return this.fb.group({
-      cod: [''],
-      can: [''],
-      des: [''],
-      uni: [''],
-      pre: [''],
-      desc: [''],
-      tot: [''],
+      cod: [null],
+      can: [null],
+      des: [null],
+      uni: [null],
+      pre: [null],
+      desc: [null],
+      tot: [null],
     });
   }
 

@@ -105,12 +105,12 @@
     </div>
   </div>
   <div class="cuerpoFactura mb-4">
-    <app-cuerpo-factura [propietario]="propietario_factura" (sendCalculos)="getCalculos($event)"></app-cuerpo-factura>
+    <app-cuerpo-factura [propietario]="propietario_factura" (getCuerpoFactura)="getCuerpoFactura($event)" (sendCalculos)="getCalculos($event)"></app-cuerpo-factura>
   </div>
   <div class="pieFactura">
     <div class="row">
       <div class="col-2 ">
-        <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'" (click)="cancelarFactura()"></app-btncircular>
+        <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
       </div>
       <div class="col-2">
         <app-btncircular [alto]="'100px'" [accion]="'Cancelar Factura'" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
