@@ -1,30 +1,30 @@
 /* ============================================== */
 /*        FOOTER                                  */
 /* ============================================== */
-.footerCustom{
+.footerCustom {
   bottom: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   height: 30px;
   background-color: #586458;
-  color:white;
+  color: white;
   padding: 0rem 2rem 0rem 0rem;
-
 }
 
-
-.titulo{
+.titulo {
   font-family: 'Lobster';
-  font-size: 2.4rem;
-  color: #0b4a18
+  font-size: 2rem;
+  color: #0b4a18;
+  padding: 0;
+  transform: translate(-37px, -8px);
+  position: absolute;
 }
-
 
 /* ============================================== */
 /*        LOADER                                  */
 /* ============================================== */
-.loader{
+.loader {
   position: fixed;
   z-index: 99;
   top: 0;
@@ -37,245 +37,238 @@
   align-items: center;
 }
 
-.loader > img{
+.loader > img {
   width: 5s00px;
 }
-
-
 
 /* ============================================== */
 /*        contenido                               */
 /* ============================================== */
 
+.container {
+  padding: 2rem;
+}
 
-.container{
-    padding: 2rem;
+.sidenav-container {
+  height: 100%;
+  background-color: #e4e4e4d2;
+  overflow: hidden;
+}
+
+/* ============================================== */
+/*        Menu                                    */
+/* ============================================== */
+
+.menuList {
+  list-style: none;
+}
+.menuList1 {
+  margin: 40px 0px 0px 0px;
+  .tituloMenu1 {
+    transform: scale(0);
+    transition: all 0.2s;
   }
-  
-  .sidenav-container {
-      height: 100%;
-      background-color:#e4e4e4d2;
-      overflow: hidden;
-    }
 
-  
-  /* ============================================== */
-  /*        Menu                                    */
-  /* ============================================== */
-  
-    .menuList{
-      list-style: none;
-    }
-    .menuList1{
-      margin: 40px 0px 0px 0px;
-      .tituloMenu1{
-        transform: scale(0) ;
-        transition: all .2s;
-      }
-      
-      &:hover .tituloMenu1, .tituloMenu1A{
-        transform:  scale(1) translate(0px, -130px);
-      }
-      
-    }
-    
-    .menuList2{
-      .tituloMenu2{
-        transform: scale(0);
-        transition: all .2s;
-      }
-      
-      &:hover .tituloMenu2,.tituloMenu2A{
-        transform:  scale(1) translate(0px, -130px);
-      }
-      .subMenuRegistros{
-        display: none;
-        transform: scale(0);
-      }
-      
-      .subMenuRegistrosA{
-        transform: scale(1) ;
-        background-color: #23be69;
-        color:white;
-      }
-      .Registro{
-        padding: 0.5rem;
-        background-color: #23be69;
-      }
-      .Registro:hover{
-        width: 100%;
-        background-color: #1aa056;
-        cursor: pointer;
-      }
-    }
-    
-    .menuList3{
+  &:hover .tituloMenu1,
+  .tituloMenu1A {
+    transform: scale(1) translate(0px, -130px);
+  }
+}
 
-      .tituloMenu3{
-        transform: scale(0);
-        transition: all .2s;
-      }
+.menuList2 {
+  .tituloMenu2 {
+    transform: scale(0);
+    transition: all 0.2s;
+  }
 
-      &:hover .tituloMenu3,.tituloMenu3A{
-        transform:  scale(1) translate(0px, -130px);
-      }
-    }
-    
-    .menuList4{
+  &:hover .tituloMenu2,
+  .tituloMenu2A {
+    transform: scale(1) translate(0px, -130px);
+  }
+  .subMenuRegistros {
+    display: none;
+    transform: scale(0);
+  }
 
-      .tituloMenu4{
-        transform: scale(0);
-        transition: all .2s;
-      }
+  .subMenuRegistrosA {
+    transform: scale(1);
+    background-color: #23be69;
+    color: white;
+  }
+  .Registro {
+    padding: 0.5rem;
+    background-color: #23be69;
+  }
+  .Registro:hover {
+    width: 100%;
+    background-color: #1aa056;
+    cursor: pointer;
+  }
+}
 
-      &:hover .tituloMenu4,.tituloMenu4A{
-        transform:  scale(1) translate(0px, -130px);
-      }
-    }
+.menuList3 {
+  .tituloMenu3 {
+    transform: scale(0);
+    transition: all 0.2s;
+  }
 
+  &:hover .tituloMenu3,
+  .tituloMenu3A {
+    transform: scale(1) translate(0px, -130px);
+  }
+}
 
-    .iconosMenu{
-      position: relative;
-      display: block;
-      margin: 20px auto 0px auto;
-      filter: grayscale(50%);
-      height: 100px;
-      width: 100px;
-      }
+.menuList4 {
+  .tituloMenu4 {
+    transform: scale(0);
+    transition: all 0.2s;
+  }
 
-    .iconosMenuA{
-      position: relative;
-      display: block;
-      margin: auto;
-      height: 100px;
-      width: 100px;
-      filter: grayscale(10%);
-      filter: contrast(-20%);
-      z-index: 99;
-    }
+  &:hover .tituloMenu4,
+  .tituloMenu4A {
+    transform: scale(1) translate(0px, -130px);
+  }
+}
 
-    .iconosMenu:hover{
-      filter: grayscale(10%);
-      transform: scale(1.02);
-      filter: contrast(-20%);
-      z-index: 99;
-    }
+.iconosMenu {
+  position: relative;
+  display: block;
+  margin: 20px auto 0px auto;
+  filter: grayscale(50%);
+  height: 100px;
+  width: 100px;
+}
 
-    mat-nav-list{
-      background-color: #95f0a7;
-      overflow: none;
-      height: calc(100% - 50px);
-    }
-    mat-list-item{
-      margin: 2rem 0rem 2rem 0rem
-    }
+.iconosMenuA {
+  position: relative;
+  display: block;
+  margin: auto;
+  height: 100px;
+  width: 100px;
+  filter: grayscale(10%);
+  filter: contrast(-20%);
+  z-index: 99;
+}
 
-    .mat-drawer-inner-container {
-      overflow: hidden !important;
-      width: 250px; 
-      
-    }
-    
-    .sidenav {
-      width: 250px; 
-    }
-    
-    // titulito de menu
-    .sidenav .mat-toolbar {
-      background-color: #e2e2e2;
-      box-shadow: 1px 1px 5px 0.2px #9c9c9c;
-      TEXT-ALIGN: center;
-    }
-    
+.iconosMenu:hover {
+  filter: grayscale(10%);
+  transform: scale(1.02);
+  filter: contrast(-20%);
+  z-index: 99;
+}
+
+mat-nav-list {
+  background-color: #95f0a7;
+  overflow: none;
+  height: calc(100% - 50px);
+}
+mat-list-item {
+  margin: 2rem 0rem 2rem 0rem;
+}
+
+.mat-drawer-inner-container {
+  overflow: hidden !important;
+  width: 10rem;
+}
+
+.sidenav {
+  width: 10rem;
+}
+
+// titulito de menu
+.sidenav .mat-toolbar {
+  background-color: #e2e2e2;
+  box-shadow: 1px 1px 5px 0.2px #9c9c9c;
+  text-align: center;
+}
+
 /* ============================================== */
 /*        BOTON MENU                              */
 /* ============================================== */
-  #botonMenu{
-    border-radius: 50%;
-    background-color: #51dba698;
-    margin: 5px;
-    padding: 5px 10px 5px 10px;
-    cursor: pointer;
-  }
-  #botonMenu:hover{
-    background-color: #40ae8498;
-    
-  }
-    .fa-bars:before {
-      margin: -12px 0px 0px 0px;
-      position: absolute;
-  }
-    
-    /* ============================================== */
-    /*        barra superior                          */
-    /* ============================================== */
-    
-    
-    .mat-toolbar.mat-primary {
-      z-index: 1;
-    }
-    .mat-toolbar{
-      background-color: #f5f5f5;
-      box-shadow: 1px 1px 5px 0.2px #dfdfdf;
-    }
-    .mat-toolbar-row, .mat-toolbar-single-row {
-      display: block;
-      padding: 0.5rem;
-      align-content: center;
-      height: 50px;
-    }
-    .right{
-      float: right;
-      margin-right: 1rem;
-    }
-    
-    /*----- imagen cuenta ------*/
-    
-    .right img{
-      height: 35px;
-      width: 35px;
-    }
-    .right a{
-      text-decoration-line: none;
-      color: black;
-    }
-    /* boton cuenta */
-    #button-basic:hover{ 
-      text-decoration-line: none;
-      color: #00ff88;
-    }
-    
-    /* botones de opciones */
-    #dropdown-item {
-      display: block;
-      color: #333;
-      padding: 15px 25px;
-      font-size: 14px;
-    }
-    #dropdown-item:hover {
-      border-radius: 2px;
-      background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
-      color: #fff;
-    }
-    
-    /* dropdown cuerpo */
-    #dropdown-basic{
-      max-width: 300px;
-      min-width: 300px;
-      margin:  0.4rem 0px 0px calc(100% - 280px);
-      background: #fff;
-      box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.1);
-      padding: 4px;
-    }
-    
-    .dropdown-header{
-      background-color: #a2f6cf59;
-    }
-    .dropdown-header h2{
-      color: black;
-    }
-    .fas{
-      margin-right: 1rem;
-    }
-    
-  
+#botonMenu {
+  border-radius: 50%;
+  background-color: #51dba698;
+  margin: 5px;
+  padding: 5px 10px 5px 10px;
+  cursor: pointer;
+}
+#botonMenu:hover {
+  background-color: #40ae8498;
+}
+.fa-bars:before {
+  margin: -12px 0px 0px 0px;
+  position: absolute;
+}
+
+/* ============================================== */
+/*        barra superior                          */
+/* ============================================== */
+
+.mat-toolbar.mat-primary {
+  z-index: 1;
+}
+.mat-toolbar {
+  background-color: #f5f5f5;
+  box-shadow: 1px 1px 5px 0.2px #dfdfdf;
+}
+.mat-toolbar-row,
+.mat-toolbar-single-row {
+  display: block;
+  padding: 0.5rem;
+  align-content: center;
+  height: 2rem;
+}
+.right {
+  float: right;
+  margin-right: 1rem;
+}
+
+/*----- imagen cuenta ------*/
+
+.right img {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+.right a {
+  text-decoration-line: none;
+  color: black;
+  font-size: 1rem;
+}
+/* boton cuenta */
+#button-basic:hover {
+  text-decoration-line: none;
+  color: #36c080;
+}
+
+/* botones de opciones */
+#dropdown-item {
+  display: block;
+  color: #333;
+  padding: 15px 25px;
+  font-size: 14px;
+}
+#dropdown-item:hover {
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
+  color: #fff;
+}
+
+/* dropdown cuerpo */
+#dropdown-basic {
+  max-width: 300px;
+  min-width: 300px;
+  margin: 0.4rem 0px 0px calc(100% - 280px);
+  background: #fff;
+  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+}
+
+.dropdown-header {
+  background-color: #a2f6cf59;
+}
+.dropdown-header h2 {
+  color: black;
+}
+.fas {
+  margin-right: 1rem;
+}

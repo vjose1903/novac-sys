@@ -54,7 +54,6 @@
 .tiUNI {
   max-width: 1.3rem;
   text-align: left;
-  
 }
 .tiPRE {
   max-width: 1rem;
@@ -89,9 +88,15 @@
 }
 
 .cuadro {
-  // height: 30rem;
-  max-height: 36vh;
-  overflow: auto;
+  height: 47vh;
+}
+
+.conFlow {
+  overflow: auto !important;
+}
+
+.sinFLow {
+  overflow: hidden !important;
 }
 
 .Overlay {
@@ -106,5 +111,5 @@
 }
 
 .cuerpoFact {
-  display: contents;
+  // display: contents;
 }

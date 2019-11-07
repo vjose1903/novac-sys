@@ -8,7 +8,7 @@
     [opened]="(isHandset$ | async) === false"
   >
     <mat-toolbar>
-      <h5 class="titulo" (click)="navegar(1)" >Menu</h5> 
+      <span class="titulo" (click)="navegar(1)">Menu</span>
       <!-- <img src="../../assets/img/logoADM.png" class="img-fluid" /> -->
     </mat-toolbar>
     <mat-nav-list class="text-center">
@@ -83,7 +83,7 @@
         </li> -->
     </mat-toolbar>
 
-    <div class="" style="padding: 15px 80px 20px 80px; height: calc(100% - 80px);">
+    <div class="" style="padding: 15px 50px 20px 50px; height: calc(100% - 80px);">
       <router-outlet></router-outlet>
       <!-- rutas -->
     </div>

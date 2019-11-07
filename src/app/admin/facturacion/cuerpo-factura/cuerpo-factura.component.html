@@ -30,7 +30,7 @@
     </tbody>
   </table>
 
-  <div class="cuadro" #cuadro>
+  <div class="cuadro" #cuadro [ngClass]="{ sinFlow: secuencia <= 12, conFlow: secuencia >= 13 }">
     <form [formGroup]="form" action="">
       <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWFACTURAS.controls; let i = index">
         <div [formGroupName]="i">
