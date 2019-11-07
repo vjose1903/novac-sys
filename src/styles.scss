@@ -37,6 +37,10 @@ body {
   padding: 0 !important;
 }
 
+.right {
+  right: 0 !important;
+}
+
 // ========================================================
 // TEXT_COLOR
 // ========================================================
@@ -166,4 +170,12 @@ input.apple-switch:checked {
 input.apple-switch:checked:after {
   left: 16px;
   box-shadow: 1px 4px 1px #0000000f;
+}
+
+.popover-body {
+  padding: 1rem;
+  min-width: 30rem !important;
+}
+.popover {
+  min-width: 17rem !important;
 }

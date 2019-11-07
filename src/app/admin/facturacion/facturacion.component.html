@@ -6,17 +6,22 @@
   <div class="cabezaFactura ">
     <div class="row">
       <div class="col-xs-12 col-md-2">
+        <ng-template #tipos_facturas><div class="w-75" [innerHtml]="TiposFacturas"></div></ng-template>
         <h5><strong>Tipo:</strong></h5>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked />
-          <label class="form-check-label" for="exampleRadios1">Consumidor final </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2" />
-          <label class="form-check-label" for="exampleRadios2"> Valor fiscal </label>
-        </div>
+        <input
+          placement="right"
+          [mdbPopover]="tipos_facturas"
+          triggers="focus"
+          type="text"
+          (keydown.enter)="saltar('condicion', tipoFact.value)"
+          class="form-control tipo"
+          value="02"
+          id="tipoFact"
+          #tipoFact
+        />
+
         <h5 class="mt-2"><strong>Condición :</strong></h5>
-        <select class="form-control " name="condicionSelect">
+        <select id="condicion" (keydown.enter)="saltar('nom', $event.target.value)" class="form-control " name="condicionSelect">
           <option value="Contado">Contado</option>
           <option value="Credito">Credito</option>
         </select>
@@ -34,7 +39,7 @@
               <label class="control-label mr-2">Nombre:</label>
               <input
                 id="nom"
-                (keydown.enter)="saltar($event, 'dir', form.controls['nombre'].value)"
+                (keydown.enter)="saltar('dir', form.controls['nombre'].value)"
                 type="text"
                 formControlName="nombre"
                 placeholder="Introduzca nombre"
@@ -65,7 +70,7 @@
                 <label class="control-label mr-2">Direccion:</label>
                 <input
                   id="dir"
-                  (keydown.enter)="saltar($event, 'cod-0', form.controls['direccion'].value)"
+                  (keydown.enter)="saltar('cod-0', form.controls['direccion'].value)"
                   type="text"
                   formControlName="direccion"
                   placeholder="Introduzca direccion"
@@ -105,12 +110,41 @@
   <div class="pieFactura">
     <div class="row">
       <div class="col-2 ">
-        <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'"></app-btncircular>
+        <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'" (click)="cancelarFactura()"></app-btncircular>
       </div>
       <div class="col-2">
         <app-btncircular [alto]="'100px'" [accion]="'Cancelar Factura'" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
       </div>
-      <div class=" col-8"></div>
+      <div class="col-8 d-flex justify-content-end">
+        <div class="d-block mostrarNumeros">
+          <div class="row">
+            <div class="col-6">
+              <div class="d-flex">
+                <span>ITBIS:</span>
+              </div>
+              <div class="d-flex">
+                <span>IMPORTE:</span>
+              </div>
+              <div class="d-flex">
+                <!-- class="borderTOP" -->
+                <span class="mt-2"> <strong>TOTAL:</strong> </span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex">
+                <span class="text-transparent">ITBIS:</span>
+              </div>
+              <div class="d-flex">
+                <h5>{{ formatearNumero(TOTAL) }}</h5>
+              </div>
+              <div class="d-flex">
+                <!--  -->
+                <h5 class="borderTOP">{{ formatearNumero(TOTAL) }}</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

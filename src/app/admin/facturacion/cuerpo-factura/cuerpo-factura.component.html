@@ -4,8 +4,9 @@
       <tr class="text-center">
         <th class="tiCOD">Codigo</th>
         <th class="tiCAN">Cantidad</th>
-        <th class="tiUNI">Unidad</th>
+        <th class="tiUNI"><span class="ml-3">Unidad</span></th>
         <th class="tiDES">Descripcion</th>
+        <th mdbTooltip="Descuento en %" placement="top" class="tiDESC">Descuento</th>
         <th class="tiPRE">Precio</th>
         <th class="tiTOT">Total</th>
       </tr>
@@ -19,6 +20,8 @@
         <td class="UNI td0padding"></td>
 
         <td class="DES td0padding"></td>
+
+        <td mdbTooltip="Descuento en %" placement="top" class="DESC td0padding"></td>
 
         <td class="PRE td0padding"></td>
 
@@ -38,7 +41,7 @@
                 <td class="COD td0padding">
                   <div class="from-group">
                     <input
-                    [readOnly]="!propietario"
+                      [readOnly]="!propietario"
                       type="text"
                       class="form-control entrada "
                       id="cod-{{ i }}"
@@ -54,7 +57,7 @@
                 <td class="CAN td0padding">
                   <div class="from-group">
                     <input
-                    [readOnly]="!propietario"
+                      [readOnly]="!propietario"
                       type="number"
                       class="form-control entrada "
                       id="can-{{ i }}"
@@ -70,7 +73,7 @@
                 <td class="UNI td0padding">
                   <div class="from-group">
                     <input
-                    [readOnly]="!propietario"
+                      [readOnly]="!propietario"
                       *ngIf="(drop && inputDrop !== secuenciaDelDrop(i)) || (!drop && inputDrop === secuenciaDelDrop(i)) || !drop"
                       type="text"
                       class="form-control entrada "
@@ -98,12 +101,29 @@
                   </div>
                 </td>
 
+                <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
                 <td class="DES td0padding">
                   <div class="from-group">
                     <input type="text" class="form-control entrada inDES " id="des-{{ i }}" formControlName="des" readonly="true" />
                   </div>
                 </td>
 
+                <!--  ::::::::::::  DESCUENTO  ::::::::::::  -->
+                <td class="DESC td0padding">
+                  <div class="from-group">
+                    <input
+                      [readOnly]="!propietario"
+                      type="number"
+                      class="form-control entrada "
+                      id="desc-{{ i }}"
+                      (click)="verificarSecuencia(i)"
+                      (keydown.enter)="enfocarInput('cod-' + (i + 1))"
+                      formControlName="desc"
+                      (blur)="calcularDescuento(i)"
+                    />
+                  </div>
+                </td>
+                <!--  ::::::::::::  PRECIO  ::::::::::::  -->
                 <td class="PRE td0padding">
                   <div class="from-group">
                     <input type="text" class="form-control entrada inPRE " id="pre-{{ i }}" formControlName="pre" readonly="true" />
@@ -123,5 +143,4 @@
     </form>
   </div>
   <!-- <p>{{ rowFactura.value | json }}</p> -->
-  
 </div>

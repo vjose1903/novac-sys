@@ -21,6 +21,9 @@
 .DES {
   max-width: 7rem;
 }
+.DESC {
+  max-width: 1rem;
+}
 .UNI {
   max-width: 1.7rem;
 }
@@ -36,17 +39,22 @@
 // ====================================================
 
 .tiCOD {
-  max-width: 2rem;
+  max-width: 1.6rem;
 }
 .tiCAN {
-  max-width: 0.99rem;
+  max-width: 1.6rem;
 }
 .tiDES {
-  max-width: 7rem;
+  max-width: 4.5rem;
+}
+.tiDESC {
+  max-width: 1rem;
 }
 
 .tiUNI {
-  max-width: 1.7rem;
+  max-width: 1.3rem;
+  text-align: left;
+  
 }
 .tiPRE {
   max-width: 1rem;

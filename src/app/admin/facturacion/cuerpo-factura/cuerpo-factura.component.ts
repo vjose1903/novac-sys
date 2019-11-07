@@ -157,6 +157,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       des: [''],
       uni: [''],
       pre: [''],
+      desc: [''],
       tot: [''],
     });
   }
@@ -193,10 +194,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (input === 'cod-') {
       const unidad = (this.control.controls[i - 1] as any).controls['uni'].value;
 
-      if (unidad === '') {
+      if (unidad === '' || unidad === null) {
         setTimeout(() => {
           this.enfocarInput('uni-' + (i - 1));
-        }, 1);
+        }, 5);
       } else {
         this.UnidadesArticulo = [];
         this.aumentarSecuencia();
@@ -312,6 +313,30 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       const tot = precio * cantidad;
       (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(_.round(tot, 2)));
       this.calculosTotalesGenerales();
+    }
+  }
+
+  calcularDescuento(i) {
+    const precio = (this.control.controls[i] as any).controls['pre'].value;
+    const cantidad = (this.control.controls[i] as any).controls['can'].value;
+
+    let descuento = (this.control.controls[i] as any).controls['desc'].value;
+    const total = precio * cantidad;
+    let calculoDesc = 0;
+    let nuevoTotal = 0;
+
+    if (descuento === 0 || descuento === '0') {
+      (this.control.controls[i] as any).controls['desc'].reset();
+    }
+
+    if (precio !== '' && precio !== null && cantidad !== '' && cantidad != null && descuento !== '' && descuento !== null) {
+      descuento = descuento / 100;
+      calculoDesc = precio * descuento * cantidad;
+      nuevoTotal = total - calculoDesc;
+
+      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(_.round(nuevoTotal, 2)));
+      this.calculosTotalesGenerales();
+      this.aumentarSecuencia();
     }
   }
 

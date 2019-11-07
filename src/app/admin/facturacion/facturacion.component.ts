@@ -33,6 +33,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   element: HTMLElement;
   listaClientes: any;
   propietario_factura: any;
+  tipos_facturas = ['01', '02', '03', '04', '11', '12', '13', '14', '15', '16', '17'];
+
+  public TiposFacturas: string =
+    '<div style=" max-width: 21rem;" ><span>01 Valor fiscal</span><br><span>02 Factura de consumo</span><br><span>03 Nota de debito</span><br><span>04 Nota de credito</span><br><span>11 Comprobante de compras</span><br><span>12 Registro de unico ingreso</span><br> <span>13 Comprobante para gastos menores</span><br> <span>14 Comprobante de regimen especiales</span><br> <span>15 Comprobante gubernamental</span><br> <span>16 Comprobante para exportaciones</span><br> <span>17 Comprobantes para pago al exterior</span><br></div>';
+  showTipos: boolean;
+  tipoFactura: any;
   constructor(private mServ: ModalService, private dbServ: DBservice, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.form = this.fb.group({
       nombre: ['Cliente contado', Validators.required],
@@ -88,7 +94,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       .subscribe(res => {
         this.listaClientes = res;
       });
-    this.enfocarInput('nom');
+    setTimeout(() => {
+      this.enfocarInput('tipoFact');
+    }, 5);
   }
 
   ngOnDestroy(): void {}
@@ -96,12 +104,30 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.TOTAL = arg.Total;
   }
 
-  saltar(e, campo, nombre?) {
-    if (campo === 'dir' && nombre !== null) {
+  verTipos() {
+    this.showTipos = false;
+  }
+  ocultarTipos() {
+    this.showTipos = true;
+  }
+
+  saltar(campo, valor?) {
+    if (campo === 'condicion') {
+      if (this.tipos_facturas.includes(valor)) {
+        this.tipoFactura = valor;
+        this.enfocarInput(campo);
+      } else {
+        this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
+      }
+    }
+    if (campo === 'nom') {
+      this.enfocarInput(campo);
+    }
+    if (campo === 'dir' && valor !== null) {
       this.enfocarInput(campo);
     }
 
-    if (campo === 'cod-0' && nombre !== null) {
+    if (campo === 'cod-0' && valor !== null) {
       this.enfocarInput(campo);
       this.propietario_factura = {
         nombre: this.form.controls.nombre.value,
@@ -125,19 +151,26 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.mostrarModal(true);
   }
 
+  // =============================================
+  //  MODAL CANCELAR
+  // =============================================
   cancelarFactura() {
     this.mServ.modalTipo('cancelar');
     this.abrirModal();
   }
+  // =============================================
+  //  MODAL IMPRIMIR
+  // =============================================
+  imprimirFactura() {
+    this.mServ.modalTipo('imprimir');
+    this.abrirModal();
+  }
 
-  // =============================================
-  //  MODAL
-  // =============================================
   abrirModal(arg?) {
     if (arg) {
       this.mServ.ModalSeleccion(arg);
+      this.mServ.mostrarModal(true);
     }
-    this.mServ.mostrarModal(true);
   }
   decisionModal(arg) {
     const decision = arg;
