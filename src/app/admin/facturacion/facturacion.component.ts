@@ -191,17 +191,28 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   isPart(obj) {
     const x = _.findIndex(this.CuerpoPactura, o => {
-      return o.juego_id === obj.cod;
+      return o.tot === obj.tot;
     });
 
-    return x === -1 ? false : true;
+    return x;
   }
   getCuerpoFactura(arg) {
     const obj = JSON.parse(arg);
     obj.forEach(fila => {
       if (fila.tot !== null) {
-        if (!this.isPart(fila)) {
-          this.CuerpoPactura.push(fila);
+        console.log(fila);
+        console.log(this.isPart(fila));
+        const index = this.isPart(fila);
+
+        if (this.isPart(fila) === -1) {
+          if (this.CuerpoPactura[index] && this.CuerpoPactura[index].cod !== fila.cod) {
+            this.CuerpoPactura.push(fila);
+          }
+        } else {
+          // const index = this.isPart(fila);
+          if (this.CuerpoPactura[index].tot !== fila.tot) {
+            this.CuerpoPactura[index] = fila;
+          }
         }
       }
     });
