@@ -40,7 +40,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     '<div style=" max-width: 21rem;" ><span>01 Valor fiscal</span><br><span>02 Factura de consumo</span><br><span>03 Nota de debito</span><br><span>04 Nota de credito</span><br><span>11 Comprobante de compras</span><br><span>12 Registro de unico ingreso</span><br> <span>13 Comprobante para gastos menores</span><br> <span>14 Comprobante de regimen especiales</span><br> <span>15 Comprobante gubernamental</span><br> <span>16 Comprobante para exportaciones</span><br> <span>17 Comprobantes para pago al exterior</span><br></div>';
   showTipos: boolean;
   tipoFactura: any;
-  CuerpoPactura = [];
+  CuerpoFactura = [];
   constructor(private mServ: ModalService, private dbServ: DBservice, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.form = this.fb.group({
       nombre: ['Cliente contado', Validators.required],
@@ -190,35 +190,73 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   // =============================================
 
   isPart(obj) {
-    const x = _.findIndex(this.CuerpoPactura, o => {
-      return o.tot === obj.tot;
+    const x = _.findIndex(this.CuerpoFactura, o => {
+      return o.cod === obj.cod;
     });
 
     return x;
   }
+
+
   getCuerpoFactura(arg) {
     const obj = JSON.parse(arg);
     obj.forEach(fila => {
       if (fila.tot !== null) {
-        console.log(fila);
-        console.log(this.isPart(fila));
+        // console.log(fila);
+        // console.log(this.isPart(fila));
         const index = this.isPart(fila);
 
         if (this.isPart(fila) === -1) {
-          if (this.CuerpoPactura[index] && this.CuerpoPactura[index].cod !== fila.cod) {
-            this.CuerpoPactura.push(fila);
+          // console.log('NO ES ESTA AUN EN LA LISTA');
+
+          // console.log('===================');
+          // console.log('   fila entrar');
+
+          // console.log('===================');
+          // console.log(fila);
+          // console.log('===================');
+          this.CuerpoFactura.push(fila);
+          if (this.CuerpoFactura[index] && this.CuerpoFactura[index].cod === fila.cod) {
+            _.pullAt(this.CuerpoFactura, index);
           }
         } else {
+          // console.log('SI ESTA EN LA LISTA');
           // const index = this.isPart(fila);
-          if (this.CuerpoPactura[index].tot !== fila.tot) {
-            this.CuerpoPactura[index] = fila;
+          // console.log('===================');
+          // console.log('articulo dentro de la lista ');
+
+          // console.log(this.CuerpoFactura[index]);
+          // console.log('===================');
+
+          // console.log('===================');
+          // console.log('articulo para cambiar de la lista ');
+
+          // console.log(fila);
+          // console.log('===================');
+
+          if (this.CuerpoFactura[index].tot !== fila.tot) {
+            // console.log('===================');
+            // console.log('   fila cambiar');
+            // console.log('===================');
+            // console.log(fila);
+            // console.log('===================');
+            // this.CuerpoFactura[index] = fila;
+            _.pullAt(this.CuerpoFactura, index);
+            this.CuerpoFactura.push(fila);
           }
         }
+        // console.log('');
+        // console.log('');
+        // console.log('=====================');
+        // console.log(this.CuerpoFactura);
+        // console.log('=====================');
+        // console.log('');
+        // console.log('');
       }
     });
   }
 
   IMPRIMIR() {
-    console.log(this.CuerpoPactura);
+    console.log(this.CuerpoFactura);
   }
 }

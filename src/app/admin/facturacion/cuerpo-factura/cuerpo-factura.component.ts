@@ -137,18 +137,24 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   desformatear(sTnum) {
     let temp = 0;
-    if (sTnum !== undefined) {
-      const x = sTnum.split(',');
-      if (x.length === 1) {
-        temp += parseFloat(x[0]);
-        return temp;
-      } else if (x.length >= 2) {
-        let joined = '';
+    console.log(sTnum);
 
-        joined = _.join(x, '');
-        temp += parseFloat(joined);
-        return temp;
+    if (sTnum !== null) {
+      if (sTnum !== undefined) {
+        const x = sTnum.split(',');
+        if (x.length === 1) {
+          temp += parseFloat(x[0]);
+          return temp;
+        } else if (x.length >= 2) {
+          let joined = '';
+          joined = _.join(x, '');
+          temp += parseFloat(joined);
+
+          return temp;
+        }
       }
+    } else {
+      return sTnum;
     }
   }
 
@@ -312,12 +318,15 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   calcularTotalRow(i) {
-    const precio = (this.control.controls[i] as any).controls['pre'].value;
+    const precioTEMP = (this.control.controls[i] as any).controls['pre'].value;
+    const precio = this.desformatear(precioTEMP);
     const cantidad = (this.control.controls[i] as any).controls['can'].value;
 
-    if (precio !== '' && precio !== null && cantidad !== '' && cantidad != null) {
+    if (precio !== null && cantidad !== '' && cantidad != null) {
       const tot = precio * cantidad;
       (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(_.round(tot, 2)));
+      // console.log(_.round(tot,2));
+
       this.calculosTotalesGenerales();
     }
   }
