@@ -9,6 +9,7 @@ import { UsuariosI } from '../../core/models/usuario.model';
 import { profile, TIPOMODAL, SHOWMODAL, SELECCIONMODAL, DECISIONMODAL, INDEXTOFOCUS, OBJDEVUELTO } from '../../core/services/GLOBAL';
 import { get } from 'http';
 import { SharedService } from '../../core/services/shared.service';
+import { DBservice } from '../../core/services/bdservice.service';
 
 const { dialog } = require('electron').remote;
 
@@ -29,7 +30,8 @@ export class NavbarAComponent implements OnInit, OnDestroy {
   showModal;
   tipoModal: any;
   seleccionModal: any;
-  constructor(private shServ: SharedService, private breakpointObserver: BreakpointObserver, public usuariosServices: UsuariosService, private router: Router) {
+  usuario;
+  constructor(private dbServ: DBservice, private breakpointObserver: BreakpointObserver, public usuariosServices: UsuariosService, private router: Router) {
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
@@ -58,6 +60,8 @@ export class NavbarAComponent implements OnInit, OnDestroy {
     // this.sub = profile.subscribe(res => {
     //   this.usuariosServices.profile = res;
     // });
+
+    this.usuario = JSON.parse(this.dbServ.getUsuario());
   }
   ngOnDestroy() {
     // this.sub.unsubscribe();

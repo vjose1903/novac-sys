@@ -65,6 +65,9 @@ export class DBservice {
   createEmpleados(arg) {
     return this.peticion('empleados/register', 'post', JSON.stringify(arg));
   }
+  getUsuario() {
+    return localStorage.getItem('userInfo') || '';
+  }
 
   // =====================================================================
   //  ARCHIVOS

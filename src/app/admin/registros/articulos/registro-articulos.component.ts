@@ -36,7 +36,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     });
 
     this.dbServ.getTipoArticulos().subscribe(res => {
-      this.listaTipoArticulos = res;
+
+      this.listaTipoArticulos = JSON.parse(JSON.stringify(res));
     });
 
     this.createForm();

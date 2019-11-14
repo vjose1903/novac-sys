@@ -34,13 +34,14 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   element: HTMLElement;
   listaClientes: any;
   propietario_factura: any;
-  tipos_facturas = ['01', '02', '03', '04', '11', '12', '13', '14', '15', '16', '17'];
+  tipos_facturas = ['00', '01', '02', '03', '04', '11', '12', '13', '14', '15', '16', '17'];
 
   public TiposFacturas: string =
-    '<div style=" max-width: 21rem;" ><span>01 Valor fiscal</span><br><span>02 Factura de consumo</span><br><span>03 Nota de debito</span><br><span>04 Nota de credito</span><br><span>11 Comprobante de compras</span><br><span>12 Registro de unico ingreso</span><br> <span>13 Comprobante para gastos menores</span><br> <span>14 Comprobante de regimen especiales</span><br> <span>15 Comprobante gubernamental</span><br> <span>16 Comprobante para exportaciones</span><br> <span>17 Comprobantes para pago al exterior</span><br></div>';
+    '<div style=" max-width: 21rem;" ><span>00 Factura sin numeracion</span><br><span>01 Valor fiscal</span><br><span>02 Factura de consumo</span><br><span>03 Nota de debito</span><br><span>04 Nota de credito</span><br><span>11 Comprobante de compras</span><br><span>12 Registro de unico ingreso</span><br> <span>13 Comprobante para gastos menores</span><br> <span>14 Comprobante de regimen especiales</span><br> <span>15 Comprobante gubernamental</span><br> <span>16 Comprobante para exportaciones</span><br> <span>17 Comprobantes para pago al exterior</span><br></div>';
   showTipos: boolean;
   tipoFactura: any;
   CuerpoFactura = [];
+  DESCUENTO: any;
   constructor(private mServ: ModalService, private dbServ: DBservice, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.form = this.fb.group({
       nombre: ['Cliente contado', Validators.required],
@@ -104,6 +105,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {}
   getCalculos(arg) {
     this.TOTAL = arg.Total;
+  }
+  getDescuento(arg) {
+    this.DESCUENTO = arg;
+    console.log(arg);
   }
 
   verTipos() {
@@ -191,12 +196,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   isPart(obj) {
     const x = _.findIndex(this.CuerpoFactura, o => {
-      return o.cod === obj.cod;
+      return o.des === obj.des;
     });
 
     return x;
   }
-
 
   getCuerpoFactura(arg) {
     const obj = JSON.parse(arg);
@@ -216,7 +220,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
           // console.log(fila);
           // console.log('===================');
           this.CuerpoFactura.push(fila);
-          if (this.CuerpoFactura[index] && this.CuerpoFactura[index].cod === fila.cod) {
+          if (this.CuerpoFactura[index] && this.CuerpoFactura[index].des === fila.des) {
             _.pullAt(this.CuerpoFactura, index);
           }
         } else {

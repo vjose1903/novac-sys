@@ -22,6 +22,7 @@ import { Subscription } from 'rxjs';
 import { ModalService } from '../../../components/modal/modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ArticulosService } from '../../../core/services/articulos.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -49,6 +50,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   inputSecuencia = 'cod-0';
   inputDrop = 'uni-0';
   control;
+  llevaDescuento;
 
   @Input() propietario;
 
@@ -56,7 +58,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   // subIndexToFocusModal: Subscription;
 
   @Output() sendCalculos = new EventEmitter<any>();
+  @Output() sendDescuento = new EventEmitter<any>();
   @Output() getCuerpoFactura = new EventEmitter<any>();
+  DESCUENTO = 0;
+  listaDeDescuentos = [];
 
   constructor(
     private artServ: ArticulosService,
@@ -71,17 +76,29 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   ngOnInit() {
     this.form = this.fb.group({
-      rowFactura: this.fb.array([this.createItem()]),
+      rowFactura: this.fb.array([this.createItem(0)]),
     });
 
     this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
 
-    for (let index = 0; index <= 11; index++) {
-      this.addItem();
+    for (let index = 1; index <= 12; index++) {
+      this.addItem(index);
     }
 
-    this.artServ.ARTICULOS.subscribe(res => {
-      this.listaArticulos = res;
+    this.artServ.ARTICULOS.pipe(
+      map(art => {
+        if (art !== undefined) {
+          art = art.map(obj => {
+            obj.seleccionado = false;
+            return obj;
+          });
+          return art;
+        }
+      }),
+    ).subscribe(res => {
+      if (res !== undefined) {
+        this.listaArticulos = res;
+      }
     });
 
     this.mServ.OBJDEVUELTO.subscribe(res => {
@@ -137,7 +154,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   desformatear(sTnum) {
     let temp = 0;
-    console.log(sTnum);
 
     if (sTnum !== null) {
       if (sTnum !== undefined) {
@@ -162,7 +178,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   //  CREAR MAS INPUTS PARA FACTURA
   // =============================================
 
-  createItem(): FormGroup {
+  createItem(i): FormGroup {
     return this.fb.group({
       cod: [null],
       can: [null],
@@ -171,12 +187,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       pre: [null],
       desc: [null],
       tot: [null],
+      secuencia: [i],
     });
   }
 
-  addItem(): void {
+  addItem(i): void {
     this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as FormArray;
-    this.ARRAY_ROWFACTURAS.push(this.createItem());
+    this.ARRAY_ROWFACTURAS.push(this.createItem(i));
   }
 
   removeItem(i: number) {
@@ -198,7 +215,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.enfocarInput(sigInput);
 
     if (i >= 10 && input === 'cod-') {
-      this.addItem();
+      this.addItem(i);
     }
 
     let codigo = (this.control.controls[i] as any).controls['cod'].value;
@@ -241,6 +258,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.shServ.toastError('El codigo introducido no existe', 'ERROR');
       this.enfocarInput('cod-' + i);
     } else {
+      // if()
+      console.log(ARTICULO[0].descripcion);
+      if (ARTICULO[0].descripcion === 'Materia prima') {
+        (this.control.controls[i] as any).controls['desc'].disable();
+      } else {
+        (this.control.controls[i] as any).controls['desc'].enable();
+      }
       (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
       this.verificarRow(i);
       if (ARTICULO[0].is_detallable) {
@@ -259,13 +283,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
           }
         });
-        // this.enfocarInput('cod-' + this.secuencia);
-        // (this.control.controls[i] as any).controls['uni'].setValue(ARTICULO[0].medida);
-        // (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(ARTICULO[0].precio_principal));
-        // this.drop = false;
       }
     }
-    console.log(ARTICULO[0]);
   }
 
   aumentarSecuencia() {
@@ -325,7 +344,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (precio !== null && cantidad !== '' && cantidad != null) {
       const tot = precio * cantidad;
       (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(_.round(tot, 2)));
-      // console.log(_.round(tot,2));
 
       this.calculosTotalesGenerales();
     }
@@ -351,8 +369,29 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
       (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(_.round(nuevoTotal, 2)));
       this.calculosTotalesGenerales();
+      this.calculosDescuentoGeneral(calculoDesc, i);
       this.aumentarSecuencia();
     }
+  }
+
+  calculosDescuentoGeneral(descuento, i) {
+    let acuDesc = 0;
+    const obj = { fila: i, desc: _.round(descuento, 2) };
+    const index = _.findIndex(this.listaDeDescuentos, (o: any) => {
+      return o.fila === obj.fila;
+    });
+
+    if (index !== -1) {
+      this.listaDeDescuentos[index] = obj;
+    } else {
+      this.listaDeDescuentos.push(obj);
+    }
+    this.listaDeDescuentos.forEach(element => {
+      acuDesc = acuDesc + element.desc;
+    });
+
+    this.sendDescuento.emit(acuDesc);
+    
   }
 
   calculosTotalesGenerales() {
@@ -381,7 +420,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   // =============================================
   abrirModal(arg) {
     const obj = arg;
-    obj.listaArticulos = this.listaArticulos;
+    obj.listaArticulos = this.listaArticulos.filter(val => val.seleccionado === false);
     this.mServ.modalTipo('buscar');
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
@@ -397,8 +436,18 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   clickRowModal(arg) {
+    const index = _.findIndex(this.listaArticulos, (o: any) => {
+      return o.codigo === arg.codigo;
+    });
+    this.listaArticulos[index].seleccionado = true;
     (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
     (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
+    console.log(arg.descripcion);
+    if (arg.descripcion === 'Materia prima') {
+      (this.control.controls[arg.index] as any).controls['desc'].disable();
+    } else {
+      (this.control.controls[arg.index] as any).controls['desc'].enable();
+    }
     this.rowActual = arg;
     if (arg.is_detallable) {
       this.drop = true;
