@@ -46,7 +46,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     // abajo 40
 
     setTimeout(() => {
-      console.log('entro');
 
       if (this.focusRow) {
         this.key = event.keyCode;

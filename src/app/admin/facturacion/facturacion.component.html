@@ -105,7 +105,12 @@
     </div>
   </div>
   <div class="cuerpoFactura mb-4">
-    <app-cuerpo-factura [propietario]="propietario_factura" (getCuerpoFactura)="getCuerpoFactura($event)" (sendDescuento)="getDescuento($event)" (sendCalculos)="getCalculos($event)"></app-cuerpo-factura>
+    <app-cuerpo-factura
+      [propietario]="propietario_factura"
+      (getCuerpoFactura)="getCuerpoFactura($event)"
+      (sendDescuento)="getDescuento($event)"
+      (sendCalculos)="getCalculos($event)"
+    ></app-cuerpo-factura>
   </div>
   <div class="pieFactura">
     <div class="row">
@@ -119,11 +124,11 @@
         <div class="d-block mostrarNumeros">
           <div class="row">
             <div class="col-6">
-              <div class="d-flex">
-                <span>ITBIS:</span>
+              <div class="d-flex justify-content-end">
+                <span>BRUTO:</span>
               </div>
               <div class="d-flex">
-                <span>IMPORTE:</span>
+                <span>DESCUENTO:</span>
               </div>
               <div class="d-flex">
                 <!-- class="borderTOP" -->
@@ -132,14 +137,14 @@
             </div>
             <div class="col-6">
               <div class="d-flex">
-                <span class="text-transparent">ITBIS:</span>
+                <span [ngClass]="{ 'text-transparent': BRUTO === 0 }">{{ formatearNumero(BRUTO) }}</span>
               </div>
               <div class="d-flex">
-                <h5>{{ formatearNumero(TOTAL) }}</h5>
+                <span [ngClass]="{ 'text-transparent': DESCUENTO === 0 }">{{ formatearNumero(DESCUENTO) }}</span>
               </div>
               <div class="d-flex">
                 <!--  -->
-                <h5 class="borderTOP">{{ formatearNumero(TOTAL) }}</h5>
+                <h5 [ngClass]="{ 'text-transparent': TOTAL === 0, borderTOP: TOTAL !== 0 }" class="">{{ formatearNumero(TOTAL) }}</h5>
               </div>
             </div>
           </div>

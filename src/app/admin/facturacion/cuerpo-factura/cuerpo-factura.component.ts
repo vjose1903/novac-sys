@@ -85,21 +85,22 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.addItem(index);
     }
 
-    this.artServ.ARTICULOS.pipe(
-      map(art => {
-        if (art !== undefined) {
-          art = art.map(obj => {
-            obj.seleccionado = false;
-            return obj;
-          });
-          return art;
-        }
-      }),
-    ).subscribe(res => {
+    this.artServ.ARTICULOS.subscribe(res => {
       if (res !== undefined) {
         this.listaArticulos = res;
       }
     });
+    // .pipe(
+    //   map(art => {
+    //     if (art !== undefined) {
+    //       art = art.map(obj => {
+    //         obj.seleccionado = false;
+    //         return obj;
+    //       });
+    //       return art;
+    //     }
+    //   }),
+    // )
 
     this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res !== undefined && res.tipoModal !== 'buscarCliente') {
@@ -350,19 +351,23 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   calcularDescuento(i) {
-    const precio = (this.control.controls[i] as any).controls['pre'].value;
+    const precioTEMP = (this.control.controls[i] as any).controls['pre'].value;
+    const precio = this.desformatear(precioTEMP);
     const cantidad = (this.control.controls[i] as any).controls['can'].value;
 
     let descuento = (this.control.controls[i] as any).controls['desc'].value;
+
     const total = precio * cantidad;
     let calculoDesc = 0;
     let nuevoTotal = 0;
 
-    if (descuento === 0 || descuento === '0') {
+    if (descuento === 0 || descuento === '0' || descuento === null || descuento === undefined) {
       (this.control.controls[i] as any).controls['desc'].reset();
+      const total = precio * cantidad;
+      (this.control.controls[i] as any).controls['tot'].setValue(total);
     }
 
-    if (precio !== '' && precio !== null && cantidad !== '' && cantidad != null && descuento !== '' && descuento !== null) {
+    if (precio !== '' && precio !== null && cantidad !== '' && cantidad != null && descuento !== '' && descuento !== null && descuento !== null && descuento !== undefined) {
       descuento = descuento / 100;
       calculoDesc = precio * descuento * cantidad;
       nuevoTotal = total - calculoDesc;
@@ -391,7 +396,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     });
 
     this.sendDescuento.emit(acuDesc);
-    
   }
 
   calculosTotalesGenerales() {
@@ -420,7 +424,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   // =============================================
   abrirModal(arg) {
     const obj = arg;
-    obj.listaArticulos = this.listaArticulos.filter(val => val.seleccionado === false);
+    obj.listaArticulos = this.listaArticulos;
     this.mServ.modalTipo('buscar');
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
@@ -439,7 +443,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const index = _.findIndex(this.listaArticulos, (o: any) => {
       return o.codigo === arg.codigo;
     });
-    this.listaArticulos[index].seleccionado = true;
+    // this.listaArticulos[index].seleccionado = true;
     (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
     (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
     console.log(arg.descripcion);

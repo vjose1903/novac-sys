@@ -20,7 +20,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   form: FormGroup;
   numFac = 0;
   fecha;
-  TOTAL;
+
   ITBIS;
   seleccionModal: any;
   showModal = false;
@@ -41,7 +41,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   showTipos: boolean;
   tipoFactura: any;
   CuerpoFactura = [];
-  DESCUENTO: any;
+  DESCUENTO = 0;
+  BRUTO = 0;
+  TOTAL = 0;
   constructor(private mServ: ModalService, private dbServ: DBservice, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
     this.form = this.fb.group({
       nombre: ['Cliente contado', Validators.required],
@@ -105,10 +107,17 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {}
   getCalculos(arg) {
     this.TOTAL = arg.Total;
+    this.calcularBruto();
   }
   getDescuento(arg) {
     this.DESCUENTO = arg;
-    console.log(arg);
+    this.calcularBruto();
+  }
+
+  calcularBruto() {
+    setTimeout(() => {
+      this.BRUTO = this.TOTAL + this.DESCUENTO;
+    }, 5);
   }
 
   verTipos() {
