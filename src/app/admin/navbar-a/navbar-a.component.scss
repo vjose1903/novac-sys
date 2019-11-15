@@ -160,7 +160,7 @@
 mat-nav-list {
   background-color: #95f0a7;
   overflow: none;
-  height: calc(100% - 50px);
+  height: calc(100% - 32px);
 }
 mat-list-item {
   margin: 2rem 0rem 2rem 0rem;
@@ -189,7 +189,7 @@ mat-list-item {
   border-radius: 50%;
   background-color: #51dba698;
   margin: 5px;
-  padding: 5px 10px 5px 10px;
+  // padding: 5px 10px 5px 10px;
   cursor: pointer;
 }
 #botonMenu:hover {
@@ -197,7 +197,8 @@ mat-list-item {
 }
 .fa-bars:before {
   margin: -12px 0px 0px 0px;
-  position: absolute;
+  transform: translate(8px, 1px)!important;
+  // position: absolute;
 }
 
 /* ============================================== */

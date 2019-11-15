@@ -121,6 +121,7 @@
                       (keydown.enter)="enfocarInput('cod-' + (i + 1))"
                       formControlName="desc"
                       (blur)="calcularDescuento(i)"
+                      (emptied)="calcularDescuento(i)"
                     />
                   </div>
                 </td>

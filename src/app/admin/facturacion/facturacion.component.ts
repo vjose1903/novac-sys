@@ -212,61 +212,31 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   getCuerpoFactura(arg) {
+    this.CuerpoFactura = [];
     const obj = JSON.parse(arg);
-    obj.forEach(fila => {
-      if (fila.tot !== null) {
-        // console.log(fila);
-        // console.log(this.isPart(fila));
-        const index = this.isPart(fila);
+    console.log(obj);
+    this.CuerpoFactura = obj.filter(articulo => articulo.des !== null);
+    console.log(this.CuerpoFactura);
 
-        if (this.isPart(fila) === -1) {
-          // console.log('NO ES ESTA AUN EN LA LISTA');
+    // this.CuerpoFactura = [];
+    // console.log(obj);
 
-          // console.log('===================');
-          // console.log('   fila entrar');
+    // obj.forEach(fila => {
+    //   if (fila.desc !== null) {
+    //     console.log(fila);
 
-          // console.log('===================');
-          // console.log(fila);
-          // console.log('===================');
-          this.CuerpoFactura.push(fila);
-          if (this.CuerpoFactura[index] && this.CuerpoFactura[index].des === fila.des) {
-            _.pullAt(this.CuerpoFactura, index);
-          }
-        } else {
-          // console.log('SI ESTA EN LA LISTA');
-          // const index = this.isPart(fila);
-          // console.log('===================');
-          // console.log('articulo dentro de la lista ');
-
-          // console.log(this.CuerpoFactura[index]);
-          // console.log('===================');
-
-          // console.log('===================');
-          // console.log('articulo para cambiar de la lista ');
-
-          // console.log(fila);
-          // console.log('===================');
-
-          if (this.CuerpoFactura[index].tot !== fila.tot) {
-            // console.log('===================');
-            // console.log('   fila cambiar');
-            // console.log('===================');
-            // console.log(fila);
-            // console.log('===================');
-            // this.CuerpoFactura[index] = fila;
-            _.pullAt(this.CuerpoFactura, index);
-            this.CuerpoFactura.push(fila);
-          }
-        }
-        // console.log('');
-        // console.log('');
-        // console.log('=====================');
-        // console.log(this.CuerpoFactura);
-        // console.log('=====================');
-        // console.log('');
-        // console.log('');
-      }
-    });
+    //     this.CuerpoFactura.push(fila);
+    //     //   if (this.CuerpoFactura[index] && this.CuerpoFactura[index].des === fila.des) {
+    //     //     _.pullAt(this.CuerpoFactura, index);
+    //     //   }
+    //     // } else {
+    //     //   if (this.CuerpoFactura[index].tot !== fila.tot) {
+    //     //     _.pullAt(this.CuerpoFactura, index);
+    //     //     this.CuerpoFactura.push(fila);
+    //     //   }
+    //     // }
+    //   }
+    // });
   }
 
   IMPRIMIR() {
