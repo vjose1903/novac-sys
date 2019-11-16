@@ -6,25 +6,37 @@
   <div class="cabezaFactura ">
     <div class="row">
       <div class="col-xs-12 col-md-2">
-        <ng-template #tipos_facturas><div class="w-75" [innerHtml]="TiposFacturas"></div></ng-template>
-        <h5><strong>Tipo:</strong></h5>
-        <input
-          placement="right"
-          [mdbPopover]="tipos_facturas"
-          triggers="focus"
-          type="text"
-          (keydown.enter)="saltar('condicion', tipoFact.value)"
-          class="form-control tipo"
-          value="02"
-          id="tipoFact"
-          #tipoFact
-        />
+        <div class="row">
+          <div class="col-3 p-0 pl-3">
+            <ng-template #tipos_facturas><div [innerHtml]="TiposFacturas"></div></ng-template>
+            <h5><strong>Tipo:</strong></h5>
+            <input
+              placement="right"
+              [mdbPopover]="tipos_facturas"
+              triggers="focus"
+              type="text"
+              (keydown.enter)="saltar('condicion', tipoFact.value)"
+              class="form-control tipo"
+              value="02"
+              id="tipoFact"
+              #tipoFact
+            />
+          </div>
+          <div class="col-9 ">
+            <h5 ><strong>Condición :</strong></h5>
+            <select id="condicion" (keydown.enter)="saltar('nom', $event.target.value)" class="form-control " name="condicionSelect">
+              <option value="Contado">Contado</option>
+              <option value="Credito">Credito</option>
+            </select>
+          </div>
+        </div>
 
-        <h5 class="mt-2"><strong>Condición :</strong></h5>
-        <select id="condicion" (keydown.enter)="saltar('nom', $event.target.value)" class="form-control " name="condicionSelect">
+        <h5 class="mt-2"><strong>Número comprobante:</strong></h5>
+        <input type="text" class=" form-control" [(ngModel)]="numeroComprobante" [disabled]="true" />
+        <!-- <select id="condicion" (keydown.enter)="saltar('nom', $event.target.value)" class="form-control " name="condicionSelect">
           <option value="Contado">Contado</option>
           <option value="Credito">Credito</option>
-        </select>
+        </select> -->
       </div>
       <!-- ======================================================================================================================================================================== -->
       <!-- ======================================================================================================================================================================== -->
@@ -97,7 +109,7 @@
             Fecha : <strong> {{ fecha }}</strong>
           </div>
           <div class=" encabezadoRigth numFac">
-            Numero Fac. : <strong> 0000000{{ numFac }}</strong>
+            Número Fac. : <strong> 0000000{{ numFac }}</strong>
           </div>
         </div>
         <div class="cuadroTotal">RD$ {{ formatearNumero(TOTAL) }}</div>

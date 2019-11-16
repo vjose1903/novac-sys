@@ -52,6 +52,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   control;
   llevaDescuento;
 
+  sacos = [25, 50, 100];
+
   @Input() propietario;
 
   // subObjDevueltoModal: Subscription;
@@ -259,8 +261,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.shServ.toastError('El codigo introducido no existe', 'ERROR');
       this.enfocarInput('cod-' + i);
     } else {
-      // if()
-      console.log(ARTICULO[0].descripcion);
+      const Libra = ARTICULO[0].contenido_articulos.filter(art => art.medida === 'Libra');
+
+      const precioLibra = Libra[0].precio;
+
       if (ARTICULO[0].descripcion === 'Materia prima') {
         (this.control.controls[i] as any).controls['desc'].disable();
       } else {
@@ -268,24 +272,48 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
       (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
       this.verificarRow(i);
+
       if (ARTICULO[0].is_detallable) {
-        this.drop = true;
-        this.UnidadesArticulo = [];
-        this.UnidadesArticulo.push({ value: ARTICULO[0].medida, precio: ARTICULO[0].precio_principal });
-        ARTICULO[0].contenido_articulos.forEach(element => {
-          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
-        });
+        this.articulo_detallable(ARTICULO[0], precioLibra);
       } else {
-        this.drop = true;
-        this.UnidadesArticulo = [];
-        this.UnidadesArticulo.push({ value: ARTICULO[0].medida, precio: ARTICULO[0].precio_principal });
-        ARTICULO[0].contenido_articulos.forEach(element => {
-          if (element.referencia === null) {
-            this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
-          }
-        });
+        this.articulo_no_detallable(ARTICULO[0], precioLibra);
       }
     }
+  }
+
+  articulo_detallable(art, precioLibra) {
+    this.drop = true;
+    this.UnidadesArticulo = [];
+    if (art.descripcion === 'Veterinaria') {
+      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal });
+    }
+
+    art.contenido_articulos.forEach(element => {
+      console.log(element);
+
+      this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
+    });
+    if (art.descripcion !== 'Veterinaria') {
+      this.entrarSacosAUnidades(precioLibra);
+    }
+  }
+
+  articulo_no_detallable(art, precioLibra) {
+    this.drop = true;
+    this.UnidadesArticulo = [];
+    if (art.descripcion === 'Veterinaria') {
+      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal });
+    }
+    art.contenido_articulos.forEach(element => {
+      if (element.referencia === null) {
+        if (art.descripcion === 'Veterinaria') {
+          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
+        }
+      }
+      if (art.descripcion !== 'Veterinaria') {
+        this.entrarSacosAUnidades(precioLibra);
+      }
+    });
   }
 
   aumentarSecuencia() {
@@ -453,29 +481,33 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       (this.control.controls[arg.index] as any).controls['desc'].enable();
     }
     this.rowActual = arg;
+
+    const Libra = arg.contenido_articulos.filter(art => art.medida === 'Libra');
+
+    const precioLibra = Libra[0].precio;
+    console.log(Libra);
+
     if (arg.is_detallable) {
-      this.drop = true;
-      this.UnidadesArticulo = [];
-      this.UnidadesArticulo.push({ value: arg.medida, precio: arg.precio_principal });
-      arg.contenido_articulos.forEach(element => {
-        this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
-      });
+      this.articulo_detallable(arg, precioLibra);
     } else {
-      this.drop = true;
-      this.UnidadesArticulo = [];
-      this.UnidadesArticulo.push({ value: arg.medida, precio: arg.precio_principal });
-      arg.contenido_articulos.forEach(element => {
-        if (element.referencia === null) {
-          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
-        }
-      });
-      // (this.control.controls[arg.index] as any).controls['uni'].setValue(arg.medida);
-      // (this.control.controls[arg.index] as any).controls['pre'].setValue(this.formatearNumero(arg.precio));
-      // this.drop = false;
+      this.articulo_no_detallable(arg, precioLibra);
     }
 
     const sigInput = 'can-' + arg.index;
     this.enfocarInput(sigInput);
+  }
+
+  entrarSacosAUnidades(precioLibra) {
+    this.sacos.forEach(saco => {
+      const valor = 'Saco de ' + saco + ' libras';
+
+      this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioLibra) });
+    });
+  }
+
+  calcularPrecioSaco(cant, precio) {
+    const res = cant * precio;
+    return _.round(res, 2);
   }
 
   noArticuloEncontrado(arg) {

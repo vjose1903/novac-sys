@@ -31,6 +31,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   UnidadesArticulo: any[];
   tipoModal: string;
 
+  numeroComprobante;
   element: HTMLElement;
   listaClientes: any;
   propietario_factura: any;
@@ -214,9 +215,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   getCuerpoFactura(arg) {
     this.CuerpoFactura = [];
     const obj = JSON.parse(arg);
-    console.log(obj);
+    // console.log(obj);
     this.CuerpoFactura = obj.filter(articulo => articulo.des !== null);
-    console.log(this.CuerpoFactura);
+    // console.log(this.CuerpoFactura);
 
     // this.CuerpoFactura = [];
     // console.log(obj);
