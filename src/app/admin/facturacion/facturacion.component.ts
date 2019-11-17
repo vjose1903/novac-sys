@@ -30,8 +30,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   drop: boolean;
   UnidadesArticulo: any[];
   tipoModal: string;
-
+  condicion_fact = 'Contado';
   numeroComprobante;
+  forma_pago = 'Efectivo';
   element: HTMLElement;
   listaClientes: any;
   propietario_factura: any;
@@ -137,7 +138,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
       }
     }
-    if (campo === 'nom') {
+    if (campo === 'nom' || campo === 'pago') {
       this.enfocarInput(campo);
     }
     if (campo === 'dir' && valor !== null) {
@@ -159,7 +160,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.element.focus();
   }
   // =============================================
-  //  MODAL PARA FILTRAR ARTICULOS
+  //  MODAL PARA FILTRAR CLIENTES
   // =============================================
 
   abrirModalFiltro() {
@@ -215,32 +216,28 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   getCuerpoFactura(arg) {
     this.CuerpoFactura = [];
     const obj = JSON.parse(arg);
-    // console.log(obj);
+
     this.CuerpoFactura = obj.filter(articulo => articulo.des !== null);
-    // console.log(this.CuerpoFactura);
-
-    // this.CuerpoFactura = [];
-    // console.log(obj);
-
-    // obj.forEach(fila => {
-    //   if (fila.desc !== null) {
-    //     console.log(fila);
-
-    //     this.CuerpoFactura.push(fila);
-    //     //   if (this.CuerpoFactura[index] && this.CuerpoFactura[index].des === fila.des) {
-    //     //     _.pullAt(this.CuerpoFactura, index);
-    //     //   }
-    //     // } else {
-    //     //   if (this.CuerpoFactura[index].tot !== fila.tot) {
-    //     //     _.pullAt(this.CuerpoFactura, index);
-    //     //     this.CuerpoFactura.push(fila);
-    //     //   }
-    //     // }
-    //   }
-    // });
   }
 
   IMPRIMIR() {
+    const cabecera_fact = {};
+    cabecera_fact['condicion'] = this.condicion_fact;
+    cabecera_fact['forma_pago'] = this.forma_pago;
+    cabecera_fact['fecha_facturacion'] = new Date();
+    cabecera_fact['hora_facturacion'] = new Date();
+    cabecera_fact['fecha_vencimiento'] = new Date();
+    cabecera_fact['fecha_valida'] = new Date();
+    cabecera_fact['numero_comprobante'] = new Date();
+    cabecera_fact['numero_factura'] = new Date();
+    cabecera_fact['total_factura'] = this.TOTAL;
+    cabecera_fact['itbis'] = this.ITBIS;
+    cabecera_fact['descuento'] = this.DESCUENTO;
+    cabecera_fact['estado'] = new Date();
+
+    const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
+    const tipo_fact = this.tipoFactura;
+
     console.log(this.CuerpoFactura);
   }
 }
