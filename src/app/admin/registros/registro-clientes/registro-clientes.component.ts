@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
-import { ArticulosService } from '../../../core/services/articulos.service';
+import { ObservableServcie } from '../../../core/services/observables.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
@@ -37,7 +37,7 @@ export class RegistroClientesComponent implements OnInit {
   doc_principal: any;
 
   element: HTMLElement;
-  constructor(private artServ: ArticulosService, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {}
+  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.boton = 'Guardar';

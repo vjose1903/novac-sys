@@ -1,18 +1,4 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  AfterViewInit,
-  HostListener,
-  ChangeDetectorRef,
-  Input,
-  Output,
-  EventEmitter,
-  ChangeDetectionStrategy,
-  OnDestroy,
-  OnChanges,
-  ElementRef,
-} from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectionStrategy, OnDestroy, OnChanges, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { SharedService } from '../../../core/services/shared.service';
 import { ActivatedRoute } from '@angular/router';
@@ -21,7 +7,7 @@ import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../../components/modal/modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { ArticulosService } from '../../../core/services/articulos.service';
+import { ObservableServcie } from '../../../core/services/observables.service';
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -66,7 +52,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   listaDeDescuentos = [];
 
   constructor(
-    private artServ: ArticulosService,
+    private artServ: ObservableServcie,
     private dbServ: DBservice,
     private mServ: ModalService,
     private shServ: SharedService,

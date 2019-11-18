@@ -113,7 +113,7 @@
             Fecha : <strong> {{ fecha }}</strong>
           </div>
           <div class=" encabezadoRigth numFac">
-            Número Fac. : <strong> 0000000{{ numFac }}</strong>
+            Número Fac. : <strong> {{ formatoNumeroFactura(this.numFac) }}</strong>
           </div>
         </div>
         <div class="cuadroTotal">RD$ {{ formatearNumero(TOTAL) }}</div>

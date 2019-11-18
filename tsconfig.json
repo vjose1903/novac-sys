@@ -20,7 +20,7 @@
   },
   "include": [
     "main.ts",
-    "src/**/*"
+    "src/**/*", "src/app/core/services/.service.ts"
   ],
   "exclude": [
     "node_modules"

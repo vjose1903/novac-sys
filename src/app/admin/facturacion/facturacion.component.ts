@@ -4,12 +4,14 @@ import { SharedService } from '../../core/services/shared.service';
 import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL } from '../../core/services/GLOBAL';
+
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
 import { isUndefined } from 'ngx-bootstrap/chronos/utils/type-checks';
 import { DBservice } from '../../core/services/bdservice.service';
 import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
+import { ObservableServcie } from '../../core/services/observables.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -39,20 +41,60 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   tipos_facturas = ['00', '01', '02', '03', '04', '11', '12', '13', '14', '15', '16', '17'];
 
   public TiposFacturas: string =
-    '<div style=" max-width: 21rem;" ><span>00 Factura sin numeracion</span><br><span>01 Valor fiscal</span><br><span>02 Factura de consumo</span><br><span>03 Nota de debito</span><br><span>04 Nota de credito</span><br><span>11 Comprobante de compras</span><br><span>12 Registro de unico ingreso</span><br> <span>13 Comprobante para gastos menores</span><br> <span>14 Comprobante de regimen especiales</span><br> <span>15 Comprobante gubernamental</span><br> <span>16 Comprobante para exportaciones</span><br> <span>17 Comprobantes para pago al exterior</span><br></div>';
+    '<div style=" max-width: 21rem;" ><span>00 Factura sin comprobante</span><br><span>01 Valor fiscal</span><br><span>02 Factura de consumo</span><br><span>03 Nota de debito</span><br><span>04 Nota de credito</span><br><span>11 Comprobante de compras</span><br><span>12 Registro de unico ingreso</span><br> <span>13 Comprobante para gastos menores</span><br> <span>14 Comprobante de regimen especiales</span><br> <span>15 Comprobante gubernamental</span><br> <span>16 Comprobante para exportaciones</span><br> <span>17 Comprobantes para pago al exterior</span><br></div>';
+
   showTipos: boolean;
   tipoFactura: any;
   CuerpoFactura = [];
   DESCUENTO = 0;
   BRUTO = 0;
   TOTAL = 0;
-  constructor(private mServ: ModalService, private dbServ: DBservice, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {
+  lista_tipos_facturas: any;
+  lista_secuencia_facturas: any;
+  secuenciaVenta: any;
+  constructor(
+    private mServ: ModalService,
+    private obsServ: ObservableServcie,
+    private dbServ: DBservice,
+    private shServ: SharedService,
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+  ) {
     this.form = this.fb.group({
       nombre: ['Cliente contado', Validators.required],
       direccion: ['Autopista duarte KM 0 el Higuero', Validators.required],
       telefono: [],
     });
   }
+
+  formatoNumeroFactura(num) {
+    if (num >= 0 && num <= 9) {
+      return '0000000' + num;
+    }
+    if (num >= 10 && num <= 99) {
+      return '000000' + num;
+    }
+    if (num >= 100 && num <= 999) {
+      return '00000' + num;
+    }
+    if (num >= 1000 && num <= 9999) {
+      return '0000' + num;
+    }
+    if (num >= 10000 && num <= 99999) {
+      return '000' + num;
+    }
+    if (num >= 100000 && num <= 999999) {
+      return '00' + num;
+    }
+    if (num >= 1000000 && num <= 9999999) {
+      return '0' + num;
+    }
+    if (num >= 10000000 && num <= 99999999) {
+      return num;
+    }
+  }
+  formatoComprobante() {}
+
   formatearNumero(nStr) {
     if (nStr !== undefined) {
       nStr += '';
@@ -104,6 +146,27 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.enfocarInput('tipoFact');
     }, 5);
+
+    this.obsServ.TIPOS_FACTURAS.subscribe(res => {
+      if (res !== undefined) {
+        this.lista_tipos_facturas = res;
+        console.log('tipos');
+        console.log(res);
+      }
+    });
+    this.obsServ.SECUENCIA_FACTURAS.subscribe(res => {
+      if (res !== undefined) {
+        this.lista_secuencia_facturas = res;
+
+        this.secuenciaVenta = res.filter(secu => secu.tipo_factura_id === 13);
+        this.numFac = this.secuenciaVenta[0].secuencia;
+
+        console.log('secuencia');
+        // console.log(res);
+        // console.log(this.secuenciaVenta);
+        console.log(this.formatoNumeroFactura(this.numFac));
+      }
+    });
   }
 
   ngOnDestroy(): void {}

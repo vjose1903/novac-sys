@@ -100,6 +100,16 @@ export class DBservice {
   }
 
   // =====================================================================
+  // FACTURAS
+  // =====================================================================
+  getTiposFacturas() {
+    return this.peticion('tipo_facturas', 'get');
+  }
+  getSecuenciaFacturas() {
+    return this.peticion('secuencia_facturas', 'get');
+  }
+
+  // =====================================================================
   // TOASTS
   // =====================================================================
   toastSuccess(msg?, titulo?) {

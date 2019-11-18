@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { TABLA } from '../../../components/tablas/tabla';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as moment from 'moment';
-import { ArticulosService } from '../../../core/services/articulos.service';
+import { ObservableServcie } from '../../../core/services/observables.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -26,7 +26,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   listaArticulos = [];
   FORM: any;
   listaTipoArticulos: any;
-  constructor(private artServ: ArticulosService, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
 
