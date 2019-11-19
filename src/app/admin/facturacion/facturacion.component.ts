@@ -67,33 +67,23 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     });
   }
 
-  formatoNumeroFactura(num) {
-    if (num >= 0 && num <= 9) {
-      return '0000000' + num;
-    }
-    if (num >= 10 && num <= 99) {
-      return '000000' + num;
-    }
-    if (num >= 100 && num <= 999) {
-      return '00000' + num;
-    }
-    if (num >= 1000 && num <= 9999) {
-      return '0000' + num;
-    }
-    if (num >= 10000 && num <= 99999) {
-      return '000' + num;
-    }
-    if (num >= 100000 && num <= 999999) {
-      return '00' + num;
-    }
-    if (num >= 1000000 && num <= 9999999) {
-      return '0' + num;
-    }
-    if (num >= 10000000 && num <= 99999999) {
-      return num;
+  formatoNumerosMasCero(num) {
+    return _.padStart(num.toString(), 8, '0');
+  }
+  formatearComprobante(ref) {
+    let num = 1572;
+
+    const objTipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === ref);
+
+    const objSecuenciaFact = this.lista_secuencia_facturas.filter(secu => secu.tipo_factura_id === objTipoFact[0].id);
+
+    num = objSecuenciaFact[0].secuencia;
+    if (ref === '00') {
+      this.numeroComprobante = null;
+    } else {
+      this.numeroComprobante = 'B' + ref + this.formatoNumerosMasCero(num);
     }
   }
-  formatoComprobante() {}
 
   formatearNumero(nStr) {
     if (nStr !== undefined) {
@@ -149,22 +139,23 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     this.obsServ.TIPOS_FACTURAS.subscribe(res => {
       if (res !== undefined) {
-        this.lista_tipos_facturas = res;
         console.log('tipos');
+
         console.log(res);
+        console.log('==================');
+        this.lista_tipos_facturas = res;
       }
     });
     this.obsServ.SECUENCIA_FACTURAS.subscribe(res => {
       if (res !== undefined) {
         this.lista_secuencia_facturas = res;
+        console.log('secuencia');
 
+        console.log(res);
+
+        console.log('==================');
         this.secuenciaVenta = res.filter(secu => secu.tipo_factura_id === 13);
         this.numFac = this.secuenciaVenta[0].secuencia;
-
-        console.log('secuencia');
-        // console.log(res);
-        // console.log(this.secuenciaVenta);
-        console.log(this.formatoNumeroFactura(this.numFac));
       }
     });
   }
@@ -196,6 +187,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (campo === 'condicion') {
       if (this.tipos_facturas.includes(valor)) {
         this.tipoFactura = valor;
+        this.formatearComprobante(valor);
         this.enfocarInput(campo);
       } else {
         this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
