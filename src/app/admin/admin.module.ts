@@ -20,11 +20,13 @@ import { BTNcircularComponent } from '../components/btncircular/btncircular.comp
 import { RegistroClientesComponent } from './registros/registro-clientes/registro-clientes.component';
 import { UploadImgComponent } from '../components/upload-img/upload-img.component';
 import { ValidateRayaAbajo } from '../directives/validaciones';
+import { FiltroParaNgforPipe } from '../pipe/filtro-para-ngfor.pipe';
 
 @NgModule({
   declarations: [
     HomeAdminComponent,
     ModalComponent,
+    FiltroParaNgforPipe,
     NavbarAComponent,
     FacturacionComponent,
     InventarioComponent,

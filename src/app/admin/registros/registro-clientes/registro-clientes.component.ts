@@ -29,7 +29,6 @@ export class RegistroClientesComponent implements OnInit {
 
   documento_identidad = true;
 
-  
   phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   rncMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
@@ -53,14 +52,13 @@ export class RegistroClientesComponent implements OnInit {
                   cli.documento_identidad = docu.documento;
                 }
               });
-
               return cli;
             })),
         ),
       )
       .subscribe(res => {
         this.listaClientes = res;
-        console.log(this.listaClientes);
+        this.quitarContadoDeLista();
       });
 
     this.form = this.fb.group({
@@ -73,6 +71,21 @@ export class RegistroClientesComponent implements OnInit {
       cedula: [null, ValidateRayaAbajo.verificarRayaAbajo],
     });
   }
+
+  quitarContadoDeLista() {
+    const temp = JSON.parse(JSON.stringify(this.listaClientes));
+    this.listaClientes = [];
+    const cliente = temp.filter(cli => cli.nombre === 'Cliente contado');
+    const index = _.indexOf(temp, cliente[0]);
+
+    _.pullAt(temp, index);
+    this.listaClientes = temp;
+  }
+
+  Filtro(filtro: any) {
+    return filtro.id !== 1;
+  }
+
   getPhotoData(img) {
     this.PhotoData = img;
   }
@@ -93,7 +106,10 @@ export class RegistroClientesComponent implements OnInit {
 
     const temp = JSON.parse(JSON.stringify(arg.value));
     const documentos_identidad = [];
-    const temp_documentos_identidad = [{ doc: temp.cedula, descripcion: 'cedula' }, { doc: temp.rnc, descripcion: 'rnc' }];
+    const temp_documentos_identidad = [
+      { doc: temp.cedula, descripcion: 'cedula' },
+      { doc: temp.rnc, descripcion: 'rnc' },
+    ];
 
     temp.documentos_identidad_attributes = null;
     if (this.validarRayaAbajo('telefono')) {

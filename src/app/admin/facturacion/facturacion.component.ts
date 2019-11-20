@@ -37,7 +37,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   forma_pago = 'Efectivo';
   element: HTMLElement;
   listaClientes: any;
-  propietario_factura: any;
+  propietario_factura = {
+    id: 1,
+    nombre: 'Cliente contado',
+    direccion: 'Autopista duarte KM 0 el Higuero',
+    telefono: null,
+  };
   tipos_facturas = ['00', '01', '02', '03', '04', '11', '12', '13', '14', '15', '16', '17'];
 
   public TiposFacturas: string =
@@ -61,29 +66,30 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
   ) {
     this.form = this.fb.group({
+      id: [],
       nombre: ['Cliente contado', Validators.required],
       direccion: ['Autopista duarte KM 0 el Higuero', Validators.required],
       telefono: [],
     });
   }
 
-  formatoNumerosMasCero(num) {
-    return _.padStart(num.toString(), 8, '0');
-  }
-  formatearComprobante(ref) {
-    let num = 1572;
+  // formatoNumerosMasCero(num) {
+  //   return _.padStart(num.toString(), 8, '0');
+  // }
+  // formatearComprobante(ref) {
+  //   let num = 1572;
 
-    const objTipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === ref);
+  //   const objTipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === ref);
 
-    const objSecuenciaFact = this.lista_secuencia_facturas.filter(secu => secu.tipo_factura_id === objTipoFact[0].id);
+  //   const objSecuenciaFact = this.lista_secuencia_facturas.filter(secu => secu.tipo_factura_id === objTipoFact[0].id);
 
-    num = objSecuenciaFact[0].secuencia;
-    if (ref === '00') {
-      this.numeroComprobante = null;
-    } else {
-      this.numeroComprobante = 'B' + ref + this.formatoNumerosMasCero(num);
-    }
-  }
+  //   num = objSecuenciaFact[0].secuencia;
+  //   if (ref === '00') {
+  //     this.numeroComprobante = null;
+  //   } else {
+  //     this.numeroComprobante = 'B' + ref + this.formatoNumerosMasCero(num);
+  //   }
+  // }
 
   formatearNumero(nStr) {
     if (nStr !== undefined) {
@@ -106,6 +112,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       if (res !== undefined && res.tipoModal === 'buscarCliente') {
         this.propietario_factura = res;
         this.form.patchValue(this.propietario_factura);
+        console.log(res);
+
         this.enfocarInput('cod-0');
       }
     });
@@ -187,7 +195,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (campo === 'condicion') {
       if (this.tipos_facturas.includes(valor)) {
         this.tipoFactura = valor;
-        this.formatearComprobante(valor);
+        // this.formatearComprobante(valor);
         this.enfocarInput(campo);
       } else {
         this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
@@ -203,6 +211,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (campo === 'cod-0' && valor !== null) {
       this.enfocarInput(campo);
       this.propietario_factura = {
+        id: 0,
         nombre: this.form.controls.nombre.value,
         direccion: this.form.controls.direccion.value,
         telefono: this.form.controls.telefono.value,
@@ -219,9 +228,20 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   // =============================================
 
   abrirModalFiltro() {
+    this.quitarContadoDeLista();
     this.mServ.modalTipo('buscarCliente');
     this.mServ.ModalSeleccion(this.listaClientes);
     this.mServ.mostrarModal(true);
+  }
+
+  quitarContadoDeLista() {
+    const temp = JSON.parse(JSON.stringify(this.listaClientes));
+    this.listaClientes = [];
+    const cliente = temp.filter(cli => cli.nombre === 'Cliente contado');
+    const index = _.indexOf(temp, cliente[0]);
+
+    _.pullAt(temp, index);
+    this.listaClientes = temp;
   }
 
   // =============================================
@@ -276,23 +296,28 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   IMPRIMIR() {
-    const cabecera_fact = {};
-    cabecera_fact['condicion'] = this.condicion_fact;
-    cabecera_fact['forma_pago'] = this.forma_pago;
-    cabecera_fact['fecha_facturacion'] = new Date();
-    cabecera_fact['hora_facturacion'] = new Date();
-    cabecera_fact['fecha_vencimiento'] = new Date();
-    cabecera_fact['fecha_valida'] = new Date();
-    cabecera_fact['numero_comprobante'] = new Date();
-    cabecera_fact['numero_factura'] = new Date();
-    cabecera_fact['total_factura'] = this.TOTAL;
-    cabecera_fact['itbis'] = this.ITBIS;
-    cabecera_fact['descuento'] = this.DESCUENTO;
-    cabecera_fact['estado'] = new Date();
+    if (!this.propietario_factura) {
+      this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
+    } else {
+      const cabecera_fact = {};
+      cabecera_fact['condicion'] = this.condicion_fact;
+      cabecera_fact['forma_pago'] = this.forma_pago;
+      cabecera_fact['fecha_facturacion'] = new Date();
 
-    const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
-    const tipo_fact = this.tipoFactura;
+      cabecera_fact['fecha_vencimiento'] = new Date();
+      cabecera_fact['fecha_valida'] = new Date();
+      cabecera_fact['numero_comprobante'] = null;
+      cabecera_fact['numero_factura'] = null;
+      cabecera_fact['total_factura'] = this.TOTAL;
+      cabecera_fact['itbis'] = this.ITBIS;
+      cabecera_fact['descuento'] = this.DESCUENTO;
+      cabecera_fact['estado'] = true;
+      cabecera_fact['tipo_factura_id'] = this.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
+      cabecera_fact['cliente_id'] = this.propietario_factura.id;
 
-    console.log(this.CuerpoFactura);
+      const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
+
+      console.log(this.CuerpoFactura);
+    }
   }
 }
