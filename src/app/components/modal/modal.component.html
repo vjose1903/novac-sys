@@ -82,8 +82,8 @@
     id="tablaSearch"
     (onShow)="prueba()"
   >
+  <!-- *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos" -->
     <app-tablas
-      *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos"
       [focusRow]="true"
       [paraFiltroArticulos]="paraFiltroArticulos"
       (clickRow)="devolverCLick($event)"

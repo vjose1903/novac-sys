@@ -240,6 +240,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   buscarArticuloPorCodigo(i, codigo) {
+    let precioLibra;
     this.inputDrop = 'uni-' + i;
     // const ls = this.TodosLosSorteos.filter(val => val.loteria_id === idLoteria);
     const ARTICULO = this.listaArticulos.filter(articulo => articulo.codigo === codigo);
@@ -248,8 +249,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.enfocarInput('cod-' + i);
     } else {
       const Libra = ARTICULO[0].contenido_articulos.filter(art => art.medida === 'Libra');
+      console.log(Libra.length);
 
-      const precioLibra = Libra[0].precio;
+      if (Libra.length !== 0) {
+        precioLibra = Libra[0].precio;
+      }
 
       if (ARTICULO[0].descripcion === 'Materia prima') {
         (this.control.controls[i] as any).controls['desc'].disable();
@@ -454,6 +458,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   clickRowModal(arg) {
+    let precioLibra;
     const index = _.findIndex(this.listaArticulos, (o: any) => {
       return o.codigo === arg.codigo;
     });
@@ -469,8 +474,14 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.rowActual = arg;
 
     const Libra = arg.contenido_articulos.filter(art => art.medida === 'Libra');
+    console.log('============');
 
-    const precioLibra = Libra[0].precio;
+    console.log(Libra.length);
+    console.log('============');
+
+    if (Libra.length !== 0) {
+      precioLibra = Libra[0].precio;
+    }
     console.log(Libra);
 
     if (arg.is_detallable) {

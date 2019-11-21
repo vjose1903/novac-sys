@@ -23,7 +23,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   numFac = 0;
   fecha;
 
-  ITBIS;
+  ITBIS = 0;
   seleccionModal: any;
   showModal = false;
   modalSearch: boolean;
@@ -37,12 +37,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   forma_pago = 'Efectivo';
   element: HTMLElement;
   listaClientes: any;
-  propietario_factura = {
-    id: 1,
-    nombre: 'Cliente contado',
-    direccion: 'Autopista duarte KM 0 el Higuero',
-    telefono: null,
-  };
+  propietario_factura;
+  // propietario_factura = {
+  //   id: 1,
+  //   nombre: 'Cliente contado',
+  //   direccion: 'Autopista duarte KM 0 el Higuero',
+  //   telefono: null,
+  // };
   tipos_facturas = ['00', '01', '02', '03', '04', '11', '12', '13', '14', '15', '16', '17'];
 
   public TiposFacturas: string =
@@ -66,7 +67,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
   ) {
     this.form = this.fb.group({
-      id: [],
+      id: [1],
       nombre: ['Cliente contado', Validators.required],
       direccion: ['Autopista duarte KM 0 el Higuero', Validators.required],
       telefono: [],
@@ -209,13 +210,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
 
     if (campo === 'cod-0' && valor !== null) {
-      this.enfocarInput(campo);
-      this.propietario_factura = {
-        id: 0,
-        nombre: this.form.controls.nombre.value,
-        direccion: this.form.controls.direccion.value,
-        telefono: this.form.controls.telefono.value,
-      };
+      if (this.condicion_fact !== 'Credito' && !this.propietario_factura) {
+        this.enfocarInput(campo);
+      } else {
+        this.dbServ.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
+      }
     }
   }
 
@@ -295,29 +294,40 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.CuerpoFactura = obj.filter(articulo => articulo.des !== null);
   }
 
+  p() {}
+
   IMPRIMIR() {
     if (!this.propietario_factura) {
       this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
     } else {
+      const TipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
+
+      const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
+
       const cabecera_fact = {};
       cabecera_fact['condicion'] = this.condicion_fact;
       cabecera_fact['forma_pago'] = this.forma_pago;
-      cabecera_fact['fecha_facturacion'] = new Date();
-
-      cabecera_fact['fecha_vencimiento'] = new Date();
-      cabecera_fact['fecha_valida'] = new Date();
+      cabecera_fact['fecha_facturacion'] = moment(new Date()).format('DD/MM/YYYY');
+      if (this.condicion_fact === 'Credito') {
+        cabecera_fact['fecha_vencimiento'] = moment(new Date())
+          .add(this.propietario_factura.limite_credito, 'days')
+          .format('DD/MM/YYYY');
+      }
+      cabecera_fact['fecha_valida'] = moment(new Date())
+        .add(1, 'year')
+        .format('DD/MM/YYYY');
       cabecera_fact['numero_comprobante'] = null;
       cabecera_fact['numero_factura'] = null;
       cabecera_fact['total_factura'] = this.TOTAL;
       cabecera_fact['itbis'] = this.ITBIS;
       cabecera_fact['descuento'] = this.DESCUENTO;
       cabecera_fact['estado'] = true;
-      cabecera_fact['tipo_factura_id'] = this.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
+      cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
       cabecera_fact['cliente_id'] = this.propietario_factura.id;
 
-      const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
+      cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
 
-      console.log(this.CuerpoFactura);
+      console.log(cabecera_fact);
     }
   }
 }

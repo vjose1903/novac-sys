@@ -68,6 +68,7 @@ export class RegistroClientesComponent implements OnInit {
       sexo: ['', Validators.required],
       telefono: [null, Validators.required],
       rnc: [null, ValidateRayaAbajo.verificarRayaAbajo],
+      limite_credito: ['', Validators.required],
       cedula: [null, ValidateRayaAbajo.verificarRayaAbajo],
     });
   }
@@ -164,6 +165,7 @@ export class RegistroClientesComponent implements OnInit {
             this.listaClientes = [...this.listaClientes, obj];
 
             this.form.reset();
+            this.doc_principal = null;
             this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
             this.element = document.getElementById('campoNombre') as HTMLElement;
             this.element.focus();
