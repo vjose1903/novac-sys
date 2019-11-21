@@ -50,6 +50,16 @@ export class DBservice {
   }
 
   // =====================================================================
+  // FActuras
+  // =====================================================================
+  getFacturas() {
+    return this.peticion('cabecera_facturas', 'get');
+  }
+
+  createFacturas(arg) {
+    return this.peticion('cabecera_facturas', 'post', JSON.stringify(arg));
+  }
+  // =====================================================================
   // CLIENTES
   // =====================================================================
   getClientes() {

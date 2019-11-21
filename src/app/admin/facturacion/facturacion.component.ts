@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
 import { isUndefined } from 'ngx-bootstrap/chronos/utils/type-checks';
 import { DBservice } from '../../core/services/bdservice.service';
-import { map } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { ObservableServcie } from '../../core/services/observables.service';
 
@@ -212,6 +212,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (campo === 'cod-0' && valor !== null) {
       if (this.condicion_fact !== 'Credito' && !this.propietario_factura) {
         this.enfocarInput(campo);
+        const cliente = this.listaClientes.filter(cli => cli.nombre === 'Cliente contado');
+        this.propietario_factura = cliente[0];
       } else {
         this.dbServ.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
       }
@@ -307,15 +309,17 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       const cabecera_fact = {};
       cabecera_fact['condicion'] = this.condicion_fact;
       cabecera_fact['forma_pago'] = this.forma_pago;
-      cabecera_fact['fecha_facturacion'] = moment(new Date()).format('DD/MM/YYYY');
+      cabecera_fact['fecha_facturacion'] = null;
       if (this.condicion_fact === 'Credito') {
         cabecera_fact['fecha_vencimiento'] = moment(new Date())
           .add(this.propietario_factura.limite_credito, 'days')
           .format('DD/MM/YYYY');
       }
+
       cabecera_fact['fecha_valida'] = moment(new Date())
         .add(1, 'year')
         .format('DD/MM/YYYY');
+
       cabecera_fact['numero_comprobante'] = null;
       cabecera_fact['numero_factura'] = null;
       cabecera_fact['total_factura'] = this.TOTAL;
@@ -327,6 +331,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
       cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
 
+      this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
+        console.log(res);
+      });
       console.log(cabecera_fact);
     }
   }

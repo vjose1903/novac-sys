@@ -110,6 +110,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     this.form.valueChanges.subscribe(res => {
       if (res !== undefined) {
+        const obj = {};
+        res.forEach(fila => {
+          const articulo = this.listaArticulos.filter(art => art.codigo === fila.cod);
+          console.log(articulo[0]);
+        });
+
         this.getCuerpoFactura.emit(JSON.stringify(res.rowFactura));
       }
     });
@@ -169,6 +175,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   createItem(i): FormGroup {
     return this.fb.group({
+      id: [],
       cod: [null],
       can: [null],
       des: [null],
