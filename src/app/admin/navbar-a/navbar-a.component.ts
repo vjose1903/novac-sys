@@ -61,7 +61,7 @@ export class NavbarAComponent implements OnInit, OnDestroy {
     //   this.usuariosServices.profile = res;
     // });
 
-    this.usuario = JSON.parse(this.dbServ.getUsuario());
+    this.usuario = JSON.parse(this.dbServ.getEmpleado());
   }
   ngOnDestroy() {
     // this.sub.unsubscribe();

@@ -109,14 +109,25 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     });
 
     this.form.valueChanges.subscribe(res => {
+      const detalle_factura = [];
       if (res !== undefined) {
         const obj = {};
-        res.forEach(fila => {
-          const articulo = this.listaArticulos.filter(art => art.codigo === fila.cod);
-          console.log(articulo[0]);
-        });
 
-        this.getCuerpoFactura.emit(JSON.stringify(res.rowFactura));
+        res.rowFactura.forEach(fila => {
+          const articulo = this.listaArticulos.filter(art => art.codigo === fila.cod);
+
+          if (fila !== undefined && articulo.length > 0) {
+            fila.articulo_id = articulo[0].id;
+            fila.cantidad = fila.can;
+            fila.total = this.desformatear(fila.tot);
+            fila.descuento = fila.desc ? (fila.desc !== null ? fila.desc : 0) : 0;
+            fila.itbis = 0;
+            fila.unidad = fila.uni;
+            const lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'desc', 'tot', 'secuencia']);
+            detalle_factura.push(JSON.parse(JSON.stringify(lol)));
+          }
+        });
+        this.getCuerpoFactura.emit(JSON.stringify(detalle_factura));
       }
     });
   }

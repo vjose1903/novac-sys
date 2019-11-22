@@ -293,7 +293,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.CuerpoFactura = [];
     const obj = JSON.parse(arg);
 
-    this.CuerpoFactura = obj.filter(articulo => articulo.des !== null);
+    this.CuerpoFactura = obj;
+    console.log(this.CuerpoFactura);
   }
 
   p() {}
@@ -302,6 +303,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (!this.propietario_factura) {
       this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
     } else {
+      const empleado = JSON.parse(this.dbServ.getEmpleado());
       const TipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
 
       const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
@@ -330,7 +332,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['cliente_id'] = this.propietario_factura.id;
 
       cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
-
+      cabecera_fact['FACTURA_DE'] = 13;
+      cabecera_fact['tipo'] = 'venta';
+      cabecera_fact['user_id'] = empleado.id;
       this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
         console.log(res);
       });

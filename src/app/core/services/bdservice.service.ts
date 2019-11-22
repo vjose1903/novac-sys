@@ -71,11 +71,13 @@ export class DBservice {
   // =====================================================================
   // USUARIOS
   // =====================================================================
+
   getEmpleados() {}
+
   createEmpleados(arg) {
     return this.peticion('empleados/register', 'post', JSON.stringify(arg));
   }
-  getUsuario() {
+  getEmpleado() {
     return localStorage.getItem('userInfo') || '';
   }
 
