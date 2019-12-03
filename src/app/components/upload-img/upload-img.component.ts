@@ -50,15 +50,16 @@ export class UploadImgComponent implements OnInit {
     const files = ev.target.files;
     const reader = new FileReader();
     const file = files[0];
-
+    
     if (files && files.length > 0) {
       reader.readAsDataURL(file);
-
+      
       reader.onload = e => {
         const bas64 = reader.result.toString().split(',')[1];
         this.FILE_NAME = files[0].name;
         this.BASE_64 = bas64;
         this.imageSrc = reader.result;
+        console.log(reader.result);
       };
     }
     const img = {

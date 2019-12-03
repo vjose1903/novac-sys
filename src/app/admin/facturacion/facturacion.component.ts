@@ -12,6 +12,7 @@ import { DBservice } from '../../core/services/bdservice.service';
 import { map, filter } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { ObservableServcie } from '../../core/services/observables.service';
+import { PdfService } from '../../core/services/pdf.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -64,6 +65,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     private dbServ: DBservice,
     private shServ: SharedService,
     private fb: FormBuilder,
+    private pdfServ: PdfService,
     private route: ActivatedRoute,
   ) {
     this.form = this.fb.group({
@@ -337,8 +339,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['user_id'] = empleado.id;
       this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
         console.log(res);
+        console.log(this.pdfServ.cabeceraFacturaVenta(res));
       });
-      console.log(cabecera_fact);
+      // console.log(cabecera_fact);
     }
   }
 }

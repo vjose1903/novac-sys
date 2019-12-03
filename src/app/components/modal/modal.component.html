@@ -12,6 +12,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
+    blockScroll="false"
   >
     <p>Desea eliminar {{ seleccionModal.nombre }}</p>
     <p-footer>
@@ -34,6 +35,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
+    blockScroll="false"
   >
     <p>Seguro que desea cancelar la factura</p>
     <p-footer>
@@ -56,6 +58,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
+    blockScroll="false"
   >
     <p>Seguro que desea imprimir la factura</p>
     <p-footer>
@@ -81,8 +84,9 @@
     (onHide)="reinicioModal()"
     id="tablaSearch"
     (onShow)="prueba()"
+    blockScroll="false"
   >
-  <!-- *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos" -->
+    <!-- *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos" -->
     <app-tablas
       [focusRow]="true"
       [paraFiltroArticulos]="paraFiltroArticulos"
@@ -111,6 +115,7 @@
     [minY]="70"
     (onHide)="reinicioModal()"
     (onShow)="prueba()"
+    blockScroll="false"
   >
     <app-tablas
       *ngIf="seleccionModal"
