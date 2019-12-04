@@ -55,6 +55,9 @@ export class DBservice {
   getFacturas() {
     return this.peticion('cabecera_facturas', 'get');
   }
+  getFacturaById(id) {
+    return this.peticion(`cabecera_facturas/${id}`, 'get');
+  }
 
   createFacturas(arg) {
     return this.peticion('cabecera_facturas', 'post', JSON.stringify(arg));

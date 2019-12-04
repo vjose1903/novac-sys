@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-
+import pdfMake from 'pdfmake/build/pdfmake';
 @Injectable({
   providedIn: 'root',
 })
@@ -184,5 +184,15 @@ export class PdfService {
     return header;
   }
 
-  makeFacturaVenta(data) {}
+  makeFacturaVenta(data) {
+    var dd = {
+      pageSize: { width: 750, height: 480 },
+      pageMargins: [30, 185, 30, 40],
+      header: this.cabeceraFacturaVenta(data),
+      images: '../../../assets/img/logoBlancoNegro.jpg',
+    };
+
+    const win = window.open('', '_blank');
+    pdfMake.createPdf(dd).open({}, win);
+  }
 }

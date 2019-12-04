@@ -338,8 +338,15 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['tipo'] = 'venta';
       cabecera_fact['user_id'] = empleado.id;
       this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
-        console.log(res);
-        console.log(this.pdfServ.cabeceraFacturaVenta(res));
+        
+            console.log(res);
+            this.pdfServ.makeFacturaVenta(res);
+            console.log(this.pdfServ.cabeceraFacturaVenta(res));
+
+        // this.dbServ.getFacturaById(res.id).subscribe(res => {
+        //   if (res) {
+        //   }
+        // });
       });
       // console.log(cabecera_fact);
     }
