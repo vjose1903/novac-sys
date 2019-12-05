@@ -13,7 +13,7 @@
 }
 
 .titulo {
-  font-family: 'Lobster';
+  font-family: "Lobster";
   font-size: 2rem;
   color: #0b4a18;
   padding: 0;
@@ -71,7 +71,7 @@
 
   &:hover .tituloMenu1,
   .tituloMenu1A {
-    transform: scale(1) translate(0px, -130px);
+    transform: scale(1) translate(0px, -6rem);
   }
 }
 
@@ -83,7 +83,7 @@
 
   &:hover .tituloMenu2,
   .tituloMenu2A {
-    transform: scale(1) translate(0px, -130px);
+    transform: scale(1) translate(0px, -6rem);
   }
   .subMenuRegistros {
     display: none;
@@ -96,13 +96,14 @@
     color: white;
   }
   .Registro {
+    font-size: 1rem !important;
     padding: 0.5rem;
     background-color: #23be69;
-  }
-  .Registro:hover {
-    width: 100%;
-    background-color: #1aa056;
-    cursor: pointer;
+    &:hover {
+      width: 100%;
+      background-color: #1aa056;
+      cursor: pointer;
+    }
   }
 }
 
@@ -114,7 +115,7 @@
 
   &:hover .tituloMenu3,
   .tituloMenu3A {
-    transform: scale(1) translate(0px, -130px);
+    transform: scale(1) translate(0px, -6rem);
   }
 }
 
@@ -126,25 +127,25 @@
 
   &:hover .tituloMenu4,
   .tituloMenu4A {
-    transform: scale(1) translate(0px, -130px);
+    transform: scale(1) translate(0px, -6rem);
   }
 }
 
 .iconosMenu {
   position: relative;
   display: block;
-  margin: 20px auto 0px auto;
+  margin: 0rem auto 0px auto;
   filter: grayscale(50%);
-  height: 100px;
-  width: 100px;
+  height: 4.5rem;
+  width: 4.5rem;
 }
 
 .iconosMenuA {
   position: relative;
   display: block;
   margin: auto;
-  height: 100px;
-  width: 100px;
+  height: 4.5rem;
+  width: 4.5rem;
   filter: grayscale(10%);
   filter: contrast(-20%);
   z-index: 99;
@@ -155,6 +156,9 @@
   transform: scale(1.02);
   filter: contrast(-20%);
   z-index: 99;
+}
+.mat-drawer-content {
+  overflow: hidden !important;
 }
 
 mat-nav-list {
@@ -168,11 +172,11 @@ mat-list-item {
 
 .mat-drawer-inner-container {
   overflow: hidden !important;
-  width: 10rem;
+  width: 6.5rem;
 }
 
 .sidenav {
-  width: 10rem;
+  width: 6.5rem;
 }
 
 // titulito de menu
@@ -197,7 +201,7 @@ mat-list-item {
 }
 .fa-bars:before {
   margin: -12px 0px 0px 0px;
-  transform: translate(8px, 1px)!important;
+  transform: translate(8px, 1px) !important;
   // position: absolute;
 }
 

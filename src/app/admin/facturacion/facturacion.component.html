@@ -1,30 +1,30 @@
 <!-- <div class="row" style="height: calc(100% - 80px)"> -->
 <!-- <div class="row"> -->
-<!-- <div class="col-xs-12 col-md-12"> -->
-<h3>Facturación</h3>
-<div class="card cardPrincipal sinPadding tamano">
+<!-- <div class="col-md-12"> -->
+
+<div class="cardPrincipal sinPadding tamano">
   <div class="cabezaFactura ">
     <div class="row">
-      <div class="col-xs-12 col-md-2">
+      <div class="col-md-3 divRigth">
         <div class="row">
-          <div class="col-3 p-0 pl-3">
+          <div class="col-3 p-0 pl-3 ">
             <ng-template #tipos_facturas><div [innerHtml]="TiposFacturas"></div></ng-template>
-            <h5><strong>Tipo:</strong></h5>
+            <span class="titulos"><strong>Tipo:</strong></span>
             <input
               placement="right"
               [mdbPopover]="tipos_facturas"
               triggers="focus"
               type="text"
               (keydown.enter)="saltar('condicion', tipoFact.value)"
-              class="form-control tipo"
+              class="form-control tipo inputE"
               value="02"
               id="tipoFact"
               #tipoFact
             />
           </div>
           <div class="col-9 ">
-            <h5><strong>Condición :</strong></h5>
-            <select id="condicion" (keydown.enter)="saltar('pago', $event.target.value)" class="form-control " [(ngModel)]="condicion_fact" name="condicionSelect">
+            <span class="titulos"><strong>Condición :</strong></span>
+            <select id="condicion" (keydown.enter)="saltar('pago', $event.target.value)" class="form-control inputE" [(ngModel)]="condicion_fact" name="condicionSelect">
               <option value="Contado">Contado</option>
               <option value="Credito">Credito</option>
             </select>
@@ -32,34 +32,34 @@
         </div>
 
         <!-- <div class="d-flex  mt-2"> -->
-        <h5 class="mr-2 mt-2"><strong>Pago </strong></h5>
-        <select id="pago" (keydown.enter)="saltar('nom', $event.target.value)" class="form-control " [(ngModel)]="forma_pago" name="condicionSelect">
+        <span class="mr-2 mt-2 titulos"><strong>Pago </strong></span>
+        <select id="pago" (keydown.enter)="saltar('nom', $event.target.value)" class="form-control inputE" [(ngModel)]="forma_pago" name="condicionSelect">
           <option value="Efectivo">Efectivo</option>
           <option value="Targeta">Targeta</option>
           <option value="Cheque">Cheque</option>
         </select>
         <!-- </div> -->
         <!-- <h5 class="mt-2"><strong>Número comprobante:</strong></h5>
-        <input type="text" class=" form-control" [(ngModel)]="numeroComprobante" [disabled]="true" /> -->
+        <input type="text" class="form-control"inputE [(ngModel)]="numeroComprobante" [disabled]="true" /> -->
       </div>
       <!-- ======================================================================================================================================================================== -->
       <!-- ======================================================================================================================================================================== -->
-      <div class="col-xs-12 col-md-6">
+      <div class="col-md-5 divRigth">
         <form [formGroup]="form">
           <div class="d-flex" style="height: 1.7rem;">
             <h5><strong>Cliente:</strong></h5>
             <i (click)="abrirModalFiltro()" mdbTooltip="Buscar cliente" placement="top" class="fas fa-search ml-3 botonBuscar"></i>
           </div>
           <div class="row">
-            <div class="col-xs-12 col-md-7">
-              <label class="control-label mr-2">Nombre:</label>
+            <div class="col-md-7">
+              <span class="control-label titulos mr-2">Nombre:</span>
               <input
                 id="nom"
                 (keydown.enter)="saltar('dir', form.controls['nombre'].value)"
                 type="text"
                 formControlName="nombre"
                 placeholder="Introduzca nombre"
-                class="form-control "
+                class="form-control inputE"
                 autocomplete="off"
               />
               <input id="id" type="hidden" formControlName="id" />
@@ -68,10 +68,10 @@
               </div>
             </div>
 
-            <div class="col-xs-12 col-md-5">
+            <div class="col-md-5">
               <div class="from-group">
-                <label class="control-label">Telefono:</label>
-                <input type="text" class="form-control" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" readonly="true" />
+                <span class="control-label titulos">Telefono:</span>
+                <input type="text" class="form-control inputE" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" readonly="true" />
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"
@@ -82,16 +82,16 @@
               </div>
             </div>
 
-            <div class="col-xs-12 col-md-12">
+            <div class="col-md-12">
               <div class="form-group">
-                <label class="control-label mr-2">Direccion:</label>
+                <span class="control-label titulos mr-2">Direccion:</span>
                 <input
                   id="dir"
                   (keydown.enter)="saltar('cod-0', form.controls['direccion'].value)"
                   type="text"
                   formControlName="direccion"
                   placeholder="Introduzca direccion"
-                  class="form-control"
+                  class="form-control inputE"
                   autocomplete="off"
                 />
                 <div
@@ -108,20 +108,17 @@
       </div>
       <!-- ======================================================================================================================================================================== -->
       <!-- ======================================================================================================================================================================== -->
-      <div class="col-xs-12 col-md-4">
-        <div class="d-flex flex-column">
-          <div class=" encabezadoRigth fecha">
+      <div class="col-md-4">
+        <div class="encabezadoRigth fecha">
+          <span class="titulos w-100">
             Fecha : <strong> {{ fecha }}</strong>
-          </div>
-          <!-- <div class=" encabezadoRigth numFac">
-            Número Fac. : <strong> {{ formatoNumerosMasCero(this.numFac) }}</strong>
-          </div> -->
+          </span>
         </div>
         <div class="cuadroTotal">RD$ {{ formatearNumero(TOTAL) }}</div>
       </div>
     </div>
   </div>
-  <div class="cuerpoFactura mb-4">
+  <div class="cuerpoFactura mb-2" >
     <app-cuerpo-factura
       [propietario]="propietario_factura"
       (getCuerpoFactura)="getCuerpoFactura($event)"

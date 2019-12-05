@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css?family=Orbitron&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Orbitron&display=swap");
 .cabezaFactura {
   background-color: #eaffe4;
   border-radius: 1rem 1rem 0rem 0rem !important;
-  padding: 1rem;
+  padding: 0.6rem;
 }
 #inputTelefono {
   &:hover {
@@ -28,17 +28,28 @@
   width: 20vw;
   background-color: #21573c;
   border-radius: 0.5rem;
-  font-family: 'Orbitron', sans-serif;
+  font-family: "Orbitron", sans-serif;
   font-size: 2rem;
   color: white;
   position: absolute;
-  bottom: 1rem;
+  bottom: 2.5rem;
   right: 2rem;
 }
 
 .encabezadoRigth {
   position: absolute;
   right: 4rem;
+}
+
+div.pieFactura {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
+div.cuerpoFactura.mb-2 {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 36vh);
 }
 
 .fecha {
@@ -50,9 +61,19 @@
   font-size: 1.3rem;
 }
 
-.tamano {
-  height: calc(100% - 4rem) !important;
+.titulos {
+  font-size: 1rem;
 }
+.divRigth {
+  border-right: 1px solid #96aa967a;
+}
+.divRigth {
+  border-right: 1px solid #96aa967a;
+}
+
+// .tamano {
+//   height: calc(100% - 4rem) !important;
+// }
 
 .botonBuscar {
   border: 1px solid #495b49;
@@ -77,6 +98,10 @@
 
 .tipo {
   width: 3rem;
+}
+.inputE {
+  height: calc(1.5em + 0.3rem + 2px) !important;
+  padding: 0.2rem !important;
 }
 .popover-body {
   min-width: 22rem !important;

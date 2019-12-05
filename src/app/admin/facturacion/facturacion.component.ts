@@ -109,7 +109,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.fecha = moment().format('L');
+    this.fecha = moment().format('DD/MM/YYYY');
 
     this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res !== undefined && res.tipoModal === 'buscarCliente') {
