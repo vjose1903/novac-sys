@@ -1,7 +1,7 @@
 .entrada {
   border-radius: 0 !important;
   height: calc(1.5em + 0.3rem + 2px) !important;
-  padding: 0.2rem !important;
+  padding: 0.2rem 0rem 0rem 0.5rem !important;
 }
 .columna0padding,
 .td0padding {
@@ -15,10 +15,10 @@
 // TAMAÑO DE LOS TITULOS
 // ====================================================
 .COD {
-  max-width: 2.4rem;
+  max-width: 2rem;
 }
 .CAN {
-  max-width: 1.7rem;
+  max-width: 1rem;
 }
 .DES {
   max-width: 7rem;
@@ -27,7 +27,7 @@
   max-width: 1rem;
 }
 .UNI {
-  max-width: 1.7rem;
+  max-width: 2rem;
 }
 .PRE {
   max-width: 2rem;
@@ -41,16 +41,17 @@
 // ====================================================
 
 .tiCOD {
-  max-width: 1.6rem;
+  max-width: 1.005rem;
 }
 .tiCAN {
-  max-width: 1.6rem;
+  max-width: 1rem;
 }
 .tiDES {
-  max-width: 4.5rem;
+  max-width: 3.9rem;
 }
 .tiDESC {
   max-width: 1rem;
+  padding: 0rem 0rem 0.5rem 1rem;
 }
 
 .tiUNI {
@@ -61,7 +62,7 @@
   max-width: 1rem;
 }
 .tiTOT {
-  max-width: 1.7rem;
+  max-width: 1.4rem;
 }
 
 .inDES,
