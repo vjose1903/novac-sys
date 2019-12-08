@@ -12,7 +12,7 @@ import { DBservice } from '../../core/services/bdservice.service';
 import { map, filter } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { ObservableServcie } from '../../core/services/observables.service';
-import { PdfService } from '../../core/services/pdf.service';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -150,21 +150,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     this.obsServ.TIPOS_FACTURAS.subscribe(res => {
       if (res !== undefined) {
-        console.log('tipos');
-
-        console.log(res);
-        console.log('==================');
         this.lista_tipos_facturas = res;
       }
     });
     this.obsServ.SECUENCIA_FACTURAS.subscribe(res => {
       if (res !== undefined) {
         this.lista_secuencia_facturas = res;
-        console.log('secuencia');
-
-        console.log(res);
-
-        console.log('==================');
         this.secuenciaVenta = res.filter(secu => secu.tipo_factura_id === 13);
         this.numFac = this.secuenciaVenta[0].secuencia;
       }
@@ -212,8 +203,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
 
     if (campo === 'cod-0' && valor !== null) {
-      if (this.condicion_fact !== 'Credito' && !this.propietario_factura) {
+      if (this.condicion_fact !== 'Credito') {
         this.enfocarInput(campo);
+        console.log(this.form.value);
+
+        // if(this.form.value)
         const cliente = this.listaClientes.filter(cli => cli.nombre === 'Cliente contado');
         this.propietario_factura = cliente[0];
       } else {
@@ -301,6 +295,118 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   p() {}
 
+  prueba() {
+    const factCre = {
+      id: 4,
+      tipo_factura_id: 2,
+      suplidor_id: null,
+      cliente_id: 2,
+      user_id: 1,
+      fecha_facturacion: '2019-12-08',
+      fecha_vencimiento: '2020-01-07',
+      fecha_valida: '2020-12-08',
+      numero_comprobante: 'B0100000001',
+      numero_factura: 4,
+      condicion: 'Credito',
+      forma_pago: 'Efectivo',
+      total_factura: 7492.5,
+      itbis: 0.0,
+      descuento: 0.0,
+      estado: true,
+      tipo: 'venta',
+      created_at: '2019-12-08T18:33:55.439Z',
+      updated_at: '2019-12-08T18:33:55.439Z',
+      Bruto: 7492.5,
+      detalle_facturas: [
+        {
+          descripcion: 'maiz (25 LBS)',
+          unidad: 'Saco',
+          precio: 999.99,
+          total: 499,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 2,
+        },
+        {
+          descripcion: 'maiz (100 LBS)',
+          unidad: 'Saco',
+          precio: 999.99,
+          total: 6993,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 7,
+        },
+      ],
+      cliente: {
+        nombre: 'marcos',
+        direccion: 'la vega centro de la ciudad\n',
+        rnc: '047-0144534-5',
+      },
+      suplidor: null,
+      tipo_factura: 'Valor fiscal',
+    };
+    const factCon = {
+      id: 3,
+      tipo_factura_id: 3,
+      suplidor_id: null,
+      cliente_id: 1,
+      user_id: 1,
+      fecha_facturacion: '2019-12-08',
+      fecha_vencimiento: null,
+      fecha_valida: '2020-12-08',
+      numero_comprobante: 'B0200000003',
+      numero_factura: 3,
+      condicion: 'Contado',
+      forma_pago: 'Efectivo',
+      total_factura: 8491.5,
+      itbis: 0.0,
+      descuento: 0.0,
+      estado: true,
+      tipo: 'venta',
+      created_at: '2019-12-08T18:30:55.617Z',
+      updated_at: '2019-12-08T18:30:55.617Z',
+      Bruto: 8491.5,
+      detalle_facturas: [
+        {
+          descripcion: 'maiz (25 LBS)',
+          unidad: 'Saco',
+          precio: 999.99,
+          total: 499,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 2,
+        },
+        {
+          descripcion: 'maiz (50 LBS)',
+          unidad: 'Saco',
+          precio: 999.99,
+          total: 1998,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 4,
+        },
+        {
+          descripcion: 'maiz (100 LBS)',
+          unidad: 'Saco',
+          precio: 999.99,
+          total: 5994,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 6,
+        },
+      ],
+      cliente: {
+        nombre: 'Cliente contado',
+        direccion: 'Autopista duarte KM 0 el Higuero',
+        rnc: ' ',
+      },
+      suplidor: null,
+      tipo_factura: 'Factura de consumo',
+    };
+    // this.pdfServ.makeFacturaVenta(factCon);
+    this.pdfServ.makeFacturaVenta(factCre);
+  }
+
   IMPRIMIR() {
     if (!this.propietario_factura) {
       this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
@@ -327,6 +433,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['numero_comprobante'] = null;
       cabecera_fact['numero_factura'] = null;
       cabecera_fact['total_factura'] = this.TOTAL;
+      cabecera_fact['Bruto'] = this.BRUTO;
       cabecera_fact['itbis'] = this.ITBIS;
       cabecera_fact['descuento'] = this.DESCUENTO;
       cabecera_fact['estado'] = true;
@@ -338,17 +445,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['tipo'] = 'venta';
       cabecera_fact['user_id'] = empleado.id;
       this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
-        
-            console.log(res);
-            this.pdfServ.makeFacturaVenta(res);
-            console.log(this.pdfServ.cabeceraFacturaVenta(res));
-
-        // this.dbServ.getFacturaById(res.id).subscribe(res => {
-        //   if (res) {
-        //   }
-        // });
+        this.pdfServ.makeFacturaVenta(res);
       });
-      // console.log(cabecera_fact);
     }
   }
 }
