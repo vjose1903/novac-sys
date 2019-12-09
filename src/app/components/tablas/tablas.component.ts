@@ -14,7 +14,6 @@ import {
   ElementRef,
 } from '@angular/core';
 import { MdbTablePaginationComponent, MdbTableDirective } from 'angular-bootstrap-md';
-import { SharedService } from '../../core/services/shared.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -94,7 +93,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   @Output() DELETE = new EventEmitter<any>();
   @Output() reinicioModal = new EventEmitter<any>();
   @Output() noArticulo = new EventEmitter<any>();
-  constructor(private cdRef: ChangeDetectorRef, private shServ: SharedService, private fb: FormBuilder, private route: ActivatedRoute) {}
+  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute) {}
 
   ngOnInit() {
     if (this.focusRow) {

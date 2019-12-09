@@ -8,7 +8,7 @@ import { UsuariosService } from '../../core/services/usuarios.service';
 import { UsuariosI } from '../../core/models/usuario.model';
 import { profile, TIPOMODAL, SHOWMODAL, SELECCIONMODAL, DECISIONMODAL, INDEXTOFOCUS, OBJDEVUELTO } from '../../core/services/GLOBAL';
 import { get } from 'http';
-import { SharedService } from '../../core/services/shared.service';
+
 import { DBservice } from '../../core/services/bdservice.service';
 
 const { dialog } = require('electron').remote;

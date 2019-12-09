@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectionStrategy, OnDestroy, OnChanges, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
-import { SharedService } from '../../../core/services/shared.service';
+
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 // import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL, OBJDEVUELTO, INDEXTOFOCUS } from '../../../core/services/GLOBAL';
@@ -55,7 +55,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     private artServ: ObservableServcie,
     private dbServ: DBservice,
     private mServ: ModalService,
-    private shServ: SharedService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
   ) {
@@ -263,7 +262,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     // const ls = this.TodosLosSorteos.filter(val => val.loteria_id === idLoteria);
     const ARTICULO = this.listaArticulos.filter(articulo => articulo.codigo === codigo);
     if (ARTICULO[0] === undefined) {
-      this.shServ.toastError('El codigo introducido no existe', 'ERROR');
+      this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
       this.enfocarInput('cod-' + i);
     } else {
       const Libra = ARTICULO[0].contenido_articulos.filter(art => art.medida === 'Libra');
@@ -526,7 +525,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   noArticuloEncontrado(arg) {
-    this.shServ.toastError('Articulo no existe', 'ERROR');
+    this.dbServ.toastError('Articulo no existe', 'ERROR');
     this.enfocarInput('cod-' + arg);
     // this.element = document.getElementById('cod-' + arg) as HTMLElement;
     // this.element.focus();

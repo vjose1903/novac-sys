@@ -4,8 +4,7 @@ import { parseDate, BsDatepickerConfig } from 'ngx-bootstrap';
 import { PhotosService } from '../../../core/services/photos.service';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-
-import { SharedService } from '../../../core/services/shared.service';
+import { DBservice } from '../../../core/services/bdservice.service';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -19,7 +18,7 @@ export class RegistroEmpleadosComponent implements OnInit {
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private shServ: SharedService) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice) {
     this.form = this.fb.group({
       nombre: [null, Validators.required],
       apellido: [null, Validators.required],
@@ -75,7 +74,7 @@ export class RegistroEmpleadosComponent implements OnInit {
 
     this.route.paramMap.subscribe(params => {
       if (params.get('accion') === 'INS') {
-        this.shServ.createEmpleados(obj).subscribe(
+        this.dbServ.createEmpleados(obj).subscribe(
           res => {
             this.shServ.toastSuccess('Usuario Creado', 'Correcto');
           },

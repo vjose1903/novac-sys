@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { SharedService } from '../../core/services/shared.service';
 import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL } from '../../core/services/GLOBAL';
@@ -63,7 +62,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     private mServ: ModalService,
     private obsServ: ObservableServcie,
     private dbServ: DBservice,
-    private shServ: SharedService,
     private fb: FormBuilder,
     private pdfServ: PdfService,
     private route: ActivatedRoute,
