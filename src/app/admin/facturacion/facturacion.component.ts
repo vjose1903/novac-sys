@@ -8,7 +8,6 @@ import { map, filter } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { PdfService } from '../../core/services/pdf/pdf.service';
-import {inicioRuta} from '/src/main';
 
 @Component({
   selector: 'app-facturacion',
@@ -163,24 +162,33 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {}
   getCalculos(arg) {
     console.log('calculos');
-    
-    console.log(arg);
-    
-    this.TOTAL = arg.total;
+
+    this.TOTAL = parseFloat(arg.Total);
+
+    console.log(arg.Total);
+    console.log(this.TOTAL);
     this.calcularBruto();
   }
   getDescuento(arg) {
     console.log('descuento');
-    
+
+    this.DESCUENTO = parseFloat(arg);
     console.log(arg);
-    
-    this.DESCUENTO = arg;
+    console.log(this.DESCUENTO);
+
     this.calcularBruto();
   }
 
   calcularBruto() {
     setTimeout(() => {
       const calculo = this.TOTAL + this.DESCUENTO;
+      console.log('============');
+      console.log('  CALCULO');
+      console.log('============');
+
+      console.log(calculo);
+      console.log('============');
+
       this.BRUTO = calculo;
     }, 5);
   }
@@ -212,7 +220,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (campo === 'cod-0' && valor !== null) {
       if (this.condicion_fact !== 'Credito') {
         this.enfocarInput(campo);
-        console.log(this.form.value);
 
         // if(this.form.value)
         const cliente = this.listaClientes.filter(cli => cli.nombre === 'Cliente contado');
@@ -295,9 +302,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   getCuerpoFactura(arg) {
     this.CuerpoFactura = [];
     const obj = JSON.parse(arg);
-
     this.CuerpoFactura = obj;
-    console.log(this.CuerpoFactura);
   }
 
   p() {}
@@ -365,40 +370,40 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       numero_factura: 3,
       condicion: 'Contado',
       forma_pago: 'Efectivo',
-      total_factura: 8491.50,
-      itbis: 0.00,
-      descuento: 0.00,
+      total_factura: 8491.5,
+      itbis: 0.0,
+      descuento: 0.0,
       estado: true,
       tipo: 'venta',
       created_at: '2019-12-08T18:30:55.617Z',
       updated_at: '2019-12-08T18:30:55.617Z',
-      Bruto: 8491.50,
+      Bruto: 8491.5,
       detalle_facturas: [
         {
           descripcion: 'maiz (25 LBS)',
           unidad: 'Saco',
           precio: 999.99,
-          total: 499.00,
-          descuento: 0.00,
-          itbis: 0.00,
+          total: 499.0,
+          descuento: 0.0,
+          itbis: 0.0,
           cantidad: 2,
         },
         {
           descripcion: 'maiz (50 LBS)',
           unidad: 'Saco',
           precio: 999.99,
-          total: 1998.00,
-          descuento: 0.00,
-          itbis: 0.00,
+          total: 1998.0,
+          descuento: 0.0,
+          itbis: 0.0,
           cantidad: 4,
         },
         {
           descripcion: 'maiz (100 LBS)',
           unidad: 'Saco',
           precio: 999.99,
-          total: 5994.00,
-          descuento: 0.00,
-          itbis: 0.00,
+          total: 5994.0,
+          descuento: 0.0,
+          itbis: 0.0,
           cantidad: 6,
         },
       ],

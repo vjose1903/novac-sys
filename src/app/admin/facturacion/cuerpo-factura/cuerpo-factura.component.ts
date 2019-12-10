@@ -478,7 +478,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     // this.listaArticulos[index].seleccionado = true;
     (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
     (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
-    console.log(arg.descripcion);
     if (arg.descripcion === 'Materia prima') {
       (this.control.controls[arg.index] as any).controls['desc'].disable();
     } else {
@@ -487,10 +486,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.rowActual = arg;
 
     const Libra = arg.contenido_articulos.filter(art => art.medida === 'Libra');
-    console.log('============');
-
-    console.log(Libra.length);
-    console.log('============');
 
     if (Libra.length !== 0) {
       precioLibra = Libra[0].precio;

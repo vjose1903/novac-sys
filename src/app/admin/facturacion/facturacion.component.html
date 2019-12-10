@@ -114,7 +114,7 @@
             Fecha : <strong> {{ fecha }}</strong>
           </span>
         </div>
-        <div class="cuadroTotal">RD$ {{ formatearNumero(TOTAL) }}</div>
+        <div class="cuadroTotal">RD$ {{ formatearNumero(redondearAdos(TOTAL)) }}</div>
       </div>
     </div>
   </div>
@@ -153,15 +153,15 @@
               </div>
             </div>
             <div class="col-6">
-              <div class="d-flex">
-                <span [ngClass]="{ 'text-transparent': BRUTO === 0 }">{{ formatearNumero(BRUTO) }}</span>
+              <div class="d-flex numerosCalculos">
+                <span>{{ formatearNumero(redondearAdos(BRUTO)) }}</span>
               </div>
-              <div class="d-flex">
-                <span [ngClass]="{ 'text-transparent': DESCUENTO === 0 }">{{ formatearNumero(DESCUENTO) }}</span>
+              <div class="d-flex numerosCalculos">
+                <span>{{ formatearNumero(redondearAdos(DESCUENTO)) }}</span>
               </div>
-              <div class="d-flex">
+              <div class="d-flex numerosCalculos">
                 <!--  -->
-                <h5 [ngClass]="{ 'text-transparent': TOTAL === 0, borderTOP: TOTAL !== 0 }" class="">{{ formatearNumero(TOTAL) }}</h5>
+                <h5 class="borderTOP w-100 TOTALN">{{ formatearNumero(redondearAdos(TOTAL)) }}</h5>
               </div>
             </div>
           </div>
