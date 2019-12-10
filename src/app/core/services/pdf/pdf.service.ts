@@ -176,9 +176,9 @@ export class PdfService {
         canvas: [
           {
             type: 'rect',
-            x: 30,
+            x: 25,
             y: 5,
-            w: 690,
+            w: 710,
             h: 2,
             color: '#000000',
           },
@@ -204,13 +204,14 @@ export class PdfService {
             [1, 'Sample value 1', 'value 2', 'value 3', 'value 4', 'value 5', 'value 6'],
           ],
         },
-        margin: [30, 0, 30, 0],
+        margin: [25, 0, 25, 0],
         layout: 'headerLineOnly',
       },
     ];
 
     return header;
   }
+
   // ==========================================================================================================================================================
   // CONTENIDO
   // ==========================================================================================================================================================
@@ -219,7 +220,16 @@ export class PdfService {
     const tempBody = [];
     data.detalle_facturas.forEach((detalle, i) => {
       const row = [];
-      row.push(i + 1, detalle.descripcion, detalle.cantidad, detalle.unidad, detalle.precio, detalle.itbis !== 0 ? detalle.itbis : '', detalle.total);
+
+      row.push(
+        i + 1,
+        detalle.descripcion,
+        this.formatearNumero(detalle.cantidad),
+        detalle.unidad,
+        this.formatearNumero(detalle.precio),
+        detalle.itbis !== 0 ? this.formatearNumero(detalle.itbis) : '',
+        this.formatearNumero(detalle.total),
+      );
       tempBody.push(row);
     });
     const content = [
@@ -263,19 +273,19 @@ export class PdfService {
               body: [
                 [
                   { text: 'Bruto RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(data.Bruto), fontSize: 11 },
+                  { text: this.formatearNumero(data.Bruto), fontSize: 11, alignment: 'right' },
                 ],
                 [
                   { text: 'Itbis RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(data.itbis), fontSize: 11 },
+                  { text: this.formatearNumero(data.itbis), fontSize: 11, alignment: 'right' },
                 ],
                 [
                   { text: 'Descuento RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(data.descuento), fontSize: 11 },
+                  { text: this.formatearNumero(data.descuento), fontSize: 11, alignment: 'right' },
                 ],
                 [
                   { text: 'TOTAL RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(data.total_factura), fontSize: 11 },
+                  { text: this.formatearNumero(data.total_factura), fontSize: 11, alignment: 'right' },
                 ],
               ],
             },
@@ -340,8 +350,9 @@ export class PdfService {
     console.log(data);
 
     const dd = {
-      pageSize: { width: 750, height: 480 },
-      pageMargins: data.condicion === 'Contado' ? [30, 165.5, 30, 40] : [30, 184, 30, 40],
+      pageSize: { width: 760, height: 480 },
+      pageMargins: data.condicion === 'Contado' ? [25, 165.5, 25, 40] : [25, 184, 25, 40],
+      pageOrientation: 'landscape',
       header: this.cabeceraFacturaVenta(data),
       content: this.contenidoFacturaVenta(data),
       images: {
@@ -352,6 +363,8 @@ export class PdfService {
       },
     };
 
-    pdfMake.createPdf(dd).download('prueba.pdf');
+    var win = window.open('', '_blank');
+    pdfMake.createPdf(dd).print({}, win)
+    // pdfMake.createPdf(dd).download('prueba.pdf');
   }
 }

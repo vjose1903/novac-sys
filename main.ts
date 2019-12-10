@@ -6,7 +6,9 @@ let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
-export const inicioRuta = __dirname;
+
+
+export let inicioRuta = __dirname;
 
 function createWindow() {
   const electronScreen = screen;
@@ -22,6 +24,7 @@ function createWindow() {
     minHeight: size.height,
     webPreferences: {
       nodeIntegration: true,
+      plugins: false
     },
   });
 

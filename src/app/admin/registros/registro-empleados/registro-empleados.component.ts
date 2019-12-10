@@ -76,10 +76,10 @@ export class RegistroEmpleadosComponent implements OnInit {
       if (params.get('accion') === 'INS') {
         this.dbServ.createEmpleados(obj).subscribe(
           res => {
-            this.shServ.toastSuccess('Usuario Creado', 'Correcto');
+            this.dbServ.toastSuccess('Usuario Creado', 'Correcto');
           },
           err => {
-            this.shServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
+            this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
           },
         );
       } else {

@@ -39,6 +39,7 @@ export class HomeComponent implements OnInit {
         if (err.error.errors[0] === 'Usuario ingresado no existe') {
           this.errorU = 'usuario no existe.';
         } else {
+          this.errorU = '';
           if (err.error.errors[0] === 'Contraseña incorrecta') {
             this.errorC = 'contraseña invalida';
           }

@@ -51,16 +51,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   DESCUENTO = 0;
   listaDeDescuentos = [];
 
-  constructor(
-    private artServ: ObservableServcie,
-    private dbServ: DBservice,
-    private mServ: ModalService,
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-  ) {
+  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private mServ: ModalService, private fb: FormBuilder, private route: ActivatedRoute) {
     // this.rowFactura = new FormArray([new FormControl()]);
   }
 
+  redondearAdos(num) {
+    return (Math.round(num * 100) / 100).toFixed(2);
+  }
   ngOnInit() {
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
@@ -379,8 +376,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     if (precio !== null && cantidad !== '' && cantidad != null) {
       const tot = precio * cantidad;
-      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(_.round(tot, 2)));
-
+      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(this.redondearAdos(tot)));
       this.calculosTotalesGenerales();
     }
   }
@@ -407,7 +403,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       calculoDesc = precio * descuento * cantidad;
       nuevoTotal = total - calculoDesc;
 
-      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(_.round(nuevoTotal, 2)));
+      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(this.redondearAdos(nuevoTotal)));
       this.calculosTotalesGenerales();
       this.calculosDescuentoGeneral(calculoDesc, i);
       this.aumentarSecuencia();
@@ -416,7 +412,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   calculosDescuentoGeneral(descuento, i) {
     let acuDesc = 0;
-    const obj = { fila: i, desc: _.round(descuento, 2) };
+    const obj = { fila: i, desc: this.redondearAdos(descuento) };
     const index = _.findIndex(this.listaDeDescuentos, (o: any) => {
       return o.fila === obj.fila;
     });
@@ -447,7 +443,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.TOTAL = temp;
 
       const obj = {
-        Total: _.round(this.TOTAL, 2),
+        Total: this.redondearAdos(this.TOTAL),
         ITBIS: '',
       };
       this.sendCalculos.emit(obj);
@@ -521,7 +517,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   calcularPrecioSaco(cant, precio) {
     const res = cant * precio;
-    return _.round(res, 2);
+    return this.redondearAdos(res);
   }
 
   noArticuloEncontrado(arg) {

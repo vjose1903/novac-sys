@@ -2,16 +2,13 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
-import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL } from '../../core/services/GLOBAL';
-
-import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
-import { isUndefined } from 'ngx-bootstrap/chronos/utils/type-checks';
 import { DBservice } from '../../core/services/bdservice.service';
 import { map, filter } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import {inicioRuta} from '/src/main';
 
 @Component({
   selector: 'app-facturacion',
@@ -52,9 +49,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   showTipos: boolean;
   tipoFactura: any;
   CuerpoFactura = [];
-  DESCUENTO = 0;
-  BRUTO = 0;
-  TOTAL = 0;
+  DESCUENTO = 0.0;
+  BRUTO = 0.0;
+  TOTAL: number = 0.0;
   lista_tipos_facturas: any;
   lista_secuencia_facturas: any;
   secuenciaVenta: any;
@@ -92,6 +89,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   //   }
   // }
 
+  redondearAdos(num) {
+    return (Math.round(num * 100) / 100).toFixed(2);
+  }
   formatearNumero(nStr) {
     if (nStr !== undefined) {
       nStr += '';
@@ -162,17 +162,26 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {}
   getCalculos(arg) {
-    this.TOTAL = arg.Total;
+    console.log('calculos');
+    
+    console.log(arg);
+    
+    this.TOTAL = arg.total;
     this.calcularBruto();
   }
   getDescuento(arg) {
+    console.log('descuento');
+    
+    console.log(arg);
+    
     this.DESCUENTO = arg;
     this.calcularBruto();
   }
 
   calcularBruto() {
     setTimeout(() => {
-      this.BRUTO = this.TOTAL + this.DESCUENTO;
+      const calculo = this.TOTAL + this.DESCUENTO;
+      this.BRUTO = calculo;
     }, 5);
   }
 
@@ -341,7 +350,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         rnc: '047-0144534-5',
       },
       suplidor: null,
-      tipo_factura: 'Valor fiscal',
+      tipo_factura: 'Factura con valor fiscal',
     };
     const factCon = {
       id: 3,
@@ -356,40 +365,40 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       numero_factura: 3,
       condicion: 'Contado',
       forma_pago: 'Efectivo',
-      total_factura: 8491.5,
-      itbis: 0.0,
-      descuento: 0.0,
+      total_factura: 8491.50,
+      itbis: 0.00,
+      descuento: 0.00,
       estado: true,
       tipo: 'venta',
       created_at: '2019-12-08T18:30:55.617Z',
       updated_at: '2019-12-08T18:30:55.617Z',
-      Bruto: 8491.5,
+      Bruto: 8491.50,
       detalle_facturas: [
         {
           descripcion: 'maiz (25 LBS)',
           unidad: 'Saco',
           precio: 999.99,
-          total: 499,
-          descuento: 0,
-          itbis: 0,
+          total: 499.00,
+          descuento: 0.00,
+          itbis: 0.00,
           cantidad: 2,
         },
         {
           descripcion: 'maiz (50 LBS)',
           unidad: 'Saco',
           precio: 999.99,
-          total: 1998,
-          descuento: 0,
-          itbis: 0,
+          total: 1998.00,
+          descuento: 0.00,
+          itbis: 0.00,
           cantidad: 4,
         },
         {
           descripcion: 'maiz (100 LBS)',
           unidad: 'Saco',
           precio: 999.99,
-          total: 5994,
-          descuento: 0,
-          itbis: 0,
+          total: 5994.00,
+          descuento: 0.00,
+          itbis: 0.00,
           cantidad: 6,
         },
       ],
@@ -401,8 +410,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       suplidor: null,
       tipo_factura: 'Factura de consumo',
     };
-    // this.pdfServ.makeFacturaVenta(factCon);
-    this.pdfServ.makeFacturaVenta(factCre);
+    this.pdfServ.makeFacturaVenta(factCon);
+    // this.pdfServ.makeFacturaVenta(factCre);
   }
 
   IMPRIMIR() {
