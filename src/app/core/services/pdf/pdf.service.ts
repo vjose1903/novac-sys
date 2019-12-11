@@ -27,6 +27,11 @@ export class PdfService {
     }
     // console.log(pathSplit);
   }
+
+  redondearAdos(num) {
+    return (Math.round(num * 100) / 100).toFixed(2);
+  }
+
   formatearNumero(nStr) {
     if (nStr !== undefined) {
       nStr += '';
@@ -224,11 +229,11 @@ export class PdfService {
       row.push(
         i + 1,
         detalle.descripcion,
-        this.formatearNumero(detalle.cantidad),
+        this.formatearNumero(this.redondearAdos(detalle.cantidad)),
         detalle.unidad,
         this.formatearNumero(detalle.precio),
-        detalle.itbis !== 0 ? this.formatearNumero(detalle.itbis) : '',
-        this.formatearNumero(detalle.total),
+        detalle.itbis !== 0 ? this.formatearNumero(this.redondearAdos(detalle.itbis)) : '',
+        this.formatearNumero(this.redondearAdos(detalle.total)),
       );
       tempBody.push(row);
     });
@@ -273,19 +278,19 @@ export class PdfService {
               body: [
                 [
                   { text: 'Bruto RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(data.Bruto), fontSize: 11, alignment: 'right' },
+                  { text: this.formatearNumero(this.redondearAdos(data.Bruto)), fontSize: 11, alignment: 'right' },
                 ],
                 [
                   { text: 'Itbis RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(data.itbis), fontSize: 11, alignment: 'right' },
+                  { text: this.formatearNumero(this.redondearAdos(data.itbis)), fontSize: 11, alignment: 'right' },
                 ],
                 [
                   { text: 'Descuento RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(data.descuento), fontSize: 11, alignment: 'right' },
+                  { text: this.formatearNumero(this.redondearAdos(data.descuento)), fontSize: 11, alignment: 'right' },
                 ],
                 [
                   { text: 'TOTAL RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(data.total_factura), fontSize: 11, alignment: 'right' },
+                  { text: this.formatearNumero(this.redondearAdos(data.total_factura)), fontSize: 11, alignment: 'right' },
                 ],
               ],
             },

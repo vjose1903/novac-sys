@@ -358,59 +358,41 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       tipo_factura: 'Factura con valor fiscal',
     };
     const factCon = {
-      id: 3,
+      id: 15,
       tipo_factura_id: 3,
       suplidor_id: null,
       cliente_id: 1,
       user_id: 1,
-      fecha_facturacion: '2019-12-08',
+      fecha_facturacion: '2019-12-11',
       fecha_vencimiento: null,
-      fecha_valida: '2020-12-08',
-      numero_comprobante: 'B0200000003',
-      numero_factura: 3,
+      fecha_valida: '2020-12-11',
+      numero_comprobante: 'B0200000011',
+      numero_factura: 17,
       condicion: 'Contado',
       forma_pago: 'Efectivo',
-      total_factura: 8491.5,
+      total_factura: 2497.5,
       itbis: 0.0,
       descuento: 0.0,
       estado: true,
       tipo: 'venta',
-      created_at: '2019-12-08T18:30:55.617Z',
-      updated_at: '2019-12-08T18:30:55.617Z',
-      Bruto: 8491.5,
+      created_at: '2019-12-11T12:39:38.318Z',
+      updated_at: '2019-12-11T12:39:38.318Z',
+      Bruto: 2497.5,
       detalle_facturas: [
-        {
-          descripcion: 'maiz (25 LBS)',
-          unidad: 'Saco',
-          precio: 999.99,
-          total: 499.0,
-          descuento: 0.0,
-          itbis: 0.0,
-          cantidad: 2,
-        },
         {
           descripcion: 'maiz (50 LBS)',
           unidad: 'Saco',
           precio: 999.99,
-          total: 1998.0,
-          descuento: 0.0,
-          itbis: 0.0,
-          cantidad: 4,
-        },
-        {
-          descripcion: 'maiz (100 LBS)',
-          unidad: 'Saco',
-          precio: 999.99,
-          total: 5994.0,
-          descuento: 0.0,
-          itbis: 0.0,
-          cantidad: 6,
+          total: 2497,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 5,
         },
       ],
       cliente: {
         nombre: 'Cliente contado',
         direccion: 'Autopista duarte KM 0 el Higuero',
-        rnc: ' ',
+        rnc: '',
       },
       suplidor: null,
       tipo_factura: 'Factura de consumo',
@@ -444,10 +426,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
       cabecera_fact['numero_comprobante'] = null;
       cabecera_fact['numero_factura'] = null;
-      cabecera_fact['total_factura'] = this.TOTAL;
-      cabecera_fact['Bruto'] = this.BRUTO;
-      cabecera_fact['itbis'] = this.ITBIS;
-      cabecera_fact['descuento'] = this.DESCUENTO;
+      cabecera_fact['total_factura'] = this.redondearAdos(this.TOTAL);
+      cabecera_fact['Bruto'] = this.redondearAdos(this.BRUTO);
+      cabecera_fact['itbis'] = this.redondearAdos(this.ITBIS);
+      cabecera_fact['descuento'] = this.redondearAdos(this.DESCUENTO);
       cabecera_fact['estado'] = true;
       cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
       cabecera_fact['cliente_id'] = this.propietario_factura.id;
@@ -456,9 +438,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['FACTURA_DE'] = 13;
       cabecera_fact['tipo'] = 'venta';
       cabecera_fact['user_id'] = empleado.id;
-      this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
-        this.pdfServ.makeFacturaVenta(res);
-      });
+      console.log(cabecera_fact);
+      
+      // this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
+      //   this.pdfServ.makeFacturaVenta(res);
+      // });
     }
   }
 }

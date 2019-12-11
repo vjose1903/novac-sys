@@ -56,7 +56,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   redondearAdos(num) {
-    return (Math.round(num * 100) / 100).toFixed(2);
+    return ((Math.round(num * 100) / 100).toFixed(2));
   }
   ngOnInit() {
     this.form = this.fb.group({
@@ -120,6 +120,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             fila.itbis = 0;
             fila.unidad = fila.uni;
             const lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'desc', 'tot', 'secuencia']);
+            
             detalle_factura.push(JSON.parse(JSON.stringify(lol)));
           }
         });
@@ -340,7 +341,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const unidad = this.UnidadesArticulo[this.indiceDetalle].value;
 
     (this.control.controls[i] as any).controls['uni'].setValue(unidad);
-    (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(this.precioDetalle));
+    (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(this.redondearAdos(this.precioDetalle)));
     this.calcularTotalRow(i);
   }
 
@@ -395,7 +396,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (descuento === 0 || descuento === '0' || descuento === null || descuento === undefined) {
       (this.control.controls[i] as any).controls['desc'].reset();
       const total = precio * cantidad;
-      (this.control.controls[i] as any).controls['tot'].setValue(total);
+      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(this.redondearAdos(total)));
     }
 
     if (precio !== '' && precio !== null && cantidad !== '' && cantidad != null && descuento !== '' && descuento !== null && descuento !== null && descuento !== undefined) {

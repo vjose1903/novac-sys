@@ -115,7 +115,7 @@
                   <input
                     [readOnly]="!propietario"
                     type="number"
-                    class="form-control entrada "
+                    class="form-control entrada campoNumeros"
                     id="desc-{{ i }}"
                     (click)="verificarSecuencia(i)"
                     (keydown.enter)="enfocarInput('cod-' + (i + 1))"
@@ -128,13 +128,13 @@
               <!--  ::::::::::::  PRECIO  ::::::::::::  -->
               <td class="PRE td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada inPRE " id="pre-{{ i }}" formControlName="pre" readonly="true" />
+                  <input type="text" class="form-control entrada campoNumeros inPRE " id="pre-{{ i }}" formControlName="pre" readonly="true" />
                 </div>
               </td>
 
               <td class="TOT td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada inTOT " id="tot-{{ i }}" formControlName="tot" readonly="true" />
+                  <input type="text" class="form-control entrada inTOT campoNumeros " id="tot-{{ i }}" formControlName="tot" readonly="true" />
                   <input type="hidden" [value]="i" formControlName="secuencia" />
                 </div>
               </td>
