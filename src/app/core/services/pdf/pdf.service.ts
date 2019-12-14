@@ -220,7 +220,10 @@ export class PdfService {
   // ==========================================================================================================================================================
   // CONTENIDO
   // ==========================================================================================================================================================
-
+  calcularPrecio(cant, precio) {
+    const res = cant * precio;
+    return this.redondearAdos(res);
+  }
   contenidoFacturaVenta(data) {
     const tempBody = [];
     data.detalle_facturas.forEach((detalle, i) => {
@@ -231,7 +234,7 @@ export class PdfService {
         detalle.descripcion,
         this.formatearNumero(this.redondearAdos(detalle.cantidad)),
         detalle.unidad,
-        this.formatearNumero(detalle.precio),
+        this.formatearNumero(this.calcularPrecio(detalle.cantidad, detalle.precio)),
         detalle.itbis !== 0 ? this.formatearNumero(this.redondearAdos(detalle.itbis)) : '',
         this.formatearNumero(this.redondearAdos(detalle.total)),
       );
@@ -369,7 +372,7 @@ export class PdfService {
     };
 
     var win = window.open('', '_blank');
-    pdfMake.createPdf(dd).print({}, win)
+    pdfMake.createPdf(dd).print({}, win);
     // pdfMake.createPdf(dd).download('prueba.pdf');
   }
 }
