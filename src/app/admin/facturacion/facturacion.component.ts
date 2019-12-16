@@ -218,7 +218,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
 
     if (campo === 'cod-0' && valor !== null) {
-      if (this.condicion_fact !== 'Credito') {
+      if (this.condicion_fact !== 'Crédito') {
         this.enfocarInput(campo);
 
         // if(this.form.value)
@@ -319,7 +319,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       fecha_valida: '2020-12-08',
       numero_comprobante: 'B0100000001',
       numero_factura: 4,
-      condicion: 'Credito',
+      condicion: 'Crédito',
       forma_pago: 'Efectivo',
       total_factura: 7492.5,
       itbis: 0.0,
@@ -414,7 +414,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['condicion'] = this.condicion_fact;
       cabecera_fact['forma_pago'] = this.forma_pago;
       cabecera_fact['fecha_facturacion'] = null;
-      if (this.condicion_fact === 'Credito') {
+      if (this.condicion_fact === 'Crédito') {
         cabecera_fact['fecha_vencimiento'] = moment(new Date())
           .add(this.propietario_factura.limite_credito, 'days')
           .format('DD/MM/YYYY');
