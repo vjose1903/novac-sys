@@ -7,31 +7,13 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import { logoADM } from './files';
 import { IpcRenderer } from 'electron';
+import { IpcService } from '../ipc.service';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class PdfService {
-  private ipc: IpcRenderer
-  constructor() {
-    if ((<any>window).require) {
-      try {
-        this.ipc = (<any>window).require('electron').ipcRenderer;
-      } catch (e) {
-        throw e;
-      }
-    } else {
-      console.warn('App not running inside Electron!');
-    }
-  }
-
-
-
-  printApi() {
-    this.ipc.send("print");
-  }
-
 
   getInicioDeRuta(para) {
     const path = __dirname;

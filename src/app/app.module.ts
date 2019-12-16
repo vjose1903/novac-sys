@@ -27,6 +27,7 @@ import { AngularModule } from './modules/angular.module';
 import { ToastrModule } from 'ngx-toastr';
 import { TablasModule } from './components/tablas/tablas.module';
 import { UploadImgComponent } from './components/upload-img/upload-img.component';
+import { IpcService } from './core/services/ipc.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -56,6 +57,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       },
     }),
 
+
     //modulos
     AngularModule,
     MDBBootstrapModule,
@@ -67,4 +69,8 @@ export function HttpLoaderFactory(http: HttpClient) {
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly _ipc: IpcService) {
+  }
+
+}

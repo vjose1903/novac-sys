@@ -32,10 +32,7 @@ export const INDEXTOFOCUS = new BehaviorSubject<any>(0);
 // ===========================================================================
 export const showLoadin = new BehaviorSubject<boolean>(false);
 
-// ===========================================================================
-// PARA MOSTRAR MODAL DE INICIAR SESION
-// ===========================================================================
-export const showModalHome = new BehaviorSubject<boolean>(false);
+
 
 // ===========================================================================
 // PARA LOS DATOS DE SESIONAMIENTO

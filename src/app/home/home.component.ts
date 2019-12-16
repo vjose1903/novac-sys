@@ -6,6 +6,7 @@ import { UsuariosService } from '../core/services/usuarios.service';
 import { UsuariosI } from '../core/models/usuario.model';
 import { ToastrService } from 'ngx-toastr';
 import { DBservice } from '../core/services/bdservice.service';
+import { IpcService } from '../core/services/ipc.service';
 
 @Component({
   selector: 'app-home',
@@ -16,7 +17,7 @@ export class HomeComponent implements OnInit {
   loginForm: FormGroup;
   errorC = '';
   errorU = '';
-  constructor(private dbServ: DBservice, private toastr: ToastrService, private fb: FormBuilder, private router: Router, private usuariosServices: UsuariosService) {}
+  constructor(private dbServ: DBservice, private toastr: ToastrService, private fb: FormBuilder, private router: Router, private usuariosServices: UsuariosService, private _ipc:IpcService) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -34,6 +35,7 @@ export class HomeComponent implements OnInit {
         this.errorC = '';
         this.errorU = '';
         this.dbServ.toastSuccess('', 'Correcto');
+        this.getPrintersName()
       },
       err => {
         if (err.error.errors[0] === 'Usuario ingresado no existe') {
@@ -46,5 +48,13 @@ export class HomeComponent implements OnInit {
         }
       },
     );
+  }
+
+  getPrintersName(){
+    this._ipc.on('printersNameRes', (event: Electron.IpcMessageEvent, res) => {
+      this._ipc.PRINTERS_NEW(res)
+    });
+
+    this._ipc.send('printerNames');
   }
 }

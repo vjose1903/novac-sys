@@ -397,7 +397,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       suplidor: null,
       tipo_factura: 'Factura de consumo',
     };
-    this.pdfServ.makeFacturaVenta(factCon);
+    // this.pdfServ.makeFacturaVenta(factCon);
+    // this.pdfServ.printApi()
     // this.pdfServ.makeFacturaVenta(factCre);
   }
 

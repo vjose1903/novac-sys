@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, ipcMain } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, IpcMessageEvent } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -6,7 +6,7 @@ var win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
-
+let contents
 
 export let inicioRuta = __dirname;
 
@@ -27,8 +27,8 @@ function createWindow() {
       plugins: false
     },
   });
-
   if (serve) {
+    contents = win.webContents
     require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`),
     });
@@ -82,6 +82,11 @@ try {
   // Catch Error
   // throw e;
 }
-ipcMain.on('print', (event, arg) => {
+
+
+ipcMain.on('printerNames', (event: any, arg) => {
   // name of function
+  var printersName = contents.getPrinters()
+  event.sender.send('printersNameRes', printersName);
 })
+
