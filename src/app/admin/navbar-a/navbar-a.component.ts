@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChildren, ViewChild, AfterViewInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -19,7 +19,7 @@ const { dialog } = require('electron').remote;
   templateUrl: './navbar-a.component.html',
   styleUrls: ['./navbar-a.component.scss'],
 })
-export class NavbarAComponent implements OnInit, OnDestroy {
+export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   mantenimiento: boolean;
 
   sub = new Subscription();
@@ -33,7 +33,9 @@ export class NavbarAComponent implements OnInit, OnDestroy {
   seleccionModal: any;
   usuario;
   PrintersInstall: any;
-  constructor(private dbServ: DBservice, private breakpointObserver: BreakpointObserver, public usuariosServices: UsuariosService, private router: Router, private _ipc:IpcService) {
+  OpenPrinterMenu = false;
+  // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
+  constructor(private dbServ: DBservice, private breakpointObserver: BreakpointObserver, public usuariosServices: UsuariosService, private router: Router, private _ipc: IpcService) {
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
@@ -52,13 +54,12 @@ export class NavbarAComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.mantenimiento = true;
-    this._ipc.PRINTERS.subscribe(res=>{
-      if(res!=undefined){
-        this.PrintersInstall= res
+    this._ipc.PRINTERS.subscribe(res => {
+      if (res != undefined) {
+        this.PrintersInstall = res;
         console.log(res);
-        
       }
-    })
+    });
     // const userPayload = this.usuariosServices.getUserPayload();
     // this.usuariosServices.getUser(userPayload._id).subscribe(res => {
     //   const data = res as UsuariosI;
@@ -75,19 +76,30 @@ export class NavbarAComponent implements OnInit, OnDestroy {
     // this.sub.unsubscribe();
   }
 
+  element: HTMLElement;
+  ngAfterViewInit() {
+
+  }
+
+  stop(e) {
+    this.OpenPrinterMenu = true;
+    e.stopPropagation();
+  }
+
+  selectPrinter(name) {
+    console.log(name);
+    this.OpenPrinterMenu = false;
+  }
+  closePrinterMenu() {
+    this.OpenPrinterMenu = false;
+  }
+
+
+
   prueba1(hi: any) {
     console.log(hi._animationState);
   }
 
-  onHidden(): void {
-    console.log('Dropdown is hidden');
-  }
-  onShown(): void {
-    console.log('Dropdown is shown');
-  }
-  isOpenChange(): void {
-    console.log('Dropdown state is changed');
-  }
 
   mostarSubmenu(x: string) {
     console.log(this.mantenimiento);
