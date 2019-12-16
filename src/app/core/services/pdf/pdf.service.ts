@@ -6,12 +6,32 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import { logoADM } from './files';
+import { IpcRenderer } from 'electron';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class PdfService {
-  constructor() {}
+  private ipc: IpcRenderer
+  constructor() {
+    if ((<any>window).require) {
+      try {
+        this.ipc = (<any>window).require('electron').ipcRenderer;
+      } catch (e) {
+        throw e;
+      }
+    } else {
+      console.warn('App not running inside Electron!');
+    }
+  }
+
+
+
+  printApi() {
+    this.ipc.send("print");
+  }
+
 
   getInicioDeRuta(para) {
     const path = __dirname;
@@ -144,12 +164,12 @@ export class PdfService {
             data.condicion === 'Contado'
               ? null
               : {
-                  text: [
-                    { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                    { text: this.fecha(data.fecha_vencimiento), fontSize: 10 },
-                  ],
-                  margin: [60, 3, 0, 0],
-                },
+                text: [
+                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
+                  { text: this.fecha(data.fecha_vencimiento), fontSize: 10 },
+                ],
+                margin: [60, 3, 0, 0],
+              },
 
             {
               text: [
@@ -253,16 +273,16 @@ export class PdfService {
         // margin: [0, 1, 0, 0],
         //  layout: 'lightHorizontalLines'
         layout: {
-          hLineWidth: function(i, node) {
+          hLineWidth: function (i, node) {
             return i === node.table.body.length ? 2 : 1;
           },
-          vLineWidth: function(i, node) {
+          vLineWidth: function (i, node) {
             return 0;
           },
-          hLineColor: function(i, node) {
+          hLineColor: function (i, node) {
             return i === 0 || i === node.table.body.length || i === 1 ? 'black' : 'gray';
           },
-          vLineColor: function(i, node) {
+          vLineColor: function (i, node) {
             return i === 0 || i === node.table.widths.length ? 'black' : 'gray';
           },
         },
