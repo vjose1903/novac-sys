@@ -240,7 +240,7 @@ export class PdfService {
   // ==========================================================================================================================================================
   // CONTENIDO
   // ==========================================================================================================================================================
-  calcularPrecio(cant, precio) {
+  calcularPrecio(cant, precio, tipo) {
     const res = cant * precio;
     return this.redondearAdos(res);
   }
@@ -254,7 +254,7 @@ export class PdfService {
         detalle.descripcion,
         this.formatearNumero(this.redondearAdos(detalle.cantidad)),
         detalle.unidad,
-        this.formatearNumero(this.calcularPrecio(detalle.cantidad, detalle.precio)),
+        this.formatearNumero(this.calcularPrecio(detalle.cantidad, detalle.precio, '')),
         detalle.itbis !== 0 ? this.formatearNumero(this.redondearAdos(detalle.itbis)) : '',
         this.formatearNumero(this.redondearAdos(detalle.total)),
       );
@@ -370,6 +370,12 @@ export class PdfService {
     return content;
   }
   // ==========================================================================================================================================================
+  // PIE FACT VENTA
+  // ==========================================================================================================================================================
+
+  pieFactVenta() {}
+
+  // ==========================================================================================================================================================
   // UNIR FACTURA VENTA
   // ==========================================================================================================================================================
 
@@ -380,9 +386,22 @@ export class PdfService {
     const dd = {
       pageSize: { width: 760, height: 480 },
       pageMargins: data.condicion === 'Contado' ? [25, 165.5, 25, 40] : [25, 184, 25, 40],
-      pageOrientation: 'landscape',
       header: this.cabeceraFacturaVenta(data),
       content: this.contenidoFacturaVenta(data),
+      footer: (currentPage, pageCount) => {
+        return [
+          {
+            text: 'pag: ' + currentPage.toString() + ' de ' + pageCount,
+            alignment: 'right',
+            margin: [0, 0, 30, 0],
+          },
+          {
+            text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+            alignment: 'center',
+            margin: [0, -15, 0, 0],
+          },
+        ];
+      },
       images: {
         logo: logoADM,
       },
@@ -391,8 +410,43 @@ export class PdfService {
       },
     };
 
-    var win = window.open('', '_blank');
-    pdfMake.createPdf(dd).print({}, win);
+    console.log(JSON.stringify(dd));
+    
+    // var win = window.open('', '_blank');
+    // pdfMake.createPdf(dd).print({}, win);
     // pdfMake.createPdf(dd).download('prueba.pdf');
   }
+
+  // imprimir(filename, conexion) {
+  //   console.log('filename', filename);
+
+  //   nodePrinter.printFile({
+  //     filename: filename,
+
+  //     nodePrinter: process.env[3],
+  //     // printer name, if missing then will print to default printer
+
+  //     success: function(jobID) {
+  //       conexion.send(
+  //         JSON.stringify({
+  //           type: 'success_print',
+  //           data: { msj: 'impresion correcta ' + filename },
+  //         }),
+  //       );
+
+  //       console.log('sent to printer with ID: ' + jobID);
+  //     },
+
+  //     error: function(err) {
+  //       conexion.send(
+  //         JSON.stringify({
+  //           type: 'error_print',
+  //           data: { msj: 'impresion incorrecta ' + filename },
+  //         }),
+  //       );
+
+  //       console.log('errrrrrrr', err);
+  //     },
+  //   });
+  // }
 }
