@@ -399,7 +399,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     };
     // this.pdfServ.makeFacturaVenta(factCon);
     // this.pdfServ.printApi()
-    // this.pdfServ.makeFacturaVenta(factCre);
+    this.pdfServ.makeFacturaVenta(factCre);
   }
 
   IMPRIMIR() {

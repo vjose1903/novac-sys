@@ -33,7 +33,7 @@ export class NavbarAComponent implements OnInit, OnDestroy {
   seleccionModal: any;
   usuario;
   PrintersInstall: any;
-  constructor(private dbServ: DBservice, private breakpointObserver: BreakpointObserver, public usuariosServices: UsuariosService, private router: Router, private _ipc:IpcService) {
+  constructor(private dbServ: DBservice, private breakpointObserver: BreakpointObserver, public usuariosServices: UsuariosService, private router: Router, private _ipc: IpcService) {
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
@@ -52,13 +52,12 @@ export class NavbarAComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.mantenimiento = true;
-    this._ipc.PRINTERS.subscribe(res=>{
-      if(res!=undefined){
-        this.PrintersInstall= res
+    this._ipc.PRINTERS.subscribe(res => {
+      if (res !== undefined) {
+        this.PrintersInstall = res;
         console.log(res);
-        
       }
-    })
+    });
     // const userPayload = this.usuariosServices.getUserPayload();
     // this.usuariosServices.getUser(userPayload._id).subscribe(res => {
     //   const data = res as UsuariosI;

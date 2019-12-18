@@ -9,12 +9,10 @@ import { logoADM } from './files';
 import { IpcRenderer } from 'electron';
 import { IpcService } from '../ipc.service';
 
-
 @Injectable({
   providedIn: 'root',
 })
 export class PdfService {
-
   getInicioDeRuta(para) {
     const path = __dirname;
     const pathSplit = _.split(path, '/');
@@ -146,12 +144,12 @@ export class PdfService {
             data.condicion === 'Contado'
               ? null
               : {
-                text: [
-                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                  { text: this.fecha(data.fecha_vencimiento), fontSize: 10 },
-                ],
-                margin: [60, 3, 0, 0],
-              },
+                  text: [
+                    { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
+                    { text: this.fecha(data.fecha_vencimiento), fontSize: 10 },
+                  ],
+                  margin: [60, 3, 0, 0],
+                },
 
             {
               text: [
@@ -255,16 +253,16 @@ export class PdfService {
         // margin: [0, 1, 0, 0],
         //  layout: 'lightHorizontalLines'
         layout: {
-          hLineWidth: function (i, node) {
+          hLineWidth: function(i, node) {
             return i === node.table.body.length ? 2 : 1;
           },
-          vLineWidth: function (i, node) {
+          vLineWidth: function(i, node) {
             return 0;
           },
-          hLineColor: function (i, node) {
+          hLineColor: function(i, node) {
             return i === 0 || i === node.table.body.length || i === 1 ? 'black' : 'gray';
           },
-          vLineColor: function (i, node) {
+          vLineColor: function(i, node) {
             return i === 0 || i === node.table.widths.length ? 'black' : 'gray';
           },
         },
@@ -351,11 +349,6 @@ export class PdfService {
 
     return content;
   }
-  // ==========================================================================================================================================================
-  // PIE FACT VENTA
-  // ==========================================================================================================================================================
-
-  pieFactVenta() {}
 
   // ==========================================================================================================================================================
   // UNIR FACTURA VENTA
@@ -363,7 +356,7 @@ export class PdfService {
 
   makeFacturaVenta(data) {
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
-    console.log(data);
+    // console.log(data);
 
     const dd = {
       pageSize: { width: 760, height: 480 },
@@ -392,10 +385,20 @@ export class PdfService {
       },
     };
 
-    console.log(JSON.stringify(dd));
-    
+    const options = { silent: true };
+    const PDF = pdfMake.createPdf(dd);
+    console.log(PDF);
+
+    PDF.print(options, (success, errorType) => {
+      if (success) {
+        console.log('todo correcto');
+      } else {
+        console.log('error');
+        console.log(errorType);
+      }
+    });
+
     // var win = window.open('', '_blank');
-    // pdfMake.createPdf(dd).print({}, win);
     // pdfMake.createPdf(dd).download('prueba.pdf');
   }
 
