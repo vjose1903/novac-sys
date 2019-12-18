@@ -385,18 +385,19 @@ export class PdfService {
       },
     };
 
-    const options = { silent: true };
     const PDF = pdfMake.createPdf(dd);
-    console.log(PDF);
+    return PDF;
 
-    PDF.print(options, (success, errorType) => {
-      if (success) {
-        console.log('todo correcto');
-      } else {
-        console.log('error');
-        console.log(errorType);
-      }
-    });
+    // console.log(JSON.stringify(dd));
+
+    // PDF.print(options, (success, errorType) => {
+    //   if (success) {
+    //     console.log('todo correcto');
+    //   } else {
+    //     console.log('error');
+    //     console.log(errorType);
+    //   }
+    // });
 
     // var win = window.open('', '_blank');
     // pdfMake.createPdf(dd).download('prueba.pdf');

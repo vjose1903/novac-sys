@@ -8,6 +8,7 @@ import { map, filter } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import { IpcService } from '../../core/services/ipc.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -55,6 +56,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   lista_secuencia_facturas: any;
   secuenciaVenta: any;
   constructor(
+    private _ipc: IpcService,
     private mServ: ModalService,
     private obsServ: ObservableServcie,
     private dbServ: DBservice,
@@ -397,9 +399,16 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       suplidor: null,
       tipo_factura: 'Factura de consumo',
     };
+
+    this._ipc.on('testRes', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+    });
+    const Fact = this.pdfServ.makeFacturaVenta(factCre);
+
+    this._ipc.send('test', Fact);
+
     // this.pdfServ.makeFacturaVenta(factCon);
-    // this.pdfServ.printApi()
-    this.pdfServ.makeFacturaVenta(factCre);
+    // this._ipc.PRINTERS()
   }
 
   IMPRIMIR() {
@@ -440,7 +449,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['tipo'] = 'venta';
       cabecera_fact['user_id'] = empleado.id;
       console.log(cabecera_fact);
-      
+
       // this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
       //   this.pdfServ.makeFacturaVenta(res);
       // });

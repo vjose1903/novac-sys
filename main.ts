@@ -6,7 +6,7 @@ var win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
-let contents
+let contents;
 
 export let inicioRuta = __dirname;
 
@@ -24,11 +24,11 @@ function createWindow() {
     minHeight: size.height,
     webPreferences: {
       nodeIntegration: true,
-      plugins: false
+      plugins: false,
     },
   });
   if (serve) {
-    contents = win.webContents
+    contents = win.webContents;
     require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`),
     });
@@ -83,10 +83,22 @@ try {
   // throw e;
 }
 
-
 ipcMain.on('printerNames', (event: any, arg) => {
   // name of function
-  var printersName = contents.getPrinters()
+  var printersName = contents.getPrinters();
   event.sender.send('printersNameRes', printersName);
-})
+});
 
+ipcMain.on('test', (event: any, arg) => {
+  // name of function
+  // console.log(arg);
+  const options = { silent: true };
+
+  arg.print(options, (success, errorType) => {
+    if (success) {
+      event.sender.send('testRes', 'todo Correcto');
+    } else {
+      event.sender.send('testRes', errorType);
+    }
+  });
+});
