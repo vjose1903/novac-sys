@@ -5,9 +5,8 @@ import * as _ from 'lodash';
 
 import * as moment from 'moment';
 
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { logoADM } from './files';
 
 var win, serve;
@@ -32,7 +31,7 @@ function createWindow() {
     minHeight: size.height,
     webPreferences: {
       nodeIntegration: true,
-      plugins: false,
+      plugins: true,
     },
   });
   if (serve) {
@@ -98,12 +97,12 @@ ipcMain.on('printerNames', (event: any, arg) => {
 });
 
 ipcMain.on('test', (event: any, arg) => {
-  // name of function
   // console.log(arg);
-  const options = { silent: true };
-  console.log(arg);
+
   const PDF = makeFacturaVenta(arg);
-  
+  // console.log(PDF);
+
+  const options = { silent: true };
   PDF.print(options, (success, errorType) => {
     if (success) {
       event.sender.send('testRes', 'todo Correcto');
@@ -442,6 +441,8 @@ function contenidoFacturaVenta(data) {
 // ==========================================================================================================================================================
 
 function makeFacturaVenta(data) {
+  // console.log(data);
+
   pdfMake.vfs = pdfFonts.pdfMake.vfs;
   // console.log(data);
 

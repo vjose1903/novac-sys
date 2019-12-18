@@ -13,6 +13,7 @@ import { IpcService } from '../ipc.service';
   providedIn: 'root',
 })
 export class PdfService {
+  
   getInicioDeRuta(para) {
     const path = __dirname;
     const pathSplit = _.split(path, '/');
