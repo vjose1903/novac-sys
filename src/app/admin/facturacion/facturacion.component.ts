@@ -403,9 +403,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this._ipc.on('testRes', (event: Electron.IpcMessageEvent, res) => {
       console.log(res);
     });
-    const Fact = this.pdfServ.makeFacturaVenta(factCre);
+    // const Fact = this.pdfServ.makeFacturaVenta(factCre);
 
-    this._ipc.send('test', Fact);
+    this._ipc.send('test', factCre);
 
     // this.pdfServ.makeFacturaVenta(factCon);
     // this._ipc.PRINTERS()

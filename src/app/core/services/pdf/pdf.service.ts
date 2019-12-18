@@ -388,19 +388,7 @@ export class PdfService {
     const PDF = pdfMake.createPdf(dd);
     return PDF;
 
-    // console.log(JSON.stringify(dd));
-
-    // PDF.print(options, (success, errorType) => {
-    //   if (success) {
-    //     console.log('todo correcto');
-    //   } else {
-    //     console.log('error');
-    //     console.log(errorType);
-    //   }
-    // });
-
-    // var win = window.open('', '_blank');
-    // pdfMake.createPdf(dd).download('prueba.pdf');
+   
   }
 
   // imprimir(filename, conexion) {
