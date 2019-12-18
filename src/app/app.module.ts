@@ -57,7 +57,6 @@ export function HttpLoaderFactory(http: HttpClient) {
       },
     }),
 
-
     //modulos
     AngularModule,
     MDBBootstrapModule,
@@ -71,6 +70,14 @@ export function HttpLoaderFactory(http: HttpClient) {
 })
 export class AppModule {
   constructor(private readonly _ipc: IpcService) {
+    this.getPrintersName();
   }
 
+  getPrintersName() {
+    this._ipc.on('printersNameRes', (event: Electron.IpcMessageEvent, res) => {
+      this._ipc.PRINTERS_NEW(res);
+    });
+
+    this._ipc.send('printerNames');
+  }
 }

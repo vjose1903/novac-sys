@@ -13,7 +13,7 @@
 }
 
 .titulo {
-  font-family: "Lobster";
+  font-family: 'Lobster';
   font-size: 1.5rem;
   color: #0b4a18;
   padding: 0;
@@ -246,13 +246,13 @@ mat-list-item {
 }
 
 /* botones de opciones */
-#dropdown-item {
+.dropdown-item {
   display: block;
   color: #333;
   padding: 15px 25px;
   font-size: 14px;
 }
-#dropdown-item:hover {
+.dropdown-item:hover {
   border-radius: 2px;
   background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
   color: #fff;
@@ -277,3 +277,16 @@ mat-list-item {
 .fas {
   margin-right: 1rem;
 }
+
+.selectPrint {
+  transform: translate(-25.1rem, 16.5rem);
+  background-color: white;
+  border-radius: 0.2rem;
+  position: absolute;
+  max-width: 13.7rem;
+  display: none;
+  &.open{
+    display: block !important;
+  }
+}
+
