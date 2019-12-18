@@ -13,7 +13,6 @@ import { IpcService } from '../ipc.service';
   providedIn: 'root',
 })
 export class PdfService {
-  
   getInicioDeRuta(para) {
     const path = __dirname;
     const pathSplit = _.split(path, '/');
@@ -386,10 +385,25 @@ export class PdfService {
       },
     };
 
-    const PDF = pdfMake.createPdf(dd);
-    return PDF;
+    // const options = { silent: true };
+    // const PDF = pdfMake.createPdf(dd);
+    // console.log(PDF);
 
-   
+    // console.log(JSON.stringify(dd));
+    
+
+
+    // PDF.print(options, (success, errorType) => {
+    //   if (success) {
+    //     console.log('todo correcto');
+    //   } else {
+    //     console.log('error');
+    //     console.log(errorType);
+    //   }
+    // });
+
+    // var win = window.open('', '_blank');
+    // pdfMake.createPdf(dd).download('prueba.pdf');
   }
 
   // imprimir(filename, conexion) {

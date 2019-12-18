@@ -97,19 +97,26 @@ ipcMain.on('printerNames', (event: any, arg) => {
 });
 
 ipcMain.on('test', (event: any, arg) => {
+  let options = { silent: true };
+
+  contents.print(options, err => {
+    if (!err) console.error('printing failed');
+  });
+
   // console.log(arg);
 
-  const PDF = makeFacturaVenta(arg);
+  // const PDF = makeFacturaVenta(arg);
   // console.log(PDF);
 
-  const options = { silent: true };
-  PDF.print(options, (success, errorType) => {
-    if (success) {
-      event.sender.send('testRes', 'todo Correcto');
-    } else {
-      event.sender.send('testRes', errorType);
-    }
-  });
+  // const options = { silent: true };
+
+  // PDF.print(options, (success, errorType) => {
+  //   if (success) {
+  //     event.sender.send('testRes', 'todo Correcto');
+  //   } else {
+  //     event.sender.send('testRes', errorType);
+  //   }
+  // });
 });
 // ==========================================================================================================================================================
 
@@ -304,7 +311,7 @@ function cabeceraFacturaVenta(data) {
 
 // ==========================================================================================================================================================
 // CONTENIDO
-// ==========================================================================================================================================================
+// =========================================================~=================================================================================================
 function calcularPrecio(cant, precio, tipo) {
   const res = cant * precio;
   return redondearAdos(res);
@@ -473,6 +480,12 @@ function makeFacturaVenta(data) {
     },
   };
 
-  const PDF = pdfMake.createPdf(dd);
-  return PDF;
+  // const PDF = pdfMake.createPdf(dd);
+  const options = { silent: true };
+  // var win = window.open('', '_blank');
+  // pdfMake.createPdf(dd).download('prueba.pdf');
+  pdfMake.createPdf(dd).download('efef');
+  // console.log(PDF);
+
+  // return PDF;
 }
