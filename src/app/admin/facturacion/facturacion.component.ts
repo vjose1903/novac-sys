@@ -404,9 +404,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       console.log(res);
     });
     const Fact = this.pdfServ.makeFacturaVenta(factCre);
-console.log(Fact);
 
-    this._ipc.send('test', Fact);
+    
 
     // this.pdfServ.makeFacturaVenta(factCon);
     // this._ipc.PRINTERS()

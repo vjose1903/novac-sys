@@ -99,7 +99,7 @@ ipcMain.on('printerNames', (event: any, arg) => {
 });
 
 function convert(base64) {
-  const imageBlob = dataURItoBlob(base64.base64);
+  var imageBlob = dataURItoBlob(base64.base64);
   return new File([imageBlob], base64.name, { type: 'application/pdf' });
 }
 
@@ -119,14 +119,17 @@ ipcMain.on('test', (event: any, arg) => {
   let options = { silent: true };
   var format = 'RAW';
   var obj = {
-    base64: logoADM,
-    name: 'prueba'
-  }
-  var File= convert(obj)
-  console.log(File);
-  
-  // function to create file from base64 encoded string
+    base64: arg,
+    name: 'prueba',
+  };
+  // var File = convert(obj);
 
+  fs.writeFile('application/pdf', arg, { encoding: 'base64' }, function(err) {
+    console.log('File created', err);
+  });
+  console.log(obj);
+
+  // function to create file from base64 encoded string
 
   // var data = fs.readFileSync(logoADM).toString()
 
@@ -140,7 +143,6 @@ ipcMain.on('test', (event: any, arg) => {
   // console.log(p.getPrinters())
 
   // console.log(data);
-
 
   // data.print(options, err => {
   //   if (!err) console.error('printing failed')
@@ -282,12 +284,12 @@ function cabeceraFacturaVenta(data) {
           data.condicion === 'Contado'
             ? null
             : {
-              text: [
-                { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                { text: fecha(data.fecha_vencimiento), fontSize: 10 },
-              ],
-              margin: [60, 3, 0, 0],
-            },
+                text: [
+                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
+                  { text: fecha(data.fecha_vencimiento), fontSize: 10 },
+                ],
+                margin: [60, 3, 0, 0],
+              },
 
           {
             text: [
@@ -392,16 +394,16 @@ function contenidoFacturaVenta(data) {
       // margin: [0, 1, 0, 0],
       //  layout: 'lightHorizontalLines'
       layout: {
-        hLineWidth: function (i, node) {
+        hLineWidth: function(i, node) {
           return i === node.table.body.length ? 2 : 1;
         },
-        vLineWidth: function (i, node) {
+        vLineWidth: function(i, node) {
           return 0;
         },
-        hLineColor: function (i, node) {
+        hLineColor: function(i, node) {
           return i === 0 || i === node.table.body.length || i === 1 ? 'black' : 'gray';
         },
-        vLineColor: function (i, node) {
+        vLineColor: function(i, node) {
           return i === 0 || i === node.table.widths.length ? 'black' : 'gray';
         },
       },

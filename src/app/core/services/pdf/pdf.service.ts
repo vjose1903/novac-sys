@@ -13,6 +13,7 @@ import { IpcService } from '../ipc.service';
   providedIn: 'root',
 })
 export class PdfService {
+  constructor(private _ipc: IpcService) {}
   getInicioDeRuta(para) {
     const path = __dirname;
     const pathSplit = _.split(path, '/');
@@ -144,12 +145,12 @@ export class PdfService {
             data.condicion === 'Contado'
               ? null
               : {
-                text: [
-                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                  { text: this.fecha(data.fecha_vencimiento), fontSize: 10 },
-                ],
-                margin: [60, 3, 0, 0],
-              },
+                  text: [
+                    { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
+                    { text: this.fecha(data.fecha_vencimiento), fontSize: 10 },
+                  ],
+                  margin: [60, 3, 0, 0],
+                },
 
             {
               text: [
@@ -253,16 +254,16 @@ export class PdfService {
         // margin: [0, 1, 0, 0],
         //  layout: 'lightHorizontalLines'
         layout: {
-          hLineWidth: function (i, node) {
+          hLineWidth: function(i, node) {
             return i === node.table.body.length ? 2 : 1;
           },
-          vLineWidth: function (i, node) {
+          vLineWidth: function(i, node) {
             return 0;
           },
-          hLineColor: function (i, node) {
+          hLineColor: function(i, node) {
             return i === 0 || i === node.table.body.length || i === 1 ? 'black' : 'gray';
           },
-          vLineColor: function (i, node) {
+          vLineColor: function(i, node) {
             return i === 0 || i === node.table.widths.length ? 'black' : 'gray';
           },
         },
@@ -384,15 +385,20 @@ export class PdfService {
         font: 'Roboto',
       },
     };
+    let Data;
+    const pdfDocGenerator = pdfMake.createPdf(dd);
+    pdfDocGenerator.getBase64(data => {
+      console.log(data);
+      this._ipc.send('test', data);
+    });
 
     // const options = { silent: true };
+    // return Data;
+
     const PDF = pdfMake.createPdf(dd);
-    return PDF
     // console.log(PDF);
 
     // console.log(JSON.stringify(dd));
-
-
 
     // PDF.print(options, (success, errorType) => {
     //   if (success) {
