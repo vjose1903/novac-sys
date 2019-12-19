@@ -3,8 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
-
-import * as p from 'printer';
+//import * as p from 'printer';
 import * as moment from 'moment';
 import * as base64 from 'base64topdf';
 
@@ -119,14 +118,19 @@ ipcMain.on('printerNames', (event: any, arg) => {
 ipcMain.on('test', (event: any, arg) => {
   let options = { silent: true };
 
-  let decodedBase64 = base64.base64Decode(arg, 'PdfFileNameToWrite');
-
-  decodedBase64.print(options, err => {
-        if (!err) console.error('printing failed')
-        else {
-          console.error('succes')
-        }
-      });
+  let decodedBase64 = base64.base64Decode(arg, 'test.pdf');
+  require('./test.pdf').print(options, err => {
+    if (!err) console.error('printing failed')
+    else {
+      console.error('succes')
+    }
+  });
+  //fs.open('./test.pdf').print(options, err => {
+  //    if (!err) console.error('printing failed')
+  //  else {
+  //        console.error('succes')
+  //      }
+  //    });
 
   // var format = 'RAW';
   // var obj = {
@@ -290,12 +294,12 @@ function cabeceraFacturaVenta(data) {
           data.condicion === 'Contado'
             ? null
             : {
-                text: [
-                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                  { text: fecha(data.fecha_vencimiento), fontSize: 10 },
-                ],
-                margin: [60, 3, 0, 0],
-              },
+              text: [
+                { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
+                { text: fecha(data.fecha_vencimiento), fontSize: 10 },
+              ],
+              margin: [60, 3, 0, 0],
+            },
 
           {
             text: [
@@ -400,16 +404,16 @@ function contenidoFacturaVenta(data) {
       // margin: [0, 1, 0, 0],
       //  layout: 'lightHorizontalLines'
       layout: {
-        hLineWidth: function(i, node) {
+        hLineWidth: function (i, node) {
           return i === node.table.body.length ? 2 : 1;
         },
-        vLineWidth: function(i, node) {
+        vLineWidth: function (i, node) {
           return 0;
         },
-        hLineColor: function(i, node) {
+        hLineColor: function (i, node) {
           return i === 0 || i === node.table.body.length || i === 1 ? 'black' : 'gray';
         },
-        vLineColor: function(i, node) {
+        vLineColor: function (i, node) {
           return i === 0 || i === node.table.widths.length ? 'black' : 'gray';
         },
       },
