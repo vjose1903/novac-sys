@@ -104,6 +104,7 @@
     "popper.js": "^1.15.0",
     "primeicons": "^2.0.0",
     "primeng": "^8.0.3",
+    "printer": "^0.4.0",
     "sass-google-fonts": "^1.0.1"
   }
 }

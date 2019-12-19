@@ -1,8 +1,10 @@
 import { app, BrowserWindow, screen, ipcMain, IpcMessageEvent } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
 
+import * as p from 'printer';
 import * as moment from 'moment';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
@@ -87,7 +89,7 @@ try {
   });
 } catch (e) {
   // Catch Error
-  // throw e;
+  throw e;
 }
 
 ipcMain.on('printerNames', (event: any, arg) => {
@@ -96,12 +98,56 @@ ipcMain.on('printerNames', (event: any, arg) => {
   event.sender.send('printersNameRes', printersName);
 });
 
+function convert(base64) {
+  const imageBlob = dataURItoBlob(base64.base64);
+  return new File([imageBlob], base64.name, { type: 'application/pdf' });
+}
+
+function dataURItoBlob(dataURI) {
+  const byteString = window.atob(dataURI);
+
+  const arrayBuffer = new ArrayBuffer(byteString.length);
+  const int8Array = new Uint8Array(arrayBuffer);
+  for (let i = 0; i < byteString.length; i++) {
+    int8Array[i] = byteString.charCodeAt(i);
+  }
+  const blob = new Blob([int8Array], { type: 'application/pdf' });
+  return blob;
+}
+
 ipcMain.on('test', (event: any, arg) => {
   let options = { silent: true };
+  var format = 'RAW';
+  var obj = {
+    base64: logoADM,
+    name: 'prueba'
+  }
+  var File= convert(obj)
+  console.log(File);
+  
+  // function to create file from base64 encoded string
 
-  contents.print(options, err => {
-    if (!err) console.error('printing failed');
-  });
+
+  // var data = fs.readFileSync(logoADM).toString()
+
+  // print(options, err => {
+  //     if (!err) console.error('printing failed')
+  //     else {
+  //       console.error('succes')
+  //     }
+  //   });
+
+  // console.log(p.getPrinters())
+
+  // console.log(data);
+
+
+  // data.print(options, err => {
+  //   if (!err) console.error('printing failed')
+  //   else {
+  //     console.error('succes')
+  //   }
+  // });
 
   // console.log(arg);
 
@@ -236,12 +282,12 @@ function cabeceraFacturaVenta(data) {
           data.condicion === 'Contado'
             ? null
             : {
-                text: [
-                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                  { text: fecha(data.fecha_vencimiento), fontSize: 10 },
-                ],
-                margin: [60, 3, 0, 0],
-              },
+              text: [
+                { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
+                { text: fecha(data.fecha_vencimiento), fontSize: 10 },
+              ],
+              margin: [60, 3, 0, 0],
+            },
 
           {
             text: [
@@ -346,16 +392,16 @@ function contenidoFacturaVenta(data) {
       // margin: [0, 1, 0, 0],
       //  layout: 'lightHorizontalLines'
       layout: {
-        hLineWidth: function(i, node) {
+        hLineWidth: function (i, node) {
           return i === node.table.body.length ? 2 : 1;
         },
-        vLineWidth: function(i, node) {
+        vLineWidth: function (i, node) {
           return 0;
         },
-        hLineColor: function(i, node) {
+        hLineColor: function (i, node) {
           return i === 0 || i === node.table.body.length || i === 1 ? 'black' : 'gray';
         },
-        vLineColor: function(i, node) {
+        vLineColor: function (i, node) {
           return i === 0 || i === node.table.widths.length ? 'black' : 'gray';
         },
       },
