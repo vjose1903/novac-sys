@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 
 import * as p from 'printer';
 import * as moment from 'moment';
+import * as base64 from 'base64topdf';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -98,36 +99,41 @@ ipcMain.on('printerNames', (event: any, arg) => {
   event.sender.send('printersNameRes', printersName);
 });
 
-function convert(base64) {
-  var imageBlob = dataURItoBlob(base64.base64);
-  return new File([imageBlob], base64.name, { type: 'application/pdf' });
-}
+// function convert(base64) {
+//   var imageBlob = dataURItoBlob(base64.base64);
+//   return new File([imageBlob], base64.name, { type: 'application/pdf' });
+// }
 
-function dataURItoBlob(dataURI) {
-  const byteString = window.atob(dataURI);
+// function dataURItoBlob(dataURI) {
+//   const byteString = window.atob(dataURI);
 
-  const arrayBuffer = new ArrayBuffer(byteString.length);
-  const int8Array = new Uint8Array(arrayBuffer);
-  for (let i = 0; i < byteString.length; i++) {
-    int8Array[i] = byteString.charCodeAt(i);
-  }
-  const blob = new Blob([int8Array], { type: 'application/pdf' });
-  return blob;
-}
+//   const arrayBuffer = new ArrayBuffer(byteString.length);
+//   const int8Array = new Uint8Array(arrayBuffer);
+//   for (let i = 0; i < byteString.length; i++) {
+//     int8Array[i] = byteString.charCodeAt(i);
+//   }
+//   const blob = new Blob([int8Array], { type: 'application/pdf' });
+//   return blob;
+// }
 
 ipcMain.on('test', (event: any, arg) => {
   let options = { silent: true };
-  var format = 'RAW';
-  var obj = {
-    base64: arg,
-    name: 'prueba',
-  };
-  // var File = convert(obj);
 
-  fs.writeFile('application/pdf', arg, { encoding: 'base64' }, function(err) {
-    console.log('File created', err);
-  });
-  console.log(obj);
+  let decodedBase64 = base64.base64Decode(arg, 'PdfFileNameToWrite');
+
+  decodedBase64.print(options, err => {
+        if (!err) console.error('printing failed')
+        else {
+          console.error('succes')
+        }
+      });
+
+  // var format = 'RAW';
+  // var obj = {
+  //   base64: arg,
+  //   name: 'prueba',
+  // };
+  // var File = convert(obj);
 
   // function to create file from base64 encoded string
 
