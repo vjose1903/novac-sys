@@ -512,6 +512,7 @@ function makeFacturaVenta(data) {
   // pdfMake.vfs = pdfFonts.pdfMake.vfs;
   // console.log(data);
 
+
   const dd = {
     pageSize: { width: 760, height: 480 },
     pageMargins: data.condicion === 'Contado' ? [25, 165.5, 25, 40] : [25, 184, 25, 40],
