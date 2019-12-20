@@ -293,12 +293,12 @@ function cabeceraFacturaVenta(data) {
           data.condicion === 'Contado'
             ? null
             : {
-                text: [
-                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                  { text: fecha(data.fecha_vencimiento), fontSize: 10 },
-                ],
-                margin: [60, 3, 0, 0],
-              },
+              text: [
+                { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
+                { text: fecha(data.fecha_vencimiento), fontSize: 10 },
+              ],
+              margin: [60, 3, 0, 0],
+            },
 
           {
             text: [
@@ -404,16 +404,16 @@ function contenidoFacturaVenta(data) {
       // margin: [0, 1, 0, 0],
       //  layout: 'lightHorizontalLines'
       layout: {
-        hLineWidth: function(i, node) {
+        hLineWidth: function (i, node) {
           return i === node.table.body.length ? 2 : 1;
         },
-        vLineWidth: function(i, node) {
+        vLineWidth: function (i, node) {
           return 0;
         },
-        hLineColor: function(i, node) {
+        hLineColor: function (i, node) {
           return i === 0 || i === node.table.body.length || i === 1 ? 'black' : 'gray';
         },
-        vLineColor: function(i, node) {
+        vLineColor: function (i, node) {
           return i === 0 || i === node.table.widths.length ? 'black' : 'gray';
         },
       },
@@ -526,10 +526,10 @@ function makeFacturaVenta(data) {
         },
         data.condicion === 'Contado'
           ? {
-              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-              alignment: 'center',
-              margin: [0, -15, 0, 0],
-            }
+            text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+            alignment: 'center',
+            margin: [0, -15, 0, 0],
+          }
           : null,
       ];
     },
@@ -574,9 +574,12 @@ function makeFacturaVenta(data) {
 function imprimir(cFileName) {
   const sumatrapdf_path = PathApp() + 'print\\lp.exe';
 
+
   // var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
   const { exec } = require('child_process');
-  exec(`${sumatrapdf_path} -print-to-default -print-settings "fit" ${cFileName}`, (error, stdout, stderr) => {});
+
+  // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
+  exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\ADM-Agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
 }
 function PathApp() {
   return app.getPath('exe').substr(0, app.getPath('exe').indexOf(app.getName() + '.exe'));
