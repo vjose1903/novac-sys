@@ -385,17 +385,10 @@ export class PdfService {
         font: 'Roboto',
       },
     };
-    let Data;
-    const pdfDocGenerator = pdfMake.createPdf(dd);
-    pdfDocGenerator.getBase64(data => {
-      console.log(data);
-      this._ipc.send('test', data);
-    });
-
-    // const options = { silent: true };
-    // return Data;
 
     const PDF = pdfMake.createPdf(dd);
+    return dd;
+
     // console.log(PDF);
 
     // console.log(JSON.stringify(dd));
