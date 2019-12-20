@@ -3,11 +3,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
-//import * as p from 'printer';
+
 import * as moment from 'moment';
 import * as base64 from 'base64topdf';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// import * as pdfMake from 'pdfmake/src/print';
+var pdfmake = require('pdfmake/src/printer');
+
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { logoADM } from './files';
 
@@ -117,14 +119,9 @@ ipcMain.on('printerNames', (event: any, arg) => {
 
 ipcMain.on('test', (event: any, arg) => {
   let options = { silent: true };
+  event.sender.send('testRes', 'llego' + arg);
 
-  let decodedBase64 = base64.base64Decode(arg, 'test.pdf');
-  require('./test.pdf').print(options, err => {
-    if (!err) console.error('printing failed')
-    else {
-      console.error('succes')
-    }
-  });
+  makeFacturaVenta(arg);
   //fs.open('./test.pdf').print(options, err => {
   //    if (!err) console.error('printing failed')
   //  else {
@@ -210,6 +207,8 @@ function hora(a: any) {
 // CABECERA
 // ==========================================================================================================================================================
 function cabeceraFacturaVenta(data) {
+  console.log('CABEZA=============', data);
+
   const header = [
     {
       columns: [
@@ -294,12 +293,12 @@ function cabeceraFacturaVenta(data) {
           data.condicion === 'Contado'
             ? null
             : {
-              text: [
-                { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                { text: fecha(data.fecha_vencimiento), fontSize: 10 },
-              ],
-              margin: [60, 3, 0, 0],
-            },
+                text: [
+                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
+                  { text: fecha(data.fecha_vencimiento), fontSize: 10 },
+                ],
+                margin: [60, 3, 0, 0],
+              },
 
           {
             text: [
@@ -376,6 +375,7 @@ function calcularPrecio(cant, precio, tipo) {
 }
 
 function contenidoFacturaVenta(data) {
+  console.log('CONTENIDO=============', data);
   const tempBody = [];
   data.detalle_facturas.forEach((detalle, i) => {
     const row = [];
@@ -404,16 +404,16 @@ function contenidoFacturaVenta(data) {
       // margin: [0, 1, 0, 0],
       //  layout: 'lightHorizontalLines'
       layout: {
-        hLineWidth: function (i, node) {
+        hLineWidth: function(i, node) {
           return i === node.table.body.length ? 2 : 1;
         },
-        vLineWidth: function (i, node) {
+        vLineWidth: function(i, node) {
           return 0;
         },
-        hLineColor: function (i, node) {
+        hLineColor: function(i, node) {
           return i === 0 || i === node.table.body.length || i === 1 ? 'black' : 'gray';
         },
-        vLineColor: function (i, node) {
+        vLineColor: function(i, node) {
           return i === 0 || i === node.table.widths.length ? 'black' : 'gray';
         },
       },
@@ -507,8 +507,9 @@ function contenidoFacturaVenta(data) {
 
 function makeFacturaVenta(data) {
   // console.log(data);
+  console.log(data);
 
-  pdfMake.vfs = pdfFonts.pdfMake.vfs;
+  // pdfMake.vfs = pdfFonts.pdfMake.vfs;
   // console.log(data);
 
   const dd = {
@@ -523,11 +524,13 @@ function makeFacturaVenta(data) {
           alignment: 'right',
           margin: [0, 0, 30, 0],
         },
-        {
-          text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-          alignment: 'center',
-          margin: [0, -15, 0, 0],
-        },
+        data.condicion === 'Contado'
+          ? {
+              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+              alignment: 'center',
+              margin: [0, -15, 0, 0],
+            }
+          : null,
       ];
     },
     images: {
@@ -537,13 +540,45 @@ function makeFacturaVenta(data) {
       font: 'Roboto',
     },
   };
+  console.log('paso');
 
-  // const PDF = pdfMake.createPdf(dd);
-  const options = { silent: true };
-  // var win = window.open('', '_blank');
-  // pdfMake.createPdf(dd).download('prueba.pdf');
-  pdfMake.createPdf(dd).download('efef');
-  // console.log(PDF);
+  // console.log(dd);
 
-  // return PDF;
+  let type_font = 'roboto\\Roboto';
+  var fontDescriptors = {
+    Roboto: {
+      normal: PathApp() + 'fonts\\' + type_font + '-Regular.ttf',
+      bold: PathApp() + 'fonts\\' + type_font + '-Bold.ttf',
+      italics: PathApp() + 'fonts\\' + type_font + '-Italic.ttf',
+      bolditalics: PathApp() + 'fonts\\' + type_font + '-BoldItalic.ttf',
+    },
+  };
+  var printer = new pdfmake(fontDescriptors);
+
+  let cFileName = 'test.pdf';
+  try {
+    var pdfDoc = printer.createPdfKitDocument(dd);
+    pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', function() {
+      console.log('finizu');
+      imprimir(cFileName);
+    });
+    pdfDoc.end();
+  } catch (err) {
+    console.log('::::::::ERROR::::::::');
+
+    console.log(err);
+
+    win.webContents.send('testRes', 'Error creando factura!!');
+  }
+}
+
+function imprimir(cFileName) {
+  var sumatrapdf_path = PathApp() + 'print\\lp.exe';
+
+  var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
+  const { exec } = require('child_process');
+  exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,monochrome" -silent ${cFileName}`, (error, stdout, stderr) => {});
+}
+function PathApp() {
+  return app.getPath('exe').substr(0, app.getPath('exe').indexOf(app.getName() + '.exe'));
 }
