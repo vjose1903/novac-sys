@@ -26,6 +26,107 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  prueba() {
+    const factCre = {
+      id: 4,
+      tipo_factura_id: 2,
+      suplidor_id: null,
+      cliente_id: 2,
+      user_id: 1,
+      fecha_facturacion: '2019-12-08',
+      fecha_vencimiento: '2020-01-07',
+      fecha_valida: '2020-12-08',
+      numero_comprobante: 'B0100000001',
+      numero_factura: 4,
+      condicion: 'Crédito',
+      forma_pago: 'Efectivo',
+      total_factura: 7492.5,
+      itbis: 0.0,
+      descuento: 0.0,
+      estado: true,
+      tipo: 'venta',
+      created_at: '2019-12-08T18:33:55.439Z',
+      updated_at: '2019-12-08T18:33:55.439Z',
+      Bruto: 7492.5,
+      detalle_facturas: [
+        {
+          descripcion: 'maiz (25 LBS)',
+          unidad: 'Saco',
+          precio: 999.99,
+          total: 499,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 2,
+        },
+        {
+          descripcion: 'maiz (100 LBS)',
+          unidad: 'Saco',
+          precio: 999.99,
+          total: 6993,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 7,
+        },
+      ],
+      cliente: {
+        nombre: 'marcos',
+        direccion: 'la vega centro de la ciudad\n',
+        rnc: '047-0144534-5',
+      },
+      suplidor: null,
+      tipo_factura: 'Factura con valor fiscal',
+    };
+    const factCon = {
+      id: 15,
+      tipo_factura_id: 3,
+      suplidor_id: null,
+      cliente_id: 1,
+      user_id: 1,
+      fecha_facturacion: '2019-12-11',
+      fecha_vencimiento: null,
+      fecha_valida: '2020-12-11',
+      numero_comprobante: 'B0200000011',
+      numero_factura: 17,
+      condicion: 'Contado',
+      forma_pago: 'Efectivo',
+      total_factura: 2497.5,
+      itbis: 0.0,
+      descuento: 0.0,
+      estado: true,
+      tipo: 'venta',
+      created_at: '2019-12-11T12:39:38.318Z',
+      updated_at: '2019-12-11T12:39:38.318Z',
+      Bruto: 2497.5,
+      detalle_facturas: [
+        {
+          descripcion: 'maiz (50 LBS)',
+          unidad: 'Saco',
+          precio: 999.99,
+          total: 2497,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 5,
+        },
+      ],
+      cliente: {
+        nombre: 'Cliente contado',
+        direccion: 'Autopista duarte KM 0 el Higuero',
+        rnc: '',
+      },
+      suplidor: null,
+      tipo_factura: 'Factura de consumo',
+    };
+
+    this._ipc.on('testRes', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+    });
+    // const Fact = this.pdfServ.makeFacturaVenta(factCre);
+    // this.pdfServ.makeFacturaVenta(factCon);
+    console.log('presion');
+
+    this._ipc.send('test', factCon)
+  }
+
   // =================================================================
   // LOGIN
   // =================================================================

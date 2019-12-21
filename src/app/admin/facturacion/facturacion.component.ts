@@ -124,6 +124,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.decisionModal(res);
       }
     });
+
     this.dbServ
       .getClientes()
       .pipe(
@@ -143,6 +144,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       .subscribe(res => {
         this.listaClientes = res;
       });
+
     setTimeout(() => {
       this.enfocarInput('tipoFact');
     }, 5);
@@ -403,11 +405,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this._ipc.on('testRes', (event: Electron.IpcMessageEvent, res) => {
       console.log(res);
     });
-    // const Fact = this.pdfServ.makeFacturaVenta(factCre);
+    const Fact = this.pdfServ.makeFacturaVenta(factCre);
+    console.log(Fact);
+
     // this.pdfServ.makeFacturaVenta(factCon);
     console.log('presion');
 
-    this._ipc.send('test', factCon)
+    // this._ipc.send('test', factCon)
   }
 
   IMPRIMIR() {
@@ -441,17 +445,27 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['descuento'] = this.redondearAdos(this.DESCUENTO);
       cabecera_fact['estado'] = true;
       cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
-      cabecera_fact['cliente_id'] = this.propietario_factura.id;
+
+      if (this.propietario_factura.id === 1) {
+        cabecera_fact['cliente_id'] = null;
+        cabecera_fact['NoCliente_nombre'] = this.form.controls.nombre.value;
+        cabecera_fact['NoCliente_direccion'] = this.form.controls.direccion.value;
+      } else {
+        cabecera_fact['cliente_id'] = this.propietario_factura.id;
+      }
 
       cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
       cabecera_fact['FACTURA_DE'] = 13;
       cabecera_fact['tipo'] = 'venta';
       cabecera_fact['user_id'] = empleado.id;
-      console.log(cabecera_fact);
 
-      // this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
-      //   this.pdfServ.makeFacturaVenta(res);
-      // });
+      // console.log(cabecera_fact);
+
+      this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
+        // this.pdfServ.makeFacturaVenta(res);
+        console.log(res);
+        
+      });
     }
   }
 }
