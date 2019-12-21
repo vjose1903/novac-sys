@@ -525,12 +525,12 @@ function makeFacturaVenta(data) {
           margin: [0, 0, 30, 0],
         },
         data.condicion === 'Contado'
-          ? {
+          ?
+           null:  {
             text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
             alignment: 'center',
             margin: [0, -15, 0, 0],
-          }
-          : null,
+          },
       ];
     },
     images: {
@@ -577,9 +577,22 @@ function imprimir(cFileName) {
 
   // var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
   const { exec } = require('child_process');
-
+  // "C:\Users\User\Desktop\test.pdf" "EPSON LX-350 ESC/P"
   // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
-  exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\ADM-Agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
+  exec(`"C:\\Program Files\\Foxit Software\\Foxit Reader\\FoxitReader.exe" /t "C:\\Users\\User\\Documents\\proyectos\\ADM-Agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { 
+    if(error){
+      win.webContents.send('testRes', 'Error imprimiendo Factura!!');
+      return;
+    }else{
+      console.log('stdout  ',stdout);
+      console.log('stdout  ',stderr);
+      
+      win.webContents.send('testRes', 'Factura impresa correctamente!!');
+
+    }
+
+  });
+  // exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\ADM-Agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
 }
 function PathApp() {
   return app.getPath('exe').substr(0, app.getPath('exe').indexOf(app.getName() + '.exe'));
