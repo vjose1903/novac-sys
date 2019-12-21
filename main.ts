@@ -579,7 +579,8 @@ function imprimir(cFileName) {
   const { exec } = require('child_process');
   // "C:\Users\User\Desktop\test.pdf" "EPSON LX-350 ESC/P"
   // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
-  exec(`"C:\\Program Files\\Foxit Software\\Foxit Reader\\FoxitReader.exe" /t "C:\\Users\\User\\Documents\\proyectos\\ADM-Agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { 
+
+  exec(`${__dirname}"\\print\\FoxitReaderPortable.exe" /t "${__dirname}\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { 
     if(error){
       win.webContents.send('testRes', 'Error imprimiendo Factura!!');
       return;
