@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 // componentes
 import { HomeAdminComponent } from './home/homeAdmin.component';
 import { NavbarAComponent } from './navbar-a/navbar-a.component';
-import { FacturacionComponent } from './facturacion/facturacion.component';
+
 import { InventarioComponent } from './inventario/inventario.component';
 import { RegistroArticulosComponent } from './registros/articulos/registro-articulos.component';
 import { RegistroEmpleadosComponent } from './registros/registro-empleados/registro-empleados.component';
@@ -21,6 +21,8 @@ import { RegistroClientesComponent } from './registros/registro-clientes/registr
 import { UploadImgComponent } from '../components/upload-img/upload-img.component';
 import { ValidateRayaAbajo } from '../directives/validaciones';
 import { FiltroParaNgforPipe } from '../pipe/filtro-para-ngfor.pipe';
+import { FacturacionComponent } from './facturacion/facturacion.component';
+
 
 @NgModule({
   declarations: [
