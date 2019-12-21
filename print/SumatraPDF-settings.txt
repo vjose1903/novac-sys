@@ -58,7 +58,7 @@ EnableTeXEnhancements = false
 DefaultDisplayMode = automatic
 DefaultZoom = fit page
 WindowState = 1
-WindowPos = 1102 0 1636 2118
+WindowPos = 256 0 768 994
 ShowToc = true
 SidebarDx = 0
 TocDy = 0
@@ -67,7 +67,27 @@ UseTabs = true
 
 FileStates [
 	[
-		FilePath = C:\Users\vjose1903\Documents\proyectos\ADM-Agroindustrial\test.pdf
+		FilePath = C:\Users\User\Documents\proyectos\ADM-Agroindustrial\test.pdf
+		Favorites [
+		]
+		IsPinned = false
+		IsMissing = false
+		OpenCount = 2
+		UseDefaultState = false
+		DisplayMode = continuous
+		ScrollPos = -1 -1
+		PageNo = 1
+		Zoom = fit page
+		Rotation = 0
+		WindowState = 1
+		WindowPos = 256 0 768 994
+		ShowToc = false
+		SidebarDx = 0
+		DisplayR2L = false
+		ReparseIdx = 0
+	]
+	[
+		FilePath = C:\Users\User\Desktop\prueba.pdf
 		Favorites [
 		]
 		IsPinned = false
@@ -80,7 +100,7 @@ FileStates [
 		Zoom = fit page
 		Rotation = 0
 		WindowState = 1
-		WindowPos = 1102 0 1636 2118
+		WindowPos = 256 0 768 994
 		ShowToc = false
 		SidebarDx = 0
 		DisplayR2L = false
@@ -88,34 +108,8 @@ FileStates [
 	]
 ]
 SessionData [
-	[
-		TabStates [
-			[
-				FilePath = C:\Users\vjose1903\Documents\proyectos\ADM-Agroindustrial\-print-to-default
-				DisplayMode = automatic
-				PageNo = 1
-				Zoom = fit page
-				Rotation = 0
-				ScrollPos = 0 0
-				ShowToc = false
-			]
-			[
-				FilePath = C:\Users\vjose1903\Documents\proyectos\ADM-Agroindustrial\print\-silen
-				DisplayMode = automatic
-				PageNo = 1
-				Zoom = fit page
-				Rotation = 0
-				ScrollPos = 0 0
-				ShowToc = false
-			]
-		]
-		TabIndex = 2
-		WindowState = 1
-		WindowPos = 1102 0 1636 2118
-		SidebarDx = 0
-	]
 ]
 TimeOfLastUpdateCheck = 0 0
-OpenCountWeek = 467
+OpenCountWeek = 468
 
 # Settings after this line have not been recognized by the current version

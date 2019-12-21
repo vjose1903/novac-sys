@@ -387,7 +387,8 @@ export class PdfService {
     };
 
     const PDF = pdfMake.createPdf(dd);
-    return PDF;
+    return dd;
+
     // console.log(PDF);
 
     // console.log(JSON.stringify(dd));

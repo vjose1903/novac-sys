@@ -293,12 +293,12 @@ function cabeceraFacturaVenta(data) {
           data.condicion === 'Contado'
             ? null
             : {
-                text: [
-                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                  { text: fecha(data.fecha_vencimiento), fontSize: 10 },
-                ],
-                margin: [60, 3, 0, 0],
-              },
+              text: [
+                { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
+                { text: fecha(data.fecha_vencimiento), fontSize: 10 },
+              ],
+              margin: [60, 3, 0, 0],
+            },
 
           {
             text: [
@@ -404,16 +404,16 @@ function contenidoFacturaVenta(data) {
       // margin: [0, 1, 0, 0],
       //  layout: 'lightHorizontalLines'
       layout: {
-        hLineWidth: function(i, node) {
+        hLineWidth: function (i, node) {
           return i === node.table.body.length ? 2 : 1;
         },
-        vLineWidth: function(i, node) {
+        vLineWidth: function (i, node) {
           return 0;
         },
-        hLineColor: function(i, node) {
+        hLineColor: function (i, node) {
           return i === 0 || i === node.table.body.length || i === 1 ? 'black' : 'gray';
         },
-        vLineColor: function(i, node) {
+        vLineColor: function (i, node) {
           return i === 0 || i === node.table.widths.length ? 'black' : 'gray';
         },
       },
@@ -526,10 +526,10 @@ function makeFacturaVenta(data) {
         },
         data.condicion === 'Contado'
           ? {
-              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-              alignment: 'center',
-              margin: [0, -15, 0, 0],
-            }
+            text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+            alignment: 'center',
+            margin: [0, -15, 0, 0],
+          }
           : null,
       ];
     },
@@ -544,8 +544,8 @@ function makeFacturaVenta(data) {
 
   // console.log(dd);
 
-  let type_font = 'roboto\\Roboto';
-  var fontDescriptors = {
+  const type_font = 'roboto\\Roboto';
+  const fontDescriptors = {
     Roboto: {
       normal: PathApp() + 'fonts\\' + type_font + '-Regular.ttf',
       bold: PathApp() + 'fonts\\' + type_font + '-Bold.ttf',
@@ -553,19 +553,18 @@ function makeFacturaVenta(data) {
       bolditalics: PathApp() + 'fonts\\' + type_font + '-BoldItalic.ttf',
     },
   };
-  var printer = new pdfmake(fontDescriptors);
+  const printer = new pdfmake(fontDescriptors);
 
-  let cFileName = 'test.pdf';
+  const cFileName = 'test.pdf';
   try {
-    var pdfDoc = printer.createPdfKitDocument(dd);
-    pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', function() {
+    const pdfDoc = printer.createPdfKitDocument(dd);
+    pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
       console.log('finizu');
       imprimir(cFileName);
     });
     pdfDoc.end();
   } catch (err) {
     console.log('::::::::ERROR::::::::');
-
     console.log(err);
 
     win.webContents.send('testRes', 'Error creando factura!!');
@@ -573,11 +572,14 @@ function makeFacturaVenta(data) {
 }
 
 function imprimir(cFileName) {
-  var sumatrapdf_path = PathApp() + 'print\\lp.exe';
+  const sumatrapdf_path = PathApp() + 'print\\lp.exe';
 
-  var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
+
+  // var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
   const { exec } = require('child_process');
-  exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,monochrome" -silent ${cFileName}`, (error, stdout, stderr) => {});
+
+  // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
+  exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\ADM-Agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
 }
 function PathApp() {
   return app.getPath('exe').substr(0, app.getPath('exe').indexOf(app.getName() + '.exe'));
