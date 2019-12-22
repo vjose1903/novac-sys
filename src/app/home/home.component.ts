@@ -26,6 +26,7 @@ export class HomeComponent implements OnInit {
       password: null,
     });
   }
+
   prueba() {
     const factCre = {
       id: 4,
@@ -118,7 +119,9 @@ export class HomeComponent implements OnInit {
     };
 
     const Fact = this.pdfServ.makeFacturaVenta(factCre);
-console.log(JSON.stringify(Fact));
+
+    console.log(JSON.stringify(Fact));
+    
 
   }
 

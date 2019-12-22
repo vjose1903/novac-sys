@@ -382,7 +382,7 @@ export class PdfService {
         logo: logoADM,
       },
       defaultStyle: {
-        font: 'Roboto',
+        font: 'Times',
       },
     };
 
