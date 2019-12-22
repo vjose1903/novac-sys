@@ -3,11 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
-
 import * as moment from 'moment';
 const pdfmake = require('pdfmake/src/printer');
-
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { logoADM } from './files';
 
 // tslint:disable-next-line: one-variable-per-declaration
@@ -98,78 +95,8 @@ ipcMain.on('printerNames', (event: any, arg) => {
   event.sender.send('printersNameRes', printersName);
 });
 
-// function convert(base64) {
-//   var imageBlob = dataURItoBlob(base64.base64);
-//   return new File([imageBlob], base64.name, { type: 'application/pdf' });
-// }
-
-// function dataURItoBlob(dataURI) {
-//   const byteString = window.atob(dataURI);
-
-//   const arrayBuffer = new ArrayBuffer(byteString.length);
-//   const int8Array = new Uint8Array(arrayBuffer);
-//   for (let i = 0; i < byteString.length; i++) {
-//     int8Array[i] = byteString.charCodeAt(i);
-//   }
-//   const blob = new Blob([int8Array], { type: 'application/pdf' });
-//   return blob;
-// }
-
 ipcMain.on('test', (event: any, arg) => {
-  let options = { silent: true };
-  event.sender.send('testRes', 'llego' + arg);
-
   makeFacturaVenta(arg);
-  //fs.open('./test.pdf').print(options, err => {
-  //    if (!err) console.error('printing failed')
-  //  else {
-  //        console.error('succes')
-  //      }
-  //    });
-
-  // var format = 'RAW';
-  // var obj = {
-  //   base64: arg,
-  //   name: 'prueba',
-  // };
-  // var File = convert(obj);
-
-  // function to create file from base64 encoded string
-
-  // var data = fs.readFileSync(logoADM).toString()
-
-  // print(options, err => {
-  //     if (!err) console.error('printing failed')
-  //     else {
-  //       console.error('succes')
-  //     }
-  //   });
-
-  // console.log(p.getPrinters())
-
-  // console.log(data);
-
-  // data.print(options, err => {
-  //   if (!err) console.error('printing failed')
-  //   else {
-  //     console.error('succes')
-  //   }
-  // });
-
-  // console.log(arg);
-
-  // const PDF = makeFacturaVenta(arg);
-  // console.log(PDF);
-
-  // const options = { silent: true };
-
-  // PDF.print(options, (success, errorType) => {
-  //   if (success) {
-  //     event.sender.send('testRes', 'todo Correcto');
-  //   } else {
-  //     event.sender.send('testRes', errorType);
-  //   }
-  // });
 });
 // ==========================================================================================================================================================
 
