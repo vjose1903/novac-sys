@@ -5,15 +5,13 @@ import * as url from 'url';
 import * as _ from 'lodash';
 
 import * as moment from 'moment';
-import * as base64 from 'base64topdf';
-
-// import * as pdfMake from 'pdfmake/src/print';
-var pdfmake = require('pdfmake/src/printer');
+const pdfmake = require('pdfmake/src/printer');
 
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { logoADM } from './files';
 
-var win, serve;
+// tslint:disable-next-line: one-variable-per-declaration
+let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
@@ -499,9 +497,6 @@ function contenidoFacturaVenta(data) {
 // ==========================================================================================================================================================
 
 function makeFacturaVenta(data) {
-  // pdfMake.vfs = pdfFonts.pdfMake.vfs;
-  // console.log(data);
-
   const dd = {
     pageSize: { width: 760, height: 480 },
     pageMargins: data.condicion === 'Contado' ? [10, 166, 0, 40] : [10, 185, 0, 40],
