@@ -207,8 +207,6 @@ function hora(a: any) {
 // CABECERA
 // ==========================================================================================================================================================
 function cabeceraFacturaVenta(data) {
-  console.log('CABEZA=============', data);
-
   const header = [
     {
       columns: [
@@ -247,10 +245,10 @@ function cabeceraFacturaVenta(data) {
         },
         {
           text: [
-            { text: 'Telefono: ', fontSize: 9, bold: true },
-            { text: '809-572-0060 ', fontSize: 9 },
-            { text: ' RNC: ', fontSize: 9, bold: true },
-            { text: '131-99603-5', fontSize: 9 },
+            { text: 'Telefono: ', fontSize: 10 },
+            { text: '809-572-0060 ', fontSize: 10 },
+            { text: ' RNC: ', fontSize: 10 },
+            { text: '131-99603-5', fontSize: 10 },
           ],
           alignment: 'center',
         },
@@ -258,7 +256,7 @@ function cabeceraFacturaVenta(data) {
     },
 
     {
-      margin: [30, 20, 0, 0],
+      margin: [15, 20, 0, 0],
       columns: [
         [
           {
@@ -288,38 +286,38 @@ function cabeceraFacturaVenta(data) {
               { text: fecha(data.created_at), fontSize: 10 },
               { text: ' - ' + hora(data.created_at), fontSize: 10 },
             ],
-            margin: [60, 0, 0, 0],
+            margin: [75, 0, 0, 0],
           },
           data.condicion === 'Contado'
             ? null
             : {
-              text: [
-                { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                { text: fecha(data.fecha_vencimiento), fontSize: 10 },
-              ],
-              margin: [60, 3, 0, 0],
-            },
+                text: [
+                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
+                  { text: fecha(data.fecha_vencimiento), fontSize: 10 },
+                ],
+                margin: [75, 3, 0, 0],
+              },
 
           {
             text: [
               { text: 'NCF: ', fontSize: 10, bold: true },
               { text: data.numero_comprobante, fontSize: 10 },
             ],
-            margin: [60, 3, 0, 0],
+            margin: [75, 3, 0, 0],
           },
           {
             text: [
               { text: 'Fact No: ', fontSize: 10, bold: true },
               { text: _.padStart(data.numero_factura, 8, '0'), fontSize: 10 },
             ],
-            margin: [60, 3, 0, 0],
+            margin: [75, 3, 0, 0],
           },
           {
             text: [
               { text: 'Valida hasta: ', fontSize: 10, bold: true },
               { text: fecha(data.fecha_valida), fontSize: 10 },
             ],
-            margin: [60, 3, 0, 0],
+            margin: [75, 3, 0, 0],
           },
         ],
       ],
@@ -330,9 +328,9 @@ function cabeceraFacturaVenta(data) {
       canvas: [
         {
           type: 'rect',
-          x: 25,
+          x: 10,
           y: 5,
-          w: 710,
+          w: 760,
           h: 2,
           color: '#000000',
         },
@@ -343,22 +341,22 @@ function cabeceraFacturaVenta(data) {
       style: 'tableExample',
       table: {
         headerRows: 1,
-        widths: [23, 233, '*', '*', '*', '*', '*'],
+        widths: [30, 233, '*', '*', '*', '*', '*'],
         body: [
           [
-            { text: '#', style: 'tableHeader', bold: true },
-            { text: 'Articulo', style: 'tableHeader', bold: true },
-            { text: 'Cantidad', style: 'tableHeader', bold: true },
-            { text: 'Unidad', style: 'tableHeader', bold: true },
-            { text: 'Precio', style: 'tableHeader', bold: true },
-            { text: 'Itbis', style: 'tableHeader', bold: true },
-            { text: 'Total', style: 'tableHeader', bold: true },
+            { text: ' #', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
+            { text: 'Articulo', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
+            { text: 'Cantidad', style: 'tableHeader', bold: true, margin: [23, 0, 0, 0] },
+            { text: 'Unidad', style: 'tableHeader', bold: true, margin: [23, 0, 0, 0] },
+            { text: 'Precio', style: 'tableHeader', bold: true, margin: [23, 0, 0, 0] },
+            { text: 'Itbis', style: 'tableHeader', bold: true, margin: [23, 0, 0, 0] },
+            { text: 'Total', style: 'tableHeader', bold: true, margin: [10, 0, 0, 0] },
           ],
 
           [1, 'Sample value 1', 'value 2', 'value 3', 'value 4', 'value 5', 'value 6'],
         ],
       },
-      margin: [25, 0, 25, 0],
+      margin: [10, 0, 0, 0],
       layout: 'headerLineOnly',
     },
   ];
@@ -375,7 +373,6 @@ function calcularPrecio(cant, precio, tipo) {
 }
 
 function contenidoFacturaVenta(data) {
-  console.log('CONTENIDO=============', data);
   const tempBody = [];
   data.detalle_facturas.forEach((detalle, i) => {
     const row = [];
@@ -395,25 +392,21 @@ function contenidoFacturaVenta(data) {
     {
       style: 'tableExample',
       table: {
-        // headerRows: 1,
-        // widths: [23, 250, '*', '*', '*', '*', '*'],
         widths: [24, 260, '*', '*', '*', '*', '*'],
         body: tempBody,
       },
       margin: data.condicion === 'Contado' ? [0, -2, 0, 0] : [0, -6, 0, 0],
-      // margin: [0, 1, 0, 0],
-      //  layout: 'lightHorizontalLines'
       layout: {
-        hLineWidth: function (i, node) {
+        hLineWidth: (i, node) => {
           return i === node.table.body.length ? 2 : 1;
         },
-        vLineWidth: function (i, node) {
+        vLineWidth: (i, node) => {
           return 0;
         },
-        hLineColor: function (i, node) {
+        hLineColor: (i, node) => {
           return i === 0 || i === node.table.body.length || i === 1 ? 'black' : 'gray';
         },
-        vLineColor: function (i, node) {
+        vLineColor: (i, node) => {
           return i === 0 || i === node.table.widths.length ? 'black' : 'gray';
         },
       },
@@ -449,7 +442,7 @@ function contenidoFacturaVenta(data) {
             ],
           },
           layout: 'noBorders',
-          margin: [530, 3, 0, 0],
+          margin: [595, 3, 0, 0],
         },
         {
           stack: [
@@ -485,7 +478,7 @@ function contenidoFacturaVenta(data) {
                 [
                   {
                     text: [{ text: 'Cliente', fontSize: 12, bold: true }],
-                    margin: [-37, 5, 0, 0],
+                    margin: [-70, 5, 0, 0],
                   },
                 ],
               ],
@@ -506,15 +499,12 @@ function contenidoFacturaVenta(data) {
 // ==========================================================================================================================================================
 
 function makeFacturaVenta(data) {
-  // console.log(data);
-  console.log(data);
-
   // pdfMake.vfs = pdfFonts.pdfMake.vfs;
   // console.log(data);
 
   const dd = {
     pageSize: { width: 760, height: 480 },
-    pageMargins: data.condicion === 'Contado' ? [25, 165.5, 25, 40] : [25, 184, 25, 40],
+    pageMargins: data.condicion === 'Contado' ? [10, 165.5, 0, 40] : [10, 184, 0, 40],
     header: cabeceraFacturaVenta(data),
     content: contenidoFacturaVenta(data),
     footer: (currentPage, pageCount) => {
@@ -525,12 +515,12 @@ function makeFacturaVenta(data) {
           margin: [0, 0, 30, 0],
         },
         data.condicion === 'Contado'
-          ?
-           null:  {
-            text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-            alignment: 'center',
-            margin: [0, -15, 0, 0],
-          },
+          ? null
+          : {
+              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+              alignment: 'center',
+              margin: [0, -15, 0, 0],
+            },
       ];
     },
     images: {
@@ -574,24 +564,21 @@ function makeFacturaVenta(data) {
 function imprimir(cFileName) {
   const sumatrapdf_path = PathApp() + 'print\\lp.exe';
 
-
   // var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
   const { exec } = require('child_process');
   // "C:\Users\User\Desktop\test.pdf" "EPSON LX-350 ESC/P"
   // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
 
-  exec(`${__dirname}"\\print\\FoxitReaderPortable.exe" /t "${__dirname}\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { 
-    if(error){
+  exec(`${__dirname}"\\print\\FoxitReaderPortable.exe" /t "${__dirname}\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => {
+    if (error) {
       win.webContents.send('testRes', 'Error imprimiendo Factura!!');
       return;
-    }else{
-      console.log('stdout  ',stdout);
-      console.log('stdout  ',stderr);
-      
+    } else {
+      console.log('stdout  ', stdout);
+      console.log('stdout  ', stderr);
+
       win.webContents.send('testRes', 'Factura impresa correctamente!!');
-
     }
-
   });
   // exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\ADM-Agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
 }
