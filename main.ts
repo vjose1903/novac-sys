@@ -141,7 +141,7 @@ function cabeceraFacturaVenta(data) {
             image: 'logo',
             width: 72,
             opacity: 0.85,
-            margin: [90, 2, 0, 0],
+            margin: [90, 0, 0, 0],
           },
         ],
         [
@@ -435,7 +435,8 @@ function contenidoFacturaVenta(data) {
 function makeFacturaVenta(data) {
   const dd = {
     pageSize: { width: 760, height: 480 },
-    pageMargins: data.condicion === 'Contado' ? [10, 156, 0, 40] : [10, 173, 0, 40],
+    pageMargins: data.condicion === 'Contado' ? [10, 157.9, 0, 40] : [10, 173, 0, 40],
+    // pageMargins: data.condicion === 'Contado' ? [10, 157.5, 0, 40] : [10, 172.9, 0, 40],
     header: cabeceraFacturaVenta(data),
     content: contenidoFacturaVenta(data),
     footer: (currentPage, pageCount) => {
