@@ -118,10 +118,11 @@ export class HomeComponent implements OnInit {
       tipo_factura: 'Factura de consumo',
     };
 
-    const Fact = this.pdfServ.makeFacturaVenta(factCre);
-
-    console.log(JSON.stringify(Fact));
-    
+    this._ipc.on('testRes', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+    });
+    // this._ipc.send('test', factCre)
+    this._ipc.send('test', factCon)
 
   }
 

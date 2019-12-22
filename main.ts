@@ -24,6 +24,7 @@ function createWindow() {
   win = new BrowserWindow({
     x: 0,
     y: 0,
+    icon: process.platform === 'darwin' ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
     width: size.width,
     height: size.height,
     minWidth: size.width,
@@ -140,7 +141,7 @@ function cabeceraFacturaVenta(data) {
             image: 'logo',
             width: 72,
             opacity: 0.85,
-            margin: [90, 12, 0, 0],
+            margin: [90, 2, 0, 0],
           },
         ],
         [
@@ -149,14 +150,14 @@ function cabeceraFacturaVenta(data) {
             alignment: 'right',
             bold: true,
             fontSize: 14,
-            margin: [0, 20, 30],
+            margin: [0, 15, 30],
           },
           //
         ],
       ],
     },
     {
-      margin: [0, -62, 0, 0],
+      margin: [0, -67, 0, 0],
       stack: [
         {
           text: 'ADM Agroindustrial S.R.L',
@@ -181,69 +182,77 @@ function cabeceraFacturaVenta(data) {
     },
 
     {
-      margin: [15, 20, 0, 0],
+      margin: [15, 10, 0, 0],
       columns: [
         [
           {
-            text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: data.cliente.nombre }],
+            text: [{ text: 'Cliente : ', fontSize: 12 }, { text: data.cliente.nombre, fontSize: 12 }],
             margin: [0, 0, 0, 0],
           },
           {
-            text: [{ text: 'Rnc cliente: ', fontSize: 12, bold: true }, { text: data.cliente.rnc }],
+            text: [{ text: 'Rnc cliente : ', fontSize: 12 }, { text: data.cliente.rnc, fontSize: 12 }],
             margin: [0, 5, 0, 0],
           },
           {
-            text: [{ text: 'Dirección: ', fontSize: 12, bold: true }, { text: data.cliente.direccion }],
+            text: [{ text: 'Dirección : ', fontSize: 12 }, { text: data.cliente.direccion, fontSize: 12 }],
             margin: [0, 5, 0, 0],
           },
         ],
         [
           {
-            text: [{ text: data.tipo_factura, fontSize: 14, bold: true }],
+            text: [{ text: data.tipo_factura, fontSize: 14 }],
             margin: [0, 15, 0, 0],
             alignment: 'center',
           },
         ],
         [
           {
-            text: [
-              { text: 'Fecha: ', fontSize: 10, bold: true },
-              { text: fecha(data.created_at), fontSize: 10 },
-              { text: ' - ' + hora(data.created_at), fontSize: 10 },
-            ],
-            margin: [75, 0, 0, 0],
-          },
-          data.condicion === 'Contado'
-            ? null
-            : {
+            stack: [
+              {
                 text: [
-                  { text: 'Fecha vencimiento: ', fontSize: 10, bold: true },
-                  { text: fecha(data.fecha_vencimiento), fontSize: 10 },
+                  { text: 'Fecha : ', fontSize: 11.5 },
+                  { text: fecha(data.created_at), fontSize: 11.5 },
+                  { text: ' - ' + hora(data.created_at), fontSize: 11.5 },
+                ],
+                margin: [75, 0, 0, 0],
+              },
+              data.condicion === 'Contado'
+                ? null
+                : {
+                  text: [
+                    { text: 'Fecha vencimiento : ', fontSize: 11.5 },
+                    { text: fecha(data.fecha_vencimiento), fontSize: 11.5 },
+                  ],
+                  margin: [75, 3, 0, 0],
+                },
+
+              {
+                text: [
+                  { text: 'NCF : ', fontSize: 11.5 },
+                  { text: data.numero_comprobante, fontSize: 11.5 },
                 ],
                 margin: [75, 3, 0, 0],
               },
+              {
+                text: [
+                  { text: 'Fact No : ', fontSize: 11.5 },
+                  { text: _.padStart(data.numero_factura, 8, '0'), fontSize: 11.5 },
+                ],
+                margin: [75, 3, 0, 0],
+              },
+              {
+                text: [
+                  { text: 'Valida hasta : ', fontSize: 11.5 },
+                  { text: fecha(data.fecha_valida), fontSize: 11.5 },
+                ],
+                margin: [75, 3, 0, 0],
+              },
+            ],
+            margin: data.condicion === 'Contado' ? [-10, 0, 0, 0] : [-10, -5, 0, 0]
+          }
 
-          {
-            text: [
-              { text: 'NCF: ', fontSize: 10, bold: true },
-              { text: data.numero_comprobante, fontSize: 10 },
-            ],
-            margin: [75, 3, 0, 0],
-          },
-          {
-            text: [
-              { text: 'Fact No: ', fontSize: 10, bold: true },
-              { text: _.padStart(data.numero_factura, 8, '0'), fontSize: 10 },
-            ],
-            margin: [75, 3, 0, 0],
-          },
-          {
-            text: [
-              { text: 'Valida hasta: ', fontSize: 10, bold: true },
-              { text: fecha(data.fecha_valida), fontSize: 10 },
-            ],
-            margin: [75, 3, 0, 0],
-          },
+
+
         ],
       ],
     },
@@ -254,7 +263,7 @@ function cabeceraFacturaVenta(data) {
         {
           type: 'rect',
           x: 10,
-          y: 5,
+          y: 3,
           w: 760,
           h: 2,
           color: '#000000',
@@ -271,11 +280,11 @@ function cabeceraFacturaVenta(data) {
           [
             { text: ' #', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
             { text: 'Articulo', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
-            { text: 'Cantidad', style: 'tableHeader', bold: true, margin: [23, 0, 0, 0] },
-            { text: 'Unidad', style: 'tableHeader', bold: true, margin: [23, 0, 0, 0] },
-            { text: 'Precio', style: 'tableHeader', bold: true, margin: [23, 0, 0, 0] },
-            { text: 'Itbis', style: 'tableHeader', bold: true, margin: [23, 0, 0, 0] },
-            { text: 'Total', style: 'tableHeader', bold: true, margin: [10, 0, 0, 0] },
+            { text: 'Cantidad', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
+            { text: 'Unidad', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
+            { text: 'Precio', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
+            { text: 'Itbis', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
+            { text: 'Total', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
           ],
 
           [1, 'Sample value 1', 'value 2', 'value 3', 'value 4', 'value 5', 'value 6'],
@@ -426,7 +435,7 @@ function contenidoFacturaVenta(data) {
 function makeFacturaVenta(data) {
   const dd = {
     pageSize: { width: 760, height: 480 },
-    pageMargins: data.condicion === 'Contado' ? [10, 166, 0, 40] : [10, 185, 0, 40],
+    pageMargins: data.condicion === 'Contado' ? [10, 156, 0, 40] : [10, 173, 0, 40],
     header: cabeceraFacturaVenta(data),
     content: contenidoFacturaVenta(data),
     footer: (currentPage, pageCount) => {
@@ -439,10 +448,10 @@ function makeFacturaVenta(data) {
         data.condicion === 'Contado'
           ? null
           : {
-              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-              alignment: 'center',
-              margin: [0, -15, 0, 0],
-            },
+            text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+            alignment: 'center',
+            margin: [0, -15, 0, 0],
+          },
       ];
     },
     images: {
@@ -497,8 +506,7 @@ function imprimir(cFileName) {
       return;
     } else {
       console.log('stdout  ', stdout);
-      console.log('stdout  ', stderr);
-
+      console.log('stderr  ', stderr);
       win.webContents.send('testRes', 'Factura impresa correctamente!!');
     }
   });
