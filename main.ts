@@ -504,7 +504,7 @@ function makeFacturaVenta(data) {
 
   const dd = {
     pageSize: { width: 760, height: 480 },
-    pageMargins: data.condicion === 'Contado' ? [10, 165.5, 0, 40] : [10, 184, 0, 40],
+    pageMargins: data.condicion === 'Contado' ? [10, 166, 0, 40] : [10, 185, 0, 40],
     header: cabeceraFacturaVenta(data),
     content: contenidoFacturaVenta(data),
     footer: (currentPage, pageCount) => {
