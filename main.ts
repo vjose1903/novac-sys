@@ -497,6 +497,13 @@ function contenidoFacturaVenta(data) {
 // ==========================================================================================================================================================
 
 function makeFacturaVenta(data) {
+<<<<<<< HEAD
+  // pdfMake.vfs = pdfFonts.pdfMake.vfs;
+  // console.log(data);
+
+
+=======
+>>>>>>> aa6fc4952568d395bc3a5a7b535b1fd4ecfd24c5
   const dd = {
     pageSize: { width: 760, height: 480 },
     pageMargins: data.condicion === 'Contado' ? [10, 166, 0, 40] : [10, 185, 0, 40],
