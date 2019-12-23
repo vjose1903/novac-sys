@@ -91,7 +91,14 @@ export class RegistroSuplidoresComponent implements OnInit {
   atras() {
     window.history.back();
   }
-
+  enfocarInput(arg) {
+    this.element = document.getElementById(arg) as HTMLElement;
+    this.element.focus();
+  }
+  borrar() {
+    this.form.reset();
+    this.enfocarInput('nombre');
+  }
   submit(form) {
     const obj = JSON.parse(JSON.stringify(form.value));
 

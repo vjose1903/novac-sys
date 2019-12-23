@@ -16,7 +16,7 @@ export class RegistroEmpleadosComponent implements OnInit {
   boton = '';
   phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
-
+  element: HTMLElement;
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice) {
     this.form = this.fb.group({
@@ -68,7 +68,14 @@ export class RegistroEmpleadosComponent implements OnInit {
   atras() {
     window.history.back();
   }
-
+  enfocarInput(arg) {
+    this.element = document.getElementById(arg) as HTMLElement;
+    this.element.focus();
+  }
+  borrar() {
+    this.form.reset();
+    this.enfocarInput('nombre');
+  }
   submit(form) {
     const obj = JSON.parse(JSON.stringify(form.value));
 

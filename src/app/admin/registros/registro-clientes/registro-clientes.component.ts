@@ -180,7 +180,14 @@ export class RegistroClientesComponent implements OnInit {
     }
   }
   atras(temp) {}
-
+  enfocarInput(arg) {
+    this.element = document.getElementById(arg) as HTMLElement;
+    this.element.focus();
+  }
+  borrar() {
+    this.form.reset();
+    this.enfocarInput('nombre');
+  }
   changeIdent(arg) {
     this.documento_identidad = arg;
   }

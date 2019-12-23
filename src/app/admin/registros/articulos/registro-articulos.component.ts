@@ -90,6 +90,21 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     });
   }
 
+  saltar(campo) {
+    if (campo !== 'send') {
+      this.enfocarInput(campo);
+    } else {
+      this.submit(this.form);
+    }
+  }
+  enfocarInput(arg) {
+    this.element = document.getElementById(arg) as HTMLElement;
+    this.element.focus();
+  }
+  borrar() {
+    this.form.reset();
+    this.enfocarInput('nombre');
+  }
   resetCompradoEn(value) {
     this.FORM.medida_contenido_padre.value = null;
     this.FORM.medida_contenido_hijo.value = null;
@@ -244,7 +259,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       nombre: x.nombre,
       costo_principal: x.costo_principal,
       precio_principal: x.precio_principal,
-      // existencia: '',
+      aviso_existencia: x.aviso_existencia,
+      suplidor_id: x.suplidor_id,
       fecha_ingreso: moment().format('DD/MM/YYYY'),
       medida: x.medida,
       is_detallable: x.is_detallable,
@@ -258,8 +274,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
         // this.listaArticulos = [...this.listaArticulos, res];
         this.artServ.next_articulo([...this.listaArticulos, res]);
         this.form.reset();
-        this.element = document.getElementById('campoNombre') as HTMLElement;
-        this.element.focus();
+        this.enfocarInput('nombre');
         this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
       },
       err => {
