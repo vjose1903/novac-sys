@@ -12,7 +12,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   seleccionModal: any;
   tipoModal;
   paraFiltroClientes: any;
-
+  tituloModal;
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       if (this.tipoModal === 'buscar') {
@@ -29,6 +29,10 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     {
       titulo: 'Descripción',
       key: 'nombre',
+    },
+    {
+      titulo: 'Existencia',
+      key: 'existencia',
     },
   ];
 
@@ -70,6 +74,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
       if (res !== undefined) {
         this.seleccionModal = res;
         this.paraFiltroArticulos = res.filtrar;
+        console.log(res);
+
+        if (this.tipoModal === 'buscarCliente' && res.limite_credito !== undefined) {
+          this.tituloModal = 'Buscar cliente';
+        } else {
+          this.tituloModal = 'Buscar suplidor';
+        }
       }
     });
   }

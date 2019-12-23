@@ -99,34 +99,20 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     if (this.focusRow) {
       this.IDROW = this.ROW + _.toString(this.NUM);
     }
-    if (this.search) {
-      setTimeout(() => {
-        this.element = document.getElementById('search') as HTMLElement;
-        this.element.focus();
-      }, 5);
-    }
+    // if (this.search) {
+    //   setTimeout(() => {
+    //     this.element = document.getElementById('search') as HTMLElement;
+    //     this.element.focus();
+    //   }, 5);
+    // }
   }
 
   ngOnChanges() {}
 
-  // searchItems() {
-  //   this.NUM = 0;
-  //   if (!this.searchText) {
-  //     this.mdbTable.setDataSource(JSON.parse(JSON.stringify(this.elements)));
-  //     this.elements = this.mdbTable.getDataSource();
-  //   }
-
-  //   if (this.searchText) {
-  //     this.data = this.mdbTable.searchLocalDataBy(this.searchText);
-  //     this.mdbTable.setDataSource(JSON.parse(JSON.stringify(this.elements)));
-  //   }
-  //   this.cdRef.detectChanges();
-  // }
   searchItems() {
     const prev = this.mdbTable.getDataSource();
 
     if (!this.searchText) {
-      this.NUM = 0;
       this.mdbTable.setDataSource(this.previous);
       this.data = this.mdbTable.getDataSource();
     }
@@ -135,18 +121,19 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
       this.data = this.mdbTable.searchLocalDataBy(this.searchText);
       this.mdbTable.setDataSource(prev);
     }
-    this.cdRef.detectChanges();
   }
+
   setDATATABLE() {
     this.data.forEach(element => {
       this.elements.push(element);
       this.previous.push(element);
     });
 
-    this.mdbTable.setDataSource(JSON.parse(JSON.stringify(this.elements)));
+    if (this.elements !== undefined) {
+      this.mdbTable.setDataSource(this.elements);
+    }
     this.elements = this.mdbTable.getDataSource();
     this.previous = this.mdbTable.getDataSource();
-    this.cdRef.detectChanges();
   }
 
   ngAfterViewInit() {

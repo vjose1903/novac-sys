@@ -10,6 +10,11 @@
         <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="../../../assets/img/factura.png"
           alt="" (click)="navegar(2)" />
         <h5 [ngClass]="actualTab == 'factura' ? 'tituloMenu1A' : 'tituloMenu1'"><strong>Facturacion</strong></h5>
+
+        <div [ngClass]="actualTab == 'factura' ? 'subMenuFacturaA' : 'subMenuFactura'">
+          <h4 class="opcion" (click)="navegar('venta')">Venta</h4>
+          <h4 class="opcion" (click)="navegar('compra')">Compra</h4>
+        </div>
       </div>
 
       <div class="menuList menuList2">
@@ -18,9 +23,10 @@
         <h5 [ngClass]="actualTab == 'registro' ? 'tituloMenu2A' : 'tituloMenu2'"><strong>Registros</strong></h5>
 
         <div [ngClass]="actualTab == 'registro' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-          <h4 class="Registro" (click)="navegar('clientes')">Clientes</h4>
-          <h4 class="Registro" (click)="navegar('empleados')">Empleados</h4>
-          <h4 class="Registro" (click)="navegar('articulos')">Articulos</h4>
+          <h4 class="opcion" (click)="navegar('clientes')">Clientes</h4>
+          <h4 class="opcion" (click)="navegar('empleados')">Empleados</h4>
+          <h4 class="opcion" (click)="navegar('articulos')">Articulos</h4>
+          <h4 class="opcion" (click)="navegar('suplidores')">Suplidores</h4>
         </div>
       </div>
 

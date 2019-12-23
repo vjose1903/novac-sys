@@ -30,23 +30,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   UnidadesArticulo = [];
   tipoModal: string;
   condicion_fact = 'Contado';
-
   forma_pago = 'Efectivo';
   element: HTMLElement;
   listaClientes;
   propietario_factura;
-
-  // propietario_factura = {
-  //   id: 1,
-  //   nombre: 'Cliente contado',
-  //   direccion: 'Autopista duarte KM 0 el Higuero',
-  //   telefono: null,
-  // };
-  tipos_facturas = ['00', '01', '02', '03', '04', '11', '12', '13', '14', '15', '16', '17'];
-
-  public TiposFacturas: string =
-    '<div style=" max-width: 21rem;" ><span>00 Factura sin comprobante</span><br><span>01 Valor fiscal</span><br><span>02 Factura de consumo</span><br><span>03 Nota de debito</span><br><span>04 Nota de credito</span><br><span>11 Comprobante de compras</span><br><span>12 Registro de unico ingreso</span><br> <span>13 Comprobante para gastos menores</span><br> <span>14 Comprobante de regimen especiales</span><br> <span>15 Comprobante gubernamental</span><br> <span>16 Comprobante para exportaciones</span><br> <span>17 Comprobantes para pago al exterior</span><br></div>';
-
+  tipos_facturas = [];
+  public TiposFacturas: string;
   showTipos: boolean;
   tipoFactura = '02';
   CuerpoFactura = [];
@@ -55,8 +44,14 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   TOTAL = 0.0;
   lista_tipos_facturas;
   lista_secuencia_facturas;
-
+  NCFcompra;
+  CostoYgasto = '';
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
+  metodo: any;
+  labelSearch: string;
+  listaSuplidores: any;
+  TiposCostosGastos: string;
+  tipos_costosYgastos: string[];
 
   constructor(
     private _ipc: IpcService,
@@ -68,9 +63,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
   ) {
     this.form = this.fb.group({
-      id: [1],
-      nombre: ['Cliente contado', Validators.required],
-      direccion: ['Autopista duarte KM 0 el Higuero', Validators.required],
+      id: [],
+      nombre: [],
+      direccion: [],
       telefono: [],
     });
   }
@@ -111,6 +106,57 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.metodo = this.route.snapshot.params['tipo'];
+
+    console.log(this.metodo);
+
+    if (this.metodo === 'venta') {
+      this.TiposFacturas =
+        '<div style=" max-width: 21rem;" > \
+        <span>00 Factura sin comprobante</span><br>\
+        <span>01 Valor fiscal</span><br>\
+        <span>02 Factura de consumo</span><br>\
+        <span>03 Nota de debito</span><br>\
+        <span>04 Nota de credito</span><br>\
+        <span>11 Comprobante de compras</span><br>\
+        <span>12 Registro de unico ingreso</span><br>\
+        <span>13 Comprobante para gastos menores</span><br>\
+        <span>14 Comprobante de regimen especiales</span><br>\
+        <span>15 Comprobante gubernamental</span><br>\
+        <span>16 Comprobante para exportaciones</span><br>\
+        <span>17 Comprobantes para pago al exterior</span><br>\
+        </div>';
+      this.tipos_facturas = ['00', '01', '02', '03', '04', '11', '12', '13', '14', '15', '16', '17'];
+      this.labelSearch = 'Cliente';
+      this.form.patchValue({
+        id: 1,
+        nombre: 'Cliente contado',
+        direccion: 'Autopista duarte KM 0 el Higuero',
+      });
+    } else {
+      this.TiposFacturas = '<div style=" max-width: 21rem;" > \
+      <span>01 Valor fiscal</span><br>\
+      <span>02 Factura de consumo</span><br>\
+      </div>';
+
+      this.TiposCostosGastos =
+        '<div style=" max-width: 30rem; min-width: 30rem;" > \
+    <span>1 Gastos de personal </span><br>\
+    <span>2 Gastos de trabajos, suministros y servicios</span><br>\
+    <span>3 Arrendamientos</span><br>\
+    <span>4 Gastos de activos fijos</span><br>\
+    <span>5 Gastos de representación</span><br>\
+    <span>6 Gastos deducciones admitidas</span><br>\
+    <span>7 Gastos financieros</span><br>\
+    <span>8 Gastos extraordinarios</span><br>\
+    <span>9 Compras y gastos que forman parte del costo de venta</span><br>\
+    <span>10 Adquisiciones de activos</span><br>\
+    <span>11 Gastos de Seguros</span><br>\
+    </div>';
+      this.tipos_facturas = ['01', '02'];
+      this.tipos_costosYgastos = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
+      this.labelSearch = 'Suplidor';
+    }
     this.fecha = moment().format('DD/MM/YYYY');
 
     this.mServ.OBJDEVUELTO.subscribe(res => {
@@ -128,25 +174,47 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.dbServ
-      .getClientes()
-      .pipe(
-        map(
-          cliente =>
-            (cliente = cliente.map(cli => {
-              cli.documentos_de_identidad.map(docu => {
-                if (docu.principal) {
-                  cli.documento_identidad = docu.documento;
-                }
-              });
-
-              return cli;
-            })),
-        ),
-      )
-      .subscribe(res => {
-        this.listaClientes = res;
-      });
+    if (this.metodo === 'compra') {
+      this.dbServ
+        .getSuplidores()
+        .pipe(
+          map(
+            val =>
+              (val = val.map(suplidor => {
+                suplidor.documentos_de_identidad.map(docu => {
+                  if (docu.principal) {
+                    suplidor.documento_identidad = docu.documento;
+                  }
+                });
+                suplidor.codigo = _.padStart(suplidor.id, 5, '0');
+                return suplidor;
+              })),
+          ),
+        )
+        .subscribe(res => {
+          this.listaSuplidores = JSON.parse(JSON.stringify(res));
+          console.log(res);
+        });
+    } else {
+      this.dbServ
+        .getClientes()
+        .pipe(
+          map(
+            cliente =>
+              (cliente = cliente.map(cli => {
+                cli.documentos_de_identidad.map(docu => {
+                  if (docu.principal) {
+                    cli.documento_identidad = docu.documento;
+                  }
+                });
+                return cli;
+              })),
+          ),
+        )
+        .subscribe(res => {
+          this.listaClientes = res;
+        });
+    }
 
     setTimeout(() => {
       this.enfocarInput('tipoFact');
@@ -165,7 +233,14 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     });
   }
-
+  setWidthPop(bool, e) {
+    e.select();
+    if (bool) {
+      document.documentElement.style.setProperty('--popInfo', '17rem');
+    } else {
+      document.documentElement.style.setProperty('--popInfo', '25rem');
+    }
+  }
   ngOnDestroy(): void {}
   getCalculos(arg) {
     console.log('calculos');
@@ -217,9 +292,35 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
       }
     }
-    if (campo === 'nom' || campo === 'pago') {
+    if (campo === 'costo') {
       this.enfocarInput(campo);
     }
+    if (campo === 'pago') {
+      if (this.condicion_fact === 'Contado') {
+        this.enfocarInput(campo);
+      } else {
+        if (this.metodo === 'venta') {
+          this.enfocarInput('nom');
+        } else {
+          this.enfocarInput('ncf');
+        }
+      }
+    }
+    if (campo === 'nom') {
+      if (this.metodo === 'venta') {
+        this.enfocarInput('nom');
+      } else {
+        this.enfocarInput('ncf');
+      }
+    }
+    if (campo === 'filtro') {
+      if (valor.length === 11) {
+        this.abrirModalFiltro();
+      } else {
+        this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso');
+      }
+    }
+
     if (campo === 'dir' && valor !== null) {
       this.enfocarInput(campo);
     }
@@ -243,13 +344,17 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   // =============================================
-  //  MODAL PARA FILTRAR CLIENTES
+  //  MODAL PARA FILTRAR CLIENTES & SUPLIDORES
   // =============================================
 
   abrirModalFiltro() {
-    this.quitarContadoDeLista();
     this.mServ.modalTipo('buscarCliente');
-    this.mServ.ModalSeleccion(this.listaClientes);
+    if (this.metodo === 'venta') {
+      this.quitarContadoDeLista();
+      this.mServ.ModalSeleccion(this.listaClientes);
+    } else {
+      this.mServ.ModalSeleccion(this.listaSuplidores);
+    }
     this.mServ.mostrarModal(true);
   }
 

@@ -74,6 +74,15 @@ export class DBservice {
     return this.peticion('clientes', 'post', JSON.stringify(arg));
   }
   // =====================================================================
+  // SUPLIDORES
+  // =====================================================================
+  getSuplidores() {
+    return this.peticion('suplidores', 'get');
+  }
+  createSuplidor(arg) {
+    return this.peticion('suplidores', 'post', JSON.stringify(arg));
+  }
+  // =====================================================================
   // USUARIOS
   // =====================================================================
 

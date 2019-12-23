@@ -20,35 +20,62 @@
               [(ngModel)]="tipoFactura"
               id="tipoFact"
               #tipoFact
-              (focus)="$event.target.select()"
+              (focus)="setWidthPop(true, $event.target)"
             />
           </div>
-          <div class="col-9 ">
+          <div class="{{ metodo === 'compra' ? 'col-6' : 'col-9' }}">
             <span class="titulos"><strong>Condición :</strong></span>
-            <select id="condicion" (keydown.enter)="saltar('pago', $event.target.value)" class="form-control inputE" [(ngModel)]="condicion_fact" name="condicionSelect">
+            <select
+              id="condicion"
+              (keydown.enter)="saltar(metodo === 'compra' ? 'costo' : 'pago', $event.target.value)"
+              class="form-control inputE"
+              [(ngModel)]="condicion_fact"
+              name="condicionSelect"
+            >
               <option value="Contado">Contado</option>
               <option value="Crédito">Crédito</option>
             </select>
           </div>
+          <div *ngIf="metodo === 'compra'" class="col-3 p-0 ">
+            <ng-template #tipos_costos><div [innerHtml]="TiposCostosGastos"></div></ng-template>
+            <span class="titulos"><strong>Gasto de:</strong></span>
+            <input
+              placement="right"
+              [mdbPopover]="tipos_costos"
+              triggers="focus"
+              type="text"
+              (keydown.enter)="saltar('pago', costo.value)"
+              class="form-control tipo inputE"
+              [(ngModel)]="CostoYgasto"
+              id="costo"
+              #costo
+              (focus)="setWidthPop(false, $event.target)"
+            />
+          </div>
         </div>
 
-        <!-- <div class="d-flex  mt-2"> -->
-        <span class="mr-2 mt-2 titulos"><strong>Pago </strong></span>
-        <select id="pago" (keydown.enter)="saltar('nom', $event.target.value)" class="form-control inputE" [(ngModel)]="forma_pago" name="condicionSelect">
-          <option value="Efectivo">Efectivo</option>
-          <option value="Targeta">Targeta</option>
-          <option value="Cheque">Cheque</option>
-        </select>
-        <!-- </div> -->
-        <!-- <h5 class="mt-2"><strong>Número comprobante:</strong></h5>
-        <input type="text" class="form-control"inputE [(ngModel)]="numeroComprobante" [disabled]="true" /> -->
+        <div *ngIf="condicion_fact === 'Contado'">
+          <span class="mr-2 mt-2 titulos"><strong>Pago </strong></span>
+          <select id="pago" (keydown.enter)="saltar('nom', $event.target.value)" class="form-control inputE" [(ngModel)]="forma_pago" name="condicionSelect">
+            <option value="Efectivo">Efectivo</option>
+            <option value="Targeta">Targeta</option>
+            <option value="Cheque">Cheque</option>
+          </select>
+        </div>
+
+        <div *ngIf="metodo === 'compra'">
+          <h5 class="mt-2"><strong>Número comprobante:</strong></h5>
+          <input type="text" class="form-control inputE UPPERCASE" (keydown.enter)="saltar('filtro', $event.target.value)" [(ngModel)]="NCFcompra" id="ncf" />
+        </div>
       </div>
       <!-- ======================================================================================================================================================================== -->
       <!-- ======================================================================================================================================================================== -->
       <div class="col-md-5 divRigth">
         <form [formGroup]="form">
           <div class="d-flex" style="height: 1.7rem;">
-            <h5><strong>Cliente:</strong></h5>
+            <h5>
+              <strong>{{ labelSearch }}:</strong>
+            </h5>
             <i (click)="abrirModalFiltro()" mdbTooltip="Buscar cliente" placement="top" class="fas fa-search ml-3 botonBuscar"></i>
           </div>
           <div class="row">
@@ -59,10 +86,10 @@
                 (keydown.enter)="saltar('dir', form.controls['nombre'].value)"
                 type="text"
                 formControlName="nombre"
-                placeholder="Introduzca nombre"
                 class="form-control inputE"
                 (focus)="$event.target.select()"
                 autocomplete="off"
+                [readOnly]="metodo === 'compra'"
               />
               <input id="id" type="hidden" formControlName="id" />
               <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
@@ -92,10 +119,10 @@
                   (keydown.enter)="saltar('cod-0', form.controls['direccion'].value)"
                   type="text"
                   formControlName="direccion"
-                  placeholder="Introduzca direccion"
                   class="form-control inputE"
                   (focus)="$event.target.select()"
                   autocomplete="off"
+                  [readOnly]="metodo === 'compra'"
                 />
                 <div
                   class="alerta text-danger ml-1"

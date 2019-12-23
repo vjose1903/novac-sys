@@ -6,6 +6,7 @@ import { TABLA } from '../../../components/tablas/tabla';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as moment from 'moment';
 import { ObservableServcie } from '../../../core/services/observables.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -26,6 +27,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   listaArticulos = [];
   FORM: any;
   listaTipoArticulos: any;
+  listaSuplidores: any;
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
@@ -33,13 +35,31 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.artServ.ARTICULOS.subscribe(res => {
       this.listaArticulos = res;
+      console.log(res);
     });
 
     this.dbServ.getTipoArticulos().subscribe(res => {
-
       this.listaTipoArticulos = JSON.parse(JSON.stringify(res));
     });
 
+    this.dbServ
+      .getSuplidores()
+      .pipe(
+        map(
+          val =>
+            (val = val.map(suplidor => {
+              suplidor.documentos_de_identidad.map(docu => {
+                if (docu.principal) {
+                  suplidor.documento = docu.documento;
+                }
+              });
+              return suplidor;
+            })),
+        ),
+      )
+      .subscribe(res => {
+        this.listaSuplidores = JSON.parse(JSON.stringify(res));
+      });
     this.createForm();
     this.FORM = this.form.controls;
 
@@ -51,12 +71,13 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       nombre: [this.articuloSelected ? this.articuloSelected.nombre : '', Validators.required],
       tipo_articulo_id: [this.articuloSelected ? this.articuloSelected.tipo_articulo_id : '', Validators.required],
+      suplidor_id: [this.articuloSelected ? this.articuloSelected.suplidor_id : '', Validators.required],
       medida: [this.articuloSelected ? this.articuloSelected.medida : '', Validators.required],
       costo_principal: [this.articuloSelected ? this.articuloSelected.costo_principal : null, Validators.required],
       precio_principal: [this.articuloSelected ? this.articuloSelected.precio_principal : null, Validators.required],
       is_detallable: [this.articuloSelected ? this.articuloSelected.is_detallable : this.isDetallable],
       fecha_ingreso: [this.articuloSelected ? this.articuloSelected.fecha_ingreso : new Date()],
-      // existencia: [this.articuloSelected ? this.articuloSelected.existencia : 0],
+      aviso_existencia: [this.articuloSelected ? this.articuloSelected.aviso_existencia : null],
       cantidad_contenido_padre: [null],
       medida_contenido_padre: [null],
       precio_padre: [null],

@@ -24,7 +24,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
 
   sub = new Subscription();
 
-  actualTab: any;
+  actualTab;
 
   showLoading = true;
 
@@ -77,9 +77,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   element: HTMLElement;
-  ngAfterViewInit() {
-
-  }
+  ngAfterViewInit() {}
 
   stop(e) {
     this.OpenPrinterMenu = true;
@@ -94,12 +92,9 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
     this.OpenPrinterMenu = false;
   }
 
-
-
   prueba1(hi: any) {
     console.log(hi._animationState);
   }
-
 
   mostarSubmenu(x: string) {
     console.log(this.mantenimiento);
@@ -134,7 +129,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
 
       case 2:
         this.actualTab = 'factura';
-        this.router.navigateByUrl('/admin/factura');
+        // this.router.navigateByUrl('/admin/factura');
         break;
 
       case 3:
@@ -152,6 +147,20 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         // this.router.navigateByUrl("/admin/factura")
         break;
 
+      case 'venta':
+        this.router.navigateByUrl('/admin');
+        this.actualTab = 'home';
+        setTimeout(() => {
+          this.router.navigate(['/admin/factura/venta']);
+        }, 5);
+        break;
+      case 'compra':
+        this.router.navigateByUrl('/admin');
+        this.actualTab = 'home';
+        setTimeout(() => {
+          this.router.navigate(['/admin/factura/compra']);
+        }, 5);
+        break;
       case 'articulos':
         this.actualTab = 'home';
         this.router.navigate(['/admin/articulos']);
@@ -165,6 +174,11 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
       case 'clientes':
         this.actualTab = 'home';
         this.router.navigate(['/admin/clientes']);
+        break;
+
+      case 'suplidores':
+        this.actualTab = 'home';
+        this.router.navigate(['/admin/suplidores']);
         break;
 
       default:

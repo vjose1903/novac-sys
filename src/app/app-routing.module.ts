@@ -12,6 +12,7 @@ import { NavbarAComponent } from './admin/navbar-a/navbar-a.component';
 // home
 import { HomeComponent } from './home/home.component';
 import { RegistroClientesComponent } from './admin/registros/registro-clientes/registro-clientes.component';
+import { RegistroSuplidoresComponent } from './admin/registros/registro-suplidores/registro-suplidores.component';
 
 const routes: Routes = [
   {
@@ -23,7 +24,7 @@ const routes: Routes = [
         component: HomeAdminComponent,
       },
       {
-        path: 'factura',
+        path: 'factura/:tipo',
         component: FacturacionComponent,
       },
       {
@@ -38,10 +39,10 @@ const routes: Routes = [
         path: 'clientes',
         component: RegistroClientesComponent,
       },
-      // {
-      //   path: '',
-      //   component: HomeAdminComponent
-      // },
+      {
+        path: 'suplidores',
+        component: RegistroSuplidoresComponent,
+      },
     ],
   },
   {

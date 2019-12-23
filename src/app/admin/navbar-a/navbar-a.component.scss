@@ -74,7 +74,27 @@
     transform: scale(1) translate(0px, -6rem);
   }
 }
+.subMenuRegistros, .subMenuFactura {
+  display: none;
+  transform: scale(0);
+}
 
+.subMenuRegistrosA, .subMenuFacturaA {
+  transform: scale(1);
+  background-color: #23be69;
+  color: white;
+}
+
+.opcion {
+  font-size: 1rem !important;
+  padding: 0.5rem;
+  background-color: #23be69;
+  &:hover {
+    width: 100%;
+    background-color: #1aa056;
+    cursor: pointer;
+  }
+}
 .menuList2 {
   .tituloMenu2 {
     transform: scale(0);
@@ -84,26 +104,6 @@
   &:hover .tituloMenu2,
   .tituloMenu2A {
     transform: scale(1) translate(0px, -6rem);
-  }
-  .subMenuRegistros {
-    display: none;
-    transform: scale(0);
-  }
-
-  .subMenuRegistrosA {
-    transform: scale(1);
-    background-color: #23be69;
-    color: white;
-  }
-  .Registro {
-    font-size: 1rem !important;
-    padding: 0.5rem;
-    background-color: #23be69;
-    &:hover {
-      width: 100%;
-      background-color: #1aa056;
-      cursor: pointer;
-    }
   }
 }
 

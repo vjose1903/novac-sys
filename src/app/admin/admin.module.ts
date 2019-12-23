@@ -22,6 +22,7 @@ import { UploadImgComponent } from '../components/upload-img/upload-img.componen
 import { ValidateRayaAbajo } from '../directives/validaciones';
 import { FiltroParaNgforPipe } from '../pipe/filtro-para-ngfor.pipe';
 import { FacturacionComponent } from './facturacion/facturacion.component';
+import { RegistroSuplidoresComponent } from './registros/registro-suplidores/registro-suplidores.component';
 
 
 @NgModule({
@@ -39,6 +40,7 @@ import { FacturacionComponent } from './facturacion/facturacion.component';
     RegistroClientesComponent,
     UploadImgComponent,
     ValidateRayaAbajo,
+    RegistroSuplidoresComponent,
   ],
   imports: [
     DialogModule,

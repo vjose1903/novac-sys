@@ -117,6 +117,7 @@ export class RegistroClientesComponent implements OnInit {
       Fail.push('Telefono');
       devolver = true;
     }
+    
     temp_documentos_identidad.forEach(element => {
       //  esto es para saber si el documento de identidad esta mal escrito
       if (this.validarRayaAbajo(element.descripcion)) {

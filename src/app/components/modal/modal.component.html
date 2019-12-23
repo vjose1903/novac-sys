@@ -105,7 +105,7 @@
 
   <p-dialog
     *ngIf="tipoModal === 'buscarCliente' && seleccionModal && infoCliente"
-    header="Buscar cliente"
+    [header]="tituloModal"
     [(visible)]="showModal"
     [focusTrap]="true"
     [focusOnShow]="true"
