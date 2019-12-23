@@ -17,9 +17,10 @@
               type="text"
               (keydown.enter)="saltar('condicion', tipoFact.value)"
               class="form-control tipo inputE"
-              value="02"
+              [(ngModel)]="tipoFactura"
               id="tipoFact"
               #tipoFact
+              (focus)="$event.target.select()"
             />
           </div>
           <div class="col-9 ">
@@ -60,6 +61,7 @@
                 formControlName="nombre"
                 placeholder="Introduzca nombre"
                 class="form-control inputE"
+                (focus)="$event.target.select()"
                 autocomplete="off"
               />
               <input id="id" type="hidden" formControlName="id" />
@@ -92,6 +94,7 @@
                   formControlName="direccion"
                   placeholder="Introduzca direccion"
                   class="form-control inputE"
+                  (focus)="$event.target.select()"
                   autocomplete="off"
                 />
                 <div

@@ -96,7 +96,7 @@ ipcMain.on('printerNames', (event: any, arg) => {
   event.sender.send('printersNameRes', printersName);
 });
 
-ipcMain.on('test', (event: any, arg) => {
+ipcMain.on('print', (event: any, arg) => {
   makeFacturaVenta(arg);
 });
 // ==========================================================================================================================================================
@@ -186,15 +186,24 @@ function cabeceraFacturaVenta(data) {
       columns: [
         [
           {
-            text: [{ text: 'Cliente : ', fontSize: 12 }, { text: data.cliente.nombre, fontSize: 12 }],
+            text: [
+              { text: 'Cliente : ', fontSize: 12 },
+              { text: data.cliente.nombre, fontSize: 12 },
+            ],
             margin: [0, 0, 0, 0],
           },
           {
-            text: [{ text: 'Rnc cliente : ', fontSize: 12 }, { text: data.cliente.rnc, fontSize: 12 }],
+            text: [
+              { text: 'Rnc cliente : ', fontSize: 12 },
+              { text: data.cliente.rnc, fontSize: 12 },
+            ],
             margin: [0, 5, 0, 0],
           },
           {
-            text: [{ text: 'Dirección : ', fontSize: 12 }, { text: data.cliente.direccion, fontSize: 12 }],
+            text: [
+              { text: 'Dirección : ', fontSize: 12 },
+              { text: data.cliente.direccion, fontSize: 12 },
+            ],
             margin: [0, 5, 0, 0],
           },
         ],
@@ -219,12 +228,12 @@ function cabeceraFacturaVenta(data) {
               data.condicion === 'Contado'
                 ? null
                 : {
-                  text: [
-                    { text: 'Fecha vencimiento : ', fontSize: 11.5 },
-                    { text: fecha(data.fecha_vencimiento), fontSize: 11.5 },
-                  ],
-                  margin: [75, 3, 0, 0],
-                },
+                    text: [
+                      { text: 'Fecha vencimiento : ', fontSize: 11.5 },
+                      { text: fecha(data.fecha_vencimiento), fontSize: 11.5 },
+                    ],
+                    margin: [75, 3, 0, 0],
+                  },
 
               {
                 text: [
@@ -248,11 +257,8 @@ function cabeceraFacturaVenta(data) {
                 margin: [75, 3, 0, 0],
               },
             ],
-            margin: data.condicion === 'Contado' ? [-10, 0, 0, 0] : [-10, -5, 0, 0]
-          }
-
-
-
+            margin: data.condicion === 'Contado' ? [-10, 0, 0, 0] : [-10, -5, 0, 0],
+          },
         ],
       ],
     },
@@ -348,7 +354,7 @@ function contenidoFacturaVenta(data) {
     {
       text: [
         { text: 'Realizada Por:  ', fontSize: 11, bold: true },
-        { text: 'Usuario', fontSize: 11 },
+        { text: data.usuario, fontSize: 11 },
       ],
       margin: [0, 5, 0, 0],
     },
@@ -449,10 +455,10 @@ function makeFacturaVenta(data) {
         data.condicion === 'Contado'
           ? null
           : {
-            text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-            alignment: 'center',
-            margin: [0, -15, 0, 0],
-          },
+              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+              alignment: 'center',
+              margin: [0, -15, 0, 0],
+            },
       ];
     },
     images: {
@@ -489,7 +495,7 @@ function makeFacturaVenta(data) {
     console.log('::::::::ERROR::::::::');
     console.log(err);
 
-    win.webContents.send('testRes', 'Error creando factura!!');
+    win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false });
   }
 }
 
@@ -503,12 +509,12 @@ function imprimir(cFileName) {
 
   exec(`${__dirname}"\\print\\FoxitReaderPortable.exe" /t "${__dirname}\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => {
     if (error) {
-      win.webContents.send('testRes', 'Error imprimiendo Factura!!');
+      win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: false });
       return;
     } else {
       console.log('stdout  ', stdout);
       console.log('stderr  ', stderr);
-      win.webContents.send('testRes', 'Factura impresa correctamente!!');
+      win.webContents.send('printRes', { msg: 'Factura impresa correctamente!!', status: true });
     }
   });
   // exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\ADM-Agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });

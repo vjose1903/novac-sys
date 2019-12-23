@@ -56,7 +56,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   redondearAdos(num) {
-    return ((Math.round(num * 100) / 100).toFixed(2));
+    return (Math.round(num * 100) / 100).toFixed(2);
   }
   ngOnInit() {
     this.form = this.fb.group({
@@ -120,7 +120,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             fila.itbis = 0;
             fila.unidad = fila.uni;
             const lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'desc', 'tot', 'secuencia']);
-            
+
             detalle_factura.push(JSON.parse(JSON.stringify(lol)));
           }
         });
@@ -134,6 +134,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.control = <FormArray>this.form.controls['rowFactura'];
   }
   ngOnChanges() {}
+
+  // =============================================
+  //  RESETEAR FORMULARIO
+  // =============================================
+  RESETCUERPO() {
+    this.form.reset();
+  }
 
   // =============================================
   //  FORMATEAR LOS NUMEROS

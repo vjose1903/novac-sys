@@ -118,7 +118,7 @@ export class HomeComponent implements OnInit {
       tipo_factura: 'Factura de consumo',
     };
 
-    this._ipc.on('testRes', (event: Electron.IpcMessageEvent, res) => {
+    this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
       console.log(res);
     });
     // this._ipc.send('test', factCre)

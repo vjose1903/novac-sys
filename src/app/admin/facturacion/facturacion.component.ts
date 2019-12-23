@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { IpcService } from '../../core/services/ipc.service';
+import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 
 @Component({
   selector: 'app-facturacion',
@@ -17,24 +18,24 @@ import { IpcService } from '../../core/services/ipc.service';
 })
 export class FacturacionComponent implements OnInit, OnDestroy {
   form: FormGroup;
-  numFac = 0;
   fecha;
 
   ITBIS = 0;
-  seleccionModal: any;
+  seleccionModal;
   showModal = false;
   modalSearch: boolean;
-  control: any;
-  rowActual: any;
+  control;
+  rowActual;
   drop: boolean;
-  UnidadesArticulo: any[];
+  UnidadesArticulo = [];
   tipoModal: string;
   condicion_fact = 'Contado';
-  numeroComprobante;
+
   forma_pago = 'Efectivo';
   element: HTMLElement;
-  listaClientes: any;
+  listaClientes;
   propietario_factura;
+
   // propietario_factura = {
   //   id: 1,
   //   nombre: 'Cliente contado',
@@ -47,14 +48,16 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     '<div style=" max-width: 21rem;" ><span>00 Factura sin comprobante</span><br><span>01 Valor fiscal</span><br><span>02 Factura de consumo</span><br><span>03 Nota de debito</span><br><span>04 Nota de credito</span><br><span>11 Comprobante de compras</span><br><span>12 Registro de unico ingreso</span><br> <span>13 Comprobante para gastos menores</span><br> <span>14 Comprobante de regimen especiales</span><br> <span>15 Comprobante gubernamental</span><br> <span>16 Comprobante para exportaciones</span><br> <span>17 Comprobantes para pago al exterior</span><br></div>';
 
   showTipos: boolean;
-  tipoFactura: any;
+  tipoFactura = '02';
   CuerpoFactura = [];
   DESCUENTO = 0.0;
   BRUTO = 0.0;
-  TOTAL: number = 0.0;
-  lista_tipos_facturas: any;
-  lista_secuencia_facturas: any;
-  secuenciaVenta: any;
+  TOTAL = 0.0;
+  lista_tipos_facturas;
+  lista_secuencia_facturas;
+
+  @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
+
   constructor(
     private _ipc: IpcService,
     private mServ: ModalService,
@@ -157,8 +160,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.obsServ.SECUENCIA_FACTURAS.subscribe(res => {
       if (res !== undefined) {
         this.lista_secuencia_facturas = res;
-        this.secuenciaVenta = res.filter(secu => secu.tipo_factura_id === 13);
-        this.numFac = this.secuenciaVenta[0].secuencia;
+        // this.secuenciaVenta = res.filter(secu => secu.tipo_factura_id === 13);
+        // this.numFac = this.secuenciaVenta[0].secuencia;
       }
     });
   }
@@ -238,6 +241,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
   }
+
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES
   // =============================================
@@ -286,6 +290,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (arg) {
       if (this.tipoModal === 'imprimir') {
         this.IMPRIMIR();
+      } else if (this.tipoModal === 'cancelar') {
+        this.CancelarFactura();
       }
     }
     this.tipoModal = '';
@@ -402,10 +408,33 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       tipo_factura: 'Factura de consumo',
     };
 
-    this._ipc.on('testRes', (event: Electron.IpcMessageEvent, res) => {
+    this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
       console.log(res);
     });
-    this._ipc.send('test', factCon)
+    this._ipc.send('test', factCon);
+  }
+
+  CancelarFactura() {
+    this.propietario_factura = null;
+
+    this.form.patchValue({
+      id: 1,
+      nombre: 'Cliente contado',
+      direccion: 'Autopista duarte KM 0 el Higuero',
+      telefono: null,
+    });
+
+    this.tipoFactura = '02';
+    this.CuerpoFactura = [];
+    this.DESCUENTO = 0.0;
+    this.BRUTO = 0.0;
+    this.TOTAL = 0.0;
+    this.condicion_fact = 'Contado';
+    this.forma_pago = 'Efectivo';
+    this.rowActual = undefined;
+    this.ITBIS = 0;
+    this.cuerpo.RESETCUERPO();
+    this.enfocarInput('tipoFact');
   }
 
   IMPRIMIR() {
@@ -456,9 +485,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       // console.log(cabecera_fact);
 
       this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
-        // this.pdfServ.makeFacturaVenta(res);
-        console.log(res);
-        
+        this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+          if (res.status) {
+            this.CancelarFactura();
+          }
+        });
+        this._ipc.send('print', res);
       });
     }
   }
