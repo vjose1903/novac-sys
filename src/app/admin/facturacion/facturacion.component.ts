@@ -275,9 +275,17 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   //  MODAL IMPRIMIR
   // =============================================
   imprimirFactura() {
-    this.mServ.modalTipo('imprimir');
-    this.tipoModal = 'imprimir';
-    this.abrirModal();
+    if (!this.propietario_factura) {
+      this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
+    } else {
+      if (this.CuerpoFactura.length === 0) {
+        this.dbServ.toastWarning('Factura no tiene Articulos', 'Aviso');
+      } else {
+        this.mServ.modalTipo('imprimir');
+        this.tipoModal = 'imprimir';
+        this.abrirModal();
+      }
+    }
   }
 
   abrirModal(arg?) {
@@ -438,60 +446,56 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   IMPRIMIR() {
-    if (!this.propietario_factura) {
-      this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
-    } else {
-      const empleado = JSON.parse(this.dbServ.getEmpleado());
-      const TipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
+    const empleado = JSON.parse(this.dbServ.getEmpleado());
+    const TipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
 
-      const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
+    const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
 
-      const cabecera_fact = {};
-      cabecera_fact['condicion'] = this.condicion_fact;
-      cabecera_fact['forma_pago'] = this.forma_pago;
-      cabecera_fact['fecha_facturacion'] = null;
-      if (this.condicion_fact === 'Crédito') {
-        cabecera_fact['fecha_vencimiento'] = moment(new Date())
-          .add(this.propietario_factura.limite_credito, 'days')
-          .format('DD/MM/YYYY');
-      }
-
-      cabecera_fact['fecha_valida'] = moment(new Date())
-        .add(1, 'year')
+    const cabecera_fact = {};
+    cabecera_fact['condicion'] = this.condicion_fact;
+    cabecera_fact['forma_pago'] = this.forma_pago;
+    cabecera_fact['fecha_facturacion'] = null;
+    if (this.condicion_fact === 'Crédito') {
+      cabecera_fact['fecha_vencimiento'] = moment(new Date())
+        .add(this.propietario_factura.limite_credito, 'days')
         .format('DD/MM/YYYY');
-
-      cabecera_fact['numero_comprobante'] = null;
-      cabecera_fact['numero_factura'] = null;
-      cabecera_fact['total_factura'] = this.redondearAdos(this.TOTAL);
-      cabecera_fact['Bruto'] = this.redondearAdos(this.BRUTO);
-      cabecera_fact['itbis'] = this.redondearAdos(this.ITBIS);
-      cabecera_fact['descuento'] = this.redondearAdos(this.DESCUENTO);
-      cabecera_fact['estado'] = true;
-      cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
-
-      if (this.propietario_factura.id === 1) {
-        cabecera_fact['cliente_id'] = null;
-        cabecera_fact['NoCliente_nombre'] = this.form.controls.nombre.value;
-        cabecera_fact['NoCliente_direccion'] = this.form.controls.direccion.value;
-      } else {
-        cabecera_fact['cliente_id'] = this.propietario_factura.id;
-      }
-
-      cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
-      cabecera_fact['FACTURA_DE'] = 13;
-      cabecera_fact['tipo'] = 'venta';
-      cabecera_fact['user_id'] = empleado.id;
-
-      // console.log(cabecera_fact);
-
-      this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
-        this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-          if (res.status) {
-            this.CancelarFactura();
-          }
-        });
-        this._ipc.send('print', res);
-      });
     }
+
+    cabecera_fact['fecha_valida'] = moment(new Date())
+      .add(1, 'year')
+      .format('DD/MM/YYYY');
+
+    cabecera_fact['numero_comprobante'] = null;
+    cabecera_fact['numero_factura'] = null;
+    cabecera_fact['total_factura'] = this.redondearAdos(this.TOTAL);
+    cabecera_fact['Bruto'] = this.redondearAdos(this.BRUTO);
+    cabecera_fact['itbis'] = this.redondearAdos(this.ITBIS);
+    cabecera_fact['descuento'] = this.redondearAdos(this.DESCUENTO);
+    cabecera_fact['estado'] = true;
+    cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
+
+    if (this.propietario_factura.id === 1) {
+      cabecera_fact['cliente_id'] = null;
+      cabecera_fact['NoCliente_nombre'] = this.form.controls.nombre.value;
+      cabecera_fact['NoCliente_direccion'] = this.form.controls.direccion.value;
+    } else {
+      cabecera_fact['cliente_id'] = this.propietario_factura.id;
+    }
+
+    cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
+    cabecera_fact['FACTURA_DE'] = 13;
+    cabecera_fact['tipo'] = 'venta';
+    cabecera_fact['user_id'] = empleado.id;
+
+    // console.log(cabecera_fact);
+
+    this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
+      this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+        if (res.status) {
+          this.CancelarFactura();
+        }
+      });
+      this._ipc.send('print', res);
+    });
   }
 }
