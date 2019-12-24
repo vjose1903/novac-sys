@@ -1,4 +1,4 @@
-<h1>{{ titulo }}</h1>
+<h4>{{ titulo }}</h4>
 <div class="row" style="height: calc(100% - 60px)">
   <div class="col-xs-12 col-md-6">
     <div class="contenedorRegistro">
@@ -34,11 +34,7 @@
               <div class="from-group">
                 <label class="control-label">Usuario: <span style="color: red">*</span></label>
                 <input type="text" formControlName="usuario" placeholder="Introduzca usuario" class="form-control" autocomplete="off" />
-                <div
-                  class="alerta text-danger ml-1"
-                  style="font-size: 12px"
-                  *ngIf="!form.controls['usuario'].valid && (form.controls['usuario'].dirty || form.controls['usuario'].touched)"
-                >
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['usuario'].valid && (form.controls['usuario'].dirty || form.controls['usuario'].touched)">
                   Introduzca un usuario
                 </div>
               </div>

@@ -31,11 +31,13 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   listaSuplidores: any;
   tipoModal: string;
   indexEditar: any;
+  usuario: any;
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
 
   ngOnInit() {
+    this.usuario = JSON.parse(this.dbServ.getEmpleado());
     this.artServ.ARTICULOS.subscribe(res => {
       this.listaArticulos = res;
       console.log(res);
@@ -296,6 +298,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     }
 
     const obj = {
+      user_id: this.usuario.id,
       tipo_articulo_id: _.parseInt(x.tipo_articulo_id),
       nombre: x.nombre,
       costo_principal: x.costo_principal,
@@ -307,12 +310,15 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       is_detallable: x.is_detallable,
       contenido_articulos_attributes: contenido,
     };
+    console.log(obj);
 
     if (x.id) {
       obj['id'] = x.id;
 
       this.dbServ.editarArticulo(obj).subscribe(
         res => {
+          console.log(res);
+
           this.listaArticulos[this.indexEditar] = res;
           this.form.reset();
           this.enfocarInput('nombre');
