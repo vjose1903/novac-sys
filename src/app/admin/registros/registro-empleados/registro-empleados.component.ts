@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { parseDate, BsDatepickerConfig } from 'ngx-bootstrap';
 import { PhotosService } from '../../../core/services/photos.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 @Component({
@@ -18,7 +18,7 @@ export class RegistroEmpleadosComponent implements OnInit {
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   element: HTMLElement;
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice,  private router: Router) {
     this.form = this.fb.group({
       nombre: [null, Validators.required],
       apellido: [null, Validators.required],
@@ -66,7 +66,7 @@ export class RegistroEmpleadosComponent implements OnInit {
   }
 
   atras() {
-    window.history.back();
+    this.router.navigateByUrl('/admin');
   }
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;

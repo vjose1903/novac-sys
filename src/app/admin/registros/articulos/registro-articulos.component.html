@@ -290,7 +290,7 @@
           <div class="from-group">
             <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a>
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-            <input [disabled]="!form.valid" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+            <input [disabled]="!form.valid" (click)="submit(form)" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
           </div>
         </div>
       </div>
@@ -300,7 +300,15 @@
   <div class=" col-md-6">
     <h1>Listado articulos</h1>
     <div class="card cardListados ">
-      <app-tablas *ngIf="listaArticulos && info" [info]="info" [data]="listaArticulos" [focusRow]="false"></app-tablas>
+      <app-tablas
+        *ngIf="listaArticulos && info"
+        [info]="info"
+        [data]="listaArticulos"
+        [focusRow]="false"
+        [botones]="botones"
+        (DevolverInfo)="editarItem($event)"
+        (DELETE)="abrirModal($event)"
+      ></app-tablas>
     </div>
   </div>
 </div>

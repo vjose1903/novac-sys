@@ -82,7 +82,7 @@ body {
 // ========================================================
 
 #btn-gris {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;;
+  box-shadow: 0px 2px 3px 0px #a0a0a0;
   background-color: gray;
   color: white;
   &:hover {
@@ -92,7 +92,7 @@ body {
 }
 
 #btn-blanco {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;;
+  box-shadow: 0px 2px 3px 0px #a0a0a0;
   background-color: rgb(233, 233, 233);
   color: black;
   &:hover {
@@ -101,7 +101,7 @@ body {
   }
 }
 #btn-verde {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;;
+  box-shadow: 0px 2px 3px 0px #a0a0a0;
   background-color: rgb(30, 176, 55);
   color: white;
   &:hover {
@@ -110,6 +110,16 @@ body {
   }
 }
 
+.btnAccion {
+  & i {
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+    &:hover {
+      color: rgb(79, 160, 93);
+    }
+  }
+}
 /* ====================================================== */
 /* INPUT BUSCAR */
 /* ====================================================== */

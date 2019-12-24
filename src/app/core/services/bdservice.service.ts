@@ -4,12 +4,13 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import * as _ from 'lodash';
 @Injectable({
   providedIn: 'root',
 })
 export class DBservice {
-  url = 'http://vjose.ddns.net:3000';
-  // url = 'http://localhost:3000';
+  // url = 'http://vjose.ddns.net:3000';
+  url = 'http://localhost:3000';
 
   constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}
   peticion(ruta: string, metodo: string, json?: string): Observable<any> {
@@ -73,15 +74,25 @@ export class DBservice {
   createCliente(arg) {
     return this.peticion('clientes', 'post', JSON.stringify(arg));
   }
+  editarCliente(arg) {
+    return this.peticion('clientes/' + arg.id, 'put', JSON.stringify(arg));
+  }
   // =====================================================================
   // SUPLIDORES
   // =====================================================================
   getSuplidores() {
     return this.peticion('suplidores', 'get');
   }
+  getNombresSuplidores() {
+    return this.peticion('nombreSuplidores', 'get');
+  }
   createSuplidor(arg) {
     return this.peticion('suplidores', 'post', JSON.stringify(arg));
   }
+  editarSuplidor(arg) {
+    return this.peticion('suplidores/' + arg.id, 'patch', JSON.stringify(arg));
+  }
+
   // =====================================================================
   // USUARIOS
   // =====================================================================
@@ -93,6 +104,9 @@ export class DBservice {
   }
   getEmpleado() {
     return localStorage.getItem('userInfo') || '';
+  }
+  editarEmpleado(arg) {
+    return this.peticion('empleados/' + arg.id, 'put', JSON.stringify(arg));
   }
 
   // =====================================================================
@@ -108,6 +122,11 @@ export class DBservice {
 
   createArticulo(arg) {
     return this.peticion('articulos', 'post', JSON.stringify(arg));
+  }
+  editarArticulo(arg) {
+    const id = arg.id;
+    const body = _.omit(arg, ['id']);
+    return this.peticion('articulos/' + id, 'patch', JSON.stringify(body));
   }
   getArticulos() {
     return this.peticion('articulos', 'get');

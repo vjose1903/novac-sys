@@ -31,7 +31,7 @@
           </span>
         </td>
         <td class="btnAccion" *ngIf="botones.titulo">
-          <app-btnacciones [row]="row" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
+          <app-btnacciones [row]="row" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
         </td>
       </tr>
     </tbody>

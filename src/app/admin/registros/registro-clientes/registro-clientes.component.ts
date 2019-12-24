@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { ObservableServcie } from '../../../core/services/observables.service';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
 import { ValidateRayaAbajo } from '../../../directives/validaciones';
@@ -36,7 +36,7 @@ export class RegistroClientesComponent implements OnInit {
   doc_principal: any;
 
   element: HTMLElement;
-  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {}
+  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit() {
     this.boton = 'Guardar';
@@ -117,7 +117,7 @@ export class RegistroClientesComponent implements OnInit {
       Fail.push('Telefono');
       devolver = true;
     }
-    
+
     temp_documentos_identidad.forEach(element => {
       //  esto es para saber si el documento de identidad esta mal escrito
       if (this.validarRayaAbajo(element.descripcion)) {
@@ -223,4 +223,9 @@ export class RegistroClientesComponent implements OnInit {
       key: 'documento_identidad', // ojo
     },
   ];
+  botones = {
+    titulo: true,
+    borrar: true,
+    editar: true,
+  };
 }

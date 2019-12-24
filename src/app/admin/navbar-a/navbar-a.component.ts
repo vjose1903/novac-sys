@@ -11,6 +11,7 @@ import { get } from 'http';
 
 import { DBservice } from '../../core/services/bdservice.service';
 import { IpcService } from '../../core/services/ipc.service';
+import { ObservableServcie } from '../../core/services/observables.service';
 
 const { dialog } = require('electron').remote;
 
@@ -35,7 +36,14 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   PrintersInstall: any;
   OpenPrinterMenu = false;
   // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
-  constructor(private dbServ: DBservice, private breakpointObserver: BreakpointObserver, public usuariosServices: UsuariosService, private router: Router, private _ipc: IpcService) {
+  constructor(
+    private dbServ: DBservice,
+    private breakpointObserver: BreakpointObserver,
+    public usuariosServices: UsuariosService,
+    private router: Router,
+    private _ipc: IpcService,
+    private obsServ: ObservableServcie,
+  ) {
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
@@ -53,6 +61,17 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
     .pipe(map(result => result.matches));
 
   ngOnInit() {
+    this.dbServ.getArticulos().subscribe(res => {
+      res.sort((a, b) => {
+        return a.id > b.id ? 1 : -1;
+      });
+
+      this.obsServ.next_articulo(res);
+    });
+
+    // this.dbServ.getTiposFacturas().subscribe(res => {
+    //   this.obsServ.next_tipo_factura(res);
+    // });
     this.mantenimiento = true;
     this._ipc.PRINTERS.subscribe(res => {
       if (res !== undefined) {

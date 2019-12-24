@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { TABLA } from '../../../components/tablas/tabla';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as moment from 'moment';
 import { ObservableServcie } from '../../../core/services/observables.service';
 import { map } from 'rxjs/operators';
+import { ModalService } from '../../../components/modal/modal.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -28,7 +29,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   FORM: any;
   listaTipoArticulos: any;
   listaSuplidores: any;
-  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute) {
+  tipoModal: string;
+  indexEditar: any;
+  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
 
@@ -42,24 +45,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       this.listaTipoArticulos = JSON.parse(JSON.stringify(res));
     });
 
-    this.dbServ
-      .getSuplidores()
-      .pipe(
-        map(
-          val =>
-            (val = val.map(suplidor => {
-              suplidor.documentos_de_identidad.map(docu => {
-                if (docu.principal) {
-                  suplidor.documento = docu.documento;
-                }
-              });
-              return suplidor;
-            })),
-        ),
-      )
-      .subscribe(res => {
-        this.listaSuplidores = JSON.parse(JSON.stringify(res));
-      });
+    this.dbServ.getNombresSuplidores().subscribe(res => {
+      this.listaSuplidores = JSON.parse(JSON.stringify(res));
+    });
     this.createForm();
     this.FORM = this.form.controls;
 
@@ -82,6 +70,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       medida_contenido_padre: [null],
       precio_padre: [null],
       precio_libra: [null],
+      id: [null],
+      id_contenido_padre: [null],
+      id_contenido_hijo: [null],
+
+      referencia_padre: [null],
+      referencia_hijo: [null],
 
       medida_contenido_hijo: [null],
       cantidad_contenido_hijo: [null],
@@ -104,6 +98,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   borrar() {
     this.form.reset();
     this.enfocarInput('nombre');
+    this.titulo = 'Registro de articulos';
+    this.boton = 'Registrar';
   }
   resetCompradoEn(value) {
     this.FORM.medida_contenido_padre.value = null;
@@ -158,7 +154,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   //  BOTON ATRAS
   // =============================================
   atras() {
-    window.history.back();
+    this.router.navigateByUrl('/admin');
   }
 
   // =============================================
@@ -208,6 +204,44 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     }
   }
 
+  editarItem(item) {
+    this.titulo = 'Editar producto: ' + item.ARG.nombre;
+    this.boton = 'Editar';
+    this.indexEditar = item.INDEX;
+    item.ARG.contenido_articulos.forEach(contenido => {
+      if (contenido.referencia) {
+        this.form.controls.cantidad_contenido_hijo.setValue(contenido.cantidad);
+        this.form.controls.medida_contenido_hijo.setValue(contenido.medida);
+        this.form.controls.precio_hijo.setValue(contenido.precio);
+        this.form.controls.id_contenido_hijo.setValue(contenido.id);
+        this.form.controls.referencia_hijo.setValue(contenido.referencia);
+      } else {
+        if (item.ARG.contenido_articulos.length === 1) {
+          this.form.controls.precio_libra.setValue(contenido.precio);
+          this.form.controls.id_contenido_padre.setValue(contenido.id);
+        } else {
+          this.form.controls.cantidad_contenido_padre.setValue(contenido.cantidad);
+          this.form.controls.medida_contenido_padre.setValue(contenido.medida);
+          this.form.controls.precio_padre.setValue(contenido.precio);
+          this.form.controls.id_contenido_padre.setValue(contenido.id);
+        }
+      }
+    });
+    this.form.patchValue(item.ARG);
+  }
+  abrirModal(arg?) {
+    console.log(arg);
+
+    this.mServ.modalTipo('borrar');
+    this.tipoModal = 'borrar';
+    this.mServ.ModalSeleccion(arg);
+    this.mServ.mostrarModal(true);
+  }
+  decisionModal(arg) {
+    if (arg) {
+    }
+    this.tipoModal = '';
+  }
   // =============================================
   //  Crear articulo
   // =============================================
@@ -221,6 +255,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       if (x.medida_contenido_hijo === null) {
         contenido = [
           {
+            referencia: null,
+            id: x.id_contenido_padre,
             costo: null,
             precio: x.precio_padre,
             cantidad: x.cantidad_contenido_padre,
@@ -230,12 +266,16 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       } else {
         contenido = [
           {
+            referencia: null,
+            id: x.id_contenido_padre,
             costo: null,
             precio: x.precio_padre,
             cantidad: x.cantidad_contenido_padre,
             medida: x.medida_contenido_padre,
           },
           {
+            referencia: x.referencia_hijo,
+            id: x.id_contenido_hijo,
             costo: null,
             precio: x.precio_hijo,
             cantidad: x.cantidad_contenido_hijo,
@@ -246,6 +286,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     } else {
       contenido = [
         {
+          id: x.id_contenido_padre,
           costo: null,
           precio: x.precio_libra,
           cantidad: 100,
@@ -261,28 +302,45 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       precio_principal: x.precio_principal,
       aviso_existencia: x.aviso_existencia,
       suplidor_id: x.suplidor_id,
-      fecha_ingreso: moment().format('DD/MM/YYYY'),
+      fecha_ingreso: x.id ? x.fecha_ingreso : moment().format('DD/MM/YYYY'),
       medida: x.medida,
       is_detallable: x.is_detallable,
       contenido_articulos_attributes: contenido,
     };
 
-    // console.log(obj);
+    if (x.id) {
+      obj['id'] = x.id;
 
-    this.dbServ.createArticulo(obj).subscribe(
-      res => {
-        // this.listaArticulos = [...this.listaArticulos, res];
-        this.artServ.next_articulo([...this.listaArticulos, res]);
-        this.form.reset();
-        this.enfocarInput('nombre');
-        this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
-      },
-      err => {
-        console.log(err);
-        this.mostrarErrores(err.error);
-        // this.dbServ.toastError(err.error, 'Error');
-      },
-    );
+      this.dbServ.editarArticulo(obj).subscribe(
+        res => {
+          this.listaArticulos[this.indexEditar] = res;
+          this.form.reset();
+          this.enfocarInput('nombre');
+          this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
+        },
+        err => {
+          console.log(err);
+          this.mostrarErrores(err.error);
+          // this.dbServ.toastError(err.error, 'Error');
+        },
+      );
+      //
+    } else {
+      this.dbServ.createArticulo(obj).subscribe(
+        res => {
+          // this.listaArticulos = [...this.listaArticulos, res];
+          this.artServ.next_articulo([...this.listaArticulos, res]);
+          this.form.reset();
+          this.enfocarInput('nombre');
+          this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
+        },
+        err => {
+          console.log(err);
+          this.mostrarErrores(err.error);
+          // this.dbServ.toastError(err.error, 'Error');
+        },
+      );
+    }
   }
 
   mostrarErrores(arg) {
@@ -316,4 +374,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       key: 'precio_principal',
     },
   ];
+  botones = {
+    titulo: true,
+    borrar: true,
+    editar: true,
+  };
 }
