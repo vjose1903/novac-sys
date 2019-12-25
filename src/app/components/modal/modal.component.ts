@@ -74,7 +74,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
       if (res !== undefined && res !== null) {
         this.seleccionModal = res;
         this.paraFiltroArticulos = res.filtrar;
-        console.log(res);
 
         if (this.tipoModal === 'buscarCliente' && res.limite_credito !== undefined) {
           this.tituloModal = 'Buscar cliente';

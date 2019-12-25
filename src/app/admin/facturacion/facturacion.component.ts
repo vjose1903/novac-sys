@@ -54,6 +54,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   tipos_costosYgastos: string[];
 
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
+  listaArticulos: any;
 
   constructor(
     private _ipc: IpcService,
@@ -91,6 +92,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   // }
 
   redondearAdos(num) {
+
     return (Math.round(num * 100) / 100).toFixed(2);
   }
   formatearNumero(nStr) {
@@ -108,6 +110,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.obsServ.ARTICULOS.subscribe(res => {
+      if (res !== undefined && res !== null) {
+        this.listaArticulos = res;
+      }
+    });
+
     this.metodo = this.route.snapshot.params['tipo'];
 
     console.log(this.metodo);
@@ -252,7 +260,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
   getCalculos(arg) {
     console.log('calculos');
-    
 
     this.TOTAL = parseFloat(arg.Total);
 
@@ -592,6 +599,24 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.enfocarInput('tipoFact');
   }
 
+  revisarPrecios(cuerpoFact) {
+    cuerpoFact.forEach(row => {
+      const articulo = this.listaArticulos.filter(art => art.id === row.articulo_id);
+      // if (articulo[0].precio)
+      console.log('');
+      console.log('');
+      console.log('==================');
+
+      console.log(articulo[0]);
+
+      console.log('-----------------');
+      console.log(row);
+      console.log('==================');
+      console.log('');
+      console.log('');
+    });
+  }
+
   IMPRIMIR() {
     const empleado = JSON.parse(this.dbServ.getEmpleado());
     const TipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
@@ -639,15 +664,17 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['user_id'] = empleado.id;
 
     console.log(cabecera_fact);
-
-    this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
-      this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-        if (res.status) {
-          this.CancelarFactura();
-        }
-      });
-      // res['FACTURA_DE'] = this.metodo;
-      // this._ipc.send('print', res);
-    });
+    if (this.metodo === 'compra') {
+      this.revisarPrecios(cabecera_fact['detalle_facturas_attributes']);
+    }
+    // this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
+    //   this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+    //     if (res.status) {
+    //       this.CancelarFactura();
+    //     }
+    //   });
+    //   // res['FACTURA_DE'] = this.metodo;
+    //   // this._ipc.send('print', res);
+    // });
   }
 }

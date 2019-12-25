@@ -18,7 +18,6 @@ import { map } from 'rxjs/operators';
 export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   form: FormGroup;
   ARRAY_ROWFACTURAS;
-  listaArticulos: any;
 
   seleccionModal;
   showModal = false;
@@ -42,6 +41,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   @Input() propietario;
   @Input() metodo;
+  @Input() listaArticulos;
 
   // subObjDevueltoModal: Subscription;
   // subIndexToFocusModal: Subscription;
@@ -52,19 +52,16 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   DESCUENTO = 0;
   listaDeDescuentos = [];
 
-  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private mServ: ModalService, private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private dbServ: DBservice, private mServ: ModalService, private fb: FormBuilder, private route: ActivatedRoute) {
     // this.rowFactura = new FormArray([new FormControl()]);
   }
 
   redondearAdos(num) {
+    console.log('-- FORMATEANDO A 2 --');
+    console.log(num);
     return (Math.round(num * 100) / 100).toFixed(2);
   }
   ngOnInit() {
-    console.log('this.metodo');
-    console.log(this.metodo);
-    console.log('this.propietario');
-    console.log(this.propietario);
-
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
@@ -75,11 +72,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.addItem(index);
     }
 
-    this.artServ.ARTICULOS.subscribe(res => {
-      if (res !== undefined && res !== null) {
-        this.listaArticulos = res;
-      }
-    });
     // .pipe(
     //   map(art => {
     //     if (art !== undefined) {
@@ -125,7 +117,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             fila.descuento = fila.desc ? (fila.desc !== null ? fila.desc : 0) : 0;
             fila.itbis = 0;
             fila.unidad = fila.uni;
-            const lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'desc', 'tot', 'secuencia']);
+            let lol;
+            if (this.metodo === 'venta') {
+              lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'desc', 'tot', 'secuencia']);
+            } else {
+              lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'desc', 'tot', 'secuencia']);
+            }
 
             detalle_factura.push(JSON.parse(JSON.stringify(lol)));
           }
@@ -144,6 +141,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   readPrecio() {
     let res = true;
     if (this.metodo === 'compra' && this.propietario !== null) {
+      res = false;
+    }
+    return res;
+  }
+  readDescuento() {
+    let res = true;
+    if (this.metodo === 'venta' && this.propietario !== null) {
       res = false;
     }
     return res;
@@ -231,12 +235,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     window.history.back();
   }
 
-  element: HTMLElement;
+  element: any;
 
   saltar(e, input, i, elemento) {
     const sigInput = input + i;
-
-    this.enfocarInput(sigInput);
 
     if (i >= 10 && input === 'cod-') {
       this.addItem(i);
@@ -244,6 +246,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     let codigo = (this.control.controls[i] as any).controls['cod'].value;
 
+    if (input === 'uni-') {
+      const cantidad = (this.control.controls[i] as any).controls['can'].value;
+
+      if (cantidad !== '' && cantidad !== null) {
+        this.enfocarInput(sigInput);
+      }
+    }
     if (input === 'cod-') {
       const unidad = (this.control.controls[i - 1] as any).controls['uni'].value;
 
@@ -254,6 +263,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       } else {
         this.UnidadesArticulo = [];
         this.aumentarSecuencia();
+        this.enfocarInput(sigInput);
       }
     }
     if (codigo === '') {
@@ -261,9 +271,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
     if (input === 'can-' && codigo !== '') {
       codigo = _.parseInt(codigo);
+
       if (_.isInteger(codigo)) {
         codigo = (this.control.controls[i] as any).controls['cod'].value;
         this.buscarArticuloPorCodigo(i, codigo);
+        this.enfocarInput(sigInput);
       } else {
         this.element = document.getElementById('can-' + i) as HTMLElement;
         this.element.blur();
@@ -275,40 +287,49 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   buscarArticuloPorCodigo(i, codigo) {
-    let precioLibra;
+    let precioQuintal;
     this.inputDrop = 'uni-' + i;
     // const ls = this.TodosLosSorteos.filter(val => val.loteria_id === idLoteria);
     const ARTICULO = this.listaArticulos.filter(articulo => articulo.codigo === codigo);
     if (ARTICULO[0] === undefined) {
       this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
-      this.enfocarInput('cod-' + i);
+      setTimeout(() => {
+        this.enfocarInput('cod-' + i);
+      }, 5);
+      this.selectContenido('cod-' + i);
     } else {
-      console.log(ARTICULO[0]);
-
-      const Libra = ARTICULO[0].contenido_articulos.filter(art => art.medida === 'Libra');
-      console.log(Libra.length);
-
-      if (Libra.length !== 0) {
-        precioLibra = Libra[0].precio;
-      }
-
-      if (ARTICULO[0].descripcion === 'Materia prima') {
-        (this.control.controls[i] as any).controls['desc'].disable();
+      if (this.metodo === 'compra' && ARTICULO[0].suplidor_id !== this.propietario.id) {
+        setTimeout(() => {
+          this.enfocarInput('cod-' + i);
+        }, 5);
+        this.selectContenido('cod-' + i);
+        this.dbServ.toastError('El codigo introducido es suplido por un suplidor distinto al seleccionado', 'ERROR');
       } else {
-        (this.control.controls[i] as any).controls['desc'].enable();
-      }
-      (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
-      this.verificarRow(i);
+        const arti = ARTICULO[0].contenido_articulos.filter(art => art.medida === 'Quintal');
 
-      if (ARTICULO[0].is_detallable) {
-        this.articulo_detallable(ARTICULO[0], precioLibra);
-      } else {
-        this.articulo_no_detallable(ARTICULO[0], precioLibra);
+        if (arti.length !== 0) {
+          precioQuintal = arti[0].precio;
+        }
+
+        if (ARTICULO[0].descripcion === 'Materia prima') {
+          (this.control.controls[i] as any).controls['desc'].disable();
+        } else {
+          (this.control.controls[i] as any).controls['desc'].enable();
+        }
+        (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
+        this.verificarRow(i);
+
+        if (ARTICULO[0].is_detallable) {
+          this.articulo_detallable(ARTICULO[0]);
+        } else {
+          this.articulo_no_detallable(ARTICULO[0]);
+        }
       }
     }
   }
 
-  articulo_detallable(art, precioLibra) {
+  articulo_detallable(art) {
+    const precioQuintal = art.precio_principal;
     this.drop = true;
     this.UnidadesArticulo = [];
     if (art.descripcion === 'Veterinaria') {
@@ -319,11 +340,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
     });
     if (art.descripcion !== 'Veterinaria') {
-      this.entrarSacosAUnidades(precioLibra);
+      this.entrarSacosAUnidades(precioQuintal);
     }
   }
 
-  articulo_no_detallable(art, precioLibra) {
+  articulo_no_detallable(art) {
+    const precioQuintal = art.precio_principal;
     this.drop = true;
     this.UnidadesArticulo = [];
     if (art.descripcion === 'Veterinaria') {
@@ -336,7 +358,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         }
       }
       if (art.descripcion !== 'Veterinaria') {
-        this.entrarSacosAUnidades(precioLibra);
+        this.entrarSacosAUnidades(precioQuintal);
       }
     });
   }
@@ -369,6 +391,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
   }
+  selectContenido(arg) {
+    this.element = document.getElementById(arg);
+    this.element.select();
+  }
 
   verificarSecuencia(i, input?) {
     if (this.secuencia < i) {
@@ -380,7 +406,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
 
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
-    if (input === 'unidad' && codigo !== '') {
+    if (input === 'unidad' && codigo !== '' && codigo !== null && codigo !== undefined) {
       this.verificarRow(i);
       this.buscarArticuloPorCodigo(i, codigo);
     }
@@ -476,7 +502,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   // =============================================
   abrirModal(arg) {
     const obj = arg;
-    obj.listaArticulos = this.listaArticulos;
+    if (this.metodo === 'venta') {
+      obj.listaArticulos = this.listaArticulos;
+    } else {
+      obj.listaArticulos = this.listaArticulos.filter(articulo => articulo.suplidor_id === this.propietario.id);
+    }
     this.mServ.modalTipo('buscar');
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
@@ -492,52 +522,64 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   clickRowModal(arg) {
-    let precioLibra;
+    let precioQuintal;
     const index = _.findIndex(this.listaArticulos, (o: any) => {
       return o.codigo === arg.codigo;
     });
     // this.listaArticulos[index].seleccionado = true;
     (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
     (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
-    if (arg.descripcion === 'Materia prima') {
-      (this.control.controls[arg.index] as any).controls['desc'].disable();
-    } else {
-      (this.control.controls[arg.index] as any).controls['desc'].enable();
+    if (this.metodo === 'venta') {
+      if (arg.descripcion === 'Materia prima') {
+        (this.control.controls[arg.index] as any).controls['desc'].disable();
+      } else {
+        (this.control.controls[arg.index] as any).controls['desc'].enable();
+      }
     }
-    this.rowActual = arg;
+    // this.rowActual = arg;
+    // const arti = arg.contenido_articulos.filter(art => art.medida === 'Quintal');
 
-    const Libra = arg.contenido_articulos.filter(art => art.medida === 'Libra');
+    const arti = arg.medida;
 
-    if (Libra.length !== 0) {
-      precioLibra = Libra[0].precio;
+    if (arti.length !== 0) {
+      precioQuintal = arti[0].precio;
     }
-    console.log(Libra);
 
     if (arg.is_detallable) {
-      this.articulo_detallable(arg, precioLibra);
+      this.articulo_detallable(arg);
     } else {
-      this.articulo_no_detallable(arg, precioLibra);
+      this.articulo_no_detallable(arg);
     }
 
     const sigInput = 'can-' + arg.index;
     this.enfocarInput(sigInput);
   }
 
-  entrarSacosAUnidades(precioLibra) {
+  entrarSacosAUnidades(precioQuintal) {
     this.sacos.forEach(saco => {
       const valor = 'Saco de ' + saco + ' libras';
-
-      this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioLibra) });
+      this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioQuintal) });
     });
   }
 
   calcularPrecioSaco(cant, precio) {
-    const res = cant * precio;
+    console.log('');
+    console.log('------------');
+
+    console.log('precio antes de entrar', precio);
+
+    const res = (cant / 100) * precio;
+    console.log('precio respuesta', res);
     return this.redondearAdos(res);
   }
 
   noArticuloEncontrado(arg) {
-    this.dbServ.toastError('Articulo no existe', 'ERROR');
+    if (this.metodo === 'venta') {
+      this.dbServ.toastError('Articulo no creado', 'ERROR');
+    } else {
+      this.dbServ.toastError(`O es surtido por un suplidor distinto al seleccionado`, 'ERROR');
+      this.dbServ.toastError(`Articulo no creado `, 'ERROR');
+    }
     this.enfocarInput('cod-' + arg);
     // this.element = document.getElementById('cod-' + arg) as HTMLElement;
     // this.element.focus();
