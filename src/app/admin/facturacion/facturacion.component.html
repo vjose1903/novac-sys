@@ -65,7 +65,15 @@
 
         <div *ngIf="metodo === 'compra'">
           <h5 class="mt-2"><strong>Número comprobante:</strong></h5>
-          <input type="text" class="form-control inputE UPPERCASE" (keydown.enter)="saltar('filtro', $event.target.value)" [(ngModel)]="NCFcompra" id="ncf" />
+          <input
+            type="text"
+            [textMask]="{ mask: ncfMask }"
+            placeholder="b__________"
+            class="form-control inputE UPPERCASE"
+            (keydown.enter)="saltar('filtro', $event.target.value)"
+            [(ngModel)]="NCFcompra"
+            id="ncf"
+          />
         </div>
       </div>
       <!-- ======================================================================================================================================================================== -->
@@ -151,6 +159,7 @@
   <div class="cuerpoFactura mb-2">
     <app-cuerpo-factura
       [propietario]="propietario_factura"
+      [metodo]="metodo"
       (getCuerpoFactura)="getCuerpoFactura($event)"
       (sendDescuento)="getDescuento($event)"
       (sendCalculos)="getCalculos($event)"

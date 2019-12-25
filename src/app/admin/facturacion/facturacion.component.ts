@@ -37,7 +37,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   tipos_facturas = [];
   public TiposFacturas: string;
   showTipos: boolean;
-  tipoFactura = '02';
+  tipoFactura;
   CuerpoFactura = [];
   DESCUENTO = 0.0;
   BRUTO = 0.0;
@@ -52,6 +52,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   listaSuplidores: any;
   TiposCostosGastos: string;
   tipos_costosYgastos: string[];
+
+  ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
   constructor(
     private _ipc: IpcService,
@@ -110,22 +112,25 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     console.log(this.metodo);
 
+    this.propietario_factura = null;
+
     if (this.metodo === 'venta') {
+      this.tipoFactura = '02';
       this.TiposFacturas =
         '<div style=" max-width: 21rem;" > \
-        <span>00 Factura sin comprobante</span><br>\
-        <span>01 Valor fiscal</span><br>\
-        <span>02 Factura de consumo</span><br>\
-        <span>03 Nota de debito</span><br>\
-        <span>04 Nota de credito</span><br>\
-        <span>11 Comprobante de compras</span><br>\
-        <span>12 Registro de unico ingreso</span><br>\
-        <span>13 Comprobante para gastos menores</span><br>\
-        <span>14 Comprobante de regimen especiales</span><br>\
-        <span>15 Comprobante gubernamental</span><br>\
-        <span>16 Comprobante para exportaciones</span><br>\
-        <span>17 Comprobantes para pago al exterior</span><br>\
-        </div>';
+      <span>00 Factura sin comprobante</span><br>\
+      <span>01 Valor fiscal</span><br>\
+      <span>02 Factura de consumo</span><br>\
+      <span>03 Nota de debito</span><br>\
+      <span>04 Nota de credito</span><br>\
+      <span>11 Comprobante de compras</span><br>\
+      <span>12 Registro de unico ingreso</span><br>\
+      <span>13 Comprobante para gastos menores</span><br>\
+      <span>14 Comprobante de regimen especiales</span><br>\
+      <span>15 Comprobante gubernamental</span><br>\
+      <span>16 Comprobante para exportaciones</span><br>\
+      <span>17 Comprobantes para pago al exterior</span><br>\
+      </div>';
       this.tipos_facturas = ['00', '01', '02', '03', '04', '11', '12', '13', '14', '15', '16', '17'];
       this.labelSearch = 'Cliente';
       this.form.patchValue({
@@ -134,6 +139,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         direccion: 'Autopista duarte KM 0 el Higuero',
       });
     } else {
+      this.tipoFactura = '01';
       this.TiposFacturas = '<div style=" max-width: 21rem;" > \
       <span>01 Valor fiscal</span><br>\
       <span>02 Factura de consumo</span><br>\
@@ -160,7 +166,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.fecha = moment().format('DD/MM/YYYY');
 
     this.mServ.OBJDEVUELTO.subscribe(res => {
-      if (res !== undefined && res.tipoModal === 'buscarCliente') {
+      if (res !== undefined && res !== null && res.tipoModal === 'buscarCliente') {
         this.propietario_factura = res;
         this.form.patchValue(this.propietario_factura);
         console.log(res);
@@ -193,7 +199,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         )
         .subscribe(res => {
           this.listaSuplidores = JSON.parse(JSON.stringify(res));
-          console.log(res);
         });
     } else {
       this.dbServ
@@ -220,11 +225,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.enfocarInput('tipoFact');
     }, 5);
 
-    this.obsServ.TIPOS_FACTURAS.subscribe(res => {
-      if (res !== undefined) {
-        this.lista_tipos_facturas = res;
-      }
+    this.dbServ.getTiposFacturas().subscribe(res => {
+      this.lista_tipos_facturas = res;
     });
+
     this.obsServ.SECUENCIA_FACTURAS.subscribe(res => {
       if (res !== undefined) {
         this.lista_secuencia_facturas = res;
@@ -241,9 +245,14 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       document.documentElement.style.setProperty('--popInfo', '25rem');
     }
   }
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.mServ.ModalObj(null);
+    this.mServ.modalTipo(null);
+    this.mServ.ModalSeleccion(null);
+  }
   getCalculos(arg) {
     console.log('calculos');
+    
 
     this.TOTAL = parseFloat(arg.Total);
 
@@ -281,12 +290,24 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   ocultarTipos() {
     this.showTipos = true;
   }
+  validarRayaAbajo() {
+    console.log(this.NCFcompra);
+    console.log(_.endsWith(this.NCFcompra, '_'));
+
+    if (this.NCFcompra && this.NCFcompra !== null) {
+      if (!_.endsWith(this.NCFcompra, '_')) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
 
   saltar(campo, valor?) {
     if (campo === 'condicion') {
       if (this.tipos_facturas.includes(valor)) {
         this.tipoFactura = valor;
-        // this.formatearComprobante(valor);
+        // this.NCFcompra = 'b' + valor;
         this.enfocarInput(campo);
       } else {
         this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
@@ -296,13 +317,18 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.enfocarInput(campo);
     }
     if (campo === 'pago') {
-      if (this.condicion_fact === 'Contado') {
-        this.enfocarInput(campo);
+      if (this.metodo === 'compra' && !this.tipos_costosYgastos.includes(valor)) {
+        this.dbServ.toastError('El tipo de costo y gasto introducido es incorrecto.', 'ERROR');
       } else {
-        if (this.metodo === 'venta') {
-          this.enfocarInput('nom');
+        this.CostoYgasto = valor;
+        if (this.condicion_fact === 'Contado') {
+          this.enfocarInput(campo);
         } else {
-          this.enfocarInput('ncf');
+          if (this.metodo === 'venta') {
+            this.enfocarInput('nom');
+          } else {
+            this.enfocarInput('ncf');
+          }
         }
       }
     }
@@ -314,7 +340,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     }
     if (campo === 'filtro') {
-      if (valor.length === 11) {
+      if (this.validarRayaAbajo()) {
         this.abrirModalFiltro();
       } else {
         this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso');
@@ -529,16 +555,32 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   CancelarFactura() {
     this.propietario_factura = null;
+    this.NCFcompra = null;
+    this.CostoYgasto = null;
+    this.mServ.ModalObj(null);
+    this.mServ.modalTipo(null);
+    this.mServ.ModalSeleccion(null);
 
-    this.form.patchValue({
-      id: 1,
-      nombre: 'Cliente contado',
-      direccion: 'Autopista duarte KM 0 el Higuero',
-      telefono: null,
-    });
+    if (this.metodo === 'venta') {
+      this.form.patchValue({
+        id: 1,
+        nombre: 'Cliente contado',
+        direccion: 'Autopista duarte KM 0 el Higuero',
+        telefono: null,
+      });
+      this.tipoFactura = '02';
+    } else {
+      this.tipoFactura = '01';
+      this.form.patchValue({
+        id: null,
+        nombre: null,
+        direccion: null,
+        telefono: null,
+      });
+    }
 
-    this.tipoFactura = '02';
     this.CuerpoFactura = [];
+
     this.DESCUENTO = 0.0;
     this.BRUTO = 0.0;
     this.TOTAL = 0.0;
@@ -570,7 +612,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       .add(1, 'year')
       .format('DD/MM/YYYY');
 
-    cabecera_fact['numero_comprobante'] = null;
+    cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
+    cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;
     cabecera_fact['numero_factura'] = null;
     cabecera_fact['total_factura'] = this.redondearAdos(this.TOTAL);
     cabecera_fact['Bruto'] = this.redondearAdos(this.BRUTO);
@@ -578,21 +621,24 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['descuento'] = this.redondearAdos(this.DESCUENTO);
     cabecera_fact['estado'] = true;
     cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
-
-    if (this.propietario_factura.id === 1) {
-      cabecera_fact['cliente_id'] = null;
-      cabecera_fact['NoCliente_nombre'] = this.form.controls.nombre.value;
-      cabecera_fact['NoCliente_direccion'] = this.form.controls.direccion.value;
+    if (this.metodo === 'venta') {
+      if (this.propietario_factura.id === 1) {
+        cabecera_fact['cliente_id'] = null;
+        cabecera_fact['NoCliente_nombre'] = this.form.controls.nombre.value;
+        cabecera_fact['NoCliente_direccion'] = this.form.controls.direccion.value;
+      } else {
+        cabecera_fact['cliente_id'] = this.propietario_factura.id;
+      }
     } else {
-      cabecera_fact['cliente_id'] = this.propietario_factura.id;
+      cabecera_fact['supldior_id'] = this.form.controls.id.value;
     }
 
     cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
-    cabecera_fact['FACTURA_DE'] = 13;
-    cabecera_fact['tipo'] = 'venta';
+    cabecera_fact['FACTURA_DE'] = this.metodo === 'venta' ? 13 : 14;
+    cabecera_fact['tipo'] = this.metodo;
     cabecera_fact['user_id'] = empleado.id;
 
-    // console.log(cabecera_fact);
+    console.log(cabecera_fact);
 
     this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
       this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
@@ -600,7 +646,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
           this.CancelarFactura();
         }
       });
-      this._ipc.send('print', res);
+      // res['FACTURA_DE'] = this.metodo;
+      // this._ipc.send('print', res);
     });
   }
 }

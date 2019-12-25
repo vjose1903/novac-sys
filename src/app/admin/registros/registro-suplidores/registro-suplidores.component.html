@@ -64,7 +64,7 @@
               </div>
             </div>
           </div>
-          <div class=" col-md-8">
+          <div class="col-md-12">
             <div class="from-group">
               <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a>
               <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
@@ -78,7 +78,15 @@
   <div class="col-xs-12 col-md-6">
     <h4>Listado Suplidores</h4>
     <div class="card cardListados ">
-      <app-tablas *ngIf="listaSuplidores && info" [info]="info" [botones]="botones" (DevolverInfo)="editarItem($event)" (DELETE)="abrirModal($event)" [data]="listaSuplidores" [focusRow]="false"></app-tablas>
+      <app-tablas
+        *ngIf="listaSuplidores && info"
+        [info]="info"
+        [botones]="botones"
+        (DevolverInfo)="editarItem($event)"
+        (DELETE)="abrirModal($event)"
+        [data]="listaSuplidores"
+        [focusRow]="false"
+      ></app-tablas>
     </div>
   </div>
 </div>

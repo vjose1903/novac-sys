@@ -69,14 +69,10 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
       this.obsServ.next_articulo(res);
     });
 
-    // this.dbServ.getTiposFacturas().subscribe(res => {
-    //   this.obsServ.next_tipo_factura(res);
-    // });
     this.mantenimiento = true;
     this._ipc.PRINTERS.subscribe(res => {
       if (res !== undefined) {
         this.PrintersInstall = res;
-        console.log(res);
       }
     });
     // const userPayload = this.usuariosServices.getUserPayload();

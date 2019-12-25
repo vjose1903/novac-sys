@@ -41,6 +41,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   sacos = [25, 50, 100];
 
   @Input() propietario;
+  @Input() metodo;
 
   // subObjDevueltoModal: Subscription;
   // subIndexToFocusModal: Subscription;
@@ -59,6 +60,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     return (Math.round(num * 100) / 100).toFixed(2);
   }
   ngOnInit() {
+    console.log('this.metodo');
+    console.log(this.metodo);
+    console.log('this.propietario');
+    console.log(this.propietario);
+
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
@@ -70,7 +76,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
 
     this.artServ.ARTICULOS.subscribe(res => {
-      if (res !== undefined) {
+      if (res !== undefined && res !== null) {
         this.listaArticulos = res;
       }
     });
@@ -87,26 +93,26 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     // )
 
     this.mServ.OBJDEVUELTO.subscribe(res => {
-      if (res !== undefined && res.tipoModal !== 'buscarCliente') {
+      if (res !== undefined && res !== null && res.tipoModal !== 'buscarCliente') {
         this.clickRowModal(res);
       }
     });
 
     this.mServ.PRESSESC.subscribe(res => {
-      if (res !== undefined) {
+      if (res !== undefined && res !== null) {
         this.enfocarInput('cod-' + res);
       }
     });
 
     this.mServ.INDEXTOFOCUS.subscribe(res => {
-      if (res !== undefined) {
+      if (res !== undefined && res !== null) {
         this.noArticuloEncontrado(res);
       }
     });
 
     this.form.valueChanges.subscribe(res => {
       const detalle_factura = [];
-      if (res !== undefined) {
+      if (res !== undefined && res !== null) {
         const obj = {};
 
         res.rowFactura.forEach(fila => {
@@ -135,6 +141,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
   ngOnChanges() {}
 
+  readPrecio() {
+    let res = true;
+    if (this.metodo === 'compra' && this.propietario !== null) {
+      res = false;
+    }
+    return res;
+  }
   // =============================================
   //  RESETEAR FORMULARIO
   // =============================================
@@ -270,6 +283,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
       this.enfocarInput('cod-' + i);
     } else {
+      console.log(ARTICULO[0]);
+
       const Libra = ARTICULO[0].contenido_articulos.filter(art => art.medida === 'Libra');
       console.log(Libra.length);
 
@@ -301,8 +316,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
 
     art.contenido_articulos.forEach(element => {
-      console.log(element);
-
       this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
     });
     if (art.descripcion !== 'Veterinaria') {

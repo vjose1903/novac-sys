@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig } from 'ngx-bootstrap';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DBservice } from '../../../core/services/bdservice.service';
-import _ = require('lodash');
+import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
 import { ModalService } from '../../../components/modal/modal.service';
 
@@ -159,7 +159,7 @@ export class RegistroSuplidoresComponent implements OnInit {
         },
         err => {
           console.log(err);
-          
+
           this.mostrarErrores(err.error);
         },
       );

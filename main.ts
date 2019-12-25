@@ -186,17 +186,11 @@ function cabeceraFacturaVenta(data) {
       columns: [
         [
           {
-            text: [
-              { text: 'Cliente : ', fontSize: 12 },
-              { text: data.cliente.nombre, fontSize: 12 },
-            ],
+            text: [data.FACTURA_DE === 'venta' ? { text: 'Cliente : ', fontSize: 12 } : { text: 'Suplidor : ', fontSize: 12 }, { text: data.cliente.nombre, fontSize: 12 }],
             margin: [0, 0, 0, 0],
           },
           {
-            text: [
-              { text: 'Rnc cliente : ', fontSize: 12 },
-              { text: data.cliente.rnc, fontSize: 12 },
-            ],
+            text: [data.FACTURA_DE === 'venta' ? { text: 'Rnc cliente : ', fontSize: 12 } : { text: 'Rnc suplidor : ', fontSize: 12 }, { text: data.cliente.rnc, fontSize: 12 }],
             margin: [0, 5, 0, 0],
           },
           {
@@ -213,6 +207,13 @@ function cabeceraFacturaVenta(data) {
             margin: [0, 15, 0, 0],
             alignment: 'center',
           },
+          data.FACTURA_DE === 'compra'
+            ? {
+                text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
+                margin: [0, 1, 0, 0],
+                alignment: 'center',
+              }
+            : null,
         ],
         [
           {
@@ -396,14 +397,16 @@ function contenidoFacturaVenta(data) {
                   h: 1,
                   color: '#000000',
                 },
-                {
-                  type: 'rect',
-                  x: 260,
-                  y: 0,
-                  w: 140,
-                  h: 1,
-                  color: '#000000',
-                },
+                data.FACTURA_DE === 'venta'
+                  ? {
+                      type: 'rect',
+                      x: 260,
+                      y: 0,
+                      w: 140,
+                      h: 1,
+                      color: '#000000',
+                    }
+                  : null,
               ],
               margin: [0, 30, 0, 0],
             },
@@ -416,10 +419,12 @@ function contenidoFacturaVenta(data) {
                   },
                 ],
                 [
-                  {
-                    text: [{ text: 'Cliente', fontSize: 12, bold: true }],
-                    margin: [-70, 5, 0, 0],
-                  },
+                  data.FACTURA_DE === 'venta'
+                    ? {
+                        text: [{ text: 'Cliente', fontSize: 12, bold: true }],
+                        margin: [-70, 5, 0, 0],
+                      }
+                    : null,
                 ],
               ],
             },
@@ -452,13 +457,15 @@ function makeFacturaVenta(data) {
           alignment: 'right',
           margin: [0, 0, 30, 0],
         },
-        data.condicion === 'Contado'
-          ? null
-          : {
-              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-              alignment: 'center',
-              margin: [0, -15, 0, 0],
-            },
+        data.FACTURA_DE === 'venta'
+          ? data.condicion === 'Contado'
+            ? null
+            : {
+                text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+                alignment: 'center',
+                margin: [0, -15, 0, 0],
+              }
+          : null,
       ];
     },
     images: {
@@ -485,6 +492,7 @@ function makeFacturaVenta(data) {
 
   const cFileName = 'test.pdf';
   try {
+    
     const pdfDoc = printer.createPdfKitDocument(dd);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
       console.log('finizu');

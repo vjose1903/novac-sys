@@ -61,17 +61,17 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   element: HTMLElement;
   ngOnInit() {
     this.mServ.SHOWMODAL.subscribe(res => {
-      if (res !== undefined) {
+      if (res !== undefined && res !== null) {
         this.showModal = res;
       }
     });
     this.mServ.TIPOMODAL.subscribe(res => {
-      if (res !== undefined) {
+      if (res !== undefined && res !== null) {
         this.tipoModal = res;
       }
     });
     this.mServ.SELECCIONMODAL.subscribe(res => {
-      if (res !== undefined) {
+      if (res !== undefined && res !== null) {
         this.seleccionModal = res;
         this.paraFiltroArticulos = res.filtrar;
         console.log(res);

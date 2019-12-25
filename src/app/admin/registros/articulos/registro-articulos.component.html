@@ -113,15 +113,34 @@
           <div class="col-md-6 ">
             <div class="from-group">
               <label class="control-label">Alertar existencia: <span style="color: red">*</span></label>
-              <input
-                type="Number"
-                (keydown.enter)="saltar(form.controls['medida'].value === 'Quintal' ? 'precioLibra' : 'contenidoPadre')"
-                id="existencia"
-                formControlName="aviso_existencia"
-                placeholder="Cantidad para alertar"
-                class="form-control mb-4"
-                autocomplete="off"
-              />
+              <div class="row">
+                <div class="col-8">
+                  <input
+                    type="Number"
+                    (keydown.enter)="saltar('medida_alerta')"
+                    id="existencia"
+                    formControlName="aviso_existencia"
+                    placeholder="Cantidad para alertar"
+                    class="form-control mb-4"
+                    autocomplete="off"
+                  />
+                </div>
+
+                <div class="col-4 p-0">
+                  <select
+                    (keydown.enter)="saltar(form.controls['medida'].value === 'Quintal' ? 'precioLibra' : 'contenidoPadre')"
+                    class="form-control"
+                    formControlName="medida_alerta"
+                    id="medida_alerta"
+                  >
+                    <option value="Quintal">Quintal</option>
+                    <option value="Libra">Libra</option>
+                    <option value="Caja">Caja</option>
+                    <option value="Paquete">Paquete</option>
+                    <option value="Unidad">Unidad</option>
+                  </select>
+                </div>
+              </div>
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
@@ -184,8 +203,8 @@
                 <option value="" disabled selected hidden>Seleccione</option>
                 <option value="Paquete">Paquete</option>
                 <option value="Unidad">Unidad</option>
-                <option value="Sobre">Sobre</option>
-                <option value="Frasco">Frasco</option>
+                <!-- <option value="Sobre">Sobre</option>
+                <option value="Frasco">Frasco</option> -->
               </select>
               <div
                 class="alerta text-danger ml-1"
@@ -248,8 +267,8 @@
               <select (keydown.enter)="saltar('precioHijo')" id="medidaHijo" formControlName="medida_contenido_hijo" class="form-control mb-4" value="">
                 <option value="" disabled selected hidden>Seleccione</option>
                 <option value="Unidad">Unidad</option>
-                <option value="Sobre">Sobre</option>
-                <option value="Frasco">Frasco</option>
+                <!-- <option value="Sobre">Sobre</option>
+                <option value="Frasco">Frasco</option> -->
               </select>
               <div
                 class="alerta text-danger ml-1"
@@ -286,7 +305,7 @@
         <!-- <p>{{ form.value | json }}</p> -->
       </form>
       <div class="row">
-        <div class=" col-md-8  col-sm8     mt-3">
+        <div class="col-md-12 mt-3">
           <div class="from-group">
             <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a>
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
