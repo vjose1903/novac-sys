@@ -128,7 +128,7 @@
               <!--  ::::::::::::  PRECIO  ::::::::::::  -->
               <td class="PRE td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada campoNumeros inPRE " id="pre-{{ i }}" formControlName="pre" [readOnly]="readPrecio()" />
+                  <input type="text" (blur)="revisarPrecio(i)" class="form-control entrada campoNumeros inPRE " id="pre-{{ i }}" formControlName="pre" [readOnly]="readPrecio()" />
                 </div>
               </td>
 

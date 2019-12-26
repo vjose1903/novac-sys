@@ -157,6 +157,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   // =============================================
   RESETCUERPO() {
     this.form.reset();
+    this.TOTAL = 0;
+    this.ITBIS = 0;
+    this.secuencia = 0;
+    this.inputSecuencia = 'cod-0';
+    this.inputDrop = 'uni-0';
+    this.DESCUENTO = 0;
   }
 
   // =============================================
@@ -425,6 +431,68 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       const tot = precio * cantidad;
       (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(this.redondearAdos(tot)));
       this.calculosTotalesGenerales();
+    }
+  }
+
+  checkNumbers(arg) {
+    let res = false;
+    for (let i = 0; i < arg.length; i++) {
+      const tempCaracter = arg.charAt(i);
+      if (tempCaracter !== ',') {
+        const caracter = _.parseInt(tempCaracter);
+        if (_.isNaN(caracter)) {
+          res = true;
+        }
+      }
+    }
+    return res;
+  }
+  checkLongMillares(num) {
+    let res = false;
+    const splitNum = _.split(num, ',');
+    splitNum.forEach((element, i) => {
+      if (i !== 0) {
+        if (element.length !== 3) {
+          res = true;
+        }
+      }
+    });
+    return res;
+  }
+
+  revisarPrecio(i) {
+    const precioTEMPO = (this.control.controls[i] as any).controls['pre'].value;
+    if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
+      const splitPrecio = _.split(precioTEMPO, '.');
+      let precioTEMP;
+      const enteros = splitPrecio[0];
+      let tempdecimales = splitPrecio[1];
+      if (tempdecimales === undefined) {
+        tempdecimales = '00';
+      }
+      //
+      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales)) {
+        this.dbServ.toastError('Precio introducido es invalido', 'ERROR');
+        this.enfocarInput('pre-' + i);
+      } else {
+        //
+        if (splitPrecio.length === 2) {
+          let decimales;
+          if (tempdecimales.length > 2) {
+            decimales = tempdecimales.substring(0, 2);
+          } else {
+            decimales = _.padEnd(tempdecimales, 2, '0');
+          }
+          const temp = [enteros, decimales];
+          precioTEMP = _.join(temp, '.');
+        } else if (splitPrecio.length === 1) {
+          const decimales = '00';
+          const temp = [enteros, decimales];
+          precioTEMP = _.join(temp, '.');
+        }
+      }
+
+      (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(precioTEMP));
     }
   }
 

@@ -92,8 +92,29 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   // }
 
   redondearAdos(num) {
-
     return (Math.round(num * 100) / 100).toFixed(2);
+  }
+
+  desformatear(sTnum) {
+    let temp = 0;
+
+    if (sTnum !== null) {
+      if (sTnum !== undefined) {
+        const x = sTnum.split(',');
+        if (x.length === 1) {
+          temp += parseFloat(x[0]);
+          return temp;
+        } else if (x.length >= 2) {
+          let joined = '';
+          joined = _.join(x, '');
+          temp += parseFloat(joined);
+
+          return temp;
+        }
+      }
+    } else {
+      return sTnum;
+    }
   }
   formatearNumero(nStr) {
     if (nStr !== undefined) {
@@ -259,20 +280,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(null);
   }
   getCalculos(arg) {
-    console.log('calculos');
-
     this.TOTAL = parseFloat(arg.Total);
 
-    console.log(arg.Total);
-    console.log(this.TOTAL);
     this.calcularBruto();
   }
   getDescuento(arg) {
-    console.log('descuento');
-
     this.DESCUENTO = parseFloat(arg);
-    console.log(arg);
-    console.log(this.DESCUENTO);
 
     this.calcularBruto();
   }
@@ -280,12 +293,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   calcularBruto() {
     setTimeout(() => {
       const calculo = this.TOTAL + this.DESCUENTO;
-      console.log('============');
-      console.log('  CALCULO');
-      console.log('============');
-
-      console.log(calculo);
-      console.log('============');
 
       this.BRUTO = calculo;
     }, 5);
@@ -298,9 +305,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.showTipos = true;
   }
   validarRayaAbajo() {
-    console.log(this.NCFcompra);
-    console.log(_.endsWith(this.NCFcompra, '_'));
-
     if (this.NCFcompra && this.NCFcompra !== null) {
       if (!_.endsWith(this.NCFcompra, '_')) {
         return true;
@@ -461,8 +465,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.CuerpoFactura = obj;
   }
 
-  p() {}
-
   prueba() {
     const factCre = {
       id: 4,
@@ -600,21 +602,80 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   revisarPrecios(cuerpoFact) {
+    const tempCuerpo = [];
     cuerpoFact.forEach(row => {
       const articulo = this.listaArticulos.filter(art => art.id === row.articulo_id);
+      const contenido_articulo = articulo[0].contenido_articulos;
+      const precioRow = this.desformatear(row.pre);
+
+      const roundArticulo = Math.round(articulo[0].precio_principal);
+      const roundRow = Math.round(precioRow);
+
+      let temp = {};
       // if (articulo[0].precio)
       console.log('');
       console.log('');
       console.log('==================');
 
-      console.log(articulo[0]);
+      console.log('Articulo: ', roundArticulo, ' Row: ', roundRow);
 
       console.log('-----------------');
-      console.log(row);
+      if (roundArticulo === roundRow) {
+        console.log('precio no cambia');
+      } else {
+        let cantPadre;
+        let cantHijo;
+        console.log('precio si cambio');
+        console.log(' ');
+        console.log('nuevos precios');
+        const tempContenido = [];
+        contenido_articulo.forEach(contenido => {
+          let temporal = contenido;
+          if (!contenido.referencia) {
+            if (contenido.precio) {
+              cantPadre = contenido.cantidad;
+              temporal.precio = this.calcularNuevosPrecios(cantPadre, precioRow);
+            }
+          } else {
+            if (contenido.precio) {
+              cantHijo = contenido.cantidad;
+              const prePadre = this.calcularNuevosPrecios(cantPadre, precioRow);
+              temporal.precio = this.calcularNuevosPrecios(cantHijo, this.redondearAdos(prePadre));
+            } else {
+              temporal = null;
+            }
+          }
+          if (temporal !== null) {
+            tempContenido.push(temporal);
+          }
+        });
+
+        const newArticulo = articulo[0];
+        newArticulo.precio_principal = precioRow;
+        newArticulo.contenido_articulos = tempContenido;
+        console.log('-0-0-0-0-0-0-0-0');
+        console.log('  newArticulo');
+        console.log('----------------');
+
+        console.log(newArticulo);
+
+        console.log('-0-0-0-0-0-0-0-0');
+      }
+      console.log(' ');
+      console.log(' ');
       console.log('==================');
+      temp = _.omit(row, ['pre']);
+      tempCuerpo.push(temp);
+      console.log(tempCuerpo);
+
       console.log('');
       console.log('');
     });
+  }
+
+  calcularNuevosPrecios(cant, precio) {
+    const pre = precio / cant;
+    return this.redondearAdos(pre);
   }
 
   IMPRIMIR() {
