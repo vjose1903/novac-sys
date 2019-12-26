@@ -465,18 +465,21 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
       const splitPrecio = _.split(precioTEMPO, '.');
       let precioTEMP;
-      const enteros = splitPrecio[0];
+      let enteros = splitPrecio[0];
       let tempdecimales = splitPrecio[1];
       if (tempdecimales === undefined) {
         tempdecimales = '00';
       }
       //
-      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales)) {
+      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
         this.dbServ.toastError('Precio introducido es invalido', 'ERROR');
         this.enfocarInput('pre-' + i);
       } else {
         //
         if (splitPrecio.length === 2) {
+          if (enteros === '' || enteros === ' ') {
+            enteros = '0';
+          }
           let decimales;
           if (tempdecimales.length > 2) {
             decimales = tempdecimales.substring(0, 2);
@@ -490,6 +493,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
           const temp = [enteros, decimales];
           precioTEMP = _.join(temp, '.');
         }
+        this.calcularTotalRow(i);
       }
 
       (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(precioTEMP));
@@ -631,13 +635,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   calcularPrecioSaco(cant, precio) {
-    console.log('');
-    console.log('------------');
-
-    console.log('precio antes de entrar', precio);
-
     const res = (cant / 100) * precio;
-    console.log('precio respuesta', res);
     return this.redondearAdos(res);
   }
 

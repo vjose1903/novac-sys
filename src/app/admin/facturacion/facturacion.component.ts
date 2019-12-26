@@ -604,7 +604,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   revisarPrecios(cuerpoFact) {
     const tempCuerpo = [];
     cuerpoFact.forEach(row => {
-      const articulo = this.listaArticulos.filter(art => art.id === row.articulo_id);
+      const Articulo = this.listaArticulos.filter(art => art.id === row.articulo_id);
+      const articulo = JSON.parse(JSON.stringify(Articulo))
       const contenido_articulo = articulo[0].contenido_articulos;
       const precioRow = this.desformatear(row.pre);
 
@@ -612,7 +613,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       const roundRow = Math.round(precioRow);
 
       let temp = {};
-      // if (articulo[0].precio)
       console.log('');
       console.log('');
       console.log('==================');
@@ -634,13 +634,15 @@ export class FacturacionComponent implements OnInit, OnDestroy {
           if (!contenido.referencia) {
             if (contenido.precio) {
               cantPadre = contenido.cantidad;
-              temporal.precio = this.calcularNuevosPrecios(cantPadre, precioRow);
+              const precio = this.calcularNuevosPrecios(cantPadre, precioRow);
+              temporal.precio = this.desformatear(precio);
             }
           } else {
             if (contenido.precio) {
               cantHijo = contenido.cantidad;
               const prePadre = this.calcularNuevosPrecios(cantPadre, precioRow);
-              temporal.precio = this.calcularNuevosPrecios(cantHijo, this.redondearAdos(prePadre));
+              const precio = this.calcularNuevosPrecios(cantHijo, this.redondearAdos(prePadre));
+              temporal.precio = this.desformatear(precio);
             } else {
               temporal = null;
             }
