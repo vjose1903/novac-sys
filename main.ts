@@ -212,11 +212,11 @@ function cabeceraFacturaVenta(data) {
           },
           data.FACTURA_DE === 'compra'
             ? {
-                text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
-                margin: [0, 1, 0, 0],
-                alignment: 'center',
-              }
-            : null,
+              text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
+              margin: [0, 1, 0, 0],
+              alignment: 'center',
+            }
+            : '',
         ],
         [
           {
@@ -230,14 +230,14 @@ function cabeceraFacturaVenta(data) {
                 margin: [75, 0, 0, 0],
               },
               data.condicion === 'Contado'
-                ? null
+                ? ''
                 : {
-                    text: [
-                      { text: 'Fecha vencimiento : ', fontSize: 11.5 },
-                      { text: fecha(data.fecha_vencimiento), fontSize: 11.5 },
-                    ],
-                    margin: [75, 3, 0, 0],
-                  },
+                  text: [
+                    { text: 'Fecha vencimiento : ', fontSize: 11.5 },
+                    { text: fecha(data.fecha_vencimiento), fontSize: 11.5 },
+                  ],
+                  margin: [75, 3, 0, 0],
+                },
 
               {
                 text: [
@@ -402,14 +402,14 @@ function contenidoFacturaVenta(data) {
                 },
                 data.FACTURA_DE === 'venta'
                   ? {
-                      type: 'rect',
-                      x: 260,
-                      y: 0,
-                      w: 140,
-                      h: 1,
-                      color: '#000000',
-                    }
-                  : null,
+                    type: 'rect',
+                    x: 260,
+                    y: 0,
+                    w: 140,
+                    h: 1,
+                    color: '#000000',
+                  }
+                  : '',
               ],
               margin: [0, 30, 0, 0],
             },
@@ -424,10 +424,10 @@ function contenidoFacturaVenta(data) {
                 [
                   data.FACTURA_DE === 'venta'
                     ? {
-                        text: [{ text: 'Cliente', fontSize: 12, bold: true }],
-                        margin: [-70, 5, 0, 0],
-                      }
-                    : null,
+                      text: [{ text: 'Cliente', fontSize: 12, bold: true }],
+                      margin: [-70, 5, 0, 0],
+                    }
+                    : '',
                 ],
               ],
             },
@@ -462,13 +462,13 @@ function makeFacturaVenta(data) {
         },
         data.FACTURA_DE === 'venta'
           ? data.condicion === 'Contado'
-            ? null
+            ? ''
             : {
-                text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-                alignment: 'center',
-                margin: [0, -15, 0, 0],
-              }
-          : null,
+              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+              alignment: 'center',
+              margin: [0, -15, 0, 0],
+            }
+          : '',
       ];
     },
     images: {
@@ -479,8 +479,6 @@ function makeFacturaVenta(data) {
     },
   };
   console.log('paso');
-
-  // console.log(dd);
 
   const type_font = 'roboto\\Roboto';
   const fontDescriptors = {
@@ -493,20 +491,21 @@ function makeFacturaVenta(data) {
   };
   const printer = new pdfmake(fontDescriptors);
 
+  win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
   const cFileName = 'test.pdf';
-  try {
-    const pdfDoc = printer.createPdfKitDocument(dd);
-    pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
-      console.log('finizu');
-      imprimir(cFileName);
-    });
-    pdfDoc.end();
-  } catch (err) {
-    console.log('::::::::ERROR::::::::');
-    console.log(err);
+  // try {
+  //   const pdfDoc = printer.createPdfKitDocument(dd);
+  //   pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
+  //     console.log('finizu');
+  //     imprimir(cFileName);
+  //   });
+  //   pdfDoc.end();
+  // } catch (err) {
+  //   console.log('::::::::ERROR::::::::');
+  //   console.log(err);
 
-    win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false });
-  }
+  //   win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false, error: err});
+  // }
 }
 
 function imprimir(cFileName) {

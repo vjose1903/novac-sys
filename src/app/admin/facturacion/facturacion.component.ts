@@ -702,7 +702,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       console.log(tempEnviar);
 
       this.dbServ.editarArticulo(tempEnviar).subscribe(
-        res => {},
+        res => { },
         err => {
           console.log(err);
           this.mostrarErrores(err.error);
@@ -828,6 +828,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       console.log(res);
 
       this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+        console.log(res);
+
         if (res.status) {
           this.CancelarFactura();
         }
