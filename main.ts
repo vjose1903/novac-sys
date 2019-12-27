@@ -491,21 +491,21 @@ function makeFacturaVenta(data) {
   };
   const printer = new pdfmake(fontDescriptors);
 
-  win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
+  // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
   const cFileName = 'test.pdf';
-  // try {
-  //   const pdfDoc = printer.createPdfKitDocument(dd);
-  //   pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
-  //     console.log('finizu');
-  //     imprimir(cFileName);
-  //   });
-  //   pdfDoc.end();
-  // } catch (err) {
-  //   console.log('::::::::ERROR::::::::');
-  //   console.log(err);
+  try {
+    const pdfDoc = printer.createPdfKitDocument(dd);
+    pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
+      console.log('finizu');
+      imprimir(cFileName);
+    });
+    pdfDoc.end();
+  } catch (err) {
+    console.log('::::::::ERROR::::::::');
+    console.log(err);
 
-  //   win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false, error: err});
-  // }
+    win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false, error: err});
+  }
 }
 
 function imprimir(cFileName) {
