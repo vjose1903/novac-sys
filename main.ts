@@ -186,18 +186,21 @@ function cabeceraFacturaVenta(data) {
       columns: [
         [
           {
-            text: [data.FACTURA_DE === 'venta' ? { text: 'Cliente : ', fontSize: 12 } : { text: 'Suplidor : ', fontSize: 12 }, { text: data.cliente.nombre, fontSize: 12 }],
+            text: [
+              data.FACTURA_DE === 'venta' ? { text: 'Cliente : ', fontSize: 12 } : { text: 'Suplidor : ', fontSize: 12 },
+              data.FACTURA_DE === 'venta' ? { text: data.cliente.nombre, fontSize: 12 } : { text: data.suplidor.nombre, fontSize: 12 },
+            ],
             margin: [0, 0, 0, 0],
           },
           {
-            text: [data.FACTURA_DE === 'venta' ? { text: 'Rnc cliente : ', fontSize: 12 } : { text: 'Rnc suplidor : ', fontSize: 12 }, { text: data.cliente.rnc, fontSize: 12 }],
+            text: [
+              data.FACTURA_DE === 'venta' ? { text: 'Rnc cliente : ', fontSize: 12 } : { text: 'Rnc suplidor : ', fontSize: 12 },
+              data.FACTURA_DE === 'venta' ? { text: data.cliente.rnc, fontSize: 12 } : { text: data.suplidor.rnc, fontSize: 12 },
+            ],
             margin: [0, 5, 0, 0],
           },
           {
-            text: [
-              { text: 'Dirección : ', fontSize: 12 },
-              { text: data.cliente.direccion, fontSize: 12 },
-            ],
+            text: [{ text: 'Dirección : ', fontSize: 12 }, data.FACTURA_DE === 'venta' ? { text: data.cliente.direccion, fontSize: 12 } : { text: data.suplidor.direccion, fontSize: 12 }],
             margin: [0, 5, 0, 0],
           },
         ],
@@ -492,7 +495,6 @@ function makeFacturaVenta(data) {
 
   const cFileName = 'test.pdf';
   try {
-    
     const pdfDoc = printer.createPdfKitDocument(dd);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
       console.log('finizu');
@@ -508,8 +510,6 @@ function makeFacturaVenta(data) {
 }
 
 function imprimir(cFileName) {
-  const sumatrapdf_path = PathApp() + 'print\\lp.exe';
-
   // var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
   const { exec } = require('child_process');
   // "C:\Users\User\Desktop\test.pdf" "EPSON LX-350 ESC/P"

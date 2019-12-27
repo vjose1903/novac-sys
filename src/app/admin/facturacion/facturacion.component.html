@@ -72,6 +72,7 @@
             class="form-control inputE UPPERCASE"
             (keydown.enter)="saltar('filtro', $event.target.value)"
             [(ngModel)]="NCFcompra"
+            (focus)="trimEndNcf()"
             id="ncf"
           />
         </div>

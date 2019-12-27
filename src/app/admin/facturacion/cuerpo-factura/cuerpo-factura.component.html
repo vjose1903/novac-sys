@@ -6,7 +6,7 @@
       <th class="tiUNI"><span class="ml-3">Unidad</span></th>
       <th class="tiDES">Descripcion</th>
       <th mdbTooltip="Descuento en %" placement="top" class="tiDESC">Descuento</th>
-      <th class="tiPRE">Precio</th>
+      <th class="tiPRE">{{ metodo === 'venta' ? 'Precio' : 'Costo' }}</th>
       <th class="tiTOT">Total</th>
     </tr>
   </thead>
@@ -86,6 +86,7 @@
 
                   <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
                     <select
+                      value="Medida"
                       (focus)="verificarRow(i)"
                       formControlName="uni"
                       (change)="selectMedidaChange($event.target.value, i)"
@@ -131,7 +132,8 @@
                   <input
                     type="text"
                     (blur)="revisarPrecio(i)"
-                    class="form-control entrada campoNumeros inPRE "
+                    (focus)="$event.target.select()"
+                    class="form-control entrada campoNumeros {{ metodo === 'venta' ? 'inPRE' : '' }}"
                     (keydown.enter)="enfocarInput('cod-' + (i + 1))"
                     (click)="verificarRow(i)"
                     id="pre-{{ i }}"

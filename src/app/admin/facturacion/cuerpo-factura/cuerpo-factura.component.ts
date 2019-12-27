@@ -57,8 +57,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   redondearAdos(num) {
-    console.log('-- FORMATEANDO A 2 --');
-    console.log(num);
     return (Math.round(num * 100) / 100).toFixed(2);
   }
   ngOnInit() {
@@ -119,7 +117,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             fila.unidad = fila.uni;
             let lol;
             if (this.metodo === 'venta') {
-              lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'desc', 'tot', 'secuencia']);
+              lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'desc', 'tot', 'costo', 'secuencia']);
             } else {
               lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'desc', 'tot', 'secuencia']);
             }
@@ -163,6 +161,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.inputSecuencia = 'cod-0';
     this.inputDrop = 'uni-0';
     this.DESCUENTO = 0;
+    this.drop = false;
   }
 
   // =============================================
@@ -219,6 +218,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       des: [null],
       uni: [null],
       pre: [null],
+      costo: [null],
       desc: [null],
       tot: [null],
       secuencia: [i],
@@ -256,7 +256,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       const cantidad = (this.control.controls[i] as any).controls['can'].value;
 
       if (cantidad !== '' && cantidad !== null) {
-        this.enfocarInput(sigInput);
+        if (input === 'uni-' && codigo !== '' && codigo !== null && codigo !== undefined) {
+          this.verificarRow(i);
+          this.buscarArticuloPorCodigo(i, codigo);
+          this.enfocarInput(sigInput);
+        }
       }
     }
     if (input === 'cod-' || input === 'pre-') {
@@ -305,7 +309,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   buscarArticuloPorCodigo(i, codigo) {
     let precioQuintal;
     this.inputDrop = 'uni-' + i;
-    // const ls = this.TodosLosSorteos.filter(val => val.loteria_id === idLoteria);
+
     const ARTICULO = this.listaArticulos.filter(articulo => articulo.codigo === codigo);
     if (ARTICULO[0] === undefined) {
       this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
@@ -348,7 +352,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   articulo_detallable(art) {
-    const precioQuintal = art.precio_principal;
+    const precioQuintal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
     this.drop = true;
     this.UnidadesArticulo = [];
 
@@ -358,30 +362,34 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
     } else {
       if (art.descripcion !== 'Veterinaria') {
-        this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal });
+        this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
+        this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
       }
     }
 
     if (art.descripcion === 'Veterinaria') {
-      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal });
+      this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
+      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
     }
 
     art.contenido_articulos.forEach(element => {
-      this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
+      this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
     });
   }
 
   articulo_no_detallable(art) {
-    const precioQuintal = art.precio_principal;
+    const precioQuintal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
     this.drop = true;
     this.UnidadesArticulo = [];
+
     if (art.descripcion === 'Veterinaria') {
-      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal });
+      this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
+      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
     }
     art.contenido_articulos.forEach(element => {
       if (element.referencia === null) {
         if (art.descripcion === 'Veterinaria') {
-          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio });
+          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
         }
       }
       if (art.descripcion !== 'Veterinaria') {
@@ -402,15 +410,17 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   selectMedidaChange(arg, i) {
-    this.indiceDetalle = _.findIndex(this.UnidadesArticulo, function(o) {
+    this.indiceDetalle = _.findIndex(this.UnidadesArticulo, o => {
       return o.value === arg;
     });
 
     this.precioDetalle = this.UnidadesArticulo[this.indiceDetalle].precio;
+    const costoDetalle = this.UnidadesArticulo[this.indiceDetalle].costo;
     const unidad = this.UnidadesArticulo[this.indiceDetalle].value;
 
     (this.control.controls[i] as any).controls['uni'].setValue(unidad);
-    (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(this.redondearAdos(this.precioDetalle)));
+    (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(this.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
+    (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
     this.calcularTotalRow(i);
   }
 
@@ -643,6 +653,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   entrarSacosAUnidades(precioQuintal) {
+    this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
     this.sacos.forEach(saco => {
       const valor = 'Saco de ' + saco + ' libras';
       this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioQuintal) });

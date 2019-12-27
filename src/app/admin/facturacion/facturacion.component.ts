@@ -55,6 +55,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   listaArticulos: any;
+  usuario: any;
 
   constructor(
     private _ipc: IpcService,
@@ -92,7 +93,19 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   // }
 
   redondearAdos(num) {
-    return (Math.round(num * 100) / 100).toFixed(2);
+    const string = num + '';
+    const splitStr = _.split(string, '.');
+    const enteros = splitStr[0];
+    let tempdecimales = splitStr[1];
+    if (splitStr.length === 1) {
+      tempdecimales = '00';
+    }
+
+    const decimales = tempdecimales.substring(0, 2);
+    const Arreglo = [enteros, decimales];
+    const numStr = _.join(Arreglo, '.');
+    return parseFloat(numStr).toFixed(2);
+    // return (Math.round(num * 100) / 100).toFixed(2);
   }
 
   desformatear(sTnum) {
@@ -131,6 +144,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.usuario = JSON.parse(this.dbServ.getEmpleado());
     this.obsServ.ARTICULOS.subscribe(res => {
       if (res !== undefined && res !== null) {
         this.listaArticulos = res;
@@ -306,10 +320,18 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
   validarRayaAbajo() {
     if (this.NCFcompra && this.NCFcompra !== null) {
-      if (!_.endsWith(this.NCFcompra, '_')) {
-        return true;
-      } else {
+      let char = '';
+      let num = 0;
+      for (let index = 0; index < this.NCFcompra.length; index++) {
+        const c = this.NCFcompra.charAt(index);
+        char = c;
+        num = index;
+      }
+
+      if (num < 10 || char === '_') {
         return false;
+      } else {
+        return true;
       }
     }
   }
@@ -318,7 +340,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (campo === 'condicion') {
       if (this.tipos_facturas.includes(valor)) {
         this.tipoFactura = valor;
-        // this.NCFcompra = 'b' + valor;
+        this.NCFcompra = 'b' + valor;
         this.enfocarInput(campo);
       } else {
         this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
@@ -366,13 +388,40 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       if (this.condicion_fact !== 'Crédito') {
         this.enfocarInput(campo);
 
-        // if(this.form.value)
-        const cliente = this.listaClientes.filter(cli => cli.nombre === 'Cliente contado');
-        this.propietario_factura = cliente[0];
+        this.propietario_factura = this.form.value;
       } else {
         this.dbServ.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
       }
     }
+  }
+  setCaretPosition(ctrl, pos) {
+    // Modern browsers
+    if (ctrl.setSelectionRange) {
+      ctrl.focus();
+      ctrl.setSelectionRange(pos, pos);
+
+      // IE8 and below
+    } else if (ctrl.createTextRange) {
+      const range = ctrl.createTextRange();
+      range.collapse(true);
+      range.moveEnd('character', pos);
+      range.moveStart('character', pos);
+      range.select();
+    }
+  }
+  pru() {
+    const input = document.getElementById('ncf') as any;
+    console.log('-------------');
+    console.log(input.value.length);
+    console.log('-------------');
+  }
+  trimEndNcf() {
+    const input = document.getElementById('ncf') as any;
+    const valor = input.value;
+
+    this.setCaretPosition(input, input.value.length - 8);
+    valor.substring(0, 3);
+    input.value = valor;
   }
 
   enfocarInput(arg) {
@@ -600,81 +649,115 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.cuerpo.RESETCUERPO();
     this.enfocarInput('tipoFact');
   }
+  calculatePrice(costo): number {
+    if (costo > 0 || costo != null || costo) {
+      const precio = costo / 0.9;
+      return this.desformatear(this.redondearAdos(precio));
+    }
+  }
+
+  calculoMedidaprincipal(roundArticulo, costoRow, precioRow, contenido_articulo, newArticulo) {
+    if (roundArticulo !== costoRow) {
+      let cantPadre;
+      let cantHijo;
+      const tempContenido = [];
+
+      precioRow = this.calculatePrice(costoRow);
+
+      contenido_articulo.forEach(contenido => {
+        let temporal = contenido;
+        if (!contenido.referencia) {
+          if (contenido.precio) {
+            cantPadre = contenido.cantidad;
+            const precio = this.calcularNuevosPrecios(cantPadre, precioRow);
+            const costo = this.calcularNuevosPrecios(cantPadre, costoRow);
+            temporal.precio = this.desformatear(precio);
+            temporal.costo = this.desformatear(costo);
+          }
+        } else {
+          if (contenido.precio) {
+            cantHijo = contenido.cantidad;
+            const prePadre = this.calcularNuevosPrecios(cantPadre, precioRow);
+            const cosPadre = this.calcularNuevosPrecios(cantPadre, costoRow);
+            const precio = this.calcularNuevosPrecios(cantHijo, this.redondearAdos(prePadre));
+            const costo = this.calcularNuevosPrecios(cantHijo, this.redondearAdos(cosPadre));
+            temporal.precio = this.desformatear(precio);
+            temporal.costo = this.desformatear(costo);
+          } else {
+            temporal = null;
+          }
+        }
+        if (temporal !== null) {
+          const tempu = _.omit(temporal, ['created_at', 'updated_at']);
+          tempContenido.push(tempu);
+        }
+      });
+
+      newArticulo.costo_principal = costoRow;
+      newArticulo.precio_principal = precioRow;
+      newArticulo.contenido_articulos_attributes = tempContenido;
+      newArticulo.user_id = this.usuario.id;
+
+      const tempEnviar = _.omit(newArticulo, ['created_at', 'updated_at', 'contenido_articulos']);
+      console.log(tempEnviar);
+
+      this.dbServ.editarArticulo(tempEnviar).subscribe(
+        res => {},
+        err => {
+          console.log(err);
+          this.mostrarErrores(err.error);
+        },
+      );
+    }
+  }
 
   revisarPrecios(cuerpoFact) {
     const tempCuerpo = [];
+
     cuerpoFact.forEach(row => {
       const Articulo = this.listaArticulos.filter(art => art.id === row.articulo_id);
-      const articulo = JSON.parse(JSON.stringify(Articulo))
+      const articulo = JSON.parse(JSON.stringify(Articulo));
       const contenido_articulo = articulo[0].contenido_articulos;
-      const precioRow = this.desformatear(row.pre);
+      const costoRow = this.desformatear(row.pre);
+      let precioRow = 0;
 
-      const roundArticulo = Math.round(articulo[0].precio_principal);
-      const roundRow = Math.round(precioRow);
+      const roundArticulo = articulo[0].costo_principal;
 
+      const newArticulo = articulo[0];
       let temp = {};
-      console.log('');
-      console.log('');
-      console.log('==================');
 
-      console.log('Articulo: ', roundArticulo, ' Row: ', roundRow);
-
-      console.log('-----------------');
-      if (roundArticulo === roundRow) {
-        console.log('precio no cambia');
+      if (row.unidad === 'Caja' || row.unidad === 'Quintal') {
+        this.calculoMedidaprincipal(roundArticulo, costoRow, precioRow, contenido_articulo, newArticulo);
       } else {
-        let cantPadre;
-        let cantHijo;
-        console.log('precio si cambio');
-        console.log(' ');
-        console.log('nuevos precios');
-        const tempContenido = [];
-        contenido_articulo.forEach(contenido => {
-          let temporal = contenido;
-          if (!contenido.referencia) {
-            if (contenido.precio) {
-              cantPadre = contenido.cantidad;
-              const precio = this.calcularNuevosPrecios(cantPadre, precioRow);
-              temporal.precio = this.desformatear(precio);
-            }
-          } else {
-            if (contenido.precio) {
-              cantHijo = contenido.cantidad;
-              const prePadre = this.calcularNuevosPrecios(cantPadre, precioRow);
-              const precio = this.calcularNuevosPrecios(cantHijo, this.redondearAdos(prePadre));
-              temporal.precio = this.desformatear(precio);
-            } else {
-              temporal = null;
-            }
-          }
-          if (temporal !== null) {
-            tempContenido.push(temporal);
-          }
-        });
+        const contenidoPadre = contenido_articulo.filter(cont => cont.medida === row.unidad);
+        const contenidoHijo = contenido_articulo.filter(cont => cont.medida !== row.unidad);
+        let costoA;
+        let costoR;
+        if (row.unidad === 'Paquete' || row.unidad === 'Libra') {
+          costoA = contenidoPadre[0].costo * contenidoPadre[0].cantidad;
+          costoR = contenidoPadre[0].cantidad * costoRow;
+        } else {
+          const MaxContenido = contenidoPadre[0].cantidad * contenidoHijo[0].cantidad;
+          costoA = contenidoHijo[0].costo * MaxContenido;
+          costoR = MaxContenido * costoRow;
+        }
 
-        const newArticulo = articulo[0];
-        newArticulo.precio_principal = precioRow;
-        newArticulo.contenido_articulos = tempContenido;
-        console.log('-0-0-0-0-0-0-0-0');
-        console.log('  newArticulo');
-        console.log('----------------');
-
-        console.log(newArticulo);
-
-        console.log('-0-0-0-0-0-0-0-0');
+        this.calculoMedidaprincipal(costoA, costoR, precioRow, contenido_articulo, newArticulo);
       }
-      console.log(' ');
-      console.log(' ');
-      console.log('==================');
-      temp = _.omit(row, ['pre']);
+
+      temp = _.omit(row, ['costo', 'pre']);
       tempCuerpo.push(temp);
-      console.log(tempCuerpo);
-
-      console.log('');
-      console.log('');
     });
+    return tempCuerpo;
   }
-
+  mostrarErrores(arg) {
+    for (const error in arg) {
+      if (arg.hasOwnProperty(error)) {
+        const element = arg[error];
+        this.dbServ.toastError(element, 'Error');
+      }
+    }
+  }
   calcularNuevosPrecios(cant, precio) {
     const pre = precio / cant;
     return this.redondearAdos(pre);
@@ -717,8 +800,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       } else {
         cabecera_fact['cliente_id'] = this.propietario_factura.id;
       }
-    } else {
-      cabecera_fact['supldior_id'] = this.form.controls.id.value;
+    }
+    if (this.metodo === 'compra') {
+      cabecera_fact['suplidor_id'] = this.form.controls.id.value;
     }
 
     cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
@@ -726,18 +810,30 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['tipo'] = this.metodo;
     cabecera_fact['user_id'] = empleado.id;
 
-    console.log(cabecera_fact);
     if (this.metodo === 'compra') {
-      this.revisarPrecios(cabecera_fact['detalle_facturas_attributes']);
+      cabecera_fact['detalle_facturas_attributes'] = this.revisarPrecios(cabecera_fact['detalle_facturas_attributes']);
     }
-    // this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
-    //   this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-    //     if (res.status) {
-    //       this.CancelarFactura();
-    //     }
-    //   });
-    //   // res['FACTURA_DE'] = this.metodo;
-    //   // this._ipc.send('print', res);
-    // });
+    console.log(cabecera_fact);
+    console.log('');
+    console.log('');
+    console.log('');
+    console.log('=============');
+    console.log('');
+    console.log('');
+    console.log('');
+    console.log('');
+    console.log('');
+
+    this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
+      console.log(res);
+
+      this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+        if (res.status) {
+          this.CancelarFactura();
+        }
+      });
+      res['FACTURA_DE'] = this.metodo;
+      this._ipc.send('print', res);
+    });
   }
 }

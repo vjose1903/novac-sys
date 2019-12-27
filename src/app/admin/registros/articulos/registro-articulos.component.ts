@@ -35,12 +35,59 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
+  redondearAdos(num) {
+    const string = num + '';
+    const splitStr = _.split(string, '.');
+    const enteros = splitStr[0];
+    let tempdecimales = splitStr[1];
+    if (splitStr.length === 1) {
+      tempdecimales = '00';
+    }
 
+    const decimales = tempdecimales.substring(0, 2);
+    const Arreglo = [enteros, decimales];
+    const numStr = _.join(Arreglo, '.');
+    return parseFloat(numStr).toFixed(2);
+    // return (Math.round(num * 100) / 100).toFixed(2);
+  }
+  desformatear(sTnum) {
+    let temp = 0;
+
+    if (sTnum !== null) {
+      if (sTnum !== undefined) {
+        const x = sTnum.split(',');
+        if (x.length === 1) {
+          temp += parseFloat(x[0]);
+          return temp;
+        } else if (x.length >= 2) {
+          let joined = '';
+          joined = _.join(x, '');
+          temp += parseFloat(joined);
+
+          return temp;
+        }
+      }
+    } else {
+      return sTnum;
+    }
+  }
+  formatearNumero(nStr) {
+    if (nStr !== undefined) {
+      nStr += '';
+      const x = nStr.split('.');
+      let x1 = x[0];
+      const x2 = x.length > 1 ? '.' + x[1] : '';
+      const rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+    }
+  }
   ngOnInit() {
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
     this.artServ.ARTICULOS.subscribe(res => {
       this.listaArticulos = res;
-      console.log(res);
     });
 
     this.dbServ.getTipoArticulos().subscribe(res => {
@@ -73,6 +120,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       medida_contenido_padre: [null],
       precio_padre: [null],
       precio_libra: [null],
+      costo_padre: [null],
+      costo_hijo: [null],
       id: [null],
       id_contenido_padre: [null],
       id_contenido_hijo: [null],
@@ -91,7 +140,10 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     if (campo !== 'send') {
       this.enfocarInput(campo);
     } else {
-      this.submit(this.form);
+      this.enfocarInput('nombre');
+      setTimeout(() => {
+        this.submit(this.form);
+      }, 250);
     }
   }
   enfocarInput(arg) {
@@ -180,34 +232,71 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   //  Calculate price
   // =============================================
   calculatePrice() {
-    const costo = this.form.value.costo_principal;
+    const costoTemp = this.form.value.costo_principal;
+    const costo = this.desformatear(costoTemp);
     if (costo > 0 || costo != null || costo) {
       const precio = costo / 0.9;
       const precioLibra = precio / 100;
-      this.form.controls.precio_principal.setValue(_.round(precio, 2));
-      this.form.controls.precio_libra.setValue(_.round(precioLibra, 2));
+      this.form.controls.precio_principal.setValue(this.formatearNumero(this.redondearAdos(precio)));
+      this.form.controls.precio_libra.setValue(this.formatearNumero(this.redondearAdos(precioLibra)));
+
+      this.calculatePriceLibra();
+    }
+  }
+  calculatePriceLibra() {
+    const medida = this.form.value.medida;
+
+    const precioTemp = this.form.value.precio_principal;
+    const precio = this.desformatear(precioTemp);
+
+    const costoTemp = this.form.value.costo_principal;
+    const costo = this.desformatear(costoTemp);
+
+    if (precio > 0 || precio != null || precio) {
+      const precioLibra = precio / 100;
+      const costoLibra = costo / 100;
+      if (medida === 'Quintal') {
+        this.form.controls.precio_libra.setValue(this.formatearNumero(this.redondearAdos(precioLibra)));
+        this.form.controls.costo_padre.setValue(this.formatearNumero(this.redondearAdos(costoLibra)));
+      } else {
+        this.calculatePricePadre();
+        this.calculatePriceHijo();
+      }
     }
   }
 
   calculatePricePadre() {
-    const Precio = this.form.value.precio_principal;
+    const PrecioTemp = this.form.value.precio_principal;
+    const Precio = this.desformatear(PrecioTemp);
+
+    const costoTemp = this.form.value.costo_principal;
+    const costo = this.desformatear(costoTemp);
     const cantidadPadre = this.form.value.cantidad_contenido_padre;
 
-    if (Precio > 0 || Precio != null || Precio) {
+    if (Precio > 0 && Precio != null && Precio !== undefined && !isNaN(Precio) && cantidadPadre > 0 && cantidadPadre != null && cantidadPadre !== undefined && !isNaN(cantidadPadre)) {
       const PrecioPadre = Precio / cantidadPadre;
-      this.form.controls.precio_padre.setValue(_.round(PrecioPadre, 2));
+      const costoPadre = costo / cantidadPadre;
+      this.form.controls.precio_padre.setValue(this.formatearNumero(this.redondearAdos(PrecioPadre)));
+      this.form.controls.costo_padre.setValue(this.formatearNumero(this.redondearAdos(costoPadre)));
     }
   }
   calculatePriceHijo() {
-    const PrecioPadre = this.form.value.precio_padre;
+    const PrecioPadreTemp = this.form.value.precio_padre;
+    const PrecioP = this.desformatear(PrecioPadreTemp);
+
+    const costoPadreTemp = this.form.value.costo_padre;
+    const costoP = this.desformatear(costoPadreTemp);
     const cantidadHijo = this.form.value.cantidad_contenido_hijo;
-    if (PrecioPadre > 0 || PrecioPadre != null || PrecioPadre) {
-      const PrecioHijo = PrecioPadre / cantidadHijo;
-      this.form.controls.precio_hijo.setValue(_.round(PrecioHijo, 2));
+    if (PrecioP > 0 && PrecioP != null && PrecioP !== undefined && !isNaN(PrecioP) && cantidadHijo > 0 && cantidadHijo != null && cantidadHijo !== undefined && !isNaN(cantidadHijo)) {
+      const PrecioHijo = PrecioP / cantidadHijo;
+      const costoHijo = costoP / cantidadHijo;
+      this.form.controls.precio_hijo.setValue(this.formatearNumero(this.redondearAdos(PrecioHijo)));
+      this.form.controls.costo_hijo.setValue(this.formatearNumero(this.redondearAdos(costoHijo)));
     }
   }
 
   editarItem(item) {
+    this.borrar();
     this.titulo = 'Editar producto: ' + item.ARG.nombre;
     this.boton = 'Editar';
     this.indexEditar = item.INDEX;
@@ -215,22 +304,28 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       if (contenido.referencia) {
         this.form.controls.cantidad_contenido_hijo.setValue(contenido.cantidad);
         this.form.controls.medida_contenido_hijo.setValue(contenido.medida);
-        this.form.controls.precio_hijo.setValue(contenido.precio);
+        this.form.controls.precio_hijo.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
+        this.form.controls.costo_hijo.setValue(contenido.costo);
         this.form.controls.id_contenido_hijo.setValue(contenido.id);
         this.form.controls.referencia_hijo.setValue(contenido.referencia);
       } else {
         if (item.ARG.contenido_articulos.length === 1) {
-          this.form.controls.precio_libra.setValue(contenido.precio);
+          this.form.controls.precio_libra.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
+          this.form.controls.costo_padre.setValue(contenido.costo);
           this.form.controls.id_contenido_padre.setValue(contenido.id);
         } else {
           this.form.controls.cantidad_contenido_padre.setValue(contenido.cantidad);
           this.form.controls.medida_contenido_padre.setValue(contenido.medida);
-          this.form.controls.precio_padre.setValue(contenido.precio);
+          this.form.controls.precio_padre.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
+          this.form.controls.costo_padre.setValue(contenido.costo);
           this.form.controls.id_contenido_padre.setValue(contenido.id);
         }
       }
     });
+
     this.form.patchValue(item.ARG);
+    this.form.controls.costo_principal.setValue(this.formatearNumero(this.redondearAdos(item.ARG.costo_principal)));
+    this.form.controls.precio_principal.setValue(this.formatearNumero(this.redondearAdos(item.ARG.precio_principal)));
   }
   abrirModal(arg?) {
     console.log(arg);
@@ -252,6 +347,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   element: HTMLElement;
   submit(form) {
     const x = JSON.parse(JSON.stringify(form.value));
+    console.log(x);
 
     let contenido = [];
     if (x.medida === 'Caja') {
@@ -260,8 +356,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
           {
             referencia: null,
             id: x.id_contenido_padre,
-            costo: null,
-            precio: x.precio_padre,
+            costo: this.desformatear(x.costo_padre),
+            precio: this.desformatear(x.precio_padre),
             cantidad: x.cantidad_contenido_padre,
             medida: x.medida_contenido_padre,
           },
@@ -271,16 +367,16 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
           {
             referencia: null,
             id: x.id_contenido_padre,
-            costo: null,
-            precio: x.precio_padre,
+            costo: this.desformatear(x.costo_padre),
+            precio: this.desformatear(x.precio_padre),
             cantidad: x.cantidad_contenido_padre,
             medida: x.medida_contenido_padre,
           },
           {
             referencia: x.referencia_hijo,
             id: x.id_contenido_hijo,
-            costo: null,
-            precio: x.precio_hijo,
+            costo: this.desformatear(x.costo_hijo),
+            precio: this.desformatear(x.precio_hijo),
             cantidad: x.cantidad_contenido_hijo,
             medida: x.medida_contenido_hijo,
           },
@@ -290,8 +386,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       contenido = [
         {
           id: x.id_contenido_padre,
-          costo: null,
-          precio: x.precio_libra,
+          costo: this.desformatear(x.costo_padre),
+          precio: this.desformatear(x.precio_libra),
           cantidad: 100,
           medida: 'Libra',
         },
@@ -303,7 +399,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       tipo_articulo_id: _.parseInt(x.tipo_articulo_id),
       nombre: x.nombre,
       costo_principal: x.costo_principal,
-      precio_principal: x.precio_principal,
+      precio_principal: this.desformatear(x.precio_principal),
       aviso_existencia: x.aviso_existencia,
       medida_alerta: x.medida_alerta,
       suplidor_id: x.suplidor_id,
@@ -357,6 +453,74 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
         const element = arg[error];
         this.dbServ.toastError(element, 'Error');
       }
+    }
+  }
+
+  checkNumbers(arg) {
+    let res = false;
+    for (let i = 0; i < arg.length; i++) {
+      const tempCaracter = arg.charAt(i);
+      if (tempCaracter !== ',') {
+        const caracter = _.parseInt(tempCaracter);
+        if (_.isNaN(caracter)) {
+          res = true;
+        }
+      }
+    }
+    return res;
+  }
+  checkLongMillares(num) {
+    let res = false;
+    const splitNum = _.split(num, ',');
+    splitNum.forEach((element, i) => {
+      if (i !== 0) {
+        if (element.length !== 3) {
+          res = true;
+        }
+      }
+    });
+    return res;
+  }
+
+  revisarPrecio(input, id) {
+    const Input = this.form.controls[input];
+    console.log(Input.value);
+
+    const precioTEMPO = Input.value;
+    if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
+      const splitPrecio = _.split(precioTEMPO, '.');
+      let precioTEMP;
+      let enteros = splitPrecio[0];
+      let tempdecimales = splitPrecio[1];
+      if (tempdecimales === undefined) {
+        tempdecimales = '00';
+      }
+      //
+      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
+        this.dbServ.toastError('Precio introducido es invalido', 'ERROR');
+        this.enfocarInput(id);
+      } else {
+        //
+        if (splitPrecio.length === 2) {
+          if (enteros === '' || enteros === ' ') {
+            enteros = '0';
+          }
+          let decimales;
+          if (tempdecimales.length > 2) {
+            decimales = tempdecimales.substring(0, 2);
+          } else {
+            decimales = _.padEnd(tempdecimales, 2, '0');
+          }
+          const temp = [enteros, decimales];
+          precioTEMP = _.join(temp, '.');
+        } else if (splitPrecio.length === 1) {
+          const decimales = '00';
+          const temp = [enteros, decimales];
+          precioTEMP = _.join(temp, '.');
+        }
+      }
+
+      Input.setValue(this.formatearNumero(precioTEMP));
     }
   }
 
