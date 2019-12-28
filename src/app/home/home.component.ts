@@ -18,7 +18,15 @@ export class HomeComponent implements OnInit {
   loginForm: FormGroup;
   errorC = '';
   errorU = '';
-  constructor(private dbServ: DBservice,private pdfServ: PdfService ,private toastr: ToastrService, private fb: FormBuilder, private router: Router, private usuariosServices: UsuariosService, private _ipc:IpcService) {}
+  constructor(
+    private dbServ: DBservice,
+    private pdfServ: PdfService,
+    private toastr: ToastrService,
+    private fb: FormBuilder,
+    private router: Router,
+    private usuariosServices: UsuariosService,
+    private _ipc: IpcService,
+  ) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -28,102 +36,93 @@ export class HomeComponent implements OnInit {
   }
 
   prueba() {
-    const factCre = {
-      id: 4,
+    const factVen = {};
+
+    const factCom = {
+      id: 53,
       tipo_factura_id: 2,
-      suplidor_id: null,
-      cliente_id: 2,
+      suplidor_id: 2,
+      cliente_id: null,
       user_id: 1,
-      fecha_facturacion: '2019-12-08',
-      fecha_vencimiento: '2020-01-07',
-      fecha_valida: '2020-12-08',
-      numero_comprobante: 'B0100000001',
-      numero_factura: 4,
-      condicion: 'Crédito',
+      fecha_facturacion: '2019-12-27',
+      fecha_vencimiento: null,
+      fecha_valida: '2020-12-27',
+      numero_comprobante: 'b0100000005',
+      numero_factura: 10,
+      condicion: 'Contado',
       forma_pago: 'Efectivo',
-      total_factura: 7492.5,
+      total_factura: 373.0,
       itbis: 0.0,
       descuento: 0.0,
       estado: true,
-      tipo: 'venta',
-      created_at: '2019-12-08T18:33:55.439Z',
-      updated_at: '2019-12-08T18:33:55.439Z',
-      Bruto: 7492.5,
+      tipo: 'compra',
+      created_at: '2019-12-27T23:42:26.774Z',
+      updated_at: '2019-12-27T23:42:26.774Z',
+      Bruto: 373.0,
+      NoCliente_nombre: null,
+      NoCliente_direccion: null,
+      costoYgasto: '2',
       detalle_facturas: [
         {
-          descripcion: 'maiz (25 LBS)',
-          unidad: 'Saco',
-          precio: 999.99,
-          total: 499,
+          descripcion: 'Maiz',
+          unidad: 'Libra',
+          costo: 10.0,
+          precio: 11.11,
+          total: 10,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 1,
+          tipo: 'Materia prima',
+        },
+        {
+          descripcion: 'Guantes latex',
+          unidad: 'Paquete',
+          costo: 33.0,
+          precio: 36.66,
+          total: 33,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 1,
+          tipo: 'Veterinaria',
+        },
+        {
+          descripcion: 'jeringas',
+          unidad: 'Unidad',
+          costo: 27.0,
+          precio: 30.0,
+          total: 270,
+          descuento: 0,
+          itbis: 0,
+          cantidad: 10,
+          tipo: 'Veterinaria',
+        },
+        {
+          descripcion: 'prueba',
+          unidad: 'Quintal',
+          costo: 30.0,
+          precio: 33.33,
+          total: 60,
           descuento: 0,
           itbis: 0,
           cantidad: 2,
-        },
-        {
-          descripcion: 'maiz (100 LBS)',
-          unidad: 'Saco',
-          precio: 999.99,
-          total: 6993,
-          descuento: 0,
-          itbis: 0,
-          cantidad: 7,
+          tipo: 'Materia prima',
         },
       ],
-      cliente: {
-        nombre: 'marcos',
-        direccion: 'la vega centro de la ciudad\n',
-        rnc: '047-0144534-5',
+      cliente: null,
+      suplidor: {
+        nombre: 'suplidor 2',
+        direccion: 'jeremias la vega',
+        rnc: '047-9858570-3',
       },
-      suplidor: null,
-      tipo_factura: 'Factura con valor fiscal',
-    };
-    const factCon = {
-      id: 15,
-      tipo_factura_id: 3,
-      suplidor_id: null,
-      cliente_id: 1,
-      user_id: 1,
-      fecha_facturacion: '2019-12-11',
-      fecha_vencimiento: null,
-      fecha_valida: '2020-12-11',
-      numero_comprobante: 'B0200000011',
-      numero_factura: 17,
-      condicion: 'Contado',
-      forma_pago: 'Efectivo',
-      total_factura: 2497.5,
-      itbis: 0.0,
-      descuento: 0.0,
-      estado: true,
-      tipo: 'venta',
-      created_at: '2019-12-11T12:39:38.318Z',
-      updated_at: '2019-12-11T12:39:38.318Z',
-      Bruto: 2497.5,
-      detalle_facturas: [
-        {
-          descripcion: 'maiz (50 LBS)',
-          unidad: 'Saco',
-          precio: 999.99,
-          total: 2497,
-          descuento: 0,
-          itbis: 0,
-          cantidad: 5,
-        },
-      ],
-      cliente: {
-        nombre: 'Cliente contado',
-        direccion: 'Autopista duarte KM 0 el Higuero',
-        rnc: '',
-      },
-      suplidor: null,
-      tipo_factura: 'Factura de consumo',
+      tipo_factura: 'Valor fiscal',
+      usuario: 'administrador Santos',
     };
 
     this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
       console.log(res);
     });
-    // this._ipc.send('test', factCre)
-    this._ipc.send('test', factCon)
-
+    // this._ipc.send('test', factVen)
+    this._ipc.send('test', factCom);
   }
 
   // =================================================================
@@ -135,7 +134,7 @@ export class HomeComponent implements OnInit {
         this.errorC = '';
         this.errorU = '';
         this.dbServ.toastSuccess('', 'Correcto');
-        this.getPrintersName()
+        this.getPrintersName();
       },
       err => {
         if (err.error.errors[0] === 'Usuario ingresado no existe') {
@@ -150,9 +149,9 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  getPrintersName(){
+  getPrintersName() {
     this._ipc.on('printersNameRes', (event: Electron.IpcMessageEvent, res) => {
-      this._ipc.PRINTERS_NEW(res)
+      this._ipc.PRINTERS_NEW(res);
     });
 
     this._ipc.send('printerNames');

@@ -212,10 +212,10 @@ function cabeceraFacturaVenta(data) {
           },
           data.FACTURA_DE === 'compra'
             ? {
-              text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
-              margin: [0, 1, 0, 0],
-              alignment: 'center',
-            }
+                text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
+                margin: [0, 1, 0, 0],
+                alignment: 'center',
+              }
             : '',
         ],
         [
@@ -232,12 +232,12 @@ function cabeceraFacturaVenta(data) {
               data.condicion === 'Contado'
                 ? ''
                 : {
-                  text: [
-                    { text: 'Fecha vencimiento : ', fontSize: 11.5 },
-                    { text: fecha(data.fecha_vencimiento), fontSize: 11.5 },
-                  ],
-                  margin: [75, 3, 0, 0],
-                },
+                    text: [
+                      { text: 'Fecha vencimiento : ', fontSize: 11.5 },
+                      { text: fecha(data.fecha_vencimiento), fontSize: 11.5 },
+                    ],
+                    margin: [75, 3, 0, 0],
+                  },
 
               {
                 text: [
@@ -292,7 +292,9 @@ function cabeceraFacturaVenta(data) {
             { text: 'Articulo', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
             { text: 'Cantidad', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
             { text: 'Unidad', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
-            { text: 'Precio', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
+            data.FACTURA_DE === 'venta'
+              ? { text: 'Precio', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] }
+              : { text: 'Costo', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
             { text: 'Itbis', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
             { text: 'Total', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
           ],
@@ -326,7 +328,7 @@ function contenidoFacturaVenta(data) {
       detalle.descripcion,
       formatearNumero(redondearAdos(detalle.cantidad)),
       detalle.unidad,
-      formatearNumero(calcularPrecio(detalle.cantidad, detalle.precio, '')),
+      formatearNumero(data.FACTURA_DE === 'venta' ? detalle.precio : detalle.costo),
       detalle.itbis !== 0 ? formatearNumero(redondearAdos(detalle.itbis)) : '',
       formatearNumero(redondearAdos(detalle.total)),
     );
@@ -402,13 +404,13 @@ function contenidoFacturaVenta(data) {
                 },
                 data.FACTURA_DE === 'venta'
                   ? {
-                    type: 'rect',
-                    x: 260,
-                    y: 0,
-                    w: 140,
-                    h: 1,
-                    color: '#000000',
-                  }
+                      type: 'rect',
+                      x: 260,
+                      y: 0,
+                      w: 140,
+                      h: 1,
+                      color: '#000000',
+                    }
                   : '',
               ],
               margin: [0, 30, 0, 0],
@@ -424,9 +426,9 @@ function contenidoFacturaVenta(data) {
                 [
                   data.FACTURA_DE === 'venta'
                     ? {
-                      text: [{ text: 'Cliente', fontSize: 12, bold: true }],
-                      margin: [-70, 5, 0, 0],
-                    }
+                        text: [{ text: 'Cliente', fontSize: 12, bold: true }],
+                        margin: [-70, 5, 0, 0],
+                      }
                     : '',
                 ],
               ],
@@ -464,10 +466,10 @@ function makeFacturaVenta(data) {
           ? data.condicion === 'Contado'
             ? ''
             : {
-              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-              alignment: 'center',
-              margin: [0, -15, 0, 0],
-            }
+                text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+                alignment: 'center',
+                margin: [0, -15, 0, 0],
+              }
           : '',
       ];
     },
@@ -504,7 +506,7 @@ function makeFacturaVenta(data) {
     console.log('::::::::ERROR::::::::');
     console.log(err);
 
-    win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false, error: err});
+    win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false, error: err });
   }
 }
 
