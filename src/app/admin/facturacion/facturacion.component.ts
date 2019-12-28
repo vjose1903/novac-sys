@@ -511,6 +511,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   getCuerpoFactura(arg) {
     this.CuerpoFactura = [];
     const obj = JSON.parse(arg);
+    console.log(obj);
+
     this.CuerpoFactura = obj;
   }
 
@@ -702,7 +704,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       console.log(tempEnviar);
 
       this.dbServ.editarArticulo(tempEnviar).subscribe(
-        res => { },
+        res => {},
         err => {
           console.log(err);
           this.mostrarErrores(err.error);
