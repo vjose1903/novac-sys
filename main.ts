@@ -212,11 +212,11 @@ function cabeceraFacturaVenta(data) {
           },
           data.FACTURA_DE === 'compra'
             ? {
-                text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
-                margin: [0, 1, 0, 0],
-                alignment: 'center',
-              }
-            : '',
+              text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
+              margin: [0, 1, 0, 0],
+              alignment: 'center',
+            }
+            : {text:''},
         ],
         [
           {
@@ -230,7 +230,7 @@ function cabeceraFacturaVenta(data) {
                 margin: [75, 0, 0, 0],
               },
               data.condicion === 'Contado'
-                ? ''
+                ? {text:''}
                 : {
                     text: [
                       { text: 'Fecha vencimiento : ', fontSize: 11.5 },
@@ -404,14 +404,21 @@ function contenidoFacturaVenta(data) {
                 },
                 data.FACTURA_DE === 'venta'
                   ? {
-                      type: 'rect',
-                      x: 260,
-                      y: 0,
-                      w: 140,
-                      h: 1,
-                      color: '#000000',
-                    }
-                  : '',
+                    type: 'rect',
+                    x: 260,
+                    y: 0,
+                    w: 140,
+                    h: 1,
+                    color: '#000000',
+                  }
+                  : {
+                    type: 'rect',
+                    x: 0,
+                    y: 0,
+                    w: 0,
+                    h: 0,
+                    color: '#ffffff',
+                  },
               ],
               margin: [0, 30, 0, 0],
             },
@@ -426,10 +433,10 @@ function contenidoFacturaVenta(data) {
                 [
                   data.FACTURA_DE === 'venta'
                     ? {
-                        text: [{ text: 'Cliente', fontSize: 12, bold: true }],
-                        margin: [-70, 5, 0, 0],
-                      }
-                    : '',
+                      text: [{ text: 'Cliente', fontSize: 12, bold: true }],
+                      margin: [-70, 5, 0, 0],
+                    }
+                    : {text:''},
                 ],
               ],
             },
@@ -464,13 +471,13 @@ function makeFacturaVenta(data) {
         },
         data.FACTURA_DE === 'venta'
           ? data.condicion === 'Contado'
-            ? ''
+            ?  {text:''}
             : {
-                text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-                alignment: 'center',
-                margin: [0, -15, 0, 0],
-              }
-          : '',
+              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+              alignment: 'center',
+              margin: [0, -15, 0, 0],
+            }
+          :  {text:''},
       ];
     },
     images: {
