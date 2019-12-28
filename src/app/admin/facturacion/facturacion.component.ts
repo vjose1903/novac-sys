@@ -829,15 +829,15 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
       console.log(res);
 
-      this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-        console.log(res);
+      // this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+      //   console.log(res);
 
-        if (res.status) {
-          this.CancelarFactura();
-        }
-      });
-      res['FACTURA_DE'] = this.metodo;
-      this._ipc.send('print', res);
+      //   if (res.status) {
+      //     this.CancelarFactura();
+      //   }
+      // });
+      // res['FACTURA_DE'] = this.metodo;
+      // this._ipc.send('print', res);
     });
   }
 }
