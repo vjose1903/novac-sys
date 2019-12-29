@@ -31,6 +31,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   mdbTablePagination: MdbTablePaginationComponent;
 
   @ViewChild(MdbTableDirective, { static: false }) mdbTable: MdbTableDirective;
+  cantiTootip: string;
 
   @HostListener('input') oninput() {
     this.searchItems();
@@ -45,7 +46,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     // abajo 40
 
     setTimeout(() => {
-
       if (this.focusRow) {
         this.key = event.keyCode;
         if (this.key === 38) {
@@ -67,8 +67,16 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   ROW = 'row-';
   NUM = 0;
   IDROW;
+  medidas = {
+    Libra: 'Libras',
+    Quintal: 'Quintales',
+    Caja: 'Cajas',
+    Paquete: 'Paquetes',
+    Unidad: 'Unidades',
+  };
 
   // inputs
+
   @Input() paraFiltroArticulos;
   @Input() paraFiltroClientes;
   @Input() info;
@@ -105,6 +113,45 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     //     this.element.focus();
     //   }, 5);
     // }
+  }
+
+  formatearNumero(nStr) {
+    if (nStr !== undefined) {
+      nStr += '';
+      const x = nStr.split('.');
+      let x1 = x[0];
+      const x2 = x.length > 1 ? '.' + x[1] : '';
+      const rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+    }
+  }
+
+  lookOters(objeto) {
+    const keys = _.keys(objeto);
+    const values = _.values(objeto);
+
+    const fin1 = values[1] > 1 ? this.medidas[keys[1]] : keys[1];
+    const fin2 = values[2] > 1 ? this.medidas[keys[2]] : keys[2];
+
+    const padre = this.formatearNumero(values[1]) + '  ' + fin1;
+    const hijo = this.formatearNumero(values[2]) + '  ' + fin2;
+    
+    let cantiTootip = ``;
+    if (keys.length === 2) {
+      cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
+    } else {
+      cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br> <span>${hijo}</span><br> </div>`;
+    }
+    return cantiTootip;
+  }
+  lookprincipal(objeto) {
+    const keys = _.keys(objeto);
+    const values = _.values(objeto);
+    const fin = values[0] > 1 ? this.medidas[keys[0]] : keys[0];
+    return this.formatearNumero(values[0]) + '  ' + fin;
   }
 
   ngOnChanges() {}

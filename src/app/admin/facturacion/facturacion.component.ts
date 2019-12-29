@@ -52,7 +52,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   listaSuplidores: any;
   TiposCostosGastos: string;
   tipos_costosYgastos: string[];
-
+  medidas = {
+    Libra: 'Libras',
+    Quintal: 'Quintales',
+    Caja: 'Cajas',
+    Paquete: 'Paquetes',
+    Unidad: 'Unidades',
+  };
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   listaArticulos: any;
   usuario: any;
@@ -145,11 +151,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
-    this.obsServ.ARTICULOS.subscribe(res => {
-      if (res !== undefined && res !== null) {
-        this.listaArticulos = res;
-      }
-    });
+    this.GetArticulos();
 
     this.metodo = this.route.snapshot.params['tipo'];
 
@@ -190,18 +192,18 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
       this.TiposCostosGastos =
         '<div style=" max-width: 30rem; min-width: 30rem;" > \
-    <span>1 Gastos de personal </span><br>\
-    <span>2 Gastos de trabajos, suministros y servicios</span><br>\
-    <span>3 Arrendamientos</span><br>\
-    <span>4 Gastos de activos fijos</span><br>\
-    <span>5 Gastos de representación</span><br>\
-    <span>6 Gastos deducciones admitidas</span><br>\
-    <span>7 Gastos financieros</span><br>\
-    <span>8 Gastos extraordinarios</span><br>\
-    <span>9 Compras y gastos que forman parte del costo de venta</span><br>\
-    <span>10 Adquisiciones de activos</span><br>\
-    <span>11 Gastos de Seguros</span><br>\
-    </div>';
+      <span>1 Gastos de personal </span><br>\
+      <span>2 Gastos de trabajos, suministros y servicios</span><br>\
+      <span>3 Arrendamientos</span><br>\
+      <span>4 Gastos de activos fijos</span><br>\
+      <span>5 Gastos de representación</span><br>\
+      <span>6 Gastos deducciones admitidas</span><br>\
+      <span>7 Gastos financieros</span><br>\
+      <span>8 Gastos extraordinarios</span><br>\
+      <span>9 Compras y gastos que forman parte del costo de venta</span><br>\
+      <span>10 Adquisiciones de activos</span><br>\
+      <span>11 Gastos de Seguros</span><br>\
+      </div>';
       this.tipos_facturas = ['01', '02'];
       this.tipos_costosYgastos = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
       this.labelSearch = 'Suplidor';
@@ -280,6 +282,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     });
   }
+  ngOnDestroy(): void {
+    this.mServ.ModalObj(null);
+    this.mServ.modalTipo(null);
+    this.mServ.ModalSeleccion(null);
+    this.GetArticulos();
+  }
+
   setWidthPop(bool, e) {
     e.select();
     if (bool) {
@@ -288,10 +297,18 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       document.documentElement.style.setProperty('--popInfo', '25rem');
     }
   }
-  ngOnDestroy(): void {
-    this.mServ.ModalObj(null);
-    this.mServ.modalTipo(null);
-    this.mServ.ModalSeleccion(null);
+  GetArticulos() {
+    this.dbServ.getArticulos().subscribe(res => {
+      res.sort((a, b) => {
+        return a.id > b.id ? 1 : -1;
+      });
+
+      if (res !== undefined && res !== null) {
+        console.log(res);
+
+        this.listaArticulos = res;
+      }
+    });
   }
   getCalculos(arg) {
     this.TOTAL = parseFloat(arg.Total);
@@ -718,6 +735,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     cuerpoFact.forEach(row => {
       const Articulo = this.listaArticulos.filter(art => art.id === row.articulo_id);
+
       const articulo = JSON.parse(JSON.stringify(Articulo));
       const contenido_articulo = articulo[0].contenido_articulos;
       const costoRow = this.desformatear(row.pre);
@@ -829,15 +847,16 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.dbServ.createFacturas(cabecera_fact).subscribe(res => {
       console.log(res);
 
-      // this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      //   console.log(res);
-
-      //   if (res.status) {
-      //     this.CancelarFactura();
-      //   }
-      // });
-      // res['FACTURA_DE'] = this.metodo;
-      // this._ipc.send('print', res);
+      this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+        console.log(res);
+        res.status = true;
+        if (res.status) {
+          this.CancelarFactura();
+          this.GetArticulos();
+        }
+      });
+      res['FACTURA_DE'] = this.metodo;
+      this._ipc.send('print', res);
     });
   }
 }

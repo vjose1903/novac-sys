@@ -14,24 +14,26 @@
     <tbody>
       <tr
         mdbTableCol
-        *ngFor="let row of data; let i = index"
+        *ngFor="let dato of data; let i = index"
         class="text-center"
-        id="row-{{ i }}"
+        id="dato-{{ i }}"
         [ngClass]="{
-          'bg-selected': !focusRow && row.id == seleccionado,
+          'bg-selected': !focusRow && dato.id == seleccionado,
           'bg-light': focusRow && RowElement.id == IDROW
         }"
         style="cursor: pointer;"
         #RowElement
-        (click)="clickROW(row)"
+        (click)="clickROW(dato)"
       >
-        <td *ngFor="let column of info">
-          <span style="width: 100%">
-            {{ row[column.key] }}
+        <td *ngFor="let column of info; let j = index">
+          <span *ngIf="!column.cantidades" style="width: 100%"> {{ column.cantidades }}{{ dato[column.key] }} </span>
+          <ng-template #cantiTool><div [innerHtml]="lookOters(dato[column.key])"></div></ng-template>
+          <span [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" *ngIf="column.cantidades" style="width: 100%">
+            {{ lookprincipal(dato[column.key]) }}
           </span>
         </td>
         <td class="btnAccion" *ngIf="botones.titulo">
-          <app-btnacciones [row]="row" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
+          <app-btnacciones [row]="dato" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
         </td>
       </tr>
     </tbody>

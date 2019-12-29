@@ -617,6 +617,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   // =============================================
   abrirModal(arg) {
     const obj = arg;
+    // this.listaArticulos.map()
     if (this.metodo === 'venta') {
       obj.listaArticulos = this.listaArticulos;
     } else {

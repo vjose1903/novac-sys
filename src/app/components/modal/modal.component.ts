@@ -32,7 +32,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     },
     {
       titulo: 'Existencia',
-      key: 'existencia',
+      key: 'cantidades',
+      cantidades: true,
     },
   ];
 

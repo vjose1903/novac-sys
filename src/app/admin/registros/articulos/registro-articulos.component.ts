@@ -86,9 +86,33 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   }
   ngOnInit() {
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
-    this.artServ.ARTICULOS.subscribe(res => {
-      this.listaArticulos = res;
-    });
+
+    // this.artServ.ARTICULOS.subscribe(res => {
+    //   this.listaArticulos = res;
+    // });
+    this.dbServ
+      .getArticulos()
+      // .pipe(
+      //   map(
+      //     val =>
+      //       (val = val.map(arti => {
+      //         // console.log(arti);
+
+      //         // console.log(arti.existencia);
+      //         arti.medidaMostrar = this.calcularExistencia(arti.contenido_articulos, arti);
+      //         return arti;
+      //       })),
+      //   ),
+      // )
+      .subscribe(res => {
+        res.sort((a, b) => {
+          return a.id > b.id ? 1 : -1;
+        });
+
+        if (res !== undefined && res !== null) {
+          this.listaArticulos = res;
+        }
+      });
 
     this.dbServ.getTipoArticulos().subscribe(res => {
       this.listaTipoArticulos = JSON.parse(JSON.stringify(res));
@@ -115,6 +139,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       is_detallable: [this.articuloSelected ? this.articuloSelected.is_detallable : this.isDetallable],
       fecha_ingreso: [this.articuloSelected ? this.articuloSelected.fecha_ingreso : new Date()],
       aviso_existencia: [this.articuloSelected ? this.articuloSelected.aviso_existencia : null, Validators.required],
+      existencia: [0],
       medida_alerta: [this.articuloSelected ? this.articuloSelected.medida_alerta : null],
       cantidad_contenido_padre: [null],
       medida_contenido_padre: [null],
@@ -153,6 +178,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   borrar() {
     this.form.reset();
     this.enfocarInput('nombre');
+    this.form.controls.is_detallable.setValue(false);
+    this.form.controls.existencia.setValue(0);
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
   }
@@ -257,7 +284,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       const costoLibra = costo / 100;
       if (medida === 'Quintal') {
         this.form.controls.precio_libra.setValue(this.formatearNumero(this.redondearAdos(precioLibra)));
-        this.form.controls.costo_padre.setValue(this.formatearNumero(this.redondearAdos(costoLibra)));
+        this.form.controls.costo_padre.setValue(this.redondearAdos(costoLibra));
       } else {
         this.calculatePricePadre();
         this.calculatePriceHijo();
@@ -277,7 +304,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       const PrecioPadre = Precio / cantidadPadre;
       const costoPadre = costo / cantidadPadre;
       this.form.controls.precio_padre.setValue(this.formatearNumero(this.redondearAdos(PrecioPadre)));
-      this.form.controls.costo_padre.setValue(this.formatearNumero(this.redondearAdos(costoPadre)));
+      this.form.controls.costo_padre.setValue(this.redondearAdos(costoPadre));
     }
   }
   calculatePriceHijo() {
@@ -324,7 +351,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     });
 
     this.form.patchValue(item.ARG);
-    this.form.controls.costo_principal.setValue(this.formatearNumero(this.redondearAdos(item.ARG.costo_principal)));
+
+    this.form.controls.costo_principal.setValue(this.redondearAdos(item.ARG.costo_principal));
     this.form.controls.precio_principal.setValue(this.formatearNumero(this.redondearAdos(item.ARG.precio_principal)));
   }
   abrirModal(arg?) {
@@ -347,7 +375,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   element: HTMLElement;
   submit(form) {
     const x = JSON.parse(JSON.stringify(form.value));
-    console.log(x);
 
     let contenido = [];
     if (x.medida === 'Caja') {
@@ -356,7 +383,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
           {
             referencia: null,
             id: x.id_contenido_padre,
-            costo: this.desformatear(x.costo_padre),
+            costo: x.costo_padre,
             precio: this.desformatear(x.precio_padre),
             cantidad: x.cantidad_contenido_padre,
             medida: x.medida_contenido_padre,
@@ -367,7 +394,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
           {
             referencia: null,
             id: x.id_contenido_padre,
-            costo: this.desformatear(x.costo_padre),
+            costo: x.costo_padre,
             precio: this.desformatear(x.precio_padre),
             cantidad: x.cantidad_contenido_padre,
             medida: x.medida_contenido_padre,
@@ -375,7 +402,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
           {
             referencia: x.referencia_hijo,
             id: x.id_contenido_hijo,
-            costo: this.desformatear(x.costo_hijo),
+            costo: x.costo_hijo,
             precio: this.desformatear(x.precio_hijo),
             cantidad: x.cantidad_contenido_hijo,
             medida: x.medida_contenido_hijo,
@@ -386,7 +413,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       contenido = [
         {
           id: x.id_contenido_padre,
-          costo: this.desformatear(x.costo_padre),
+          costo: x.costo_padre,
           precio: this.desformatear(x.precio_libra),
           cantidad: 100,
           medida: 'Libra',
@@ -407,8 +434,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       medida: x.medida,
       is_detallable: x.is_detallable,
       contenido_articulos_attributes: contenido,
+      existencia: x.existencia,
     };
-    console.log(obj);
 
     if (x.id) {
       obj['id'] = x.id;
@@ -418,8 +445,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
           console.log(res);
 
           this.listaArticulos[this.indexEditar] = res;
-          this.form.reset();
-          this.enfocarInput('nombre');
+          this.borrar();
           this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
         },
         err => {
@@ -434,8 +460,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
         res => {
           // this.listaArticulos = [...this.listaArticulos, res];
           this.artServ.next_articulo([...this.listaArticulos, res]);
-          this.form.reset();
-          this.enfocarInput('nombre');
+          this.borrar();
           this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
         },
         err => {

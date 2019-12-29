@@ -61,13 +61,6 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
     .pipe(map(result => result.matches));
 
   ngOnInit() {
-    this.dbServ.getArticulos().subscribe(res => {
-      res.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
-      });
-
-      this.obsServ.next_articulo(res);
-    });
 
     this.mantenimiento = true;
     this._ipc.PRINTERS.subscribe(res => {
