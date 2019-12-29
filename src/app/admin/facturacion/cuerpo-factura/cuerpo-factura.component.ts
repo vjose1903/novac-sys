@@ -450,14 +450,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const tempArticulo = this.listaArticulos.filter(arti => arti.nombre === descripcion);
     const articulo = tempArticulo[0];
     const cantidades = articulo.cantidades;
+    const cantContenidos = articulo.contenido;
     const splitUnidad = _.split(unidad, ' ');
     let unidad_ = splitUnidad[0];
-    let maxCant = 1;
-    articulo.contenido_articulos.forEach(conte => {
-      if (conte.medida !== 'Libra') {
-        maxCant *= conte.cantidad;
-      }
-    });
+    
+
+
 
     for (let index = 0; index < this.control.controls.length; index++) {
       let cantidadF = (this.control.controls[index] as any).controls['can'].value;
