@@ -20,6 +20,7 @@ import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { idLocale } from 'ngx-bootstrap';
 import * as _ from 'lodash';
+import { DBservice } from '../../core/services/bdservice.service';
 
 @Component({
   selector: 'app-tablas',
@@ -67,6 +68,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   ROW = 'row-';
   NUM = 0;
   IDROW;
+
   medidas = {
     Libra: 'Libras',
     Quintal: 'Quintales',
@@ -77,7 +79,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
 
   // inputs
 
-  @Input() paraFiltroArticulos;
+  @Input() paraFiltroArticulos = null;
   @Input() paraFiltroClientes;
   @Input() info;
   @Input() search = true;
@@ -101,7 +103,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   @Output() DELETE = new EventEmitter<any>();
   @Output() reinicioModal = new EventEmitter<any>();
   @Output() noArticulo = new EventEmitter<any>();
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute) {}
+  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice) {}
 
   ngOnInit() {
     if (this.focusRow) {
@@ -138,7 +140,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
 
     const padre = this.formatearNumero(values[1]) + '  ' + fin1;
     const hijo = this.formatearNumero(values[2]) + '  ' + fin2;
-    
+
     let cantiTootip = ``;
     if (keys.length === 2) {
       cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
@@ -212,8 +214,13 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     if (arg.id) {
       this.seleccionado = arg.id;
     }
-    this.clickRow.emit(arg);
-    this.reinicioModal.emit();
+
+    if (this.paraFiltroArticulos !== null && arg.existencia === 0) {
+      this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+    } else {
+      this.clickRow.emit(arg);
+      this.reinicioModal.emit();
+    }
   }
 
   devolverInfo(arg) {
@@ -240,6 +247,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     if (this.NUM === this.data.length - 1) {
       this.NUM = -1;
     }
+
     this.NUM = this.NUM + 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
     this.entrar++;
@@ -247,10 +255,11 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
 
   ENTER(arg) {
     this.entrar++;
+
     if (this.entrar > 1) {
-      this.element = document.getElementById(arg) as HTMLElement;
+      this.element = document.getElementById(arg) as any;
       this.element.click();
-      this.reinicioModal.emit();
+      // this.reinicioModal.emit();
     }
   }
 }

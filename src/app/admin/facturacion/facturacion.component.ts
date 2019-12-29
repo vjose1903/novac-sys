@@ -528,7 +528,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   getCuerpoFactura(arg) {
     this.CuerpoFactura = [];
     const obj = JSON.parse(arg);
-    console.log(obj);
 
     this.CuerpoFactura = obj;
   }

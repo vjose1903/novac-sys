@@ -276,31 +276,33 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
     }
     if (input === 'cod-' || input === 'pre-') {
+      let unidad;
       let index = i;
 
-      let unidad;
       if (input === 'cod-') {
         index--;
       }
       unidad = (this.control.controls[index] as any).controls['uni'].value;
 
-      if (unidad === '' || unidad === null) {
-        setTimeout(() => {
-          if (this.metodo === 'venta') {
-            this.enfocarInput('uni-' + (i - 1));
-          } else {
-            this.enfocarInput('uni-' + i);
-          }
-        }, 5);
-      } else {
-        this.UnidadesArticulo = [];
-        this.aumentarSecuencia();
-        this.enfocarInput(sigInput);
+      const excede = this.checkCantidadExede(index, unidad, 'saltar');
+
+      if (!excede) {
+        if (unidad === '' || unidad === null) {
+          setTimeout(() => {
+            if (this.metodo === 'venta') {
+              this.enfocarInput('uni-' + (i - 1));
+            } else {
+              this.enfocarInput('uni-' + i);
+            }
+          }, 5);
+        } else {
+          this.UnidadesArticulo = [];
+          this.aumentarSecuencia();
+          this.enfocarInput(sigInput);
+        }
       }
     }
-    if (codigo === '') {
-      this.enfocarInput('cod-' + i);
-    }
+
     if (input === 'can-' && codigo !== '') {
       codigo = _.parseInt(codigo);
 
@@ -312,8 +314,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         this.element = document.getElementById('can-' + i) as HTMLElement;
         this.element.blur();
         codigo = (this.control.controls[i] as any).controls['cod'].value;
-        const obj = { filtrar: codigo, index: i };
-        this.filtrarArticulo(obj);
+        if (codigo === null) {
+          this.enfocarInput('cod-' + i);
+          this.selectContenido('cod-' + i);
+        } else {
+          const obj = { filtrar: codigo, index: i };
+          this.filtrarArticulo(obj);
+        }
       }
     }
   }
@@ -337,27 +344,43 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         this.selectContenido('cod-' + i);
         this.dbServ.toastError('El codigo introducido es suplido por un suplidor distinto al seleccionado', 'ERROR');
       } else {
-        const arti = ARTICULO[0].contenido_articulos.filter(art => art.medida === 'Quintal');
-
-        if (arti.length !== 0) {
-          precioQuintal = arti[0].precio;
-        }
-
-        if (ARTICULO[0].descripcion === 'Materia prima') {
-          (this.control.controls[i] as any).controls['desc'].disable();
+        const cantidades = ARTICULO[0].cantidades;
+        if (ARTICULO[0].existencia === 0) {
+          this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+          setTimeout(() => {
+            this.enfocarInput('cod-' + i);
+            this.selectContenido('cod-' + i);
+          }, 5);
         } else {
-          (this.control.controls[i] as any).controls['desc'].enable();
-        }
-        (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
-        this.verificarRow(i);
-        if (this.metodo === 'venta') {
-          if (ARTICULO[0].is_detallable) {
-            this.articulo_detallable(ARTICULO[0]);
-          } else {
-            this.articulo_no_detallable(ARTICULO[0]);
+          if (ARTICULO[0].existencia > 0 && ARTICULO[0].aviso_existencia > cantidades[ARTICULO[0].medida_alerta]) {
+            this.dbServ.toastWarning(
+              'Solo quedan ' + cantidades[ARTICULO[0].medida_alerta] + ' ' + ARTICULO[0].medida_alerta + ' de este producto, debe de aumentar el inventario!!!',
+              'AVISO',
+            );
           }
-        } else {
-          this.articulo_detallable(ARTICULO[0]);
+
+          const arti = ARTICULO[0].contenido_articulos.filter(art => art.medida === 'Quintal');
+
+          if (arti.length !== 0) {
+            precioQuintal = arti[0].precio;
+          }
+
+          if (ARTICULO[0].descripcion === 'Materia prima') {
+            (this.control.controls[i] as any).controls['desc'].disable();
+          } else {
+            (this.control.controls[i] as any).controls['desc'].enable();
+          }
+          (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
+          this.verificarRow(i);
+          if (this.metodo === 'venta') {
+            if (ARTICULO[0].is_detallable) {
+              this.articulo_detallable(ARTICULO[0]);
+            } else {
+              this.articulo_no_detallable(ARTICULO[0]);
+            }
+          } else {
+            this.articulo_detallable(ARTICULO[0]);
+          }
         }
       }
     }
@@ -421,6 +444,50 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.inputDrop = 'uni-' + arg;
   }
 
+  checkCantidadExede(i, unidad, lugar) {
+    let cantidad = 0;
+    const descripcion = (this.control.controls[i] as any).controls['des'].value;
+    const tempArticulo = this.listaArticulos.filter(arti => arti.nombre === descripcion);
+    const articulo = tempArticulo[0];
+    const cantidades = articulo.cantidades;
+    const splitUnidad = _.split(unidad, ' ');
+    let unidad_ = splitUnidad[0];
+    let maxCant = 1;
+    articulo.contenido_articulos.forEach(conte => {
+      if (conte.medida !== 'Libra') {
+        maxCant *= conte.cantidad;
+      }
+    });
+
+    for (let index = 0; index < this.control.controls.length; index++) {
+      let cantidadF = (this.control.controls[index] as any).controls['can'].value;
+
+      if (tempArticulo.length === 1) {
+        if (unidad_ === 'Saco') {
+          unidad_ = 'Libra';
+          cantidadF = cantidadF * _.parseInt(splitUnidad[2]);
+        } else {
+          unidad_ = 'Unidad';
+        }
+
+        cantidad += cantidadF;
+      }
+    }
+
+    if (lugar === 'saltar') {
+      i--;
+    }
+    if (cantidad > cantidades[unidad_]) {
+      this.dbServ.toastError('Cantidad introducida exede la cantidad en inventario', 'ERROR');
+      (this.control.controls[i] as any).controls['uni'].setValue(null);
+      this.enfocarInput('can-' + i);
+      this.selectContenido('can-' + i);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   selectMedidaChange(arg, i) {
     this.indiceDetalle = _.findIndex(this.UnidadesArticulo, o => {
       return o.value === arg;
@@ -430,10 +497,14 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const costoDetalle = this.UnidadesArticulo[this.indiceDetalle].costo;
     const unidad = this.UnidadesArticulo[this.indiceDetalle].value;
 
-    (this.control.controls[i] as any).controls['uni'].setValue(unidad);
-    (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(this.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
-    (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
-    this.calcularTotalRow(i);
+    const execede = this.checkCantidadExede(i, unidad, 'change');
+
+    if (!execede) {
+      (this.control.controls[i] as any).controls['uni'].setValue(unidad);
+      (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(this.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
+      (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
+      this.calcularTotalRow(i);
+    }
   }
 
   enfocarInput(arg) {
@@ -642,6 +713,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       return o.codigo === arg.codigo;
     });
     // this.listaArticulos[index].seleccionado = true;
+
+    const cantidades = arg.cantidades;
+
+    if (arg.existencia > 0 && arg.aviso_existencia > cantidades[arg.medida_alerta]) {
+      this.dbServ.toastWarning('Solo quedan ' + cantidades[arg.medida_alerta] + ' ' + arg.medida_alerta + ' de este producto, debe de aumentar el inventario!!!', 'AVISO');
+    }
+
     (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
     (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
     if (this.metodo === 'venta') {
