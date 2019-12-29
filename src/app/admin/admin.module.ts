@@ -23,7 +23,8 @@ import { ValidateRayaAbajo } from '../directives/validaciones';
 
 import { FacturacionComponent } from './facturacion/facturacion.component';
 import { RegistroSuplidoresComponent } from './registros/registro-suplidores/registro-suplidores.component';
-import { FiltroParaNgforPipe } from '../pipe/filtro-para-ngfor.pipe';
+import { FiltroParaNgforPipe } from '../core/pipe/filtro-para-ngfor.pipe';
+
 
 @NgModule({
   declarations: [
