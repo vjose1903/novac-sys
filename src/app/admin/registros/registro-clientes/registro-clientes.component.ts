@@ -179,7 +179,7 @@ export class RegistroClientesComponent implements OnInit {
       }
     }
   }
-  atras(temp) {}
+  atras() {}
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
