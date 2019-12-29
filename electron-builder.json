@@ -19,17 +19,17 @@
     "!tsconfig.json",
     "!tslint.json"
   ],
-  "extraFiles": ["./fonts/*"],
+  "extraFiles": ["./fonts/*", "./print/*", "./node_modules","./icons"],
   "win": {
-    "icon": "dist",
+    "icon": "./icons/win/icon.ico",
     "target": ["portable"]
   },
   "mac": {
-    "icon": "dist",
+    "icon": "./icons/mac/icon.icns",
     "target": ["dmg"]
   },
   "linux": {
-    "icon": "dist",
+    "icon": "./icons/mac/icon.icns",
     "target": ["AppImage"]
   }
 }
