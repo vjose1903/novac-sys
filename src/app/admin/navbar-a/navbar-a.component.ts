@@ -22,9 +22,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   mantenimiento: boolean;
 
   sub = new Subscription();
-
   actualTab;
-
   showLoading = true;
 
   showModal;
