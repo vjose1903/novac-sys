@@ -19,7 +19,20 @@
     "!tsconfig.json",
     "!tslint.json"
   ],
-  "extraFiles": ["./fonts/*", "./print/*", "./node_modules","./icons"],
+  "extraFiles": [
+    "./fonts/*",
+    "./print/*",
+    "./icons/*",
+    "./node_modules/electron/*",
+    "./electron-builder/*",
+    "./electron-chromedriver/*",
+    "./node_modules/electron-download/*",
+    "./node_modules/electron-osx-sign/*",
+    "./node_modules/electron-publish/*",
+    "./node_modules/electron-rebuild/*",
+    "./node_modules/electron-reload/*",
+    "./node_modules/electron-to-chromium/*"
+  ],
   "win": {
     "icon": "./icons/win/icon.ico",
     "target": ["portable"]
