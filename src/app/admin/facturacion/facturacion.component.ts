@@ -742,7 +742,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
       const roundArticulo = articulo[0].costo_principal;
 
-      const newArticulo = articulo[0];
+      const newArticulo = JSON.parse(JSON.stringify(articulo[0]));
       let temp = {};
 
       if (row.unidad === 'Caja' || row.unidad === 'Quintal') {
@@ -849,8 +849,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
         this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
           console.log(res);
-          res.status = true;
-          if (res.status === 'si') {
+          if (res.status) {
             this.CancelarFactura();
             this.GetArticulos();
             this.dbServ.toastSuccess(res.msg, 'CORRECTO');

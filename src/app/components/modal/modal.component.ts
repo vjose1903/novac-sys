@@ -38,7 +38,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   ];
 
   paraFiltroArticulos;
-
+  metodo;
   infoCliente = [
     {
       titulo: 'Nombre',
@@ -75,6 +75,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
       if (res !== undefined && res !== null) {
         this.seleccionModal = res;
         this.paraFiltroArticulos = res.filtrar;
+        this.metodo = res.metodo;
 
         if (this.tipoModal === 'buscarCliente' && res.limite_credito !== undefined) {
           this.tituloModal = 'Buscar cliente';

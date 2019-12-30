@@ -79,6 +79,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
 
   // inputs
 
+  @Input() metodo = null;
   @Input() paraFiltroArticulos = null;
   @Input() paraFiltroClientes;
   @Input() info;
@@ -215,7 +216,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
       this.seleccionado = arg.id;
     }
 
-    if (this.paraFiltroArticulos !== null && arg.existencia === 0) {
+    if (this.metodo === 'venta' && this.paraFiltroArticulos !== null && arg.existencia === 0) {
       this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
     } else {
       this.clickRow.emit(arg);

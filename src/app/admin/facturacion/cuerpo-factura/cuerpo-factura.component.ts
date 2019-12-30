@@ -271,7 +271,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         if (input === 'uni-' && codigo !== '' && codigo !== null && codigo !== undefined) {
           this.verificarRow(i);
           this.buscarArticuloPorCodigo(i, codigo);
-          this.enfocarInput(sigInput);
+          setTimeout(() => {
+            this.enfocarInput(sigInput);
+          }, 2);
         }
       }
     }
@@ -300,6 +302,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
           this.aumentarSecuencia();
           this.enfocarInput(sigInput);
         }
+      } else {
+        this.enfocarInput('can-' + index);
+        this.selectContenido('can-' + index);
+        setTimeout(() => {
+          (this.control.controls[index] as any).controls['uni'].setValue(null);
+        }, 2);
       }
     }
 
@@ -308,7 +316,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
       if (_.isInteger(codigo)) {
         codigo = (this.control.controls[i] as any).controls['cod'].value;
-        this.buscarArticuloPorCodigo(i, codigo);
+        this.buscarArticuloPorCodigo(i, codigo, input);
         this.enfocarInput(sigInput);
       } else {
         this.element = document.getElementById('can-' + i) as HTMLElement;
@@ -318,14 +326,14 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
           this.enfocarInput('cod-' + i);
           this.selectContenido('cod-' + i);
         } else {
-          const obj = { filtrar: codigo, index: i };
+          const obj = { filtrar: codigo, index: i, metodo: this.metodo };
           this.filtrarArticulo(obj);
         }
       }
     }
   }
 
-  buscarArticuloPorCodigo(i, codigo) {
+  buscarArticuloPorCodigo(i, codigo, input?) {
     let precioQuintal;
     this.inputDrop = 'uni-' + i;
 
@@ -345,7 +353,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         this.dbServ.toastError('El codigo introducido es suplido por un suplidor distinto al seleccionado', 'ERROR');
       } else {
         const cantidades = ARTICULO[0].cantidades;
-        if (ARTICULO[0].existencia === 0) {
+        if (this.metodo === 'venta' && ARTICULO[0].existencia === 0) {
           this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
           setTimeout(() => {
             this.enfocarInput('cod-' + i);
@@ -353,10 +361,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
           }, 5);
         } else {
           if (ARTICULO[0].existencia > 0 && ARTICULO[0].aviso_existencia > cantidades[ARTICULO[0].medida_alerta]) {
-            this.dbServ.toastWarning(
-              'Solo quedan ' + cantidades[ARTICULO[0].medida_alerta] + ' ' + ARTICULO[0].medida_alerta + ' de este producto, debe de aumentar el inventario!!!',
-              'AVISO',
-            );
+            if (input === 'can-') {
+              this.dbServ.toastWarning(
+                'Solo quedan ' + cantidades[ARTICULO[0].medida_alerta] + ' ' + ARTICULO[0].medida_alerta + ' de este producto, debe de aumentar el inventario!!!',
+                'AVISO',
+              );
+            }
           }
 
           const arti = ARTICULO[0].contenido_articulos.filter(art => art.medida === 'Quintal');
@@ -473,28 +483,32 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       unidadF = (this.control.controls[index] as any).controls['uni'].value;
 
       const splitUnidadF = _.split(unidadF, ' ');
+      let unity = splitUnidadF[0];
       const FindProd = (this.control.controls[index] as any).controls['des'].value;
 
       if (FindProd === descripcion) {
         if (unidad_ === 'Libra') {
           cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
+          console.log('cantidadF', cantidadF);
+        }
+        if (unity === 'Saco') {
+          unity = 'Libra';
         }
 
-        cantidadF *= articulo.contenido[unidad_];
+        cantidadF *= articulo.contenido[unity];
 
         cantidad += cantidadF;
+        console.log('cantidad', cantidad);
       }
     }
 
     if (lugar === 'saltar') {
       i--;
     }
+    console.log('vendiendo ', cantidad, ' en inventario tengo ', cantidades[unidad_]);
 
     if (this.metodo === 'venta' && cantidad > cantidades[unidad_]) {
       this.dbServ.toastError('Cantidad introducida exede la cantidad en inventario', 'ERROR');
-      (this.control.controls[i] as any).controls['uni'].setValue(null);
-      this.enfocarInput('can-' + i);
-      this.selectContenido('can-' + i);
       return true;
     } else {
       return false;
@@ -517,6 +531,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(this.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
       (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
       this.calcularTotalRow(i);
+    } else {
+      this.enfocarInput('can-' + i);
+      this.selectContenido('can-' + i);
+      setTimeout(() => {
+        (this.control.controls[i] as any).controls['uni'].setValue(null);
+      }, 2);
     }
   }
 
