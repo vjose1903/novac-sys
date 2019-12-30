@@ -20,8 +20,8 @@
     "!tslint.json"
   ],
   "extraFiles": [
-    "./fonts/*",
-    "./print/*",
+    "fonts/*",
+    "print/*",
     "./icons/*",
     "./node_modules/electron/*",
     "./electron-builder/*",

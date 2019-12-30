@@ -99,6 +99,7 @@ ipcMain.on('printerNames', (event: any, arg) => {
 ipcMain.on('print', (event: any, arg) => {
   makeFacturaVenta(arg);
 });
+
 // ==========================================================================================================================================================
 
 function redondearAdos(num) {
@@ -522,15 +523,15 @@ function imprimir(cFileName) {
   const { exec } = require('child_process');
   // "C:\Users\User\Desktop\test.pdf" "EPSON LX-350 ESC/P"
   // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
-
-  exec(`${__dirname}"\\print\\FoxitReaderPortable.exe" /t "${__dirname}\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => {
+  var foxitPath = PathApp() + 'print\\FoxitReaderPortable.exe';
+  exec(`${foxitPath} /t "${PathApp()}test.pdf"`, (error, stdout, stderr) => {
     if (error) {
-      win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: false });
+      win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err:error });
       return;
     } else {
       console.log('stdout  ', stdout);
       console.log('stderr  ', stderr);
-      win.webContents.send('printRes', { msg: 'Factura impresa correctamente!!', status: true });
+      win.webContents.send('printRes', { msg: 'Factura impresa correctamente!!', status: 'si' });
     }
   });
   // exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\ADM-Agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
