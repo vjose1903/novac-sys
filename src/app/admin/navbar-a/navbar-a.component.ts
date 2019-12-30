@@ -13,8 +13,6 @@ import { DBservice } from '../../core/services/bdservice.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { ObservableServcie } from '../../core/services/observables.service';
 
-const { dialog } = require('electron').remote;
-
 @Component({
   selector: 'app-navbar-a',
   templateUrl: './navbar-a.component.html',
