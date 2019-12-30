@@ -450,23 +450,37 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const tempArticulo = this.listaArticulos.filter(arti => arti.nombre === descripcion);
     const articulo = tempArticulo[0];
     const cantidades = articulo.cantidades;
-    const cantContenidos = articulo.contenido;
+
     const splitUnidad = _.split(unidad, ' ');
     let unidad_ = splitUnidad[0];
-    
+    unidad = splitUnidad[0];
 
-
+    if (unidad_ === 'Saco') {
+      unidad_ = 'Libra';
+    } else {
+      unidad_ = 'Unidad';
+    }
 
     for (let index = 0; index < this.control.controls.length; index++) {
-      let cantidadF = (this.control.controls[index] as any).controls['can'].value;
+      const cod = (this.control.controls[index] as any).controls['cod'].value;
+      if (cod === null || cod === undefined || cod === '' || cod === ' ') {
+        break;
+      }
+      let cantidadF = 0;
+      let unidadF = '';
 
-      if (tempArticulo.length === 1) {
-        if (unidad_ === 'Saco') {
-          unidad_ = 'Libra';
-          cantidadF = cantidadF * _.parseInt(splitUnidad[2]);
-        } else {
-          unidad_ = 'Unidad';
+      cantidadF = (this.control.controls[index] as any).controls['can'].value;
+      unidadF = (this.control.controls[index] as any).controls['uni'].value;
+
+      const splitUnidadF = _.split(unidadF, ' ');
+      const FindProd = (this.control.controls[index] as any).controls['des'].value;
+
+      if (FindProd === descripcion) {
+        if (unidad_ === 'Libra') {
+          cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
         }
+
+        cantidadF *= articulo.contenido[unidad_];
 
         cantidad += cantidadF;
       }
@@ -475,7 +489,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (lugar === 'saltar') {
       i--;
     }
-    if (cantidad > cantidades[unidad_]) {
+
+    if (this.metodo === 'venta' && cantidad > cantidades[unidad_]) {
       this.dbServ.toastError('Cantidad introducida exede la cantidad en inventario', 'ERROR');
       (this.control.controls[i] as any).controls['uni'].setValue(null);
       this.enfocarInput('can-' + i);
