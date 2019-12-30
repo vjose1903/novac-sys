@@ -502,7 +502,7 @@ function makeFacturaVenta(data) {
   const printer = new pdfmake(fontDescriptors);
 
   // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
-  const cFileName = 'test.pdf';
+  const cFileName = 'factura.pdf';
   try {
     const pdfDoc = printer.createPdfKitDocument(dd);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
@@ -521,10 +521,10 @@ function makeFacturaVenta(data) {
 function imprimir(cFileName) {
   // var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
   const { exec } = require('child_process');
-  // "C:\Users\User\Desktop\test.pdf" "EPSON LX-350 ESC/P"
+  // "C:\Users\User\Desktop\factura.pdf" "EPSON LX-350 ESC/P"
   // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
   var foxitPath = PathApp() + 'print\\FoxitReaderPortable.exe';
-  exec(`${foxitPath} /t "${PathApp()}test.pdf"`, (error, stdout, stderr) => {
+  exec(`${foxitPath} /t "${PathApp()}factura.pdf"`, (error, stdout, stderr) => {
     if (error) {
       win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err:error });
       return;
