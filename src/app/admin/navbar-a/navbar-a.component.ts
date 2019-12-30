@@ -33,6 +33,11 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   usuario;
   PrintersInstall: any;
   OpenPrinterMenu = false;
+  imgUser: string;
+  imgFacturacion: string;
+  imgRegistros: string;
+  imgInventario: string;
+  imgReportes: string;
   // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
   constructor(
     private dbServ: DBservice,
@@ -59,6 +64,12 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
     .pipe(map(result => result.matches));
 
   ngOnInit() {
+
+    this.imgUser = __dirname+"/src/assets/img/userH.png"
+    this.imgFacturacion = __dirname+"/src/assets/img/factura.png"
+    this.imgRegistros = __dirname+"/src/assets/img/registro.png"
+    this.imgInventario = __dirname+"/src/assets/img/inventario.png"
+    this.imgReportes = __dirname+"/src/assets/img/reporte.png"
 
     this.mantenimiento = true;
     this._ipc.PRINTERS.subscribe(res => {

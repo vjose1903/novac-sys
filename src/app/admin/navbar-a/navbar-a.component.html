@@ -3,12 +3,12 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
     <mat-toolbar>
       <span class="titulo" (click)="navegar(1)">Menu</span>
-      <!-- <img src="./assets/img/logoADM.png" class="img-fluid" /> -->
+      <!-- <img src="" class="img-fluid" /> -->
     </mat-toolbar>
     <mat-nav-list class="text-center">
       <div class="menuList menuList1">
-        <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="./assets/img/factura.png"
-          alt="" (click)="navegar(2)" />
+        <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" [src]="imgFacturacion"
+          alt="Facturacion" (click)="navegar(2)" />
         <h5 [ngClass]="actualTab == 'factura' ? 'tituloMenu1A' : 'tituloMenu1'"><strong>Facturacion</strong></h5>
 
         <div [ngClass]="actualTab == 'factura' ? 'subMenuFacturaA' : 'subMenuFactura'">
@@ -18,8 +18,8 @@
       </div>
 
       <div class="menuList menuList2">
-        <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'" src="./assets/img/registro.png"
-          alt="" (click)="navegar(3)" />
+        <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'" [src]="imgRegistros"
+          alt="Registros" (click)="navegar(3)" />
         <h5 [ngClass]="actualTab == 'registro' ? 'tituloMenu2A' : 'tituloMenu2'"><strong>Registros</strong></h5>
 
         <div [ngClass]="actualTab == 'registro' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
@@ -32,13 +32,13 @@
 
       <div class="menuList menuList3">
         <img [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'"
-          src="./assets/img/inventario.png" alt="" (click)="navegar(4)" />
+          [src]="imgInventario" alt="Inventario" (click)="navegar(4)" />
         <h5 [ngClass]="actualTab == 'inventario' ? 'tituloMenu3A' : 'tituloMenu3'"><strong>Inventario</strong></h5>
       </div>
 
       <div class="menuList menuList4">
-        <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" src="./assets/img/reporte.png"
-          alt="" (click)="navegar(5)" />
+        <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" [src]="imgReportes"
+          alt="Reportes" (click)="navegar(5)" />
         <h5 [ngClass]="actualTab == 'reporte' ? 'tituloMenu4A' : 'tituloMenu4'"><strong>Reporte</strong></h5>
       </div>
     </mat-nav-list>
@@ -59,7 +59,7 @@
 
         <div class="btn-group" dropdown id="dropCuenta" (onHidden)="closePrinterMenu()" #dropCuenta>
           <a id="button-basic" dropdownToggle class="dropdown-toggle" aria-controls="dropdown-basic">
-            <img class="rounded-circle" src="./assets/img/userH.png" alt="Admin" />
+            <img class="rounded-circle" [src]="imgUser" alt="Admin" />
             Cuenta <span class="caret"></span>
           </a>
           <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
