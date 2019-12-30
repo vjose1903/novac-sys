@@ -18,7 +18,6 @@ export class HomeComponent implements OnInit {
   loginForm: FormGroup;
   errorC = '';
   errorU = '';
-  logoPath: string;
   constructor(
     private dbServ: DBservice,
     private pdfServ: PdfService,
@@ -30,7 +29,6 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.logoPath = __dirname+"/src/assets/img/logoADM.png"
     this.loginForm = this.fb.group({
       usuario: null,
       password: null,

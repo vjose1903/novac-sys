@@ -7,7 +7,7 @@
     </mat-toolbar>
     <mat-nav-list class="text-center">
       <div class="menuList menuList1">
-        <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" [src]="imgFacturacion"
+        <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/factura.png"
           alt="Facturacion" (click)="navegar(2)" />
         <h5 [ngClass]="actualTab == 'factura' ? 'tituloMenu1A' : 'tituloMenu1'"><strong>Facturacion</strong></h5>
 
@@ -18,7 +18,7 @@
       </div>
 
       <div class="menuList menuList2">
-        <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'" [src]="imgRegistros"
+        <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/registro.png"
           alt="Registros" (click)="navegar(3)" />
         <h5 [ngClass]="actualTab == 'registro' ? 'tituloMenu2A' : 'tituloMenu2'"><strong>Registros</strong></h5>
 
@@ -32,12 +32,12 @@
 
       <div class="menuList menuList3">
         <img [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'"
-          [src]="imgInventario" alt="Inventario" (click)="navegar(4)" />
+          src="assets/img/inventario.png" alt="Inventario" (click)="navegar(4)" />
         <h5 [ngClass]="actualTab == 'inventario' ? 'tituloMenu3A' : 'tituloMenu3'"><strong>Inventario</strong></h5>
       </div>
 
       <div class="menuList menuList4">
-        <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" [src]="imgReportes"
+        <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png"
           alt="Reportes" (click)="navegar(5)" />
         <h5 [ngClass]="actualTab == 'reporte' ? 'tituloMenu4A' : 'tituloMenu4'"><strong>Reporte</strong></h5>
       </div>

@@ -34,10 +34,6 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   PrintersInstall: any;
   OpenPrinterMenu = false;
   imgUser: string;
-  imgFacturacion: string;
-  imgRegistros: string;
-  imgInventario: string;
-  imgReportes: string;
   // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
   constructor(
     private dbServ: DBservice,
@@ -64,12 +60,12 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
     .pipe(map(result => result.matches));
 
   ngOnInit() {
-
-    this.imgUser = __dirname+"/src/assets/img/userH.png"
-    this.imgFacturacion = __dirname+"/src/assets/img/factura.png"
-    this.imgRegistros = __dirname+"/src/assets/img/registro.png"
-    this.imgInventario = __dirname+"/src/assets/img/inventario.png"
-    this.imgReportes = __dirname+"/src/assets/img/reporte.png"
+    this.usuario = JSON.parse(this.dbServ.getEmpleado());
+    if (this.usuario.sexo === 'm') {
+      this.imgUser = 'assets/img/userM.png';
+    } else {
+      this.imgUser = 'assets/img/userH.png';
+    }
 
     this.mantenimiento = true;
     this._ipc.PRINTERS.subscribe(res => {
@@ -86,8 +82,6 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
     // this.sub = profile.subscribe(res => {
     //   this.usuariosServices.profile = res;
     // });
-
-    this.usuario = JSON.parse(this.dbServ.getEmpleado());
   }
   ngOnDestroy() {
     // this.sub.unsubscribe();
