@@ -92,7 +92,7 @@ try {
 
 ipcMain.on('printerNames', (event: any, arg) => {
   // name of function
-  var printersName = contents.getPrinters();
+  var printersName = win.webContents.getPrinters();
   event.sender.send('printersNameRes', printersName);
 });
 

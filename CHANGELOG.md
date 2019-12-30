@@ -1,4 +1,4 @@
-## <small>6.0.1 (2019-05-31)</small>
+## <small>0.0.1 (2019-05-31)</small>
 
 * ref/ strict version build-angular & zonejs ([5a24b56](https://github.com/maximegris/angular-electron/commit/5a24b56))
 * ref/ strict version codelyzer ([6ede0c8](https://github.com/maximegris/angular-electron/commit/6ede0c8))
