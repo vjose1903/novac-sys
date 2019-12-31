@@ -8,7 +8,6 @@ import * as _ from 'lodash';
 @Injectable({
   providedIn: 'root',
 })
-
 export class DBservice {
   // url = 'http://vjose.ddns.net:3000';
   url = 'http://localhost:3000';
@@ -98,16 +97,16 @@ export class DBservice {
   // USUARIOS
   // =====================================================================
 
-  getEmpleados() {}
+  getEmpleados() {
+    return this.peticion('users', 'get');
+  }
 
   createEmpleados(arg) {
-    return this.peticion('empleados/register', 'post', JSON.stringify(arg));
+    return this.peticion('auth', 'post', JSON.stringify(arg));
   }
+
   getEmpleado() {
     return localStorage.getItem('userInfo') || '';
-  }
-  editarEmpleado(arg) {
-    return this.peticion('empleados/' + arg.id, 'put', JSON.stringify(arg));
   }
 
   // =====================================================================

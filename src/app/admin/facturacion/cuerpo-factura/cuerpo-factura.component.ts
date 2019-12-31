@@ -508,7 +508,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     console.log('vendiendo ', cantidad, ' en inventario tengo ', cantidades[unidad_]);
 
     if (this.metodo === 'venta' && cantidad > cantidades[unidad_]) {
-      this.dbServ.toastError('Cantidad introducida exede la cantidad en inventario', 'ERROR');
+      this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
       return true;
     } else {
       return false;

@@ -5,10 +5,20 @@
     <div class="card card-padding sombra">
       <form [formGroup]="form" (submit)="submit(form)">
         <div class="row">
-          <div class=" col-12 ">
-            <div class="from-group mb-2">
-              <input formControlName="is_detallable" class="apple-switch ml-2" type="checkbox" />
-              <span class="ml-2">Detallable</span>
+          <div class="col-12">
+            <div class="row">
+              <div class="col-6">
+                <div class="from-group mb-2">
+                  <input formControlName="is_detallable" class="apple-switch ml-2" type="checkbox" />
+                  <span class="ml-2 subirLabelCheck">Detallable</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="from-group mb-2 ml-2">
+                  <input formControlName="calcular_itbis" class="apple-switch ml-2" type="checkbox" />
+                  <span class="ml-2 subirLabelCheck">Calcular Itbis</span>
+                </div>
+              </div>
             </div>
           </div>
           <div class="col-md-12 ">
@@ -69,7 +79,9 @@
               <select formControlName="medida" (keydown.enter)="saltar('costoP')" id="comprado" class="form-control mb-4" value="" (change)="resetCompradoEn($event.target.value)">
                 <option value="" disabled selected hidden>Tipo</option>
                 <option value="Quintal">Quintal</option>
+                <option value="Libra">Libra</option>
                 <option value="Caja">Caja</option>
+                <option value="Unidad">Unidad</option>
               </select>
               <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)">
                 Seleccione una opcion
@@ -148,11 +160,11 @@
                     formControlName="medida_alerta"
                     id="medida_alerta"
                   >
-                    <option value="Quintal">Quintal</option>
-                    <option value="Libra">Libra</option>
+                    <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
+                    <!-- <option value="Libra">Libra</option>
                     <option value="Caja">Caja</option>
                     <option value="Paquete">Paquete</option>
-                    <option value="Unidad">Unidad</option>
+                    <option value="Unidad">Unidad</option> -->
                   </select>
                 </div>
               </div>

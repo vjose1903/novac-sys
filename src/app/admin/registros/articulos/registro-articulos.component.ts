@@ -32,6 +32,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   tipoModal: string;
   indexEditar: any;
   usuario: any;
+  optionsAlerta: any[];
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
@@ -139,12 +140,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       is_detallable: [this.articuloSelected ? this.articuloSelected.is_detallable : this.isDetallable],
       fecha_ingreso: [this.articuloSelected ? this.articuloSelected.fecha_ingreso : new Date()],
       aviso_existencia: [this.articuloSelected ? this.articuloSelected.aviso_existencia : null, Validators.required],
+      calcular_itbis: [this.articuloSelected ? this.articuloSelected.calcular_itbis : false],
       existencia: [0],
       medida_alerta: [this.articuloSelected ? this.articuloSelected.medida_alerta : null],
       cantidad_contenido_padre: [null],
       medida_contenido_padre: [null],
       precio_padre: [null],
       precio_libra: [null],
+      precio_unidad: [null],
       costo_padre: [null],
       costo_hijo: [null],
       id: [null],
@@ -196,6 +199,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     if (value === 'Quintal') {
       this.calculatePrice();
     }
+    this.fillDropAlerta(value);
   }
 
   ngOnDestroy() {}
@@ -322,13 +326,39 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     }
   }
 
+  fillDropAlerta(medida) {
+    if (medida === 'Quintal') {
+      this.optionsAlerta = ['Quintal', 'Libra'];
+    } else if (medida === 'Libra') {
+      this.optionsAlerta = ['Libra'];
+    } else if (medida === 'Caja') {
+      this.optionsAlerta = ['Caja', 'Paquete', 'Unidad'];
+    } else if (medida === 'Unidad') {
+      this.optionsAlerta = ['Unidad'];
+    }
+  }
   editarItem(item) {
     this.borrar();
     this.titulo = 'Editar producto: ' + item.ARG.nombre;
     this.boton = 'Editar';
     this.indexEditar = item.INDEX;
+    console.log(item.ARG);
+
+    this.fillDropAlerta(item.ARG.medida);
+
     item.ARG.contenido_articulos.forEach(contenido => {
-      if (contenido.referencia) {
+      if (item.ARG.contenido_articulos.length === 1) {
+        if (item.ARG.contenido_articulos[0].medida === 'Libra') {
+          this.form.controls.precio_libra.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
+          this.form.controls.costo_padre.setValue(contenido.costo);
+          this.form.controls.id_contenido_padre.setValue(contenido.id);
+        } else {
+          this.form.controls.precio_unidad.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
+          this.form.controls.costo_padre.setValue(contenido.costo);
+          this.form.controls.id_contenido_padre.setValue(contenido.id);
+        }
+      }
+      if (contenido.condicion === 'hijo') {
         this.form.controls.cantidad_contenido_hijo.setValue(contenido.cantidad);
         this.form.controls.medida_contenido_hijo.setValue(contenido.medida);
         this.form.controls.precio_hijo.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
@@ -336,17 +366,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
         this.form.controls.id_contenido_hijo.setValue(contenido.id);
         this.form.controls.referencia_hijo.setValue(contenido.referencia);
       } else {
-        if (item.ARG.contenido_articulos.length === 1) {
-          this.form.controls.precio_libra.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
-          this.form.controls.costo_padre.setValue(contenido.costo);
-          this.form.controls.id_contenido_padre.setValue(contenido.id);
-        } else {
-          this.form.controls.cantidad_contenido_padre.setValue(contenido.cantidad);
-          this.form.controls.medida_contenido_padre.setValue(contenido.medida);
-          this.form.controls.precio_padre.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
-          this.form.controls.costo_padre.setValue(contenido.costo);
-          this.form.controls.id_contenido_padre.setValue(contenido.id);
-        }
+        this.form.controls.cantidad_contenido_padre.setValue(contenido.cantidad);
+        this.form.controls.medida_contenido_padre.setValue(contenido.medida);
+        this.form.controls.precio_padre.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
+        this.form.controls.costo_padre.setValue(contenido.costo);
+        this.form.controls.id_contenido_padre.setValue(contenido.id);
       }
     });
 
@@ -387,6 +411,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
             precio: this.desformatear(x.precio_padre),
             cantidad: x.cantidad_contenido_padre,
             medida: x.medida_contenido_padre,
+            condicion: 'padre',
           },
         ];
       } else {
@@ -398,6 +423,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
             precio: this.desformatear(x.precio_padre),
             cantidad: x.cantidad_contenido_padre,
             medida: x.medida_contenido_padre,
+            condicion: 'padre',
           },
           {
             referencia: x.referencia_hijo,
@@ -406,6 +432,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
             precio: this.desformatear(x.precio_hijo),
             cantidad: x.cantidad_contenido_hijo,
             medida: x.medida_contenido_hijo,
+            condicion: 'hijo',
           },
         ];
       }
@@ -414,9 +441,10 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
         {
           id: x.id_contenido_padre,
           costo: x.costo_padre,
-          precio: this.desformatear(x.precio_libra),
-          cantidad: 100,
-          medida: 'Libra',
+          precio: this.desformatear(x.medida_padre === 'Libra' ? x.precio_libra : x.precio_unidad),
+          cantidad: x.medida_padre === 'Libra' ? 100 : x.cantidad_contenido_padre,
+          medida: x.medida_padre,
+          condicion: 'padre',
         },
       ];
     }
@@ -425,7 +453,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       user_id: this.usuario.id,
       tipo_articulo_id: _.parseInt(x.tipo_articulo_id),
       nombre: x.nombre,
-      costo_principal: x.costo_principal,
+      costo_principal: this.desformatear(x.costo_principal),
       precio_principal: this.desformatear(x.precio_principal),
       aviso_existencia: x.aviso_existencia,
       medida_alerta: x.medida_alerta,
@@ -458,8 +486,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     } else {
       this.dbServ.createArticulo(obj).subscribe(
         res => {
-          // this.listaArticulos = [...this.listaArticulos, res];
-          this.artServ.next_articulo([...this.listaArticulos, res]);
+          this.listaArticulos = [...this.listaArticulos, res];
+          // this.artServ.next_articulo([...this.listaArticulos, res]);
           this.borrar();
           this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
         },
