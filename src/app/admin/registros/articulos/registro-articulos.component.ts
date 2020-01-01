@@ -143,7 +143,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       is_detallable: [this.articuloSelected ? this.articuloSelected.is_detallable : this.isDetallable],
       fecha_ingreso: [this.articuloSelected ? this.articuloSelected.fecha_ingreso : new Date()],
       aviso_existencia: [this.articuloSelected ? this.articuloSelected.aviso_existencia : null, Validators.required],
-      calcular_itbis: [this.articuloSelected ? this.articuloSelected.calcular_itbis : false],
+      calcular_itbis: [false],
       existencia: [0],
       medida_alerta: [this.articuloSelected ? this.articuloSelected.medida_alerta : null, Validators.required],
       cantidad_contenido_padre: [null],
@@ -203,7 +203,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     this.FORM.precio_libra.value = null;
     this.FORM.precio_hijo.value = null;
 
-    this.form.controls.medida_alerta.setValue(-1);
+    this.form.controls.medida_alerta.setValue(null);
     if (value === 'Quintal') {
       this.calculatePrice();
     }
@@ -431,15 +431,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   formarContenido() {
     const x = JSON.parse(JSON.stringify(this.form.value));
 
-    console.log('x.medida_contenido_padre', x.medida_contenido_padre);
-    console.log('x.medida_contenido_hijo', x.medida_contenido_hijo);
     if (x.medida === 'Quintal') {
       x.medida_contenido_padre = 'Libra';
     }
-    console.log('--------------');
-
-    console.log('costoPadre es string ', _.isString(x.costo_padre));
-    console.log('--------------');
 
     const padre = {
       referencia: null,
@@ -451,7 +445,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       condicion: 'padre',
       calcular_itbis: x.calcular_itbis,
     };
-    console.log('padre ', padre);
 
     const hijo = {
       referencia: x.referencia_hijo,
@@ -464,7 +457,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       calcular_itbis: x.calcular_itbis,
     };
 
-    console.log('hijo ', hijo);
     let contenido = [];
     if (x.medida_contenido_padre !== null) {
       if (x.medida_contenido_hijo === null) {
@@ -473,8 +465,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
         contenido = [padre, hijo];
       }
     }
-
-    console.log('contenido ', contenido);
 
     return contenido;
   }
@@ -485,56 +475,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   element: HTMLElement;
   submit(form) {
     const x = JSON.parse(JSON.stringify(form.value));
-
-    // if (x.medida === 'Caja') {
-    //   if (x.medida_contenido_hijo === null) {
-    //     if (x.medida_contenido_padre !== null) {
-    //       contenido = [
-    //         {
-    //           referencia: null,
-    //           id: x.id_contenido_padre,
-    //           costo: x.costo_padre,
-    //           precio: this.desformatear(x.precio_padre),
-    //           cantidad: x.cantidad_contenido_padre,
-    //           medida: x.medida_contenido_padre,
-    //           condicion: 'padre',
-    //         },
-    //       ];
-    //     }
-    //   } else {
-    //     contenido = [
-    //       {
-    //         referencia: null,
-    //         id: x.id_contenido_padre,
-    //         costo: x.costo_padre,
-    //         precio: this.desformatear(x.precio_padre),
-    //         cantidad: x.cantidad_contenido_padre,
-    //         medida: x.medida_contenido_padre,
-    //         condicion: 'padre',
-    //       },
-    //       {
-    //         referencia: x.referencia_hijo,
-    //         id: x.id_contenido_hijo,
-    //         costo: x.costo_hijo,
-    //         precio: this.desformatear(x.precio_hijo),
-    //         cantidad: x.cantidad_contenido_hijo,
-    //         medida: x.medida_contenido_hijo,
-    //         condicion: 'hijo',
-    //       },
-    //     ];
-    //   }
-    // } else {
-    //   contenido = [
-    //     {
-    //       id: x.id_contenido_padre,
-    //       costo: x.costo_padre,
-    //       precio: this.desformatear(x.precio_libra),
-    //       cantidad: 100,
-    //       medida: 'Libra',
-    //       condicion: 'padre',
-    //     },
-    //   ];
-    // }
 
     const obj = {
       user_id: this.usuario.id,
@@ -550,43 +490,43 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       is_detallable: x.is_detallable,
       contenido_articulos_attributes: this.formarContenido(),
       existencia: x.existencia,
-      calcular_itbis: x.calcular_itbis,
+      calcular_itbis: x.calcular_itbis !== null ? x.calcular_itbis : false,
     };
     console.log(obj);
 
-    // if (x.id) {
-    //   obj['id'] = x.id;
+    if (x.id) {
+      obj['id'] = x.id;
 
-    //   this.dbServ.editarArticulo(obj).subscribe(
-    //     res => {
-    //       console.log(res);
+      this.dbServ.editarArticulo(obj).subscribe(
+        res => {
+          console.log(res);
 
-    //       this.listaArticulos[this.indexEditar] = res;
-    //       this.borrar();
-    //       this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
-    //     },
-    //     err => {
-    //       console.log(err);
-    //       this.mostrarErrores(err.error);
-    //       // this.dbServ.toastError(err.error, 'Error');
-    //     },
-    //   );
-    //   //
-    // } else {
-    //   this.dbServ.createArticulo(obj).subscribe(
-    //     res => {
-    //       this.listaArticulos = [...this.listaArticulos, res];
-    //       // this.artServ.next_articulo([...this.listaArticulos, res]);
-    //       this.borrar();
-    //       this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
-    //     },
-    //     err => {
-    //       console.log(err);
-    //       this.mostrarErrores(err.error);
-    //       // this.dbServ.toastError(err.error, 'Error');
-    //     },
-    //   );
-    // }
+          this.listaArticulos[this.indexEditar] = res;
+          this.borrar();
+          this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
+        },
+        err => {
+          console.log(err);
+          this.mostrarErrores(err.error);
+          // this.dbServ.toastError(err.error, 'Error');
+        },
+      );
+      //
+    } else {
+      this.dbServ.createArticulo(obj).subscribe(
+        res => {
+          this.listaArticulos = [...this.listaArticulos, res];
+          // this.artServ.next_articulo([...this.listaArticulos, res]);
+          this.borrar();
+          this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
+        },
+        err => {
+          console.log(err);
+          this.mostrarErrores(err.error);
+          // this.dbServ.toastError(err.error, 'Error');
+        },
+      );
+    }
   }
 
   mostrarErrores(arg) {

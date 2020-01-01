@@ -170,11 +170,8 @@
                     (change)="seleccionarContenidoCaja()"
                     [ngClass]="{ badAlert: Ispaquete }"
                   >
+                    <option value="{{ null }}"></option>
                     <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
-                    <!-- <option value="Libra">Libra</option>
-                    <option value="Caja">Caja</option>
-                    <option value="Paquete">Paquete</option>
-                    <option value="Unidad">Unidad</option> -->
                   </select>
                 </div>
               </div>
