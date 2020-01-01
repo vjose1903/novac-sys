@@ -155,10 +155,20 @@
 
                 <div class="col-4 p-0">
                   <select
-                    (keydown.enter)="saltar(form.controls['medida'].value === 'Quintal' ? 'precioLibra' : 'contenidoPadre')"
+                    (keydown.enter)="
+                      saltar(
+                        form.controls['medida'].value === 'Quintal'
+                          ? 'precioLibra'
+                          : form.controls['medida'].value === 'Unidad' || form.controls['medida'].value === 'Libra'
+                          ? 'send'
+                          : 'contenidoPadre'
+                      )
+                    "
                     class="form-control"
                     formControlName="medida_alerta"
                     id="medida_alerta"
+                    (change)="seleccionarContenidoCaja()"
+                    [ngClass]="{ badAlert: Ispaquete }"
                   >
                     <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                     <!-- <option value="Libra">Libra</option>
@@ -174,6 +184,9 @@
                 *ngIf="!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)"
               >
                 Este Campo es obligatorio
+              </div>
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="Ispaquete">
+                Este Articulo no se contiene Paquetes
               </div>
             </div>
           </div>
@@ -236,7 +249,14 @@
           <div class="  col-md-6">
             <div class="from-group">
               <label class="control-label text-transparent">medida </label>
-              <select (keydown.enter)="saltar('precioPadre')" id="medidaPadre" formControlName="medida_contenido_padre" class="form-control mb-4" value="">
+              <select
+                (keydown.enter)="saltar('precioPadre')"
+                id="medidaPadre"
+                formControlName="medida_contenido_padre"
+                (change)="seleccionarContenidoCaja()"
+                class="form-control mb-4"
+                value=""
+              >
                 <option value="" disabled selected hidden>Seleccione</option>
                 <option value="Paquete">Paquete</option>
                 <option value="Unidad">Unidad</option>
@@ -351,7 +371,7 @@
           <div class="from-group">
             <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a>
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-            <input [disabled]="!form.valid" (click)="submit(form)" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+            <input [disabled]="abilitarBtnSend()" (click)="submit(form)" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
           </div>
         </div>
       </div>

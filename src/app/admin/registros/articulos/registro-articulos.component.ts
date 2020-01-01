@@ -33,6 +33,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   indexEditar: any;
   usuario: any;
   optionsAlerta: any[];
+  alertaMedida: any;
+
+  Ispaquete = false;
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
@@ -142,7 +145,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       aviso_existencia: [this.articuloSelected ? this.articuloSelected.aviso_existencia : null, Validators.required],
       calcular_itbis: [this.articuloSelected ? this.articuloSelected.calcular_itbis : false],
       existencia: [0],
-      medida_alerta: [this.articuloSelected ? this.articuloSelected.medida_alerta : null],
+      medida_alerta: [this.articuloSelected ? this.articuloSelected.medida_alerta : null, Validators.required],
       cantidad_contenido_padre: [null],
       medida_contenido_padre: [null],
       precio_padre: [null],
@@ -168,10 +171,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     if (campo !== 'send') {
       this.enfocarInput(campo);
     } else {
-      this.enfocarInput('nombre');
-      setTimeout(() => {
-        this.submit(this.form);
-      }, 250);
+      const continu = this.abilitarBtnSend();
+
+      if (!continu) {
+        this.enfocarInput('nombre');
+        setTimeout(() => {
+          this.submit(this.form);
+        }, 250);
+      }
     }
   }
   enfocarInput(arg) {
@@ -196,6 +203,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     this.FORM.precio_libra.value = null;
     this.FORM.precio_hijo.value = null;
 
+    this.form.controls.medida_alerta.setValue(-1);
     if (value === 'Quintal') {
       this.calculatePrice();
     }
@@ -307,6 +315,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     if (Precio > 0 && Precio != null && Precio !== undefined && !isNaN(Precio) && cantidadPadre > 0 && cantidadPadre != null && cantidadPadre !== undefined && !isNaN(cantidadPadre)) {
       const PrecioPadre = Precio / cantidadPadre;
       const costoPadre = costo / cantidadPadre;
+
+      console.log('costo', costo);
+      console.log('cantidadPadre', cantidadPadre);
+      console.log('costoPadre', costoPadre);
+
       this.form.controls.precio_padre.setValue(this.formatearNumero(this.redondearAdos(PrecioPadre)));
       this.form.controls.costo_padre.setValue(this.redondearAdos(costoPadre));
     }
@@ -322,8 +335,20 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       const PrecioHijo = PrecioP / cantidadHijo;
       const costoHijo = costoP / cantidadHijo;
       this.form.controls.precio_hijo.setValue(this.formatearNumero(this.redondearAdos(PrecioHijo)));
-      this.form.controls.costo_hijo.setValue(this.formatearNumero(this.redondearAdos(costoHijo)));
+      this.form.controls.costo_hijo.setValue(this.redondearAdos(costoHijo));
     }
+  }
+
+  abilitarBtnSend() {
+    let res = true;
+    if (this.form.valid) {
+      res = false;
+
+      if (this.Ispaquete) {
+        res = true;
+      }
+    }
+    return res;
   }
 
   fillDropAlerta(medida) {
@@ -336,6 +361,16 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     } else if (medida === 'Unidad') {
       this.optionsAlerta = ['Unidad'];
     }
+  }
+
+  seleccionarContenidoCaja() {
+    const x = this.form.controls;
+    if (x.medida_alerta.value === 'Paquete' && x.medida_contenido_padre.value === 'Unidad') {
+      this.Ispaquete = true;
+    } else {
+      this.Ispaquete = false;
+    }
+    console.log(this.Ispaquete);
   }
   editarItem(item) {
     this.borrar();
@@ -392,6 +427,57 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     }
     this.tipoModal = '';
   }
+
+  formarContenido() {
+    const x = JSON.parse(JSON.stringify(this.form.value));
+
+    console.log('x.medida_contenido_padre', x.medida_contenido_padre);
+    console.log('x.medida_contenido_hijo', x.medida_contenido_hijo);
+    if (x.medida === 'Quintal') {
+      x.medida_contenido_padre = 'Libra';
+    }
+    console.log('--------------');
+
+    console.log('costoPadre es string ', _.isString(x.costo_padre));
+    console.log('--------------');
+
+    const padre = {
+      referencia: null,
+      id: x.id_contenido_padre,
+      costo: _.isString(x.costo_padre) ? parseFloat(x.costo_padre) : x.costo_padre,
+      precio: this.desformatear(x.medida === 'Caja' ? x.precio_padre : x.precio_libra),
+      cantidad: x.medida === 'Caja' ? x.cantidad_contenido_padre : 100,
+      medida: x.medida_contenido_padre,
+      condicion: 'padre',
+      calcular_itbis: x.calcular_itbis,
+    };
+    console.log('padre ', padre);
+
+    const hijo = {
+      referencia: x.referencia_hijo,
+      id: x.id_contenido_hijo,
+      costo: _.isString(x.costo_hijo) ? parseFloat(x.costo_hijo) : x.costo_hijo,
+      precio: this.desformatear(x.precio_hijo),
+      cantidad: x.cantidad_contenido_hijo,
+      medida: x.medida_contenido_hijo,
+      condicion: 'hijo',
+      calcular_itbis: x.calcular_itbis,
+    };
+
+    console.log('hijo ', hijo);
+    let contenido = [];
+    if (x.medida_contenido_padre !== null) {
+      if (x.medida_contenido_hijo === null) {
+        contenido = [padre];
+      } else {
+        contenido = [padre, hijo];
+      }
+    }
+
+    console.log('contenido ', contenido);
+
+    return contenido;
+  }
   // =============================================
   //  Crear articulo
   // =============================================
@@ -400,54 +486,55 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   submit(form) {
     const x = JSON.parse(JSON.stringify(form.value));
 
-    let contenido = [];
-    if (x.medida === 'Caja') {
-      if (x.medida_contenido_hijo === null) {
-        contenido = [
-          {
-            referencia: null,
-            id: x.id_contenido_padre,
-            costo: x.costo_padre,
-            precio: this.desformatear(x.precio_padre),
-            cantidad: x.cantidad_contenido_padre,
-            medida: x.medida_contenido_padre,
-            condicion: 'padre',
-          },
-        ];
-      } else {
-        contenido = [
-          {
-            referencia: null,
-            id: x.id_contenido_padre,
-            costo: x.costo_padre,
-            precio: this.desformatear(x.precio_padre),
-            cantidad: x.cantidad_contenido_padre,
-            medida: x.medida_contenido_padre,
-            condicion: 'padre',
-          },
-          {
-            referencia: x.referencia_hijo,
-            id: x.id_contenido_hijo,
-            costo: x.costo_hijo,
-            precio: this.desformatear(x.precio_hijo),
-            cantidad: x.cantidad_contenido_hijo,
-            medida: x.medida_contenido_hijo,
-            condicion: 'hijo',
-          },
-        ];
-      }
-    } else {
-      contenido = [
-        {
-          id: x.id_contenido_padre,
-          costo: x.costo_padre,
-          precio: this.desformatear(x.medida_padre === 'Libra' ? x.precio_libra : x.precio_unidad),
-          cantidad: x.medida_padre === 'Libra' ? 100 : x.cantidad_contenido_padre,
-          medida: x.medida_padre,
-          condicion: 'padre',
-        },
-      ];
-    }
+    // if (x.medida === 'Caja') {
+    //   if (x.medida_contenido_hijo === null) {
+    //     if (x.medida_contenido_padre !== null) {
+    //       contenido = [
+    //         {
+    //           referencia: null,
+    //           id: x.id_contenido_padre,
+    //           costo: x.costo_padre,
+    //           precio: this.desformatear(x.precio_padre),
+    //           cantidad: x.cantidad_contenido_padre,
+    //           medida: x.medida_contenido_padre,
+    //           condicion: 'padre',
+    //         },
+    //       ];
+    //     }
+    //   } else {
+    //     contenido = [
+    //       {
+    //         referencia: null,
+    //         id: x.id_contenido_padre,
+    //         costo: x.costo_padre,
+    //         precio: this.desformatear(x.precio_padre),
+    //         cantidad: x.cantidad_contenido_padre,
+    //         medida: x.medida_contenido_padre,
+    //         condicion: 'padre',
+    //       },
+    //       {
+    //         referencia: x.referencia_hijo,
+    //         id: x.id_contenido_hijo,
+    //         costo: x.costo_hijo,
+    //         precio: this.desformatear(x.precio_hijo),
+    //         cantidad: x.cantidad_contenido_hijo,
+    //         medida: x.medida_contenido_hijo,
+    //         condicion: 'hijo',
+    //       },
+    //     ];
+    //   }
+    // } else {
+    //   contenido = [
+    //     {
+    //       id: x.id_contenido_padre,
+    //       costo: x.costo_padre,
+    //       precio: this.desformatear(x.precio_libra),
+    //       cantidad: 100,
+    //       medida: 'Libra',
+    //       condicion: 'padre',
+    //     },
+    //   ];
+    // }
 
     const obj = {
       user_id: this.usuario.id,
@@ -461,43 +548,45 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       fecha_ingreso: x.id ? x.fecha_ingreso : moment().format('DD/MM/YYYY'),
       medida: x.medida,
       is_detallable: x.is_detallable,
-      contenido_articulos_attributes: contenido,
+      contenido_articulos_attributes: this.formarContenido(),
       existencia: x.existencia,
+      calcular_itbis: x.calcular_itbis,
     };
+    console.log(obj);
 
-    if (x.id) {
-      obj['id'] = x.id;
+    // if (x.id) {
+    //   obj['id'] = x.id;
 
-      this.dbServ.editarArticulo(obj).subscribe(
-        res => {
-          console.log(res);
+    //   this.dbServ.editarArticulo(obj).subscribe(
+    //     res => {
+    //       console.log(res);
 
-          this.listaArticulos[this.indexEditar] = res;
-          this.borrar();
-          this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
-        },
-        err => {
-          console.log(err);
-          this.mostrarErrores(err.error);
-          // this.dbServ.toastError(err.error, 'Error');
-        },
-      );
-      //
-    } else {
-      this.dbServ.createArticulo(obj).subscribe(
-        res => {
-          this.listaArticulos = [...this.listaArticulos, res];
-          // this.artServ.next_articulo([...this.listaArticulos, res]);
-          this.borrar();
-          this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
-        },
-        err => {
-          console.log(err);
-          this.mostrarErrores(err.error);
-          // this.dbServ.toastError(err.error, 'Error');
-        },
-      );
-    }
+    //       this.listaArticulos[this.indexEditar] = res;
+    //       this.borrar();
+    //       this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
+    //     },
+    //     err => {
+    //       console.log(err);
+    //       this.mostrarErrores(err.error);
+    //       // this.dbServ.toastError(err.error, 'Error');
+    //     },
+    //   );
+    //   //
+    // } else {
+    //   this.dbServ.createArticulo(obj).subscribe(
+    //     res => {
+    //       this.listaArticulos = [...this.listaArticulos, res];
+    //       // this.artServ.next_articulo([...this.listaArticulos, res]);
+    //       this.borrar();
+    //       this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
+    //     },
+    //     err => {
+    //       console.log(err);
+    //       this.mostrarErrores(err.error);
+    //       // this.dbServ.toastError(err.error, 'Error');
+    //     },
+    //   );
+    // }
   }
 
   mostrarErrores(arg) {

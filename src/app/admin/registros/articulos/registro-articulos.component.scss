@@ -28,138 +28,91 @@
   }
 }
 
-.raya{
+.raya {
   border: 1px solid #e0e0e0;
-  margin: 0.5rem 0.3rem
+  margin: 0.5rem 0.3rem;
 }
 
-
+.badAlert{
+	animation:alertBack 0.5s infinite;
+}
+@keyframes alertBack{
+	0%{		background-color: #ec8f8fc3;	}
+	50%{	background-color: #d82e2ec3;	}
+	100%{	background-color: #e75454c3;	}
+}
 /* ============================================== */
 /*        Apple switch                            */
 /* ============================================== */
-.custom-control.custom-switch.div-form-dynamic.form-check{
-    input {
-        position: absolute;
-        margin: 8px 0 0 16px;
-      }
-      input + label {
-        position: relative;
-        padding: 5px 0 0 50px;
-        line-height: 2em;
-      }
-      input + label:before {
-        content: '';
-        position: absolute;
-        display: block;
-        left: 0;
-        top: 8px;
-        width: 40px; /* x*5 */
-        height: 24px; /* x*3 */
-        border-radius: 16px; /* x*2 */
-        background: #fff;
-        border: 1px solid #d9d9d9;
-        -webkit-transition: all 0.3s;
-        transition: all 0.3s;
-      }
-      input + label:after {
-        content: '';
-        position: absolute;
-        display: block;
-        left: 0px;
-        top: 8px;
-        width: 24px; /* x*3 */
-        height: 24px; /* x*3 */
-        border-radius: 16px; /* x*2 */
-        background: #fff;
-        border: 1px solid #d9d9d9;
-        -webkit-transition: all 0.3s;
-        transition: all 0.3s;
-      }
-      input + label:hover:after {
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-      }
-      input:checked + label:after {
-        margin-left: 16px;
-      }
-      input:checked + label:before {
-        background: #55d069;
-      }
+.custom-control.custom-switch.div-form-dynamic.form-check {
+  input {
+    position: absolute;
+    margin: 8px 0 0 16px;
+  }
+  input + label {
+    position: relative;
+    padding: 5px 0 0 50px;
+    line-height: 2em;
+  }
+  input + label:before {
+    content: "";
+    position: absolute;
+    display: block;
+    left: 0;
+    top: 8px;
+    width: 40px; /* x*5 */
+    height: 24px; /* x*3 */
+    border-radius: 16px; /* x*2 */
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+  }
+  input + label:after {
+    content: "";
+    position: absolute;
+    display: block;
+    left: 0px;
+    top: 8px;
+    width: 24px; /* x*3 */
+    height: 24px; /* x*3 */
+    border-radius: 16px; /* x*2 */
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+  }
+  input + label:hover:after {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  }
+  input:checked + label:after {
+    margin-left: 16px;
+  }
+  input:checked + label:before {
+    background: #55d069;
+  }
 }
-
-
-
-
-/* ============================================== */
-/*        Apple switch                            */
-/* ============================================== */
-
-// input[type='checkbox'].ios8-switch {
-//   position: absolute;
-//   margin: 8px 0 0 16px;
-// }
-// input[type='checkbox'].ios8-switch + label {
-//   position: relative;
-//   padding: 5px 0 0 50px;
-//   line-height: 2em;
-// }
-// input[type='checkbox'].ios8-switch + label:before {
-//   content: '';
-//   position: absolute;
-//   display: block;
-//   left: 0;
-//   top: 8px;
-//   width: 40px; /* x*5 */
-//   height: 24px; /* x*3 */
-//   border-radius: 16px; /* x*2 */
-//   background: #fff;
-//   border: 1px solid #d9d9d9;
-//   -webkit-transition: all 0.3s;
-//   transition: all 0.3s;
-// }
-// input[type='checkbox'].ios8-switch + label:after {
-//   content: '';
-//   position: absolute;
-//   display: block;
-//   left: 0px;
-//   top: 8px;
-//   width: 24px; /* x*3 */
-//   height: 24px; /* x*3 */
-//   border-radius: 16px; /* x*2 */
-//   background: #fff;
-//   border: 1px solid #d9d9d9;
-//   -webkit-transition: all 0.3s;
-//   transition: all 0.3s;
-// }
-// input[type='checkbox'].ios8-switch + label:hover:after {
-//   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-// }
-// input[type='checkbox'].ios8-switch:checked + label:after {
-//   margin-left: 16px;
-// }
-// input[type='checkbox'].ios8-switch:checked + label:before {
-//   background: #55d069;
-// }
 
 /* ============================================== */
 /*       MDBOOTSTRAP APPLE SWICTH                 */
 /* ============================================== */
 
-mdb-checkbox .form-check{
-  &input[type='checkbox'].ios8-switch {
+mdb-checkbox .form-check {
+  &input[type="checkbox"].ios8-switch {
     position: absolute;
     margin: 8px 0 0 16px;
   }
 }
-mdb-checkbox .form-check{
-  &input[type='checkbox'].ios8-switch + label {
+mdb-checkbox .form-check {
+  &input[type="checkbox"].ios8-switch + label {
     position: relative;
     padding: 5px 0 0 50px;
     line-height: 2em;
   }
 }
-mdb-checkbox .form-check{
-  &input[type='checkbox'].ios8-switch + label:before {
-    content: '';
+mdb-checkbox .form-check {
+  &input[type="checkbox"].ios8-switch + label:before {
+    content: "";
     position: absolute;
     display: block;
     left: 0;
@@ -173,9 +126,9 @@ mdb-checkbox .form-check{
     transition: all 0.3s;
   }
 }
-mdb-checkbox .form-check{
-  &input[type='checkbox'].ios8-switch + label:after {
-    content: '';
+mdb-checkbox .form-check {
+  &input[type="checkbox"].ios8-switch + label:after {
+    content: "";
     position: absolute;
     display: block;
     left: 0px;
@@ -189,18 +142,18 @@ mdb-checkbox .form-check{
     transition: all 0.3s;
   }
 }
-mdb-checkbox .form-check{
-  &input[type='checkbox'].ios8-switch + label:hover:after {
+mdb-checkbox .form-check {
+  &input[type="checkbox"].ios8-switch + label:hover:after {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   }
 }
-mdb-checkbox .form-check{
-  &input[type='checkbox'].ios8-switch:checked + label:after {
+mdb-checkbox .form-check {
+  &input[type="checkbox"].ios8-switch:checked + label:after {
     margin-left: 16px;
   }
 }
-mdb-checkbox .form-check{
-  &input[type='checkbox'].ios8-switch:checked + label:before {
+mdb-checkbox .form-check {
+  &input[type="checkbox"].ios8-switch:checked + label:before {
     background: #55d069;
   }
 }
