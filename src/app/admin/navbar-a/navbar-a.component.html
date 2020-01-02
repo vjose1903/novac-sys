@@ -1,14 +1,19 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-    [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+  >
     <mat-toolbar>
       <span class="titulo" (click)="navegar(1)">Menu</span>
       <!-- <img src="" class="img-fluid" /> -->
     </mat-toolbar>
     <mat-nav-list class="text-center">
       <div class="menuList menuList1">
-        <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/factura.png"
-          alt="Facturacion" (click)="navegar(2)" />
+        <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/factura.png" alt="Facturacion" (click)="navegar(2)" />
         <h5 [ngClass]="actualTab == 'factura' ? 'tituloMenu1A' : 'tituloMenu1'"><strong>Facturacion</strong></h5>
 
         <div [ngClass]="actualTab == 'factura' ? 'subMenuFacturaA' : 'subMenuFactura'">
@@ -18,8 +23,7 @@
       </div>
 
       <div class="menuList menuList2">
-        <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/registro.png"
-          alt="Registros" (click)="navegar(3)" />
+        <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/registro.png" alt="Registros" (click)="navegar(3)" />
         <h5 [ngClass]="actualTab == 'registro' ? 'tituloMenu2A' : 'tituloMenu2'"><strong>Registros</strong></h5>
 
         <div [ngClass]="actualTab == 'registro' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
@@ -30,14 +34,12 @@
         </div>
       </div>
       <div class="menuList menuList3">
-        <img [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'"
-          src="assets/img/inventario.png" alt="Inventario" (click)="navegar(4)" />
+        <img [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/inventario.png" alt="Inventario" (click)="navegar(4)" />
         <h5 [ngClass]="actualTab == 'inventario' ? 'tituloMenu3A' : 'tituloMenu3'"><strong>Inventario</strong></h5>
       </div>
 
       <div class="menuList menuList4">
-        <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png"
-          alt="Reportes" (click)="navegar(5)" />
+        <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png" alt="Reportes" (click)="navegar(5)" />
         <h5 [ngClass]="actualTab == 'reporte' ? 'tituloMenu4A' : 'tituloMenu4'"><strong>Reporte</strong></h5>
       </div>
     </mat-nav-list>
@@ -46,8 +48,7 @@
   <mat-sidenav-content>
     <mat-toolbar class="d-flex justify-content-between">
       <div class="">
-        <div id="botonMenu" *ngIf="drawer._animationState == 'void'" title="Mostrar Menu" data-toggle="Tooltip"
-          (click)="drawer.toggle()"><i class="fas fa-bars"></i></div>
+        <div id="botonMenu" *ngIf="drawer._animationState == 'void'" title="Mostrar Menu" data-toggle="Tooltip" (click)="drawer.toggle()"><i class="fas fa-bars"></i></div>
       </div>
 
       <!-- ============================================================================================ -->
@@ -55,7 +56,6 @@
       <!-- ============================================================================================ -->
 
       <div class="right">
-
         <div class="btn-group" dropdown id="dropCuenta" (onHidden)="closePrinterMenu()" #dropCuenta>
           <a id="button-basic" dropdownToggle class="dropdown-toggle" aria-controls="dropdown-basic">
             <img class="rounded-circle" [src]="imgUser" alt="Admin" />
@@ -79,14 +79,13 @@
             </li>
             <li class="divider dropdown-divider"></li>
             <li role="menuitem">
-              <a class="dropdown-item" id="dropdown-item" (click)="logOut()"><i class="fas fa-power-off"></i>Cerrar
-                sesión</a>
+              <a class="dropdown-item" id="dropdown-item" (click)="logOut()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
             </li>
           </ul>
         </div>
-        <div class="selectPrint" [ngClass]="{'open': OpenPrinterMenu}" dropdown >
-          <h3 class="dropdown-item" *ngFor="let print of PrintersInstall" (click)="selectPrinter(print.name)" >
-            {{print.name}}
+        <div class="selectPrint" [ngClass]="{ open: OpenPrinterMenu }" dropdown>
+          <h3 class="dropdown-item" *ngFor="let print of PrintersInstall" (click)="selectPrinter(print.name)">
+            {{ print.name }}
           </h3>
         </div>
       </div>

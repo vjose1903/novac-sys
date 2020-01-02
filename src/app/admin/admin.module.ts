@@ -24,10 +24,13 @@ import { ValidateRayaAbajo } from '../directives/validaciones';
 import { FacturacionComponent } from './facturacion/facturacion.component';
 import { RegistroSuplidoresComponent } from './registros/registro-suplidores/registro-suplidores.component';
 import { FiltroParaNgforPipe } from '../core/pipe/filtro-para-ngfor.pipe';
-
+import { PaswordConfirmDirective } from '../core/directive/pasword-confirm-directive.directive';
+import { ChangePasswordComponent } from '../components/change-password/change-password.component';
 
 @NgModule({
   declarations: [
+    ChangePasswordComponent,
+    PaswordConfirmDirective,
     HomeAdminComponent,
     ModalComponent,
     FiltroParaNgforPipe,

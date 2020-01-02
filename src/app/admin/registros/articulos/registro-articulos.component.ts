@@ -94,29 +94,15 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     // this.artServ.ARTICULOS.subscribe(res => {
     //   this.listaArticulos = res;
     // });
-    this.dbServ
-      .getArticulos()
-      // .pipe(
-      //   map(
-      //     val =>
-      //       (val = val.map(arti => {
-      //         // console.log(arti);
-
-      //         // console.log(arti.existencia);
-      //         arti.medidaMostrar = this.calcularExistencia(arti.contenido_articulos, arti);
-      //         return arti;
-      //       })),
-      //   ),
-      // )
-      .subscribe(res => {
-        res.sort((a, b) => {
-          return a.id > b.id ? 1 : -1;
-        });
-
-        if (res !== undefined && res !== null) {
-          this.listaArticulos = res;
-        }
+    this.dbServ.getArticulos().subscribe(res => {
+      res.sort((a, b) => {
+        return a.id > b.id ? 1 : -1;
       });
+
+      if (res !== undefined && res !== null) {
+        this.listaArticulos = res;
+      }
+    });
 
     this.dbServ.getTipoArticulos().subscribe(res => {
       this.listaTipoArticulos = JSON.parse(JSON.stringify(res));
