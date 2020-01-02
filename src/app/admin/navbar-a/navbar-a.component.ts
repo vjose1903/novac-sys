@@ -59,11 +59,8 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit() {
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
-    console.log(this.usuario);
 
     if (this.usuario.sexo === 'm') {
-      console.log();
-
       this.imgUser = 'assets/img/userH.png';
     } else {
       this.imgUser = 'assets/img/userM.png';

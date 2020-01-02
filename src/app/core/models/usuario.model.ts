@@ -12,6 +12,6 @@ export class UsuariosI {
     email: String;
     fechaN: String;
     password: String;
-    estado: Boolean;
+    // estado: Boolean;
     role: String;
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig } from 'ngx-bootstrap';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,8 +14,9 @@ import { map } from 'rxjs/operators';
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss'],
 })
-export class ChangePasswordComponent implements OnInit {
+export class ChangePasswordComponent implements OnInit, AfterViewInit {
   form: FormGroup;
+  element: HTMLElement;
   @Input() user;
 
   @Output() cancel = new EventEmitter<any>();
@@ -24,13 +25,23 @@ export class ChangePasswordComponent implements OnInit {
 
   ngOnInit() {
     console.log(this.user);
-
     this.form = this.fb.group({
       password: [null, Validators.minLength(5)],
       confirmPassword: [null, Validators.minLength(5)],
     });
   }
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.enfocarInput('pass');
+    }, 50);
+  }
 
+  enfocarInput(arg) {
+    this.element = document.getElementById(arg) as HTMLElement;
+    console.log(this.element);
+
+    this.element.focus();
+  }
   accion(arg) {
     this.cancel.emit(arg);
   }
@@ -41,8 +52,10 @@ export class ChangePasswordComponent implements OnInit {
     if (objTemp.password === null) {
       this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
-      const obj = this.user;
-      obj['password'] = this.form.controls.password.value;
+      const objT = this.user;
+      const obj = _.omit(objT, ['', 'uid', 'sign_in_count', 'created_at', 'updated_at', 'documentos_de_identidad', 'documento_identidad']);
+      obj['password'] = objTemp.password;
+      obj['documentos_de_identidad_attributes'] = this.user.documentos_de_identidad;
 
       this.dbServ.updateEmpleados(obj).subscribe(
         res => {
@@ -55,3 +68,4 @@ export class ChangePasswordComponent implements OnInit {
     }
   }
 }
+

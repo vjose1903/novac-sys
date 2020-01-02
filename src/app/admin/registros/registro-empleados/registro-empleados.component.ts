@@ -96,7 +96,7 @@ export class RegistroEmpleadosComponent implements OnInit {
       email: [null, Validators.compose([Validators.pattern(/^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+$/)])],
       fecha_nacimiento: [null, Validators.required],
       password: [null],
-      estado: [true],
+      // estado: [true],
       role: [null, Validators.required],
     });
   }
@@ -125,9 +125,11 @@ export class RegistroEmpleadosComponent implements OnInit {
   editarItem(item) {
     this.indexSeleccionado = item.INDEX;
     const doc = item.ARG.documentos_de_identidad.filter(doc => doc.principal === true);
-    if (doc) {
+
+    if (item.ARG.documentos_de_identidad.length > 0 && doc !== [] && doc !== null && doc !== undefined) {
       this.form.controls.cedula.setValue(doc[0].documento);
     }
+
     item.ARG.fecha_nacimiento = this.fecha(item.ARG.fecha_nacimiento);
     this.form.patchValue(item.ARG);
     this.usuarioSelected = item.ARG;
