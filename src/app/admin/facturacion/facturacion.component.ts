@@ -207,6 +207,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.labelSearch = 'Suplidor';
     }
     this.fecha = moment().format('DD/MM/YYYY');
+    // this.fecha = moment().format('DD/MM/YYYY');
 
     this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res !== undefined && res !== null && res.tipoModal === 'buscarCliente') {
