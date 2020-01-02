@@ -136,17 +136,24 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     const keys = _.keys(objeto);
     const values = _.values(objeto);
 
+    const fin = values[0] > 1 ? this.medidas[keys[0]] : keys[0];
     const fin1 = values[1] > 1 ? this.medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? this.medidas[keys[2]] : keys[2];
+
+    const principal = this.formatearNumero(values[0]) + '  ' + fin;
 
     const padre = this.formatearNumero(values[1]) + '  ' + fin1;
     const hijo = this.formatearNumero(values[2]) + '  ' + fin2;
 
     let cantiTootip = ``;
-    if (keys.length === 2) {
-      cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
+    if (keys.length > 1) {
+      if (keys.length === 2) {
+        cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
+      } else {
+        cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br> <span>${hijo}</span><br> </div>`;
+      }
     } else {
-      cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br> <span>${hijo}</span><br> </div>`;
+      cantiTootip = `<div style=" max-width: 21rem;" > <span> ${principal} </span><br></div>`;
     }
     return cantiTootip;
   }
