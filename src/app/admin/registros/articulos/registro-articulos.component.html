@@ -382,6 +382,7 @@
         *ngIf="listaArticulos && info"
         [info]="info"
         [data]="listaArticulos"
+        [scrollContainer]="'scroll-container'"
         [focusRow]="false"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"

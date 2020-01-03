@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
 import { UsuariosService } from '../../core/services/usuarios.service';
 import { UsuariosI } from '../../core/models/usuario.model';
-import { profile, TIPOMODAL, SHOWMODAL, SELECCIONMODAL, DECISIONMODAL, INDEXTOFOCUS, OBJDEVUELTO } from '../../core/services/GLOBAL';
+
 import { get } from 'http';
 
 import { DBservice } from '../../core/services/bdservice.service';
@@ -200,22 +200,22 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   // MODAL
   // ===========================================================================
 
-  reiniciarVarModal() {
-    TIPOMODAL.next('');
-    SHOWMODAL.next(false);
-    SELECCIONMODAL.next({});
-  }
+  // reiniciarVarModal() {
+  //   TIPOMODAL.next('');
+  //   SHOWMODAL.next(false);
+  //   SELECCIONMODAL.next({});
+  // }
 
-  BtnModal(arg) {
-    DECISIONMODAL.next(arg);
-    this.reiniciarVarModal();
-  }
+  // BtnModal(arg) {
+  //   DECISIONMODAL.next(arg);
+  //   this.reiniciarVarModal();
+  // }
 
-  clickRowModal(arg) {
-    OBJDEVUELTO.next(arg);
-  }
+  // clickRowModal(arg) {
+  //   OBJDEVUELTO.next(arg);
+  // }
 
-  noArticuloEncontrado(arg) {
-    INDEXTOFOCUS.next(arg);
-  }
+  // noArticuloEncontrado(arg) {
+  //   INDEXTOFOCUS.next(arg);
+  // }
 }

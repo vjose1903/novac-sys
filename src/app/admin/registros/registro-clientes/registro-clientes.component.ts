@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
 import { ValidateRayaAbajo } from '../../../directives/validaciones';
+import { ModalService } from '../../../components/modal/modal.service';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -36,7 +37,17 @@ export class RegistroClientesComponent implements OnInit {
   doc_principal: any;
 
   element: HTMLElement;
-  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router) {}
+
+  botones = {
+    titulo: true,
+    borrar: true,
+    editar: true,
+  };
+  indexSeleccionado: any;
+  tipoModal: string;
+  seleccionModal: string;
+  indexBorrar: any;
+  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
     this.boton = 'Guardar';
@@ -63,6 +74,7 @@ export class RegistroClientesComponent implements OnInit {
 
     this.form = this.fb.group({
       nombre: [null, Validators.required],
+      id: [null],
       apellido: [null, Validators.required],
       direccion: [null, Validators.required],
       sexo: ['', Validators.required],
@@ -70,6 +82,11 @@ export class RegistroClientesComponent implements OnInit {
       rnc: [null, ValidateRayaAbajo.verificarRayaAbajo],
       limite_credito: ['', Validators.required],
       cedula: [null, ValidateRayaAbajo.verificarRayaAbajo],
+    });
+    this.mServ.DECISIONMODAL.subscribe(res => {
+      if (res !== null || res !== undefined) {
+        this.decisionModal(res);
+      }
     });
   }
 
@@ -90,6 +107,27 @@ export class RegistroClientesComponent implements OnInit {
   getPhotoData(img) {
     this.PhotoData = img;
   }
+
+  editarItem(item) {
+    this.indexSeleccionado = item.INDEX;
+
+    item.ARG.documentos_de_identidad.forEach(doc => {
+      if (doc.descripcion === 'rnc') {
+        this.form.controls.rnc.setValue(doc.documento);
+      } else {
+        this.form.controls.cedula.setValue(doc.documento);
+      }
+      if (doc.principal) {
+        this.doc_principal = doc.descripcion;
+      }
+    });
+
+    this.form.patchValue(item.ARG);
+
+    this.titulo = 'Editar cliente: ' + item.ARG.nombre;
+    this.boton = 'Editar';
+  }
+
   validarRayaAbajo(input) {
     const form = this.form.controls;
     if (form[input] && form[input].value !== null) {
@@ -152,29 +190,51 @@ export class RegistroClientesComponent implements OnInit {
           temp.imagen_attributes = null;
           temp.imagen_attributes = this.PhotoData;
         }
+        temp.estado = true;
 
         const obj = _.omit(temp, ['cedula', 'rnc']);
+        if (obj.id === null) {
+          this.dbServ.createCliente(obj).subscribe(
+            res => {
+              const obj = JSON.parse(JSON.stringify(res));
+              obj.documentos_de_identidad.map(docu => {
+                if (docu.principal) {
+                  obj.documento_identidad = docu.documento;
+                }
+              });
+              this.listaClientes = [...this.listaClientes, obj];
 
-        this.dbServ.createCliente(obj).subscribe(
-          res => {
-            const obj = JSON.parse(JSON.stringify(res));
-            obj.documentos_de_identidad.map(docu => {
-              if (docu.principal) {
-                obj.documento_identidad = docu.documento;
-              }
-            });
-            this.listaClientes = [...this.listaClientes, obj];
+              this.doc_principal = null;
+              this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
+              this.form.reset();
+              this.enfocarInput('campoNombre');
+            },
+            err => {
+              console.log(err);
+              this.mostrarErrores(err.error);
+            },
+          );
+        } else {
+          this.dbServ.editarCliente(obj).subscribe(
+            res => {
+              const obj = JSON.parse(JSON.stringify(res));
+              obj.documentos_de_identidad.map(docu => {
+                if (docu.principal) {
+                  obj.documento_identidad = docu.documento;
+                }
+              });
+              this.listaClientes[this.indexSeleccionado] = obj;
 
-            this.doc_principal = null;
-            this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
-            this.form.reset();
-            this.enfocarInput('campoNombre');
-          },
-          err => {
-            console.log(err);
-            this.mostrarErrores(err.error);
-          },
-        );
+              this.doc_principal = null;
+              this.dbServ.toastSuccess('Cliente editado con exito.', 'Correcto');
+              this.borrar();
+            },
+            err => {
+              console.log(err);
+              this.mostrarErrores(err.error);
+            },
+          );
+        }
       }
     }
   }
@@ -185,7 +245,11 @@ export class RegistroClientesComponent implements OnInit {
   }
   borrar() {
     this.form.reset();
-    this.enfocarInput('nombre');
+    this.enfocarInput('campoNombre');
+    this.documento_identidad = true;
+    this.boton = 'Guardar';
+    this.titulo = 'Registro de clientes';
+    this.doc_principal = '';
   }
   changeIdent(arg) {
     this.documento_identidad = arg;
@@ -222,9 +286,33 @@ export class RegistroClientesComponent implements OnInit {
       key: 'documento_identidad', // ojo
     },
   ];
-  botones = {
-    titulo: true,
-    borrar: true,
-    editar: true,
-  };
+  abrirModal(arg?) {
+    console.log(arg);
+
+    this.indexBorrar = arg.INDEX;
+    this.mServ.modalTipo('borrar');
+    this.tipoModal = 'borrar';
+    this.seleccionModal = arg.ARG;
+    this.mServ.ModalSeleccion(arg.ARG);
+    this.mServ.mostrarModal(true);
+  }
+  decisionModal(arg) {
+    if (arg) {
+      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
+      obj['estado'] = false;
+      obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
+      this.dbServ.editarCliente(obj).subscribe(
+        res => {
+          this.dbServ.toastSuccess('Cliente ' + obj.nombre + ' borrado.', 'CORRECTO');
+          _.pullAt(this.listaClientes, this.indexBorrar);
+          this.tipoModal = '';
+          this.decisionModal = null;
+        },
+        err => {
+          console.log(err);
+          this.mostrarErrores(err.error);
+        },
+      );
+    }
+  }
 }

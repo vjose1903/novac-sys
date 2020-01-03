@@ -21,6 +21,15 @@ body {
   transform: translate(10px, 2px);
   position: absolute;
 }
+
+.scroll-container {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - 0.5rem) !important;
+  min-width: 100px;
+  overflow: auto;
+  overflow-x: hidden;
+}
 // ========================================================
 // CARDS
 // ========================================================

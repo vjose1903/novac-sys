@@ -36,6 +36,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   alertaMedida: any;
 
   Ispaquete = false;
+  seleccionModal: any;
+  indexBorrar: any;
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
@@ -116,6 +118,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
 
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
+
+    this.mServ.DECISIONMODAL.subscribe(res => {
+      if (res !== null || res !== undefined) {
+        this.decisionModal(res);
+      }
+    });
   }
 
   createForm() {
@@ -402,7 +410,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   }
   abrirModal(arg?) {
     console.log(arg);
-
+    this.seleccionModal = arg.ARG;
+    this.indexBorrar = arg.INDEX;
     this.mServ.modalTipo('borrar');
     this.tipoModal = 'borrar';
     this.mServ.ModalSeleccion(arg);
@@ -410,10 +419,22 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   }
   decisionModal(arg) {
     if (arg) {
+      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
+      this.dbServ.eliminarArticulo(obj).subscribe(
+        res => {
+          this.dbServ.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
+          _.pullAt(this.listaArticulos, this.indexBorrar);
+          this.tipoModal = '';
+          this.decisionModal = null;
+          this.borrar();
+        },
+        err => {
+          console.log(err);
+          this.mostrarErrores(err.error);
+        },
+      );
     }
-    this.tipoModal = '';
   }
-
   formarContenido() {
     const x = JSON.parse(JSON.stringify(this.form.value));
 
@@ -477,6 +498,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       contenido_articulos_attributes: this.formarContenido(),
       existencia: x.existencia,
       calcular_itbis: x.calcular_itbis !== null ? x.calcular_itbis : false,
+      estado: true,
     };
     console.log(obj);
 
@@ -612,6 +634,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     {
       titulo: 'Precio',
       key: 'precio_principal',
+      formatoNumero: true,
     },
   ];
   botones = {

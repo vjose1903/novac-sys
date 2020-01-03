@@ -43,6 +43,10 @@ export class BTNACCIONESComponent implements OnInit {
   }
 
   delete(arg) {
-    this.deleteBTN.emit(arg);
+    const i = _.findIndex(this.data, (o: any) => {
+      return o.id === arg.id;
+    });
+    const obj = { ARG: arg, INDEX: i };
+    this.deleteBTN.emit(obj);
   }
 }

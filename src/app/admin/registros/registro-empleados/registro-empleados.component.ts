@@ -46,6 +46,8 @@ export class RegistroEmpleadosComponent implements OnInit {
   indexSeleccionado: any;
   editando = false;
   usuarioSelected: any;
+  seleccionModal: any;
+  indexBorrar: any;
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {
     this.dpConfig = Object.assign(
       {},
@@ -98,6 +100,11 @@ export class RegistroEmpleadosComponent implements OnInit {
       password: [null],
       // estado: [true],
       role: [null, Validators.required],
+    });
+    this.mServ.DECISIONMODAL.subscribe(res => {
+      if (res !== null || res !== undefined) {
+        this.decisionModal(res);
+      }
     });
   }
 
@@ -158,6 +165,7 @@ export class RegistroEmpleadosComponent implements OnInit {
       }
     });
     objTemp.documentos_de_identidad_attributes = documentos_identidad;
+    objTemp.estado = true;
     const objSend = _.omit(objTemp, ['cedula']);
     // console.log(objSend);
 
@@ -200,8 +208,10 @@ export class RegistroEmpleadosComponent implements OnInit {
   abrirModal(arg?) {
     console.log(arg);
     this.mServ.modalTipo('borrar');
+    this.indexBorrar = arg.INDEX;
+    this.seleccionModal = arg.ARG;
     this.tipoModal = 'borrar';
-    this.mServ.ModalSeleccion(arg);
+    this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
   cambiarPassword(arg?) {
@@ -212,7 +222,31 @@ export class RegistroEmpleadosComponent implements OnInit {
   }
   decisionModal(arg) {
     if (arg) {
+      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
+      obj['estado'] = false;
+      obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
+      this.dbServ.updateEmpleados(obj).subscribe(
+        res => {
+          this.dbServ.toastSuccess('Empleado ' + obj.nombre + ' borrado.', 'CORRECTO');
+          _.pullAt(this.listaEmpleados, this.indexBorrar);
+          this.tipoModal = '';
+          this.indexBorrar = -1;
+          this.decisionModal = null;
+        },
+        err => {
+          console.log(err);
+          this.mostrarErrores(err.error);
+        },
+      );
     }
-    this.tipoModal = '';
+  }
+
+  mostrarErrores(arg) {
+    for (const error in arg) {
+      if (arg.hasOwnProperty(error)) {
+        const element = arg[error];
+        this.dbServ.toastError(element, 'Error');
+      }
+    }
   }
 }

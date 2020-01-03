@@ -131,6 +131,11 @@ export class DBservice {
     const body = _.omit(arg, ['id']);
     return this.peticion('articulos/' + id, 'patch', JSON.stringify(body));
   }
+  eliminarArticulo(arg) {
+    const id = arg.id;
+    const body = _.omit(arg, ['id']);
+    return this.peticion('articulos/delete/' + id, 'patch', JSON.stringify(null));
+  }
   getArticulos() {
     return this.peticion('articulos', 'get');
   }
