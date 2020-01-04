@@ -84,11 +84,22 @@ body {
 .text-green {
   color: green;
 }
+.text-blue {
+  color: #1e6cb6 !important;
+}
 .text-transparent {
   color: transparent;
 }
 .campoNumeros {
   text-align: end;
+}
+
+.btnArray {
+  font-size: 1.7rem;
+  &:hover {
+    filter: grayscale(50%);
+    cursor: pointer;
+  }
 }
 
 // ========================================================
