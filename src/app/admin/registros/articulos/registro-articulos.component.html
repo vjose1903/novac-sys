@@ -199,10 +199,10 @@
             <div class="row mb-2">
               <div class="col-4">Ingredientes</div>
               <div class="col-3">Cantidad LBS</div>
-              <div class="col-2">Costo</div>
+              <div class="col-3">Costo</div>
               <div class="col-2"></div>
             </div>
-            <div [ngClass]="{ 'd-none': Formula.controls['_destroy'].value === '1' }" formArrayName="rowFormula" *ngFor="let Formula of ARRAY_FORMULA.controls; let j = index">
+            <div [ngClass]="{ 'd-none': Formula.controls['_destroy'].value === '1' }" class="mb-2" formArrayName="rowFormula" *ngFor="let Formula of ARRAY_FORMULA.controls; let j = index">
               <div [formGroupName]="j">
                 <hr *ngIf="j > 0" style="margin: 0.5rem 0rem 0.5rem 0rem; border: 0.5px solid #979797" />
                 <div class="row">
@@ -222,7 +222,7 @@
                       <input (focus)="$event.target.select()" type="text" id="cantidad_formula" formControlName="cantidad_formula" class="form-control" autocomplete="off" />
                     </div>
                   </div>
-                  <div class="col-2">
+                  <div class="col-3">
                     <div class="from-group">
                       <!-- (keydown.enter)="saltar('send')" -->
                       <input (focus)="$event.target.select()" readonly type="text" id="costo_formula" formControlName="costo_formula" class="form-control" autocomplete="off" />
@@ -230,10 +230,10 @@
                   </div>
                   <div class="col-2  ">
                     <div *ngIf="j === 0" class="d-flex aling justify-content-between">
-                      <i (click)="addItem(j)" mdbTooltip="Agregar Ingrediente" placement="right" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
+                      <i (click)="addItem(j)" mdbTooltip="Agregar Ingrediente" placement="left" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
                     </div>
                     <div *ngIf="j !== 0" class="d-flex aling justify-content-between">
-                      <i (click)="removeItem(j)" mdbTooltip="Quitar Ingrediente" placement="right" class="fas btnArray fa-minus-square text-danger btnQuitar"></i>
+                      <i (click)="removeItem(j)" mdbTooltip="Quitar Ingrediente" placement="left" class="fas btnArray fa-minus-square text-danger btnQuitar"></i>
                     </div>
                   </div>
                 </div>

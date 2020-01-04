@@ -448,8 +448,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       ) {
         if (this.ARRAY_FORMULA.controls.length > 0) {
           this.ARRAY_FORMULA.controls.forEach((row, i) => {
-            console.log((row as any).controls['cantidad_formula'].value);
-
             if (
               (row as any).controls['articulo_id'].value !== null &&
               (row as any).controls['cantidad_formula'].value !== null &&
@@ -607,6 +605,21 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
 
     return contenido;
   }
+
+  formarFormula() {
+    const x = JSON.parse(JSON.stringify(this.ARRAY_FORMULA.value));
+    const formulas = [];
+    x.forEach(element => {
+      const obj = {
+        articulo_id: _.parseInt(element.articulo_id),
+        cantidad: _.parseInt(element.cantidad_formula),
+        costo: element.costo_formula,
+        _destroy: element._destroy ? element._destroy : null,
+      };
+      formulas.push(obj);
+    });
+    return formulas;
+  }
   // =============================================
   //  Crear articulo
   // =============================================
@@ -615,7 +628,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   submit(form) {
     const x = JSON.parse(JSON.stringify(form.value));
 
-    const temPobj = {
+    const obj = {
       user_id: this.usuario.id,
       tipo_articulo_id: _.parseInt(x.tipo_articulo_id),
       nombre: x.nombre,
@@ -628,52 +641,50 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       medida: x.medida,
       is_detallable: x.is_detallable,
       contenido_articulos_attributes: this.formarContenido(),
-      // formulas_productos_terminados_attributes: this.formarContenido(),
       existencia: x.existencia,
       calcular_itbis: x.calcular_itbis !== null ? x.calcular_itbis : false,
       estado: true,
       isCombo: this.isCombo,
     };
-    let obj;
-    if (!this.isCombo) {
-      obj = _.omit(temPobj, ['formulas_productos_terminados_attributes']);
+    if (obj.isCombo) {
+      obj['formulas_productos_terminados_attributes'] = this.formarFormula();
     }
 
     console.log(obj);
 
-    // if (x.id) {
-    //   obj['id'] = x.id;
+    if (x.id) {
+      obj['id'] = x.id;
 
-    //   this.dbServ.editarArticulo(obj).subscribe(
-    //     res => {
-    //       console.log(res);
+      this.dbServ.editarArticulo(obj).subscribe(
+        res => {
+          console.log(res);
 
-    //       this.listaArticulos[this.indexEditar] = res;
-    //       this.borrar();
-    //       this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
-    //     },
-    //     err => {
-    //       console.log(err);
-    //       this.mostrarErrores(err.error);
-    //       // this.dbServ.toastError(err.error, 'Error');
-    //     },
-    //   );
-    //   //
-    // } else {
-    //   this.dbServ.createArticulo(obj).subscribe(
-    //     res => {
-    //       this.listaArticulos = [...this.listaArticulos, res];
-    //       // this.artServ.next_articulo([...this.listaArticulos, res]);
-    //       this.borrar();
-    //       this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
-    //     },
-    //     err => {
-    //       console.log(err);
-    //       this.mostrarErrores(err.error);
-    //       // this.dbServ.toastError(err.error, 'Error');
-    //     },
-    //   );
-    // }
+          this.listaArticulos[this.indexEditar] = res;
+          this.borrar();
+          this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
+        },
+        err => {
+          console.log(err);
+          this.mostrarErrores(err.error);
+          // this.dbServ.toastError(err.error, 'Error');
+        },
+      );
+      //
+    } else {
+      this.dbServ.createArticulo(obj).subscribe(
+        res => {
+          this.listaArticulos = [...this.listaArticulos, res];
+          // this.artServ.next_articulo([...this.listaArticulos, res]);
+          this.borrar();
+          this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
+        },
+        err => {
+          console.log(err);
+          this.mostrarErrores(err.error);
+          // this.dbServ.toastError(err.error, 'Error');
+        },
+      );
+    }
   }
 
   mostrarErrores(arg) {
