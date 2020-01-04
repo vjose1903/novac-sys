@@ -225,7 +225,16 @@
                   <div class="col-3">
                     <div class="from-group">
                       <!-- (keydown.enter)="saltar('send')" -->
-                      <input (focus)="$event.target.select()" readonly type="text" id="costo_formula" formControlName="costo_formula" class="form-control" autocomplete="off" />
+                      <input
+                        (focus)="$event.target.select()"
+                        readonly
+                        type="text"
+                        id="costo_formula"
+                        formControlName="costo_formula"
+                        [ngClass]="{ badAlert: checkCostoFormula(Formula) }"
+                        class="form-control"
+                        autocomplete="off"
+                      />
                     </div>
                   </div>
                   <div class="col-2  ">
@@ -245,18 +254,18 @@
           <div class="row">
             <div class="col-md-4 ">
               <div class="from-group">
-                <label class="control-label">Otros Gastos: <span style="color: red">*</span></label>
+                <label class="control-label">Otros Costos: <span style="color: red">*</span></label>
                 <!-- (blur)="calculatePrice()" -->
                 <input
                   type="text"
                   (keydown.enter)="saltar('precioP')"
                   id="OtrosG"
-                  formControlName="otros_gastos"
+                  formControlName="otros_costos"
                   placeholder="Otros Gastos"
                   class="form-control mb-4"
                   (focus)="$event.target.select()"
                   autocomplete="off"
-                  (blur)="revisarPrecio('otros_gastos', 'OtrosG')"
+                  (blur)="revisarPrecio('otros_costos', 'OtrosG')"
                 />
                 <div
                   class="alerta text-danger ml-1"

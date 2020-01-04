@@ -44,6 +44,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   COMPRADOEN: any;
   MEDIDACAJA: any;
   isCombo = false;
+  numIngredientes: any;
+  Recalcular: boolean;
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
@@ -177,7 +179,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       cantidad_contenido_hijo: [null],
       precio_hijo: [null],
       rowFormula: this.fb.array([]),
-      otros_gastos: [null],
+      otros_costos: [null],
       // detallableArray: this.fb.array([]),
     });
     this.ARRAY_FORMULA = this.form.controls['rowFormula'] as FormArray;
@@ -210,6 +212,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     this.boton = 'Registrar';
     this.TIPOARTICULO = '';
     this.isCombo = false;
+    if (this.ARRAY_FORMULA.controls.length > 0) {
+      this.ARRAY_FORMULA.controls.forEach((x, i) => {
+        this.removeItem(0);
+      });
+    }
   }
   resetCompradoEn(value) {
     this.FORM.medida_contenido_padre.value = null;
@@ -240,6 +247,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
 
   createItem(): FormGroup {
     return this.fb.group({
+      id: [null],
       articulo_id: [null],
       cantidad_formula: [null],
       costo_formula: [null],
@@ -254,16 +262,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   }
 
   removeItem(i: number) {
-    const control = <FormArray>this.form.controls['rowFormula'];
+    const control = this.form.controls['rowFormula'] as FormArray;
     control.removeAt(i);
   }
   filtroFormula(item) {
     return item.tipo_articulo_id === 2;
   }
   getCosto(id, i) {
-    const control = <FormArray>this.form.controls['rowFormula'];
-    console.log('id', id);
-    console.log('i', i);
+    const control = this.form.controls['rowFormula'] as FormArray;
 
     const TempMateriaPrima = this.listaArticulos.filter(val => val.id === _.parseInt(id));
     const MateriaPrima = TempMateriaPrima[0];
@@ -273,7 +279,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     } else if (MateriaPrima.medida === 'Libra') {
       costo = MateriaPrima.costoPrincipal;
     }
-    console.log(costo);
 
     (control.controls[i] as any).controls['costo_formula'].setValue(costo);
   }
@@ -282,7 +287,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   //  VALIDACIONES DE ARRAY
   // =============================================
   getvalidateControlArray(i, campo) {
-    const control = <FormArray>this.form.controls['rowFormula'];
+    const control = this.form.controls['rowFormula'] as FormArray;
     if ((control.controls[i] as any).controls[campo].status === 'INVALID' && (control.controls[i] as any).controls[campo].touched) {
       return true;
     }
@@ -490,25 +495,85 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       this.Ispaquete = false;
     }
   }
-  editarItem(item) {
-    this.borrar();
-    this.titulo = 'Editar producto: ' + item.ARG.nombre;
-    this.boton = 'Editar';
-    this.COMPRADOEN = '';
-    this.MEDIDACAJA = '';
-    this.indexEditar = item.INDEX;
-    console.log(item.ARG);
-    this.COMPRADOEN = item.ARG.medida;
+  checkCostoFormula(formula) {
+    let res = false;
+    this.Recalcular = true;
 
-    if (item.ARG.contenido_articulos.length > 0) {
-      this.MEDIDACAJA = item.ARG.contenido_articulos[0].medida;
+    const x = JSON.parse(JSON.stringify(formula.value));
+
+    const tempArticulo = this.listaArticulos.filter(val => val.id === x.articulo_id);
+
+    const articulo = tempArticulo[0];
+    let costo;
+    if (articulo !== undefined) {
+      if (articulo.medida === 'Quintal') {
+        costo = articulo.contenido_articulos[0].costo;
+      } else if (articulo.medida === 'Libra') {
+        costo = articulo.costoPrincipal;
+      }
+      if (costo !== x.costo_formula) {
+        res = true;
+      }
     }
 
-    this.fillDropAlerta(item.ARG.medida);
+    return res;
+  }
+  fillFormula(ingredient, i) {
+    const control = this.form.controls['rowFormula'] as FormArray;
 
-    item.ARG.contenido_articulos.forEach(contenido => {
-      if (item.ARG.contenido_articulos.length === 1) {
-        if (item.ARG.contenido_articulos[0].medida === 'Libra') {
+    const TempMateriaPrima = this.listaArticulos.filter(val => val.id === _.parseInt(ingredient.articulo_combo));
+    const MateriaPrima = TempMateriaPrima[0];
+
+    let costo = 0;
+    if (MateriaPrima.medida === 'Quintal') {
+      costo = MateriaPrima.contenido_articulos[0].costo;
+    } else if (MateriaPrima.medida === 'Libra') {
+      costo = MateriaPrima.costoPrincipal;
+    }
+
+    (control.controls[i] as any).controls['costo_formula'].setValue(costo);
+    (control.controls[i] as any).controls['articulo_id'].setValue(ingredient.articulo_combo);
+    (control.controls[i] as any).controls['cantidad_formula'].setValue(ingredient.cantidad);
+    (control.controls[i] as any).controls['id'].setValue(ingredient.id ? ingredient.id : null);
+  }
+  editarItem(item) {
+    const articulo = item.ARG;
+    this.borrar();
+    this.titulo = 'Editar producto: ' + articulo.nombre;
+    this.boton = 'Editar';
+    this.indexEditar = item.INDEX;
+    this.COMPRADOEN = '';
+    this.MEDIDACAJA = '';
+
+    if (articulo.isCombo) {
+      this.numIngredientes = articulo.formulas_productos_terminados.length;
+
+      this.isCombo = true;
+      // articulo.formulas_productos_terminados.forEach((ingredient, i) => {
+      // });
+      this.TIPOARTICULO = 'Producto terminado';
+      this.form.controls.medida.setValue('Quintal');
+      this.fillDropAlerta('Quintal');
+      articulo.formulas_productos_terminados.forEach((ingredient, i) => {
+        this.addItem();
+        setTimeout(() => {
+          this.fillFormula(ingredient, i);
+        }, 5);
+      });
+    } else {
+      this.isCombo = false;
+      this.numIngredientes = null;
+      this.COMPRADOEN = articulo.medida;
+    }
+    if (articulo.contenido_articulos.length > 0) {
+      this.MEDIDACAJA = articulo.contenido_articulos[0].medida;
+    }
+
+    this.fillDropAlerta(articulo.medida);
+
+    articulo.contenido_articulos.forEach(contenido => {
+      if (articulo.contenido_articulos.length === 1) {
+        if (articulo.contenido_articulos[0].medida === 'Libra') {
           this.form.controls.precio_libra.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
           this.form.controls.costo_padre.setValue(contenido.costo);
           this.form.controls.id_contenido_padre.setValue(contenido.id);
@@ -534,10 +599,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.form.patchValue(item.ARG);
-
-    this.form.controls.costo_principal.setValue(this.redondearAdos(item.ARG.costo_principal));
-    this.form.controls.precio_principal.setValue(this.formatearNumero(this.redondearAdos(item.ARG.precio_principal)));
+    this.form.patchValue(articulo);
+    if (articulo.isCombo) {
+      this.form.controls.otros_costos.setValue(this.formatearNumero(this.redondearAdos(articulo.otros_costos)));
+    }
+    this.form.controls.costo_principal.setValue(this.redondearAdos(articulo.costo_principal));
+    this.form.controls.precio_principal.setValue(this.formatearNumero(this.redondearAdos(articulo.precio_principal)));
   }
   abrirModal(arg?) {
     this.seleccionModal = arg.ARG;
@@ -559,7 +626,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
           this.borrar();
         },
         err => {
-          console.log(err);
           this.mostrarErrores(err.error);
         },
       );
@@ -611,7 +677,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     const formulas = [];
     x.forEach(element => {
       const obj = {
-        articulo_id: _.parseInt(element.articulo_id),
+        id: _.parseInt(element.id ? element.id : null),
+        articulo_combo: _.parseInt(element.articulo_id),
         cantidad: _.parseInt(element.cantidad_formula),
         costo: element.costo_formula,
         _destroy: element._destroy ? element._destroy : null,
@@ -647,24 +714,20 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       isCombo: this.isCombo,
     };
     if (obj.isCombo) {
+      obj['otros_costos'] = x.otros_costos;
       obj['formulas_productos_terminados_attributes'] = this.formarFormula();
     }
-
-    console.log(obj);
 
     if (x.id) {
       obj['id'] = x.id;
 
       this.dbServ.editarArticulo(obj).subscribe(
         res => {
-          console.log(res);
-
           this.listaArticulos[this.indexEditar] = res;
           this.borrar();
           this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
         },
         err => {
-          console.log(err);
           this.mostrarErrores(err.error);
           // this.dbServ.toastError(err.error, 'Error');
         },
@@ -679,7 +742,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
           this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
         },
         err => {
-          console.log(err);
           this.mostrarErrores(err.error);
           // this.dbServ.toastError(err.error, 'Error');
         },
@@ -724,7 +786,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
 
   revisarPrecio(input, id) {
     const Input = this.form.controls[input];
-    console.log(Input.value);
 
     const precioTEMPO = Input.value;
     if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
