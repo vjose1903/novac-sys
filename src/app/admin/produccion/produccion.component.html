@@ -1,0 +1,79 @@
+<div class="row">
+  <div class="col-5">
+    <div class="card card-padding-1 sombra heightPmin mb-3">
+      <h5>Seleccione el producto a elaborar:</h5>
+      <div class="row">
+        <div class="col-12">
+          <div class="from-group">
+            <label class="control-label mt-1 mb-0">Nombre producto:</label>
+            <div>
+              <select [(ngModel)]="articulo_id" class="form-control  entrada" style="border-radius:0 " (change)="getIngredients()" id="articulo_id">
+                <option value="{{ null }}" selected>seleccione producto</option>
+                <option *ngFor="let lista of listaArticulos | callback: filtroFormula" value="{{ lista.id }}">{{ lista.nombre }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mt-4">
+          <div class="from-group">
+            <label class="control-label">Cantidad a producir: <span style="color: red">*</span></label>
+            <div class="row">
+              <div class="col-4 pr-0">
+                <input
+                  type="Number"
+                  (keydown.enter)="saltar('medida_alerta')"
+                  id="existencia"
+                  formControlName="aviso_existencia"
+                  (focus)="$event.target.select()"
+                  placeholder="Cantidad para alertar"
+                  class="form-control mb-4"
+                  autocomplete="off"
+                />
+              </div>
+
+              <div class="col-8">
+                <select (keydown.enter)="saltar()" class="form-control" formControlName="medida_alerta" id="medida_alerta" (change)="seleccionarMedida()" [ngClass]="{ badAlert: Ispaquete }">
+                  <option value="{{ null }}"></option>
+                  <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pl-3">
+          <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+          <input [disabled]="abilitarBtnSend()" (click)="agregarAlista()" type="submit" class="btn" value="Agregar" id="btn-verde" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-7">
+    <div class="card card-padding-1 sombra heightPmin mb-3">
+      <h4>Ingredientes</h4>
+      <div class="row h-100">
+        <div class="col-6 p-0 fondoGris bordes">
+          <div class="text-center tituloIngre">Inventario</div>
+          <div class="scroll-container">
+            <div *ngFor="let ingrediente of ingredientes; let i = index" class="ingredientesList d-flex">
+              <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
+              <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
+
+              <div class="d-flex justify-content-end" style="width: 100%">
+                <span [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
+                  {{ lookprincipal(ingrediente.existencia) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 p-0 bordes">
+          <div class="text-center tituloIngre">Producción</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card card-padding-1 sombra heightPmax"></div>
+  </div>
+</div>

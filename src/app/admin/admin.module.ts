@@ -26,6 +26,7 @@ import { RegistroSuplidoresComponent } from './registros/registro-suplidores/reg
 import { FiltroParaNgforPipe } from '../core/pipe/filtro-para-ngfor.pipe';
 import { PaswordConfirmDirective } from '../core/directive/pasword-confirm-directive.directive';
 import { ChangePasswordComponent } from '../components/change-password/change-password.component';
+import { ProduccionComponent } from './produccion/produccion.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { ChangePasswordComponent } from '../components/change-password/change-pa
     UploadImgComponent,
     ValidateRayaAbajo,
     RegistroSuplidoresComponent,
+    ProduccionComponent,
   ],
   imports: [
     DialogModule,

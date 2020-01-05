@@ -63,7 +63,7 @@
   list-style: none;
 }
 .menuList1 {
-  margin: 40px 0px 0px 0px;
+  margin: 30px 0px 0px 0px;
   .tituloMenu1 {
     transform: scale(0);
     transition: all 0.2s;
@@ -95,38 +95,16 @@
     cursor: pointer;
   }
 }
-.menuList2 {
-  .tituloMenu2 {
+
+
+.menuList {
+  .tituloMenu {
     transform: scale(0);
     transition: all 0.2s;
   }
 
-  &:hover .tituloMenu2,
-  .tituloMenu2A {
-    transform: scale(1) translate(0px, -6rem);
-  }
-}
-
-.menuList3 {
-  .tituloMenu3 {
-    transform: scale(0);
-    transition: all 0.2s;
-  }
-
-  &:hover .tituloMenu3,
-  .tituloMenu3A {
-    transform: scale(1) translate(0px, -6rem);
-  }
-}
-
-.menuList4 {
-  .tituloMenu4 {
-    transform: scale(0);
-    transition: all 0.2s;
-  }
-
-  &:hover .tituloMenu4,
-  .tituloMenu4A {
+  &:hover .tituloMenu,
+  .tituloMenuA {
     transform: scale(1) translate(0px, -6rem);
   }
 }

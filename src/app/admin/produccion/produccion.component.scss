@@ -1,0 +1,28 @@
+.heightPmin {
+  height: calc(100vh - 41rem);
+}
+.heightPmax {
+  height: calc(100vh - 29rem);
+}
+
+.bordes {
+  border: 1px solid grey;
+}
+.fondoGris {
+  background-color: #f1f1f1d0;
+}
+.ingredientesList {
+  padding: 0.5rem 0rem 0.5rem 1rem;
+  border-bottom: 0.5px solid grey;
+}
+.tituloIngre {
+  background-color: #cfffcf;
+  border-bottom: 1px solid grey;
+}
+.Nombreingre {
+  font-weight: bold;
+}
+
+.cantidadInve {
+  margin-right: 0.7rem;
+}
