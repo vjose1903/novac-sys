@@ -259,7 +259,7 @@ export class RegistroSuplidoresComponent implements OnInit {
     this.indexBorrar = arg.INDEX;
     this.mServ.modalTipo('borrar');
     this.tipoModal = 'borrar';
-    this.mServ.ModalSeleccion(arg);
+    this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
   decisionModal(arg) {

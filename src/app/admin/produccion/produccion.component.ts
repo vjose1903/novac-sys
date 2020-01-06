@@ -14,8 +14,13 @@ import { ModalService } from '../../components/modal/modal.service';
 export class ProduccionComponent implements OnInit {
   listaArticulos: any;
   articulo_id;
+  cantidad_producir;
+  medida_producir;
   articuloSelected: any;
+
+  lista_produccion = [];
   ingredientes = [];
+  ingredientesParaProduccion = [];
   medidas = {
     Libra: 'Libras',
     Quintal: 'Quintales',
@@ -23,9 +28,13 @@ export class ProduccionComponent implements OnInit {
     Paquete: 'Paquetes',
     Unidad: 'Unidades',
   };
-  element: HTMLElement;
+  element: any;
   optionsAlerta = ['Quintal', 'Libra'];
+  seleccionModal: any;
+  indexBorrar: any;
+  tipoModal: string;
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {}
+
   formatearNumero(nStr) {
     if (nStr !== undefined) {
       nStr += '';
@@ -40,6 +49,21 @@ export class ProduccionComponent implements OnInit {
     }
   }
 
+  redondearAdos(num) {
+    const string = num + '';
+    const splitStr = _.split(string, '.');
+    const enteros = splitStr[0];
+    let tempdecimales = splitStr[1];
+    if (splitStr.length === 1) {
+      tempdecimales = '00';
+    }
+
+    const decimales = tempdecimales.substring(0, 2);
+    const Arreglo = [enteros, decimales];
+    const numStr = _.join(Arreglo, '.');
+    return parseFloat(numStr).toFixed(2);
+    // return (Math.round(num * 100) / 100).toFixed(2);
+  }
   ngOnInit() {
     this.dbServ.getArticulos().subscribe(res => {
       res.sort((a, b) => {
@@ -48,6 +72,12 @@ export class ProduccionComponent implements OnInit {
 
       if (res !== undefined && res !== null) {
         this.listaArticulos = res;
+      }
+    });
+
+    this.mServ.DECISIONMODAL.subscribe(res => {
+      if (res !== null || res !== undefined) {
+        this.decisionModalP(res);
       }
     });
   }
@@ -66,11 +96,11 @@ export class ProduccionComponent implements OnInit {
         nombre: ingre.nombre,
         cantidad: ingrediente.cantidad,
         existencia: ingre.cantidades,
-        contenido: ingre.contendido,
+        contenido: ingre.contenido,
       });
     });
-    console.log(this.articuloSelected);
-    console.log(this.ingredientes);
+    // console.log(this.articuloSelected);
+    // console.log(this.ingredientes);
   }
 
   lookOters(objeto) {
@@ -81,10 +111,10 @@ export class ProduccionComponent implements OnInit {
     const fin1 = values[1] > 1 ? this.medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? this.medidas[keys[2]] : keys[2];
 
-    const principal = this.formatearNumero(values[0]) + '  ' + fin;
+    const principal = this.formatearNumero(this.redondearAdos(values[0])) + '  ' + fin;
 
-    const padre = this.formatearNumero(values[1]) + '  ' + fin1;
-    const hijo = this.formatearNumero(values[2]) + '  ' + fin2;
+    const padre = this.formatearNumero(this.redondearAdos(values[1])) + '  ' + fin1;
+    const hijo = this.formatearNumero(this.redondearAdos(values[2])) + '  ' + fin2;
 
     let cantiTootip = ``;
     if (keys.length > 1) {
@@ -102,19 +132,20 @@ export class ProduccionComponent implements OnInit {
     const keys = _.keys(objeto);
     const values = _.values(objeto);
     const fin = values[0] > 1 ? this.medidas[keys[0]] : keys[0];
-    return this.formatearNumero(values[0]) + '  ' + fin;
+    return this.formatearNumero(this.redondearAdos(values[0])) + '  ' + fin;
   }
 
   saltar(campo) {
-    if (campo !== 'send') {
+    if (campo !== 'agregar') {
       this.enfocarInput(campo);
     } else {
-      const continu = this.abilitarBtnSend();
+      const continu = this.abilitarBtnAgregar();
 
       if (!continu) {
-        this.enfocarInput('nombre');
+        this.enfocarInput('articulo_id');
         setTimeout(() => {
-          // this.submit(this.form);
+          this.agregarAlista();
+          this.borrar();
         }, 250);
       }
     }
@@ -123,11 +154,121 @@ export class ProduccionComponent implements OnInit {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
   }
-  abilitarBtnSend() {
-    return true;
+  disableOption(arg, boolean) {
+    (this.element = document.getElementById(arg) as any).disabled = boolean;
+  }
+  abilitarBtnAgregar() {
+    let res = true;
+    if (
+      this.articulo_id !== null &&
+      this.articulo_id !== undefined &&
+      this.articulo_id !== '' &&
+      this.articulo_id !== ' ' &&
+      this.cantidad_producir !== null &&
+      this.cantidad_producir !== undefined &&
+      this.cantidad_producir !== '' &&
+      this.cantidad_producir !== ' ' &&
+      this.medida_producir !== null &&
+      this.medida_producir !== undefined &&
+      this.medida_producir !== '' &&
+      this.medida_producir !== ' '
+    ) {
+      res = false;
+    }
+    return res;
   }
 
-  seleccionarMedida() {}
-  borrar() {}
-  agregarAlista() {}
+  calcularCantidadEnProduccion() {
+    this.ingredientesParaProduccion = [];
+    if (
+      this.cantidad_producir !== null &&
+      this.cantidad_producir !== undefined &&
+      this.cantidad_producir !== '' &&
+      this.cantidad_producir !== ' ' &&
+      this.medida_producir !== null &&
+      this.medida_producir !== undefined &&
+      this.medida_producir !== '' &&
+      this.medida_producir !== ' '
+    ) {
+      this.ingredientes.forEach(ingre => {
+        console.log(ingre);
+        let cantidadFormula = ingre.cantidad;
+        if (this.medida_producir === 'Libra') {
+          cantidadFormula = cantidadFormula / 100;
+        }
+        const quin = cantidadFormula * this.cantidad_producir;
+        const obj = {
+          Quintal: quin / 100,
+          Libra: quin,
+        };
+        if (quin > ingre.existencia.Libra) {
+          this.cantidad_producir = null;
+          this.ingredientesParaProduccion = [];
+          this.dbServ.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR');
+          this.enfocarInput('cantidad_producir');
+        } else {
+          this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj });
+        }
+      });
+    }
+  }
+
+  borrar() {
+    this.articulo_id = null;
+    this.medida_producir = null;
+    this.cantidad_producir = null;
+  }
+  agregarAlista() {
+    const obj = {
+      nombre: this.articuloSelected.nombre,
+      cantidad: this.cantidad_producir,
+      medida: this.medida_producir,
+      articulo_id: this.articulo_id,
+    };
+    this.lista_produccion.push(obj);
+    this.ingredientes = [];
+    this.ingredientesParaProduccion = [];
+    this.disableOption('prod-' + this.articulo_id, true);
+  }
+  editarItem(item) {}
+  abrirModal(arg?) {
+    this.seleccionModal = arg.ARG;
+    this.indexBorrar = arg.INDEX;
+    this.mServ.modalTipo('remover');
+    this.tipoModal = 'remover';
+    this.mServ.ModalSeleccion(arg.ARG);
+    this.mServ.mostrarModal(true);
+  }
+  decisionModalP(bool) {
+    const listaTemp = JSON.parse(JSON.stringify(this.lista_produccion));
+    if (bool) {
+      this.lista_produccion = [];
+      this.disableOption('prod-' + this.seleccionModal.articulo_id, false);
+      this.lista_produccion = _.pullAt(listaTemp[this.indexBorrar]);
+    }
+  }
+  // =============================================
+  //  TABLAS
+  // =============================================
+
+  info = [
+    {
+      titulo: 'Producto',
+      key: 'nombre',
+    },
+    {
+      titulo: 'Cantidad',
+      key: 'cantidad',
+      formatoNumero: true,
+    },
+    {
+      titulo: 'Medida',
+      key: 'medida',
+    },
+  ];
+  botones = {
+    titulo: true,
+    borrar: true,
+    editar: true,
+  };
 }

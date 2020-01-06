@@ -611,7 +611,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     this.indexBorrar = arg.INDEX;
     this.mServ.modalTipo('borrar');
     this.tipoModal = 'borrar';
-    this.mServ.ModalSeleccion(arg);
+    this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
   decisionModal(arg) {
