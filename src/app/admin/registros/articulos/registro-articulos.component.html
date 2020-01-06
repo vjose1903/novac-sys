@@ -367,15 +367,7 @@
 
                   <div class="col-4 p-0">
                     <select
-                      (keydown.enter)="
-                        saltar(
-                          form.controls['medida'].value === 'Quintal'
-                            ? 'precioLibra'
-                            : form.controls['medida'].value === 'Unidad' || form.controls['medida'].value === 'Libra'
-                            ? 'send'
-                            : 'contenidoPadre'
-                        )
-                      "
+                      (keydown.enter)="saltar('send')"
                       class="form-control"
                       formControlName="medida_alerta"
                       id="medida_alerta"
