@@ -5,7 +5,6 @@ import { map } from 'rxjs/operators';
 
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
 import { UsuariosService } from '../../core/services/usuarios.service';
-import { UsuariosI } from '../../core/models/usuario.model';
 
 import { get } from 'http';
 
@@ -72,15 +71,6 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         this.PrintersInstall = res;
       }
     });
-    // const userPayload = this.usuariosServices.getUserPayload();
-    // this.usuariosServices.getUser(userPayload._id).subscribe(res => {
-    //   const data = res as UsuariosI;
-    //   profile.next(data);
-    // });
-
-    // this.sub = profile.subscribe(res => {
-    //   this.usuariosServices.profile = res;
-    // });
   }
   ngOnDestroy() {
     // this.sub.unsubscribe();

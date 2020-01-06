@@ -58,7 +58,7 @@
           </div>
         </div>
         <div class="pl-3">
-          <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+          <a class="btn mr-2 btn-blanco" (click)="borrar()">Borrar</a>
           <input [disabled]="abilitarBtnAgregar()" (click)="agregarAlista()" type="submit" class="btn" value="Agregar" id="btn-verde" />
         </div>
       </div>
@@ -103,16 +103,22 @@
   </div>
   <div class="col-12">
     <div class="card card-padding-1 sombra heightPmax">
-      <app-tablas
-        [info]="info"
-        [data]="lista_produccion"
-        [search]="false"
-        [scrollContainer]="'scroll-container'"
-        [focusRow]="false"
-        [botones]="botones"
-        (DevolverInfo)="editarItem($event)"
-        (DELETE)="abrirModal($event)"
-      ></app-tablas>
+      <div style="height: 90%;">
+        <app-tablas
+          [info]="info"
+          [data]="lista_produccion"
+          [search]="false"
+          [scrollContainer]="'scroll-container'"
+          [focusRow]="false"
+          [botones]="botones"
+          (DevolverInfo)="editarItem($event)"
+          (DELETE)="abrirModal($event)"
+        ></app-tablas>
+      </div>
+      <div class="d-flex justify-content-end">
+        <input [disabled]="abilitarBtnConfirmar()" (click)="cancelarProduccion()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+        <input [disabled]="abilitarBtnConfirmar()" (click)="confirmarProduccion()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      </div>
     </div>
   </div>
 </div>

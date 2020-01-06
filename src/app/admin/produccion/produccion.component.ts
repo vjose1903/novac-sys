@@ -85,6 +85,8 @@ export class ProduccionComponent implements OnInit {
     return item.tipo_articulo_id === 3;
   }
   getIngredients() {
+    this.ingredientes = [];
+
     const tempArticulo = this.listaArticulos.filter(val => val.id === _.parseInt(this.articulo_id));
     this.articuloSelected = tempArticulo[0];
     const tempIngredientes = tempArticulo[0].formulas_productos_terminados;
@@ -142,10 +144,8 @@ export class ProduccionComponent implements OnInit {
       const continu = this.abilitarBtnAgregar();
 
       if (!continu) {
-        this.enfocarInput('articulo_id');
         setTimeout(() => {
           this.agregarAlista();
-          this.borrar();
         }, 250);
       }
     }
@@ -173,6 +173,13 @@ export class ProduccionComponent implements OnInit {
       this.medida_producir !== '' &&
       this.medida_producir !== ' '
     ) {
+      res = false;
+    }
+    return res;
+  }
+  abilitarBtnConfirmar() {
+    let res = true;
+    if (this.lista_produccion.length > 0) {
       res = false;
     }
     return res;
@@ -214,9 +221,12 @@ export class ProduccionComponent implements OnInit {
   }
 
   borrar() {
+    this.ingredientes = [];
+    this.ingredientesParaProduccion = [];
     this.articulo_id = null;
     this.medida_producir = null;
     this.cantidad_producir = null;
+    this.enfocarInput('articulo_id');
   }
   agregarAlista() {
     const obj = {
@@ -226,11 +236,20 @@ export class ProduccionComponent implements OnInit {
       articulo_id: this.articulo_id,
     };
     this.lista_produccion.push(obj);
+    this.disableOption('prod-' + this.articulo_id, true);
+    this.borrar();
+  }
+  editarItem(item) {
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
-    this.disableOption('prod-' + this.articulo_id, true);
+    this.articulo_id = item.ARG.articulo_id;
+    this.cantidad_producir = item.ARG.cantidad;
+    this.medida_producir = item.ARG.medida;
+    setTimeout(() => {
+      this.getIngredients();
+      this.calcularCantidadEnProduccion();
+    }, 5);
   }
-  editarItem(item) {}
   abrirModal(arg?) {
     this.seleccionModal = arg.ARG;
     this.indexBorrar = arg.INDEX;
@@ -242,11 +261,23 @@ export class ProduccionComponent implements OnInit {
   decisionModalP(bool) {
     const listaTemp = JSON.parse(JSON.stringify(this.lista_produccion));
     if (bool) {
-      this.lista_produccion = [];
-      this.disableOption('prod-' + this.seleccionModal.articulo_id, false);
-      this.lista_produccion = _.pullAt(listaTemp[this.indexBorrar]);
+      if (this.tipoModal === 'remover') {
+        this.lista_produccion = [];
+        this.disableOption('prod-' + this.seleccionModal.articulo_id, false);
+        this.lista_produccion = _.pullAt(listaTemp[this.indexBorrar]);
+      } else {
+        this.lista_produccion = [];
+        this.borrar();
+      }
     }
   }
+  cancelarProduccion() {
+    this.mServ.modalTipo('cancelarP');
+    this.tipoModal = 'cancelarP';
+    this.mServ.mostrarModal(true);
+  }
+  confirmarProduccion() {}
+
   // =============================================
   //  TABLAS
   // =============================================

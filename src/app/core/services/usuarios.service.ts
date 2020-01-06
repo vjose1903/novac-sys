@@ -2,23 +2,22 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { BehaviorSubject } from 'rxjs';
-import { UsuariosI } from '../models/usuario.model';
 import { JwtResponsesI } from '../models/jwt-responses';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UsuariosService {
-  selectedUsuario: UsuariosI;
-  profile: UsuariosI;
-  array_Usuarios: UsuariosI[] = [];
+  selectedUsuario;
+  profile;
+  array_Usuarios = [];
   readonly URL_API = 'http://localhost:3000/api/empleados';
 
   noAuthHeader = { headers: new HttpHeaders({ NoAuth: 'true' }) };
 
   constructor(private http: HttpClient) {
-    this.selectedUsuario = new UsuariosI();
-    this.profile = new UsuariosI();
+    this.selectedUsuario;
+    this.profile;
   }
 
   getUsuarios() {
@@ -33,11 +32,11 @@ export class UsuariosService {
     return this.http.get(this.URL_API + '/cant');
   }
 
-  register(Usuario: UsuariosI) {
+  register(Usuario) {
     return this.http.post(this.URL_API + '/register', Usuario);
   }
 
-  login(Usuario: UsuariosI) {
+  login(Usuario) {
     return this.http.post<JwtResponsesI>(this.URL_API + '/authenticate', Usuario);
   }
   getUserProfile() {
@@ -84,14 +83,14 @@ export class UsuariosService {
     return localStorage.getItem('token');
   }
 
-  updateUsuario(Usuario: UsuariosI) {
+  updateUsuario(Usuario) {
     return this.http.put(this.URL_API + `/edit/${Usuario._id}`, Usuario);
   }
-  updatePass(Usuario: UsuariosI) {
+  updatePass(Usuario) {
     return this.http.put(this.URL_API + `/editP/${Usuario._id}`, Usuario);
   }
 
-  deleteUsuario(Usuario: UsuariosI) {
+  deleteUsuario(Usuario) {
     return this.http.put(this.URL_API + `/eliminar/${Usuario._id}`, Usuario);
   }
 }

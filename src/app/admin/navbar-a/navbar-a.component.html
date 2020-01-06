@@ -12,7 +12,7 @@
       <!-- <img src="" class="img-fluid" /> -->
     </mat-toolbar>
     <mat-nav-list class="text-center">
-      <div class="menuList menuList mt-5">
+      <div class="menuList mt-5">
         <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/factura.png" alt="Facturacion" (click)="navegar(2)" />
         <h5 [ngClass]="actualTab == 'factura' ? 'tituloMenuA' : 'tituloMenu'"><strong>Facturacion</strong></h5>
 
@@ -22,7 +22,12 @@
         </div>
       </div>
 
-      <div class="menuList menuList">
+      <div class="menuList">
+        <img [ngClass]="actualTab == 'reciboIngreso' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="navegar(2)" />
+        <h5 [ngClass]="actualTab == 'reciboIngreso' ? 'tituloMenuA' : 'tituloMenu'"><strong>Ingresos</strong></h5>
+      </div>
+
+      <div class="menuList">
         <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/registro.png" alt="Registros" (click)="navegar(3)" />
         <h5 [ngClass]="actualTab == 'registro' ? 'tituloMenuA' : 'tituloMenu'"><strong>Registros</strong></h5>
 
@@ -33,16 +38,16 @@
           <h4 class="opcion" (click)="navegar('suplidores')">Suplidores</h4>
         </div>
       </div>
-      <div class="menuList menuList">
+      <div class="menuList">
         <img [ngClass]="actualTab == 'produccion' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/produccion.png" alt="Producción" (click)="navegar(6)" />
         <h5 [ngClass]="actualTab == 'produccion' ? 'tituloMenuA' : 'tituloMenu'"><strong>Producción</strong></h5>
       </div>
-      <div class="menuList menuList">
+      <div class="menuList">
         <img [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/inventario.png" alt="Inventario" (click)="navegar(4)" />
         <h5 [ngClass]="actualTab == 'inventario' ? 'tituloMenuA' : 'tituloMenu'"><strong>Inventario</strong></h5>
       </div>
 
-      <div class="menuList menuList">
+      <div class="menuList">
         <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png" alt="Reportes" (click)="navegar(5)" />
         <h5 [ngClass]="actualTab == 'reporte' ? 'tituloMenuA' : 'tituloMenu'"><strong>Reporte</strong></h5>
       </div>

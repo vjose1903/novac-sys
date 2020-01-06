@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonsModule, WavesModule } from 'angular-bootstrap-md';
 import { UsuariosService } from '../core/services/usuarios.service';
-import { UsuariosI } from '../core/models/usuario.model';
+
 import { ToastrService } from 'ngx-toastr';
 import { DBservice } from '../core/services/bdservice.service';
 import { IpcService } from '../core/services/ipc.service';

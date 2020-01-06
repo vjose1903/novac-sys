@@ -219,7 +219,15 @@
                   <div class="col-3">
                     <div class="from-group">
                       <!-- (keydown.enter)="saltar('send')" -->
-                      <input (focus)="$event.target.select()" type="text" id="cantidad_formula" formControlName="cantidad_formula" class="form-control" autocomplete="off" />
+                      <input
+                        (focus)="$event.target.select()"
+                        type="text"
+                        (blur)="calculateCostoPT()"
+                        id="cantidad_formula"
+                        formControlName="cantidad_formula"
+                        class="form-control"
+                        autocomplete="off"
+                      />
                     </div>
                   </div>
                   <div class="col-3">
@@ -255,7 +263,6 @@
             <div class="col-md-4 ">
               <div class="from-group">
                 <label class="control-label">Otros Costos: <span style="color: red">*</span></label>
-                <!-- (blur)="calculatePrice()" -->
                 <input
                   type="text"
                   (keydown.enter)="saltar('precioP')"
@@ -263,6 +270,7 @@
                   formControlName="otros_costos"
                   placeholder="Otros Gastos"
                   class="form-control mb-4"
+                  (blur)="calculateCostoPT()"
                   (focus)="$event.target.select()"
                   autocomplete="off"
                   (blur)="revisarPrecio('otros_costos', 'OtrosG')"
@@ -566,6 +574,7 @@
             <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a>
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
             <input [disabled]="abilitarBtnSend()" (click)="submit(form)" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+            <a *ngIf="Recalcular" class="btn ml-2" id="btn-blanco" (click)="recalcular()">Recarcular</a>
           </div>
         </div>
       </div>

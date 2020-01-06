@@ -13,7 +13,7 @@
 }
 
 .titulo {
-  font-family: 'Lobster';
+  font-family: "Lobster";
   font-size: 1.5rem;
   color: #0b4a18;
   padding: 0;
@@ -59,27 +59,14 @@
 /*        Menu                                    */
 /* ============================================== */
 
-.menuList {
-  list-style: none;
-}
-.menuList1 {
-  margin: 30px 0px 0px 0px;
-  .tituloMenu1 {
-    transform: scale(0);
-    transition: all 0.2s;
-  }
-
-  &:hover .tituloMenu1,
-  .tituloMenu1A {
-    transform: scale(1) translate(0px, -6rem);
-  }
-}
-.subMenuRegistros, .subMenuFactura {
+.subMenuRegistros,
+.subMenuFactura {
   display: none;
   transform: scale(0);
 }
 
-.subMenuRegistrosA, .subMenuFacturaA {
+.subMenuRegistrosA,
+.subMenuFacturaA {
   transform: scale(1);
   background-color: #23be69;
   color: white;
@@ -96,8 +83,8 @@
   }
 }
 
-
 .menuList {
+  list-style: none;
   .tituloMenu {
     transform: scale(0);
     transition: all 0.2s;
@@ -263,8 +250,7 @@ mat-list-item {
   position: absolute;
   max-width: 13.7rem;
   display: none;
-  &.open{
+  &.open {
     display: block !important;
   }
 }
-

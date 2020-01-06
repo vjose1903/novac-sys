@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -14,7 +14,7 @@ import { ModalService } from '../../../components/modal/modal.service';
   templateUrl: './registro-articulos.component.html',
   styleUrls: ['./registro-articulos.component.scss'],
 })
-export class RegistroArticulosComponent implements OnInit, OnDestroy {
+export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges {
   titulo = '';
   boton = '';
   form: FormGroup;
@@ -45,8 +45,17 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   MEDIDACAJA: any;
   isCombo = false;
   numIngredientes: any;
-  Recalcular: boolean;
-  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {
+  Recalcular = false;
+  ProductoEditando: any;
+  constructor(
+    private artServ: ObservableServcie,
+    private dbServ: DBservice,
+    private cdRef: ChangeDetectorRef,
+    private fb: FormBuilder,
+    private actRou: ActivatedRoute,
+    private router: Router,
+    private mServ: ModalService,
+  ) {
     this.detallableArray = new FormArray([new FormControl()]);
   }
   redondearAdos(num) {
@@ -133,6 +142,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  ngOnChanges() {
+    this.cdRef.detectChanges();
+  }
+
   selectTipoArticulo(tipo) {
     const Tipo = this.listaTipoArticulos.filter(val => val.id === _.parseInt(tipo));
 
@@ -204,6 +218,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     this.element.focus();
   }
   borrar() {
+    this.ProductoEditando = null;
     this.form.reset();
     this.enfocarInput('nombre');
     this.form.controls.is_detallable.setValue(false);
@@ -214,7 +229,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     this.isCombo = false;
     if (this.ARRAY_FORMULA.controls.length > 0) {
       this.ARRAY_FORMULA.controls.forEach((x, i) => {
-        this.removeItem(0);
+        setTimeout(() => {
+          this.removeItem(0);
+        }, 5);
       });
     }
   }
@@ -282,7 +299,21 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
 
     (control.controls[i] as any).controls['costo_formula'].setValue(costo);
   }
+  calculateCostoPT() {
+    let sumatoriaMult = 0;
 
+    if (this.ARRAY_FORMULA.length > 0) {
+      this.ARRAY_FORMULA.controls.forEach((ingrediente: any) => {
+        const ingre = ingrediente.controls;
+        sumatoriaMult += parseFloat(ingre.cantidad_formula.value) * ingre.costo_formula.value;
+      });
+      const formulario = this.form.controls;
+      if (formulario.otros_costos.value !== null && formulario.otros_costos.value !== undefined && formulario.otros_costos.value !== '' && formulario.otros_costos.value !== ' ') {
+        sumatoriaMult += this.desformatear(formulario.otros_costos.value);
+        this.form.controls.costo_principal.setValue(this.formatearNumero(this.redondearAdos(sumatoriaMult)));
+      }
+    }
+  }
   // =============================================
   //  VALIDACIONES DE ARRAY
   // =============================================
@@ -306,16 +337,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   //  CHECK DETALLABLE
   // =============================================
   isDetallableClick() {
-    const array = this.form.get('detallableArray') as FormArray;
-    if (array.length === 0) {
-      this.addItem();
-    } else {
-      const array = this.form.get('detallableArray') as FormArray;
-      if (array.length === 1 && array.valid === false) {
-        this.removeItem(0);
-      }
-    }
-
     this.isDetallable = !this.isDetallable;
   }
   // =============================================
@@ -497,7 +518,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   }
   checkCostoFormula(formula) {
     let res = false;
-    this.Recalcular = true;
 
     const x = JSON.parse(JSON.stringify(formula.value));
 
@@ -511,14 +531,30 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
       } else if (articulo.medida === 'Libra') {
         costo = articulo.costoPrincipal;
       }
+
       if (costo !== x.costo_formula) {
         res = true;
+        setTimeout(() => {
+          this.Recalcular = true;
+        }, 10);
       }
     }
 
     return res;
   }
-  fillFormula(ingredient, i) {
+
+  recalcular() {
+    this.ARRAY_FORMULA = ([] as unknown) as FormArray;
+
+    this.ProductoEditando.formulas_productos_terminados.forEach((ingredient, i) => {
+      this.addItem();
+      setTimeout(() => {
+        this.fillFormula(ingredient, i, true);
+      }, 5);
+    });
+  }
+
+  fillFormula(ingredient, i, recalcular?) {
     const control = this.form.controls['rowFormula'] as FormArray;
 
     const TempMateriaPrima = this.listaArticulos.filter(val => val.id === _.parseInt(ingredient.articulo_combo));
@@ -530,8 +566,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     } else if (MateriaPrima.medida === 'Libra') {
       costo = MateriaPrima.costoPrincipal;
     }
-
-    (control.controls[i] as any).controls['costo_formula'].setValue(costo);
+    if (recalcular) {
+      (control.controls[i] as any).controls['costo_formula'].setValue(costo);
+    } else {
+      (control.controls[i] as any).controls['costo_formula'].setValue(ingredient.costo);
+    }
     (control.controls[i] as any).controls['articulo_id'].setValue(ingredient.articulo_combo);
     (control.controls[i] as any).controls['cantidad_formula'].setValue(ingredient.cantidad);
     (control.controls[i] as any).controls['id'].setValue(ingredient.id ? ingredient.id : null);
@@ -539,6 +578,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
   editarItem(item) {
     const articulo = item.ARG;
     this.borrar();
+    this.ProductoEditando = item.ARG;
     this.titulo = 'Editar producto: ' + articulo.nombre;
     this.boton = 'Editar';
     this.indexEditar = item.INDEX;
@@ -605,6 +645,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy {
     }
     this.form.controls.costo_principal.setValue(this.redondearAdos(articulo.costo_principal));
     this.form.controls.precio_principal.setValue(this.formatearNumero(this.redondearAdos(articulo.precio_principal)));
+
+    console.log('this.ProductoEditando', this.ProductoEditando);
   }
   abrirModal(arg?) {
     this.seleccionModal = arg.ARG;
