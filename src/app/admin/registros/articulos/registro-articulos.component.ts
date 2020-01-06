@@ -199,7 +199,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.ARRAY_FORMULA = this.form.controls['rowFormula'] as FormArray;
   }
 
-  saltar(campo) {
+  saltar(campo, array?, i?) {
+    if (array) {
+      campo = campo + i;
+    }
+
     if (campo !== 'send') {
       this.enfocarInput(campo);
     } else {
@@ -228,7 +232,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.TIPOARTICULO = '';
     this.isCombo = false;
     if (this.ARRAY_FORMULA.controls.length > 0) {
-      this.ARRAY_FORMULA.controls.forEach((x, i) => {
+      this.ARRAY_FORMULA.value.forEach((x, i) => {
         setTimeout(() => {
           this.removeItem(0);
         }, 5);
@@ -273,6 +277,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     });
   }
 
+  resetArray() {
+    this.ARRAY_FORMULA = this.form.get('rowFormula') as FormArray;
+    // this.ARRAY_FORMULA.controls.forEach((element, i) => {
+    this.ARRAY_FORMULA.value.forEach((element, i) => {
+      this.removeItem(0);
+    });
+  }
+
   addItem(): void {
     this.ARRAY_FORMULA = this.form.get('rowFormula') as FormArray;
     this.ARRAY_FORMULA.push(this.createItem());
@@ -302,15 +314,17 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   calculateCostoPT() {
     let sumatoriaMult = 0;
 
-    if (this.ARRAY_FORMULA.length > 0) {
-      this.ARRAY_FORMULA.controls.forEach((ingrediente: any) => {
-        const ingre = ingrediente.controls;
-        sumatoriaMult += parseFloat(ingre.cantidad_formula.value) * ingre.costo_formula.value;
+    if (this.ARRAY_FORMULA.value.length > 0 && this.ARRAY_FORMULA.value !== undefined) {
+      this.ARRAY_FORMULA.value.forEach((ingrediente: any) => {
+        sumatoriaMult += parseFloat(ingrediente.cantidad_formula) * ingrediente.costo_formula;
       });
+
       const formulario = this.form.controls;
       if (formulario.otros_costos.value !== null && formulario.otros_costos.value !== undefined && formulario.otros_costos.value !== '' && formulario.otros_costos.value !== ' ') {
         sumatoriaMult += this.desformatear(formulario.otros_costos.value);
         this.form.controls.costo_principal.setValue(this.formatearNumero(this.redondearAdos(sumatoriaMult)));
+        this.calculatePrice();
+        this.calculatePriceLibra();
       }
     }
   }
@@ -544,14 +558,13 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   recalcular() {
-    this.ARRAY_FORMULA = ([] as unknown) as FormArray;
-
+    this.resetArray();
     this.ProductoEditando.formulas_productos_terminados.forEach((ingredient, i) => {
       this.addItem();
-      setTimeout(() => {
-        this.fillFormula(ingredient, i, true);
-      }, 5);
+      this.fillFormula(ingredient, i, true);
     });
+
+    this.calculateCostoPT();
   }
 
   fillFormula(ingredient, i, recalcular?) {
@@ -645,8 +658,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     }
     this.form.controls.costo_principal.setValue(this.redondearAdos(articulo.costo_principal));
     this.form.controls.precio_principal.setValue(this.formatearNumero(this.redondearAdos(articulo.precio_principal)));
-
-    console.log('this.ProductoEditando', this.ProductoEditando);
   }
   abrirModal(arg?) {
     this.seleccionModal = arg.ARG;

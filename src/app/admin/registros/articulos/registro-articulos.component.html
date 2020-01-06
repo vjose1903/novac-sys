@@ -42,7 +42,14 @@
           <div class="col-md-6 ">
             <div class="form-group">
               <label class="control-label">Tipo: <span style="color: red">*</span></label>
-              <select (keydown.enter)="saltar('suplidor')" id="tipo" formControlName="tipo_articulo_id" (change)="selectTipoArticulo($event.target.value)" class="form-control mb-4" value="">
+              <select
+                (keydown.enter)="saltar(TIPOARTICULO !== 'Producto terminado' ? 'suplidor' : 'articulo_id-0')"
+                id="tipo"
+                formControlName="tipo_articulo_id"
+                (change)="selectTipoArticulo($event.target.value)"
+                class="form-control mb-4"
+                value=""
+              >
                 <option value="" disabled selected hidden>Tipo de articulo</option>
                 <option *ngFor="let tipo of listaTipoArticulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
               </select>
@@ -209,7 +216,14 @@
                   <div class="col-4">
                     <div class="from-group">
                       <div>
-                        <select formControlName="articulo_id" class="form-control  entrada" style="border-radius:0 " (change)="getCosto($event.target.value, j)" id="articulo_id-{{ j }}">
+                        <select
+                          formControlName="articulo_id"
+                          (keydown.enter)="saltar('cantidad_formula-', true, j)"
+                          class="form-control  entrada"
+                          style="border-radius:0 "
+                          (change)="getCosto($event.target.value, j)"
+                          id="articulo_id-{{ j }}"
+                        >
                           <option value="{{ null }}" selected>seleccione materia prima</option>
                           <option *ngFor="let lista of listaArticulos | callback: filtroFormula" value="{{ lista.id }}">{{ lista.nombre }}</option>
                         </select>
@@ -222,8 +236,9 @@
                       <input
                         (focus)="$event.target.select()"
                         type="text"
+                        (keydown.enter)="saltar(j !== ARRAY_FORMULA.controls.length - 1 ? 'articulo_id-' : 'OtrosG', j !== ARRAY_FORMULA.controls.length - 1 ? true : false, j + 1)"
                         (blur)="calculateCostoPT()"
-                        id="cantidad_formula"
+                        id="cantidad_formula-{{ j }}"
                         formControlName="cantidad_formula"
                         class="form-control"
                         autocomplete="off"
@@ -237,7 +252,7 @@
                         (focus)="$event.target.select()"
                         readonly
                         type="text"
-                        id="costo_formula"
+                        id="costo_formula-{{ j }}"
                         formControlName="costo_formula"
                         [ngClass]="{ badAlert: checkCostoFormula(Formula) }"
                         class="form-control"
@@ -265,7 +280,7 @@
                 <label class="control-label">Otros Costos: <span style="color: red">*</span></label>
                 <input
                   type="text"
-                  (keydown.enter)="saltar('precioP')"
+                  (keydown.enter)="saltar('costoP')"
                   id="OtrosG"
                   formControlName="otros_costos"
                   placeholder="Otros Gastos"
