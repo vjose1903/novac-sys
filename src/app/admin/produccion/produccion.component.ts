@@ -80,6 +80,7 @@ export class ProduccionComponent implements OnInit {
         this.decisionModalP(res);
       }
     });
+    this.enfocarInput('articulo_id');
   }
   filtroFormula(item) {
     return item.tipo_articulo_id === 3;
@@ -95,6 +96,7 @@ export class ProduccionComponent implements OnInit {
       const tempIngre = this.listaArticulos.filter(val => val.id === _.parseInt(ingrediente.articulo_combo));
       const ingre = tempIngre[0];
       this.ingredientes.push({
+        articulo_id: ingre.id,
         nombre: ingre.nombre,
         cantidad: ingrediente.cantidad,
         existencia: ingre.cantidades,
@@ -214,7 +216,7 @@ export class ProduccionComponent implements OnInit {
           this.dbServ.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR');
           this.enfocarInput('cantidad_producir');
         } else {
-          this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj });
+          this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj, articulo_id: ingre.articulo_id });
         }
       });
     }
@@ -229,11 +231,19 @@ export class ProduccionComponent implements OnInit {
     this.enfocarInput('articulo_id');
   }
   agregarAlista() {
+    this.ingredientesParaProduccion.forEach(ingre => {
+      console.log(ingre);
+
+      ingre.cantidad = ingre.existencia.Libra;
+      ingre.articulo_id = ingre.articulo_id;
+      delete ingre.existencia;
+    });
     const obj = {
       nombre: this.articuloSelected.nombre,
       cantidad: this.cantidad_producir,
       medida: this.medida_producir,
-      articulo_id: this.articulo_id,
+      articulo_id: _.parseInt(this.articulo_id),
+      ingredientes: this.ingredientesParaProduccion,
     };
     this.lista_produccion.push(obj);
     this.disableOption('prod-' + this.articulo_id, true);
@@ -276,8 +286,38 @@ export class ProduccionComponent implements OnInit {
     this.tipoModal = 'cancelarP';
     this.mServ.mostrarModal(true);
   }
-  confirmarProduccion() {}
+  async confirmarProduccion() {
+    const obj = JSON.parse(JSON.stringify(this.lista_produccion));
+    let continuar = true;
 
+    const empleado = JSON.parse(this.dbServ.getEmpleado());
+    await obj.forEach(produccion => {
+      produccion['user_id'] = empleado.id;
+      this.dbServ.createProduccion(produccion).subscribe(
+        res => {},
+        err => {
+          continuar = false;
+          console.log(err.error);
+
+          this.mostrarErrores(err.error);
+          // this.dbServ.toastError(err.error, 'Error');
+        },
+      );
+    });
+    if (continuar) {
+      console.log('entro');
+
+      this.dbServ.toastSuccess('Producción registrada.', 'Correcto');
+    }
+  }
+  mostrarErrores(arg) {
+    for (const error in arg) {
+      if (arg.hasOwnProperty(error)) {
+        const element = arg[error];
+        this.dbServ.toastError(element, 'Error');
+      }
+    }
+  }
   // =============================================
   //  TABLAS
   // =============================================

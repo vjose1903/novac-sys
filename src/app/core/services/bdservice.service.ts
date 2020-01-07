@@ -66,6 +66,16 @@ export class DBservice {
     return this.peticion('cabecera_facturas', 'post', JSON.stringify(arg));
   }
   // =====================================================================
+  // HISTORICO PRODUCCIONES
+  // =====================================================================
+  getProducciones() {
+    return this.peticion('historico_produccions', 'get');
+  }
+  createProduccion(arg) {
+    return this.peticion('historico_produccions', 'post', JSON.stringify(arg));
+  }
+
+  // =====================================================================
   // CLIENTES
   // =====================================================================
   getClientes() {
