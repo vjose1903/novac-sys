@@ -288,15 +288,16 @@ export class ProduccionComponent implements OnInit {
   }
   async confirmarProduccion() {
     const obj = JSON.parse(JSON.stringify(this.lista_produccion));
-    let continuar = true;
+    let continuar = false;
 
     const empleado = JSON.parse(this.dbServ.getEmpleado());
     await obj.forEach(produccion => {
       produccion['user_id'] = empleado.id;
       this.dbServ.createProduccion(produccion).subscribe(
-        res => {},
+        res => {
+          continuar = true;
+        },
         err => {
-          continuar = false;
           console.log(err.error);
 
           this.mostrarErrores(err.error);
