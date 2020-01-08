@@ -47,6 +47,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   numIngredientes: any;
   Recalcular = false;
   ProductoEditando: any;
+  clickBtnRe = false;
   constructor(
     private artServ: ObservableServcie,
     private dbServ: DBservice,
@@ -231,14 +232,19 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.boton = 'Registrar';
     this.TIPOARTICULO = '';
     this.isCombo = false;
+    this.clickBtnRe = false;
+
     if (this.ARRAY_FORMULA.controls.length > 0) {
-      this.ARRAY_FORMULA.value.forEach((x, i) => {
-        setTimeout(() => {
-          this.removeItem(0);
-        }, 5);
-      });
+      this.resetArray();
+    }
+    this.form.controls['rowFormula'].setValue([]);
+
+    if (this.Recalcular === true) {
+      this.Recalcular = false;
+      console.log('this.Recalcular', this.Recalcular);
     }
   }
+
   resetCompradoEn(value) {
     this.FORM.medida_contenido_padre.value = null;
     this.FORM.medida_contenido_hijo.value = null;
@@ -328,6 +334,15 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       }
     }
   }
+
+  checkRecalcular() {
+    let res = false;
+    if (this.Recalcular) {
+      res = true;
+    }
+    return res;
+  }
+
   // =============================================
   //  VALIDACIONES DE ARRAY
   // =============================================
@@ -558,6 +573,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   recalcular() {
+    this.clickBtnRe = true;
+    const temp = JSON.parse(JSON.stringify(this.TIPOARTICULO));
+    this.TIPOARTICULO = null;
     this.resetArray();
     this.ProductoEditando.formulas_productos_terminados.forEach((ingredient, i) => {
       this.addItem();
@@ -565,6 +583,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     });
 
     this.calculateCostoPT();
+    this.Recalcular = null;
+    this.TIPOARTICULO = temp;
   }
 
   fillFormula(ingredient, i, recalcular?) {
@@ -609,9 +629,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       this.fillDropAlerta('Quintal');
       articulo.formulas_productos_terminados.forEach((ingredient, i) => {
         this.addItem();
-        setTimeout(() => {
-          this.fillFormula(ingredient, i);
-        }, 5);
+        this.fillFormula(ingredient, i);
       });
     } else {
       this.isCombo = false;
@@ -776,8 +794,20 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
       this.dbServ.editarArticulo(obj).subscribe(
         res => {
-          this.listaArticulos[this.indexEditar] = res;
+          const temp = JSON.parse(JSON.stringify(this.listaArticulos));
+          this.listaArticulos = [];
+
+          res['contenido_articulos'] = res['contenido_articulos_attributes'];
+          res['formulas_productos_terminados'] = res['formulas_productos_terminados_attributes'];
+          res['codigo'] = _.padStart(res.id, 5, '0');
+          delete res['formulas_productos_terminados_attributes'];
+          delete res['contenido_articulos_attributes'];
+
+          temp[this.indexEditar] = res;
+          this.listaArticulos = JSON.parse(JSON.stringify(temp));
           this.borrar();
+          console.log(res);
+
           this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
         },
         err => {

@@ -465,7 +465,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     let unidad_ = splitUnidad[0];
     unidad = splitUnidad[0];
 
-    if (unidad_ === 'Saco') {
+    if (unidad_ === 'Saco' || unidad_ === 'Libra') {
       unidad_ = 'Libra';
     } else {
       unidad_ = 'Unidad';
@@ -488,7 +488,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
       if (FindProd === descripcion) {
         if (unidad_ === 'Libra') {
-          cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
+          if (splitUnidadF.length > 1) {
+            cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
+          }
           console.log('cantidadF', cantidadF);
         }
         if (unity === 'Saco') {
@@ -498,13 +500,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         cantidadF *= articulo.contenido[unity];
 
         cantidad += cantidadF;
-        console.log('cantidad', cantidad);
       }
     }
 
     if (lugar === 'saltar') {
       i--;
     }
+
     console.log('vendiendo ', cantidad, ' en inventario tengo ', cantidades[unidad_]);
 
     if (this.metodo === 'venta' && cantidad > cantidades[unidad_]) {

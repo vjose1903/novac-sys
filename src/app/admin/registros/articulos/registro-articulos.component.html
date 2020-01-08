@@ -581,13 +581,17 @@
             <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a>
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
             <input [disabled]="abilitarBtnSend()" (click)="submit(form)" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
-            <a *ngIf="Recalcular" class="btn ml-2" id="btn-blanco" (click)="recalcular()">Recarcular</a>
+
+            <ng-container *ngIf="clickBtnRe === false && TIPOARTICULO === 'Producto terminado' && Recalcular === true">
+              <a class="btn ml-2" id="btn-blanco" (click)="recalcular()">Recarcular</a>
+            </ng-container>
           </div>
         </div>
       </div>
     </div>
     <!-- </div> -->
   </div>
+
   <div class=" col-md-6">
     <h4>Listado articulos</h4>
     <div class="card cardListados ">
