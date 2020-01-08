@@ -200,7 +200,6 @@ export class ProduccionComponent implements OnInit {
       this.medida_producir !== ' '
     ) {
       this.ingredientes.forEach(ingre => {
-        console.log(ingre);
         let cantidadFormula = ingre.cantidad;
         if (this.medida_producir === 'Libra') {
           cantidadFormula = cantidadFormula / 100;
@@ -232,12 +231,11 @@ export class ProduccionComponent implements OnInit {
   }
   agregarAlista() {
     this.ingredientesParaProduccion.forEach(ingre => {
-      console.log(ingre);
-
       ingre.cantidad = ingre.existencia.Libra;
       ingre.articulo_id = ingre.articulo_id;
       delete ingre.existencia;
     });
+
     const obj = {
       nombre: this.articuloSelected.nombre,
       cantidad: this.cantidad_producir,
@@ -291,8 +289,14 @@ export class ProduccionComponent implements OnInit {
     let continuar = false;
 
     const empleado = JSON.parse(this.dbServ.getEmpleado());
+
     await obj.forEach(produccion => {
       produccion['user_id'] = empleado.id;
+      if (produccion.medida === 'Quintal') {
+        produccion.cantidad *= 100;
+      }
+      console.log(produccion);
+
       this.dbServ.createProduccion(produccion).subscribe(
         res => {
           continuar = true;
