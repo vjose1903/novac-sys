@@ -284,22 +284,26 @@ export class ProduccionComponent implements OnInit {
     this.tipoModal = 'cancelarP';
     this.mServ.mostrarModal(true);
   }
-  async confirmarProduccion() {
+  confirmarProduccion() {
     const obj = JSON.parse(JSON.stringify(this.lista_produccion));
     let continuar = false;
 
     const empleado = JSON.parse(this.dbServ.getEmpleado());
 
-    await obj.forEach(produccion => {
+    obj.forEach((produccion, i) => {
       produccion['user_id'] = empleado.id;
       if (produccion.medida === 'Quintal') {
         produccion.cantidad *= 100;
       }
-      console.log(produccion);
 
       this.dbServ.createProduccion(produccion).subscribe(
         res => {
-          continuar = true;
+          console.log('i', i);
+          console.log('this.lista_produccion.length', this.lista_produccion.length - 1);
+
+          if (i === this.lista_produccion.length - 1) {
+            this.succes();
+          }
         },
         err => {
           console.log(err.error);
@@ -309,11 +313,10 @@ export class ProduccionComponent implements OnInit {
         },
       );
     });
-    if (continuar) {
-      console.log('entro');
-
-      this.dbServ.toastSuccess('Producción registrada.', 'Correcto');
-    }
+  }
+  succes() {
+    this.dbServ.toastSuccess('Producción registrada.', 'Correcto');
+    this.cancelarProduccion();
   }
   mostrarErrores(arg) {
     for (const error in arg) {
