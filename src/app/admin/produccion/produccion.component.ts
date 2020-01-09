@@ -204,11 +204,27 @@ export class ProduccionComponent implements OnInit {
         if (this.medida_producir === 'Libra') {
           cantidadFormula = cantidadFormula / 100;
         }
-        const quin = cantidadFormula * this.cantidad_producir;
+
+        let quin = cantidadFormula * this.cantidad_producir;
         const obj = {
           Quintal: quin / 100,
           Libra: quin,
         };
+        if (this.lista_produccion.length > 0) {
+          for (let i = 0; i < this.lista_produccion.length; i++) {
+            const element = this.lista_produccion[i];
+
+            if (element.ingredientes.length > 0) {
+              for (let j = 0; j < element.ingredientes.length; j++) {
+                const ingrediente = element.ingredientes[j];
+                if (ingrediente.nombre === ingre.nombre) {
+                  quin += ingrediente.cantidad;
+                }
+              }
+            }
+          }
+        }
+
         if (quin > ingre.existencia.Libra) {
           this.cantidad_producir = null;
           this.ingredientesParaProduccion = [];
@@ -244,6 +260,8 @@ export class ProduccionComponent implements OnInit {
       ingredientes: this.ingredientesParaProduccion,
     };
     this.lista_produccion.push(obj);
+    console.log(this.lista_produccion);
+
     this.disableOption('prod-' + this.articulo_id, true);
     this.borrar();
   }
@@ -274,6 +292,9 @@ export class ProduccionComponent implements OnInit {
         this.disableOption('prod-' + this.seleccionModal.articulo_id, false);
         this.lista_produccion = _.pullAt(listaTemp[this.indexBorrar]);
       } else {
+        this.lista_produccion.forEach(element => {
+          this.disableOption('prod-' + element.articulo_id, false);
+        });
         this.lista_produccion = [];
         this.borrar();
       }
