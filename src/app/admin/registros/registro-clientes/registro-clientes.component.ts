@@ -47,7 +47,58 @@ export class RegistroClientesComponent implements OnInit {
   tipoModal: string;
   seleccionModal: string;
   indexBorrar: any;
+  vendedores;
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService) {}
+
+  redondearAdos(num) {
+    const string = num + '';
+    const splitStr = _.split(string, '.');
+    const enteros = splitStr[0];
+    let tempdecimales = splitStr[1];
+    if (splitStr.length === 1) {
+      tempdecimales = '00';
+    }
+
+    const decimales = tempdecimales.substring(0, 2);
+    const Arreglo = [enteros, decimales];
+    const numStr = _.join(Arreglo, '.');
+    return parseFloat(numStr).toFixed(2);
+    // return (Math.round(num * 100) / 100).toFixed(2);
+  }
+  desformatear(sTnum) {
+    let temp = 0;
+
+    if (sTnum !== null) {
+      if (sTnum !== undefined) {
+        const x = sTnum.split(',');
+        if (x.length === 1) {
+          temp += parseFloat(x[0]);
+          return temp;
+        } else if (x.length >= 2) {
+          let joined = '';
+          joined = _.join(x, '');
+          temp += parseFloat(joined);
+
+          return temp;
+        }
+      }
+    } else {
+      return sTnum;
+    }
+  }
+  formatearNumero(nStr) {
+    if (nStr !== undefined) {
+      nStr += '';
+      const x = nStr.split('.');
+      let x1 = x[0];
+      const x2 = x.length > 1 ? '.' + x[1] : '';
+      const rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+    }
+  }
 
   ngOnInit() {
     this.boton = 'Guardar';
@@ -81,13 +132,87 @@ export class RegistroClientesComponent implements OnInit {
       telefono: [null, Validators.required],
       rnc: [null, ValidateRayaAbajo.verificarRayaAbajo],
       limite_credito: ['', Validators.required],
+      maximo_credito: ['', Validators.required],
+      vendedor_id: [''],
       cedula: [null, ValidateRayaAbajo.verificarRayaAbajo],
     });
+
     this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== null || res !== undefined) {
         this.decisionModal(res);
       }
     });
+
+    this.dbServ.getVendedores().subscribe(res => {
+      this.vendedores = res;
+    });
+  }
+
+  checkNumbers(arg) {
+    let res = false;
+    for (let i = 0; i < arg.length; i++) {
+      const tempCaracter = arg.charAt(i);
+      if (tempCaracter !== ',') {
+        const caracter = _.parseInt(tempCaracter);
+        if (_.isNaN(caracter)) {
+          res = true;
+        }
+      }
+    }
+    return res;
+  }
+  checkLongMillares(num) {
+    let res = false;
+    const splitNum = _.split(num, ',');
+    splitNum.forEach((element, i) => {
+      if (i !== 0) {
+        if (element.length !== 3) {
+          res = true;
+        }
+      }
+    });
+    return res;
+  }
+
+  revisarPrecio(input, id) {
+    const Input = this.form.controls[input];
+
+    const precioTEMPO = Input.value;
+    if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
+      const splitPrecio = _.split(precioTEMPO, '.');
+      let precioTEMP;
+      let enteros = splitPrecio[0];
+      let tempdecimales = splitPrecio[1];
+      if (tempdecimales === undefined) {
+        tempdecimales = '00';
+      }
+      //
+      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
+        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
+        this.enfocarInput(id);
+      } else {
+        //
+        if (splitPrecio.length === 2) {
+          if (enteros === '' || enteros === ' ') {
+            enteros = '0';
+          }
+          let decimales;
+          if (tempdecimales.length > 2) {
+            decimales = tempdecimales.substring(0, 2);
+          } else {
+            decimales = _.padEnd(tempdecimales, 2, '0');
+          }
+          const temp = [enteros, decimales];
+          precioTEMP = _.join(temp, '.');
+        } else if (splitPrecio.length === 1) {
+          const decimales = '00';
+          const temp = [enteros, decimales];
+          precioTEMP = _.join(temp, '.');
+        }
+      }
+
+      Input.setValue(this.formatearNumero(precioTEMP));
+    }
   }
 
   quitarContadoDeLista() {
@@ -123,6 +248,8 @@ export class RegistroClientesComponent implements OnInit {
     });
 
     this.form.patchValue(item.ARG);
+
+    this.form.controls.maximo_credito.setValue(this.formatearNumero(this.redondearAdos(item.ARG.maximo_credito)));
 
     this.titulo = 'Editar cliente: ' + item.ARG.nombre;
     this.boton = 'Editar';
@@ -193,6 +320,7 @@ export class RegistroClientesComponent implements OnInit {
         temp.estado = true;
 
         const obj = _.omit(temp, ['cedula', 'rnc']);
+        obj.maximo_credito = this.desformatear(obj.maximo_credito);
         if (obj.id === null) {
           this.dbServ.createCliente(obj).subscribe(
             res => {
@@ -226,7 +354,7 @@ export class RegistroClientesComponent implements OnInit {
               this.listaClientes[this.indexSeleccionado] = obj;
 
               this.doc_principal = null;
-              this.dbServ.toastSuccess('Cliente editado con exito.', 'Correcto');
+
               this.borrar();
             },
             err => {

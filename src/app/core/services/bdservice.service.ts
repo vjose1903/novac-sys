@@ -110,6 +110,9 @@ export class DBservice {
   getEmpleados() {
     return this.peticion('users', 'get');
   }
+  getVendedores() {
+    return this.peticion('users/vendedores', 'get');
+  }
 
   updateEmpleados(arg) {
     return this.peticion('auth', 'patch', JSON.stringify(arg));
