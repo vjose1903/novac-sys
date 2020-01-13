@@ -231,12 +231,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
     this.TIPOARTICULO = '';
-    this.isCombo = false;
     this.clickBtnRe = false;
 
-    if (this.ARRAY_FORMULA.controls.length > 0) {
+    if (this.isCombo) {
       this.resetArray();
     }
+    this.isCombo = false;
     this.form.controls['rowFormula'].setValue([]);
 
     if (this.Recalcular === true) {

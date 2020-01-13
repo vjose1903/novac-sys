@@ -212,6 +212,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res !== undefined && res !== null && res.tipoModal === 'buscarCliente') {
         this.propietario_factura = res;
+        console.log(res);
+
         this.form.patchValue(this.propietario_factura);
 
         this.enfocarInput('cod-0');
@@ -284,6 +286,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.ModalObj(null);
     this.mServ.modalTipo(null);
     this.mServ.ModalSeleccion(null);
+    this.CancelarFactura();
     this.GetArticulos();
   }
 
@@ -679,6 +682,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     });
     return tempCuerpo;
   }
+
   mostrarErrores(arg) {
     for (const error in arg) {
       if (arg.hasOwnProperty(error)) {
@@ -687,6 +691,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  ingresarFecha() {
+    this.mServ.modalTipo('pendiente');
+    this.tipoModal = 'pendiente';
+    this.abrirModal();
+  }
+
   calcularNuevosPrecios(cant, precio) {
     const pre = precio / cant;
     return this.redondearAdos(pre);
@@ -706,6 +717,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['fecha_vencimiento'] = moment(new Date())
         .add(this.propietario_factura.limite_credito, 'days')
         .format('DD/MM/YYYY');
+      cabecera_fact['pagada'] = false;
+    } else {
+      cabecera_fact['pagada'] = true;
     }
 
     cabecera_fact['fecha_valida'] = moment(new Date())
@@ -730,9 +744,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         cabecera_fact['cliente_id'] = this.propietario_factura.id;
       }
     }
-    if (this.metodo === 'compra') {
-      cabecera_fact['suplidor_id'] = this.form.controls.id.value;
-    }
 
     cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
     cabecera_fact['FACTURA_DE'] = this.metodo === 'venta' ? 13 : 14;
@@ -740,11 +751,18 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['user_id'] = empleado.id;
 
     if (this.metodo === 'compra') {
+      cabecera_fact['suplidor_id'] = this.form.controls.id.value;
       cabecera_fact['detalle_facturas_attributes'] = this.revisarPrecios(cabecera_fact['detalle_facturas_attributes']);
     }
 
+    if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
+      cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
+    }
+    // console.log(cabecera_fact);
+
     this.dbServ.createFacturas(cabecera_fact).subscribe(
       res => {
+        console.log(res);
         this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
           if (res.status) {
             this.CancelarFactura();

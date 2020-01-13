@@ -169,11 +169,14 @@
   </div>
   <div class="pieFactura">
     <div class="row">
-      <div class="col-3 ">
+      <div class="col-2 ">
         <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
       </div>
-      <div class="col-3">
+      <div class="col-2">
         <app-btncircular [alto]="'100px'" [accion]="'Cancelar Factura'" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
+      </div>
+      <div class="col-2">
+        <app-btncircular [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (click)="ingresarFecha()"></app-btncircular>
       </div>
 
       <div class="col-6 d-flex justify-content-end">

@@ -134,6 +134,7 @@ export class RegistroClientesComponent implements OnInit {
       limite_credito: ['', Validators.required],
       maximo_credito: ['', Validators.required],
       vendedor_id: [''],
+      cuenta: [0],
       cedula: [null, ValidateRayaAbajo.verificarRayaAbajo],
     });
 
@@ -322,6 +323,7 @@ export class RegistroClientesComponent implements OnInit {
         const obj = _.omit(temp, ['cedula', 'rnc']);
         obj.maximo_credito = this.desformatear(obj.maximo_credito);
         if (obj.id === null) {
+          obj.cuenta = obj.cuenta;
           this.dbServ.createCliente(obj).subscribe(
             res => {
               const obj = JSON.parse(JSON.stringify(res));
@@ -343,6 +345,7 @@ export class RegistroClientesComponent implements OnInit {
             },
           );
         } else {
+          obj.cuenta = 0;
           this.dbServ.editarCliente(obj).subscribe(
             res => {
               const obj = JSON.parse(JSON.stringify(res));

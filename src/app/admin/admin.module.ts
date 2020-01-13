@@ -27,6 +27,8 @@ import { FiltroParaNgforPipe } from '../core/pipe/filtro-para-ngfor.pipe';
 import { PaswordConfirmDirective } from '../core/directive/pasword-confirm-directive.directive';
 import { ChangePasswordComponent } from '../components/change-password/change-password.component';
 import { ProduccionComponent } from './produccion/produccion.component';
+import { PendienteFormComponent } from '../components/pendiente-form/pendiente-form.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -47,6 +49,7 @@ import { ProduccionComponent } from './produccion/produccion.component';
     ValidateRayaAbajo,
     RegistroSuplidoresComponent,
     ProduccionComponent,
+    PendienteFormComponent,
   ],
   imports: [
     DialogModule,
@@ -57,6 +60,7 @@ import { ProduccionComponent } from './produccion/produccion.component';
     NgxBootstrapModule,
     // MdBootstrapModule
     MDBBootstrapModule.forRoot(),
+    NgbModule,
   ],
   exports: [],
 })

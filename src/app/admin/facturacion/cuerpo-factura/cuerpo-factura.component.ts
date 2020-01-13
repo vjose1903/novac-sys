@@ -142,9 +142,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     });
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    this.RESETCUERPO();
+  }
   ngAfterViewInit() {
-    this.control = <FormArray>this.form.controls['rowFactura'];
+    this.control = this.form.controls['rowFactura'] as FormArray;
   }
   ngOnChanges() {}
 

@@ -21,6 +21,8 @@ export class RegistroEmpleadosComponent implements OnInit {
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   element: HTMLElement;
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
+  rolesF = { V: 'Vendedora', A: 'Administradora', U: 'Usuario' };
+  rolesM = { V: 'Vendedor', A: 'Administrador', U: 'Usuario' };
 
   info = [
     {
@@ -34,6 +36,10 @@ export class RegistroEmpleadosComponent implements OnInit {
     {
       titulo: 'Doc. identidad',
       key: 'documento_identidad', // ojo
+    },
+    {
+      titulo: 'Role',
+      key: 'role_', // ojo
     },
   ];
   botones = {
@@ -71,6 +77,7 @@ export class RegistroEmpleadosComponent implements OnInit {
         map(
           emple =>
             (emple = emple.map(cli => {
+              cli.role_ = cli.sexo === 'm' ? this.rolesM[cli.role] : this.rolesF[cli.role];
               cli.documentos_de_identidad.map(docu => {
                 if (docu.principal) {
                   cli.documento_identidad = docu.documento;
@@ -192,12 +199,19 @@ export class RegistroEmpleadosComponent implements OnInit {
       } else {
         this.dbServ.createEmpleados(objSend).subscribe(
           res => {
-            this.listaEmpleados = [...this.listaEmpleados, res];
+            console.log(res);
+
+            const docu = res.data.documentos_de_identidad.filter(doc => doc.principal === true);
+            res.data.documento_identidad = docu[0].documento;
+
+            this.listaEmpleados = [...this.listaEmpleados, res.data];
             this.dbServ.toastSuccess('Usuario Creado', 'Correcto');
             this.form.reset();
             this.enfocarInput('campoNombre');
           },
           err => {
+            console.log(err);
+
             this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
           },
         );

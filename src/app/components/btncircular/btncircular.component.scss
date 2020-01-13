@@ -1,5 +1,6 @@
 .contenedor {
-  display: grid;
+  display: inline-grid;
+  justify-content: center;
 }
 .labelBtn {
   margin: auto;
@@ -19,5 +20,5 @@
     }
   }
 
-//   margin: auto auto;
+  //   margin: auto auto;
 }

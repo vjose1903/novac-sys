@@ -107,6 +107,7 @@
                 <select formControlName="role" class="form-control   ">
                   <option value="" disabled selected hidden>Role</option>
                   <option value="A">Administrador</option>
+                  <option value="V">Vendedor</option>
                   <option value="U">Usuario</option>
                 </select>
                 <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['role'].valid && (form.controls['role'].dirty || form.controls['role'].touched)">

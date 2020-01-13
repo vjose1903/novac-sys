@@ -44,6 +44,24 @@
     </p-dialog>
 
     <!-- ================================================================================================================================ -->
+    <!--  ESCOGER FECHA  -->
+    <!-- ================================================================================================================================ -->
+
+    <p-dialog
+      *ngIf="tipoModal === 'pendiente'"
+      header="Introducir fecha factura pendiente"
+      [(visible)]="showModal"
+      [modal]="false"
+      [responsive]="true"
+      [style]="{ width: '350px', minWidth: '200px' }"
+      [minY]="70"
+      [baseZIndex]="10000"
+      (onHide)="reinicioModal()"
+      blockScroll="false"
+    >
+      <app-pendiente-form (cancel)="accion($event)"></app-pendiente-form>
+    </p-dialog>
+    <!-- ================================================================================================================================ -->
     <!--  CAMBIAR CONTRASEÑA  -->
     <!-- ================================================================================================================================ -->
 
@@ -141,7 +159,7 @@
       [focusOnShow]="true"
       [modal]="false"
       [responsive]="true"
-      [style]="{ width: '600px', minWidth: '400px' }"
+      [style]="{ width: '900px', minWidth: '400px' }"
       [minY]="70"
       (onHide)="reinicioModal()"
       id="tablaSearch"
@@ -175,7 +193,7 @@
       [focusOnShow]="true"
       [modal]="false"
       [responsive]="true"
-      [style]="{ width: '600px', minWidth: '400px' }"
+      [style]="{ width: '900px', minWidth: '400px' }"
       [minY]="70"
       (onHide)="reinicioModal()"
       (onShow)="prueba()"

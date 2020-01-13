@@ -213,11 +213,11 @@ function cabeceraFacturaVenta(data) {
           },
           data.FACTURA_DE === 'compra'
             ? {
-              text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
-              margin: [0, 1, 0, 0],
-              alignment: 'center',
-            }
-            : {text:''},
+                text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
+                margin: [0, 1, 0, 0],
+                alignment: 'center',
+              }
+            : { text: '' },
         ],
         [
           {
@@ -231,7 +231,7 @@ function cabeceraFacturaVenta(data) {
                 margin: [75, 0, 0, 0],
               },
               data.condicion === 'Contado'
-                ? {text:''}
+                ? { text: '' }
                 : {
                     text: [
                       { text: 'Fecha vencimiento : ', fontSize: 11.5 },
@@ -362,6 +362,9 @@ function contenidoFacturaVenta(data) {
       text: [
         { text: 'Realizada Por:  ', fontSize: 11, bold: true },
         { text: data.usuario, fontSize: 11 },
+
+        data.vendedor ? { text: 'Vendedor:  ', fontSize: 11, bold: true } : { text: '' },
+        data.vendedor ? { text: data.vendedor, fontSize: 11 } : { text: '' },
       ],
       margin: [0, 5, 0, 0],
     },
@@ -405,21 +408,21 @@ function contenidoFacturaVenta(data) {
                 },
                 data.FACTURA_DE === 'venta'
                   ? {
-                    type: 'rect',
-                    x: 260,
-                    y: 0,
-                    w: 140,
-                    h: 1,
-                    color: '#000000',
-                  }
+                      type: 'rect',
+                      x: 260,
+                      y: 0,
+                      w: 140,
+                      h: 1,
+                      color: '#000000',
+                    }
                   : {
-                    type: 'rect',
-                    x: 0,
-                    y: 0,
-                    w: 0,
-                    h: 0,
-                    color: '#ffffff',
-                  },
+                      type: 'rect',
+                      x: 0,
+                      y: 0,
+                      w: 0,
+                      h: 0,
+                      color: '#ffffff',
+                    },
               ],
               margin: [0, 30, 0, 0],
             },
@@ -434,10 +437,10 @@ function contenidoFacturaVenta(data) {
                 [
                   data.FACTURA_DE === 'venta'
                     ? {
-                      text: [{ text: 'Cliente', fontSize: 12, bold: true }],
-                      margin: [-70, 5, 0, 0],
-                    }
-                    : {text:''},
+                        text: [{ text: 'Cliente', fontSize: 12, bold: true }],
+                        margin: [-70, 5, 0, 0],
+                      }
+                    : { text: '' },
                 ],
               ],
             },
@@ -472,13 +475,13 @@ function makeFacturaVenta(data) {
         },
         data.FACTURA_DE === 'venta'
           ? data.condicion === 'Contado'
-            ?  {text:''}
+            ? { text: '' }
             : {
-              text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-              alignment: 'center',
-              margin: [0, -15, 0, 0],
-            }
-          :  {text:''},
+                text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+                alignment: 'center',
+                margin: [0, -15, 0, 0],
+              }
+          : { text: '' },
       ];
     },
     images: {
@@ -526,7 +529,7 @@ function imprimir(cFileName) {
   var foxitPath = PathApp() + 'print\\FoxitReaderPortable.exe';
   exec(`${foxitPath} /t "${PathApp()}factura.pdf"`, (error, stdout, stderr) => {
     if (error) {
-      win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err:error });
+      win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err: error });
       return;
     } else {
       console.log('stdout  ', stdout);
