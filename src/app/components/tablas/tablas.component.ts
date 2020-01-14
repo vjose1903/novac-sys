@@ -117,7 +117,21 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     //   }, 5);
     // }
   }
+  redondearAdos(num) {
+    const string = num + '';
+    const splitStr = _.split(string, '.');
+    const enteros = splitStr[0];
+    let tempdecimales = splitStr[1];
+    if (splitStr.length === 1) {
+      tempdecimales = '00';
+    }
 
+    const decimales = tempdecimales.substring(0, 2);
+    const Arreglo = [enteros, decimales];
+    const numStr = _.join(Arreglo, '.');
+    return parseFloat(numStr).toFixed(2);
+    // return (Math.round(num * 100) / 100).toFixed(2);
+  }
   formatearNumero(nStr) {
     if (nStr !== undefined) {
       nStr += '';
@@ -140,9 +154,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     const fin1 = values[1] > 1 ? this.medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? this.medidas[keys[2]] : keys[2];
 
-    const principal = this.formatearNumero(values[0]) + '  ' + fin;
+    const principal = this.formatearNumero(this.redondearAdos(values[0])) + '  ' + fin;
 
-    const padre = this.formatearNumero(values[1]) + '  ' + fin1;
+    const padre = this.formatearNumero(this.redondearAdos(values[1])) + '  ' + fin1;
     const hijo = this.formatearNumero(values[2]) + '  ' + fin2;
 
     let cantiTootip = ``;
@@ -161,7 +175,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     const keys = _.keys(objeto);
     const values = _.values(objeto);
     const fin = values[0] > 1 ? this.medidas[keys[0]] : keys[0];
-    return this.formatearNumero(values[0]) + '  ' + fin;
+    return this.formatearNumero(this.redondearAdos(values[0])) + '  ' + fin;
   }
 
   ngOnChanges() {}

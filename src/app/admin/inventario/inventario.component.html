@@ -1,3 +1,34 @@
-<p>
-  inventario works!
-</p>
+<div class="cardPrincipal sinPadding tamano">
+  <div class="row d-flex justify-content-center">
+    <div class="col-11 bordes mt-2">
+      <div class="d-flex justify-content-between">
+        <div class="text-center">
+          <span class="w-100"> Cantidad de productos en inventario </span>
+          <h3 *ngIf="listaArticulos">{{ listaArticulos.length }}</h3>
+        </div>
+
+        <div class="text-center">
+          <span class="w-100"> Costo total </span>
+          <h3 *ngIf="listaArticulos">{{ listaArticulos.length }}</h3>
+        </div>
+
+        <div class="text-center">
+          <span class="w-100"> Ganancia total </span>
+          <h3 *ngIf="listaArticulos">{{ listaArticulos.length }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-2">
+    <app-tablas
+      *ngIf="listaArticulos && info"
+      [info]="info"
+      [data]="listaArticulos"
+      [scrollContainer]="'scroll-container'"
+      [focusRow]="false"
+      [botones]="botones"
+      (DevolverInfo)="movimientoInventario($event)"
+    ></app-tablas>
+  </div>
+</div>

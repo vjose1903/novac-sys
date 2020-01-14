@@ -18,7 +18,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   titulo = '';
   boton = '';
   form: FormGroup;
-  detallableArray: FormArray;
+
   isDetallable = false;
   medida: boolean;
 
@@ -56,9 +56,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     private actRou: ActivatedRoute,
     private router: Router,
     private mServ: ModalService,
-  ) {
-    this.detallableArray = new FormArray([new FormControl()]);
-  }
+  ) {}
   redondearAdos(num) {
     const string = num + '';
     const splitStr = _.split(string, '.');
@@ -195,7 +193,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       precio_hijo: [null],
       rowFormula: this.fb.array([]),
       otros_costos: [null],
-      // detallableArray: this.fb.array([]),
     });
     this.ARRAY_FORMULA = this.form.controls['rowFormula'] as FormArray;
   }

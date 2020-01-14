@@ -12,7 +12,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="false"
+    blockScroll="true"
   >
     <p>Desea remover {{ seleccionModal.nombre }} de la lista</p>
     <p-footer>
@@ -34,7 +34,7 @@
       [minY]="70"
       [baseZIndex]="10000"
       (onHide)="reinicioModal()"
-      blockScroll="false"
+      blockScroll="true"
     >
       <p>Desea eliminar {{ seleccionModal.nombre }}</p>
       <p-footer>
@@ -49,7 +49,7 @@
 
     <p-dialog
       *ngIf="tipoModal === 'pendiente'"
-      header="Introducir fecha factura pendiente"
+      header="Factura pendiente"
       [(visible)]="showModal"
       [modal]="false"
       [responsive]="true"
@@ -57,7 +57,7 @@
       [minY]="70"
       [baseZIndex]="10000"
       (onHide)="reinicioModal()"
-      blockScroll="false"
+      blockScroll="true"
     >
       <app-pendiente-form (cancel)="accion($event)"></app-pendiente-form>
     </p-dialog>
@@ -75,7 +75,7 @@
       [minY]="70"
       [baseZIndex]="10000"
       (onHide)="reinicioModal()"
-      blockScroll="false"
+      blockScroll="true"
     >
       <app-change-password [user]="seleccionModal" (cancel)="accion($event)"></app-change-password>
     </p-dialog>
@@ -93,7 +93,7 @@
       [minY]="70"
       [baseZIndex]="10000"
       (onHide)="reinicioModal()"
-      blockScroll="false"
+      blockScroll="true"
     >
       <p>Seguro que desea cancelar la produccion</p>
       <p-footer>
@@ -115,7 +115,7 @@
       [minY]="70"
       [baseZIndex]="10000"
       (onHide)="reinicioModal()"
-      blockScroll="false"
+      blockScroll="true"
     >
       <p>Seguro que desea cancelar la factura</p>
       <p-footer>
@@ -138,7 +138,7 @@
       [minY]="70"
       [baseZIndex]="10000"
       (onHide)="reinicioModal()"
-      blockScroll="false"
+      blockScroll="true"
     >
       <p>Seguro que desea imprimir la factura</p>
       <p-footer>
@@ -164,7 +164,7 @@
       (onHide)="reinicioModal()"
       id="tablaSearch"
       (onShow)="prueba()"
-      blockScroll="false"
+      blockScroll="true"
     >
       <!-- *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos" -->
       <app-tablas
@@ -197,7 +197,7 @@
       [minY]="70"
       (onHide)="reinicioModal()"
       (onShow)="prueba()"
-      blockScroll="false"
+      blockScroll="true"
     >
       <app-tablas
         *ngIf="seleccionModal"
