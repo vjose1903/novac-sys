@@ -1,5 +1,10 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import * as moment from 'moment';
+import { FormBuilder } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DBservice } from '../../core/services/bdservice.service';
+import { ModalService } from '../modal/modal.service';
+import { parseDate, BsDatepickerConfig } from 'ngx-bootstrap';
 
 @Component({
   selector: 'app-pendiente-form',
@@ -11,12 +16,25 @@ export class PendienteFormComponent implements OnInit {
   hora;
   minutos;
   meridian = true;
+  fecha;
+  public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   @Output() cancel = new EventEmitter<any>();
-  constructor() {}
+
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {
+    this.dpConfig = Object.assign(
+      {},
+      {
+        // locale:'es',
+        showWeekNumbers: false,
+        maxDate: new Date(),
+      },
+    );
+  }
 
   ngOnInit() {
     this.hora = moment().hour();
     this.minutos = moment().minutes();
+    this.fecha = moment().format('MM/DD/YYYY');
 
     this.time = { hour: this.hora, minute: this.minutos };
   }
@@ -28,4 +46,5 @@ export class PendienteFormComponent implements OnInit {
   accion(arg) {
     this.cancel.emit(arg);
   }
+  articulosHistoricos() {}
 }
