@@ -9,3 +9,7 @@
 <span mdbTooltip="Borrar" (click)="delete(row)" placement="top" *ngIf="botones.borrar">
   <i class="far fa-trash-alt"></i>
 </span>
+
+<span mdbTooltip="Movimientos de inventario" (click)="devolverInfo(row, 'inventario')" placement="top" *ngIf="botones.inventario">
+  <i class="fas fa-dolly"></i>
+</span>

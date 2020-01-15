@@ -1,6 +1,6 @@
 <div class="cardPrincipal sinPadding tamano">
   <div class="row d-flex justify-content-center">
-    <div class="col-11 bordes mt-2">
+    <div class="col-11 bordes mt-4">
       <div class="d-flex justify-content-between">
         <div class="text-center">
           <span class="w-100"> Cantidad de productos en inventario </span>
@@ -9,18 +9,18 @@
 
         <div class="text-center">
           <span class="w-100"> Costo total </span>
-          <h3 *ngIf="listaArticulos">{{ listaArticulos.length }}</h3>
+          <h3 *ngIf="listaArticulos">RD$ {{ formatoNumero(costoTotal) }}</h3>
         </div>
 
         <div class="text-center">
           <span class="w-100"> Ganancia total </span>
-          <h3 *ngIf="listaArticulos">{{ listaArticulos.length }}</h3>
+          <h3 *ngIf="listaArticulos">RD$ {{ formatoNumero(gananciaTotal) }}</h3>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="p-2">
+  <div class="p-2 mt-2">
     <app-tablas
       *ngIf="listaArticulos && info"
       [info]="info"

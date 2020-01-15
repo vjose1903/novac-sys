@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalService } from '../../components/modal/modal.service';
+import { GLOBAL } from '../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-inventario',
@@ -37,10 +38,11 @@ export class InventarioComponent implements OnInit {
   ];
   botones = {
     titulo: true,
-    borrar: true,
-    editar: true,
+    inventario: true,
   };
   listaArticulos;
+  costoTotal: number;
+  gananciaTotal: number;
   constructor(
     private artServ: ObservableServcie,
     private dbServ: DBservice,
@@ -52,15 +54,38 @@ export class InventarioComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.dbServ.getArticulos().subscribe(res => {
-      res.sort((a, b) => {
+    this.necesarioParaEmpezar();
+    // this.formatearNum(15421545.54165);
+  }
+
+  formatoNumero(num) {
+    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
+  }
+
+  async necesarioParaEmpezar() {
+    await this.getArticulos();
+    await this.calcularGananciasCostos();
+  }
+  async getArticulos() {
+    try {
+      this.listaArticulos = await this.dbServ.getArticulos().toPromise();
+      this.listaArticulos.sort((a, b) => {
         return a.id > b.id ? 1 : -1;
       });
+    } catch (error) {}
+  }
+  calcularGananciasCostos() {
+    this.costoTotal = 0;
+    this.gananciaTotal = 0;
+    for (let i = 0; i < this.listaArticulos.length; i++) {
+      const articulo = this.listaArticulos[i];
+      const costo = articulo.costo_principal;
+      const precio = articulo.precio_principal;
+      const cantidad = articulo.cantidades[articulo.medida];
 
-      if (res !== undefined && res !== null) {
-        this.listaArticulos = res;
-      }
-    });
+      this.costoTotal += costo * cantidad;
+      this.gananciaTotal += precio * cantidad;
+    }
   }
   movimientoInventario() {}
 }

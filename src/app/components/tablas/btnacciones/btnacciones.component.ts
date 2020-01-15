@@ -12,6 +12,7 @@ export class BTNACCIONESComponent implements OnInit {
     editar: false,
     panico: false,
     mostrar: false,
+    inventario: false,
   };
   @Input() row: any;
   @Input() data: any;

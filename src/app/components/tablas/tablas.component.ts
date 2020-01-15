@@ -181,7 +181,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   ngOnChanges() {}
 
   searchItems() {
-    const prev = this.mdbTable.getDataSource();
+    const prev = JSON.parse(JSON.stringify(this.previous));
 
     if (!this.searchText) {
       this.mdbTable.setDataSource(this.previous);
@@ -199,7 +199,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
       this.elements.push(element);
       this.previous.push(element);
     });
-
     if (this.elements !== undefined) {
       this.mdbTable.setDataSource(this.elements);
     }
@@ -207,8 +206,12 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     this.previous = this.mdbTable.getDataSource();
   }
 
-  ngAfterViewInit() {
-    this.setDATATABLE();
+  async setData() {
+    await this.setDATATABLE();
+  }
+
+  async ngAfterViewInit() {
+    await this.setData();
 
     if (this.paraFiltroArticulos) {
       this.searchText = this.paraFiltroArticulos;
