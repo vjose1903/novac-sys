@@ -15,6 +15,9 @@ export class GLOBAL {
       return x1 + x2;
     }
   }
+  static duplicarJson(json) {
+    return JSON.parse(JSON.stringify(json));
+  }
   static redondearAdos(num) {
     const string = num + '';
     const splitStr = _.split(string, '.');

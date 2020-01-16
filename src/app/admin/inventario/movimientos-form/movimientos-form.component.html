@@ -28,7 +28,7 @@
       <input type="number" class="form-control" [(ngModel)]="cantidad" placeholder="Introduzca la cantidad" autocomplete="off" />
     </div>
   </div>
-  <div *ngIf="medida && cantidad" class="col-12">
+  <div *ngIf="medida && cantidad" class="col-12 mb-3">
     <div class="contenedorAvisosMov">
       {{ mostrarExistencia('mov') }} <br />
       {{ mostrarExistencia('stock') }}

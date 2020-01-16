@@ -5,14 +5,13 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
-
+import * as _ from 'lodash';
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
   styleUrls: ['./inventario.component.scss'],
 })
 export class InventarioComponent implements OnInit {
-  [x: string]: any;
   // =============================================
   //  TABLAS
   // =============================================
@@ -41,9 +40,16 @@ export class InventarioComponent implements OnInit {
     titulo: true,
     inventario: true,
   };
-  listaArticulos;
+  listaArticulos = [];
   costoTotal: number;
   gananciaTotal: number;
+  tipo_articulos;
+  indexBorrar: any;
+  tipoModal: string;
+  seleccionModal: any;
+  filtrado = false;
+  filtro;
+  restarFiltro: any;
   constructor(
     private artServ: ObservableServcie,
     private dbServ: DBservice,
@@ -54,9 +60,11 @@ export class InventarioComponent implements OnInit {
     private mServ: ModalService,
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.necesarioParaEmpezar();
-    // this.formatearNum(15421545.54165);
+    this.dbServ.getTipoArticulos().subscribe(res => {
+      this.tipo_articulos = res;
+    });
   }
 
   formatoNumero(num) {
@@ -66,6 +74,8 @@ export class InventarioComponent implements OnInit {
   async necesarioParaEmpezar() {
     await this.getArticulos();
     await this.calcularGananciasCostos();
+    this.restarFiltro = GLOBAL.duplicarJson(this.listaArticulos);
+    this.filtro = '0';
   }
   async getArticulos() {
     try {
@@ -74,6 +84,22 @@ export class InventarioComponent implements OnInit {
         return a.id > b.id ? 1 : -1;
       });
     } catch (error) {}
+  }
+
+  filtrarArticulos() {
+    console.log('this.filtrado', this.filtrado);
+
+    if (this.filtro === 'todos' && this.filtrado === true) {
+      this.listaArticulos = this.restarFiltro;
+      this.filtrado = false;
+    }
+
+    if (this.filtro !== 'todos') {
+      this.listaArticulos = GLOBAL.duplicarJson(this.restarFiltro);
+      // this.listaArticulos.slice(0);
+      this.listaArticulos = this.listaArticulos.filter(val => val.tipo_articulo_id === _.parseInt(this.filtro));
+      this.filtrado = true;
+    }
   }
   calcularGananciasCostos() {
     this.costoTotal = 0;

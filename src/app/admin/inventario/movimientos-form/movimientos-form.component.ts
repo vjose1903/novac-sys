@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
 import { ValidateRayaAbajo } from '../../../directives/validaciones';
 import { ModalService } from '../../../components/modal/modal.service';
+import { GLOBAL } from '../../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-movimientos-form',
@@ -31,6 +32,9 @@ export class MovimientosFormComponent implements OnInit {
   accion(arg) {
     this.cancel.emit(arg);
   }
+  formatoNumero(arg) {
+    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(arg));
+  }
 
   mostrarExistencia(arg) {
     if (this.cantidad && this.medida) {
@@ -49,7 +53,7 @@ export class MovimientosFormComponent implements OnInit {
         } else {
           calculo = existenciaPorMedida - this.cantidad;
         }
-        return 'Proximo en inventario ' + calculo + ' ' + med;
+        return 'Proximo en inventario ' + this.formatoNumero(calculo) + ' ' + med;
       }
     }
   }

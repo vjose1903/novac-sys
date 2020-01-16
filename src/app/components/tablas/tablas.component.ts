@@ -178,7 +178,15 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     return this.formatearNumero(this.redondearAdos(values[0])) + '  ' + fin;
   }
 
-  ngOnChanges() {}
+  ngOnChanges(simpleChanges) {
+    if (simpleChanges['data'] && this.data) {
+      this.waitForChange();
+    }
+  }
+
+  async waitForChange() {
+    await this.setDATATABLE();
+  }
 
   searchItems() {
     const prev = JSON.parse(JSON.stringify(this.previous));
@@ -195,15 +203,20 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   setDATATABLE() {
+    this.elements = [];
+    this.previous = [];
+
     this.data.forEach(element => {
       this.elements.push(element);
       this.previous.push(element);
     });
-    if (this.elements !== undefined) {
-      this.mdbTable.setDataSource(this.elements);
-    }
-    this.elements = this.mdbTable.getDataSource();
-    this.previous = this.mdbTable.getDataSource();
+    setTimeout(() => {
+      if (this.elements !== undefined) {
+        this.mdbTable.setDataSource(this.elements);
+      }
+      this.elements = this.mdbTable.getDataSource();
+      this.previous = this.mdbTable.getDataSource();
+    }, 1000);
   }
 
   async setData() {
