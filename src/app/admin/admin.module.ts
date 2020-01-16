@@ -29,6 +29,7 @@ import { ChangePasswordComponent } from '../components/change-password/change-pa
 import { ProduccionComponent } from './produccion/produccion.component';
 import { PendienteFormComponent } from '../components/pendiente-form/pendiente-form.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { MovimientosFormComponent } from './inventario/movimientos-form/movimientos-form.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     RegistroSuplidoresComponent,
     ProduccionComponent,
     PendienteFormComponent,
+    MovimientosFormComponent,
   ],
   imports: [
     DialogModule,

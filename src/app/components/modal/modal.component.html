@@ -62,6 +62,26 @@
       <app-pendiente-form (cancel)="accion($event)"></app-pendiente-form>
     </p-dialog>
     <!-- ================================================================================================================================ -->
+    <!--  MOVIMIENTO INVENTARIO  -->
+    <!-- ================================================================================================================================ -->
+
+    <p-dialog
+      *ngIf="tipoModal === 'inventario'"
+      header="Movimientos de inventario"
+      [(visible)]="showModal"
+      [modal]="false"
+      [responsive]="true"
+      [style]="{ width: '450px', minWidth: '200px' }"
+      [minY]="70"
+      [baseZIndex]="10000"
+      (onHide)="reinicioModal()"
+      blockScroll="true"
+    >
+      <div class="p-2">
+        <app-movimientos-form [data]="seleccionModal" (cancel)="accion($event)"></app-movimientos-form>
+      </div>
+    </p-dialog>
+    <!-- ================================================================================================================================ -->
     <!--  CAMBIAR CONTRASEÑA  -->
     <!-- ================================================================================================================================ -->
 

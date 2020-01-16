@@ -1,0 +1,48 @@
+<div class="row">
+  <div class="col-12">
+    <h2>
+      Producto: {{ ' ' }}<span class="text-bold">{{ data.nombre }}</span>
+    </h2>
+  </div>
+  <div class=" col-12">
+    <div class="form-group">
+      <label class="control-label">Tipo movimiento: </label>
+      <select [(ngModel)]="tipo_movimiento" class="form-control">
+        <option value="entrada">Entrada</option>
+        <option value="salida"> Salida</option>
+      </select>
+    </div>
+  </div>
+  <div class=" col-12">
+    <div class="from-group">
+      <label class="control-label">Medida: </label>
+      <select [(ngModel)]="medida" class="form-control">
+        <option *ngFor="let item of medidas" value="{{ item }}">{{ item }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="form-group">
+      <label class="control-label mt-3">cantidad: </label>
+      <input type="number" class="form-control" [(ngModel)]="cantidad" placeholder="Introduzca la cantidad" autocomplete="off" />
+    </div>
+  </div>
+  <div *ngIf="medida && cantidad" class="col-12">
+    <div class="contenedorAvisosMov">
+      {{ mostrarExistencia('mov') }} <br />
+      {{ mostrarExistencia('stock') }}
+    </div>
+  </div>
+
+  <div class="col-12">
+    <label class="control-label">Motivo {{ tipo_movimiento }}</label>
+    <textarea [(ngModel)]="motivo" class="form-control" cols="30" rows="3"></textarea>
+  </div>
+  <div class="mt-3">
+    <div class="from-group">
+      <a class="btn mr-2" id="btn-gris" (click)="accion(false)">Cancelar</a>
+      <a class="btn mr-2" id="btn-verde" (click)="submit()">Aceptar</a>
+    </div>
+  </div>
+</div>

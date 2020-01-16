@@ -12,6 +12,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
   styleUrls: ['./inventario.component.scss'],
 })
 export class InventarioComponent implements OnInit {
+  [x: string]: any;
   // =============================================
   //  TABLAS
   // =============================================
@@ -87,5 +88,14 @@ export class InventarioComponent implements OnInit {
       this.gananciaTotal += precio * cantidad;
     }
   }
-  movimientoInventario() {}
+  movimientoInventario(arg) {
+    console.log(arg);
+
+    this.indexBorrar = arg.INDEX;
+    this.mServ.modalTipo('inventario');
+    this.tipoModal = 'inventario';
+    this.seleccionModal = arg.ARG;
+    this.mServ.ModalSeleccion(arg.ARG);
+    this.mServ.mostrarModal(true);
+  }
 }
