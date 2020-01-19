@@ -21,6 +21,7 @@ import { TablasService } from './tablas.service';
 import { idLocale } from 'ngx-bootstrap';
 import * as _ from 'lodash';
 import { DBservice } from '../../core/services/bdservice.service';
+import { GLOBAL } from '../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-tablas',
@@ -117,33 +118,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     //   }, 5);
     // }
   }
-  redondearAdos(num) {
-    const string = num + '';
-    const splitStr = _.split(string, '.');
-    const enteros = splitStr[0];
-    let tempdecimales = splitStr[1];
-    if (splitStr.length === 1) {
-      tempdecimales = '00';
-    }
 
-    const decimales = tempdecimales.substring(0, 2);
-    const Arreglo = [enteros, decimales];
-    const numStr = _.join(Arreglo, '.');
-    return parseFloat(numStr).toFixed(2);
-    // return (Math.round(num * 100) / 100).toFixed(2);
-  }
-  formatearNumero(nStr) {
-    if (nStr !== undefined) {
-      nStr += '';
-      const x = nStr.split('.');
-      let x1 = x[0];
-      const x2 = x.length > 1 ? '.' + x[1] : '';
-      const rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      }
-      return x1 + x2;
-    }
+  formatoNumero(num) {
+    return GLOBAL.formatearNumero(num);
   }
 
   lookOters(objeto) {
@@ -154,32 +131,33 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     const fin1 = values[1] > 1 ? this.medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? this.medidas[keys[2]] : keys[2];
 
-    const principal = this.formatearNumero(this.redondearAdos(values[0])) + '  ' + fin;
+    const principal = GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[0])) + '  ' + fin;
 
-    const padre = this.formatearNumero(this.redondearAdos(values[1])) + '  ' + fin1;
-    const hijo = this.formatearNumero(values[2]) + '  ' + fin2;
+    const padre = GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[1])) + '  ' + fin1;
+    const hijo = GLOBAL.formatearNumero(values[2]) + '  ' + fin2;
 
-    let cantiTootip = ``;
+    let cantiTootip = { Padre: undefined, Hijo: undefined };
     if (keys.length > 1) {
       if (keys.length === 2) {
-        cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
+        cantiTootip = { Padre: padre, Hijo: undefined };
       } else {
-        cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br> <span>${hijo}</span><br> </div>`;
+        cantiTootip = { Padre: padre, Hijo: hijo };
       }
     } else {
-      cantiTootip = `<div style=" max-width: 21rem;" > <span> ${principal} </span><br></div>`;
+      cantiTootip = { Padre: principal, Hijo: undefined };
     }
+
     return cantiTootip;
   }
   lookprincipal(objeto) {
     const keys = _.keys(objeto);
     const values = _.values(objeto);
     const fin = values[0] > 1 ? this.medidas[keys[0]] : keys[0];
-    return this.formatearNumero(this.redondearAdos(values[0])) + '  ' + fin;
+    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[0])) + '  ' + fin;
   }
 
   ngOnChanges(simpleChanges) {
-    if (simpleChanges['data'] && this.data) {
+    if (simpleChanges['data'].firstChange === false) {
       this.waitForChange();
     }
   }
@@ -210,21 +188,18 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
       this.elements.push(element);
       this.previous.push(element);
     });
-    setTimeout(() => {
-      if (this.elements !== undefined) {
-        this.mdbTable.setDataSource(this.elements);
-      }
-      this.elements = this.mdbTable.getDataSource();
-      this.previous = this.mdbTable.getDataSource();
-    }, 1000);
+
+    if (this.elements !== undefined) {
+      this.mdbTable.setDataSource(this.elements);
+    }
+    this.elements = this.mdbTable.getDataSource();
+    this.previous = this.mdbTable.getDataSource();
   }
 
-  async setData() {
-    await this.setDATATABLE();
-  }
+  waitFor() {}
 
   async ngAfterViewInit() {
-    await this.setData();
+    await this.setDATATABLE();
 
     if (this.paraFiltroArticulos) {
       this.searchText = this.paraFiltroArticulos;
@@ -235,6 +210,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
         }
       }, 50);
     }
+
     if (this.focusRow) {
       this.IDROW = 'row-0';
     }
@@ -249,7 +225,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   clickROW(arg) {
-    if (arg.id) {
+    if (this.focusRow && arg.id) {
       this.seleccionado = arg.id;
     }
 

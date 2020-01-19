@@ -96,6 +96,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     // }
   }
 
+  getDatePendiente(date) {
+    const obj = { bool: true, Date: date };
+    this.accion(obj);
+  }
+
   accion(arg) {
     this.mServ.ModalDecision(arg);
     this.reinicioModal();

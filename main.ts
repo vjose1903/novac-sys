@@ -103,7 +103,20 @@ ipcMain.on('print', (event: any, arg) => {
 // ==========================================================================================================================================================
 
 function redondearAdos(num) {
-  return (Math.round(num * 100) / 100).toFixed(2);
+  const string = num + '';
+  const splitStr = _.split(string, '.');
+  let enteros = splitStr[0];
+  const splitEnteros = _.split(enteros, ',');
+  enteros = _.join(splitEnteros, '');
+  let tempdecimales = splitStr[1];
+  if (splitStr.length === 1) {
+    tempdecimales = '00';
+  }
+
+  const decimales = tempdecimales.substring(0, 2);
+  const Arreglo = [enteros, decimales];
+  const numStr = _.join(Arreglo, '.');
+  return parseFloat(numStr).toFixed(2);
 }
 
 function formatearNumero(nStr) {

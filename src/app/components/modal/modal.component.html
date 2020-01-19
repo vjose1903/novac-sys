@@ -59,7 +59,7 @@
       (onHide)="reinicioModal()"
       blockScroll="true"
     >
-      <app-pendiente-form (cancel)="accion($event)"></app-pendiente-form>
+      <app-pendiente-form (cancel)="accion($event)" (getDate)="getDatePendiente($event)"></app-pendiente-form>
     </p-dialog>
     <!-- ================================================================================================================================ -->
     <!--  MOVIMIENTO INVENTARIO  -->

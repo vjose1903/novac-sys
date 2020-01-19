@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { ObservableServcie } from '../../../core/services/observables.service';
 import { DBservice } from '../../../core/services/bdservice.service';
@@ -14,10 +14,11 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
   templateUrl: './movimientos-form.component.html',
   styleUrls: ['./movimientos-form.component.scss'],
 })
-export class MovimientosFormComponent implements OnInit {
+export class MovimientosFormComponent implements OnInit, AfterViewInit {
   form;
   tipo_movimiento;
   medida;
+  element: any;
   cantidad = 0;
   motivo;
   @Input() data;
@@ -28,6 +29,9 @@ export class MovimientosFormComponent implements OnInit {
 
   ngOnInit() {
     this.medidas = _.keys(this.data.contenido);
+  }
+  ngAfterViewInit() {
+    this.enfocarInput('tipo_movimiento');
   }
   accion(arg) {
     this.cancel.emit(arg);
@@ -57,5 +61,72 @@ export class MovimientosFormComponent implements OnInit {
       }
     }
   }
-  submit() {}
+  enfocarInput(arg) {
+    this.element = document.getElementById(arg) as HTMLElement;
+    this.element.focus();
+  }
+  selectContenido(arg) {
+    this.element = document.getElementById(arg);
+    this.element.select();
+  }
+  saltar(campo) {
+    if (campo !== 'send') {
+      this.enfocarInput(campo);
+    } else {
+      this.submit();
+    }
+  }
+  abilitarBtnSend() {
+    let res = true;
+    if (this.tipo_movimiento && this.medida && this.cantidad && this.motivo) {
+      res = false;
+    } else {
+      res = true;
+    }
+    return res;
+  }
+  submit() {
+    const empleado = JSON.parse(this.dbServ.getEmpleado());
+
+    const obj = {
+      user_id: empleado.id,
+      articulo_id: this.data.id,
+      cantidad: this.cantidad,
+      accion: this.tipo_movimiento,
+      motivo: this.motivo,
+      medida: this.medida,
+    };
+    this.dbServ.createMovimientoI(obj).subscribe(
+      res => {
+        this.dbServ.toastSuccess(_.capitalize(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
+        this.resetForm();
+
+        const obj = {
+          bool: true,
+          body: res.articulo,
+        };
+        this.accion(obj);
+      },
+      err => {
+        console.log(err.error);
+        this.mostrarErrores(err.error);
+        // this.dbServ.toastError(err.error, 'Error');
+      },
+    );
+  }
+  mostrarErrores(arg) {
+    for (const error in arg) {
+      if (arg.hasOwnProperty(error)) {
+        const element = arg[error];
+        this.dbServ.toastError(element, 'Error');
+      }
+    }
+  }
+  resetForm() {
+    this.tipo_movimiento = undefined;
+    this.medida = undefined;
+    this.cantidad = undefined;
+    this.motivo = undefined;
+    this.enfocarInput('tipo_movimiento');
+  }
 }

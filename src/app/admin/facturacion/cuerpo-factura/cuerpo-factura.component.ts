@@ -9,6 +9,7 @@ import { ModalService } from '../../../components/modal/modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ObservableServcie } from '../../../core/services/observables.service';
 import { map } from 'rxjs/operators';
+import { GLOBAL } from '../../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -56,21 +57,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     // this.rowFactura = new FormArray([new FormControl()]);
   }
 
-  redondearAdos(num) {
-    const string = num + '';
-    const splitStr = _.split(string, '.');
-    const enteros = splitStr[0];
-    let tempdecimales = splitStr[1];
-    if (splitStr.length === 1) {
-      tempdecimales = '00';
-    }
-
-    const decimales = tempdecimales.substring(0, 2);
-    const Arreglo = [enteros, decimales];
-    const numStr = _.join(Arreglo, '.');
-    return parseFloat(numStr).toFixed(2);
-    // return (Math.round(num * 100) / 100).toFixed(2);
-  }
   ngOnInit() {
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
@@ -532,7 +518,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     if (!execede) {
       (this.control.controls[i] as any).controls['uni'].setValue(unidad);
-      (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(this.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
+      (this.control.controls[i] as any).controls['pre'].setValue(this.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
       (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
       this.calcularTotalRow(i);
     } else {
@@ -580,7 +566,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     if (precio !== null && cantidad !== '' && cantidad != null) {
       const tot = precio * cantidad;
-      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(this.redondearAdos(tot)));
+      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(GLOBAL.redondearAdos(tot)));
       this.calculosTotalesGenerales();
     }
   }
@@ -665,7 +651,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (descuento === 0 || descuento === '0' || descuento === null || descuento === undefined) {
       (this.control.controls[i] as any).controls['desc'].reset();
       const total = precio * cantidad;
-      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(this.redondearAdos(total)));
+      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(GLOBAL.redondearAdos(total)));
     }
 
     if (precio !== '' && precio !== null && cantidad !== '' && cantidad != null && descuento !== '' && descuento !== null && descuento !== null && descuento !== undefined) {
@@ -673,7 +659,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       calculoDesc = precio * descuento * cantidad;
       nuevoTotal = total - calculoDesc;
 
-      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(this.redondearAdos(nuevoTotal)));
+      (this.control.controls[i] as any).controls['tot'].setValue(this.formatearNumero(GLOBAL.redondearAdos(nuevoTotal)));
       this.calculosTotalesGenerales();
       this.calculosDescuentoGeneral(calculoDesc, i);
       this.aumentarSecuencia();
@@ -682,7 +668,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   calculosDescuentoGeneral(descuento, i) {
     let acuDesc = 0;
-    const obj = { fila: i, desc: this.redondearAdos(descuento) };
+    const obj = { fila: i, desc: GLOBAL.redondearAdos(descuento) };
     const index = _.findIndex(this.listaDeDescuentos, (o: any) => {
       return o.fila === obj.fila;
     });
@@ -713,7 +699,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.TOTAL = temp;
 
       const obj = {
-        Total: this.redondearAdos(this.TOTAL),
+        Total: GLOBAL.redondearAdos(this.TOTAL),
         ITBIS: '',
       };
       this.sendCalculos.emit(obj);
@@ -731,6 +717,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     } else {
       obj.listaArticulos = this.listaArticulos.filter(articulo => articulo.suplidor_id === this.propietario.id);
     }
+    console.log('###############');
+    console.log('###############');
+    
+    console.log(obj);
+
     this.mServ.modalTipo('buscar');
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
@@ -790,7 +781,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   calcularPrecioSaco(cant, precio) {
     const res = (cant / 100) * precio;
-    return this.redondearAdos(res);
+    return GLOBAL.redondearAdos(res);
   }
 
   noArticuloEncontrado(arg) {

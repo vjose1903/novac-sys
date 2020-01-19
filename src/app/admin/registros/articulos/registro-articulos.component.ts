@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import { ObservableServcie } from '../../../core/services/observables.service';
 import { map } from 'rxjs/operators';
 import { ModalService } from '../../../components/modal/modal.service';
+import { GLOBAL } from '../../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -57,55 +58,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     private router: Router,
     private mServ: ModalService,
   ) {}
-  redondearAdos(num) {
-    const string = num + '';
-    const splitStr = _.split(string, '.');
-    const enteros = splitStr[0];
-    let tempdecimales = splitStr[1];
-    if (splitStr.length === 1) {
-      tempdecimales = '00';
-    }
 
-    const decimales = tempdecimales.substring(0, 2);
-    const Arreglo = [enteros, decimales];
-    const numStr = _.join(Arreglo, '.');
-    return parseFloat(numStr).toFixed(2);
-    // return (Math.round(num * 100) / 100).toFixed(2);
-  }
-  desformatear(sTnum) {
-    let temp = 0;
-
-    if (sTnum !== null) {
-      if (sTnum !== undefined) {
-        const x = sTnum.split(',');
-        if (x.length === 1) {
-          temp += parseFloat(x[0]);
-          return temp;
-        } else if (x.length >= 2) {
-          let joined = '';
-          joined = _.join(x, '');
-          temp += parseFloat(joined);
-
-          return temp;
-        }
-      }
-    } else {
-      return sTnum;
-    }
-  }
-  formatearNumero(nStr) {
-    if (nStr !== undefined) {
-      nStr += '';
-      const x = nStr.split('.');
-      let x1 = x[0];
-      const x2 = x.length > 1 ? '.' + x[1] : '';
-      const rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      }
-      return x1 + x2;
-    }
-  }
   ngOnInit() {
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
 
@@ -123,11 +76,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     });
 
     this.dbServ.getTipoArticulos().subscribe(res => {
-      this.listaTipoArticulos = JSON.parse(JSON.stringify(res));
+      this.listaTipoArticulos = GLOBAL.duplicarJson(res);
     });
 
     this.dbServ.getNombresSuplidores().subscribe(res => {
-      this.listaSuplidores = JSON.parse(JSON.stringify(res));
+      this.listaSuplidores = GLOBAL.duplicarJson(res);
     });
     this.createForm();
     this.FORM = this.form.controls;
@@ -136,7 +89,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.boton = 'Registrar';
 
     this.mServ.DECISIONMODAL.subscribe(res => {
-      if (res !== null || res !== undefined) {
+      if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
     });
@@ -238,7 +191,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
     if (this.Recalcular === true) {
       this.Recalcular = false;
-      console.log('this.Recalcular', this.Recalcular);
+      // console.log('this.Recalcular', this.Recalcular);
     }
   }
 
@@ -324,8 +277,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
       const formulario = this.form.controls;
       if (formulario.otros_costos.value !== null && formulario.otros_costos.value !== undefined && formulario.otros_costos.value !== '' && formulario.otros_costos.value !== ' ') {
-        sumatoriaMult += this.desformatear(formulario.otros_costos.value);
-        this.form.controls.costo_principal.setValue(this.formatearNumero(this.redondearAdos(sumatoriaMult)));
+        sumatoriaMult += GLOBAL.desformatear(formulario.otros_costos.value);
+        this.form.controls.costo_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(sumatoriaMult)));
         this.calculatePrice();
         this.calculatePriceLibra();
       }
@@ -370,12 +323,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   // =============================================
   calculatePrice() {
     const costoTemp = this.form.value.costo_principal;
-    const costo = this.desformatear(costoTemp);
+    const costo = GLOBAL.desformatear(costoTemp);
     if (costo > 0 || costo != null || costo) {
       const precio = costo / 0.9;
       const precioLibra = precio / 100;
-      this.form.controls.precio_principal.setValue(this.formatearNumero(this.redondearAdos(precio)));
-      this.form.controls.precio_libra.setValue(this.formatearNumero(this.redondearAdos(precioLibra)));
+      this.form.controls.precio_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precio)));
+      this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioLibra)));
 
       this.calculatePriceLibra();
     }
@@ -384,17 +337,19 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     const medida = this.form.value.medida;
 
     const precioTemp = this.form.value.precio_principal;
-    const precio = this.desformatear(precioTemp);
+    const precio = GLOBAL.desformatear(precioTemp);
 
     const costoTemp = this.form.value.costo_principal;
-    const costo = this.desformatear(costoTemp);
+    const costo = GLOBAL.desformatear(costoTemp);
 
     if (precio > 0 || precio != null || precio) {
       const precioLibra = precio / 100;
       const costoLibra = costo / 100;
       if (medida === 'Quintal') {
-        this.form.controls.precio_libra.setValue(this.formatearNumero(this.redondearAdos(precioLibra)));
-        this.form.controls.costo_padre.setValue(this.redondearAdos(costoLibra));
+        // console.log('entro');
+
+        this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioLibra)));
+        this.form.controls.costo_padre.setValue(GLOBAL.redondearAdos(costoLibra));
       } else {
         this.calculatePricePadre();
         this.calculatePriceHijo();
@@ -404,32 +359,37 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   calculatePricePadre() {
     const PrecioTemp = this.form.value.precio_principal;
-    const Precio = this.desformatear(PrecioTemp);
+    const Precio = GLOBAL.desformatear(PrecioTemp);
+    // console.log('Precio', Precio);
 
     const costoTemp = this.form.value.costo_principal;
-    const costo = this.desformatear(costoTemp);
+    const costo = GLOBAL.desformatear(costoTemp);
+    // console.log('costo', costo);
     const cantidadPadre = this.form.value.cantidad_contenido_padre;
+    // console.log('cantidadPadre', cantidadPadre);
 
     if (Precio > 0 && Precio != null && Precio !== undefined && !isNaN(Precio) && cantidadPadre > 0 && cantidadPadre != null && cantidadPadre !== undefined && !isNaN(cantidadPadre)) {
       const PrecioPadre = Precio / cantidadPadre;
       const costoPadre = costo / cantidadPadre;
+      // console.log('PrecioPadre', PrecioPadre);
+      // console.log('costoPadre', costoPadre);
 
-      this.form.controls.precio_padre.setValue(this.formatearNumero(this.redondearAdos(PrecioPadre)));
-      this.form.controls.costo_padre.setValue(this.redondearAdos(costoPadre));
+      this.form.controls.precio_padre.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(PrecioPadre)));
+      this.form.controls.costo_padre.setValue(GLOBAL.redondearAdos(costoPadre));
     }
   }
   calculatePriceHijo() {
     const PrecioPadreTemp = this.form.value.precio_padre;
-    const PrecioP = this.desformatear(PrecioPadreTemp);
+    const PrecioP = GLOBAL.desformatear(PrecioPadreTemp);
 
     const costoPadreTemp = this.form.value.costo_padre;
-    const costoP = this.desformatear(costoPadreTemp);
+    const costoP = GLOBAL.desformatear(costoPadreTemp);
     const cantidadHijo = this.form.value.cantidad_contenido_hijo;
     if (PrecioP > 0 && PrecioP != null && PrecioP !== undefined && !isNaN(PrecioP) && cantidadHijo > 0 && cantidadHijo != null && cantidadHijo !== undefined && !isNaN(cantidadHijo)) {
       const PrecioHijo = PrecioP / cantidadHijo;
       const costoHijo = costoP / cantidadHijo;
-      this.form.controls.precio_hijo.setValue(this.formatearNumero(this.redondearAdos(PrecioHijo)));
-      this.form.controls.costo_hijo.setValue(this.redondearAdos(costoHijo));
+      this.form.controls.precio_hijo.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(PrecioHijo)));
+      this.form.controls.costo_hijo.setValue(GLOBAL.redondearAdos(costoHijo));
     }
   }
 
@@ -545,7 +505,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   checkCostoFormula(formula) {
     let res = false;
 
-    const x = JSON.parse(JSON.stringify(formula.value));
+    const x = GLOBAL.duplicarJson(formula.value);
 
     const tempArticulo = this.listaArticulos.filter(val => val.id === x.articulo_id);
 
@@ -571,7 +531,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   recalcular() {
     this.clickBtnRe = true;
-    const temp = JSON.parse(JSON.stringify(this.TIPOARTICULO));
+    const temp = GLOBAL.duplicarJson(this.TIPOARTICULO);
     this.TIPOARTICULO = null;
     this.resetArray();
     this.ProductoEditando.formulas_productos_terminados.forEach((ingredient, i) => {
@@ -642,11 +602,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     articulo.contenido_articulos.forEach(contenido => {
       if (articulo.contenido_articulos.length === 1) {
         if (articulo.contenido_articulos[0].medida === 'Libra') {
-          this.form.controls.precio_libra.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
+          this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
           this.form.controls.costo_padre.setValue(contenido.costo);
           this.form.controls.id_contenido_padre.setValue(contenido.id);
         } else {
-          this.form.controls.precio_unidad.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
+          this.form.controls.precio_unidad.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
           this.form.controls.costo_padre.setValue(contenido.costo);
           this.form.controls.id_contenido_padre.setValue(contenido.id);
         }
@@ -654,14 +614,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       if (contenido.condicion === 'hijo') {
         this.form.controls.cantidad_contenido_hijo.setValue(contenido.cantidad);
         this.form.controls.medida_contenido_hijo.setValue(contenido.medida);
-        this.form.controls.precio_hijo.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
+        this.form.controls.precio_hijo.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
         this.form.controls.costo_hijo.setValue(contenido.costo);
         this.form.controls.id_contenido_hijo.setValue(contenido.id);
         this.form.controls.referencia_hijo.setValue(contenido.referencia);
       } else {
         this.form.controls.cantidad_contenido_padre.setValue(contenido.cantidad);
         this.form.controls.medida_contenido_padre.setValue(contenido.medida);
-        this.form.controls.precio_padre.setValue(this.formatearNumero(this.redondearAdos(contenido.precio)));
+        this.form.controls.precio_padre.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
         this.form.controls.costo_padre.setValue(contenido.costo);
         this.form.controls.id_contenido_padre.setValue(contenido.id);
       }
@@ -669,10 +629,10 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
     this.form.patchValue(articulo);
     if (articulo.isCombo) {
-      this.form.controls.otros_costos.setValue(this.formatearNumero(this.redondearAdos(articulo.otros_costos)));
+      this.form.controls.otros_costos.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.otros_costos)));
     }
-    this.form.controls.costo_principal.setValue(this.redondearAdos(articulo.costo_principal));
-    this.form.controls.precio_principal.setValue(this.formatearNumero(this.redondearAdos(articulo.precio_principal)));
+    this.form.controls.costo_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.costo_principal)));
+    this.form.controls.precio_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.precio_principal)));
   }
   abrirModal(arg?) {
     this.seleccionModal = arg.ARG;
@@ -684,7 +644,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   }
   decisionModal(arg) {
     if (arg) {
-      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
+      const obj = GLOBAL.duplicarJson(this.seleccionModal);
       this.dbServ.eliminarArticulo(obj).subscribe(
         res => {
           this.dbServ.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
@@ -700,7 +660,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
   formarContenido() {
-    const x = JSON.parse(JSON.stringify(this.form.value));
+    const x = GLOBAL.duplicarJson(this.form.value);
 
     if (x.medida === 'Quintal') {
       x.medida_contenido_padre = 'Libra';
@@ -710,7 +670,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       referencia: null,
       id: x.id_contenido_padre,
       costo: _.isString(x.costo_padre) ? parseFloat(x.costo_padre) : x.costo_padre,
-      precio: this.desformatear(x.medida === 'Caja' ? x.precio_padre : x.precio_libra),
+      precio: GLOBAL.desformatear(x.medida === 'Caja' ? x.precio_padre : x.precio_libra),
       cantidad: x.medida === 'Caja' ? x.cantidad_contenido_padre : 100,
       medida: x.medida_contenido_padre,
       condicion: 'padre',
@@ -721,7 +681,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       referencia: x.referencia_hijo,
       id: x.id_contenido_hijo,
       costo: _.isString(x.costo_hijo) ? parseFloat(x.costo_hijo) : x.costo_hijo,
-      precio: this.desformatear(x.precio_hijo),
+      precio: GLOBAL.desformatear(x.precio_hijo),
       cantidad: x.cantidad_contenido_hijo,
       medida: x.medida_contenido_hijo,
       condicion: 'hijo',
@@ -741,7 +701,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   formarFormula() {
-    const x = JSON.parse(JSON.stringify(this.ARRAY_FORMULA.value));
+    const x = GLOBAL.duplicarJson(this.ARRAY_FORMULA.value);
     const formulas = [];
     x.forEach(element => {
       const obj = {
@@ -761,14 +721,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   element: HTMLElement;
   submit(form) {
-    const x = JSON.parse(JSON.stringify(form.value));
+    const x = GLOBAL.duplicarJson(form.value);
 
     const obj = {
       user_id: this.usuario.id,
       tipo_articulo_id: _.parseInt(x.tipo_articulo_id),
       nombre: x.nombre,
-      costo_principal: this.desformatear(x.costo_principal),
-      precio_principal: this.desformatear(x.precio_principal),
+      costo_principal: GLOBAL.desformatear(x.costo_principal),
+      precio_principal: GLOBAL.desformatear(x.precio_principal),
       aviso_existencia: x.aviso_existencia,
       medida_alerta: x.medida_alerta,
       suplidor_id: x.suplidor_id,
@@ -791,7 +751,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
       this.dbServ.editarArticulo(obj).subscribe(
         res => {
-          const temp = JSON.parse(JSON.stringify(this.listaArticulos));
+          const temp = GLOBAL.duplicarJson(this.listaArticulos);
           this.listaArticulos = [];
 
           res['contenido_articulos'] = res['contenido_articulos_attributes'];
@@ -801,9 +761,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
           delete res['contenido_articulos_attributes'];
 
           temp[this.indexEditar] = res;
-          this.listaArticulos = JSON.parse(JSON.stringify(temp));
+          this.listaArticulos = GLOBAL.duplicarJson(temp);
           this.borrar();
-          console.log(res);
+          // console.log(res);
 
           this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
         },
@@ -866,11 +826,15 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   revisarPrecio(input, id) {
     const Input = this.form.controls[input];
-
     const precioTEMPO = Input.value;
+
     if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
+      console.log('precioTEMPO', precioTEMPO);
       const splitPrecio = _.split(precioTEMPO, '.');
+      console.log('splitPrecio', splitPrecio);
+
       let precioTEMP;
+
       let enteros = splitPrecio[0];
       let tempdecimales = splitPrecio[1];
       if (tempdecimales === undefined) {
@@ -899,9 +863,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
           const temp = [enteros, decimales];
           precioTEMP = _.join(temp, '.');
         }
-      }
+        console.log('precioTEMP', precioTEMP);
+        console.log('GLOBAL.redondearAdos(precioTEMP)', GLOBAL.redondearAdos(precioTEMP));
 
-      Input.setValue(this.formatearNumero(precioTEMP));
+        Input.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioTEMP)));
+      }
     }
   }
 

@@ -8,6 +8,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { logoADM } from './files';
 import { IpcRenderer } from 'electron';
 import { IpcService } from '../ipc.service';
+import { GLOBAL } from '../GLOBAL';
 
 @Injectable({
   providedIn: 'root',
@@ -27,24 +28,6 @@ export class PdfService {
       }
     }
     // console.log(pathSplit);
-  }
-
-  redondearAdos(num) {
-    return (Math.round(num * 100) / 100).toFixed(2);
-  }
-
-  formatearNumero(nStr) {
-    if (nStr !== undefined) {
-      nStr += '';
-      const x = nStr.split('.');
-      let x1 = x[0];
-      const x2 = x.length > 1 ? '.' + x[1] : '';
-      const rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      }
-      return x1 + x2;
-    }
   }
 
   fecha(a: any) {
@@ -223,7 +206,7 @@ export class PdfService {
   // ==========================================================================================================================================================
   calcularPrecio(cant, precio, tipo) {
     const res = cant * precio;
-    return this.redondearAdos(res);
+    return GLOBAL.redondearAdos(res);
   }
   contenidoFacturaVenta(data) {
     const tempBody = [];
@@ -233,11 +216,11 @@ export class PdfService {
       row.push(
         i + 1,
         detalle.descripcion,
-        this.formatearNumero(this.redondearAdos(detalle.cantidad)),
+        GLOBAL.formatearNumero(GLOBAL.redondearAdos(detalle.cantidad)),
         detalle.unidad,
-        this.formatearNumero(this.calcularPrecio(detalle.cantidad, detalle.precio, '')),
-        detalle.itbis !== 0 ? this.formatearNumero(this.redondearAdos(detalle.itbis)) : '',
-        this.formatearNumero(this.redondearAdos(detalle.total)),
+        GLOBAL.formatearNumero(this.calcularPrecio(detalle.cantidad, detalle.precio, '')),
+        detalle.itbis !== 0 ? GLOBAL.formatearNumero(GLOBAL.redondearAdos(detalle.itbis)) : '',
+        GLOBAL.formatearNumero(GLOBAL.redondearAdos(detalle.total)),
       );
       tempBody.push(row);
     });
@@ -282,19 +265,19 @@ export class PdfService {
               body: [
                 [
                   { text: 'Bruto RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(this.redondearAdos(data.Bruto)), fontSize: 11, alignment: 'right' },
+                  { text: GLOBAL.formatearNumero(GLOBAL.redondearAdos(data.Bruto)), fontSize: 11, alignment: 'right' },
                 ],
                 [
                   { text: 'Itbis RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(this.redondearAdos(data.itbis)), fontSize: 11, alignment: 'right' },
+                  { text: GLOBAL.formatearNumero(GLOBAL.redondearAdos(data.itbis)), fontSize: 11, alignment: 'right' },
                 ],
                 [
                   { text: 'Descuento RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(this.redondearAdos(data.descuento)), fontSize: 11, alignment: 'right' },
+                  { text: GLOBAL.formatearNumero(GLOBAL.redondearAdos(data.descuento)), fontSize: 11, alignment: 'right' },
                 ],
                 [
                   { text: 'TOTAL RD$: ', fontSize: 11, bold: true },
-                  { text: this.formatearNumero(this.redondearAdos(data.total_factura)), fontSize: 11, alignment: 'right' },
+                  { text: GLOBAL.formatearNumero(GLOBAL.redondearAdos(data.total_factura)), fontSize: 11, alignment: 'right' },
                 ],
               ],
             },

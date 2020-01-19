@@ -21,7 +21,10 @@ export class GLOBAL {
   static redondearAdos(num) {
     const string = num + '';
     const splitStr = _.split(string, '.');
-    const enteros = splitStr[0];
+    let enteros = splitStr[0];
+    const splitEnteros = _.split(enteros, ',');
+    enteros = _.join(splitEnteros, '');
+
     let tempdecimales = splitStr[1];
     if (splitStr.length === 1) {
       tempdecimales = '00';
@@ -29,8 +32,15 @@ export class GLOBAL {
 
     const decimales = tempdecimales.substring(0, 2);
     const Arreglo = [enteros, decimales];
+    console.log('Arreglo', Arreglo);
+
     const numStr = _.join(Arreglo, '.');
+    console.log('numStr', numStr);
+
+    console.log('numStrparsedf', parseFloat(numStr).toFixed(2));
+
     return parseFloat(numStr).toFixed(2);
+
     // return (Math.round(num * 100) / 100).toFixed(2);
   }
   static desformatear(sTnum) {

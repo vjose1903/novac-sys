@@ -55,6 +55,9 @@ export class DBservice {
   // =====================================================================
   // FActuras
   // =====================================================================
+  createFacturas(arg) {
+    return this.peticion('cabecera_facturas', 'post', JSON.stringify(arg));
+  }
   getFacturas() {
     return this.peticion('cabecera_facturas', 'get');
   }
@@ -62,9 +65,6 @@ export class DBservice {
     return this.peticion(`cabecera_facturas/${id}`, 'get');
   }
 
-  createFacturas(arg) {
-    return this.peticion('cabecera_facturas', 'post', JSON.stringify(arg));
-  }
   // =====================================================================
   // HISTORICO PRODUCCIONES
   // =====================================================================
@@ -133,6 +133,13 @@ export class DBservice {
     return this.peticion('imagenes', 'post', JSON.stringify(arg));
   }
   // =====================================================================
+  // MOVIMIENTOS INVENTARIOS
+  // =====================================================================
+
+  createMovimientoI(arg) {
+    return this.peticion('movimientos_inventarios', 'post', JSON.stringify(arg));
+  }
+  // =====================================================================
   // ARTICULOS
   // =====================================================================
 
@@ -151,6 +158,9 @@ export class DBservice {
   }
   getArticulos() {
     return this.peticion('articulos', 'get');
+  }
+  getArticulosByDate(date) {
+    return this.peticion(`articulos/historico/${date}/0`, 'get');
   }
   getTipoArticulos() {
     return this.peticion('tipo_articulos', 'get');

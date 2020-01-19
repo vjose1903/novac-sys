@@ -109,7 +109,7 @@ export class RegistroEmpleadosComponent implements OnInit {
       role: [null, Validators.required],
     });
     this.mServ.DECISIONMODAL.subscribe(res => {
-      if (res !== null || res !== undefined) {
+      if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
     });

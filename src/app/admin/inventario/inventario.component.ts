@@ -40,11 +40,11 @@ export class InventarioComponent implements OnInit {
     titulo: true,
     inventario: true,
   };
-  listaArticulos = [];
+  listaArticulos;
   costoTotal: number;
   gananciaTotal: number;
   tipo_articulos;
-  indexBorrar: any;
+  indexSelected: any;
   tipoModal: string;
   seleccionModal: any;
   filtrado = false;
@@ -64,6 +64,12 @@ export class InventarioComponent implements OnInit {
     this.necesarioParaEmpezar();
     this.dbServ.getTipoArticulos().subscribe(res => {
       this.tipo_articulos = res;
+    });
+
+    this.mServ.DECISIONMODAL.subscribe(res => {
+      if (res !== null && res !== undefined) {
+        this.decisionModal(res);
+      }
     });
   }
 
@@ -100,6 +106,7 @@ export class InventarioComponent implements OnInit {
       this.listaArticulos = this.listaArticulos.filter(val => val.tipo_articulo_id === _.parseInt(this.filtro));
       this.filtrado = true;
     }
+    this.calcularGananciasCostos();
   }
   calcularGananciasCostos() {
     this.costoTotal = 0;
@@ -115,13 +122,33 @@ export class InventarioComponent implements OnInit {
     }
   }
   movimientoInventario(arg) {
-    console.log(arg);
-
-    this.indexBorrar = arg.INDEX;
+    this.indexSelected = arg.INDEX;
     this.mServ.modalTipo('inventario');
     this.tipoModal = 'inventario';
     this.seleccionModal = arg.ARG;
     this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
+  }
+
+  async decisionModal(arg) {
+    if (arg.bool) {
+      console.log('this.listaArticulos', this.listaArticulos);
+
+      const temp = JSON.parse(JSON.stringify(this.listaArticulos));
+      this.listaArticulos = undefined;
+      console.log('this.indexSelected', this.indexSelected);
+      console.log('temp ANTES', JSON.parse(JSON.stringify(temp)));
+      console.log('arg.body', arg.body);
+
+      temp[this.indexSelected] = [];
+
+      temp[this.indexSelected].nombre = JSON.parse(JSON.stringify(arg.body));
+
+      console.log('temp DESPUES', JSON.parse(JSON.stringify(temp)));
+      setTimeout(() => {
+        this.listaArticulos = JSON.parse(JSON.stringify(temp));
+        console.log('this.listaArticulos DESPUES', this.listaArticulos);
+      }, 5);
+    }
   }
 }

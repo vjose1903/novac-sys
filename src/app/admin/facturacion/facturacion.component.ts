@@ -10,6 +10,7 @@ import { ObservableServcie } from '../../core/services/observables.service';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
+import { GLOBAL } from '../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-facturacion',
@@ -80,73 +81,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     });
   }
 
-  // formatoNumerosMasCero(num) {
-  //   return _.padStart(num.toString(), 8, '0');
-  // }
-  // formatearComprobante(ref) {
-  //   let num = 1572;
-
-  //   const objTipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === ref);
-
-  //   const objSecuenciaFact = this.lista_secuencia_facturas.filter(secu => secu.tipo_factura_id === objTipoFact[0].id);
-
-  //   num = objSecuenciaFact[0].secuencia;
-  //   if (ref === '00') {
-  //     this.numeroComprobante = null;
-  //   } else {
-  //     this.numeroComprobante = 'B' + ref + this.formatoNumerosMasCero(num);
-  //   }
-  // }
-
-  redondearAdos(num) {
-    const string = num + '';
-    const splitStr = _.split(string, '.');
-    const enteros = splitStr[0];
-    let tempdecimales = splitStr[1];
-    if (splitStr.length === 1) {
-      tempdecimales = '00';
-    }
-
-    const decimales = tempdecimales.substring(0, 2);
-    const Arreglo = [enteros, decimales];
-    const numStr = _.join(Arreglo, '.');
-    return parseFloat(numStr).toFixed(2);
-    // return (Math.round(num * 100) / 100).toFixed(2);
-  }
-
-  desformatear(sTnum) {
-    let temp = 0;
-
-    if (sTnum !== null) {
-      if (sTnum !== undefined) {
-        const x = sTnum.split(',');
-        if (x.length === 1) {
-          temp += parseFloat(x[0]);
-          return temp;
-        } else if (x.length >= 2) {
-          let joined = '';
-          joined = _.join(x, '');
-          temp += parseFloat(joined);
-
-          return temp;
-        }
-      }
-    } else {
-      return sTnum;
-    }
-  }
-  formatearNumero(nStr) {
-    if (nStr !== undefined) {
-      nStr += '';
-      const x = nStr.split('.');
-      let x1 = x[0];
-      const x2 = x.length > 1 ? '.' + x[1] : '';
-      const rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      }
-      return x1 + x2;
-    }
+  formatoNumero(num) {
+    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
   }
 
   ngOnInit() {
@@ -222,6 +158,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== undefined) {
         this.decisionModal(res);
+      }
+      if (res !== undefined && res.bool) {
+        this.filterArticulosByDate(res.Date);
       }
     });
 
@@ -310,6 +249,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     });
   }
   getCalculos(arg) {
+    console.log(arg);
+
     this.TOTAL = parseFloat(arg.Total);
 
     this.calcularBruto();
@@ -569,7 +510,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   calculatePrice(costo): number {
     if (costo > 0 || costo != null || costo) {
       const precio = costo / 0.9;
-      return this.desformatear(this.redondearAdos(precio));
+      return GLOBAL.desformatear(GLOBAL.redondearAdos(precio));
     }
   }
 
@@ -588,18 +529,18 @@ export class FacturacionComponent implements OnInit, OnDestroy {
               cantPadre = contenido.cantidad;
               const precio = this.calcularNuevosPrecios(cantPadre, precioRow);
               const costo = this.calcularNuevosPrecios(cantPadre, costoRow);
-              temporal.precio = this.desformatear(precio);
-              temporal.costo = this.desformatear(costo);
+              temporal.precio = GLOBAL.desformatear(precio);
+              temporal.costo = GLOBAL.desformatear(costo);
             }
           } else {
             if (contenido.precio) {
               cantHijo = contenido.cantidad;
               const prePadre = this.calcularNuevosPrecios(cantPadre, precioRow);
               const cosPadre = this.calcularNuevosPrecios(cantPadre, costoRow);
-              const precio = this.calcularNuevosPrecios(cantHijo, this.redondearAdos(prePadre));
-              const costo = this.calcularNuevosPrecios(cantHijo, this.redondearAdos(cosPadre));
-              temporal.precio = this.desformatear(precio);
-              temporal.costo = this.desformatear(costo);
+              const precio = this.calcularNuevosPrecios(cantHijo, GLOBAL.redondearAdos(prePadre));
+              const costo = this.calcularNuevosPrecios(cantHijo, GLOBAL.redondearAdos(cosPadre));
+              temporal.precio = GLOBAL.desformatear(precio);
+              temporal.costo = GLOBAL.desformatear(costo);
             } else {
               temporal = null;
             }
@@ -635,7 +576,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
       const articulo = JSON.parse(JSON.stringify(Articulo[0]));
       const contenido_articulo = articulo.contenido_articulos;
-      const costoRow = this.desformatear(row.pre);
+      const costoRow = GLOBAL.desformatear(row.pre);
       const precioRow = 0;
 
       const roundArticulo = articulo.costo_principal;
@@ -700,7 +641,19 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   calcularNuevosPrecios(cant, precio) {
     const pre = precio / cant;
-    return this.redondearAdos(pre);
+    return GLOBAL.redondearAdos(pre);
+  }
+
+  async filterArticulosByDate(date) {
+    console.log('siiiii');
+
+    console.log(date);
+    try {
+      this.listaArticulos = await this.dbServ.getArticulosByDate(date).toPromise();
+    } catch (error) {
+      console.log(error);
+      this.dbServ.toastError('Algo salio mal buscando historico de articulos', 'ERROR');
+    }
   }
 
   IMPRIMIR() {
@@ -729,10 +682,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;
     cabecera_fact['numero_factura'] = null;
-    cabecera_fact['total_factura'] = this.redondearAdos(this.TOTAL);
-    cabecera_fact['Bruto'] = this.redondearAdos(this.BRUTO);
-    cabecera_fact['itbis'] = this.redondearAdos(this.ITBIS);
-    cabecera_fact['descuento'] = this.redondearAdos(this.DESCUENTO);
+    cabecera_fact['total_factura'] = GLOBAL.redondearAdos(this.TOTAL);
+    cabecera_fact['Bruto'] = GLOBAL.redondearAdos(this.BRUTO);
+    cabecera_fact['itbis'] = GLOBAL.redondearAdos(this.ITBIS);
+    cabecera_fact['descuento'] = GLOBAL.redondearAdos(this.DESCUENTO);
     cabecera_fact['estado'] = true;
     cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
     if (this.metodo === 'venta') {

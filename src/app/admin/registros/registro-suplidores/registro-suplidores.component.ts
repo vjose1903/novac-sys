@@ -94,7 +94,7 @@ export class RegistroSuplidoresComponent implements OnInit {
         this.listaSuplidores = JSON.parse(JSON.stringify(res));
       });
     this.mServ.DECISIONMODAL.subscribe(res => {
-      if (res !== null || res !== undefined) {
+      if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
     });

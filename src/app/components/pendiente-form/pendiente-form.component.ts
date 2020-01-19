@@ -19,6 +19,7 @@ export class PendienteFormComponent implements OnInit {
   fecha;
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   @Output() cancel = new EventEmitter<any>();
+  @Output() getDate = new EventEmitter<any>();
 
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {
     this.dpConfig = Object.assign(
@@ -46,5 +47,9 @@ export class PendienteFormComponent implements OnInit {
   accion(arg) {
     this.cancel.emit(arg);
   }
-  articulosHistoricos() {}
+  makeDateTime() {
+    const fechaTemp = moment(this.fecha).format('YYYY-MM-DD');
+    const fechaF = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute ;
+    this.getDate.emit(fechaF);
+  }
 }
