@@ -105,12 +105,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   @Output() DELETE = new EventEmitter<any>();
   @Output() reinicioModal = new EventEmitter<any>();
   @Output() noArticulo = new EventEmitter<any>();
+
   constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice) {}
 
   ngOnInit() {
-    if (this.focusRow) {
-      this.IDROW = this.ROW + _.toString(this.NUM);
-    }
     // if (this.search) {
     //   setTimeout(() => {
     //     this.element = document.getElementById('search') as HTMLElement;
@@ -196,8 +194,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     this.previous = this.mdbTable.getDataSource();
   }
 
-  waitFor() {}
-
   async ngAfterViewInit() {
     await this.setDATATABLE();
 
@@ -210,10 +206,19 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
         }
       }, 50);
     }
-
-    if (this.focusRow) {
-      this.IDROW = 'row-0';
+    if (this.paraFiltroClientes) {
+      this.searchText = this.paraFiltroClientes;
+      await setTimeout(() => {
+        this.searchItems();
+        if (this.data.length === 0) {
+          this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO');
+        }
+      }, 50);
     }
+    if (this.focusRow) {
+      this.IDROW = this.ROW + _.toString(this.NUM);
+    }
+
     // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
     // this.mdbTablePagination.calculateFirstItemIndex();
     // this.mdbTablePagination.calculateLastItemIndex();

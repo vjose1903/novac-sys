@@ -26,9 +26,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   showModal = false;
   modalSearch: boolean;
   control;
-  rowActual;
-  drop: boolean;
-  UnidadesArticulo = [];
+
   tipoModal: string;
   condicion_fact = 'Contado';
   forma_pago = 'Efectivo';
@@ -44,10 +42,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   BRUTO = 0.0;
   TOTAL = 0.0;
   lista_tipos_facturas;
-  lista_secuencia_facturas;
   NCFcompra;
   CostoYgasto = '';
-  @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
   metodo: any;
   labelSearch: string;
   listaSuplidores: any;
@@ -60,9 +56,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     Paquete: 'Paquetes',
     Unidad: 'Unidades',
   };
-  ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   listaArticulos: any;
   usuario: any;
+  @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
+  ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
   constructor(
     private _ipc: IpcService,
@@ -215,7 +212,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     this.obsServ.SECUENCIA_FACTURAS.subscribe(res => {
       if (res !== undefined) {
-        this.lista_secuencia_facturas = res;
         // this.secuenciaVenta = res.filter(secu => secu.tipo_factura_id === 13);
         // this.numFac = this.secuenciaVenta[0].secuencia;
       }
@@ -495,14 +491,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       });
     }
 
-    this.CuerpoFactura = [];
-
     this.DESCUENTO = 0.0;
     this.BRUTO = 0.0;
     this.TOTAL = 0.0;
     this.condicion_fact = 'Contado';
     this.forma_pago = 'Efectivo';
-    this.rowActual = undefined;
+
     this.ITBIS = 0;
     this.cuerpo.RESETCUERPO();
     this.enfocarInput('tipoFact');

@@ -30,6 +30,7 @@ import { ProduccionComponent } from './produccion/produccion.component';
 import { PendienteFormComponent } from '../components/pendiente-form/pendiente-form.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MovimientosFormComponent } from './inventario/movimientos-form/movimientos-form.component';
+import { IngresosComponent } from './ingresos/ingresos.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { MovimientosFormComponent } from './inventario/movimientos-form/movimien
     ProduccionComponent,
     PendienteFormComponent,
     MovimientosFormComponent,
+    IngresosComponent,
   ],
   imports: [
     DialogModule,

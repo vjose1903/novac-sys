@@ -85,7 +85,7 @@
             <h5>
               <strong>{{ labelSearch }}:</strong>
             </h5>
-            <i (click)="abrirModalFiltro()" mdbTooltip="Buscar cliente" placement="top" class="fas fa-search ml-3 botonBuscar"></i>
+            <i (click)="abrirModalFiltro()" mdbTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" placement="top" class="fas fa-search ml-3 botonBuscar"></i>
           </div>
           <div class="row">
             <div class="col-md-7">

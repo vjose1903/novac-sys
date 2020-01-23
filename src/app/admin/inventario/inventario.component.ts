@@ -93,8 +93,6 @@ export class InventarioComponent implements OnInit {
   }
 
   filtrarArticulos() {
-    console.log('this.filtrado', this.filtrado);
-
     if (this.filtro === 'todos' && this.filtrado === true) {
       this.listaArticulos = this.restarFiltro;
       this.filtrado = false;
@@ -132,23 +130,13 @@ export class InventarioComponent implements OnInit {
 
   async decisionModal(arg) {
     if (arg.bool) {
-      console.log('this.listaArticulos', this.listaArticulos);
-
       const temp = JSON.parse(JSON.stringify(this.listaArticulos));
       this.listaArticulos = undefined;
-      console.log('this.indexSelected', this.indexSelected);
-      console.log('temp ANTES', JSON.parse(JSON.stringify(temp)));
-      console.log('arg.body', arg.body);
 
       temp[this.indexSelected] = [];
 
-      temp[this.indexSelected].nombre = JSON.parse(JSON.stringify(arg.body));
-
-      console.log('temp DESPUES', JSON.parse(JSON.stringify(temp)));
-      setTimeout(() => {
-        this.listaArticulos = JSON.parse(JSON.stringify(temp));
-        console.log('this.listaArticulos DESPUES', this.listaArticulos);
-      }, 5);
+      temp[this.indexSelected] = JSON.parse(JSON.stringify(arg.body));
+      this.listaArticulos = JSON.parse(JSON.stringify(temp));
     }
   }
 }

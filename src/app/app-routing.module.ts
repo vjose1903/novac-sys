@@ -15,6 +15,7 @@ import { RegistroClientesComponent } from './admin/registros/registro-clientes/r
 import { RegistroSuplidoresComponent } from './admin/registros/registro-suplidores/registro-suplidores.component';
 import { ProduccionComponent } from './admin/produccion/produccion.component';
 import { InventarioComponent } from './admin/inventario/inventario.component';
+import { IngresosComponent } from './admin/ingresos/ingresos.component';
 
 const routes: Routes = [
   {
@@ -52,6 +53,10 @@ const routes: Routes = [
       {
         path: 'inventario',
         component: InventarioComponent,
+      },
+      {
+        path: 'ingresos',
+        component: IngresosComponent,
       },
     ],
   },

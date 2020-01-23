@@ -151,6 +151,10 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         this.actualTab = 'produccion';
         this.router.navigateByUrl('/admin/produccion');
         break;
+      case 7:
+        this.actualTab = 'ingresos';
+        this.router.navigateByUrl('/admin/ingresos');
+        break;
 
       case 'venta':
         this.router.navigateByUrl('/admin');

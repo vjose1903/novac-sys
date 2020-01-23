@@ -221,6 +221,7 @@
     >
       <app-tablas
         *ngIf="seleccionModal"
+        [paraFiltroClientes]="paraFiltroClientes"
         [focusRow]="true"
         (clickRow)="devolverCLick($event)"
         [info]="infoCliente"

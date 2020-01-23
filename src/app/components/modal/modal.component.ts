@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input, OnChanges, ElementRef, OnDestroy, HostListener } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
+import { DBservice } from '../../core/services/bdservice.service';
 
 @Component({
   selector: 'app-modal',
@@ -57,7 +58,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
       key: 'direccion',
     },
   ];
-  constructor(private mServ: ModalService) {}
+  constructor(private mServ: ModalService, private dbServ: DBservice) {}
 
   element: HTMLElement;
   ngOnInit() {
@@ -75,6 +76,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
       if (res !== undefined && res !== null) {
         this.seleccionModal = res;
         this.paraFiltroArticulos = res.filtrar;
+        this.paraFiltroClientes = res.filtrarCliente;
         this.metodo = res.metodo;
 
         if (this.tipoModal === 'buscarCliente' && res.limite_credito !== undefined) {

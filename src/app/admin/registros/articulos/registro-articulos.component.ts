@@ -228,6 +228,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       articulo_id: [null],
       cantidad_formula: [null],
       costo_formula: [null],
+      precio_formula: [null],
       _destroy: [null],
       // costo: [null],
     });
@@ -538,6 +539,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       this.addItem();
       this.fillFormula(ingredient, i, true);
     });
+    console.log(this.ARRAY_FORMULA.value);
 
     this.calculateCostoPT();
     this.Recalcular = null;
@@ -551,15 +553,26 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     const MateriaPrima = TempMateriaPrima[0];
 
     let costo = 0;
+    let precio = 0;
+    console.log('MATERIAPRIMA', MateriaPrima);
     if (MateriaPrima.medida === 'Quintal') {
       costo = MateriaPrima.contenido_articulos[0].costo;
+      precio = MateriaPrima.contenido_articulos[0].precio;
+      console.log('BUSCANDO ', precio);
     } else if (MateriaPrima.medida === 'Libra') {
-      costo = MateriaPrima.costoPrincipal;
+      costo = MateriaPrima.costo_principal;
+      precio = MateriaPrima.precio_principal;
+      console.log('BUSCANDO ', precio);
     }
+
     if (recalcular) {
       (control.controls[i] as any).controls['costo_formula'].setValue(costo);
+      (control.controls[i] as any).controls['precio_formula'].setValue(precio);
+      console.log('LLENANDO  ', precio);
     } else {
       (control.controls[i] as any).controls['costo_formula'].setValue(ingredient.costo);
+      (control.controls[i] as any).controls['precio_formula'].setValue(ingredient.precio);
+      console.log('LLENANDO  ', ingredient.precio);
     }
     (control.controls[i] as any).controls['articulo_id'].setValue(ingredient.articulo_combo);
     (control.controls[i] as any).controls['cantidad_formula'].setValue(ingredient.cantidad);
@@ -585,9 +598,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       this.form.controls.medida.setValue('Quintal');
       this.fillDropAlerta('Quintal');
       articulo.formulas_productos_terminados.forEach((ingredient, i) => {
+        console.log('Antes de la funcion que llena ', ingredient);
+
         this.addItem();
         this.fillFormula(ingredient, i);
       });
+      console.log(this.ARRAY_FORMULA.value);
     } else {
       this.isCombo = false;
       this.numIngredientes = null;
@@ -709,6 +725,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
         articulo_combo: _.parseInt(element.articulo_id),
         cantidad: _.parseInt(element.cantidad_formula),
         costo: element.costo_formula,
+        precio: element.precio_formula,
         _destroy: element._destroy ? element._destroy : null,
       };
       formulas.push(obj);
