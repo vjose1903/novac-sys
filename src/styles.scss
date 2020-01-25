@@ -116,8 +116,20 @@ body {
 
 .disableBtn {
   pointer-events: none !important;
-  filter: grayscale(64%);
+  filter: grayscale(74%);
 }
+
+input[type="checkbox"],
+input[type="text"] {
+  &:hover {
+    cursor: pointer;
+  }
+}
+input[type="checkbox"]:disabled,
+input[type="text"]:disabled {
+  filter: grayscale(74%);
+}
+
 #btn-gris {
   box-shadow: 0px 2px 3px 0px #a0a0a0;
   background-color: gray;

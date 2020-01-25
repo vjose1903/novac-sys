@@ -18,6 +18,10 @@ export class GLOBAL {
   static duplicarJson(json) {
     return JSON.parse(JSON.stringify(json));
   }
+  static Capitalice(json) {
+    return _.capitalize(json);
+  }
+
   static redondearAdos(num) {
     const string = num + '';
     const splitStr = _.split(string, '.');
@@ -35,6 +39,7 @@ export class GLOBAL {
     const numStr = _.join(Arreglo, '.');
     return parseFloat(numStr).toFixed(2);
   }
+
   static desformatear(sTnum) {
     let temp = 0;
 

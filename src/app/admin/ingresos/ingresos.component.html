@@ -29,7 +29,17 @@
       </div>
     </div>
   </div>
+  <div class="col-7">
+    <div class="text-center">
+      <h1 *ngIf="clienteAdepositar" class="text-bold">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h1>
+      <span *ngIf="clienteAdepositar"> Debe: RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span>
+    </div>
+  </div>
   <div class="col-12 rowIngre">
-    <div class="card card-padding sombra ingreCard"></div>
+    <div class="card card-padding sombra ingreCard">
+      <app-tablas *ngIf="Facturas" [info]="info" [data]="Facturas" [scrollContainer]="'scroll-container'" (DevolverInfo)="preuba($event)" [focusRow]="false"></app-tablas>
+      <!-- 
+      (DELETE)="abrirModal($event)" -->
+    </div>
   </div>
 </div>

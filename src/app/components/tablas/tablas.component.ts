@@ -117,6 +117,111 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     // }
   }
 
+  changeValorCheck(key, i) {
+    this.data[i][key] = !this.data[i][key];
+  }
+  changeValorInput(key, i, valor) {
+    this.data[i][key] = valor;
+  }
+  disabledInput(condicion, i) {
+    let res = true;
+    if (condicion.getDisabled) {
+      res = true;
+      if (condicion.campo2) {
+        if (this.data[i][condicion.campo] && !this.data[i][condicion.campo2]) {
+          res = false;
+        } else {
+          res = true;
+        }
+      } else {
+        if (this.data[i][condicion.campo]) {
+          res = false;
+        } else {
+          res = true;
+        }
+      }
+    } else {
+      res = false;
+    }
+    return res;
+  }
+
+  checkNumbers(arg) {
+    let res = false;
+    for (let i = 0; i < arg.length; i++) {
+      const tempCaracter = arg.charAt(i);
+      if (tempCaracter !== ',') {
+        const caracter = _.parseInt(tempCaracter);
+        if (_.isNaN(caracter)) {
+          res = true;
+        }
+      }
+    }
+    return res;
+  }
+  checkLongMillares(num) {
+    let res = false;
+    const splitNum = _.split(num, ',');
+    splitNum.forEach((element, i) => {
+      if (i !== 0) {
+        if (element.length !== 3) {
+          res = true;
+        }
+      }
+    });
+    return res;
+  }
+
+  revisarPrecio(i, valor, key, input) {
+    const precioTEMPO = valor;
+
+    if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
+      console.log('precioTEMPO', precioTEMPO);
+      const splitPrecio = _.split(precioTEMPO, '.');
+      console.log('splitPrecio', splitPrecio);
+
+      let precioTEMP;
+
+      let enteros = splitPrecio[0];
+      let tempdecimales = splitPrecio[1];
+      if (tempdecimales === undefined) {
+        tempdecimales = '00';
+      }
+      //
+      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
+        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
+        this.enfocarInput(input);
+      } else {
+        //
+        if (splitPrecio.length === 2) {
+          if (enteros === '' || enteros === ' ') {
+            enteros = '0';
+          }
+          let decimales;
+          if (tempdecimales.length > 2) {
+            decimales = tempdecimales.substring(0, 2);
+          } else {
+            decimales = _.padEnd(tempdecimales, 2, '0');
+          }
+          const temp = [enteros, decimales];
+          precioTEMP = _.join(temp, '.');
+        } else if (splitPrecio.length === 1) {
+          const decimales = '00';
+          const temp = [enteros, decimales];
+          precioTEMP = _.join(temp, '.');
+        }
+        this.data[i][key] = GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioTEMP));
+      }
+    }
+  }
+
+  enfocarInput(arg) {
+    this.element = document.getElementById(arg) as HTMLElement;
+    this.element.focus();
+  }
+
+  // ===================================================================================================
+
   formatoNumero(num) {
     return GLOBAL.formatearNumero(num);
   }

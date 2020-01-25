@@ -184,6 +184,9 @@ export class DBservice {
   getSecuenciaFacturas() {
     return this.peticion('secuencia_facturas', 'get');
   }
+  getFacturasByClienteIdAndPagada(cliente_id, pagada) {
+    return this.peticion(`cabecera_facturas/cliente/${cliente_id}/pagada/${pagada}`, 'get');
+  }
 
   // =====================================================================
   // TOASTS
