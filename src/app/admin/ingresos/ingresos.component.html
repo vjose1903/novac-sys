@@ -37,7 +37,7 @@
   </div>
   <div class="col-12 rowIngre">
     <div class="card card-padding sombra ingreCard">
-      <app-tablas *ngIf="Facturas" [info]="info" [data]="Facturas" [scrollContainer]="'scroll-container'" (DevolverInfo)="preuba($event)" [focusRow]="false"></app-tablas>
+      <app-tablas *ngIf="Facturas" [info]="info" [data]="Facturas" (getInfoChange)="getInfoChange($event)" [scrollContainer]="'scroll-container'" (DevolverInfo)="preuba($event)" [focusRow]="false"></app-tablas>
       <!-- 
       (DELETE)="abrirModal($event)" -->
     </div>

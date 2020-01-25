@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ModalService } from '../../components/modal/modal.service';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
@@ -8,6 +8,7 @@ import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as moment from 'moment';
+import { TablasComponent } from '../../components/tablas/tablas.component';
 
 @Component({
   selector: 'app-ingresos',
@@ -20,7 +21,7 @@ export class IngresosComponent implements OnInit {
   clienteAdepositar: any;
   tipoIngreso: any;
   Facturas: any;
-
+  @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
   // =============================================
   //  TABLAS
   // =============================================
@@ -160,6 +161,13 @@ export class IngresosComponent implements OnInit {
   selectContenido(arg) {
     this.element = document.getElementById(arg);
     this.element.select();
+  }
+
+  getInfoChange(item) {
+    console.log(item);
+    if (item.cambio === 'pagoT' && item.value) {
+      this.tablas.resetInput('total_factura', 'monto', item.index, true);
+    }
   }
 
   quitarContadoDeLista() {

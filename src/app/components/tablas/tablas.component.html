@@ -52,6 +52,7 @@
 
             <span *ngIf="column.tipo === 'check' && column.tipo !== 'input'">
               <div class="from-group mb-2">
+                {{ dato[column.key] }}
                 <input class="apple-switch ml-2" [disabled]="disabledInput(column.disable, i)" type="checkbox" (change)="changeValorCheck(column.key, i)" [checked]="dato[column.key]" />
                 <span class="ml-2 subirLabelCheck">{{ column.title }}</span>
               </div>

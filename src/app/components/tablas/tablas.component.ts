@@ -105,6 +105,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   @Output() DELETE = new EventEmitter<any>();
   @Output() reinicioModal = new EventEmitter<any>();
   @Output() noArticulo = new EventEmitter<any>();
+  @Output() getInfoChange = new EventEmitter<any>();
 
   constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice) {}
 
@@ -117,12 +118,38 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     // }
   }
 
+  resetInput(referencia, destino, i, formatear) {
+    const copia = GLOBAL.duplicarJson(this.data[i][referencia]);
+
+    if (formatear) {
+      this.data[i][destino] = GLOBAL.formatearNumero(GLOBAL.redondearAdos(copia));
+    } else {
+      this.data[i][destino] = copia;
+    }
+  }
+
   changeValorCheck(key, i) {
     this.data[i][key] = !this.data[i][key];
+    const obj = {
+      body: this.data,
+      index: i,
+      cambio: key,
+      value: this.data[i][key],
+    };
+    this.getInfoChange.emit(obj);
   }
+
   changeValorInput(key, i, valor) {
     this.data[i][key] = valor;
+    const obj = {
+      body: this.data,
+      index: i,
+      cambio: key,
+      value: valor,
+    };
+    this.getInfoChange.emit(obj);
   }
+
   disabledInput(condicion, i) {
     let res = true;
     if (condicion.getDisabled) {
@@ -210,7 +237,17 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
           const temp = [enteros, decimales];
           precioTEMP = _.join(temp, '.');
         }
-        this.data[i][key] = GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioTEMP));
+
+        const numeroFormateado = GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioTEMP));
+
+        this.data[i][key] = numeroFormateado;
+        const obj = {
+          body: this.data,
+          index: i,
+          cambio: key,
+          value: numeroFormateado,
+        };
+        this.getInfoChange.emit(obj);
       }
     }
   }

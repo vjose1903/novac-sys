@@ -163,7 +163,7 @@ export class RegistroClientesComponent implements OnInit {
         }
       }
 
-      Input.setValue(this.formatearNumero(precioTEMP));
+      Input.setValue(GLOBAL.formatearNumero(precioTEMP));
     }
   }
 
