@@ -144,13 +144,16 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     // this.fecha = moment().format('DD/MM/YYYY');
 
     this.mServ.OBJDEVUELTO.subscribe(res => {
-      if (res !== undefined && res !== null && res.tipoModal === 'buscarCliente') {
+      if (res && res.tipoModal === 'buscarCliente') {
         this.propietario_factura = res;
         console.log(res);
 
         this.form.patchValue(this.propietario_factura);
 
         this.enfocarInput('cod-0');
+      } else if (res && res.tipoModal === 'cambio') {
+        this.Devuelta = res.devuelta;
+        this.IMPRIMIR();
       }
     });
     this.mServ.DECISIONMODAL.subscribe(res => {

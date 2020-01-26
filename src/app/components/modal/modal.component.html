@@ -115,7 +115,7 @@
       (onHide)="reinicioModal()"
       blockScroll="true"
     >
-      <app-form-cantidad-efectivo [data]="seleccionModal"></app-form-cantidad-efectivo>
+      <app-form-cantidad-efectivo [data]="seleccionModal" (cancel)="accion(false)" (getDevuelta)="getDevuelta($event)"></app-form-cantidad-efectivo>
     </p-dialog>
     <!-- ================================================================================================================================ -->
     <!--  CANCELAR LA PRODUCCION-->

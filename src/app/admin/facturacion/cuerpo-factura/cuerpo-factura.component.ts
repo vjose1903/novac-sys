@@ -79,7 +79,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     // )
 
     this.mServ.OBJDEVUELTO.subscribe(res => {
-      if (res !== undefined && res !== null && res.tipoModal !== 'buscarCliente') {
+      if (res !== undefined && res !== null && res.tipoModal === 'buscar') {
         this.clickRowModal(res);
       }
     });

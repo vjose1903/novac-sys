@@ -15,8 +15,9 @@
     <input
       type="text"
       class="inputEfectivo"
-      (focus)="($event.target.select)"
+      (focus)="$event.target.select()"
       (keyup)="calcularDevueta()"
+      (keydown.enter)="enviar()"
       [(ngModel)]="efectivo"
       (blur)="revisarPrecio($event.target.value, 'devuelta')"
       id="devuelta"
@@ -29,6 +30,13 @@
       <span *ngIf="devuelta" class="text-bold w-100 total">
         {{ ' ' + devuelta }}
       </span>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="from-group">
+      <button type="button" mdbBtn (click)="cancelar()" class="btn-sm mr-2 btn-light">Cancelar</button>
+      <button type="button" mdbBtn (click)="confirmar()" id="btnSend" class="btn-sm btn-success">Confirmar</button>
     </div>
   </div>
 </div>

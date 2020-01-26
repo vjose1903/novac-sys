@@ -107,7 +107,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     this.mServ.ModalDecision(arg);
     this.reinicioModal();
   }
-
+  getDevuelta(arg) {
+    const obj = { devuelta: arg };
+    this.devolverCLick(obj);
+    this.reinicioModal();
+  }
   reinicioModal() {
     this.mServ.modalTipo(undefined);
     this.mServ.mostrarModal(false);

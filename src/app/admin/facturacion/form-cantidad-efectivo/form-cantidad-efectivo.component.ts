@@ -1,10 +1,11 @@
-import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ModalService } from '../../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as _ from 'lodash';
+
 @Component({
   selector: 'app-form-cantidad-efectivo',
   templateUrl: './form-cantidad-efectivo.component.html',
@@ -15,6 +16,9 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
   element: any;
   devuelta;
   efectivo: string;
+
+  @Output() getDevuelta = new EventEmitter<any>();
+  @Output() cancel = new EventEmitter<any>();
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
@@ -104,9 +108,17 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
     const efectivo = GLOBAL.desformatear(this.efectivo);
     const dev = efectivo - total;
     this.devuelta = this.formatoNumero(dev);
-    console.log(this.devuelta);
   }
 
+  cancelar() {
+    this.cancel.emit();
+  }
+  confirmar() {
+    this.getDevuelta.emit(this.devuelta);
+  }
+  enviar() {
+    this.enfocarInput('btnSend');
+  }
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();

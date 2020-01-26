@@ -272,6 +272,7 @@ export class RegistroClientesComponent implements OnInit {
         temp.estado = true;
 
         const obj = _.omit(temp, ['cedula', 'rnc']);
+        obj['balance'] = 0;
         obj.maximo_credito = GLOBAL.desformatear(obj.maximo_credito);
         if (obj.id === null) {
           obj.cuenta = obj.cuenta;
