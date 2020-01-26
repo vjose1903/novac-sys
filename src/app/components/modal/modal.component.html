@@ -100,6 +100,24 @@
       <app-change-password [user]="seleccionModal" (cancel)="accion($event)"></app-change-password>
     </p-dialog>
     <!-- ================================================================================================================================ -->
+    <!--  FORMULARIO CANTIDAD EFECTIVO  -->
+    <!-- ================================================================================================================================ -->
+
+    <p-dialog
+      *ngIf="tipoModal === 'cambio'"
+      header="Cantidad de efectivo"
+      [(visible)]="showModal"
+      [modal]="false"
+      [responsive]="true"
+      [style]="{ width: '500px', minWidth: '500px' }"
+      [minY]="70"
+      [baseZIndex]="10000"
+      (onHide)="reinicioModal()"
+      blockScroll="true"
+    >
+      <app-form-cantidad-efectivo [data]="seleccionModal"></app-form-cantidad-efectivo>
+    </p-dialog>
+    <!-- ================================================================================================================================ -->
     <!--  CANCELAR LA PRODUCCION-->
     <!-- ================================================================================================================================ -->
 

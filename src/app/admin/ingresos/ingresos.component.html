@@ -8,10 +8,10 @@
         <label class="control-label">Tipo recibo: </label>
         <!-- (change)="selectTipoArticulo($event.target.value)" -->
 
-        <select id="tipo_recibo" class="form-control" (change)="saltar('clienteI', $event.target.value)" value="">
+        <select id="tipo_recibo" [(ngModel)]="tipo_recibo" class="form-control" (change)="saltar('clienteI', $event.target.value)" value="">
           <option value="{{ null }}" selected disabled>Escoger tipo</option>
           <option value="pago_facturas">Pago factura</option>
-          <option value="pago_facturas">Compra adelantada</option>
+          <option value="compra_adelantada">Compra adelantada</option>
         </select>
       </div>
       <div class="form-group">
@@ -36,10 +36,21 @@
     </div>
   </div>
   <div class="col-12 rowIngre">
-    <div class="card card-padding sombra ingreCard">
-      <app-tablas *ngIf="Facturas" [info]="info" [data]="Facturas" (getInfoChange)="getInfoChange($event)" [scrollContainer]="'scroll-container'" (DevolverInfo)="preuba($event)" [focusRow]="false"></app-tablas>
-      <!-- 
-      (DELETE)="abrirModal($event)" -->
+    <div *ngIf="Facturas" class="card card-padding sombra ingreCard">
+      <div style="height: 90%;">
+        <app-tablas
+          [info]="info"
+          [data]="Facturas"
+          (getInfoChange)="getInfoChange($event)"
+          [scrollContainer]="'scroll-container'"
+          (DevolverInfo)="preuba($event)"
+          [focusRow]="false"
+        ></app-tablas>
+      </div>
+      <div class="d-flex justify-content-end">
+        <input [disabled]="abilitarBtnConfirmar()" (click)="cancelarIgreso()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+        <input [disabled]="abilitarBtnConfirmar()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      </div>
     </div>
   </div>
 </div>

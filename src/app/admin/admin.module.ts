@@ -31,6 +31,7 @@ import { PendienteFormComponent } from '../components/pendiente-form/pendiente-f
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MovimientosFormComponent } from './inventario/movimientos-form/movimientos-form.component';
 import { IngresosComponent } from './ingresos/ingresos.component';
+import { FormCantidadEfectivoComponent } from './facturacion/form-cantidad-efectivo/form-cantidad-efectivo.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { IngresosComponent } from './ingresos/ingresos.component';
     PendienteFormComponent,
     MovimientosFormComponent,
     IngresosComponent,
+    FormCantidadEfectivoComponent,
   ],
   imports: [
     DialogModule,

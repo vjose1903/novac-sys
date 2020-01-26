@@ -60,6 +60,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   usuario: any;
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
+  Devuelta = 0;
 
   constructor(
     private _ipc: IpcService,
@@ -422,9 +423,16 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       if (this.CuerpoFactura.length === 0) {
         this.dbServ.toastWarning('Factura no tiene Articulos', 'Aviso');
       } else {
-        this.mServ.modalTipo('imprimir');
-        this.tipoModal = 'imprimir';
-        this.abrirModal();
+        if (this.condicion_fact === 'Crédito') {
+          this.mServ.modalTipo('imprimir');
+          this.tipoModal = 'imprimir';
+          this.abrirModal();
+        } else {
+          const obj = { total_factura: this.TOTAL, devuelta: 0 };
+          this.mServ.modalTipo('cambio');
+          this.tipoModal = 'cambio';
+          this.abrirModal(obj);
+        }
       }
     }
   }
@@ -665,8 +673,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         .add(this.propietario_factura.limite_credito, 'days')
         .format('DD/MM/YYYY');
       cabecera_fact['pagada'] = false;
+      cabecera_fact['balance'] = GLOBAL.redondearAdos(this.TOTAL);
+      cabecera_fact['devuelta'] = 0;
     } else {
       cabecera_fact['pagada'] = true;
+      cabecera_fact['balance'] = 0;
+      cabecera_fact['devuelta'] = this.Devuelta;
     }
 
     cabecera_fact['fecha_valida'] = moment(new Date())

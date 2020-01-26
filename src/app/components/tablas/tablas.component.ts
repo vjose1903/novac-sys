@@ -203,9 +203,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     const precioTEMPO = valor;
 
     if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
-      console.log('precioTEMPO', precioTEMPO);
       const splitPrecio = _.split(precioTEMPO, '.');
-      console.log('splitPrecio', splitPrecio);
 
       let precioTEMP;
 

@@ -21,6 +21,8 @@ export class IngresosComponent implements OnInit {
   clienteAdepositar: any;
   tipoIngreso: any;
   Facturas: any;
+  tipo_recibo;
+  facturas_selected = [];
   @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
   // =============================================
   //  TABLAS
@@ -154,6 +156,20 @@ export class IngresosComponent implements OnInit {
     }
   }
 
+  abilitarBtnConfirmar() {
+    let res = true;
+    if (this.tipo_recibo === 'pago_facturas') {
+      if (this.facturas_selected.length > 0) {
+        res = false;
+      }
+    } else {
+    }
+    return res;
+  }
+
+  cancelarIgreso() {}
+  confirmarIgreso() {}
+
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
@@ -164,9 +180,45 @@ export class IngresosComponent implements OnInit {
   }
 
   getInfoChange(item) {
-    console.log(item);
     if (item.cambio === 'pagoT' && item.value) {
       this.tablas.resetInput('total_factura', 'monto', item.index, true);
+      this.modificarFacturaSelected(item);
+    }
+    if (item.cambio === 'select') {
+      if (!item.value) {
+        this.Facturas[item.index].pagoT = true;
+        this.tablas.resetInput('total_factura', 'monto', item.index, true);
+
+        const i = this.facturas_selected.indexOf(item.body[item.index]);
+        _.pullAt(this.facturas_selected, i);
+      } else {
+        this.facturas_selected.push(item.body[item.index]);
+      }
+    }
+
+    if (item.cambio === 'monto') {
+      if (!item.value) {
+        this.dbServ.toastWarning('Debe de introducir un Monto', 'AVISO');
+        this.tablas.enfocarInput('input-' + item.index);
+      }
+      const total = item.body[item.index].total_factura;
+      const monto = GLOBAL.desformatear(item.value);
+
+      if (monto > total) {
+        this.dbServ.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+        this.tablas.enfocarInput('input-' + item.index);
+      }
+      this.modificarFacturaSelected(item);
+    }
+    console.log(this.facturas_selected);
+  }
+
+  modificarFacturaSelected(item) {
+    const index = _.findIndex(this.facturas_selected, (fact: any) => {
+      return fact.id === item.body[item.index].id;
+    });
+    if (index !== -1) {
+      this.facturas_selected[index] = item.body[item.index];
     }
   }
 

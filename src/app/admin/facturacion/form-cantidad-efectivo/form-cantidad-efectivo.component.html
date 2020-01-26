@@ -1,0 +1,34 @@
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex ">
+      <h3 class="label w-100">
+        TOTAL: RD$
+      </h3>
+      <span class="text-bold w-100 total">
+        {{ ' ' + formatoNumero(data.total_factura) }}
+      </span>
+    </div>
+
+    <h3 class="label w-100 mt-3">
+      EFECTIVO: RD$
+    </h3>
+    <input
+      type="text"
+      class="inputEfectivo"
+      (focus)="($event.target.select)"
+      (keyup)="calcularDevueta()"
+      [(ngModel)]="efectivo"
+      (blur)="revisarPrecio($event.target.value, 'devuelta')"
+      id="devuelta"
+    />
+
+    <div class="d-flex mt-3">
+      <h3 class="label w-100">
+        DEVUELTA: RD$
+      </h3>
+      <span *ngIf="devuelta" class="text-bold w-100 total">
+        {{ ' ' + devuelta }}
+      </span>
+    </div>
+  </div>
+</div>
