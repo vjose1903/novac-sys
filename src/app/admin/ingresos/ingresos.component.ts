@@ -117,17 +117,22 @@ export class IngresosComponent implements OnInit {
     }
     this.Facturas.forEach((fact, j) => {
       if (select) {
-        this.Facturas[j].pagoT = true;
-        this.Facturas[j].select = false;
-        this.tablas.resetInput('total_factura', 'monto', j, true);
+        if (fact.select) {
+          this.Facturas[j].pagoT = true;
+          this.Facturas[j].select = false;
+          this.tablas.resetInput('total_factura', 'monto', j, true);
 
-        const i = this.facturas_selected.indexOf(fact[j]);
-        _.pullAt(this.facturas_selected, i);
+          const i = this.facturas_selected.indexOf(fact);
+          _.pullAt(this.facturas_selected, i);
+        }
       } else {
-        this.Facturas[j].select = true;
-        this.facturas_selected.push(fact[j]);
+        if (!fact.select) {
+          this.Facturas[j].select = true;
+          this.facturas_selected.push(fact);
+        }
       }
     });
+    console.log(this.facturas_selected);
   }
 
   preuba(o) {
