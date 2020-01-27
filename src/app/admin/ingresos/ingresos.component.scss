@@ -8,3 +8,11 @@ div.col-12.rowIngre {
     width: 100%;
   }
 }
+
+.btnSelect {
+  position: absolute;
+  font-size: 1.5rem;
+  &:hover {
+    cursor: pointer;
+  }
+}

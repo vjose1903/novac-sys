@@ -720,7 +720,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
-    // console.log(cabecera_fact);
+    console.log(cabecera_fact);
 
     this.dbServ.createFacturas(cabecera_fact).subscribe(
       res => {

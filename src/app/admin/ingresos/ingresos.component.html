@@ -10,8 +10,8 @@
 
         <select id="tipo_recibo" [(ngModel)]="tipo_recibo" class="form-control" (change)="saltar('clienteI', $event.target.value)" value="">
           <option value="{{ null }}" selected disabled>Escoger tipo</option>
-          <option value="pago_facturas">Pago factura</option>
-          <option value="compra_adelantada">Compra adelantada</option>
+          <option *ngFor="let tipo of tipoFacturas" value="{{ tipo.descripcion }}">{{ tipo.descripcion }}</option>
+          <!-- <option value="compra_adelantada">Compra adelantada</option> -->
         </select>
       </div>
       <div class="form-group">
@@ -38,6 +38,9 @@
   <div class="col-12 rowIngre">
     <div *ngIf="Facturas" class="card card-padding sombra ingreCard">
       <div style="height: 90%;">
+        <div class="w-100 d-flex justify-content-end">
+          <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+        </div>
         <app-tablas
           [info]="info"
           [data]="Facturas"

@@ -80,6 +80,8 @@ export class IngresosComponent implements OnInit {
       title: '',
     },
   ];
+  tipoFacturas: Promise<any>;
+  AllSelected = false;
 
   constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {}
 
@@ -96,6 +98,36 @@ export class IngresosComponent implements OnInit {
 
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
+  }
+
+  getIcon() {
+    if (this.AllSelected) {
+      return { icon: 'fa-check-square', tooltip: 'Deseleccionar Todos' };
+    } else {
+      return { icon: 'fa-square', tooltip: 'Seleccionar Todos' };
+    }
+  }
+  selectAll() {
+    this.AllSelected = !this.AllSelected;
+    let select = false;
+    if (this.AllSelected) {
+      select = false;
+    } else {
+      select = true;
+    }
+    this.Facturas.forEach((fact, j) => {
+      if (select) {
+        this.Facturas[j].pagoT = true;
+        this.Facturas[j].select = false;
+        this.tablas.resetInput('total_factura', 'monto', j, true);
+
+        const i = this.facturas_selected.indexOf(fact[j]);
+        _.pullAt(this.facturas_selected, i);
+      } else {
+        this.Facturas[j].select = true;
+        this.facturas_selected.push(fact[j]);
+      }
+    });
   }
 
   preuba(o) {
@@ -128,8 +160,17 @@ export class IngresosComponent implements OnInit {
   async necesarioStar() {
     await this.pedirClientes();
     await this.quitarContadoDeLista();
+    await this.getTipoFacturas();
 
     this.enfocarInput('tipo_recibo');
+  }
+  async getTipoFacturas() {
+    try {
+      this.tipoFacturas = await this.dbServ.getTiposRecibos().toPromise();
+      console.log(this.tipoFacturas);
+    } catch (error) {
+      console.error(error);
+    }
   }
   async pedirClientes() {
     try {
@@ -158,7 +199,7 @@ export class IngresosComponent implements OnInit {
 
   abilitarBtnConfirmar() {
     let res = true;
-    if (this.tipo_recibo === 'pago_facturas') {
+    if (this.tipo_recibo === 'Pago factura') {
       if (this.facturas_selected.length > 0) {
         res = false;
       }
