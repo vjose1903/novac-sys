@@ -83,17 +83,22 @@ body {
 // TEXT_COLOR
 // ========================================================
 .text-bold {
-  font-weight: bold;
+  font-weight: bold !important;
 }
-
 .control-label {
-  font-weight: bold;
+  font-weight: bold !important;
 }
 .text-green {
-  color: green;
+  color: green !important;
 }
 .text-blue {
   color: #1e6cb6 !important;
+}
+.text-red {
+  color: #ff0000 !important;
+}
+.text-black {
+  color: #000000 !important;
 }
 .text-transparent {
   color: transparent;

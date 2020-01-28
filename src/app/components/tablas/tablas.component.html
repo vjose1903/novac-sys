@@ -27,7 +27,13 @@
           (click)="clickROW(dato)"
         >
           <td *ngFor="let column of info; let j = index">
-            <span *ngIf="column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero" style="width: 100%"> {{ dato[column.key] }} </span>
+            <span
+              *ngIf="column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero"
+              style="width: 100%"
+              class="text-{{ column.color ? (dato.text_color ? dato.text_color : 'black') : 'black' }}"
+            >
+              {{ dato[column.key] }}
+            </span>
 
             <ng-template #cantiTool>
               <div *ngIf="lookOters(dato[column.key]).Hijo === undefined" style=" max-width: 21rem;">

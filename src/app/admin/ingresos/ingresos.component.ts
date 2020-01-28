@@ -19,7 +19,6 @@ export class IngresosComponent implements OnInit {
   element: any;
   listaClientes: unknown;
   clienteAdepositar: any;
-  tipoIngreso: any;
   Facturas: any;
   tipo_recibo;
   facturas_selected = [];
@@ -40,6 +39,11 @@ export class IngresosComponent implements OnInit {
     {
       titulo: 'Fecha Facturacion',
       key: 'fecha',
+    },
+    {
+      titulo: 'Fecha Vencimiento',
+      key: 'fechaV',
+      color: true,
     },
     {
       titulo: 'Total tactura',
@@ -80,7 +84,7 @@ export class IngresosComponent implements OnInit {
       title: '',
     },
   ];
-  tipoFacturas: Promise<any>;
+  tipoFacturas;
   AllSelected = false;
 
   constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {}
@@ -141,6 +145,7 @@ export class IngresosComponent implements OnInit {
 
   async pedirFacturasPorCliente(cliente_id) {
     try {
+      const fechaA = moment().format('YYYY-MM-DD');
       this.Facturas = await this.dbServ
         .getFacturasByClienteIdAndPagada(cliente_id, false)
         .pipe(
@@ -149,9 +154,12 @@ export class IngresosComponent implements OnInit {
               (fact = fact.map(val => {
                 val.secuencia = _.padStart(val.numero_factura, 5, '0');
                 val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
+                val.fechaV = moment(val.fecha_vencimiento).format('DD-MM-YYYY');
                 val.select = false;
                 val.pagoT = true;
                 val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.total_factura));
+                val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
+                val.text_color = val.fecha_vencimiento < fechaA ? 'red' : 'black';
                 return val;
               })),
           ),
@@ -214,7 +222,52 @@ export class IngresosComponent implements OnInit {
   }
 
   cancelarIgreso() {}
-  confirmarIgreso() {}
+
+  formarDetalleRecibos() {
+    const temp = [];
+    let total = 0;
+    for (let i = 0; i < this.facturas_selected.length; i++) {
+      const fact = this.facturas_selected[i];
+      temp.push({
+        // recibos_ingreso_id: null,
+        cabecera_factura_id: fact.id,
+        pago_total: fact.pagoT,
+        depositvo: GLOBAL.desformatear(fact.monto),
+        descripcion: this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo Factura ' + fact.secuencia : 'Abono a factura ' + fact.secuencia) : '',
+        pago_a_tiempo: fact.pagoT ? fact.pago_a_tiempo : null,
+      });
+
+      if (fact.pagoT) {
+        total += fact.total_factura;
+      } else {
+        total += GLOBAL.desformatear(fact.monto);
+      }
+    }
+
+    const obj = {
+      total_recibo: total,
+      detalle: temp,
+    };
+
+    return obj;
+  }
+
+  confirmarIgreso() {
+    const empleado = JSON.parse(this.dbServ.getEmpleado());
+    const tipo = this.tipoFacturas.filter(val => val.descripcion === this.tipo_recibo)[0];
+    const obj = {
+      user_id: empleado.id,
+      total: 0,
+      forma_pago: '',
+      tipo_recibo_id: tipo.id,
+      devuelta: 0,
+    };
+    const detalleYtotal = this.formarDetalleRecibos();
+
+    obj.total = detalleYtotal.total_recibo;
+    obj['detalle_recibo_attributes'] = detalleYtotal.detalle;
+    console.log(obj);
+  }
 
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
@@ -288,6 +341,5 @@ export class IngresosComponent implements OnInit {
 
   saltar(campo, valor?) {
     this.enfocarInput(campo);
-    this.tipoIngreso = valor;
   }
 }
