@@ -181,6 +181,9 @@ export class DBservice {
   getTiposRecibos() {
     return this.peticion('tipo_recibos', 'get');
   }
+  createRecibo(arg) {
+    return this.peticion('recibos_ingresos', 'post', JSON.stringify(arg));
+  }
   // =====================================================================
   // FACTURAS
   // =====================================================================

@@ -51,6 +51,11 @@ export class IngresosComponent implements OnInit {
       formatoNumero: true,
     },
     {
+      titulo: 'Balance tactura',
+      key: 'balance',
+      formatoNumero: true,
+    },
+    {
       titulo: 'Seleccione',
       tipo: 'check',
       key: 'select',
@@ -157,7 +162,7 @@ export class IngresosComponent implements OnInit {
                 val.fechaV = moment(val.fecha_vencimiento).format('DD-MM-YYYY');
                 val.select = false;
                 val.pagoT = true;
-                val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.total_factura));
+                val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
                 val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
                 val.text_color = val.fecha_vencimiento < fechaA ? 'red' : 'black';
                 return val;
@@ -232,7 +237,7 @@ export class IngresosComponent implements OnInit {
         // recibos_ingreso_id: null,
         cabecera_factura_id: fact.id,
         pago_total: fact.pagoT,
-        depositvo: GLOBAL.desformatear(fact.monto),
+        deposito: GLOBAL.desformatear(fact.monto),
         descripcion: this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo Factura ' + fact.secuencia : 'Abono a factura ' + fact.secuencia) : '',
         pago_a_tiempo: fact.pagoT ? fact.pago_a_tiempo : null,
       });
@@ -256,6 +261,7 @@ export class IngresosComponent implements OnInit {
     const empleado = JSON.parse(this.dbServ.getEmpleado());
     const tipo = this.tipoFacturas.filter(val => val.descripcion === this.tipo_recibo)[0];
     const obj = {
+      cliente_id: this.clienteAdepositar.id,
       user_id: empleado.id,
       total: 0,
       forma_pago: '',
@@ -265,8 +271,15 @@ export class IngresosComponent implements OnInit {
     const detalleYtotal = this.formarDetalleRecibos();
 
     obj.total = detalleYtotal.total_recibo;
-    obj['detalle_recibo_attributes'] = detalleYtotal.detalle;
-    console.log(obj);
+    obj['detalle_recibos_attributes'] = detalleYtotal.detalle;
+    this.dbServ.createRecibo(obj).subscribe(
+      res => {
+        console.log(res);
+      },
+      err => {
+        console.error(err);
+      },
+    );
   }
 
   enfocarInput(arg) {

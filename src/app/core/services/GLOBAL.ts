@@ -40,7 +40,7 @@ export class GLOBAL {
     return parseFloat(numStr).toFixed(2);
   }
 
-  static desformatear(sTnum) {
+  static desformatear(sTnum){
     let temp = 0;
 
     if (sTnum !== null) {

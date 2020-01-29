@@ -258,7 +258,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   // ===================================================================================================
 
   formatoNumero(num) {
-    return GLOBAL.formatearNumero(num);
+    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
   }
 
   lookOters(objeto) {
