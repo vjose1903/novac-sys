@@ -293,13 +293,13 @@ export class IngresosComponent implements OnInit {
 
   getInfoChange(item) {
     if (item.cambio === 'pagoT' && item.value) {
-      this.tablas.resetInput('total_factura', 'monto', item.index, true);
+      this.tablas.resetInput('balance', 'monto', item.index, true);
       this.modificarFacturaSelected(item);
     }
     if (item.cambio === 'select') {
       if (!item.value) {
         this.Facturas[item.index].pagoT = true;
-        this.tablas.resetInput('total_factura', 'monto', item.index, true);
+        this.tablas.resetInput('balance', 'monto', item.index, true);
 
         const i = this.facturas_selected.indexOf(item.body[item.index]);
         _.pullAt(this.facturas_selected, i);
