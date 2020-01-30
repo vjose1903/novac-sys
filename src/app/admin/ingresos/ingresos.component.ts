@@ -10,6 +10,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 import * as moment from 'moment';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { Subscription } from 'rxjs';
+import { NgSelectConfig } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-ingresos',
@@ -23,7 +24,9 @@ export class IngresosComponent implements OnInit, OnDestroy {
   Facturas: any;
   tipo_recibo;
   facturas_selected = [];
-  texto;
+  articuloEnTurno = null;
+  articuloEnTurnoid = null;
+  medidaEnTurno = null;
   @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
   // =============================================
   //  TABLAS
@@ -95,8 +98,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
   AllSelected = false;
   sub: Subscription;
   articulos: any;
+  precioEnTurno: any;
 
-  constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {}
+  constructor(private config: NgSelectConfig, private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {
+    this.config.notFoundText = 'Articulo no existe';
+  }
 
   ngOnInit() {
     this.necesarioStar();
@@ -152,6 +158,13 @@ export class IngresosComponent implements OnInit, OnDestroy {
     console.log(o);
   }
 
+  selectArticulo(arg, valor?) {
+    if (arg === 'articulo') {
+      this.medidaEnTurno = -1;
+    } else if (arg === 'medida') {
+      this.precioEnTurno = this.articuloEnTurno.medidas.filter(val => val.medida === valor)[0].precio;
+    }
+  }
   async pedirFacturasPorCliente(cliente_id) {
     try {
       const fechaA = moment().format('YYYY-MM-DD');
@@ -190,7 +203,23 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   async getArticulos() {
     try {
-      this.articulos = await this.dbServ.getArticulos().toPromise();
+      this.articulos = await this.dbServ
+        .getArticulos()
+        .pipe(
+          map(
+            articulo =>
+              (articulo = articulo.map(val => {
+                const medidas = [{ medida: val.medida, precio: val.precio_principal }];
+                for (let i = 0; i < val.contenido_articulos.length; i++) {
+                  const cont = val.contenido_articulos[i];
+                  medidas.push({ medida: cont.medida, precio: cont.precio });
+                }
+                val.medidas = medidas;
+                return val;
+              })),
+          ),
+        )
+        .toPromise();
     } catch (error) {
       console.log(error);
       this.dbServ.toastError('Algo fallo en la busqueda de articulos', 'ERROR');
@@ -375,6 +404,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
     if (valor === 'Pago factura') {
       this.enfocarInput(campo);
     } else if (valor === 'Compra adelantada') {
+      this.medidaEnTurno = null;
     }
   }
   ngOnDestroy() {

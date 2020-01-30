@@ -33,6 +33,9 @@ import { MovimientosFormComponent } from './inventario/movimientos-form/movimien
 import { IngresosComponent } from './ingresos/ingresos.component';
 import { FormCantidadEfectivoComponent } from './facturacion/form-cantidad-efectivo/form-cantidad-efectivo.component';
 
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
+
 @NgModule({
   declarations: [
     ChangePasswordComponent,
@@ -64,6 +67,8 @@ import { FormCantidadEfectivoComponent } from './facturacion/form-cantidad-efect
     AppRoutingModule,
     AngularModule,
     NgxBootstrapModule,
+    NgSelectModule,
+    FormsModule,
     // MdBootstrapModule
     MDBBootstrapModule.forRoot(),
     NgbModule,

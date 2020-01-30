@@ -34,15 +34,31 @@
   </div>
   <div *ngIf="tipo_recibo === 'Compra adelantada'" class="col-7">
     <div class="card card-padding sombra">
-      <div class="form-group">
-        <label class="control-label">Articulo </label>
-        <!-- (change)="selectTipoArticulo($event.target.value)" -->
-
-        <select id="tipo_recibo" [(ngModel)]="tipo_recibo" class="form-control" (change)="saltar('clienteI', $event.target.value)" value="">
-          <option value="{{ null }}" selected disabled>Escoger tipo</option>
-          <option *ngFor="let tipo of tipoFacturas" value="{{ tipo.descripcion }}">{{ tipo.descripcion }}</option>
-          <!-- <option value="compra_adelantada">Compra adelantada</option> -->
-        </select>
+      <div class="row">
+        <div class="col-4 pr-0">
+          <div class="form-group">
+            <label class="control-label">Articulo </label>
+            <ng-select id="articuloI" [groupBy]="'descripcion'" [(ngModel)]="articuloEnTurno" (change)="selectArticulo('articulo')" [items]="articulos" bindLabel="nombre"> </ng-select>
+          </div>
+        </div>
+        <div class="col-4 pr-0">
+          <div class="form-group">
+            <label class="control-label">Medida </label>
+            <select id="medidaI" [(ngModel)]="medidaEnTurno" class="form-control" (change)="selectArticulo('medida', $event.target.value)">
+              <option *ngIf="!articuloEnTurno" value="{{ null }}" selected disabled>seleccione un articulo</option>
+              <option *ngIf="articuloEnTurno" value="{{ -1 }}" selected disabled>Escoger medida</option>
+              <ng-container *ngIf="articuloEnTurno">
+                <option *ngFor="let m of articuloEnTurno.medidas" value="{{ m.medida }}">{{ m.medida }}</option>
+              </ng-container>
+            </select>
+          </div>
+        </div>
+        <div class="col-4 pr-0">
+          <div class="form-group">
+            <label class="control-label">Precio </label>
+            <input class="form-control" type="text" [disabled]="true" value="{{ precioEnTurno ? precioEnTurno : null }}" />
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <label class="control-label">Cliente: </label>
@@ -65,7 +81,7 @@
       <span *ngIf="clienteAdepositar"> Debe: RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span>
     </div>
   </div>
-  <div  class="col-12 rowIngre">
+  <div class="col-12 rowIngre">
     <div *ngIf="Facturas" class="card card-padding sombra ingreCard">
       <div style="height: 90%;">
         <div class="w-100 d-flex justify-content-end">

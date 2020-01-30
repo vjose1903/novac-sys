@@ -85,6 +85,7 @@
     "@angular/material": "^8.1.2",
     "@fortawesome/fontawesome-free": "~5.6.3",
     "@ng-bootstrap/ng-bootstrap": "^5.1.5",
+    "@ng-select/ng-select": "^3.7.2",
     "@types/chart.js": "^2.7.40",
     "@types/electron": "^1.6.10",
     "angular-bootstrap-md": "^8.1.1",
