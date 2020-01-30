@@ -4,7 +4,7 @@ import '../polyfills';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 
@@ -29,6 +29,10 @@ import { TablasModule } from './components/tablas/tablas.module';
 import { UploadImgComponent } from './components/upload-img/upload-img.component';
 import { IpcService } from './core/services/ipc.service';
 
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { LoaderService } from './loader/loader.service';
+import { LoaderInterceptor } from './loader/loader.interceptor';
+
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -50,6 +54,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ToastrModule.forRoot(),
     AppRoutingModule,
     TablasModule,
+    NgxSpinnerModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -66,7 +71,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     NgxBootstrapModule,
   ],
   exports: [AngularModule, MDBBootstrapModule, AdminModule, BrowserAnimationsModule, NgxBootstrapModule],
-  providers: [],
+  providers: [LoaderService, { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true }],
   bootstrap: [AppComponent],
 })
 export class AppModule {

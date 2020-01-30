@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ModalService } from '../../components/modal/modal.service';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
@@ -9,19 +9,21 @@ import * as _ from 'lodash';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as moment from 'moment';
 import { TablasComponent } from '../../components/tablas/tablas.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-ingresos',
   templateUrl: './ingresos.component.html',
   styleUrls: ['./ingresos.component.scss'],
 })
-export class IngresosComponent implements OnInit {
+export class IngresosComponent implements OnInit, OnDestroy {
   element: any;
   listaClientes: unknown;
   clienteAdepositar: any;
   Facturas: any;
   tipo_recibo;
   facturas_selected = [];
+  texto;
   @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
   // =============================================
   //  TABLAS
@@ -91,12 +93,14 @@ export class IngresosComponent implements OnInit {
   ];
   tipoFacturas;
   AllSelected = false;
+  sub: Subscription;
+  articulos: any;
 
   constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {}
 
   ngOnInit() {
     this.necesarioStar();
-    this.mServ.OBJDEVUELTO.subscribe(res => {
+    this.sub = this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res && res.tipoModal === 'buscarCliente') {
         this.clienteAdepositar = res;
         (document.getElementById('clienteI') as any).value = res.nombre;
@@ -179,9 +183,20 @@ export class IngresosComponent implements OnInit {
     await this.pedirClientes();
     await this.quitarContadoDeLista();
     await this.getTipoFacturas();
+    await this.getArticulos();
 
     this.enfocarInput('tipo_recibo');
   }
+
+  async getArticulos() {
+    try {
+      this.articulos = await this.dbServ.getArticulos().toPromise();
+    } catch (error) {
+      console.log(error);
+      this.dbServ.toastError('Algo fallo en la busqueda de articulos', 'ERROR');
+    }
+  }
+
   async getTipoFacturas() {
     try {
       this.tipoFacturas = await this.dbServ.getTiposRecibos().toPromise();
@@ -275,9 +290,13 @@ export class IngresosComponent implements OnInit {
     this.dbServ.createRecibo(obj).subscribe(
       res => {
         console.log(res);
+        this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
+        this.clienteAdepositar.balance = this.clienteAdepositar.balance - res.total;
+        this.pedirFacturasPorCliente(this.clienteAdepositar.id);
       },
       err => {
         console.error(err);
+        this.dbServ.toastSuccess(err.error, 'ERROR');
       },
     );
   }
@@ -352,7 +371,13 @@ export class IngresosComponent implements OnInit {
     this.mServ.mostrarModal(true);
   }
 
-  saltar(campo, valor?) {
-    this.enfocarInput(campo);
+  async saltar(campo, valor?) {
+    if (valor === 'Pago factura') {
+      this.enfocarInput(campo);
+    } else if (valor === 'Compra adelantada') {
+    }
+  }
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 }

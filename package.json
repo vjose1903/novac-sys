@@ -102,6 +102,7 @@
     "moment": "^2.24.0",
     "ngx-bootstrap": "^5.1.1",
     "ngx-pagination": "^4.1.0",
+    "ngx-spinner": "^8.1.0",
     "ngx-toastr": "^10.0.4",
     "npm-registry-client": "^8.6.0",
     "pdfmake": "^0.1.62",
