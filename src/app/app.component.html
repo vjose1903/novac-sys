@@ -1,5 +1,11 @@
+<div id="fondoC" *ngIf="loading" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
+  <img class="img-fluid logoLoading rubberBand" src="../assets/img/admLogo_opt.png" alt="" />
+  <span class="text">
+    CARGANDO ...
+  </span>
+</div>
 <router-outlet></router-outlet>
 
-<ngx-spinner size="large" bdOpacity="0.9" [fullScreen]="true" type="ball-atom" color="#95f0a7">
+<!-- <ngx-spinner size="large" bdOpacity="0.9" [fullScreen]="true" type="ball-atom" color="#95f0a7">
   <p style="font-size: 3rem; color: white">{{ 'Por favor espere!...' | translate }}</p>
-</ngx-spinner>
+</ngx-spinner> -->

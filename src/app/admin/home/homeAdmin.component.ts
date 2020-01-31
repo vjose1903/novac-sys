@@ -10,4 +10,7 @@ export class HomeAdminComponent implements OnInit {
   constructor(private dbServ: DBservice) {}
 
   ngOnInit() {}
+  p() {
+    // document.getElementById('imgd').classList.add('rubberBand');
+  }
 }

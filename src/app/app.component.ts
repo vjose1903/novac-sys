@@ -26,9 +26,9 @@ export class AppComponent implements OnInit {
       this.loading = v;
 
       if (this.loading) {
-        this.spinner.show();
+        document.getElementById('fondoC').classList.add('fadeIn');
       } else {
-        this.spinner.hide();
+        document.getElementById('fondoC').classList.add('fadeOut');
       }
     });
   }
