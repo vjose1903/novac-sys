@@ -402,10 +402,14 @@ function contenidoFacturaVenta(data) {
                 { text: 'TOTAL RD$: ', fontSize: 11, bold: true },
                 { text: formatearNumero(redondearAdos(data.total_factura)), fontSize: 11, alignment: 'right' },
               ],
+              [
+                { text: 'Devuelta RD$: ', fontSize: 11, bold: true },
+                { text: formatearNumero(redondearAdos(data.devuelta)), fontSize: 11, alignment: 'right' },
+              ],
             ],
           },
           layout: 'noBorders',
-          margin: [595, 3, 0, 0],
+          margin: [585, 3, 0, 0],
         },
         {
           stack: [
