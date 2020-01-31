@@ -20,7 +20,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 export class FacturacionComponent implements OnInit, OnDestroy {
   form: FormGroup;
   fecha;
-
+  tipoVenta = 'Normal';
   ITBIS = 0;
   seleccionModal;
   showModal = false;
@@ -146,22 +146,24 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res && res.tipoModal === 'buscarCliente') {
         this.propietario_factura = res;
-        console.log(res);
-
         this.form.patchValue(this.propietario_factura);
-
         this.enfocarInput('cod-0');
+        this.mServ.ModalObj(undefined);
       } else if (res && res.tipoModal === 'cambio') {
         this.Devuelta = res.devuelta;
+        this.forma_pago = res.forma_pago;
         this.IMPRIMIR();
+        this.mServ.ModalObj(undefined);
       }
     });
     this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== undefined) {
         this.decisionModal(res);
+        this.mServ.ModalDecision(undefined);
       }
       if (res !== undefined && res.bool) {
         this.filterArticulosByDate(res.Date);
+        this.mServ.ModalDecision(undefined);
       }
     });
 
@@ -249,10 +251,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     });
   }
   getCalculos(arg) {
-    console.log(arg);
-
     this.TOTAL = parseFloat(arg.Total);
-
     this.calcularBruto();
   }
   getDescuento(arg) {
@@ -293,7 +292,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  saltar(campo, valor?) {
+  saltar(campo, valor?, salioDe?) {
+    if (campo === 'buscarCliente') {
+      this.desEnfocarInput(salioDe);
+      this.abrirModalFiltro();
+    }
+
     if (campo === 'condicion') {
       if (this.tipos_facturas.includes(valor)) {
         this.tipoFactura = valor;
@@ -302,6 +306,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       } else {
         this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
       }
+    }
+    if (campo === 'venta') {
+      this.desEnfocarInput(salioDe);
+      this.enfocarInput(campo);
     }
     if (campo === 'costo') {
       this.enfocarInput(campo);
@@ -381,6 +389,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
+  }
+  desEnfocarInput(arg) {
+    this.element = document.getElementById(arg) as HTMLElement;
+    this.element.blur();
   }
 
   // =============================================
@@ -650,9 +662,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   async filterArticulosByDate(date) {
-    console.log('siiiii');
-
-    console.log(date);
     try {
       this.listaArticulos = await this.dbServ.getArticulosByDate(date).toPromise();
     } catch (error) {
@@ -698,7 +707,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['estado'] = true;
     cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
     if (this.metodo === 'venta') {
-      if (this.propietario_factura.id === 1) {
+      if (this.propietario_factura && this.propietario_factura.id === 1) {
         cabecera_fact['cliente_id'] = null;
         cabecera_fact['NoCliente_nombre'] = this.form.controls.nombre.value;
         cabecera_fact['NoCliente_direccion'] = this.form.controls.direccion.value;
@@ -726,6 +735,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       res => {
         console.log(res);
         this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+          console.log('printRes=====> ', res);
+
           if (res.status) {
             this.CancelarFactura();
             this.GetArticulos();

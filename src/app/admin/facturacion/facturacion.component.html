@@ -27,10 +27,9 @@
             <span class="titulos"><strong>Condición :</strong></span>
             <select
               id="condicion"
-              (keydown.enter)="saltar(metodo === 'compra' ? 'costo' : 'pago', $event.target.value)"
+              (keydown.enter)="saltar(metodo === 'compra' ? 'costo' : $event.target.value === 'Contado' ? 'venta' : 'buscarCliente', $event.target.value, 'condicion')"
               class="form-control inputE"
               [(ngModel)]="condicion_fact"
-              name="condicionSelect"
             >
               <option value="Contado">Contado</option>
               <option value="Crédito">Crédito</option>
@@ -54,12 +53,16 @@
           </div>
         </div>
 
-        <div *ngIf="condicion_fact === 'Contado'">
-          <span class="mr-2 mt-2 titulos"><strong>Pago </strong></span>
-          <select id="pago" (keydown.enter)="saltar('nom', $event.target.value)" class="form-control inputE" [(ngModel)]="forma_pago" name="condicionSelect">
-            <option value="Efectivo">Efectivo</option>
-            <option value="Targeta">Targeta</option>
-            <option value="Cheque">Cheque</option>
+        <div *ngIf="metodo === 'venta' && condicion_fact === 'Contado'">
+          <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
+          <select
+            id="venta"
+            (keydown.enter)="saltar($event.target.value === 'Adelantada' ? 'buscarCliente' : condicion_fact === 'Credito' ? 'buscarCliente' : 'nom', $event.target.value, 'venta')"
+            class="form-control inputE"
+            [(ngModel)]="tipoVenta"
+          >
+            <option value="Normal">Normal</option>
+            <option value="Adelantada">Adelantada</option>
           </select>
         </div>
 

@@ -111,7 +111,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             fila.descuento = fila.desc ? (fila.desc !== null ? fila.desc : 0) : 0;
             fila.itbis = 0;
             fila.unidad = fila.uni;
-            fila.precio = fila.pre;
+            fila.precio = GLOBAL.desformatear(fila.pre);
             let lol;
             if (this.metodo === 'venta') {
               lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'desc', 'tot', 'costo', 'secuencia']);

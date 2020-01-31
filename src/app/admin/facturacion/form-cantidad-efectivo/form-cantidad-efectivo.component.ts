@@ -16,7 +16,7 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
   element: any;
   devuelta;
   efectivo: string;
-
+  formaPago = 'Efectivo';
   @Output() getDevuelta = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {}
@@ -26,7 +26,18 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.enfocarInput('devuelta');
+    setTimeout(() => {
+      this.enfocarInput('devuelta');
+    }, 250);
+  }
+
+  saltar(campo, valor?) {
+    if (campo === 'formaPago') {
+      this.enfocarInput(campo);
+    }
+    if (campo === 'send') {
+      this.enfocarInput('btnSend');
+    }
   }
 
   formatoNumero(num) {
@@ -114,11 +125,13 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
     this.cancel.emit();
   }
   confirmar() {
-    this.getDevuelta.emit(this.devuelta);
+    const obj = {
+      devuelta: GLOBAL.desformatear(this.devuelta),
+      forma_pago: this.formaPago,
+    };
+    this.getDevuelta.emit(obj);
   }
-  enviar() {
-    this.enfocarInput('btnSend');
-  }
+
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();

@@ -108,6 +108,7 @@ function redondearAdos(num) {
   let enteros = splitStr[0];
   const splitEnteros = _.split(enteros, ',');
   enteros = _.join(splitEnteros, '');
+
   let tempdecimales = splitStr[1];
   if (splitStr.length === 1) {
     tempdecimales = '00';
@@ -299,18 +300,18 @@ function cabeceraFacturaVenta(data) {
       style: 'tableExample',
       table: {
         headerRows: 1,
-        widths: [30, 233, '*', '*', '*', '*', '*'],
+        widths: [30, 245, 65, '*', '*', '*', '*'],
         body: [
           [
             { text: ' #', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
             { text: 'Articulo', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
-            { text: 'Cantidad', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
-            { text: 'Unidad', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
+            { text: 'Cantidad', style: 'tableHeader', bold: true, margin: [5, 0, 0, 0] },
+            { text: 'Unidad', style: 'tableHeader', bold: true, margin: [-1, 0, 0, 0] },
             data.FACTURA_DE === 'venta'
-              ? { text: 'Precio', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] }
-              : { text: 'Costo', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
-            { text: 'Itbis', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
-            { text: 'Total', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
+              ? { text: 'Precio', style: 'tableHeader', bold: true, margin: [13, 0, 0, 0] }
+              : { text: 'Costo', style: 'tableHeader', bold: true, margin: [14, 0, 0, 0] },
+            { text: 'Itbis', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
+            { text: 'Total', style: 'tableHeader', bold: true, margin: [12, 0, 0, 0] },
           ],
 
           [1, 'Sample value 1', 'value 2', 'value 3', 'value 4', 'value 5', 'value 6'],
@@ -340,11 +341,11 @@ function contenidoFacturaVenta(data) {
     row.push(
       i + 1,
       detalle.descripcion,
-      formatearNumero(redondearAdos(detalle.cantidad)),
-      detalle.unidad,
-      formatearNumero(data.FACTURA_DE === 'venta' ? detalle.precio : detalle.costo),
-      detalle.itbis !== 0 ? formatearNumero(redondearAdos(detalle.itbis)) : '',
-      formatearNumero(redondearAdos(detalle.total)),
+      { text: formatearNumero(redondearAdos(detalle.cantidad)), alignment: 'right', margin: [0, 0, 25, 0] },
+      { text: detalle.unidad, margin: [8, 0, 0, 0] },
+      { text: formatearNumero(data.FACTURA_DE === 'venta' ? detalle.precio : detalle.costo), alignment: 'right', margin: [0, 0, 10, 0] },
+      { text: formatearNumero(redondearAdos(detalle.itbis)), alignment: 'right', margin: [0, 0, 32, 0] },
+      { text: formatearNumero(redondearAdos(detalle.total)), alignment: 'right', margin: [0, 0, 26, 0] },
     );
     tempBody.push(row);
   });
@@ -352,7 +353,7 @@ function contenidoFacturaVenta(data) {
     {
       style: 'tableExample',
       table: {
-        widths: [24, 260, '*', '*', '*', '*', '*'],
+        widths: [24, 240, '*', 55, '*', '*', '*'],
         body: tempBody,
       },
       margin: data.condicion === 'Contado' ? [0, -2, 0, 0] : [0, -6, 0, 0],
@@ -373,10 +374,9 @@ function contenidoFacturaVenta(data) {
     },
     {
       text: [
-        { text: 'Realizada Por:  ', fontSize: 11, bold: true },
+        { text: 'Realizada Por :  ', fontSize: 11, bold: true },
         { text: data.usuario, fontSize: 11 },
-
-        data.vendedor ? { text: 'Vendedor:  ', fontSize: 11, bold: true } : { text: '' },
+        data.vendedor ? { text: '    Vendedor :  ', fontSize: 11, bold: true } : { text: '' },
         data.vendedor ? { text: data.vendedor, fontSize: 11 } : { text: '' },
       ],
       margin: [0, 5, 0, 0],
@@ -473,10 +473,9 @@ function contenidoFacturaVenta(data) {
 // ==========================================================================================================================================================
 
 function makeFacturaVenta(data) {
-  const dd = {
+  const DD = {
     pageSize: { width: 760, height: 480 },
     pageMargins: data.condicion === 'Contado' ? [10, 157.9, 0, 40] : [10, 173, 0, 40],
-    // pageMargins: data.condicion === 'Contado' ? [10, 157.5, 0, 40] : [10, 172.9, 0, 40],
     header: cabeceraFacturaVenta(data),
     content: contenidoFacturaVenta(data),
     footer: (currentPage, pageCount) => {
@@ -500,30 +499,34 @@ function makeFacturaVenta(data) {
     images: {
       logo: logoADM,
     },
-    defaultStyle: {
-      font: 'Roboto',
-    },
+    // defaultStyle: {
+    //   font: 'Roboto',
+    // },
   };
-  console.log('paso');
 
-  const type_font = 'roboto\\Roboto';
+  const type_font = process.platform === 'darwin' ? 'roboto/Roboto' : 'roboto\\Roboto';
+
+  const inicioRuta = process.platform === 'darwin' ? 'fonts/' : 'fonts\\';
+
   const fontDescriptors = {
     Roboto: {
-      normal: PathApp() + 'fonts\\' + type_font + '-Regular.ttf',
-      bold: PathApp() + 'fonts\\' + type_font + '-Bold.ttf',
-      italics: PathApp() + 'fonts\\' + type_font + '-Italic.ttf',
-      bolditalics: PathApp() + 'fonts\\' + type_font + '-BoldItalic.ttf',
+      normal: PathApp() + inicioRuta + type_font + '-Regular.ttf',
+      bold: PathApp() + inicioRuta + type_font + '-Bold.ttf',
+      italics: PathApp() + inicioRuta + type_font + '-Italic.ttf',
+      bolditalics: PathApp() + inicioRuta + type_font + '-BoldItalic.ttf',
     },
   };
+
   const printer = new pdfmake(fontDescriptors);
 
-  // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
+  // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(DD), datos: data });
   const cFileName = 'factura.pdf';
   try {
-    const pdfDoc = printer.createPdfKitDocument(dd);
+    const pdfDoc = printer.createPdfKitDocument(DD);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
       console.log('finizu');
-      imprimir(cFileName);
+      win.webContents.send('printRes', { msg: 'Factura creada correctamente', status: 'prueba', body: DD, mas: JSON.stringify(DD) });
+      // imprimir(cFileName);
     });
     pdfDoc.end();
   } catch (err) {
@@ -535,10 +538,9 @@ function makeFacturaVenta(data) {
 }
 
 function imprimir(cFileName) {
-  // var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
   const { exec } = require('child_process');
   // "C:\Users\User\Desktop\factura.pdf" "EPSON LX-350 ESC/P"
-  // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
+
   var foxitPath = PathApp() + 'print\\FoxitReaderPortable.exe';
   exec(`${foxitPath} /t "${PathApp()}factura.pdf"`, (error, stdout, stderr) => {
     if (error) {
@@ -550,7 +552,6 @@ function imprimir(cFileName) {
       win.webContents.send('printRes', { msg: 'Factura impresa correctamente!!', status: 'si' });
     }
   });
-  // exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\ADM-Agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
 }
 function PathApp() {
   return app.getPath('exe').substr(0, app.getPath('exe').indexOf(app.getName() + '.exe'));

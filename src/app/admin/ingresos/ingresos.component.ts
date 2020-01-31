@@ -19,7 +19,7 @@ import { NgSelectConfig } from '@ng-select/ng-select';
 })
 export class IngresosComponent implements OnInit, OnDestroy {
   element: any;
-  listaClientes: unknown;
+  listaClientes;
   clienteAdepositar: any;
   Facturas: any;
   tipo_recibo;
@@ -111,6 +111,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
         this.clienteAdepositar = res;
         (document.getElementById('clienteI') as any).value = res.nombre;
         this.pedirFacturasPorCliente(res.id);
+        this.mServ.ModalObj(undefined);
       }
     });
   }
@@ -195,10 +196,10 @@ export class IngresosComponent implements OnInit, OnDestroy {
   async necesarioStar() {
     await this.pedirClientes();
     await this.quitarContadoDeLista();
-    await this.getTipoFacturas();
+    // await this.getTipoFacturas();
     await this.getArticulos();
 
-    this.enfocarInput('tipo_recibo');
+    this.enfocarInput('clienteI');
   }
 
   async getArticulos() {
@@ -226,14 +227,14 @@ export class IngresosComponent implements OnInit, OnDestroy {
     }
   }
 
-  async getTipoFacturas() {
-    try {
-      this.tipoFacturas = await this.dbServ.getTiposRecibos().toPromise();
-      console.log(this.tipoFacturas);
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  // async getTipoFacturas() {
+  //   try {
+  //     this.tipoFacturas = await this.dbServ.getTiposRecibos().toPromise();
+  //     console.log(this.tipoFacturas);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
   async pedirClientes() {
     try {
       this.listaClientes = await this.dbServ
@@ -394,6 +395,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   abrirModalFiltro(nombre) {
     this.mServ.modalTipo('buscarCliente');
+
     this.listaClientes['filtrarCliente'] = nombre;
     this.mServ.ModalSeleccion(this.listaClientes);
 
