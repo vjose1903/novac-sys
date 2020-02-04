@@ -3472,6 +3472,8 @@
 .slideOutLeft {
   -webkit-animation-name: slideOutLeft;
   animation-name: slideOutLeft;
+  animation: slideOutLeft 2s infinite;
+
 }
 
 @-webkit-keyframes slideOutRight {

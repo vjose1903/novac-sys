@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { ObservableServcie } from '../../../core/services/observables.service';
 import { DBservice } from '../../../core/services/bdservice.service';
@@ -8,13 +8,14 @@ import { map } from 'rxjs/operators';
 import { ValidateRayaAbajo } from '../../../directives/validaciones';
 import { ModalService } from '../../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
   styleUrls: ['./registro-clientes.component.scss'],
 })
-export class RegistroClientesComponent implements OnInit {
+export class RegistroClientesComponent implements OnInit, OnDestroy {
   titulo = '';
   boton = '';
   form: FormGroup;
@@ -49,6 +50,7 @@ export class RegistroClientesComponent implements OnInit {
   seleccionModal: string;
   indexBorrar: any;
   vendedores;
+  subDeci: Subscription;
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
@@ -89,7 +91,7 @@ export class RegistroClientesComponent implements OnInit {
       cedula: [null, ValidateRayaAbajo.verificarRayaAbajo],
     });
 
-    this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
@@ -99,7 +101,9 @@ export class RegistroClientesComponent implements OnInit {
       this.vendedores = res;
     });
   }
-
+  ngOnDestroy() {
+    this.subDeci.unsubscribe;
+  }
   checkNumbers(arg) {
     let res = false;
     for (let i = 0; i < arg.length; i++) {

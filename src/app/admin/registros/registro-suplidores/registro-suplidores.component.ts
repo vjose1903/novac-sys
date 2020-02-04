@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig } from 'ngx-bootstrap';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,13 +6,14 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
 import { ModalService } from '../../../components/modal/modal.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-registro-suplidores',
   templateUrl: './registro-suplidores.component.html',
   styleUrls: ['./registro-suplidores.component.scss'],
 })
-export class RegistroSuplidoresComponent implements OnInit {
+export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
   form: FormGroup;
   titulo = '';
   boton = '';
@@ -21,6 +22,7 @@ export class RegistroSuplidoresComponent implements OnInit {
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   rncMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   listaSuplidores;
+  subDeci: Subscription;
   // =============================================
   //  TABLAS
   // =============================================
@@ -93,11 +95,14 @@ export class RegistroSuplidoresComponent implements OnInit {
         });
         this.listaSuplidores = JSON.parse(JSON.stringify(res));
       });
-    this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
     });
+  }
+  ngOnDestroy(): void {
+    this.subDeci.unsubscribe();
   }
   validarRayaAbajo(input) {
     const form = this.form.controls;

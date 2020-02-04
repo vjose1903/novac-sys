@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
@@ -6,13 +6,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
   styleUrls: ['./produccion.component.scss'],
 })
-export class ProduccionComponent implements OnInit {
+export class ProduccionComponent implements OnInit, OnDestroy {
   listaArticulos: any;
   articulo_id;
   cantidad_producir;
@@ -34,8 +35,8 @@ export class ProduccionComponent implements OnInit {
   seleccionModal: any;
   indexBorrar: any;
   tipoModal: string;
+  subDeci: Subscription;
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {}
-
 
   ngOnInit() {
     this.dbServ.getArticulos().subscribe(res => {
@@ -48,12 +49,15 @@ export class ProduccionComponent implements OnInit {
       }
     });
 
-    this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== null && res !== undefined) {
         this.decisionModalP(res);
       }
     });
     this.enfocarInput('articulo_id');
+  }
+  ngOnDestroy() {
+    this.subDeci.unsubscribe();
   }
   filtroFormula(item) {
     return item.tipo_articulo_id === 3;

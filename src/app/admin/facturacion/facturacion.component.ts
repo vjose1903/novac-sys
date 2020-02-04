@@ -11,6 +11,7 @@ import { PdfService } from '../../core/services/pdf/pdf.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { GLOBAL } from '../../core/services/GLOBAL';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-facturacion',
@@ -20,7 +21,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 export class FacturacionComponent implements OnInit, OnDestroy {
   form: FormGroup;
   fecha;
-  tipoVenta = 'Normal';
+  tipoVenta = 'false';
   ITBIS = 0;
   seleccionModal;
   showModal = false;
@@ -58,9 +59,17 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   };
   listaArticulos: any;
   usuario: any;
+
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   Devuelta = 0;
+
+  subObj: Subscription;
+  subDeci: Subscription;
+  subTipoF: Subscription;
+  subSecu: Subscription;
+  FacturaAtrasada = false;
+  FechaFacturaAtrasada;
 
   constructor(
     private _ipc: IpcService,
@@ -143,7 +152,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.fecha = moment().format('DD/MM/YYYY');
     // this.fecha = moment().format('DD/MM/YYYY');
 
-    this.mServ.OBJDEVUELTO.subscribe(res => {
+    this.subObj = this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res && res.tipoModal === 'buscarCliente') {
         this.propietario_factura = res;
         this.form.patchValue(this.propietario_factura);
@@ -156,7 +165,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.mServ.ModalObj(undefined);
       }
     });
-    this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== undefined) {
         this.decisionModal(res);
         this.mServ.ModalDecision(undefined);
@@ -212,11 +221,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.enfocarInput('tipoFact');
     }, 5);
 
-    this.dbServ.getTiposFacturas().subscribe(res => {
+    this.subTipoF = this.dbServ.getTiposFacturas().subscribe(res => {
       this.lista_tipos_facturas = res;
     });
 
-    this.obsServ.SECUENCIA_FACTURAS.subscribe(res => {
+    this.subSecu = this.obsServ.SECUENCIA_FACTURAS.subscribe(res => {
       if (res !== undefined) {
         // this.secuenciaVenta = res.filter(secu => secu.tipo_factura_id === 13);
         // this.numFac = this.secuenciaVenta[0].secuencia;
@@ -229,6 +238,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(null);
     this.CancelarFactura();
     this.GetArticulos();
+    this.subObj.unsubscribe();
+    this.subDeci.unsubscribe();
+    this.subTipoF.unsubscribe();
+    this.subSecu.unsubscribe();
   }
 
   setWidthPop(bool, e) {
@@ -289,6 +302,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       } else {
         return true;
       }
+    }
+  }
+
+  cambiarTipoVenta(arg) {
+    if (arg === 'Crédito') {
+      this.tipoVenta = 'false';
     }
   }
 
@@ -484,7 +503,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   getCuerpoFactura(arg) {
     this.CuerpoFactura = [];
     const obj = JSON.parse(arg);
-
     this.CuerpoFactura = obj;
   }
 
@@ -495,6 +513,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.ModalObj(null);
     this.mServ.modalTipo(null);
     this.mServ.ModalSeleccion(null);
+    this.FacturaAtrasada = false;
+    this.FechaFacturaAtrasada = null;
 
     if (this.metodo === 'venta') {
       this.form.patchValue({
@@ -662,6 +682,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   async filterArticulosByDate(date) {
+    this.FacturaAtrasada = true;
+    this.FechaFacturaAtrasada = moment(date).format('DD/MM/YYYY');
     try {
       this.listaArticulos = await this.dbServ.getArticulosByDate(date).toPromise();
     } catch (error) {
@@ -679,7 +701,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     const cabecera_fact = {};
     cabecera_fact['condicion'] = this.condicion_fact;
     cabecera_fact['forma_pago'] = this.forma_pago;
-    cabecera_fact['fecha_facturacion'] = null;
+    cabecera_fact['fecha_facturacion'] = this.FechaFacturaAtrasada ? this.FechaFacturaAtrasada : null;
     if (this.condicion_fact === 'Crédito') {
       cabecera_fact['fecha_vencimiento'] = moment(new Date())
         .add(this.propietario_factura.limite_credito, 'days')
@@ -697,6 +719,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       .add(1, 'year')
       .format('DD/MM/YYYY');
 
+    cabecera_fact['adelantada'] = this.tipoVenta === 'true' ? true : false;
     cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;
     cabecera_fact['numero_factura'] = null;
@@ -731,26 +754,26 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
     console.log(cabecera_fact);
 
-    this.dbServ.createFacturas(cabecera_fact).subscribe(
-      res => {
-        console.log(res);
-        this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-          console.log('printRes=====> ', res);
+    // this.dbServ.createFacturas(cabecera_fact).subscribe(
+    //   res => {
+    //     console.log(res);
+    //     this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+    //       console.log('printRes=====> ', res);
 
-          if (res.status) {
-            this.CancelarFactura();
-            this.GetArticulos();
-            this.dbServ.toastSuccess(res.msg, 'CORRECTO');
-          } else {
-            this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-          }
-        });
-        res['FACTURA_DE'] = this.metodo;
-        this._ipc.send('print', res);
-      },
-      err => {
-        this.dbServ.toastError(err.statusText, 'ERROR');
-      },
-    );
+    //       if (res.status) {
+    //         this.CancelarFactura();
+    //         this.GetArticulos();
+    //         this.dbServ.toastSuccess(res.msg, 'CORRECTO');
+    //       } else {
+    //         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+    //       }
+    //     });
+    //     res['FACTURA_DE'] = this.metodo;
+    //     this._ipc.send('print', res);
+    //   },
+    //   err => {
+    //     this.dbServ.toastError(err.statusText, 'ERROR');
+    //   },
+    // );
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, AfterContentInit, ChangeDetectorRef, OnChanges } from '@angular/core';
 import { ElectronService } from './core/services';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConfig } from '../environments/environment';
@@ -12,24 +12,20 @@ import { NgxSpinnerService } from 'ngx-spinner';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
-  loading: boolean;
-  constructor(
-    private loaderServ: LoaderService,
-    private spinner: NgxSpinnerService,
-    private dbServ: DBservice,
-    public electronService: ElectronService,
-    private translate: TranslateService,
-    private obsServ: ObservableServcie,
-  ) {
-    this.loaderServ.isLoading.subscribe(v => {
-      this.loading = v;
+export class AppComponent implements OnInit, AfterViewInit {
+  loading = false;
 
-      if (this.loading) {
-        document.getElementById('fondoC').classList.add('fadeIn');
-      } else {
-        document.getElementById('fondoC').classList.add('fadeOut');
-      }
+  constructor(private loaderServ: LoaderService, private spinner: NgxSpinnerService, private cdRef: ChangeDetectorRef, public electronService: ElectronService) {
+    this.loaderServ.isLoading.subscribe(v => {
+      setTimeout(() => {
+        this.loading = v;
+      }, 5);
+
+      // if (this.loading) {
+      //   document.getElementById('fondoC').classList.add('fadeIn');
+      // } else {
+      //   document.getElementById('fondoC').classList.add('fadeOut');
+      // }
     });
   }
 
@@ -37,5 +33,9 @@ export class AppComponent implements OnInit {
     // this.dbServ.getSecuenciaFacturas().subscribe(res => {
     //   this.obsServ.next_secuencia_factura(res);
     // });
+  }
+
+  ngAfterViewInit() {
+    this.cdRef.detectChanges();
   }
 }

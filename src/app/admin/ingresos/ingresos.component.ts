@@ -22,7 +22,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   listaClientes;
   clienteAdepositar: any;
   Facturas: any;
-  tipo_recibo;
+  tipo_recibo = 'Pago factura';
   facturas_selected = [];
   articuloEnTurno = null;
   articuloEnTurnoid = null;
@@ -99,6 +99,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   sub: Subscription;
   articulos: any;
   precioEnTurno: any;
+  ExisteMontoMayor: boolean;
 
   constructor(private config: NgSelectConfig, private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {
     this.config.notFoundText = 'Articulo no existe';
@@ -188,6 +189,9 @@ export class IngresosComponent implements OnInit, OnDestroy {
           ),
         )
         .toPromise();
+      this.Facturas.sort((a, b) => {
+        return a.id > b.id ? 1 : -1;
+      });
     } catch (error) {
       console.error(error);
       this.dbServ.toastError(error, 'ERROR');
@@ -196,7 +200,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   async necesarioStar() {
     await this.pedirClientes();
     await this.quitarContadoDeLista();
-    // await this.getTipoFacturas();
+    await this.getTipoFacturas();
     await this.getArticulos();
 
     this.enfocarInput('clienteI');
@@ -227,14 +231,14 @@ export class IngresosComponent implements OnInit, OnDestroy {
     }
   }
 
-  // async getTipoFacturas() {
-  //   try {
-  //     this.tipoFacturas = await this.dbServ.getTiposRecibos().toPromise();
-  //     console.log(this.tipoFacturas);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
+  async getTipoFacturas() {
+    try {
+      this.tipoFacturas = await this.dbServ.getTiposRecibos().toPromise();
+      console.log(this.tipoFacturas);
+    } catch (error) {
+      console.error(error);
+    }
+  }
   async pedirClientes() {
     try {
       this.listaClientes = await this.dbServ
@@ -262,16 +266,22 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   abilitarBtnConfirmar() {
     let res = true;
-    if (this.tipo_recibo === 'Pago factura') {
-      if (this.facturas_selected.length > 0) {
-        res = false;
-      }
-    } else {
+
+    if (this.facturas_selected.length > 0) {
+      res = false;
     }
+
     return res;
   }
 
-  cancelarIgreso() {}
+  cancelarIgreso() {
+    this.facturas_selected = [];
+    this.Facturas = [];
+    this.clienteAdepositar = undefined;
+    this.enfocarInput('clienteI');
+    (document.getElementById('clienteI') as any).value = null;
+    this.AllSelected = false;
+  }
 
   formarDetalleRecibos() {
     const temp = [];
@@ -303,32 +313,39 @@ export class IngresosComponent implements OnInit, OnDestroy {
   }
 
   confirmarIgreso() {
-    const empleado = JSON.parse(this.dbServ.getEmpleado());
-    const tipo = this.tipoFacturas.filter(val => val.descripcion === this.tipo_recibo)[0];
-    const obj = {
-      cliente_id: this.clienteAdepositar.id,
-      user_id: empleado.id,
-      total: 0,
-      forma_pago: '',
-      tipo_recibo_id: tipo.id,
-      devuelta: 0,
-    };
-    const detalleYtotal = this.formarDetalleRecibos();
+    if (this.ExisteMontoMayor) {
+      this.dbServ.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
+    } else {
+      const empleado = JSON.parse(this.dbServ.getEmpleado());
 
-    obj.total = detalleYtotal.total_recibo;
-    obj['detalle_recibos_attributes'] = detalleYtotal.detalle;
-    this.dbServ.createRecibo(obj).subscribe(
-      res => {
-        console.log(res);
-        this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
-        this.clienteAdepositar.balance = this.clienteAdepositar.balance - res.total;
-        this.pedirFacturasPorCliente(this.clienteAdepositar.id);
-      },
-      err => {
-        console.error(err);
-        this.dbServ.toastSuccess(err.error, 'ERROR');
-      },
-    );
+      const tipo = this.tipoFacturas.filter(val => val.descripcion === this.tipo_recibo)[0];
+      const obj = {
+        cliente_id: this.clienteAdepositar.id,
+        user_id: empleado.id,
+        total: 0,
+        forma_pago: '',
+        tipo_recibo_id: tipo.id,
+        devuelta: 0,
+      };
+      const detalleYtotal = this.formarDetalleRecibos();
+
+      obj.total = detalleYtotal.total_recibo;
+      obj['detalle_recibos_attributes'] = detalleYtotal.detalle;
+      console.log(obj);
+
+      // this.dbServ.createRecibo(obj).subscribe(
+      //   res => {
+      //     console.log(res);
+      //     this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
+      //     this.clienteAdepositar.balance = this.clienteAdepositar.balance - res.total;
+      //     this.pedirFacturasPorCliente(this.clienteAdepositar.id);
+      //   },
+      //   err => {
+      //     console.error(err);
+      //     this.dbServ.toastError(err.error, 'ERROR');
+      //   },
+      // );
+    }
   }
 
   enfocarInput(arg) {
@@ -366,8 +383,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
       const monto = GLOBAL.desformatear(item.value);
 
       if (monto > total) {
+        this.ExisteMontoMayor = true;
         this.dbServ.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
         this.tablas.enfocarInput('input-' + item.index);
+      } else {
+        this.ExisteMontoMayor = false;
       }
       this.modificarFacturaSelected(item);
     }

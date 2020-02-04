@@ -9,6 +9,7 @@ import { ObservableServcie } from '../../../core/services/observables.service';
 import { map } from 'rxjs/operators';
 import { ModalService } from '../../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -49,6 +50,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   Recalcular = false;
   ProductoEditando: any;
   clickBtnRe = false;
+  subDeci: Subscription;
   constructor(
     private artServ: ObservableServcie,
     private dbServ: DBservice,
@@ -88,7 +90,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
 
-    this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
@@ -217,6 +219,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   ngOnDestroy() {
     this.borrar();
+    this.subDeci.unsubscribe();
   }
   // =============================================
   //  CREAR MAS INPUTS PARA DETALLE

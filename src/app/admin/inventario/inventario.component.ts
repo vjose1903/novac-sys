@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, OnDestroy } from '@angular/core';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
@@ -6,12 +6,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
   styleUrls: ['./inventario.component.scss'],
 })
-export class InventarioComponent implements OnInit {
+export class InventarioComponent implements OnInit, OnDestroy {
   // =============================================
   //  TABLAS
   // =============================================
@@ -50,6 +51,7 @@ export class InventarioComponent implements OnInit {
   filtrado = false;
   filtro;
   restarFiltro: any;
+  subDeci: Subscription;
   constructor(
     private artServ: ObservableServcie,
     private dbServ: DBservice,
@@ -66,13 +68,15 @@ export class InventarioComponent implements OnInit {
       this.tipo_articulos = res;
     });
 
-    this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
     });
   }
-
+  ngOnDestroy() {
+    this.subDeci.unsubscribe();
+  }
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
   }

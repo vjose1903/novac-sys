@@ -80,8 +80,8 @@
             <li role="menuitem" [routerLink]="['/admin/cuenta']">
               <a class="dropdown-item"><i class="fas fa-address-card"></i>Perfil</a>
             </li>
-            <li role="menuitem" [routerLink]="['/admin/']">
-              <a class="dropdown-item"><i class="fas fa-chart-bar"></i>Cuenta</a>
+            <li role="menuitem" (click)="modalConfig()">
+              <a class="dropdown-item"><i class="fas fa-cogs"></i>Configuraciones</a>
             </li>
             <li role="menuitem" class="itemPrinter" (click)="stop($event)">
               <a class="dropdown-item"><i class="fas fa-print"></i>Seleccionar impresora</a>

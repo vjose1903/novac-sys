@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { parseDate, BsDatepickerConfig } from 'ngx-bootstrap';
 import { PhotosService } from '../../../core/services/photos.service';
@@ -8,12 +8,13 @@ import * as moment from 'moment';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { map } from 'rxjs/operators';
 import { ModalService } from '../../../components/modal/modal.service';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
   styleUrls: ['./registro-empleados.component.scss'],
 })
-export class RegistroEmpleadosComponent implements OnInit {
+export class RegistroEmpleadosComponent implements OnInit , OnDestroy{
   form: FormGroup;
   titulo = '';
   boton = '';
@@ -54,6 +55,7 @@ export class RegistroEmpleadosComponent implements OnInit {
   usuarioSelected: any;
   seleccionModal: any;
   indexBorrar: any;
+  subDeci: Subscription;
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {
     this.dpConfig = Object.assign(
       {},
@@ -108,11 +110,14 @@ export class RegistroEmpleadosComponent implements OnInit {
       // estado: [true],
       role: [null, Validators.required],
     });
-    this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
     });
+  }
+  ngOnDestroy(): void {
+    this.subDeci.unsubscribe();
   }
 
   atras() {

@@ -30,6 +30,7 @@
               (keydown.enter)="saltar(metodo === 'compra' ? 'costo' : $event.target.value === 'Contado' ? 'venta' : 'buscarCliente', $event.target.value, 'condicion')"
               class="form-control inputE"
               [(ngModel)]="condicion_fact"
+              (change)="cambiarTipoVenta($event.target.value)"
             >
               <option value="Contado">Contado</option>
               <option value="Crédito">Crédito</option>
@@ -61,8 +62,8 @@
             class="form-control inputE"
             [(ngModel)]="tipoVenta"
           >
-            <option value="Normal">Normal</option>
-            <option value="Adelantada">Adelantada</option>
+            <option value="{{ false }}">Normal</option>
+            <option value="{{ true }}">Adelantada</option>
           </select>
         </div>
 
@@ -157,6 +158,11 @@
           </span>
         </div>
         <div class="cuadroTotal">RD$ {{ formatoNumero(TOTAL) }}</div>
+        <div *ngIf="FacturaAtrasada" class="encabezadoRigth fechaA">
+          <span class="w-100 text-danger letrasT">
+            Factura atrasada, fecha: <strong> {{ FechaFacturaAtrasada }}</strong>
+          </span>
+        </div>
       </div>
     </div>
   </div>

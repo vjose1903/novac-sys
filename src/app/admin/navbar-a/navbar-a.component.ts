@@ -194,7 +194,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         break;
     }
   }
-
+  modalConfig() {}
   // ===========================================================================
   // MODAL
   // ===========================================================================
