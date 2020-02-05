@@ -223,6 +223,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   }
   submit(arg) {
     let devolver = false;
+    let cedulaCorrecta = false;
 
     const Fail = [];
 
@@ -247,6 +248,15 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       }
       // haciendo la estructura para mandar los documentos a la base de datos
       if (element.doc !== null && element.doc !== ' ' && element.doc !== '') {
+        if (element.descripcion === 'cedula') {
+          const cedulaSplit = _.split(element.doc, '-');
+
+          const cedulaSinGuiones = _.join(cedulaSplit, '');
+          if (GLOBAL.ValidaCedula2(cedulaSinGuiones)) {
+            cedulaCorrecta = true;
+          }
+        }
+
         documentos_identidad.push({
           descripcion: element.descripcion,
           documento: element.doc,
@@ -262,65 +272,69 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       // entra aqui si pasa la validacion de documento de identidad
     } else {
       // entra aqui si no selecciono un documento como principal
-      if (this.doc_principal === undefined || this.doc_principal === null || this.doc_principal === ' ' || this.doc_principal === '') {
-        this.dbServ.toastError('Debe de seleccionar un documento de identidad como principal', 'ERROR');
-
-        // paso todas las validaciones
+      if (!cedulaCorrecta) {
+        this.dbServ.toastError('Cedula introducida incorrecta', 'ERROR');
       } else {
-        temp.documentos_de_identidad_attributes = documentos_identidad;
+        if (this.doc_principal === undefined || this.doc_principal === null || this.doc_principal === ' ' || this.doc_principal === '') {
+          this.dbServ.toastError('Debe de seleccionar un documento de identidad como principal', 'ERROR');
 
-        if (this.PhotoData !== undefined) {
-          temp.imagen_attributes = null;
-          temp.imagen_attributes = this.PhotoData;
-        }
-        temp.estado = true;
-
-        const obj = _.omit(temp, ['cedula', 'rnc']);
-        obj['balance'] = 0;
-        obj.maximo_credito = GLOBAL.desformatear(obj.maximo_credito);
-        if (obj.id === null) {
-          obj.cuenta = obj.cuenta;
-          this.dbServ.createCliente(obj).subscribe(
-            res => {
-              const obj = JSON.parse(JSON.stringify(res));
-              obj.documentos_de_identidad.map(docu => {
-                if (docu.principal) {
-                  obj.documento_identidad = docu.documento;
-                }
-              });
-              this.listaClientes = [...this.listaClientes, obj];
-
-              this.doc_principal = null;
-              this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
-              this.form.reset();
-              this.enfocarInput('campoNombre');
-            },
-            err => {
-              console.log(err);
-              this.mostrarErrores(err.error);
-            },
-          );
+          // paso todas las validaciones
         } else {
-          obj.cuenta = 0;
-          this.dbServ.editarCliente(obj).subscribe(
-            res => {
-              const obj = JSON.parse(JSON.stringify(res));
-              obj.documentos_de_identidad.map(docu => {
-                if (docu.principal) {
-                  obj.documento_identidad = docu.documento;
-                }
-              });
-              this.listaClientes[this.indexSeleccionado] = obj;
+          temp.documentos_de_identidad_attributes = documentos_identidad;
 
-              this.doc_principal = null;
+          if (this.PhotoData !== undefined) {
+            temp.imagen_attributes = null;
+            temp.imagen_attributes = this.PhotoData;
+          }
+          temp.estado = true;
 
-              this.borrar();
-            },
-            err => {
-              console.log(err);
-              this.mostrarErrores(err.error);
-            },
-          );
+          const obj = _.omit(temp, ['cedula', 'rnc']);
+          obj['balance'] = 0;
+          obj.maximo_credito = GLOBAL.desformatear(obj.maximo_credito);
+          if (obj.id === null) {
+            obj.cuenta = obj.cuenta;
+            this.dbServ.createCliente(obj).subscribe(
+              res => {
+                const obj = JSON.parse(JSON.stringify(res));
+                obj.documentos_de_identidad.map(docu => {
+                  if (docu.principal) {
+                    obj.documento_identidad = docu.documento;
+                  }
+                });
+                this.listaClientes = [...this.listaClientes, obj];
+
+                this.doc_principal = null;
+                this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
+                this.form.reset();
+                this.enfocarInput('campoNombre');
+              },
+              err => {
+                console.log(err);
+                this.mostrarErrores(err.error);
+              },
+            );
+          } else {
+            obj.cuenta = 0;
+            this.dbServ.editarCliente(obj).subscribe(
+              res => {
+                const obj = JSON.parse(JSON.stringify(res));
+                obj.documentos_de_identidad.map(docu => {
+                  if (docu.principal) {
+                    obj.documento_identidad = docu.documento;
+                  }
+                });
+                this.listaClientes[this.indexSeleccionado] = obj;
+
+                this.doc_principal = null;
+
+                this.borrar();
+              },
+              err => {
+                console.log(err);
+                this.mostrarErrores(err.error);
+              },
+            );
+          }
         }
       }
     }

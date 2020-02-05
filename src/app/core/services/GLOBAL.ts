@@ -22,6 +22,52 @@ export class GLOBAL {
     return _.capitalize(json);
   }
 
+  // =========================================================================================================
+  static roundDecenaMayor(value) {
+    if (0 > value) {
+      const decenaMenor = Math.ceil(value / 10) * 10;
+      return decenaMenor + 10;
+    }
+    const decenaMenor = Math.floor(value / 10) * 10;
+    return decenaMenor + 10;
+  }
+
+  // =========================================================================================================
+
+  // * Método o función para validar una cédula dominicana*
+  static ValidaCedula2(cedula) {
+    // Declaración de variables a nivel de método o función.
+    let verificador = 0;
+    let digito = 0;
+    const digitoVerificador = cedula.charAt(10); // es el ultimo numero despues del guion
+    let suma = 0;
+    /*Control de errores en el código*/
+    try {
+      // verificamos que la longitud del parametro sea igual a 11
+      // recorremos en un ciclo for cada dígito de la cédula
+      for (let i = 0; i < 10; i++) {
+        // se multiplica el numero entre 1 y 2 alternadamente
+        digito = _.parseInt(cedula.charAt(i)) * (i % 2 === 0 ? 1 : 2);
+        // si la multiplicacion da de dos digitos se suman los numeros individuales
+        if (digito > 9) {
+          digito = _.parseInt(digito.toString().charAt(0)) + _.parseInt(digito.toString().charAt(1));
+        }
+        suma += digito;
+      }
+      /*Obtenemos el verificador restandole la decena mayor a la sumatoria*/
+      verificador = this.roundDecenaMayor(suma) - suma;
+
+      // si el verificador da igual a la resta esta correcta
+      if (verificador.toString() === digitoVerificador.toString()) {
+        return true;
+      }
+    } catch {
+      return false;
+    }
+    return false;
+  }
+  // =========================================================================================================
+
   static redondearAdos(num) {
     const string = num + '';
     const splitStr = _.split(string, '.');
@@ -40,7 +86,7 @@ export class GLOBAL {
     return parseFloat(numStr).toFixed(2);
   }
 
-  static desformatear(sTnum){
+  static desformatear(sTnum) {
     let temp = 0;
 
     if (sTnum !== null) {

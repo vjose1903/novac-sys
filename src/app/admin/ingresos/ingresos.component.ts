@@ -100,6 +100,10 @@ export class IngresosComponent implements OnInit, OnDestroy {
   articulos: any;
   precioEnTurno: any;
   ExisteMontoMayor: boolean;
+  tipoModal: string;
+  detalleYtotal: any;
+  Devuelta: any;
+  forma_pago: any;
 
   constructor(private config: NgSelectConfig, private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {
     this.config.notFoundText = 'Articulo no existe';
@@ -112,6 +116,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
         this.clienteAdepositar = res;
         (document.getElementById('clienteI') as any).value = res.nombre;
         this.pedirFacturasPorCliente(res.id);
+        this.mServ.ModalObj(undefined);
+      } else if (res && res.tipoModal === 'cambio') {
+        this.Devuelta = res.devuelta;
+        this.forma_pago = res.forma_pago;
+        this.sendIngreso();
         this.mServ.ModalObj(undefined);
       }
     });
@@ -289,11 +298,10 @@ export class IngresosComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.facturas_selected.length; i++) {
       const fact = this.facturas_selected[i];
       temp.push({
-        // recibos_ingreso_id: null,
-        cabecera_factura_id: fact.id,
+        Fcabecera_factura_id: fact.id,
         pago_total: fact.pagoT,
         deposito: GLOBAL.desformatear(fact.monto),
-        descripcion: this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo Factura ' + fact.secuencia : 'Abono a factura ' + fact.secuencia) : '',
+        descripcion: this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo Factura ' + fact.secuencia : 'Abono ' + fact.monto + ' pesos a factura ' + fact.secuencia) : '',
         pago_a_tiempo: fact.pagoT ? fact.pago_a_tiempo : null,
       });
 
@@ -312,40 +320,53 @@ export class IngresosComponent implements OnInit, OnDestroy {
     return obj;
   }
 
-  confirmarIgreso() {
+  abrirModal(arg?) {
+    if (arg) {
+      this.mServ.ModalSeleccion(arg);
+    }
+    this.mServ.mostrarModal(true);
+  }
+
+  async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
       this.dbServ.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
-      const empleado = JSON.parse(this.dbServ.getEmpleado());
-
-      const tipo = this.tipoFacturas.filter(val => val.descripcion === this.tipo_recibo)[0];
-      const obj = {
-        cliente_id: this.clienteAdepositar.id,
-        user_id: empleado.id,
-        total: 0,
-        forma_pago: '',
-        tipo_recibo_id: tipo.id,
-        devuelta: 0,
-      };
-      const detalleYtotal = this.formarDetalleRecibos();
-
-      obj.total = detalleYtotal.total_recibo;
-      obj['detalle_recibos_attributes'] = detalleYtotal.detalle;
-      console.log(obj);
-
-      // this.dbServ.createRecibo(obj).subscribe(
-      //   res => {
-      //     console.log(res);
-      //     this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
-      //     this.clienteAdepositar.balance = this.clienteAdepositar.balance - res.total;
-      //     this.pedirFacturasPorCliente(this.clienteAdepositar.id);
-      //   },
-      //   err => {
-      //     console.error(err);
-      //     this.dbServ.toastError(err.error, 'ERROR');
-      //   },
-      // );
+      this.detalleYtotal = await this.formarDetalleRecibos();
+      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0 };
+      this.mServ.modalTipo('cambio');
+      this.tipoModal = 'cambio';
+      this.abrirModal(obj);
     }
+  }
+
+  sendIngreso() {
+    const empleado = JSON.parse(this.dbServ.getEmpleado());
+
+    const tipo = this.tipoFacturas.filter(val => val.descripcion === this.tipo_recibo)[0];
+    const obj = {
+      cliente_id: this.clienteAdepositar.id,
+      user_id: empleado.id,
+      total: 0,
+      forma_pago: this.forma_pago,
+      tipo_recibo_id: tipo.id,
+      devuelta: this.Devuelta,
+    };
+
+    obj.total = this.detalleYtotal.total_recibo;
+    obj['detalle_recibos_attributes'] = this.detalleYtotal.detalle;
+
+    this.dbServ.createRecibo(obj).subscribe(
+      res => {
+        console.log(res);
+        this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
+        this.clienteAdepositar.balance = this.clienteAdepositar.balance - res.total;
+        this.pedirFacturasPorCliente(this.clienteAdepositar.id);
+      },
+      err => {
+        console.error(err);
+        this.dbServ.toastError(err.error, 'ERROR');
+      },
+    );
   }
 
   enfocarInput(arg) {
