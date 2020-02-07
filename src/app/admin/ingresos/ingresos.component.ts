@@ -21,7 +21,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   element: any;
   listaClientes;
   clienteAdepositar: any;
-  Facturas: any;
+  Facturas;
   tipo_recibo = 'Pago factura';
   facturas_selected = [];
   articuloEnTurno = null;
@@ -210,35 +210,35 @@ export class IngresosComponent implements OnInit, OnDestroy {
     await this.pedirClientes();
     await this.quitarContadoDeLista();
     await this.getTipoFacturas();
-    await this.getArticulos();
+    // await this.getArticulos();
 
     this.enfocarInput('clienteI');
   }
 
-  async getArticulos() {
-    try {
-      this.articulos = await this.dbServ
-        .getArticulos()
-        .pipe(
-          map(
-            articulo =>
-              (articulo = articulo.map(val => {
-                const medidas = [{ medida: val.medida, precio: val.precio_principal }];
-                for (let i = 0; i < val.contenido_articulos.length; i++) {
-                  const cont = val.contenido_articulos[i];
-                  medidas.push({ medida: cont.medida, precio: cont.precio });
-                }
-                val.medidas = medidas;
-                return val;
-              })),
-          ),
-        )
-        .toPromise();
-    } catch (error) {
-      console.log(error);
-      this.dbServ.toastError('Algo fallo en la busqueda de articulos', 'ERROR');
-    }
-  }
+  // async getArticulos() {
+  //   try {
+  //     this.articulos = await this.dbServ
+  //       .getArticulos()
+  //       .pipe(
+  //         map(
+  //           articulo =>
+  //             (articulo = articulo.map(val => {
+  //               const medidas = [{ medida: val.medida, precio: val.precio_principal }];
+  //               for (let i = 0; i < val.contenido_articulos.length; i++) {
+  //                 const cont = val.contenido_articulos[i];
+  //                 medidas.push({ medida: cont.medida, precio: cont.precio });
+  //               }
+  //               val.medidas = medidas;
+  //               return val;
+  //             })),
+  //         ),
+  //       )
+  //       .toPromise();
+  //   } catch (error) {
+  //     console.log(error);
+  //     this.dbServ.toastError('Algo fallo en la busqueda de articulos', 'ERROR');
+  //   }
+  // }
 
   async getTipoFacturas() {
     try {
@@ -284,12 +284,12 @@ export class IngresosComponent implements OnInit, OnDestroy {
   }
 
   cancelarIgreso() {
-    this.facturas_selected = [];
-    this.Facturas = [];
+    this.Facturas = null;
     this.clienteAdepositar = undefined;
     this.enfocarInput('clienteI');
     (document.getElementById('clienteI') as any).value = null;
     this.AllSelected = false;
+    this.resetVariables();
   }
 
   formarDetalleRecibos() {
@@ -298,18 +298,14 @@ export class IngresosComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.facturas_selected.length; i++) {
       const fact = this.facturas_selected[i];
       temp.push({
-        Fcabecera_factura_id: fact.id,
+        cabecera_factura_id: fact.id,
         pago_total: fact.pagoT,
         deposito: GLOBAL.desformatear(fact.monto),
         descripcion: this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo Factura ' + fact.secuencia : 'Abono ' + fact.monto + ' pesos a factura ' + fact.secuencia) : '',
         pago_a_tiempo: fact.pagoT ? fact.pago_a_tiempo : null,
       });
 
-      if (fact.pagoT) {
-        total += fact.total_factura;
-      } else {
-        total += GLOBAL.desformatear(fact.monto);
-      }
+      total += GLOBAL.desformatear(fact.monto);
     }
 
     const obj = {
@@ -361,12 +357,24 @@ export class IngresosComponent implements OnInit, OnDestroy {
         this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
         this.clienteAdepositar.balance = this.clienteAdepositar.balance - res.total;
         this.pedirFacturasPorCliente(this.clienteAdepositar.id);
+        this.resetVariables();
       },
       err => {
-        console.error(err);
-        this.dbServ.toastError(err.error, 'ERROR');
+        console.error(err.error.msg);
+        this.dbServ.toastError(err.error.msg, 'ERROR');
       },
     );
+  }
+  resetVariables() {
+    console.log('//////////////////////');
+
+    console.log('reseteo de vaiables');
+    console.log('//////////////////////');
+
+    this.forma_pago = null;
+    this.Devuelta = null;
+    this.detalleYtotal = undefined;
+    this.facturas_selected = [];
   }
 
   enfocarInput(arg) {

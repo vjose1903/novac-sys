@@ -4,13 +4,6 @@
   </div>
   <div class="col-5">
     <div class="card card-padding sombra">
-      <!-- <div class="form-group">
-        <label class="control-label">Tipo recibo: </label>
-        <select id="tipo_recibo" [(ngModel)]="tipo_recibo" class="form-control" (change)="saltar('clienteI', $event.target.value)" value="">
-          <option value="{{ null }}" selected disabled>Escoger tipo</option>
-          <option *ngFor="let tipo of tipoFacturas" value="{{ tipo.descripcion }}">{{ tipo.descripcion }}</option>
-        </select>
-      </div> -->
       <div class="form-group">
         <label class="control-label">Cliente: </label>
         <!-- (change)="selectTipoArticulo($event.target.value)" -->
@@ -24,53 +17,14 @@
           autocomplete="off"
         />
       </div>
-      <!-- <div class="form-group">
-        <textarea class="form-control" [(ngModel)]="texto" id="texto" cols="30" rows="3"></textarea>
-      </div> -->
     </div>
   </div>
-  <!-- <div *ngIf="tipo_recibo === 'Compra adelantada'" class="col-7">
-    <div class="card card-padding sombra">
-      <div class="row">
-        <div class="col-4 pr-0">
+  <!-- 
           <div class="form-group">
             <label class="control-label">Articulo </label>
             <ng-select id="articuloI" [groupBy]="'descripcion'" [(ngModel)]="articuloEnTurno" (change)="selectArticulo('articulo')" [items]="articulos" bindLabel="nombre"> </ng-select>
           </div>
-        </div>
-        <div class="col-4 pr-0">
-          <div class="form-group">
-            <label class="control-label">Medida </label>
-            <select id="medidaI" [(ngModel)]="medidaEnTurno" class="form-control" (change)="selectArticulo('medida', $event.target.value)">
-              <option *ngIf="!articuloEnTurno" value="{{ null }}" selected disabled>seleccione un articulo</option>
-              <option *ngIf="articuloEnTurno" value="{{ -1 }}" selected disabled>Escoger medida</option>
-              <ng-container *ngIf="articuloEnTurno">
-                <option *ngFor="let m of articuloEnTurno.medidas" value="{{ m.medida }}">{{ m.medida }}</option>
-              </ng-container>
-            </select>
-          </div>
-        </div>
-        <div class="col-4 pr-0">
-          <div class="form-group">
-            <label class="control-label">Precio </label>
-            <input class="form-control" type="text" [disabled]="true" value="{{ precioEnTurno ? precioEnTurno : null }}" />
-          </div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="control-label">Cliente: </label>
-        <input
-          type="text"
-          id="clienteI"
-          (keydown.enter)="abrirModalFiltro($event.target.value)"
-          (focus)="$event.target.select()"
-          placeholder="Nombre Cliente"
-          class="form-control mb-4"
-          autocomplete="off"
-        />
-      </div>
-    </div>
-  </div> -->
+ -->
   <div class="col-7">
     <div class="text-center">
       <h1 *ngIf="clienteAdepositar" class="text-bold">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h1>

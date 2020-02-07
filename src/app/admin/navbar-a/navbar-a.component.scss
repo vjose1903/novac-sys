@@ -95,7 +95,22 @@
     transform: scale(1) translate(0px, -6rem);
   }
 }
+.menuList2 {
+  list-style: none;
+  .tituloMenu2 {
+    transform: scale(0);
+    transition: all 0.2s;
+  }
 
+  &:hover .tituloMenu2,
+  .tituloMenuA2 {
+    transform: scale(1) translate(0px, -6.5rem);
+  }
+}
+
+.bajarUnPoco {
+  transform: translate(0px, 1rem) !important;
+}
 .iconosMenu {
   position: relative;
   display: block;

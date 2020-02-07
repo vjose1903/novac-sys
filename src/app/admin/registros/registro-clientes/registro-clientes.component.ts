@@ -102,7 +102,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
     });
   }
   ngOnDestroy() {
-    this.subDeci.unsubscribe;
+    this.subDeci.unsubscribe();
   }
   checkNumbers(arg) {
     let res = false;

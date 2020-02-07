@@ -89,7 +89,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   formatoNumero(num) {
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
+    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num)) + '  ';
   }
 
   ngOnInit() {
@@ -158,6 +158,14 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.form.patchValue(this.propietario_factura);
         this.enfocarInput('cod-0');
         this.mServ.ModalObj(undefined);
+        const balance = _.parseInt(this.propietario_factura.balance);
+        const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
+
+        if (balance > maxCred - 1000 && balance < maxCred) {
+          this.dbServ.toastWarning(`Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
+        } else if (balance > maxCred) {
+          this.dbServ.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
+        }
       } else if (res && res.tipoModal === 'cambio') {
         this.Devuelta = res.devuelta;
         this.forma_pago = res.forma_pago;
@@ -752,28 +760,28 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
-    console.log(cabecera_fact);
+    // console.log(cabecera_fact);
 
-    // this.dbServ.createFacturas(cabecera_fact).subscribe(
-    //   res => {
-    //     console.log(res);
-    //     this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-    //       console.log('printRes=====> ', res);
+    this.dbServ.createFacturas(cabecera_fact).subscribe(
+      res => {
+        console.log(res);
+        this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+          console.log('printRes=====> ', res);
 
-    //       if (res.status) {
-    //         this.CancelarFactura();
-    //         this.GetArticulos();
-    //         this.dbServ.toastSuccess(res.msg, 'CORRECTO');
-    //       } else {
-    //         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-    //       }
-    //     });
-    //     res['FACTURA_DE'] = this.metodo;
-    //     this._ipc.send('print', res);
-    //   },
-    //   err => {
-    //     this.dbServ.toastError(err.statusText, 'ERROR');
-    //   },
-    // );
+          if (res.status) {
+            this.CancelarFactura();
+            this.GetArticulos();
+            this.dbServ.toastSuccess(res.msg, 'CORRECTO');
+          } else {
+            this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+          }
+        });
+        res['FACTURA_DE'] = this.metodo;
+        // this._ipc.send('print', res);
+      },
+      err => {
+        this.dbServ.toastError(err.statusText, 'ERROR');
+      },
+    );
   }
 }

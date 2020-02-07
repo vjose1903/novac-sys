@@ -57,13 +57,29 @@ export class GLOBAL {
       /*Obtenemos el verificador restandole la decena mayor a la sumatoria*/
       verificador = this.roundDecenaMayor(suma) - suma;
 
-      // si el verificador da igual a la resta esta correcta
-      if (verificador.toString() === digitoVerificador.toString()) {
+      // si el verificador da igual a la resta esta correctaß
+
+      if ((verificador === 10 && digitoVerificador === '0') || verificador.toString() === digitoVerificador.toString()) {
+        console.log('cedula ', cedula.substring(0, 3) + '-' + cedula.substring(3, 10) + '-' + cedula.substring(10, 11));
+
+        console.log('=====================');
+        console.log('|      correcto      |');
+        console.log('=====================');
+
         return true;
       }
     } catch {
+      console.log('cedula ', cedula.substring(0, 3) + '-' + cedula.substring(3, 10) + '-' + cedula.substring(10, 11));
+      console.log('=====================');
+      console.log('|     inorrecto     |');
+      console.log('=====================');
       return false;
     }
+
+    console.log('cedula ', cedula.substring(0, 3) + '-' + cedula.substring(3, 10) + '-' + cedula.substring(10, 11));
+    console.log('=====================');
+    console.log('|     incorrecto     |');
+    console.log('=====================');
     return false;
   }
   // =========================================================================================================
