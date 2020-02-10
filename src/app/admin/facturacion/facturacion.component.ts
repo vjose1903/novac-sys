@@ -465,15 +465,19 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       if (this.CuerpoFactura.length === 0) {
         this.dbServ.toastWarning('Factura no tiene Articulos', 'Aviso');
       } else {
-        if (this.condicion_fact === 'Crédito') {
-          this.mServ.modalTipo('imprimir');
-          this.tipoModal = 'imprimir';
-          this.abrirModal();
+        if (this.TOTAL === 0) {
+          this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
-          const obj = { total_factura: this.TOTAL, devuelta: 0 };
-          this.mServ.modalTipo('cambio');
-          this.tipoModal = 'cambio';
-          this.abrirModal(obj);
+          if (this.condicion_fact === 'Crédito') {
+            this.mServ.modalTipo('imprimir');
+            this.tipoModal = 'imprimir';
+            this.abrirModal();
+          } else {
+            const obj = { total_factura: this.TOTAL, devuelta: 0 };
+            this.mServ.modalTipo('cambio');
+            this.tipoModal = 'cambio';
+            this.abrirModal(obj);
+          }
         }
       }
     }

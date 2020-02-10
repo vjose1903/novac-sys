@@ -35,6 +35,7 @@ import { FormCantidadEfectivoComponent } from './facturacion/form-cantidad-efect
 
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
+import { BuscarFacturaComponent } from './manipular facturas/buscar-factura/buscar-factura.component';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { FormsModule } from '@angular/forms';
     MovimientosFormComponent,
     IngresosComponent,
     FormCantidadEfectivoComponent,
+    BuscarFacturaComponent,
   ],
   imports: [
     DialogModule,

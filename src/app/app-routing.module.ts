@@ -16,6 +16,7 @@ import { RegistroSuplidoresComponent } from './admin/registros/registro-suplidor
 import { ProduccionComponent } from './admin/produccion/produccion.component';
 import { InventarioComponent } from './admin/inventario/inventario.component';
 import { IngresosComponent } from './admin/ingresos/ingresos.component';
+import { BuscarFacturaComponent } from './admin/manipular facturas/buscar-factura/buscar-factura.component';
 
 const routes: Routes = [
   {
@@ -57,6 +58,10 @@ const routes: Routes = [
       {
         path: 'ingresos',
         component: IngresosComponent,
+      },
+      {
+        path: 'buscarFactura',
+        component: BuscarFacturaComponent,
       },
     ],
   },
