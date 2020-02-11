@@ -6,10 +6,9 @@
     <div class="card card-padding sombra">
       <div class="form-group">
         <label class="control-label">Buscar factura por : </label>
-        <!-- (change)="selectTipoArticulo($event.target.value)" -->
 
-        <select id="campoI" [(ngModel)]="campo" class="form-control" (change)="changeSelect($event.target.value)" value="">
-          <option value="{{ null }}" selected disabled>Escoger tipo</option>
+        <select id="campoI" [(ngModel)]="campo" class="form-control" (keydown.enter)="saltar('valorI', $event.target.value)" (change)="changeSelect($event.target.value)" value="">
+          <option [value]="null" selected disabled>Escoger tipo</option>
           <option value="1">Por cliente</option>
           <option value="2">Por numero comprobante</option>
           <option value="3">Por numero factura</option>
@@ -17,9 +16,16 @@
       </div>
       <div *ngIf="campo" class="form-group">
         <label class="control-label">{{ campoSelected + ' ' }} : </label>
-        <!-- (change)="selectTipoArticulo($event.target.value)" -->
-        <!-- (keydown.enter)="abrirModalFiltro($event.target.value)" -->
-        <input type="text" id="valorI" (focus)="$event.target.select()" [placeholder]="placeHolder" class="form-control mb-4" autocomplete="off" />
+
+        <input
+          type="text"
+          id="valorI"
+          (keydown.enter)="saltar(campo === '1' ? 'cliente' : 'buscarFactura', $event.target.value)"
+          (focus)="$event.target.select()"
+          [placeholder]="placeHolder"
+          class="form-control mb-4"
+          autocomplete="off"
+        />
       </div>
     </div>
   </div>
