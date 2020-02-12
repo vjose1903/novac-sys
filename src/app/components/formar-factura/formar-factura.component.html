@@ -7,26 +7,52 @@
       <div class="col-4 text-center">
         <b class="L1">ADM Agroindustrial S.R.L</b>
         <small class="L2"> Autopista Duarte Km0 El Higuero, La Vega</small>
-        <small class="L3"> <b>Telefono:</b> 809-572-0060 <b>Rnc:</b> 131-99603-5</small>
+        <small class="L3"> <b>Telefono:</b> 809-572-0060 &nbsp; <b>Rnc:</b> 131-99603-5</small>
       </div>
       <div class="col-4 d-flex justify-content-end">
         <span class="TipoFact">FACTURA A {{ factura.condicion | uppercase }}</span>
       </div>
     </div>
-	</div>
+  </div>
 
   <div class="col-12">
     <div class="row">
-      <div class="col-4 ">
-        <img class="img-fluid logo" src="assets/img/admLogo_opt.png" alt="" />
+      <div class="col-4 mt-2">
+        <span class="d-block">
+          <b class="text-bold ">{{ factura.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
+          >&nbsp;
+          <span>{{ factura.tipo === 'compra' ? factura.suplidor.nombre : factura.cliente.nombre }}</span>
+        </span>
+        <span class="d-block">
+          <b class="text-bold ">{{ factura.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
+          >&nbsp;
+          <span>{{ factura.tipo === 'compra' ? factura.suplidor.rnc : factura.cliente.rnc }}</span>
+        </span>
+        <span class="d-block">
+          <b class="text-bold ">Direccion :</b>&nbsp; <span>{{ factura.tipo === 'compra' ? factura.suplidor.direccion : factura.cliente.direccion }}</span>
+        </span>
       </div>
-      <div class="col-4 text-center">
-        <b class="L1">ADM Agroindustrial S.R.L</b>
-        <small class="L2"> Autopista Duarte Km0 El Higuero, La Vega</small>
-        <small class="L3"> <b>Telefono:</b> 809-572-0060 <b>Rnc:</b> 131-99603-5</small>
+      <div class="col-4 d-flex justify-content-center align-items-center">
+        <b class="L1">{{ factura.tipo_factura }}</b>
       </div>
-      <div class="col-4 ">
-        <span class="TipoFact">FACTURA A {{ factura.condicion | uppercase }}</span>
+      <div class="col-4 d-flex justify-content-center">
+        <div class="infoFactura">
+          <span class="d-block">
+            <b class="text-bold ">Fecha :</b>&nbsp; <span>{{ formatoFecha(factura.fecha_facturacion) }}</span>
+          </span>
+          <span *ngIf="factura.condicion === 'Crédito'" class="d-block">
+            <b class="text-bold ">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_vencimiento) }}</span>
+          </span>
+          <span class="d-block">
+            <b class="text-bold ">NCF :</b>&nbsp; <span>{{ factura.numero_comprobante }}</span>
+          </span>
+          <span class="d-block">
+            <b class="text-bold ">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(factura.numero_factura) }}</span>
+          </span>
+          <span class="d-block">
+            <b class="text-bold ">Valida hasta :</b> &nbsp;<span>{{ formatoFecha(factura.fecha_valida) }}</span>
+          </span>
+        </div>
       </div>
     </div>
   </div>
