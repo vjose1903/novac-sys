@@ -61,18 +61,21 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   constructor(private mServ: ModalService, private dbServ: DBservice) {}
 
   element: HTMLElement;
+  subShow: Subscription;
+  subTipo: Subscription;
+  subSelec: Subscription;
   ngOnInit() {
-    this.mServ.SHOWMODAL.subscribe(res => {
+    this.subShow = this.mServ.SHOWMODAL.subscribe(res => {
       if (res !== undefined && res !== null) {
         this.showModal = res;
       }
     });
-    this.mServ.TIPOMODAL.subscribe(res => {
+    this.subTipo = this.mServ.TIPOMODAL.subscribe(res => {
       if (res !== undefined && res !== null) {
         this.tipoModal = res;
       }
     });
-    this.mServ.SELECCIONMODAL.subscribe(res => {
+    this.subSelec = this.mServ.SELECCIONMODAL.subscribe(res => {
       if (res !== undefined && res !== null) {
         this.seleccionModal = res;
         this.paraFiltroArticulos = res.filtrar;
@@ -88,7 +91,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    this.subShow.unsubscribe();
+    this.subTipo.unsubscribe();
+    this.subSelec.unsubscribe();
+  }
 
   ngOnChanges() {
     // if (this.seleccionModal) {

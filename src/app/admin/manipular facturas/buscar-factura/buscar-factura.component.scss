@@ -1,0 +1,10 @@
+div.col-12.rowIngre {
+    height: calc(100vh - 27rem);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    > div.card.card-padding.sombra.ingreCard {
+      height: 90%;
+      width: 100%;
+    }
+  }

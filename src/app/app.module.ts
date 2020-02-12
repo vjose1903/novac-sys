@@ -33,6 +33,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { LoaderService } from './loader/loader.service';
 import { LoaderInterceptor } from './loader/loader.interceptor';
 
+
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -41,6 +42,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 @NgModule({
   declarations: [
     AppComponent,
+    
 
     //  UploadImgComponent
   ],

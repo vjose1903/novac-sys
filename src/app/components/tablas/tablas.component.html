@@ -40,7 +40,7 @@
                 <span> {{ lookOters(dato[column.key]).Padre }} </span><br />
               </div>
 
-              <div *ngIf="lookOters(dato[column.key]).Hijo !== undefined" style=" max-width: 21rem;">
+              <div *ngIf="lookOters(dato[column.key]).Hijo" style=" max-width: 21rem;">
                 <span> {{ lookOters(dato[column.key]).Padre }} </span> <br />
                 <span>{{ lookOters(dato[column.key]).Hijo }}</span> <br />
               </div>

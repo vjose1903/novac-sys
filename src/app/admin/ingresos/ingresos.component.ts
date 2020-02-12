@@ -51,7 +51,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
       color: true,
     },
     {
-      titulo: 'Total tactura',
+      titulo: 'Total tacturado',
       key: 'total_factura',
       formatoNumero: true,
     },
