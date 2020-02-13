@@ -18,19 +18,21 @@
   <div class="col-12">
     <div class="row">
       <div class="col-4 mt-2">
-        <span class="d-block">
-          <b class="text-bold ">{{ factura.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
-          >&nbsp;
-          <span>{{ factura.tipo === 'compra' ? factura.suplidor.nombre : factura.cliente.nombre }}</span>
-        </span>
-        <span class="d-block">
-          <b class="text-bold ">{{ factura.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
-          >&nbsp;
-          <span>{{ factura.tipo === 'compra' ? factura.suplidor.rnc : factura.cliente.rnc }}</span>
-        </span>
-        <span class="d-block">
-          <b class="text-bold ">Direccion :</b>&nbsp; <span>{{ factura.tipo === 'compra' ? factura.suplidor.direccion : factura.cliente.direccion }}</span>
-        </span>
+        <div class="infoPropFact">
+          <span class="d-block">
+            <b class="text-bold ">{{ factura.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
+            >&nbsp;
+            <span>{{ factura.tipo === 'compra' ? factura.suplidor.nombre : factura.cliente.nombre }}</span>
+          </span>
+          <span class="d-block">
+            <b class="text-bold ">{{ factura.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
+            >&nbsp;
+            <span>{{ factura.tipo === 'compra' ? factura.suplidor.rnc : factura.cliente.rnc }}</span>
+          </span>
+          <span class="d-block">
+            <b class="text-bold ">Direccion :</b>&nbsp; <span>{{ factura.tipo === 'compra' ? factura.suplidor.direccion : factura.cliente.direccion }}</span>
+          </span>
+        </div>
       </div>
       <div class="col-4 d-flex justify-content-center align-items-center">
         <b class="L1">{{ factura.tipo_factura }}</b>
@@ -51,6 +53,71 @@
           </span>
           <span class="d-block">
             <b class="text-bold ">Valida hasta :</b> &nbsp;<span>{{ formatoFecha(factura.fecha_valida) }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <table class="table" mdbTable small="true">
+      <thead class="">
+        <tr>
+          <th>#</th>
+          <th>Articulo</th>
+          <th class="text-right">Cantidad</th>
+          <th class="text-right">Unidad</th>
+          <th class="text-right">{{ factura.tipo === 'compra' ? 'Costo' : 'Precio' }}</th>
+          <th class="text-right">Itbis</th>
+          <th class="text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of factura.detalle_facturas; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ row.descripcion }}</td>
+          <td class="text-right">{{ formatoNumero(row.cantidad) }}</td>
+          <td class="text-right">{{ row.unidad }}</td>
+          <td class="text-right">{{ factura.tipo === 'compra' ? formatoNumero(row.costo) : formatoNumero(row.precio) }}</td>
+          <td class="text-right">{{ formatoNumero(row.itbis) }}</td>
+          <td class="text-right">{{ formatoNumero(row.total) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-12">
+    <div class="row">
+      <div class="col-7">
+        <div *ngIf="factura.tipo === 'venta'">
+          <span>
+            <b class="text-bold ">Realizada por :</b>&nbsp; <span>{{ factura.usuario }}</span>
+          </span>
+          <span>
+            &nbsp;&nbsp; <b class="text-bold ">Vendedor :</b>&nbsp; <span>{{ factura.vendedor }}</span>
+          </span>
+        </div>
+      </div>
+      <div class="col-1"></div>
+      <div class="col-4 d-flex justify-content-center">
+        <div class="infoCantidades">
+          <span class="d-block">
+            <span class="cantidadesSpaced">
+              <b class="text-bold ">Bruto RD$ :</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span>{{ formatoNumero(factura.Bruto) }}</span>
+            </span>
+          </span>
+          <span class="d-block">
+            <span class="cantidadesSpaced">
+              <b class="text-bold ">Itbis RD$ :</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span>{{ formatoNumero(factura.itbis) }}</span>
+            </span>
+          </span>
+          <span class="d-block">
+            <span class="cantidadesSpaced">
+              <b class="text-bold ">Descuento RD$ :</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span>{{ formatoNumero(factura.descuento) }}</span>
+            </span>
+          </span>
+          <span class="d-block">
+            <span class="cantidadesSpaced">
+              <b class="text-bold ">TOTAL RD$ :</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ formatoNumero(factura.total_factura) }}</span>
+            </span>
           </span>
         </div>
       </div>

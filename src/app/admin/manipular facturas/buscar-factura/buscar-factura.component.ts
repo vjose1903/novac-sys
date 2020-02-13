@@ -185,7 +185,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
   }
-
   borrar() {
     this.facturas = undefined;
     (document.getElementById('valorI') as any).value = null;
@@ -210,6 +209,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   }
 
   confirmarSeleccion() {
+    console.log(this.facturaSelected);
+
     this.abrirModal(this.facturaSelected, 'mostrarFactura');
   }
 

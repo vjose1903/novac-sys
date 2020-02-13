@@ -17,13 +17,24 @@
 }
 .L3 {
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
 }
 .TipoFact {
   font-weight: 550;
   font-size: 1.5rem;
   transform: translate(-24px, 8px);
 }
+
 .infoFactura {
   transform: translate(29px, 0px);
+}
+.infoPropFact {
+  transform: translate(29px, 17px);
+}
+.infoCantidades {
+  transform: translate(3px, 0px);
+}
+.cantidadesSpaced {
+  display: flex;
+  justify-content: space-between;
 }

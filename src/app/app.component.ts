@@ -18,6 +18,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   constructor(private loaderServ: LoaderService, private spinner: NgxSpinnerService, private cdRef: ChangeDetectorRef, public electronService: ElectronService) {
     this.loaderServ.isLoading.subscribe(v => {
       setTimeout(() => {
+        // this.loading = true;
         this.loading = v;
       }, 5);
 

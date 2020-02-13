@@ -278,6 +278,7 @@
     <p-dialog
       *ngIf="tipoModal === 'mostrarFactura' && seleccionModal"
       header="Mostrar Factura"
+      [dismissableMask]="false"
       [(visible)]="showModal"
       [focusTrap]="true"
       [focusOnShow]="true"
@@ -289,7 +290,9 @@
       (onShow)="prueba()"
       blockScroll="true"
     >
-      <app-formar-factura [factura]="this.seleccionModal"></app-formar-factura>
+      <div class="p-2">
+        <app-formar-factura [factura]="this.seleccionModal"></app-formar-factura>
+      </div>
     </p-dialog>
   </div>
 </div>
