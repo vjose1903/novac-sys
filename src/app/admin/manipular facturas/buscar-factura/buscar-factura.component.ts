@@ -76,8 +76,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.completarTituloPag();
 
     this.sub = this.mServ.OBJDEVUELTO.subscribe(res => {
-      console.log(res);
-
       if (res && res.tipoModal === 'buscarCliente') {
         this.clienteBuscado = res;
         (document.getElementById('valorI') as any).value = res.nombre;
@@ -86,8 +84,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       }
     });
     this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
-      console.log(res);
-
       if (res) {
         if (this.tipoModal === 'mostrarFactura') {
           this.facturaSelected['identificadorFact'] =
@@ -98,7 +94,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
             this.abrirModal(this.facturaSelected, 'cancelar');
           }, 10);
         } else if (this.tipoModal === 'cancelar') {
-          console.log('Ya si cancelala');
+          this.decisionesModal();
         }
       } else {
         if (this.tipoModal === 'cancelar') {
@@ -116,7 +112,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     } else if (this.BuscarPara === 'nota_credito') {
       this.Para = ' Nota de crédito';
     } else if (this.BuscarPara === 'nota_debito') {
-      this.Para = ' -Nota de débito';
+      this.Para = ' Nota de débito';
     }
   }
 
@@ -313,5 +309,23 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   selectContenido(arg) {
     const element = document.getElementById(arg) as any;
     element.select();
+  }
+
+  decisionesModal() {
+    if (this.BuscarPara === 'cancelar_factura') {
+      this.CancelarFactura();
+    } else if (this.BuscarPara === 'nota_credito') {
+    } else if (this.BuscarPara === 'nota_debito') {
+    }
+  }
+  async CancelarFactura() {
+    console.log('cancelando');
+
+    try {
+      const res = await this.dbServ.cancelarFactura(this.facturaSelected.id).toPromise();
+      console.log(res);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

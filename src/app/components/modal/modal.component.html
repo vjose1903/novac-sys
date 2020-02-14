@@ -298,7 +298,7 @@
       <p-footer>
         <ng-container class="p-1\" *ngIf="lugar === 'cancelar_factura'">
           <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cerrar</button>
-          <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Cancelar factura</button>
+          <button [disabled]="!this.seleccionModal.estado" type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Cancelar factura</button>
         </ng-container>
       </p-footer>
     </p-dialog>

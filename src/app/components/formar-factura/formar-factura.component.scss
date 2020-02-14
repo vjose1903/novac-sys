@@ -38,3 +38,19 @@
   display: flex;
   justify-content: space-between;
 }
+span.canceladaContent {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  > span.canceladaContent {
+    font-size: 6rem;
+    color: red;
+    z-index: 9999;
+    font-weight: 510;
+    transform: rotate(15deg);
+    text-shadow: 2px 2px 12px #585858eb;
+  }
+}
