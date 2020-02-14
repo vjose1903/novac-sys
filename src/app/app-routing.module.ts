@@ -60,7 +60,7 @@ const routes: Routes = [
         component: IngresosComponent,
       },
       {
-        path: 'buscarFactura',
+        path: 'buscarFactura/:para',
         component: BuscarFacturaComponent,
       },
     ],

@@ -17,25 +17,50 @@
       <div *ngIf="campo" class="form-group">
         <label class="control-label">{{ campoSelected + ' ' }} : </label>
 
-        <input
-          type="text"
-          id="valorI"
-          (keydown.enter)="saltar(campo === '1' ? 'cliente' : 'buscarFactura', $event.target.value)"
-          (focus)="$event.target.select()"
-          [placeholder]="placeHolder"
-          class="form-control mb-4"
-          autocomplete="off"
-        />
+        <ng-container *ngIf="campo === '1'">
+          <input
+            type="text"
+            id="valorI"
+            (keydown.enter)="saltar('cliente', $event.target.value)"
+            (focus)="$event.target.select()"
+            [placeholder]="placeHolder"
+            class="form-control mb-4"
+            autocomplete="off"
+          />
+        </ng-container>
+
+        <ng-container *ngIf="campo === '2'">
+          <input
+            type="text"
+            [textMask]="{ mask: ncfMask }"
+            placeholder="b__________"
+            class="form-control inputE UPPERCASE"
+            (keydown.enter)="saltar('buscarFactura', $event.target.value)"
+            (focus)="$event.target.select()"
+            id="valorI"
+          />
+        </ng-container>
+        <ng-container *ngIf="campo === '3'">
+          <input
+            type="number"
+            id="valorI"
+            (keydown.enter)="saltar('buscarFactura', $event.target.value)"
+            (focus)="$event.target.select()"
+            [placeholder]="placeHolder"
+            class="form-control mb-4"
+            autocomplete="off"
+          />
+        </ng-container>
       </div>
     </div>
   </div>
   <div class="col-12 rowIngre">
-    <div *ngIf="facturas" class="card card-padding sombra ingreCard">
+    <div *ngIf="facturas && this.campo === '1'" class="card card-padding sombra ingreCard">
       <div style="height: 90%;">
         <app-tablas [info]="info" [data]="facturas" [scrollContainer]="'scroll-container ingresosScroll'" (getInfoChange)="selectFactura($event)" [focusRow]="false"></app-tablas>
       </div>
       <div class="d-flex justify-content-end">
-        <input [disabled]="abilitarBtns()" (click)="abrirModal(undefined, 'cancelarBusqueda')" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+        <input (click)="abrirModal(undefined, 'cancelarBusqueda')" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
         <input [disabled]="abilitarBtns()" (click)="confirmarSeleccion()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
       </div>
     </div>

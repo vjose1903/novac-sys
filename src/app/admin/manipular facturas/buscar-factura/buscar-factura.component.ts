@@ -7,6 +7,7 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { TablasComponent } from '../../../components/tablas/tablas.component';
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -21,7 +22,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   listaClientes: unknown;
   facturaSelected: any;
   @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
-  constructor(private dbServ: DBservice, private mServ: ModalService) {}
+  BuscarPara: any;
+  NCF;
+  constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute) {}
   campo = null;
   placeHolder = '';
   info = [
@@ -64,19 +67,19 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       title: '',
     },
   ];
+  ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   ngOnInit() {
     this.necesarioStart();
+    this.BuscarPara = this.route.snapshot.params['para'];
     this.sub = this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res && res.tipoModal === 'buscarCliente') {
         this.clienteBuscado = res;
         (document.getElementById('valorI') as any).value = res.nombre;
-        this.pedirFactura('1', res.id);
+        this.pedirFacturaModal('1', res.id);
         this.mServ.ModalObj(undefined);
       }
     });
     this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
-      console.log(res);
-
       if (res) {
         this.borrar();
         this.mServ.ModalDecision(undefined);
@@ -119,6 +122,19 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   async pedirFactura(campo, valor) {
     try {
+      this.facturas = await this.dbServ.getFacturasByParams(campo, valor).toPromise();
+      if (this.facturas.length > 0) {
+        this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
+        this.abrirModal(this.facturas[0], 'mostrarFactura');
+      } else {
+        this.dbServ.toastError('La factura buscada no existe', 'ERROR');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async pedirFacturaModal(campo, valor) {
+    try {
       const fechaA = moment().format('YYYY-MM-DD');
       this.facturas = await this.dbServ
         .getFacturasByParams(campo, valor)
@@ -142,7 +158,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       this.facturas.sort((a, b) => {
         return a.id > b.id ? 1 : -1;
       });
-      console.log(this.facturas);
     } catch (error) {
       console.error(error);
     }
@@ -186,6 +201,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.mServ.mostrarModal(true);
   }
   borrar() {
+    this.NCF = null;
     this.facturas = undefined;
     (document.getElementById('valorI') as any).value = null;
     this.campo = null;
@@ -201,27 +217,50 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
             this.facturas[j].select = false;
             this.facturaSelected = undefined;
           }
-        } else {
-          this.facturaSelected = this.facturas[item.index];
         }
       });
+      this.facturaSelected = this.facturas[item.index];
     }
   }
 
   confirmarSeleccion() {
-    console.log(this.facturaSelected);
-
+    this.facturaSelected['mostrarFacturaPara'] = this.BuscarPara;
     this.abrirModal(this.facturaSelected, 'mostrarFactura');
   }
+  validarRayaAbajo() {
+    if (this.NCF) {
+      let char = '';
+      let num = 0;
+      for (let index = 0; index < this.NCF.length; index++) {
+        const c = this.NCF.charAt(index);
+        char = c;
+        num = index;
+      }
 
+      if (num < 10 || char === '_') {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
   saltar(campo, valor) {
     if (valor) {
-      console.log(`campo ${campo}`);
-      console.log(`valor ${valor}`);
-
       if (campo === 'cliente') {
         this.abrirModalFiltro(valor);
       } else if (campo === 'buscarFactura') {
+        this.NCF = null;
+        if (this.campo === '2') {
+          valor = valor.toUpperCase();
+          this.NCF = valor;
+          if (this.validarRayaAbajo()) {
+            this.pedirFactura(this.campo, valor);
+          } else {
+            this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso');
+          }
+        } else {
+          this.pedirFactura(this.campo, valor);
+        }
       } else {
         this.enfocarInput(campo);
       }

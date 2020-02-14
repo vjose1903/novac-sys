@@ -14,6 +14,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   tipoModal;
   paraFiltroClientes: any;
   tituloModal;
+  lugar: any;
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       if (this.tipoModal === 'buscar') {
@@ -26,6 +27,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   @Input() listaArticulos: any;
+
   infoArticulos = [
     {
       titulo: 'Descripción',
@@ -86,6 +88,10 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
           this.tituloModal = 'Buscar cliente';
         } else {
           this.tituloModal = 'Buscar suplidor';
+        }
+
+        if (this.tipoModal === 'mostrarFactura' && res) {
+          this.lugar = res.mostrarFacturaPara;
         }
       }
     });

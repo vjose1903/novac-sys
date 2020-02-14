@@ -27,9 +27,9 @@
         <!-- ultimo -->
 
         <div [ngClass]="actualTab == 'nota' ? 'subMenuFacturaA' : 'subMenuFactura'">
-          <h4 class="opcion" (click)="navegar('buscarFactura')">Nota de Crédito</h4>
-          <h4 class="opcion" (click)="navegar('buscarFactura')">Nota de Débito</h4>
-          <h4 class="opcion" (click)="navegar('buscarFactura')">Cancelar factura</h4>
+          <h4 class="opcion" (click)="navegar('buscarFactura','nota_credito')">Nota de Crédito</h4>
+          <h4 class="opcion" (click)="navegar('buscarFactura','nota_debito')">Nota de Débito</h4>
+          <h4 class="opcion" (click)="navegar('buscarFactura','cancelar_factura')">Cancelar factura</h4>
         </div>
       </div>
 

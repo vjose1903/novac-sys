@@ -121,7 +121,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   // =================================================================================
   // NAVEGAR
   // =================================================================================
-  navegar(lugar: any) {
+  navegar(lugar: any, accion?) {
     switch (lugar) {
       case 1:
         this.actualTab = 'home';
@@ -177,7 +177,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
 
       case 'buscarFactura':
         this.actualTab = 'home';
-        this.router.navigate(['/admin/buscarFactura']);
+        this.router.navigate(['/admin/buscarFactura/' + accion]);
         break;
 
       case 'articulos':
