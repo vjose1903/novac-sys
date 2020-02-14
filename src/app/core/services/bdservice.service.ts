@@ -198,10 +198,7 @@ export class DBservice {
   }
   getFacturasByParams(campo, valor) {
     const valor_enc = btoa(valor);
-    console.log('>>>>>>>>> ', valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
-    console.log('>>>>>>>>> ', VALOR_ENC);
-
     return this.peticion(`cabecera_facturas/params/${campo}/${VALOR_ENC}`, 'get');
   }
 

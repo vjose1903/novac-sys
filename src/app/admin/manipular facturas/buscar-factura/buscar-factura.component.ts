@@ -24,6 +24,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
   BuscarPara: any;
   NCF;
+  Para: string;
+  tipoModal: any;
   constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute) {}
   campo = null;
   placeHolder = '';
@@ -71,7 +73,11 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.necesarioStart();
     this.BuscarPara = this.route.snapshot.params['para'];
+    this.completarTituloPag();
+
     this.sub = this.mServ.OBJDEVUELTO.subscribe(res => {
+      console.log(res);
+
       if (res && res.tipoModal === 'buscarCliente') {
         this.clienteBuscado = res;
         (document.getElementById('valorI') as any).value = res.nombre;
@@ -80,12 +86,40 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       }
     });
     this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+      console.log(res);
+
       if (res) {
-        this.borrar();
-        this.mServ.ModalDecision(undefined);
+        if (this.tipoModal === 'mostrarFactura') {
+          this.facturaSelected['identificadorFact'] =
+            this.campo === '2'
+              ? ' con el comprobante fiscal ' + this.facturaSelected.numero_comprobante
+              : ' con el numero de factura ' + this.formatoNumeroFactura(this.facturaSelected.numero_factura);
+          setTimeout(() => {
+            this.abrirModal(this.facturaSelected, 'cancelar');
+          }, 10);
+        } else if (this.tipoModal === 'cancelar') {
+          console.log('Ya si cancelala');
+        }
+      } else {
+        if (this.tipoModal === 'cancelar') {
+          setTimeout(() => {
+            this.abrirModal(this.facturas[0], 'mostrarFactura');
+          }, 10);
+        }
       }
     });
   }
+
+  completarTituloPag() {
+    if (this.BuscarPara === 'cancelar_factura') {
+      this.Para = ' Cancelar factura';
+    } else if (this.BuscarPara === 'nota_credito') {
+      this.Para = ' Nota de crédito';
+    } else if (this.BuscarPara === 'nota_debito') {
+      this.Para = ' -Nota de débito';
+    }
+  }
+
   ngOnDestroy(): void {
     this.sub.unsubscribe();
     this.subDeci.unsubscribe();
@@ -125,6 +159,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       this.facturas = await this.dbServ.getFacturasByParams(campo, valor).toPromise();
       if (this.facturas.length > 0) {
         this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
+        this.facturaSelected = this.facturas[0];
         this.abrirModal(this.facturas[0], 'mostrarFactura');
       } else {
         this.dbServ.toastError('La factura buscada no existe', 'ERROR');
@@ -165,7 +200,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   abrirModalFiltro(nombre) {
     this.mServ.modalTipo('buscarCliente');
-
+    this.tipoModal = 'buscarCliente';
     this.listaClientes['filtrarCliente'] = nombre;
     this.mServ.ModalSeleccion(this.listaClientes);
 
@@ -196,11 +231,13 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   abrirModal(arg, tipo) {
     const obj = arg;
+    this.tipoModal = tipo;
     this.mServ.modalTipo(tipo);
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
   }
   borrar() {
+    this.tipoModal = null;
     this.NCF = null;
     this.facturas = undefined;
     (document.getElementById('valorI') as any).value = null;
@@ -265,6 +302,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         this.enfocarInput(campo);
       }
     }
+  }
+  formatoNumeroFactura(num) {
+    return _.padStart(num, 8, '0');
   }
   enfocarInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
