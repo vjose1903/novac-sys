@@ -25,14 +25,12 @@ import { NgxBootstrapModule } from './modules/ngx-bootstrap.module';
 import { AngularModule } from './modules/angular.module';
 
 import { ToastrModule } from 'ngx-toastr';
-import { TablasModule } from './components/tablas/tablas.module';
 import { UploadImgComponent } from './components/upload-img/upload-img.component';
 import { IpcService } from './core/services/ipc.service';
 
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { LoaderService } from './loader/loader.service';
 import { LoaderInterceptor } from './loader/loader.interceptor';
-
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -42,7 +40,6 @@ export function HttpLoaderFactory(http: HttpClient) {
 @NgModule({
   declarations: [
     AppComponent,
-    
 
     //  UploadImgComponent
   ],
@@ -55,7 +52,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     HomeModule,
     ToastrModule.forRoot(),
     AppRoutingModule,
-    TablasModule,
     NgxSpinnerModule,
     TranslateModule.forRoot({
       loader: {

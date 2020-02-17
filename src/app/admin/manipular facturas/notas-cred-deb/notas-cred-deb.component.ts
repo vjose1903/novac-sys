@@ -28,6 +28,8 @@ export class NotasCredDebComponent implements OnInit {
     {
       titulo: 'Articulo',
       key: 'descripcion',
+      customClass: true,
+      estilos: [{ color: 'red' }],
     },
     {
       titulo: 'Cantidad',

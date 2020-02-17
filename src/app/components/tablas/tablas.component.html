@@ -7,7 +7,7 @@
   <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" small="true" id="VICtablas">
     <thead class="text-center " [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
       <tr>
-        <th *ngFor="let row of info">{{ row.titulo }}</th>
+        <th id="{{ row.titulo }}" *ngFor="let row of info">{{ row.titulo }}</th>
         <th *ngIf="botones.titulo">Acciones</th>
       </tr>
     </thead>

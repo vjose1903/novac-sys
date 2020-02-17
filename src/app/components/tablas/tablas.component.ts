@@ -338,7 +338,21 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
 
   async ngAfterViewInit() {
     await this.setDATATABLE();
+    // ================================================
 
+    for (let i = 0; i < this.info.length; i++) {
+      const info = this.info[i];
+      if (info.customClass) {
+        for (let j = 0; j < info.estilos.length; j++) {
+          const estilos = info.estilos[j];
+          const key = Object.keys(estilos)[0];
+          const value = Object.values(estilos)[0];
+          const columna = document.getElementById(info.titulo) as any;
+          columna.style[key] = value;
+        }
+      }
+    }
+    // ================================================
     if (this.paraFiltroArticulos) {
       this.searchText = this.paraFiltroArticulos;
       setTimeout(() => {
