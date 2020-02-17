@@ -37,6 +37,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { BuscarFacturaComponent } from './manipular facturas/buscar-factura/buscar-factura.component';
 import { FormarFacturaComponent } from '../components/formar-factura/formar-factura.component';
+import { NotasCredDebComponent } from './manipular facturas/notas-cred-deb/notas-cred-deb.component';
 
 @NgModule({
   declarations: [
@@ -63,6 +64,7 @@ import { FormarFacturaComponent } from '../components/formar-factura/formar-fact
     FormCantidadEfectivoComponent,
     BuscarFacturaComponent,
     FormarFacturaComponent,
+    NotasCredDebComponent,
   ],
   imports: [
     DialogModule,

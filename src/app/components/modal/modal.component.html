@@ -296,9 +296,13 @@
         <app-formar-factura [factura]="this.seleccionModal"></app-formar-factura>
       </div>
       <p-footer>
-        <ng-container class="p-1\" *ngIf="lugar === 'cancelar_factura'">
+        <ng-container class="p-1" *ngIf="lugar === 'cancelar_factura'">
           <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cerrar</button>
-          <button [disabled]="!this.seleccionModal.estado" type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Cancelar factura</button>
+          <button [disabled]="!this.seleccionModal.estado" type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Anular factura</button>
+        </ng-container>
+        <ng-container class="p-1" *ngIf="lugar !== 'cancelar_factura'">
+          <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cerrar</button>
+          <button [disabled]="!this.seleccionModal.estado" type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Continuar</button>
         </ng-container>
       </p-footer>
     </p-dialog>

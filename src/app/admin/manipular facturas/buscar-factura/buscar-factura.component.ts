@@ -7,7 +7,7 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { TablasComponent } from '../../../components/tablas/tablas.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -26,7 +26,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   NCF;
   Para: string;
   tipoModal: any;
-  constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute) {}
+  constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute, private router: Router) {}
   campo = null;
   placeHolder = '';
   info = [
@@ -83,16 +83,22 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         this.mServ.ModalObj(undefined);
       }
     });
+
     this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
       if (res) {
         if (this.tipoModal === 'mostrarFactura') {
-          this.facturaSelected['identificadorFact'] =
-            this.campo === '2'
-              ? ' con el comprobante fiscal ' + this.facturaSelected.numero_comprobante
-              : ' con el numero de factura ' + this.formatoNumeroFactura(this.facturaSelected.numero_factura);
-          setTimeout(() => {
-            this.abrirModal(this.facturaSelected, 'cancelar');
-          }, 10);
+          if (this.BuscarPara === 'cancelar_factura') {
+            this.facturaSelected['identificadorFact'] =
+              this.campo === '2'
+                ? ' con el comprobante fiscal ' + this.facturaSelected.numero_comprobante
+                : ' con el numero de factura ' + this.formatoNumeroFactura(this.facturaSelected.numero_factura);
+            setTimeout(() => {
+              this.abrirModal(this.facturaSelected, 'cancelar');
+            }, 10);
+          } else {
+            const url = `/admin/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
+            this.router.navigateByUrl(url);
+          }
         } else if (this.tipoModal === 'cancelar') {
           this.decisionesModal();
         }
@@ -108,7 +114,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   completarTituloPag() {
     if (this.BuscarPara === 'cancelar_factura') {
-      this.Para = ' Cancelar factura';
+      this.Para = ' Anular factura';
     } else if (this.BuscarPara === 'nota_credito') {
       this.Para = ' Nota de crédito';
     } else if (this.BuscarPara === 'nota_debito') {
