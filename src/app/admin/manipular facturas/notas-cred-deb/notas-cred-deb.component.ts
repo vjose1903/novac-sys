@@ -5,6 +5,7 @@ import * as moment from 'moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -26,10 +27,21 @@ export class NotasCredDebComponent implements OnInit {
 
   info = [
     {
+      titulo: 'Seleccione',
+      tipo: 'check',
+      key: 'select',
+
+      disable: {
+        getDisabled: false,
+        campo: '',
+      },
+      title: '',
+      customClass: true,
+      estilos: [{ width: '5.5rem' }],
+    },
+    {
       titulo: 'Articulo',
       key: 'descripcion',
-      customClass: true,
-      estilos: [{ color: 'red' }],
     },
     {
       titulo: 'Cantidad',
@@ -38,8 +50,11 @@ export class NotasCredDebComponent implements OnInit {
       tipo: 'input',
       inputType: 'number',
       disable: {
-        getDisabled: false,
+        getDisabled: true,
+        campo: 'select',
       },
+      customClass: true,
+      estilos: [{ width: '5.5rem' }],
     },
     {
       titulo: 'Unidad',
@@ -61,6 +76,7 @@ export class NotasCredDebComponent implements OnInit {
       formatoNumero: true,
     },
   ];
+  detalleFacturas: any;
 
   constructor(private dbServ: DBservice, private route: ActivatedRoute) {}
 
@@ -83,6 +99,13 @@ export class NotasCredDebComponent implements OnInit {
   async getFactura() {
     try {
       this.factura = await this.dbServ.getFacturaById(this.idFactura).toPromise();
+      const temp = [];
+      for (let i = 0; i < this.factura.detalle_facturas.length; i++) {
+        const detalle = this.factura.detalle_facturas[i];
+        detalle['select'] = false;
+        temp.push(detalle);
+      }
+      this.detalleFacturas = temp;
     } catch (error) {
       console.log(error);
       this.dbServ.toastError('Error mostrando factura elegida', 'ERROR');
