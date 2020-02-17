@@ -23,6 +23,43 @@ export class NotasCredDebComponent implements OnInit {
   };
   fecha: string;
   TOTAL = 0;
+
+  info = [
+    {
+      titulo: 'Articulo',
+      key: 'descripcion',
+    },
+    {
+      titulo: 'Cantidad',
+      key: 'cantidad',
+      formatoNumero: true,
+      tipo: 'input',
+      inputType: 'number',
+      disable: {
+        getDisabled: false,
+      },
+    },
+    {
+      titulo: 'Unidad',
+      key: 'unidad',
+    },
+    {
+      titulo: 'Descuento',
+      key: 'descuento',
+      formatoNumero: true,
+    },
+    {
+      titulo: 'Precio',
+      key: 'precio',
+      formatoNumero: true,
+    },
+    {
+      titulo: 'Total',
+      key: 'total',
+      formatoNumero: true,
+    },
+  ];
+
   constructor(private dbServ: DBservice, private route: ActivatedRoute) {}
 
   ngOnInit() {

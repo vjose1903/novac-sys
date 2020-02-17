@@ -4,8 +4,8 @@
 </div>
 
 <div class="{{ scrollContainer }}" style="border-radius: 10px 10px 0px 0px">
-  <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" hover="true" small="true" id="VICtablas">
-    <thead class="text-center head-table ">
+  <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" small="true" id="VICtablas">
+    <thead class="text-center " [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
       <tr>
         <th *ngFor="let row of info">{{ row.titulo }}</th>
         <th *ngIf="botones.titulo">Acciones</th>
@@ -19,6 +19,8 @@
           class="text-center"
           id="row-{{ i }}"
           [ngClass]="{
+            tdHover: tablaHover,
+            tdNoHover: !tablaHover,
             'bg-selected': !focusRow && dato.id == seleccionado,
             'bg-light': focusRow && RowElement.id == IDROW
           }"
@@ -67,7 +69,7 @@
               <div *ngIf="!column.checkNumber" class="from-group mb-2">
                 <input
                   class="form-control"
-                  type="text"
+                  type="{{ column.inputType ? column.inputType : 'text' }}"
                   [value]="dato[column.key]"
                   [disabled]="disabledInput(column.disable, i)"
                   (keyup)="changeValorInput(column.key, i, $event.target.value)"

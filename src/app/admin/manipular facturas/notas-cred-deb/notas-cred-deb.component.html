@@ -67,5 +67,17 @@
         </div>
       </div>
     </div>
+
+    <!-- ======================================================================================================== -->
+    <app-tablas
+      *ngIf="factura"
+      [search]="false"
+      [tablaHover]="false"
+      [info]="info"
+      [data]="factura.detalle_facturas"
+      [scrollContainer]="'scroll-container'"
+      [focusRow]="false"
+      [colorHead]="false"
+    ></app-tablas>
   </div>
 </div>

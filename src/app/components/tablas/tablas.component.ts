@@ -84,6 +84,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() paraFiltroArticulos = null;
   @Input() paraFiltroClientes;
   @Input() info;
+  @Input() colorHead = true;
+  @Input() tablaHover = true;
   @Input() search = true;
   @Input() botones = {
     titulo: false,
