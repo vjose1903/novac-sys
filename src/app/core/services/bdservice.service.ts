@@ -202,8 +202,6 @@ export class DBservice {
     return this.peticion(`cabecera_facturas/params/${campo}/${VALOR_ENC}`, 'get');
   }
   cancelarFactura(id) {
-    console.log('en componente de peticiones');
-
     return this.peticion(`cabecera_facturas/cancelar_factura/${id}`, 'post', JSON.stringify({}));
   }
 

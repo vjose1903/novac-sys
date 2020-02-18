@@ -26,6 +26,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   NCF;
   Para: string;
   tipoModal: any;
+  indexSelected: any;
   constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute, private router: Router) {}
   campo = null;
   placeHolder = '';
@@ -77,6 +78,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
     this.sub = this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res && res.tipoModal === 'buscarCliente') {
+        console.log(res);
+
         this.clienteBuscado = res;
         (document.getElementById('valorI') as any).value = res.nombre;
         this.pedirFacturaModal('1', res.id);
@@ -247,6 +250,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.enfocarInput('campoI');
   }
   selectFactura(item) {
+    console.log(item);
     if (!item.value) {
       this.facturaSelected = undefined;
     } else {
@@ -259,6 +263,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         }
       });
       this.facturaSelected = this.facturas[item.index];
+      this.indexSelected = item.index;
     }
   }
 
@@ -284,9 +289,10 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     }
   }
   saltar(campo, valor) {
-    if (valor) {
+    if (valor && this.campo) {
       if (campo === 'cliente') {
         this.abrirModalFiltro(valor);
+        this.desEnfocarInput('valorI');
       } else if (campo === 'buscarFactura') {
         this.NCF = null;
         if (this.campo === '2') {
@@ -312,6 +318,10 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     const element = document.getElementById(arg) as HTMLElement;
     element.focus();
   }
+  desEnfocarInput(arg) {
+    const element = document.getElementById(arg) as HTMLElement;
+    element.blur();
+  }
   selectContenido(arg) {
     const element = document.getElementById(arg) as any;
     element.select();
@@ -329,6 +339,12 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
     try {
       const res = await this.dbServ.cancelarFactura(this.facturaSelected.id).toPromise();
+      const temp = GLOBAL.duplicarJson(this.facturas);
+
+      this.facturas = [];
+      temp[this.indexSelected].estado = false;
+      temp[this.indexSelected].select = false;
+      this.facturas = temp;
       console.log(res);
     } catch (error) {
       console.error(error);

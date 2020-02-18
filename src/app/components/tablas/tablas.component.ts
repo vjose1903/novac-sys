@@ -28,7 +28,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
   templateUrl: './tablas.component.html',
   styleUrls: ['./tablas.component.scss'],
 })
-export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
+export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @ViewChild(MdbTablePaginationComponent, { static: true })
   mdbTablePagination: MdbTablePaginationComponent;
 
@@ -66,7 +66,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
   elements: any[] = [];
   previous: any = [];
   searchText = '';
-  ROW = 'row-';
+  @Input() ROW = 'row-';
   NUM = 0;
   IDROW;
 
@@ -118,6 +118,11 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     //     this.element.focus();
     //   }, 5);
     // }
+  }
+  ngOnDestroy() {
+    this.entrar = 0;
+    this.ROW = 'row-';
+    this.NUM = 0;
   }
 
   resetInput(referencia, destino, i, formatear) {
@@ -432,8 +437,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges {
     this.entrar++;
 
     if (this.entrar > 1) {
-      this.element = document.getElementById(arg) as any;
-      this.element.click();
+      const element = document.getElementById(arg) as any;
+      console.log(element);
+
+      element.click();
       // this.reinicioModal.emit();
     }
   }
