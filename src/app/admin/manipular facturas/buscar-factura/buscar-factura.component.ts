@@ -32,6 +32,12 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   placeHolder = '';
   info = [
     {
+      titulo: '',
+      key: 'estado_',
+      isIcon: true,
+      color: true,
+    },
+    {
       titulo: 'Numero Fact',
       key: 'secuencia',
     },
@@ -46,7 +52,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     {
       titulo: 'Fecha Vencimiento',
       key: 'fechaV',
-      color: true,
     },
     {
       titulo: 'Total tacturado',
@@ -162,6 +167,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   async pedirFactura(campo, valor) {
     try {
       this.facturas = await this.dbServ.getFacturasByParams(campo, valor).toPromise();
+
       if (this.facturas.length > 0) {
         this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
         this.facturaSelected = this.facturas[0];
@@ -187,9 +193,10 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
                 val.fechaV = moment(val.fecha_vencimiento).format('DD-MM-YYYY');
                 val.select = false;
                 val.pagoT = true;
+                val.estado_ = val.estado ? 'fas fa-check' : 'fas fa-times';
                 val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
                 val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
-                val.text_color = val.fecha_vencimiento < fechaA ? 'red' : 'black';
+                val.text_color = val.estado ? 'green' : 'red';
                 return val;
               })),
           ),

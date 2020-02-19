@@ -30,7 +30,7 @@
         >
           <td *ngFor="let column of info; let j = index">
             <span
-              *ngIf="column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero"
+              *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero"
               style="width: 100%"
               class="text-{{ column.color ? (dato.text_color ? dato.text_color : 'black') : 'black' }}"
             >
@@ -56,9 +56,15 @@
               {{ lookprincipal(dato[column.key]) }}
             </span>
 
-            <span *ngIf="column.tipo !== 'check' && column.tipo !== 'input' && column.formatoNumero && !column.cantidades" style="width: 100%"> {{ formatoNumero(dato[column.key]) }} </span>
+            <span *ngIf="column.isIcon && dato._destroy !== '1'" class="text-{{ column.color ? (dato.text_color ? dato.text_color : 'black') : 'black' }}">
+              <i class="{{ dato[column.key] }}"></i>
+            </span>
 
-            <span *ngIf="column.tipo === 'check' && column.tipo !== 'input'">
+            <span *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && column.formatoNumero && !column.cantidades" style="width: 100%">
+              {{ formatoNumero(dato[column.key]) }}
+            </span>
+
+            <span *ngIf="!column.isIcon && column.tipo === 'check' && column.tipo !== 'input'">
               <div class="from-group mb-2">
                 <input class="apple-switch ml-2" [disabled]="disabledInput(column.disable, i)" type="checkbox" (change)="changeValorCheck(column.key, i)" [checked]="dato[column.key]" />
                 <span class="ml-2 subirLabelCheck">{{ column.title }}</span>
@@ -69,6 +75,9 @@
               <div *ngIf="!column.checkNumber" class="from-group mb-2">
                 <input
                   class="form-control"
+                  id="inputNu-{{ i }}"
+                  [min]="dato.min_ ? dato.min_ : 0"
+                  [max]="dato.max_ ? dato.max_ : null"
                   type="{{ column.inputType ? column.inputType : 'text' }}"
                   [value]="dato[column.key]"
                   [disabled]="disabledInput(column.disable, i)"

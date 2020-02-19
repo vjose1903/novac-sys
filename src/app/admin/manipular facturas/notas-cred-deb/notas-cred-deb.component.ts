@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -6,6 +6,7 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
+import { TablasComponent } from '../../../components/tablas/tablas.component';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -77,7 +78,8 @@ export class NotasCredDebComponent implements OnInit {
     },
   ];
   detalleFacturas: any;
-
+  detalleNota = [];
+  @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
   constructor(private dbServ: DBservice, private route: ActivatedRoute) {}
 
   ngOnInit() {
@@ -103,12 +105,66 @@ export class NotasCredDebComponent implements OnInit {
       for (let i = 0; i < this.factura.detalle_facturas.length; i++) {
         const detalle = this.factura.detalle_facturas[i];
         detalle['select'] = false;
+        detalle['cant'] = detalle.cantidad;
+        if (this.tipoNota === 'credito') {
+          detalle['min_'] = 0;
+          detalle['max_'] = detalle.cantidad;
+        } else {
+          detalle['min_'] = detalle.cantidad;
+          detalle['max_'] = null;
+        }
         temp.push(detalle);
       }
       this.detalleFacturas = temp;
     } catch (error) {
       console.log(error);
       this.dbServ.toastError('Error mostrando factura elegida', 'ERROR');
+    }
+  }
+
+  getIndexNota(id_) {
+    return _.findIndex(this.detalleNota, { id: id_ });
+  }
+
+  getInfoChange(info) {
+    console.log(info);
+    const entidad = info.body[info.index];
+    if (info.cambio === 'cantidad') {
+      if (this.tipoNota === 'credito') {
+        if (entidad.cantidad > entidad.cant) {
+          this.dbServ.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
+          this.tablas.enfocarInput('inputNu-' + info.index);
+          setTimeout(() => {
+            this.tablas.resetInput('cant', 'cantidad', info.index);
+          }, 5);
+        } else {
+          const index = this.getIndexNota(entidad.id);
+          this.detalleNota[index].cantidad = entidad.cantidad;
+        }
+      } else {
+        if (entidad.cantidad < entidad.cant) {
+          this.dbServ.toastError('Nota de débito no puede ser menor a la factura original', 'ERROR');
+          this.tablas.enfocarInput('inputNu-' + info.index);
+          setTimeout(() => {
+            this.tablas.resetInput('cant', 'cantidad', info.index);
+          }, 5);
+        } else {
+          const index = this.getIndexNota(entidad.id);
+          this.detalleNota[index].cantidad = entidad.cantidad;
+        }
+      }
+    }
+    if (info.cambio === 'select') {
+      if (!info.value) {
+        this.detalleFacturas[info.index].select = false;
+        this.tablas.resetInput('cant', 'cantidad', info.index);
+
+        const i = this.detalleNota.indexOf(info.body[info.index]);
+        _.pullAt(this.detalleNota, i);
+      } else {
+        this.detalleFacturas[info.index].select = true;
+        this.detalleNota.push(info.body[info.index]);
+      }
     }
   }
 
