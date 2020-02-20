@@ -26,57 +26,7 @@ export class NotasCredDebComponent implements OnInit {
   fecha: string;
   TOTAL = 0;
 
-  info = [
-    {
-      titulo: 'Seleccione',
-      tipo: 'check',
-      key: 'select',
-
-      disable: {
-        getDisabled: false,
-        campo: '',
-      },
-      title: '',
-      customClass: true,
-      estilos: [{ width: '5.5rem' }],
-    },
-    {
-      titulo: 'Articulo',
-      key: 'descripcion',
-    },
-    {
-      titulo: 'Cantidad',
-      key: 'cantidad',
-      formatoNumero: true,
-      tipo: 'input',
-      inputType: 'number',
-      disable: {
-        getDisabled: true,
-        campo: 'select',
-      },
-      customClass: true,
-      estilos: [{ width: '5.5rem' }],
-    },
-    {
-      titulo: 'Unidad',
-      key: 'unidad',
-    },
-    {
-      titulo: 'Descuento',
-      key: 'descuento',
-      formatoNumero: true,
-    },
-    {
-      titulo: 'Precio',
-      key: 'precio',
-      formatoNumero: true,
-    },
-    {
-      titulo: 'Total',
-      key: 'total',
-      formatoNumero: true,
-    },
-  ];
+  info = [];
   detalleFacturas: any;
   detalleNota = [];
   @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
@@ -96,6 +46,65 @@ export class NotasCredDebComponent implements OnInit {
   async necesarioStart() {
     await this.getFactura();
     this.factura_aplicada = this.factura.numero_comprobante;
+    await this.formarTitulosTabla();
+  }
+  formarTitulosTabla() {
+    this.info = [
+      {
+        titulo: 'Seleccione',
+        tipo: 'check',
+        key: 'select',
+
+        disable: {
+          getDisabled: false,
+          campo: '',
+        },
+        title: '',
+        customClass: true,
+        estilos: [{ width: '5.5rem' }],
+      },
+      {
+        titulo: 'Articulo',
+        key: 'descripcion',
+      },
+      {
+        titulo: this.tipoNota === 'credito' ? 'Devolver' : 'Aumentar',
+        key: 'cant_nota',
+        formatoNumero: true,
+        tipo: 'input',
+        inputType: 'number',
+        disable: {
+          getDisabled: true,
+          campo: 'select',
+        },
+        customClass: true,
+        estilos: [{ width: '5.5rem' }],
+      },
+      {
+        titulo: 'Cantidad',
+        key: 'cantidad',
+        formatoNumero: true,
+      },
+      {
+        titulo: 'Unidad',
+        key: 'unidad',
+      },
+      {
+        titulo: 'Descuento',
+        key: 'descuento',
+        formatoNumero: true,
+      },
+      {
+        titulo: 'Precio',
+        key: 'precio',
+        formatoNumero: true,
+      },
+      {
+        titulo: 'Total',
+        key: 'total',
+        formatoNumero: true,
+      },
+    ];
   }
 
   async getFactura() {
@@ -106,6 +115,7 @@ export class NotasCredDebComponent implements OnInit {
         const detalle = this.factura.detalle_facturas[i];
         detalle['select'] = false;
         detalle['cant'] = detalle.cantidad;
+        detalle['cant_nota'] = 0;
         if (this.tipoNota === 'credito') {
           detalle['min_'] = 0;
           detalle['max_'] = detalle.cantidad;
@@ -125,42 +135,64 @@ export class NotasCredDebComponent implements OnInit {
   getIndexNota(id_) {
     return _.findIndex(this.detalleNota, { id: id_ });
   }
+  async sumarTotal() {
+    let total = 0;
+    for (let i = 0; i < this.detalleNota.length; i++) {
+      const detalle = this.detalleNota[i];
+      const cantidad = detalle.cant_nota;
 
-  getInfoChange(info) {
-    console.log(info);
-    const entidad = info.body[info.index];
-    if (info.cambio === 'cantidad') {
       if (this.tipoNota === 'credito') {
-        if (entidad.cantidad > entidad.cant) {
+        total += cantidad * detalle.precio * -1;
+      } else {
+        total += cantidad * detalle.precio;
+      }
+
+      console.log('>>>> ', total);
+    }
+    this.TOTAL = total;
+  }
+
+  async getInfoChange(info) {
+    const entidad = info.body[info.index];
+    entidad.cant_nota = parseFloat(entidad.cant_nota);
+    if (info.cambio === 'cant_nota') {
+      if (this.tipoNota === 'credito') {
+        console.log(`${entidad.cant_nota} > ${entidad.cant} = ${entidad.cant_nota > entidad.cant}`);
+
+        if (entidad.cant_nota > entidad.cant) {
           this.dbServ.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
           this.tablas.enfocarInput('inputNu-' + info.index);
           setTimeout(() => {
-            this.tablas.resetInput('cant', 'cantidad', info.index);
+            this.tablas.resetInput('cant', 'cant_nota', info.index, false);
           }, 5);
+        } else if (isNaN(entidad.cant_nota)) {
+          this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
+          this.sumarTotal();
         } else {
-          const index = this.getIndexNota(entidad.id);
-          this.detalleNota[index].cantidad = entidad.cantidad;
+          this.sumarTotal();
         }
       } else {
-        if (entidad.cantidad < entidad.cant) {
+        console.log(`${entidad.cant_nota} < ${entidad.cant} = ${entidad.cant_nota < entidad.cant}`);
+        if (entidad.cant_nota < entidad.cant) {
           this.dbServ.toastError('Nota de débito no puede ser menor a la factura original', 'ERROR');
           this.tablas.enfocarInput('inputNu-' + info.index);
           setTimeout(() => {
-            this.tablas.resetInput('cant', 'cantidad', info.index);
+            this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
           }, 5);
         } else {
-          const index = this.getIndexNota(entidad.id);
-          this.detalleNota[index].cantidad = entidad.cantidad;
+          this.sumarTotal();
         }
       }
     }
     if (info.cambio === 'select') {
       if (!info.value) {
         this.detalleFacturas[info.index].select = false;
-        this.tablas.resetInput('cant', 'cantidad', info.index);
+        this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
 
         const i = this.detalleNota.indexOf(info.body[info.index]);
         _.pullAt(this.detalleNota, i);
+
+        this.sumarTotal();
       } else {
         this.detalleFacturas[info.index].select = true;
         this.detalleNota.push(info.body[info.index]);

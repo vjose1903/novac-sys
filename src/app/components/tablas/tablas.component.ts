@@ -125,13 +125,17 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.NUM = 0;
   }
 
-  resetInput(referencia, destino, i, formatear?) {
-    const copia = GLOBAL.duplicarJson(this.data[i][referencia]);
-
-    if (formatear) {
-      this.data[i][destino] = GLOBAL.formatearNumero(GLOBAL.redondearAdos(copia));
+  resetInput(referencia, destino, i, formatear, especifico?) {
+    if (referencia === 'especificar') {
+      this.data[i][destino] = especifico;
     } else {
-      this.data[i][destino] = copia;
+      const copia = GLOBAL.duplicarJson(this.data[i][referencia]);
+
+      if (formatear) {
+        this.data[i][destino] = GLOBAL.formatearNumero(GLOBAL.redondearAdos(copia));
+      } else {
+        this.data[i][destino] = copia;
+      }
     }
   }
 

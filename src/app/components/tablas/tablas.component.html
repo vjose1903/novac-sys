@@ -82,6 +82,7 @@
                   [value]="dato[column.key]"
                   [disabled]="disabledInput(column.disable, i)"
                   (keyup)="changeValorInput(column.key, i, $event.target.value)"
+                  (change)="changeValorInput(column.key, i, $event.target.value)"
                 />
               </div>
               <div *ngIf="column.checkNumber" class="from-group mb-2">
@@ -93,6 +94,7 @@
                   (blur)="revisarPrecio(i, $event.target.value, column.key, 'input-' + i)"
                   [disabled]="disabledInput(column.disable, i)"
                   (keyup)="changeValorInput(column.key, i, $event.target.value)"
+                  (change)="changeValorInput(column.key, i, $event.target.value)"
                 />
               </div>
             </span>
