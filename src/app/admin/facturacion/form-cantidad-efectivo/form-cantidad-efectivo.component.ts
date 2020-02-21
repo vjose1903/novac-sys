@@ -27,7 +27,7 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.enfocarInput('devuelta');
+      this.enfocarInput('inputEfectivo');
     }, 250);
   }
 
@@ -36,7 +36,12 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
       this.enfocarInput(campo);
     }
     if (campo === 'send') {
-      this.enfocarInput('btnSend');
+      if (this.efectivo < this.data.total_factura) {
+        this.dbServ.toastError('Cantidad de dinero insuficiente.');
+        this.enfocarInput('inputEfectivo');
+      } else {
+        this.enfocarInput('btnSend');
+      }
     }
   }
 

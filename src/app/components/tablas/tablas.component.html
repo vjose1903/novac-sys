@@ -65,16 +65,16 @@
             </span>
 
             <span *ngIf="!column.isIcon && column.tipo === 'check' && column.tipo !== 'input'">
-              <div class="from-group mb-2">
+              <div class="from-group">
                 <input class="apple-switch ml-2" [disabled]="disabledInput(column.disable, i)" type="checkbox" (change)="changeValorCheck(column.key, i)" [checked]="dato[column.key]" />
                 <span class="ml-2 subirLabelCheck">{{ column.title }}</span>
               </div>
             </span>
 
             <span *ngIf="column.tipo === 'input' && column.tipo !== 'check'">
-              <div *ngIf="!column.checkNumber" class="from-group mb-2">
+              <div *ngIf="!column.checkNumber">
                 <input
-                  class="form-control"
+                  class="form-control m-0 inputTabla"
                   id="inputNu-{{ i }}"
                   [min]="dato.min_ ? dato.min_ : 0"
                   [max]="dato.max_ ? dato.max_ : null"
@@ -85,9 +85,9 @@
                   (change)="changeValorInput(column.key, i, $event.target.value)"
                 />
               </div>
-              <div *ngIf="column.checkNumber" class="from-group mb-2">
+              <div *ngIf="column.checkNumber">
                 <input
-                  class="form-control"
+                  class="form-control m-0 inputTabla"
                   type="text"
                   id="input-{{ i }}"
                   [value]="dato[column.key]"

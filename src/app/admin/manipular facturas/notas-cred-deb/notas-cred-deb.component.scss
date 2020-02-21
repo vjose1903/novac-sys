@@ -38,7 +38,25 @@
   right: 4rem;
 }
 
+.mostrarNumeros {
+  margin-right: 7rem;
+}
 .fecha {
   top: 0.2rem;
   font-size: 1rem;
+}
+
+div.pieFactura {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
+div.cuerpoFactura.mb-2 {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 36vh);
+}
+
+.numerosCalculos {
+  justify-content: flex-end;
 }

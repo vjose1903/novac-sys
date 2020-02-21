@@ -7,6 +7,8 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { TablasComponent } from '../../../components/tablas/tablas.component';
+import { ModalService } from '../../../components/modal/modal.service';
+import { IpcService } from '../../../core/services/ipc.service';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -30,7 +32,8 @@ export class NotasCredDebComponent implements OnInit {
   detalleFacturas: any;
   detalleNota = [];
   @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
-  constructor(private dbServ: DBservice, private route: ActivatedRoute) {}
+  tipoModal: string;
+  constructor(private dbServ: DBservice, private route: ActivatedRoute, private mServ: ModalService, private _ipc: IpcService) {}
 
   ngOnInit() {
     this.fecha = moment().format('DD/MM/YYYY');
@@ -90,19 +93,24 @@ export class NotasCredDebComponent implements OnInit {
         key: 'unidad',
       },
       {
-        titulo: 'Descuento',
-        key: 'descuento',
-        formatoNumero: true,
-      },
-      {
         titulo: 'Precio',
         key: 'precio',
         formatoNumero: true,
       },
       {
-        titulo: 'Total',
+        titulo: 'Total Facturado',
         key: 'total',
         formatoNumero: true,
+      },
+      {
+        titulo: 'Total nota',
+        key: 'total_nota',
+        tipo: 'input',
+        disable: {
+          getDisabled: true,
+        },
+        customClass: true,
+        estilos: [{ width: '12rem' }],
       },
     ];
   }
@@ -116,13 +124,15 @@ export class NotasCredDebComponent implements OnInit {
         detalle['select'] = false;
         detalle['cant'] = detalle.cantidad;
         detalle['cant_nota'] = 0;
+
         if (this.tipoNota === 'credito') {
           detalle['min_'] = 0;
           detalle['max_'] = detalle.cantidad;
         } else {
-          detalle['min_'] = detalle.cantidad;
+          detalle['min_'] = 0;
           detalle['max_'] = null;
         }
+        detalle['total_nota'] = 0;
         temp.push(detalle);
       }
       this.detalleFacturas = temp;
@@ -157,8 +167,6 @@ export class NotasCredDebComponent implements OnInit {
     entidad.cant_nota = parseFloat(entidad.cant_nota);
     if (info.cambio === 'cant_nota') {
       if (this.tipoNota === 'credito') {
-        console.log(`${entidad.cant_nota} > ${entidad.cant} = ${entidad.cant_nota > entidad.cant}`);
-
         if (entidad.cant_nota > entidad.cant) {
           this.dbServ.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
           this.tablas.enfocarInput('inputNu-' + info.index);
@@ -167,27 +175,29 @@ export class NotasCredDebComponent implements OnInit {
           }, 5);
         } else if (isNaN(entidad.cant_nota)) {
           this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
+          this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
           this.sumarTotal();
         } else {
           this.sumarTotal();
+          const total = entidad.cant_nota * entidad.precio;
+          entidad.total_nota = this.formatoNumero(total);
         }
       } else {
-        console.log(`${entidad.cant_nota} < ${entidad.cant} = ${entidad.cant_nota < entidad.cant}`);
-        if (entidad.cant_nota < entidad.cant) {
-          this.dbServ.toastError('Nota de débito no puede ser menor a la factura original', 'ERROR');
-          this.tablas.enfocarInput('inputNu-' + info.index);
-          setTimeout(() => {
-            this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
-          }, 5);
-        } else {
-          this.sumarTotal();
+        if (isNaN(entidad.cant_nota)) {
+          this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
+          this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
         }
+        this.sumarTotal();
+        const total = entidad.cant_nota * entidad.precio;
+        entidad.total_nota = this.formatoNumero(total);
       }
     }
+
     if (info.cambio === 'select') {
       if (!info.value) {
         this.detalleFacturas[info.index].select = false;
         this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
+        this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
 
         const i = this.detalleNota.indexOf(info.body[info.index]);
         _.pullAt(this.detalleNota, i);
@@ -208,5 +218,36 @@ export class NotasCredDebComponent implements OnInit {
   }
   formatoFecha(fecha) {
     return moment(fecha).format('DD/MM/YYYY');
+  }
+  abrirModal(arg?) {
+    if (arg) {
+      this.mServ.ModalSeleccion(arg);
+    }
+    this.mServ.mostrarModal(true);
+  }
+  // =============================================
+  //  MODAL CANCELAR
+  // =============================================
+  cancelarFactura() {
+    this.mServ.modalTipo('cancelar');
+    this.tipoModal = 'cancelar';
+    this.abrirModal();
+  }
+  // =============================================
+  //  MODAL IMPRIMIR
+  // =============================================
+  imprimirFactura() {
+    if (this.detalleNota.length === 0) {
+      this.dbServ.toastWarning('Nota de ' + this.tipoNota + ' no puede estar vacía.', 'Aviso');
+    } else {
+      if (this.TOTAL === 0) {
+        this.dbServ.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
+      } else {
+        const obj = { total_factura: this.TOTAL, devuelta: 0 };
+        this.mServ.modalTipo('cambio');
+        this.tipoModal = 'cambio';
+        this.abrirModal(obj);
+      }
+    }
   }
 }
