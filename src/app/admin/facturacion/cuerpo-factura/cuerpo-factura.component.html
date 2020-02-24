@@ -37,6 +37,10 @@
         <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
           <tbody>
             <tr>
+              <td *ngIf="propietario" class="btnQuitarRow" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
+                <!-- <div class="hoverZone"></div> -->
+                <i class="fas fa-ban text-red btnBorrar" (click)="modalRemover(i)"></i>
+              </td>
               <!--  ::::::::::::  CODIGO  ::::::::::::  -->
               <td class="COD td0padding">
                 <div class="from-group">

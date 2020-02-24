@@ -39,7 +39,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   listaDeDescuentos = [];
 
   sacos = [25, 50, 100];
-
+  indexRemove;
   @Input() propietario;
   @Input() metodo;
   @Input() listaArticulos;
@@ -50,7 +50,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   @Output() sendCalculos = new EventEmitter<any>();
   @Output() sendDescuento = new EventEmitter<any>();
   @Output() getCuerpoFactura = new EventEmitter<any>();
-
+  subDeci: Subscription;
+  subObj: Subscription;
+  subEsc: Subscription;
+  subInde: Subscription;
+  tipoModal: string;
   constructor(private dbServ: DBservice, private mServ: ModalService, private fb: FormBuilder, private route: ActivatedRoute) {
     // this.rowFactura = new FormArray([new FormControl()]);
   }
@@ -78,19 +82,25 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     //   }),
     // )
 
-    this.mServ.OBJDEVUELTO.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+      console.log(res);
+      if (this.tipoModal === 'removerArticulo' && res) {
+        this.procesoQuitarArticulo();
+      }
+    });
+    this.subObj = this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res !== undefined && res !== null && res.tipoModal === 'buscar') {
         this.clickRowModal(res);
       }
     });
 
-    this.mServ.PRESSESC.subscribe(res => {
+    this.subEsc = this.mServ.PRESSESC.subscribe(res => {
       if (res !== undefined && res !== null) {
         this.enfocarInput('cod-' + res);
       }
     });
 
-    this.mServ.INDEXTOFOCUS.subscribe(res => {
+    this.subInde = this.mServ.INDEXTOFOCUS.subscribe(res => {
       if (res !== undefined && res !== null) {
         this.noArticuloEncontrado(res);
       }
@@ -129,9 +139,18 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   ngOnDestroy() {
     this.RESETCUERPO();
+    this.subDeci.unsubscribe();
+    this.subObj.unsubscribe();
+    this.subEsc.unsubscribe();
+    this.subInde.unsubscribe();
   }
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
+  }
+  async procesoQuitarArticulo() {
+    await this.removeItem(this.indexRemove);
+    await this.calculosTotalesGenerales();
+    await this.disminuirSecuencia();
   }
   ngOnChanges() {}
 
@@ -148,6 +167,25 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       res = false;
     }
     return res;
+  }
+
+  ModificarClass(item, clase, action) {
+    if (action === 'add') {
+      document.getElementById(item).classList.add(clase);
+    } else {
+      document.getElementById(item).classList.remove(clase);
+    }
+  }
+
+  selectedRow(i, bool) {
+    const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i, 'desc-' + i, 'pre-' + i, 'tot-' + i];
+    lista.forEach(row => {
+      if (bool) {
+        this.ModificarClass(row, 'inputOscuro', 'add');
+      } else {
+        this.ModificarClass(row, 'inputOscuro', 'remove');
+      }
+    });
   }
   // =============================================
   //  RESETEAR FORMULARIO
@@ -395,6 +433,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.inputDrop = 'uni-' + this.secuencia;
     this.drop = false;
   }
+  disminuirSecuencia() {
+    this.secuencia--;
+    this.inputSecuencia = 'cod-' + this.secuencia;
+    this.inputDrop = 'uni-' + this.secuencia;
+    this.drop = false;
+  }
 
   verificarRow(arg) {
     this.inputDrop = 'uni-' + arg;
@@ -631,6 +675,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       return o.fila === obj.fila;
     });
 
+
+
+
+    
+
     if (index !== -1) {
       this.listaDeDescuentos[index] = obj;
     } else {
@@ -663,7 +712,19 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.sendCalculos.emit(obj);
     }
   }
+  modalRemover(i) {
+    const name = (this.control.controls[i] as any).controls['des'].value;
+    const unidad = (this.control.controls[i] as any).controls['uni'].value;
+    const obj = { nombre: name + ' (' + unidad + ')' };
 
+    if (name) {
+      this.tipoModal = 'removerArticulo';
+      this.indexRemove = i;
+      this.mServ.modalTipo('removerArticulo');
+      this.mServ.ModalSeleccion(obj);
+      this.mServ.mostrarModal(true);
+    }
+  }
   // =============================================
   //  MODAL PARA FILTRAR ARTICULOS
   // =============================================

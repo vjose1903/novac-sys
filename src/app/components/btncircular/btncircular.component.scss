@@ -8,7 +8,7 @@
 }
 .imgBtn {
   ~ .labelBtn {
-    transform: translate(0.2rem, -3rem) scale(0);
+    transform: translate(2rem, 0rem) scale(0);
   }
 
   filter: grayscale(50%);
@@ -16,7 +16,7 @@
     filter: grayscale(0%);
     cursor: pointer;
     ~ .labelBtn {
-      transform: translate(0.2rem, 0rem) scale(1);
+      transform: translate(1.2rem, 0.3rem) scale(1);
     }
   }
 

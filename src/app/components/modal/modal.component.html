@@ -185,6 +185,30 @@
         <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
       </p-footer>
     </p-dialog>
+    <!-- ================================================================================================================================ -->
+    <!--  REMOVER ARTICULO FACTURA-->
+    <!-- ================================================================================================================================ -->
+
+    <p-dialog
+      *ngIf="tipoModal === 'removerArticulo'"
+      header="Confirmar"
+      [(visible)]="showModal"
+      [modal]="false"
+      [responsive]="true"
+      [style]="{ width: '350px', minWidth: '200px' }"
+      [minY]="70"
+      [baseZIndex]="10000"
+      (onHide)="reinicioModal()"
+      blockScroll="true"
+    >
+      <p>
+        Seguro que desea remover el articulo <b class="text-bold">{{ seleccionModal.nombre }}</b> de la factura
+      </p>
+      <p-footer>
+        <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
+        <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      </p-footer>
+    </p-dialog>
 
     <!-- ================================================================================================================================ -->
     <!--  IMPRIMIR  FACTURA-->
