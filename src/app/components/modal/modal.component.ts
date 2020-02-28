@@ -23,6 +23,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
         setTimeout(() => {
           this.mServ.pressEsc(undefined);
         }, 1000);
+      } else {
+        this.mServ.pressEsc({});
       }
     }
   }

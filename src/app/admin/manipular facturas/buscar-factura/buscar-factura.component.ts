@@ -18,6 +18,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   campoSelected: string;
   sub: Subscription;
   subDeci: Subscription;
+  subEsc: Subscription;
   clienteBuscado: any;
   listaClientes: unknown;
   facturaSelected: any;
@@ -81,6 +82,15 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.BuscarPara = this.route.snapshot.params['para'];
     this.completarTituloPag();
 
+    this.subEsc = this.mServ.PRESSESC.subscribe(res => {
+      console.log('press esc');
+      
+      if (res !== undefined && res !== null) {
+
+        this.enfocarInput('valorI' );
+      }
+    });
+
     this.sub = this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res && res.tipoModal === 'buscarCliente') {
         console.log(res);
@@ -133,6 +143,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.sub.unsubscribe();
     this.subDeci.unsubscribe();
+    this.subEsc.unsubscribe();
   }
 
   async necesarioStart() {
