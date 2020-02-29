@@ -14,8 +14,12 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class AppComponent implements OnInit, AfterViewInit {
   loading = false;
+  noServer = false;
+  constructor(private dbServ: DBservice, private loaderServ: LoaderService, private spinner: NgxSpinnerService, private cdRef: ChangeDetectorRef, public electronService: ElectronService) {
+    setInterval(() => {
+      this.buscarNoServer();
+    }, 20000);
 
-  constructor(private loaderServ: LoaderService, private spinner: NgxSpinnerService, private cdRef: ChangeDetectorRef, public electronService: ElectronService) {
     this.loaderServ.isLoading.subscribe(v => {
       setTimeout(() => {
         // this.loading = true;
@@ -30,7 +34,26 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
   }
 
+  buscarNoServer() {
+    this.dbServ.getTipoArticuloById(1).subscribe(
+      res => {
+        if (this.noServer) {
+          window.location.reload();
+        }
+        this.noServer = false;
+      },
+      err => {
+        if (err.status === 0) {
+          this.noServer = true;
+        } else {
+          this.noServer = false;
+        }
+      },
+    );
+  }
+
   ngOnInit(): void {
+    this.buscarNoServer();
     // this.dbServ.getSecuenciaFacturas().subscribe(res => {
     //   this.obsServ.next_secuencia_factura(res);
     // });

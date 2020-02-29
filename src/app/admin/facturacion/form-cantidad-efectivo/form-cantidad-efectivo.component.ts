@@ -12,6 +12,7 @@ import * as _ from 'lodash';
   styleUrls: ['./form-cantidad-efectivo.component.scss'],
 })
 export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
+  @Input() tipo = 'devuelta';
   @Input() data;
   element: any;
   devuelta;
@@ -27,7 +28,9 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.enfocarInput('inputEfectivo');
+      if (this.tipo === 'devuelta') {
+        this.enfocarInput('inputEfectivo');
+      }
     }, 250);
   }
 

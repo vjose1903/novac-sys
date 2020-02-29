@@ -53,19 +53,19 @@ export class HomeComponent implements OnInit {
           this.errorC = 'contraseña invalida';
           this.errorU = '';
         } else {
-          this.mostrarErrores(err.error.errors)
+          this.mostrarErrores(err.error.errors);
         }
       },
     );
   }
 
-
   mostrarErrores(arg) {
+    console.log('---------------');
+
     for (const error in arg) {
       if (arg.hasOwnProperty(error)) {
-
         const element = arg[error];
-        
+
         this.dbServ.toastError(element, 'Error');
       }
     }

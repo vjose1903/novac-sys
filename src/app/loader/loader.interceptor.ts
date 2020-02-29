@@ -20,7 +20,17 @@ export class LoaderInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     this.requests.push(req);
-    this.loaderService.isLoading.next(true);
+    // check if you have the parameter 'spinner'
+    const spinner = req.params.get('spinner');
+
+    if (spinner && spinner === 'no') {
+      // remove parameter
+      req.params.delete('spinner');
+    } else {
+      // Execute interceptor
+      this.loaderService.isLoading.next(true);
+    }
+
     // tslint:disable-next-line: deprecation
     return Observable.create(observer => {
       const subscription = next.handle(req).subscribe(

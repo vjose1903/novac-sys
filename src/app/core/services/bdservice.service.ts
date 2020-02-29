@@ -14,6 +14,7 @@ export class DBservice {
 
   constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}
   peticion(ruta: string, metodo: string, json?: string): Observable<any> {
+    const xhttp = new XMLHttpRequest();
     if (metodo === 'get' || metodo === 'delete') {
       return this.http[metodo](`${this.url}/${ruta}`, {
         headers: {
@@ -32,6 +33,41 @@ export class DBservice {
       });
     }
   }
+
+  peticionSinLoad(ruta: string, metodo: string, json?: string): Observable<any> {
+    // set obs true
+    if (metodo === 'get' || metodo === 'delete') {
+      return this.http[metodo](`${this.url}/${ruta}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + this.getAuthToken(),
+          Accept: 'Application/json',
+        },
+        params: { spinner: 'no' },
+      }).pipe(
+        map(val => {
+          // set obs false
+
+          return val;
+        }),
+      );
+    } else {
+      return this.http[metodo](`${this.url}/${ruta}`, json || '', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + this.getAuthToken(),
+          Accept: 'Application/json',
+        },
+        params: { spinner: 'no' },
+      }).pipe(
+        map(val => {
+          // set obs false
+          return val;
+        }),
+      );
+    }
+  }
+
   getAuthToken() {
     return localStorage.getItem('token') || '';
   }
@@ -78,6 +114,9 @@ export class DBservice {
   // =====================================================================
   // CLIENTES
   // =====================================================================
+  getClienteById(id) {
+    return this.peticion(`clientes/${id}`, 'get');
+  }
   getClientes() {
     return this.peticion('clientes', 'get');
   }
@@ -161,6 +200,9 @@ export class DBservice {
   }
   getArticulosByDate(date) {
     return this.peticion(`articulos/historico/${date}/0`, 'get');
+  }
+  getTipoArticuloById(id) {
+    return this.peticionSinLoad(`tipo_articulos/${id}`, 'get');
   }
   getTipoArticulos() {
     return this.peticion('tipo_articulos', 'get');

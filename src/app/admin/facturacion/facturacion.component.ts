@@ -740,6 +740,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['itbis'] = GLOBAL.redondearAdos(this.ITBIS);
     cabecera_fact['descuento'] = GLOBAL.redondearAdos(this.DESCUENTO);
     cabecera_fact['estado'] = true;
+    cabecera_fact['is_nota'] = false;
     cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
     if (this.metodo === 'venta') {
       if (this.propietario_factura && this.propietario_factura.id === 1) {

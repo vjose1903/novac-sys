@@ -16,6 +16,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   tituloModal;
   lugar: any;
   identificadorFact: any;
+  tipoDevuelta: any;
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       if (this.tipoModal === 'buscar') {
@@ -96,6 +97,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
 
         if (this.tipoModal === 'mostrarFactura' && res) {
           this.lugar = res.mostrarFacturaPara;
+        }
+        if (this.tipoModal === 'cambio' && res) {
+          if (this.seleccionModal.tipo__) {
+            this.tipoDevuelta = this.seleccionModal.tipo__;
+          }
         }
       }
     });

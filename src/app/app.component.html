@@ -4,6 +4,9 @@
     CARGANDO ...
   </span>
 </div>
+<div id="fondoC" *ngIf="noServer" class="h-100 w-100 position-absolute backnegro">
+  <span [ngClass]="{'letraLogin': true}" >El servidor está caido no puede realizar ninguna accion.</span>
+</div>
 <router-outlet></router-outlet>
 
 <!-- <ngx-spinner size="large" bdOpacity="0.9" [fullScreen]="true" type="ball-atom" color="#95f0a7">
