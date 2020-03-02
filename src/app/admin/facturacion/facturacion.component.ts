@@ -347,7 +347,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       } else {
         this.CostoYgasto = valor;
         if (this.condicion_fact === 'Contado') {
-          this.enfocarInput(campo);
+          const enfocar = this.metodo === 'compra' && campo === 'pago' ? 'ncf' : campo;
+          this.enfocarInput(enfocar);
         } else {
           if (this.metodo === 'venta') {
             this.enfocarInput('nom');
@@ -759,7 +760,15 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     if (this.metodo === 'compra') {
       cabecera_fact['suplidor_id'] = this.form.controls.id.value;
-      cabecera_fact['detalle_facturas_attributes'] = this.revisarPrecios(cabecera_fact['detalle_facturas_attributes']);
+      const newPrecios = this.revisarPrecios(cabecera_fact['detalle_facturas_attributes']);
+      if (newPrecios !== cuerpo_fact) {
+        this.dbServ.toastWarning('cambios en los cuerpos de facturas', 'AVISO');
+        console.log('nuevo cuerpo ', newPrecios);
+        console.log('cuerpo actual ', cuerpo_fact);
+      } else {
+        this.dbServ.toastSuccess('no hay cambios', 'AVISO');
+      }
+      cabecera_fact['detalle_facturas_attributes'];
     }
 
     if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
@@ -767,26 +776,26 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
     // console.log(cabecera_fact);
 
-    this.dbServ.createFacturas(cabecera_fact).subscribe(
-      res => {
-        console.log(res);
-        this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-          console.log('printRes=====> ', res);
+    // this.dbServ.createFacturas(cabecera_fact).subscribe(
+    //   res => {
+    //     console.log(res);
+    //     this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+    //       console.log('printRes=====> ', res);
 
-          if (res.status) {
-            this.CancelarFactura();
-            this.GetArticulos();
-            this.dbServ.toastSuccess(res.msg, 'CORRECTO');
-          } else {
-            this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-          }
-        });
-        res['FACTURA_DE'] = this.metodo;
-        // this._ipc.send('print', res);
-      },
-      err => {
-        this.dbServ.toastError(err.statusText, 'ERROR');
-      },
-    );
+    //       if (res.status) {
+    //         this.CancelarFactura();
+    //         this.GetArticulos();
+    //         this.dbServ.toastSuccess(res.msg, 'CORRECTO');
+    //       } else {
+    //         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+    //       }
+    //     });
+    //     res['FACTURA_DE'] = this.metodo;
+    //     // this._ipc.send('print', res);
+    //   },
+    //   err => {
+    //     this.dbServ.toastError(err.statusText, 'ERROR');
+    //   },
+    // );
   }
 }

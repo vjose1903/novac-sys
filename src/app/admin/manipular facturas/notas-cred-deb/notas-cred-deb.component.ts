@@ -306,7 +306,17 @@ export class NotasCredDebComponent implements OnInit {
       for (let i = 0; i < this.detalleFacturas.length; i++) {
         const element = this.detalleFacturas[i];
         if (element.select) {
-          temp.push(element);
+          const fila = {
+            articulo_id: element.id,
+            cantidad: element.cantidad,
+            total: GLOBAL.desformatear(element.total),
+            descuento: element.descuento ? (element.descuento !== null ? element.descuento : 0) : 0,
+            itbis: 0,
+            unidad: element.unidad,
+            precio: GLOBAL.desformatear(element.precio),
+          };
+
+          temp.push(fila);
         }
       }
       console.log(temp);
@@ -357,6 +367,7 @@ export class NotasCredDebComponent implements OnInit {
     cabecera_fact['FACTURA_DE'] = null;
     cabecera_fact['tipo'] = 'nota_' + this.tipoNota;
     cabecera_fact['user_id'] = empleado.id;
+    cabecera_fact['aplicada_a'] = this.factura_aplicada;
 
     if (this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;

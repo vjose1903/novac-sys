@@ -122,6 +122,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             fila.itbis = 0;
             fila.unidad = fila.uni;
             fila.precio = GLOBAL.desformatear(fila.pre);
+            fila.costo = GLOBAL.desformatear(fila.costo);
             let lol;
             if (this.metodo === 'venta') {
               lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'desc', 'tot', 'costo', 'secuencia']);
@@ -382,21 +383,22 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   articulo_detallable(art) {
     const precioQuintal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
+    const costoQuintal = art.costo_principal;
     this.drop = true;
     this.UnidadesArticulo = [];
 
     if (this.metodo === 'venta') {
-      if (art.descripcion !== 'Veterinaria') {
-        this.entrarSacosAUnidades(precioQuintal);
+      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
+        this.entrarSacosAUnidades(precioQuintal, costoQuintal);
       }
     } else {
-      if (art.descripcion !== 'Veterinaria') {
+      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
         this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
         this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
       }
     }
 
-    if (art.descripcion === 'Veterinaria') {
+    if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
       this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
     }
@@ -408,10 +410,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   articulo_no_detallable(art) {
     const precioQuintal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
+    const costoQuintal = art.costo_principal;
     this.drop = true;
     this.UnidadesArticulo = [];
 
-    if (art.descripcion === 'Veterinaria') {
+    if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
       this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
     }
@@ -421,8 +424,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
           this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
         }
       }
-      if (art.descripcion !== 'Veterinaria') {
-        this.entrarSacosAUnidades(precioQuintal);
+      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
+        this.entrarSacosAUnidades(precioQuintal, costoQuintal);
       }
     });
   }
@@ -454,11 +457,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const splitUnidad = _.split(unidad, ' ');
     let unidad_ = splitUnidad[0];
     unidad = splitUnidad[0];
-
-    if (unidad_ === 'Saco' || unidad_ === 'Libra') {
-      unidad_ = 'Libra';
-    } else {
-      unidad_ = 'Unidad';
+    if (this.metodo === 'venta') {
+      if (unidad_ === 'Saco' || unidad_ === 'Libra') {
+        unidad_ = 'Libra';
+      } else {
+        unidad_ = 'Unidad';
+      }
     }
 
     for (let index = 0; index < this.control.controls.length; index++) {
@@ -496,6 +500,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (lugar === 'saltar') {
       i--;
     }
+    console.log('unidad_ ', unidad_);
+    console.log('cantidades ', cantidades);
 
     console.log('vendiendo ', cantidad, ' en inventario tengo ', cantidades[unidad_]);
 
@@ -515,6 +521,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.precioDetalle = this.UnidadesArticulo[indiceDetalle].precio;
     const costoDetalle = this.UnidadesArticulo[indiceDetalle].costo;
     const unidad = this.UnidadesArticulo[indiceDetalle].value;
+
+    console.log('indiceDetalle ', indiceDetalle);
+    console.log('UnidadesArticulo ', this.UnidadesArticulo);
+    console.log('precioDetalle ', this.precioDetalle);
+    console.log('costoDetalle ', costoDetalle);
+    console.log(' unidad ', unidad);
 
     const execede = this.checkCantidadExede(i, unidad, 'change');
 
@@ -675,11 +687,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       return o.fila === obj.fila;
     });
 
-
-
-
-    
-
     if (index !== -1) {
       this.listaDeDescuentos[index] = obj;
     } else {
@@ -736,10 +743,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     } else {
       obj.listaArticulos = this.listaArticulos.filter(articulo => articulo.suplidor_id === this.propietario.id);
     }
-    console.log('###############');
-    console.log('###############');
-
-    console.log(obj);
 
     this.mServ.modalTipo('buscar');
     this.mServ.ModalSeleccion(obj);
@@ -790,11 +793,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.enfocarInput(sigInput);
   }
 
-  entrarSacosAUnidades(precioQuintal) {
+  entrarSacosAUnidades(precioQuintal, costoQuintal) {
     this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
     this.sacos.forEach(saco => {
       const valor = 'Saco de ' + saco + ' libras';
-      this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioQuintal) });
+      this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioQuintal), costo: this.calcularPrecioSaco(saco, costoQuintal) });
     });
   }
 
