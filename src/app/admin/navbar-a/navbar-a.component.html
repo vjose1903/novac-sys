@@ -27,9 +27,9 @@
         <!-- ultimo -->
 
         <div [ngClass]="actualTab == 'nota' ? 'subMenuFacturaA' : 'subMenuFactura'">
-          <h4 class="opcion" (click)="navegar('buscarFactura','nota_credito')">Nota de Crédito</h4>
-          <h4 class="opcion" (click)="navegar('buscarFactura','nota_debito')">Nota de Débito</h4>
-          <h4 class="opcion" (click)="navegar('buscarFactura','cancelar_factura')">Anular factura</h4>
+          <h4 class="opcion" (click)="navegar('buscarFactura', 'nota_credito')">Nota de Crédito</h4>
+          <h4 class="opcion" (click)="navegar('buscarFactura', 'nota_debito')">Nota de Débito</h4>
+          <h4 class="opcion" (click)="navegar('buscarFactura', 'cancelar_factura')">Anular factura</h4>
         </div>
       </div>
 
@@ -67,8 +67,8 @@
 
   <mat-sidenav-content>
     <mat-toolbar class="d-flex justify-content-between">
-      <div class="">
-        <div id="botonMenu" *ngIf="drawer._animationState == 'void'" title="Mostrar Menu" data-toggle="Tooltip" (click)="drawer.toggle()"><i class="fas fa-bars"></i></div>
+      <div *ngIf="drawer._animationState == 'void'" title="Mostrar Menu" data-toggle="Tooltip" (click)="drawer.toggle()" id="botonMenu" class="">
+        <i class="fas fa-bars m-0 p-0"></i>
       </div>
 
       <!-- ============================================================================================ -->
