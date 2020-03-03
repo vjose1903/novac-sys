@@ -363,7 +363,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
     // ================================================
     if (this.paraFiltroArticulos) {
-      this.searchText = this.paraFiltroArticulos;
+      this.searchText = await this.paraFiltroArticulos;
       setTimeout(() => {
         this.searchItems();
         if (this.data.length === 0) {
@@ -372,7 +372,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       }, 50);
     }
     if (this.paraFiltroClientes) {
-      this.searchText = this.paraFiltroClientes;
+      this.searchText = await this.paraFiltroClientes;
       await setTimeout(() => {
         this.searchItems();
         if (this.data.length === 0) {

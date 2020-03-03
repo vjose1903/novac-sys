@@ -83,7 +83,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     // )
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
-      console.log(res);
       if (this.tipoModal === 'removerArticulo' && res) {
         this.procesoQuitarArticulo();
       }
@@ -485,7 +484,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
           if (splitUnidadF.length > 1) {
             cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
           }
-          console.log('cantidadF', cantidadF);
         }
         if (unity === 'Saco') {
           unity = 'Libra';
@@ -531,6 +529,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const execede = this.checkCantidadExede(i, unidad, 'change');
 
     if (!execede) {
+      
+      console.log('this.precioDetalle', this.precioDetalle);
+      console.log('costoDetalle', costoDetalle);
       (this.control.controls[i] as any).controls['uni'].setValue(unidad);
       (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
       (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);

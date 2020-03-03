@@ -87,8 +87,11 @@ export class GLOBAL {
   static redondearAdos(num) {
     const string = num + '';
     const splitStr = _.split(string, '.');
+
     let enteros = splitStr[0];
+
     const splitEnteros = _.split(enteros, ',');
+
     enteros = _.join(splitEnteros, '');
 
     let tempdecimales = splitStr[1];
@@ -99,15 +102,16 @@ export class GLOBAL {
     const decimales = tempdecimales.substring(0, 2);
     const Arreglo = [enteros, decimales];
     const numStr = _.join(Arreglo, '.');
+
     return parseFloat(numStr).toFixed(2);
   }
 
   static desformatear(sTnum) {
     let temp = 0;
 
-    if (sTnum !== null) {
-      if (sTnum !== undefined) {
-        const x = sTnum.split(',');
+    if (sTnum) {
+      if (!isNaN(sTnum)) {
+        const x = _.split(sTnum, ',');
         if (x.length === 1) {
           temp += parseFloat(x[0]);
           return temp;
@@ -115,9 +119,10 @@ export class GLOBAL {
           let joined = '';
           joined = _.join(x, '');
           temp += parseFloat(joined);
-
           return temp;
         }
+      } else {
+        return sTnum;
       }
     } else {
       return sTnum;
