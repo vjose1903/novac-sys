@@ -34,6 +34,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   @ViewChild(MdbTableDirective, { static: false }) mdbTable: MdbTableDirective;
   cantiTootip: string;
+  ready = false;
 
   @HostListener('input') oninput() {
     this.searchItems();
@@ -68,7 +69,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   searchText = '';
   @Input() ROW = 'row-';
   NUM = 0;
-  IDROW;
+  IDROW = 'row-0';
 
   medidas = {
     Libra: 'Libras',
@@ -97,7 +98,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() seleccionado = -1;
   @Input() focusRow = false;
   @Input() filtroSelect: any;
-  @Input() data: any[] = [];
+  @Input() data;
   @Input() scrollContainer;
   @Input() colores = false;
 
@@ -112,6 +113,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice) {}
 
   ngOnInit() {
+    this.necesarioStart();
+
     // if (this.search) {
     //   setTimeout(() => {
     //     this.element = document.getElementById('search') as HTMLElement;
@@ -119,6 +122,47 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     //   }, 5);
     // }
   }
+
+  async necesarioStart() {
+    if (this.focusRow) {
+      this.IDROW = this.ROW + _.toString(this.NUM);
+    }
+
+    await this.setDATATABLE();
+
+    if (this.paraFiltroArticulos) {
+      this.searchText = await this.paraFiltroArticulos;
+      await this.searchItems();
+      if (this.data.length === 0) {
+        this.noArticulo.emit();
+      }
+    }
+
+    if (this.paraFiltroClientes) {
+      this.searchText = await this.paraFiltroClientes;
+      await this.searchItems();
+      if (this.data.length === 0) {
+        this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO');
+      }
+    }
+    // ================================================
+
+    for (let i = 0; i < this.info.length; i++) {
+      const info = this.info[i];
+      if (info.customClass) {
+        for (let j = 0; j < info.estilos.length; j++) {
+          const estilos = info.estilos[j];
+          const key = Object.keys(estilos)[0];
+          const value = Object.values(estilos)[0];
+          const columna = document.getElementById(info.titulo) as any;
+          columna.style[key] = value;
+        }
+      }
+    }
+    // ================================================
+    this.ready = true;
+  }
+
   ngOnDestroy() {
     this.entrar = 0;
     this.ROW = 'row-';
@@ -306,17 +350,20 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   ngOnChanges(simpleChanges) {
-    if (simpleChanges['data'].firstChange === false) {
-      this.waitForChange();
-    }
+    // if (simpleChanges['data'].firstChange === false) {
+    //   this.waitForChange();
+    // }
   }
 
   async waitForChange() {
     await this.setDATATABLE();
   }
 
-  searchItems() {
-    const prev = JSON.parse(JSON.stringify(this.previous));
+  async searchItems() {
+    const temp = GLOBAL.duplicarJson(this.ROW + '0');
+    this.IDROW = null;
+
+    const prev = await this.mdbTable.getDataSource();
 
     if (!this.searchText) {
       this.mdbTable.setDataSource(this.previous);
@@ -327,63 +374,40 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       this.data = this.mdbTable.searchLocalDataBy(this.searchText);
       this.mdbTable.setDataSource(prev);
     }
+    setTimeout(() => {
+      this.IDROW = temp;
+    }, 250);
   }
+  // ===================================================
+  //  Setear data en las tablas para busqueda
+  // ===================================================
+  llenarArreglos() {
+    for (let i = 0; i < this.data.length; i++) {
+      const element = this.data[i];
 
-  setDATATABLE() {
-    this.elements = [];
-    this.previous = [];
-
-    this.data.forEach(element => {
       this.elements.push(element);
       this.previous.push(element);
-    });
-
-    if (this.elements !== undefined) {
+    }
+  }
+  setearDataEnLaTabla() {
+    if (this.elements) {
       this.mdbTable.setDataSource(this.elements);
     }
+  }
+  actualizarArreglos() {
     this.elements = this.mdbTable.getDataSource();
     this.previous = this.mdbTable.getDataSource();
   }
 
+  async setDATATABLE() {
+    this.elements = [];
+    this.previous = [];
+    await this.llenarArreglos();
+    await this.setearDataEnLaTabla();
+    await this.actualizarArreglos();
+  }
+
   async ngAfterViewInit() {
-    await this.setDATATABLE();
-    // ================================================
-
-    for (let i = 0; i < this.info.length; i++) {
-      const info = this.info[i];
-      if (info.customClass) {
-        for (let j = 0; j < info.estilos.length; j++) {
-          const estilos = info.estilos[j];
-          const key = Object.keys(estilos)[0];
-          const value = Object.values(estilos)[0];
-          const columna = document.getElementById(info.titulo) as any;
-          columna.style[key] = value;
-        }
-      }
-    }
-    // ================================================
-    if (this.paraFiltroArticulos) {
-      this.searchText = await this.paraFiltroArticulos;
-      setTimeout(() => {
-        this.searchItems();
-        if (this.data.length === 0) {
-          this.noArticulo.emit();
-        }
-      }, 50);
-    }
-    if (this.paraFiltroClientes) {
-      this.searchText = await this.paraFiltroClientes;
-      await setTimeout(() => {
-        this.searchItems();
-        if (this.data.length === 0) {
-          this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO');
-        }
-      }, 50);
-    }
-    if (this.focusRow) {
-      this.IDROW = this.ROW + _.toString(this.NUM);
-    }
-
     // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
     // this.mdbTablePagination.calculateFirstItemIndex();
     // this.mdbTablePagination.calculateLastItemIndex();
@@ -443,7 +467,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     if (this.entrar > 1) {
       const element = document.getElementById(arg) as any;
       element.click();
-      // this.reinicioModal.emit();
     }
   }
 }

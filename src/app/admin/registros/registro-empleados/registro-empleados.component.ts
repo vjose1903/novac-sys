@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './registro-empleados.component.html',
   styleUrls: ['./registro-empleados.component.scss'],
 })
-export class RegistroEmpleadosComponent implements OnInit , OnDestroy{
+export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
   form: FormGroup;
   titulo = '';
   boton = '';
@@ -48,7 +48,7 @@ export class RegistroEmpleadosComponent implements OnInit , OnDestroy{
     borrar: true,
     editar: true,
   };
-  listaEmpleados: any;
+  listaEmpleados;
   tipoModal: string;
   indexSeleccionado: any;
   editando = false;

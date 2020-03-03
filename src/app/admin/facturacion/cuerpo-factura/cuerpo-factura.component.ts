@@ -239,7 +239,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   element: any;
 
-  saltar(e, input, i) {
+  async saltar(e, input, i) {
     const sigInput = input + i;
 
     if (i >= 10 && input === 'cod-') {
@@ -297,14 +297,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     if (input === 'can-' && codigo !== '') {
       codigo = _.parseInt(codigo);
-
       if (_.isInteger(codigo)) {
         codigo = (this.control.controls[i] as any).controls['cod'].value;
         this.buscarArticuloPorCodigo(i, codigo, input);
         this.enfocarInput(sigInput);
       } else {
-        this.element = document.getElementById('can-' + i) as HTMLElement;
-        this.element.blur();
+        await this.desEnfocarInput('cod-' + i);
+
         codigo = (this.control.controls[i] as any).controls['cod'].value;
         if (codigo === null) {
           this.enfocarInput('cod-' + i);
@@ -498,10 +497,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (lugar === 'saltar') {
       i--;
     }
-    console.log('unidad_ ', unidad_);
-    console.log('cantidades ', cantidades);
+    // console.log('unidad_ ', unidad_);
+    // console.log('cantidades ', cantidades);
 
-    console.log('vendiendo ', cantidad, ' en inventario tengo ', cantidades[unidad_]);
+    // console.log('vendiendo ', cantidad, ' en inventario tengo ', cantidades[unidad_]);
 
     if (this.metodo === 'venta' && cantidad > cantidades[unidad_]) {
       this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
@@ -520,18 +519,17 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const costoDetalle = this.UnidadesArticulo[indiceDetalle].costo;
     const unidad = this.UnidadesArticulo[indiceDetalle].value;
 
-    console.log('indiceDetalle ', indiceDetalle);
-    console.log('UnidadesArticulo ', this.UnidadesArticulo);
-    console.log('precioDetalle ', this.precioDetalle);
-    console.log('costoDetalle ', costoDetalle);
-    console.log(' unidad ', unidad);
+    // console.log('indiceDetalle ', indiceDetalle);
+    // console.log('UnidadesArticulo ', this.UnidadesArticulo);
+    // console.log('precioDetalle ', this.precioDetalle);
+    // console.log('costoDetalle ', costoDetalle);
+    // console.log(' unidad ', unidad);
 
     const execede = this.checkCantidadExede(i, unidad, 'change');
 
     if (!execede) {
-      
-      console.log('this.precioDetalle', this.precioDetalle);
-      console.log('costoDetalle', costoDetalle);
+      // console.log('this.precioDetalle', this.precioDetalle);
+      // console.log('costoDetalle', costoDetalle);
       (this.control.controls[i] as any).controls['uni'].setValue(unidad);
       (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
       (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
@@ -545,6 +543,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
   }
 
+  desEnfocarInput(arg) {
+    this.element = document.getElementById(arg) as HTMLElement;
+    this.element.blur();
+  }
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();

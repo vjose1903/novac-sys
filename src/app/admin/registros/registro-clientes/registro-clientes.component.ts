@@ -26,7 +26,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   articuloSelected;
 
   vendersePorSelected;
-  listaClientes = [];
+  listaClientes;
   FORM: any;
   listaTipoArticulos: any;
 

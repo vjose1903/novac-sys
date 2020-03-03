@@ -27,7 +27,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   articuloSelected;
 
   vendersePorSelected;
-  listaArticulos = [];
+  listaArticulos;
   FORM: any;
   listaTipoArticulos: any;
   listaSuplidores: any;
