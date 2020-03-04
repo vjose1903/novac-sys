@@ -39,10 +39,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @HostListener('input') oninput() {
     this.searchItems();
   }
-
-  key;
   element: HTMLElement;
   entrar = 0;
+
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
     // arriba 38
@@ -50,13 +49,13 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     setTimeout(() => {
       if (this.focusRow) {
-        this.key = event.keyCode;
-        if (this.key === 38) {
+        const key = event.keyCode;
+        if (key === 38) {
           event.stopPropagation();
           this.ARRIBA();
-        } else if (this.key === 40) {
+        } else if (key === 40) {
           this.ABAJO();
-        } else if (this.key === 13) {
+        } else if (key === 13) {
           this.ENTER(this.IDROW);
         }
       }
@@ -424,7 +423,11 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
 
     if (this.metodo === 'venta' && this.paraFiltroArticulos !== null && arg.existencia === 0) {
-      this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+      if (arg.descripcion === 'Producto terminado') {
+        this.dbServ.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
+      } else {
+        this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+      }
     } else {
       this.clickRow.emit(arg);
       this.reinicioModal.emit();

@@ -64,30 +64,32 @@
     </div>
   </div>
   <div class="col-12">
-    <table class="table" mdbTable small="true">
-      <thead class="">
-        <tr>
-          <th>#</th>
-          <th>Articulo</th>
-          <th class="text-right">Cantidad</th>
-          <th class="text-right">Unidad</th>
-          <th class="text-right">{{ factura.tipo === 'compra' ? 'Costo' : 'Precio' }}</th>
-          <th class="text-right">Itbis</th>
-          <th class="text-right">Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let row of factura.detalle_facturas; let i = index">
-          <td>{{ i + 1 }}</td>
-          <td>{{ row.descripcion }}</td>
-          <td class="text-right">{{ formatoNumero(row.cantidad) }}</td>
-          <td class="text-right">{{ row.unidad }}</td>
-          <td class="text-right">{{ factura.tipo === 'compra' ? formatoNumero(row.costo) : formatoNumero(row.precio) }}</td>
-          <td class="text-right">{{ formatoNumero(row.itbis) }}</td>
-          <td class="text-right">{{ formatoNumero(row.total) }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="heigthFactura">
+      <table class="table" mdbTable small="true">
+        <thead class="">
+          <tr>
+            <th>#</th>
+            <th>Articulo</th>
+            <th class="text-right">Cantidad</th>
+            <th class="text-right">Unidad</th>
+            <th class="text-right">{{ factura.tipo === 'compra' ? 'Costo' : 'Precio' }}</th>
+            <th class="text-right">Itbis</th>
+            <th class="text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of factura.detalle_facturas; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ row.descripcion }}</td>
+            <td class="text-right">{{ formatoNumero(row.cantidad) }}</td>
+            <td class="text-right">{{ row.unidad }}</td>
+            <td class="text-right">{{ factura.tipo === 'compra' ? formatoNumero(row.costo) : formatoNumero(row.precio) }}</td>
+            <td class="text-right">{{ formatoNumero(row.itbis) }}</td>
+            <td class="text-right">{{ formatoNumero(row.total) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   <div class="col-12">
     <div class="row">

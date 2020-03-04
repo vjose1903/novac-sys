@@ -380,7 +380,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (campo === 'cod-0' && valor !== null) {
       if (this.condicion_fact !== 'Crédito') {
         this.enfocarInput(campo);
-
         this.propietario_factura = this.form.value;
       } else {
         this.dbServ.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
@@ -474,7 +473,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
             this.tipoModal = 'imprimir';
             this.abrirModal();
           } else {
-            const obj = { total_factura: this.TOTAL, devuelta: 0 };
+            const obj = { total_factura: this.TOTAL, devuelta: 0, tipo__: 'devuelta' };
             this.mServ.modalTipo('cambio');
             this.tipoModal = 'cambio';
             this.abrirModal(obj);
@@ -774,7 +773,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
-    // console.log(cabecera_fact);
+    console.log(cabecera_fact);
 
     // this.dbServ.createFacturas(cabecera_fact).subscribe(
     //   res => {

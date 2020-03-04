@@ -119,15 +119,15 @@
               <td class="DESC td0padding">
                 <div class="from-group">
                   <input
-                    [readOnly]="readDescuento"
                     type="number"
                     class="form-control entrada campoNumeros"
                     id="desc-{{ i }}"
                     (click)="verificarSecuencia(i)"
                     (keydown.enter)="enfocarInput('cod-' + (i + 1))"
-                    formControlName="desc"
+                    formControlName="descuento_porciento"
                     (blur)="calcularDescuento(i)"
                     (emptied)="calcularDescuento(i)"
+                    [readOnly]="readDescuento()"
                   />
                 </div>
               </td>

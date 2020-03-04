@@ -147,6 +147,10 @@ export class NotasCredDebComponent implements OnInit {
         formatoNumero: true,
       },
       {
+        titulo: 'Descuento',
+        key: 'descuento',
+      },
+      {
         titulo: 'Total Facturado',
         key: 'total',
         formatoNumero: true,

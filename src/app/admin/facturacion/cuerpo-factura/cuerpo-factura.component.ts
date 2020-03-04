@@ -117,16 +117,17 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             fila.articulo_id = articulo[0].id;
             fila.cantidad = fila.can;
             fila.total = GLOBAL.desformatear(fila.tot);
-            fila.descuento = fila.desc ? (fila.desc !== null ? fila.desc : 0) : 0;
+            fila.descuento_valor = fila.descuento_valor ? (fila.descuento_valor !== null ? fila.descuento_valor : 0) : 0;
+            fila.descuento_porciento = fila.descuento_porciento ? (fila.descuento_porciento !== null ? fila.descuento_porciento : 0) : 0;
             fila.itbis = 0;
             fila.unidad = fila.uni;
             fila.precio = GLOBAL.desformatear(fila.pre);
             fila.costo = GLOBAL.desformatear(fila.costo);
             let lol;
             if (this.metodo === 'venta') {
-              lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'desc', 'tot', 'costo', 'secuencia']);
+              lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'tot', 'costo', 'secuencia']);
             } else {
-              lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'desc', 'tot', 'secuencia']);
+              lol = _.omit(fila, ['cod', 'can', 'des', 'uni', 'tot', 'secuencia']);
             }
 
             detalle_factura.push(JSON.parse(JSON.stringify(lol)));
@@ -215,7 +216,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       uni: [null],
       pre: [null],
       costo: [null],
-      desc: [null],
+      descuento_porciento: [null],
+      descuento_valor: [null],
       tot: [null],
       secuencia: [i],
     });
@@ -261,6 +263,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         }
       }
     }
+
     if (input === 'cod-' || input === 'pre-') {
       let unidad;
       let index = i;
@@ -337,7 +340,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       } else {
         const cantidades = ARTICULO[0].cantidades;
         if (this.metodo === 'venta' && ARTICULO[0].existencia === 0) {
-          this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+          if (ARTICULO[0].descripcion === 'Producto terminado') {
+            this.dbServ.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
+          } else {
+            this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+          }
           setTimeout(() => {
             this.enfocarInput('cod-' + i);
             this.selectContenido('cod-' + i);
@@ -359,9 +366,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
           }
 
           if (ARTICULO[0].descripcion === 'Materia prima') {
-            (this.control.controls[i] as any).controls['desc'].disable();
+            (this.control.controls[i] as any).controls['descuento_porciento'].disable();
           } else {
-            (this.control.controls[i] as any).controls['desc'].enable();
+            (this.control.controls[i] as any).controls['descuento_porciento'].enable();
           }
           (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
           this.verificarRow(i);
@@ -659,21 +666,23 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const precio = GLOBAL.desformatear(precioTEMP);
     const cantidad = (this.control.controls[i] as any).controls['can'].value;
 
-    let descuento = (this.control.controls[i] as any).controls['desc'].value;
+    let descuento = (this.control.controls[i] as any).controls['descuento_porciento'].value;
 
     const total = precio * cantidad;
     let calculoDesc = 0;
     let nuevoTotal = 0;
 
     if (descuento === 0 || descuento === '0' || descuento === null || descuento === undefined) {
-      (this.control.controls[i] as any).controls['desc'].reset();
+      (this.control.controls[i] as any).controls['descuento_porciento'].reset();
       const total = precio * cantidad;
       (this.control.controls[i] as any).controls['tot'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(total)));
     }
 
-    if (precio !== '' && precio !== null && cantidad !== '' && cantidad != null && descuento !== '' && descuento !== null && descuento !== null && descuento !== undefined) {
+    if (precio !== '' && precio !== null && cantidad !== '' && cantidad != null && descuento !== '' && descuento !== ' ' && descuento !== null && descuento !== undefined) {
       descuento = descuento / 100;
+
       calculoDesc = precio * descuento * cantidad;
+      (this.control.controls[i] as any).controls['descuento_valor'].setValue(calculoDesc);
       nuevoTotal = total - calculoDesc;
 
       (this.control.controls[i] as any).controls['tot'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(nuevoTotal)));
@@ -685,19 +694,28 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   calculosDescuentoGeneral(descuento, i) {
     let acuDesc = 0;
-    const obj = { fila: i, desc: GLOBAL.redondearAdos(descuento) };
+    console.log('i ', i);
+
+    // const obj = { fila: i, desc: GLOBAL.redondearAdos(descuento) };
+    const obj = { fila: i, desc: descuento };
+
+    console.log('obj ', obj);
     const index = _.findIndex(this.listaDeDescuentos, (o: any) => {
       return o.fila === obj.fila;
     });
 
+    console.log('index', index);
     if (index !== -1) {
       this.listaDeDescuentos[index] = obj;
     } else {
       this.listaDeDescuentos.push(obj);
     }
+    console.log('this.listaDeDescuentos ', this.listaDeDescuentos);
     this.listaDeDescuentos.forEach(element => {
+      console.log('element ', element);
       acuDesc = acuDesc + element.desc;
     });
+    console.log(acuDesc);
 
     this.sendDescuento.emit(acuDesc);
   }
@@ -775,11 +793,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
     (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
+
     if (this.metodo === 'venta') {
       if (arg.descripcion === 'Materia prima') {
-        (this.control.controls[arg.index] as any).controls['desc'].disable();
+        (this.control.controls[arg.index] as any).controls['descuento_porciento'].disable();
       } else {
-        (this.control.controls[arg.index] as any).controls['desc'].enable();
+        (this.control.controls[arg.index] as any).controls['descuento_porciento'].enable();
       }
     }
     const arti = arg.medida;

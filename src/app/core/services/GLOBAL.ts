@@ -110,24 +110,42 @@ export class GLOBAL {
     let temp = 0;
 
     if (sTnum) {
-      if (!isNaN(sTnum)) {
-        const x = _.split(sTnum, ',');
-        if (x.length === 1) {
-          temp += parseFloat(x[0]);
-          return temp;
-        } else if (x.length >= 2) {
-          let joined = '';
-          joined = _.join(x, '');
-          temp += parseFloat(joined);
-          return temp;
-        }
-      } else {
-        return sTnum;
+      const x = _.split(sTnum, ',');
+      if (x.length === 1) {
+        temp += parseFloat(x[0]);
+        return temp;
+      } else if (x.length >= 2) {
+        let joined = '';
+        joined = _.join(x, '');
+        temp += parseFloat(joined);
+        return temp;
       }
     } else {
       return sTnum;
     }
   }
+  // static desformatear(sTnum) {
+  //   let temp = 0;
+
+  //   if (sTnum) {
+  //     if (!isNaN(sTnum)) {
+  //       const x = _.split(sTnum, ',');
+  //       if (x.length === 1) {
+  //         temp += parseFloat(x[0]);
+  //         return temp;
+  //       } else if (x.length >= 2) {
+  //         let joined = '';
+  //         joined = _.join(x, '');
+  //         temp += parseFloat(joined);
+  //         return temp;
+  //       }
+  //     } else {
+  //       return sTnum;
+  //     }
+  //   } else {
+  //     return sTnum;
+  //   }
+  // }
 }
 
 // ===========================================================================
