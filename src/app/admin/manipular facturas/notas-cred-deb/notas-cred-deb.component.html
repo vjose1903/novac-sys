@@ -17,16 +17,16 @@
                   <span class="d-block">
                     <b class="text-bold ">{{ factura.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
                     >&nbsp;
-                    <span>{{ factura.tipo === 'compra' ? factura.suplidor.nombre : factura.cliente.nombre }}</span>
+                    <span>{{ propietario_factura?.nombre }}</span>
                   </span>
 
                   <span class="d-block">
                     <b class="text-bold ">{{ factura.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
                     >&nbsp;
-                    <span>{{ factura.tipo === 'compra' ? factura.suplidor.rnc : factura.cliente.rnc }}</span>
+                    <span>{{ propietario_factura?.rnc }}</span>
                   </span>
                   <span class="d-block">
-                    <b class="text-bold ">Direccion :</b>&nbsp; <span>{{ factura.tipo === 'compra' ? factura.suplidor.direccion : factura.cliente.direccion }}</span>
+                    <b class="text-bold ">Direccion :</b>&nbsp; <span>{{ propietario_factura?.direccion }}</span>
                   </span>
                 </div>
               </div>

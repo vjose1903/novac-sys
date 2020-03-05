@@ -83,18 +83,13 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.completarTituloPag();
 
     this.subEsc = this.mServ.PRESSESC.subscribe(res => {
-      console.log('press esc');
-      
       if (res !== undefined && res !== null) {
-
-        this.enfocarInput('valorI' );
+        this.enfocarInput('valorI');
       }
     });
 
     this.sub = this.mServ.OBJDEVUELTO.subscribe(res => {
       if (res && res.tipoModal === 'buscarCliente') {
-        console.log(res);
-
         this.clienteBuscado = res;
         (document.getElementById('valorI') as any).value = res.nombre;
         this.pedirFacturaModal('1', res.id);
@@ -114,6 +109,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
               this.abrirModal(this.facturaSelected, 'cancelar');
             }, 10);
           } else {
+            this.mServ.ModalDecision(undefined);
             const url = `/admin/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
             this.router.navigateByUrl(url);
           }

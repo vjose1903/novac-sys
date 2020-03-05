@@ -43,9 +43,10 @@ export class NotasCredDebComponent implements OnInit {
   constructor(private dbServ: DBservice, private route: ActivatedRoute, private mServ: ModalService, private _ipc: IpcService) {}
 
   ngOnInit() {
-    this.fecha = moment().format('DD/MM/YYYY');
     this.idFactura = this.route.snapshot.params['id'];
     this.tipoNota = this.route.snapshot.params['tipo'];
+    this.fecha = moment().format('DD/MM/YYYY');
+    this.necesarioStart();
     if (this.tipoNota === 'credito') {
       this.tituloPag = 'Nota de crédito aplicada a factura ';
       this.tipoFactura = '04';
@@ -53,10 +54,12 @@ export class NotasCredDebComponent implements OnInit {
       this.tituloPag = 'Nota de débito aplicada a factura ';
       this.tipoFactura = '03';
     }
-    this.necesarioStart();
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
-      if (res !== null && res !== undefined) {
+      console.log(res);
+
+      if (res) {
+        console.log('decision modal');
         this.decisionModal(res);
       }
     });
@@ -84,20 +87,24 @@ export class NotasCredDebComponent implements OnInit {
     await this.getPropietario(this.factura.cliente_id);
   }
   async getPropietario(id) {
-    console.log(id);
-
     if (id) {
       try {
-        console.log('entro');
-
-        this.propietario_factura = await this.dbServ.getClienteById(id).toPromise();
-        console.log(this.propietario_factura);
+        const cliente = await this.dbServ.getClienteById(id).toPromise();
+        const documento = cliente.documentos_de_identidad.filter(doc => doc.principal === true)[0];
+        this.propietario_factura = {
+          nombre: cliente.nombre + ' ' + cliente.apellido,
+          direccion: cliente.direccion,
+          rnc: documento.documento,
+        };
       } catch (error) {
         console.error(error);
       }
     } else {
-      console.log('entro');
-      this.propietario_factura;
+      this.propietario_factura = {
+        nombre: this.factura.NoCliente_nombre,
+        direccion: this.factura.NoCliente_direccion,
+        rnc: '------------',
+      };
     }
   }
   formarTitulosTabla() {
@@ -148,7 +155,7 @@ export class NotasCredDebComponent implements OnInit {
       },
       {
         titulo: 'Descuento',
-        key: 'descuento',
+        key: 'descuento_valor',
       },
       {
         titulo: 'Total Facturado',
@@ -203,11 +210,12 @@ export class NotasCredDebComponent implements OnInit {
     for (let i = 0; i < this.detalleNota.length; i++) {
       const detalle = this.detalleNota[i];
       const cantidad = detalle.cant_nota;
+      const descuento = detalle.descuento_valor / detalle.cantidad;
 
       if (this.tipoNota === 'credito') {
-        total += cantidad * detalle.precio * -1;
+        total += cantidad * (detalle.precio - descuento) * -1;
       } else {
-        total += cantidad * detalle.precio;
+        total += cantidad * (detalle.precio - descuento);
       }
     }
     this.TOTAL = total;
@@ -230,7 +238,8 @@ export class NotasCredDebComponent implements OnInit {
           this.sumarTotal();
         } else {
           this.sumarTotal();
-          const total = entidad.cant_nota * entidad.precio;
+          const descuento = entidad.descuento_valor / entidad.cantidad;
+          const total = entidad.cant_nota * (entidad.precio - descuento);
           entidad.total_nota = this.formatoNumero(total);
         }
       } else {
@@ -239,7 +248,8 @@ export class NotasCredDebComponent implements OnInit {
           this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
         }
         this.sumarTotal();
-        const total = entidad.cant_nota * entidad.precio;
+        const descuento = entidad.descuento_valor / entidad.cantidad;
+        const total = entidad.cant_nota * (entidad.precio - descuento);
         entidad.total_nota = this.formatoNumero(total);
       }
     }
@@ -304,19 +314,38 @@ export class NotasCredDebComponent implements OnInit {
   }
 
   async decisionModal(res) {
+    if (this.tipoModal === 'cambio') {
+      this.formarNota(res);
+    }
+  }
+
+  obtenerPesoSaco(descripcion) {
+    let num = '';
+    const split = _.split(descripcion, '(')[1];
+    const splitFinal = _.split(split, ' ')[0];
+    num = 'Saco de ' + splitFinal + ' libras';
+    return num;
+  }
+
+  formarNota(res) {
     console.log(this.detalleFacturas);
     const temp = [];
     if (res) {
       for (let i = 0; i < this.detalleFacturas.length; i++) {
         const element = this.detalleFacturas[i];
+        let unidad_ = element.unidad;
         if (element.select) {
+          if (unidad_ === 'Saco') {
+            unidad_ = this.obtenerPesoSaco(element.descripcion);
+          }
           const fila = {
             articulo_id: element.id,
-            cantidad: element.cantidad,
-            total: GLOBAL.desformatear(element.total),
-            descuento: element.descuento ? (element.descuento !== null ? element.descuento : 0) : 0,
+            cantidad: element.cant_nota,
+            total: GLOBAL.desformatear(element.total_nota),
+            descuento_valor: element.descuento_valor ? (element.descuento_valor !== null ? element.descuento_valor : 0) : 0,
+            descuento_porciento: element.descuento_porciento ? (element.descuento_porciento !== null ? element.descuento_porciento : 0) : 0,
             itbis: 0,
-            unidad: element.unidad,
+            unidad: unidad_,
             precio: GLOBAL.desformatear(element.precio),
           };
 
@@ -361,8 +390,8 @@ export class NotasCredDebComponent implements OnInit {
 
     if (this.factura.cliente_id === null) {
       cabecera_fact['cliente_id'] = null;
-      cabecera_fact['NoCliente_nombre'] = this.factura.cliente.nombre;
-      cabecera_fact['NoCliente_direccion'] = this.factura.cliente.direccion;
+      cabecera_fact['NoCliente_nombre'] = this.propietario_factura.nombre;
+      cabecera_fact['NoCliente_direccion'] = this.propietario_factura.direccion;
     } else {
       cabecera_fact['cliente_id'] = this.factura.cliente_id;
     }

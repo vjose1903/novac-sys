@@ -694,28 +694,21 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   calculosDescuentoGeneral(descuento, i) {
     let acuDesc = 0;
-    console.log('i ', i);
 
     // const obj = { fila: i, desc: GLOBAL.redondearAdos(descuento) };
     const obj = { fila: i, desc: descuento };
-
-    console.log('obj ', obj);
     const index = _.findIndex(this.listaDeDescuentos, (o: any) => {
       return o.fila === obj.fila;
     });
 
-    console.log('index', index);
     if (index !== -1) {
       this.listaDeDescuentos[index] = obj;
     } else {
       this.listaDeDescuentos.push(obj);
     }
-    console.log('this.listaDeDescuentos ', this.listaDeDescuentos);
     this.listaDeDescuentos.forEach(element => {
-      console.log('element ', element);
       acuDesc = acuDesc + element.desc;
     });
-    console.log(acuDesc);
 
     this.sendDescuento.emit(acuDesc);
   }
