@@ -102,6 +102,13 @@ export class DBservice {
   }
 
   // =====================================================================
+  // NUMERO DE COMPROBANTE FISCAL
+  // =====================================================================
+  getPaquetesNCF(tipo_factura_id, estado = true) {
+    return this.peticionSinLoad(`paqueteNCF/${tipo_factura_id}/${estado}`, 'get');
+  }
+
+  // =====================================================================
   // HISTORICO PRODUCCIONES
   // =====================================================================
   getProducciones() {

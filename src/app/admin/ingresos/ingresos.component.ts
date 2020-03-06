@@ -193,6 +193,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
                 val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
                 val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
                 val.text_color = val.fecha_vencimiento < fechaA ? 'red' : 'black';
+
                 return val;
               })),
           ),
@@ -201,6 +202,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
       this.Facturas.sort((a, b) => {
         return a.id > b.id ? 1 : -1;
       });
+      let total = 0;
+      this.Facturas.forEach(element => {
+        total += element.balance;
+      });
+      console.log(total);
     } catch (error) {
       console.error(error);
       this.dbServ.toastError(error, 'ERROR');

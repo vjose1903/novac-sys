@@ -67,7 +67,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   subObj: Subscription;
   subDeci: Subscription;
   subTipoF: Subscription;
-  subSecu: Subscription;
   FacturaAtrasada = false;
   FechaFacturaAtrasada;
 
@@ -94,7 +93,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
-    this.GetArticulos();
+    this.necesarioStart();
 
     this.metodo = this.route.snapshot.params['tipo'];
 
@@ -107,8 +106,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       <span>00 Factura sin comprobante</span><br>\
       <span>01 Valor fiscal</span><br>\
       <span>02 Factura de consumo</span><br>\
-      <span>03 Nota de debito</span><br>\
-      <span>04 Nota de credito</span><br>\
       <span>11 Comprobante de compras</span><br>\
       <span>12 Registro de unico ingreso</span><br>\
       <span>13 Comprobante para gastos menores</span><br>\
@@ -117,7 +114,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       <span>16 Comprobante para exportaciones</span><br>\
       <span>17 Comprobantes para pago al exterior</span><br>\
       </div>';
-      this.tipos_facturas = ['00', '01', '02', '03', '04', '11', '12', '13', '14', '15', '16', '17'];
+      this.tipos_facturas = ['00', '01', '02', '11', '12', '13', '14', '15', '16', '17'];
       this.labelSearch = 'Cliente';
       this.form.patchValue({
         id: 1,
@@ -232,13 +229,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.subTipoF = this.dbServ.getTiposFacturas().subscribe(res => {
       this.lista_tipos_facturas = res;
     });
-
-    this.subSecu = this.obsServ.SECUENCIA_FACTURAS.subscribe(res => {
-      if (res !== undefined) {
-        // this.secuenciaVenta = res.filter(secu => secu.tipo_factura_id === 13);
-        // this.numFac = this.secuenciaVenta[0].secuencia;
-      }
-    });
   }
   ngOnDestroy(): void {
     this.mServ.ModalObj(null);
@@ -249,7 +239,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.subObj.unsubscribe();
     this.subDeci.unsubscribe();
     this.subTipoF.unsubscribe();
-    this.subSecu.unsubscribe();
   }
 
   setWidthPop(bool, e) {
@@ -260,6 +249,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       document.documentElement.style.setProperty('--popInfo', '25rem');
     }
   }
+
+  async necesarioStart() {
+    await this.GetArticulos();
+  }
+
   GetArticulos() {
     this.dbServ.getArticulos().subscribe(res => {
       res.sort((a, b) => {
@@ -319,6 +313,47 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
 
+  async calcularPorcientoComprobante() {
+    const TipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
+    try {
+      const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
+
+      const desde = paquete.body.desde;
+      const hasta = paquete.body.hasta;
+      const secuencia = paquete.body.secuencia;
+
+      const cant = hasta - desde;
+      const cantidad = cant + 1;
+      let porciento = 0;
+
+      if (cantidad > 0 && cantidad <= 40) {
+        porciento = cantidad * 0.5;
+      } else if (cantidad > 40 && cantidad <= 100) {
+        porciento = cantidad * 0.25;
+      } else if (cantidad > 100 && cantidad <= cantidad * 500) {
+        porciento = cantidad * 0.1;
+      } else if (cantidad > 500) {
+        porciento = cantidad * 0.04;
+      }
+      const limite = hasta - porciento;
+      const restante = hasta - secuencia + 1;
+
+      const msg =
+        paquete.msg === 'Ultimo comprobante de este paquete'
+          ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
+          : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
+
+      if (secuencia >= limite) {
+        this.dbServ.toastWarning(msg, 'AVISO');
+      }
+      return 'si';
+    } catch (error) {
+      this.dbServ.toastError(error.error.msg, 'ERROR');
+      this.desEnfocarInput('tipoFact');
+      return 'no';
+    }
+  }
+
   saltar(campo, valor?, salioDe?) {
     if (campo === 'buscarCliente') {
       this.desEnfocarInput(salioDe);
@@ -329,6 +364,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       if (this.tipos_facturas.includes(valor)) {
         this.tipoFactura = valor;
         this.NCFcompra = 'b' + valor;
+        const continuar = this.calcularPorcientoComprobante();
+        console.log('continuar', JSON.stringify(continuar));
+
         this.enfocarInput(campo);
       } else {
         this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
@@ -773,28 +811,31 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
-    console.log(cabecera_fact);
+    // console.log(cabecera_fact);
 
-    // this.dbServ.createFacturas(cabecera_fact).subscribe(
-    //   res => {
-    //     console.log(res);
-    //     this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-    //       console.log('printRes=====> ', res);
+    this.dbServ.createFacturas(cabecera_fact).subscribe(
+      res => {
+        console.log(res);
+        // this.CancelarFactura();
+        // this.GetArticulos();
+        // this.dbServ.toastSuccess(res.msg, 'CORRECTO');
 
-    //       if (res.status) {
-    //         this.CancelarFactura();
-    //         this.GetArticulos();
-    //         this.dbServ.toastSuccess(res.msg, 'CORRECTO');
-    //       } else {
-    //         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-    //       }
-    //     });
-    //     res['FACTURA_DE'] = this.metodo;
-    //     // this._ipc.send('print', res);
-    //   },
-    //   err => {
-    //     this.dbServ.toastError(err.statusText, 'ERROR');
-    //   },
-    // );
+        this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+          console.log('printRes=====> ', res);
+
+          if (res.status) {
+          } else {
+            this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+          }
+        });
+        res['FACTURA_DE'] = this.metodo;
+        // this._ipc.send('print', res);
+      },
+      err => {
+        console.log(err);
+
+        this.dbServ.toastError(err.error.msg, 'ERROR');
+      },
+    );
   }
 }
