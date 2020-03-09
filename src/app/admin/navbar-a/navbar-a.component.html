@@ -62,11 +62,22 @@
         <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png" alt="Reportes" (click)="navegar(5)" />
         <h5 [ngClass]="actualTab == 'reporte' ? 'tituloMenuA' : 'tituloMenu'"><strong>Reporte</strong></h5>
       </div>
+
+      <div class="menuListMant">
+        <img [ngClass]="actualTab == 'mantenimiento' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/mantenimiento.png" alt="Registros" (click)="navegar(9)" />
+        <h5 [ngClass]="actualTab == 'mantenimiento' ? 'tituloMenuAMant' : 'tituloMenuMant'"><strong>Mantenimiento</strong></h5>
+
+        <div [ngClass]="actualTab == 'mantenimiento' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
+          <h4 class="opcion" (click)="navegar('ncf')">Ingreso NCF</h4>
+          <h4 class="opcion" (click)="navegar('permisos')">Roles Usuarios</h4>
+        </div>
+      </div>
     </mat-nav-list>
   </mat-sidenav>
 
   <mat-sidenav-content>
     <mat-toolbar class="d-flex justify-content-between">
+      <div *ngIf="drawer._animationState != 'void'"></div>
       <div *ngIf="drawer._animationState == 'void'" title="Mostrar Menu" data-toggle="Tooltip" (click)="drawer.toggle()" id="botonMenu" class="">
         <i class="fas fa-bars m-0 p-0"></i>
       </div>

@@ -35,6 +35,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     {
       titulo: '',
       key: 'estado_',
+      text_color: 'colorEstado',
       isIcon: true,
       color: true,
     },
@@ -203,7 +204,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
                 val.estado_ = val.estado ? 'fas fa-check' : 'fas fa-times';
                 val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
                 val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
-                val.text_color = val.estado ? 'green' : 'red';
+                val.colorEstado = val.estado ? 'green' : 'red';
                 return val;
               })),
           ),

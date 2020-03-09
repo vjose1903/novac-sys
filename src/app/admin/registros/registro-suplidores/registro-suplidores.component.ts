@@ -246,10 +246,19 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
   }
 
   mostrarErrores(arg) {
-    for (const error in arg) {
-      if (arg.hasOwnProperty(error)) {
-        const element = arg[error];
-        this.dbServ.toastError(element, 'Error');
+    if (Array.isArray(arg)) {
+      arg.forEach(error => {
+        this.dbServ.toastError(error, 'ERROR');
+      });
+    } else {
+      for (const key in arg) {
+        if (arg.hasOwnProperty(key)) {
+          const element = arg[key];
+
+          if (key !== 'status') {
+            this.dbServ.toastError(element, 'ERROR');
+          }
+        }
       }
     }
   }

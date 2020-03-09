@@ -92,7 +92,19 @@
 
   &:hover .tituloMenu,
   .tituloMenuA {
-    transform: scale(1) translate(0px, -6rem);
+    transform: scale(0.8) translate(0px, -7.7rem);
+  }
+}
+.menuListMant {
+  list-style: none;
+  .tituloMenuMant {
+    transform: scale(0);
+    transition: all 0.2s;
+  }
+
+  &:hover .tituloMenuMant,
+  .tituloMenuAMant {
+    transform: scale(0.7) translate(-13px, -9rem);
   }
 }
 .menuList2 {
@@ -104,7 +116,7 @@
 
   &:hover .tituloMenu2,
   .tituloMenuA2 {
-    transform: scale(1) translate(0px, -6.5rem);
+    transform: scale(0.9) translate(0px, -7.5rem);
   }
 }
 
@@ -143,7 +155,7 @@
 
 mat-nav-list {
   background-color: #95f0a7;
-  overflow: none;
+  overflow: auto;
   height: calc(100% - 32px);
 }
 mat-list-item {

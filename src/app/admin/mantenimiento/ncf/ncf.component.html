@@ -1,0 +1,120 @@
+<div class="row" style="height: calc(100% - 60px)">
+  <div class=" col-md-6  contenedorRegistro">
+    <!-- <div class=""> -->
+    <h4>{{ titulo }}</h4>
+    <div class="card card-padding sombra">
+      <div class="row">
+        <div class="col-12">
+          <div class="form-group">
+            <label class="control-label">Tipo comprobante: <span style="color: red">*</span></label>
+            <select
+              (keydown.enter)="saltar('Producto terminado')"
+              id="tipo"
+              [(ngModel)]="tipo_articulo_id"
+              (change)="selectTipoFactura($event.target.value)"
+              (blur)="checkTipoArticuloSelect()"
+              class="form-control mb-4"
+            >
+              <option value="{{ -1 }}" disabled>Tipo de comprobantes</option>
+              <ng-container *ngFor="let tipo of lista_tipos_facturas">
+                <option *ngIf="tipo.referencia" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+              </ng-container>
+            </select>
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="aletarTipoArticulo">
+              Debe de seleccionar tipo de comprobante
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 ">
+          <div class="form-group">
+            <label class="control-label">Desde: <span style="color: red">*</span></label>
+            <input type="number" class="form-control" [(ngModel)]="Desde" />
+          </div>
+        </div>
+        <div class="col-md-6 ">
+          <div class="form-group">
+            <label class="control-label">Hasta: <span style="color: red">*</span></label>
+            <input type="number" class="form-control" [(ngModel)]="Hasta" />
+          </div>
+        </div>
+        <div class="col-md-6 ">
+          <div class="form-group">
+            <label class="control-label">Fecha compra: <span style="color: red">*</span></label>
+            <input
+              type="text"
+              [bsConfig]="dpConfig"
+              placeholder="dd/mm/aaaa"
+              class="form-control"
+              value="{{ fechaCompra | date: 'dd/MM/yyyy' }}"
+              [(ngModel)]="fechaCompra"
+              #dp="bsDatepicker"
+              placement="bottom"
+              bsDatepicker
+              (ngModelChange)="calculateFechaValida()"
+            />
+          </div>
+        </div>
+        <div class="col-md-6 ">
+          <div class="form-group">
+            <label class="control-label">Fecha validez: <span style="color: red">*</span></label>
+            <input
+              type="text"
+              [bsConfig]="dpConfigValidez"
+              placeholder="dd/mm/aaaa"
+              value="{{ fechaValidez | date: 'dd/MM/yyyy' }}"
+              class="form-control"
+              [(ngModel)]="fechaValidez"
+              #dp="bsDatepicker"
+              placement="bottom"
+              (focus)="calculateFechaValida()"
+              bsDatepicker
+            />
+          </div>
+        </div>
+        <div *ngIf="is_editando" class="col-12">
+          <div class="row">
+            <div class="col-6">
+              <div class="d-flex">
+                <h5>Usado:</h5>
+                <i class="ml-3 mt-1 {{ ncfSelected.usado ? 'fas fa-check' : 'fas fa-times' }} {{ ncfSelected.usado ? 'text-green' : 'text-red' }}"></i>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex">
+                <h5>Activo:</h5>
+                <i class="ml-3 mt-1 {{ ncfSelected.estado ? 'fas fa-check' : 'fas fa-times' }}  {{ ncfSelected.estado ? 'text-green' : 'text-red' }}"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mt-3">
+          <div class="from-group">
+            <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a>
+            <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+            <input [disabled]="abilitarBtnSend()" (click)="submit()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- </div> -->
+  </div>
+
+  <div class=" col-md-6">
+    <h4>Listado articulos</h4>
+    <div class="card cardListados ">
+      <app-tablas
+        *ngIf="listaNCF && info"
+        [info]="info"
+        [data]="listaNCF"
+        [scrollContainer]="'scroll-container'"
+        [focusRow]="false"
+        [botones]="botones"
+        (DevolverInfo)="editarItem($event)"
+        (DELETE)="abrirModal($event)"
+      ></app-tablas>
+    </div>
+  </div>
+</div>

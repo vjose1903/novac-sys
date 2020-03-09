@@ -38,6 +38,7 @@ import { FormsModule } from '@angular/forms';
 import { BuscarFacturaComponent } from './manipular facturas/buscar-factura/buscar-factura.component';
 import { FormarFacturaComponent } from '../components/formar-factura/formar-factura.component';
 import { NotasCredDebComponent } from './manipular facturas/notas-cred-deb/notas-cred-deb.component';
+import { NcfComponent } from './mantenimiento/ncf/ncf.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { NotasCredDebComponent } from './manipular facturas/notas-cred-deb/notas
     BuscarFacturaComponent,
     FormarFacturaComponent,
     NotasCredDebComponent,
+    NcfComponent,
   ],
   imports: [
     DialogModule,

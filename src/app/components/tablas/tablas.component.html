@@ -32,7 +32,7 @@
             <span
               *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero"
               style="width: 100%"
-              class="text-{{ column.color ? (dato.text_color ? dato.text_color : 'black') : 'black' }}"
+              class="text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
             >
               {{ dato[column.key] }}
             </span>
@@ -56,7 +56,7 @@
               {{ lookprincipal(dato[column.key]) }}
             </span>
 
-            <span *ngIf="column.isIcon && dato._destroy !== '1'" class="text-{{ column.color ? (dato.text_color ? dato.text_color : 'black') : 'black' }}">
+            <span *ngIf="column.isIcon && dato._destroy !== '1'" class="text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}">
               <i class="{{ dato[column.key] }}"></i>
             </span>
 

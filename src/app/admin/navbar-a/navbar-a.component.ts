@@ -158,6 +158,9 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
       case 8:
         this.actualTab = 'nota';
         break;
+      case 9:
+        this.actualTab = 'mantenimiento';
+        break;
 
       case 'venta':
         this.router.navigateByUrl('/admin');
@@ -181,6 +184,14 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         setTimeout(() => {
           this.router.navigate(['/admin/buscarFactura/' + accion]);
         }, 5);
+        break;
+
+      case 'ncf':
+        // this.router.navigateByUrl('/admin');
+        // this.actualTab = 'home';
+        // setTimeout(() => {
+        this.router.navigate(['/admin/ncf']);
+        // }, 5);
         break;
 
       case 'articulos':

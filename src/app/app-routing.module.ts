@@ -18,6 +18,7 @@ import { InventarioComponent } from './admin/inventario/inventario.component';
 import { IngresosComponent } from './admin/ingresos/ingresos.component';
 import { BuscarFacturaComponent } from './admin/manipular facturas/buscar-factura/buscar-factura.component';
 import { NotasCredDebComponent } from './admin/manipular facturas/notas-cred-deb/notas-cred-deb.component';
+import { NcfComponent } from './admin/mantenimiento/ncf/ncf.component';
 
 const routes: Routes = [
   {
@@ -66,7 +67,11 @@ const routes: Routes = [
       },
       {
         path: 'nota/:tipo/:id',
-        component: NotasCredDebComponent
+        component: NotasCredDebComponent,
+      },
+      {
+        path: 'ncf',
+        component: NcfComponent,
       },
     ],
   },

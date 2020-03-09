@@ -104,6 +104,12 @@ export class DBservice {
   // =====================================================================
   // NUMERO DE COMPROBANTE FISCAL
   // =====================================================================
+  createPaqueteNCF(arg) {
+    return this.peticion('secuencia_comprobantes', 'post', JSON.stringify(arg));
+  }
+  getNCFregistrados() {
+    return this.peticion(`secuencia_comprobantes`, 'get');
+  }
   getPaquetesNCF(tipo_factura_id, estado = true) {
     return this.peticionSinLoad(`paqueteNCF/${tipo_factura_id}/${estado}`, 'get');
   }
