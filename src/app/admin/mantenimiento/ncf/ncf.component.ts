@@ -4,7 +4,7 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalService } from '../../../components/modal/modal.service';
-import _ = require('lodash');
+import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { BsDatepickerConfig } from 'ngx-bootstrap';
 import { map } from 'rxjs/operators';
@@ -67,7 +67,7 @@ export class NcfComponent implements OnInit, OnDestroy {
     borrar: true,
     editar: true,
   };
-  subTipoF: Subscription;
+  subDeci: Subscription;
   lista_tipos_facturas: any;
 
   fechaCompra;
@@ -104,8 +104,15 @@ export class NcfComponent implements OnInit, OnDestroy {
     this.titulo = 'Paquetes de numeros comprobantes fiscales';
     this.necesarioStart();
     this.setDateInputs(new Date());
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+      if (res !== null && res !== undefined) {
+        this.decisionModal(res);
+      }
+    });
   }
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.subDeci.unsubscribe();
+  }
   text(arg) {
     this.setDateInputs(arg);
   }
@@ -160,8 +167,8 @@ export class NcfComponent implements OnInit, OnDestroy {
                 ncf.cantidad = ncf.hasta - ncf.desde + 1;
                 ncf.tipoC = this.lista_tipos_facturas.filter(tipo => tipo.id === ncf.tipo_factura_id)[0].descripcion;
                 ncf.codigo = _.padStart(ncf.id, 5, '0');
-                ncf.fecha_compra = moment(ncf.fecha_compra, 'YYY-MM-DD[T]HH:mm:ss').format('DD-MM-YYYY');
-                ncf.fecha_valida = moment(ncf.fecha_valida, 'YYY-MM-DD[T]HH:mm:ss').format('DD-MM-YYYY');
+                ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
+                ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
                 ncf.colorUsado = ncf.usado ? 'green' : 'red';
                 ncf.colorEstado = ncf.estado ? 'green' : 'red';
                 ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
@@ -193,39 +200,50 @@ export class NcfComponent implements OnInit, OnDestroy {
 
   async submit() {
     const obj = {
+      id: this.ncfSelected ? this.ncfSelected.id : null,
       tipo_factura_id: this.tipo_articulo_id,
       secuencia: this.Desde,
       desde: this.Desde,
       hasta: this.Hasta,
-      fecha_compra: this.fechaCompra,
-      fecha_valida: this.fechaValidez,
+      fecha_compra: moment(this.fechaCompra).format(),
+      fecha_valida: moment(this.fechaValidez).format(),
       estado: false,
       usado: false,
     };
+    // console.log(obj);
 
     try {
-      let res = await this.dbServ.createPaqueteNCF(obj).toPromise();
-      this.dbServ.toastSuccess('Comprobante ingresado', 'CORRECTO');
-
+      const res = await this.dbServ.PaqueteNCF(obj).toPromise();
       res.cantidad = res.hasta - res.desde + 1;
       res.tipoC = this.lista_tipos_facturas.filter(tipo => tipo.id === res.tipo_factura_id)[0].descripcion;
       res.codigo = _.padStart(res.id, 5, '0');
-      res.fecha_compra = moment(res.fecha_compra, 'YYY-MM-DD[T]HH:mm:ss').format('DD-MM-YYYY');
-      res.fecha_valida = moment(res.fecha_valida, 'YYY-MM-DD[T]HH:mm:ss').format('DD-MM-YYYY');
+      res.fecha_compra = moment(res.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
+      res.fecha_valida = moment(res.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
       res.colorUsado = res.usado ? 'green' : 'red';
       res.colorEstado = res.estado ? 'green' : 'red';
       res.estado_ = res.estado ? 'fas fa-check' : 'fas fa-times';
       res.usado_ = res.usado ? 'fas fa-check' : 'fas fa-times';
 
-      this.listaNCF = [...this.listaNCF, res];
-      this.listaNCF.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
-      });
+      if (this.is_editando) {
+        this.dbServ.toastSuccess('Comprobante editado', 'CORRECTO');
+        console.log('index ', this.indexSelected);
+        console.log('editando ', this.listaNCF[this.indexSelected]);
+        setTimeout(() => {
+          this.listaNCF[this.indexSelected] = GLOBAL.duplicarJson(res);
+        }, 5);
+      } else {
+        this.dbServ.toastSuccess('Comprobante ingresado', 'CORRECTO');
+
+        this.listaNCF = [...this.listaNCF, res];
+        this.listaNCF.sort((a, b) => {
+          return a.id > b.id ? 1 : -1;
+        });
+      }
       this.borrar();
       console.log(res);
     } catch (error) {
       console.error(error);
-      this.dbServ.toastSuccess('Error del servidor', 'ERROR');
+      this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }
   abilitarBtnSend() {
@@ -253,17 +271,18 @@ export class NcfComponent implements OnInit, OnDestroy {
   }
 
   llenarCampos(item) {
-    this.fechaCompra = new Date(item.fecha_compra);
-    this.fechaValidez = new Date(item.fecha_valida);
+    this.fechaCompra = item.fecha_compra;
+    this.fechaValidez = item.fecha_valida;
     this.tipo_articulo_id = item.tipo_factura_id;
     this.Desde = item.desde;
     this.Hasta = item.hasta;
     this.ncfSelected = GLOBAL.duplicarJson(item);
-    console.log(item);
   }
 
   editarItem(item) {
-    this.indexSelected = item.index;
+    console.log(item);
+
+    this.indexSelected = item.INDEX;
     this.is_editando = true;
     if (item.METODO === 'editar') {
       this.paqueteSelected = item.ARG;
@@ -277,20 +296,20 @@ export class NcfComponent implements OnInit, OnDestroy {
     this.mServ.modalTipo('borrar');
     this.tipoModal = 'borrar';
     this.seleccionModal = arg.ARG;
+    this.seleccionModal.nombre = 'comprobante para ' + arg.ARG.tipoC + ' numero: ' + arg.ARG.codigo;
     this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
   decisionModal(arg) {
+    console.log(arg);
     if (arg) {
-      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      obj['estado'] = false;
-      obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
-      this.dbServ.editarCliente(obj).subscribe(
+      console.log('BORRANDO');
+
+      this.dbServ.deleteNCF(this.seleccionModal.id).subscribe(
         res => {
-          this.dbServ.toastSuccess('Cliente ' + obj.nombre + ' borrado.', 'CORRECTO');
+          this.dbServ.toastSuccess('comprobante para ' + this.seleccionModal.tipoC + ' numero: ' + this.seleccionModal.codigo + ' borrado', 'CORRECTO');
           _.pullAt(this.listaNCF, this.indexSelected);
           this.tipoModal = '';
-          this.decisionModal = null;
         },
         err => {
           console.log(err);

@@ -89,7 +89,7 @@ export class DBservice {
   }
 
   // =====================================================================
-  // FActuras
+  // Facturas
   // =====================================================================
   createFacturas(arg) {
     return this.peticion('cabecera_facturas', 'post', JSON.stringify(arg));
@@ -104,11 +104,22 @@ export class DBservice {
   // =====================================================================
   // NUMERO DE COMPROBANTE FISCAL
   // =====================================================================
-  createPaqueteNCF(arg) {
-    return this.peticion('secuencia_comprobantes', 'post', JSON.stringify(arg));
+  PaqueteNCF(arg) {
+    let url = '';
+    let metodo = 'post';
+    if (arg.id) {
+      url = `secuencia_comprobantes/${arg.id}`;
+      metodo = 'put';
+    } else {
+      url = 'secuencia_comprobantes';
+    }
+    return this.peticion(url, metodo, JSON.stringify(arg));
   }
   getNCFregistrados() {
     return this.peticion(`secuencia_comprobantes`, 'get');
+  }
+  deleteNCF(id) {
+    return this.peticion(`secuencia_comprobantes/${id}`, 'delete');
   }
   getPaquetesNCF(tipo_factura_id, estado = true) {
     return this.peticionSinLoad(`paqueteNCF/${tipo_factura_id}/${estado}`, 'get');

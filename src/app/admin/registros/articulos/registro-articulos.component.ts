@@ -266,7 +266,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     if (MateriaPrima.medida === 'Quintal') {
       costo = MateriaPrima.contenido_articulos[0].costo;
     } else if (MateriaPrima.medida === 'Libra') {
-      costo = MateriaPrima.costoPrincipal;
+      costo = MateriaPrima.costo_principal;
     }
 
     (control.controls[i] as any).controls['costo_formula'].setValue(costo);
@@ -519,7 +519,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       if (articulo.medida === 'Quintal') {
         costo = articulo.contenido_articulos[0].costo;
       } else if (articulo.medida === 'Libra') {
-        costo = articulo.costoPrincipal;
+        costo = articulo.costo_principal;
       }
 
       if (costo !== x.costo_formula) {

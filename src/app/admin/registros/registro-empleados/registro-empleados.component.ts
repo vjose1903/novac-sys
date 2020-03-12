@@ -216,8 +216,8 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
           },
           err => {
             console.log(err);
-
-            this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
+            this.mostrarErrores(err.error.errors.full_messages);
+            // this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
           },
         );
       }
@@ -253,8 +253,8 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
           this.decisionModal = null;
         },
         err => {
-          console.log(err);
-          this.mostrarErrores(err.error);
+          console.log(err.error.errors);
+          this.mostrarErrores(err.error.errors);
         },
       );
     }
