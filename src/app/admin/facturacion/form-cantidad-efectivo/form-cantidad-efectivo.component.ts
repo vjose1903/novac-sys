@@ -20,15 +20,22 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
   formaPago = 'Efectivo';
   @Output() getDevuelta = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
+  factura_de: any;
+  cambiar_articulos = undefined;
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
     this.efectivo = this.formatoNumero(this.data.devuelta);
+    this.factura_de = this.data.factura_de;
+
+    if (!this.data.cambios_articulos) {
+      this.cambiar_articulos = 'no';
+    }
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      if (this.tipo === 'devuelta') {
+      if (this.factura_de !== 'compra' && this.tipo === 'devuelta') {
         this.enfocarInput('inputEfectivo');
       }
     }, 250);
@@ -134,14 +141,28 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
   }
   confirmar() {
     const obj = {
-      devuelta: GLOBAL.desformatear(this.devuelta),
+      devuelta: this.devuelta ? GLOBAL.desformatear(this.devuelta) : 0,
       forma_pago: this.formaPago,
+      decision_cambio: this.cambiar_articulos === 'si' ? true : false,
     };
-    this.getDevuelta.emit(obj);
+
+    if (this.factura_de === 'compra') {
+      if (this.cambiar_articulos !== undefined) {
+        this.getDevuelta.emit(obj);
+      } else {
+        this.dbServ.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
+      }
+    } else {
+      this.getDevuelta.emit(obj);
+    }
   }
 
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
+  }
+
+  cambiosEnArticulos(lugar) {
+    this.cambiar_articulos = lugar;
   }
 }

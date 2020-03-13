@@ -8,3 +8,49 @@
   font-size: 2.4rem;
   padding: 0rem 3rem 0rem 0rem;
 }
+
+.cambioDePrecios {
+  background-color: #95f0a7;
+  border: 1.5px solid #7add8d;
+  border-radius: 1rem;
+  padding: 0.5rem;
+}
+
+span.spanTituloCambio {
+  display: block;
+  text-align: center;
+  font-size: 1.15rem;
+  > span {
+    font-weight: 520;
+    color: #1e6f15;
+  }
+  > i.fas.fa-exclamation-circle {
+    color: #22ad41;
+    font-size: 1.5rem;
+  }
+}
+
+span.deseaCambio_ {
+  display: block;
+  margin: 0.9rem;
+}
+
+.btnDecision {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+span.decisionesCambio {
+  display: block;
+  text-align: center;
+  > span.si_ {
+    font-size: 1.8rem;
+    font-weight: 500;
+  }
+  > span.no_ {
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin: 0rem 0rem 0rem 5rem;
+  }
+}

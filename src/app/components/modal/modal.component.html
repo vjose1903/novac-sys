@@ -118,7 +118,7 @@
       <app-form-cantidad-efectivo [tipo]="tipoDevuelta" [data]="seleccionModal" (cancel)="accion(false)" (getDevuelta)="getDevuelta($event)"></app-form-cantidad-efectivo>
     </p-dialog>
     <!-- ================================================================================================================================ -->
-    <!--  CANCELAR LA PRODUCCION-->
+    <!--  CANCELAR LA PRODUCCION -->
     <!-- ================================================================================================================================ -->
 
     <p-dialog
@@ -134,6 +134,28 @@
       blockScroll="true"
     >
       <p>Seguro que desea cancelar la produccion</p>
+      <p-footer>
+        <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
+        <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      </p-footer>
+    </p-dialog>
+    <!-- ================================================================================================================================ -->
+    <!--  ACTUALIZAR LOS PRECIOS DE LOS ARTICULOS COMPRADOS -->
+    <!-- ================================================================================================================================ -->
+
+    <p-dialog
+      *ngIf="tipoModal === 'modificarArticulosCompra'"
+      header="Confirmar"
+      [(visible)]="showModal"
+      [modal]="false"
+      [responsive]="true"
+      [style]="{ width: '350px', minWidth: '200px' }"
+      [minY]="70"
+      [baseZIndex]="10000"
+      (onHide)="reinicioModal()"
+      blockScroll="true"
+    >
+      <p>Existen articulos con costos distintos desea que se actualicen los costos automaticamente?</p>
       <p-footer>
         <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
         <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>

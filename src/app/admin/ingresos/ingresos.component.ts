@@ -334,7 +334,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
       this.dbServ.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
-      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0 };
+      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso' };
       this.mServ.modalTipo('cambio');
       this.tipoModal = 'cambio';
       this.abrirModal(obj);

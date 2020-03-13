@@ -69,6 +69,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   subTipoF: Subscription;
   FacturaAtrasada = false;
   FechaFacturaAtrasada;
+  articulosAcambiar = [];
+  newCuerpo: any[];
 
   constructor(
     private _ipc: IpcService,
@@ -166,10 +168,21 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       } else if (res && res.tipoModal === 'cambio') {
         this.Devuelta = res.devuelta;
         this.forma_pago = res.forma_pago;
-        this.IMPRIMIR();
-        this.mServ.ModalObj(undefined);
+        if (this.metodo === 'compra') {
+          if (res.decision_cambio) {
+            this.cambiarCostos();
+          }
+
+          this.CuerpoFactura = this.newCuerpo;
+          this.IMPRIMIR();
+          this.mServ.ModalObj(undefined);
+        } else {
+          this.IMPRIMIR();
+          this.mServ.ModalObj(undefined);
+        }
       }
     });
+
     this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
       if (res !== undefined) {
         this.decisionModal(res);
@@ -511,7 +524,19 @@ export class FacturacionComponent implements OnInit, OnDestroy {
             this.tipoModal = 'imprimir';
             this.abrirModal();
           } else {
-            const obj = { total_factura: this.TOTAL, devuelta: 0, tipo__: 'devuelta' };
+            let articulos_a_cambiar = false;
+            console.log('this.articulosAcambiar.length', this.articulosAcambiar.length);
+            console.log('this.articulosAcambiar', this.articulosAcambiar);
+
+            if (this.metodo === 'compra') {
+              const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
+              this.newCuerpo = this.revisarPrecios(cuerpo_fact);
+            }
+
+            if (this.articulosAcambiar.length > 0) {
+              articulos_a_cambiar = true;
+            }
+            const obj = { total_factura: this.TOTAL, devuelta: 0, tipo__: 'devuelta', factura_de: this.metodo, cambios_articulos: articulos_a_cambiar };
             this.mServ.modalTipo('cambio');
             this.tipoModal = 'cambio';
             this.abrirModal(obj);
@@ -527,6 +552,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
     this.mServ.mostrarModal(true);
   }
+
   decisionModal(arg) {
     if (arg) {
       if (this.tipoModal === 'imprimir') {
@@ -552,11 +578,15 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   getCuerpoFactura(arg) {
     this.CuerpoFactura = [];
+
     const obj = JSON.parse(arg);
     this.CuerpoFactura = obj;
+    console.log(this.CuerpoFactura);
   }
 
   CancelarFactura() {
+    this.articulosAcambiar = [];
+    this.newCuerpo = undefined;
     this.propietario_factura = null;
     this.NCFcompra = null;
     this.CostoYgasto = null;
@@ -646,12 +676,14 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
       const tempEnviar = _.omit(newArticulo, ['created_at', 'updated_at', 'contenido_articulos']);
 
-      this.dbServ.editarArticulo(tempEnviar).subscribe(
-        res => {},
-        err => {
-          this.mostrarErrores(err.error);
-        },
-      );
+      this.articulosAcambiar.push(tempEnviar);
+
+      // this.dbServ.editarArticulo(tempEnviar).subscribe(
+      //   res => {},
+      //   err => {
+      //     this.mostrarErrores(err.error);
+      //   },
+      // );
     }
   }
 
@@ -662,6 +694,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       const Articulo = this.listaArticulos.filter(art => art.id === row.articulo_id);
 
       const articulo = JSON.parse(JSON.stringify(Articulo[0]));
+
       const contenido_articulo = articulo.contenido_articulos;
       const costoRow = GLOBAL.desformatear(row.pre);
       const precioRow = 0;
@@ -742,6 +775,27 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
 
+  parsearDetalleComprarDetallesCompra(cuerpo) {
+    cuerpo.forEach(element => {
+      delete element.pre;
+      element.precio = null;
+    });
+    return cuerpo;
+  }
+  async cambiarCostos() {
+    if (this.articulosAcambiar.length > 0) {
+      for (let i = 0; i < this.articulosAcambiar.length; i++) {
+        const articulo = this.articulosAcambiar[i];
+        try {
+          console.log(articulo);
+          // const res = await this.dbServ.editarArticulo(articulo).toPromise();
+        } catch (error) {
+          console.error(error);
+          this.dbServ.toastError('Error actualizando costos articulos.', 'ERROR');
+        }
+      }
+    }
+  }
   IMPRIMIR() {
     const empleado = JSON.parse(this.dbServ.getEmpleado());
     const TipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
@@ -774,7 +828,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;
     cabecera_fact['numero_factura'] = null;
     cabecera_fact['total_factura'] = GLOBAL.redondearAdos(this.TOTAL);
-    cabecera_fact['Bruto'] = GLOBAL.redondearAdos(this.BRUTO);
+    cabecera_fact['Bruto'] = this.BRUTO;
     cabecera_fact['itbis'] = GLOBAL.redondearAdos(this.ITBIS);
     cabecera_fact['descuento'] = GLOBAL.redondearAdos(this.DESCUENTO);
     cabecera_fact['estado'] = true;
@@ -795,47 +849,34 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['tipo'] = this.metodo;
     cabecera_fact['user_id'] = empleado.id;
 
-    if (this.metodo === 'compra') {
-      cabecera_fact['suplidor_id'] = this.form.controls.id.value;
-      const newPrecios = this.revisarPrecios(cabecera_fact['detalle_facturas_attributes']);
-      if (newPrecios !== cuerpo_fact) {
-        this.dbServ.toastWarning('cambios en los cuerpos de facturas', 'AVISO');
-        console.log('nuevo cuerpo ', newPrecios);
-        console.log('cuerpo actual ', cuerpo_fact);
-      } else {
-        this.dbServ.toastSuccess('no hay cambios', 'AVISO');
-      }
-      cabecera_fact['detalle_facturas_attributes'];
-    }
-
     if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
-    // console.log(cabecera_fact);
+    console.log(cabecera_fact);
 
-    this.dbServ.createFacturas(cabecera_fact).subscribe(
-      res => {
-        console.log(res);
-        // this.CancelarFactura();
-        // this.GetArticulos();
-        // this.dbServ.toastSuccess(res.msg, 'CORRECTO');
+    // this.dbServ.createFacturas(cabecera_fact).subscribe(
+    //   res => {
+    //     console.log(res);
+    //     // this.CancelarFactura();
+    //     // this.GetArticulos();
+    //     // this.dbServ.toastSuccess(res.msg, 'CORRECTO');
 
-        this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-          console.log('printRes=====> ', res);
+    //     this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+    //       console.log('printRes=====> ', res);
 
-          if (res.status) {
-          } else {
-            this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-          }
-        });
-        res['FACTURA_DE'] = this.metodo;
-        // this._ipc.send('print', res);
-      },
-      err => {
-        console.log(err);
+    //       if (res.status) {
+    //       } else {
+    //         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+    //       }
+    //     });
+    //     res['FACTURA_DE'] = this.metodo;
+    //     // this._ipc.send('print', res);
+    //   },
+    //   err => {
+    //     console.log(err);
 
-        this.dbServ.toastError(err.error.msg, 'ERROR');
-      },
-    );
+    //     this.dbServ.toastError(err.error.msg, 'ERROR');
+    //   },
+    // );
   }
 }

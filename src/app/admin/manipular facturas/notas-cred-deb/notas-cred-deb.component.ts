@@ -305,7 +305,7 @@ export class NotasCredDebComponent implements OnInit {
       if (this.TOTAL === 0) {
         this.dbServ.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
       } else {
-        const obj = { total_factura: this.TOTAL, devuelta: 0 };
+        const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota };
         this.mServ.modalTipo('cambio');
         this.tipoModal = 'cambio';
         this.abrirModal(obj);
