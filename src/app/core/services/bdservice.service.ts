@@ -9,7 +9,7 @@ import * as _ from 'lodash';
   providedIn: 'root',
 })
 export class DBservice {
-  // url = 'http://vjose.ddns.net:3000';
+  // url = 'http://admservidor.ddns.net:3000';
   url = 'http://localhost:3000';
 
   constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}

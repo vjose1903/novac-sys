@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { GLOBAL } from '../../core/services/GLOBAL';
+import { GLOBAL } from '../../../core/services/GLOBAL';
 @Component({
   selector: 'app-formar-factura',
   templateUrl: './formar-factura.component.html',

@@ -5,11 +5,12 @@ import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 // import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL, OBJDEVUELTO, INDEXTOFOCUS } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
-import { ModalService } from '../../../components/modal/modal.service';
+
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ObservableServcie } from '../../../core/services/observables.service';
 import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { ModalService } from '../../components/modal/modal.service';
 
 @Component({
   selector: 'app-cuerpo-factura',

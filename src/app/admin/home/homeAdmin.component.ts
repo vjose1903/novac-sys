@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DBservice } from '../../core/services/bdservice.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
-import { ModalService } from '../../components/modal/modal.service';
+import { ModalService } from '../components/modal/modal.service';
 
 @Component({
   selector: 'app-homeAdmin',

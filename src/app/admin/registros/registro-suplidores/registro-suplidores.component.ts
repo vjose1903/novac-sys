@@ -5,8 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
-import { ModalService } from '../../../components/modal/modal.service';
 import { Subscription } from 'rxjs';
+import { ModalService } from '../../components/modal/modal.service';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -77,9 +77,9 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
       .getSuplidores()
       .pipe(
         map(
-          val =>
-            (val = val.map(suplidor => {
-              suplidor.documentos_de_identidad.map(docu => {
+          (val) =>
+            (val = val.map((suplidor) => {
+              suplidor.documentos_de_identidad.map((docu) => {
                 if (docu.principal) {
                   suplidor.documento = docu.documento;
                 }
@@ -89,13 +89,13 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
             })),
         ),
       )
-      .subscribe(res => {
+      .subscribe((res) => {
         res.sort((a, b) => {
           return a.id > b.id ? 1 : -1;
         });
         this.listaSuplidores = JSON.parse(JSON.stringify(res));
       });
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
@@ -140,7 +140,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
     this.titulo = 'Editar suplidor: ' + item.ARG.nombre;
     this.boton = 'Editar';
     this.form.patchValue(item.ARG);
-    item.ARG.documentos_de_identidad.forEach(doc => {
+    item.ARG.documentos_de_identidad.forEach((doc) => {
       if (doc.descripcion === 'rnc') {
         this.form.controls.rnc.setValue(doc.documento);
       } else {
@@ -167,7 +167,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
       Fail.push('Telefono');
       devolver = true;
     }
-    temp_documentos_identidad.forEach(element => {
+    temp_documentos_identidad.forEach((element) => {
       //  esto es para saber si el documento de identidad esta mal escrito
       if (this.validarRayaAbajo(element.descripcion)) {
         Fail.push(element.descripcion);
@@ -186,7 +186,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
     obj.estado = true;
     // entra aqui si el formato de un documento de identidad esta mal
     if (devolver) {
-      Fail.forEach(doc => {
+      Fail.forEach((doc) => {
         this.dbServ.toastError('Formato de ' + doc + ' incorrecto', 'ERROR');
       });
       // entra aqui si pasa la validacion de documento de identidad
@@ -198,10 +198,10 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
       } else {
         if (obj.id === null) {
           this.dbServ.createSuplidor(obj).subscribe(
-            res => {
+            (res) => {
               const obj = JSON.parse(JSON.stringify(res));
 
-              obj.documentos_de_identidad.map(docu => {
+              obj.documentos_de_identidad.map((docu) => {
                 if (docu.principal) {
                   obj.documento = docu.documento;
                 }
@@ -212,7 +212,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
               this.dbServ.toastSuccess('Suplidor registrado con exito.', 'Correcto');
               this.borrar();
             },
-            err => {
+            (err) => {
               console.log(err);
 
               this.mostrarErrores(err.error);
@@ -220,9 +220,9 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
           );
         } else {
           this.dbServ.editarSuplidor(obj).subscribe(
-            res => {
+            (res) => {
               const obj = JSON.parse(JSON.stringify(res));
-              obj.documentos_de_identidad.map(docu => {
+              obj.documentos_de_identidad.map((docu) => {
                 if (docu.principal) {
                   obj.documento = docu.documento;
                 }
@@ -234,7 +234,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
               this.dbServ.toastSuccess('Suplidor editado con exito.', 'Correcto');
               this.borrar();
             },
-            err => {
+            (err) => {
               console.log(err);
 
               this.mostrarErrores(err.error);
@@ -247,7 +247,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
 
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
-      arg.forEach(error => {
+      arg.forEach((error) => {
         this.dbServ.toastError(error, 'ERROR');
       });
     } else {
@@ -282,14 +282,14 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
       obj['estado'] = false;
       obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
       this.dbServ.editarSuplidor(obj).subscribe(
-        res => {
+        (res) => {
           this.dbServ.toastSuccess('Empleado ' + obj.nombre + ' borrado.', 'CORRECTO');
           _.pullAt(this.listaSuplidores, this.indexBorrar);
           this.tipoModal = '';
           this.indexBorrar = -1;
           this.decisionModal = null;
         },
-        err => {
+        (err) => {
           console.log(err);
           this.mostrarErrores(err.error);
         },

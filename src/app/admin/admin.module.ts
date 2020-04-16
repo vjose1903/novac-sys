@@ -14,31 +14,29 @@ import { InventarioComponent } from './inventario/inventario.component';
 import { RegistroArticulosComponent } from './registros/articulos/registro-articulos.component';
 import { RegistroEmpleadosComponent } from './registros/registro-empleados/registro-empleados.component';
 import { CuerpoFacturaComponent } from './facturacion/cuerpo-factura/cuerpo-factura.component';
-import { TablasModule } from '../components/tablas/tablas.module';
-import { ModalComponent } from '../components/modal/modal.component';
-import { BTNcircularComponent } from '../components/btncircular/btncircular.component';
 import { RegistroClientesComponent } from './registros/registro-clientes/registro-clientes.component';
-import { UploadImgComponent } from '../components/upload-img/upload-img.component';
 import { ValidateRayaAbajo } from '../directives/validaciones';
-
 import { FacturacionComponent } from './facturacion/facturacion.component';
 import { RegistroSuplidoresComponent } from './registros/registro-suplidores/registro-suplidores.component';
 import { FiltroParaNgforPipe } from '../core/pipe/filtro-para-ngfor.pipe';
 import { PaswordConfirmDirective } from '../core/directive/pasword-confirm-directive.directive';
-import { ChangePasswordComponent } from '../components/change-password/change-password.component';
 import { ProduccionComponent } from './produccion/produccion.component';
-import { PendienteFormComponent } from '../components/pendiente-form/pendiente-form.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MovimientosFormComponent } from './inventario/movimientos-form/movimientos-form.component';
 import { IngresosComponent } from './ingresos/ingresos.component';
 import { FormCantidadEfectivoComponent } from './facturacion/form-cantidad-efectivo/form-cantidad-efectivo.component';
-
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { BuscarFacturaComponent } from './manipular facturas/buscar-factura/buscar-factura.component';
-import { FormarFacturaComponent } from '../components/formar-factura/formar-factura.component';
 import { NotasCredDebComponent } from './manipular facturas/notas-cred-deb/notas-cred-deb.component';
 import { NcfComponent } from './mantenimiento/ncf/ncf.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
+import { ModalComponent } from './components/modal/modal.component';
+import { BTNcircularComponent } from './components/btncircular/btncircular.component';
+import { UploadImgComponent } from './components/upload-img/upload-img.component';
+import { PendienteFormComponent } from './components/pendiente-form/pendiente-form.component';
+import { FormarFacturaComponent } from './components/formar-factura/formar-factura.component';
+import { TablasModule } from './components/tablas/tablas.module';
 
 @NgModule({
   declarations: [

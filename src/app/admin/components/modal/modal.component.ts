@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input, OnChanges, ElementRef, OnDestroy, HostListener } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
-import { DBservice } from '../../core/services/bdservice.service';
+import { DBservice } from '../../../core/services/bdservice.service';
 
 @Component({
   selector: 'app-modal',
@@ -71,17 +71,17 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   subTipo: Subscription;
   subSelec: Subscription;
   ngOnInit() {
-    this.subShow = this.mServ.SHOWMODAL.subscribe(res => {
+    this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.showModal = res;
       }
     });
-    this.subTipo = this.mServ.TIPOMODAL.subscribe(res => {
+    this.subTipo = this.mServ.TIPOMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.tipoModal = res;
       }
     });
-    this.subSelec = this.mServ.SELECCIONMODAL.subscribe(res => {
+    this.subSelec = this.mServ.SELECCIONMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.seleccionModal = res;
         this.paraFiltroArticulos = res.filtrar;

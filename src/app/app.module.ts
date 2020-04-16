@@ -25,7 +25,7 @@ import { NgxBootstrapModule } from './modules/ngx-bootstrap.module';
 import { AngularModule } from './modules/angular.module';
 
 import { ToastrModule } from 'ngx-toastr';
-import { UploadImgComponent } from './components/upload-img/upload-img.component';
+// import { UploadImgComponent } from './components/upload-img/upload-img.component';
 import { IpcService } from './core/services/ipc.service';
 
 import { NgxSpinnerModule } from 'ngx-spinner';

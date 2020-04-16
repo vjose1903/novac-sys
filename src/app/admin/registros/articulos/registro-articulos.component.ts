@@ -2,12 +2,11 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@ang
 import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { TABLA } from '../../../components/tablas/tabla';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as moment from 'moment';
 import { ObservableServcie } from '../../../core/services/observables.service';
 import { map } from 'rxjs/operators';
-import { ModalService } from '../../../components/modal/modal.service';
+import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 
@@ -75,6 +74,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       if (res !== undefined && res !== null) {
         this.listaArticulos = res;
       }
+      console.log(this.listaArticulos);
     });
 
     this.dbServ.getTipoArticulos().subscribe(res => {
@@ -103,8 +103,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   selectTipoArticulo(tipo) {
     const Tipo = this.listaTipoArticulos.filter(val => val.id === _.parseInt(tipo));
-
     this.TIPOARTICULO = Tipo[0].descripcion;
+
     if (this.TIPOARTICULO === 'Producto terminado') {
       this.addItem();
       this.form.controls.medida.setValue('Quintal');
@@ -114,6 +114,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       this.ARRAY_FORMULA = ([] as unknown) as FormArray;
       this.isCombo = false;
     }
+    console.log(this.ARRAY_FORMULA);
+
+    console.log(this.listaArticulos);
   }
   createForm() {
     this.form = this.fb.group({
@@ -258,10 +261,13 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     return item.tipo_articulo_id === 2;
   }
   getCosto(id, i) {
+    console.log('id ', id);
+    console.log('############');
+
     const control = this.form.controls['rowFormula'] as FormArray;
 
-    const TempMateriaPrima = this.listaArticulos.filter(val => val.id === _.parseInt(id));
-    const MateriaPrima = TempMateriaPrima[0];
+    const MateriaPrima = this.listaArticulos.filter(val => val.id === _.parseInt(id))[0];
+
     let costo = 0;
     if (MateriaPrima.medida === 'Quintal') {
       costo = MateriaPrima.contenido_articulos[0].costo;
@@ -271,6 +277,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
     (control.controls[i] as any).controls['costo_formula'].setValue(costo);
   }
+
   calculateCostoPT() {
     let sumatoriaMult = 0;
 
@@ -533,18 +540,20 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     return res;
   }
 
-  recalcular() {
+  async recalcular() {
     this.clickBtnRe = true;
     const temp = GLOBAL.duplicarJson(this.TIPOARTICULO);
     this.TIPOARTICULO = null;
     this.resetArray();
-    this.ProductoEditando.formulas_productos_terminados.forEach((ingredient, i) => {
+
+    for (let i = 0; i < this.ProductoEditando.formulas_productos_terminados.length; i++) {
+      const ingredient = this.ProductoEditando.formulas_productos_terminados[i];
       this.addItem();
       this.fillFormula(ingredient, i, true);
-    });
+    }
     console.log(this.ARRAY_FORMULA.value);
 
-    this.calculateCostoPT();
+    await this.calculateCostoPT();
     this.Recalcular = null;
     this.TIPOARTICULO = temp;
   }

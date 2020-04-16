@@ -4,7 +4,7 @@ import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { ModalService } from '../../components/modal/modal.service';
+import { ModalService } from '../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 

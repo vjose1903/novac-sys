@@ -2,9 +2,9 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import * as moment from 'moment';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DBservice } from '../../core/services/bdservice.service';
 import { ModalService } from '../modal/modal.service';
 import { parseDate, BsDatepickerConfig } from 'ngx-bootstrap';
+import { DBservice } from '../../../core/services/bdservice.service';
 
 @Component({
   selector: 'app-pendiente-form',
@@ -49,7 +49,7 @@ export class PendienteFormComponent implements OnInit {
   }
   makeDateTime() {
     const fechaTemp = moment(this.fecha).format('YYYY-MM-DD');
-    const fechaF = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute ;
+    const fechaF = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute;
     this.getDate.emit(fechaF);
   }
 }

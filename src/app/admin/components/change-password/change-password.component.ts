@@ -1,13 +1,12 @@
 import { Component, OnInit, Output, EventEmitter, Input, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { BsDatepickerConfig } from 'ngx-bootstrap';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DBservice } from '../../core/services/bdservice.service';
-import { ModalService } from '../modal/modal.service';
+import { DBservice } from '../../../core/services/bdservice.service';
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { map } from 'rxjs/operators';
+import { ModalService } from '../modal/modal.service';
 
 @Component({
   selector: 'app-change-password',
@@ -58,14 +57,13 @@ export class ChangePasswordComponent implements OnInit, AfterViewInit {
       obj['documentos_de_identidad_attributes'] = this.user.documentos_de_identidad;
 
       this.dbServ.updateEmpleados(obj).subscribe(
-        res => {
+        (res) => {
           this.cancel.emit(false);
         },
-        err => {
+        (err) => {
           this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
         },
       );
     }
   }
 }
-

@@ -6,10 +6,10 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { TablasComponent } from '../../../components/tablas/tablas.component';
-import { ModalService } from '../../../components/modal/modal.service';
 import { IpcService } from '../../../core/services/ipc.service';
 import { Subscription } from 'rxjs';
+import { TablasComponent } from '../../components/tablas/tablas.component';
+import { ModalService } from '../../components/modal/modal.service';
 
 @Component({
   selector: 'app-notas-cred-deb',

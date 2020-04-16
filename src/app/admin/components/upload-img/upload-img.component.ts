@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { DBservice } from '../../core/services/bdservice.service';
+import { DBservice } from '../../../core/services/bdservice.service';
 
 @Component({
   selector: 'app-upload-img',
@@ -50,10 +50,10 @@ export class UploadImgComponent implements OnInit {
     const files = ev.target.files;
     const reader = new FileReader();
     const file = files[0];
-    
+
     if (files && files.length > 0) {
       reader.readAsDataURL(file);
-      
+
       reader.onload = e => {
         const bas64 = reader.result.toString().split(',')[1];
         this.FILE_NAME = files[0].name;

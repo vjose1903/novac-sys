@@ -3,7 +3,6 @@ import { ObservableServcie } from '../../../core/services/observables.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalService } from '../../../components/modal/modal.service';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { BsDatepickerConfig } from 'ngx-bootstrap';
@@ -11,6 +10,7 @@ import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as moment from 'moment';
 import * as dateFormat from 'dateFormat';
+import { ModalService } from '../../components/modal/modal.service';
 
 @Component({
   selector: 'app-ncf',

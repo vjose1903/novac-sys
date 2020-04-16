@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { ModalService } from '../../../components/modal/modal.service';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { TablasComponent } from '../../../components/tablas/tablas.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TablasComponent } from '../../components/tablas/tablas.component';
+import { ModalService } from '../../components/modal/modal.service';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',

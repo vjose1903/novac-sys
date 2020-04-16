@@ -3,10 +3,10 @@ import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
+import { ModalService } from '../components/modal/modal.service';
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',

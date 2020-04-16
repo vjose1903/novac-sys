@@ -7,8 +7,8 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { map } from 'rxjs/operators';
-import { ModalService } from '../../../components/modal/modal.service';
 import { Subscription } from 'rxjs';
+import { ModalService } from '../../components/modal/modal.service';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -77,10 +77,10 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
       .getEmpleados()
       .pipe(
         map(
-          emple =>
-            (emple = emple.map(cli => {
+          (emple) =>
+            (emple = emple.map((cli) => {
               cli.role_ = cli.sexo === 'm' ? this.rolesM[cli.role] : this.rolesF[cli.role];
-              cli.documentos_de_identidad.map(docu => {
+              cli.documentos_de_identidad.map((docu) => {
                 if (docu.principal) {
                   cli.documento_identidad = docu.documento;
                 }
@@ -89,7 +89,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
             })),
         ),
       )
-      .subscribe(res => {
+      .subscribe((res) => {
         res.sort((a, b) => {
           return a.id > b.id ? 1 : -1;
         });
@@ -110,7 +110,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
       // estado: [true],
       role: [null, Validators.required],
     });
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
@@ -143,7 +143,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
 
   editarItem(item) {
     this.indexSeleccionado = item.INDEX;
-    const doc = item.ARG.documentos_de_identidad.filter(doc => doc.principal === true);
+    const doc = item.ARG.documentos_de_identidad.filter((doc) => doc.principal === true);
 
     if (item.ARG.documentos_de_identidad.length > 0 && doc !== [] && doc !== null && doc !== undefined) {
       this.form.controls.cedula.setValue(doc[0].documento);
@@ -166,7 +166,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
       // { doc: objTemp.rnc, descripcion: 'rnc' },
     ];
 
-    temp_documentos_identidad.forEach(element => {
+    temp_documentos_identidad.forEach((element) => {
       // haciendo la estructura para mandar los documentos a la base de datos
       if (element.doc !== null && element.doc !== ' ' && element.doc !== '' && element.doc !== undefined) {
         documentos_identidad.push({
@@ -188,25 +188,25 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
         objSend['id'] = objSend.id;
 
         this.dbServ.updateEmpleados(objSend).subscribe(
-          res => {
+          (res) => {
             this.dbServ.toastSuccess('Usuario Editado', 'Correcto');
 
-            const docu = res.data.documentos_de_identidad.filter(doc => doc.principal === true);
+            const docu = res.data.documentos_de_identidad.filter((doc) => doc.principal === true);
             res.data.documento_identidad = docu[0].documento;
 
             this.listaEmpleados[this.indexSeleccionado] = res.data;
             this.borrar();
           },
-          err => {
+          (err) => {
             this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
           },
         );
       } else {
         this.dbServ.createEmpleados(objSend).subscribe(
-          res => {
+          (res) => {
             console.log(res);
 
-            const docu = res.data.documentos_de_identidad.filter(doc => doc.principal === true);
+            const docu = res.data.documentos_de_identidad.filter((doc) => doc.principal === true);
             res.data.documento_identidad = docu[0].documento;
 
             this.listaEmpleados = [...this.listaEmpleados, res.data];
@@ -214,7 +214,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
             this.form.reset();
             this.enfocarInput('campoNombre');
           },
-          err => {
+          (err) => {
             console.log(err);
             this.mostrarErrores(err.error.errors.full_messages);
             // this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
@@ -245,14 +245,14 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
       obj['estado'] = false;
       obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
       this.dbServ.updateEmpleados(obj).subscribe(
-        res => {
+        (res) => {
           this.dbServ.toastSuccess('Empleado ' + obj.nombre + ' borrado.', 'CORRECTO');
           _.pullAt(this.listaEmpleados, this.indexBorrar);
           this.tipoModal = '';
           this.indexBorrar = -1;
           this.decisionModal = null;
         },
-        err => {
+        (err) => {
           console.log(err.error.errors);
           this.mostrarErrores(err.error.errors);
         },
@@ -262,7 +262,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
 
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
-      arg.forEach(error => {
+      arg.forEach((error) => {
         this.dbServ.toastError(error, 'ERROR');
       });
     } else {

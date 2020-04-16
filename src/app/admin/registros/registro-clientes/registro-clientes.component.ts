@@ -6,9 +6,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
 import { ValidateRayaAbajo } from '../../../directives/validaciones';
-import { ModalService } from '../../../components/modal/modal.service';
+
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
+import { ModalService } from '../../components/modal/modal.service';
 
 @Component({
   selector: 'app-registro-clientes',
