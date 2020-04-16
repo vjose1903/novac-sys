@@ -71,6 +71,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   FechaFacturaAtrasada;
   articulosAcambiar = [];
   newCuerpo: any[];
+  paqueteComprobante: any;
 
   constructor(
     private _ipc: IpcService,
@@ -329,10 +330,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
     try {
       const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
+      this.paqueteComprobante = paquete.body;
 
-      const desde = paquete.body.desde;
-      const hasta = paquete.body.hasta;
-      const secuencia = paquete.body.secuencia;
+      const desde = this.paqueteComprobante.desde;
+      const hasta = this.paqueteComprobante.hasta;
+      const secuencia = this.paqueteComprobante.secuencia;
 
       const cant = hasta - desde;
       const cantidad = cant + 1;
@@ -351,7 +353,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       const restante = hasta - secuencia + 1;
 
       const msg =
-        paquete.msg === 'Ultimo comprobante de este paquete'
+        this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
           ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
           : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
 
@@ -808,8 +810,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['balance'] = 0;
       cabecera_fact['devuelta'] = this.Devuelta;
     }
+    console.log('this.paqueteComprobante', this.paqueteComprobante);
 
-    cabecera_fact['fecha_valida'] = moment(new Date()).add(1, 'year').format('DD/MM/YYYY');
+    cabecera_fact['fecha_valida'] = moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY');
     cabecera_fact['adelantada'] = this.tipoVenta === 'true' ? true : false;
     cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;

@@ -304,8 +304,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         this.buscarArticuloPorCodigo(i, codigo, input);
         this.enfocarInput(sigInput);
       } else {
-        await this.desEnfocarInput('cod-' + i);
-
         codigo = (this.control.controls[i] as any).controls['cod'].value;
         if (codigo === null) {
           this.enfocarInput('cod-' + i);
