@@ -1,14 +1,9 @@
 import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectionStrategy, OnDestroy, OnChanges, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
-
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-// import { SELECCIONMODAL, SHOWMODAL, TIPOMODAL, DECISIONMODAL, OBJDEVUELTO, INDEXTOFOCUS } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
-
 import { DBservice } from '../../../core/services/bdservice.service';
-import { ObservableServcie } from '../../../core/services/observables.service';
-import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { ModalService } from '../../components/modal/modal.service';
 
@@ -83,36 +78,38 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     //   }),
     // )
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (this.tipoModal === 'removerArticulo' && res) {
         this.procesoQuitarArticulo();
       }
     });
-    this.subObj = this.mServ.OBJDEVUELTO.subscribe(res => {
+    this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res !== undefined && res !== null && res.tipoModal === 'buscar') {
         this.clickRowModal(res);
       }
     });
 
-    this.subEsc = this.mServ.PRESSESC.subscribe(res => {
+    this.subEsc = this.mServ.PRESSESC.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.enfocarInput('cod-' + res);
       }
     });
 
-    this.subInde = this.mServ.INDEXTOFOCUS.subscribe(res => {
+    this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => {
+      console.log(res);
+
       if (res !== undefined && res !== null) {
         this.noArticuloEncontrado(res);
       }
     });
 
-    this.form.valueChanges.subscribe(res => {
+    this.form.valueChanges.subscribe((res) => {
       const detalle_factura = [];
       if (res !== undefined && res !== null) {
         const obj = {};
 
-        res.rowFactura.forEach(fila => {
-          const articulo = this.listaArticulos.filter(art => art.codigo === fila.cod);
+        res.rowFactura.forEach((fila) => {
+          const articulo = this.listaArticulos.filter((art) => art.codigo === fila.cod);
 
           if (fila !== undefined && articulo.length > 0) {
             fila.articulo_id = articulo[0].id;
@@ -150,6 +147,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.control = this.form.controls['rowFactura'] as FormArray;
   }
   async procesoQuitarArticulo() {
+    await this.sacarDescuento(this.indexRemove);
     await this.removeItem(this.indexRemove);
     await this.calculosTotalesGenerales();
     await this.disminuirSecuencia();
@@ -181,7 +179,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   selectedRow(i, bool) {
     const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i, 'desc-' + i, 'pre-' + i, 'tot-' + i];
-    lista.forEach(row => {
+    lista.forEach((row) => {
       if (bool) {
         this.ModificarClass(row, 'inputOscuro', 'add');
       } else {
@@ -324,7 +322,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     let precioQuintal;
     this.inputDrop = 'uni-' + i;
 
-    const ARTICULO = this.listaArticulos.filter(articulo => articulo.codigo === codigo);
+    const ARTICULO = this.listaArticulos.filter((articulo) => articulo.codigo === codigo);
     if (ARTICULO[0] === undefined) {
       this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
       setTimeout(() => {
@@ -360,7 +358,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             }
           }
 
-          const arti = ARTICULO[0].contenido_articulos.filter(art => art.medida === 'Quintal');
+          const arti = ARTICULO[0].contenido_articulos.filter((art) => art.medida === 'Quintal');
 
           if (arti.length !== 0) {
             precioQuintal = arti[0].precio;
@@ -409,7 +407,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
     }
 
-    art.contenido_articulos.forEach(element => {
+    art.contenido_articulos.forEach((element) => {
       this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
     });
   }
@@ -424,7 +422,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
       this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
     }
-    art.contenido_articulos.forEach(element => {
+    art.contenido_articulos.forEach((element) => {
       if (element.referencia === null) {
         if (art.descripcion === 'Veterinaria') {
           this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
@@ -456,7 +454,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   checkCantidadExede(i, unidad, lugar) {
     let cantidad = 0;
     const descripcion = (this.control.controls[i] as any).controls['des'].value;
-    const tempArticulo = this.listaArticulos.filter(arti => arti.nombre === descripcion);
+    const tempArticulo = this.listaArticulos.filter((arti) => arti.nombre === descripcion);
     const articulo = tempArticulo[0];
     const cantidades = articulo.cantidades;
 
@@ -519,7 +517,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   selectMedidaChange(arg, i) {
-    const indiceDetalle = _.findIndex(this.UnidadesArticulo, o => {
+    const indiceDetalle = _.findIndex(this.UnidadesArticulo, (o) => {
       return o.value === arg;
     });
 
@@ -693,10 +691,22 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
   }
 
+  sacarDescuento(i) {
+    let acuDesc = 0;
+    const index = _.findIndex(this.listaDeDescuentos, (o: any) => {
+      return o.fila === i;
+    });
+    if (index !== -1) {
+      _.pullAt(this.listaDeDescuentos, index);
+      this.listaDeDescuentos.forEach((element) => {
+        acuDesc = acuDesc + element.desc;
+      });
+
+      this.sendDescuento.emit(acuDesc);
+    }
+  }
   calculosDescuentoGeneral(descuento, i) {
     let acuDesc = 0;
-
-    // const obj = { fila: i, desc: GLOBAL.redondearAdos(descuento) };
     const obj = { fila: i, desc: descuento };
     const index = _.findIndex(this.listaDeDescuentos, (o: any) => {
       return o.fila === obj.fila;
@@ -707,7 +717,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     } else {
       this.listaDeDescuentos.push(obj);
     }
-    this.listaDeDescuentos.forEach(element => {
+    this.listaDeDescuentos.forEach((element) => {
       acuDesc = acuDesc + element.desc;
     });
 
@@ -756,7 +766,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (this.metodo === 'venta') {
       obj.listaArticulos = this.listaArticulos;
     } else {
-      obj.listaArticulos = this.listaArticulos.filter(articulo => articulo.suplidor_id === this.propietario.id);
+      obj.listaArticulos = this.listaArticulos.filter((articulo) => articulo.suplidor_id === this.propietario.id);
     }
 
     this.mServ.modalTipo('buscar');
@@ -811,7 +821,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   entrarSacosAUnidades(precioQuintal, costoQuintal) {
     this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
-    this.sacos.forEach(saco => {
+    this.sacos.forEach((saco) => {
       const valor = 'Saco de ' + saco + ' libras';
       this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioQuintal), costo: this.calcularPrecioSaco(saco, costoQuintal) });
     });
@@ -830,6 +840,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.dbServ.toastError(`Articulo no creado `, 'ERROR');
     }
     this.enfocarInput('cod-' + arg);
+    this.mServ.ModalIndex(undefined);
+
     // this.element = document.getElementById('cod-' + arg) as HTMLElement;
     // this.element.focus();
   }

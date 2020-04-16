@@ -674,15 +674,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       newArticulo.user_id = this.usuario.id;
 
       const tempEnviar = _.omit(newArticulo, ['created_at', 'updated_at', 'contenido_articulos']);
-
       this.articulosAcambiar.push(tempEnviar);
-
-      // this.dbServ.editarArticulo(tempEnviar).subscribe(
-      //   res => {},
-      //   err => {
-      //     this.mostrarErrores(err.error);
-      //   },
-      // );
     }
   }
 
@@ -825,7 +817,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['total_factura'] = GLOBAL.redondearAdos(this.TOTAL);
     cabecera_fact['Bruto'] = this.BRUTO;
     cabecera_fact['itbis'] = GLOBAL.redondearAdos(this.ITBIS);
-    cabecera_fact['descuento'] = GLOBAL.redondearAdos(this.DESCUENTO);
+    cabecera_fact['descuento'] = GLOBAL.desformatear(GLOBAL.redondearAdos(this.DESCUENTO));
     cabecera_fact['estado'] = true;
     cabecera_fact['is_nota'] = false;
     cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
@@ -851,29 +843,29 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
     console.log(cabecera_fact);
 
-    this.dbServ.createFacturas(cabecera_fact).subscribe(
-      (res) => {
-        console.log(res);
-        this.CancelarFactura();
-        this.GetArticulos();
-        this.dbServ.toastSuccess(res.msg, 'CORRECTO');
+    // this.dbServ.createFacturas(cabecera_fact).subscribe(
+    //   (res) => {
+    //     console.log(res);
+    //     this.CancelarFactura();
+    //     this.GetArticulos();
+    //     this.dbServ.toastSuccess(res.msg, 'CORRECTO');
 
-        this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-          console.log('printRes=====> ', res);
+    //     this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+    //       console.log('printRes=====> ', res);
 
-          if (res.status) {
-          } else {
-            this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-          }
-        });
-        res['FACTURA_DE'] = this.metodo;
-        // this._ipc.send('print', res);
-      },
-      (err) => {
-        console.log(err);
+    //       if (res.status) {
+    //       } else {
+    //         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+    //       }
+    //     });
+    //     res['FACTURA_DE'] = this.metodo;
+    //     // this._ipc.send('print', res);
+    //   },
+    //   (err) => {
+    //     console.log(err);
 
-        this.dbServ.toastError(err.error.msg, 'ERROR');
-      },
-    );
+    //     this.dbServ.toastError(err.error.msg, 'ERROR');
+    //   },
+    // );
   }
 }
