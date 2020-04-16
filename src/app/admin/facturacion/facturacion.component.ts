@@ -332,33 +332,35 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
       this.paqueteComprobante = paquete.body;
 
-      const desde = this.paqueteComprobante.desde;
-      const hasta = this.paqueteComprobante.hasta;
-      const secuencia = this.paqueteComprobante.secuencia;
+      if (this.paqueteComprobante.fecha_valida !== null) {
+        const desde = this.paqueteComprobante.desde;
+        const hasta = this.paqueteComprobante.hasta;
+        const secuencia = this.paqueteComprobante.secuencia;
 
-      const cant = hasta - desde;
-      const cantidad = cant + 1;
-      let porciento = 0;
+        const cant = hasta - desde;
+        const cantidad = cant + 1;
+        let porciento = 0;
 
-      if (cantidad > 0 && cantidad <= 40) {
-        porciento = cantidad * 0.5;
-      } else if (cantidad > 40 && cantidad <= 100) {
-        porciento = cantidad * 0.25;
-      } else if (cantidad > 100 && cantidad <= cantidad * 500) {
-        porciento = cantidad * 0.1;
-      } else if (cantidad > 500) {
-        porciento = cantidad * 0.04;
-      }
-      const limite = hasta - porciento;
-      const restante = hasta - secuencia + 1;
+        if (cantidad > 0 && cantidad <= 40) {
+          porciento = cantidad * 0.5;
+        } else if (cantidad > 40 && cantidad <= 100) {
+          porciento = cantidad * 0.25;
+        } else if (cantidad > 100 && cantidad <= cantidad * 500) {
+          porciento = cantidad * 0.1;
+        } else if (cantidad > 500) {
+          porciento = cantidad * 0.04;
+        }
+        const limite = hasta - porciento;
+        const restante = hasta - secuencia + 1;
 
-      const msg =
-        this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
-          ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
-          : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
+        const msg =
+          this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
+            ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
+            : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
 
-      if (secuencia >= limite) {
-        this.dbServ.toastWarning(msg, 'AVISO');
+        if (secuencia >= limite) {
+          this.dbServ.toastWarning(msg, 'AVISO');
+        }
       }
       return 'si';
     } catch (error) {
@@ -810,9 +812,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['balance'] = 0;
       cabecera_fact['devuelta'] = this.Devuelta;
     }
-    console.log('this.paqueteComprobante', this.paqueteComprobante);
 
-    cabecera_fact['fecha_valida'] = moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY');
+    cabecera_fact['fecha_valida'] = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
     cabecera_fact['adelantada'] = this.tipoVenta === 'true' ? true : false;
     cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;
