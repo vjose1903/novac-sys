@@ -797,6 +797,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['condicion'] = this.condicion_fact;
     cabecera_fact['forma_pago'] = this.forma_pago;
     cabecera_fact['fecha_facturacion'] = this.FechaFacturaAtrasada ? this.FechaFacturaAtrasada : null;
+
     if (this.condicion_fact === 'Crédito') {
       cabecera_fact['fecha_vencimiento'] = moment(new Date()).add(this.propietario_factura.limite_credito, 'days').format('DD/MM/YYYY');
       cabecera_fact['pagada'] = false;
@@ -809,18 +810,18 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
 
     cabecera_fact['fecha_valida'] = moment(new Date()).add(1, 'year').format('DD/MM/YYYY');
-
     cabecera_fact['adelantada'] = this.tipoVenta === 'true' ? true : false;
     cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;
     cabecera_fact['numero_factura'] = null;
-    cabecera_fact['total_factura'] = GLOBAL.redondearAdos(this.TOTAL);
+    cabecera_fact['total_factura'] = GLOBAL.desformatear(GLOBAL.redondearAdos(this.TOTAL));
     cabecera_fact['Bruto'] = this.BRUTO;
     cabecera_fact['itbis'] = GLOBAL.redondearAdos(this.ITBIS);
     cabecera_fact['descuento'] = GLOBAL.desformatear(GLOBAL.redondearAdos(this.DESCUENTO));
     cabecera_fact['estado'] = true;
     cabecera_fact['is_nota'] = false;
     cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
+
     if (this.metodo === 'venta') {
       if (this.propietario_factura && this.propietario_factura.id === 1) {
         cabecera_fact['cliente_id'] = null;

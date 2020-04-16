@@ -47,7 +47,7 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
     }
     if (campo === 'send') {
       if (this.efectivo < this.data.total_factura) {
-        this.dbServ.toastError('Cantidad de dinero insuficiente.');
+        this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         this.enfocarInput('inputEfectivo');
       } else {
         this.enfocarInput('btnSend');
@@ -140,20 +140,28 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
     this.cancel.emit();
   }
   confirmar() {
+    const total = this.data.total_factura;
+    const devuelta_ = GLOBAL.desformatear(this.devuelta);
+    const efectivo = GLOBAL.desformatear(this.efectivo);
     const obj = {
-      devuelta: this.devuelta ? GLOBAL.desformatear(this.devuelta) : 0,
+      devuelta: this.devuelta ? devuelta_ : 0,
       forma_pago: this.formaPago,
       decision_cambio: this.cambiar_articulos === 'si' ? true : false,
     };
+    console.log('total > efectivo', 'total ', total, 'efectivo ', efectivo, total > efectivo);
 
-    if (this.factura_de === 'compra') {
-      if (this.cambiar_articulos !== undefined) {
-        this.getDevuelta.emit(obj);
-      } else {
-        this.dbServ.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
-      }
+    if (total > efectivo) {
+      this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR');
     } else {
-      this.getDevuelta.emit(obj);
+      if (this.factura_de === 'compra') {
+        if (this.cambiar_articulos !== undefined) {
+          this.getDevuelta.emit(obj);
+        } else {
+          this.dbServ.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
+        }
+      } else {
+        this.getDevuelta.emit(obj);
+      }
     }
   }
 
