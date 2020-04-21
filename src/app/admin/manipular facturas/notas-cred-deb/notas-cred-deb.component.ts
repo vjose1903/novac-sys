@@ -36,17 +36,20 @@ export class NotasCredDebComponent implements OnInit {
   @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
   tipoModal: string;
   subObj: Subscription;
-  subTipoF: Subscription;
   tipoFactura: any;
   lista_tipos_facturas: any;
   propietario_factura: any;
+  paqueteComprobante;
   constructor(private dbServ: DBservice, private route: ActivatedRoute, private mServ: ModalService, private _ipc: IpcService) {}
 
   ngOnInit() {
     this.idFactura = this.route.snapshot.params['id'];
     this.tipoNota = this.route.snapshot.params['tipo'];
     this.fecha = moment().format('DD/MM/YYYY');
-    this.necesarioStart();
+    this.dbServ.getTiposFacturas().subscribe((res) => {
+      this.lista_tipos_facturas = res;
+    });
+
     if (this.tipoNota === 'credito') {
       this.tituloPag = 'Nota de crédito aplicada a factura ';
       this.tipoFactura = '04';
@@ -54,8 +57,9 @@ export class NotasCredDebComponent implements OnInit {
       this.tituloPag = 'Nota de débito aplicada a factura ';
       this.tipoFactura = '03';
     }
+    this.necesarioStart();
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       console.log(res);
 
       if (res) {
@@ -64,10 +68,7 @@ export class NotasCredDebComponent implements OnInit {
       }
     });
 
-    this.subTipoF = this.dbServ.getTiposFacturas().subscribe(res => {
-      this.lista_tipos_facturas = res;
-    });
-    this.subObj = this.mServ.OBJDEVUELTO.subscribe(res => {
+    this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'cambio') {
         this.decisionModal(res);
       }
@@ -77,7 +78,6 @@ export class NotasCredDebComponent implements OnInit {
   ngOnDestroy(): void {
     this.subDeci.unsubscribe();
     this.subObj.unsubscribe();
-    this.subTipoF.unsubscribe();
   }
 
   async necesarioStart() {
@@ -85,12 +85,19 @@ export class NotasCredDebComponent implements OnInit {
     this.factura_aplicada = this.factura.numero_comprobante;
     await this.formarTitulosTabla();
     await this.getPropietario(this.factura.cliente_id);
+    await this.getPaqueteComprobante();
+  }
+  async getPaqueteComprobante() {
+    const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
+    const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
+    this.paqueteComprobante = paquete.body;
+    console.log(this.paqueteComprobante);
   }
   async getPropietario(id) {
     if (id) {
       try {
         const cliente = await this.dbServ.getClienteById(id).toPromise();
-        const documento = cliente.documentos_de_identidad.filter(doc => doc.principal === true)[0];
+        const documento = cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0];
         this.propietario_factura = {
           nombre: cliente.nombre + ' ' + cliente.apellido,
           direccion: cliente.direccion,
@@ -327,7 +334,7 @@ export class NotasCredDebComponent implements OnInit {
     return num;
   }
 
-  formarNota(res) {
+  async formarNota(res) {
     console.log(this.detalleFacturas);
     const temp = [];
     if (res) {
@@ -356,7 +363,7 @@ export class NotasCredDebComponent implements OnInit {
     }
 
     const empleado = JSON.parse(this.dbServ.getEmpleado());
-    const TipoFact = this.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
+    const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
     const cuerpo_fact = GLOBAL.duplicarJson(temp);
 
@@ -372,9 +379,7 @@ export class NotasCredDebComponent implements OnInit {
     cabecera_fact['balance'] = 0;
     cabecera_fact['devuelta'] = this.TOTAL * -1;
 
-    cabecera_fact['fecha_valida'] = moment(new Date())
-      .add(1, 'year')
-      .format('DD/MM/YYYY');
+    cabecera_fact['fecha_valida'] = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
 
     cabecera_fact['adelantada'] = false;
     cabecera_fact['numero_comprobante'] = null;
@@ -406,27 +411,24 @@ export class NotasCredDebComponent implements OnInit {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
     console.log(cabecera_fact);
-
-    // this.dbServ.createFacturas(cabecera_fact).subscribe(
-    //   res => {
-    //     console.log(res);
-    //     this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-    //       console.log('printRes=====> ', res);
-
-    //       if (res.status) {
-    //         this.CancelarFactura();
-    //         this.GetArticulos();
-    //         this.dbServ.toastSuccess(res.msg, 'CORRECTO');
-    //       } else {
-    //         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-    //       }
-    //     });
-    //     res['FACTURA_DE'] = this.metodo;
-    //     // this._ipc.send('print', res);
-    //   },
-    //   err => {
-    //     this.dbServ.toastError(err.statusText, 'ERROR');
-    //   },
-    // );
+    try {
+      // const res = await this.dbServ.createFacturas(cabecera_fact).toPromise()
+      //     console.log(res);
+      //     await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+      //       console.log('printRes=====> ', res);
+      //       if (res.status) {
+      //         await this.CancelarFactura();
+      //         this.GetArticulos();
+      //         this.dbServ.toastSuccess(res.msg, 'CORRECTO');
+      //       } else {
+      //         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+      //       }
+      //     });
+      //     res['FACTURA_DE'] = this.metodo;
+      //     // this._ipc.send('print', res);
+    } catch (error) {
+      // console.error(error);
+      //     this.dbServ.toastError(error.statusText, 'ERROR');
+    }
   }
 }

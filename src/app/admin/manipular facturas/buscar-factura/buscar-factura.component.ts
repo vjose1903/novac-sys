@@ -28,6 +28,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   Para: string;
   tipoModal: any;
   indexSelected: any;
+  lista_tipos_facturas: any;
+  tipoFactura: any;
+  paqueteComprobante: any;
   constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute, private router: Router) {}
   campo = null;
   placeHolder = '';
@@ -79,17 +82,25 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   ];
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   ngOnInit() {
-    this.necesarioStart();
+    this.dbServ.getTiposFacturas().subscribe((res) => {
+      this.lista_tipos_facturas = res;
+    });
     this.BuscarPara = this.route.snapshot.params['para'];
+    if (this.BuscarPara === 'nota_credito') {
+      this.tipoFactura = '04';
+    } else {
+      this.tipoFactura = '03';
+    }
+    this.necesarioStart();
     this.completarTituloPag();
 
-    this.subEsc = this.mServ.PRESSESC.subscribe(res => {
+    this.subEsc = this.mServ.PRESSESC.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.enfocarInput('valorI');
       }
     });
 
-    this.sub = this.mServ.OBJDEVUELTO.subscribe(res => {
+    this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'buscarCliente') {
         this.clienteBuscado = res;
         (document.getElementById('valorI') as any).value = res.nombre;
@@ -98,7 +109,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res) {
         if (this.tipoModal === 'mostrarFactura') {
           if (this.BuscarPara === 'cancelar_factura') {
@@ -126,8 +137,49 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       }
     });
   }
+  async getPaqueteComprobante() {
+    try {
+      const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
+      const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
+      this.paqueteComprobante = paquete.body;
+      console.log(this.paqueteComprobante);
+      if (this.paqueteComprobante.fecha_valida !== null) {
+        const desde = this.paqueteComprobante.desde;
+        const hasta = this.paqueteComprobante.hasta;
+        const secuencia = this.paqueteComprobante.secuencia;
 
+        const cant = hasta - desde;
+        const cantidad = cant + 1;
+        let porciento = 0;
+
+        if (cantidad > 0 && cantidad <= 40) {
+          porciento = cantidad * 0.5;
+        } else if (cantidad > 40 && cantidad <= 100) {
+          porciento = cantidad * 0.25;
+        } else if (cantidad > 100 && cantidad <= cantidad * 500) {
+          porciento = cantidad * 0.1;
+        } else if (cantidad > 500) {
+          porciento = cantidad * 0.04;
+        }
+        const limite = hasta - porciento;
+        const restante = hasta - secuencia + 1;
+
+        const msg =
+          this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
+            ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
+            : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
+
+        if (secuencia >= limite) {
+          this.dbServ.toastWarning(msg, 'AVISO');
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      this.dbServ.toastError(error.error.msg, 'ERROR');
+    }
+  }
   completarTituloPag() {
+    console.log(this.BuscarPara)
     if (this.BuscarPara === 'cancelar_factura') {
       this.Para = ' Anular factura';
     } else if (this.BuscarPara === 'nota_credito') {
@@ -145,6 +197,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   async necesarioStart() {
     await this.getClientes();
+    await this.getPaqueteComprobante();
     this.enfocarInput('campoI');
   }
   async getClientes() {
@@ -153,11 +206,11 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         .getClientes()
         .pipe(
           map(
-            cliente =>
-              (cliente = cliente.map(cli => {
+            (cliente) =>
+              (cliente = cliente.map((cli) => {
                 cli.nombre = GLOBAL.Capitalice(cli.nombre);
                 cli.apellido = GLOBAL.Capitalice(cli.apellido);
-                cli.documentos_de_identidad.map(docu => {
+                cli.documentos_de_identidad.map((docu) => {
                   if (docu.principal) {
                     cli.documento_identidad = docu.documento;
                   }
@@ -194,8 +247,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         .getFacturasByParams(campo, valor)
         .pipe(
           map(
-            fact =>
-              (fact = fact.map(val => {
+            (fact) =>
+              (fact = fact.map((val) => {
                 val.secuencia = _.padStart(val.numero_factura, 5, '0');
                 val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
                 val.fechaV = moment(val.fecha_vencimiento).format('DD-MM-YYYY');

@@ -122,7 +122,7 @@ export class NcfComponent implements OnInit, OnDestroy {
       const anio = moment(this.fechaCompra)
         .add(1, 'year')
         .format('YYYY');
-      const newFecha = '12/21/' + anio;
+      const newFecha = '12/31/' + anio;
 
       this.fechaValidez = newFecha;
     }, 50);
@@ -133,7 +133,7 @@ export class NcfComponent implements OnInit, OnDestroy {
     const anio = moment(this.fechaCompra)
       .add(1, 'year')
       .format('YYYY');
-    const newFecha = '12/21/' + anio;
+    const newFecha = '12/31/' + anio;
     this.fechaValidez = newFecha;
   }
 

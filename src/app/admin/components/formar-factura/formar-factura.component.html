@@ -45,7 +45,7 @@
       <div class="col-4 d-flex justify-content-center">
         <div class="infoFactura">
           <span class="d-block">
-            <b class="text-bold ">Fecha :</b>&nbsp; <span>{{ formatoFecha(factura.fecha_facturacion) }}</span>
+            <b class="text-bold ">Fecha :</b>&nbsp; <span>{{ formatoFecha(factura.fecha_facturacion) }}</span> - <span>{{ formatoHora(factura.fecha_facturacion) }}</span>
           </span>
           <span *ngIf="factura.condicion === 'Crédito'" class="d-block">
             <b class="text-bold ">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_vencimiento) }}</span>

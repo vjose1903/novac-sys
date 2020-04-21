@@ -791,7 +791,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     }
   }
-  IMPRIMIR() {
+  async IMPRIMIR() {
     const empleado = JSON.parse(this.dbServ.getEmpleado());
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
@@ -848,29 +848,27 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
     console.log(cabecera_fact);
 
-    // this.dbServ.createFacturas(cabecera_fact).subscribe(
-    //   (res) => {
-    //     console.log(res);
-    //     this.CancelarFactura();
-    //     this.GetArticulos();
-    //     this.dbServ.toastSuccess(res.msg, 'CORRECTO');
+    try {
+      const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
 
-    //     this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-    //       console.log('printRes=====> ', res);
+      console.log(res);
+      await this.CancelarFactura();
+      this.GetArticulos();
+      this.dbServ.toastSuccess(res.msg, 'CORRECTO');
 
-    //       if (res.status) {
-    //       } else {
-    //         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-    //       }
-    //     });
-    //     res['FACTURA_DE'] = this.metodo;
-    //     // this._ipc.send('print', res);
-    //   },
-    //   (err) => {
-    //     console.log(err);
+      await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+        console.log('printRes=====> ', res);
 
-    //     this.dbServ.toastError(err.error.msg, 'ERROR');
-    //   },
-    // );
+        if (res.status) {
+        } else {
+          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+        }
+      });
+      res['FACTURA_DE'] = this.metodo;
+      // this._ipc.send('print', res);
+    } catch (error) {
+      console.log(error);
+      this.dbServ.toastError(error.error.msg, 'ERROR');
+    }
   }
 }

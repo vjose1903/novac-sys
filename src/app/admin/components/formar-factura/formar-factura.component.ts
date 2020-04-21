@@ -19,6 +19,11 @@ export class FormarFacturaComponent implements OnInit {
     return _.padStart(num, 8, '0');
   }
   formatoFecha(fecha) {
+    moment.locale('es');
     return moment(fecha).format('DD/MM/YYYY');
+  }
+  formatoHora(fecha) {
+    moment.locale('es');
+    return moment(fecha).format('hh:mm a');
   }
 }
