@@ -29,6 +29,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   tipoModal: any;
   indexSelected: any;
   lista_tipos_facturas: any;
+  existenComprobantes = false;
   tipoFactura: any;
   paqueteComprobante: any;
   constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute, private router: Router) {}
@@ -174,12 +175,13 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         }
       }
     } catch (error) {
+      this.existenComprobantes = true;
       console.error(error);
       this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }
   completarTituloPag() {
-    console.log(this.BuscarPara)
+    console.log(this.BuscarPara);
     if (this.BuscarPara === 'cancelar_factura') {
       this.Para = ' Anular factura';
     } else if (this.BuscarPara === 'nota_credito') {

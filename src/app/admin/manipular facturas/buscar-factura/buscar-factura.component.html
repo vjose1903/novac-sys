@@ -9,7 +9,15 @@
       <div class="form-group">
         <label class="control-label">Buscar factura por : </label>
 
-        <select id="campoI" [(ngModel)]="campo" class="form-control" (keydown.enter)="saltar('valorI', $event.target.value)" (change)="changeSelect($event.target.value)" value="">
+        <select
+          id="campoI"
+          [(ngModel)]="campo"
+          class="form-control"
+          (keydown.enter)="saltar('valorI', $event.target.value)"
+          (change)="changeSelect($event.target.value)"
+          value=""
+          [disabled]="existenComprobantes"
+        >
           <option [value]="null" selected disabled>Escoger tipo</option>
           <option value="1">Por cliente</option>
           <option value="2">Por numero comprobante</option>
@@ -28,6 +36,7 @@
             [placeholder]="placeHolder"
             class="form-control mb-4"
             autocomplete="off"
+            [disabled]="existenComprobantes"
           />
         </ng-container>
 
@@ -40,6 +49,7 @@
             (keydown.enter)="saltar('buscarFactura', $event.target.value)"
             (focus)="$event.target.select()"
             id="valorI"
+            [disabled]="existenComprobantes"
           />
         </ng-container>
         <ng-container *ngIf="campo === '3'">
@@ -51,6 +61,7 @@
             [placeholder]="placeHolder"
             class="form-control mb-4"
             autocomplete="off"
+            [disabled]="existenComprobantes"
           />
         </ng-container>
       </div>
