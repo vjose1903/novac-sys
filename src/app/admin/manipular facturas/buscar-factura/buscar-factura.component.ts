@@ -30,8 +30,10 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   indexSelected: any;
   lista_tipos_facturas: any;
   existenComprobantes = false;
-  tipoFactura: any;
+  tipo_factu_nota: any;
   paqueteComprobante: any;
+  tipo_factura_id = null;
+
   constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute, private router: Router) {}
   campo = null;
   placeHolder = '';
@@ -60,7 +62,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       key: 'fechaV',
     },
     {
-      titulo: 'Total tacturado',
+      titulo: 'Total facturado',
       key: 'total_factura',
       formatoNumero: true,
     },
@@ -88,9 +90,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     });
     this.BuscarPara = this.route.snapshot.params['para'];
     if (this.BuscarPara === 'nota_credito') {
-      this.tipoFactura = '04';
+      this.tipo_factu_nota = '04';
     } else {
-      this.tipoFactura = '03';
+      this.tipo_factu_nota = '03';
     }
     this.necesarioStart();
     this.completarTituloPag();
@@ -111,9 +113,12 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     });
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
+      console.log('res ', res);
+      console.log('tipoModal ', this.tipoModal);
+
       if (res) {
         if (this.tipoModal === 'mostrarFactura') {
-          if (this.BuscarPara === 'cancelar_factura') {
+          if (this.BuscarPara === 'anular_factura') {
             this.facturaSelected['identificadorFact'] =
               this.campo === '2'
                 ? ' con el comprobante fiscal ' + this.facturaSelected.numero_comprobante
@@ -126,7 +131,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
             const url = `/admin/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
             this.router.navigateByUrl(url);
           }
-        } else if (this.tipoModal === 'cancelar') {
+        } else if (this.tipoModal === 'cancelarBusqueda') {
           this.decisionesModal();
         }
       } else {
@@ -140,7 +145,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   }
   async getPaqueteComprobante() {
     try {
-      const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
+      const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipo_factu_nota);
       const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
       this.paqueteComprobante = paquete.body;
       console.log(this.paqueteComprobante);
@@ -182,7 +187,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   }
   completarTituloPag() {
     console.log(this.BuscarPara);
-    if (this.BuscarPara === 'cancelar_factura') {
+    if (this.BuscarPara === 'anular_factura') {
       this.Para = ' Anular factura';
     } else if (this.BuscarPara === 'nota_credito') {
       this.Para = ' Nota de crédito';
@@ -229,7 +234,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   async pedirFactura(campo, valor) {
     try {
-      this.facturas = await this.dbServ.getFacturasByParams(campo, valor).toPromise();
+      this.facturas = undefined;
+      const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id).toPromise();
+      this.facturas = GLOBAL.duplicarJson(busqueda);
 
       if (this.facturas.length > 0) {
         this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
@@ -245,8 +252,10 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   async pedirFacturaModal(campo, valor) {
     try {
       const fechaA = moment().format('YYYY-MM-DD');
-      this.facturas = await this.dbServ
-        .getFacturasByParams(campo, valor)
+      this.facturas = undefined;
+
+      const busqueda = await this.dbServ
+        .getFacturasByParams(campo, valor, this.tipo_factura_id)
         .pipe(
           map(
             (fact) =>
@@ -265,9 +274,10 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
           ),
         )
         .toPromise();
-      this.facturas.sort((a, b) => {
+      busqueda.sort((a, b) => {
         return a.id > b.id ? 1 : -1;
       });
+      this.facturas = GLOBAL.duplicarJson(busqueda);
     } catch (error) {
       console.error(error);
     }
@@ -283,6 +293,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   }
 
   changeSelect(valor) {
+    this.tipo_factura_id = null;
     if (valor === '1') {
       this.campoSelected = 'Cliente';
       this.placeHolder = 'Nombre Cliente';
@@ -316,6 +327,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.NCF = null;
     this.facturas = undefined;
     (document.getElementById('valorI') as any).value = null;
+    this.tipo_factura_id = null;
     this.campo = null;
     this.enfocarInput('campoI');
   }
@@ -398,10 +410,11 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   }
 
   decisionesModal() {
-    if (this.BuscarPara === 'cancelar_factura') {
+    if (this.BuscarPara === 'anular_factura') {
       this.CancelarFactura();
-    } else if (this.BuscarPara === 'nota_credito') {
-    } else if (this.BuscarPara === 'nota_debito') {
+    }
+    if (this.tipoModal === 'cancelarBusqueda') {
+      this.borrar();
     }
   }
   async CancelarFactura() {

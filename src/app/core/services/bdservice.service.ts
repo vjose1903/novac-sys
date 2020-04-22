@@ -45,7 +45,7 @@ export class DBservice {
         },
         params: { spinner: 'no' },
       }).pipe(
-        map(val => {
+        map((val) => {
           // set obs false
 
           return val;
@@ -60,7 +60,7 @@ export class DBservice {
         },
         params: { spinner: 'no' },
       }).pipe(
-        map(val => {
+        map((val) => {
           // set obs false
           return val;
         }),
@@ -78,7 +78,7 @@ export class DBservice {
 
   login(arg): Observable<any> {
     return this.peticion('auth/sign_in', 'post', arg).pipe(
-      map(val => {
+      map((val) => {
         if (val.data) {
           this.saveAuthUser(val.data);
           this.router.navigate(['/admin']);
@@ -262,13 +262,13 @@ export class DBservice {
   getFacturasByClienteIdAndPagada(cliente_id, pagada) {
     return this.peticion(`cabecera_facturas/cliente/${cliente_id}/pagada/${pagada}`, 'get');
   }
-  getFacturasByParams(campo, valor) {
+  getFacturasByParams(campo, valor, tipo_factura_id) {
     const valor_enc = btoa(valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
-    return this.peticion(`cabecera_facturas/params/${campo}/${VALOR_ENC}`, 'get');
+    return this.peticion(`cabecera_facturas/params/${campo}/${VALOR_ENC}/${tipo_factura_id}`, 'get');
   }
   cancelarFactura(id) {
-    return this.peticion(`cabecera_facturas/cancelar_factura/${id}`, 'post', JSON.stringify({}));
+    return this.peticion(`cabecera_facturas/anular_factura/${id}`, 'post', JSON.stringify({}));
   }
 
   // =====================================================================

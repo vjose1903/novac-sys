@@ -13,7 +13,7 @@
           id="campoI"
           [(ngModel)]="campo"
           class="form-control"
-          (keydown.enter)="saltar('valorI', $event.target.value)"
+          (keydown.enter)="saltar('campoTipoFact', $event.target.value)"
           (change)="changeSelect($event.target.value)"
           value=""
           [disabled]="existenComprobantes"
@@ -24,51 +24,64 @@
           <option value="3">Por numero factura</option>
         </select>
       </div>
-      <div *ngIf="campo" class="form-group">
-        <label class="control-label">{{ campoSelected + ' ' }} : </label>
+      <div class="d-flex">
+        <div *ngIf="campo" class="form-group mr-3">
+          <label class="control-label">Tipo factura : </label>
 
-        <ng-container *ngIf="campo === '1'">
-          <input
-            type="text"
-            id="valorI"
-            (keydown.enter)="saltar('cliente', $event.target.value)"
-            (focus)="$event.target.select()"
-            [placeholder]="placeHolder"
-            class="form-control mb-4"
-            autocomplete="off"
-            [disabled]="existenComprobantes"
-          />
-        </ng-container>
+          <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control" (keydown.enter)="saltar('valorI', $event.target.value)" [disabled]="existenComprobantes">
+            <option [value]="null" selected disabled>Escoger tipo</option>
+            <option value="3">Factura de consumo</option>
+            <option value="2">Factura con Valor Fiscal</option>
+            <option value="1">Factura sin comprobante</option>
+            <option value="0">Todas</option>
+          </select>
+        </div>
+        <div *ngIf="campo" class="form-group">
+          <label class="control-label">{{ campoSelected + ' ' }} : </label>
+          <ng-container *ngIf="campo === '1'">
+            <input
+              type="text"
+              id="valorI"
+              (keydown.enter)="saltar('cliente', $event.target.value)"
+              (focus)="$event.target.select()"
+              [placeholder]="placeHolder"
+              class="form-control mb-4"
+              autocomplete="off"
+              [disabled]="existenComprobantes || tipo_factura_id == null"
+            />
+          </ng-container>
 
-        <ng-container *ngIf="campo === '2'">
-          <input
-            type="text"
-            [textMask]="{ mask: ncfMask }"
-            placeholder="b__________"
-            class="form-control inputE UPPERCASE"
-            (keydown.enter)="saltar('buscarFactura', $event.target.value)"
-            (focus)="$event.target.select()"
-            id="valorI"
-            [disabled]="existenComprobantes"
-          />
-        </ng-container>
-        <ng-container *ngIf="campo === '3'">
-          <input
-            type="number"
-            id="valorI"
-            (keydown.enter)="saltar('buscarFactura', $event.target.value)"
-            (focus)="$event.target.select()"
-            [placeholder]="placeHolder"
-            class="form-control mb-4"
-            autocomplete="off"
-            [disabled]="existenComprobantes"
-          />
-        </ng-container>
+          <ng-container *ngIf="campo === '2'">
+            <input
+              type="text"
+              [textMask]="{ mask: ncfMask }"
+              placeholder="b__________"
+              class="form-control inputE UPPERCASE"
+              (keydown.enter)="saltar('buscarFactura', $event.target.value)"
+              (focus)="$event.target.select()"
+              id="valorI"
+              [disabled]="existenComprobantes || tipo_factura_id == null"
+            />
+          </ng-container>
+          <ng-container *ngIf="campo === '3'">
+            <input
+              type="number"
+              id="valorI"
+              (keydown.enter)="saltar('buscarFactura', $event.target.value)"
+              (focus)="$event.target.select()"
+              [placeholder]="placeHolder"
+              class="form-control mb-4"
+              autocomplete="off"
+              [disabled]="existenComprobantes || tipo_factura_id == null"
+            />
+          </ng-container>
+        </div>
       </div>
     </div>
   </div>
+
   <div class="col-12 rowIngre">
-    <div *ngIf="facturas && this.campo === '1'" class="card card-padding sombra ingreCard">
+    <div *ngIf="facturas && campo === '1'" class="card card-padding sombra ingreCard">
       <div style="height: 90%;">
         <app-tablas [info]="info" [data]="facturas" [scrollContainer]="'scroll-container ingresosScroll'" (getInfoChange)="selectFactura($event)" [focusRow]="false"></app-tablas>
       </div>

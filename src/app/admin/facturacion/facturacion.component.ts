@@ -66,7 +66,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   subObj: Subscription;
   subDeci: Subscription;
-  subTipoF: Subscription;
   FacturaAtrasada = false;
   FechaFacturaAtrasada;
   articulosAcambiar = [];
@@ -239,7 +238,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.enfocarInput('tipoFact');
     }, 5);
 
-    this.subTipoF = this.dbServ.getTiposFacturas().subscribe((res) => {
+    this.dbServ.getTiposFacturas().subscribe((res) => {
       this.lista_tipos_facturas = res;
     });
   }
@@ -251,7 +250,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.GetArticulos();
     this.subObj.unsubscribe();
     this.subDeci.unsubscribe();
-    this.subTipoF.unsubscribe();
   }
 
   setWidthPop(bool, e) {

@@ -71,6 +71,7 @@ export class NotasCredDebComponent implements OnInit {
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'cambio') {
         this.decisionModal(res);
+        this.mServ.ModalObj(undefined);
       }
     });
   }
@@ -163,6 +164,7 @@ export class NotasCredDebComponent implements OnInit {
       {
         titulo: 'Descuento',
         key: 'descuento_valor',
+        formatoNumero: true,
       },
       {
         titulo: 'Total Facturado',
@@ -335,7 +337,6 @@ export class NotasCredDebComponent implements OnInit {
   }
 
   async formarNota(res) {
-    console.log(this.detalleFacturas);
     const temp = [];
     if (res) {
       for (let i = 0; i < this.detalleFacturas.length; i++) {
