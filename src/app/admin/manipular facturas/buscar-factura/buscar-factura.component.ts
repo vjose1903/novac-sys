@@ -54,6 +54,14 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       key: 'tipo_factura',
     },
     {
+      titulo: 'Comprobante',
+      key: 'numero_comprobante',
+    },
+    {
+      titulo: 'Condicion',
+      key: 'condicion',
+    },
+    {
       titulo: 'Fecha Facturacion',
       key: 'fecha',
     },
@@ -231,7 +239,22 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       console.error(error);
     }
   }
+  mostrarListaFacturas() {
+    let res = false;
+    if (this.facturas && this.facturas.length > 0) {
+      if (this.campo === '1') {
+        res = true;
+      } else if (this.campo === '3' && this.tipo_factura_id === '0') {
+        res = true;
+      } else {
+        res = false;
+      }
+    } else {
+      res = false;
+    }
 
+    return res;
+  }
   async pedirFactura(campo, valor) {
     try {
       this.facturas = undefined;
@@ -262,7 +285,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
               (fact = fact.map((val) => {
                 val.secuencia = _.padStart(val.numero_factura, 5, '0');
                 val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
-                val.fechaV = moment(val.fecha_vencimiento).format('DD-MM-YYYY');
+                val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : '';
                 val.select = false;
                 val.pagoT = true;
                 val.estado_ = val.estado ? 'fas fa-check' : 'fas fa-times';
@@ -278,6 +301,18 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         return a.id > b.id ? 1 : -1;
       });
       this.facturas = GLOBAL.duplicarJson(busqueda);
+
+      if (this.facturas.length === 0) {
+        if (this.campo === '1') {
+          if (this.tipo_factura_id === '0') {
+            this.dbServ.toastError('Este cliente no tiene facturas a su nombre', 'ERROR');
+          } else {
+            this.dbServ.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
+          }
+        } else if (this.campo === '3') {
+          this.dbServ.toastError('No existen facturas con este numero.', 'ERROR');
+        }
+      }
     } catch (error) {
       console.error(error);
     }
@@ -294,12 +329,14 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   changeSelect(valor) {
     this.tipo_factura_id = null;
+    this.facturas = undefined;
     if (valor === '1') {
       this.campoSelected = 'Cliente';
       this.placeHolder = 'Nombre Cliente';
     } else if (valor === '2') {
       this.campoSelected = 'Numero Comprobante';
       this.placeHolder = 'Escriba numero de comprobante';
+      this.tipo_factura_id = 0;
     } else if (valor === '3') {
       this.campoSelected = 'Numero Factura';
       this.placeHolder = 'Escriba numero de factura';
@@ -386,7 +423,11 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
             this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso');
           }
         } else {
-          this.pedirFactura(this.campo, valor);
+          if (this.tipo_factura_id === '0') {
+            this.pedirFacturaModal(this.campo, valor);
+          } else {
+            this.pedirFactura(this.campo, valor);
+          }
         }
       } else {
         this.enfocarInput(campo);

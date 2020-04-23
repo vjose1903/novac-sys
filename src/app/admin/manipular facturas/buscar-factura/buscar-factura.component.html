@@ -25,7 +25,7 @@
         </select>
       </div>
       <div class="d-flex">
-        <div *ngIf="campo" class="form-group mr-3">
+        <div *ngIf="campo && campo !== '2'" class="form-group mr-3">
           <label class="control-label">Tipo factura : </label>
 
           <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control" (keydown.enter)="saltar('valorI', $event.target.value)" [disabled]="existenComprobantes">
@@ -81,7 +81,7 @@
   </div>
 
   <div class="col-12 rowIngre">
-    <div *ngIf="facturas && campo === '1'" class="card card-padding sombra ingreCard">
+    <div *ngIf="mostrarListaFacturas()" class="card card-padding sombra ingreCard">
       <div style="height: 90%;">
         <app-tablas [info]="info" [data]="facturas" [scrollContainer]="'scroll-container ingresosScroll'" (getInfoChange)="selectFactura($event)" [focusRow]="false"></app-tablas>
       </div>
