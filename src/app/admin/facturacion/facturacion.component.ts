@@ -840,6 +840,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['FACTURA_DE'] = this.metodo === 'venta' ? 13 : 14;
     cabecera_fact['tipo'] = this.metodo;
     cabecera_fact['user_id'] = empleado.id;
+    cabecera_fact['tiene_nota'] = false;
 
     if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
@@ -863,7 +864,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         }
       });
       res['FACTURA_DE'] = this.metodo;
-      // this._ipc.send('print', res);
+      this._ipc.send('print', res);
     } catch (error) {
       console.log(error);
       this.dbServ.toastError(error.error.msg, 'ERROR');

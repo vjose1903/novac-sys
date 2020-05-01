@@ -84,6 +84,7 @@ export class NotasCredDebComponent implements OnInit {
   async necesarioStart() {
     await this.getFactura();
     this.factura_aplicada = this.factura.numero_comprobante;
+    this.factura_aplicada = this.factura.numero_comprobante;
     await this.formarTitulosTabla();
     await this.getPropietario(this.factura.cliente_id);
     await this.getPaqueteComprobante();
@@ -190,6 +191,7 @@ export class NotasCredDebComponent implements OnInit {
       const temp = [];
       for (let i = 0; i < this.factura.detalle_facturas.length; i++) {
         const detalle = this.factura.detalle_facturas[i];
+
         detalle['select'] = false;
         detalle['cant'] = detalle.cantidad;
         detalle['cant_nota'] = 0;
@@ -206,7 +208,7 @@ export class NotasCredDebComponent implements OnInit {
       }
       this.detalleFacturas = temp;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       this.dbServ.toastError('Error mostrando factura elegida', 'ERROR');
     }
   }
@@ -325,6 +327,8 @@ export class NotasCredDebComponent implements OnInit {
   async decisionModal(res) {
     if (this.tipoModal === 'cambio') {
       this.formarNota(res);
+    } else if (this.tipoModal === 'cancelar') {
+      window.history.back();
     }
   }
 
@@ -341,13 +345,14 @@ export class NotasCredDebComponent implements OnInit {
     if (res) {
       for (let i = 0; i < this.detalleFacturas.length; i++) {
         const element = this.detalleFacturas[i];
+
         let unidad_ = element.unidad;
         if (element.select) {
           if (unidad_ === 'Saco') {
             unidad_ = this.obtenerPesoSaco(element.descripcion);
           }
           const fila = {
-            articulo_id: element.id,
+            articulo_id: element.articulo_id,
             cantidad: element.cant_nota,
             total: GLOBAL.desformatear(element.total_nota),
             descuento_valor: element.descuento_valor ? (element.descuento_valor !== null ? element.descuento_valor : 0) : 0,
@@ -370,7 +375,7 @@ export class NotasCredDebComponent implements OnInit {
 
     const cabecera_fact = {};
     cabecera_fact['condicion'] = 'contado';
-    cabecera_fact['forma_pago'] = 'efectivo';
+    cabecera_fact['forma_pago'] = 'Efectivo';
     cabecera_fact['fecha_facturacion'] = null;
     // cabecera_fact['fecha_vencimiento'] = moment(new Date())
     //   .add(this.propietario_factura.limite_credito, 'days')
@@ -393,6 +398,7 @@ export class NotasCredDebComponent implements OnInit {
     cabecera_fact['estado'] = true;
     cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
     cabecera_fact['is_nota'] = true;
+    cabecera_fact['tiene_nota'] = false;
 
     if (this.factura.cliente_id === null) {
       cabecera_fact['cliente_id'] = null;
@@ -407,29 +413,29 @@ export class NotasCredDebComponent implements OnInit {
     cabecera_fact['tipo'] = 'nota_' + this.tipoNota;
     cabecera_fact['user_id'] = empleado.id;
     cabecera_fact['aplicada_a'] = this.factura_aplicada;
+    cabecera_fact['factura_id'] = this.factura.id;
 
     if (this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
     console.log(cabecera_fact);
     try {
-      // const res = await this.dbServ.createFacturas(cabecera_fact).toPromise()
-      //     console.log(res);
-      //     await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      //       console.log('printRes=====> ', res);
-      //       if (res.status) {
-      //         await this.CancelarFactura();
-      //         this.GetArticulos();
-      //         this.dbServ.toastSuccess(res.msg, 'CORRECTO');
-      //       } else {
-      //         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-      //       }
-      //     });
-      //     res['FACTURA_DE'] = this.metodo;
-      //     // this._ipc.send('print', res);
+      const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
+      console.log(res);
+      await this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
+        console.log('printRes=====> ', res);
+        if (res.status) {
+          this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
+          window.history.back();
+        } else {
+          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+        }
+      });
+      res['FACTURA_DE'] = 'nota';
+      this._ipc.send('print', res);
     } catch (error) {
-      // console.error(error);
-      //     this.dbServ.toastError(error.statusText, 'ERROR');
+      console.error(error);
+      this.dbServ.toastError(error.statusText, 'ERROR');
     }
   }
 }

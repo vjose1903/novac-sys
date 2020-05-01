@@ -16,11 +16,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   loading = false;
   noServer = false;
   constructor(private dbServ: DBservice, private loaderServ: LoaderService, private spinner: NgxSpinnerService, private cdRef: ChangeDetectorRef, public electronService: ElectronService) {
-    setInterval(() => {
-      this.buscarNoServer();
-    }, 20000);
+    // setInterval(() => {
+    //   this.buscarNoServer();
+    // }, 20000);
 
-    this.loaderServ.isLoading.subscribe(v => {
+    this.loaderServ.isLoading.subscribe((v) => {
       setTimeout(() => {
         // this.loading = true;
         this.loading = v;
@@ -36,13 +36,13 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   buscarNoServer() {
     this.dbServ.getTipoArticuloById(1).subscribe(
-      res => {
+      (res) => {
         if (this.noServer) {
           window.location.reload();
         }
         this.noServer = false;
       },
-      err => {
+      (err) => {
         if (err.status === 0) {
           this.noServer = true;
         } else {

@@ -10,7 +10,7 @@ import { logoADM } from './files';
 // tslint:disable-next-line: one-variable-per-declaration
 let win, serve;
 const args = process.argv.slice(1);
-serve = args.some(val => val === '--serve');
+serve = args.some((val) => val === '--serve');
 
 let contents;
 
@@ -187,7 +187,7 @@ function cabeceraFacturaVenta(data) {
         {
           text: [
             { text: 'Telefono: ', fontSize: 10 },
-            { text: '809-572-0060 ', fontSize: 10 },
+            { text: '809-573-0060 ', fontSize: 10 },
             { text: ' RNC: ', fontSize: 10 },
             { text: '131-99603-5', fontSize: 10 },
           ],
@@ -202,20 +202,23 @@ function cabeceraFacturaVenta(data) {
         [
           {
             text: [
-              data.FACTURA_DE === 'venta' ? { text: 'Cliente : ', fontSize: 12 } : { text: 'Suplidor : ', fontSize: 12 },
-              data.FACTURA_DE === 'venta' ? { text: data.cliente.nombre, fontSize: 12 } : { text: data.suplidor.nombre, fontSize: 12 },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: 'Cliente : ', fontSize: 12 } : { text: 'Suplidor : ', fontSize: 12 },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.nombre, fontSize: 12 } : { text: data.suplidor.nombre, fontSize: 12 },
             ],
             margin: [0, 0, 0, 0],
           },
           {
             text: [
-              data.FACTURA_DE === 'venta' ? { text: 'Rnc cliente : ', fontSize: 12 } : { text: 'Rnc suplidor : ', fontSize: 12 },
-              data.FACTURA_DE === 'venta' ? { text: data.cliente.rnc, fontSize: 12 } : { text: data.suplidor.rnc, fontSize: 12 },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: 'Rnc cliente : ', fontSize: 12 } : { text: 'Rnc suplidor : ', fontSize: 12 },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.rnc, fontSize: 12 } : { text: data.suplidor.rnc, fontSize: 12 },
             ],
             margin: [0, 5, 0, 0],
           },
           {
-            text: [{ text: 'Dirección : ', fontSize: 12 }, data.FACTURA_DE === 'venta' ? { text: data.cliente.direccion, fontSize: 12 } : { text: data.suplidor.direccion, fontSize: 12 }],
+            text: [
+              { text: 'Dirección : ', fontSize: 12 },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.direccion, fontSize: 12 } : { text: data.suplidor.direccion, fontSize: 12 },
+            ],
             margin: [0, 5, 0, 0],
           },
         ],
@@ -244,7 +247,7 @@ function cabeceraFacturaVenta(data) {
                 ],
                 margin: [75, 0, 0, 0],
               },
-              data.condicion === 'Contado'
+              data.condicion === 'Contado' && data.FACTURA_DE === 'venta'
                 ? { text: '' }
                 : {
                     text: [
@@ -307,7 +310,7 @@ function cabeceraFacturaVenta(data) {
             { text: 'Articulo', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
             { text: 'Cantidad', style: 'tableHeader', bold: true, margin: [5, 0, 0, 0] },
             { text: 'Unidad', style: 'tableHeader', bold: true, margin: [-1, 0, 0, 0] },
-            data.FACTURA_DE === 'venta'
+            data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
               ? { text: 'Precio', style: 'tableHeader', bold: true, margin: [13, 0, 0, 0] }
               : { text: 'Costo', style: 'tableHeader', bold: true, margin: [14, 0, 0, 0] },
             { text: 'Itbis', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
@@ -343,7 +346,7 @@ function contenidoFacturaVenta(data) {
       detalle.descripcion,
       { text: formatearNumero(redondearAdos(detalle.cantidad)), alignment: 'right', margin: [0, 0, 25, 0] },
       { text: detalle.unidad, margin: [8, 0, 0, 0] },
-      { text: formatearNumero(data.FACTURA_DE === 'venta' ? detalle.precio : detalle.costo), alignment: 'right', margin: [0, 0, 10, 0] },
+      { text: formatearNumero(data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? detalle.precio : detalle.costo), alignment: 'right', margin: [0, 0, 10, 0] },
       { text: formatearNumero(redondearAdos(detalle.itbis)), alignment: 'right', margin: [0, 0, 32, 0] },
       { text: formatearNumero(redondearAdos(detalle.total)), alignment: 'right', margin: [0, 0, 26, 0] },
     );
@@ -423,7 +426,7 @@ function contenidoFacturaVenta(data) {
                   h: 1,
                   color: '#000000',
                 },
-                data.FACTURA_DE === 'venta'
+                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
                   ? {
                       type: 'rect',
                       x: 260,
@@ -452,7 +455,7 @@ function contenidoFacturaVenta(data) {
                   },
                 ],
                 [
-                  data.FACTURA_DE === 'venta'
+                  data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
                     ? {
                         text: [{ text: 'Cliente', fontSize: 12, bold: true }],
                         margin: [-70, 5, 0, 0],

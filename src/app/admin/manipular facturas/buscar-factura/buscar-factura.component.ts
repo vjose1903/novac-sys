@@ -93,9 +93,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   ];
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   ngOnInit() {
-    this.dbServ.getTiposFacturas().subscribe((res) => {
-      this.lista_tipos_facturas = res;
-    });
     this.BuscarPara = this.route.snapshot.params['para'];
     if (this.BuscarPara === 'nota_credito') {
       this.tipo_factu_nota = '04';
@@ -209,8 +206,17 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.subDeci.unsubscribe();
     this.subEsc.unsubscribe();
   }
+  async getPaquetesComprobantes() {
+    try {
+      const res = await this.dbServ.getTiposFacturas().toPromise();
+      this.lista_tipos_facturas = res;
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   async necesarioStart() {
+    await this.getPaquetesComprobantes();
     await this.getClientes();
     await this.getPaqueteComprobante();
     this.enfocarInput('campoI');
