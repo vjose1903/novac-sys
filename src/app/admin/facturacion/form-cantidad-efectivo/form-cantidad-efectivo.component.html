@@ -1,6 +1,6 @@
-<div *ngIf="factura_de !== 'compra' && tipo === 'devuelta'" class="row">
+<div *ngIf="(factura_de !== 'compra' || factura_de === 'ingreso') && tipo === 'devuelta'" class="row">
   <div class="col-12">
-    <div class="d-flex ">
+    <div class="d-flex">
       <h3 class="label w-100">
         TOTAL: RD$
       </h3>
@@ -52,7 +52,7 @@
 
 <div *ngIf="factura_de !== 'compra' && tipo === 'credito'" class="row">
   <div class="col-12">
-    <div class="d-flex ">
+    <div class="d-flex">
       <h3 class="label w-100">
         TOTAL A DEVOLVER: RD$
       </h3>
@@ -72,7 +72,7 @@
 <!-- ======================================================= -->
 <div *ngIf="factura_de === 'compra'" class="row">
   <div class="col-12">
-    <div class="d-flex ">
+    <div class="d-flex">
       <h3 class="label w-100">
         TOTAL DE COMPRA: RD$
       </h3>

@@ -228,9 +228,21 @@ function cabeceraFacturaVenta(data) {
             margin: [0, 15, 0, 0],
             alignment: 'center',
           },
+
           data.FACTURA_DE === 'compra'
             ? {
                 text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
+                margin: [0, 1, 0, 0],
+                alignment: 'center',
+              }
+            : { text: '' },
+
+          data.FACTURA_DE === 'nota'
+            ? {
+                text: [
+                  { text: 'Aplicada a: ', fontSize: 11 },
+                  { text: data.aplicada_a, fontSize: 11 },
+                ],
                 margin: [0, 1, 0, 0],
                 alignment: 'center',
               }

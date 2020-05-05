@@ -111,7 +111,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.necesarioStar();
-    this.sub = this.mServ.OBJDEVUELTO.subscribe(res => {
+
+    this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'buscarCliente') {
         this.clienteAdepositar = res;
         (document.getElementById('clienteI') as any).value = res.nombre;
@@ -173,9 +174,25 @@ export class IngresosComponent implements OnInit, OnDestroy {
     if (arg === 'articulo') {
       this.medidaEnTurno = -1;
     } else if (arg === 'medida') {
-      this.precioEnTurno = this.articuloEnTurno.medidas.filter(val => val.medida === valor)[0].precio;
+      this.precioEnTurno = this.articuloEnTurno.medidas.filter((val) => val.medida === valor)[0].precio;
     }
   }
+
+  recalcularMonto(monto_original, notas) {
+    let monto = monto_original;
+    for (let i = 0; i < notas.length; i++) {
+      const element = notas[i];
+      const totalABS = Math.abs(element.total_factura);
+
+      if (element.tipo_factura_id === 5) {
+        monto -= totalABS;
+      } else if (element.tipo_factura_id === 4) {
+        monto += totalABS;
+      }
+    }
+    return monto;
+  }
+
   async pedirFacturasPorCliente(cliente_id) {
     try {
       const fechaA = moment().format('YYYY-MM-DD');
@@ -183,17 +200,19 @@ export class IngresosComponent implements OnInit, OnDestroy {
         .getFacturasByClienteIdAndPagada(cliente_id, false)
         .pipe(
           map(
-            fact =>
-              (fact = fact.map(val => {
+            (fact) =>
+              (fact = fact.map((val) => {
                 val.secuencia = _.padStart(val.numero_factura, 5, '0');
                 val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
                 val.fechaV = moment(val.fecha_vencimiento).format('DD-MM-YYYY');
                 val.select = false;
                 val.pagoT = true;
-                val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
                 val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
                 val.text_color = val.fecha_vencimiento < fechaA ? 'red' : 'black';
 
+                val.balance = this.recalcularMonto(val.balance, val.notas);
+                val.total_factura = this.recalcularMonto(val.total_factura, val.notas);
+                val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
                 return val;
               })),
           ),
@@ -203,7 +222,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
         return a.id > b.id ? 1 : -1;
       });
       let total = 0;
-      this.Facturas.forEach(element => {
+      this.Facturas.forEach((element) => {
         total += element.balance;
       });
       console.log(total);
@@ -260,11 +279,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
         .getClientes()
         .pipe(
           map(
-            cliente =>
-              (cliente = cliente.map(cli => {
+            (cliente) =>
+              (cliente = cliente.map((cli) => {
                 cli.nombre = GLOBAL.Capitalice(cli.nombre);
                 cli.apellido = GLOBAL.Capitalice(cli.apellido);
-                cli.documentos_de_identidad.map(docu => {
+                cli.documentos_de_identidad.map((docu) => {
                   if (docu.principal) {
                     cli.documento_identidad = docu.documento;
                   }
@@ -303,12 +322,14 @@ export class IngresosComponent implements OnInit, OnDestroy {
     let total = 0;
     for (let i = 0; i < this.facturas_selected.length; i++) {
       const fact = this.facturas_selected[i];
+      console.log(fact);
+
       temp.push({
         cabecera_factura_id: fact.id,
         pago_total: fact.pagoT,
         deposito: GLOBAL.desformatear(fact.monto),
         descripcion: this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo Factura ' + fact.secuencia : 'Abono ' + fact.monto + ' pesos a factura ' + fact.secuencia) : '',
-        pago_a_tiempo: fact.pagoT ? fact.pago_a_tiempo : null,
+        pago_a_tiempo: fact.pago_a_tiempo,
       });
 
       total += GLOBAL.desformatear(fact.monto);
@@ -334,7 +355,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
       this.dbServ.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
-      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso' };
+      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo__: 'devuelta' };
       this.mServ.modalTipo('cambio');
       this.tipoModal = 'cambio';
       this.abrirModal(obj);
@@ -344,7 +365,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   sendIngreso() {
     const empleado = JSON.parse(this.dbServ.getEmpleado());
 
-    const tipo = this.tipoFacturas.filter(val => val.descripcion === this.tipo_recibo)[0];
+    const tipo = this.tipoFacturas.filter((val) => val.descripcion === this.tipo_recibo)[0];
     const obj = {
       cliente_id: this.clienteAdepositar.id,
       user_id: empleado.id,
@@ -356,18 +377,27 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
     obj.total = this.detalleYtotal.total_recibo;
     obj['detalle_recibos_attributes'] = this.detalleYtotal.detalle;
+    console.log(obj);
 
     this.dbServ.createRecibo(obj).subscribe(
-      res => {
+      (res) => {
         console.log(res);
         this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
         this.clienteAdepositar.balance = this.clienteAdepositar.balance - res.total;
         this.pedirFacturasPorCliente(this.clienteAdepositar.id);
         this.resetVariables();
       },
-      err => {
-        console.error(err.error.msg);
-        this.dbServ.toastError(err.error.msg, 'ERROR');
+      (err) => {
+        console.error(err);
+        console.log('-----');
+        console.log('-----');
+        console.log('-----');
+
+        if (err.error) {
+          this.dbServ.toastError(err.error.msg, 'ERROR');
+        } else {
+          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+        }
       },
     );
   }
@@ -441,7 +471,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   quitarContadoDeLista() {
     const temp = JSON.parse(JSON.stringify(this.listaClientes));
     this.listaClientes = [];
-    const cliente = temp.filter(cli => cli.nombre === 'Cliente contado');
+    const cliente = temp.filter((cli) => cli.nombre === 'Cliente contado');
     const index = _.indexOf(temp, cliente[0]);
 
     _.pullAt(temp, index);
