@@ -37,6 +37,7 @@ import { UploadImgComponent } from './components/upload-img/upload-img.component
 import { PendienteFormComponent } from './components/pendiente-form/pendiente-form.component';
 import { FormarFacturaComponent } from './components/formar-factura/formar-factura.component';
 import { TablasModule } from './components/tablas/tablas.module';
+import { ModalHistorialPagosComponent } from './ingresos/modal-historial-pagos/modal-historial-pagos.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { TablasModule } from './components/tablas/tablas.module';
     FormarFacturaComponent,
     NotasCredDebComponent,
     NcfComponent,
+    ModalHistorialPagosComponent,
   ],
   imports: [
     DialogModule,

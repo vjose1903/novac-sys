@@ -82,7 +82,11 @@ body {
 .right {
   right: 0 !important;
 }
-
+.c-pointer {
+  &:hover {
+    cursor: pointer !important;
+  }
+}
 // ========================================================
 // TEXT_COLOR
 // ========================================================
@@ -103,6 +107,9 @@ body {
 }
 .text-black {
   color: #000000 !important;
+}
+.text-gris-claro {
+  color: #a0a0a0 !important;
 }
 .text-transparent {
   color: transparent;

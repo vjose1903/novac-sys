@@ -41,8 +41,9 @@
           [info]="info"
           [data]="Facturas"
           (getInfoChange)="getInfoChange($event)"
+          (clickIcon)="clickVerPagos($event)"
           [scrollContainer]="'scroll-container ingresosScroll'"
-          (DevolverInfo)="preuba($event)"
+          [tablaHover]="false"
           [focusRow]="false"
         ></app-tablas>
       </div>

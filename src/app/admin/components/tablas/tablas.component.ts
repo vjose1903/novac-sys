@@ -102,6 +102,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() colores = false;
 
   // output
+  @Output() clickIcon = new EventEmitter<any>();
   @Output() clickRow = new EventEmitter<any>();
   @Output() DevolverInfo = new EventEmitter<any>();
   @Output() DELETE = new EventEmitter<any>();
@@ -432,6 +433,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       this.clickRow.emit(arg);
       this.reinicioModal.emit();
     }
+  }
+
+  iconBtn(arg) {
+    this.clickIcon.emit(arg);
   }
 
   devolverInfo(arg) {

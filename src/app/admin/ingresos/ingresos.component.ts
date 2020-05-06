@@ -34,6 +34,13 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   info = [
     {
+      titulo: '',
+      key: 'historyPagos',
+      text_color: 'colorEstado',
+      isIcon: true,
+      color: true,
+    },
+    {
       titulo: 'Numero Fact',
       key: 'secuencia',
     },
@@ -166,10 +173,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
     console.log(this.facturas_selected);
   }
 
-  preuba(o) {
-    console.log(o);
-  }
-
   selectArticulo(arg, valor?) {
     if (arg === 'articulo') {
       this.medidaEnTurno = -1;
@@ -213,6 +216,10 @@ export class IngresosComponent implements OnInit, OnDestroy {
                 val.balance = this.recalcularMonto(val.balance, val.notas);
                 val.total_factura = this.recalcularMonto(val.total_factura, val.notas);
                 val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
+                val.historyPagos = val.pagos.length > 0 ? 'fas fa-comment-dollar' : 'far fa-comment';
+                val.colorEstado = val.pagos.length > 0 ? 'black' : 'gris-claro';
+                val.iconHover = val.pagos.length > 0 ? true : false;
+
                 return val;
               })),
           ),
@@ -264,6 +271,20 @@ export class IngresosComponent implements OnInit, OnDestroy {
   //     this.dbServ.toastError('Algo fallo en la busqueda de articulos', 'ERROR');
   //   }
   // }
+
+  clickVerPagos(arg) {
+    const pagos = arg.pagos;
+    if (pagos.length > 0) {
+      for (let i = 0; i < pagos.length; i++) {
+        const pago = pagos[i];
+        pago.recibo_created_at = moment(pago.recibo_created_at).format('DD/MM/YYYY');
+      }
+      this.mServ.modalTipo('historial_pago');
+      console.log(pagos);
+
+      this.abrirModal(pagos);
+    }
+  }
 
   async getTipoFacturas() {
     try {

@@ -3,9 +3,9 @@
   <input [(ngModel)]="searchText" id="search" class="search-input" />
 </div>
 
-<div class="{{ scrollContainer }}" style="border-radius: 10px 10px 0px 0px">
+<div class="{{ scrollContainer }}" style="border-radius: 10px 10px 0px 0px;">
   <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" small="true" id="VICtablas">
-    <thead class="text-center " [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
+    <thead class="text-center" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
       <tr>
         <th id="{{ row.titulo }}" *ngFor="let row of info">{{ row.titulo }}</th>
         <th *ngIf="botones.titulo">Acciones</th>
@@ -31,36 +31,37 @@
           <td *ngFor="let column of info; let j = index">
             <span
               *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero"
-              style="width: 100%"
+              style="width: 100%;"
               class="text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
             >
               {{ dato[column.key] }}
             </span>
 
             <ng-template #cantiTool>
-              <div *ngIf="lookOters(dato[column.key]).Hijo === undefined" style=" max-width: 21rem;">
+              <div *ngIf="lookOters(dato[column.key]).Hijo === undefined" style="max-width: 21rem;">
                 <span> {{ lookOters(dato[column.key]).Padre }} </span><br />
               </div>
 
-              <div *ngIf="lookOters(dato[column.key]).Hijo" style=" max-width: 21rem;">
+              <div *ngIf="lookOters(dato[column.key]).Hijo" style="max-width: 21rem;">
                 <span> {{ lookOters(dato[column.key]).Padre }} </span> <br />
                 <span>{{ lookOters(dato[column.key]).Hijo }}</span> <br />
               </div>
             </ng-template>
+
             <span
               [mdbTooltip]="cantiTool"
               placement="{{ i != 0 ? 'top' : 'botton' }}"
               *ngIf="column.tipo !== 'check' && column.tipo !== 'input' && column.cantidades && !column.formatoNumero"
-              style="width: 100%"
+              style="width: 100%;"
             >
               {{ lookprincipal(dato[column.key]) }}
             </span>
 
             <span *ngIf="column.isIcon && dato._destroy !== '1'" class="text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}">
-              <i class="{{ dato[column.key] }}"></i>
+              <i (click)="iconBtn(dato)" class="{{ dato[column.key] }} {{ dato.iconHover ? 'c-pointer' : '' }}"></i>
             </span>
 
-            <span *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && column.formatoNumero && !column.cantidades" style="width: 100%">
+            <span *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && column.formatoNumero && !column.cantidades" style="width: 100%;">
               {{ formatoNumero(dato[column.key]) }}
             </span>
 
