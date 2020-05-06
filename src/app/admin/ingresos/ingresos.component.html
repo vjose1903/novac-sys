@@ -48,7 +48,7 @@
         ></app-tablas>
       </div>
       <div class="d-flex justify-content-end">
-        <input [disabled]="abilitarBtnConfirmar()" (click)="cancelarIgreso()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+        <input (click)="cancelarIgreso()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
         <input [disabled]="abilitarBtnConfirmar()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
       </div>
     </div>

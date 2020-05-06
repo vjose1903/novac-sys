@@ -289,7 +289,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
           map(
             (fact) =>
               (fact = fact.map((val) => {
-                val.secuencia = _.padStart(val.numero_factura, 5, '0');
+                val.secuencia = _.padStart(val.numero_factura, 8, '0');
                 val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
                 val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : '';
                 val.select = false;

@@ -205,7 +205,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
           map(
             (fact) =>
               (fact = fact.map((val) => {
-                val.secuencia = _.padStart(val.numero_factura, 5, '0');
+                val.secuencia = _.padStart(val.numero_factura, 8, '0');
                 val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
                 val.fechaV = moment(val.fecha_vencimiento).format('DD-MM-YYYY');
                 val.select = false;
@@ -277,6 +277,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
     if (pagos.length > 0) {
       for (let i = 0; i < pagos.length; i++) {
         const pago = pagos[i];
+        pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
         pago.recibo_created_at = moment(pago.recibo_created_at).format('DD/MM/YYYY');
       }
       this.mServ.modalTipo('historial_pago');
@@ -404,7 +405,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
       (res) => {
         console.log(res);
         this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
-        this.clienteAdepositar.balance = this.clienteAdepositar.balance - res.total;
+        const nuevoBalance = this.clienteAdepositar.balance - res.total;
+        this.clienteAdepositar.balance = GLOBAL.duplicarJson(nuevoBalance);
         this.pedirFacturasPorCliente(this.clienteAdepositar.id);
         this.resetVariables();
       },

@@ -104,7 +104,7 @@ export class NcfComponent implements OnInit, OnDestroy {
     this.titulo = 'Paquetes de numeros comprobantes fiscales';
     this.necesarioStart();
     this.setDateInputs(new Date());
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
@@ -119,9 +119,7 @@ export class NcfComponent implements OnInit, OnDestroy {
 
   calculateFechaValida() {
     setTimeout(() => {
-      const anio = moment(this.fechaCompra)
-        .add(1, 'year')
-        .format('YYYY');
+      const anio = moment(this.fechaCompra).add(1, 'year').format('YYYY');
       const newFecha = '12/31/' + anio;
 
       this.fechaValidez = newFecha;
@@ -130,9 +128,7 @@ export class NcfComponent implements OnInit, OnDestroy {
 
   setDateInputs(actual) {
     this.fechaCompra = actual;
-    const anio = moment(this.fechaCompra)
-      .add(1, 'year')
-      .format('YYYY');
+    const anio = moment(this.fechaCompra).add(1, 'year').format('YYYY');
     const newFecha = '12/31/' + anio;
     this.fechaValidez = newFecha;
   }
@@ -162,10 +158,10 @@ export class NcfComponent implements OnInit, OnDestroy {
         .getNCFregistrados()
         .pipe(
           map(
-            val =>
-              (val = val.map(ncf => {
+            (val) =>
+              (val = val.map((ncf) => {
                 ncf.cantidad = ncf.hasta - ncf.desde + 1;
-                ncf.tipoC = this.lista_tipos_facturas.filter(tipo => tipo.id === ncf.tipo_factura_id)[0].descripcion;
+                ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
                 ncf.codigo = _.padStart(ncf.id, 5, '0');
                 ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
                 ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
@@ -215,7 +211,7 @@ export class NcfComponent implements OnInit, OnDestroy {
     try {
       const res = await this.dbServ.PaqueteNCF(obj).toPromise();
       res.cantidad = res.hasta - res.desde + 1;
-      res.tipoC = this.lista_tipos_facturas.filter(tipo => tipo.id === res.tipo_factura_id)[0].descripcion;
+      res.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === res.tipo_factura_id)[0].descripcion;
       res.codigo = _.padStart(res.id, 5, '0');
       res.fecha_compra = moment(res.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
       res.fecha_valida = moment(res.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
@@ -306,12 +302,12 @@ export class NcfComponent implements OnInit, OnDestroy {
       console.log('BORRANDO');
 
       this.dbServ.deleteNCF(this.seleccionModal.id).subscribe(
-        res => {
+        (res) => {
           this.dbServ.toastSuccess('comprobante para ' + this.seleccionModal.tipoC + ' numero: ' + this.seleccionModal.codigo + ' borrado', 'CORRECTO');
           _.pullAt(this.listaNCF, this.indexSelected);
           this.tipoModal = '';
         },
-        err => {
+        (err) => {
           console.log(err);
           this.mostrarErrores(err.error);
         },
@@ -320,7 +316,7 @@ export class NcfComponent implements OnInit, OnDestroy {
   }
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
-      arg.forEach(error => {
+      arg.forEach((error) => {
         this.dbServ.toastError(error, 'ERROR');
       });
     } else {
