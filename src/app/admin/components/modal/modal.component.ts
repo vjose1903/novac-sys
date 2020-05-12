@@ -17,6 +17,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   lugar: any;
   identificadorFact: any;
   tipoDevuelta: any;
+  cant_notas_credito = 0;
+  cant_notas_debito = 0;
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       if (this.tipoModal === 'buscar') {
@@ -97,7 +99,21 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
 
         if (this.tipoModal === 'mostrarFactura' && res) {
           this.lugar = res.mostrarFacturaPara;
+          console.log(this.seleccionModal);
+
+          if (this.seleccionModal.tiene_nota && this.seleccionModal.notas.length > 0) {
+            for (let i = 0; i < this.seleccionModal.notas.length; i++) {
+              const nota = this.seleccionModal.notas[i];
+              if (nota.tipo_factura_id === 5) {
+                this.cant_notas_credito++;
+              }
+              if (nota.tipo_factura_id === 4) {
+                this.cant_notas_debito++;
+              }
+            }
+          }
         }
+
         if (this.tipoModal === 'cambio' && res) {
           if (this.seleccionModal.tipo__) {
             this.tipoDevuelta = this.seleccionModal.tipo__;

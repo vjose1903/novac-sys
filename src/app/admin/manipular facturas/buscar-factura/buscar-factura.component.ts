@@ -153,7 +153,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipo_factu_nota);
       const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
       this.paqueteComprobante = paquete.body;
-      console.log(this.paqueteComprobante);
+
       if (this.paqueteComprobante.fecha_valida !== null) {
         const desde = this.paqueteComprobante.desde;
         const hasta = this.paqueteComprobante.hasta;
@@ -206,7 +206,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.subDeci.unsubscribe();
     this.subEsc.unsubscribe();
   }
-  async getPaquetesComprobantes() {
+  async getTipoFacturas() {
     try {
       const res = await this.dbServ.getTiposFacturas().toPromise();
       this.lista_tipos_facturas = res;
@@ -216,9 +216,12 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   }
 
   async necesarioStart() {
-    await this.getPaquetesComprobantes();
+    await this.getTipoFacturas();
     await this.getClientes();
-    await this.getPaqueteComprobante();
+    if (this.BuscarPara !== 'anular_factura') {
+      await this.getPaqueteComprobante();
+    }
+
     this.enfocarInput('campoI');
   }
   async getClientes() {

@@ -358,16 +358,32 @@
       blockScroll="true"
     >
       <div class="p-2">
-        <app-formar-factura [factura]="this.seleccionModal"></app-formar-factura>
+        <app-formar-factura [factura]="seleccionModal"></app-formar-factura>
       </div>
       <p-footer>
         <ng-container class="p-1" *ngIf="lugar === 'anular_factura'">
           <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cerrar</button>
-          <button [disabled]="!this.seleccionModal.estado" type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Anular factura</button>
+          <button [disabled]="!seleccionModal.estado" type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Anular factura</button>
         </ng-container>
         <ng-container class="p-1" *ngIf="lugar !== 'anular_factura'">
-          <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cerrar</button>
-          <button [disabled]="!this.seleccionModal.estado" type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Continuar</button>
+          <div class="d-flex justify-content-between">
+            <div>
+              <span class="textoNota" *ngIf="seleccionModal.tiene_nota">
+                Esta factura presenta:
+                <span *ngIf="cant_notas_credito > 0">
+                  {{ cant_notas_credito }} <span *ngIf="cant_notas_credito === 1"> Nota de credito </span> <span *ngIf="cant_notas_credito > 1"> Notas de credito </span>
+                </span>
+                <span *ngIf="cant_notas_debito > 0">
+                  <span *ngIf="cant_notas_credito > 0"> & </span> {{ cant_notas_debito }} <span *ngIf="cant_notas_debito === 1"> Nota de debito </span>
+                  <span *ngIf="cant_notas_debito > 1"> Notas de debito </span>
+                </span>
+              </span>
+            </div>
+            <div>
+              <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cerrar</button>
+              <button [disabled]="!seleccionModal.estado" type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Continuar</button>
+            </div>
+          </div>
         </ng-container>
       </p-footer>
     </p-dialog>

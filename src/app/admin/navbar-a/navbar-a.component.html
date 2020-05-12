@@ -21,7 +21,7 @@
           <h4 class="opcion" (click)="navegar('compra')">Compra</h4>
         </div>
       </div>
-      <div class="menuList2 ">
+      <div class="menuList2">
         <img [ngClass]="actualTab == 'nota' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'" src="assets/img/notaM.png" alt="Notas" (click)="navegar(8)" />
         <h5 [ngClass]="actualTab == 'nota' ? 'tituloMenuA2' : 'tituloMenu2'"><strong>Manipular facturas</strong></h5>
         <!-- ultimo -->
@@ -29,7 +29,7 @@
         <div [ngClass]="actualTab == 'nota' ? 'subMenuFacturaA' : 'subMenuFactura'">
           <h4 class="opcion" (click)="navegar('buscarFactura', 'nota_credito')">Nota de Crédito</h4>
           <h4 class="opcion" (click)="navegar('buscarFactura', 'nota_debito')">Nota de Débito</h4>
-          <h4 class="opcion" (click)="navegar('buscarFactura', 'anular_factura')">Anular factura</h4>
+          <!-- <h4 class="opcion" (click)="navegar('buscarFactura', 'anular_factura')">Anular factura</h4> -->
         </div>
       </div>
 
