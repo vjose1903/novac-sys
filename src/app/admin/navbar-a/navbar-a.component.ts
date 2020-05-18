@@ -55,7 +55,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
 
-    .pipe(map(result => result.matches));
+    .pipe(map((result) => result.matches));
 
   ngOnInit() {
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
@@ -67,7 +67,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     this.mantenimiento = true;
-    this._ipc.PRINTERS.subscribe(res => {
+    this._ipc.PRINTERS.subscribe((res) => {
       if (res !== undefined) {
         this.PrintersInstall = res;
       }
@@ -142,8 +142,8 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         this.actualTab = 'inventario';
         this.router.navigateByUrl('/admin/inventario');
         break;
-
-      case 5:
+        
+        case 5:
         this.actualTab = 'reporte';
         // this.router.navigateByUrl("/admin/factura")
         break;
@@ -160,6 +160,10 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         break;
       case 9:
         this.actualTab = 'mantenimiento';
+        break;
+        case 10:
+          this.actualTab = 'conduce';
+          this.router.navigateByUrl('/admin/conduce');
         break;
 
       case 'venta':

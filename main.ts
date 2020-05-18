@@ -160,13 +160,15 @@ function cabeceraFacturaVenta(data) {
           },
         ],
         [
-          {
-            text: 'FACTURA A ' + _.toUpper(data.condicion),
-            alignment: 'right',
-            bold: true,
-            fontSize: 14,
-            margin: [0, 15, 30],
-          },
+          data.FACTURA_DE === 'nota'
+            ? { text: '' }
+            : {
+                text: 'FACTURA A ' + _.toUpper(data.condicion),
+                alignment: 'right',
+                bold: true,
+                fontSize: 14,
+                margin: [0, 15, 30],
+              },
           //
         ],
       ],
@@ -259,7 +261,7 @@ function cabeceraFacturaVenta(data) {
                 ],
                 margin: [75, 0, 0, 0],
               },
-              data.condicion === 'Contado' && data.FACTURA_DE === 'venta'
+              (data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota') && data.condicion === 'Contado'
                 ? { text: '' }
                 : {
                     text: [
@@ -278,7 +280,7 @@ function cabeceraFacturaVenta(data) {
               },
               {
                 text: [
-                  { text: 'Fact No : ', fontSize: 11.5 },
+                  { text: 'Doc No : ', fontSize: 11.5 },
                   { text: _.padStart(data.numero_factura, 8, '0'), fontSize: 11.5 },
                 ],
                 margin: [75, 3, 0, 0],
@@ -417,10 +419,12 @@ function contenidoFacturaVenta(data) {
                 { text: 'TOTAL RD$: ', fontSize: 11, bold: true },
                 { text: formatearNumero(redondearAdos(data.total_factura)), fontSize: 11, alignment: 'right' },
               ],
-              [
-                { text: 'Devuelta RD$: ', fontSize: 11, bold: true },
-                { text: formatearNumero(redondearAdos(data.devuelta)), fontSize: 11, alignment: 'right' },
-              ],
+              data.FACTURA_DE === 'nota'
+                ? [{ text: '' }]
+                : [
+                    { text: 'Devuelta RD$: ', fontSize: 11, bold: true },
+                    { text: formatearNumero(redondearAdos(data.devuelta)), fontSize: 11, alignment: 'right' },
+                  ],
             ],
           },
           layout: 'noBorders',

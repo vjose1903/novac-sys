@@ -39,6 +39,11 @@
       </div>
 
       <div class="menuList">
+        <img [ngClass]="actualTab == 'conduce' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="navegar(10)" />
+        <h5 [ngClass]="actualTab == 'conduce' ? 'tituloMenuA' : 'tituloMenu'"><strong>Conduce</strong></h5>
+      </div>
+
+      <div class="menuList">
         <img [ngClass]="actualTab == 'registro' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/registro.png" alt="Registros" (click)="navegar(3)" />
         <h5 [ngClass]="actualTab == 'registro' ? 'tituloMenuA' : 'tituloMenu'"><strong>Registros</strong></h5>
 
@@ -47,6 +52,7 @@
           <h4 class="opcion" (click)="navegar('empleados')">Empleados</h4>
           <h4 class="opcion" (click)="navegar('articulos')">Articulos</h4>
           <h4 class="opcion" (click)="navegar('suplidores')">Suplidores</h4>
+          <h4 class="opcion" (click)="navegar('ncf')">NCF</h4>
         </div>
       </div>
       <div class="menuList">
@@ -68,7 +74,6 @@
         <h5 [ngClass]="actualTab == 'mantenimiento' ? 'tituloMenuAMant' : 'tituloMenuMant'"><strong>Mantenimiento</strong></h5>
 
         <div [ngClass]="actualTab == 'mantenimiento' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-          <h4 class="opcion" (click)="navegar('ncf')">Ingreso NCF</h4>
           <h4 class="opcion" (click)="navegar('permisos')">Roles Usuarios</h4>
         </div>
       </div>

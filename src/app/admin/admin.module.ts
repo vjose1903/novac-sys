@@ -29,7 +29,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { BuscarFacturaComponent } from './manipular facturas/buscar-factura/buscar-factura.component';
 import { NotasCredDebComponent } from './manipular facturas/notas-cred-deb/notas-cred-deb.component';
-import { NcfComponent } from './mantenimiento/ncf/ncf.component';
+import { NcfComponent } from './registros/ncf/ncf.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { BTNcircularComponent } from './components/btncircular/btncircular.component';
@@ -38,6 +38,7 @@ import { PendienteFormComponent } from './components/pendiente-form/pendiente-fo
 import { FormarFacturaComponent } from './components/formar-factura/formar-factura.component';
 import { TablasModule } from './components/tablas/tablas.module';
 import { ModalHistorialPagosComponent } from './ingresos/modal-historial-pagos/modal-historial-pagos.component';
+import { ConduceComponent } from './conduce/conduce.component';
 
 @NgModule({
   declarations: [
@@ -67,6 +68,7 @@ import { ModalHistorialPagosComponent } from './ingresos/modal-historial-pagos/m
     NotasCredDebComponent,
     NcfComponent,
     ModalHistorialPagosComponent,
+    ConduceComponent,
   ],
   imports: [
     DialogModule,
