@@ -58,7 +58,7 @@
           <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
           <select
             id="venta"
-            (keydown.enter)="saltar($event.target.value === 'Adelantada' ? 'buscarCliente' : condicion_fact === 'Credito' ? 'buscarCliente' : 'nom', $event.target.value, 'venta')"
+            (keydown.enter)="saltar($event.target.value === 'true' ? 'buscarCliente' : condicion_fact === 'Crédito' ? 'buscarCliente' : 'nom', $event.target.value, 'venta')"
             class="form-control inputE"
             [(ngModel)]="tipoVenta"
           >
@@ -102,7 +102,7 @@
                 class="form-control inputE"
                 (focus)="$event.target.select()"
                 autocomplete="off"
-                [readOnly]="metodo === 'compra'"
+                [readOnly]="activarNombreDireccion()"
               />
               <input id="id" type="hidden" formControlName="id" />
               <div class="alerta text-danger ml-1" style="font-size: 12px;" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
@@ -135,7 +135,7 @@
                   class="form-control inputE"
                   (focus)="$event.target.select()"
                   autocomplete="off"
-                  [readOnly]="metodo === 'compra'"
+                  [readOnly]="activarNombreDireccion()"
                 />
                 <div
                   class="alerta text-danger ml-1"

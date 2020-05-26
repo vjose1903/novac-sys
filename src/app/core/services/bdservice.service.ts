@@ -262,10 +262,10 @@ export class DBservice {
   getFacturasByClienteIdAndPagada(cliente_id, pagada) {
     return this.peticion(`cabecera_facturas/cliente/${cliente_id}/pagada/${pagada}`, 'get');
   }
-  getFacturasByParams(campo, valor, tipo_factura_id) {
+  getFacturasByParams(campo, valor, tipo_factura_id, adelantada = false) {
     const valor_enc = btoa(valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
-    return this.peticion(`cabecera_facturas/params/${campo}/${VALOR_ENC}/${tipo_factura_id}`, 'get');
+    return this.peticion(`cabecera_facturas/params/${campo}/${VALOR_ENC}/${tipo_factura_id}/${adelantada}`, 'get');
   }
   cancelarFactura(id) {
     return this.peticion(`cabecera_facturas/anular_factura/${id}`, 'post', JSON.stringify({}));

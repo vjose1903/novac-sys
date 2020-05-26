@@ -453,6 +453,22 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       range.select();
     }
   }
+  activarNombreDireccion() {
+    let res = false;
+    if (this.metodo === 'compra') {
+      res = true;
+    } else {
+      res = false;
+
+      if (this.tipoVenta === 'true' || this.condicion_fact === 'Crédito') {
+        res = true;
+      } else {
+        res = false;
+      }
+    }
+
+    return res;
+  }
   pru() {
     const input = document.getElementById('ncf') as any;
   }

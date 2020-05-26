@@ -163,6 +163,35 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.ready = true;
   }
 
+  // ===================================================
+  //  Setear data en las tablas para busqueda
+  // ===================================================
+  llenarArreglos() {
+    for (let i = 0; i < this.data.length; i++) {
+      const element = this.data[i];
+
+      this.elements.push(element);
+      this.previous.push(element);
+    }
+  }
+  setearDataEnLaTabla() {
+    if (this.elements) {
+      this.mdbTable.setDataSource(this.elements);
+    }
+  }
+  actualizarArreglos() {
+    this.elements = this.mdbTable.getDataSource();
+    this.previous = this.mdbTable.getDataSource();
+  }
+
+  async setDATATABLE() {
+    this.elements = [];
+    this.previous = [];
+    await this.llenarArreglos();
+    await this.setearDataEnLaTabla();
+    await this.actualizarArreglos();
+  }
+
   ngOnDestroy() {
     this.entrar = 0;
     this.ROW = 'row-';
@@ -377,34 +406,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     setTimeout(() => {
       this.IDROW = temp;
     }, 250);
-  }
-  // ===================================================
-  //  Setear data en las tablas para busqueda
-  // ===================================================
-  llenarArreglos() {
-    for (let i = 0; i < this.data.length; i++) {
-      const element = this.data[i];
-
-      this.elements.push(element);
-      this.previous.push(element);
-    }
-  }
-  setearDataEnLaTabla() {
-    if (this.elements) {
-      this.mdbTable.setDataSource(this.elements);
-    }
-  }
-  actualizarArreglos() {
-    this.elements = this.mdbTable.getDataSource();
-    this.previous = this.mdbTable.getDataSource();
-  }
-
-  async setDATATABLE() {
-    this.elements = [];
-    this.previous = [];
-    await this.llenarArreglos();
-    await this.setearDataEnLaTabla();
-    await this.actualizarArreglos();
   }
 
   async ngAfterViewInit() {

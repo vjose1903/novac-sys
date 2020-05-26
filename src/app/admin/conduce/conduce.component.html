@@ -1,1 +1,22 @@
-<p>conduce works!</p>
+<div class="row">
+  <div class="col-12 mb-3">
+    <h3>Conduce</h3>
+  </div>
+  <div class="col-5">
+    <div class="card card-padding sombra">
+      <div class="form-group">
+        <label class="control-label">Cliente: </label>
+        <!-- (change)="selectTipoArticulo($event.target.value)" -->
+        <input
+          type="text"
+          id="clienteI"
+          (keydown.enter)="abrirModalFiltro($event.target.value)"
+          (focus)="$event.target.select()"
+          placeholder="Nombre Cliente"
+          class="form-control mb-4"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+  </div>
+</div>
