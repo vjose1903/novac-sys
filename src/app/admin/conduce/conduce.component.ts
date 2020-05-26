@@ -1,24 +1,62 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { ModalService } from '../components/modal/modal.service';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
+import * as _ from 'lodash';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-conduce',
   templateUrl: './conduce.component.html',
   styleUrls: ['./conduce.component.scss'],
 })
-export class ConduceComponent implements OnInit, OnDestroy {
+export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   listaClientes;
   sub: Subscription;
   cliente: any;
+  facturas_adelantadas = [];
+  info = [
+    {
+      titulo: 'Numero Fact',
+      key: 'secuencia',
+    },
+    {
+      titulo: 'NCF',
+      key: 'numero_comprobante',
+    },
+    {
+      titulo: 'Fecha Facturacion',
+      key: 'fecha',
+    },
+    {
+      titulo: 'Total Facturado',
+      key: 'total_factura',
+      formatoNumero: true,
+    },
+  ];
+  form: FormGroup;
+  ARRAY_ROWARTICULOS: any;
+  tipoModal: string;
+  indexRemove: any;
+  control: FormArray;
+  inputDrop: string;
+  secuencia: any;
+  drop: boolean;
+  listaArticulos = [];
+  UnidadesArticulo: any[];
+  sacos = [25, 50, 100];
   constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {}
 
   ngOnInit() {
+    this.form = this.fb.group({
+      rowFactura: this.fb.array([this.createItem(0)]),
+    });
+    this.ARRAY_ROWARTICULOS = this.form['rowFactura'] as FormArray;
+
     this.necesarioStar();
     this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'buscarCliente') {
@@ -35,25 +73,297 @@ export class ConduceComponent implements OnInit, OnDestroy {
       //   this.mServ.ModalObj(undefined);
       // }
     });
+    this.getArticulos();
   }
+
+  ngAfterViewInit() {
+    this.control = this.form.controls['rowFactura'] as FormArray;
+  }
+
   ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
+
   async necesarioStar() {
     await this.pedirClientes();
     // await this.getArticulos();
 
     this.enfocarInput('clienteI');
   }
+  aumentarSecuencia() {
+    this.secuencia++;
+    this.inputSecuencia = 'cod-' + this.secuencia;
+    this.inputDrop = 'uni-' + this.secuencia;
+    this.drop = false;
+  }
+
+  async saltar(e, input, i) {
+    const sigInput = input + i;
+
+    if (i >= 10 && input === 'cod-') {
+      this.addItem(i);
+    }
+
+    let codigo = (this.control.controls[i] as any).controls['cod'].value;
+
+    if (input === 'uni-') {
+      const cantidad = (this.control.controls[i] as any).controls['can'].value;
+
+      if (cantidad !== '' && cantidad !== null) {
+        if (input === 'uni-' && codigo !== '' && codigo !== null && codigo !== undefined) {
+          this.verificarRow(i);
+          this.buscarArticuloPorCodigo(i, codigo);
+          setTimeout(() => {
+            this.enfocarInput(sigInput);
+          }, 2);
+        }
+      }
+    }
+
+    if (input === 'cod-' || input === 'pre-') {
+      let unidad;
+      let index = i;
+
+      if (input === 'cod-') {
+        index--;
+      }
+      unidad = (this.control.controls[index] as any).controls['uni'].value;
+
+      const excede = this.checkCantidadExede(index, unidad, 'saltar');
+
+      if (!excede) {
+        if (unidad === '' || unidad === null) {
+          setTimeout(() => {
+            this.enfocarInput('uni-' + (i - 1));
+          }, 5);
+        } else {
+          this.UnidadesArticulo = [];
+          this.aumentarSecuencia();
+          this.enfocarInput(sigInput);
+        }
+      } else {
+        this.enfocarInput('can-' + index);
+        this.selectContenido('can-' + index);
+        setTimeout(() => {
+          (this.control.controls[index] as any).controls['uni'].setValue(null);
+        }, 2);
+      }
+    }
+
+    if (input === 'can-' && codigo !== '') {
+      codigo = _.parseInt(codigo);
+      if (_.isInteger(codigo)) {
+        codigo = (this.control.controls[i] as any).controls['cod'].value;
+        this.buscarArticuloPorCodigo(i, codigo, input);
+        this.enfocarInput(sigInput);
+      } else {
+        codigo = (this.control.controls[i] as any).controls['cod'].value;
+        if (codigo === null) {
+          this.enfocarInput('cod-' + i);
+          this.selectContenido('cod-' + i);
+        } else {
+          const obj = { filtrar: codigo, index: i, metodo: 'venta' };
+          this.filtrarArticulo(obj);
+        }
+      }
+    }
+  }
+  
+    // =============================================
+  //  MODAL PARA FILTRAR ARTICULOS
+  // =============================================
+  abrirModal(arg) {
+    const obj = arg;
+    
+    obj.listaArticulos = this.listaArticulos;
+    
+    
+    this.mServ.modalTipo('buscar');
+    this.mServ.ModalSeleccion(obj);
+    this.mServ.mostrarModal(true);
+  }
+  filtrarArticulo(arg) {
+    this.abrirModal(arg);
+  }
+  
+  // =============================================
+  checkCantidadExede(i, unidad, lugar) {
+    let cantidad = 0;
+    const descripcion = (this.control.controls[i] as any).controls['des'].value;
+    const tempArticulo = this.listaArticulos.filter((arti) => arti.nombre === descripcion);
+    const articulo = tempArticulo[0];
+    const cantidades = articulo.cantidades;
+
+    const splitUnidad = _.split(unidad, ' ');
+    let unidad_ = splitUnidad[0];
+    unidad = splitUnidad[0];
+
+    if (unidad_ === 'Saco' || unidad_ === 'Libra') {
+      unidad_ = 'Libra';
+    } else {
+      unidad_ = 'Unidad';
+    }
+
+    for (let index = 0; index < this.control.controls.length; index++) {
+      const cod = (this.control.controls[index] as any).controls['cod'].value;
+      if (cod === null || cod === undefined || cod === '' || cod === ' ') {
+        break;
+      }
+      let cantidadF = 0;
+      let unidadF = '';
+
+      cantidadF = (this.control.controls[index] as any).controls['can'].value;
+      unidadF = (this.control.controls[index] as any).controls['uni'].value;
+
+      const splitUnidadF = _.split(unidadF, ' ');
+      let unity = splitUnidadF[0];
+      const FindProd = (this.control.controls[index] as any).controls['des'].value;
+
+      if (FindProd === descripcion) {
+        if (unidad_ === 'Libra') {
+          if (splitUnidadF.length > 1) {
+            cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
+          }
+        }
+        if (unity === 'Saco') {
+          unity = 'Libra';
+        }
+
+        cantidadF *= articulo.contenido[unity];
+
+        cantidad += cantidadF;
+      }
+    }
+
+    if (lugar === 'saltar') {
+      i--;
+    }
+
+    if (cantidad > cantidades[unidad_]) {
+      this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  addItem(i): void {
+    this.ARRAY_ROWARTICULOS = this.form.get('rowFactura') as FormArray;
+    this.ARRAY_ROWARTICULOS.push(this.createItem(i));
+  }
+
+  removeItem(i: number) {
+    this.control.removeAt(i);
+  }
+
+  verificarSecuencia(i, input?) {
+    if (this.secuencia < i) {
+      this.enfocarInput(this.inputSecuencia);
+    }
+
+    if (!input) {
+      this.drop = false;
+    }
+
+    const codigo = (this.control.controls[i] as any).controls['cod'].value;
+    if (input === 'unidad' && codigo !== '' && codigo !== null && codigo !== undefined) {
+      this.verificarRow(i);
+      this.buscarArticuloPorCodigo(i, codigo);
+    }
+  }
+  inputSecuencia(inputSecuencia: any) {
+    throw new Error('Method not implemented.');
+  }
+
+  verificarRow(arg) {
+    this.inputDrop = 'uni-' + arg;
+  }
+
   enfocarInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
     element.focus();
   }
 
+  selectContenido(arg) {
+    const element = document.getElementById(arg) as any;
+    element.select();
+  }
+
+  createItem(i): FormGroup {
+    return this.fb.group({
+      id: [],
+      cod: [null],
+      uni: [null],
+      des: [null],
+      can: [null],
+      secuencia: [i],
+    });
+  }
+
+  modalRemover(i) {
+    const name = (this.control.controls[i] as any).controls['des'].value;
+    const unidad = (this.control.controls[i] as any).controls['uni'].value;
+    const obj = { nombre: name + ' (' + unidad + ')' };
+
+    if (name) {
+      this.tipoModal = 'removerArticulo';
+      this.indexRemove = i;
+      this.mServ.modalTipo('removerArticulo');
+      this.mServ.ModalSeleccion(obj);
+      this.mServ.mostrarModal(true);
+    }
+  }
+
+  ModificarClass(item, clase, action) {
+    if (action === 'add') {
+      document.getElementById(item).classList.add(clase);
+    } else {
+      document.getElementById(item).classList.remove(clase);
+    }
+  }
+
+  selectedRow(i, bool) {
+    const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i];
+    lista.forEach((row) => {
+      if (bool) {
+        this.ModificarClass(row, 'inputOscuro', 'add');
+      } else {
+        this.ModificarClass(row, 'inputOscuro', 'remove');
+      }
+    });
+  }
+  getArticulos() {
+    try {
+      this.dbServ.getArticulos().subscribe((res) => {
+        res.sort((a, b) => {
+          return a.id > b.id ? 1 : -1;
+        });
+
+        if (res !== undefined && res !== null) {
+          this.listaArticulos = res;
+        }
+      });
+    } catch (error) {}
+  }
+
   async BuscarFacturasAdelantadas(id) {
     try {
-      const facturas_adelantadas = await this.dbServ.getFacturasByParams('1', id, 0, true).toPromise();
-      console.log(facturas_adelantadas);
+      this.facturas_adelantadas = await this.dbServ
+        .getFacturasByParams('1', id, 0, true)
+        .pipe(
+          map(
+            (fact) =>
+              (fact = fact.map((val) => {
+                val.secuencia = _.padStart(val.numero_factura, 8, '0');
+                val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
+                val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : '';
+                val.estado_ = val.estado ? 'fas fa-check' : 'fas fa-times';
+                val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
+                return val;
+              })),
+          ),
+        )
+        .toPromise();
     } catch (error) {}
   }
 
@@ -89,5 +399,115 @@ export class ConduceComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(this.listaClientes);
 
     this.mServ.mostrarModal(true);
+  }
+
+  SeleccionarFactruaAdelantada(factura) {
+    console.log(factura);
+  }
+
+  buscarArticuloPorCodigo(i, codigo, input?) {
+    let precioQuintal;
+    this.inputDrop = 'uni-' + i;
+
+    const ARTICULO = this.listaArticulos.filter((articulo) => articulo.codigo === codigo);
+    if (ARTICULO[0] === undefined) {
+      this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
+      setTimeout(() => {
+        this.enfocarInput('cod-' + i);
+      }, 5);
+      this.selectContenido('cod-' + i);
+    } else {
+      const cantidades = ARTICULO[0].cantidades;
+      if (ARTICULO[0].existencia === 0) {
+        if (ARTICULO[0].descripcion === 'Producto terminado') {
+          this.dbServ.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
+        } else {
+          this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+        }
+        setTimeout(() => {
+          this.enfocarInput('cod-' + i);
+          this.selectContenido('cod-' + i);
+        }, 5);
+      } else {
+        if (ARTICULO[0].existencia > 0 && ARTICULO[0].aviso_existencia > cantidades[ARTICULO[0].medida_alerta]) {
+          if (input === 'can-') {
+            this.dbServ.toastWarning(
+              'Solo quedan ' + cantidades[ARTICULO[0].medida_alerta] + ' ' + ARTICULO[0].medida_alerta + ' de este producto, debe de aumentar el inventario!!!',
+              'AVISO',
+            );
+          }
+        }
+
+        const arti = ARTICULO[0].contenido_articulos.filter((art) => art.medida === 'Quintal');
+
+        if (arti.length !== 0) {
+          precioQuintal = arti[0].precio;
+        }
+
+        (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
+        this.verificarRow(i);
+
+        if (ARTICULO[0].is_detallable) {
+          this.articulo_detallable(ARTICULO[0]);
+        } else {
+          this.articulo_no_detallable(ARTICULO[0]);
+        }
+      }
+    }
+  }
+
+  calcularPrecioSaco(cant, precio) {
+    const res = (cant / 100) * precio;
+    return GLOBAL.redondearAdos(res);
+  }
+
+  entrarSacosAUnidades(precioQuintal, costoQuintal) {
+    this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
+    this.sacos.forEach((saco) => {
+      const valor = 'Saco de ' + saco + ' libras';
+      this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioQuintal), costo: this.calcularPrecioSaco(saco, costoQuintal) });
+    });
+  }
+
+  articulo_detallable(art) {
+    const precioQuintal = art.precio_principal;
+    const costoQuintal = art.costo_principal;
+    this.drop = true;
+    this.UnidadesArticulo = [];
+
+    if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
+      this.entrarSacosAUnidades(precioQuintal, costoQuintal);
+    }
+
+    if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
+      this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
+      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
+    }
+
+    art.contenido_articulos.forEach((element) => {
+      this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
+    });
+  }
+
+  articulo_no_detallable(art) {
+    const precioQuintal = art.precio_principal;
+    const costoQuintal = art.costo_principal;
+    this.drop = true;
+    this.UnidadesArticulo = [];
+
+    if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
+      this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
+      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
+    }
+    art.contenido_articulos.forEach((element) => {
+      if (element.referencia === null) {
+        if (art.descripcion === 'Veterinaria') {
+          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
+        }
+      }
+      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
+        this.entrarSacosAUnidades(precioQuintal, costoQuintal);
+      }
+    });
   }
 }
