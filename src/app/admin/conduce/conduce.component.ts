@@ -16,7 +16,7 @@ import * as moment from 'moment';
 })
 export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   listaClientes;
-  sub: Subscription;
+
   cliente: any;
   facturas_adelantadas = [];
   info = [
@@ -49,22 +49,38 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   listaArticulos = [];
   UnidadesArticulo: any[];
   sacos = [25, 50, 100];
+  inputSecuencia;
+  TOTAL: number;
+
+  subDeci: Subscription;
+  subObj: Subscription;
+  subEsc: Subscription;
+  subInde: Subscription;
   constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {}
 
   ngOnInit() {
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
+
     this.ARRAY_ROWARTICULOS = this.form['rowFactura'] as FormArray;
 
+    for (let index = 1; index <= 22; index++) {
+      this.addItem(index);
+    }
+
     this.necesarioStar();
-    this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
+    this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'buscarCliente') {
         this.cliente = res;
         (document.getElementById('clienteI') as any).value = res.nombre;
 
         this.BuscarFacturasAdelantadas(res.id);
         this.mServ.ModalObj(undefined);
+      } else if (res && res.tipoModal === 'buscar') {
+        console.log('articulo seleccionado');
+
+        this.clickRowModal(res);
       }
       // else if (res && res.tipoModal === 'cambio') {
       //   this.Devuelta = res.devuelta;
@@ -73,21 +89,47 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       //   this.mServ.ModalObj(undefined);
       // }
     });
+
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
+      if (this.tipoModal === 'removerArticulo' && res) {
+        this.procesoQuitarArticulo();
+      }
+    });
+
+    this.subEsc = this.mServ.PRESSESC.subscribe((res) => {
+      if (res !== undefined && res !== null) {
+        this.enfocarInput('cod-' + res);
+      }
+    });
+
+    this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => {
+      if (res !== undefined && res !== null) {
+        this.noArticuloEncontrado(res);
+      }
+    });
+
     this.getArticulos();
   }
 
+  noArticuloEncontrado(arg) {
+    this.dbServ.toastError('Articulo no creado', 'ERROR');
+
+    this.enfocarInput('cod-' + arg);
+    this.mServ.ModalIndex(undefined);
+  }
+
+  ngOnDestroy() {
+    this.subDeci.unsubscribe();
+    this.subObj.unsubscribe();
+    this.subEsc.unsubscribe();
+    this.subInde.unsubscribe();
+  }
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
   }
 
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
-
   async necesarioStar() {
     await this.pedirClientes();
-    // await this.getArticulos();
-
     this.enfocarInput('clienteI');
   }
   aumentarSecuencia() {
@@ -97,7 +139,18 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.drop = false;
   }
 
-  async saltar(e, input, i) {
+  async procesoQuitarArticulo() {
+    await this.removeItem(this.indexRemove);
+    await this.disminuirSecuencia();
+  }
+
+  disminuirSecuencia() {
+    this.secuencia--;
+    this.inputSecuencia = 'cod-' + this.secuencia;
+    this.inputDrop = 'uni-' + this.secuencia;
+    this.drop = false;
+  }
+  async saltar(input, i) {
     const sigInput = input + i;
 
     if (i >= 10 && input === 'cod-') {
@@ -105,6 +158,23 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     let codigo = (this.control.controls[i] as any).controls['cod'].value;
+
+    if (input === 'can-' && codigo !== '') {
+      codigo = _.parseInt(codigo);
+      if (_.isInteger(codigo)) {
+        codigo = (this.control.controls[i] as any).controls['cod'].value;
+        this.buscarArticuloPorCodigo(i, codigo, input);
+      } else {
+        codigo = (this.control.controls[i] as any).controls['cod'].value;
+        if (!codigo) {
+          this.enfocarInput('cod-' + i);
+          this.selectContenido('cod-' + i);
+        } else {
+          const obj = { filtrar: codigo, index: i, metodo: 'venta' };
+          this.abrirModal(obj);
+        }
+      }
+    }
 
     if (input === 'uni-') {
       const cantidad = (this.control.controls[i] as any).controls['can'].value;
@@ -149,43 +219,45 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 2);
       }
     }
-
-    if (input === 'can-' && codigo !== '') {
-      codigo = _.parseInt(codigo);
-      if (_.isInteger(codigo)) {
-        codigo = (this.control.controls[i] as any).controls['cod'].value;
-        this.buscarArticuloPorCodigo(i, codigo, input);
-        this.enfocarInput(sigInput);
-      } else {
-        codigo = (this.control.controls[i] as any).controls['cod'].value;
-        if (codigo === null) {
-          this.enfocarInput('cod-' + i);
-          this.selectContenido('cod-' + i);
-        } else {
-          const obj = { filtrar: codigo, index: i, metodo: 'venta' };
-          this.filtrarArticulo(obj);
-        }
-      }
-    }
   }
-  
-    // =============================================
+
+  async clickRowModal(arg) {
+    const index = _.findIndex(this.listaArticulos, (o: any) => {
+      return o.codigo === arg.codigo;
+    });
+
+    const cantidades = arg.cantidades;
+
+    if (arg.existencia > 0 && arg.aviso_existencia > cantidades[arg.medida_alerta]) {
+      this.dbServ.toastWarning('Solo quedan ' + cantidades[arg.medida_alerta] + ' ' + arg.medida_alerta + ' de este producto, debe de aumentar el inventario!!!', 'AVISO');
+    }
+
+    (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
+    (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
+
+    if (arg.is_detallable) {
+      await this.articulo_detallable(arg);
+    } else {
+      await this.articulo_no_detallable(arg);
+    }
+
+    const sigInput = 'can-' + arg.index;
+    this.enfocarInput(sigInput);
+  }
+
+  // =============================================
   //  MODAL PARA FILTRAR ARTICULOS
   // =============================================
   abrirModal(arg) {
     const obj = arg;
-    
+
     obj.listaArticulos = this.listaArticulos;
-    
-    
+
     this.mServ.modalTipo('buscar');
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
   }
-  filtrarArticulo(arg) {
-    this.abrirModal(arg);
-  }
-  
+
   // =============================================
   checkCantidadExede(i, unidad, lugar) {
     let cantidad = 0;
@@ -271,8 +343,28 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       this.buscarArticuloPorCodigo(i, codigo);
     }
   }
-  inputSecuencia(inputSecuencia: any) {
-    throw new Error('Method not implemented.');
+
+  selectMedidaChange(arg, i) {
+    const indiceDetalle = _.findIndex(this.UnidadesArticulo, (o) => {
+      return o.value === arg;
+    });
+    const unidad = this.UnidadesArticulo[indiceDetalle].value;
+
+    const execede = this.checkCantidadExede(i, unidad, 'change');
+
+    if (!execede) {
+      (this.control.controls[i] as any).controls['uni'].setValue(unidad);
+    } else {
+      this.enfocarInput('can-' + i);
+      this.selectContenido('can-' + i);
+      setTimeout(() => {
+        (this.control.controls[i] as any).controls['uni'].setValue(null);
+      }, 2);
+    }
+  }
+
+  secuenciaDelDrop(arg) {
+    return 'uni-' + arg;
   }
 
   verificarRow(arg) {
@@ -280,7 +372,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   enfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
+    console.log('enfocar ', arg);
+
+    const element = document.getElementById(arg) as any;
     element.focus();
   }
 
@@ -406,10 +500,11 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   buscarArticuloPorCodigo(i, codigo, input?) {
-    let precioQuintal;
     this.inputDrop = 'uni-' + i;
 
     const ARTICULO = this.listaArticulos.filter((articulo) => articulo.codigo === codigo);
+    console.log('ARTICULO[0] ', ARTICULO[0]);
+
     if (ARTICULO[0] === undefined) {
       this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
       setTimeout(() => {
@@ -438,12 +533,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         }
 
-        const arti = ARTICULO[0].contenido_articulos.filter((art) => art.medida === 'Quintal');
-
-        if (arti.length !== 0) {
-          precioQuintal = arti[0].precio;
-        }
-
         (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
         this.verificarRow(i);
 
@@ -452,62 +541,60 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
         } else {
           this.articulo_no_detallable(ARTICULO[0]);
         }
+
+        this.enfocarInput('can-' + i);
       }
     }
   }
 
-  calcularPrecioSaco(cant, precio) {
-    const res = (cant / 100) * precio;
-    return GLOBAL.redondearAdos(res);
-  }
-
-  entrarSacosAUnidades(precioQuintal, costoQuintal) {
+  entrarSacosAUnidades() {
     this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
-    this.sacos.forEach((saco) => {
+    for (let i = 0; i < this.sacos.length; i++) {
+      const saco = this.sacos[i];
       const valor = 'Saco de ' + saco + ' libras';
-      this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioQuintal), costo: this.calcularPrecioSaco(saco, costoQuintal) });
-    });
+      this.UnidadesArticulo.push({ value: valor, precio: 0, costo: 0 });
+    }
   }
 
   articulo_detallable(art) {
-    const precioQuintal = art.precio_principal;
-    const costoQuintal = art.costo_principal;
     this.drop = true;
     this.UnidadesArticulo = [];
 
     if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-      this.entrarSacosAUnidades(precioQuintal, costoQuintal);
+      this.entrarSacosAUnidades();
     }
 
     if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
-      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
+      this.UnidadesArticulo.push({ value: art.medida, precio: 0, costo: 0 });
     }
 
     art.contenido_articulos.forEach((element) => {
-      this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
+      this.UnidadesArticulo.push({ value: element.medida, precio: 0, costo: 0 });
     });
   }
 
   articulo_no_detallable(art) {
-    const precioQuintal = art.precio_principal;
-    const costoQuintal = art.costo_principal;
     this.drop = true;
     this.UnidadesArticulo = [];
 
     if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
-      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
+      this.UnidadesArticulo.push({ value: art.medida, precio: 0, costo: 0 });
     }
+
     art.contenido_articulos.forEach((element) => {
       if (element.referencia === null) {
         if (art.descripcion === 'Veterinaria') {
-          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
+          this.UnidadesArticulo.push({ value: element.medida, precio: 0, costo: 0 });
         }
       }
       if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-        this.entrarSacosAUnidades(precioQuintal, costoQuintal);
+        this.entrarSacosAUnidades();
       }
     });
   }
+
+  imprimirConduce() {}
+  cancelarConduce() {}
 }

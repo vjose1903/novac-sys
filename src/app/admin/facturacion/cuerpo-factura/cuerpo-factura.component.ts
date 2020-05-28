@@ -145,6 +145,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
+    
   }
   async procesoQuitarArticulo() {
     await this.sacarDescuento(this.indexRemove);
