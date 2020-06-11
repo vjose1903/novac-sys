@@ -4,7 +4,7 @@
       <h3 class="label w-100">
         TOTAL: RD$
       </h3>
-      <span class="text-bold w-100 total">
+      <span class="negrita w-100 total">
         {{ ' ' + formatoNumero(data.total_factura) }}
       </span>
     </div>
@@ -35,7 +35,7 @@
       <h3 class="label w-100">
         DEVUELTA: RD$
       </h3>
-      <span *ngIf="devuelta" class="text-bold w-100 total">
+      <span *ngIf="devuelta" class="negrita w-100 total">
         {{ ' ' + devuelta }}
       </span>
     </div>
@@ -56,7 +56,7 @@
       <h3 class="label w-100">
         TOTAL A DEVOLVER: RD$
       </h3>
-      <span class="text-bold w-100 total">
+      <span class="negrita w-100 total">
         {{ ' ' + formatoNumero(data.total_factura) }}
       </span>
     </div>
@@ -76,7 +76,7 @@
       <h3 class="label w-100">
         TOTAL DE COMPRA: RD$
       </h3>
-      <span class="text-bold w-100 total">
+      <span class="negrita w-100 total">
         {{ ' ' + formatoNumero(data.total_factura) }}
       </span>
     </div>

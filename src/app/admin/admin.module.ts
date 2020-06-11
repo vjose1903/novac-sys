@@ -40,7 +40,6 @@ import { TablasModule } from './components/tablas/tablas.module';
 import { ModalHistorialPagosComponent } from './ingresos/modal-historial-pagos/modal-historial-pagos.component';
 import { ConduceComponent } from './conduce/conduce.component';
 import { ModalSeleccinarArticuloComponent } from './conduce/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
-import { FacturasAdelantadasComponent } from './conduce/facturas-adelantadas/facturas-adelantadas.component';
 
 @NgModule({
   declarations: [
@@ -72,7 +71,6 @@ import { FacturasAdelantadasComponent } from './conduce/facturas-adelantadas/fac
     ModalHistorialPagosComponent,
     ConduceComponent,
     ModalSeleccinarArticuloComponent,
-    FacturasAdelantadasComponent,
   ],
   imports: [
     DialogModule,

@@ -15,18 +15,18 @@
               <div class="row">
                 <div class="col-12">
                   <span class="d-block">
-                    <b class="text-bold ">{{ factura.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
+                    <b class="negrita ">{{ factura.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
                     >&nbsp;
                     <span>{{ propietario_factura?.nombre }}</span>
                   </span>
 
                   <span class="d-block">
-                    <b class="text-bold ">{{ factura.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
+                    <b class="negrita ">{{ factura.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
                     >&nbsp;
                     <span>{{ propietario_factura?.rnc }}</span>
                   </span>
                   <span class="d-block">
-                    <b class="text-bold ">Direccion :</b>&nbsp; <span>{{ propietario_factura?.direccion }}</span>
+                    <b class="negrita ">Direccion :</b>&nbsp; <span>{{ propietario_factura?.direccion }}</span>
                   </span>
                 </div>
               </div>
@@ -34,16 +34,16 @@
             <div class="col-5 d-flex justify-content-center">
               <div class="infoFactura">
                 <span class="d-block">
-                  <b class="text-bold ">Fecha facturación:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_facturacion) }}</span>
+                  <b class="negrita ">Fecha facturación:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_facturacion) }}</span>
                 </span>
                 <span *ngIf="factura.condicion === 'Crédito'" class="d-block">
-                  <b class="text-bold ">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_vencimiento) }}</span>
+                  <b class="negrita ">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_vencimiento) }}</span>
                 </span>
                 <span class="d-block">
-                  <b class="text-bold ">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(factura.numero_factura) }}</span>
+                  <b class="negrita ">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(factura.numero_factura) }}</span>
                 </span>
                 <span class="d-block">
-                  <b class="text-bold ">Valida hasta :</b> &nbsp;<span>{{ formatoFecha(factura.fecha_valida) }}</span>
+                  <b class="negrita ">Valida hasta :</b> &nbsp;<span>{{ formatoFecha(factura.fecha_valida) }}</span>
                 </span>
               </div>
             </div>

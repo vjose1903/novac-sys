@@ -4,17 +4,17 @@
       <div class="d-flex justify-content-between">
         <div class="text-center">
           <span class="w-100"> Cantidad de productos en inventario </span>
-          <h4 class="text-bold" *ngIf="listaArticulos">{{ listaArticulos.length }}</h4>
+          <h4 class="negrita" *ngIf="listaArticulos">{{ listaArticulos.length }}</h4>
         </div>
 
         <div class="text-center">
           <span class="w-100"> Costo total </span>
-          <h4 class="text-bold" *ngIf="listaArticulos">RD$ {{ formatoNumero(costoTotal) }}</h4>
+          <h4 class="negrita" *ngIf="listaArticulos">RD$ {{ formatoNumero(costoTotal) }}</h4>
         </div>
 
         <div class="text-center">
           <span class="w-100"> Ganancia total </span>
-          <h4 class="text-bold" *ngIf="listaArticulos">RD$ {{ formatoNumero(gananciaTotal) }}</h4>
+          <h4 class="negrita" *ngIf="listaArticulos">RD$ {{ formatoNumero(gananciaTotal) }}</h4>
         </div>
       </div>
     </div>

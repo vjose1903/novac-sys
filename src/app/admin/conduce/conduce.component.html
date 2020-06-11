@@ -2,7 +2,7 @@
   <div class="col-5">
     <div class="row">
       <div class="col-12 mb-3">
-        <h2 class="text-bold">Conduce</h2>
+        <h2 class="negrita">Conduce</h2>
       </div>
       <div class="col-12">
         <div class="card card-padding sombra">
@@ -24,8 +24,25 @@
     </div>
   </div>
   <div class="col-7">
-    <div *ngIf="facturas_adelantadas.length > 0">
-      <app-facturas-adelantadas [facturas_adelantadas]="facturas_adelantadas"></app-facturas-adelantadas>
+    <div *ngIf="facturas_adelantadas.length > 0" class="row">
+      <!-- <app-facturas-adelantadas [facturas_adelantadas]="facturas_adelantadas"></app-facturas-adelantadas> -->
+      <div class="col-12 mb-3">
+        <h3>Ventas adelantadas</h3>
+      </div>
+      <div class="col-12">
+        <div class="card sombra bordeRedondeado factAdelantadas">
+          <app-tablas
+            *ngIf="facturas_adelantadas && info"
+            [info]="info"
+            [ROW]="'row_adelantada'"
+            [search]="false"
+            [data]="facturas_adelantadas"
+            [scrollContainer]="'scroll-container'"
+            [focusRow]="false"
+            (clickRow)="SeleccionarFactruaAdelantada($event)"
+          ></app-tablas>
+        </div>
+      </div>
     </div>
   </div>
   <!-- ================================================================================================================================================ -->

@@ -19,7 +19,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   cliente: any;
   facturas_adelantadas = [];
-  
+
   form: FormGroup;
   ARRAY_ROWARTICULOS: any;
   tipoModal: string;
@@ -38,6 +38,26 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   subObj: Subscription;
   subEsc: Subscription;
   subInde: Subscription;
+
+  info = [
+    {
+      titulo: 'Numero Fact',
+      key: 'secuencia',
+    },
+    {
+      titulo: 'NCF',
+      key: 'numero_comprobante',
+    },
+    {
+      titulo: 'Fecha Facturacion',
+      key: 'fecha',
+    },
+    {
+      titulo: 'Total Facturado',
+      key: 'total_factura',
+      formatoNumero: true,
+    },
+  ];
   constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {}
 
   ngOnInit() {
@@ -152,18 +172,13 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     let codigo = (this.control.controls[i] as any).controls['cod'].value;
 
     if (input === 'can-' && codigo !== '') {
-      console.log('input ', input);
-      console.log('codigo ', codigo);
-      console.log(' ');
-
       codigo = _.parseInt(codigo);
-      console.log('_.isInteger(codigo) ', _.isInteger(codigo));
+
       if (_.isInteger(codigo)) {
         codigo = (this.control.controls[i] as any).controls['cod'].value;
         this.buscarArticuloPorCodigo(i, codigo, input);
       } else {
         codigo = (this.control.controls[i] as any).controls['cod'].value;
-        console.log('codigo ', codigo);
 
         if (!codigo) {
           this.enfocarInput('cod-' + i);
@@ -496,13 +511,11 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   SeleccionarFactruaAdelantada(factura) {
-    // if (factura) {
-    //   this.mServ.modalTipo('seleccionar_articulos_adelantados');
-    //   this.mServ.ModalSeleccion(factura.detalle_facturas);
-    //   this.mServ.mostrarModal(true);
-    //   console.log(factura);
-    //   console.log(factura.detalle_facturas);
-    // }
+    if (factura) {
+      this.mServ.modalTipo('seleccionar_articulos_adelantados');
+      this.mServ.ModalSeleccion(factura.detalle_facturas);
+      this.mServ.mostrarModal(true);
+    }
   }
 
   buscarArticuloPorCodigo(i, codigo, input?) {
