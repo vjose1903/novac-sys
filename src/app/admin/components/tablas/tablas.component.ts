@@ -477,7 +477,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.entrar++;
     console.log('this.entrar ', this.entrar);
     if (this.entrar > 1) {
+      console.log('arg ', arg);
+
       const element = document.getElementById(arg) as any;
+      console.log('element ', element);
       element.click();
     }
   }

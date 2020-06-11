@@ -19,25 +19,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   cliente: any;
   facturas_adelantadas = [];
-  info = [
-    {
-      titulo: 'Numero Fact',
-      key: 'secuencia',
-    },
-    {
-      titulo: 'NCF',
-      key: 'numero_comprobante',
-    },
-    {
-      titulo: 'Fecha Facturacion',
-      key: 'fecha',
-    },
-    {
-      titulo: 'Total Facturado',
-      key: 'total_factura',
-      formatoNumero: true,
-    },
-  ];
+  
   form: FormGroup;
   ARRAY_ROWARTICULOS: any;
   tipoModal: string;

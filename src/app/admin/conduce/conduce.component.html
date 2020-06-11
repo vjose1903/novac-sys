@@ -24,23 +24,8 @@
     </div>
   </div>
   <div class="col-7">
-    <div *ngIf="facturas_adelantadas.length > 0" class="row">
-      <div class="col-12 mb-3">
-        <h3>Ventas adelantadas</h3>
-      </div>
-      <div class="col-12">
-        <div class="card sombra bordeRedondeado factAdelantadas">
-          <app-tablas
-            *ngIf="facturas_adelantadas && info"
-            [info]="info"
-            [search]="false"
-            [data]="facturas_adelantadas"
-            [scrollContainer]="'scroll-container'"
-            [focusRow]="false"
-            (clickRow)="SeleccionarFactruaAdelantada($event)"
-          ></app-tablas>
-        </div>
-      </div>
+    <div *ngIf="facturas_adelantadas.length > 0">
+      <app-facturas-adelantadas [facturas_adelantadas]="facturas_adelantadas"></app-facturas-adelantadas>
     </div>
   </div>
   <!-- ================================================================================================================================================ -->
