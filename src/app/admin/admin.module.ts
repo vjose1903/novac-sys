@@ -39,6 +39,7 @@ import { FormarFacturaComponent } from './components/formar-factura/formar-factu
 import { TablasModule } from './components/tablas/tablas.module';
 import { ModalHistorialPagosComponent } from './ingresos/modal-historial-pagos/modal-historial-pagos.component';
 import { ConduceComponent } from './conduce/conduce.component';
+import { ModalSeleccinarArticuloComponent } from './conduce/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +70,7 @@ import { ConduceComponent } from './conduce/conduce.component';
     NcfComponent,
     ModalHistorialPagosComponent,
     ConduceComponent,
+    ModalSeleccinarArticuloComponent,
   ],
   imports: [
     DialogModule,

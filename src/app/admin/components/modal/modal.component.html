@@ -251,6 +251,29 @@
     </p-dialog>
 
     <!-- ================================================================================================================================ -->
+    <!--  SELECCIONAR LOS ARTICULOS DEL CONDUCE DE FACTURAS ADELANTADAS -->
+    <!-- ================================================================================================================================ -->
+
+    <p-dialog
+      *ngIf="tipoModal === 'seleccionar_articulos_adelantados'"
+      header="Confirmar"
+      [(visible)]="showModal"
+      [modal]="false"
+      [responsive]="true"
+      [style]="{ width: '900px', minWidth: '200px' }"
+      [minY]="70"
+      [baseZIndex]="10000"
+      (onHide)="reinicioModal()"
+      blockScroll="true"
+    >
+      <app-modal-seleccinar-articulo [articulos]="seleccionModal"></app-modal-seleccinar-articulo>
+
+      <p-footer>
+        <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cancelar</button>
+        <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Aceptar</button>
+      </p-footer>
+    </p-dialog>
+    <!-- ================================================================================================================================ -->
     <!--  IMPRIMIR  FACTURA-->
     <!-- ================================================================================================================================ -->
 

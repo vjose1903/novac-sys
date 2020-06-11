@@ -70,7 +70,13 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     this.necesarioStar();
+
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
+      if (res) {
+        console.log('tipoModal ', this.tipoModal);
+        console.log('res ', res);
+      }
+
       if (res && res.tipoModal === 'buscarCliente') {
         this.cliente = res;
         (document.getElementById('clienteI') as any).value = res.nombre;
@@ -123,6 +129,10 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subObj.unsubscribe();
     this.subEsc.unsubscribe();
     this.subInde.unsubscribe();
+
+    this.mServ.modalTipo(undefined);
+    this.mServ.ModalSeleccion(undefined);
+    this.mServ.mostrarModal(false);
   }
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
@@ -160,12 +170,19 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     let codigo = (this.control.controls[i] as any).controls['cod'].value;
 
     if (input === 'can-' && codigo !== '') {
+      console.log('input ', input);
+      console.log('codigo ', codigo);
+      console.log(' ');
+
       codigo = _.parseInt(codigo);
+      console.log('_.isInteger(codigo) ', _.isInteger(codigo));
       if (_.isInteger(codigo)) {
         codigo = (this.control.controls[i] as any).controls['cod'].value;
         this.buscarArticuloPorCodigo(i, codigo, input);
       } else {
         codigo = (this.control.controls[i] as any).controls['cod'].value;
+        console.log('codigo ', codigo);
+
         if (!codigo) {
           this.enfocarInput('cod-' + i);
           this.selectContenido('cod-' + i);
@@ -488,6 +505,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   abrirModalFiltro(nombre) {
     this.mServ.modalTipo('buscarCliente');
+    this.tipoModal = 'buscarCliente';
 
     this.listaClientes['filtrarCliente'] = nombre;
     this.mServ.ModalSeleccion(this.listaClientes);
@@ -496,7 +514,13 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   SeleccionarFactruaAdelantada(factura) {
-    console.log(factura);
+    // if (factura) {
+    //   this.mServ.modalTipo('seleccionar_articulos_adelantados');
+    //   this.mServ.ModalSeleccion(factura.detalle_facturas);
+    //   this.mServ.mostrarModal(true);
+    //   console.log(factura);
+    //   console.log(factura.detalle_facturas);
+    // }
   }
 
   buscarArticuloPorCodigo(i, codigo, input?) {

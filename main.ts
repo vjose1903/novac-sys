@@ -34,6 +34,7 @@ function createWindow() {
       plugins: true,
     },
   });
+
   if (serve) {
     contents = win.webContents;
     require('electron-reload')(__dirname, {

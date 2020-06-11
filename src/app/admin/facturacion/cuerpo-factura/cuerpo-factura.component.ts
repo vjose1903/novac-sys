@@ -142,10 +142,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.subObj.unsubscribe();
     this.subEsc.unsubscribe();
     this.subInde.unsubscribe();
+
+    this.mServ.modalTipo(undefined);
+    this.mServ.ModalSeleccion(undefined);
+    this.mServ.mostrarModal(false);
   }
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
-    
   }
   async procesoQuitarArticulo() {
     await this.sacarDescuento(this.indexRemove);
@@ -800,6 +803,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         (this.control.controls[arg.index] as any).controls['descuento_porciento'].enable();
       }
     }
+
     const arti = arg.medida;
     if (this.metodo === 'venta') {
       if (arg.is_detallable) {
