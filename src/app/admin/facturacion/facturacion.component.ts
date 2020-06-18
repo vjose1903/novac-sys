@@ -21,7 +21,7 @@ import { ModalService } from '../components/modal/modal.service';
 export class FacturacionComponent implements OnInit, OnDestroy {
   form: FormGroup;
   fecha;
-  tipoVenta = 'false';
+  adelantada = 'false';
   ITBIS = 0;
   seleccionModal;
   showModal = false;
@@ -320,7 +320,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   cambiarTipoVenta(arg) {
     if (arg === 'Crédito') {
-      this.tipoVenta = 'false';
+      this.adelantada = 'false';
     }
   }
 
@@ -460,7 +460,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     } else {
       res = false;
 
-      if (this.tipoVenta === 'true' || this.condicion_fact === 'Crédito') {
+      if (this.adelantada === 'true' || this.condicion_fact === 'Crédito') {
         res = true;
       } else {
         res = false;
@@ -598,6 +598,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     const obj = JSON.parse(arg);
     this.CuerpoFactura = obj;
+
+    if (this.metodo === 'venta') {
+      this.CuerpoFactura.map((articulo) => {
+        articulo.retirado = this.adelantada === 'true' ? 0 : articulo.cantidad;
+        return articulo;
+      });
+    }
     console.log(this.CuerpoFactura);
   }
 
@@ -828,7 +835,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
 
     cabecera_fact['fecha_valida'] = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
-    cabecera_fact['adelantada'] = this.tipoVenta === 'true' ? true : false;
+    cabecera_fact['adelantada'] = this.adelantada === 'true' ? true : false;
     cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;
     cabecera_fact['numero_factura'] = null;

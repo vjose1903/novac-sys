@@ -33,6 +33,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   @Input() listaArticulos: any;
+  texto: any;
 
   infoArticulos = [
     {
@@ -78,11 +79,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
         this.showModal = res;
       }
     });
+
     this.subTipo = this.mServ.TIPOMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.tipoModal = res;
       }
     });
+
     this.subSelec = this.mServ.SELECCIONMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.seleccionModal = res;
@@ -118,6 +121,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
           if (this.seleccionModal.tipo__) {
             this.tipoDevuelta = this.seleccionModal.tipo__;
           }
+        }
+        if (res.texto_modal) {
+          this.texto = res.texto_modal;
         }
       }
     });
@@ -162,6 +168,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     if (this.tipoModal === 'buscar') {
       obj.index = this.seleccionModal.index;
     }
+
     obj.tipoModal = this.tipoModal;
 
     this.mServ.ModalObj(obj);

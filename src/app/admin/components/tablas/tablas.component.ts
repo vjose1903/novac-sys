@@ -48,11 +48,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     // abajo 40
 
     setTimeout(() => {
-      console.log('this.focusRow', this.focusRow);
-      console.log('IDROW ', this.IDROW);
       if (this.focusRow) {
         const key = event.keyCode;
-        console.log('key ', key);
         if (key === 38) {
           event.stopPropagation();
           this.ARRIBA();
@@ -475,12 +472,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   ENTER(arg) {
     this.entrar++;
-    console.log('this.entrar ', this.entrar);
     if (this.entrar > 1) {
-      console.log('arg ', arg);
-
       const element = document.getElementById(arg) as any;
-      console.log('element ', element);
       element.click();
     }
   }

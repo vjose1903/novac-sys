@@ -60,7 +60,7 @@
             id="venta"
             (keydown.enter)="saltar($event.target.value === 'true' ? 'buscarCliente' : condicion_fact === 'Crédito' ? 'buscarCliente' : 'nom', $event.target.value, 'venta')"
             class="form-control inputE"
-            [(ngModel)]="tipoVenta"
+            [(ngModel)]="adelantada"
           >
             <option value="{{ false }}">Normal</option>
             <option value="{{ true }}">Adelantada</option>

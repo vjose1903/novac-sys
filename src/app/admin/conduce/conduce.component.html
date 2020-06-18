@@ -25,7 +25,6 @@
   </div>
   <div class="col-7">
     <div *ngIf="facturas_adelantadas.length > 0" class="row">
-      <!-- <app-facturas-adelantadas [facturas_adelantadas]="facturas_adelantadas"></app-facturas-adelantadas> -->
       <div class="col-12 mb-3">
         <h3>Ventas adelantadas</h3>
       </div>
@@ -162,7 +161,7 @@
           <app-btncircular [alto]="'100px'" [accion]="'Imprimir Conduce'" [nombreImg]="'printer'" (click)="imprimirConduce()"></app-btncircular>
         </div>
         <div class="col-2">
-          <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (click)="cancelarConduce()"></app-btncircular>
+          <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (click)="checkIfCuerpoDirty()"></app-btncircular>
         </div>
       </div>
     </div>

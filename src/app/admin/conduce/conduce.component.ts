@@ -19,19 +19,22 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   cliente: any;
   facturas_adelantadas = [];
+  facturas_adelantadas_wait = [];
 
   form: FormGroup;
   ARRAY_ROWARTICULOS: any;
   tipoModal: string;
   indexRemove: any;
   control: FormArray;
-  inputDrop: string;
-  secuencia: any;
-  drop: boolean;
+
+  secuencia = 0;
+  inputSecuencia = 'cod-0';
+  inputDrop = 'uni-0';
+  drop = false;
   listaArticulos = [];
   UnidadesArticulo: any[];
   sacos = [25, 50, 100];
-  inputSecuencia;
+
   TOTAL: number;
 
   subDeci: Subscription;
@@ -58,6 +61,8 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       formatoNumero: true,
     },
   ];
+
+  facturaAdelantadaSelected;
   constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {}
 
   ngOnInit() {
@@ -75,21 +80,22 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res) {
-        console.log('tipoModal ', this.tipoModal);
-        console.log('res ', res);
+        if (res.tipoModal === 'buscarCliente') {
+          this.cliente = res;
+          (document.getElementById('clienteI') as any).value = res.nombre;
+          this.BuscarFacturasAdelantadas(res.id);
+          //
+        } else if (res.tipoModal === 'buscar') {
+          this.clickRowModal(res);
+          //
+        } else if (res.tipoModal === 'seleccionar_articulos_adelantados') {
+          this.llenarConduce(res.body);
+        }
+        setTimeout(() => {
+          this.resetModalVaribales();
+        }, 1000);
       }
 
-      if (res && res.tipoModal === 'buscarCliente') {
-        this.cliente = res;
-        (document.getElementById('clienteI') as any).value = res.nombre;
-
-        this.BuscarFacturasAdelantadas(res.id);
-        this.mServ.ModalObj(undefined);
-      } else if (res && res.tipoModal === 'buscar') {
-        console.log('articulo seleccionado');
-
-        this.clickRowModal(res);
-      }
       // else if (res && res.tipoModal === 'cambio') {
       //   this.Devuelta = res.devuelta;
       //   this.forma_pago = res.forma_pago;
@@ -98,9 +104,19 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       // }
     });
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (this.tipoModal === 'removerArticulo' && res) {
-        this.procesoQuitarArticulo();
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe(async (res) => {
+      if (res) {
+        if (this.tipoModal === 'removerArticulo') {
+          this.procesoQuitarArticulo();
+        }
+        if (this.tipoModal === 'conduce_lleno') {
+          await this.form.reset();
+          await this.SeleccionarFactruaAdelantada(this.facturas_adelantadas_wait);
+          this.facturas_adelantadas_wait = [];
+        }
+        setTimeout(() => {
+          this.resetModalVaribales();
+        }, 1000);
       }
     });
 
@@ -117,6 +133,12 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     this.getArticulos();
+  }
+  resetModalVaribales() {
+    this.mServ.ModalObj(undefined);
+    this.mServ.ModalSeleccion(undefined);
+    this.mServ.ModalDecision(undefined);
+    this.tipoModal = undefined;
   }
 
   noArticuloEncontrado(arg) {
@@ -386,8 +408,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   enfocarInput(arg) {
-    console.log('enfocar ', arg);
-
     const element = document.getElementById(arg) as any;
     element.focus();
   }
@@ -512,9 +532,14 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   SeleccionarFactruaAdelantada(factura) {
     if (factura) {
-      this.mServ.modalTipo('seleccionar_articulos_adelantados');
-      this.mServ.ModalSeleccion(factura.detalle_facturas);
-      this.mServ.mostrarModal(true);
+      if (this.checkIfCuerpoDirty()) {
+        this.facturas_adelantadas_wait = GLOBAL.duplicarJson(factura);
+        this.abrirModalCuerpoLleno();
+      } else {
+        this.mServ.modalTipo('seleccionar_articulos_adelantados');
+        this.mServ.ModalSeleccion(factura.detalle_facturas);
+        this.mServ.mostrarModal(true);
+      }
     }
   }
 
@@ -522,7 +547,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.inputDrop = 'uni-' + i;
 
     const ARTICULO = this.listaArticulos.filter((articulo) => articulo.codigo === codigo);
-    console.log('ARTICULO[0] ', ARTICULO[0]);
 
     if (ARTICULO[0] === undefined) {
       this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
@@ -564,6 +588,26 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
         this.enfocarInput('can-' + i);
       }
     }
+  }
+
+  checkIfCuerpoDirty() {
+    let acu = false;
+    for (let i = 0; i < this.control.controls.length; i++) {
+      const element = this.control.controls[i] as any;
+      if (element.controls['cod'].value || element.controls['des'].value) {
+        acu = true;
+        break;
+      }
+    }
+    return acu;
+  }
+
+  abrirModalCuerpoLleno() {
+    const obj = { texto_modal: 'Conduce no terminado, ¿Desea sobreescribirlo?' };
+    this.tipoModal = 'conduce_lleno';
+    this.mServ.modalTipo('dinamico_texto');
+    this.mServ.ModalSeleccion(obj);
+    this.mServ.mostrarModal(true);
   }
 
   entrarSacosAUnidades() {
@@ -612,6 +656,20 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
         this.entrarSacosAUnidades();
       }
     });
+  }
+  llenarConduce(articulos) {
+    for (let i = 0; i < articulos.length; i++) {
+      const element = articulos[i];
+      (this.control.controls[i] as any).controls['cod'].setValue(element.codigo);
+      (this.control.controls[i] as any).controls['can'].setValue(element.cantidad - element.retirado);
+      (this.control.controls[i] as any).controls['des'].setValue(_.capitalize(element.articulo));
+      if (element.peso_saco) {
+        (this.control.controls[i] as any).controls['uni'].setValue('Saco de ' + element.peso_saco + ' libras');
+      } else {
+        (this.control.controls[i] as any).controls['uni'].setValue(element.unidad);
+      }
+      this.aumentarSecuencia();
+    }
   }
 
   imprimirConduce() {}

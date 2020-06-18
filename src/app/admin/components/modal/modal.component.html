@@ -23,6 +23,7 @@
   <!-- ================================================================================================================================ -->
   <!-- ELIMINAR -->
   <!-- ================================================================================================================================ -->
+
   <div *ngIf="showModal" class="overlay" (keypress)="prueba($event)">
     <p-dialog
       *ngIf="tipoModal === 'borrar' && seleccionModal"
@@ -266,7 +267,7 @@
       (onHide)="reinicioModal()"
       blockScroll="true"
     >
-      <app-modal-seleccinar-articulo [articulos]="seleccionModal"></app-modal-seleccinar-articulo>
+      <app-modal-seleccinar-articulo [articulos]="seleccionModal" (getArtculos)="devolverCLick($event)"></app-modal-seleccinar-articulo>
 
       <p-footer>
         <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cancelar</button>
@@ -408,6 +409,31 @@
             </div>
           </div>
         </ng-container>
+      </p-footer>
+    </p-dialog>
+
+    <!-- ================================================================================================================================= -->
+    <!--  DINAMICO SOLO TEXTO -->
+    <!-- ================================================================================================================================= -->
+
+    <p-dialog
+      closeIcon="false"
+      *ngIf="tipoModal === 'dinamico_texto' && seleccionModal && texto"
+      header="Confirmación"
+      [(visible)]="showModal"
+      [modal]="true"
+      [responsive]="true"
+      [style]="{ width: '350px', minWidth: '200px' }"
+      [minY]="70"
+      [baseZIndex]="10000"
+      (onHide)="accion(false)"
+    >
+      <p>
+        {{ texto }}
+      </p>
+      <p-footer>
+        <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
+        <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
       </p-footer>
     </p-dialog>
   </div>
