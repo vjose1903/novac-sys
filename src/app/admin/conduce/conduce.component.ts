@@ -17,7 +17,7 @@ import * as moment from 'moment';
 export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   listaClientes;
 
-  cliente: any;
+  cliente;
   facturas_adelantadas = [];
   facturas_adelantadas_wait = [];
 
@@ -108,6 +108,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       if (res) {
         if (this.tipoModal === 'removerArticulo') {
           this.procesoQuitarArticulo();
+        }
+        if (this.tipoModal === 'cancelar_conduce') {
+          this.cancelarConduce(2);
         }
         if (this.tipoModal === 'conduce_lleno') {
           await this.form.reset();
@@ -409,6 +412,8 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   enfocarInput(arg) {
     const element = document.getElementById(arg) as any;
+    console.log(element);
+
     element.focus();
   }
 
@@ -534,7 +539,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     if (factura) {
       if (this.checkIfCuerpoDirty()) {
         this.facturas_adelantadas_wait = GLOBAL.duplicarJson(factura);
-        this.abrirModalCuerpoLleno();
+        this.abrirModalDinamicText('Conduce no terminado, ¿Desea sobreescribirlo?', 1);
       } else {
         this.mServ.modalTipo('seleccionar_articulos_adelantados');
         this.mServ.ModalSeleccion(factura.detalle_facturas);
@@ -602,10 +607,15 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     return acu;
   }
 
-  abrirModalCuerpoLleno() {
-    const obj = { texto_modal: 'Conduce no terminado, ¿Desea sobreescribirlo?' };
-    this.tipoModal = 'conduce_lleno';
-    this.mServ.modalTipo('dinamico_texto');
+  abrirModalDinamicText(texto, tipo) {
+    const obj = { texto_modal: texto };
+    if (tipo === 1) {
+      this.tipoModal = 'conduce_lleno';
+      this.mServ.modalTipo('dinamico_texto');
+    } else {
+      this.tipoModal = 'cancelar_conduce';
+      this.mServ.modalTipo('dinamico_texto');
+    }
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
   }
@@ -673,5 +683,24 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   imprimirConduce() {}
-  cancelarConduce() {}
+
+  cancelarConduce(secuencia) {
+    if (secuencia === 1) {
+      this.abrirModalDinamicText('Conduce no terminado, ¿Desea cancelarlo?', 2);
+    } else {
+      this.form.reset();
+      this.cliente = undefined;
+      this.facturas_adelantadas_wait = [];
+      this.facturas_adelantadas = [];
+      this.secuencia = 0;
+      this.inputSecuencia = 'cod-0';
+      this.inputDrop = 'uni-0';
+      this.facturaAdelantadaSelected = undefined;
+
+      (document.getElementById('clienteI') as any).value = '';
+      setTimeout(() => {
+        this.enfocarInput('clienteI');
+      }, 10);
+    }
+  }
 }

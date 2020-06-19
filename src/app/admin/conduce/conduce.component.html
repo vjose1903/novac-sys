@@ -17,6 +17,8 @@
               placeholder="Nombre Cliente"
               class="form-control mb-4"
               autocomplete="off"
+              [disabled]="cliente"
+              value=""
             />
           </div>
         </div>
@@ -158,10 +160,10 @@
 
       <div class="row my-4">
         <div class="col-2">
-          <app-btncircular [alto]="'100px'" [accion]="'Imprimir Conduce'" [nombreImg]="'printer'" (click)="imprimirConduce()"></app-btncircular>
+          <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (click)="cancelarConduce(1)"></app-btncircular>
         </div>
         <div class="col-2">
-          <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (click)="checkIfCuerpoDirty()"></app-btncircular>
+          <app-btncircular [alto]="'100px'" [accion]="'Imprimir Conduce'" [nombreImg]="'printer'" (click)="imprimirConduce()"></app-btncircular>
         </div>
       </div>
     </div>
