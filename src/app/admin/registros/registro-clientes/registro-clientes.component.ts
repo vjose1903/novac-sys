@@ -61,9 +61,9 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       .getClientes()
       .pipe(
         map(
-          cliente =>
-            (cliente = cliente.map(cli => {
-              cli.documentos_de_identidad.map(docu => {
+          (cliente) =>
+            (cliente = cliente.map((cli) => {
+              cli.documentos_de_identidad.map((docu) => {
                 if (docu.principal) {
                   cli.documento_identidad = docu.documento;
                 }
@@ -72,7 +72,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
             })),
         ),
       )
-      .subscribe(res => {
+      .subscribe((res) => {
         this.listaClientes = res;
         this.quitarContadoDeLista();
       });
@@ -92,13 +92,13 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       cedula: [null, ValidateRayaAbajo.verificarRayaAbajo],
     });
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
     });
 
-    this.dbServ.getVendedores().subscribe(res => {
+    this.dbServ.getVendedores().subscribe((res) => {
       this.vendedores = res;
     });
   }
@@ -175,7 +175,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   quitarContadoDeLista() {
     const temp = JSON.parse(JSON.stringify(this.listaClientes));
     this.listaClientes = [];
-    const cliente = temp.filter(cli => cli.nombre === 'Cliente contado');
+    const cliente = temp.filter((cli) => cli.nombre === 'Cliente contado');
     const index = _.indexOf(temp, cliente[0]);
 
     _.pullAt(temp, index);
@@ -193,7 +193,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   editarItem(item) {
     this.indexSeleccionado = item.INDEX;
 
-    item.ARG.documentos_de_identidad.forEach(doc => {
+    item.ARG.documentos_de_identidad.forEach((doc) => {
       if (doc.descripcion === 'rnc') {
         this.form.controls.rnc.setValue(doc.documento);
       } else {
@@ -241,7 +241,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       devolver = true;
     }
 
-    temp_documentos_identidad.forEach(element => {
+    temp_documentos_identidad.forEach((element) => {
       //  esto es para saber si el documento de identidad esta mal escrito
       if (this.validarRayaAbajo(element.descripcion)) {
         Fail.push(element.descripcion);
@@ -267,13 +267,14 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
     });
     // entra aqui si el formato de un documento de identidad esta mal
     if (devolver) {
-      Fail.forEach(doc => {
+      Fail.forEach((doc) => {
         this.dbServ.toastError('Formato de ' + doc + ' incorrecto', 'ERROR');
       });
       // entra aqui si pasa la validacion de documento de identidad
     } else {
       // entra aqui si no selecciono un documento como principal
-      if (!cedulaCorrecta) {
+      // if (!cedulaCorrecta) {
+      if (false) {
         this.dbServ.toastError('Cedula introducida incorrecta', 'ERROR');
       } else {
         if (this.doc_principal === undefined || this.doc_principal === null || this.doc_principal === ' ' || this.doc_principal === '') {
@@ -295,9 +296,9 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
           if (obj.id === null) {
             obj.cuenta = obj.cuenta;
             this.dbServ.createCliente(obj).subscribe(
-              res => {
+              (res) => {
                 const obj = JSON.parse(JSON.stringify(res));
-                obj.documentos_de_identidad.map(docu => {
+                obj.documentos_de_identidad.map((docu) => {
                   if (docu.principal) {
                     obj.documento_identidad = docu.documento;
                   }
@@ -309,7 +310,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
                 this.form.reset();
                 this.enfocarInput('campoNombre');
               },
-              err => {
+              (err) => {
                 console.log(err);
                 this.mostrarErrores(err.error);
               },
@@ -317,9 +318,9 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
           } else {
             obj.cuenta = 0;
             this.dbServ.editarCliente(obj).subscribe(
-              res => {
+              (res) => {
                 const obj = JSON.parse(JSON.stringify(res));
-                obj.documentos_de_identidad.map(docu => {
+                obj.documentos_de_identidad.map((docu) => {
                   if (docu.principal) {
                     obj.documento_identidad = docu.documento;
                   }
@@ -330,7 +331,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
 
                 this.borrar();
               },
-              err => {
+              (err) => {
                 console.log(err);
                 this.mostrarErrores(err.error);
               },
@@ -363,7 +364,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
 
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
-      arg.forEach(error => {
+      arg.forEach((error) => {
         this.dbServ.toastError(error, 'ERROR');
       });
     } else {
@@ -413,13 +414,13 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       obj['estado'] = false;
       obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
       this.dbServ.editarCliente(obj).subscribe(
-        res => {
+        (res) => {
           this.dbServ.toastSuccess('Cliente ' + obj.nombre + ' borrado.', 'CORRECTO');
           _.pullAt(this.listaClientes, this.indexBorrar);
           this.tipoModal = '';
           this.decisionModal = null;
         },
-        err => {
+        (err) => {
           console.log(err);
           this.mostrarErrores(err.error);
         },

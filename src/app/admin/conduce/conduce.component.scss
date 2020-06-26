@@ -1,39 +1,39 @@
 .entrada {
-	border-radius: 0 !important;
-	height: calc(1.5em + 0.3rem + 2px) !important;
-	padding: 0rem 0.3rem 0rem 0.5rem !important;
+  border-radius: 0 !important;
+  height: calc(1.5em + 0.3rem + 2px) !important;
+  padding: 0rem 0.3rem 0rem 0.5rem !important;
 }
 .columna0padding,
 .td0padding {
-	padding: 0 !important;
+  padding: 0 !important;
 }
 .filaFact {
-	padding: 0rem 0.9rem;
-	width: 100vw;
+  padding: 0rem 0.9rem;
+  width: 100vw;
 }
 // ====================================================
 // TAMAÑO DE LOS TITULOS
 // ====================================================
 .COD {
-	max-width: 2rem;
+  max-width: 2rem;
 }
 .CAN {
-	max-width: 1rem;
+  max-width: 1rem;
 }
 .DES {
-	max-width: 7rem;
+  max-width: 7rem;
 }
 .DESC {
-	max-width: 1rem;
+  max-width: 1rem;
 }
 .UNI {
-	max-width: 2rem;
+  max-width: 2rem;
 }
 .PRE {
-	max-width: 2rem;
+  max-width: 2rem;
 }
 .TOT {
-	max-width: 2rem;
+  max-width: 2rem;
 }
 
 // ====================================================
@@ -41,37 +41,37 @@
 // ====================================================
 
 .tiCOD {
-	max-width: 1.005rem;
+  max-width: 1.005rem;
 }
 .tiCAN {
-	max-width: 1rem;
+  max-width: 1rem;
 }
 .tiDES {
-	max-width: 3.9rem;
+  max-width: 3.9rem;
 }
 .tiDESC {
-	max-width: 1rem;
-	padding: 0rem 0rem 0.5rem 1rem;
+  max-width: 1rem;
+  padding: 0rem 0rem 0.5rem 1rem;
 }
 
 .tiUNI {
-	max-width: 1.3rem;
-	text-align: left;
+  max-width: 1.3rem;
+  text-align: left;
 }
 .tiPRE {
-	max-width: 1rem;
+  max-width: 1rem;
 }
 .tiTOT {
-	max-width: 1.4rem;
+  max-width: 1.4rem;
 }
 
 .inDES,
 .inUNI,
 .inPRE,
 .inTOT {
-	&:hover {
-		cursor: default;
-	}
+  &:hover {
+    cursor: default;
+  }
 }
 .inDES:active,
 .inPRE:active,
@@ -85,75 +85,89 @@
 .inPRE.active,
 .inUNI.active,
 .inTOT.active {
-	outline: 0px;
-	border-color: #d4d4d4 !important;
-	box-shadow: 1px 1px #d4d4d4 !important;
+  outline: 0px;
+  border-color: #d4d4d4 !important;
+  box-shadow: 1px 1px #d4d4d4 !important;
 }
 .scrollContainer {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	max-height: calc(100% - 2rem) !important;
-	overflow: auto;
-	overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: calc(100% - 2rem) !important;
+  overflow: auto;
+  overflow-x: hidden;
 }
 .cuadro {
-	height: 47vh;
+  height: 47vh;
 }
 
 .conFlow {
-	overflow: auto !important;
+  overflow: auto !important;
 }
 
 .sinFLow {
-	overflow: hidden !important;
+  overflow: hidden !important;
 }
 
 .Overlay {
-	bottom: 0;
-	left: 0;
-	background: #00000050;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: calc(100% - 37.2vh) !important;
-	transform: translate(0px, -153px);
+  bottom: 0;
+  left: 0;
+  background: #00000050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100% - 37.2vh) !important;
+  transform: translate(0px, -153px);
 }
 
 .btnQuitarRow {
-	background-color: rgba(187, 187, 187, 0.842);
-	width: 1rem;
-	margin: 0;
-	padding: 0;
-	> .btnBorrar {
-		transform: translate(0.2rem, -3rem) scale(0);
-		// display: none;
-	}
-	&:hover {
-		cursor: pointer;
-		> .btnBorrar {
-			transform: translate(0rem, 0.3rem) scale(1);
-			display: block;
-			font-size: 1.3rem;
-		}
-	}
+  background-color: rgba(187, 187, 187, 0.842);
+  width: 1rem;
+  margin: 0;
+  padding: 0;
+  > .btnBorrar {
+    transform: translate(0.2rem, -3rem) scale(0);
+    // display: none;
+  }
+  &:hover {
+    cursor: pointer;
+    > .btnBorrar {
+      transform: translate(0rem, 0.3rem) scale(1);
+      display: block;
+      font-size: 1.3rem;
+    }
+  }
+}
+
+.sombreado {
+  background-color: rgba(187, 187, 187, 0.842);
+  width: 1rem;
+  margin: 0;
+  padding: 0;
+  > .btnBorrar {
+    transform: translate(0.2rem, -3rem) scale(0);
+    // display: none;
+  }
+  &:hover {
+    cursor: pointer;
+  }
 }
 .btnBorrar {
-	transition: all 0.3s;
+  transition: all 0.3s;
 }
 
 .inputOscuro {
-	background-color: rgba(194, 194, 194, 0.753);
+  background-color: rgba(194, 194, 194, 0.753);
 }
 
 // ======================================================
 // ======================================================
 
 .bordeRedondeado {
-	border-radius: 0.7rem;
+  border-radius: 0.7rem;
 }
 
 .factAdelantadas {
-	max-height: 11rem;
-	min-height: 11rem;
+  max-height: 11rem;
+  min-height: 11rem;
 }

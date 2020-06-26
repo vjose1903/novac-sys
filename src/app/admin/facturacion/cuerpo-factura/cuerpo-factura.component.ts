@@ -182,14 +182,26 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   selectedRow(i, bool) {
-    const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i, 'desc-' + i, 'pre-' + i, 'tot-' + i];
+    const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i];
     lista.forEach((row) => {
-      if (bool) {
-        this.ModificarClass(row, 'inputOscuro', 'add');
-      } else {
-        this.ModificarClass(row, 'inputOscuro', 'remove');
+      if (this.checkIfArticuloRow(i)) {
+        if (bool) {
+          this.ModificarClass(row, 'inputOscuro', 'add');
+        } else {
+          this.ModificarClass(row, 'inputOscuro', 'remove');
+        }
       }
     });
+  }
+  checkIfArticuloRow(i) {
+    let res = false;
+    const element = this.control.controls[i] as any;
+    if (element.controls['des'].value || element.controls['cod'].value) {
+      res = true;
+    } else {
+      res = false;
+    }
+    return res;
   }
   // =============================================
   //  RESETEAR FORMULARIO
@@ -745,8 +757,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   modalRemover(i) {
     const name = (this.control.controls[i] as any).controls['des'].value;
     const unidad = (this.control.controls[i] as any).controls['uni'].value;
-    const obj = { nombre: name + ' (' + unidad + ')' };
-
+    let obj = {};
+    if (unidad) {
+      obj = { nombre: name + ' (' + unidad + ')' };
+    } else {
+      obj = { nombre: name };
+    }
     if (name) {
       this.tipoModal = 'removerArticulo';
       this.indexRemove = i;

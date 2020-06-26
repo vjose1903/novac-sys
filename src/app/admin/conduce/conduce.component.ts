@@ -63,6 +63,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   ];
 
   facturaAdelantadaSelected;
+  CuerpoConduce = [];
   constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {}
 
   ngOnInit() {
@@ -84,6 +85,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
           this.cliente = res;
           (document.getElementById('clienteI') as any).value = res.nombre;
           this.BuscarFacturasAdelantadas(res.id);
+          setTimeout(() => {
+            this.enfocarInput('cod-0');
+          }, 10);
           //
         } else if (res.tipoModal === 'buscar') {
           this.clickRowModal(res);
@@ -116,6 +120,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
           await this.form.reset();
           await this.SeleccionarFactruaAdelantada(this.facturas_adelantadas_wait);
           this.facturas_adelantadas_wait = [];
+        }
+        if (this.tipoModal === 'imprimir_conduce') {
+          await this.sendData();
         }
         setTimeout(() => {
           this.resetModalVaribales();
@@ -412,8 +419,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   enfocarInput(arg) {
     const element = document.getElementById(arg) as any;
-    console.log(element);
-
     element.focus();
   }
 
@@ -436,7 +441,12 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   modalRemover(i) {
     const name = (this.control.controls[i] as any).controls['des'].value;
     const unidad = (this.control.controls[i] as any).controls['uni'].value;
-    const obj = { nombre: name + ' (' + unidad + ')' };
+    let obj = {};
+    if (unidad) {
+      obj = { nombre: name + ' (' + unidad + ')' };
+    } else {
+      obj = { nombre: name };
+    }
 
     if (name) {
       this.tipoModal = 'removerArticulo';
@@ -458,10 +468,12 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   selectedRow(i, bool) {
     const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i];
     lista.forEach((row) => {
-      if (bool) {
-        this.ModificarClass(row, 'inputOscuro', 'add');
-      } else {
-        this.ModificarClass(row, 'inputOscuro', 'remove');
+      if (this.checkIfArticuloRow(i)) {
+        if (bool) {
+          this.ModificarClass(row, 'inputOscuro', 'add');
+        } else {
+          this.ModificarClass(row, 'inputOscuro', 'remove');
+        }
       }
     });
   }
@@ -594,12 +606,21 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
   }
-
+  checkIfArticuloRow(i) {
+    let res = false;
+    const element = this.control.controls[i] as any;
+    if (element.controls['des'].value || element.controls['cod'].value) {
+      res = true;
+    } else {
+      res = false;
+    }
+    return res;
+  }
   checkIfCuerpoDirty() {
     let acu = false;
     for (let i = 0; i < this.control.controls.length; i++) {
       const element = this.control.controls[i] as any;
-      if (element.controls['cod'].value || element.controls['des'].value) {
+      if (element.controls['des'].value || element.controls['cod'].value) {
         acu = true;
         break;
       }
@@ -612,6 +633,11 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     if (tipo === 1) {
       this.tipoModal = 'conduce_lleno';
       this.mServ.modalTipo('dinamico_texto');
+    } else if (tipo === 2) {
+      {
+        this.tipoModal = 'imprimir_conduce';
+        this.mServ.modalTipo('dinamico_texto');
+      }
     } else {
       this.tipoModal = 'cancelar_conduce';
       this.mServ.modalTipo('dinamico_texto');
@@ -667,9 +693,12 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
   }
+
   llenarConduce(articulos) {
     for (let i = 0; i < articulos.length; i++) {
       const element = articulos[i];
+
+      (this.control.controls[i] as any).controls['id'].setValue(element.id);
       (this.control.controls[i] as any).controls['cod'].setValue(element.codigo);
       (this.control.controls[i] as any).controls['can'].setValue(element.cantidad - element.retirado);
       (this.control.controls[i] as any).controls['des'].setValue(_.capitalize(element.articulo));
@@ -681,12 +710,54 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       this.aumentarSecuencia();
     }
   }
+  async ParsearCuerpo() {
+    for (let i = 0; i < this.control.value.length; i++) {
+      const element = this.control.value[i];
+      if (element.cod && element.uni && element.can) {
+        element['articulo_id'] = this.listaArticulos.filter((art) => art.codigo === element.cod)[0].id;
 
-  imprimirConduce() {}
+        this.CuerpoConduce.push({
+          detalle_factura_id: element.id ? element.id : null,
+          articulo_id: element.articulo_id,
+          cantidad: element.can,
+          unidad: element.uni,
+        });
+      } else {
+        break;
+      }
+    }
+    console.log(this.CuerpoConduce);
+  }
+
+  imprimirConduce() {
+    if (!this.cliente) {
+      this.dbServ.toastWarning('Conduce no tiene cliente', 'Aviso');
+    } else {
+      this.ParsearCuerpo();
+      if (this.CuerpoConduce.length === 0) {
+        this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
+      } else {
+        this.abrirModalDinamicText('Seguro que desea imprimir el conduce', 2);
+      }
+    }
+  }
+
+  sendData() {
+    console.log('enviando data');
+    const empleado = JSON.parse(this.dbServ.getEmpleado());
+
+    const obj = {};
+    obj['user_id'] = empleado.id;
+    obj['cliente_id'] = this.cliente.id;
+    obj['numero_conduce'] = '';
+    obj['detalle_conduce_attributes'] = this.CuerpoConduce;
+
+    console.log(obj);
+  }
 
   cancelarConduce(secuencia) {
     if (secuencia === 1) {
-      this.abrirModalDinamicText('Conduce no terminado, ¿Desea cancelarlo?', 2);
+      this.abrirModalDinamicText('Conduce no terminado, ¿Desea cancelarlo?', null);
     } else {
       this.form.reset();
       this.cliente = undefined;
