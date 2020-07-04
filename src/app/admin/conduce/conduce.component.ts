@@ -93,7 +93,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
           this.clickRowModal(res);
           //
         } else if (res.tipoModal === 'seleccionar_articulos_adelantados') {
-          this.llenarConduce(res.body);
+          this.parsearDetalleModal(res.body);
         }
         setTimeout(() => {
           this.resetModalVaribales();
@@ -504,6 +504,12 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
                 val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : '';
                 val.estado_ = val.estado ? 'fas fa-check' : 'fas fa-times';
                 val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
+
+                for (let i = 0; i < val.detalle_facturas.length; i++) {
+                  const detalle = val.detalle_facturas[i];
+                  detalle.select = false;
+                }
+
                 return val;
               })),
           ),
@@ -547,16 +553,19 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.mServ.mostrarModal(true);
   }
 
-  SeleccionarFactruaAdelantada(factura) {
+  async SeleccionarFactruaAdelantada(factura) {
     if (factura) {
-      if (this.checkIfCuerpoDirty()) {
-        this.facturas_adelantadas_wait = GLOBAL.duplicarJson(factura);
-        this.abrirModalDinamicText('Conduce no terminado, ¿Desea sobreescribirlo?', 1);
-      } else {
-        this.mServ.modalTipo('seleccionar_articulos_adelantados');
-        this.mServ.ModalSeleccion(factura.detalle_facturas);
-        this.mServ.mostrarModal(true);
+      // if (this.checkIfCuerpoDirty()) {
+      //   this.facturas_adelantadas_wait = GLOBAL.duplicarJson(factura);
+      //   this.abrirModalDinamicText('Conduce no terminado, ¿Desea sobreescribirlo?', 1);
+      // } else {
+      this.mServ.modalTipo('seleccionar_articulos_adelantados');
+      for (let i = 0; i < factura.detalle_facturas.length; i++) {
+        const detalle = factura.detalle_facturas[i];
       }
+      this.mServ.ModalSeleccion(factura.detalle_facturas);
+      this.mServ.mostrarModal(true);
+      // }
     }
   }
 
@@ -694,12 +703,69 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  parsearDetalleModal(articulos) {
+    console.log(articulos);
+    const articulos_parsed = [];
+
+    for (let i = 0; i < this.control.controls.length; i++) {
+      const row_conduce = this.control.controls[i].value;
+
+      if (row_conduce.id) {
+        for (let j = 0; j < articulos.length; j++) {
+          const articulo = articulos[j];
+
+          const i = _.findIndex(this.control.controls, (control: any) => {
+            return control.id === articulo.id;
+          });
+
+          if (i !== -1) {
+            articulo.cantidad = this.control.controls[i].value.can + articulo.retirado;
+            articulos_parsed.push(articulo);
+          } else {
+            if (row_conduce.cod && row_conduce.des) {
+              articulos_parsed.push(row_conduce);
+            }
+          }
+        }
+      } else {
+        if (row_conduce.cod && row_conduce.des) {
+          articulos_parsed.push(row_conduce);
+        }
+      }
+
+      // for (let j = 0; j < articulos.length; j++) {
+      //   const articulo_selected = articulos[j];
+
+      //   const i = _.findIndex(this.control.controls, (control: any) => {
+      //     return control.id === articulo_selected.id;
+      //   });
+
+      //   console.log('row_conduce ', row_conduce);
+      //   console.log('articulo_selected ', articulo_selected);
+      //   console.log(' ');
+
+      //   if (i !== -1) {
+      //     articulo_selected.cantidad = this.control.controls[i].value.can + articulo_selected.retirado;
+      //     articulos_parsed.push(articulo_selected);
+      //   } else {
+      //     if (row_conduce.cod && row_conduce.des) {
+      //       articulos_parsed.push(row_conduce);
+      //     }
+      //   }
+      // }
+    }
+    this.form.reset();
+    console.log(articulos_parsed);
+
+    this.llenarConduce(articulos_parsed);
+  }
+
   llenarConduce(articulos) {
     for (let i = 0; i < articulos.length; i++) {
       const element = articulos[i];
-
       (this.control.controls[i] as any).controls['id'].setValue(element.id);
       (this.control.controls[i] as any).controls['cod'].setValue(element.codigo);
+
       (this.control.controls[i] as any).controls['can'].setValue(element.cantidad - element.retirado);
       (this.control.controls[i] as any).controls['des'].setValue(_.capitalize(element.articulo));
       if (element.peso_saco) {

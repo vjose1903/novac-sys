@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnChanges, ElementRef, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, OnDestroy, HostListener } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
@@ -19,6 +19,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   tipoDevuelta: any;
   cant_notas_credito = 0;
   cant_notas_debito = 0;
+
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       if (this.tipoModal === 'buscar') {
@@ -73,6 +74,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
   subShow: Subscription;
   subTipo: Subscription;
   subSelec: Subscription;
+
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
@@ -152,11 +154,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     this.mServ.ModalDecision(arg);
     this.reinicioModal();
   }
+
   getDevuelta(arg) {
     const obj = { devuelta: arg.devuelta, forma_pago: arg.forma_pago, decision_cambio: arg.decision_cambio };
     this.devolverCLick(obj);
     this.reinicioModal();
   }
+
   reinicioModal() {
     this.mServ.modalTipo(undefined);
     this.mServ.mostrarModal(false);
