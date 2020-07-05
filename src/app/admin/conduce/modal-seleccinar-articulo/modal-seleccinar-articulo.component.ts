@@ -69,18 +69,38 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
   mandarArticulos() {
     this.getArtculos.emit({ body: this.articulos_selected });
   }
+
   resetLista() {
     this.articulos_selected = [];
   }
 
   getInfoChange(item) {
     if (item.cambio === 'select') {
+      const articulo = item.body[item.index];
+
+      const _x_ = _.findIndex(this.articulos_selected, (arti) => {
+        return arti.id === articulo.id;
+      });
       if (!item.value) {
-        const i = this.articulos_selected.indexOf(item.body[item.index]);
-        _.pullAt(this.articulos_selected, i);
+        if (this.articulos_selected[_x_]) {
+          this.articulos_selected[_x_].destroy = 1;
+        } else {
+          articulo.destroy = 1;
+
+          this.articulos_selected.push(articulo);
+        }
+        // _.pullAt(this.articulos_selected, i);
       } else {
-        this.articulos_selected.push(item.body[item.index]);
+        if (_x_ !== -1) {
+          this.articulos_selected[_x_].destroy = 0;
+        } else {
+          this.articulos_selected.push(articulo);
+        }
       }
+
+      console.log('_x_ ', _x_);
+      console.log('articulo ', articulo);
+      console.log('this.articulos_selected ', this.articulos_selected);
     }
   }
 

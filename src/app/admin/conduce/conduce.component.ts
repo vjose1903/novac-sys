@@ -93,7 +93,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
           this.clickRowModal(res);
           //
         } else if (res.tipoModal === 'seleccionar_articulos_adelantados') {
-          this.parsearDetalleModal(res.body);
+          this.llenarConduce(res.body);
         }
         setTimeout(() => {
           this.resetModalVaribales();
@@ -562,6 +562,13 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       this.mServ.modalTipo('seleccionar_articulos_adelantados');
       for (let i = 0; i < factura.detalle_facturas.length; i++) {
         const detalle = factura.detalle_facturas[i];
+
+        const existe = this.control.value.find((d) => d.id === detalle.id);
+        if (existe) {
+          detalle.select = true;
+        } else {
+          detalle.select = false;
+        }
       }
       this.mServ.ModalSeleccion(factura.detalle_facturas);
       this.mServ.mostrarModal(true);
@@ -704,7 +711,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   parsearDetalleModal(articulos) {
-    console.log(articulos);
     const articulos_parsed = [];
 
     for (let i = 0; i < this.control.controls.length; i++) {
@@ -740,10 +746,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       //     return control.id === articulo_selected.id;
       //   });
 
-      //   console.log('row_conduce ', row_conduce);
-      //   console.log('articulo_selected ', articulo_selected);
-      //   console.log(' ');
-
       //   if (i !== -1) {
       //     articulo_selected.cantidad = this.control.controls[i].value.can + articulo_selected.retirado;
       //     articulos_parsed.push(articulo_selected);
@@ -755,27 +757,47 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       // }
     }
     this.form.reset();
-    console.log(articulos_parsed);
 
-    this.llenarConduce(articulos_parsed);
+    // this.llenarConduce(articulos_parsed);
   }
 
   llenarConduce(articulos) {
-    for (let i = 0; i < articulos.length; i++) {
-      const element = articulos[i];
-      (this.control.controls[i] as any).controls['id'].setValue(element.id);
-      (this.control.controls[i] as any).controls['cod'].setValue(element.codigo);
+    for (let i = 0; i < this.control.controls.length; i++) {
+      const element = this.control.controls[i].value;
 
-      (this.control.controls[i] as any).controls['can'].setValue(element.cantidad - element.retirado);
-      (this.control.controls[i] as any).controls['des'].setValue(_.capitalize(element.articulo));
-      if (element.peso_saco) {
-        (this.control.controls[i] as any).controls['uni'].setValue('Saco de ' + element.peso_saco + ' libras');
-      } else {
-        (this.control.controls[i] as any).controls['uni'].setValue(element.unidad);
+      for (let j = 0; j < articulos.length; j++) {
+        const articulo = articulos[j];
+
+        const existe = this.control.value.find((d) => d.id === articulo.id);
+
+        if (element.des && element.cod) {
+          if (element.id === articulo.id && articulo.destroy === 1) {
+            this.indexRemove = i;
+            this.procesoQuitarArticulo();
+          }
+        } else {
+          if (!existe && articulo.destroy !== 1) {
+            this.llenarFila(articulo, i);
+          }
+        }
       }
-      this.aumentarSecuencia();
     }
   }
+
+  llenarFila(element, i) {
+    (this.control.controls[i] as any).controls['id'].setValue(element.id);
+    (this.control.controls[i] as any).controls['cod'].setValue(element.codigo);
+
+    (this.control.controls[i] as any).controls['can'].setValue(element.cantidad - element.retirado);
+    (this.control.controls[i] as any).controls['des'].setValue(_.capitalize(element.articulo));
+    if (element.peso_saco) {
+      (this.control.controls[i] as any).controls['uni'].setValue('Saco de ' + element.peso_saco + ' libras');
+    } else {
+      (this.control.controls[i] as any).controls['uni'].setValue(element.unidad);
+    }
+    this.aumentarSecuencia();
+  }
+
   async ParsearCuerpo() {
     for (let i = 0; i < this.control.value.length; i++) {
       const element = this.control.value[i];
@@ -792,7 +814,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
         break;
       }
     }
-    console.log(this.CuerpoConduce);
   }
 
   imprimirConduce() {
@@ -809,7 +830,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   sendData() {
-    console.log('enviando data');
     const empleado = JSON.parse(this.dbServ.getEmpleado());
 
     const obj = {};
@@ -817,8 +837,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     obj['cliente_id'] = this.cliente.id;
     obj['numero_conduce'] = '';
     obj['detalle_conduce_attributes'] = this.CuerpoConduce;
-
-    console.log(obj);
   }
 
   cancelarConduce(secuencia) {
