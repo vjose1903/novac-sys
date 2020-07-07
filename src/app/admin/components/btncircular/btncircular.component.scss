@@ -1,14 +1,17 @@
 .contenedor {
-  display: inline-grid;
+  display: flex;
   justify-content: center;
+  height: 140px;
 }
 .labelBtn {
   margin: auto;
   transition: all 0.2s;
 }
 .imgBtn {
+  height: 100px;
+  position: absolute;
   ~ .labelBtn {
-    transform: translate(2rem, 0rem) scale(0);
+    transform: translate(0rem, 0rem) scale(0);
   }
 
   filter: grayscale(50%);
@@ -16,7 +19,7 @@
     filter: grayscale(0%);
     cursor: pointer;
     ~ .labelBtn {
-      transform: translate(1.2rem, 0.3rem) scale(1);
+      transform: translate(0rem, 3.2rem) scale(1);
     }
   }
 
