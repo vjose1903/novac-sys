@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalService } from '../modal/modal.service';
-import { parseDate, BsDatepickerConfig } from 'ngx-bootstrap';
+import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import { DBservice } from '../../../core/services/bdservice.service';
 
 @Component({

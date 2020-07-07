@@ -1,11 +1,18 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { CarouselModule,  TabsModule ,ModalModule, ButtonsModule, BsDropdownModule , AlertModule, BsDatepickerModule, DatepickerModule, } from 'ngx-bootstrap';
-import { ToastrModule} from 'ngx-toastr';
-import { NgxPaginationModule } from 'ngx-pagination';
-import { AccordionModule } from 'ngx-bootstrap';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { AlertModule } from 'ngx-bootstrap/alert';
+import { BsDatepickerModule, DatepickerModule } from 'ngx-bootstrap/datepicker';
+import { ButtonsModule } from 'ngx-bootstrap/buttons';
+import { CarouselModule } from 'ngx-bootstrap/carousel';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+
+import { ToastrModule } from 'ngx-toastr';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { AccordionModule } from 'ngx-bootstrap/accordion';
 
 @NgModule({
   declarations: [],
@@ -23,18 +30,6 @@ import { AccordionModule } from 'ngx-bootstrap';
     NgxPaginationModule,
     AccordionModule.forRoot(),
   ],
-  exports:[
-    CarouselModule,
-    ModalModule,
-    ButtonsModule,
-    BsDropdownModule,
-    AlertModule,
-    BsDatepickerModule,
-    DatepickerModule,
-    TabsModule,
-    ToastrModule,
-    AccordionModule
-  ]
-
+  exports: [CarouselModule, ModalModule, ButtonsModule, BsDropdownModule, AlertModule, BsDatepickerModule, DatepickerModule, TabsModule, ToastrModule, AccordionModule],
 })
-export class NgxBootstrapModule { }
+export class NgxBootstrapModule {}

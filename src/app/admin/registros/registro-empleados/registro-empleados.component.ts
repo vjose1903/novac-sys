@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { parseDate, BsDatepickerConfig } from 'ngx-bootstrap';
+import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import { PhotosService } from '../../../core/services/photos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
