@@ -30,6 +30,6 @@ import { AccordionModule } from 'ngx-bootstrap/accordion';
     NgxPaginationModule,
     AccordionModule.forRoot(),
   ],
-  exports: [CarouselModule, ModalModule, ButtonsModule, BsDropdownModule, AlertModule, BsDatepickerModule, DatepickerModule, TabsModule, ToastrModule, AccordionModule],
+  exports: [CarouselModule, ModalModule, ButtonsModule, BsDropdownModule, AlertModule, BsDatepickerModule, DatepickerModule, TabsModule, ToastrModule, AccordionModule, NgxPaginationModule],
 })
 export class NgxBootstrapModule {}

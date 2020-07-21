@@ -37,7 +37,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   rncMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   PhotoData: any;
-  doc_principal: any;
+  doc_principal = 'cedula';
 
   element: HTMLElement;
 
@@ -352,7 +352,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
     this.documento_identidad = true;
     this.boton = 'Guardar';
     this.titulo = 'Registro de clientes';
-    this.doc_principal = '';
+    this.doc_principal = 'cedula';
   }
   changeIdent(arg) {
     this.documento_identidad = arg;

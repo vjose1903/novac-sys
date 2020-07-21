@@ -44,7 +44,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   ARRAY_FORMULA: FormArray;
   COMPRADOEN: any;
   MEDIDACAJA: any;
-  isCombo = false;
+  is_combo = false;
   numIngredientes: any;
   Recalcular = false;
   ProductoEditando: any;
@@ -66,7 +66,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     // this.artServ.ARTICULOS.subscribe(res => {
     //   this.listaArticulos = res;
     // });
-    this.dbServ.getArticulos().subscribe(res => {
+    this.dbServ.getArticulos().subscribe((res) => {
       res.sort((a, b) => {
         return a.id > b.id ? 1 : -1;
       });
@@ -74,14 +74,13 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       if (res !== undefined && res !== null) {
         this.listaArticulos = res;
       }
-      console.log(this.listaArticulos);
     });
 
-    this.dbServ.getTipoArticulos().subscribe(res => {
+    this.dbServ.getTipoArticulos().subscribe((res) => {
       this.listaTipoArticulos = GLOBAL.duplicarJson(res);
     });
 
-    this.dbServ.getNombresSuplidores().subscribe(res => {
+    this.dbServ.getNombresSuplidores().subscribe((res) => {
       this.listaSuplidores = GLOBAL.duplicarJson(res);
     });
     this.createForm();
@@ -90,7 +89,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
@@ -102,21 +101,18 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   selectTipoArticulo(tipo) {
-    const Tipo = this.listaTipoArticulos.filter(val => val.id === _.parseInt(tipo));
+    const Tipo = this.listaTipoArticulos.filter((val) => val.id === _.parseInt(tipo));
     this.TIPOARTICULO = Tipo[0].descripcion;
 
     if (this.TIPOARTICULO === 'Producto terminado') {
       this.addItem();
       this.form.controls.medida.setValue('Quintal');
       this.fillDropAlerta('Quintal');
-      this.isCombo = true;
+      this.is_combo = true;
     } else {
       this.ARRAY_FORMULA = ([] as unknown) as FormArray;
-      this.isCombo = false;
+      this.is_combo = false;
     }
-    console.log(this.ARRAY_FORMULA);
-
-    console.log(this.listaArticulos);
   }
   createForm() {
     this.form = this.fb.group({
@@ -188,15 +184,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.TIPOARTICULO = '';
     this.clickBtnRe = false;
 
-    if (this.isCombo) {
+    if (this.is_combo) {
       this.resetArray();
     }
-    this.isCombo = false;
+    this.is_combo = false;
     this.form.controls['rowFormula'].setValue([]);
 
     if (this.Recalcular === true) {
       this.Recalcular = false;
-      // console.log('this.Recalcular', this.Recalcular);
     }
   }
 
@@ -261,12 +256,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     return item.tipo_articulo_id === 2;
   }
   getCosto(id, i) {
-    console.log('id ', id);
-    console.log('############');
-
     const control = this.form.controls['rowFormula'] as FormArray;
 
-    const MateriaPrima = this.listaArticulos.filter(val => val.id === _.parseInt(id))[0];
+    const MateriaPrima = this.listaArticulos.filter((val) => val.id === _.parseInt(id))[0];
 
     let costo = 0;
     if (MateriaPrima.medida === 'Quintal') {
@@ -357,8 +349,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       const precioLibra = precio / 100;
       const costoLibra = costo / 100;
       if (medida === 'Quintal') {
-        // console.log('entro');
-
         this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioLibra)));
         this.form.controls.costo_padre.setValue(GLOBAL.redondearAdos(costoLibra));
       } else {
@@ -371,19 +361,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   calculatePricePadre() {
     const PrecioTemp = this.form.value.precio_principal;
     const Precio = GLOBAL.desformatear(PrecioTemp);
-    // console.log('Precio', Precio);
 
     const costoTemp = this.form.value.costo_principal;
     const costo = GLOBAL.desformatear(costoTemp);
-    // console.log('costo', costo);
     const cantidadPadre = this.form.value.cantidad_contenido_padre;
-    // console.log('cantidadPadre', cantidadPadre);
 
     if (Precio > 0 && Precio != null && Precio !== undefined && !isNaN(Precio) && cantidadPadre > 0 && cantidadPadre != null && cantidadPadre !== undefined && !isNaN(cantidadPadre)) {
       const PrecioPadre = Precio / cantidadPadre;
       const costoPadre = costo / cantidadPadre;
-      // console.log('PrecioPadre', PrecioPadre);
-      // console.log('costoPadre', costoPadre);
 
       this.form.controls.precio_padre.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(PrecioPadre)));
       this.form.controls.costo_padre.setValue(GLOBAL.redondearAdos(costoPadre));
@@ -518,7 +503,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
     const x = GLOBAL.duplicarJson(formula.value);
 
-    const tempArticulo = this.listaArticulos.filter(val => val.id === x.articulo_id);
+    const tempArticulo = this.listaArticulos.filter((val) => val.id === x.articulo_id);
 
     const articulo = tempArticulo[0];
     let costo;
@@ -551,7 +536,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       this.addItem();
       this.fillFormula(ingredient, i, true);
     }
-    console.log(this.ARRAY_FORMULA.value);
 
     await this.calculateCostoPT();
     this.Recalcular = null;
@@ -561,30 +545,25 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   fillFormula(ingredient, i, recalcular?) {
     const control = this.form.controls['rowFormula'] as FormArray;
 
-    const TempMateriaPrima = this.listaArticulos.filter(val => val.id === _.parseInt(ingredient.articulo_combo));
+    const TempMateriaPrima = this.listaArticulos.filter((val) => val.id === _.parseInt(ingredient.articulo_combo));
     const MateriaPrima = TempMateriaPrima[0];
 
     let costo = 0;
     let precio = 0;
-    console.log('MATERIAPRIMA', MateriaPrima);
     if (MateriaPrima.medida === 'Quintal') {
       costo = MateriaPrima.contenido_articulos[0].costo;
       precio = MateriaPrima.contenido_articulos[0].precio;
-      console.log('BUSCANDO ', precio);
     } else if (MateriaPrima.medida === 'Libra') {
       costo = MateriaPrima.costo_principal;
       precio = MateriaPrima.precio_principal;
-      console.log('BUSCANDO ', precio);
     }
 
     if (recalcular) {
       (control.controls[i] as any).controls['costo_formula'].setValue(costo);
       (control.controls[i] as any).controls['precio_formula'].setValue(precio);
-      console.log('LLENANDO  ', precio);
     } else {
       (control.controls[i] as any).controls['costo_formula'].setValue(ingredient.costo);
       (control.controls[i] as any).controls['precio_formula'].setValue(ingredient.precio);
-      console.log('LLENANDO  ', ingredient.precio);
     }
     (control.controls[i] as any).controls['articulo_id'].setValue(ingredient.articulo_combo);
     (control.controls[i] as any).controls['cantidad_formula'].setValue(ingredient.cantidad);
@@ -600,24 +579,21 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
 
-    if (articulo.isCombo) {
+    if (articulo.is_combo) {
       this.numIngredientes = articulo.formulas_productos_terminados.length;
 
-      this.isCombo = true;
+      this.is_combo = true;
       // articulo.formulas_productos_terminados.forEach((ingredient, i) => {
       // });
       this.TIPOARTICULO = 'Producto terminado';
       this.form.controls.medida.setValue('Quintal');
       this.fillDropAlerta('Quintal');
       articulo.formulas_productos_terminados.forEach((ingredient, i) => {
-        console.log('Antes de la funcion que llena ', ingredient);
-
         this.addItem();
         this.fillFormula(ingredient, i);
       });
-      console.log(this.ARRAY_FORMULA.value);
     } else {
-      this.isCombo = false;
+      this.is_combo = false;
       this.numIngredientes = null;
       this.COMPRADOEN = articulo.medida;
     }
@@ -627,7 +603,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
     this.fillDropAlerta(articulo.medida);
 
-    articulo.contenido_articulos.forEach(contenido => {
+    articulo.contenido_articulos.forEach((contenido) => {
       if (articulo.contenido_articulos.length === 1) {
         if (articulo.contenido_articulos[0].medida === 'Libra') {
           this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
@@ -656,12 +632,13 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     });
 
     this.form.patchValue(articulo);
-    if (articulo.isCombo) {
+    if (articulo.is_combo) {
       this.form.controls.otros_costos.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.otros_costos)));
     }
     this.form.controls.costo_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.costo_principal)));
     this.form.controls.precio_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.precio_principal)));
   }
+
   abrirModal(arg?) {
     this.seleccionModal = arg.ARG;
     this.indexBorrar = arg.INDEX;
@@ -674,14 +651,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     if (arg) {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
       this.dbServ.eliminarArticulo(obj).subscribe(
-        res => {
+        (res) => {
           this.dbServ.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
           _.pullAt(this.listaArticulos, this.indexBorrar);
           this.tipoModal = '';
           this.decisionModal = null;
           this.borrar();
         },
-        err => {
+        (err) => {
           this.mostrarErrores(err.error);
         },
       );
@@ -731,7 +708,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   formarFormula() {
     const x = GLOBAL.duplicarJson(this.ARRAY_FORMULA.value);
     const formulas = [];
-    x.forEach(element => {
+    x.forEach((element) => {
       const obj = {
         id: _.parseInt(element.id ? element.id : null),
         articulo_combo: _.parseInt(element.articulo_id),
@@ -768,9 +745,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       existencia: x.existencia,
       calcular_itbis: x.calcular_itbis !== null ? x.calcular_itbis : false,
       estado: true,
-      isCombo: this.isCombo,
+      is_combo: this.is_combo,
     };
-    if (obj.isCombo) {
+    if (obj.is_combo) {
       obj['otros_costos'] = x.otros_costos;
       obj['formulas_productos_terminados_attributes'] = this.formarFormula();
     }
@@ -779,7 +756,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       obj['id'] = x.id;
 
       this.dbServ.editarArticulo(obj).subscribe(
-        res => {
+        (res) => {
           const temp = GLOBAL.duplicarJson(this.listaArticulos);
           this.listaArticulos = [];
 
@@ -792,11 +769,10 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
           temp[this.indexEditar] = res;
           this.listaArticulos = GLOBAL.duplicarJson(temp);
           this.borrar();
-          // console.log(res);
 
           this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
         },
-        err => {
+        (err) => {
           this.mostrarErrores(err.error);
           // this.dbServ.toastError(err.error, 'Error');
         },
@@ -804,13 +780,13 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       //
     } else {
       this.dbServ.createArticulo(obj).subscribe(
-        res => {
+        (res) => {
           this.listaArticulos = [...this.listaArticulos, res];
           // this.artServ.next_articulo([...this.listaArticulos, res]);
           this.borrar();
           this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
         },
-        err => {
+        (err) => {
           this.mostrarErrores(err.error);
           // this.dbServ.toastError(err.error, 'Error');
         },
@@ -820,7 +796,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
-      arg.forEach(error => {
+      arg.forEach((error) => {
         this.dbServ.toastError(error, 'ERROR');
       });
     } else {
@@ -867,9 +843,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     const precioTEMPO = Input.value;
 
     if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
-      console.log('precioTEMPO', precioTEMPO);
       const splitPrecio = _.split(precioTEMPO, '.');
-      console.log('splitPrecio', splitPrecio);
 
       let precioTEMP;
 
@@ -901,8 +875,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
           const temp = [enteros, decimales];
           precioTEMP = _.join(temp, '.');
         }
-        console.log('precioTEMP', precioTEMP);
-        console.log('GLOBAL.redondearAdos(precioTEMP)', GLOBAL.redondearAdos(precioTEMP));
 
         Input.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioTEMP)));
       }

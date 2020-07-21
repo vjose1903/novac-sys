@@ -1,15 +1,15 @@
-<span mdbTooltip="Mostrar" (click)="devolverInfo(row, 'mostrar')" placement="top" *ngIf="botones.mostrar">
+<span mdbTooltip="Mostrar" (click)="devolverInfo(row, 'mostrar')" placement="{{ i === 0 ? 'bottom' : 'top' }}" *ngIf="botones.mostrar">
   <i class="far fa-eye"></i>
 </span>
 
-<span mdbTooltip="Editar" (click)="devolverInfo(row, 'editar')" placement="top" *ngIf="botones.editar">
+<span mdbTooltip="Editar" (click)="devolverInfo(row, 'editar')" placement="{{ i === 0 ? 'bottom' : 'top' }}" *ngIf="botones.editar">
   <i class="fas fa-pencil-alt"></i>
 </span>
 
-<span mdbTooltip="Borrar" (click)="delete(row)" placement="top" *ngIf="botones.borrar">
+<span mdbTooltip="Borrar" (click)="delete(row)" placement="{{ i === 0 ? 'bottom' : 'top' }}" *ngIf="botones.borrar">
   <i class="far fa-trash-alt"></i>
 </span>
 
-<span mdbTooltip="Movimientos de inventario" (click)="devolverInfo(row, 'inventario')" placement="top" *ngIf="botones.inventario">
+<span mdbTooltip="Movimientos de inventario" (click)="devolverInfo(row, 'inventario')" placement="{{ i === 0 ? 'bottom' : 'top' }}" *ngIf="botones.inventario">
   <i class="fas fa-dolly"></i>
 </span>

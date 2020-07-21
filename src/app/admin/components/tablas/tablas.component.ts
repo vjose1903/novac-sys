@@ -101,6 +101,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() colores = false;
 
   // output
+  @Output() pageChanges = new EventEmitter<any>();
   @Output() clickIcon = new EventEmitter<any>();
   @Output() clickRow = new EventEmitter<any>();
   @Output() DevolverInfo = new EventEmitter<any>();
@@ -231,6 +232,23 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       value: valor,
     };
     this.getInfoChange.emit(obj);
+  }
+
+  pagActual = 1;
+  mostrar = 50;
+  listaMostrar = [5, 10, 20, 50];
+
+  cambiaMostrar(num: number) {
+    this.mostrar = num;
+  }
+
+  pageChange(arg) {
+    this.pagActual = arg;
+    const obj = {
+      pagActual: arg,
+      mostrar: this.mostrar,
+    };
+    this.pageChanges.emit(obj);
   }
 
   disabledInput(condicion, i) {

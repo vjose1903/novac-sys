@@ -3,7 +3,7 @@
   <input [(ngModel)]="searchText" id="search" class="search-input" />
 </div>
 
-<div class="{{ scrollContainer }}" style="border-radius: 10px 10px 0px 0px;">
+<div style="border-radius: 10px 10px 0px 0px;" class="tableBodyScroll">
   <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" small="true" id="VICtablas">
     <thead class="text-center" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
       <tr>
@@ -11,11 +11,11 @@
         <th *ngIf="botones.titulo">Acciones</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody style="">
       <ng-container *ngIf="data">
         <tr
           mdbTableCol
-          *ngFor="let dato of data; let i = index"
+          *ngFor="let dato of data | paginate: { itemsPerPage: mostrar, currentPage: pagActual, totalItems: data.length }; index as i"
           class="text-center"
           id="{{ ROW }}{{ i }}"
           [ngClass]="{
@@ -102,12 +102,27 @@
           </td>
 
           <td class="btnAccion" *ngIf="botones.titulo">
-            <app-btnacciones [row]="dato" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
+            <app-btnacciones [row]="dato" [i]="i" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
           </td>
         </tr>
       </ng-container>
     </tbody>
     <tfoot class="grey lighten-5 w-100"></tfoot>
   </table>
+  <div class="Pietabla d-flex flex-row-reverse">
+    <pagination-controls nextLabel="Siguiente" previousLabel="Anterior" class="my-pagination mr-3" (pageChange)="pageChange($event)"></pagination-controls>
+
+    <div class="btn-group" dropdown [dropup]="true">
+      <button id="button-dropup" dropdownToggle type="button" class="btn btn-primary dropdown-toggle" aria-controls="dropdown-dropup">
+        {{ mostrar }} registros <span class="caret"></span>
+      </button>
+      <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-dropup">
+        <li *ngFor="let i of listaMostrar" role="menuitem" (click)="cambiaMostrar(i)">
+          <a class="dropdown-item"> {{ i }} registros</a>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>
+
 <!-- {key:"nombre"} {"nombre":''}[{key:"nombre"}] -->

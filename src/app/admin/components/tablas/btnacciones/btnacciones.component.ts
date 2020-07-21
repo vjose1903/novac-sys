@@ -15,6 +15,7 @@ export class BTNACCIONESComponent implements OnInit {
     inventario: false,
   };
   @Input() row: any;
+  @Input() i: any;
   @Input() data: any;
 
   @Output() panicoBTN = new EventEmitter<any>();
