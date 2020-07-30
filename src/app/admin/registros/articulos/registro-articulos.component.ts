@@ -31,7 +31,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   listaTipoArticulos: any;
   listaSuplidores: any;
   tipoModal: string;
-  indexEditar: any;
+
   usuario: any;
   optionsAlerta: any[];
   alertaMedida: any;
@@ -336,6 +336,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       this.calculatePriceLibra();
     }
   }
+
   calculatePriceLibra() {
     const medida = this.form.value.medida;
 
@@ -575,7 +576,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.ProductoEditando = item.ARG;
     this.titulo = 'Editar producto: ' + articulo.nombre;
     this.boton = 'Editar';
-    this.indexEditar = item.INDEX;
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
 
@@ -652,8 +652,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
       this.dbServ.eliminarArticulo(obj).subscribe(
         (res) => {
+          const i = _.findIndex(this.listaArticulos, (art: any) => {
+            if (art.id === obj['id']) {
+              return true;
+            }
+          });
+
           this.dbServ.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
-          _.pullAt(this.listaArticulos, this.indexBorrar);
+          _.pullAt(this.listaArticulos, i);
           this.tipoModal = '';
           this.decisionModal = null;
           this.borrar();
@@ -664,6 +670,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       );
     }
   }
+
   formarContenido() {
     const x = GLOBAL.duplicarJson(this.form.value);
 
@@ -760,13 +767,19 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
           const temp = GLOBAL.duplicarJson(this.listaArticulos);
           this.listaArticulos = [];
 
+          const i = _.findIndex(temp, (art: any) => {
+            if (art.id === obj['id']) {
+              return true;
+            }
+          });
+
           res['contenido_articulos'] = res['contenido_articulos_attributes'];
           res['formulas_productos_terminados'] = res['formulas_productos_terminados_attributes'];
           res['codigo'] = _.padStart(res.id, 5, '0');
           delete res['formulas_productos_terminados_attributes'];
           delete res['contenido_articulos_attributes'];
 
-          temp[this.indexEditar] = res;
+          temp[i] = res;
           this.listaArticulos = GLOBAL.duplicarJson(temp);
           this.borrar();
 
