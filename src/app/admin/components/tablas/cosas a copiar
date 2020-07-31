@@ -14,3 +14,14 @@ altoDiv;
 ngAfterViewInit() {
     this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }
+
+
+------------------------------------------------
+
+  calcularHeigth() {
+    setTimeout(() => {
+      console.log(document.getElementById('cardTabla'));
+
+      this.altoDiv = document.getElementById('cardTabla').offsetHeight;
+    }, 10);
+  }

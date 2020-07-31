@@ -10,8 +10,8 @@
               <select
                 [(ngModel)]="articulo_id"
                 (keydown.enter)="saltar('cantidad_producir')"
-                class="form-control  entrada"
-                style="border-radius:0 "
+                class="form-control entrada"
+                style="border-radius: 0;"
                 (change)="getIngredients()"
                 id="articulo_id"
               >
@@ -24,7 +24,7 @@
 
         <div class="col-12 mt-4">
           <div class="from-group">
-            <label class="control-label">Cantidad a producir: <span style="color: red">*</span></label>
+            <label class="control-label">Cantidad a producir: <span style="color: red;">*</span></label>
             <div class="row">
               <div class="col-4 pr-0">
                 <input
@@ -47,9 +47,9 @@
                   [(ngModel)]="medida_producir"
                   id="medida_producir"
                   (change)="calcularCantidadEnProduccion()"
-                  [ngClass]="{ badAlert: Ispaquete }"
                   (blur)="calcularCantidadEnProduccion()"
                 >
+                  <!-- [ngClass]="{ badAlert: Ispaquete }" -->
                   <option value="{{ null }}"></option>
                   <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                 </select>
@@ -75,7 +75,7 @@
               <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
               <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
 
-              <div class="d-flex justify-content-end" style="width: 100%">
+              <div class="d-flex justify-content-end" style="width: 100%;">
                 <span [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
                   {{ lookprincipal(ingrediente.existencia) }}
                 </span>
@@ -90,7 +90,7 @@
               <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
               <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
 
-              <div class="d-flex justify-content-end" style="width: 100%">
+              <div class="d-flex justify-content-end" style="width: 100%;">
                 <span [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
                   {{ lookprincipal(ingrediente.existencia) }}
                 </span>
@@ -108,7 +108,6 @@
           [info]="info"
           [data]="lista_produccion"
           [search]="false"
-          [scrollContainer]="'scroll-container'"
           [focusRow]="false"
           [botones]="botones"
           (DevolverInfo)="editarItem($event)"

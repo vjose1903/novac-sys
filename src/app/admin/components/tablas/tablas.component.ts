@@ -94,6 +94,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() tablaHover = true;
   @Input() search = true;
   @Input() paginate = true;
+  @Input() quitarAScorll = 110;
   @Input() botones = {
     titulo: false,
     borrar: false,
@@ -106,7 +107,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() focusRow = false;
   @Input() filtroSelect: any;
   @Input() data;
-  @Input() scrollContainer;
   @Input() colores = false;
 
   // output
@@ -146,13 +146,17 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     if (this.alto) {
       setTimeout(() => {
         if (this.search && this.paginate) {
-          this.restoAHeigthDiv = this.searchDiv.nativeElement.offsetHeight + this.paginationDiv.nativeElement.offsetHeight + 110;
+          // si tiene paginacion y buscador
+          this.restoAHeigthDiv = this.searchDiv.nativeElement.offsetHeight + this.paginationDiv.nativeElement.offsetHeight + this.quitarAScorll;
         } else if (this.search && !this.paginate) {
-          this.restoAHeigthDiv = this.searchDiv.nativeElement.offsetHeight + 110;
+          // si solo buscador
+          this.restoAHeigthDiv = this.searchDiv.nativeElement.offsetHeight + this.quitarAScorll;
         } else if (!this.search && this.paginate) {
-          this.restoAHeigthDiv = this.paginationDiv.nativeElement.offsetHeight + 110;
+          // si solo paginacion
+          this.restoAHeigthDiv = this.paginationDiv.nativeElement.offsetHeight + this.quitarAScorll;
         } else if (!this.search && !this.paginate) {
-          this.restoAHeigthDiv = 110;
+          // si no tiene ni paginacion ni buscador
+          this.restoAHeigthDiv = this.quitarAScorll;
         }
         console.log('this.alto ANTES ', this.alto);
 

@@ -36,6 +36,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   indexBorrar: any;
   tipoModal: string;
   subDeci: Subscription;
+
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {

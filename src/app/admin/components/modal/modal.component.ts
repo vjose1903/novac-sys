@@ -113,7 +113,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.paraFiltroClientes = res.filtrarCliente;
         this.metodo = res.metodo;
         this.identificadorFact = res.identificadorFact;
-        console.log(res);
 
         if (this.tipoModal === 'buscarCliente' && res[0].limite_credito !== undefined) {
           this.tituloModal = 'Buscar cliente';

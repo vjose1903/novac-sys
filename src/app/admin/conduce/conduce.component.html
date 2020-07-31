@@ -31,15 +31,17 @@
         <h3>Ventas adelantadas</h3>
       </div>
       <div class="col-12">
-        <div class="card sombra bordeRedondeado factAdelantadas">
+        <div id="cardTabla" class="card sombra bordeRedondeado factAdelantadas">
           <app-tablas
             *ngIf="facturas_adelantadas && info"
             [info]="info"
             [ROW]="'row_adelantada'"
             [search]="false"
+            [paginate]="false"
+            [alto]="altoDiv"
             [data]="facturas_adelantadas"
-            [scrollContainer]="'scroll-container'"
             [focusRow]="false"
+            [quitarAScorll]="49"
             (clickRow)="SeleccionarFactruaAdelantada($event)"
           ></app-tablas>
         </div>
@@ -80,7 +82,7 @@
               <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
                 <tbody>
                   <tr>
-                    <td class="{{checkIfArticuloRow(i)?'btnQuitarRow':'sombreado'}}" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
+                    <td class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
                       <!-- <div class="hoverZone"></div> -->
                       <i class="fas fa-ban text-red btnBorrar" (click)="modalRemover(i)"></i>
                     </td>
