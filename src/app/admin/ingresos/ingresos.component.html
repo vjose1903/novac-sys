@@ -19,7 +19,7 @@
       </div>
     </div>
   </div>
-  <!-- 
+  <!--
           <div class="form-group">
             <label class="control-label">Articulo </label>
             <ng-select id="articuloI" [groupBy]="'descripcion'" [(ngModel)]="articuloEnTurno" (change)="selectArticulo('articulo')" [items]="articulos" bindLabel="nombre"> </ng-select>
@@ -31,25 +31,32 @@
       <span *ngIf="clienteAdepositar"> Debe: RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span>
     </div>
   </div>
-  <div class="col-12 rowIngre">
-    <div *ngIf="Facturas" class="card card-padding sombra ingreCard">
-      <div style="height: 90%;">
-        <div class="w-100 d-flex justify-content-end">
-          <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+  <div class="col-12 mt-4">
+    <div *ngIf="Facturas" class="row">
+      <div class="col-12">
+        <div id="cardTabla" class="card card-padding sombra ingreCard" style="height: 42rem;">
+          <div style="height: 90%;">
+            <div class="w-100 d-flex justify-content-end">
+              <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+            </div>
+            <app-tablas
+              [info]="info"
+              [data]="Facturas"
+              (getInfoChange)="getInfoChange($event)"
+              (clickIcon)="clickVerPagos($event)"
+              [scrollContainer]="'scroll-container ingresosScroll'"
+              [tablaHover]="false"
+              [alto]="altoDiv"
+              [focusRow]="false"
+            ></app-tablas>
+          </div>
         </div>
-        <app-tablas
-          [info]="info"
-          [data]="Facturas"
-          (getInfoChange)="getInfoChange($event)"
-          (clickIcon)="clickVerPagos($event)"
-          [scrollContainer]="'scroll-container ingresosScroll'"
-          [tablaHover]="false"
-          [focusRow]="false"
-        ></app-tablas>
       </div>
-      <div class="d-flex justify-content-end">
-        <input (click)="cancelarIgreso()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-        <input [disabled]="abilitarBtnConfirmar()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      <div class="col-12 mt-3">
+        <div class="d-flex justify-content-end">
+          <input (click)="cancelarIgreso()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+          <input [disabled]="abilitarBtnConfirmar()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+        </div>
       </div>
     </div>
   </div>

@@ -3,7 +3,7 @@
     {{ tituloPag }}<b>{{ factura_aplicada }}</b>
   </h3>
   <div class="cardPrincipal sinPadding tamano">
-    <div class="cabezaFactura ">
+    <div class="cabezaFactura">
       <div class="row">
         <!-- ============ factura aplicada ============ -->
         <div class="col-8 divRigth">
@@ -15,18 +15,18 @@
               <div class="row">
                 <div class="col-12">
                   <span class="d-block">
-                    <b class="negrita ">{{ factura.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
+                    <b class="negrita">{{ factura.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
                     >&nbsp;
                     <span>{{ propietario_factura?.nombre }}</span>
                   </span>
 
                   <span class="d-block">
-                    <b class="negrita ">{{ factura.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
+                    <b class="negrita">{{ factura.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
                     >&nbsp;
                     <span>{{ propietario_factura?.rnc }}</span>
                   </span>
                   <span class="d-block">
-                    <b class="negrita ">Direccion :</b>&nbsp; <span>{{ propietario_factura?.direccion }}</span>
+                    <b class="negrita">Direccion :</b>&nbsp; <span>{{ propietario_factura?.direccion }}</span>
                   </span>
                 </div>
               </div>
@@ -34,16 +34,16 @@
             <div class="col-5 d-flex justify-content-center">
               <div class="infoFactura">
                 <span class="d-block">
-                  <b class="negrita ">Fecha facturación:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_facturacion) }}</span>
+                  <b class="negrita">Fecha facturación:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_facturacion) }}</span>
                 </span>
                 <span *ngIf="factura.condicion === 'Crédito'" class="d-block">
-                  <b class="negrita ">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_vencimiento) }}</span>
+                  <b class="negrita">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_vencimiento) }}</span>
                 </span>
                 <span class="d-block">
-                  <b class="negrita ">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(factura.numero_factura) }}</span>
+                  <b class="negrita">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(factura.numero_factura) }}</span>
                 </span>
                 <span class="d-block">
-                  <b class="negrita ">Valida hasta :</b> &nbsp;<span>{{ formatoFecha(factura.fecha_valida) }}</span>
+                  <b class="negrita">Valida hasta :</b> &nbsp;<span>{{ formatoFecha(factura.fecha_valida) }}</span>
                 </span>
               </div>
             </div>
@@ -69,22 +69,23 @@
     </div>
 
     <!-- ======================================================================================================== -->
-    <div class="cuerpoFactura mb-2">
+    <div #cardTabla class="cuerpoFactura mb-2">
       <app-tablas
         *ngIf="factura"
         [search]="false"
+        [paginate]="false"
         [tablaHover]="false"
         [info]="info"
+        [alto]="altoDiv"
         (getInfoChange)="getInfoChange($event)"
         [data]="detalleFacturas"
-        [scrollContainer]="'scroll-container'"
         [focusRow]="false"
         [colorHead]="false"
       ></app-tablas>
     </div>
     <div class="pieFactura">
       <div class="row">
-        <div class="col-3 ">
+        <div class="col-3">
           <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
         </div>
         <div class="col-3">

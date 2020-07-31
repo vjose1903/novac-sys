@@ -93,6 +93,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() colorHead = true;
   @Input() tablaHover = true;
   @Input() search = true;
+  @Input() paginate = true;
   @Input() botones = {
     titulo: false,
     borrar: false,
@@ -141,17 +142,29 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     // }
   }
 
-  async ngAfterViewInit() {
-    if (this.search) {
-      this.restoAHeigthDiv = this.searchDiv.nativeElement.offsetHeight + this.paginationDiv.nativeElement.offsetHeight + 110;
-    } else {
-      this.restoAHeigthDiv = this.paginationDiv.nativeElement.offsetHeight + 110;
+  calcularAlto() {
+    if (this.alto) {
+      setTimeout(() => {
+        if (this.search && this.paginate) {
+          this.restoAHeigthDiv = this.searchDiv.nativeElement.offsetHeight + this.paginationDiv.nativeElement.offsetHeight + 110;
+        } else if (this.search && !this.paginate) {
+          this.restoAHeigthDiv = this.searchDiv.nativeElement.offsetHeight + 110;
+        } else if (!this.search && this.paginate) {
+          this.restoAHeigthDiv = this.paginationDiv.nativeElement.offsetHeight + 110;
+        } else if (!this.search && !this.paginate) {
+          this.restoAHeigthDiv = 110;
+        }
+        console.log('this.alto ANTES ', this.alto);
+
+        this.alto = this.alto - this.restoAHeigthDiv;
+        console.log('this.alto DESPUES ', this.alto);
+        console.log('this.restoAHeigthDiv  ', this.restoAHeigthDiv);
+      }, 20);
     }
+  }
 
-    this.alto = this.alto - this.restoAHeigthDiv;
-
-    console.log(this.alto);
-
+  async ngAfterViewInit() {
+    // this.calcularAlto();
     // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
     // this.mdbTablePagination.calculateFirstItemIndex();
     // this.mdbTablePagination.calculateLastItemIndex();
@@ -209,11 +222,13 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       this.previous.push(element);
     }
   }
+
   setearDataEnLaTabla() {
     if (this.elements) {
       this.mdbTable.setDataSource(this.elements);
     }
   }
+
   actualizarArreglos() {
     this.elements = this.mdbTable.getDataSource();
     this.previous = this.mdbTable.getDataSource();
@@ -231,6 +246,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.entrar = 0;
     this.ROW = 'row-';
     this.NUM = 0;
+
+    this.alto = undefined;
+    this.restoAHeigthDiv = undefined;
   }
 
   resetInput(referencia, destino, i, formatear, especifico?) {
@@ -424,6 +442,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     return cantiTootip;
   }
+
   lookprincipal(objeto) {
     const keys = _.keys(objeto);
     const values = _.values(objeto);
@@ -432,6 +451,18 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   ngOnChanges(simpleChanges) {
+    if (simpleChanges.alto) {
+      console.log(' ---------------------- ');
+      console.log(' ');
+
+      console.log('simpleChanges.alto ', simpleChanges.alto);
+      console.log(' ');
+      console.log(' ---------------------- ');
+
+      if (simpleChanges.alto.currentValue) {
+        this.calcularAlto();
+      }
+    }
     // if (simpleChanges['data'].firstChange === false) {
     //   this.waitForChange();
     // }

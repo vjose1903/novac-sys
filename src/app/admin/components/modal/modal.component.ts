@@ -9,11 +9,10 @@ import { DBservice } from '../../../core/services/bdservice.service';
   styleUrls: ['./modal.component.scss'],
 })
 export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
-  @ViewChild('ModalTabla', { static: false }) ModalTabla: ElementRef;
-
   altoDiv;
 
   showModal = false;
+
   seleccionModal: any;
   tipoModal;
   paraFiltroClientes: any;
@@ -78,20 +77,26 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   subShow: Subscription;
   subTipo: Subscription;
   subSelec: Subscription;
+  subCalcularHeigth: Subscription;
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.showModal = res;
+      }
+    });
+
+    this.subCalcularHeigth = this.mServ.CALCULARHEIGHT.subscribe((res) => {
+      if (res) {
+        console.log('entro a calcular el height');
+
         setTimeout(() => {
-          console.log('filtrarCliente-----> ', (document.getElementsByClassName('ui-dialog-content')[0] as any).offsetHeight);
-
-          this.altoDiv = (document.getElementsByClassName('ui-dialog-content')[0] as any).offsetHeight - 150;
-
-          console.log('this.showModal ', this.showModal);
-          console.log('this.altoDiv ', this.altoDiv);
-          console.log('this.ModalTabla ', this.ModalTabla);
+          if (document.getElementsByClassName('ui-dialog-content')) {
+            this.altoDiv = (document.getElementsByClassName('ui-dialog-content')[0] as any).offsetHeight + 30;
+          }
         }, 10);
+      } else {
+        console.log('NO entro a calcular el height');
       }
     });
 
@@ -108,8 +113,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.paraFiltroClientes = res.filtrarCliente;
         this.metodo = res.metodo;
         this.identificadorFact = res.identificadorFact;
+        console.log(res);
 
-        if (this.tipoModal === 'buscarCliente' && res.limite_credito !== undefined) {
+        if (this.tipoModal === 'buscarCliente' && res[0].limite_credito !== undefined) {
           this.tituloModal = 'Buscar cliente';
         } else {
           this.tituloModal = 'Buscar suplidor';
@@ -117,7 +123,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         if (this.tipoModal === 'mostrarFactura' && res) {
           this.lugar = res.mostrarFacturaPara;
-          console.log(this.seleccionModal);
 
           if (this.seleccionModal.tiene_nota && this.seleccionModal.notas.length > 0) {
             for (let i = 0; i < this.seleccionModal.notas.length; i++) {
@@ -150,6 +155,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.subShow.unsubscribe();
     this.subTipo.unsubscribe();
     this.subSelec.unsubscribe();
+    this.subCalcularHeigth.unsubscribe();
   }
 
   ngOnChanges() {
@@ -180,6 +186,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.modalTipo(undefined);
     this.mServ.mostrarModal(false);
     this.mServ.ModalSeleccion(undefined);
+    this.mServ.ModalTablaHeight(false);
   }
 
   devolverCLick(arg) {

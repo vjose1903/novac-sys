@@ -7,6 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 export class ModalService {
   private tipoModal = new BehaviorSubject<any>(undefined);
   private showModal = new BehaviorSubject<boolean>(undefined);
+  private calcularHeight = new BehaviorSubject<boolean>(false);
   private seleccionModal = new BehaviorSubject<any>(undefined);
   private decisionModal = new BehaviorSubject<any>(undefined);
   private ObjDevuelto = new BehaviorSubject<any>(undefined);
@@ -15,6 +16,7 @@ export class ModalService {
 
   TIPOMODAL = this.tipoModal.asObservable();
   SHOWMODAL = this.showModal.asObservable();
+  CALCULARHEIGHT = this.calcularHeight.asObservable();
   SELECCIONMODAL = this.seleccionModal.asObservable();
   DECISIONMODAL = this.decisionModal.asObservable();
   OBJDEVUELTO = this.ObjDevuelto.asObservable();
@@ -34,9 +36,15 @@ export class ModalService {
   ModalSeleccion(nextValue) {
     this.seleccionModal.next(nextValue);
   }
+
+  ModalTablaHeight(nextValue) {
+    this.calcularHeight.next(nextValue);
+  }
+
   ModalDecision(nextValue) {
     this.decisionModal.next(nextValue);
   }
+
   ModalObj(nextValue) {
     this.ObjDevuelto.next(nextValue);
   }

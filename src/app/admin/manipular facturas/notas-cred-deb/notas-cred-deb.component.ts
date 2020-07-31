@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -16,7 +16,10 @@ import { ModalService } from '../../components/modal/modal.service';
   templateUrl: './notas-cred-deb.component.html',
   styleUrls: ['./notas-cred-deb.component.scss'],
 })
-export class NotasCredDebComponent implements OnInit {
+export class NotasCredDebComponent implements OnInit, OnDestroy {
+  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
+  altoDiv;
+
   factura;
   idFactura: any;
   tipoNota: any;
@@ -76,6 +79,12 @@ export class NotasCredDebComponent implements OnInit {
     });
   }
 
+  calculateHeigth() {
+    setTimeout(() => {
+      this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
+    }, 10);
+  }
+
   ngOnDestroy(): void {
     this.subDeci.unsubscribe();
     this.subObj.unsubscribe();
@@ -129,7 +138,7 @@ export class NotasCredDebComponent implements OnInit {
         },
         title: '',
         customClass: true,
-        estilos: [{ width: '5.5rem' }],
+        estilos: [{ width: '12rem' }],
       },
       {
         titulo: 'Articulo',
@@ -146,7 +155,7 @@ export class NotasCredDebComponent implements OnInit {
           campo: 'select',
         },
         customClass: true,
-        estilos: [{ width: '5.5rem' }],
+        estilos: [{ width: '12rem' }],
       },
       {
         titulo: 'Cantidad',
@@ -207,6 +216,8 @@ export class NotasCredDebComponent implements OnInit {
         temp.push(detalle);
       }
       this.detalleFacturas = temp;
+
+      this.calculateHeigth();
     } catch (error) {
       console.error(error);
       this.dbServ.toastError('Error mostrando factura elegida', 'ERROR');

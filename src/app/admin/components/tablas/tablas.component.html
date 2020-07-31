@@ -110,7 +110,7 @@
     </tbody>
     <tfoot class="grey lighten-5 w-100"></tfoot>
   </table>
-  <div #paginationDiv class="Pietabla d-flex flex-row-reverse">
+  <div *ngIf="paginate" #paginationDiv class="Pietabla d-flex flex-row-reverse">
     <pagination-controls nextLabel="Siguiente" previousLabel="Anterior" class="my-pagination mr-3" [id]="id_tabla" (pageChange)="pageChange($event)"></pagination-controls>
 
     <div class="btn-group" dropdown [dropup]="true">

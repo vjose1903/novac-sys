@@ -309,7 +309,7 @@
       [focusOnShow]="true"
       [modal]="false"
       [responsive]="true"
-      [style]="{ width: '900px', minWidth: '400px' }"
+      [style]="{ width: '900px', height: '400px' }"
       [minY]="70"
       (onHide)="reinicioModal()"
       id="tablaSearch"
@@ -324,6 +324,7 @@
         (clickRow)="devolverCLick($event)"
         [info]="infoArticulos"
         [data]="seleccionModal.listaArticulos"
+        [alto]="altoDiv"
         [search]="false"
         (noArticulo)="noArticulo()"
         (reinicioModal)="reinicioModal()"
@@ -348,7 +349,6 @@
       (onHide)="reinicioModal()"
       (onShow)="prueba()"
       blockScroll="true"
-      id="filtrarCliente"
     >
       <app-tablas
         *ngIf="seleccionModal"

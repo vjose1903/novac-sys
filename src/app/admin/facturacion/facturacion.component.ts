@@ -246,6 +246,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.ModalObj(null);
     this.mServ.modalTipo(null);
     this.mServ.ModalSeleccion(null);
+    this.mServ.ModalTablaHeight(false);
+    this.mServ.mostrarModal(false);
     this.CancelarFactura();
     this.GetArticulos();
     this.subObj.unsubscribe();
@@ -503,6 +505,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.mServ.ModalSeleccion(this.listaSuplidores);
     }
     this.mServ.mostrarModal(true);
+    this.mServ.ModalTablaHeight(true);
   }
 
   quitarContadoDeLista() {

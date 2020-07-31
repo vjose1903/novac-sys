@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -14,6 +14,8 @@ import { ModalService } from '../../components/modal/modal.service';
   styleUrls: ['./buscar-factura.component.scss'],
 })
 export class BuscarFacturaComponent implements OnInit, OnDestroy {
+  altoDiv;
+
   facturas: any;
   campoSelected: string;
   sub: Subscription;
@@ -92,6 +94,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     },
   ];
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
+
   ngOnInit() {
     this.BuscarPara = this.route.snapshot.params['para'];
     if (this.BuscarPara === 'nota_credito') {
@@ -148,6 +151,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   async getPaqueteComprobante() {
     try {
       const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipo_factu_nota);
@@ -206,6 +210,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.subDeci.unsubscribe();
     this.subEsc.unsubscribe();
   }
+
   async getTipoFacturas() {
     try {
       const res = await this.dbServ.getTiposFacturas().toPromise();
@@ -248,6 +253,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       console.error(error);
     }
   }
+
   mostrarListaFacturas() {
     let res = false;
     if (this.facturas && this.facturas.length > 0) {
@@ -264,16 +270,31 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
     return res;
   }
+
+  calcularHeigth() {
+    setTimeout(() => {
+      console.log(document.getElementById('cardTabla'));
+
+      this.altoDiv = document.getElementById('cardTabla').offsetHeight;
+    }, 10);
+  }
+
   async pedirFactura(campo, valor) {
     try {
+      console.log('campo ', campo);
+
       this.facturas = undefined;
       const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id).toPromise();
       this.facturas = GLOBAL.duplicarJson(busqueda);
+      console.log(this.facturas);
 
       if (this.facturas.length > 0) {
         this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
         this.facturaSelected = this.facturas[0];
         this.abrirModal(this.facturas[0], 'mostrarFactura');
+        if (campo !== '2') {
+          this.calcularHeigth();
+        }
       } else {
         this.dbServ.toastError('La factura buscada no existe', 'ERROR');
       }
@@ -321,6 +342,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         } else if (this.campo === '3') {
           this.dbServ.toastError('No existen facturas con este numero.', 'ERROR');
         }
+      } else {
+        this.calcularHeigth();
       }
     } catch (error) {
       console.error(error);
@@ -334,6 +357,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(this.listaClientes);
 
     this.mServ.mostrarModal(true);
+    this.mServ.ModalTablaHeight(true);
   }
 
   changeSelect(valor) {
@@ -423,6 +447,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         this.desEnfocarInput('valorI');
       } else if (campo === 'buscarFactura') {
         this.NCF = null;
+
         if (this.campo === '2') {
           valor = valor.toUpperCase();
           this.NCF = valor;
@@ -434,6 +459,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         } else {
           if (this.tipo_factura_id === '0') {
             this.pedirFacturaModal(this.campo, valor);
+            console.log('aqui');
           } else {
             this.pedirFactura(this.campo, valor);
           }

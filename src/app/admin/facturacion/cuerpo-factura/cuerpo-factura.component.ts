@@ -146,6 +146,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.mServ.modalTipo(undefined);
     this.mServ.ModalSeleccion(undefined);
     this.mServ.mostrarModal(false);
+    this.mServ.ModalTablaHeight(false);
   }
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
@@ -786,6 +787,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.mServ.modalTipo('buscar');
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
+    this.mServ.ModalTablaHeight(true);
   }
 
   filtrarArticulo(arg) {

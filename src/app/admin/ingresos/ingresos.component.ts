@@ -111,6 +111,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   detalleYtotal: any;
   Devuelta: any;
   forma_pago: any;
+  altoDiv: number;
 
   constructor(private config: NgSelectConfig, private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {
     this.config.notFoundText = 'Articulo no existe';
@@ -196,6 +197,14 @@ export class IngresosComponent implements OnInit, OnDestroy {
     return monto;
   }
 
+  calcularHeigth() {
+    setTimeout(() => {
+      console.log(document.getElementById('cardTabla'));
+
+      this.altoDiv = document.getElementById('cardTabla').offsetHeight - 10;
+    }, 10);
+  }
+
   async pedirFacturasPorCliente(cliente_id) {
     try {
       const fechaA = moment().format('YYYY-MM-DD');
@@ -229,9 +238,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
         return a.id > b.id ? 1 : -1;
       });
       let total = 0;
+
       this.Facturas.forEach((element) => {
         total += element.balance;
       });
+      this.calcularHeigth();
       console.log(total);
     } catch (error) {
       console.error(error);
@@ -508,6 +519,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(this.listaClientes);
 
     this.mServ.mostrarModal(true);
+    this.mServ.ModalTablaHeight(true);
   }
 
   async saltar(campo, valor?) {
