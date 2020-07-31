@@ -1,0 +1,16 @@
+
+
+
+<div #cardTabla class="card cardListados">
+[alto]="altoDiv"
+
+------------------------------------------------
+
+AfterViewInit
+
+@ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
+altoDiv;
+
+ngAfterViewInit() {
+    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
+  }

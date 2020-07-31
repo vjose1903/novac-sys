@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import { PhotosService } from '../../../core/services/photos.service';
@@ -14,7 +14,10 @@ import { ModalService } from '../../components/modal/modal.service';
   templateUrl: './registro-empleados.component.html',
   styleUrls: ['./registro-empleados.component.scss'],
 })
-export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
+export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
+  altoDiv;
+
   form: FormGroup;
   titulo = '';
   boton = '';
@@ -116,6 +119,11 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  ngAfterViewInit() {
+    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
+  }
+
   ngOnDestroy(): void {
     this.subDeci.unsubscribe();
   }

@@ -1,9 +1,10 @@
-<div *ngIf="search" class="searchDiv">
+<div #searchDiv *ngIf="search" class="searchDiv">
   <label class="search-label" for="search">Busqueda </label>
   <input [(ngModel)]="searchText" id="search" class="search-input" />
 </div>
 
-<div style="border-radius: 10px 10px 0px 0px;" class="tableBodyScroll">
+<!-- <div style="border-radius: 10px 10px 0px 0px;" class="tableBodyScroll"> -->
+<div style="border-radius: 10px 10px 0px 0px;" class="tableBodyScroll" [ngStyle]="{ height: alto + 'px' }">
   <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" small="true" id="VICtablas">
     <thead class="text-center" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
       <tr>
@@ -11,11 +12,11 @@
         <th *ngIf="botones.titulo">Acciones</th>
       </tr>
     </thead>
-    <tbody style="">
+    <tbody [ngStyle]="{ height: alto + 'px' }">
       <ng-container *ngIf="data">
         <tr
           mdbTableCol
-          *ngFor="let dato of data | paginate: { itemsPerPage: mostrar, currentPage: pagActual, totalItems: data.length }; index as i"
+          *ngFor="let dato of data | paginate: { id: id_tabla, itemsPerPage: mostrar, currentPage: pagActual, totalItems: total_registros }; index as i"
           class="text-center"
           id="{{ ROW }}{{ i }}"
           [ngClass]="{
@@ -109,11 +110,11 @@
     </tbody>
     <tfoot class="grey lighten-5 w-100"></tfoot>
   </table>
-  <div class="Pietabla d-flex flex-row-reverse">
-    <pagination-controls nextLabel="Siguiente" previousLabel="Anterior" class="my-pagination mr-3" (pageChange)="pageChange($event)"></pagination-controls>
+  <div #paginationDiv class="Pietabla d-flex flex-row-reverse">
+    <pagination-controls nextLabel="Siguiente" previousLabel="Anterior" class="my-pagination mr-3" [id]="id_tabla" (pageChange)="pageChange($event)"></pagination-controls>
 
     <div class="btn-group" dropdown [dropup]="true">
-      <button id="button-dropup" dropdownToggle type="button" class="btn btn-primary dropdown-toggle" aria-controls="dropdown-dropup">
+      <button id="button-dropup" dropdownToggle type="button" class="btn btn-peque btn-verde dropdown-toggle" aria-controls="dropdown-dropup">
         {{ mostrar }} registros <span class="caret"></span>
       </button>
       <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-dropup">
@@ -124,5 +125,3 @@
     </div>
   </div>
 </div>
-
-<!-- {key:"nombre"} {"nombre":''}[{key:"nombre"}] -->

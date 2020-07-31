@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { ObservableServcie } from '../../../core/services/observables.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -17,7 +17,10 @@ import { ModalService } from '../../components/modal/modal.service';
   templateUrl: './ncf.component.html',
   styleUrls: ['./ncf.component.scss'],
 })
-export class NcfComponent implements OnInit, OnDestroy {
+export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
+  altoDiv;
+
   titulo;
   form;
   boton = 'Ingresar';
@@ -110,9 +113,15 @@ export class NcfComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  ngAfterViewInit() {
+    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
+  }
+
   ngOnDestroy(): void {
     this.subDeci.unsubscribe();
   }
+
   text(arg) {
     this.setDateInputs(arg);
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, OnDestroy, HostListener, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
@@ -8,7 +8,11 @@ import { DBservice } from '../../../core/services/bdservice.service';
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
 })
-export class ModalComponent implements OnInit, OnChanges, OnDestroy {
+export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+  @ViewChild('ModalTabla', { static: false }) ModalTabla: ElementRef;
+
+  altoDiv;
+
   showModal = false;
   seleccionModal: any;
   tipoModal;
@@ -79,6 +83,15 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.showModal = res;
+        setTimeout(() => {
+          console.log('filtrarCliente-----> ', (document.getElementsByClassName('ui-dialog-content')[0] as any).offsetHeight);
+
+          this.altoDiv = (document.getElementsByClassName('ui-dialog-content')[0] as any).offsetHeight - 150;
+
+          console.log('this.showModal ', this.showModal);
+          console.log('this.altoDiv ', this.altoDiv);
+          console.log('this.ModalTabla ', this.ModalTabla);
+        }, 10);
       }
     });
 
@@ -130,6 +143,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy {
       }
     });
   }
+
+  ngAfterViewInit() {}
 
   ngOnDestroy() {
     this.subShow.unsubscribe();

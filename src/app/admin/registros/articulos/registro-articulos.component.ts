@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -15,7 +15,10 @@ import { Subscription } from 'rxjs';
   templateUrl: './registro-articulos.component.html',
   styleUrls: ['./registro-articulos.component.scss'],
 })
-export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges {
+export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
+  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
+
+  altoDiv;
   titulo = '';
   boton = '';
   form: FormGroup;
@@ -94,6 +97,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
         this.decisionModal(res);
       }
     });
+  }
+  ngAfterViewInit() {
+    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }
 
   ngOnChanges() {

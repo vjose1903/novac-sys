@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { ObservableServcie } from '../../../core/services/observables.service';
 import { DBservice } from '../../../core/services/bdservice.service';
@@ -16,7 +16,9 @@ import { ModalService } from '../../components/modal/modal.service';
   templateUrl: './registro-clientes.component.html',
   styleUrls: ['./registro-clientes.component.scss'],
 })
-export class RegistroClientesComponent implements OnInit, OnDestroy {
+export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
+
   titulo = '';
   boton = '';
   form: FormGroup;
@@ -52,7 +54,14 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   indexBorrar: any;
   vendedores;
   subDeci: Subscription;
-  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService) {}
+
+  altoDiv;
+
+  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService) {
+    // setInterval(() => {
+    //   console.log(this.cardTabla.nativeElement.offsetHeight);
+    // }, 1000);
+  }
 
   ngOnInit() {
     this.boton = 'Guardar';
@@ -102,9 +111,15 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       this.vendedores = res;
     });
   }
+
   ngOnDestroy() {
     this.subDeci.unsubscribe();
   }
+
+  ngAfterViewInit() {
+    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
+  }
+
   checkNumbers(arg) {
     let res = false;
     for (let i = 0; i < arg.length; i++) {

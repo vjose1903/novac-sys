@@ -147,13 +147,13 @@
   </div>
   <div class=" col-md-6">
     <h4>Listado empleados</h4>
-    <div class="card cardListados ">
+    <div #cardTabla class="card cardListados">
       <app-tablas
         *ngIf="listaEmpleados && info"
         [info]="info"
         [data]="listaEmpleados"
         [focusRow]="false"
-        [scrollContainer]="'scroll-container'"
+        [alto]="altoDiv"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
         (DELETE)="abrirModal($event)"

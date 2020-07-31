@@ -1,0 +1,32 @@
+/* ====================================================== */
+/* PAGINATION*/
+/* ====================================================== */
+
+.my-pagination {
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+.my-pagination /deep/ .ngx-pagination {
+  margin: 0;
+  padding: 0;
+}
+
+.my-pagination /deep/ .ngx-pagination .current {
+  background: #4ee488;
+}
+.my-pagination /deep/ .ngx-pagination .current:hover {
+  background: #30a756;
+  cursor: pointer;
+}
+
+.my-pagination /deep/ .ngx-pagination .pagination-next > a:hover {
+  color: #30a756;
+  cursor: pointer;
+}
+
+.my-pagination /deep/ .ngx-pagination .pagination-next > a:hover,
+.ngx-pagination .pagination-previous > a:hover {
+  color: #30a756;
+  cursor: pointer;
+}

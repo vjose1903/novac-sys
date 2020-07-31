@@ -17,7 +17,7 @@ import { MdbTablePaginationComponent, MdbTableDirective } from 'angular-bootstra
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { TablasService } from './tablas.service';
+import { TablasService, obj_paginate } from './tablas.service';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
@@ -34,6 +34,11 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @ViewChild(MdbTableDirective, { static: false }) mdbTable: MdbTableDirective;
   cantiTootip: string;
   ready = false;
+
+  @ViewChild('searchDiv', { static: false }) searchDiv: ElementRef;
+  @ViewChild('paginationDiv', { static: false }) paginationDiv: ElementRef;
+
+  restoAHeigthDiv: any;
 
   @HostListener('input') oninput() {
     this.searchItems();
@@ -62,6 +67,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   // variables
+
   elements: any[] = [];
   previous: any = [];
   searchText = '';
@@ -76,6 +82,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     Paquete: 'Paquetes',
     Unidad: 'Unidades',
   };
+  paginate_info = obj_paginate;
 
   // inputs
 
@@ -92,6 +99,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     editar: false,
     mostrar: false,
   };
+  @Input() id_tabla = 'tabla';
 
   @Input() seleccionado = -1;
   @Input() focusRow = false;
@@ -110,10 +118,20 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Output() noArticulo = new EventEmitter<any>();
   @Output() getInfoChange = new EventEmitter<any>();
 
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice) {}
+  subTotalPag: Subscription;
+
+  @Input() alto = 200;
+
+  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private tServ: TablasService) {}
 
   ngOnInit() {
     this.necesarioStart();
+
+    this.subTotalPag = this.tServ.TOTALPAGINAS.subscribe((res) => {
+      if (res) {
+        this.total_registros = res;
+      }
+    });
 
     // if (this.search) {
     //   setTimeout(() => {
@@ -121,6 +139,23 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     //     this.element.focus();
     //   }, 5);
     // }
+  }
+
+  async ngAfterViewInit() {
+    if (this.search) {
+      this.restoAHeigthDiv = this.searchDiv.nativeElement.offsetHeight + this.paginationDiv.nativeElement.offsetHeight + 110;
+    } else {
+      this.restoAHeigthDiv = this.paginationDiv.nativeElement.offsetHeight + 110;
+    }
+
+    this.alto = this.alto - this.restoAHeigthDiv;
+
+    console.log(this.alto);
+
+    // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
+    // this.mdbTablePagination.calculateFirstItemIndex();
+    // this.mdbTablePagination.calculateLastItemIndex();
+    this.cdRef.detectChanges();
   }
 
   async necesarioStart() {
@@ -235,8 +270,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   pagActual = 1;
-  mostrar = 50;
-  listaMostrar = [5, 10, 20, 50];
+  mostrar = 15;
+  listaMostrar = [10, 15, 20];
+  total_registros;
 
   cambiaMostrar(num: number) {
     this.mostrar = num;
@@ -423,13 +459,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     setTimeout(() => {
       this.IDROW = temp;
     }, 250);
-  }
-
-  async ngAfterViewInit() {
-    // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
-    // this.mdbTablePagination.calculateFirstItemIndex();
-    // this.mdbTablePagination.calculateLastItemIndex();
-    this.cdRef.detectChanges();
   }
 
   changeVisibleItems(items) {

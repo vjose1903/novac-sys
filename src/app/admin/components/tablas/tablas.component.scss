@@ -24,16 +24,26 @@
 .Pietabla {
 }
 
+.Pietabla {
+  position: absolute;
+  bottom: 1rem;
+  right: 0.5rem;
+  align-items: center;
+}
+
+.table {
+  margin-bottom: 3rem !important;
+}
 
 .tableBodyScroll tbody {
   display: block;
-  max-height: calc(100% - 17vh);
+  // max-height: calc(100% - 17vh);
   overflow-y: scroll;
-  }
+}
 
-  .tableBodyScroll thead,
-  tbody tr {
+.tableBodyScroll thead,
+tbody tr {
   display: table;
   width: 100%;
   table-layout: fixed;
-  }
+}

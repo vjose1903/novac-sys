@@ -343,22 +343,23 @@
       [focusOnShow]="true"
       [modal]="false"
       [responsive]="true"
-      [style]="{ width: '900px', minWidth: '400px' }"
+      [style]="{ width: '900px', height: '400px' }"
       [minY]="70"
       (onHide)="reinicioModal()"
       (onShow)="prueba()"
       blockScroll="true"
+      id="filtrarCliente"
     >
       <app-tablas
         *ngIf="seleccionModal"
         [paraFiltroClientes]="paraFiltroClientes"
         [focusRow]="true"
+        [alto]="altoDiv"
         (clickRow)="devolverCLick($event)"
         [info]="infoCliente"
         [data]="seleccionModal"
         [search]="true"
         [ROW]="'cliente'"
-        [scrollContainer]="'scroll-container'"
         (reinicioModal)="reinicioModal()"
       ></app-tablas>
     </p-dialog>
