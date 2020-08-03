@@ -23,6 +23,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   lista_produccion = [];
   ingredientes = [];
   ingredientesParaProduccion = [];
+
   medidas = {
     Libra: 'Libras',
     Quintal: 'Quintales',
@@ -30,6 +31,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     Paquete: 'Paquetes',
     Unidad: 'Unidades',
   };
+
   element: any;
   optionsAlerta = ['Quintal', 'Libra'];
   seleccionModal: any;
@@ -40,7 +42,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
-    this.dbServ.getArticulos().subscribe(res => {
+    this.dbServ.getArticulos().subscribe((res) => {
       res.sort((a, b) => {
         return a.id > b.id ? 1 : -1;
       });
@@ -50,7 +52,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModalP(res);
       }
@@ -66,12 +68,12 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   getIngredients() {
     this.ingredientes = [];
 
-    const tempArticulo = this.listaArticulos.filter(val => val.id === _.parseInt(this.articulo_id));
+    const tempArticulo = this.listaArticulos.filter((val) => val.id === _.parseInt(this.articulo_id));
     this.articuloSelected = tempArticulo[0];
     const tempIngredientes = tempArticulo[0].formulas_productos_terminados;
 
-    tempIngredientes.forEach(ingrediente => {
-      const tempIngre = this.listaArticulos.filter(val => val.id === _.parseInt(ingrediente.articulo_combo));
+    tempIngredientes.forEach((ingrediente) => {
+      const tempIngre = this.listaArticulos.filter((val) => val.id === _.parseInt(ingrediente.articulo_combo));
       const ingre = tempIngre[0];
       this.ingredientes.push({
         articulo_id: ingre.id,
@@ -177,7 +179,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this.medida_producir !== '' &&
       this.medida_producir !== ' '
     ) {
-      this.ingredientes.forEach(ingre => {
+      this.ingredientes.forEach((ingre) => {
         let cantidadFormula = ingre.cantidad;
         if (this.medida_producir === 'Libra') {
           cantidadFormula = cantidadFormula / 100;
@@ -224,7 +226,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.enfocarInput('articulo_id');
   }
   agregarAlista() {
-    this.ingredientesParaProduccion.forEach(ingre => {
+    this.ingredientesParaProduccion.forEach((ingre) => {
       ingre.cantidad = ingre.existencia.Libra;
       ingre.articulo_id = ingre.articulo_id;
       delete ingre.existencia;
@@ -270,7 +272,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         this.disableOption('prod-' + this.seleccionModal.articulo_id, false);
         this.lista_produccion = _.pullAt(listaTemp[this.indexBorrar]);
       } else {
-        this.lista_produccion.forEach(element => {
+        this.lista_produccion.forEach((element) => {
           this.disableOption('prod-' + element.articulo_id, false);
         });
         this.lista_produccion = [];
@@ -296,7 +298,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       }
 
       this.dbServ.createProduccion(produccion).subscribe(
-        res => {
+        (res) => {
           console.log('i', i);
           console.log('this.lista_produccion.length', this.lista_produccion.length - 1);
 
@@ -304,7 +306,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
             this.succes();
           }
         },
-        err => {
+        (err) => {
           console.log(err.error);
 
           this.mostrarErrores(err.error);

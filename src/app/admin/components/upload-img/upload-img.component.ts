@@ -30,7 +30,7 @@ export class UploadImgComponent implements OnInit {
     if (this.BASE_64 && this.FILE_NAME) {
       const obj = {
         base_64: this.BASE_64,
-        fileName: this.FILE_NAME,
+        file_name: this.FILE_NAME,
       };
 
       this.dbServ.subirFoto(obj).subscribe(
