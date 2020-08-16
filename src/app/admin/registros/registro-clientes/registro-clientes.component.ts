@@ -10,6 +10,7 @@ import { ValidateRayaAbajo } from '../../../directives/validaciones';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
+import { obj_paginate } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -56,6 +57,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
   subDeci: Subscription;
 
   altoDiv;
+  obj_paginate_ = obj_paginate;
 
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService) {
     // setInterval(() => {
@@ -66,25 +68,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
   ngOnInit() {
     this.boton = 'Guardar';
     this.titulo = 'Registro de clientes';
-    this.dbServ
-      .getClientes()
-      .pipe(
-        map(
-          (cliente) =>
-            (cliente = cliente.map((cli) => {
-              cli.documentos_de_identidad.map((docu) => {
-                if (docu.principal) {
-                  cli.documento_identidad = docu.documento;
-                }
-              });
-              return cli;
-            })),
-        ),
-      )
-      .subscribe((res) => {
-        this.listaClientes = res;
-        this.quitarContadoDeLista();
-      });
 
     this.form = this.fb.group({
       nombre: [null, Validators.required],
@@ -107,11 +90,39 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
       }
     });
 
+    this.necesarioStart();
+  }
+  necesarioStart() {
+    this.getClientes(this.obj_paginate_);
+    this.getVendedores();
+  }
+
+  getVendedores() {
     this.dbServ.getVendedores().subscribe((res) => {
       this.vendedores = res;
     });
   }
+  async getClientes(e) {
+    try {
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
+      const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+      res['data'].map((cliente) => {
+        cliente.documentos_de_identidad.map((docu) => {
+          if (docu.principal) {
+            cliente.documento_identidad = docu.documento;
+          }
+        });
+        return cliente;
+      });
+
+      this.listaClientes = res.data;
+      this.quitarContadoDeLista();
+    } catch (error) {}
+  }
   ngOnDestroy() {
     this.subDeci.unsubscribe();
   }
@@ -403,6 +414,10 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
     {
       titulo: 'Nombre',
       key: 'nombre',
+    },
+    {
+      titulo: 'Apellido',
+      key: 'apellido',
     },
     {
       titulo: 'Telefono',

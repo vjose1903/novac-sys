@@ -118,6 +118,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Output() reinicioModal = new EventEmitter<any>();
   @Output() noArticulo = new EventEmitter<any>();
   @Output() getInfoChange = new EventEmitter<any>();
+  @Output() paginateChange = new EventEmitter<any>();
 
   subTotalPag: Subscription;
 
@@ -292,21 +293,32 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   pagActual = 1;
-  mostrar = 15;
+  mostrar = this.paginate_info.per_page;
   listaMostrar = [10, 15, 20];
   total_registros;
 
   cambiaMostrar(num: number) {
     this.mostrar = num;
+
+    this.paginate_info = {
+      page: this.pagActual,
+      per_page: this.mostrar,
+      searchText: this.searchText,
+    };
+
+    this.paginateChange.emit(this.paginate_info);
   }
 
   pageChange(arg) {
     this.pagActual = arg;
-    const obj = {
-      pagActual: arg,
-      mostrar: this.mostrar,
+
+    this.paginate_info = {
+      page: arg,
+      per_page: this.mostrar,
+      searchText: this.searchText,
     };
-    this.pageChanges.emit(obj);
+
+    this.paginateChange.emit(this.paginate_info);
   }
 
   disabledInput(condicion, i) {
@@ -479,7 +491,38 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   async searchItems() {
     const temp = GLOBAL.duplicarJson(this.ROW + '0');
     this.IDROW = null;
+    // ------------------------------------------------------------------------------
+    if (this.searchText) {
+      if (this.paraFiltroClientes) {
+        if (this.data[0].documento_de_identidad.cliente_id !== null) {
+          try {
+            // this.data = await this.dbServ
+            //   .getClienteByName(this.searchText)
+            //   .pipe(
+            //     map(
+            //       (cliente) =>
+            //         (cliente = cliente.map((cli) => {
+            //           cli.nombre = GLOBAL.Capitalice(cli.nombre);
+            //           cli.apellido = GLOBAL.Capitalice(cli.apellido);
+            //           cli.documento_identidad = cli.documento_de_identidad ? (cli.documento_de_identidad.documento ? cli.documento_de_identidad.documento : '---------') : '---------';
+            //           return cli;
+            //         })),
+            //     ),
+            //   )
+            //   .toPromise();
+            // this.mdbTable.setDataSource(this.data);
+          } catch (error) {
+            this.dbServ.toastError('Error buscando clientes', 'ERROR');
+          }
+        }
+      }
+    }
 
+    if (this.searchText === '' || this.searchText === ' ' || this.searchText) {
+      this.pageChange(this.pagActual);
+    }
+
+    // ------------------------------------------------------------------------------
     const prev = await this.mdbTable.getDataSource();
 
     if (!this.searchText) {

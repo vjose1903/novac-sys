@@ -150,6 +150,11 @@ export class DBservice {
   editarCliente(arg) {
     return this.peticion('clientes/' + arg.id, 'put', JSON.stringify(arg));
   }
+
+  getClientesFiltrados(arg, page, per_page, paginado) {
+    return this.peticionSinLoad(`clientes/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  }
+
   // =====================================================================
   // SUPLIDORES
   // =====================================================================
@@ -164,6 +169,10 @@ export class DBservice {
   }
   editarSuplidor(arg) {
     return this.peticion('suplidores/' + arg.id, 'patch', JSON.stringify(arg));
+  }
+
+  getSuplidoresFiltrados(arg, page, per_page, paginado) {
+    return this.peticionSinLoad(`suplidores/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   // =====================================================================
@@ -188,6 +197,10 @@ export class DBservice {
     return localStorage.getItem('userInfo') || '';
   }
 
+  getEmpleadosFiltrados(arg, page, per_page, paginado) {
+    return this.peticionSinLoad(`users/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  }
+
   // =====================================================================
   //  ARCHIVOS
   // =====================================================================
@@ -205,6 +218,10 @@ export class DBservice {
   // =====================================================================
   // ARTICULOS
   // =====================================================================
+
+  getArticulosFiltrados(arg, page, per_page, paginado) {
+    return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  }
 
   createArticulo(arg) {
     return this.peticion('articulos', 'post', JSON.stringify(arg));

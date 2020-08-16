@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
+import { obj_paginate } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -53,6 +54,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   ProductoEditando: any;
   clickBtnRe = false;
   subDeci: Subscription;
+  obj_paginate_ = obj_paginate;
   constructor(
     private artServ: ObservableServcie,
     private dbServ: DBservice,
@@ -97,7 +99,15 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
         this.decisionModal(res);
       }
     });
+    this.necesarioStart()
   }
+
+  async necesarioStart() {
+    await this.getArticulos(this.obj_paginate_);
+  }
+
+  getArticulos(e) {}
+
   ngAfterViewInit() {
     this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }

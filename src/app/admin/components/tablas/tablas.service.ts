@@ -8,6 +8,7 @@ export const obj_paginate = {
   per_page: 10,
   searchText: '',
 };
+
 @Injectable({
   providedIn: 'root',
 })

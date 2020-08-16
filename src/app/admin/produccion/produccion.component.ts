@@ -67,10 +67,16 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   }
   getIngredients() {
     this.ingredientes = [];
+    console.log('this.listaArticulos ', this.listaArticulos);
 
     const tempArticulo = this.listaArticulos.filter((val) => val.id === _.parseInt(this.articulo_id));
+
+    console.log('tempArticulo ', tempArticulo);
     this.articuloSelected = tempArticulo[0];
+
+    console.log('this.articuloSelected ', this.articuloSelected);
     const tempIngredientes = tempArticulo[0].formulas_productos_terminados;
+    console.log('this.tempArticulo[0] ', tempArticulo[0]);
 
     tempIngredientes.forEach((ingrediente) => {
       const tempIngre = this.listaArticulos.filter((val) => val.id === _.parseInt(ingrediente.articulo_combo));
