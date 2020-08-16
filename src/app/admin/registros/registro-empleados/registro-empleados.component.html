@@ -156,6 +156,7 @@
         [alto]="altoDiv"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
+        (paginateChange)="getEmpleados($event)"
         (DELETE)="abrirModal($event)"
       ></app-tablas>
     </div>

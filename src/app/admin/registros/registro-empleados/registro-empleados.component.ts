@@ -9,6 +9,7 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
+import { obj_paginate } from '../../components/tablas/tablas.service';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -32,6 +33,10 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
     {
       titulo: 'Nombre',
       key: 'nombre',
+    },
+    {
+      titulo: 'Apellido',
+      key: 'apellido',
     },
     {
       titulo: 'Telefono',
@@ -59,6 +64,8 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
   seleccionModal: any;
   indexBorrar: any;
   subDeci: Subscription;
+
+  obj_paginate_ = obj_paginate;
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {
     this.dpConfig = Object.assign(
       {},
@@ -76,29 +83,8 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
 
     // this.titulo = 'Actualizar empleado';
     // this.boton = 'Actualizar';
-    this.dbServ
-      .getEmpleados()
-      .pipe(
-        map(
-          (emple) =>
-            (emple = emple.map((cli) => {
-              cli.role_ = cli.sexo === 'm' ? this.rolesM[cli.role] : this.rolesF[cli.role];
-              cli.documentos_de_identidad.map((docu) => {
-                if (docu.principal) {
-                  cli.documento_identidad = docu.documento;
-                }
-              });
-              return cli;
-            })),
-        ),
-      )
-      .subscribe((res) => {
-        res.sort((a, b) => {
-          return a.id > b.id ? 1 : -1;
-        });
-        this.listaEmpleados = JSON.parse(JSON.stringify(res));
-      });
 
+    this.necesarioStart();
     this.form = this.fb.group({
       id: [null],
       nombre: [null, Validators.required],
@@ -120,6 +106,33 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
     });
   }
 
+  async necesarioStart() {
+    await this.getEmpleados(this.obj_paginate_);
+  }
+
+  async getEmpleados(e) {
+    try {
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+
+      const res = await this.dbServ.getEmpleadosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+      res.data.map((cli) => {
+        cli.role_ = cli.sexo === 'm' ? this.rolesM[cli.role] : this.rolesF[cli.role];
+        cli.documentos_de_identidad.map((docu) => {
+          if (docu.principal) {
+            cli.documento_identidad = docu.documento;
+          }
+        });
+        return cli;
+      });
+
+      this.listaEmpleados = res.data;
+    } catch (error) {
+      this.dbServ.toastError('Error buscando empleados registrados.', 'ERROR');
+    }
+  }
   ngAfterViewInit() {
     this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }
