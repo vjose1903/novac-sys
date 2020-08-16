@@ -298,7 +298,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   abrirModal(arg) {
     const obj = arg;
 
-    obj.listaArticulos = this.listaArticulos;
+    obj.data = this.listaArticulos;
 
     this.mServ.modalTipo('buscar');
     this.mServ.ModalSeleccion(obj);

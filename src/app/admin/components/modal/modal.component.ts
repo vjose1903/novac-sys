@@ -108,7 +108,16 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
     this.subSelec = this.mServ.SELECCIONMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
-        this.seleccionModal = res;
+        console.log('-------------');
+        console.log(res);
+        console.log('-------------');
+
+        if (res.filtrar || res.filtrarCliente) {
+          this.seleccionModal = res.data;
+        } else {
+          this.seleccionModal = res;
+        }
+
         this.paraFiltroArticulos = res.filtrar;
         this.paraFiltroClientes = res.filtrarCliente;
         this.metodo = res.metodo;

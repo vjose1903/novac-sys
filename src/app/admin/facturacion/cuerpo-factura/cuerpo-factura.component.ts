@@ -779,9 +779,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const obj = arg;
     // this.listaArticulos.map()
     if (this.metodo === 'venta') {
-      obj.listaArticulos = this.listaArticulos;
+      obj.data = this.listaArticulos;
     } else {
-      obj.listaArticulos = this.listaArticulos.filter((articulo) => articulo.suplidor_id === this.propietario.id);
+      obj.data = this.listaArticulos.filter((articulo) => articulo.suplidor_id === this.propietario.id);
     }
 
     this.mServ.modalTipo('buscar');

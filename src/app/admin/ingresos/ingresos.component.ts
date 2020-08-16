@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../components/tablas/tablas.component';
 import { ModalService } from '../components/modal/modal.service';
+import { obj_paginate } from '../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -112,6 +113,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
   Devuelta: any;
   forma_pago: any;
   altoDiv: number;
+
+  obj_paginate_ = obj_paginate;
 
   constructor(private config: NgSelectConfig, private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {
     this.config.notFoundText = 'Articulo no existe';
@@ -250,38 +253,10 @@ export class IngresosComponent implements OnInit, OnDestroy {
     }
   }
   async necesarioStar() {
-    await this.pedirClientes();
-    await this.quitarContadoDeLista();
     await this.getTipoFacturas();
-    // await this.getArticulos();
 
     this.enfocarInput('clienteI');
   }
-
-  // async getArticulos() {
-  //   try {
-  //     this.articulos = await this.dbServ
-  //       .getArticulos()
-  //       .pipe(
-  //         map(
-  //           articulo =>
-  //             (articulo = articulo.map(val => {
-  //               const medidas = [{ medida: val.medida, precio: val.precio_principal }];
-  //               for (let i = 0; i < val.contenido_articulos.length; i++) {
-  //                 const cont = val.contenido_articulos[i];
-  //                 medidas.push({ medida: cont.medida, precio: cont.precio });
-  //               }
-  //               val.medidas = medidas;
-  //               return val;
-  //             })),
-  //         ),
-  //       )
-  //       .toPromise();
-  //   } catch (error) {
-  //     console.log(error);
-  //     this.dbServ.toastError('Algo fallo en la busqueda de articulos', 'ERROR');
-  //   }
-  // }
 
   clickVerPagos(arg) {
     const pagos = arg.pagos;
@@ -302,30 +277,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
     try {
       this.tipoFacturas = await this.dbServ.getTiposRecibos().toPromise();
       console.log(this.tipoFacturas);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  async pedirClientes() {
-    try {
-      this.listaClientes = await this.dbServ
-        .getClientes()
-        .pipe(
-          map(
-            (cliente) =>
-              (cliente = cliente.map((cli) => {
-                cli.nombre = GLOBAL.Capitalice(cli.nombre);
-                cli.apellido = GLOBAL.Capitalice(cli.apellido);
-                cli.documentos_de_identidad.map((docu) => {
-                  if (docu.principal) {
-                    cli.documento_identidad = docu.documento;
-                  }
-                });
-                return cli;
-              })),
-          ),
-        )
-        .toPromise();
     } catch (error) {
       console.error(error);
     }
@@ -512,11 +463,43 @@ export class IngresosComponent implements OnInit, OnDestroy {
     this.listaClientes = temp;
   }
 
-  abrirModalFiltro(nombre) {
+  async pedirClientes(e, buscando) {
+    try {
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = buscando === '' || buscando === null || buscando === undefined ? ' ' : buscando;
+
+      const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+      res.data.map((cli) => {
+        cli.nombre = GLOBAL.Capitalice(cli.nombre);
+        cli.apellido = GLOBAL.Capitalice(cli.apellido);
+        cli.documentos_de_identidad.map((docu) => {
+          if (docu.principal) {
+            cli.documento_identidad = docu.documento;
+          }
+        });
+        return cli;
+      });
+
+      this.listaClientes = res.data;
+    } catch (error) {
+      console.error(error);
+      this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
+    }
+  }
+
+  async abrirModalFiltro(nombre) {
+    await this.pedirClientes(this.obj_paginate_, nombre);
+
     this.mServ.modalTipo('buscarCliente');
 
-    this.listaClientes['filtrarCliente'] = nombre;
-    this.mServ.ModalSeleccion(this.listaClientes);
+    const obj = {
+      data: this.listaClientes,
+      filtrarCliente: nombre,
+    };
+
+    this.mServ.ModalSeleccion(obj);
 
     this.mServ.mostrarModal(true);
     this.mServ.ModalTablaHeight(true);

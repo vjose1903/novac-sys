@@ -353,7 +353,12 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   abrirModalFiltro(nombre) {
     this.mServ.modalTipo('buscarCliente');
     this.tipoModal = 'buscarCliente';
-    this.listaClientes['filtrarCliente'] = nombre;
+
+    const obj = {
+      data: this.listaClientes,
+      filtrarCliente: nombre,
+    };
+
     this.mServ.ModalSeleccion(this.listaClientes);
 
     this.mServ.mostrarModal(true);
