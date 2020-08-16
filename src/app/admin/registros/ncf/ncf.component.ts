@@ -11,6 +11,7 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as moment from 'moment';
 import * as dateFormat from 'dateFormat';
 import { ModalService } from '../../components/modal/modal.service';
+import { obj_paginate } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-ncf',
@@ -85,6 +86,7 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
 
   is_editando = false;
   ncfSelected;
+  obj_paginate_ = obj_paginate;
   constructor(private dbServ: DBservice, private cdRef: ChangeDetectorRef, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {
     this.dpConfig = Object.assign(
       {},
@@ -144,7 +146,7 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async necesarioStart() {
     await this.getTiposFacturas();
-    await this.getNcfRegistrados();
+    await this.getPaquetesNCF(this.obj_paginate_);
   }
 
   async getTiposFacturas() {
@@ -161,34 +163,32 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
     } catch (error) {}
   }
 
-  async getNcfRegistrados() {
+  async getPaquetesNCF(e) {
     try {
-      this.listaNCF = await this.dbServ
-        .getNCFregistrados()
-        .pipe(
-          map(
-            (val) =>
-              (val = val.map((ncf) => {
-                ncf.cantidad = ncf.hasta - ncf.desde + 1;
-                ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
-                ncf.codigo = _.padStart(ncf.id, 5, '0');
-                ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
-                ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
-                ncf.colorUsado = ncf.usado ? 'green' : 'red';
-                ncf.colorEstado = ncf.estado ? 'green' : 'red';
-                ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
-                ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
-                return ncf;
-              })),
-          ),
-        )
-        .toPromise();
-      this.listaNCF.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+
+      const res = await this.dbServ.getPaquetesNCFFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+      res.data.map((ncf) => {
+        ncf.cantidad = ncf.hasta - ncf.desde + 1;
+        ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
+        ncf.codigo = _.padStart(ncf.id, 5, '0');
+        ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
+        ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
+        ncf.colorUsado = ncf.usado ? 'green' : 'red';
+        ncf.colorEstado = ncf.estado ? 'green' : 'red';
+        ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
+        ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
+        return ncf;
       });
-      console.log(this.listaNCF);
+
+      this.listaNCF = res.data;
     } catch (error) {
       console.error(error);
+
+      this.dbServ.toastError('Error buscando Paquetes de NCF registrados.', 'ERROR');
     }
   }
 

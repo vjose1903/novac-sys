@@ -113,6 +113,7 @@
         [focusRow]="false"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
+        (paginateChange)="getPaquetesNCF($event)"
         (DELETE)="abrirModal($event)"
       ></app-tablas>
     </div>

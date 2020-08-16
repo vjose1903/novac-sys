@@ -121,7 +121,9 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
 
       this.listaClientes = res.data;
       this.quitarContadoDeLista();
-    } catch (error) {}
+    } catch (error) {
+      this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
+    }
   }
   ngOnDestroy() {
     this.subDeci.unsubscribe();

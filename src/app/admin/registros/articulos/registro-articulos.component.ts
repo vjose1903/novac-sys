@@ -69,31 +69,37 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   ngOnInit() {
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
 
-    this.dbServ.getTipoArticulos().subscribe((res) => {
-      this.listaTipoArticulos = GLOBAL.duplicarJson(res);
-    });
-
-    this.dbServ.getNombresSuplidores().subscribe((res) => {
-      this.listaSuplidores = GLOBAL.duplicarJson(res);
-    });
     this.createForm();
     this.FORM = this.form.controls;
 
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
+    this.necesarioStart();
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
     });
-    this.necesarioStart();
   }
 
   async necesarioStart() {
     await this.getArticulos(this.obj_paginate_);
+    this.getTipoArticulos();
+    this.getNombreSuplidores();
   }
 
+  getTipoArticulos() {
+    this.dbServ.getTipoArticulos().subscribe((res) => {
+      this.listaTipoArticulos = GLOBAL.duplicarJson(res);
+    });
+  }
+
+  getNombreSuplidores() {
+    this.dbServ.getNombresSuplidores().subscribe((res) => {
+      this.listaSuplidores = GLOBAL.duplicarJson(res);
+    });
+  }
   async getArticulos(e) {
     try {
       const page = e.page;

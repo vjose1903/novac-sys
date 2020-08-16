@@ -125,6 +125,10 @@ export class DBservice {
     return this.peticionSinLoad(`paqueteNCF/${tipo_factura_id}/${estado}`, 'get');
   }
 
+  getPaquetesNCFFiltrados(arg, page, per_page, paginado) {
+    return this.peticionSinLoad(`secuencia_comprobantes/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  }
+
   // =====================================================================
   // HISTORICO PRODUCCIONES
   // =====================================================================
