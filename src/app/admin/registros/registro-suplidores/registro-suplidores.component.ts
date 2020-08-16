@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
+import { obj_paginate } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -56,6 +57,8 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy, AfterView
   seleccionModal: any;
   indexBorrar: any;
 
+  obj_paginate_ = obj_paginate;
+
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private mServ: ModalService, private router: Router) {}
 
   ngOnInit() {
@@ -75,28 +78,8 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy, AfterView
       email: [null, Validators.compose([Validators.pattern(/^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+$/)])],
     });
 
-    this.dbServ
-      .getSuplidores()
-      .pipe(
-        map(
-          (val) =>
-            (val = val.map((suplidor) => {
-              suplidor.documentos_de_identidad.map((docu) => {
-                if (docu.principal) {
-                  suplidor.documento = docu.documento;
-                }
-              });
-              suplidor.codigo = _.padStart(suplidor.id, 5, '0');
-              return suplidor;
-            })),
-        ),
-      )
-      .subscribe((res) => {
-        res.sort((a, b) => {
-          return a.id > b.id ? 1 : -1;
-        });
-        this.listaSuplidores = JSON.parse(JSON.stringify(res));
-      });
+    this.nesesarioStart();
+
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
@@ -104,6 +87,33 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy, AfterView
     });
   }
 
+  async nesesarioStart() {
+    await this.getSuplidores(this.obj_paginate_);
+  }
+
+  async getSuplidores(e) {
+    try {
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+
+      const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+      res.data.map((suplidor) => {
+        suplidor.documentos_de_identidad.map((docu) => {
+          if (docu.principal) {
+            suplidor.documento = docu.documento;
+          }
+        });
+        suplidor.codigo = _.padStart(suplidor.id, 5, '0');
+        return suplidor;
+      });
+
+      this.listaSuplidores = res.data;
+    } catch (error) {
+      this.dbServ.toastError('Error buscando suplidores registrados.', 'ERROR');
+    }
+  }
   ngAfterViewInit() {
     this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }

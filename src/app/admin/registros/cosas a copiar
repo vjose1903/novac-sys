@@ -9,9 +9,7 @@ this.getClientes(this.obj_paginate_);
 
 async getClientes(e) {
     try {
-      const page = e.page;
-      const per_page = e.per_page;
-      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+
 
       const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 

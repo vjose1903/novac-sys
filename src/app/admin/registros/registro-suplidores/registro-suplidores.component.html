@@ -134,6 +134,7 @@
         (DevolverInfo)="editarItem($event)"
         (DELETE)="abrirModal($event)"
         [data]="listaSuplidores"
+        (paginateChange)="getSuplidores($event)"
         [focusRow]="false"
       ></app-tablas>
     </div>
