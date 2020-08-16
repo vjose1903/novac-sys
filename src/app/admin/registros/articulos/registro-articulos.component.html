@@ -608,6 +608,7 @@
         [focusRow]="false"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
+        (paginateChange)="getArticulos($event)"
         (DELETE)="abrirModal($event)"
       ></app-tablas>
     </div>

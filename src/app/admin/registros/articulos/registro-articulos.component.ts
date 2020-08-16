@@ -55,6 +55,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   clickBtnRe = false;
   subDeci: Subscription;
   obj_paginate_ = obj_paginate;
+
   constructor(
     private artServ: ObservableServcie,
     private dbServ: DBservice,
@@ -67,19 +68,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
 
   ngOnInit() {
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
-
-    // this.artServ.ARTICULOS.subscribe(res => {
-    //   this.listaArticulos = res;
-    // });
-    this.dbServ.getArticulos().subscribe((res) => {
-      res.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
-      });
-
-      if (res !== undefined && res !== null) {
-        this.listaArticulos = res;
-      }
-    });
 
     this.dbServ.getTipoArticulos().subscribe((res) => {
       this.listaTipoArticulos = GLOBAL.duplicarJson(res);
@@ -99,14 +87,25 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
         this.decisionModal(res);
       }
     });
-    this.necesarioStart()
+    this.necesarioStart();
   }
 
   async necesarioStart() {
     await this.getArticulos(this.obj_paginate_);
   }
 
-  getArticulos(e) {}
+  async getArticulos(e) {
+    try {
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+      const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+      this.listaArticulos = res.data;
+    } catch (error) {
+      this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
+    }
+  }
 
   ngAfterViewInit() {
     this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
