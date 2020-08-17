@@ -59,6 +59,10 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       key: 'nombre',
     },
     {
+      titulo: 'Apellido',
+      key: 'apellido',
+    },
+    {
       titulo: 'Telefono',
       key: 'telefono',
     },
@@ -123,7 +127,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.metodo = res.metodo;
         this.identificadorFact = res.identificadorFact;
 
-        if (this.tipoModal === 'buscarCliente' && res[0].limite_credito !== undefined) {
+        if (this.tipoModal === 'buscarCliente' && res.data[0].limite_credito !== undefined) {
           this.tituloModal = 'Buscar cliente';
         } else {
           this.tituloModal = 'Buscar suplidor';
@@ -172,6 +176,10 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     //     this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
     //   }
     // }
+  }
+
+  TablaChange(change) {
+    this.mServ.func_tabla_modal_change(change);
   }
 
   getDatePendiente(date) {

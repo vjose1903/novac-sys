@@ -13,6 +13,7 @@ export class ModalService {
   private ObjDevuelto = new BehaviorSubject<any>(undefined);
   private indexToFocus = new BehaviorSubject<any>(undefined);
   private press_Esc = new BehaviorSubject<any>(undefined);
+  private tabla_modal_change = new BehaviorSubject<any>(undefined);
 
   TIPOMODAL = this.tipoModal.asObservable();
   SHOWMODAL = this.showModal.asObservable();
@@ -22,8 +23,13 @@ export class ModalService {
   OBJDEVUELTO = this.ObjDevuelto.asObservable();
   INDEXTOFOCUS = this.indexToFocus.asObservable();
   PRESSESC = this.press_Esc.asObservable();
+  TABLA_MODAL_CHANGE = this.press_Esc.asObservable();
 
   constructor() {}
+
+  func_tabla_modal_change(nextValue) {
+    this.tabla_modal_change.next(nextValue);
+  }
 
   mostrarModal(nextValue) {
     this.showModal.next(nextValue);

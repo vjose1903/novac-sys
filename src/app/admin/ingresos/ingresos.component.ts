@@ -28,6 +28,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   articuloEnTurno = null;
   articuloEnTurnoid = null;
   medidaEnTurno = null;
+
   @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
   // =============================================
   //  TABLAS
@@ -104,8 +105,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
   ];
   tipoFacturas;
   AllSelected = false;
-  sub: Subscription;
-  articulos: any;
   precioEnTurno: any;
   ExisteMontoMayor: boolean;
   tipoModal: string;
@@ -114,6 +113,9 @@ export class IngresosComponent implements OnInit, OnDestroy {
   forma_pago: any;
   altoDiv: number;
 
+  sub: Subscription;
+  subTablaModalChange: Subscription;
+
   obj_paginate_ = obj_paginate;
 
   constructor(private config: NgSelectConfig, private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {
@@ -121,7 +123,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.necesarioStar();
+    this.subTablaModalChange = this.mServ.TABLA_MODAL_CHANGE.subscribe((res) => {
+      if (res) {
+        this.pedirClientes(res, res.searchText);
+      }
+    });
 
     this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'buscarCliente') {
@@ -136,6 +142,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
         this.mServ.ModalObj(undefined);
       }
     });
+    this.necesarioStart();
   }
 
   formatoNumero(num) {
@@ -175,14 +182,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
       }
     });
     console.log(this.facturas_selected);
-  }
-
-  selectArticulo(arg, valor?) {
-    if (arg === 'articulo') {
-      this.medidaEnTurno = -1;
-    } else if (arg === 'medida') {
-      this.precioEnTurno = this.articuloEnTurno.medidas.filter((val) => val.medida === valor)[0].precio;
-    }
   }
 
   recalcularMonto(monto_original, notas) {
@@ -252,9 +251,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
       this.dbServ.toastError(error, 'ERROR');
     }
   }
-  async necesarioStar() {
-    await this.getTipoFacturas();
-
+  async necesarioStart() {
     this.enfocarInput('clienteI');
   }
 
@@ -270,15 +267,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
       console.log(pagos);
 
       this.abrirModal(pagos);
-    }
-  }
-
-  async getTipoFacturas() {
-    try {
-      this.tipoFacturas = await this.dbServ.getTiposRecibos().toPromise();
-      console.log(this.tipoFacturas);
-    } catch (error) {
-      console.error(error);
     }
   }
 

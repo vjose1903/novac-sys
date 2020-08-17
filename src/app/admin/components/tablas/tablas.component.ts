@@ -492,31 +492,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const temp = GLOBAL.duplicarJson(this.ROW + '0');
     this.IDROW = null;
     // ------------------------------------------------------------------------------
-    if (this.searchText) {
-      if (this.paraFiltroClientes) {
-        if (this.data[0].documento_de_identidad.cliente_id !== null) {
-          try {
-            // this.data = await this.dbServ
-            //   .getClienteByName(this.searchText)
-            //   .pipe(
-            //     map(
-            //       (cliente) =>
-            //         (cliente = cliente.map((cli) => {
-            //           cli.nombre = GLOBAL.Capitalice(cli.nombre);
-            //           cli.apellido = GLOBAL.Capitalice(cli.apellido);
-            //           cli.documento_identidad = cli.documento_de_identidad ? (cli.documento_de_identidad.documento ? cli.documento_de_identidad.documento : '---------') : '---------';
-            //           return cli;
-            //         })),
-            //     ),
-            //   )
-            //   .toPromise();
-            // this.mdbTable.setDataSource(this.data);
-          } catch (error) {
-            this.dbServ.toastError('Error buscando clientes', 'ERROR');
-          }
-        }
-      }
-    }
 
     if (this.searchText === '' || this.searchText === ' ' || this.searchText) {
       this.pageChange(this.pagActual);
