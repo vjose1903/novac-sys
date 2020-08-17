@@ -23,7 +23,7 @@ export class ModalService {
   OBJDEVUELTO = this.ObjDevuelto.asObservable();
   INDEXTOFOCUS = this.indexToFocus.asObservable();
   PRESSESC = this.press_Esc.asObservable();
-  TABLA_MODAL_CHANGE = this.press_Esc.asObservable();
+  TABLA_MODAL_CHANGE = this.tabla_modal_change.asObservable();
 
   constructor() {}
 

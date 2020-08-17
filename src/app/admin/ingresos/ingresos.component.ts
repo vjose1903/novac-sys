@@ -126,6 +126,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
     this.subTablaModalChange = this.mServ.TABLA_MODAL_CHANGE.subscribe((res) => {
       if (res) {
         this.pedirClientes(res, res.searchText);
+        const obj = {
+          data: this.listaClientes,
+          filtrarCliente: res.searchText === '' ? ' ' : res.searchText,
+        };
+        this.mServ.ModalSeleccion(obj);
       }
     });
 
@@ -143,6 +148,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
       }
     });
     this.necesarioStart();
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+    this.subTablaModalChange.unsubscribe();
   }
 
   formatoNumero(num) {
@@ -499,8 +509,5 @@ export class IngresosComponent implements OnInit, OnDestroy {
     } else if (valor === 'Compra adelantada') {
       this.medidaEnTurno = null;
     }
-  }
-  ngOnDestroy() {
-    this.sub.unsubscribe();
   }
 }
