@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../components/tablas/tablas.component';
 import { ModalService } from '../components/modal/modal.service';
-import { obj_paginate } from '../components/tablas/tablas.service';
+import { obj_paginate, TablasService } from '../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -114,26 +114,21 @@ export class IngresosComponent implements OnInit, OnDestroy {
   altoDiv: number;
 
   sub: Subscription;
-  subTablaModalChange: Subscription;
 
   obj_paginate_ = obj_paginate;
 
-  constructor(private config: NgSelectConfig, private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {
+  constructor(
+    private config: NgSelectConfig,
+    private mServ: ModalService,
+    private obsServ: ObservableServcie,
+    private dbServ: DBservice,
+    private fb: FormBuilder,
+    private tServ: TablasService,
+  ) {
     this.config.notFoundText = 'Articulo no existe';
   }
 
   ngOnInit() {
-    this.subTablaModalChange = this.mServ.TABLA_MODAL_CHANGE.subscribe((res) => {
-      if (res) {
-        this.pedirClientes(res, res.searchText);
-        const obj = {
-          data: this.listaClientes,
-          filtrarCliente: res.searchText === '' ? ' ' : res.searchText,
-        };
-        this.mServ.ModalSeleccion(obj);
-      }
-    });
-
     this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'buscarCliente') {
         this.clienteAdepositar = res;
@@ -152,7 +147,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.sub.unsubscribe();
-    this.subTablaModalChange.unsubscribe();
   }
 
   formatoNumero(num) {
@@ -481,6 +475,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
       });
 
       this.listaClientes = res.data;
+      this.tServ.Func_total_paginas(res.total_registros);
     } catch (error) {
       console.error(error);
       this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');

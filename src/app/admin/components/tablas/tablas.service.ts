@@ -29,6 +29,8 @@ export class TablasService {
   }
 
   Func_total_paginas(nextValue) {
+    console.log('quii');
+
     this.total_paginas.next(nextValue);
   }
 }

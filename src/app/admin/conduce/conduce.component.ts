@@ -8,6 +8,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import { TablasService, obj_paginate } from '../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-conduce',
@@ -37,6 +38,8 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   TOTAL: number;
 
+  obj_paginate_ = obj_paginate;
+
   subDeci: Subscription;
   subObj: Subscription;
   subEsc: Subscription;
@@ -65,7 +68,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   facturaAdelantadaSelected;
   CuerpoConduce = [];
   altoDiv: number;
-  constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder) {}
+  constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private tServ: TablasService) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -174,7 +177,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async necesarioStar() {
-    await this.pedirClientes();
     this.enfocarInput('clienteI');
   }
   aumentarSecuencia() {
@@ -527,37 +529,48 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     } catch (error) {}
   }
 
-  async pedirClientes() {
+  async pedirClientes(e, buscando) {
     try {
-      this.listaClientes = await this.dbServ
-        .getClientes()
-        .pipe(
-          map(
-            (cliente) =>
-              (cliente = cliente.map((cli) => {
-                cli.nombre = GLOBAL.Capitalice(cli.nombre);
-                cli.apellido = GLOBAL.Capitalice(cli.apellido);
-                cli.documentos_de_identidad.map((docu) => {
-                  if (docu.principal) {
-                    cli.documento_identidad = docu.documento;
-                  }
-                });
-                return cli;
-              })),
-          ),
-        )
-        .toPromise();
+      console.log('BUSCANDO    ->"', buscando, '"');
+
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = buscando === '' || buscando === null || buscando === undefined ? ' ' : buscando;
+
+      const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+      this.listaClientes = undefined;
+
+      res.data.map((cli) => {
+        cli.nombre = GLOBAL.Capitalice(cli.nombre);
+        cli.apellido = GLOBAL.Capitalice(cli.apellido);
+        cli.documentos_de_identidad.map((docu) => {
+          if (docu.principal) {
+            cli.documento_identidad = docu.documento;
+          }
+        });
+        return cli;
+      });
+      this.listaClientes = res.data;
+
+      this.tServ.Func_total_paginas(res.total_registros);
     } catch (error) {
       console.error(error);
+      this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
     }
   }
 
-  abrirModalFiltro(nombre) {
+  async abrirModalFiltro(nombre) {
+    await this.pedirClientes(this.obj_paginate_, nombre);
     this.mServ.modalTipo('buscarCliente');
     this.tipoModal = 'buscarCliente';
 
-    this.listaClientes['filtrarCliente'] = nombre;
-    this.mServ.ModalSeleccion(this.listaClientes);
+    const obj = {
+      data: this.listaClientes,
+      filtrarCliente: nombre,
+    };
+
+    this.mServ.ModalSeleccion(obj);
 
     this.mServ.mostrarModal(true);
   }

@@ -9,7 +9,7 @@ import { map } from 'rxjs/operators';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
-import { obj_paginate } from '../../components/tablas/tablas.service';
+import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -64,6 +64,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
     private actRou: ActivatedRoute,
     private router: Router,
     private mServ: ModalService,
+    private tServ: TablasService,
   ) {}
 
   ngOnInit() {
@@ -108,6 +109,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
       this.listaArticulos = res.data;
+      this.tServ.Func_total_paginas(res.total_registros);
     } catch (error) {
       this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
     }

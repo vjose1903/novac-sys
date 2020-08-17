@@ -327,7 +327,7 @@
         [alto]="altoDiv"
         [search]="false"
         (noArticulo)="noArticulo()"
-        (paginateChange)="TablaChange($event)"
+        (paginateChange)="renovarDataFiltros($event)"
         (reinicioModal)="reinicioModal()"
       ></app-tablas>
     </p-dialog>
@@ -360,7 +360,7 @@
         [data]="seleccionModal"
         [search]="true"
         [ROW]="'cliente'"
-        (paginateChange)="TablaChange($event)"
+        (paginateChange)="renovarDataFiltros($event)"
         (reinicioModal)="reinicioModal()"
       ></app-tablas>
     </p-dialog>

@@ -19,3 +19,23 @@ async getClientes(e) {
       this.listaClientes = res.data;
 
 this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
+
+
+
+
+
+
+this.subTablaModalChange = this.mServ.TABLA_MODAL_CHANGE.subscribe((res) => {
+      if (res) {
+        this.pedirClientes(res, res.searchText);
+        const obj = {
+          data: this.listaClientes,
+          filtrarCliente: res.searchText === '' ? ' ' : res.searchText,
+        };
+        this.mServ.ModalSeleccion(obj);
+      }
+    });
+
+
+private tServ: TablasService
+this.tServ.Func_total_paginas(res.total_registros);

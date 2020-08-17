@@ -298,27 +298,38 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   total_registros;
 
   cambiaMostrar(num: number) {
+    const temp = GLOBAL.duplicarJson(this.ROW + '0');
+    this.IDROW = null;
+
     this.mostrar = num;
 
     this.paginate_info = {
       page: this.pagActual,
       per_page: this.mostrar,
-      searchText: this.searchText,
+      searchText: this.searchText === '' ? ' ' : this.searchText,
     };
 
     this.paginateChange.emit(this.paginate_info);
+    setTimeout(() => {
+      this.IDROW = temp;
+    }, 250);
   }
 
   pageChange(arg) {
+    const temp = GLOBAL.duplicarJson(this.ROW + '0');
+    this.IDROW = null;
     this.pagActual = arg;
 
     this.paginate_info = {
       page: arg,
       per_page: this.mostrar,
-      searchText: this.searchText,
+      searchText: this.searchText === '' ? ' ' : this.searchText,
     };
 
     this.paginateChange.emit(this.paginate_info);
+    setTimeout(() => {
+      this.IDROW = temp;
+    }, 250);
   }
 
   disabledInput(condicion, i) {
@@ -423,6 +434,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
+
     this.element.focus();
   }
 
@@ -557,6 +569,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
     this.NUM = this.NUM - 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
+    this.enfocarInput(this.IDROW);
     this.entrar++;
   }
   ABAJO() {
@@ -566,6 +579,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     this.NUM = this.NUM + 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
+    this.enfocarInput(this.IDROW);
     this.entrar++;
   }
 

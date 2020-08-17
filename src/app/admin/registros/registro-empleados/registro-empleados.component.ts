@@ -9,7 +9,7 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
-import { obj_paginate } from '../../components/tablas/tablas.service';
+import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -66,7 +66,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
   subDeci: Subscription;
 
   obj_paginate_ = obj_paginate;
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService, private tServ: TablasService) {
     this.dpConfig = Object.assign(
       {},
       {
@@ -129,6 +129,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
       });
 
       this.listaEmpleados = res.data;
+      this.tServ.Func_total_paginas(res.total_registros);
     } catch (error) {
       this.dbServ.toastError('Error buscando empleados registrados.', 'ERROR');
     }

@@ -2,6 +2,8 @@ import { Component, OnInit, Input, OnChanges, OnDestroy, HostListener, ViewChild
 import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
+import { TablasService } from '../tablas/tablas.service';
+import { GLOBAL } from '../../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-modal',
@@ -25,6 +27,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
+      this.tServ.Func_total_paginas(0);
+      this.mServ.func_tabla_modal_change(undefined);
       if (this.tipoModal === 'buscar') {
         this.mServ.pressEsc(this.seleccionModal.index);
         setTimeout(() => {
@@ -75,7 +79,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       key: 'direccion',
     },
   ];
-  constructor(private mServ: ModalService, private dbServ: DBservice) {}
+  constructor(private mServ: ModalService, private dbServ: DBservice, private tServ: TablasService) {}
 
   element: HTMLElement;
   subShow: Subscription;
@@ -112,9 +116,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
     this.subSelec = this.mServ.SELECCIONMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
-        console.log('-------------');
+        console.log('-*-*-*-*-*-*-*-*-');
         console.log(res);
-        console.log('-------------');
+        console.log('-*-*-*-*-*-*-*-*-');
 
         if (res.filtrar || res.filtrarCliente) {
           this.seleccionModal = res.data;
@@ -178,9 +182,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     // }
   }
 
-  TablaChange(change) {
-    this.mServ.func_tabla_modal_change(change);
-  }
+  // TablaChange(change) {
+  //   this.mServ.func_tabla_modal_change(change);
+  // }
 
   getDatePendiente(date) {
     const obj = { bool: true, Date: date };
@@ -228,6 +232,38 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.element.focus();
         this.element.click();
       }, 5);
+    }
+  }
+
+  async renovarDataFiltros(e) {
+    const page = e.page;
+    const per_page = e.per_page;
+    const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+
+    if (this.paraFiltroArticulos) {
+    } else if (this.paraFiltroClientes) {
+      try {
+        const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+        this.seleccionModal = undefined;
+
+        res.data.map((cli) => {
+          cli.nombre = GLOBAL.Capitalice(cli.nombre);
+          cli.apellido = GLOBAL.Capitalice(cli.apellido);
+          cli.documentos_de_identidad.map((docu) => {
+            if (docu.principal) {
+              cli.documento_identidad = docu.documento;
+            }
+          });
+          return cli;
+        });
+        this.seleccionModal = res.data;
+
+        this.tServ.Func_total_paginas(res.total_registros);
+      } catch (error) {
+        console.error(error);
+        this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
+      }
     }
   }
 }

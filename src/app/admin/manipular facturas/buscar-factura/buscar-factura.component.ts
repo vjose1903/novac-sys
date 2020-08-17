@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { ModalService } from '../../components/modal/modal.service';
+import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -18,9 +19,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   facturas: any;
   campoSelected: string;
-  sub: Subscription;
-  subDeci: Subscription;
-  subEsc: Subscription;
   clienteBuscado: any;
   listaClientes: unknown;
   facturaSelected: any;
@@ -36,7 +34,11 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   paqueteComprobante: any;
   tipo_factura_id = null;
 
-  constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute, private router: Router) {}
+  sub: Subscription;
+  subDeci: Subscription;
+  subEsc: Subscription;
+
+  constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute, private router: Router, private tServ: TablasService) {}
   campo = null;
   placeHolder = '';
   info = [
@@ -94,6 +96,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     },
   ];
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
+
+  obj_paginate_ = obj_paginate;
 
   ngOnInit() {
     this.BuscarPara = this.route.snapshot.params['para'];
@@ -222,35 +226,42 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   async necesarioStart() {
     await this.getTipoFacturas();
-    await this.getClientes();
+
     if (this.BuscarPara !== 'anular_factura') {
       await this.getPaqueteComprobante();
     }
 
     this.enfocarInput('campoI');
   }
-  async getClientes() {
+
+  async pedirClientes(e, buscando) {
     try {
-      this.listaClientes = await this.dbServ
-        .getClientes()
-        .pipe(
-          map(
-            (cliente) =>
-              (cliente = cliente.map((cli) => {
-                cli.nombre = GLOBAL.Capitalice(cli.nombre);
-                cli.apellido = GLOBAL.Capitalice(cli.apellido);
-                cli.documentos_de_identidad.map((docu) => {
-                  if (docu.principal) {
-                    cli.documento_identidad = docu.documento;
-                  }
-                });
-                return cli;
-              })),
-          ),
-        )
-        .toPromise();
+      console.log('BUSCANDO    ->"', buscando, '"');
+
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = buscando === '' || buscando === null || buscando === undefined ? ' ' : buscando;
+
+      const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+      this.listaClientes = undefined;
+
+      res.data.map((cli) => {
+        cli.nombre = GLOBAL.Capitalice(cli.nombre);
+        cli.apellido = GLOBAL.Capitalice(cli.apellido);
+        cli.documentos_de_identidad.map((docu) => {
+          if (docu.principal) {
+            cli.documento_identidad = docu.documento;
+          }
+        });
+        return cli;
+      });
+      this.listaClientes = res.data;
+
+      this.tServ.Func_total_paginas(res.total_registros);
     } catch (error) {
       console.error(error);
+      this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
     }
   }
 
@@ -350,7 +361,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     }
   }
 
-  abrirModalFiltro(nombre) {
+  async abrirModalFiltro(nombre) {
+    await this.pedirClientes(this.obj_paginate_, nombre);
     this.mServ.modalTipo('buscarCliente');
     this.tipoModal = 'buscarCliente';
 
@@ -359,7 +371,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       filtrarCliente: nombre,
     };
 
-    this.mServ.ModalSeleccion(this.listaClientes);
+    this.mServ.ModalSeleccion(obj);
 
     this.mServ.mostrarModal(true);
     this.mServ.ModalTablaHeight(true);

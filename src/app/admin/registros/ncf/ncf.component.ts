@@ -11,7 +11,7 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as moment from 'moment';
 import * as dateFormat from 'dateFormat';
 import { ModalService } from '../../components/modal/modal.service';
-import { obj_paginate } from '../../components/tablas/tablas.service';
+import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-ncf',
@@ -87,7 +87,15 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
   is_editando = false;
   ncfSelected;
   obj_paginate_ = obj_paginate;
-  constructor(private dbServ: DBservice, private cdRef: ChangeDetectorRef, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {
+  constructor(
+    private dbServ: DBservice,
+    private cdRef: ChangeDetectorRef,
+    private fb: FormBuilder,
+    private actRou: ActivatedRoute,
+    private router: Router,
+    private mServ: ModalService,
+    private tServ: TablasService,
+  ) {
     this.dpConfig = Object.assign(
       {},
       {
@@ -185,6 +193,7 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
       });
 
       this.listaNCF = res.data;
+      this.tServ.Func_total_paginas(res.total_registros);
     } catch (error) {
       console.error(error);
 

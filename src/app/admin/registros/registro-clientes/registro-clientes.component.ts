@@ -10,7 +10,7 @@ import { ValidateRayaAbajo } from '../../../directives/validaciones';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
-import { obj_paginate } from '../../components/tablas/tablas.service';
+import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -59,7 +59,15 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
   altoDiv;
   obj_paginate_ = obj_paginate;
 
-  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService) {
+  constructor(
+    private artServ: ObservableServcie,
+    private dbServ: DBservice,
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private mServ: ModalService,
+    private tServ: TablasService,
+  ) {
     // setInterval(() => {
     //   console.log(this.cardTabla.nativeElement.offsetHeight);
     // }, 1000);
@@ -120,6 +128,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
       });
 
       this.listaClientes = res.data;
+      this.tServ.Func_total_paginas(res.total_registros);
       this.quitarContadoDeLista();
     } catch (error) {
       this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
