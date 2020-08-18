@@ -34,8 +34,10 @@
             </div>
             <div class="col-12">
               <div>
-                <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" (click)="changeIdent(true)" checked="true" />Cedula</label>
-                <label> <input type="radio" value="1" name="identificacion" class="mr-1" (click)="changeIdent(false)" />Rnc <span style="color: red;">*</span> </label>
+                <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
+                <label>
+                  <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="mr-1" (click)="changeIdent(false)" />Rnc <span style="color: red;">*</span>
+                </label>
               </div>
 
               <div *ngIf="documento_identidad" class="from-group">

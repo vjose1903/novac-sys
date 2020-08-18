@@ -99,10 +99,19 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
     });
 
     this.necesarioStart();
+    setTimeout(() => {
+      this.marcarCheck('cedula');
+    }, 200);
   }
+
   necesarioStart() {
     this.getClientes(this.obj_paginate_);
     this.getVendedores();
+  }
+
+  marcarCheck(arg) {
+    const radio = document.getElementById('identificacion-' + arg) as HTMLElement;
+    (radio as any).checked = true;
   }
 
   getVendedores() {
@@ -232,12 +241,15 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
 
     item.ARG.documentos_de_identidad.forEach((doc) => {
       if (doc.descripcion === 'rnc') {
+        this.documento_identidad = false;
         this.form.controls.rnc.setValue(doc.documento);
       } else {
+        this.documento_identidad = true;
         this.form.controls.cedula.setValue(doc.documento);
       }
       if (doc.principal) {
         this.doc_principal = doc.descripcion;
+        this.marcarCheck(doc.descripcion);
       }
     });
 
@@ -390,6 +402,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
     this.boton = 'Guardar';
     this.titulo = 'Registro de clientes';
     this.doc_principal = 'cedula';
+    this.marcarCheck('cedula');
   }
   changeIdent(arg) {
     this.documento_identidad = arg;
