@@ -127,7 +127,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.metodo = res.metodo;
         this.identificadorFact = res.identificadorFact;
 
-        console.log('this.paraFiltroArticulos, ', this.paraFiltroArticulos);
         if (this.paraFiltroArticulos) {
           this.renovarDataFiltros(obj_paginate, this.paraFiltroArticulos);
         } else if (this.paraFiltroClientes) {
@@ -242,6 +241,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     const page = e.page;
     const per_page = e.per_page;
     let palabra_a_buscar = ' ';
+
     if (buscando) {
       palabra_a_buscar = buscando === '' || buscando === null || buscando === undefined ? ' ' : buscando;
     } else {
@@ -251,10 +251,12 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     if (this.paraFiltroArticulos) {
       // --------------------------------- ARTICULOS ---------------------------------
       try {
-        this.seleccionModal = undefined;
         const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
         this.seleccionModal = res.data;
+        if (this.seleccionModal.length === 0) {
+          this.noArticulo();
+        }
         console.log('this.seleccionModal ', this.seleccionModal);
 
         this.tServ.Func_total_paginas(res.total_registros);
@@ -279,7 +281,12 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           });
           return cli;
         });
+
         this.seleccionModal = res.data;
+
+        if (this.seleccionModal.length === 0) {
+          this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO');
+        }
 
         this.tServ.Func_total_paginas(res.total_registros);
       } catch (error) {

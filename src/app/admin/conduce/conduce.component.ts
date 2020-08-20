@@ -293,6 +293,27 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     const sigInput = 'can-' + arg.index;
     this.enfocarInput(sigInput);
   }
+  // =============================================
+  //  MODAL PARA FILTRAR CLIENTES
+  // =============================================
+
+  async abrirModalFiltro(nombre) {
+    // await this.pedirClientes(this.obj_paginate_, nombre);
+    this.mServ.modalTipo('buscarCliente');
+    this.tipoModal = 'buscarCliente';
+
+    const obj = {
+      data: [],
+      filtrarCliente: nombre,
+    };
+
+    this.mServ.ModalSeleccion(obj);
+
+    this.mServ.mostrarModal(true);
+    setTimeout(() => {
+      this.mServ.ModalTablaHeight(true);
+    }, 250);
+  }
 
   // =============================================
   //  MODAL PARA FILTRAR ARTICULOS
@@ -560,22 +581,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       console.error(error);
       this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
     }
-  }
-
-  async abrirModalFiltro(nombre) {
-    await this.pedirClientes(this.obj_paginate_, nombre);
-    this.mServ.modalTipo('buscarCliente');
-    this.tipoModal = 'buscarCliente';
-
-    const obj = {
-      data: this.listaClientes,
-      filtrarCliente: nombre,
-    };
-
-    this.mServ.ModalSeleccion(obj);
-
-    this.mServ.mostrarModal(true);
-    this.mServ.ModalTablaHeight(true);
   }
 
   async SeleccionarFactruaAdelantada(factura) {

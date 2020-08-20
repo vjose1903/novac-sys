@@ -1,19 +1,5 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  AfterViewInit,
-  HostListener,
-  ChangeDetectorRef,
-  Input,
-  Output,
-  EventEmitter,
-  ChangeDetectionStrategy,
-  OnDestroy,
-  OnChanges,
-  ElementRef,
-} from '@angular/core';
-import { MdbTablePaginationComponent, MdbTableDirective } from 'angular-bootstrap-md';
+import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter, OnDestroy, OnChanges, ElementRef } from '@angular/core';
+import { MdbTableDirective } from 'angular-bootstrap-md';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -28,9 +14,6 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
   styleUrls: ['./tablas.component.scss'],
 })
 export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  @ViewChild(MdbTablePaginationComponent, { static: true })
-  mdbTablePagination: MdbTablePaginationComponent;
-
   @ViewChild(MdbTableDirective, { static: false }) mdbTable: MdbTableDirective;
   cantiTootip: string;
   ready = false;
@@ -169,10 +152,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   async ngAfterViewInit() {
-    // this.calcularAlto();
-    // this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
-    // this.mdbTablePagination.calculateFirstItemIndex();
-    // this.mdbTablePagination.calculateLastItemIndex();
     this.cdRef.detectChanges();
   }
 
@@ -185,18 +164,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     if (this.paraFiltroArticulos) {
       this.searchText = await this.paraFiltroArticulos;
-      await this.searchItems();
-      if (this.data.length === 0) {
-        this.noArticulo.emit();
-      }
     }
 
     if (this.paraFiltroClientes) {
       this.searchText = await this.paraFiltroClientes;
-      await this.searchItems();
-      if (this.data.length === 0) {
-        this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO');
-      }
     }
     // ================================================
 
@@ -524,11 +495,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
     setTimeout(() => {
       this.IDROW = temp;
-    }, 250);
-  }
-
-  changeVisibleItems(items) {
-    this.mdbTablePagination.setMaxVisibleItemsNumberTo(items);
+    }, 300);
   }
 
   clickROW(arg) {
