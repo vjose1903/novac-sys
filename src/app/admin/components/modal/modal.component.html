@@ -302,7 +302,7 @@
     <!-- ================================================================================================================================ -->
 
     <p-dialog
-      *ngIf="tipoModal === 'buscar' && seleccionModal && infoArticulos"
+      *ngIf="tipoModal === 'buscarArticulo' && seleccionModal && infoArticulos"
       header="Buscar articulo"
       [(visible)]="showModal"
       [focusTrap]="true"
@@ -337,7 +337,7 @@
     <!-- ================================================================================================================================ -->
 
     <p-dialog
-      *ngIf="tipoModal === 'buscarCliente' && seleccionModal && infoCliente"
+      *ngIf="(tipoModal === 'buscarCliente' || tipoModal === 'buscarSuplidor') && seleccionModal && infoCliente"
       [header]="tituloModal"
       [(visible)]="showModal"
       [focusTrap]="true"

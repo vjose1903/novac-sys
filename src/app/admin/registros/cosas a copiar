@@ -22,9 +22,6 @@ this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
 
 
 
-
-
-
 this.subTablaModalChange = this.mServ.TABLA_MODAL_CHANGE.subscribe((res) => {
       if (res) {
         this.pedirClientes(res, res.searchText);

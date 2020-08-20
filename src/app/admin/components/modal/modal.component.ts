@@ -2,7 +2,7 @@ import { Component, OnInit, Input, OnChanges, OnDestroy, HostListener, ViewChild
 import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { TablasService } from '../tablas/tablas.service';
+import { TablasService, obj_paginate } from '../tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 
 @Component({
@@ -29,7 +29,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     if (this.showModal) {
       this.tServ.Func_total_paginas(0);
       this.mServ.func_tabla_modal_change(undefined);
-      if (this.tipoModal === 'buscar') {
+      if (this.tipoModal === 'buscarArticulo') {
         this.mServ.pressEsc(this.seleccionModal.index);
         setTimeout(() => {
           this.mServ.pressEsc(undefined);
@@ -116,22 +116,25 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
     this.subSelec = this.mServ.SELECCIONMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
-        console.log('-*-*-*-*-*-*-*-*-');
-        console.log(res);
-        console.log('-*-*-*-*-*-*-*-*-');
-
-        if (res.filtrar || res.filtrarCliente) {
+        if (res.filtrarArticulo || res.filtrarCliente) {
           this.seleccionModal = res.data;
         } else {
           this.seleccionModal = res;
         }
 
-        this.paraFiltroArticulos = res.filtrar;
+        this.paraFiltroArticulos = res.filtrarArticulo;
         this.paraFiltroClientes = res.filtrarCliente;
         this.metodo = res.metodo;
         this.identificadorFact = res.identificadorFact;
 
-        if (this.tipoModal === 'buscarCliente' && res.data[0].limite_credito !== undefined) {
+        console.log('this.paraFiltroArticulos, ', this.paraFiltroArticulos);
+        if (this.paraFiltroArticulos) {
+          this.renovarDataFiltros(obj_paginate, this.paraFiltroArticulos);
+        } else if (this.paraFiltroClientes) {
+          this.renovarDataFiltros(obj_paginate, this.paraFiltroClientes);
+        }
+
+        if (this.tipoModal === 'buscarCliente') {
           this.tituloModal = 'Buscar cliente';
         } else {
           this.tituloModal = 'Buscar suplidor';
@@ -211,7 +214,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   devolverCLick(arg) {
     const obj = JSON.parse(JSON.stringify(arg));
-    if (this.tipoModal === 'buscar') {
+    if (this.tipoModal === 'buscarArticulo') {
       obj.index = this.seleccionModal.index;
     }
 
@@ -226,7 +229,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   prueba() {
-    if (this.tipoModal === 'buscar') {
+    if (this.tipoModal === 'buscarArticulo') {
       this.element = document.getElementById('tablaSearch');
       setTimeout(() => {
         this.element.focus();
@@ -235,13 +238,32 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     }
   }
 
-  async renovarDataFiltros(e) {
+  async renovarDataFiltros(e, buscando?) {
     const page = e.page;
     const per_page = e.per_page;
-    const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+    let palabra_a_buscar = ' ';
+    if (buscando) {
+      palabra_a_buscar = buscando === '' || buscando === null || buscando === undefined ? ' ' : buscando;
+    } else {
+      palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+    }
 
     if (this.paraFiltroArticulos) {
+      // --------------------------------- ARTICULOS ---------------------------------
+      try {
+        this.seleccionModal = undefined;
+        const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+        this.seleccionModal = res.data;
+        console.log('this.seleccionModal ', this.seleccionModal);
+
+        this.tServ.Func_total_paginas(res.total_registros);
+      } catch (error) {
+        console.error(error);
+        this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
+      }
     } else if (this.paraFiltroClientes) {
+      // --------------------------------- CLIENTES ---------------------------------
       try {
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 

@@ -219,7 +219,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
           this.enfocarInput('cod-' + i);
           this.selectContenido('cod-' + i);
         } else {
-          const obj = { filtrar: codigo, index: i, metodo: 'venta' };
+          const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
           this.abrirModal(obj);
         }
       }
@@ -300,11 +300,10 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   abrirModal(arg) {
     const obj = arg;
 
-    obj.data = this.listaArticulos;
-
-    this.mServ.modalTipo('buscar');
+    this.mServ.modalTipo('buscarArticulo');
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
+    this.mServ.ModalTablaHeight(true);
   }
 
   // =============================================
@@ -525,7 +524,10 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
           ),
         )
         .toPromise();
-      this.calcularHeigth();
+
+      if (this.facturas_adelantadas.length > 0) {
+        this.calcularHeigth();
+      }
     } catch (error) {}
   }
 
@@ -573,6 +575,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.mServ.ModalSeleccion(obj);
 
     this.mServ.mostrarModal(true);
+    this.mServ.ModalTablaHeight(true);
   }
 
   async SeleccionarFactruaAdelantada(factura) {

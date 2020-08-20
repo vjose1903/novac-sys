@@ -254,6 +254,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     this.alto = undefined;
     this.restoAHeigthDiv = undefined;
+    this.searchText = '';
   }
 
   resetInput(referencia, destino, i, formatear, especifico?) {

@@ -497,11 +497,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   // =============================================
 
   abrirModalFiltro() {
-    this.mServ.modalTipo('buscarCliente');
     if (this.metodo === 'venta') {
+      this.mServ.modalTipo('buscarCliente');
       this.quitarContadoDeLista();
       this.mServ.ModalSeleccion(this.listaClientes);
     } else {
+      this.mServ.modalTipo('buscarSuplidor');
       this.mServ.ModalSeleccion(this.listaSuplidores);
     }
     this.mServ.mostrarModal(true);
