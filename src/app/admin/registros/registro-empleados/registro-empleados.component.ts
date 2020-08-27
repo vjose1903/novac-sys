@@ -215,9 +215,11 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
 
             const docu = res.data.documentos_de_identidad.filter((doc) => doc.principal === true);
             res.data.documento_identidad = docu[0].documento;
+            res.data.role_ = res.data.sexo === 'm' ? this.rolesM[res.data.role] : this.rolesF[res.data.role];
 
             this.listaEmpleados[this.indexSeleccionado] = res.data;
             this.borrar();
+            console.log(res);
           },
           (err) => {
             this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
@@ -226,11 +228,11 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
       } else {
         this.dbServ.createEmpleados(objSend).subscribe(
           (res) => {
-            console.log(res);
-
             const docu = res.data.documentos_de_identidad.filter((doc) => doc.principal === true);
             res.data.documento_identidad = docu[0].documento;
+            res.data.role_ = res.data.sexo === 'm' ? this.rolesM[res.data.role] : this.rolesF[res.data.role];
 
+            console.log(res);
             this.listaEmpleados = [...this.listaEmpleados, res.data];
             this.dbServ.toastSuccess('Usuario Creado', 'Correcto');
             this.form.reset();
@@ -255,12 +257,14 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
     this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
+
   cambiarPassword(arg?) {
     this.mServ.modalTipo('password');
     this.tipoModal = 'password';
     this.mServ.ModalSeleccion(this.usuarioSelected);
     this.mServ.mostrarModal(true);
   }
+
   decisionModal(arg) {
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));

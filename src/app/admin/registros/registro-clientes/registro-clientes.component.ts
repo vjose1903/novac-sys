@@ -354,7 +354,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
                 });
                 this.listaClientes = [...this.listaClientes, obj];
 
-                this.doc_principal = null;
+                this.doc_principal = 'cedula';
                 this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
                 this.form.reset();
                 this.enfocarInput('campoNombre');
@@ -376,7 +376,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
                 });
                 this.listaClientes[this.indexSeleccionado] = obj;
 
-                this.doc_principal = null;
+                this.doc_principal = 'cedula';
 
                 this.borrar();
               },

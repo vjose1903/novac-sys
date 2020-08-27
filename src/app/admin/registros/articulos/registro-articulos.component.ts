@@ -55,6 +55,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   clickBtnRe = false;
   subDeci: Subscription;
   obj_paginate_ = obj_paginate;
+  vendido_en: any;
 
   constructor(
     private artServ: ObservableServcie,
@@ -138,19 +139,53 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
     }
   }
   createForm() {
+    // this.form = this.fb.group({
+    //   nombre: [null],
+    //   tipo_articulo_id: [null],
+    //   suplidor_id: [null],
+    //   medida: [null],
+    //   costo_principal: [null],
+    //   precio_principal: [null],
+    //   is_detallable: [false],
+    //   fecha_ingreso: [new Date()],
+    //   aviso_existencia: [null],
+    //   calcular_itbis: [false],
+    //   existencia: [0],
+    //   medida_alerta: [null],
+    //   cantidad_contenido_padre: [null],
+    //   medida_contenido_padre: [null],
+    //   precio_padre: [null],
+    //   precio_libra: [null],
+    //   precio_unidad: [null],
+    //   costo_padre: [null],
+    //   costo_hijo: [null],
+    //   id: [null],
+    //   id_contenido_padre: [null],
+    //   id_contenido_hijo: [null],
+    //   vendido_en: [null],
+
+    //   referencia_padre: [null],
+    //   referencia_hijo: [null],
+
+    //   medida_contenido_hijo: [null],
+    //   cantidad_contenido_hijo: [null],
+    //   precio_hijo: [null],
+    //   rowFormula: this.fb.array([]),
+    //   otros_costos: [null],
+    // });
     this.form = this.fb.group({
-      nombre: [null],
-      tipo_articulo_id: [null],
-      suplidor_id: [null],
+      nombre: ['Maiz'],
+      tipo_articulo_id: [2],
+      suplidor_id: [1],
       medida: [null],
       costo_principal: [null],
       precio_principal: [null],
       is_detallable: [false],
       fecha_ingreso: [new Date()],
-      aviso_existencia: [null],
+      aviso_existencia: [2],
       calcular_itbis: [false],
       existencia: [0],
-      medida_alerta: [null],
+      medida_alerta: ['Quintal'],
       cantidad_contenido_padre: [null],
       medida_contenido_padre: [null],
       precio_padre: [null],
@@ -161,6 +196,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       id: [null],
       id_contenido_padre: [null],
       id_contenido_hijo: [null],
+      vendido_en: [null],
 
       referencia_padre: [null],
       referencia_hijo: [null],
@@ -211,7 +247,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       this.resetArray();
     }
     this.is_combo = false;
-    this.form.controls['rowFormula'].setValue([]);
+    this.form.controls['rowFormula'].reset();
 
     if (this.Recalcular === true) {
       this.Recalcular = false;
@@ -275,9 +311,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
     const control = this.form.controls['rowFormula'] as FormArray;
     control.removeAt(i);
   }
+
   filtroFormula(item) {
     return item.tipo_articulo_id === 2;
   }
+
   getCosto(id, i) {
     const control = this.form.controls['rowFormula'] as FormArray;
 
@@ -350,6 +388,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   calculatePrice() {
     const costoTemp = this.form.value.costo_principal;
     const costo = GLOBAL.desformatear(costoTemp);
+
     if (costo > 0 || costo != null || costo) {
       const precio = costo / 0.9;
       const precioLibra = precio / 100;
@@ -375,6 +414,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       if (medida === 'Quintal') {
         this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioLibra)));
         this.form.controls.costo_padre.setValue(GLOBAL.redondearAdos(costoLibra));
+        this.form.controls.precio_padre.setValue(GLOBAL.redondearAdos(precioLibra));
+        this.form.controls.cantidad_contenido_padre.setValue(100);
       } else {
         this.calculatePricePadre();
         this.calculatePriceHijo();
@@ -418,8 +459,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
     const FORM = this.form.controls;
 
     if (this.ARRAY_FORMULA.length === 0) {
-      // res = false;
-
       if (
         FORM.nombre.value !== null &&
         FORM.tipo_articulo_id.value !== null &&
@@ -433,13 +472,23 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
         if (this.COMPRADOEN === 'Unidad' || this.COMPRADOEN === 'Libra') {
           res = false;
         }
+
         if (this.COMPRADOEN === 'Quintal') {
-          if (FORM.cantidad_contenido_padre !== null && (FORM.precio_padre !== null) !== null && FORM.costo_padre !== null) {
+          if (FORM.cantidad_contenido_padre.value !== null && (FORM.precio_padre.value !== null) !== null && FORM.costo_padre.value !== null) {
             res = false;
           } else {
             res = true;
           }
         }
+
+        if (FORM.tipo_articulo_id.value === '2') {
+          if (FORM.vendido_en.value) {
+            res = false;
+          } else {
+            res = true;
+          }
+        }
+
         if (this.COMPRADOEN === 'Caja') {
           if (this.MEDIDACAJA === 'Unidad') {
             if (FORM.medida_contenido_padre.value !== null && FORM.cantidad_contenido_padre !== null && (FORM.precio_padre !== null) !== null && FORM.costo_padre !== null) {
@@ -709,7 +758,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       cantidad: x.medida === 'Caja' ? x.cantidad_contenido_padre : 100,
       medida: x.medida_contenido_padre,
       condicion: 'padre',
-      calcular_itbis: x.calcular_itbis,
     };
 
     const hijo = {
@@ -720,7 +768,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       cantidad: x.cantidad_contenido_hijo,
       medida: x.medida_contenido_hijo,
       condicion: 'hijo',
-      calcular_itbis: x.calcular_itbis,
     };
 
     let contenido = [];
@@ -776,6 +823,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       calcular_itbis: x.calcular_itbis !== null ? x.calcular_itbis : false,
       estado: true,
       is_combo: this.is_combo,
+      vendido_en: x.vendido_en,
     };
     if (obj.is_combo) {
       obj['otros_costos'] = x.otros_costos;

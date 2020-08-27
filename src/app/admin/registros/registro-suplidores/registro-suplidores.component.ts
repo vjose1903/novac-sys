@@ -52,7 +52,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy, AfterView
   element: HTMLElement;
   tipoModal: string;
   documento_identidad = false;
-  doc_principal: any;
+  doc_principal = 'rnc';
   indexSelected: any;
   seleccionModal: any;
   indexBorrar: any;
@@ -65,6 +65,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy, AfterView
     this.titulo = 'Registro de suplidores';
     this.boton = 'Registrar';
     this.metodo = this.route.snapshot.params['metodo'];
+    this.marcarCheck('rnc');
     // this.titulo = 'Actualizar empleado';
     // this.boton = 'Actualizar';
 
@@ -138,20 +139,30 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy, AfterView
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
   }
+
+  marcarCheck(arg) {
+    const radio = document.getElementById('identificacion-' + arg) as HTMLElement;
+    (radio as any).checked = true;
+  }
+
   borrar() {
     this.form.reset();
     this.titulo = 'Registro de suplidores';
     this.boton = 'Registrar';
     this.enfocarInput('campoNombre');
     this.documento_identidad = false;
-    this.doc_principal = '';
+    this.doc_principal = 'rnc';
+    this.marcarCheck('rnc');
   }
+
   changeIdent(arg) {
     this.documento_identidad = arg;
   }
+
   setDocumentoPrincipal(doc) {
     this.doc_principal = doc;
   }
+
   editarItem(item) {
     this.indexSelected = item.INDEX;
     this.titulo = 'Editar suplidor: ' + item.ARG.nombre;

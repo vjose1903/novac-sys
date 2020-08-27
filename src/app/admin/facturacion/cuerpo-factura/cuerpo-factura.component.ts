@@ -477,6 +477,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     let unidad_ = splitUnidad[0];
     unidad = splitUnidad[0];
     if (this.metodo === 'venta') {
+      // if (unidad_ === 'Galón' || unidad_ === 'Saco' || unidad_ === 'Libra') {
       if (unidad_ === 'Saco' || unidad_ === 'Libra') {
         unidad_ = 'Libra';
       } else {
@@ -505,6 +506,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
           }
         }
+        // if (unity === 'Saco'||unity === 'Galón') {
         if (unity === 'Saco') {
           unity = 'Libra';
         }
