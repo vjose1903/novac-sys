@@ -10,6 +10,7 @@ import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
 import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
+import { GLOBAL } from '../../../core/services/GLOBAL';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -108,6 +109,11 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
 
   async necesarioStart() {
     await this.getEmpleados(this.obj_paginate_);
+  }
+
+  capitalice(control, arg) {
+    const campo = this.form.get(control);
+    campo.setValue(GLOBAL.Capitalice(arg));
   }
 
   async getEmpleados(e) {

@@ -352,11 +352,11 @@
     >
       <app-tablas
         *ngIf="seleccionModal"
-        [paraFiltroClientes]="paraFiltroClientes"
+        [paraFiltroClientes]="tipoModal === 'buscarCliente' ? paraFiltroClientes : paraFiltroSuplidor"
         [focusRow]="true"
         [alto]="altoDiv"
         (clickRow)="devolverCLick($event)"
-        [info]="infoCliente"
+        [info]="tipoModal === 'buscarCliente' ? infoCliente : infoSuplidor"
         [data]="seleccionModal"
         [search]="true"
         [ROW]="'cliente'"

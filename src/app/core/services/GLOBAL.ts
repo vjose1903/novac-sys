@@ -15,11 +15,20 @@ export class GLOBAL {
       return x1 + x2;
     }
   }
+  // =========================================================================================================
+  static numFormatTwoDecimals(num) {
+    return this.formatearNumero(this.redondearAdos(num));
+  }
+
+  // =========================================================================================================
   static duplicarJson(json) {
     return JSON.parse(JSON.stringify(json));
   }
-  static Capitalice(json) {
-    return _.capitalize(json);
+  // =========================================================================================================
+
+  static Capitalice(str) {
+    const ultimosCaractes = str.length + 1;
+    return _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes);
   }
 
   // =========================================================================================================
@@ -35,7 +44,7 @@ export class GLOBAL {
   // =========================================================================================================
 
   // * Método o función para validar una cédula dominicana*
-  static ValidaCedula2(cedula) {
+  static ValidaCedula(cedula) {
     // Declaración de variables a nivel de método o función.
     let verificador = 0;
     let digito = 0;
@@ -57,7 +66,7 @@ export class GLOBAL {
       /*Obtenemos el verificador restandole la decena mayor a la sumatoria*/
       verificador = this.roundDecenaMayor(suma) - suma;
 
-      // si el verificador da igual a la resta esta correctaß
+      // si el verificador da igual a la resta esta correcta
 
       if ((verificador === 10 && digitoVerificador === '0') || verificador.toString() === digitoVerificador.toString()) {
         console.log('cedula ', cedula.substring(0, 3) + '-' + cedula.substring(3, 10) + '-' + cedula.substring(10, 11));

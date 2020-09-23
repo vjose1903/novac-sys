@@ -85,7 +85,7 @@
       <!-- ======================================================================================================================================================================== -->
       <div class="col-md-5 divRigth">
         <form [formGroup]="form">
-          <div class="d-flex" style="height: 1.7rem;">
+          <div class="d-flex" style="height: 1.7rem">
             <h5>
               <strong>{{ labelSearch }}:</strong>
             </h5>
@@ -105,7 +105,7 @@
                 [readOnly]="activarNombreDireccion()"
               />
               <input id="id" type="hidden" formControlName="id" />
-              <div class="alerta text-danger ml-1" style="font-size: 12px;" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
                 Este Campo es obligatorio
               </div>
             </div>
@@ -116,7 +116,7 @@
                 <input type="text" class="form-control inputE" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" readonly="true" />
                 <div
                   class="alerta text-danger ml-1"
-                  style="font-size: 12px;"
+                  style="font-size: 12px"
                   *ngIf="!form.controls['telefono'].valid && (form.controls['telefono'].dirty || form.controls['telefono'].touched)"
                 >
                   Introduzca el numero de telefono
@@ -139,7 +139,7 @@
                 />
                 <div
                   class="alerta text-danger ml-1"
-                  style="font-size: 12px;"
+                  style="font-size: 12px"
                   *ngIf="!form.controls['direccion'].valid && (form.controls['direccion'].dirty || form.controls['direccion'].touched)"
                 >
                   Este Campo es obligatorio
@@ -170,7 +170,6 @@
     <app-cuerpo-factura
       [propietario]="propietario_factura"
       [metodo]="metodo"
-      [listaArticulos]="listaArticulos"
       (getCuerpoFactura)="getCuerpoFactura($event)"
       (sendDescuento)="getDescuento($event)"
       (sendCalculos)="getCalculos($event)"

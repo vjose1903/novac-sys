@@ -14,6 +14,7 @@ export class ModalService {
   private indexToFocus = new BehaviorSubject<any>(undefined);
   private press_Esc = new BehaviorSubject<any>(undefined);
   private tabla_modal_change = new BehaviorSubject<any>(undefined);
+  private articuloFiltradoPorCodigo = new BehaviorSubject<any>(undefined);
 
   TIPOMODAL = this.tipoModal.asObservable();
   SHOWMODAL = this.showModal.asObservable();
@@ -24,8 +25,13 @@ export class ModalService {
   INDEXTOFOCUS = this.indexToFocus.asObservable();
   PRESSESC = this.press_Esc.asObservable();
   TABLA_MODAL_CHANGE = this.tabla_modal_change.asObservable();
+  ARTICULOFILTRADOPORCODIGO = this.articuloFiltradoPorCodigo.asObservable();
 
   constructor() {}
+
+  getArticuloFiltradoPorCodigo(nextValue) {
+    this.articuloFiltradoPorCodigo.next(nextValue);
+  }
 
   func_tabla_modal_change(nextValue) {
     this.tabla_modal_change.next(nextValue);

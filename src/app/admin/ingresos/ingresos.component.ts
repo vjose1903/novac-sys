@@ -131,9 +131,9 @@ export class IngresosComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'buscarCliente') {
-        this.clienteAdepositar = res;
-        (document.getElementById('clienteI') as any).value = res.nombre;
-        this.pedirFacturasPorCliente(res.id);
+        this.clienteAdepositar = res.data;
+        (document.getElementById('clienteI') as any).value = res.data.nombre;
+        this.pedirFacturasPorCliente(res.data.id);
         this.mServ.ModalObj(undefined);
       } else if (res && res.tipoModal === 'cambio') {
         this.Devuelta = res.devuelta;

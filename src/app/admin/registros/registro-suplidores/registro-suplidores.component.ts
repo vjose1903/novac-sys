@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
 import { obj_paginate } from '../../components/tablas/tablas.service';
+import { GLOBAL } from '../../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -90,6 +91,11 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy, AfterView
 
   async nesesarioStart() {
     await this.getSuplidores(this.obj_paginate_);
+  }
+
+  capitalice(control, arg) {
+    const campo = this.form.get(control);
+    campo.setValue(GLOBAL.Capitalice(arg));
   }
 
   async getSuplidores(e) {

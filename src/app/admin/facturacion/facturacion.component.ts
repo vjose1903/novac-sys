@@ -57,7 +57,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     Paquete: 'Paquetes',
     Unidad: 'Unidades',
   };
-  listaArticulos: any;
+  // listaArticulos: any;
   usuario: any;
 
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
@@ -95,7 +95,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
-    this.necesarioStart();
 
     this.metodo = this.route.snapshot.params['tipo'];
 
@@ -152,8 +151,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     // this.fecha = moment().format('DD/MM/YYYY');
 
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res && res.tipoModal === 'buscarCliente') {
-        this.propietario_factura = res;
+      if (res && res.tipo_modal === 'buscarCliente') {
+        this.propietario_factura = res.data;
         this.form.patchValue(this.propietario_factura);
         this.enfocarInput('cod-0');
         this.mServ.ModalObj(undefined);
@@ -165,13 +164,19 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         } else if (balance > maxCred) {
           this.dbServ.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
         }
-      } else if (res && res.tipoModal === 'cambio') {
-        this.Devuelta = res.devuelta;
-        this.forma_pago = res.forma_pago;
+      } else if (res && res.tipo_modal === 'buscarSuplidor') {
+        this.propietario_factura = res.data;
+        this.form.patchValue(this.propietario_factura);
+        this.enfocarInput('cod-0');
+        this.mServ.ModalObj(undefined);
+      } else if (res && res.tipo_modal === 'cambio') {
+        this.Devuelta = res.data.devuelta;
+        this.forma_pago = res.data.forma_pago;
         if (this.metodo === 'compra') {
-          if (res.decision_cambio) {
+          if (res.data.decision_cambio) {
             this.cambiarCostos();
           }
+
           this.CuerpoFactura = this.newCuerpo;
           this.IMPRIMIR();
           this.mServ.ModalObj(undefined);
@@ -193,47 +198,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     });
 
-    if (this.metodo === 'compra') {
-      this.dbServ
-        .getSuplidores()
-        .pipe(
-          map(
-            (val) =>
-              (val = val.map((suplidor) => {
-                suplidor.documentos_de_identidad.map((docu) => {
-                  if (docu.principal) {
-                    suplidor.documento_identidad = docu.documento;
-                  }
-                });
-                suplidor.codigo = _.padStart(suplidor.id, 5, '0');
-                return suplidor;
-              })),
-          ),
-        )
-        .subscribe((res) => {
-          this.listaSuplidores = JSON.parse(JSON.stringify(res));
-        });
-    } else {
-      this.dbServ
-        .getClientes()
-        .pipe(
-          map(
-            (cliente) =>
-              (cliente = cliente.map((cli) => {
-                cli.documentos_de_identidad.map((docu) => {
-                  if (docu.principal) {
-                    cli.documento_identidad = docu.documento;
-                  }
-                });
-                return cli;
-              })),
-          ),
-        )
-        .subscribe((res) => {
-          this.listaClientes = res;
-        });
-    }
-
     setTimeout(() => {
       this.enfocarInput('tipoFact');
     }, 5);
@@ -242,6 +206,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.lista_tipos_facturas = res;
     });
   }
+
   ngOnDestroy(): void {
     this.mServ.ModalObj(null);
     this.mServ.modalTipo(null);
@@ -249,7 +214,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.ModalTablaHeight(false);
     this.mServ.mostrarModal(false);
     this.CancelarFactura();
-    this.GetArticulos();
     this.subObj.unsubscribe();
     this.subDeci.unsubscribe();
   }
@@ -263,21 +227,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  async necesarioStart() {
-    await this.GetArticulos();
-  }
-
-  GetArticulos() {
-    this.dbServ.getArticulos().subscribe((res) => {
-      res.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
-      });
-
-      if (res !== undefined && res !== null) {
-        this.listaArticulos = res;
-      }
-    });
-  }
   getCalculos(arg) {
     this.TOTAL = parseFloat(arg.Total);
     this.calcularBruto();
@@ -328,45 +277,48 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   async calcularPorcientoComprobante() {
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
-    try {
-      const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
-      this.paqueteComprobante = paquete.body;
+    if (this.tipoFactura !== '00' && this.tipoFactura !== '0' && this.tipoFactura !== '02' && this.tipoFactura !== '2') {
+      try {
+        const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
 
-      if (this.paqueteComprobante.fecha_valida !== null) {
-        const desde = this.paqueteComprobante.desde;
-        const hasta = this.paqueteComprobante.hasta;
-        const secuencia = this.paqueteComprobante.secuencia;
+        this.paqueteComprobante = paquete.body;
 
-        const cant = hasta - desde;
-        const cantidad = cant + 1;
-        let porciento = 0;
+        if (this.paqueteComprobante.fecha_valida !== null) {
+          const desde = this.paqueteComprobante.desde;
+          const hasta = this.paqueteComprobante.hasta;
+          const secuencia = this.paqueteComprobante.secuencia;
 
-        if (cantidad > 0 && cantidad <= 40) {
-          porciento = cantidad * 0.5;
-        } else if (cantidad > 40 && cantidad <= 100) {
-          porciento = cantidad * 0.25;
-        } else if (cantidad > 100 && cantidad <= cantidad * 500) {
-          porciento = cantidad * 0.1;
-        } else if (cantidad > 500) {
-          porciento = cantidad * 0.04;
+          const cant = hasta - desde;
+          const cantidad = cant + 1;
+          let porciento = 0;
+
+          if (cantidad > 0 && cantidad <= 40) {
+            porciento = cantidad * 0.5;
+          } else if (cantidad > 40 && cantidad <= 100) {
+            porciento = cantidad * 0.25;
+          } else if (cantidad > 100 && cantidad <= cantidad * 500) {
+            porciento = cantidad * 0.1;
+          } else if (cantidad > 500) {
+            porciento = cantidad * 0.04;
+          }
+          const limite = hasta - porciento;
+          const restante = hasta - secuencia + 1;
+
+          const msg =
+            this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
+              ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
+              : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
+
+          if (secuencia >= limite) {
+            this.dbServ.toastWarning(msg, 'AVISO');
+          }
         }
-        const limite = hasta - porciento;
-        const restante = hasta - secuencia + 1;
-
-        const msg =
-          this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
-            ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
-            : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
-
-        if (secuencia >= limite) {
-          this.dbServ.toastWarning(msg, 'AVISO');
-        }
+        return 'si';
+      } catch (error) {
+        this.dbServ.toastError(error.error.msg, 'ERROR');
+        this.enfocarInput('tipoFact');
+        return 'no';
       }
-      return 'si';
-    } catch (error) {
-      this.dbServ.toastError(error.error.msg, 'ERROR');
-      this.desEnfocarInput('tipoFact');
-      return 'no';
     }
   }
 
@@ -381,7 +333,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.tipoFactura = valor;
         this.NCFcompra = 'b' + valor;
         const continuar = this.calcularPorcientoComprobante();
-        console.log('continuar', JSON.stringify(continuar));
 
         this.enfocarInput(campo);
       } else {
@@ -499,24 +450,27 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   abrirModalFiltro() {
     if (this.metodo === 'venta') {
       this.mServ.modalTipo('buscarCliente');
-      this.quitarContadoDeLista();
-      this.mServ.ModalSeleccion(this.listaClientes);
+      const obj = {
+        data: [],
+        filtrarCliente: ' ',
+      };
+      this.mServ.ModalSeleccion(obj);
     } else {
       this.mServ.modalTipo('buscarSuplidor');
-      this.mServ.ModalSeleccion(this.listaSuplidores);
+
+      const obj = {
+        data: [],
+        filtrarSuplidor: ' ',
+      };
+
+      this.mServ.ModalSeleccion(obj);
+
+      setTimeout(() => {
+        this.mServ.mostrarModal(true);
+      }, 250);
     }
     this.mServ.mostrarModal(true);
     this.mServ.ModalTablaHeight(true);
-  }
-
-  quitarContadoDeLista() {
-    const temp = JSON.parse(JSON.stringify(this.listaClientes));
-    this.listaClientes = [];
-    const cliente = temp.filter((cli) => cli.nombre === 'Cliente contado');
-    const index = _.indexOf(temp, cliente[0]);
-
-    _.pullAt(temp, index);
-    this.listaClientes = temp;
   }
 
   // =============================================
@@ -530,7 +484,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   // =============================================
   //  MODAL IMPRIMIR
   // =============================================
-  imprimirFactura() {
+  async imprimirFactura() {
     if (!this.propietario_factura) {
       this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
     } else {
@@ -546,12 +500,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
             this.abrirModal();
           } else {
             let articulos_a_cambiar = false;
-            console.log('this.articulosAcambiar.length', this.articulosAcambiar.length);
-            console.log('this.articulosAcambiar', this.articulosAcambiar);
 
             if (this.metodo === 'compra') {
               const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
-              this.newCuerpo = this.revisarPrecios(cuerpo_fact);
+              this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
             }
 
             if (this.articulosAcambiar.length > 0) {
@@ -610,7 +562,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         return articulo;
       });
     }
-    console.log(this.CuerpoFactura);
   }
 
   CancelarFactura() {
@@ -708,13 +659,19 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  revisarPrecios(cuerpoFact) {
+  async revisarPrecios(cuerpoFact) {
     const tempCuerpo = [];
 
-    cuerpoFact.forEach((row) => {
-      const Articulo = this.listaArticulos.filter((art) => art.id === row.articulo_id);
+    for (let i = 0; i < cuerpoFact.length; i++) {
+      const row = cuerpoFact[i];
 
-      const articulo = JSON.parse(JSON.stringify(Articulo[0]));
+      let articulo;
+      let codigo = 0;
+      try {
+        articulo = await this.dbServ.getArticulosFiltrados(row.cod, 0, 0, true).toPromise();
+      } catch (error) {}
+
+      // const articulo = JSON.parse(JSON.stringify(Articulo[0]));
 
       const contenido_articulo = articulo.contenido_articulos;
       const costoRow = GLOBAL.desformatear(row.pre);
@@ -759,9 +716,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.calculoMedidaprincipal(costoA, costoR, precioRow, contenido_articulo, newArticulo);
       }
 
-      temp = _.omit(row, ['costo', 'condicion', 'pre']);
+      temp = _.omit(row, ['costo', 'condicion', 'pre', 'cod']);
       tempCuerpo.push(temp);
-    });
+    }
     return tempCuerpo;
   }
 
@@ -789,9 +746,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.FacturaAtrasada = true;
     this.FechaFacturaAtrasada = moment(date).format('DD/MM/YYYY');
     try {
-      this.listaArticulos = await this.dbServ.getArticulosByDate(date).toPromise();
+      // this.listaArticulos = await this.dbServ.getArticulosByDate(date).toPromise();
     } catch (error) {
-      console.log(error);
       this.dbServ.toastError('Algo salio mal buscando historico de articulos', 'ERROR');
     }
   }
@@ -808,7 +764,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       for (let i = 0; i < this.articulosAcambiar.length; i++) {
         const articulo = this.articulosAcambiar[i];
         try {
-          console.log(articulo);
           const res = await this.dbServ.editarArticulo(articulo).toPromise();
         } catch (error) {
           console.error(error);
@@ -873,28 +828,29 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
-    console.log(cabecera_fact);
 
     try {
       const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
 
-      console.log(res);
       await this.CancelarFactura();
-      this.GetArticulos();
       this.dbServ.toastSuccess(res.msg, 'CORRECTO');
 
       await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-        console.log('printRes=====> ', res);
-
         if (res.status) {
         } else {
           this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
         }
       });
       res['FACTURA_DE'] = this.metodo;
-      this._ipc.send('print', res);
+
+      console.log('res ', res);
+      // const DD = this.pdfServ.makeFacturaVenta(res);
+      const DD = this.pdfServ.makeFacturaVenta(res.body);
+      console.log('DD ', DD);
+
+      this._ipc.send('print', DD);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }

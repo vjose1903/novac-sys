@@ -85,18 +85,21 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res) {
-        if (res.tipoModal === 'buscarCliente') {
-          this.cliente = res;
-          (document.getElementById('clienteI') as any).value = res.nombre;
-          this.BuscarFacturasAdelantadas(res.id);
+        if (res.tipo_modal === 'buscarCliente') {
+          this.cliente = res.data;
+          (document.getElementById('clienteI') as any).value = res.data.nombre;
+          this.BuscarFacturasAdelantadas(res.data.id);
           setTimeout(() => {
             this.enfocarInput('cod-0');
           }, 10);
           //
-        } else if (res.tipoModal === 'buscar') {
+        } else if (res.tipo_modal === 'buscar') {
           this.clickRowModal(res);
           //
-        } else if (res.tipoModal === 'seleccionar_articulos_adelantados') {
+        } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
+          console.log(res);
+
+          // mirar aqui el res
           this.llenarConduce(res.body);
         }
         setTimeout(() => {
@@ -104,7 +107,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 1000);
       }
 
-      // else if (res && res.tipoModal === 'cambio') {
+      // else if (res && res.tipo_modal === 'cambio') {
       //   this.Devuelta = res.devuelta;
       //   this.forma_pago = res.forma_pago;
       //   this.sendIngreso();

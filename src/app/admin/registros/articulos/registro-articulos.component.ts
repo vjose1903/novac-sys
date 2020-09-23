@@ -33,7 +33,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   listaArticulos;
   FORM: any;
   listaTipoArticulos: any;
-  listaSuplidores: any;
   tipoModal: string;
 
   usuario: any;
@@ -88,7 +87,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   async necesarioStart() {
     await this.getArticulos(this.obj_paginate_);
     this.getTipoArticulos();
-    this.getNombreSuplidores();
   }
 
   getTipoArticulos() {
@@ -97,11 +95,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
     });
   }
 
-  getNombreSuplidores() {
-    this.dbServ.getNombresSuplidores().subscribe((res) => {
-      this.listaSuplidores = GLOBAL.duplicarJson(res);
-    });
-  }
   async getArticulos(e) {
     try {
       const page = e.page;
@@ -138,54 +131,23 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       this.is_combo = false;
     }
   }
+  capitalice(control, arg) {
+    const campo = this.form.get(control);
+    campo.setValue(GLOBAL.Capitalice(arg));
+  }
   createForm() {
-    // this.form = this.fb.group({
-    //   nombre: [null],
-    //   tipo_articulo_id: [null],
-    //   suplidor_id: [null],
-    //   medida: [null],
-    //   costo_principal: [null],
-    //   precio_principal: [null],
-    //   is_detallable: [false],
-    //   fecha_ingreso: [new Date()],
-    //   aviso_existencia: [null],
-    //   calcular_itbis: [false],
-    //   existencia: [0],
-    //   medida_alerta: [null],
-    //   cantidad_contenido_padre: [null],
-    //   medida_contenido_padre: [null],
-    //   precio_padre: [null],
-    //   precio_libra: [null],
-    //   precio_unidad: [null],
-    //   costo_padre: [null],
-    //   costo_hijo: [null],
-    //   id: [null],
-    //   id_contenido_padre: [null],
-    //   id_contenido_hijo: [null],
-    //   vendido_en: [null],
-
-    //   referencia_padre: [null],
-    //   referencia_hijo: [null],
-
-    //   medida_contenido_hijo: [null],
-    //   cantidad_contenido_hijo: [null],
-    //   precio_hijo: [null],
-    //   rowFormula: this.fb.array([]),
-    //   otros_costos: [null],
-    // });
     this.form = this.fb.group({
-      nombre: ['Maiz'],
-      tipo_articulo_id: [2],
-      suplidor_id: [1],
+      nombre: [null],
+      tipo_articulo_id: [null],
       medida: [null],
       costo_principal: [null],
       precio_principal: [null],
       is_detallable: [false],
       fecha_ingreso: [new Date()],
-      aviso_existencia: [2],
+      aviso_existencia: [null],
       calcular_itbis: [false],
       existencia: [0],
-      medida_alerta: ['Quintal'],
+      medida_alerta: [null],
       cantidad_contenido_padre: [null],
       medida_contenido_padre: [null],
       precio_padre: [null],
@@ -207,6 +169,39 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       rowFormula: this.fb.array([]),
       otros_costos: [null],
     });
+    // this.form = this.fb.group({
+    //   nombre: ['Maiz'],
+    //   tipo_articulo_id: [2],
+    //   medida: [null],
+    //   costo_principal: [null],
+    //   precio_principal: [null],
+    //   is_detallable: [false],
+    //   fecha_ingreso: [new Date()],
+    //   aviso_existencia: [2],
+    //   calcular_itbis: [false],
+    //   existencia: [0],
+    //   medida_alerta: ['Quintal'],
+    //   cantidad_contenido_padre: [null],
+    //   medida_contenido_padre: [null],
+    //   precio_padre: [null],
+    //   precio_libra: [null],
+    //   precio_unidad: [null],
+    //   costo_padre: [null],
+    //   costo_hijo: [null],
+    //   id: [null],
+    //   id_contenido_padre: [null],
+    //   id_contenido_hijo: [null],
+    //   vendido_en: [null],
+
+    //   referencia_padre: [null],
+    //   referencia_hijo: [null],
+
+    //   medida_contenido_hijo: [null],
+    //   cantidad_contenido_hijo: [null],
+    //   precio_hijo: [null],
+    //   rowFormula: this.fb.array([]),
+    //   otros_costos: [null],
+    // });
     this.ARRAY_FORMULA = this.form.controls['rowFormula'] as FormArray;
   }
 
@@ -426,6 +421,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   calculatePricePadre() {
     const PrecioTemp = this.form.value.precio_principal;
     const Precio = GLOBAL.desformatear(PrecioTemp);
+    const PrecioPadreTemp = this.form.value.precio_padre;
 
     const costoTemp = this.form.value.costo_principal;
     const costo = GLOBAL.desformatear(costoTemp);
@@ -437,6 +433,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
 
       this.form.controls.precio_padre.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(PrecioPadre)));
       this.form.controls.costo_padre.setValue(GLOBAL.redondearAdos(costoPadre));
+    }
+    if (PrecioPadreTemp) {
+      this.calculatePriceHijo();
     }
   }
   calculatePriceHijo() {
@@ -462,7 +461,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       if (
         FORM.nombre.value !== null &&
         FORM.tipo_articulo_id.value !== null &&
-        FORM.suplidor_id.value !== null &&
         FORM.medida.value !== null &&
         FORM.costo_principal.value !== null &&
         FORM.precio_principal.value !== null &&
@@ -644,6 +642,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   }
   editarItem(item) {
     const articulo = item.ARG;
+    console.log(articulo);
+
     this.borrar();
     this.ProductoEditando = item.ARG;
     this.titulo = 'Editar producto: ' + articulo.nombre;
@@ -702,8 +702,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
         this.form.controls.id_contenido_padre.setValue(contenido.id);
       }
     });
-
+    articulo['tipo_articulo_id'] = articulo['tipo_articulo_id'] + '';
     this.form.patchValue(articulo);
+    // this.selectTipoArticulo(articulo.tipo_articulo_id);
     if (articulo.is_combo) {
       this.form.controls.otros_costos.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.otros_costos)));
     }
@@ -814,7 +815,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       precio_principal: GLOBAL.desformatear(x.precio_principal),
       aviso_existencia: x.aviso_existencia,
       medida_alerta: x.medida_alerta,
-      suplidor_id: x.suplidor_id,
       fecha_ingreso: x.id ? x.fecha_ingreso : moment().format('DD/MM/YYYY'),
       medida: x.medida,
       is_detallable: x.is_detallable,

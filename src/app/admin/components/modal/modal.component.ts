@@ -18,19 +18,21 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   seleccionModal: any;
   tipoModal;
   paraFiltroClientes: any;
+  paraFiltroSuplidor: any;
   tituloModal;
   lugar: any;
   identificadorFact: any;
   tipoDevuelta: any;
   cant_notas_credito = 0;
   cant_notas_debito = 0;
+  index;
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       this.tServ.Func_total_paginas(0);
       this.mServ.func_tabla_modal_change(undefined);
       if (this.tipoModal === 'buscarArticulo') {
-        this.mServ.pressEsc(this.seleccionModal.index);
+        this.mServ.pressEsc(this.index);
         setTimeout(() => {
           this.mServ.pressEsc(undefined);
         }, 1000);
@@ -65,6 +67,24 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     {
       titulo: 'Apellido',
       key: 'apellido',
+    },
+    {
+      titulo: 'Telefono',
+      key: 'telefono',
+    },
+    {
+      titulo: 'Doc. identidad',
+      key: 'documento_identidad',
+    },
+    {
+      titulo: 'Direccion',
+      key: 'direccion',
+    },
+  ];
+  infoSuplidor = [
+    {
+      titulo: 'Nombre',
+      key: 'nombre',
     },
     {
       titulo: 'Telefono',
@@ -116,7 +136,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
     this.subSelec = this.mServ.SELECCIONMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
-        if (res.filtrarArticulo || res.filtrarCliente) {
+        if (res.filtrarArticulo || res.filtrarCliente || res.filtrarSuplidor) {
           this.seleccionModal = res.data;
         } else {
           this.seleccionModal = res;
@@ -124,13 +144,17 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         this.paraFiltroArticulos = res.filtrarArticulo;
         this.paraFiltroClientes = res.filtrarCliente;
+        this.paraFiltroSuplidor = res.filtrarSuplidor;
         this.metodo = res.metodo;
         this.identificadorFact = res.identificadorFact;
+        this.index = res.index;
 
         if (this.paraFiltroArticulos) {
           this.renovarDataFiltros(obj_paginate, this.paraFiltroArticulos);
         } else if (this.paraFiltroClientes) {
           this.renovarDataFiltros(obj_paginate, this.paraFiltroClientes);
+        } else if (this.paraFiltroSuplidor) {
+          this.renovarDataFiltros(obj_paginate, this.paraFiltroSuplidor);
         }
 
         if (this.tipoModal === 'buscarCliente') {
@@ -212,19 +236,21 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   devolverCLick(arg) {
-    const obj = JSON.parse(JSON.stringify(arg));
-    if (this.tipoModal === 'buscarArticulo') {
-      obj.index = this.seleccionModal.index;
-    }
+    const obj = {
+      data: arg,
+      tipo_modal: this.tipoModal,
+    };
 
-    obj.tipoModal = this.tipoModal;
+    if (this.tipoModal === 'buscarArticulo') {
+      obj['index'] = this.index;
+    }
 
     this.mServ.ModalObj(obj);
   }
 
   noArticulo() {
     this.reinicioModal();
-    this.mServ.ModalIndex(this.seleccionModal.index);
+    this.mServ.ModalIndex(this.index);
   }
 
   prueba() {
@@ -237,11 +263,21 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     }
   }
 
+  articuloFiltradoPorCodigo(articulo) {
+    const obj = {
+      data: articulo,
+      index: this.index,
+    };
+
+    this.mServ.getArticuloFiltradoPorCodigo(obj);
+
+    this.reinicioModal();
+  }
+
   async renovarDataFiltros(e, buscando?) {
     const page = e.page;
     const per_page = e.per_page;
     let palabra_a_buscar = ' ';
-
     if (buscando) {
       palabra_a_buscar = buscando === '' || buscando === null || buscando === undefined ? ' ' : buscando;
     } else {
@@ -249,43 +285,61 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     }
 
     if (this.paraFiltroArticulos) {
-      // --------------------------------- ARTICULOS ---------------------------------
       try {
         const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
-        this.seleccionModal = res.data;
-        if (this.seleccionModal.length === 0) {
-          this.noArticulo();
-        }
-        console.log('this.seleccionModal ', this.seleccionModal);
+        if (res.data) {
+          this.seleccionModal = res.data;
+          if (this.seleccionModal.length === 0) {
+            this.noArticulo();
+          }
 
-        this.tServ.Func_total_paginas(res.total_registros);
+          this.tServ.Func_total_paginas(res.total_registros);
+        } else {
+          this.articuloFiltradoPorCodigo(res);
+        }
       } catch (error) {
         console.error(error);
         this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
       }
     } else if (this.paraFiltroClientes) {
-      // --------------------------------- CLIENTES ---------------------------------
       try {
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
         this.seleccionModal = undefined;
 
-        res.data.map((cli) => {
+        res.data.map(async (cli) => {
           cli.nombre = GLOBAL.Capitalice(cli.nombre);
           cli.apellido = GLOBAL.Capitalice(cli.apellido);
-          cli.documentos_de_identidad.map((docu) => {
-            if (docu.principal) {
-              cli.documento_identidad = docu.documento;
-            }
-          });
+          cli.documento_identidad = await cli.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
+          // cli.documento_identidad = cli.documento_de_identidad ? (cli.documento_de_identidad.documento ? cli.documento_de_identidad.documento : '---------') : '---------';
           return cli;
         });
-
         this.seleccionModal = res.data;
 
-        if (this.seleccionModal.length === 0) {
+        if (res.data.length === 0) {
           this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO');
+        }
+
+        this.tServ.Func_total_paginas(res.total_registros);
+      } catch (error) {
+        console.error(error);
+        this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
+      }
+    } else if (this.paraFiltroSuplidor) {
+      try {
+        const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+
+        this.seleccionModal = undefined;
+        res.data.map(async (supli) => {
+          supli.nombre = GLOBAL.Capitalice(supli.nombre);
+          supli.documento_identidad = await supli.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
+          return supli;
+        });
+        this.seleccionModal = res.data;
+
+        if (res.data.length === 0) {
+          this.dbServ.toastWarning('No existe suplidor con el nombre introducido', 'AVISO');
         }
 
         this.tServ.Func_total_paginas(res.total_registros);

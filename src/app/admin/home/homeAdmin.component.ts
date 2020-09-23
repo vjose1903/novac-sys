@@ -16,7 +16,7 @@ export class HomeAdminComponent implements OnInit {
     // document.getElementById('imgd').classList.add('rubberBand');
   }
   verificar() {
-    GLOBAL.ValidaCedula2(this.cedula);
+    GLOBAL.ValidaCedula(this.cedula);
   }
   mostrar() {
     const obj = {

@@ -8,7 +8,16 @@
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
               <div class="form-group">
                 <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                <input type="text" formControlName="nombre" id="campoNombre" placeholder="Introduzca nombre" class="form-control" autocomplete="off" autofocus />
+                <input
+                  type="text"
+                  formControlName="nombre"
+                  (keyup)="capitalice('nombre', $event.target.value)"
+                  id="campoNombre"
+                  placeholder="Introduzca nombre"
+                  class="form-control"
+                  autocomplete="off"
+                  autofocus
+                />
                 <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
                   Este Campo es obligatorio
                 </div>
@@ -17,7 +26,14 @@
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
               <div class="from-group">
                 <label class="control-label">Apellido: <span style="color: red">*</span></label>
-                <input type="text" formControlName="apellido" placeholder="Introduzca apellido" class="form-control" autocomplete="off" />
+                <input
+                  type="text"
+                  formControlName="apellido"
+                  (keyup)="capitalice('apellido', $event.target.value)"
+                  placeholder="Introduzca apellido"
+                  class="form-control"
+                  autocomplete="off"
+                />
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"
@@ -42,7 +58,7 @@
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3">
               <div class="form-group">
                 <label class="control-label">Sexo: <span style="color: red">*</span></label>
-                <select formControlName="sexo" class="form-control   ">
+                <select formControlName="sexo" class="form-control">
                   <option value="" disabled selected hidden>Sexo</option>
                   <option value="m">Masculino</option>
                   <option value="f">Femenino</option>
@@ -104,7 +120,7 @@
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3">
               <div class="form-group">
                 <label class="control-label">Role: <span style="color: red">*</span></label>
-                <select formControlName="role" class="form-control   ">
+                <select formControlName="role" class="form-control">
                   <option value="" disabled selected hidden>Role</option>
                   <option value="A">Administrador</option>
                   <option value="V">Vendedor</option>
@@ -145,7 +161,7 @@
       </div>
     </div>
   </div>
-  <div class=" col-md-6">
+  <div class="col-md-6">
     <h4>Listado empleados</h4>
     <div #cardTabla class="card cardListados">
       <app-tablas

@@ -109,6 +109,11 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
     this.getVendedores();
   }
 
+  capitalice(control, arg) {
+    const campo = this.form.get(control);
+    campo.setValue(GLOBAL.Capitalice(arg));
+  }
+
   marcarCheck(arg) {
     const radio = document.getElementById('identificacion-' + arg) as HTMLElement;
     (radio as any).checked = true;
@@ -302,7 +307,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
           const cedulaSplit = _.split(element.doc, '-');
 
           const cedulaSinGuiones = _.join(cedulaSplit, '');
-          if (GLOBAL.ValidaCedula2(cedulaSinGuiones)) {
+          if (GLOBAL.ValidaCedula(cedulaSinGuiones)) {
             cedulaCorrecta = true;
           }
         }
@@ -322,8 +327,8 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
       // entra aqui si pasa la validacion de documento de identidad
     } else {
       // entra aqui si no selecciono un documento como principal
-      // if (!cedulaCorrecta) {
-      if (false) {
+      if (!cedulaCorrecta) {
+        // if (false) {
         this.dbServ.toastError('Cedula introducida incorrecta', 'ERROR');
       } else {
         if (this.doc_principal === undefined || this.doc_principal === null || this.doc_principal === ' ' || this.doc_principal === '') {

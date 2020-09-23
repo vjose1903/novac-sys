@@ -117,9 +117,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
     this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'buscarCliente') {
-        this.clienteBuscado = res;
-        (document.getElementById('valorI') as any).value = res.nombre;
-        this.pedirFacturaModal('1', res.id);
+        this.clienteBuscado = res.data;
+        (document.getElementById('valorI') as any).value = res.data.nombre;
+        this.pedirFacturaModal('1', res.data.id);
         this.mServ.ModalObj(undefined);
       }
     });

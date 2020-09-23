@@ -8,7 +8,16 @@
             <div class="col-md-12">
               <div class="form-group">
                 <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                <input type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control" id="campoNombre" autocomplete="off" autofocus />
+                <input
+                  type="text"
+                  formControlName="nombre"
+                  (keyup)="capitalice('nombre', $event.target.value)"
+                  placeholder="Introduzca nombre"
+                  class="form-control"
+                  id="campoNombre"
+                  autocomplete="off"
+                  autofocus
+                />
                 <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
                   Este Campo es obligatorio
                 </div>
@@ -95,7 +104,14 @@
             <div class="col-md-12">
               <div class="form-group">
                 <label class="control-label">Direccion:</label>
-                <textarea formControlName="direccion" placeholder="Ingrese la direccion" cols="100" rows="2" class="form-control"></textarea>
+                <textarea
+                  formControlName="direccion"
+                  (keyup)="capitalice('direccion', $event.target.value)"
+                  placeholder="Ingrese la direccion"
+                  cols="100"
+                  rows="2"
+                  class="form-control"
+                ></textarea>
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"

@@ -29,6 +29,7 @@
                 (focus)="$event.target.select()"
                 type="text"
                 formControlName="nombre"
+                (keyup)="capitalice('nombre', $event.target.value)"
                 placeholder="Introduzca nombre"
                 class="form-control mb-4"
                 autocomplete="off"
@@ -43,7 +44,7 @@
             <div class="form-group">
               <label class="control-label">Tipo: <span style="color: red">*</span></label>
               <select
-                (keydown.enter)="saltar(TIPOARTICULO !== 'Producto terminado' ? 'suplidor' : 'articulo_id-0')"
+                (keydown.enter)="saltar(TIPOARTICULO !== 'Producto terminado' ? 'comprado' : 'articulo_id-0')"
                 id="tipo"
                 formControlName="tipo_articulo_id"
                 (change)="selectTipoArticulo($event.target.value)"
@@ -63,7 +64,7 @@
             </div>
           </div>
 
-          <div *ngIf="TIPOARTICULO !== 'Producto terminado'" class="col-md-6">
+          <!-- <div *ngIf="TIPOARTICULO !== 'Producto terminado'" class="col-md-6">
             <div class="form-group">
               <label class="control-label">Suplidor: <span style="color: red">*</span></label>
               <select (keydown.enter)="saltar('comprado')" id="suplidor" formControlName="suplidor_id" class="form-control mb-4" value="">
@@ -78,13 +79,20 @@
                 Seleccione un suplidor
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
         <div *ngIf="TIPOARTICULO !== 'Producto terminado'" class="row">
           <div class="col-md-6">
             <div class="from-group">
               <label class="control-label">Comprado en: <span style="color: red">*</span></label>
-              <select formControlName="medida" (keydown.enter)="saltar('costoP')" id="comprado" class="form-control mb-4" value="" (change)="resetCompradoEn($event.target.value)">
+              <select
+                formControlName="medida"
+                (keydown.enter)="saltar(TIPOARTICULO === 'Materia prima' ? 'vendido' : 'costoP')"
+                id="comprado"
+                class="form-control mb-4"
+                value=""
+                (change)="resetCompradoEn($event.target.value)"
+              >
                 <option value="" disabled selected>Tipo</option>
                 <option value="Quintal">Quintal</option>
                 <option value="Libra">Libra</option>
@@ -100,7 +108,7 @@
           <div *ngIf="form.controls['tipo_articulo_id'].value === '2'" class="col-md-6">
             <div class="from-group">
               <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-              <select formControlName="vendido_en" (keydown.enter)="saltar('')" id="vendido" class="form-control mb-4" value="">
+              <select formControlName="vendido_en" (keydown.enter)="saltar('costoP')" id="vendido" class="form-control mb-4" value="">
                 <option value="{{ null }}" disabled>Tipo</option>
                 <option value="Saco">Saco</option>
                 <option value="Galon">Galón</option>
@@ -512,6 +520,7 @@
                 placeholder="Introduzca precio"
                 class="form-control mb-4"
                 (blur)="revisarPrecio('precio_padre', 'precioPadre')"
+                (blur)="calculatePriceHijo()"
                 autocomplete="off"
               />
               <div

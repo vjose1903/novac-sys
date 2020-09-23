@@ -150,7 +150,7 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
     };
     console.log('total > efectivo', 'total ', total, 'efectivo ', efectivo, total > efectivo);
 
-    if (total > efectivo) {
+    if (this.factura_de === 'venta' && total > efectivo) {
       this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR');
     } else {
       if (this.factura_de === 'compra') {

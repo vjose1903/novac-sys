@@ -73,7 +73,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
 
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipoModal === 'cambio') {
-        this.decisionModal(res);
+        this.decisionModal(res.data);
         this.mServ.ModalObj(undefined);
       }
     });
