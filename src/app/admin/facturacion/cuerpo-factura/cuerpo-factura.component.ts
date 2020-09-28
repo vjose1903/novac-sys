@@ -86,6 +86,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipo_modal === 'buscarArticulo') {
+        console.log('entro   ');
+
         this.LLenarRowDespuesDeFiltro(res);
       }
     });
@@ -266,12 +268,15 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   async saltar(e, input, i) {
     const sigInput = input + i;
     const index = i;
-    if (input === 'pre') {
-      i = i - 1;
-    }
+
+    console.log('row', (this.control.controls[i] as any).controls);
+    console.log('i 00', i);
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
     const unidad = (this.control.controls[i] as any).controls['uni'].value;
     const cantidad = (this.control.controls[i] as any).controls['can'].value;
+    console.log('unidad 00', unidad);
+    console.log('codigo 00', codigo);
+    console.log('cantidad 00', cantidad);
 
     if (i >= 10 && input === 'cod-') {
       this.addItem(i);
@@ -307,30 +312,32 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       let index = i;
 
       if (input === 'cod-') {
-        index--;
+        index++;
       }
+      console.log('revisando la cantidad en el row ', i);
 
-      const excede = await this.checkCantidadExede(index, unidad, 'saltar');
+      const excede = await this.checkCantidadExede(i, unidad, 'saltar');
+      console.log('unidad ', unidad);
 
       if (!excede) {
         if (unidad === '' || unidad === null) {
+          console.log('entro en vacio');
+
           setTimeout(() => {
-            if (this.metodo === 'venta') {
-              this.enfocarInput('uni-' + (i - 1));
-            } else {
-              this.enfocarInput('uni-' + i);
-            }
+            this.enfocarInput('uni-' + i);
           }, 5);
         } else {
+          console.log('siguiente row');
+          console.log('sigInput ', sigInput);
           this.UnidadesArticulo = [];
           this.aumentarSecuencia();
-          this.enfocarInput(sigInput);
+          this.enfocarInput('cod-' + index);
         }
       } else {
-        this.enfocarInput('can-' + index);
-        this.selectContenido('can-' + index);
+        this.enfocarInput('can-' + i);
+        this.selectContenido('can-' + i);
         setTimeout(() => {
-          (this.control.controls[index] as any).controls['uni'].setValue(null);
+          (this.control.controls[i] as any).controls['uni'].setValue(null);
         }, 2);
       }
     }
@@ -876,7 +883,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const i = obj.index;
 
     if (this.metodo === 'venta' && ARTICULO.existencia === 0) {
-      this.dbServ.toastError('Articulo agotado, debe de comprar mas!!!', 'ERROR');
+      if (ARTICULO.descripcion === 'Producto terminado') {
+        this.dbServ.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
+      } else {
+        this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+      }
 
       setTimeout(() => {
         this.enfocarInput('cod-' + i);
@@ -886,12 +897,24 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       const cantidades = ARTICULO.cantidades;
 
       if (ARTICULO.existencia > 0 && ARTICULO.aviso_existencia > cantidades[ARTICULO.medida_alerta]) {
-        this.dbServ.toastWarning('Solo quedan ' + cantidades[ARTICULO.medida_alerta] + ' ' + ARTICULO.medida_alerta + ' de este producto, debe de aumentar el inventario!!!', 'AVISO');
+        if (ARTICULO.descripcion === 'Producto terminado') {
+          this.dbServ.toastWarning(
+            'Solo quedan ' + GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) + ' ' + ARTICULO.medida_alerta + ' de este producto, debe de producir mas!!!',
+            'AVISO',
+          );
+        } else {
+          this.dbServ.toastWarning(
+            'Solo quedan ' + GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) + ' ' + ARTICULO.medida_alerta + ' de este producto, debe de aumentar el inventario!!!',
+            'AVISO',
+          );
+        }
       }
 
       (this.control.controls[i] as any).controls['cod'].setValue(ARTICULO.codigo);
       (this.control.controls[i] as any).controls['des'].setValue(ARTICULO.nombre);
       (this.control.controls[i] as any).controls['articulo_id'].setValue(ARTICULO.id);
+      console.log('ARTICULO ', ARTICULO);
+
       if (this.metodo === 'venta') {
         if (ARTICULO.descripcion === 'Materia prima') {
           (this.control.controls[i] as any).controls['descuento_porciento'].disable();

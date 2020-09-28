@@ -794,7 +794,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       cabecera_fact['devuelta'] = this.Devuelta;
     }
 
-    cabecera_fact['fecha_valida'] = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
+    cabecera_fact['fecha_valida'] = this.paqueteComprobante
+      ? this.paqueteComprobante.fecha_valida !== null
+        ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY')
+        : null
+      : null;
     cabecera_fact['adelantada'] = this.adelantada === 'true' ? true : false;
     cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;
@@ -845,7 +849,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
       console.log('res ', res);
       // const DD = this.pdfServ.makeFacturaVenta(res);
-      const DD = this.pdfServ.makeFacturaVenta(res.body);
+      const DD = await this.pdfServ.makeFacturaVenta(res.body);
       console.log('DD ', DD);
 
       this._ipc.send('print', DD);

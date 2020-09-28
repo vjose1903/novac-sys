@@ -255,7 +255,7 @@
                           id="articulo_id-{{ j }}"
                         >
                           <option value="{{ null }}" selected>seleccione materia prima</option>
-                          <option *ngFor="let lista of listaArticulos | callback: filtroFormula" value="{{ lista.id }}">{{ lista.nombre }}</option>
+                          <option *ngFor="let lista of listaMateriasPrimas" value="{{ lista.id }}">{{ lista.nombre }}</option>
                         </select>
                       </div>
                     </div>

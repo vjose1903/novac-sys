@@ -37,7 +37,7 @@
         <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
           <tbody>
             <tr>
-              <td *ngIf="propietario" class="{{checkIfArticuloRow(i)?'btnQuitarRow':'sombreado'}}" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
+              <td *ngIf="propietario" class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
                 <!-- <div class="hoverZone"></div> -->
                 <i class="fas fa-ban text-red btnBorrar" (click)="modalRemover(i)"></i>
               </td>
@@ -47,7 +47,7 @@
                   <input
                     [readOnly]="!propietario"
                     type="text"
-                    class="form-control entrada "
+                    class="form-control entrada"
                     id="cod-{{ i }}"
                     (click)="verificarSecuencia(i)"
                     (keydown.enter)="saltar($event, 'can-', i)"
@@ -64,7 +64,7 @@
                     [readOnly]="!propietario"
                     type="number"
                     min="0"
-                    class="form-control entrada "
+                    class="form-control entrada"
                     id="can-{{ i }}"
                     (click)="verificarSecuencia(i)"
                     (keydown.enter)="saltar($event, 'uni-', i)"
@@ -81,10 +81,10 @@
                     [readOnly]="!propietario"
                     *ngIf="(drop && inputDrop !== secuenciaDelDrop(i)) || (!drop && inputDrop === secuenciaDelDrop(i)) || !drop"
                     type="text"
-                    class="form-control entrada "
+                    class="form-control entrada"
                     id="uni-{{ i }}"
                     (click)="verificarSecuencia(i, 'unidad')"
-                    (keydown.enter)="saltar($event, metodo === 'venta' ? 'cod-' : 'pre-', metodo === 'venta' ? i + 1 : i)"
+                    (keydown.enter)="saltar($event, metodo === 'venta' ? 'cod-' : 'pre-', i)"
                     formControlName="uni"
                     (blur)="calcularTotalRow(i) && verificarRow(i)"
                   />
@@ -95,10 +95,10 @@
                       (focus)="verificarRow(i)"
                       formControlName="uni"
                       (change)="selectMedidaChange($event.target.value, i)"
-                      class="form-control  entrada"
-                      style="border-radius:0 "
+                      class="form-control entrada"
+                      style="border-radius: 0"
                       id="uni-{{ i }}"
-                      (keydown.enter)="saltar($event, metodo === 'venta' ? 'cod-' : 'pre-', metodo === 'venta' ? i + 1 : i)"
+                      (keydown.enter)="saltar($event, metodo === 'venta' ? 'cod-' : 'pre-', i)"
                       (blur)="calcularTotalRow(i) && verificarRow(i)"
                     >
                       <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
@@ -110,7 +110,7 @@
               <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
               <td class="DES td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada inDES " id="des-{{ i }}" formControlName="des" readonly="true" />
+                  <input type="text" class="form-control entrada inDES" id="des-{{ i }}" formControlName="des" readonly="true" />
                 </div>
               </td>
 
@@ -150,7 +150,7 @@
 
               <td class="TOT td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada inTOT campoNumeros " id="tot-{{ i }}" formControlName="tot" readonly="true" />
+                  <input type="text" class="form-control entrada inTOT campoNumeros" id="tot-{{ i }}" formControlName="tot" readonly="true" />
                   <input type="hidden" [value]="i" formControlName="secuencia" />
                 </div>
               </td>

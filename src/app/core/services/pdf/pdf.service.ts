@@ -30,6 +30,9 @@ export class PdfService {
   // CABECERA
   // ==========================================================================================================================================================
   cabeceraFacturaVenta(data) {
+    console.log('cliente ', data.cliente);
+    console.log('factura de ', data.FACTURA_DE);
+
     const header = [
       {
         columns: [
@@ -38,7 +41,7 @@ export class PdfService {
               image: 'logo',
               width: 72,
               opacity: 0.85,
-              margin: [90, 0, 0, 0],
+              margin: [90, 12, 0, 0],
             },
           ],
           [
@@ -48,21 +51,21 @@ export class PdfService {
                   text: 'FACTURA A ' + _.toUpper(data.condicion),
                   alignment: 'right',
                   bold: true,
-                  fontSize: 14,
-                  margin: [0, 15, 30],
+                  style: 'letra14',
+                  margin: [0, 20, 30],
                 },
             //
           ],
         ],
       },
       {
-        margin: [0, -67, 0, 0],
+        margin: [0, -62, 0, 0],
         stack: [
           {
             text: 'ADM Agroindustrial S.R.L',
             alignment: 'center',
             bold: true,
-            fontSize: 17,
+            style: 'letra17',
           },
           {
             text: 'Autopista Duarte Km0 El Higuero, La Vega',
@@ -70,10 +73,10 @@ export class PdfService {
           },
           {
             text: [
-              { text: 'Telefono: ', fontSize: 10 },
-              { text: '809-573-0060 ', fontSize: 10 },
-              { text: ' RNC: ', fontSize: 10 },
-              { text: '131-99603-5', fontSize: 10 },
+              { text: 'Telefono: ', style: 'letra10' },
+              { text: '809-573-0060 ', style: 'letra10' },
+              { text: ' RNC: ', style: 'letra10' },
+              { text: '131-99603-5', style: 'letra10' },
             ],
             alignment: 'center',
           },
@@ -81,41 +84,41 @@ export class PdfService {
       },
 
       {
-        margin: [15, 10, 0, 0],
+        margin: [15, 20, 0, 0],
         columns: [
           [
             {
               text: [
-                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: 'Cliente : ', fontSize: 12 } : { text: 'Suplidor : ', fontSize: 12 },
-                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.nombre, fontSize: 12 } : { text: data.suplidor.nombre, fontSize: 12 },
+                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: 'Cliente : ', style: 'letra12' } : { text: 'Suplidor : ', style: 'letra12' },
+                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.nombre, style: 'letra12' } : { text: data.suplidor.nombre, style: 'letra12' },
               ],
               margin: [0, 0, 0, 0],
             },
             {
               text: [
-                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: 'Rnc cliente : ', fontSize: 12 } : { text: 'Rnc suplidor : ', fontSize: 12 },
-                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.rnc, fontSize: 12 } : { text: data.suplidor.rnc, fontSize: 12 },
+                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: 'Rnc cliente : ', style: 'letra12' } : { text: 'Rnc suplidor : ', style: 'letra12' },
+                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.rnc, style: 'letra12' } : { text: data.suplidor.rnc, style: 'letra12' },
               ],
               margin: [0, 5, 0, 0],
             },
             {
               text: [
-                { text: 'Dirección : ', fontSize: 12 },
-                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.direccion, fontSize: 12 } : { text: data.suplidor.direccion, fontSize: 12 },
+                { text: 'Dirección : ', style: 'letra12' },
+                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.direccion, style: 'letra12' } : { text: data.suplidor.direccion, style: 'letra12' },
               ],
               margin: [0, 5, 0, 0],
             },
           ],
           [
             {
-              text: [{ text: data.tipo_factura, fontSize: 14 }],
+              text: [{ text: data.tipo_factura, style: 'letra14' }],
               margin: [0, 15, 0, 0],
               alignment: 'center',
             },
 
             data.FACTURA_DE === 'compra'
               ? {
-                  text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
+                  text: [{ text: '- - - COMPRA - - -', style: 'letra11' }],
                   margin: [0, 1, 0, 0],
                   alignment: 'center',
                 }
@@ -124,8 +127,8 @@ export class PdfService {
             data.FACTURA_DE === 'nota'
               ? {
                   text: [
-                    { text: 'Aplicada a: ', fontSize: 11 },
-                    { text: data.aplicada_a, fontSize: 11 },
+                    { text: 'Aplicada a: ', style: 'letra11' },
+                    { text: data.aplicada_a, style: 'letra11' },
                   ],
                   margin: [0, 1, 0, 0],
                   alignment: 'center',
@@ -137,9 +140,9 @@ export class PdfService {
               stack: [
                 {
                   text: [
-                    { text: 'Fecha : ', fontSize: 11.5 },
-                    { text: this.fecha(data.created_at), fontSize: 11.5 },
-                    { text: ' - ' + this.hora(data.created_at), fontSize: 11.5 },
+                    { text: 'Fecha : ', style: 'letra11' },
+                    { text: this.fecha(data.created_at), style: 'letra11' },
+                    { text: ' - ' + this.hora(data.created_at), style: 'letra11' },
                   ],
                   margin: [75, 0, 0, 0],
                 },
@@ -147,30 +150,29 @@ export class PdfService {
                   ? { text: '' }
                   : {
                       text: [
-                        { text: 'Fecha vencimiento : ', fontSize: 11.5 },
-                        { text: this.fecha(data.fecha_vencimiento), fontSize: 11.5 },
+                        { text: 'Fecha vencimiento : ', style: 'letra11' },
+                        { text: this.fecha(data.fecha_vencimiento), style: 'letra11' },
                       ],
                       margin: [75, 3, 0, 0],
                     },
-
                 {
                   text: [
-                    { text: 'NCF : ', fontSize: 11.5 },
-                    { text: data.numero_comprobante, fontSize: 11.5 },
+                    { text: 'NCF : ', style: 'letra11' },
+                    { text: data.numero_comprobante, style: 'letra11' },
                   ],
                   margin: [75, 3, 0, 0],
                 },
                 {
                   text: [
-                    { text: 'Doc No : ', fontSize: 11.5 },
-                    { text: _.padStart(data.numero_factura, 8, '0'), fontSize: 11.5 },
+                    { text: 'Doc No : ', style: 'letra11' },
+                    { text: _.padStart(data.numero_factura, 8, '0'), style: 'letra11' },
                   ],
                   margin: [75, 3, 0, 0],
                 },
                 {
                   text: [
-                    { text: 'Valida hasta : ', fontSize: 11.5 },
-                    { text: this.fecha(data.fecha_valida), fontSize: 11.5 },
+                    { text: 'Valida hasta : ', style: 'letra11' },
+                    { text: this.fecha(data.fecha_valida), style: 'letra11' },
                   ],
                   margin: [75, 3, 0, 0],
                 },
@@ -273,10 +275,10 @@ export class PdfService {
       },
       {
         text: [
-          { text: 'Realizada Por :  ', fontSize: 11, bold: true },
-          { text: data.usuario, fontSize: 11 },
-          data.vendedor ? { text: '    Vendedor :  ', fontSize: 11, bold: true } : { text: '' },
-          data.vendedor ? { text: data.vendedor, fontSize: 11 } : { text: '' },
+          { text: 'Realizada Por :  ', style: 'letra11', bold: true },
+          { text: data.usuario, style: 'letra11' },
+          data.vendedor ? { text: '    Vendedor :  ', style: 'letra11', bold: true } : { text: '' },
+          data.vendedor ? { text: data.vendedor, style: 'letra11' } : { text: '' },
         ],
         margin: [0, 5, 0, 0],
       },
@@ -287,26 +289,26 @@ export class PdfService {
             table: {
               body: [
                 [
-                  { text: 'Bruto RD$: ', fontSize: 11, bold: true },
-                  { text: GLOBAL.numFormatTwoDecimals(data.Bruto), fontSize: 11, alignment: 'right' },
+                  { text: 'Bruto RD$: ', style: 'letra11', bold: true },
+                  { text: GLOBAL.numFormatTwoDecimals(data.Bruto), style: 'letra11', alignment: 'right' },
                 ],
                 [
-                  { text: 'Itbis RD$: ', fontSize: 11, bold: true },
-                  { text: GLOBAL.numFormatTwoDecimals(data.itbis), fontSize: 11, alignment: 'right' },
+                  { text: 'Itbis RD$: ', style: 'letra11', bold: true },
+                  { text: GLOBAL.numFormatTwoDecimals(data.itbis), style: 'letra11', alignment: 'right' },
                 ],
                 [
-                  { text: 'Descuento RD$: ', fontSize: 11, bold: true },
-                  { text: GLOBAL.numFormatTwoDecimals(data.descuento), fontSize: 11, alignment: 'right' },
+                  { text: 'Descuento RD$: ', style: 'letra11', bold: true },
+                  { text: GLOBAL.numFormatTwoDecimals(data.descuento), style: 'letra11', alignment: 'right' },
                 ],
                 [
-                  { text: 'TOTAL RD$: ', fontSize: 11, bold: true },
-                  { text: GLOBAL.numFormatTwoDecimals(data.total_factura), fontSize: 11, alignment: 'right' },
+                  { text: 'TOTAL RD$: ', style: 'letra11', bold: true },
+                  { text: GLOBAL.numFormatTwoDecimals(data.total_factura), style: 'letra11', alignment: 'right' },
                 ],
                 data.FACTURA_DE === 'nota'
                   ? [{ text: '' }]
                   : [
-                      { text: 'Devuelta RD$: ', fontSize: 11, bold: true },
-                      { text: GLOBAL.numFormatTwoDecimals(data.devuelta), fontSize: 11, alignment: 'right' },
+                      { text: 'Devuelta RD$: ', style: 'letra11', bold: true },
+                      { text: GLOBAL.numFormatTwoDecimals(data.devuelta), style: 'letra11', alignment: 'right' },
                     ],
               ],
             },
@@ -349,14 +351,14 @@ export class PdfService {
                 columns: [
                   [
                     {
-                      text: [{ text: 'Revisada Por', fontSize: 12, bold: true }],
+                      text: [{ text: 'Revisada Por', style: 'letra12', bold: true }],
                       margin: [75, 5, 0, 0],
                     },
                   ],
                   [
                     data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
                       ? {
-                          text: [{ text: 'Cliente', fontSize: 12, bold: true }],
+                          text: [{ text: 'Cliente', style: 'letra12', bold: true }],
                           margin: [-70, 5, 0, 0],
                         }
                       : { text: '' },
@@ -378,12 +380,15 @@ export class PdfService {
   // UNIR FACTURA VENTA
   // ==========================================================================================================================================================
 
-  makeFacturaVenta(data) {
+  async makeFacturaVenta(data) {
+    console.log('data 00 ', data);
+
     const DD = {
       pageSize: { width: 760, height: 480 },
-      pageMargins: data.condicion === 'Contado' ? [10, 157.9, 0, 40] : [10, 173, 0, 40],
-      header: this.cabeceraFacturaVenta(data),
-      content: this.contenidoFacturaVenta(data),
+      pageMargins: data.condicion === 'Contado' ? [10, 180, 0, 40] : [10, 173, 0, 40],
+      header: await this.cabeceraFacturaVenta(data),
+      content: await this.contenidoFacturaVenta(data),
+
       footer: (currentPage, pageCount) => {
         console.log('currentPage ', currentPage);
 
@@ -406,6 +411,23 @@ export class PdfService {
       },
       images: {
         logo: logoADM,
+      },
+      styles: {
+        letra10: {
+          fontSize: 10,
+        },
+        letra11: {
+          fontSize: 11,
+        },
+        letra12: {
+          fontSize: 12,
+        },
+        letra14: {
+          fontSize: 14,
+        },
+        letra17: {
+          fontSize: 17,
+        },
       },
 
       // defaultStyle: {

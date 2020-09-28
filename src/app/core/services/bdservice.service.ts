@@ -230,36 +230,41 @@ export class DBservice {
   createArticulo(arg) {
     return this.peticion('articulos', 'post', JSON.stringify(arg));
   }
+
   editarArticulo(arg) {
     const id = arg.id;
     const body = _.omit(arg, ['id']);
     return this.peticion('articulos/' + id, 'patch', JSON.stringify(body));
   }
+
   eliminarArticulo(arg) {
     const id = arg.id;
     const body = _.omit(arg, ['id']);
     return this.peticion('articulos/delete/' + id, 'patch', JSON.stringify(null));
   }
+
   getArticulos() {
     return this.peticion('articulos', 'get');
   }
+
+  getMateriasPrimas() {
+    return this.peticion('articulos/custom/materias_primas', 'get');
+  }
+
   getArticulosByDate(date) {
     return this.peticion(`articulos/historico/${date}/0`, 'get');
   }
+
   getTipoArticuloById(id) {
     return this.peticionSinLoad(`tipo_articulos/${id}`, 'get');
   }
+
   getTipoArticulos() {
     return this.peticion('tipo_articulos', 'get');
   }
+
   getOneArticulo(id: number | string) {
     return this.peticion(`articulos/${id}`, 'get');
-  }
-  getOneArticuloByCodigo(codigo: number | string) {
-    return this.peticion(`articulo/codigo/${codigo}`, 'get');
-  }
-  CountArticulos() {
-    return this.peticion('articulo/cant', 'get');
   }
 
   // =====================================================================

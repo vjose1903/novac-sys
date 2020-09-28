@@ -55,6 +55,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   subDeci: Subscription;
   obj_paginate_ = obj_paginate;
   vendido_en: any;
+  listaMateriasPrimas;
 
   constructor(
     private artServ: ObservableServcie,
@@ -87,6 +88,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   async necesarioStart() {
     await this.getArticulos(this.obj_paginate_);
     this.getTipoArticulos();
+    this.getMateriasP();
+  }
+  getMateriasP() {
+    this.dbServ.getMateriasPrimas().subscribe((res) => {
+      this.listaMateriasPrimas = GLOBAL.duplicarJson(res);
+    });
   }
 
   getTipoArticulos() {
@@ -307,23 +314,18 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
     control.removeAt(i);
   }
 
-  filtroFormula(item) {
-    return item.tipo_articulo_id === 2;
-  }
-
   getCosto(id, i) {
     const control = this.form.controls['rowFormula'] as FormArray;
 
-    const MateriaPrima = this.listaArticulos.filter((val) => val.id === _.parseInt(id))[0];
+    console.log('this.listaMateriasPrimas ',this.listaMateriasPrimas)
+    const MateriaPrima = this.listaMateriasPrimas.filter((val) => val.id === _.parseInt(id))[0];
+    console.log('MateriaPrima ',MateriaPrima)
 
-    let costo = 0;
-    if (MateriaPrima.medida === 'Quintal') {
-      costo = MateriaPrima.contenido_articulos[0].costo;
-    } else if (MateriaPrima.medida === 'Libra') {
-      costo = MateriaPrima.costo_principal;
-    }
+    const costo = MateriaPrima.costo;
+    const precio = MateriaPrima.precio;
 
     (control.controls[i] as any).controls['costo_formula'].setValue(costo);
+    (control.controls[i] as any).controls['precio_formula'].setValue(precio);
   }
 
   calculateCostoPT() {
