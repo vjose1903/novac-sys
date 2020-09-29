@@ -38,3 +38,4 @@ export const venta_contado = {
   pagos: [],
   FACTURA_DE: 'venta',
 };
+export const compra_contado_valor_fiscal = {};

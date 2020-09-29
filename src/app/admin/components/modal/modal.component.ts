@@ -109,22 +109,24 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
-      if (res !== undefined && res !== null) {
+
+      if (res !== undefined && res !== null && !this.paraFiltroArticulos) {
+        this.showModal = res;
+      }
+      if (res === false) {
         this.showModal = res;
       }
     });
 
     this.subCalcularHeigth = this.mServ.CALCULARHEIGHT.subscribe((res) => {
       if (res) {
-        console.log('entro a calcular el height');
+
 
         setTimeout(() => {
-          if (document.getElementsByClassName('ui-dialog-content')) {
+          if (document.getElementsByClassName('ui-dialog-content') && document.getElementsByClassName('ui-dialog-content')[0]) {
             this.altoDiv = (document.getElementsByClassName('ui-dialog-content')[0] as any).offsetHeight + 30;
           }
         }, 10);
-      } else {
-        console.log('NO entro a calcular el height');
       }
     });
 
@@ -293,7 +295,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           if (this.seleccionModal.length === 0) {
             this.noArticulo();
           }
-
+          this.showModal = true;
           this.tServ.Func_total_paginas(res.total_registros);
         } else {
           this.articuloFiltradoPorCodigo(res);

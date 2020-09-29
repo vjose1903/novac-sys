@@ -554,6 +554,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     const obj = JSON.parse(arg);
     this.CuerpoFactura = obj;
+    console.log('this.CuerpoFactura ', this.CuerpoFactura);
 
     if (this.metodo === 'venta') {
       this.CuerpoFactura.map((articulo) => {
