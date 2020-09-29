@@ -84,12 +84,16 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       }
     });
   }
+  filtroFormula(item) {
+    return item._destroy !== '1';
+  }
 
   async necesarioStart() {
     await this.getArticulos(this.obj_paginate_);
     this.getTipoArticulos();
     this.getMateriasP();
   }
+
   getMateriasP() {
     this.dbServ.getMateriasPrimas().subscribe((res) => {
       this.listaMateriasPrimas = GLOBAL.duplicarJson(res);
@@ -133,6 +137,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       this.form.controls.medida.setValue('Quintal');
       this.fillDropAlerta('Quintal');
       this.is_combo = true;
+      this.getMateriasP();
     } else {
       this.ARRAY_FORMULA = ([] as unknown) as FormArray;
       this.is_combo = false;
@@ -311,21 +316,26 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
 
   removeItem(i: number) {
     const control = this.form.controls['rowFormula'] as FormArray;
+    // if (control.value[i].id) {
+    //   (control.controls[i] as any).controls['_destroy'].setValue('1');
+    // } else {
     control.removeAt(i);
+    // }
+    console.log('control ', control.value[i]);
   }
 
   getCosto(id, i) {
     const control = this.form.controls['rowFormula'] as FormArray;
 
-    console.log('this.listaMateriasPrimas ',this.listaMateriasPrimas)
+    console.log('this.listaMateriasPrimas ', this.listaMateriasPrimas);
     const MateriaPrima = this.listaMateriasPrimas.filter((val) => val.id === _.parseInt(id))[0];
-    console.log('MateriaPrima ',MateriaPrima)
+    console.log('MateriaPrima ', MateriaPrima);
 
     const costo = MateriaPrima.costo;
     const precio = MateriaPrima.precio;
 
-    (control.controls[i] as any).controls['costo_formula'].setValue(costo);
-    (control.controls[i] as any).controls['precio_formula'].setValue(precio);
+    (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costo));
+    (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(precio));
   }
 
   calculateCostoPT() {
@@ -333,7 +343,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
 
     if (this.ARRAY_FORMULA.value.length > 0 && this.ARRAY_FORMULA.value !== undefined) {
       this.ARRAY_FORMULA.value.forEach((ingrediente: any) => {
-        sumatoriaMult += parseFloat(ingrediente.cantidad_formula) * ingrediente.costo_formula;
+        sumatoriaMult += GLOBAL.desformatear(ingrediente.cantidad_formula) * GLOBAL.desformatear(ingrediente.costo_formula);
       });
 
       const formulario = this.form.controls;
@@ -576,18 +586,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
 
     const x = GLOBAL.duplicarJson(formula.value);
 
-    const tempArticulo = this.listaArticulos.filter((val) => val.id === x.articulo_id);
-
+    const tempArticulo = this.listaMateriasPrimas.filter((val) => val.id === x.articulo_id);
     const articulo = tempArticulo[0];
     let costo;
     if (articulo !== undefined) {
-      if (articulo.medida === 'Quintal') {
-        costo = articulo.contenido_articulos[0].costo;
-      } else if (articulo.medida === 'Libra') {
-        costo = articulo.costo_principal;
-      }
-
-      if (costo !== x.costo_formula) {
+      costo = articulo.costo;
+      if (costo !== GLOBAL.desformatear(x.costo_formula)) {
         res = true;
         setTimeout(() => {
           this.Recalcular = true;
@@ -618,33 +622,28 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
   fillFormula(ingredient, i, recalcular?) {
     const control = this.form.controls['rowFormula'] as FormArray;
 
-    const TempMateriaPrima = this.listaArticulos.filter((val) => val.id === _.parseInt(ingredient.articulo_combo));
+    const TempMateriaPrima = this.listaMateriasPrimas.filter((val) => val.id === _.parseInt(ingredient.articulo_combo));
+
     const MateriaPrima = TempMateriaPrima[0];
 
-    let costo = 0;
-    let precio = 0;
-    if (MateriaPrima.medida === 'Quintal') {
-      costo = MateriaPrima.contenido_articulos[0].costo;
-      precio = MateriaPrima.contenido_articulos[0].precio;
-    } else if (MateriaPrima.medida === 'Libra') {
-      costo = MateriaPrima.costo_principal;
-      precio = MateriaPrima.precio_principal;
-    }
+    const costo = MateriaPrima.costo;
+    const precio = MateriaPrima.precio;
 
     if (recalcular) {
-      (control.controls[i] as any).controls['costo_formula'].setValue(costo);
-      (control.controls[i] as any).controls['precio_formula'].setValue(precio);
+      (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costo));
+      (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(precio));
     } else {
-      (control.controls[i] as any).controls['costo_formula'].setValue(ingredient.costo);
-      (control.controls[i] as any).controls['precio_formula'].setValue(ingredient.precio);
+      (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(ingredient.costo));
+      (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(ingredient.precio));
     }
     (control.controls[i] as any).controls['articulo_id'].setValue(ingredient.articulo_combo);
-    (control.controls[i] as any).controls['cantidad_formula'].setValue(ingredient.cantidad);
+    (control.controls[i] as any).controls['cantidad_formula'].setValue(GLOBAL.numFormatTwoDecimals(ingredient.cantidad));
     (control.controls[i] as any).controls['id'].setValue(ingredient.id ? ingredient.id : null);
   }
+
   editarItem(item) {
     const articulo = item.ARG;
-    console.log(articulo);
+    console.log('articulo ', articulo);
 
     this.borrar();
     this.ProductoEditando = item.ARG;
@@ -792,9 +791,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       const obj = {
         id: _.parseInt(element.id ? element.id : null),
         articulo_combo: _.parseInt(element.articulo_id),
-        cantidad: _.parseInt(element.cantidad_formula),
-        costo: element.costo_formula,
-        precio: element.precio_formula,
+        cantidad: GLOBAL.desformatear(element.cantidad_formula),
+        costo: GLOBAL.desformatear(element.costo_formula),
+        precio: GLOBAL.desformatear(element.precio_formula),
         _destroy: element._destroy ? element._destroy : null,
       };
       formulas.push(obj);
@@ -831,6 +830,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       obj['otros_costos'] = x.otros_costos;
       obj['formulas_productos_terminados_attributes'] = this.formarFormula();
     }
+    console.log('obj ', obj);
 
     if (x.id) {
       obj['id'] = x.id;

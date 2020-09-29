@@ -1,5 +1,5 @@
 <div class="row" style="height: calc(100% - 60px)">
-  <div class=" col-md-6  contenedorRegistro">
+  <div class="col-md-5 contenedorRegistro">
     <!-- <div class=""> -->
     <h4>{{ titulo }}</h4>
     <div class="card card-padding sombra">
@@ -13,32 +13,32 @@
               [(ngModel)]="tipo_articulo_id"
               (change)="selectTipoFactura($event.target.value)"
               (blur)="checkTipoArticuloSelect()"
-              class="form-control mb-4"
+              class="form-control"
             >
               <option value="{{ -1 }}" disabled>Tipo de comprobantes</option>
               <ng-container *ngFor="let tipo of lista_tipos_facturas">
                 <option *ngIf="tipo.referencia" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
               </ng-container>
             </select>
-            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="aletarTipoArticulo">
-              Debe de seleccionar tipo de comprobante
-            </div>
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="aletarTipoArticulo">Debe de seleccionar tipo de comprobante</div>
           </div>
         </div>
-        <div class="col-md-6 ">
-          <div class="form-group">
+        <div class="col-md-6">
+          <div class="form-group mt-4">
             <label class="control-label">Desde: <span style="color: red">*</span></label>
-            <input type="number" class="form-control" [(ngModel)]="Desde" />
+            <input type="number" class="form-control" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')"/>
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="desdeAlert">Debe de seleccionar una fecha</div>
           </div>
         </div>
-        <div class="col-md-6 ">
-          <div class="form-group">
+        <div class="col-md-6">
+          <div class="form-group mt-4">
             <label class="control-label">Hasta: <span style="color: red">*</span></label>
-            <input type="number" class="form-control" [(ngModel)]="Hasta" />
+            <input type="number" class="form-control" [(ngModel)]="Hasta" (keyup)="checkInputs('hasta')" (blur)="checkInputs('hasta')" />
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="hastaAlert">Debe de seleccionar una fecha</div>
           </div>
         </div>
-        <div class="col-md-6 ">
-          <div class="form-group">
+        <div class="col-md-6">
+          <div class="form-group mt-4">
             <label class="control-label">Fecha compra: <span style="color: red">*</span></label>
             <input
               type="text"
@@ -54,8 +54,8 @@
             />
           </div>
         </div>
-        <div class="col-md-6 ">
-          <div class="form-group">
+        <div class="col-md-6">
+          <div class="form-group mt-4">
             <label class="control-label">Fecha validez: <span style="color: red">*</span></label>
             <input
               type="text"
@@ -102,7 +102,7 @@
     <!-- </div> -->
   </div>
 
-  <div class=" col-md-6">
+  <div class="col-md-7">
     <h4>Listado articulos</h4>
     <div #cardTabla class="card cardListados">
       <app-tablas

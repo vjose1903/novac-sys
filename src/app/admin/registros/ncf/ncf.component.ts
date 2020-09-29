@@ -40,7 +40,7 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
       key: 'tipoC',
     },
     {
-      titulo: 'Cantidad',
+      titulo: 'Cant.',
       key: 'cantidad',
     },
     {
@@ -87,6 +87,8 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
   is_editando = false;
   ncfSelected;
   obj_paginate_ = obj_paginate;
+  desdeAlert = false;
+  hastaAlert = false;
   constructor(
     private dbServ: DBservice,
     private cdRef: ChangeDetectorRef,
@@ -163,7 +165,7 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
       const temp = GLOBAL.duplicarJson(this.lista_tipos_facturas);
       for (let i = 0; i < temp.length; i++) {
         const element = temp[i];
-        if (!element.referencia) {
+        if (!element.referencia || element.referencia === '02' || element.referencia === '00') {
           _.pullAt(temp, i);
         }
       }
@@ -204,6 +206,28 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
   checkTipoArticuloSelect() {
     if (this.tipo_articulo_id === -1) {
       this.aletarTipoArticulo = true;
+    }
+  }
+
+  checkInputs(arg) {
+    switch (arg) {
+      case 'desde':
+        if (this.Desde) {
+          this.desdeAlert = false;
+        } else {
+          this.desdeAlert = true;
+        }
+        break;
+      case 'hasta':
+        if (this.Hasta) {
+          this.hastaAlert = false;
+        } else {
+          this.hastaAlert = true;
+        }
+        break;
+
+      default:
+        break;
     }
   }
 
