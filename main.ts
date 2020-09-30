@@ -5,6 +5,7 @@ import * as url from 'url';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 const pdfmake = require('pdfmake/src/printer');
+import * as facturasCompraVenta from './facturasCompraVenta';
 import { logoADM } from './files';
 
 // tslint:disable-next-line: one-variable-per-declaration
@@ -98,8 +99,10 @@ ipcMain.on('printerNames', (event: any, arg) => {
 });
 
 ipcMain.on('print', (event: any, data) => {
-  // data = JSON.parse(data);
-  makeFacturaVenta(data);
+  const obj = facturasCompraVenta.makeFacturaVenta(data);
+  const dd = obj.doc;
+  const file = obj.file;
+  makePdf(dd, file);
 });
 
 // ==========================================================================================================================================================
@@ -509,60 +512,7 @@ function contenidoFacturaVenta(data) {
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 
-function makeFacturaVenta(data) {
-  console.log(data.condicion);
-  console.log('###########');
-
-  console.log(data);
-
-  const dd = {
-    pageSize: { width: 760, height: 480 },
-    pageMargins: data.condicion === 'Contado' ? [10, 200, 0, 40] : [10, 200, 0, 40],
-    header: cabeceraFacturaVenta(data),
-    content: contenidoFacturaVenta(data),
-
-    footer: (currentPage, pageCount) => {
-      console.log('currentPage ', currentPage);
-
-      return [
-        {
-          text: 'pag: ' + currentPage.toString() + ' de ' + pageCount,
-          alignment: 'right',
-          margin: [0, 0, 30, 0],
-        },
-        data.FACTURA_DE === 'venta'
-          ? data.condicion === 'Contado'
-            ? { text: '' }
-            : {
-                text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-                alignment: 'center',
-                margin: [0, -15, 0, 0],
-              }
-          : { text: '' },
-      ];
-    },
-    images: {
-      logo: logoADM,
-    },
-    styles: {
-      letra10: {
-        fontSize: 10,
-      },
-      letra11: {
-        fontSize: 11,
-      },
-      letra12: {
-        fontSize: 12,
-      },
-      letra14: {
-        fontSize: 14,
-      },
-      letra17: {
-        fontSize: 17,
-      },
-    },
-  };
-
+function makePdf(dd, file) {
   const type_font = process.platform === 'darwin' ? 'roboto/Roboto' : 'roboto\\Roboto';
   const font_dir = process.platform === 'darwin' ? 'fonts/' : 'fonts\\';
 
@@ -579,7 +529,7 @@ function makeFacturaVenta(data) {
   const printer = new pdfmake(fontDescriptors);
 
   // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
-  const cFileName = 'factura.pdf';
+  const cFileName = file;
   try {
     const pdfDoc = printer.createPdfKitDocument(dd);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {

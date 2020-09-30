@@ -178,8 +178,8 @@ export class HomeComponent implements OnInit {
     // };
 
     // const data = compra_credito_valor_fiscal;
-    const data = venta_credito_consumo;
     // const data = compra_contado_valor_fiscal;
+    const data = venta_credito_consumo;
 
     console.log('data ', data);
     // const DD = await this.pdfServ.makeFacturaVenta(data);

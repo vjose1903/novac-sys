@@ -298,13 +298,12 @@ export class IngresosComponent implements OnInit, OnDestroy {
     let total = 0;
     for (let i = 0; i < this.facturas_selected.length; i++) {
       const fact = this.facturas_selected[i];
-      console.log(fact);
 
       temp.push({
         cabecera_factura_id: fact.id,
         pago_total: fact.pagoT,
         deposito: GLOBAL.desformatear(fact.monto),
-        descripcion: this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo Factura ' + fact.secuencia : 'Abono ' + fact.monto + ' pesos a factura ' + fact.secuencia) : '',
+        descripcion: this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo Factura ' + fact.secuencia : 'Abono a factura no. ' + fact.secuencia) : '',
         pago_a_tiempo: fact.pago_a_tiempo,
       });
 
