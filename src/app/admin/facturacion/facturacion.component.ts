@@ -153,8 +153,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipo_modal === 'buscarCliente') {
         this.propietario_factura = res.data;
-        console.log('propietario_factura', this.propietario_factura);
-        console.log('fecha vencimiento', moment(new Date()).add(this.propietario_factura.limite_credito, 'days').format('DD/MM/YYYY'));
 
         this.form.patchValue(this.propietario_factura);
         this.enfocarInput('cod-0');
@@ -469,12 +467,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       };
 
       this.mServ.ModalSeleccion(obj);
-
-      setTimeout(() => {
-        this.mServ.mostrarModal(true);
-      }, 250);
     }
-    this.mServ.mostrarModal(true);
+    setTimeout(() => {
+      this.mServ.mostrarModal(true);
+    }, 250);
+
     this.mServ.ModalTablaHeight(true);
   }
 
