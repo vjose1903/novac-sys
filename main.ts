@@ -97,83 +97,6 @@ ipcMain.on('printerNames', (event: any, arg) => {
   event.sender.send('printersNameRes', printersName);
 });
 
-// ipcMain.on('print', (event: any, arg) => {
-//   makeFacturaVenta(JSON.parse(arg));
-// });
-
-// // ==========================================================================================================================================================
-// // UNIR FACTURA VENTA
-// // ==========================================================================================================================================================
-
-// function makeFacturaVenta(DD) {
-//   const type_font = process.platform === 'darwin' ? 'roboto/Roboto' : 'roboto\\Roboto';
-
-//   const inicioRuta = process.platform === 'darwin' ? 'fonts/' : 'fonts\\';
-
-//   const fontDescriptors = {
-//     Roboto: {
-//       normal: PathApp() + inicioRuta + type_font + '-Regular.ttf',
-//       bold: PathApp() + inicioRuta + type_font + '-Bold.ttf',
-//       italics: PathApp() + inicioRuta + type_font + '-Italic.ttf',
-//       bolditalics: PathApp() + inicioRuta + type_font + '-BoldItalic.ttf',
-//     },
-//   };
-
-//   const printer = new pdfmake(fontDescriptors);
-
-//   // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(DD), datos: data });
-//   const cFileName = 'factura.pdf';
-//   try {
-//     const pdfDoc = printer.createPdfKitDocument(DD);
-//     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
-//       console.log('finizu');
-//       win.webContents.send('printRes', { msg: 'Factura creada correctamente', status: 'prueba', body: DD, mas: JSON.stringify(DD) });
-//       // imprimir(cFileName);
-//     });
-//     pdfDoc.end();
-//   } catch (err) {
-//     console.log('::::::::ERROR::::::::');
-//     console.error(err);
-
-//     win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false, error: err });
-//   }
-// }
-
-// function imprimir(cFileName) {
-//   // const { exec } = require('child_process');
-//   // "C:\Users\User\Desktop\factura.pdf" "EPSON LX-350 ESC/P"
-
-//   // var foxitPath = PathApp() + 'print\\FoxitReaderPortable.exe';
-//   // exec(`${foxitPath} /t "${PathApp()}factura.pdf"`, (error, stdout, stderr) => {
-//   //   if (error) {
-//   //     win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err: error });
-//   //     return;
-//   //   } else {
-//   //     console.log('stdout  ', stdout);
-//   //     console.log('stderr  ', stderr);
-//   //     win.webContents.send('printRes', { msg: 'Factura impresa correctamente!!', status: 'si' });
-//   //   }
-//   // });
-
-//   var sumatrapdf_path = PathApp() + 'print\\lp.exe';
-//   // var bat = require.resolve(sumatrapdf_path);
-//   // var profile = require.resolve('../profiles/app.profile.js');
-//   var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
-//   const { exec } = require('child_process');
-//   exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,monochrome" -silent ${cFileName}`, (error, stdout, stderr) => {
-//     // if (error) {
-//     //   console.error(`exec error: ${error}`);
-//     //   return;
-//     // }
-//     // console.log(`stdout: ${stdout}`);
-//     // console.log(`stderr: ${stderr}`);
-//     // callback(true);
-//   });
-// }
-
-// function PathApp() {
-//   return app.getPath('exe').substr(0, app.getPath('exe').indexOf(app.getName() + '.exe'));
-// }
 ipcMain.on('print', (event: any, data) => {
   // data = JSON.parse(data);
   makeFacturaVenta(data);
@@ -182,7 +105,25 @@ ipcMain.on('print', (event: any, data) => {
 // ==========================================================================================================================================================
 
 function redondearAdos(num) {
-  return (Math.round(num * 100) / 100).toFixed(2);
+  const string = num + '';
+  const splitStr = _.split(string, '.');
+
+  let enteros = splitStr[0];
+
+  const splitEnteros = _.split(enteros, ',');
+
+  enteros = _.join(splitEnteros, '');
+
+  let tempdecimales = splitStr[1];
+  if (splitStr.length === 1) {
+    tempdecimales = '00';
+  }
+
+  const decimales = tempdecimales.substring(0, 2);
+  const Arreglo = [enteros, decimales];
+  const numStr = _.join(Arreglo, '.');
+
+  return parseFloat(numStr).toFixed(2);
 }
 
 function formatearNumero(nStr) {
@@ -197,6 +138,10 @@ function formatearNumero(nStr) {
     }
     return x1 + x2;
   }
+}
+// =========================================================================================================
+function numFormatTwoDecimals(num) {
+  return formatearNumero(redondearAdos(num));
 }
 
 function fecha(a: any) {
@@ -213,6 +158,10 @@ function hora(a: any) {
 // CABECERA
 // ==========================================================================================================================================================
 function cabeceraFacturaVenta(data) {
+  console.log('cliente ', data.cliente);
+  console.log('factura de ', data.FACTURA_DE);
+  console.log('########', data.tipo_factura_id);
+
   const header = [
     {
       columns: [
@@ -221,29 +170,31 @@ function cabeceraFacturaVenta(data) {
             image: 'logo',
             width: 72,
             opacity: 0.85,
-            margin: [90, 0, 0, 0],
+            margin: [90, 12, 0, 0],
           },
         ],
         [
-          {
-            text: 'FACTURA A ' + _.toUpper(data.condicion),
-            alignment: 'right',
-            bold: true,
-            fontSize: 14,
-            margin: [0, 15, 30],
-          },
+          data.FACTURA_DE === 'nota'
+            ? { text: '' }
+            : {
+                text: 'FACTURA A ' + _.toUpper(data.condicion),
+                alignment: 'right',
+                bold: true,
+                style: 'letra14',
+                margin: [0, 20, 30],
+              },
           //
         ],
       ],
     },
     {
-      margin: [0, -67, 0, 0],
+      margin: [0, -62, 0, 0],
       stack: [
         {
           text: 'ADM Agroindustrial S.R.L',
           alignment: 'center',
           bold: true,
-          fontSize: 17,
+          style: 'letra17',
         },
         {
           text: 'Autopista Duarte Km0 El Higuero, La Vega',
@@ -251,10 +202,10 @@ function cabeceraFacturaVenta(data) {
         },
         {
           text: [
-            { text: 'Telefono: ', fontSize: 10 },
-            { text: '809-572-0060 ', fontSize: 10 },
-            { text: ' RNC: ', fontSize: 10 },
-            { text: '131-99603-5', fontSize: 10 },
+            { text: 'Telefono: ', style: 'letra10' },
+            { text: '809-573-0060 ', style: 'letra10' },
+            { text: ' RNC: ', style: 'letra10' },
+            { text: '131-99603-5', style: 'letra10' },
           ],
           alignment: 'center',
         },
@@ -262,37 +213,52 @@ function cabeceraFacturaVenta(data) {
     },
 
     {
-      margin: [15, 10, 0, 0],
+      margin: [15, 20, 0, 0],
       columns: [
         [
           {
             text: [
-              data.FACTURA_DE === 'venta' ? { text: 'Cliente : ', fontSize: 12 } : { text: 'Suplidor : ', fontSize: 12 },
-              data.FACTURA_DE === 'venta' ? { text: data.cliente.nombre, fontSize: 12 } : { text: data.suplidor.nombre, fontSize: 12 },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: 'Cliente : ', style: 'letra12' } : { text: 'Suplidor : ', style: 'letra12' },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.nombre, style: 'letra12' } : { text: data.suplidor.nombre, style: 'letra12' },
             ],
             margin: [0, 0, 0, 0],
           },
           {
             text: [
-              data.FACTURA_DE === 'venta' ? { text: 'Rnc cliente : ', fontSize: 12 } : { text: 'Rnc suplidor : ', fontSize: 12 },
-              data.FACTURA_DE === 'venta' ? { text: data.cliente.rnc, fontSize: 12 } : { text: data.suplidor.rnc, fontSize: 12 },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: 'Rnc cliente : ', style: 'letra12' } : { text: 'Rnc suplidor : ', style: 'letra12' },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.rnc, style: 'letra12' } : { text: data.suplidor.rnc, style: 'letra12' },
             ],
             margin: [0, 5, 0, 0],
           },
           {
-            text: [{ text: 'Dirección : ', fontSize: 12 }, data.FACTURA_DE === 'venta' ? { text: data.cliente.direccion, fontSize: 12 } : { text: data.suplidor.direccion, fontSize: 12 }],
+            text: [
+              { text: 'Dirección : ', style: 'letra12' },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.direccion, style: 'letra12' } : { text: data.suplidor.direccion, style: 'letra12' },
+            ],
             margin: [0, 5, 0, 0],
           },
         ],
         [
           {
-            text: [{ text: data.tipo_factura, fontSize: 14 }],
+            text: [{ text: data.tipo_factura, style: 'letra14' }],
             margin: [0, 15, 0, 0],
             alignment: 'center',
           },
+
           data.FACTURA_DE === 'compra'
             ? {
-                text: [{ text: '- - - COMPRA - - -', fontSize: 11 }],
+                text: [{ text: '- - - COMPRA - - -', style: 'letra11' }],
+                margin: [0, 1, 0, 0],
+                alignment: 'center',
+              }
+            : { text: '' },
+
+          data.FACTURA_DE === 'nota'
+            ? {
+                text: [
+                  { text: 'Aplicada a: ', style: 'letra11' },
+                  { text: data.aplicada_a, style: 'letra11' },
+                ],
                 margin: [0, 1, 0, 0],
                 alignment: 'center',
               }
@@ -303,40 +269,39 @@ function cabeceraFacturaVenta(data) {
             stack: [
               {
                 text: [
-                  { text: 'Fecha : ', fontSize: 11.5 },
-                  { text: fecha(data.created_at), fontSize: 11.5 },
-                  { text: ' - ' + hora(data.created_at), fontSize: 11.5 },
+                  { text: 'Fecha : ', style: 'letra11' },
+                  { text: fecha(data.created_at), style: 'letra11' },
+                  { text: ' - ' + hora(data.created_at), style: 'letra11' },
                 ],
                 margin: [75, 0, 0, 0],
               },
-              data.condicion === 'Contado'
+              (data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' || data.FACTURA_DE === 'compra') && data.condicion === 'Contado'
                 ? { text: '' }
                 : {
                     text: [
-                      { text: 'Fecha vencimiento : ', fontSize: 11.5 },
-                      { text: fecha(data.fecha_vencimiento), fontSize: 11.5 },
+                      { text: 'Fecha vencimiento : ', style: 'letra11' },
+                      { text: fecha(data.fecha_vencimiento), style: 'letra11' },
                     ],
                     margin: [75, 3, 0, 0],
                   },
-
               {
                 text: [
-                  { text: 'NCF : ', fontSize: 11.5 },
-                  { text: data.numero_comprobante, fontSize: 11.5 },
+                  { text: 'NCF : ', style: 'letra11' },
+                  { text: data.numero_comprobante, style: 'letra11' },
                 ],
                 margin: [75, 3, 0, 0],
               },
               {
                 text: [
-                  { text: 'Fact No : ', fontSize: 11.5 },
-                  { text: _.padStart(data.numero_factura, 8, '0'), fontSize: 11.5 },
+                  { text: 'Doc No : ', style: 'letra11' },
+                  { text: _.padStart(data.numero_factura, 8, '0'), style: 'letra11' },
                 ],
                 margin: [75, 3, 0, 0],
               },
               {
                 text: [
-                  { text: 'Valida hasta : ', fontSize: 11.5 },
-                  { text: fecha(data.fecha_valida), fontSize: 11.5 },
+                  { text: 'Valida hasta : ', style: 'letra11' },
+                  data.tipo_factura_id === 3 ? { text: 'No aplica.', style: 'letra11' } : data.FACTURA_DE === 'compra' ? { text: ' ' } : { text: fecha(data.fecha_valida), style: 'letra11' },
                 ],
                 margin: [75, 3, 0, 0],
               },
@@ -354,7 +319,7 @@ function cabeceraFacturaVenta(data) {
           type: 'rect',
           x: 10,
           y: 3,
-          w: 760,
+          w: 740,
           h: 2,
           color: '#000000',
         },
@@ -365,24 +330,24 @@ function cabeceraFacturaVenta(data) {
       style: 'tableExample',
       table: {
         headerRows: 1,
-        widths: [30, 233, '*', '*', '*', '*', '*'],
+        widths: [30, 245, 65, '*', '*', '*', '*'],
         body: [
           [
-            { text: ' #', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
-            { text: 'Articulo', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
-            { text: 'Cantidad', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
-            { text: 'Unidad', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
-            data.FACTURA_DE === 'venta'
-              ? { text: 'Precio', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] }
-              : { text: 'Costo', style: 'tableHeader', bold: true, margin: [8, 0, 0, 0] },
-            { text: 'Itbis', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
-            { text: 'Total', style: 'tableHeader', bold: true, margin: [0, 0, 0, 0] },
+            { text: ' #', style: 'tableHeader', bold: true, margin: [4, 0, 0, 0] },
+            { text: 'Articulo', style: 'tableHeader', bold: true, margin: [-10, 0, 0, 0] },
+            { text: 'Cantidad', style: 'tableHeader', bold: true }, // margin: [5, 0, 0, 0]
+            { text: 'Unidad', style: 'tableHeader', bold: true, margin: [3, 0, 0, 0] }, // margin: [-1, 0, 0, 0]
+            data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
+              ? { text: 'Precio', style: 'tableHeader', bold: true, margin: [13, 0, 0, 0] }
+              : { text: 'Costo', style: 'tableHeader', bold: true, margin: [14, 0, 0, 0] },
+            { text: 'Itbis', style: 'tableHeader', bold: true, margin: [10, 0, 0, 0] },
+            { text: 'Total', style: 'tableHeader', bold: true }, // margin: [12, 0, 0, 0]
           ],
 
           [1, 'Sample value 1', 'value 2', 'value 3', 'value 4', 'value 5', 'value 6'],
         ],
       },
-      margin: [10, 0, 0, 0],
+      margin: [10, 0, 10, 0],
       layout: 'headerLineOnly',
     },
   ];
@@ -400,18 +365,17 @@ function calcularPrecio(cant, precio, tipo) {
 
 function contenidoFacturaVenta(data) {
   const tempBody = [];
-
   data.detalle_facturas.forEach((detalle, i) => {
     const row = [];
 
     row.push(
       i + 1,
       detalle.descripcion,
-      formatearNumero(redondearAdos(detalle.cantidad)),
-      detalle.unidad,
-      formatearNumero(data.FACTURA_DE === 'venta' ? detalle.precio : detalle.costo),
-      detalle.itbis !== 0 ? formatearNumero(redondearAdos(detalle.itbis)) : '',
-      formatearNumero(redondearAdos(detalle.total)),
+      { text: numFormatTwoDecimals(detalle.cantidad), alignment: 'right', margin: [0, 0, 25, 0] },
+      { text: detalle.unidad, margin: [8, 0, 0, 0] },
+      { text: numFormatTwoDecimals(data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? detalle.precio : detalle.costo), alignment: 'right', margin: [0, 0, 10, 0] },
+      { text: numFormatTwoDecimals(detalle.itbis), alignment: 'right', margin: [0, 0, 32, 0] },
+      { text: numFormatTwoDecimals(detalle.total), alignment: 'right', margin: [0, 0, 26, 0] },
     );
     tempBody.push(row);
   });
@@ -419,10 +383,10 @@ function contenidoFacturaVenta(data) {
     {
       style: 'tableExample',
       table: {
-        widths: [24, 260, '*', '*', '*', '*', '*'],
+        widths: [24, 240, '*', 55, '*', '*', '*'],
         body: tempBody,
       },
-      margin: data.condicion === 'Contado' ? [0, -2, 0, 0] : [0, -6, 0, 0],
+      margin: data.condicion === 'Contado' ? [0, -19, 10, 0] : [0, -6, 10, 0],
       layout: {
         hLineWidth: (i, node) => {
           return i === node.table.body.length ? 2 : 1;
@@ -440,36 +404,45 @@ function contenidoFacturaVenta(data) {
     },
     {
       text: [
-        { text: 'Realizada Por:  ', fontSize: 11, bold: true },
-        { text: data.usuario, fontSize: 11 },
+        { text: 'Realizada Por :  ', style: 'letra11', bold: true },
+        { text: data.usuario, style: 'letra11' },
+        data.vendedor ? { text: '    Vendedor :  ', style: 'letra11', bold: true } : { text: '' },
+        data.vendedor ? { text: data.vendedor, style: 'letra11' } : { text: '' },
       ],
       margin: [0, 5, 0, 0],
     },
+
     {
       stack: [
         {
           table: {
             body: [
               [
-                { text: 'Bruto RD$: ', fontSize: 11, bold: true },
-                { text: formatearNumero(redondearAdos(data.Bruto)), fontSize: 11, alignment: 'right' },
+                { text: 'Bruto RD$: ', style: 'letra11', bold: true },
+                { text: numFormatTwoDecimals(data.Bruto), style: 'letra11', alignment: 'right' },
               ],
               [
-                { text: 'Itbis RD$: ', fontSize: 11, bold: true },
-                { text: formatearNumero(redondearAdos(data.itbis)), fontSize: 11, alignment: 'right' },
+                { text: 'Itbis RD$: ', style: 'letra11', bold: true },
+                { text: numFormatTwoDecimals(data.itbis), style: 'letra11', alignment: 'right' },
               ],
               [
-                { text: 'Descuento RD$: ', fontSize: 11, bold: true },
-                { text: formatearNumero(redondearAdos(data.descuento)), fontSize: 11, alignment: 'right' },
+                { text: 'Descuento RD$: ', style: 'letra11', bold: true },
+                { text: numFormatTwoDecimals(data.descuento), style: 'letra11', alignment: 'right' },
               ],
               [
-                { text: 'TOTAL RD$: ', fontSize: 11, bold: true },
-                { text: formatearNumero(redondearAdos(data.total_factura)), fontSize: 11, alignment: 'right' },
+                { text: 'TOTAL RD$: ', style: 'letra11', bold: true },
+                { text: numFormatTwoDecimals(data.total_factura), style: 'letra11', alignment: 'right' },
               ],
+              data.FACTURA_DE === 'compra' || data.FACTURA_DE === 'nota'
+                ? [{ text: '' }, { text: '' }]
+                : [
+                    { text: 'Devuelta RD$: ', style: 'letra11', bold: true },
+                    { text: numFormatTwoDecimals(data.devuelta), style: 'letra11', alignment: 'right' },
+                  ],
             ],
           },
           layout: 'noBorders',
-          margin: [595, 3, 0, 0],
+          margin: [585, 3, 0, 0],
         },
         {
           stack: [
@@ -483,7 +456,7 @@ function contenidoFacturaVenta(data) {
                   h: 1,
                   color: '#000000',
                 },
-                data.FACTURA_DE === 'venta'
+                data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
                   ? {
                       type: 'rect',
                       x: 260,
@@ -507,14 +480,14 @@ function contenidoFacturaVenta(data) {
               columns: [
                 [
                   {
-                    text: [{ text: 'Revisada Por', fontSize: 12, bold: true }],
+                    text: [{ text: 'Revisada Por', style: 'letra12', bold: true }],
                     margin: [75, 5, 0, 0],
                   },
                 ],
                 [
-                  data.FACTURA_DE === 'venta'
+                  data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
                     ? {
-                        text: [{ text: 'Cliente', fontSize: 12, bold: true }],
+                        text: [{ text: 'Cliente', style: 'letra12', bold: true }],
                         margin: [-70, 5, 0, 0],
                       }
                     : { text: '' },
@@ -536,38 +509,59 @@ function contenidoFacturaVenta(data) {
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 
-function makeFacturaVenta(dd) {
-  // const dd = {
-  //   pageSize: { width: 760, height: 480 },
-  //   pageMargins: data.condicion === 'Contado' ? [10, 157.9, 0, 40] : [10, 173, 0, 40],
-  //   // pageMargins: data.condicion === 'Contado' ? [10, 157.5, 0, 40] : [10, 172.9, 0, 40],
-  //   header: cabeceraFacturaVenta(data),
-  //   content: contenidoFacturaVenta(data),
-  //   footer: (currentPage, pageCount) => {
-  //     return [
-  //       {
-  //         text: 'pag: ' + currentPage.toString() + ' de ' + pageCount,
-  //         alignment: 'right',
-  //         margin: [0, 0, 30, 0],
-  //       },
-  //       data.FACTURA_DE === 'venta'
-  //         ? data.condicion === 'Contado'
-  //           ? { text: '' }
-  //           : {
-  //               text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
-  //               alignment: 'center',
-  //               margin: [0, -15, 0, 0],
-  //             }
-  //         : { text: '' },
-  //     ];
-  //   },
-  //   images: {
-  //     logo: logoADM,
-  //   },
-  //   defaultStyle: {
-  //     font: 'Roboto',
-  //   },
-  // };
+function makeFacturaVenta(data) {
+  console.log(data.condicion);
+  console.log('###########');
+
+  console.log(data);
+
+  const dd = {
+    pageSize: { width: 760, height: 480 },
+    pageMargins: data.condicion === 'Contado' ? [10, 200, 0, 40] : [10, 200, 0, 40],
+    header: cabeceraFacturaVenta(data),
+    content: contenidoFacturaVenta(data),
+
+    footer: (currentPage, pageCount) => {
+      console.log('currentPage ', currentPage);
+
+      return [
+        {
+          text: 'pag: ' + currentPage.toString() + ' de ' + pageCount,
+          alignment: 'right',
+          margin: [0, 0, 30, 0],
+        },
+        data.FACTURA_DE === 'venta'
+          ? data.condicion === 'Contado'
+            ? { text: '' }
+            : {
+                text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
+                alignment: 'center',
+                margin: [0, -15, 0, 0],
+              }
+          : { text: '' },
+      ];
+    },
+    images: {
+      logo: logoADM,
+    },
+    styles: {
+      letra10: {
+        fontSize: 10,
+      },
+      letra11: {
+        fontSize: 11,
+      },
+      letra12: {
+        fontSize: 12,
+      },
+      letra14: {
+        fontSize: 14,
+      },
+      letra17: {
+        fontSize: 17,
+      },
+    },
+  };
 
   const type_font = process.platform === 'darwin' ? 'roboto/Roboto' : 'roboto\\Roboto';
   const font_dir = process.platform === 'darwin' ? 'fonts/' : 'fonts\\';
@@ -590,7 +584,8 @@ function makeFacturaVenta(dd) {
     const pdfDoc = printer.createPdfKitDocument(dd);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
       console.log('finizu');
-      imprimir(cFileName);
+      win.webContents.send('printRes', { msg: 'Pruebas', status: 'si', body: dd, sbody: JSON.stringify(dd) });
+      // imprimir(cFileName);
     });
     pdfDoc.end();
   } catch (err) {

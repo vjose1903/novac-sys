@@ -27,7 +27,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.searchItems();
   }
   element: HTMLElement;
-  entrar = 0;
+  entrar = 1;
 
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {

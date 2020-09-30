@@ -109,8 +109,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
+      console.log(res);
+      console.log('this.paraFiltroArticulos ', this.paraFiltroArticulos);
+      console.log('!this.paraFiltroArticulos ', !this.paraFiltroArticulos);
 
       if (res !== undefined && res !== null && !this.paraFiltroArticulos) {
+        console.log('entro');
+
         this.showModal = res;
       }
       if (res === false) {
@@ -120,8 +125,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
     this.subCalcularHeigth = this.mServ.CALCULARHEIGHT.subscribe((res) => {
       if (res) {
-
-
         setTimeout(() => {
           if (document.getElementsByClassName('ui-dialog-content') && document.getElementsByClassName('ui-dialog-content')[0]) {
             this.altoDiv = (document.getElementsByClassName('ui-dialog-content')[0] as any).offsetHeight + 30;
@@ -235,6 +238,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.mostrarModal(false);
     this.mServ.ModalSeleccion(undefined);
     this.mServ.ModalTablaHeight(false);
+    this.paraFiltroArticulos = undefined;
+    this.paraFiltroClientes = undefined;
+    this.paraFiltroSuplidor = undefined;
   }
 
   devolverCLick(arg) {
@@ -288,7 +294,14 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
     if (this.paraFiltroArticulos) {
       try {
-        const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+        const is_compra = this.metodo === 'compra' ? true : false;
+        console.log('#######');
+        console.log('#######');
+        console.log('#######');
+        console.log('#######');
+        console.log('is_compra ', is_compra);
+
+        const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra).toPromise();
 
         if (res.data) {
           this.seleccionModal = res.data;

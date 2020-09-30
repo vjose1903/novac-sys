@@ -190,7 +190,7 @@ export class PdfService {
             type: 'rect',
             x: 10,
             y: 3,
-            w: 760,
+            w: 740,
             h: 2,
             color: '#000000',
           },
@@ -218,7 +218,7 @@ export class PdfService {
             [1, 'Sample value 1', 'value 2', 'value 3', 'value 4', 'value 5', 'value 6'],
           ],
         },
-        margin: [10, 0, 0, 0],
+        margin: [10, 0, 10, 0],
         layout: 'headerLineOnly',
       },
     ];
@@ -257,7 +257,7 @@ export class PdfService {
           widths: [24, 240, '*', 55, '*', '*', '*'],
           body: tempBody,
         },
-        margin: data.condicion === 'Contado' ? [0, -2, 0, 0] : [0, -6, 0, 0],
+        margin: data.condicion === 'Contado' ? [0, -8, 10, 0] : [0, -6, 10, 0],
         layout: {
           hLineWidth: (i, node) => {
             return i === node.table.body.length ? 2 : 1;
@@ -385,7 +385,7 @@ export class PdfService {
 
     const DD = {
       pageSize: { width: 760, height: 480 },
-      pageMargins: data.condicion === 'Contado' ? [10, 180, 0, 40] : [10, 173, 0, 40],
+      pageMargins: data.condicion === 'Contado' ? [10, 190, 0, 40] : [10, 173, 0, 40],
       header: await this.cabeceraFacturaVenta(data),
       content: await this.contenidoFacturaVenta(data),
 

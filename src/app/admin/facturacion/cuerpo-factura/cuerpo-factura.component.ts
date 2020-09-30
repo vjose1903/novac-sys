@@ -902,7 +902,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     } else {
       const cantidades = ARTICULO.cantidades;
 
-      if (ARTICULO.existencia > 0 && ARTICULO.aviso_existencia > cantidades[ARTICULO.medida_alerta]) {
+      if (this.metodo === 'venta' && ARTICULO.existencia > 0 && ARTICULO.aviso_existencia > cantidades[ARTICULO.medida_alerta]) {
         if (ARTICULO.descripcion === 'Producto terminado') {
           this.dbServ.toastWarning(
             'Solo quedan ' + GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) + ' ' + ARTICULO.medida_alerta + ' de este producto, debe de producir mas!!!',
@@ -991,7 +991,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   entrarSacosAUnidades(precioQuintal, costoQuintal) {
     this.sacos.forEach((saco) => {
       const valor = 'Saco de ' + saco + ' libras';
-      this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioQuintal), costo: this.calcularPrecioSaco(saco, costoQuintal) });
+      this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioQuintal), costo: this.calcularPrecioSaco(saco, costoQuintal), cantidad: saco });
     });
   }
 
@@ -1002,9 +1002,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   noArticuloEncontrado(arg) {
     this.dbServ.toastError('Articulo no creado', 'ERROR');
+    console.log('aquiiiii ', arg);
 
-    this.enfocarInput('cod-' + arg);
     this.mServ.ModalIndex(undefined);
+    setTimeout(() => {
+      this.enfocarInput('cod-' + arg);
+      this.mServ.mostrarModal(false);
+    }, 100);
 
     // this.element = document.getElementById('cod-' + arg) as HTMLElement;
     // this.element.focus();

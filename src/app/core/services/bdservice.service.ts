@@ -223,8 +223,8 @@ export class DBservice {
   // ARTICULOS
   // =====================================================================
 
-  getArticulosFiltrados(arg, page, per_page, paginado) {
-    return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  getArticulosFiltrados(arg, page, per_page, paginado, compra = false) {
+    return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}`, 'get');
   }
 
   createArticulo(arg) {

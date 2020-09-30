@@ -9,7 +9,7 @@ import { DBservice } from '../core/services/bdservice.service';
 import { IpcService } from '../core/services/ipc.service';
 import { PdfService } from '../core/services/pdf/pdf.service';
 
-import { venta_contado } from '../../assets/facturas';
+import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, venta_contado, venta_credito_consumo } from '../../assets/facturas';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -177,15 +177,18 @@ export class HomeComponent implements OnInit {
     //   ],
     // };
 
-    const data = venta_contado;
+    // const data = compra_credito_valor_fiscal;
+    const data = venta_credito_consumo;
+    // const data = compra_contado_valor_fiscal;
 
     console.log('data ', data);
-    const DD = await this.pdfServ.makeFacturaVenta(data);
-    console.log('DD ', 'dd=' + JSON.stringify(DD));
+    // const DD = await this.pdfServ.makeFacturaVenta(data);
 
-    this._ipc.send('print', DD);
+    this._ipc.send('print', data);
 
     await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+
       if (res.status) {
       } else {
         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');

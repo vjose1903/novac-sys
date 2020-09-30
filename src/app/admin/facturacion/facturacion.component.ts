@@ -153,6 +153,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipo_modal === 'buscarCliente') {
         this.propietario_factura = res.data;
+        console.log('propietario_factura', this.propietario_factura);
+        console.log('fecha vencimiento', moment(new Date()).add(this.propietario_factura.limite_credito, 'days').format('DD/MM/YYYY'));
+
         this.form.patchValue(this.propietario_factura);
         this.enfocarInput('cod-0');
         this.mServ.ModalObj(undefined);
@@ -277,47 +280,49 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   async calcularPorcientoComprobante() {
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
-    if (this.tipoFactura !== '00' && this.tipoFactura !== '0' && this.tipoFactura !== '02' && this.tipoFactura !== '2') {
-      try {
-        const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
+    if (this.metodo === 'venta') {
+      if (this.tipoFactura !== '00' && this.tipoFactura !== '0' && this.tipoFactura !== '02' && this.tipoFactura !== '2') {
+        try {
+          const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
 
-        this.paqueteComprobante = paquete.body;
+          this.paqueteComprobante = paquete.body;
 
-        if (this.paqueteComprobante.fecha_valida !== null) {
-          const desde = this.paqueteComprobante.desde;
-          const hasta = this.paqueteComprobante.hasta;
-          const secuencia = this.paqueteComprobante.secuencia;
+          if (this.paqueteComprobante.fecha_valida !== null) {
+            const desde = this.paqueteComprobante.desde;
+            const hasta = this.paqueteComprobante.hasta;
+            const secuencia = this.paqueteComprobante.secuencia;
 
-          const cant = hasta - desde;
-          const cantidad = cant + 1;
-          let porciento = 0;
+            const cant = hasta - desde;
+            const cantidad = cant + 1;
+            let porciento = 0;
 
-          if (cantidad > 0 && cantidad <= 40) {
-            porciento = cantidad * 0.5;
-          } else if (cantidad > 40 && cantidad <= 100) {
-            porciento = cantidad * 0.25;
-          } else if (cantidad > 100 && cantidad <= cantidad * 500) {
-            porciento = cantidad * 0.1;
-          } else if (cantidad > 500) {
-            porciento = cantidad * 0.04;
+            if (cantidad > 0 && cantidad <= 40) {
+              porciento = cantidad * 0.5;
+            } else if (cantidad > 40 && cantidad <= 100) {
+              porciento = cantidad * 0.25;
+            } else if (cantidad > 100 && cantidad <= cantidad * 500) {
+              porciento = cantidad * 0.1;
+            } else if (cantidad > 500) {
+              porciento = cantidad * 0.04;
+            }
+            const limite = hasta - porciento;
+            const restante = hasta - secuencia + 1;
+
+            const msg =
+              this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
+                ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
+                : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
+
+            if (secuencia >= limite) {
+              this.dbServ.toastWarning(msg, 'AVISO');
+            }
           }
-          const limite = hasta - porciento;
-          const restante = hasta - secuencia + 1;
-
-          const msg =
-            this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
-              ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
-              : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
-
-          if (secuencia >= limite) {
-            this.dbServ.toastWarning(msg, 'AVISO');
-          }
+          return 'si';
+        } catch (error) {
+          this.dbServ.toastError(error.error.msg, 'ERROR');
+          this.enfocarInput('tipoFact');
+          return 'no';
         }
-        return 'si';
-      } catch (error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
-        this.enfocarInput('tipoFact');
-        return 'no';
       }
     }
   }
@@ -485,12 +490,23 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   //  MODAL IMPRIMIR
   // =============================================
   async imprimirFactura() {
+    console.log('voy a impimir');
+    console.log('this.propietario_factura ', this.propietario_factura);
+
     if (!this.propietario_factura) {
-      this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
+      if (this.metodo === 'compra') {
+        this.dbServ.toastWarning('Factura no tiene suplidor', 'Aviso');
+      } else {
+        this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
+      }
     } else {
+      console.log('this.CuerpoFactura.length ', this.CuerpoFactura.length);
+
       if (this.CuerpoFactura.length === 0) {
         this.dbServ.toastWarning('Factura no tiene Articulos', 'Aviso');
       } else {
+        console.log('this.TOTAL ', this.TOTAL);
+
         if (this.TOTAL === 0) {
           this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
@@ -520,6 +536,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   abrirModal(arg?) {
+    console.log('arg ', arg);
+
     if (arg) {
       this.mServ.ModalSeleccion(arg);
     }
@@ -840,20 +858,21 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       await this.CancelarFactura();
       this.dbServ.toastSuccess(res.msg, 'CORRECTO');
 
+      res['FACTURA_DE'] = this.metodo;
+
+      console.log('res ', res);
+      console.log('res.body ', res.body);
+
+      this._ipc.send('print', res);
+
       await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+        console.log(res);
+
         if (res.status) {
         } else {
           this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
         }
       });
-      res['FACTURA_DE'] = this.metodo;
-
-      console.log('res ', res);
-      // const DD = this.pdfServ.makeFacturaVenta(res);
-      const DD = await this.pdfServ.makeFacturaVenta(res.body);
-      console.log('DD ', DD);
-
-      this._ipc.send('print', DD);
     } catch (error) {
       console.error(error);
       this.dbServ.toastError(error.error.msg, 'ERROR');
