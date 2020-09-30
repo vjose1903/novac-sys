@@ -135,7 +135,11 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
       });
 
       this.listaEmpleados = res.data;
-      this.tServ.Func_total_paginas(res.total_registros);
+      const obj = {
+        total: res.total_registros,
+        tabla: 'listaEmpleados',
+      };
+      this.tServ.Func_total_paginas(obj);
     } catch (error) {
       this.dbServ.toastError('Error buscando empleados registrados.', 'ERROR');
     }

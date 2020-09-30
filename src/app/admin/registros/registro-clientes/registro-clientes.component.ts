@@ -142,7 +142,11 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
       });
 
       this.listaClientes = res.data;
-      this.tServ.Func_total_paginas(res.total_registros);
+      const obj = {
+        total: res.total_registros,
+        tabla: 'listaClientes',
+      };
+      this.tServ.Func_total_paginas(obj);
       this.quitarContadoDeLista();
     } catch (error) {
       this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');

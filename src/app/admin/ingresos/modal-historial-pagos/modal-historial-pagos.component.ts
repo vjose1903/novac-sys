@@ -7,6 +7,7 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class ModalHistorialPagosComponent implements OnInit {
   @Input() pagos;
+  @Input() alto;
   info = [
     {
       titulo: 'NO. recibo',
@@ -25,5 +26,7 @@ export class ModalHistorialPagosComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('alto ', this.alto);
+  }
 }

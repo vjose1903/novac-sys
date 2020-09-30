@@ -195,7 +195,11 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
       });
 
       this.listaNCF = res.data;
-      this.tServ.Func_total_paginas(res.total_registros);
+      const obj = {
+        total: res.total_registros,
+        tabla: 'listaNCF',
+      };
+      this.tServ.Func_total_paginas(obj);
     } catch (error) {
       console.error(error);
 

@@ -14,7 +14,10 @@ export const obj_paginate = {
 })
 export class TablasService {
   data;
-  private total_paginas = new BehaviorSubject<any>(0);
+  private total_paginas = new BehaviorSubject<any>({
+    tabla: 'tabla',
+    total: 0,
+  });
 
   TOTALPAGINAS = this.total_paginas.asObservable();
   constructor() {}

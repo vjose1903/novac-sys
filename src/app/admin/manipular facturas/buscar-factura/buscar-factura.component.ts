@@ -234,37 +234,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.enfocarInput('campoI');
   }
 
-  async pedirClientes(e, buscando) {
-    try {
-      console.log('BUSCANDO    ->"', buscando, '"');
-
-      const page = e.page;
-      const per_page = e.per_page;
-      const palabra_a_buscar = buscando === '' || buscando === null || buscando === undefined ? ' ' : buscando;
-
-      const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
-
-      this.listaClientes = undefined;
-
-      res.data.map((cli) => {
-        cli.nombre = GLOBAL.Capitalice(cli.nombre);
-        cli.apellido = GLOBAL.Capitalice(cli.apellido);
-        cli.documentos_de_identidad.map((docu) => {
-          if (docu.principal) {
-            cli.documento_identidad = docu.documento;
-          }
-        });
-        return cli;
-      });
-      this.listaClientes = res.data;
-
-      this.tServ.Func_total_paginas(res.total_registros);
-    } catch (error) {
-      console.error(error);
-      this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
-    }
-  }
-
   mostrarListaFacturas() {
     let res = false;
     if (this.facturas && this.facturas.length > 0) {
@@ -362,7 +331,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   }
 
   async abrirModalFiltro(nombre) {
-    await this.pedirClientes(this.obj_paginate_, nombre);
+
     this.mServ.modalTipo('buscarCliente');
     this.tipoModal = 'buscarCliente';
 

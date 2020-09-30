@@ -114,7 +114,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
       this.listaArticulos = res.data;
-      this.tServ.Func_total_paginas(res.total_registros);
+      const obj = {
+        total: res.total_registros,
+        tabla: 'listaArticulos',
+      };
+      this.tServ.Func_total_paginas(obj);
     } catch (error) {
       this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
     }

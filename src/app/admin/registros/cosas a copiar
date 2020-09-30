@@ -35,4 +35,8 @@ this.subTablaModalChange = this.mServ.TABLA_MODAL_CHANGE.subscribe((res) => {
 
 
 private tServ: TablasService
-this.tServ.Func_total_paginas(res.total_registros);
+const obj = {
+        total: res.total_registros,
+        tabla: ' ',
+      };
+this.tServ.Func_total_paginas(obj);

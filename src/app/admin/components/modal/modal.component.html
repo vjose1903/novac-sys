@@ -99,24 +99,7 @@
   >
     <app-change-password [user]="seleccionModal" (cancel)="accion($event)"></app-change-password>
   </p-dialog>
-  <!-- ================================================================================================================================ -->
-  <!--  HISTORIAL PAGOS EN RECIBO DE INGRESOS  -->
-  <!-- ================================================================================================================================ -->
 
-  <p-dialog
-    *ngIf="tipoModal === 'historial_pago'"
-    header="historial de abonos a facturas"
-    [(visible)]="showModal"
-    [modal]="false"
-    [responsive]="true"
-    [style]="{ width: '700px', minWidth: '700px' }"
-    [minY]="70"
-    [baseZIndex]="10000"
-    (onHide)="reinicioModal()"
-    blockScroll="true"
-  >
-    <app-modal-historial-pagos [pagos]="seleccionModal"></app-modal-historial-pagos>
-  </p-dialog>
   <!-- ================================================================================================================================ -->
   <!--  FORMULARIO CANTIDAD EFECTIVO  -->
   <!-- ================================================================================================================================ -->
@@ -295,7 +278,24 @@
       <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
     </p-footer>
   </p-dialog>
+  <!-- ================================================================================================================================ -->
+  <!--  HISTORIAL PAGOS EN RECIBO DE INGRESOS  -->
+  <!-- ================================================================================================================================ -->
 
+  <p-dialog
+    *ngIf="tipoModal === 'historial_pago'"
+    header="historial de abonos a facturas"
+    [(visible)]="showModal"
+    [modal]="false"
+    [responsive]="true"
+    [style]="{ width: '700px', height: '400px' }"
+    [minY]="70"
+    [baseZIndex]="10000"
+    (onHide)="reinicioModal()"
+    blockScroll="true"
+  >
+    <app-modal-historial-pagos *ngIf="altoDiv" [alto]="altoDiv" [pagos]="seleccionModal"></app-modal-historial-pagos>
+  </p-dialog>
   <!-- ================================================================================================================================ -->
   <!-- FILTRAR ARTICULO -->
   <!-- ================================================================================================================================ -->

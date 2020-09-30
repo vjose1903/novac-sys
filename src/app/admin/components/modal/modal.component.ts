@@ -29,7 +29,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
-      this.tServ.Func_total_paginas(0);
+      const obj = {
+        total: 0,
+        tabla: 'tabla',
+      };
+      this.tServ.Func_total_paginas(obj);
       this.mServ.func_tabla_modal_change(undefined);
       if (this.tipoModal === 'buscarArticulo') {
         this.mServ.pressEsc(this.index);
@@ -300,7 +304,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
             this.noArticulo();
           }
           this.showModal = true;
-          this.tServ.Func_total_paginas(res.total_registros);
+          const obj = {
+            total: res.total_registros,
+            tabla: 'filtroArticulos',
+          };
+          this.tServ.Func_total_paginas(obj);
         } else {
           this.articuloFiltradoPorCodigo(res);
         }
@@ -330,7 +338,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           setTimeout(() => {
             this.showModal = true;
           }, 250);
-          this.tServ.Func_total_paginas(res.total_registros);
+          const obj = {
+            total: res.total_registros,
+            tabla: 'filtroCliente',
+          };
+          this.tServ.Func_total_paginas(obj);
         }
       } catch (error) {
         console.error(error);
@@ -351,8 +363,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         if (res.data.length === 0) {
           this.dbServ.toastWarning('No existe suplidor con el nombre introducido', 'AVISO');
         }
-
-        this.tServ.Func_total_paginas(res.total_registros);
+        const obj = {
+          total: res.total_registros,
+          tabla: 'filtroSuplidor',
+        };
+        this.tServ.Func_total_paginas(obj);
       } catch (error) {
         console.error(error);
         this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');

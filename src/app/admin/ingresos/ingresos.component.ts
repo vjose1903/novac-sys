@@ -136,8 +136,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
         this.pedirFacturasPorCliente(res.data.id);
         this.mServ.ModalObj(undefined);
       } else if (res && res.tipo_modal === 'cambio') {
-        this.Devuelta = res.devuelta;
-        this.forma_pago = res.forma_pago;
+        this.Devuelta = res.data.devuelta;
+        this.forma_pago = res.data.forma_pago;
         this.sendIngreso();
         this.mServ.ModalObj(undefined);
       }
@@ -212,6 +212,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   }
 
   async pedirFacturasPorCliente(cliente_id) {
+    this.Facturas = undefined;
     try {
       const fechaA = moment().format('YYYY-MM-DD');
       this.Facturas = await this.dbServ
@@ -248,6 +249,13 @@ export class IngresosComponent implements OnInit, OnDestroy {
       this.Facturas.forEach((element) => {
         total += element.balance;
       });
+      const obj = {
+        total: this.Facturas.lenght,
+        tabla: 'facturasPendientes',
+      };
+
+      this.tServ.Func_total_paginas(obj);
+
       this.calcularHeigth();
       console.log(total);
     } catch (error) {
@@ -261,6 +269,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   clickVerPagos(arg) {
     const pagos = arg.pagos;
+    console.log(arg);
+
     if (pagos.length > 0) {
       for (let i = 0; i < pagos.length; i++) {
         const pago = pagos[i];
@@ -268,8 +278,14 @@ export class IngresosComponent implements OnInit, OnDestroy {
         pago.recibo_created_at = moment(pago.recibo_created_at).format('DD/MM/YYYY');
       }
       this.mServ.modalTipo('historial_pago');
-      console.log(pagos);
+      this.mServ.ModalTablaHeight(true);
 
+      const obj = {
+        total: pagos.length,
+        tabla: 'historial_pago',
+      };
+
+      this.tServ.Func_total_paginas(obj);
       this.abrirModal(pagos);
     }
   }
@@ -349,6 +365,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
       forma_pago: this.forma_pago,
       tipo_recibo_id: tipo.id,
       devuelta: this.Devuelta,
+      numero_recibo: null,
     };
 
     obj.total = this.detalleYtotal.total_recibo;
@@ -359,8 +376,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
       (res) => {
         console.log(res);
         this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
-        const nuevoBalance = this.clienteAdepositar.balance - res.total;
-        this.clienteAdepositar.balance = GLOBAL.duplicarJson(nuevoBalance);
+
+        this.clienteAdepositar.balance = res.cliente.balance;
         this.pedirFacturasPorCliente(this.clienteAdepositar.id);
         this.resetVariables();
       },
