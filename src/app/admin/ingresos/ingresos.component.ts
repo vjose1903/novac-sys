@@ -130,12 +130,12 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res && res.tipoModal === 'buscarCliente') {
+      if (res && res.tipo_modal === 'buscarCliente') {
         this.clienteAdepositar = res.data;
         (document.getElementById('clienteI') as any).value = res.data.nombre;
         this.pedirFacturasPorCliente(res.data.id);
         this.mServ.ModalObj(undefined);
-      } else if (res && res.tipoModal === 'cambio') {
+      } else if (res && res.tipo_modal === 'cambio') {
         this.Devuelta = res.devuelta;
         this.forma_pago = res.forma_pago;
         this.sendIngreso();
@@ -205,9 +205,9 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   calcularHeigth() {
     setTimeout(() => {
+      this.altoDiv = document.getElementById('cardTabla').offsetHeight - 18;
+      console.log('this.altoDiv ', this.altoDiv);
       console.log(document.getElementById('cardTabla'));
-
-      this.altoDiv = document.getElementById('cardTabla').offsetHeight - 10;
     }, 10);
   }
 
@@ -341,7 +341,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
   sendIngreso() {
     const empleado = JSON.parse(this.dbServ.getEmpleado());
 
-    const tipo = this.tipoFacturas.filter((val) => val.descripcion === this.tipo_recibo)[0];
+    // const tipo = this.tipoFacturas.filter((val) => val.descripcion === this.tipo_recibo)[0];
+    const tipo = { id: 2 };
     const obj = {
       cliente_id: this.clienteAdepositar.id,
       user_id: empleado.id,
@@ -445,56 +446,20 @@ export class IngresosComponent implements OnInit, OnDestroy {
     }
   }
 
-  quitarContadoDeLista() {
-    const temp = JSON.parse(JSON.stringify(this.listaClientes));
-    this.listaClientes = [];
-    const cliente = temp.filter((cli) => cli.nombre === 'Cliente contado');
-    const index = _.indexOf(temp, cliente[0]);
-
-    _.pullAt(temp, index);
-    this.listaClientes = temp;
-  }
-
-  async pedirClientes(e, buscando) {
-    try {
-      const page = e.page;
-      const per_page = e.per_page;
-      const palabra_a_buscar = buscando === '' || buscando === null || buscando === undefined ? ' ' : buscando;
-
-      const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
-
-      res.data.map((cli) => {
-        cli.nombre = GLOBAL.Capitalice(cli.nombre);
-        cli.apellido = GLOBAL.Capitalice(cli.apellido);
-        cli.documentos_de_identidad.map((docu) => {
-          if (docu.principal) {
-            cli.documento_identidad = docu.documento;
-          }
-        });
-        return cli;
-      });
-
-      this.listaClientes = res.data;
-      this.tServ.Func_total_paginas(res.total_registros);
-    } catch (error) {
-      console.error(error);
-      this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
-    }
-  }
-
   async abrirModalFiltro(nombre) {
-    await this.pedirClientes(this.obj_paginate_, nombre);
-
     this.mServ.modalTipo('buscarCliente');
-
     const obj = {
-      data: this.listaClientes,
+      data: [],
       filtrarCliente: nombre,
     };
+    console.log(obj);
 
     this.mServ.ModalSeleccion(obj);
 
+    // setTimeout(() => {
     this.mServ.mostrarModal(true);
+    // }, 250);
+
     this.mServ.ModalTablaHeight(true);
   }
 

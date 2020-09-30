@@ -109,11 +109,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
-      console.log(res);
-      console.log('this.paraFiltroArticulos ', this.paraFiltroArticulos);
-      console.log('!this.paraFiltroArticulos ', !this.paraFiltroArticulos);
-
-      if (res !== undefined && res !== null && !this.paraFiltroArticulos) {
+      if (res !== undefined && res !== null && !this.paraFiltroArticulos && !this.paraFiltroClientes) {
         console.log('entro');
 
         this.showModal = res;
@@ -295,11 +291,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     if (this.paraFiltroArticulos) {
       try {
         const is_compra = this.metodo === 'compra' ? true : false;
-        console.log('#######');
-        console.log('#######');
-        console.log('#######');
-        console.log('#######');
-        console.log('is_compra ', is_compra);
 
         const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra).toPromise();
 
@@ -323,20 +314,24 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         this.seleccionModal = undefined;
 
-        res.data.map(async (cli) => {
-          cli.nombre = GLOBAL.Capitalice(cli.nombre);
-          cli.apellido = GLOBAL.Capitalice(cli.apellido);
-          cli.documento_identidad = await cli.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
-          // cli.documento_identidad = cli.documento_de_identidad ? (cli.documento_de_identidad.documento ? cli.documento_de_identidad.documento : '---------') : '---------';
-          return cli;
-        });
-        this.seleccionModal = res.data;
-
         if (res.data.length === 0) {
           this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO');
-        }
+          this.reinicioModal();
+        } else {
+          res.data.map(async (cli) => {
+            cli.nombre = GLOBAL.Capitalice(cli.nombre);
+            cli.apellido = GLOBAL.Capitalice(cli.apellido);
+            cli.documento_identidad = await cli.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
+            // cli.documento_identidad = cli.documento_de_identidad ? (cli.documento_de_identidad.documento ? cli.documento_de_identidad.documento : '---------') : '---------';
+            return cli;
+          });
 
-        this.tServ.Func_total_paginas(res.total_registros);
+          this.seleccionModal = res.data;
+          setTimeout(() => {
+            this.showModal = true;
+          }, 250);
+          this.tServ.Func_total_paginas(res.total_registros);
+        }
       } catch (error) {
         console.error(error);
         this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
