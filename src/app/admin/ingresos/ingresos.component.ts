@@ -12,6 +12,8 @@ import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../components/tablas/tablas.component';
 import { ModalService } from '../components/modal/modal.service';
 import { obj_paginate, TablasService } from '../components/tablas/tablas.service';
+import { recibo_de_ingreso } from '../../../assets/facturas';
+import { IpcService } from '../../core/services/ipc.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -123,6 +125,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
     private obsServ: ObservableServcie,
     private dbServ: DBservice,
     private fb: FormBuilder,
+    private _ipc: IpcService,
     private tServ: TablasService,
   ) {
     this.config.notFoundText = 'Articulo no existe';
@@ -485,5 +488,26 @@ export class IngresosComponent implements OnInit, OnDestroy {
     } else if (valor === 'Compra adelantada') {
       this.medidaEnTurno = null;
     }
+  }
+
+  async prueba() {
+    const data_ = recibo_de_ingreso;
+
+    console.log('data_ ', data_);
+    // const DD = await this.pdfServ.makeFacturaVenta(data);
+    const obj = {
+      data: data_,
+      type: 'recibo_ingreso',
+    };
+    this._ipc.send('print', obj);
+
+    await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+
+      if (res.status) {
+      } else {
+        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+      }
+    });
   }
 }

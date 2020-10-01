@@ -179,12 +179,17 @@ export class HomeComponent implements OnInit {
 
     // const data = compra_credito_valor_fiscal;
     // const data = compra_contado_valor_fiscal;
-    const data = venta_credito_consumo;
+    const data_ = venta_credito_consumo;
 
-    console.log('data ', data);
-    // const DD = await this.pdfServ.makeFacturaVenta(data);
+    console.log('data_ ', data_);
 
-    this._ipc.send('print', data);
+    const obj = {
+      data: data_,
+      type: 'facturacion',
+    };
+    console.log(obj);
+
+    this._ipc.send('print', obj);
 
     await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
       console.log(res);
