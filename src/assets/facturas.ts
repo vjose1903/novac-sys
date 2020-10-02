@@ -236,6 +236,7 @@ export const recibo_de_ingreso = {
       pago_a_tiempo: true,
       created_at: '2020-10-02T02:21:06.874Z',
       updated_at: '2020-10-02T02:21:06.874Z',
+      total_factura: 1435.52,
       balance_factura: 0.0,
     },
     {
@@ -248,6 +249,7 @@ export const recibo_de_ingreso = {
       pago_a_tiempo: true,
       created_at: '2020-10-02T02:21:06.881Z',
       updated_at: '2020-10-02T02:21:06.881Z',
+      total_factura: 2033.28,
       balance_factura: 1033.28,
     },
     {
@@ -260,6 +262,7 @@ export const recibo_de_ingreso = {
       pago_a_tiempo: true,
       created_at: '2020-10-02T02:21:06.885Z',
       updated_at: '2020-10-02T02:21:06.885Z',
+      total_factura: 138.33,
       balance_factura: 0.0,
     },
     {
@@ -272,6 +275,7 @@ export const recibo_de_ingreso = {
       pago_a_tiempo: true,
       created_at: '2020-10-02T02:21:06.888Z',
       updated_at: '2020-10-02T02:21:06.888Z',
+      total_factura: 982.05,
       balance_factura: 482.05,
     },
     {
@@ -284,6 +288,7 @@ export const recibo_de_ingreso = {
       pago_a_tiempo: true,
       created_at: '2020-10-02T02:21:06.892Z',
       updated_at: '2020-10-02T02:21:06.892Z',
+      total_factura: 6129.37,
       balance_factura: 4129.37,
     },
   ],

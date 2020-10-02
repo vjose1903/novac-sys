@@ -323,7 +323,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
         pago_total: fact.pagoT,
         deposito: GLOBAL.desformatear(fact.monto),
         descripcion:
-          this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo ' + fact.secuencia + ' ' + fact.fecha_facturacion : 'Abono ' + fact.secuencia + ' ' + fact.fecha_facturacion) : '',
+          this.tipo_recibo === 'Pago factura'
+            ? fact.pagoT
+              ? 'Saldo ' + fact.numero_comprobante + ' ' + fact.fecha_facturacion
+              : 'Abono ' + fact.numero_comprobante + ' ' + fact.fecha_facturacion
+            : '',
         pago_a_tiempo: fact.pago_a_tiempo,
       });
 

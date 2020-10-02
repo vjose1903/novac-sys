@@ -162,21 +162,21 @@ function cabeceraRecibo(data) {
               margin: [0, 0, 0, 0],
             },
             {
-              text: 'Valor',
+              text: 'Valor facturado',
               style: 'tableHeader',
               bold: true,
               alignment: 'right',
               margin: [0, 0, 0, 0],
             },
             {
-              text: 'Tipo',
+              text: 'Monto recibido',
               style: 'tableHeader',
               bold: true,
-              alignment: 'center',
+              alignment: 'right',
               margin: [-15, 0, 0, 0],
             },
             {
-              text: 'Balance',
+              text: 'Balance fact.',
               style: 'tableHeader',
               bold: true,
               alignment: 'right',
@@ -211,8 +211,8 @@ function contenidoRecibo(data) {
       { text: i + 1, pageBreak: br_ ? 'before' : 'none' },
       { text: fechaParse(fecha), pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
       { text: valor, pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
-      { text: numFormatTwoDecimals(detalle.deposito), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
-      { text: tipo, pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
+      { text: numFormatTwoDecimals(detalle.total_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
+      { text: numFormatTwoDecimals(detalle.deposito), pageBreak: br_ ? 'before' : 'none', alignment: 'right' },
       { text: numFormatTwoDecimals(detalle.balance_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 20, 0] },
     );
     tempBody.push(row);
