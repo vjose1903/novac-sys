@@ -383,6 +383,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
           data: res,
           type: 'recibo_ingreso',
         };
+        this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
+        this.clienteAdepositar.balance = res.cliente.balance;
+        this.pedirFacturasPorCliente(this.clienteAdepositar.id);
+        this.resetVariables();
+
         this._ipc.send('print', obj);
 
         await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
@@ -393,11 +398,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
             this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
           }
         });
-        this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
-
-        this.clienteAdepositar.balance = res.cliente.balance;
-        this.pedirFacturasPorCliente(this.clienteAdepositar.id);
-        this.resetVariables();
       },
       (err) => {
         console.error(err);
