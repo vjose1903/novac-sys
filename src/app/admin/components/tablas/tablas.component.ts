@@ -148,8 +148,11 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           // si no tiene ni paginacion ni buscador
           this.restoAHeigthDiv = this.quitarAScorll;
         }
+        console.log('restoAHeigthDiv ', this.restoAHeigthDiv);
+        console.log('this.alto ANTES ', this.alto);
 
-        this.alto = this.alto - this.restoAHeigthDiv;
+        this.alto -= this.restoAHeigthDiv;
+        console.log('this.alto Despues ', this.alto);
       }, 20);
     }
   }

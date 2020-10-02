@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
@@ -13,12 +13,15 @@ import { Subscription } from 'rxjs';
   templateUrl: './produccion.component.html',
   styleUrls: ['./produccion.component.scss'],
 })
-export class ProduccionComponent implements OnInit, OnDestroy {
-  listaArticulos: any;
+export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
+
+  // listaArticulos: any;
   articulo_id;
   cantidad_producir;
   medida_producir;
   articuloSelected: any;
+  altoDiv;
 
   lista_produccion = [];
   ingredientes = [];
@@ -42,15 +45,15 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
-    this.dbServ.getArticulos().subscribe((res) => {
-      res.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
-      });
+    // this.dbServ.getArticulos().subscribe((res) => {
+    //   res.sort((a, b) => {
+    //     return a.id > b.id ? 1 : -1;
+    //   });
 
-      if (res !== undefined && res !== null) {
-        this.listaArticulos = res;
-      }
-    });
+    //   if (res !== undefined && res !== null) {
+    //     this.listaArticulos = res;
+    //   }
+    // });
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
@@ -59,12 +62,21 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     });
     this.enfocarInput('articulo_id');
   }
+
+  ngAfterViewInit() {
+    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
+
+    this.altoDiv += 20;
+  }
+
   ngOnDestroy() {
     this.subDeci.unsubscribe();
   }
+
   filtroFormula(item) {
     return item.tipo_articulo_id === 3;
   }
+
   getIngredients() {
     this.ingredientes = [];
     console.log('this.listaArticulos ', this.listaArticulos);
@@ -89,8 +101,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         contenido: ingre.contenido,
       });
     });
-    // console.log(this.articuloSelected);
-    // console.log(this.ingredientes);
   }
 
   lookOters(objeto) {
