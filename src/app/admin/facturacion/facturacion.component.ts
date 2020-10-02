@@ -500,7 +500,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       console.log('this.CuerpoFactura.length ', this.CuerpoFactura.length);
 
       if (this.CuerpoFactura.length === 0) {
-        this.dbServ.toastWarning('Factura no tiene Articulos', 'Aviso');
+        this.dbServ.toastWarning('Factura incompleta!!!', 'Aviso');
       } else {
         console.log('this.TOTAL ', this.TOTAL);
 
@@ -857,10 +857,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
       res['FACTURA_DE'] = this.metodo;
 
-      console.log('res ', res);
-      console.log('res.body ', res.body);
+      const obj = {
+        data: res,
+        type: 'facturacion',
+      };
 
-      this._ipc.send('print', res);
+      this._ipc.send('print', obj);
 
       await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
         console.log(res);

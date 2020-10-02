@@ -181,20 +181,25 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
 
       const res = await this.dbServ.getPaquetesNCFFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
-      res.data.map((ncf) => {
-        ncf.cantidad = ncf.hasta - ncf.desde + 1;
-        ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
-        ncf.codigo = _.padStart(ncf.id, 5, '0');
-        ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
-        ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
-        ncf.colorUsado = ncf.usado ? 'green' : 'red';
-        ncf.colorEstado = ncf.estado ? 'green' : 'red';
-        ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
-        ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
-        return ncf;
+      console.log('lista_tipos_facturas ', this.lista_tipos_facturas);
+      const tempNCF = [];
+      res.data.forEach((ncf) => {
+        if (ncf.tipo_factura_id !== 1 && ncf.tipo_factura_id !== 3) {
+          ncf.cantidad = ncf.hasta - ncf.desde + 1;
+          ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
+          ncf.codigo = _.padStart(ncf.id, 5, '0');
+          ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
+          ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
+          ncf.colorUsado = ncf.usado ? 'green' : 'red';
+          ncf.colorEstado = ncf.estado ? 'green' : 'red';
+          ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
+          ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
+
+          tempNCF.push(ncf);
+        }
       });
 
-      this.listaNCF = res.data;
+      this.listaNCF = tempNCF;
       const obj = {
         total: res.total_registros,
         tabla: 'listaNCF',

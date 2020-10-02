@@ -322,7 +322,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
         cabecera_factura_id: fact.id,
         pago_total: fact.pagoT,
         deposito: GLOBAL.desformatear(fact.monto),
-        descripcion: this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo Factura ' + fact.secuencia : 'Abono a factura no. ' + fact.secuencia) : '',
+        descripcion:
+          this.tipo_recibo === 'Pago factura' ? (fact.pagoT ? 'Saldo ' + fact.secuencia + ' ' + fact.fecha_facturacion : 'Abono ' + fact.secuencia + ' ' + fact.fecha_facturacion) : '',
         pago_a_tiempo: fact.pago_a_tiempo,
       });
 
@@ -376,8 +377,22 @@ export class IngresosComponent implements OnInit, OnDestroy {
     console.log(obj);
 
     this.dbServ.createRecibo(obj).subscribe(
-      (res) => {
+      async (res) => {
         console.log(res);
+        const obj = {
+          data: res,
+          type: 'recibo_ingreso',
+        };
+        this._ipc.send('print', obj);
+
+        await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+          console.log(res);
+
+          if (res.status) {
+          } else {
+            this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+          }
+        });
         this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
 
         this.clienteAdepositar.balance = res.cliente.balance;
@@ -488,26 +503,5 @@ export class IngresosComponent implements OnInit, OnDestroy {
     } else if (valor === 'Compra adelantada') {
       this.medidaEnTurno = null;
     }
-  }
-
-  async prueba() {
-    const data_ = recibo_de_ingreso;
-
-    console.log('data_ ', data_);
-    // const DD = await this.pdfServ.makeFacturaVenta(data);
-    const obj = {
-      data: data_,
-      type: 'recibo_ingreso',
-    };
-    this._ipc.send('print', obj);
-
-    await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      console.log(res);
-
-      if (res.status) {
-      } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-      }
-    });
   }
 }
