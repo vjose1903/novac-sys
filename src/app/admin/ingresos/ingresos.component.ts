@@ -45,12 +45,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
       color: true,
     },
     {
-      titulo: 'Numero Fact',
-      key: 'secuencia',
-    },
-    {
-      titulo: 'Tipo',
-      key: 'tipo_factura',
+      titulo: 'NCF',
+      key: 'numero_comprobante',
     },
     {
       titulo: 'Fecha Facturacion',

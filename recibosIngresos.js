@@ -136,7 +136,7 @@ function cabeceraRecibo(data) {
             margin: [10, 0, 10, 0],
             table: {
                 headerRows: 1,
-                widths: [24, '*', '*', '*', '*', '*'],
+                widths: [24, '*', '*', '*', '*', '*', '*'],
                 body: [
                     [
                         {
@@ -160,7 +160,14 @@ function cabeceraRecibo(data) {
                             margin: [0, 0, 0, 0],
                         },
                         {
-                            text: 'Valor facturado',
+                            text: 'Monto facturado',
+                            style: 'tableHeader',
+                            bold: true,
+                            alignment: 'right',
+                            margin: [0, 0, 0, 0],
+                        },
+                        {
+                            text: 'Balance anterior',
                             style: 'tableHeader',
                             bold: true,
                             alignment: 'right',
@@ -171,17 +178,17 @@ function cabeceraRecibo(data) {
                             style: 'tableHeader',
                             bold: true,
                             alignment: 'right',
-                            margin: [-15, 0, 0, 0],
+                            margin: [0, 0, 0, 0],
                         },
                         {
-                            text: 'Balance fact.',
+                            text: 'Balance actual',
                             style: 'tableHeader',
                             bold: true,
                             alignment: 'right',
                             margin: [0, 0, 20, 0],
                         },
                     ],
-                    [1, 'Sample value 1', 'value 2', 'value 2', 'value 2', 'value 2'],
+                    [1, 'Sample value 1', 'value 2', 'value 2', 'value 2', 'value 2', 'value 2'],
                 ],
             },
             layout: 'headerLineOnly',
@@ -200,14 +207,14 @@ function contenidoRecibo(data) {
         var valor = _.split(detalle.descripcion, ' ')[1];
         var fecha = _.split(detalle.descripcion, ' ')[2];
         var br_ = i !== 0 && i % 10 === 0;
-        row.push({ text: i + 1, pageBreak: br_ ? 'before' : 'none' }, { text: fechaParse(fecha), pageBreak: br_ ? 'before' : 'none', alignment: 'center' }, { text: valor, pageBreak: br_ ? 'before' : 'none', alignment: 'center' }, { text: numFormatTwoDecimals(detalle.total_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] }, { text: numFormatTwoDecimals(detalle.deposito), pageBreak: br_ ? 'before' : 'none', alignment: 'right' }, { text: numFormatTwoDecimals(detalle.balance_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 20, 0] });
+        row.push({ text: i + 1, pageBreak: br_ ? 'before' : 'none' }, { text: fechaParse(fecha), pageBreak: br_ ? 'before' : 'none', alignment: 'center' }, { text: valor, pageBreak: br_ ? 'before' : 'none', alignment: 'center' }, { text: numFormatTwoDecimals(detalle.total_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] }, { text: numFormatTwoDecimals(detalle.balance_anterior_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] }, { text: numFormatTwoDecimals(detalle.deposito), pageBreak: br_ ? 'before' : 'none', alignment: 'right' }, { text: numFormatTwoDecimals(detalle.balance_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 20, 0] });
         tempBody.push(row);
     });
     var content = [
         {
             margin: [0, 0, 0, 0],
             table: {
-                widths: [24, '*', '*', '*', '*', '*'],
+                widths: [24, '*', '*', '*', '*', '*', '*'],
                 body: tempBody,
             },
             layout: {
