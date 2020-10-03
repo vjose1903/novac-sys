@@ -27,3 +27,25 @@
 .cantidadInve {
   margin-right: 0.7rem;
 }
+
+.fondoGris,
+.fondoBlanco {
+  max-height: 17vw;
+}
+
+.scroll-container-prod {
+  display: flex;
+  flex-direction: column;
+
+  max-height: calc(100% - 1.5rem) !important;
+
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.Nombreingre,
+.cantidadInve {
+  &:hover {
+    cursor: default;
+  }
+}

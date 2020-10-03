@@ -124,7 +124,7 @@ function Miles(num) {
     var divisor = 1000;
     var cientos = Math.floor(num / divisor);
     var resto = num - cientos * divisor;
-    var strMiles = Seccion(num, divisor, 'UN MIL', 'MIL');
+    var strMiles = Seccion(num, divisor, 'MIL', 'MIL');
     var strCentenas = Centenas(resto);
     if (strMiles === '') {
         return strCentenas;

@@ -20,16 +20,29 @@
     </div>
   </div>
   <div class="col-7">
-    <div class="text-center">
-      <h1 *ngIf="clienteAdepositar" class="negrita">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h1>
-      <span *ngIf="clienteAdepositar"> Debe: RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span>
+    <div *ngIf="clienteAdepositar">
+      <div class="text-center">
+        <h1 class="negrita">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h1>
+
+        <span class="badge {{ clienteAdepositar.balance > 0 ? 'red' : 'green' }} text-white debe mb-3"> Debe: RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span>
+        <span *ngIf="facturas_selected.length > 0" class="badge green debe text-white mb-3 ml-2"> Recibiendo: RD$ {{ formatoNumero(recibiendo) }}</span>
+        <span *ngIf="facturas_selected.length > 0" class="badge yellow recibe mb-3 ml-2"> Faltando: RD$ {{ formatoNumero(restando) }}</span>
+      </div>
+      <div *ngIf="clienteAdepositar.balance > 0" class="d-flex justify-content-between">
+        <span class="negrita">Porcentaje de pago</span>
+        <div>
+          <span class="negrita">RD${{ formatoNumero(totalPagado) }} / </span>
+          <span class="negrita gris">RD${{ formatoNumero(totalFacturado) }}</span>
+        </div>
+      </div>
+      <p-progressBar *ngIf="clienteAdepositar.balance > 0" [value]="totalPagadoPorciento"></p-progressBar>
     </div>
   </div>
   <div class="col-12 mt-4">
     <div *ngIf="Facturas" class="row">
       <div class="col-12">
-        <div id="cardTabla" class="card card-padding sombra ingreCard" style="height: 39rem">
-          <div style="height: 93%">
+        <div id="cardTabla" class="card card-padding sombra ingreCard" style="height: 49vw">
+          <div>
             <div class="w-100 d-flex justify-content-end">
               <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
             </div>

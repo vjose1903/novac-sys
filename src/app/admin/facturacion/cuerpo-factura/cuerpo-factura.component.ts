@@ -85,17 +85,15 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     });
 
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res && res.tipo_modal === 'buscarArticulo') {
-        console.log('entro   ');
+      console.log('res ', res);
 
+      if (res && res.tipo_modal === 'buscarArticulo') {
         this.LLenarRowDespuesDeFiltro(res);
       }
     });
 
     this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
       if (res !== undefined && res !== null) {
-        console.log(res);
-
         this.LLenarRowDespuesDeFiltro(res);
       }
     });
@@ -501,20 +499,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true).toPromise();
     } catch (error) {}
 
-    const cantidades = articulo.cantidades;
-
-    const splitUnidad = _.split(unidad, ' ');
-    let unidad_ = splitUnidad[0];
-    unidad = splitUnidad[0];
-    if (this.metodo === 'venta') {
-      // if (unidad_ === 'Galón' || unidad_ === 'Saco' || unidad_ === 'Libra') {
-      if (unidad_ === 'Saco' || unidad_ === 'Libra') {
-        unidad_ = 'Libra';
-      } else {
-        unidad_ = 'Unidad';
-      }
-    }
-
     for (let index = 0; index < this.control.controls.length; index++) {
       const cod = (this.control.controls[index] as any).controls['cod'].value;
       if (cod === null || cod === undefined || cod === '' || cod === ' ') {
@@ -531,18 +515,16 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       const FindProd = (this.control.controls[index] as any).controls['des'].value;
 
       if (FindProd === descripcion) {
-        if (unidad_ === 'Libra') {
+        if (unity === 'Saco' || unity === 'Libra') {
           if (splitUnidadF.length > 1) {
             cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
           }
         }
-        // if (unity === 'Saco'||unity === 'Galón') {
         if (unity === 'Saco') {
           unity = 'Libra';
         }
 
         cantidadF *= articulo.contenido[unity];
-
         cantidad += cantidadF;
       }
     }
@@ -551,11 +533,21 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       i--;
     }
 
-    if (this.metodo === 'venta' && cantidad > cantidades[unidad_]) {
-      this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
-      return true;
-    } else {
-      return false;
+    try {
+      const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();
+
+      if (this.metodo === 'venta' && res.excede) {
+        this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      if (error.error) {
+        this.dbServ.toastError(error.error.msg, 'ERROR');
+      } else {
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+      }
     }
   }
 
@@ -625,13 +617,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const cantidad = (this.control.controls[i] as any).controls['can'].value;
     const unidad = (this.control.controls[i] as any).controls['uni'].value;
     let cantidadMinima = 1;
-    console.log('unidad ', unidad);
-    console.log('this.UnidadesArticulo ', this.UnidadesArticulo);
 
     if (unidad && this.UnidadesArticulo.length > 0) {
       cantidadMinima = this.UnidadesArticulo.filter((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad))[0].cantidad;
     }
-    console.log('cantidadMinima', cantidadMinima);
 
     if (precio && cantidad) {
       const tot = precio * cantidad;
@@ -919,7 +908,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       (this.control.controls[i] as any).controls['cod'].setValue(ARTICULO.codigo);
       (this.control.controls[i] as any).controls['des'].setValue(ARTICULO.nombre);
       (this.control.controls[i] as any).controls['articulo_id'].setValue(ARTICULO.id);
-      console.log('ARTICULO ', ARTICULO);
 
       if (this.metodo === 'venta') {
         if (ARTICULO.descripcion === 'Materia prima') {
@@ -948,21 +936,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.drop = true;
     this.UnidadesArticulo = [];
     this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
+    console.log('art ', art);
 
-    this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
-    // if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
-    // }
-
-    // if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-    //   this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
-    // }
+    if (art.descripcion !== 'Producto terminado' && art.descripcion !== 'Materia prima') {
+      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
+    }
 
     art.contenido_articulos.forEach((element) => {
-      // if (element.referencia === null) {
-      //   if (art.descripcion === 'Veterinaria') {
-      //     this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: art.contenido[element.medida] });
-      //   }
-      // }
       if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
         if (art.vendido_en === 'Saco' && this.metodo === 'venta') {
           this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
@@ -1002,7 +982,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   noArticuloEncontrado(arg) {
     this.dbServ.toastError('Articulo no creado', 'ERROR');
-    console.log('aquiiiii ', arg);
 
     this.mServ.ModalIndex(undefined);
     setTimeout(() => {

@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 export class DBservice {
   // url = 'http://admservidor.ddns.net:3000';
   url = 'http://localhost:3000';
+  ultimoMensajeMostrado: any;
 
   constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}
   peticion(ruta: string, metodo: string, json?: string): Observable<any> {
@@ -223,6 +224,18 @@ export class DBservice {
   // ARTICULOS
   // =====================================================================
 
+  getProductosTerminados(id) {
+    return this.peticion(`articulos/custom/productos_terminados`, 'get');
+  }
+
+  getIngredienteExcede(id, cantidad) {
+    return this.peticionSinLoad(`articulos/check_excede/${id}?cantidad=${cantidad}`, 'get');
+  }
+
+  getIngredientesFormula(id) {
+    return this.peticion(`articulos/ingredientes/${id}`, 'get');
+  }
+
   getArticulosFiltrados(arg, page, per_page, paginado, compra = false) {
     return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}`, 'get');
   }
@@ -301,12 +314,24 @@ export class DBservice {
   // TOASTS
   // =====================================================================
   toastSuccess(msg?, titulo?) {
-    this.toastr.success(msg || '', titulo || '');
+    const msg_ = msg;
+    if (this.ultimoMensajeMostrado !== msg_) {
+      this.ultimoMensajeMostrado = msg_;
+      this.toastr.success(msg || '', titulo || '');
+    }
   }
   toastError(msg?, titulo?) {
-    this.toastr.error(msg || '', titulo || '');
+    const msg_ = msg;
+    if (this.ultimoMensajeMostrado !== msg_) {
+      this.ultimoMensajeMostrado = msg_;
+      this.toastr.error(msg || '', titulo || '');
+    }
   }
   toastWarning(msg?, titulo?) {
-    this.toastr.warning(msg || '', titulo || '');
+    const msg_ = msg;
+    if (this.ultimoMensajeMostrado !== msg_) {
+      this.ultimoMensajeMostrado = msg_;
+      this.toastr.warning(msg || '', titulo || '');
+    }
   }
 }

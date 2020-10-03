@@ -148,11 +148,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           // si no tiene ni paginacion ni buscador
           this.restoAHeigthDiv = this.quitarAScorll;
         }
-        console.log('restoAHeigthDiv ', this.restoAHeigthDiv);
-        console.log('this.alto ANTES ', this.alto);
 
         this.alto -= this.restoAHeigthDiv;
-        console.log('this.alto Despues ', this.alto);
       }, 20);
     }
   }
@@ -458,13 +455,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   ngOnChanges(simpleChanges) {
     if (simpleChanges.alto) {
-      console.log(' ---------------------- ');
-      console.log(' ');
-
-      console.log('simpleChanges.alto ', simpleChanges.alto);
-      console.log(' ');
-      console.log(' ---------------------- ');
-
       if (simpleChanges.alto.currentValue) {
         this.calcularAlto();
       }

@@ -487,9 +487,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   //  MODAL IMPRIMIR
   // =============================================
   async imprimirFactura() {
-    console.log('voy a impimir');
-    console.log('this.propietario_factura ', this.propietario_factura);
-
     if (!this.propietario_factura) {
       if (this.metodo === 'compra') {
         this.dbServ.toastWarning('Factura no tiene suplidor', 'Aviso');
@@ -497,13 +494,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
       }
     } else {
-      console.log('this.CuerpoFactura.length ', this.CuerpoFactura.length);
-
       if (this.CuerpoFactura.length === 0) {
         this.dbServ.toastWarning('Factura incompleta!!!', 'Aviso');
       } else {
-        console.log('this.TOTAL ', this.TOTAL);
-
         if (this.TOTAL === 0) {
           this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
@@ -533,8 +526,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   abrirModal(arg?) {
-    console.log('arg ', arg);
-
     if (arg) {
       this.mServ.ModalSeleccion(arg);
     }
@@ -569,7 +560,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     const obj = JSON.parse(arg);
     this.CuerpoFactura = obj;
-    console.log('this.CuerpoFactura ', this.CuerpoFactura);
 
     if (this.metodo === 'venta') {
       this.CuerpoFactura.map((articulo) => {
@@ -865,8 +855,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this._ipc.send('print', obj);
 
       await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-        console.log(res);
-
         if (res.status) {
         } else {
           this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');

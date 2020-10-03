@@ -16,7 +16,7 @@
                 id="articulo_id"
               >
                 <option value="{{ null }}" selected>seleccione producto</option>
-                <option *ngFor="let lista of listaArticulos | callback: filtroFormula" id="prod-{{ lista.id }}" value="{{ lista.id }}">{{ lista.nombre }}</option>
+                <option *ngFor="let lista of listaProductos | callback: filtroFormula" id="prod-{{ lista.id }}" value="{{ lista.id }}">{{ lista.nombre }}</option>
               </select>
             </div>
           </div>
@@ -58,8 +58,8 @@
           </div>
         </div>
         <div class="pl-3">
-          <a class="btn mr-2 btn-blanco" (click)="borrar()">Borrar</a>
-          <input [disabled]="abilitarBtnAgregar()" (click)="agregarAlista()" type="submit" class="btn" value="Agregar" id="btn-verde" />
+          <a class="btn mr-2 btn-blanco" (click)="borrar()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
+          <input [disabled]="abilitarBtnAgregar()" (click)="agregarAlista()" type="submit" class="btn" value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}" id="btn-verde" />
         </div>
       </div>
     </div>
@@ -67,31 +67,40 @@
   <div class="col-7">
     <div class="card card-padding-1 sombra heightPmin mb-3">
       <h4>Ingredientes</h4>
+
       <div class="row h-100">
         <div class="col-6 p-0 fondoGris bordes">
           <div class="text-center tituloIngre">Inventario</div>
-          <div class="scroll-container">
+
+          <div class="scroll-container-prod">
             <div *ngFor="let ingrediente of ingredientes; let i = index" class="ingredientesList d-flex">
               <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
               <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
 
               <div class="d-flex justify-content-end" style="width: 100%">
-                <span [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
+                <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'" [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
+                  {{ lookprincipal(ingrediente.existencia) }}
+                </span>
+                <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Libra'" class="cantidadInve">
                   {{ lookprincipal(ingrediente.existencia) }}
                 </span>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-6 p-0 bordes">
+        <div class="col-6 p-0 bordes fondoBlanco">
           <div class="text-center tituloIngre">Producción</div>
-          <div *ngIf="ingredientesParaProduccion.length > 0" class="scroll-container">
+          <div *ngIf="ingredientesParaProduccion.length > 0" class="scroll-container-prod">
             <div *ngFor="let ingrediente of ingredientesParaProduccion; let i = index" class="ingredientesList d-flex">
               <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
+
               <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
 
               <div class="d-flex justify-content-end" style="width: 100%">
-                <span [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
+                <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'" [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
+                  {{ lookprincipal(ingrediente.existencia) }}
+                </span>
+                <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Libra'" class="cantidadInve">
                   {{ lookprincipal(ingrediente.existencia) }}
                 </span>
               </div>

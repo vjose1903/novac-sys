@@ -58,12 +58,12 @@ export class IngresosComponent implements OnInit, OnDestroy {
       color: true,
     },
     {
-      titulo: 'Total tacturado',
+      titulo: 'Total facturado',
       key: 'total_factura',
       formatoNumero: true,
     },
     {
-      titulo: 'Balance tactura',
+      titulo: 'Balance factura',
       key: 'balance',
       formatoNumero: true,
     },
@@ -114,6 +114,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
   sub: Subscription;
 
   obj_paginate_ = obj_paginate;
+  totalFacturado: number;
+  totalPagado: number;
+  totalPagadoPorciento: number;
+  recibiendo = 0;
+  restando = 0;
 
   constructor(
     private config: NgSelectConfig,
@@ -131,6 +136,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
     this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipo_modal === 'buscarCliente') {
         this.clienteAdepositar = res.data;
+        this.clienteAdepositar.balance = this.clienteAdepositar.balance ? this.clienteAdepositar.balance : 0;
+
         (document.getElementById('clienteI') as any).value = res.data.nombre;
         this.pedirFacturasPorCliente(res.data.id);
         this.mServ.ModalObj(undefined);
@@ -172,7 +179,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
         if (fact.select) {
           this.Facturas[j].pagoT = true;
           this.Facturas[j].select = false;
-          this.tablas.resetInput('total_factura', 'monto', j, true);
+          this.tablas.resetInput('balance', 'monto', j, true);
 
           const i = this.facturas_selected.indexOf(fact);
           _.pullAt(this.facturas_selected, i);
@@ -184,7 +191,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
         }
       }
     });
-    console.log(this.facturas_selected);
+
+    this.sumarTotalRecibo();
   }
 
   recalcularMonto(monto_original, notas) {
@@ -212,6 +220,10 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   async pedirFacturasPorCliente(cliente_id) {
     this.Facturas = undefined;
+    this.totalFacturado = 0;
+    this.totalPagado = 0;
+    this.totalPagadoPorciento = 0;
+
     try {
       const fechaA = moment().format('YYYY-MM-DD');
       this.Facturas = await this.dbServ
@@ -235,6 +247,13 @@ export class IngresosComponent implements OnInit, OnDestroy {
                 val.colorEstado = val.pagos.length > 0 ? 'black' : 'gris-claro';
                 val.iconHover = val.pagos.length > 0 ? true : false;
 
+                val.pagos.forEach((abono) => {
+                  this.totalPagado += abono.deposito;
+                });
+
+                this.totalFacturado += val.total_factura;
+                this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
+                this.totalPagadoPorciento = parseFloat(GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento));
                 return val;
               })),
           ),
@@ -456,25 +475,42 @@ export class IngresosComponent implements OnInit, OnDestroy {
         this.dbServ.toastWarning('Debe de introducir un Monto', 'AVISO');
         this.tablas.enfocarInput('input-' + item.index);
       }
-      const total = item.body[item.index].total_factura;
+      const total = item.body[item.index].balance;
       const monto = GLOBAL.desformatear(item.value);
+
+      if (monto === total) {
+        this.Facturas[item.index].pagoT = true;
+      }
 
       if (monto > total) {
         this.ExisteMontoMayor = true;
         this.dbServ.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+        this.Facturas[item.index].monto = this.Facturas[item.index].balance;
         this.tablas.enfocarInput('input-' + item.index);
       } else {
         this.ExisteMontoMayor = false;
       }
       this.modificarFacturaSelected(item);
     }
-    console.log(this.facturas_selected);
+    this.sumarTotalRecibo();
   }
 
+  sumarTotalRecibo() {
+    this.recibiendo = 0;
+    this.restando = 0;
+
+    this.facturas_selected.forEach((factura) => {
+      this.recibiendo += GLOBAL.desformatear(factura.monto);
+
+      this.restando = this.clienteAdepositar.balance - this.recibiendo;
+      console.log('this.recibiendo ', this.recibiendo);
+    });
+  }
   modificarFacturaSelected(item) {
     const index = _.findIndex(this.facturas_selected, (fact: any) => {
       return fact.id === item.body[item.index].id;
     });
+
     if (index !== -1) {
       this.facturas_selected[index] = item.body[item.index];
     }
@@ -486,7 +522,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
       data: [],
       filtrarCliente: nombre,
     };
-    console.log(obj);
 
     this.mServ.ModalSeleccion(obj);
 

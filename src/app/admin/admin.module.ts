@@ -5,6 +5,7 @@ import { AngularModule } from '../modules/angular.module';
 import { NgxBootstrapModule } from '../modules/ngx-bootstrap.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { DialogModule } from 'primeng/dialog';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 // componentes
 import { HomeAdminComponent } from './home/homeAdmin.component';
@@ -74,6 +75,7 @@ import { ModalSeleccinarArticuloComponent } from './conduce/modal-seleccinar-art
   ],
   imports: [
     DialogModule,
+    ProgressBarModule,
     TablasModule,
     CommonModule,
     AppRoutingModule,

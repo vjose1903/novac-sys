@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { ModalService } from '../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
+import { filter } from 'lodash';
 
 @Component({
   selector: 'app-produccion',
@@ -41,26 +42,19 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
   indexBorrar: any;
   tipoModal: string;
   subDeci: Subscription;
+  listaProductos: any;
+  articuloEditando: any;
 
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
-    // this.dbServ.getArticulos().subscribe((res) => {
-    //   res.sort((a, b) => {
-    //     return a.id > b.id ? 1 : -1;
-    //   });
-
-    //   if (res !== undefined && res !== null) {
-    //     this.listaArticulos = res;
-    //   }
-    // });
-
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModalP(res);
       }
     });
     this.enfocarInput('articulo_id');
+    this.getProductosTerminados();
   }
 
   ngAfterViewInit() {
@@ -77,30 +71,32 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     return item.tipo_articulo_id === 3;
   }
 
-  getIngredients() {
-    this.ingredientes = [];
-    console.log('this.listaArticulos ', this.listaArticulos);
+  async getProductosTerminados() {
+    try {
+      const res = await this.dbServ.getProductosTerminados(this.articulo_id).toPromise();
+      this.listaProductos = res;
+    } catch (error) {
+      if (error.error) {
+        this.dbServ.toastError(error.error.msg, 'ERROR');
+      } else {
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+      }
+    }
+  }
 
-    const tempArticulo = this.listaArticulos.filter((val) => val.id === _.parseInt(this.articulo_id));
+  async getIngredients() {
+    try {
+      const res = await this.dbServ.getIngredientesFormula(this.articulo_id).toPromise();
+      this.articuloSelected = this.listaProductos.filter((prod) => prod.id === _.parseInt(this.articulo_id))[0];
 
-    console.log('tempArticulo ', tempArticulo);
-    this.articuloSelected = tempArticulo[0];
-
-    console.log('this.articuloSelected ', this.articuloSelected);
-    const tempIngredientes = tempArticulo[0].formulas_productos_terminados;
-    console.log('this.tempArticulo[0] ', tempArticulo[0]);
-
-    tempIngredientes.forEach((ingrediente) => {
-      const tempIngre = this.listaArticulos.filter((val) => val.id === _.parseInt(ingrediente.articulo_combo));
-      const ingre = tempIngre[0];
-      this.ingredientes.push({
-        articulo_id: ingre.id,
-        nombre: ingre.nombre,
-        cantidad: ingrediente.cantidad,
-        existencia: ingre.cantidades,
-        contenido: ingre.contenido,
-      });
-    });
+      this.ingredientes = res;
+    } catch (error) {
+      if (error.error) {
+        this.dbServ.toastError(error.error.msg, 'ERROR');
+      } else {
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+      }
+    }
   }
 
   lookOters(objeto) {
@@ -128,11 +124,25 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     return cantiTootip;
   }
+  isLibraOrQuintal(objeto) {
+    let presentar = 'Quintal';
+    if (objeto.Quintal && objeto.Libra > 100) {
+      presentar = 'Quintal';
+    } else {
+      presentar = 'Libra';
+    }
+    return presentar;
+  }
+
   lookprincipal(objeto) {
-    const keys = _.keys(objeto);
-    const values = _.values(objeto);
-    const fin = values[0] > 1 ? this.medidas[keys[0]] : keys[0];
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[0])) + '  ' + fin;
+    const presentar = this.isLibraOrQuintal(objeto);
+    let cantidad = 0;
+
+    cantidad = objeto[presentar];
+
+    const fin = cantidad === 1 ? presentar : this.medidas[presentar];
+
+    return GLOBAL.numFormatTwoDecimals(cantidad) + '  ' + fin;
   }
 
   saltar(campo) {
@@ -185,27 +195,21 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
 
   calcularCantidadEnProduccion() {
     this.ingredientesParaProduccion = [];
-    if (
-      this.cantidad_producir !== null &&
-      this.cantidad_producir !== undefined &&
-      this.cantidad_producir !== '' &&
-      this.cantidad_producir !== ' ' &&
-      this.medida_producir !== null &&
-      this.medida_producir !== undefined &&
-      this.medida_producir !== '' &&
-      this.medida_producir !== ' '
-    ) {
-      this.ingredientes.forEach((ingre) => {
+    if (this.cantidad_producir && this.medida_producir) {
+      this.ingredientes.forEach(async (ingre) => {
         let cantidadFormula = ingre.cantidad;
+
         if (this.medida_producir === 'Libra') {
           cantidadFormula = cantidadFormula / 100;
         }
 
-        let quin = cantidadFormula * this.cantidad_producir;
+        let cantidad_calculada = cantidadFormula * this.cantidad_producir;
+
         const obj = {
-          Quintal: quin / 100,
-          Libra: quin,
+          Quintal: cantidad_calculada / 100,
+          Libra: cantidad_calculada,
         };
+
         if (this.lista_produccion.length > 0) {
           for (let i = 0; i < this.lista_produccion.length; i++) {
             const element = this.lista_produccion[i];
@@ -214,33 +218,49 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
               for (let j = 0; j < element.ingredientes.length; j++) {
                 const ingrediente = element.ingredientes[j];
                 if (ingrediente.nombre === ingre.nombre) {
-                  quin += ingrediente.cantidad;
+                  cantidad_calculada += ingrediente.cantidad;
                 }
               }
             }
           }
         }
 
-        if (quin > ingre.existencia.Libra) {
-          this.cantidad_producir = null;
-          this.ingredientesParaProduccion = [];
-          this.dbServ.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR');
-          this.enfocarInput('cantidad_producir');
-        } else {
-          this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj, articulo_id: ingre.articulo_id });
+        try {
+          const res = await this.dbServ.getIngredienteExcede(ingre.articulo_id, cantidad_calculada).toPromise();
+
+          if (res.excede) {
+            this.cantidad_producir = null;
+            this.ingredientesParaProduccion = [];
+
+            this.dbServ.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR');
+            this.enfocarInput('cantidad_producir');
+          } else {
+            this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj, articulo_id: ingre.articulo_id });
+          }
+        } catch (error) {
+          if (error.error) {
+            this.dbServ.toastError(error.error.msg, 'ERROR');
+          } else {
+            this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+          }
         }
       });
     }
   }
 
   borrar() {
+    if (this.articuloEditando) {
+      this.agregarAlista();
+    }
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
     this.articulo_id = null;
     this.medida_producir = null;
     this.cantidad_producir = null;
+    this.articuloEditando = undefined;
     this.enfocarInput('articulo_id');
   }
+
   agregarAlista() {
     this.ingredientesParaProduccion.forEach((ingre) => {
       ingre.cantidad = ingre.existencia.Libra;
@@ -256,22 +276,35 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
       ingredientes: this.ingredientesParaProduccion,
     };
     this.lista_produccion.push(obj);
-    console.log(this.lista_produccion);
 
     this.disableOption('prod-' + this.articulo_id, true);
+    this.articuloEditando = undefined;
     this.borrar();
   }
+
   editarItem(item) {
+    if (this.articuloEditando) {
+      this.agregarAlista();
+    }
+
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
     this.articulo_id = item.ARG.articulo_id;
     this.cantidad_producir = item.ARG.cantidad;
     this.medida_producir = item.ARG.medida;
+
+    this.articuloEditando = item.ARG;
     setTimeout(() => {
       this.getIngredients();
       this.calcularCantidadEnProduccion();
+
+      this.seleccionModal = item.ARG;
+      this.tipoModal = 'remover';
+      this.indexBorrar = item.INDEX;
+      this.decisionModalP(true);
     }, 5);
   }
+
   abrirModal(arg?) {
     this.seleccionModal = arg.ARG;
     this.indexBorrar = arg.INDEX;
@@ -280,13 +313,17 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
+
   decisionModalP(bool) {
     const listaTemp = JSON.parse(JSON.stringify(this.lista_produccion));
     if (bool) {
       if (this.tipoModal === 'remover') {
         this.lista_produccion = [];
         this.disableOption('prod-' + this.seleccionModal.articulo_id, false);
-        this.lista_produccion = _.pullAt(listaTemp[this.indexBorrar]);
+
+        this.lista_produccion = _.remove(listaTemp, (n) => {
+          return n.articulo_id !== this.seleccionModal.articulo_id;
+        });
       } else {
         this.lista_produccion.forEach((element) => {
           this.disableOption('prod-' + element.articulo_id, false);
@@ -315,16 +352,11 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
 
       this.dbServ.createProduccion(produccion).subscribe(
         (res) => {
-          console.log('i', i);
-          console.log('this.lista_produccion.length', this.lista_produccion.length - 1);
-
           if (i === this.lista_produccion.length - 1) {
             this.succes();
           }
         },
         (err) => {
-          console.log(err.error);
-
           this.mostrarErrores(err.error);
           // this.dbServ.toastError(err.error, 'Error');
         },
@@ -333,7 +365,8 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   succes() {
     this.dbServ.toastSuccess('Producción registrada.', 'Correcto');
-    this.cancelarProduccion();
+    this.tipoModal;
+    this.decisionModalP('cancelarP');
   }
   mostrarErrores(arg) {
     for (const error in arg) {

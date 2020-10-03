@@ -3,7 +3,7 @@
 @import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
-@import "./styles_pagination.css";
+
 html,
 body {
   margin: 0;
@@ -324,4 +324,10 @@ bs-daterangepicker-container {
       }
     }
   }
+}
+
+/* width */
+::-webkit-scrollbar {
+  // width: 7px;
+  display: none;
 }
