@@ -328,6 +328,39 @@ bs-daterangepicker-container {
 
 /* width */
 ::-webkit-scrollbar {
-  // width: 7px;
   display: none;
 }
+
+/* ====================================================== */
+/* PAGINATION*/
+/* ====================================================== */
+
+.my-pagination {
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+.my-pagination {
+  margin: 0;
+  padding: 0;
+}
+
+.my-pagination .current {
+  background: #4ee488 !important;
+}
+.my-pagination .current:hover {
+  background: #30a756 !important;
+  cursor: pointer;
+}
+
+.my-pagination .pagination-next > a:hover {
+  color: #30a756 !important;
+  cursor: pointer;
+}
+
+.my-pagination .pagination-next > a:hover,
+.my-pagination .pagination-previous > a:hover {
+  color: #30a756 !important;
+  cursor: pointer;
+}
+

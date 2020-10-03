@@ -32,6 +32,14 @@ export class GLOBAL {
   }
 
   // =========================================================================================================
+  static ModificarClass(item, clase, action) {
+    if (action === 'add') {
+      document.getElementById(item).classList.add(clase);
+    } else {
+      document.getElementById(item).classList.remove(clase);
+    }
+  }
+  // =========================================================================================================
   static roundDecenaMayor(value) {
     if (0 > value) {
       const decenaMenor = Math.ceil(value / 10) * 10;

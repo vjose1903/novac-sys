@@ -29,8 +29,9 @@
           #RowElement
           (click)="clickROW(dato)"
         >
-          <td *ngFor="let column of info; let j = index">
+          <td *ngFor="let column of info; let j = index" class="tableTD" id="td-{{ column.key }}-{{ i }}">
             <span
+              id="{{ column.key }}-{{ i }}"
               *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero"
               style="width: 100%"
               class="text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
@@ -50,6 +51,7 @@
             </ng-template>
 
             <span
+              id="{{ column.key }}-{{ i }}"
               [mdbTooltip]="cantiTool"
               placement="{{ i != 0 ? 'top' : 'botton' }}"
               *ngIf="column.tipo !== 'check' && column.tipo !== 'input' && column.cantidades && !column.formatoNumero"
@@ -58,11 +60,21 @@
               {{ lookprincipal(dato[column.key]) }}
             </span>
 
-            <span *ngIf="column.isIcon && dato._destroy !== '1'" class="text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}">
-              <i (click)="iconBtn(dato)" class="{{ dato[column.key] }} {{ dato.iconHover ? 'c-pointer' : '' }}"></i>
+            <span *ngIf="column.isIcon && dato._destroy !== '1'">
+              <i
+                id="{{ column.key }}-{{ i }}"
+                (click)="iconBtn(column.key, i)"
+                class="{{ dato[column.key] }} {{ dato.iconHover ? 'c-pointer' : '' }}   text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
+                (mouseenter)="mouseMoveEvent('hover', dato, column.key, $event.target.id)"
+                (mouseleave)="mouseMoveEvent('leave', dato, column.key, $event.target.id)"
+              ></i>
             </span>
 
-            <span *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && column.formatoNumero && !column.cantidades" style="width: 100%">
+            <span
+              id="{{ column.key }}-{{ i }}"
+              *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && column.formatoNumero && !column.cantidades"
+              style="width: 100%"
+            >
               {{ formatoNumero(dato[column.key]) }}
             </span>
 
@@ -102,7 +114,7 @@
             </span>
           </td>
 
-          <td class="btnAccion" *ngIf="botones.titulo">
+          <td class="btnAccion tableTD" *ngIf="botones.titulo">
             <app-btnacciones [row]="dato" [i]="i" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
           </td>
         </tr>
@@ -117,7 +129,7 @@
       <button id="button-dropup" dropdownToggle type="button" class="btn btn-peque btn-verde dropdown-toggle" aria-controls="dropdown-dropup">
         {{ mostrar }} registros <span class="caret"></span>
       </button>
-      <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-dropup">
+      <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu btn-verde" role="menu" aria-labelledby="button-dropup">
         <li *ngFor="let i of listaMostrar" role="menuitem" (click)="cambiaMostrar(i)">
           <a class="dropdown-item"> {{ i }} registros</a>
         </li>

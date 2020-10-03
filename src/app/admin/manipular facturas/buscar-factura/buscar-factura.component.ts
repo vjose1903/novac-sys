@@ -43,11 +43,13 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   placeHolder = '';
   info = [
     {
-      titulo: '',
-      key: 'estado_',
+      titulo: ' ',
+      key: 'estatus',
       text_color: 'colorEstado',
       isIcon: true,
       color: true,
+      customClass: true,
+      estilos: [{ width: '2rem' }],
     },
     {
       titulo: 'Numero Fact',
@@ -83,17 +85,26 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       key: 'balance',
       formatoNumero: true,
     },
+
     {
       titulo: 'Seleccione',
-      tipo: 'check',
       key: 'select',
-
-      disable: {
-        getDisabled: false,
-        campo: '',
-      },
-      title: '',
+      text_color: 'selectColor',
+      isIcon: true,
+      color: true,
     },
+
+    // {
+    //   titulo: 'Seleccione',
+    //   tipo: 'check',
+    //   key: 'select',
+
+    //   disable: {
+    //     getDisabled: false,
+    //     campo: '',
+    //   },
+    //   title: '',
+    // },
   ];
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
@@ -296,12 +307,17 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
                 val.secuencia = _.padStart(val.numero_factura, 8, '0');
                 val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
                 val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : '';
-                val.select = false;
                 val.pagoT = true;
-                val.estado_ = val.estado ? 'fas fa-check' : 'fas fa-times';
+                val.estatus = val.estado ? 'fas fa-check' : 'fas fa-times';
                 val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
                 val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
                 val.colorEstado = val.estado ? 'green' : 'red';
+                val.selectColor = 'gris-claro';
+                val.select = 'far fa-eye-slash';
+
+                val.iconsMoveEvents = [{ key: 'select', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
+                val.customStyles = [{ select: { estilos: [{ 'font-size': '1.5rem' }] } }, { 'td-estatus': { estilos: [{ width: '2rem' }] } }];
+
                 return val;
               })),
           ),
@@ -331,7 +347,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   }
 
   async abrirModalFiltro(nombre) {
-
     this.mServ.modalTipo('buscarCliente');
     this.tipoModal = 'buscarCliente';
 
@@ -387,28 +402,30 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.campo = null;
     this.enfocarInput('campoI');
   }
+
   selectFactura(item) {
     console.log(item);
-    if (!item.value) {
+
+    if (item.column === 'select') {
       this.facturaSelected = undefined;
-    } else {
-      this.facturas.forEach((fact, j) => {
-        if (j !== item.index) {
-          if (fact.select) {
-            this.facturas[j].select = false;
-            this.facturaSelected = undefined;
-          }
-        }
-      });
+
+      // this.facturas.forEach((fact, j) => {
+      //   if (j !== item.index) {
+      //     if (fact.select) {
+      //       this.facturaSelected = undefined;
+      //     }
+      //   }
+      // });
       this.facturaSelected = this.facturas[item.index];
       this.indexSelected = item.index;
+
+      this.facturaSelected['FACTURA_DE'] = 'venta';
+      this.facturaSelected['mostrarFacturaPara'] = this.BuscarPara;
+      this.abrirModal(this.facturaSelected, 'mostrarFactura');
     }
   }
 
-  confirmarSeleccion() {
-    this.facturaSelected['mostrarFacturaPara'] = this.BuscarPara;
-    this.abrirModal(this.facturaSelected, 'mostrarFactura');
-  }
+  confirmarSeleccion() {}
   validarRayaAbajo() {
     if (this.NCF) {
       let char = '';

@@ -41,6 +41,7 @@ import { TablasModule } from './components/tablas/tablas.module';
 import { ModalHistorialPagosComponent } from './ingresos/modal-historial-pagos/modal-historial-pagos.component';
 import { ConduceComponent } from './conduce/conduce.component';
 import { ModalSeleccinarArticuloComponent } from './conduce/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
+import { NgInitDirective } from '../directives/ngInit';
 
 @NgModule({
   declarations: [
@@ -72,6 +73,7 @@ import { ModalSeleccinarArticuloComponent } from './conduce/modal-seleccinar-art
     ModalHistorialPagosComponent,
     ConduceComponent,
     ModalSeleccinarArticuloComponent,
+
   ],
   imports: [
     DialogModule,

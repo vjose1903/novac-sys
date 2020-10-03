@@ -83,14 +83,8 @@
   <div class="col-12 mt-4">
     <div *ngIf="mostrarListaFacturas()" class="row">
       <div class="col-12">
-        <div id="cardTabla" class="card card-padding sombra ingreCard" style="height: 53vh;">
-          <app-tablas [info]="info" [alto]="altoDiv" [data]="facturas" (getInfoChange)="selectFactura($event)" [focusRow]="false"></app-tablas>
-        </div>
-      </div>
-      <div class="col-12 mt-3">
-        <div class="d-flex justify-content-end">
-          <input (click)="abrirModal(undefined, 'cancelarBusqueda')" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-          <input [disabled]="abilitarBtns()" (click)="confirmarSeleccion()" type="submit" class="btn btn-verde" value="Confirmar" />
+        <div id="cardTabla" class="card card-padding sombra ingreCard" style="height: 53vh">
+          <app-tablas [info]="info" [alto]="altoDiv" (clickIcon)="selectFactura($event)" [data]="facturas" (getInfoChange)="selectFactura($event)" [focusRow]="false"></app-tablas>
         </div>
       </div>
     </div>

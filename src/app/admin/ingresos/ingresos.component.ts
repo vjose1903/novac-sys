@@ -236,13 +236,14 @@ export class IngresosComponent implements OnInit, OnDestroy {
                 val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
                 val.fechaV = moment(val.fecha_vencimiento).format('DD-MM-YYYY');
                 val.select = false;
-                val.pagoT = true;
+                val.pagoT = false;
                 val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
                 val.text_color = val.fecha_vencimiento < fechaA ? 'red' : 'black';
 
                 val.balance = this.recalcularMonto(val.balance, val.notas);
                 val.total_factura = this.recalcularMonto(val.total_factura, val.notas);
-                val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
+                val.monto = 0;
+                // val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
                 val.historyPagos = val.pagos.length > 0 ? 'fas fa-comment-dollar' : 'far fa-comment';
                 val.colorEstado = val.pagos.length > 0 ? 'black' : 'gris-claro';
                 val.iconHover = val.pagos.length > 0 ? true : false;
@@ -460,8 +461,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
     }
     if (item.cambio === 'select') {
       if (!item.value) {
-        this.Facturas[item.index].pagoT = true;
-        this.tablas.resetInput('balance', 'monto', item.index, true);
+        this.Facturas[item.index].pagoT = false;
+        this.tablas.resetInput('especificar', 'monto', item.index, true, 0);
 
         const i = this.facturas_selected.indexOf(item.body[item.index]);
         _.pullAt(this.facturas_selected, i);

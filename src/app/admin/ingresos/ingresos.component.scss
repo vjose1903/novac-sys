@@ -34,35 +34,3 @@
   box-shadow: 1px 1px 1px black;
 }
 
-/* ====================================================== */
-/* PAGINATION*/
-/* ====================================================== */
-
-.my-pagination {
-  font-size: 12px;
-  margin-bottom: 0;
-}
-
-::ng-deep .my-pagination .ngx-pagination {
-  margin: 0;
-  padding: 0;
-}
-
-::ng-deep .my-pagination .ngx-pagination .current {
-  background: #4ee488;
-}
-::ng-deep .my-pagination .ngx-pagination .current:hover {
-  background: #30a756;
-  cursor: pointer;
-}
-
-::ng-deep .my-pagination .ngx-pagination .pagination-next > a:hover {
-  color: #30a756;
-  cursor: pointer;
-}
-
-::ng-deep .my-pagination .ngx-pagination .pagination-next > a:hover,
-.ngx-pagination .pagination-previous > a:hover {
-  color: #30a756;
-  cursor: pointer;
-}

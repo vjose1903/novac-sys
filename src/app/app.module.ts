@@ -31,6 +31,7 @@ import { IpcService } from './core/services/ipc.service';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { LoaderService } from './loader/loader.service';
 import { LoaderInterceptor } from './loader/loader.interceptor';
+import { NgInitDirective } from './directives/ngInit';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -40,7 +41,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 @NgModule({
   declarations: [
     AppComponent,
-
+    NgInitDirective,
     //  UploadImgComponent
   ],
   imports: [

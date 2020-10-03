@@ -158,6 +158,26 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.cdRef.detectChanges();
   }
 
+  mouseMoveEvent(event, row, column, id) {
+    row.iconsMoveEvents.forEach((moveEvent) => {
+      if (column === moveEvent.key) {
+        if (event === 'hover') {
+          for (let i = 0; i < moveEvent.hover.length; i++) {
+            const overEvent = moveEvent.hover[i];
+            GLOBAL.ModificarClass(id, moveEvent.leave[i], 'remove');
+            GLOBAL.ModificarClass(id, overEvent, 'add');
+          }
+        } else {
+          for (let i = 0; i < moveEvent.leave.length; i++) {
+            const overEvent = moveEvent.leave[i];
+            GLOBAL.ModificarClass(id, moveEvent.hover[i], 'remove');
+            GLOBAL.ModificarClass(id, overEvent, 'add');
+          }
+        }
+      }
+    });
+  }
+
   async necesarioStart() {
     if (this.focusRow) {
       this.IDROW = this.ROW + _.toString(this.NUM);
@@ -183,6 +203,30 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           const value = Object.values(estilos)[0];
           const columna = document.getElementById(info.titulo) as any;
           columna.style[key] = value;
+        }
+      }
+    }
+
+    // recorrer la data
+    for (let i = 0; i < this.data.length; i++) {
+      const data = this.data[i];
+
+      if (data.customStyles) {
+        // recorrer el arreglo de estilos para ese row
+        for (let k = 0; k < data.customStyles.length; k++) {
+          const cStyle = data.customStyles[k];
+          const span_titulo = Object.keys(cStyle)[0];
+          const value_span = Object.values(cStyle)[0];
+          const estilos = (value_span as any).estilos;
+          // recorrer el arreglo de estilos para cada columna
+          for (let j = 0; j < estilos.length; j++) {
+            const style = estilos[j];
+            const key = Object.keys(style)[0];
+            const value = Object.values(style)[0];
+            const span = span_titulo + '-' + i;
+            const span_ = document.getElementById(span) as any;
+            span_.style[key] = value;
+          }
         }
       }
     }
@@ -233,6 +277,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   resetInput(referencia, destino, i, formatear, especifico?) {
     if (referencia === 'especificar') {
+      console.log('especifico ', especifico);
+
       this.data[i][destino] = especifico;
     } else {
       const copia = GLOBAL.duplicarJson(this.data[i][referencia]);
@@ -265,6 +311,14 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       value: valor,
     };
     this.getInfoChange.emit(obj);
+  }
+
+  iconBtn(key, i) {
+    const obj = {
+      index: i,
+      column: key,
+    };
+    this.clickIcon.emit(obj);
   }
 
   pagActual = 1;
@@ -509,10 +563,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       this.clickRow.emit(arg);
       this.reinicioModal.emit();
     }
-  }
-
-  iconBtn(arg) {
-    this.clickIcon.emit(arg);
   }
 
   devolverInfo(arg) {

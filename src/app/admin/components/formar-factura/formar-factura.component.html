@@ -57,7 +57,12 @@
             <b class="negrita">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(factura.numero_factura) }}</span>
           </span>
           <span class="d-block">
-            <b class="negrita">Valida hasta :</b> &nbsp;<span>{{ formatoFecha(factura.fecha_valida) }}</span>
+            <b class="negrita">Valida hasta :</b> &nbsp;
+            <span *ngIf="factura.numero_factura">{{
+              factura.tipo_factura_id === 3 ? 'No aplica' : factura.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(factura.fecha_valida)
+            }}</span>
+            <!-- <span>{{ formatoFecha(factura.fecha_valida) }}</span>-->
+            <!-- data.tipo_factura_id === 3 ? { text: 'No aplica.', style: 'letra11' } : data.FACTURA_DE === 'compra' ? { text: ' ' } : { text: fecha(data.fecha_valida), style: 'letra11' }, -->
           </span>
         </div>
       </div>

@@ -5,6 +5,7 @@
   <p-dialog
     *ngIf="tipoModal === 'remover' && seleccionModal"
     header="Confirmar"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="true"
     [responsive]="true"
@@ -16,8 +17,8 @@
   >
     <p>Desea remover {{ seleccionModal.nombre }} de la lista</p>
     <p-footer>
-      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -27,6 +28,7 @@
   <p-dialog
     *ngIf="tipoModal === 'borrar' && seleccionModal"
     header="Confirmar"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="true"
     [responsive]="true"
@@ -38,8 +40,8 @@
   >
     <p>Desea eliminar {{ seleccionModal.nombre }}</p>
     <p-footer>
-      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
     </p-footer>
   </p-dialog>
 
@@ -50,6 +52,7 @@
   <p-dialog
     *ngIf="tipoModal === 'pendiente'"
     header="Factura pendiente"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -68,6 +71,7 @@
   <p-dialog
     *ngIf="tipoModal === 'inventario'"
     header="Movimientos de inventario"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -88,6 +92,7 @@
   <p-dialog
     *ngIf="tipoModal === 'password'"
     header="Cambiar contraseña"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -107,6 +112,7 @@
   <p-dialog
     *ngIf="tipoModal === 'cambio'"
     header="Cantidad de efectivo"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -125,6 +131,7 @@
   <p-dialog
     *ngIf="tipoModal === 'cancelarP'"
     header="Confirmar"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -136,8 +143,8 @@
   >
     <p>Seguro que desea cancelar la produccion</p>
     <p-footer>
-      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -147,6 +154,7 @@
   <p-dialog
     *ngIf="tipoModal === 'modificarArticulosCompra'"
     header="Confirmar"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -158,8 +166,8 @@
   >
     <p>Existen articulos con costos distintos desea que se actualicen los costos automaticamente?</p>
     <p-footer>
-      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -169,6 +177,7 @@
   <p-dialog
     *ngIf="tipoModal === 'cancelarBusqueda'"
     header="Confirmar"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -180,8 +189,8 @@
   >
     <p>Seguro que desea cancelar la busqueda de factura</p>
     <p-footer>
-      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -191,6 +200,7 @@
   <p-dialog
     *ngIf="tipoModal === 'cancelar'"
     header="Confirmar"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -204,8 +214,8 @@
       Seguro que desea cancelar la factura <b *ngIf="identificadorFact">{{ identificadorFact }}</b>
     </p>
     <p-footer>
-      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -215,6 +225,7 @@
   <p-dialog
     *ngIf="tipoModal === 'removerArticulo'"
     header="Confirmar"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -228,8 +239,8 @@
       Seguro que desea remover el articulo <b class="negrita">{{ seleccionModal.nombre }}</b>
     </p>
     <p-footer>
-      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
     </p-footer>
   </p-dialog>
 
@@ -240,6 +251,7 @@
   <p-dialog
     *ngIf="tipoModal === 'seleccionar_articulos_adelantados'"
     header="Confirmar"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -252,8 +264,8 @@
     <app-modal-seleccinar-articulo [articulos]="seleccionModal" (getArtculos)="devolverCLick($event)"></app-modal-seleccinar-articulo>
 
     <p-footer>
-      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cancelar</button>
-      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Aceptar</button>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -263,6 +275,7 @@
   <p-dialog
     *ngIf="tipoModal === 'imprimir'"
     header="Confirmar"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -274,8 +287,8 @@
   >
     <p>Seguro que desea imprimir la factura</p>
     <p-footer>
-      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -285,6 +298,7 @@
   <p-dialog
     *ngIf="tipoModal === 'historial_pago'"
     header="historial de abonos a facturas"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
@@ -303,6 +317,7 @@
   <p-dialog
     *ngIf="tipoModal === 'buscarArticulo' && seleccionModal && infoArticulos"
     header="Buscar articulo"
+    [draggable]="false"
     [(visible)]="showModal"
     [focusTrap]="true"
     [focusOnShow]="true"
@@ -338,6 +353,7 @@
   <p-dialog
     *ngIf="(tipoModal === 'buscarCliente' || tipoModal === 'buscarSuplidor') && seleccionModal && infoCliente"
     [header]="tituloModal"
+    [draggable]="false"
     [(visible)]="showModal"
     [focusTrap]="true"
     [focusOnShow]="true"
@@ -370,6 +386,7 @@
   <p-dialog
     *ngIf="tipoModal === 'mostrarFactura' && seleccionModal"
     header="Mostrar Factura"
+    [draggable]="false"
     [dismissableMask]="false"
     [(visible)]="showModal"
     [focusTrap]="true"
@@ -405,8 +422,8 @@
             </span>
           </div>
           <div>
-            <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cerrar</button>
-            <button [disabled]="!seleccionModal.estado" type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Continuar</button>
+            <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+            <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
           </div>
         </div>
       </ng-container>
@@ -421,6 +438,7 @@
     closeIcon="false"
     *ngIf="tipoModal === 'dinamico_texto' && seleccionModal && texto"
     header="Confirmación"
+    [draggable]="false"
     [(visible)]="showModal"
     [modal]="true"
     [responsive]="true"
@@ -433,8 +451,8 @@
       {{ texto }}
     </p>
     <p-footer>
-      <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">No</button>
-      <button type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Si</button>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
     </p-footer>
   </p-dialog>
 </div>
