@@ -22,7 +22,7 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
   cantidad_producir;
   medida_producir;
   articuloSelected: any;
-  altoDiv;
+  altoDiv = 500;
 
   lista_produccion = [];
   ingredientes = [];
@@ -49,8 +49,10 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit() {
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== null && res !== undefined) {
+      if (res !== null && res !== undefined && (this.tipoModal === 'remover' || this.tipoModal === 'cancelarP')) {
         this.decisionModalP(res);
+      } else if (res && this.tipoModal === 'confirmar_produccion') {
+        this.confirmarProduccion();
       }
     });
     this.enfocarInput('articulo_id');
@@ -58,9 +60,10 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
-
-    this.altoDiv += 20;
+    setTimeout(() => {
+      this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
+      this.altoDiv += 20;
+    }, 10);
   }
 
   ngOnDestroy() {
@@ -311,6 +314,17 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.mServ.modalTipo('remover');
     this.tipoModal = 'remover';
     this.mServ.ModalSeleccion(arg.ARG);
+    this.mServ.mostrarModal(true);
+  }
+
+  abrirModalDinamicText(tipo) {
+    const obj = {};
+    if (tipo === 'confirmar') {
+      this.tipoModal = 'confirmar_produccion';
+      this.mServ.modalTipo('dinamico_texto');
+      obj['texto_modal'] = 'Seguro de que desea confirmar la produccion.';
+    }
+    this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
   }
 
