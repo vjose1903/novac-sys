@@ -404,8 +404,8 @@
     </div>
     <p-footer>
       <ng-container class="p-1" *ngIf="lugar === 'anular_factura'">
-        <button type="button" mdbBtn (click)="accion(false)" class="btn-sm btn-light">Cerrar</button>
-        <button [disabled]="!seleccionModal.estado" type="button" mdbBtn (click)="accion(true)" class="btn-sm btn-success">Anular factura</button>
+        <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="Cerrar" />
+        <input (click)="accion(true)" type="submit" class="btn" value="Anular factura" id="btn-verde" />
       </ng-container>
       <ng-container class="p-1" *ngIf="lugar !== 'anular_factura'">
         <div class="d-flex justify-content-between">
