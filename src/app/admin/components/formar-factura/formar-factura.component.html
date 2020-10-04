@@ -61,8 +61,6 @@
             <span *ngIf="factura.numero_factura">{{
               factura.tipo_factura_id === 3 ? 'No aplica' : factura.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(factura.fecha_valida)
             }}</span>
-            <!-- <span>{{ formatoFecha(factura.fecha_valida) }}</span>-->
-            <!-- data.tipo_factura_id === 3 ? { text: 'No aplica.', style: 'letra11' } : data.FACTURA_DE === 'compra' ? { text: ' ' } : { text: fecha(data.fecha_valida), style: 'letra11' }, -->
           </span>
         </div>
       </div>

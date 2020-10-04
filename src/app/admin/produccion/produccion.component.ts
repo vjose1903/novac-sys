@@ -18,7 +18,7 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
 
   // listaArticulos: any;
-  articulo_id;
+  articulo_id = '-1' as any;
   cantidad_producir;
   medida_producir;
   articuloSelected: any;
@@ -70,10 +70,6 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subDeci.unsubscribe();
   }
 
-  filtroFormula(item) {
-    return item.tipo_articulo_id === 3;
-  }
-
   async getProductosTerminados() {
     try {
       const res = await this.dbServ.getProductosTerminados(this.articulo_id).toPromise();
@@ -88,16 +84,21 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async getIngredients() {
-    try {
-      const res = await this.dbServ.getIngredientesFormula(this.articulo_id).toPromise();
-      this.articuloSelected = this.listaProductos.filter((prod) => prod.id === _.parseInt(this.articulo_id))[0];
+    console.log(typeof this.articulo_id);
+    console.log(this.articulo_id);
 
-      this.ingredientes = res;
-    } catch (error) {
-      if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
-      } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+    if (this.articulo_id !== '-1') {
+      try {
+        const res = await this.dbServ.getIngredientesFormula(this.articulo_id).toPromise();
+        this.articuloSelected = this.listaProductos.filter((prod) => prod.id === _.parseInt(this.articulo_id))[0];
+
+        this.ingredientes = res;
+      } catch (error) {
+        if (error.error) {
+          this.dbServ.toastError(error.error.msg, 'ERROR');
+        } else {
+          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+        }
       }
     }
   }
@@ -152,12 +153,14 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     if (campo !== 'agregar') {
       this.enfocarInput(campo);
     } else {
-      const continu = this.abilitarBtnAgregar();
+      if (this.articulo_id) {
+        const continu = this.abilitarBtnAgregar();
 
-      if (!continu) {
-        setTimeout(() => {
-          this.agregarAlista();
-        }, 250);
+        if (!continu) {
+          setTimeout(() => {
+            this.agregarAlista();
+          }, 250);
+        }
       }
     }
   }
@@ -170,20 +173,7 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   abilitarBtnAgregar() {
     let res = true;
-    if (
-      this.articulo_id !== null &&
-      this.articulo_id !== undefined &&
-      this.articulo_id !== '' &&
-      this.articulo_id !== ' ' &&
-      this.cantidad_producir !== null &&
-      this.cantidad_producir !== undefined &&
-      this.cantidad_producir !== '' &&
-      this.cantidad_producir !== ' ' &&
-      this.medida_producir !== null &&
-      this.medida_producir !== undefined &&
-      this.medida_producir !== '' &&
-      this.medida_producir !== ' '
-    ) {
+    if (this.articulo_id && this.cantidad_producir && this.medida_producir) {
       res = false;
     }
     return res;
@@ -262,6 +252,9 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.cantidad_producir = null;
     this.articuloEditando = undefined;
     this.enfocarInput('articulo_id');
+    this.mServ.ModalDecision(false);
+    this.mServ.modalTipo(undefined);
+    this.mServ.ModalSeleccion(undefined);
   }
 
   agregarAlista() {
@@ -278,6 +271,8 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
       articulo_id: _.parseInt(this.articulo_id),
       ingredientes: this.ingredientesParaProduccion,
     };
+    console.log(obj);
+
     this.lista_produccion.push(obj);
 
     this.disableOption('prod-' + this.articulo_id, true);
@@ -381,6 +376,7 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dbServ.toastSuccess('Producción registrada.', 'Correcto');
     this.tipoModal;
     this.decisionModalP('cancelarP');
+    this.borrar();
   }
   mostrarErrores(arg) {
     for (const error in arg) {

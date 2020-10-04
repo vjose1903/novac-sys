@@ -48,6 +48,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.idFactura = this.route.snapshot.params['id'];
     this.tipoNota = this.route.snapshot.params['tipo'];
+
     this.fecha = moment().format('DD/MM/YYYY');
     this.dbServ.getTiposFacturas().subscribe((res) => {
       this.lista_tipos_facturas = res;
@@ -60,11 +61,8 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
       this.tituloPag = 'Nota de débito aplicada a factura ';
       this.tipoFactura = '03';
     }
-    this.necesarioStart();
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      console.log(res);
-
       if (res) {
         console.log('decision modal');
         this.decisionModal(res);
@@ -77,12 +75,18 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
         this.mServ.ModalObj(undefined);
       }
     });
+    this.necesarioStart();
   }
 
   calculateHeigth() {
     setTimeout(() => {
       this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
     }, 10);
+  }
+  resetVariables() {
+    this.mServ.ModalDecision(false);
+    this.mServ.modalTipo(undefined);
+    this.mServ.ModalSeleccion(undefined);
   }
 
   ngOnDestroy(): void {
@@ -92,11 +96,10 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
 
   async necesarioStart() {
     await this.getFactura();
-    this.factura_aplicada = this.factura.numero_comprobante;
-    this.factura_aplicada = this.factura.numero_comprobante;
     await this.formarTitulosTabla();
     await this.getPropietario(this.factura.cliente_id);
     await this.getPaqueteComprobante();
+    this.factura_aplicada = this.factura.numero_comprobante;
   }
   async getPaqueteComprobante() {
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
@@ -131,14 +134,13 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
         titulo: 'Seleccione',
         tipo: 'check',
         key: 'select',
-
         disable: {
           getDisabled: false,
           campo: '',
         },
         title: '',
         customClass: true,
-        estilos: [{ width: '12rem' }],
+        estilos: [{ width: '6rem' }],
       },
       {
         titulo: 'Articulo',
@@ -155,12 +157,14 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           campo: 'select',
         },
         customClass: true,
-        estilos: [{ width: '12rem' }],
+        estilos: [{ width: '8rem' }],
       },
       {
         titulo: 'Cantidad',
         key: 'cantidad',
         formatoNumero: true,
+        customClass: true,
+        estilos: [{ width: '5rem' }],
       },
       {
         titulo: 'Unidad',
@@ -189,7 +193,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           getDisabled: true,
         },
         customClass: true,
-        estilos: [{ width: '12rem' }],
+        estilos: [{ width: '8rem' }],
       },
     ];
   }
@@ -205,6 +209,12 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
         detalle['cant'] = detalle.cantidad;
         detalle['cant_nota'] = 0;
 
+        detalle['customStyles'] = [
+          { 'td-select': { estilos: [{ width: '6rem' }] } },
+          { 'td-cantidad': { estilos: [{ width: '5rem' }] } },
+          { 'td-total_nota': { estilos: [{ width: '8rem' }] } },
+          { 'td-cant_nota': { estilos: [{ width: '8rem' }] } },
+        ];
         if (this.tipoNota === 'credito') {
           detalle['min_'] = 0;
           detalle['max_'] = detalle.cantidad;
@@ -213,6 +223,20 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           detalle['max_'] = null;
         }
         detalle['total_nota'] = 0;
+
+        let contenido = {};
+        try {
+          contenido = await this.dbServ.getContenidosArticulos(detalle.articulo_id).toPromise();
+          detalle['contenidos'] = contenido;
+        } catch (error) {
+          if (error.error) {
+            this.dbServ.toastError(error.error.msg, 'ERROR');
+          } else {
+            this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+          }
+        }
+        console.log('detalle ', detalle);
+
         temp.push(detalle);
       }
       this.detalleFacturas = temp;
@@ -243,6 +267,22 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     this.TOTAL = total;
   }
 
+  async checkCantidadEnUnidades() {
+    for (let i = 0; i < this.detalleNota.length; i++) {
+      const detalle = this.detalleNota[i];
+      if (!detalle.cantidad_en_unidades_nota) {
+        detalle.cantidad_en_unidades_nota = 0;
+      }
+
+      if (detalle.unidad === 'Saco') {
+        const peso = this.obtenerSaco(detalle.descripcion, 'peso');
+        detalle.cantidad_en_unidades_nota = detalle.cant_nota * peso;
+      } else {
+        detalle.cantidad_en_unidades_nota = detalle.cant_nota * detalle.contenidos[detalle.unidad];
+      }
+    }
+  }
+
   async getInfoChange(info) {
     const entidad = info.body[info.index];
     entidad.cant_nota = parseFloat(entidad.cant_nota);
@@ -257,9 +297,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
         } else if (isNaN(entidad.cant_nota)) {
           this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
           this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
-          this.sumarTotal();
         } else {
-          this.sumarTotal();
           const descuento = entidad.descuento_valor / entidad.cantidad;
           const total = entidad.cant_nota * (entidad.precio - descuento);
           entidad.total_nota = this.formatoNumero(total);
@@ -269,11 +307,12 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
           this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
         }
-        this.sumarTotal();
         const descuento = entidad.descuento_valor / entidad.cantidad;
         const total = entidad.cant_nota * (entidad.precio - descuento);
         entidad.total_nota = this.formatoNumero(total);
       }
+      this.sumarTotal();
+      this.checkCantidadEnUnidades();
     }
 
     if (info.cambio === 'select') {
@@ -286,6 +325,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
         _.pullAt(this.detalleNota, i);
 
         this.sumarTotal();
+        this.checkCantidadEnUnidades();
       } else {
         this.detalleFacturas[info.index].select = true;
         this.detalleNota.push(info.body[info.index]);
@@ -339,50 +379,56 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     if (this.tipoModal === 'cambio') {
       this.formarNota(res);
     } else if (this.tipoModal === 'cancelar') {
+      this.resetVariables();
       window.history.back();
     }
   }
 
-  obtenerPesoSaco(descripcion) {
-    let num = '';
+  obtenerSaco(descripcion, tipo) {
+    let num = '' as any;
     const split = _.split(descripcion, '(')[1];
     const splitFinal = _.split(split, ' ')[0];
-    num = 'Saco de ' + splitFinal + ' libras';
+    if (tipo === 'descripcion') {
+      num = 'Saco de ' + splitFinal + ' libras';
+    } else {
+      num = _.parseInt(splitFinal);
+    }
     return num;
   }
 
-  async formarNota(res) {
+  formarDetallesNota() {
     const temp = [];
-    if (res) {
-      for (let i = 0; i < this.detalleFacturas.length; i++) {
-        const element = this.detalleFacturas[i];
+    for (let i = 0; i < this.detalleFacturas.length; i++) {
+      const element = this.detalleFacturas[i];
 
-        let unidad_ = element.unidad;
-        if (element.select) {
-          if (unidad_ === 'Saco') {
-            unidad_ = this.obtenerPesoSaco(element.descripcion);
-          }
-          const fila = {
-            articulo_id: element.articulo_id,
-            cantidad: element.cant_nota,
-            total: GLOBAL.desformatear(element.total_nota),
-            descuento_valor: element.descuento_valor ? (element.descuento_valor !== null ? element.descuento_valor : 0) : 0,
-            descuento_porciento: element.descuento_porciento ? (element.descuento_porciento !== null ? element.descuento_porciento : 0) : 0,
-            itbis: 0,
-            unidad: unidad_,
-            precio: GLOBAL.desformatear(element.precio),
-          };
-
-          temp.push(fila);
+      let unidad_ = element.unidad;
+      if (element.select) {
+        if (unidad_ === 'Saco') {
+          unidad_ = this.obtenerSaco(element.descripcion, 'descripcion');
         }
-      }
-      console.log(temp);
-    }
+        const fila = {
+          articulo_id: element.articulo_id,
+          cantidad: element.cant_nota,
+          cantidad_en_unidades: element.cantidad_en_unidades_nota,
+          total: GLOBAL.desformatear(element.total_nota),
+          descuento_valor: element.descuento_valor ? (element.descuento_valor !== null ? element.descuento_valor : 0) : 0,
+          descuento_porciento: element.descuento_porciento ? (element.descuento_porciento !== null ? element.descuento_porciento : 0) : 0,
+          itbis: 0,
+          unidad: unidad_,
+          precio: GLOBAL.desformatear(element.precio),
+        };
 
+        temp.push(fila);
+      }
+    }
+    return temp;
+  }
+
+  async formarNota(res) {
     const empleado = JSON.parse(this.dbServ.getEmpleado());
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
-    const cuerpo_fact = GLOBAL.duplicarJson(temp);
+    const cuerpo_fact = this.formarDetallesNota();
 
     const cabecera_fact = {};
     cabecera_fact['condicion'] = 'contado';
@@ -437,6 +483,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
         console.log('printRes=====> ', res);
         if (res.status) {
           this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
+          this.resetVariables();
           window.history.back();
         } else {
           this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');

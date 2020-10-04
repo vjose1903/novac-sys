@@ -267,6 +267,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       console.log(document.getElementById('cardTabla'));
 
       this.altoDiv = document.getElementById('cardTabla').offsetHeight;
+      this.altoDiv -= 20;
     }, 10);
   }
 

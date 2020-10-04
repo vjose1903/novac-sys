@@ -830,6 +830,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       vendido_en: x.vendido_en,
     };
     if (obj.is_combo) {
+      obj['vendido_en'] = 'Saco';
       obj['otros_costos'] = x.otros_costos;
       obj['formulas_productos_terminados_attributes'] = this.formarFormula();
     }

@@ -43,7 +43,10 @@
                   <b class="negrita">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(factura.numero_factura) }}</span>
                 </span>
                 <span class="d-block">
-                  <b class="negrita">Valida hasta :</b> &nbsp;<span>{{ formatoFecha(factura.fecha_valida) }}</span>
+                  <b class="negrita">Valida hasta :</b> &nbsp;
+                  <span *ngIf="factura.numero_factura">{{
+                    factura.tipo_factura_id === 3 ? 'No aplica' : factura.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(factura.fecha_valida)
+                  }}</span>
                 </span>
               </div>
             </div>
@@ -71,7 +74,7 @@
     <!-- ======================================================================================================== -->
     <div #cardTabla class="cuerpoFactura mb-2">
       <app-tablas
-        *ngIf="factura"
+        *ngIf="detalleFacturas"
         [search]="false"
         [paginate]="false"
         [tablaHover]="false"
@@ -86,10 +89,20 @@
     <div class="pieFactura">
       <div class="row">
         <div class="col-3">
-          <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
+          <app-btncircular
+            [alto]="'100px'"
+            [accion]="'Imprimir nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')"
+            [nombreImg]="'printer'"
+            (click)="imprimirFactura()"
+          ></app-btncircular>
         </div>
         <div class="col-3">
-          <app-btncircular [alto]="'100px'" [accion]="'Cancelar Factura'" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
+          <app-btncircular
+            [alto]="'100px'"
+            [accion]="'Cancelar nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')"
+            [nombreImg]="'cancelar'"
+            (click)="cancelarFactura()"
+          ></app-btncircular>
         </div>
 
         <div class="col-6 d-flex justify-content-end">

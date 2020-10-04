@@ -160,6 +160,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.sub.unsubscribe();
+    this.subDeci.unsubscribe();
   }
 
   formatoNumero(num) {
@@ -459,6 +460,9 @@ export class IngresosComponent implements OnInit, OnDestroy {
     this.Devuelta = null;
     this.detalleYtotal = undefined;
     this.facturas_selected = [];
+    this.mServ.ModalDecision(false);
+    this.mServ.modalTipo(undefined);
+    this.mServ.ModalSeleccion(undefined);
   }
 
   enfocarInput(arg) {

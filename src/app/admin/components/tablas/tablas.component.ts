@@ -260,6 +260,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   async setDATATABLE() {
     this.elements = [];
     this.previous = [];
+
     await this.llenarArreglos();
     await this.setearDataEnLaTabla();
     await this.actualizarArreglos();

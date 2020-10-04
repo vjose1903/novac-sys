@@ -1,17 +1,13 @@
 <div *ngIf="(factura_de !== 'compra' || factura_de === 'ingreso') && tipo === 'devuelta'" class="row">
   <div class="col-12">
     <div class="d-flex">
-      <h3 class="label w-100">
-        TOTAL: RD$
-      </h3>
+      <h3 class="label w-100">TOTAL: RD$</h3>
       <span class="negrita w-100 total">
         {{ ' ' + formatoNumero(data.total_factura) }}
       </span>
     </div>
 
-    <h3 class="label w-100 mt-3">
-      EFECTIVO: RD$
-    </h3>
+    <h3 class="label w-100 mt-3">EFECTIVO: RD$</h3>
     <input
       type="text"
       class="inputEfectivo"
@@ -22,9 +18,7 @@
       (blur)="revisarPrecio($event.target.value, 'devuelta')"
       id="inputEfectivo"
     />
-    <h3 class="label w-100 mt-3">
-      FORMA DE PAGO
-    </h3>
+    <h3 class="label w-100 mt-3">FORMA DE PAGO</h3>
     <select [(ngModel)]="formaPago" id="formaPago" (keydown.enter)="saltar('send')" class="form-control inputEfectivo">
       <option value="Efectivo">Efectivo</option>
       <option value="Targeta">Targeta</option>
@@ -32,9 +26,7 @@
     </select>
 
     <div class="d-flex mt-3">
-      <h3 class="label w-100">
-        DEVUELTA: RD$
-      </h3>
+      <h3 class="label w-100">DEVUELTA: RD$</h3>
       <span *ngIf="devuelta" class="negrita w-100 total">
         {{ ' ' + devuelta }}
       </span>
@@ -53,9 +45,7 @@
 <div *ngIf="factura_de !== 'compra' && tipo === 'credito'" class="row">
   <div class="col-12">
     <div class="d-flex">
-      <h3 class="label w-100">
-        TOTAL A DEVOLVER: RD$
-      </h3>
+      <h3 class="label w-100">TOTAL NOTA: RD$</h3>
       <span class="negrita w-100 total">
         {{ ' ' + formatoNumero(data.total_factura) }}
       </span>
@@ -73,9 +63,7 @@
 <div *ngIf="factura_de === 'compra'" class="row">
   <div class="col-12">
     <div class="d-flex">
-      <h3 class="label w-100">
-        TOTAL DE COMPRA: RD$
-      </h3>
+      <h3 class="label w-100">TOTAL DE COMPRA: RD$</h3>
       <span class="negrita w-100 total">
         {{ ' ' + formatoNumero(data.total_factura) }}
       </span>
@@ -83,9 +71,7 @@
 
     <div *ngIf="data.cambios_articulos" class="cambioDePrecios">
       <span class="spanTituloCambio"> <span> ALGUNOS ARTICULOS CAMBIARON SU COSTO </span> &nbsp; <i class="fas fa-exclamation-circle"></i> </span>
-      <span class="deseaCambio_">
-        ¿Desea actualizar los costos de los articulos automaticamente?
-      </span>
+      <span class="deseaCambio_"> ¿Desea actualizar los costos de los articulos automaticamente? </span>
       <span class="decisionesCambio">
         <span class="si_">
           SI

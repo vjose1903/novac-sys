@@ -224,6 +224,9 @@ export class DBservice {
   // ARTICULOS
   // =====================================================================
 
+  getContenidosArticulos(id) {
+    return this.peticion(`articulos/get/contenidos/${id}`, 'get');
+  }
   getProductosTerminados(id) {
     return this.peticion(`articulos/custom/productos_terminados`, 'get');
   }

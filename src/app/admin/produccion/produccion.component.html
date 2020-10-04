@@ -15,8 +15,8 @@
                 (change)="getIngredients()"
                 id="articulo_id"
               >
-                <option value="{{ null }}" selected>seleccione producto</option>
-                <option *ngFor="let lista of listaProductos | callback: filtroFormula" id="prod-{{ lista.id }}" value="{{ lista.id }}">{{ lista.nombre }}</option>
+                <option value="-1" selected>seleccione producto</option>
+                <option *ngFor="let lista of listaProductos" id="prod-{{ lista.id }}" value="{{ lista.id }}">{{ lista.nombre }}</option>
               </select>
             </div>
           </div>

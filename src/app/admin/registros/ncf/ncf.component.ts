@@ -349,7 +349,7 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   decisionModal(arg) {
     console.log(arg);
-    if (arg) {
+    if (arg && this.seleccionModal) {
       console.log('BORRANDO');
 
       this.dbServ.deleteNCF(this.seleccionModal.id).subscribe(
