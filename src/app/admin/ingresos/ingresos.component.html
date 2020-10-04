@@ -15,6 +15,7 @@
           placeholder="Nombre Cliente"
           class="form-control mb-4"
           autocomplete="off"
+          [disabled]="clienteAdepositar"
         />
       </div>
     </div>
@@ -61,7 +62,7 @@
       </div>
       <div class="col-12 mt-3">
         <div class="d-flex justify-content-end">
-          <input (click)="cancelarIgreso()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+          <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
           <input [disabled]="abilitarBtnConfirmar()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
         </div>
       </div>

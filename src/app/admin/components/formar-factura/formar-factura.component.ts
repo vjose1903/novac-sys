@@ -11,7 +11,16 @@ export class FormarFacturaComponent implements OnInit {
   @Input() factura;
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    // this.factura.detalle_facturas = [
+    //   ...this.factura.detalle_facturas,
+    //   ...this.factura.detalle_facturas,
+    //   ...this.factura.detalle_facturas,
+    //   ...this.factura.detalle_facturas,
+    //   ...this.factura.detalle_facturas,
+    //   ...this.factura.detalle_facturas,
+    // ];
+  }
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
   }

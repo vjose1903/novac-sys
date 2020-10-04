@@ -114,8 +114,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
       if (res !== undefined && res !== null && !this.paraFiltroArticulos && !this.paraFiltroClientes) {
-        console.log('entro');
-
         this.showModal = res;
       }
       if (res === false) {

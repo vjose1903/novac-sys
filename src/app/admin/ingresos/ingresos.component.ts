@@ -112,6 +112,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   altoDiv: number;
 
   sub: Subscription;
+  subDeci: Subscription;
 
   obj_paginate_ = obj_paginate;
   totalFacturado: number;
@@ -148,6 +149,12 @@ export class IngresosComponent implements OnInit, OnDestroy {
         this.mServ.ModalObj(undefined);
       }
     });
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
+      if (res && this.tipoModal === 'cancelar_ingreso') {
+        this.cancelarIgreso();
+      }
+    });
+
     this.necesarioStart();
   }
 
@@ -322,10 +329,12 @@ export class IngresosComponent implements OnInit, OnDestroy {
   cancelarIgreso() {
     this.Facturas = null;
     this.clienteAdepositar = undefined;
-    this.enfocarInput('clienteI');
     (document.getElementById('clienteI') as any).value = null;
     this.AllSelected = false;
     this.resetVariables();
+    setTimeout(() => {
+      this.enfocarInput('clienteI');
+    }, 250);
   }
 
   formarDetalleRecibos() {
@@ -362,6 +371,18 @@ export class IngresosComponent implements OnInit, OnDestroy {
     if (arg) {
       this.mServ.ModalSeleccion(arg);
     }
+    this.mServ.mostrarModal(true);
+  }
+
+  abrirModalDinamicText(tipo) {
+    const obj = {};
+    if (tipo === 'cancelar') {
+      this.tipoModal = 'cancelar_ingreso';
+      this.mServ.modalTipo('dinamico_texto');
+
+      obj['texto_modal'] = 'Seguro de que desea cancelar la operacion.';
+    }
+    this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
   }
 
@@ -434,11 +455,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
     );
   }
   resetVariables() {
-    console.log('//////////////////////');
-
-    console.log('reseteo de vaiables');
-    console.log('//////////////////////');
-
     this.forma_pago = null;
     this.Devuelta = null;
     this.detalleYtotal = undefined;
@@ -518,19 +534,17 @@ export class IngresosComponent implements OnInit, OnDestroy {
   }
 
   async abrirModalFiltro(nombre) {
-    this.mServ.modalTipo('buscarCliente');
-    const obj = {
-      data: [],
-      filtrarCliente: nombre,
-    };
+    if (nombre || nombre === ' ') {
+      this.mServ.modalTipo('buscarCliente');
+      const obj = {
+        data: [],
+        filtrarCliente: nombre,
+      };
 
-    this.mServ.ModalSeleccion(obj);
-
-    // setTimeout(() => {
-    this.mServ.mostrarModal(true);
-    // }, 250);
-
-    this.mServ.ModalTablaHeight(true);
+      this.mServ.ModalSeleccion(obj);
+      this.mServ.mostrarModal(true);
+      this.mServ.ModalTablaHeight(true);
+    }
   }
 
   async saltar(campo, valor?) {

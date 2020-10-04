@@ -69,7 +69,7 @@
     </div>
   </div>
   <div class="col-12">
-    <div class="heigthFactura">
+    <div class="factBodyScroll" [ngStyle]="{ 'max-height': '25rem' }">
       <table class="table" mdbTable small="true">
         <thead class="">
           <tr>
@@ -82,7 +82,7 @@
             <th class="text-right">Total</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody [ngStyle]="{ 'max-height': '22rem' }">
           <tr *ngFor="let row of factura.detalle_facturas; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ row.descripcion }}</td>
