@@ -22,6 +22,7 @@
   "extraFiles": [
     "fonts/*",
     "print/*",
+    "pdfs/*",
     "./icons/*",
     "./node_modules/electron/*",
     "./electron-builder/*",

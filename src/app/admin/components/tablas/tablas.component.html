@@ -4,7 +4,7 @@
 </div>
 
 <!-- <div style="border-radius: 10px 10px 0px 0px;" class="tableBodyScroll"> -->
-  <div style="border-radius: 10px 10px 0px 0px" class="tableBodyScroll" [ngStyle]="{ height: alto + 'px' }">
+<div style="border-radius: 10px 10px 0px 0px" class="tableBodyScroll" [ngStyle]="{ height: alto + 'px' }">
   <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" small="true" id="VICtablas">
     <thead class="text-center" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
       <tr>
@@ -129,7 +129,7 @@
       <button id="button-dropup" dropdownToggle type="button" class="btn btn-peque btn-verde dropdown-toggle" aria-controls="dropdown-dropup">
         {{ mostrar }} registros <span class="caret"></span>
       </button>
-      <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu btn-verde" role="menu" aria-labelledby="button-dropup">
+      <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-dropup">
         <li *ngFor="let i of listaMostrar" role="menuitem" (click)="cambiaMostrar(i)">
           <a class="dropdown-item"> {{ i }} registros</a>
         </li>

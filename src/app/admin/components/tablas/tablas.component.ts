@@ -26,27 +26,27 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @HostListener('input') oninput() {
     this.searchItems();
   }
+
   element: HTMLElement;
-  entrar = 1;
 
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
     // arriba 38
     // abajo 40
+    // enter 13
 
-    setTimeout(() => {
-      if (this.focusRow) {
-        const key = event.keyCode;
-        if (key === 38) {
-          event.stopPropagation();
-          this.ARRIBA();
-        } else if (key === 40) {
-          this.ABAJO();
-        } else if (key === 13) {
-          this.ENTER(this.IDROW);
-        }
+    if (this.focusRow && this.ready) {
+      const key = event.keyCode;
+      console.log('key ', key);
+      if (key === 38) {
+        event.stopPropagation();
+        this.ARRIBA();
+      } else if (key === 40) {
+        this.ABAJO();
+      } else if (key === 13) {
+        this.ENTER(this.IDROW);
       }
-    }, 50);
+    }
   }
 
   // variables
@@ -231,7 +231,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       }
     }
     // ================================================
-    this.ready = true;
+    setTimeout(() => {
+      this.ready = true;
+    }, 250);
   }
 
   // ===================================================
@@ -267,7 +269,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   ngOnDestroy() {
-    this.entrar = 0;
     this.ROW = 'row-';
     this.NUM = 0;
 
@@ -585,8 +586,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.NUM = this.NUM - 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
     this.enfocarInput(this.IDROW);
-    this.entrar++;
   }
+
   ABAJO() {
     if (this.NUM === this.data.length - 1) {
       this.NUM = -1;
@@ -595,14 +596,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.NUM = this.NUM + 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
     this.enfocarInput(this.IDROW);
-    this.entrar++;
   }
 
   ENTER(arg) {
-    this.entrar++;
-    if (this.entrar > 1) {
-      const element = document.getElementById(arg) as any;
-      element.click();
-    }
+    const element = document.getElementById(arg) as any;
+    element.click();
   }
 }

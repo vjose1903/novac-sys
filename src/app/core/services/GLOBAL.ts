@@ -163,6 +163,24 @@ export class GLOBAL {
   //     return sTnum;
   //   }
   // }
+  // ===========================================================================
+
+  static enfocarInput(arg) {
+    const element = document.getElementById(arg) as any;
+    element.focus();
+  }
+  // ===========================================================================
+
+  static desEnfocarInput(arg) {
+    const element = document.getElementById(arg) as HTMLElement;
+    element.blur();
+  }
+
+  // ===========================================================================
+  static selectContenido(arg) {
+    const element = document.getElementById(arg) as any;
+    element.select();
+  }
 }
 
 // ===========================================================================

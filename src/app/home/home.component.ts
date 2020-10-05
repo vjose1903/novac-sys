@@ -9,7 +9,7 @@ import { DBservice } from '../core/services/bdservice.service';
 import { IpcService } from '../core/services/ipc.service';
 import { PdfService } from '../core/services/pdf/pdf.service';
 
-import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, recibo_de_ingreso, venta_contado, venta_credito_consumo } from '../../assets/facturas';
+import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, recibo_de_ingreso, venta_contado, venta_credito_consumo } from '../../assets/facturas';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -209,6 +209,26 @@ export class HomeComponent implements OnInit {
     const obj = {
       data: data_,
       type: 'recibo_ingreso',
+    };
+    this._ipc.send('print', obj);
+
+    await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+
+      if (res.status) {
+      } else {
+        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+      }
+    });
+  }
+  async pruebaConduce() {
+    const data_ = conduce;
+
+    console.log('data_ ', data_);
+    // const DD = await this.pdfServ.makeFacturaVenta(data);
+    const obj = {
+      data: data_,
+      type: 'conduce',
     };
     this._ipc.send('print', obj);
 

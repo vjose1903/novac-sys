@@ -51,7 +51,7 @@
   <!-- ================================================================================================================================================ -->
   <!-- ================================================================================================================================================ -->
   <div *ngIf="cliente" class="col-12 mt-3">
-    <div class="card sombra bordeRedondeado">
+    <div class="card sombra bordeRedondeado" style="height: 41rem">
       <table #tituloFactTable="mdbTable" mdbTable class="table m-auto" small="true">
         <thead>
           <tr class="text-center">
@@ -97,6 +97,7 @@
                           (keydown.enter)="saltar('can-', i)"
                           formControlName="cod"
                           (blur)="verificarRow(i)"
+                          (blur)="calculateCantidadEnUnidades(i)"
                         />
                       </div>
                     </td>
@@ -112,6 +113,7 @@
                           (keydown.enter)="saltar('uni-', i)"
                           formControlName="can"
                           (blur)="verificarRow(i)"
+                          (blur)="calculateCantidadEnUnidades(i)"
                         />
                       </div>
                     </td>
@@ -125,9 +127,10 @@
                           class="form-control entrada"
                           id="uni-{{ i }}"
                           (click)="verificarSecuencia(i, 'unidad')"
-                          (keydown.enter)="saltar('cod-', i + 1)"
+                          (keydown.enter)="saltar('cod-', i)"
                           formControlName="uni"
                           (blur)="verificarRow(i)"
+                          (blur)="calculateCantidadEnUnidades(i)"
                         />
 
                         <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
@@ -137,8 +140,9 @@
                             (change)="selectMedidaChange($event.target.value, i)"
                             class="form-control entrada"
                             id="uni-{{ i }}"
-                            (keydown.enter)="saltar('cod-', i + 1)"
+                            (keydown.enter)="saltar('cod-', i)"
                             (blur)="verificarRow(i)"
+                            (blur)="calculateCantidadEnUnidades(i)"
                           >
                             <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
                           </select>

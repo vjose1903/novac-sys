@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { TablasService, obj_paginate } from '../components/tablas/tablas.service';
+import { IpcService } from '../../core/services/ipc.service';
 
 @Component({
   selector: 'app-conduce',
@@ -42,6 +43,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   subDeci: Subscription;
   subObj: Subscription;
+  subArticuloFiltro: Subscription;
   subEsc: Subscription;
   subInde: Subscription;
 
@@ -68,7 +70,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   facturaAdelantadaSelected;
   CuerpoConduce = [];
   altoDiv: number;
-  constructor(private mServ: ModalService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private tServ: TablasService) {}
+  constructor(private mServ: ModalService, private _ipc: IpcService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private tServ: TablasService) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -83,6 +85,12 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.necesarioStar();
 
+    this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
+      if (res !== undefined && res !== null) {
+        this.LLenarRowDespuesDeFiltro(res);
+      }
+    });
+
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res) {
         if (res.tipo_modal === 'buscarCliente') {
@@ -90,11 +98,11 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
           (document.getElementById('clienteI') as any).value = res.data.nombre;
           this.BuscarFacturasAdelantadas(res.data.id);
           setTimeout(() => {
-            this.enfocarInput('cod-0');
+            GLOBAL.enfocarInput('cod-0');
           }, 10);
           //
-        } else if (res.tipo_modal === 'buscar') {
-          this.clickRowModal(res);
+        } else if (res && res.tipo_modal === 'buscarArticulo') {
+          this.LLenarRowDespuesDeFiltro(res);
           //
         } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
           console.log(res);
@@ -139,7 +147,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.subEsc = this.mServ.PRESSESC.subscribe((res) => {
       if (res !== undefined && res !== null) {
-        this.enfocarInput('cod-' + res);
+        GLOBAL.enfocarInput('cod-' + res);
       }
     });
 
@@ -148,9 +156,8 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
         this.noArticuloEncontrado(res);
       }
     });
-
-    this.getArticulos();
   }
+
   resetModalVaribales() {
     this.mServ.ModalObj(undefined);
     this.mServ.ModalSeleccion(undefined);
@@ -161,13 +168,14 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   noArticuloEncontrado(arg) {
     this.dbServ.toastError('Articulo no creado', 'ERROR');
 
-    this.enfocarInput('cod-' + arg);
+    GLOBAL.enfocarInput('cod-' + arg);
     this.mServ.ModalIndex(undefined);
   }
 
   ngOnDestroy() {
     this.subDeci.unsubscribe();
     this.subObj.unsubscribe();
+    this.subArticuloFiltro.unsubscribe();
     this.subEsc.unsubscribe();
     this.subInde.unsubscribe();
 
@@ -180,7 +188,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async necesarioStar() {
-    this.enfocarInput('clienteI');
+    GLOBAL.enfocarInput('clienteI');
   }
   aumentarSecuencia() {
     this.secuencia++;
@@ -202,180 +210,234 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   async saltar(input, i) {
     const sigInput = input + i;
+    let index = i;
+
+    const codigo = (this.control.controls[i] as any).controls['cod'].value;
+    const unidad = (this.control.controls[i] as any).controls['uni'].value;
+    const cantidad = (this.control.controls[i] as any).controls['can'].value;
 
     if (i >= 10 && input === 'cod-') {
       this.addItem(i);
     }
 
-    let codigo = (this.control.controls[i] as any).controls['cod'].value;
-
     if (input === 'can-' && codigo !== '') {
-      codigo = _.parseInt(codigo);
-
-      if (_.isInteger(codigo)) {
-        codigo = (this.control.controls[i] as any).controls['cod'].value;
-        this.buscarArticuloPorCodigo(i, codigo, input);
+      if (codigo === null) {
+        GLOBAL.enfocarInput('cod-' + i);
+        GLOBAL.selectContenido('cod-' + i);
       } else {
-        codigo = (this.control.controls[i] as any).controls['cod'].value;
-
-        if (!codigo) {
-          this.enfocarInput('cod-' + i);
-          this.selectContenido('cod-' + i);
-        } else {
-          const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
-          this.abrirModal(obj);
-        }
+        const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
+        GLOBAL.desEnfocarInput('cod-' + i);
+        this.filtrarArticulo(obj);
+        // }
       }
     }
 
     if (input === 'uni-') {
-      const cantidad = (this.control.controls[i] as any).controls['can'].value;
+      if (cantidad !== '' && cantidad !== '0' && cantidad !== 0 && cantidad !== null && codigo !== '' && codigo !== null && codigo !== undefined) {
+        // this.setInputDrop(i);
 
-      if (cantidad !== '' && cantidad !== null) {
-        if (input === 'uni-' && codigo !== '' && codigo !== null && codigo !== undefined) {
-          this.verificarRow(i);
-          this.buscarArticuloPorCodigo(i, codigo);
+        let excede = false;
+        if (unidad && unidad !== '') {
+          excede = await this.checkCantidadExede(i, 'change');
+        }
+
+        if (!excede) {
+          const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
+          this.filtrarArticulo(obj);
+
           setTimeout(() => {
-            this.enfocarInput(sigInput);
+            GLOBAL.enfocarInput(sigInput);
+          }, 150);
+        } else {
+          GLOBAL.enfocarInput('can-' + index);
+          GLOBAL.selectContenido('can-' + index);
+          setTimeout(() => {
+            (this.control.controls[index] as any).controls['uni'].setValue(null);
           }, 2);
         }
       }
     }
 
-    if (input === 'cod-' || input === 'pre-') {
-      let unidad;
-      let index = i;
-
-      if (input === 'cod-') {
-        index--;
-      }
-      unidad = (this.control.controls[index] as any).controls['uni'].value;
-
-      const excede = this.checkCantidadExede(index, unidad, 'saltar');
+    if (input === 'cod-') {
+      index++;
+      const excede = await this.checkCantidadExede(i, 'saltar');
+      console.log('excede ', excede);
 
       if (!excede) {
         if (unidad === '' || unidad === null) {
           setTimeout(() => {
-            this.enfocarInput('uni-' + (i - 1));
+            GLOBAL.enfocarInput('uni-' + i);
           }, 5);
         } else {
-          this.UnidadesArticulo = [];
           this.aumentarSecuencia();
-          this.enfocarInput(sigInput);
+          GLOBAL.enfocarInput('cod-' + index);
         }
       } else {
-        this.enfocarInput('can-' + index);
-        this.selectContenido('can-' + index);
+        GLOBAL.enfocarInput('can-' + i);
+        GLOBAL.selectContenido('can-' + i);
         setTimeout(() => {
-          (this.control.controls[index] as any).controls['uni'].setValue(null);
+          (this.control.controls[i] as any).controls['uni'].setValue(null);
         }, 2);
       }
     }
   }
 
-  async clickRowModal(arg) {
-    const index = _.findIndex(this.listaArticulos, (o: any) => {
-      return o.codigo === arg.codigo;
-    });
+  LLenarRowDespuesDeFiltro(obj) {
+    const ARTICULO = obj.data;
 
-    const cantidades = arg.cantidades;
+    const i = obj.index;
 
-    if (arg.existencia > 0 && arg.aviso_existencia > cantidades[arg.medida_alerta]) {
-      this.dbServ.toastWarning('Solo quedan ' + cantidades[arg.medida_alerta] + ' ' + arg.medida_alerta + ' de este producto, debe de aumentar el inventario!!!', 'AVISO');
-    }
+    if (ARTICULO.existencia === 0) {
+      if (ARTICULO.descripcion === 'Producto terminado') {
+        this.dbServ.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
+      } else {
+        this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+      }
 
-    (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
-    (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
-
-    if (arg.is_detallable) {
-      await this.articulo_detallable(arg);
+      setTimeout(() => {
+        GLOBAL.enfocarInput('cod-' + i);
+        GLOBAL.selectContenido('cod-' + i);
+      }, 5);
     } else {
-      await this.articulo_no_detallable(arg);
+      const cantidades = ARTICULO.cantidades;
+
+      if (ARTICULO.existencia > 0 && ARTICULO.aviso_existencia > cantidades[ARTICULO.medida_alerta]) {
+        if (ARTICULO.descripcion === 'Producto terminado') {
+          this.dbServ.toastWarning(
+            'Solo quedan ' + GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) + ' ' + ARTICULO.medida_alerta + ' de este producto, debe de producir mas!!!',
+            'AVISO',
+          );
+        } else {
+          this.dbServ.toastWarning(
+            'Solo quedan ' + GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) + ' ' + ARTICULO.medida_alerta + ' de este producto, debe de aumentar el inventario!!!',
+            'AVISO',
+          );
+        }
+      }
+
+      (this.control.controls[i] as any).controls['cod'].setValue(ARTICULO.codigo);
+      (this.control.controls[i] as any).controls['des'].setValue(ARTICULO.nombre);
+      (this.control.controls[i] as any).controls['articulo_id'].setValue(ARTICULO.id);
+
+      if (ARTICULO.is_detallable) {
+        this.llenarArrayUnidades(ARTICULO, true);
+      } else {
+        this.llenarArrayUnidades(ARTICULO, false);
+      }
+      GLOBAL.enfocarInput('can-' + i);
+    }
+  }
+
+  llenarArrayUnidades(art, detallable) {
+    this.drop = true;
+
+    this.drop = true;
+    this.UnidadesArticulo = [];
+    this.UnidadesArticulo.push({ value: 'Medida', cantidad: art.contenido[art.medida] });
+
+    if (art.contenido_articulos.length === 0 || (art.descripcion !== 'Producto terminado' && art.vendido_en !== 'Saco')) {
+      this.UnidadesArticulo.push({ value: art.medida, cantidad: art.contenido[art.medida] });
     }
 
-    const sigInput = 'can-' + arg.index;
-    this.enfocarInput(sigInput);
+    art.contenido_articulos.forEach((element) => {
+      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
+        if (art.vendido_en === 'Saco') {
+          this.entrarSacosAUnidades();
+        }
+      }
+    });
+    if (detallable) {
+      this.articuloDetallable(art);
+    }
+    console.log('this.UnidadesArticulo ', this.UnidadesArticulo);
+  }
+
+  articuloDetallable(art) {
+    art.contenido_articulos.forEach((element) => {
+      this.UnidadesArticulo.push({ value: element.medida, cantidad: art.contenido[element.medida] });
+    });
+  }
+
+  entrarSacosAUnidades() {
+    for (let i = 0; i < this.sacos.length; i++) {
+      const saco = this.sacos[i];
+      const valor = 'Saco de ' + saco + ' libras';
+      this.UnidadesArticulo.push({ value: valor, cantidad: saco });
+    }
   }
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES
   // =============================================
 
   async abrirModalFiltro(nombre) {
+    if (nombre || nombre === ' ') {
+      this.mServ.modalTipo('buscarCliente');
+      this.tipoModal = 'buscarCliente';
 
-    this.mServ.modalTipo('buscarCliente');
-    this.tipoModal = 'buscarCliente';
+      const obj = {
+        data: [],
+        filtrarCliente: nombre,
+      };
 
-    const obj = {
-      data: [],
-      filtrarCliente: nombre,
-    };
+      this.mServ.ModalSeleccion(obj);
 
-    this.mServ.ModalSeleccion(obj);
-
-    this.mServ.mostrarModal(true);
-    setTimeout(() => {
-      this.mServ.ModalTablaHeight(true);
-    }, 250);
+      this.mServ.mostrarModal(true);
+      setTimeout(() => {
+        this.mServ.ModalTablaHeight(true);
+      }, 250);
+    }
   }
 
   // =============================================
   //  MODAL PARA FILTRAR ARTICULOS
   // =============================================
-  abrirModal(arg) {
-    const obj = arg;
-
-    this.mServ.modalTipo('buscarArticulo');
-    this.mServ.ModalSeleccion(obj);
-    this.mServ.mostrarModal(true);
-    this.mServ.ModalTablaHeight(true);
+  async filtrarArticulo(arg) {
+    await this.mServ.modalTipo('buscarArticulo');
+    await this.mServ.ModalSeleccion(arg);
+    await this.mServ.mostrarModal(true);
+    await this.mServ.ModalTablaHeight(true);
   }
 
   // =============================================
-  checkCantidadExede(i, unidad, lugar) {
+  async checkCantidadExede(i, lugar) {
     let cantidad = 0;
     const descripcion = (this.control.controls[i] as any).controls['des'].value;
-    const tempArticulo = this.listaArticulos.filter((arti) => arti.nombre === descripcion);
-    const articulo = tempArticulo[0];
-    const cantidades = articulo.cantidades;
+    const codigo = (this.control.controls[i] as any).controls['cod'].value;
+    let articulo;
+    console.log('trabajando en el row ', i);
 
-    const splitUnidad = _.split(unidad, ' ');
-    let unidad_ = splitUnidad[0];
-    unidad = splitUnidad[0];
-
-    if (unidad_ === 'Saco' || unidad_ === 'Libra') {
-      unidad_ = 'Libra';
-    } else {
-      unidad_ = 'Unidad';
-    }
+    try {
+      articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, 'todos').toPromise();
+    } catch (error) {}
 
     for (let index = 0; index < this.control.controls.length; index++) {
       const cod = (this.control.controls[index] as any).controls['cod'].value;
       if (cod === null || cod === undefined || cod === '' || cod === ' ') {
         break;
       }
-      let cantidadF = 0;
-      let unidadF = '';
+      let cantidad_en_turno = 0;
+      let unidad_en_turno = '';
 
-      cantidadF = (this.control.controls[index] as any).controls['can'].value;
-      unidadF = (this.control.controls[index] as any).controls['uni'].value;
+      cantidad_en_turno = (this.control.controls[index] as any).controls['can'].value;
+      unidad_en_turno = (this.control.controls[index] as any).controls['uni'].value;
 
-      const splitUnidadF = _.split(unidadF, ' ');
+      const splitUnidadF = _.split(unidad_en_turno, ' ');
       let unity = splitUnidadF[0];
+
       const FindProd = (this.control.controls[index] as any).controls['des'].value;
 
       if (FindProd === descripcion) {
-        if (unidad_ === 'Libra') {
+        if (unity === 'Saco' || unity === 'Libra') {
           if (splitUnidadF.length > 1) {
-            cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
+            cantidad_en_turno = cantidad_en_turno * _.parseInt(splitUnidadF[2]);
           }
         }
         if (unity === 'Saco') {
           unity = 'Libra';
         }
 
-        cantidadF *= articulo.contenido[unity];
-
-        cantidad += cantidadF;
+        cantidad_en_turno *= articulo.contenido[unity];
+        cantidad += cantidad_en_turno;
       }
     }
 
@@ -383,11 +445,21 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       i--;
     }
 
-    if (cantidad > cantidades[unidad_]) {
-      this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
-      return true;
-    } else {
-      return false;
+    try {
+      const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();
+
+      if (res.excede) {
+        this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      if (error.error) {
+        this.dbServ.toastError(error.error.msg, 'ERROR');
+      } else {
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+      }
     }
   }
 
@@ -402,7 +474,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   verificarSecuencia(i, input?) {
     if (this.secuencia < i) {
-      this.enfocarInput(this.inputSecuencia);
+      GLOBAL.enfocarInput(this.inputSecuencia);
     }
 
     if (!input) {
@@ -412,26 +484,38 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
     if (input === 'unidad' && codigo !== '' && codigo !== null && codigo !== undefined) {
       this.verificarRow(i);
-      this.buscarArticuloPorCodigo(i, codigo);
+      const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
+      this.filtrarArticulo(obj);
     }
   }
 
-  selectMedidaChange(arg, i) {
+  async selectMedidaChange(arg, i) {
     const indiceDetalle = _.findIndex(this.UnidadesArticulo, (o) => {
       return o.value === arg;
     });
     const unidad = this.UnidadesArticulo[indiceDetalle].value;
 
-    const execede = this.checkCantidadExede(i, unidad, 'change');
+    const execede = await this.checkCantidadExede(i, 'change');
 
     if (!execede) {
       (this.control.controls[i] as any).controls['uni'].setValue(unidad);
     } else {
-      this.enfocarInput('can-' + i);
-      this.selectContenido('can-' + i);
+      GLOBAL.enfocarInput('can-' + i);
+      GLOBAL.selectContenido('can-' + i);
       setTimeout(() => {
         (this.control.controls[i] as any).controls['uni'].setValue(null);
-      }, 2);
+      }, 250);
+    }
+  }
+
+  calculateCantidadEnUnidades(i) {
+    const cantidad = (this.control.controls[i] as any).controls['can'].value;
+    const unidad = (this.control.controls[i] as any).controls['uni'].value;
+    let cantidadMinima = 1;
+
+    if (unidad && cantidad && this.UnidadesArticulo.length > 0) {
+      cantidadMinima = this.UnidadesArticulo.filter((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad))[0].cantidad;
+      (this.control.controls[i] as any).controls['cantidad_en_unidades'].setValue(cantidad * cantidadMinima);
     }
   }
 
@@ -443,23 +527,16 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.inputDrop = 'uni-' + arg;
   }
 
-  enfocarInput(arg) {
-    const element = document.getElementById(arg) as any;
-    element.focus();
-  }
-
-  selectContenido(arg) {
-    const element = document.getElementById(arg) as any;
-    element.select();
-  }
-
   createItem(i): FormGroup {
     return this.fb.group({
       id: [],
+      detalle_factura_id: [],
+      articulo_id: [null],
       cod: [null],
       uni: [null],
       des: [null],
       can: [null],
+      cantidad_en_unidades: [null],
       secuencia: [i],
     });
   }
@@ -483,38 +560,17 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  ModificarClass(item, clase, action) {
-    if (action === 'add') {
-      document.getElementById(item).classList.add(clase);
-    } else {
-      document.getElementById(item).classList.remove(clase);
-    }
-  }
-
   selectedRow(i, bool) {
     const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i];
     lista.forEach((row) => {
       if (this.checkIfArticuloRow(i)) {
         if (bool) {
-          this.ModificarClass(row, 'inputOscuro', 'add');
+          GLOBAL.ModificarClass(row, 'inputOscuro', 'add');
         } else {
-          this.ModificarClass(row, 'inputOscuro', 'remove');
+          GLOBAL.ModificarClass(row, 'inputOscuro', 'remove');
         }
       }
     });
-  }
-  getArticulos() {
-    try {
-      this.dbServ.getArticulos().subscribe((res) => {
-        res.sort((a, b) => {
-          return a.id > b.id ? 1 : -1;
-        });
-
-        if (res !== undefined && res !== null) {
-          this.listaArticulos = res;
-        }
-      });
-    } catch (error) {}
   }
 
   calcularHeigth() {
@@ -578,52 +634,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  buscarArticuloPorCodigo(i, codigo, input?) {
-    this.inputDrop = 'uni-' + i;
-
-    const ARTICULO = this.listaArticulos.filter((articulo) => articulo.codigo === codigo);
-
-    if (ARTICULO[0] === undefined) {
-      this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
-      setTimeout(() => {
-        this.enfocarInput('cod-' + i);
-      }, 5);
-      this.selectContenido('cod-' + i);
-    } else {
-      const cantidades = ARTICULO[0].cantidades;
-      if (ARTICULO[0].existencia === 0) {
-        if (ARTICULO[0].descripcion === 'Producto terminado') {
-          this.dbServ.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
-        } else {
-          this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
-        }
-        setTimeout(() => {
-          this.enfocarInput('cod-' + i);
-          this.selectContenido('cod-' + i);
-        }, 5);
-      } else {
-        if (ARTICULO[0].existencia > 0 && ARTICULO[0].aviso_existencia > cantidades[ARTICULO[0].medida_alerta]) {
-          if (input === 'can-') {
-            this.dbServ.toastWarning(
-              'Solo quedan ' + cantidades[ARTICULO[0].medida_alerta] + ' ' + ARTICULO[0].medida_alerta + ' de este producto, debe de aumentar el inventario!!!',
-              'AVISO',
-            );
-          }
-        }
-
-        (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
-        this.verificarRow(i);
-
-        if (ARTICULO[0].is_detallable) {
-          this.articulo_detallable(ARTICULO[0]);
-        } else {
-          this.articulo_no_detallable(ARTICULO[0]);
-        }
-
-        this.enfocarInput('can-' + i);
-      }
-    }
-  }
   checkIfArticuloRow(i) {
     let res = false;
     const element = this.control.controls[i] as any;
@@ -634,6 +644,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     return res;
   }
+
   checkIfCuerpoDirty() {
     let acu = false;
     for (let i = 0; i < this.control.controls.length; i++) {
@@ -662,54 +673,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
-  }
-
-  entrarSacosAUnidades() {
-    this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
-    for (let i = 0; i < this.sacos.length; i++) {
-      const saco = this.sacos[i];
-      const valor = 'Saco de ' + saco + ' libras';
-      this.UnidadesArticulo.push({ value: valor, precio: 0, costo: 0 });
-    }
-  }
-
-  articulo_detallable(art) {
-    this.drop = true;
-    this.UnidadesArticulo = [];
-
-    if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-      this.entrarSacosAUnidades();
-    }
-
-    if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
-      this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
-      this.UnidadesArticulo.push({ value: art.medida, precio: 0, costo: 0 });
-    }
-
-    art.contenido_articulos.forEach((element) => {
-      this.UnidadesArticulo.push({ value: element.medida, precio: 0, costo: 0 });
-    });
-  }
-
-  articulo_no_detallable(art) {
-    this.drop = true;
-    this.UnidadesArticulo = [];
-
-    if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
-      this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
-      this.UnidadesArticulo.push({ value: art.medida, precio: 0, costo: 0 });
-    }
-
-    art.contenido_articulos.forEach((element) => {
-      if (element.referencia === null) {
-        if (art.descripcion === 'Veterinaria') {
-          this.UnidadesArticulo.push({ value: element.medida, precio: 0, costo: 0 });
-        }
-      }
-      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-        this.entrarSacosAUnidades();
-      }
-    });
   }
 
   parsearDetalleModal(articulos) {
@@ -787,7 +750,8 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   llenarFila(element, i) {
-    (this.control.controls[i] as any).controls['id'].setValue(element.id);
+    (this.control.controls[i] as any).controls['detalle_factura_id'].setValue(element.id);
+    (this.control.controls[i] as any).controls['articulo_id'].setValue(element.id);
     (this.control.controls[i] as any).controls['cod'].setValue(element.codigo);
 
     (this.control.controls[i] as any).controls['can'].setValue(element.cantidad - element.retirado);
@@ -801,15 +765,21 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async ParsearCuerpo() {
+    this.CuerpoConduce = [];
     for (let i = 0; i < this.control.value.length; i++) {
       const element = this.control.value[i];
       if (element.cod && element.uni && element.can) {
-        element['articulo_id'] = this.listaArticulos.filter((art) => art.codigo === element.cod)[0].id;
+        try {
+          element['articulo'] = await this.dbServ.getArticulosFiltrados(element.cod, 0, 0, true, false, 'todos').toPromise();
+        } catch (error) {}
+
+        // element['articulo'] = this.listaArticulos.filter((art) => art.codigo === element.cod)[0].id;
 
         this.CuerpoConduce.push({
-          detalle_factura_id: element.id ? element.id : null,
-          articulo_id: element.articulo_id,
+          detalle_factura_id: element.detalle_factura_id ? element.detalle_factura_id : null,
+          articulo_id: element.articulo.id,
           cantidad: element.can,
+          cantidad_en_unidades: element.cantidad_en_unidades,
           unidad: element.uni,
         });
       } else {
@@ -818,11 +788,13 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  imprimirConduce() {
+  async imprimirConduce() {
     if (!this.cliente) {
       this.dbServ.toastWarning('Conduce no tiene cliente', 'Aviso');
     } else {
-      this.ParsearCuerpo();
+      await this.ParsearCuerpo();
+      console.log('this.CuerpoConduce ', this.CuerpoConduce);
+
       if (this.CuerpoConduce.length === 0) {
         this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
       } else {
@@ -831,14 +803,44 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  sendData() {
+  async sendData() {
     const empleado = JSON.parse(this.dbServ.getEmpleado());
 
-    const obj = {};
-    obj['user_id'] = empleado.id;
-    obj['cliente_id'] = this.cliente.id;
-    obj['numero_conduce'] = '';
-    obj['detalle_conduce_attributes'] = this.CuerpoConduce;
+    const cabecera_conduce = {};
+    cabecera_conduce['user_id'] = empleado.id;
+    cabecera_conduce['cliente_id'] = this.cliente.id;
+    cabecera_conduce['numero_conduce'] = '';
+    cabecera_conduce['detalle_conduces_attributes'] = this.CuerpoConduce;
+    try {
+      const res = await this.dbServ.createConduce(cabecera_conduce).toPromise();
+      console.log('res conduce ', res);
+
+      this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
+
+      // this.resetVariables();
+
+      const obj = {
+        data: res,
+        type: 'conduce',
+      };
+
+      this._ipc.send('print', obj);
+
+      await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+        console.log(res);
+
+        if (res.status) {
+        } else {
+          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+        }
+      });
+    } catch (error) {
+      if (error.error) {
+        this.dbServ.toastError(error.error.msg, 'ERROR');
+      } else {
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+      }
+    }
   }
 
   cancelarConduce(secuencia) {
@@ -856,7 +858,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
       (document.getElementById('clienteI') as any).value = '';
       setTimeout(() => {
-        this.enfocarInput('clienteI');
+        GLOBAL.enfocarInput('clienteI');
       }, 10);
     }
   }

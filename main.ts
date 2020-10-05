@@ -5,8 +5,9 @@ import * as url from 'url';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 const pdfmake = require('pdfmake/src/printer');
-import * as facturasCompraVenta from './facturasCompraVenta';
-import * as recibosIngresos from './recibosIngresos';
+import * as facturasCompraVenta from './pdfs/facturasCompraVenta';
+import * as recibosIngresos from './pdfs/recibosIngresos';
+import * as conduces from './pdfs/conduce';
 import { logoADM } from './files';
 
 // tslint:disable-next-line: one-variable-per-declaration
@@ -112,8 +113,12 @@ ipcMain.on('print', (event: any, oPdf) => {
   switch (type) {
     case 'recibo_ingreso':
       obj = recibosIngresos.makeRecibo(data);
-
       break;
+
+    case 'conduce':
+      obj = conduces.makeConduce(data);
+      break;
+
     case 'facturacion':
       obj = facturasCompraVenta.makeFacturaVenta(data);
       break;

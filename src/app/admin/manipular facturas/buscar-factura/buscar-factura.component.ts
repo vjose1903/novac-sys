@@ -447,8 +447,10 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   saltar(campo, valor) {
     if (valor && this.campo) {
       if (campo === 'cliente') {
-        this.abrirModalFiltro(valor);
-        this.desEnfocarInput('valorI');
+        if (valor || valor === ' ') {
+          this.abrirModalFiltro(valor);
+          this.desEnfocarInput('valorI');
+        }
       } else if (campo === 'buscarFactura') {
         this.NCF = null;
 

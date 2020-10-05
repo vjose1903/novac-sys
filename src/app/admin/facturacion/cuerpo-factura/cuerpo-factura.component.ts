@@ -335,23 +335,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
     }
 
-    // if (input === 'can-' && codigo !== '') {
-    //   codigo = _.parseInt(codigo);
-    //   if (_.isInteger(codigo)) {
-    //     codigo = (this.control.controls[i] as any).controls['cod'].value;
-    //     this.buscarArticuloPorCodigo(i, codigo, input);
-    //     this.enfocarInput(sigInput);
-    //   } else {
-    //     codigo = (this.control.controls[i] as any).controls['cod'].value;
-    //     if (codigo === null) {
-    //       this.enfocarInput('cod-' + i);
-    //       this.selectContenido('cod-' + i);
-    //     } else {
-    //       const obj = { filtrar: codigo, index: i, metodo: this.metodo };
-    //       this.filtrarArticulo(obj);
-    //     }
-    //   }
-    // }
     if (input === 'can-' && codigo !== '') {
       if (codigo === null) {
         this.enfocarInput('cod-' + i);
@@ -533,6 +516,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       i--;
     }
 
+    console.log('cantidad a comparar ', cantidad);
+
     try {
       const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();
 
@@ -572,7 +557,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.selectContenido('can-' + i);
       setTimeout(() => {
         (this.control.controls[i] as any).controls['uni'].setValue(null);
-      }, 2);
+      }, 250);
     }
   }
 
@@ -801,24 +786,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   // =============================================
   //  MODAL PARA FILTRAR ARTICULOS
   // =============================================
-  // abrirModal(arg) {
-  //   const obj = arg;
-  //   // this.listaArticulos.map()
-  //   if (this.metodo === 'venta') {
-  //     obj.data = this.listaArticulos;
-  //   } else {
-  //     obj.data = this.listaArticulos.filter((articulo) => articulo.suplidor_id === this.propietario.id);
-  //   }
 
-  //   this.mServ.modalTipo('buscar');
-  //   this.mServ.ModalSeleccion(obj);
-  //   this.mServ.mostrarModal(true);
-  //   this.mServ.ModalTablaHeight(true);
-  // }
-
-  // filtrarArticulo(arg) {
-  //   this.abrirModal(arg);
-  // }
   async filtrarArticulo(arg) {
     await this.mServ.modalTipo('buscarArticulo');
     await this.mServ.ModalSeleccion(arg);
@@ -938,7 +906,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
     console.log('art ', art);
 
-    if (art.descripcion !== 'Producto terminado' && art.descripcion !== 'Materia prima') {
+    if (art.contenido_articulos.length === 0 || (art.descripcion !== 'Producto terminado' && art.vendido_en !== 'Saco')) {
       this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
     }
 
@@ -954,12 +922,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (detallable) {
       this.articuloDetallable(art);
     }
-  }
-
-  medidasCuandoCompra(art) {
-    art.contenido_articulos.forEach((element) => {
-      this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: art.contenido[element.medida] });
-    });
   }
 
   articuloDetallable(art) {
@@ -978,6 +940,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   calcularPrecioSaco(cant, precio) {
     const res = (cant / 100) * precio;
     return GLOBAL.redondearAdos(res);
+  }
+  medidasCuandoCompra(art) {
+    art.contenido_articulos.forEach((element) => {
+      this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: art.contenido[element.medida] });
+    });
   }
 
   noArticuloEncontrado(arg) {

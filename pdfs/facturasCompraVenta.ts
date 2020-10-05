@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { logoADM } from './files';
+import { logoADM } from '../files';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
