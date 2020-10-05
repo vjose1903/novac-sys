@@ -1,7 +1,19 @@
 .bordes {
   border: 2px solid rgb(23, 122, 20);
 }
+
+.info {
+  background-color: #0080002e;
+  border-radius: 10px;
+  box-shadow: 1px 1px 4px grey;
+}
+
 .filtroArticulos {
   position: absolute;
-  transform: translate(16rem, -0.5rem);
+  transform: translate(16rem, -0.01rem);
+  height: calc(1em + 0.8rem + 2px);
+  padding: 0.5rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 2;
 }

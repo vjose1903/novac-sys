@@ -4,18 +4,30 @@
       Producto: {{ ' ' }}<span class="negrita">{{ data.nombre }}</span>
     </h2>
   </div>
-  <div class=" col-12">
+
+  <div class="col-12">
     <div class="form-group">
       <label class="control-label">Tipo movimiento: </label>
-      <select id="tipo_movimiento" (keydown.enter)="saltar('medida')" [(ngModel)]="tipo_movimiento" class="form-control">
+      <select id="tipo_movimiento" (keydown.enter)="saltar(tipo_movimiento === 'entrada' ? 'medida' : 'tipo_salida')" [(ngModel)]="tipo_movimiento" class="form-control" (change)="selectTipoMov()">
         <option value="entrada">Entrada</option>
-        <option value="salida"> Salida</option>
+        <option value="salida">Salida</option>
       </select>
     </div>
   </div>
-  <div class=" col-12">
+
+  <div *ngIf="tipo_movimiento === 'salida'" class="col-12">
     <div class="from-group">
-      <label class="control-label">Medida: </label>
+      <label class="control-label">Tipo de salida: </label>
+      <select id="tipo_salida" (keydown.enter)="saltar('medida')" [(ngModel)]="tipo_salida" class="form-control">
+        <option value="perdida">Perdida</option>
+        <option value="producto_defectuoso">Producto defectuoso</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="from-group">
+      <label class="control-label {{ tipo_movimiento === 'salida' ? 'mt-3' : '' }}">Medida: </label>
       <select id="medida" (keydown.enter)="saltar('cantidad')" [(ngModel)]="medida" class="form-control">
         <option *ngFor="let item of medidas" value="{{ item }}">{{ item }}</option>
       </select>

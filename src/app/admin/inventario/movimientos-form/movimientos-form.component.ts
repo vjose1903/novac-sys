@@ -17,6 +17,7 @@ import { ModalService } from '../../components/modal/modal.service';
 export class MovimientosFormComponent implements OnInit, AfterViewInit {
   form;
   tipo_movimiento;
+  tipo_salida;
   medida;
   element: any;
   cantidad = 0;
@@ -28,7 +29,7 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
   constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
-    this.medidas = _.keys(this.data.contenido);
+    this.medidas = _.keys(this.data.cantidades);
   }
   ngAfterViewInit() {
     this.enfocarInput('tipo_movimiento');
@@ -65,10 +66,12 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
   }
+
   selectContenido(arg) {
     this.element = document.getElementById(arg);
     this.element.select();
   }
+
   saltar(campo) {
     if (campo !== 'send') {
       this.enfocarInput(campo);
@@ -76,14 +79,29 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
       this.submit();
     }
   }
+
   abilitarBtnSend() {
     let res = true;
     if (this.tipo_movimiento && this.medida && this.cantidad && this.motivo) {
-      res = false;
+      if (this.tipo_movimiento === 'salida') {
+        res = false;
+        if (!this.tipo_salida) {
+          res = true;
+        }
+      } else {
+        res = false;
+      }
     } else {
       res = true;
     }
+
     return res;
+  }
+
+  selectTipoMov() {
+    if (this.tipo_movimiento === 'entrada') {
+      this.tipo_salida = undefined;
+    }
   }
   submit() {
     const empleado = JSON.parse(this.dbServ.getEmpleado());
@@ -95,9 +113,10 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
       accion: this.tipo_movimiento,
       motivo: this.motivo,
       medida: this.medida,
+      tipo_salida: this.tipo_salida,
     };
     this.dbServ.createMovimientoI(obj).subscribe(
-      res => {
+      (res) => {
         this.dbServ.toastSuccess(_.capitalize(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
         this.resetForm();
 
@@ -107,7 +126,7 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
         };
         this.accion(obj);
       },
-      err => {
+      (err) => {
         console.log(err.error);
         this.mostrarErrores(err.error);
         // this.dbServ.toastError(err.error, 'Error');

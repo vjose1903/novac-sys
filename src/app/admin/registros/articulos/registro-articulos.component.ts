@@ -110,7 +110,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       const page = e.page;
       const per_page = e.per_page;
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
-      const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+      const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, 'todos').toPromise();
 
       this.listaArticulos = res.data;
       const obj = {

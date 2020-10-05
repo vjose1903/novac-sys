@@ -674,7 +674,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       let articulo;
       let codigo = 0;
       try {
-        articulo = await this.dbServ.getArticulosFiltrados(row.cod, 0, 0, true).toPromise();
+        articulo = await this.dbServ.getArticulosFiltrados(row.cod, 0, 0, true, false, 'todos').toPromise();
       } catch (error) {}
 
       // const articulo = JSON.parse(JSON.stringify(Articulo[0]));
@@ -841,12 +841,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     try {
       const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
-
       await this.CancelarFactura();
-      this.dbServ.toastSuccess(res.msg, 'CORRECTO');
+      console.log('res ', res);
 
+      this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO');
       res['FACTURA_DE'] = this.metodo;
-
       const obj = {
         data: res,
         type: 'facturacion',

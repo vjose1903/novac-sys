@@ -239,8 +239,8 @@ export class DBservice {
     return this.peticion(`articulos/ingredientes/${id}`, 'get');
   }
 
-  getArticulosFiltrados(arg, page, per_page, paginado, compra = false) {
-    return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}`, 'get');
+  getArticulosFiltrados(arg, page, per_page, paginado, compra = false, tipo = 'todos') {
+    return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}`, 'get');
   }
 
   createArticulo(arg) {

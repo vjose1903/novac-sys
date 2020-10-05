@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, OnDestroy, AfterViewInit, ElementRef } from '@angular/core';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
@@ -7,12 +7,14 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../components/modal/modal.service';
+import { obj_paginate, TablasService } from '../components/tablas/tablas.service';
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
   styleUrls: ['./inventario.component.scss'],
 })
-export class InventarioComponent implements OnInit, OnDestroy {
+export class InventarioComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
   // =============================================
   //  TABLAS
   // =============================================
@@ -49,31 +51,38 @@ export class InventarioComponent implements OnInit, OnDestroy {
   tipoModal: string;
   seleccionModal: any;
   filtrado = false;
-  filtro;
-  restarFiltro: any;
+  filtro = 'todos';
   subDeci: Subscription;
+  altoDiv;
+  palabra_buscar;
   constructor(
     private artServ: ObservableServcie,
     private dbServ: DBservice,
     private cdRef: ChangeDetectorRef,
     private fb: FormBuilder,
     private actRou: ActivatedRoute,
-    private router: Router,
+    private tServ: TablasService,
     private mServ: ModalService,
   ) {}
 
   async ngOnInit() {
     this.necesarioParaEmpezar();
-    this.dbServ.getTipoArticulos().subscribe(res => {
+    this.dbServ.getTipoArticulos().subscribe((res) => {
       this.tipo_articulos = res;
     });
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(res => {
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
       }
     });
   }
+
+  ngAfterViewInit() {
+    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
+    this.altoDiv -= 65;
+  }
+
   ngOnDestroy() {
     this.subDeci.unsubscribe();
   }
@@ -82,34 +91,38 @@ export class InventarioComponent implements OnInit, OnDestroy {
   }
 
   async necesarioParaEmpezar() {
-    await this.getArticulos();
+    await this.getArticulos(obj_paginate);
     await this.calcularGananciasCostos();
-    this.restarFiltro = GLOBAL.duplicarJson(this.listaArticulos);
-    this.filtro = '0';
   }
-  async getArticulos() {
+
+  async getArticulos(e) {
     try {
-      this.listaArticulos = await this.dbServ.getArticulos().toPromise();
-      this.listaArticulos.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
-      });
-    } catch (error) {}
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+      const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.filtro).toPromise();
+      this.palabra_buscar = palabra_a_buscar;
+
+      this.listaArticulos = GLOBAL.duplicarJson(res.data);
+
+      const obj = {
+        total: res.total_registros,
+        tabla: 'listaArticulos',
+      };
+
+      this.tServ.Func_total_paginas(obj);
+    } catch (error) {
+      this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
+    }
   }
 
   filtrarArticulos() {
-    if (this.filtro === 'todos' && this.filtrado === true) {
-      this.listaArticulos = this.restarFiltro;
-      this.filtrado = false;
-    }
+    obj_paginate['searchText'] = this.palabra_buscar;
 
-    if (this.filtro !== 'todos') {
-      this.listaArticulos = GLOBAL.duplicarJson(this.restarFiltro);
-      // this.listaArticulos.slice(0);
-      this.listaArticulos = this.listaArticulos.filter(val => val.tipo_articulo_id === _.parseInt(this.filtro));
-      this.filtrado = true;
-    }
+    this.getArticulos(obj_paginate);
     this.calcularGananciasCostos();
   }
+
   calcularGananciasCostos() {
     this.costoTotal = 0;
     this.gananciaTotal = 0;

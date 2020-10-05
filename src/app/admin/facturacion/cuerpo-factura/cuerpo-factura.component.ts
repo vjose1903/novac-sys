@@ -496,7 +496,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
     let articulo;
     try {
-      articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true).toPromise();
+      articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, 'todos').toPromise();
     } catch (error) {}
 
     for (let index = 0; index < this.control.controls.length; index++) {

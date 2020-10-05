@@ -294,7 +294,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       try {
         const is_compra = this.metodo === 'compra' ? true : false;
 
-        const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra).toPromise();
+        const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, 'todos').toPromise();
 
         if (res.data) {
           this.seleccionModal = res.data;

@@ -1,6 +1,6 @@
-<div class="cardPrincipal sinPadding tamano">
+<div #cardTabla class="cardPrincipal sinPadding tamano">
   <div class="row d-flex justify-content-center">
-    <div class="col-11 bordes mt-4">
+    <div class="col-11 bordes info mt-4">
       <div class="d-flex justify-content-between">
         <div class="text-center">
           <span class="w-100"> Cantidad de productos en inventario </span>
@@ -23,7 +23,7 @@
   <div class="p-2 mt-2">
     <div class="col-2">
       <select class="form-control filtroArticulos" [(ngModel)]="filtro" (change)="filtrarArticulos()">
-        <option value="{{ '0' }}" disabled>Filtro por tipo de articulos</option>
+        <option value="0" disabled>Filtro por tipo de articulos</option>
         <option value="todos">Todos</option>
         <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
       </select>
@@ -33,8 +33,12 @@
       [info]="info"
       [data]="listaArticulos"
       [focusRow]="false"
+      [search]="true"
+      [paginate]="true"
+      [alto]="altoDiv"
       [botones]="botones"
       (DevolverInfo)="movimientoInventario($event)"
+      (paginateChange)="getArticulos($event)"
     ></app-tablas>
   </div>
 </div>
