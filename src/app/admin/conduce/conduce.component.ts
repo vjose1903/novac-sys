@@ -589,7 +589,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
             (fact) =>
               (fact = fact.map((val) => {
                 val.secuencia = _.padStart(val.numero_factura, 8, '0');
-                val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
+                val.fecha = moment(val.fecha_equivalente).format('DD-MM-YYYY');
                 val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : '';
                 val.estado_ = val.estado ? 'fas fa-check' : 'fas fa-times';
                 val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
@@ -815,8 +815,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       const res = await this.dbServ.createConduce(cabecera_conduce).toPromise();
       console.log('res conduce ', res);
 
-      this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
-
       // this.resetVariables();
 
       const obj = {
@@ -829,7 +827,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
         console.log(res);
 
-        if (res.status) {
+        if (res.status === 'si') {
+          this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
+          this.cancelarConduce(2);
         } else {
           this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
         }

@@ -106,9 +106,7 @@ ipcMain.on('print', (event: any, oPdf) => {
   const data = oPdf.data;
   const type = oPdf.type;
 
-  console.log('oPdf', oPdf);
   console.log('data', data);
-  console.log('type', type);
 
   switch (type) {
     case 'recibo_ingreso':

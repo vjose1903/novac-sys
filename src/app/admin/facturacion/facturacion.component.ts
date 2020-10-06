@@ -12,6 +12,7 @@ import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.componen
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../components/modal/modal.service';
+import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 
 @Component({
   selector: 'app-facturacion',
@@ -21,7 +22,9 @@ import { ModalService } from '../components/modal/modal.service';
 export class FacturacionComponent implements OnInit, OnDestroy {
   form: FormGroup;
   fecha;
-  adelantada = 'false';
+  modo_factura = 'normal';
+  is_adelantada = false;
+  is_viaje = false;
   ITBIS = 0;
   seleccionModal;
   showModal = false;
@@ -59,7 +62,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   };
   // listaArticulos: any;
   usuario: any;
-
+  public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   Devuelta = 0;
@@ -68,6 +71,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   subDeci: Subscription;
   FacturaAtrasada = false;
   FechaFacturaAtrasada;
+  fecha_vencimiento = new Date();
+  fecha_equivalente = new Date();
   articulosAcambiar = [];
   newCuerpo: any[];
   paqueteComprobante: any;
@@ -87,6 +92,15 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       direccion: [],
       telefono: [],
     });
+    this.dpConfig = Object.assign(
+      {},
+      {
+        // locale:'en',
+        showWeekNumbers: false,
+        minDate: new Date(),
+        dateInputFormat: 'DD/MM/YYYY',
+      },
+    );
   }
 
   formatoNumero(num) {
@@ -272,7 +286,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   cambiarTipoVenta(arg) {
     if (arg === 'Crédito') {
-      this.adelantada = 'false';
+      this.modo_factura = 'normal';
+      this.fecha_vencimiento = new Date();
+      this.fecha_equivalente = new Date();
+    } else {
+      this.fecha_vencimiento = null;
     }
   }
 
@@ -342,11 +360,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
       }
     }
+
     if (campo === 'venta') {
       this.desEnfocarInput(salioDe);
       this.enfocarInput(campo);
     }
-    if (campo === 'costo') {
+
+    if (campo === 'costo' || campo === 'fecha_vencimiento' || campo === 'fecha_equivalente') {
       this.enfocarInput(campo);
     }
     if (campo === 'pago') {
@@ -394,6 +414,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     }
   }
+
   setCaretPosition(ctrl, pos) {
     // Modern browsers
     if (ctrl.setSelectionRange) {
@@ -409,6 +430,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       range.select();
     }
   }
+
   activarNombreDireccion() {
     let res = false;
     if (this.metodo === 'compra') {
@@ -416,7 +438,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     } else {
       res = false;
 
-      if (this.adelantada === 'true' || this.condicion_fact === 'Crédito') {
+      if (this.is_adelantada || this.condicion_fact === 'Crédito' || this.modo_factura === 'viaje' || this.modo_factura === 'adelantada') {
         res = true;
       } else {
         res = false;
@@ -428,6 +450,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   pru() {
     const input = document.getElementById('ncf') as any;
   }
+
   trimEndNcf() {
     const input = document.getElementById('ncf') as any;
     const valor = input.value;
@@ -543,6 +566,17 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.tipoModal = '';
   }
 
+  selectModoFactura(arg) {
+    this.is_viaje = false;
+    this.is_adelantada = false;
+
+    if (arg === 'viaje') {
+      this.is_viaje = true;
+    } else if (arg === 'adelantada') {
+      this.is_adelantada = true;
+    }
+  }
+
   // =============================================
   //  OBTENER LA DATA DEL CUERPO
   // =============================================
@@ -563,8 +597,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     if (this.metodo === 'venta') {
       this.CuerpoFactura.map((articulo) => {
-        articulo.retirado = this.adelantada === 'true' ? 0 : articulo.cantidad;
-        articulo.retirado_en_venta = this.adelantada === 'true' ? 0 : articulo.cantidad;
+        articulo.retirado = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad;
+        articulo.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad;
         return articulo;
       });
     }
@@ -581,6 +615,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(null);
     this.FacturaAtrasada = false;
     this.FechaFacturaAtrasada = null;
+    this.fecha_equivalente = new Date();
+    this.fecha_vencimiento = new Date();
+    this.modo_factura = 'normal';
+    this.is_adelantada = false;
+    this.is_viaje = false;
 
     if (this.metodo === 'venta') {
       this.form.patchValue({
@@ -787,10 +826,27 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     const cabecera_fact = {};
     cabecera_fact['condicion'] = this.condicion_fact;
     cabecera_fact['forma_pago'] = this.forma_pago;
-    cabecera_fact['fecha_facturacion'] = this.FechaFacturaAtrasada ? this.FechaFacturaAtrasada : null;
+
+    let fecha_equi;
+    if (this.is_adelantada) {
+      fecha_equi = this.FechaFacturaAtrasada;
+    } else if (this.is_viaje) {
+      fecha_equi = this.fecha_equivalente;
+    } else {
+      fecha_equi = null;
+    }
+
+    cabecera_fact['fecha_equivalente'] = fecha_equi;
 
     if (this.condicion_fact === 'Crédito') {
-      cabecera_fact['fecha_vencimiento'] = moment(new Date()).add(this.propietario_factura.limite_credito, 'days').format('DD/MM/YYYY');
+      let fecha_venci;
+      if (this.metodo === 'venta') {
+        fecha_venci = moment(new Date()).add(this.propietario_factura.limite_credito, 'days').format('DD/MM/YYYY');
+      } else {
+        fecha_venci = moment(this.fecha_vencimiento).format('DD/MM/YYYY');
+      }
+
+      cabecera_fact['fecha_vencimiento'] = fecha_venci;
       cabecera_fact['pagada'] = false;
       cabecera_fact['balance'] = GLOBAL.redondearAdos(this.TOTAL);
       cabecera_fact['devuelta'] = 0;
@@ -805,7 +861,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY')
         : null
       : null;
-    cabecera_fact['adelantada'] = this.adelantada === 'true' ? true : false;
+
+    cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
     cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;
     cabecera_fact['numero_factura'] = null;
@@ -814,8 +871,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['itbis'] = GLOBAL.redondearAdos(this.ITBIS);
     cabecera_fact['descuento'] = GLOBAL.desformatear(GLOBAL.redondearAdos(this.DESCUENTO));
     cabecera_fact['estado'] = true;
+    cabecera_fact['is_adelantada'] = this.is_adelantada;
+    cabecera_fact['is_viaje'] = this.is_viaje;
+    cabecera_fact['is_completada'] = this.modo_factura === 'viaje' ? false : true;
     cabecera_fact['is_nota'] = false;
-    cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
 
     if (this.metodo === 'venta') {
       if (this.propietario_factura && this.propietario_factura.id === 1) {
@@ -842,7 +901,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     try {
       const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
       await this.CancelarFactura();
-      console.log('res ', res);
 
       this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO');
       res['FACTURA_DE'] = this.metodo;

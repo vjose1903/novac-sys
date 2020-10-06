@@ -9,7 +9,7 @@ import { logoADM } from '../files';
 export function makeConduce(data) {
   const dd = {
     pageSize: { width: 816, height: 528 },
-    pageMargins: [10, 156, 10, 30],
+    pageMargins: [10, 169.5, 10, 30],
     header: cabeceraConduce(data),
     content: contenidoConduce(data),
     footer: function (currentPage, pageCount) {
@@ -112,8 +112,8 @@ function cabeceraConduce(data) {
           {
             text: [
               { text: 'Fecha: ', fontSize: 12, bold: true },
-              { text: fechaParse(data.created_at), fontSize: 12 },
-              { text: ' - ' + hora(data.created_at), fontSize: 12 },
+              { text: fechaParse(data.fecha_equivalente), fontSize: 12 },
+              { text: ' - ' + hora(data.fecha_equivalente), fontSize: 12 },
             ],
             margin: [70, 0, 0, 0],
           },
@@ -144,7 +144,7 @@ function cabeceraConduce(data) {
       style: 'tableExample',
       table: {
         headerRows: 1,
-        widths: [23, 60, 70, '*'],
+        widths: [23, 60, 120, '*'],
         body: [
           [
             {
@@ -165,14 +165,14 @@ function cabeceraConduce(data) {
               style: 'tableHeader',
               bold: true,
               alignment: 'right',
-              margin: [0, 0, 10, 0],
+              margin: [0, 0, 60, 0],
             },
             {
               text: 'Descripción',
               style: 'tableHeader',
               bold: true,
-              alignment: 'right',
-              margin: [0, 0, 0, 0],
+              alignment: 'left',
+              margin: [-20, 0, 0, 0],
             },
           ],
           [1, 'Sample value 1', 'value 2', 'value 2'],
@@ -195,12 +195,12 @@ function contenidoConduce(data) {
   data.detalle_conduces.forEach((detalle, i) => {
     const row = [];
 
-    const br_ = i !== 13 && i % 13 === 0;
+    const br_ = i !== 0 && i % 12 === 0;
 
     row.push(
       { text: i + 1, pageBreak: br_ ? 'before' : 'none' },
-      { text: numFormatTwoDecimals(detalle.cantidad), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 20, 0] },
-      { text: detalle.unidad, pageBreak: br_ ? 'before' : 'none', alignment: 'right' },
+      { text: numFormatTwoDecimals(detalle.cantidad), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 10, 0] },
+      { text: detalle.unidad, pageBreak: br_ ? 'before' : 'none', alignment: 'right', margin: [0, 0, 50, 0] },
       { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none', alignment: 'left' },
     );
     tempBody.push(row);
@@ -208,15 +208,15 @@ function contenidoConduce(data) {
 
   const content = [
     {
-      margin: [0, 0, 0, 0],
+      margin: [0, -2, 0, 0],
       table: {
-        widths: [24, 60, 70, '*'],
+        widths: [23, 60, 120, '*'],
         body: tempBody,
       },
 
       layout: {
         hLineWidth: function (i, node) {
-          return i % 13 === 0 && node.table.body.length !== 13 ? 0 : i === node.table.body.length ? 2 : 1;
+          return i % 12 === 0 && node.table.body.length !== 12 ? 0 : i === node.table.body.length ? 2 : 1;
         },
         vLineWidth: function (i, node) {
           return 0;
@@ -244,7 +244,7 @@ function contenidoConduce(data) {
             {
               type: 'rect',
               x: 40,
-              y: 50,
+              y: 45,
               w: 140,
               h: 1,
               color: '#000000',
@@ -252,7 +252,7 @@ function contenidoConduce(data) {
             {
               type: 'rect',
               x: 305,
-              y: 50,
+              y: 45,
               w: 140,
               h: 1,
               color: '#000000',

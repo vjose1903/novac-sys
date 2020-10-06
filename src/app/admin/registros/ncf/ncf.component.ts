@@ -102,6 +102,7 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
       {},
       {
         showWeekNumbers: false,
+        dateInputFormat: 'DD/MM/YYYY',
         // maxDate: new Date(),
       },
     );
@@ -111,6 +112,7 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
       {
         showWeekNumbers: false,
         minDate: this.fechaCompra,
+        dateInputFormat: 'DD/MM/YYYY',
       },
     );
   }

@@ -87,7 +87,7 @@ export class HomeComponent implements OnInit {
     //   suplidor_id: 1,
     //   cliente_id: null,
     //   user_id: 1,
-    //   fecha_facturacion: '2020-09-23T16:28:39.952Z',
+    //   fecha_equivalente: '2020-09-23T16:28:39.952Z',
     //   fecha_vencimiento: null,
     //   fecha_valida: '2021-12-31',
     //   numero_comprobante: 'B0135153112',

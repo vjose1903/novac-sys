@@ -28,6 +28,7 @@ export class PendienteFormComponent implements OnInit {
         // locale:'es',
         showWeekNumbers: false,
         maxDate: new Date(),
+        dateInputFormat: 'DD/MM/YYYY',
       },
     );
   }

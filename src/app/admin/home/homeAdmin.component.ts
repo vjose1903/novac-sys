@@ -25,7 +25,7 @@ export class HomeAdminComponent implements OnInit {
       suplidor_id: 1,
       cliente_id: null,
       user_id: 1,
-      fecha_facturacion: '2020-02-11',
+      fecha_equivalente: '2020-02-11',
       fecha_vencimiento: '2020-02-11',
       fecha_valida: '2021-02-11',
       numero_comprobante: 'B0100000410',

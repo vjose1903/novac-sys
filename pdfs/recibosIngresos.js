@@ -112,8 +112,8 @@ function cabeceraRecibo(data) {
                     {
                         text: [
                             { text: 'Fecha: ', fontSize: 12, bold: true },
-                            { text: fechaParse(data.created_at), fontSize: 12 },
-                            { text: ' - ' + hora(data.created_at), fontSize: 12 },
+                            { text: fechaParse(data.fecha_equivalente), fontSize: 12 },
+                            { text: ' - ' + hora(data.fecha_equivalente), fontSize: 12 },
                         ],
                         margin: [60, 0, 0, 0],
                     },

@@ -74,6 +74,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
         // locale:'es',
         showWeekNumbers: false,
         maxDate: new Date(),
+        dateInputFormat: 'DD/MM/YYYY',
       },
     );
   }

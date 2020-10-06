@@ -171,8 +171,8 @@ function cabeceraFacturaVenta(data) {
               {
                 text: [
                   { text: 'Fecha : ', style: 'letra11' },
-                  { text: fecha(data.created_at), style: 'letra11' },
-                  { text: ' - ' + hora(data.created_at), style: 'letra11' },
+                  { text: fecha(data.fecha_equivalente), style: 'letra11' },
+                  { text: ' - ' + hora(data.fecha_equivalente), style: 'letra11' },
                 ],
                 margin: [85, -10, 0, 0],
               },

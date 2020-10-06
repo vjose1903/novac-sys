@@ -58,27 +58,62 @@
           <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
           <select
             id="venta"
-            (keydown.enter)="saltar($event.target.value === 'true' ? 'buscarCliente' : condicion_fact === 'Crédito' ? 'buscarCliente' : 'nom', $event.target.value, 'venta')"
+            (keydown.enter)="saltar(modo_factura === 'normal' ? 'nom' : modo_factura === 'viaje' ? 'fecha_equivalente' : 'buscarCliente', $event.target.value, 'venta')"
+            (change)="selectModoFactura($event.target.value)"
             class="form-control inputE"
-            [(ngModel)]="adelantada"
+            [(ngModel)]="modo_factura"
           >
-            <option value="{{ false }}">Normal</option>
-            <option value="{{ true }}">Adelantada</option>
+            <option value="" disabled selected>Modo de venta</option>
+            <option value="normal">Normal</option>
+            <option value="viaje">Viaje</option>
+            <option value="adelantada">Adelantada</option>
           </select>
         </div>
 
+        <div *ngIf="modo_factura === 'viaje'">
+          <span class="mt-1"><strong>Fecha viaje:</strong></span>
+          <input
+            type="text"
+            (keydown.enter)="saltar('buscarCliente', $event.target.value, 'fecha_equivalente')"
+            [bsConfig]="dpConfig"
+            placeholder="mm/dd/aaaa"
+            class="form-control inputE"
+            id="fecha_equivalente"
+            [(ngModel)]="fecha_equivalente"
+            #dp="bsDatepicker"
+            placement="bottom"
+            bsDatepicker
+          />
+        </div>
+
         <div *ngIf="metodo === 'compra'">
-          <h5 class="mt-2"><strong>Número comprobante:</strong></h5>
+          <span class="mt-2"><strong>Número comprobante:</strong></span>
           <input
             type="text"
             [textMask]="{ mask: ncfMask }"
             placeholder="b__________"
             class="form-control inputE UPPERCASE"
-            (keydown.enter)="saltar('filtro', $event.target.value)"
+            (keydown.enter)="saltar(condicion_fact === 'Crédito' ? 'fecha_vencimiento' : 'filtro', $event.target.value)"
             [(ngModel)]="NCFcompra"
             (focus)="trimEndNcf()"
             id="ncf"
           />
+
+          <div *ngIf="condicion_fact === 'Crédito'">
+            <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
+            <input
+              type="text"
+              (keydown.enter)="saltar('filtro', $event.target.value)"
+              [bsConfig]="dpConfig"
+              placeholder="mm/dd/aaaa"
+              class="form-control inputE"
+              id="fecha_vencimiento"
+              [(ngModel)]="fecha_vencimiento"
+              #dp="bsDatepicker"
+              placement="bottom"
+              bsDatepicker
+            />
+          </div>
         </div>
       </div>
       <!-- ======================================================================================================================================================================== -->

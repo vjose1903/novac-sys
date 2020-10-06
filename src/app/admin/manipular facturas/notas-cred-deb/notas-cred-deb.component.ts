@@ -433,7 +433,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     const cabecera_fact = {};
     cabecera_fact['condicion'] = 'contado';
     cabecera_fact['forma_pago'] = 'Efectivo';
-    cabecera_fact['fecha_facturacion'] = null;
+    cabecera_fact['fecha_equivalente'] = null;
     // cabecera_fact['fecha_vencimiento'] = moment(new Date())
     //   .add(this.propietario_factura.limite_credito, 'days')
     //   .format('DD/MM/YYYY');

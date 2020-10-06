@@ -241,7 +241,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
             (fact) =>
               (fact = fact.map((val) => {
                 val.secuencia = _.padStart(val.numero_factura, 8, '0');
-                val.fecha = moment(val.fecha_facturacion).format('DD-MM-YYYY');
+                val.fecha = moment(val.fecha_equivalente).format('DD-MM-YYYY');
                 val.fechaV = moment(val.fecha_vencimiento).format('DD-MM-YYYY');
                 val.select = false;
                 val.pagoT = false;
@@ -351,8 +351,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
         descripcion:
           this.tipo_recibo === 'Pago factura'
             ? fact.pagoT
-              ? 'Saldo ' + fact.numero_comprobante + ' ' + fact.fecha_facturacion
-              : 'Abono ' + fact.numero_comprobante + ' ' + fact.fecha_facturacion
+              ? 'Saldo ' + fact.numero_comprobante + ' ' + fact.fecha_equivalente
+              : 'Abono ' + fact.numero_comprobante + ' ' + fact.fecha_equivalente
             : '',
         pago_a_tiempo: fact.pago_a_tiempo,
       });
