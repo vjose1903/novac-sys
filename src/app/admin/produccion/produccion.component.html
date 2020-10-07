@@ -36,7 +36,7 @@
                   placeholder="Cantidad para alertar"
                   class="form-control mb-4"
                   autocomplete="off"
-                  (blur)="calcularCantidadEnProduccion()"
+                  (blur)="calcularCantidadAProduccir()"
                 />
               </div>
 
@@ -46,8 +46,8 @@
                   class="form-control"
                   [(ngModel)]="medida_producir"
                   id="medida_producir"
-                  (change)="calcularCantidadEnProduccion()"
-                  (blur)="calcularCantidadEnProduccion()"
+                  (change)="calcularCantidadAProduccir()"
+                  (blur)="calcularCantidadAProduccir()"
                 >
                   <!-- [ngClass]="{ badAlert: Ispaquete }" -->
                   <option value="{{ null }}"></option>

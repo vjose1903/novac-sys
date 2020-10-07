@@ -31,6 +31,7 @@
               class="form-control inputE"
               [(ngModel)]="condicion_fact"
               (change)="cambiarTipoVenta($event.target.value)"
+              (blur)="checkCambiosModoyCondicionFactura($event.target)"
             >
               <option value="Contado">Contado</option>
               <option value="Crédito">Crédito</option>
@@ -62,6 +63,7 @@
             (change)="selectModoFactura($event.target.value)"
             class="form-control inputE"
             [(ngModel)]="modo_factura"
+            (blur)="checkCambiosModoyCondicionFactura($event.target)"
           >
             <option value="" disabled selected>Modo de venta</option>
             <option value="normal">Normal</option>
@@ -79,6 +81,7 @@
             placeholder="mm/dd/aaaa"
             class="form-control inputE"
             id="fecha_equivalente"
+            (ngModelChange)="enfocarInput('fecha_equivalente')"
             [(ngModel)]="fecha_equivalente"
             #dp="bsDatepicker"
             placement="bottom"
@@ -108,6 +111,7 @@
               placeholder="mm/dd/aaaa"
               class="form-control inputE"
               id="fecha_vencimiento"
+              (ngModelChange)="enfocarInput('fecha_vencimiento')"
               [(ngModel)]="fecha_vencimiento"
               #dp="bsDatepicker"
               placement="bottom"
@@ -124,7 +128,7 @@
             <h5>
               <strong>{{ labelSearch }}:</strong>
             </h5>
-            <i (click)="abrirModalFiltro()" mdbTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" placement="top" class="fas fa-search ml-3 botonBuscar"></i>
+            <i (click)="abrirModalFiltro()" mdbTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" placement="right" class="fas fa-search ml-3 botonBuscar"></i>
           </div>
           <div class="row">
             <div class="col-md-7">

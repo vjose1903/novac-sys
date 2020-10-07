@@ -186,7 +186,7 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     return res;
   }
 
-  calcularCantidadEnProduccion() {
+  calcularCantidadAProduccir() {
     this.ingredientesParaProduccion = [];
     if (this.cantidad_producir && this.medida_producir) {
       this.ingredientes.forEach(async (ingre) => {
@@ -259,25 +259,28 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
 
   agregarAlista() {
     this.ingredientesParaProduccion.forEach((ingre) => {
-      ingre.cantidad = ingre.existencia.Libra;
+      ingre.cantidad = this.medida_producir === 'Quintal' ? ingre.existencia.Quintal : ingre.existencia.Quintal;
+      ingre.cantidad_en_unidades = ingre.existencia.Libra;
       ingre.articulo_id = ingre.articulo_id;
+
       delete ingre.existencia;
     });
 
     const obj = {
       nombre: this.articuloSelected.nombre,
       cantidad: this.cantidad_producir,
+      cantidad_en_unidades: this.medida_producir === 'Quintal' ? this.cantidad_producir * 100 : this.cantidad_producir,
       medida: this.medida_producir,
       articulo_id: _.parseInt(this.articulo_id),
       ingredientes: this.ingredientesParaProduccion,
     };
-    console.log(obj);
 
     this.lista_produccion.push(obj);
 
     this.disableOption('prod-' + this.articulo_id, true);
     this.articuloEditando = undefined;
     this.borrar();
+    console.log('lista_produccion ', this.lista_produccion);
   }
 
   editarItem(item) {
@@ -294,7 +297,7 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.articuloEditando = item.ARG;
     setTimeout(() => {
       this.getIngredients();
-      this.calcularCantidadEnProduccion();
+      this.calcularCantidadAProduccir();
 
       this.seleccionModal = item.ARG;
       this.tipoModal = 'remover';
@@ -347,37 +350,54 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.tipoModal = 'cancelarP';
     this.mServ.mostrarModal(true);
   }
-  confirmarProduccion() {
+
+  async confirmarProduccion() {
     const obj = JSON.parse(JSON.stringify(this.lista_produccion));
-    let continuar = false;
+    const produccion_send = {};
 
     const empleado = JSON.parse(this.dbServ.getEmpleado());
 
-    obj.forEach((produccion, i) => {
-      produccion['user_id'] = empleado.id;
-      if (produccion.medida === 'Quintal') {
-        produccion.cantidad *= 100;
-      }
+    const detalle = [];
 
-      this.dbServ.createProduccion(produccion).subscribe(
-        (res) => {
-          if (i === this.lista_produccion.length - 1) {
-            this.succes();
-          }
-        },
-        (err) => {
-          this.mostrarErrores(err.error);
-          // this.dbServ.toastError(err.error, 'Error');
-        },
-      );
+    obj.forEach((produccion, i) => {
+      console.log(produccion);
+
+      detalle.push({
+        articulo_id: produccion.articulo_id,
+        cantidad: produccion.cantidad,
+        cantidad_en_unidades: produccion.cantidad_en_unidades,
+        medida: produccion.medida,
+      });
     });
+
+    produccion_send['user_id'] = empleado.id;
+    produccion_send['numero'] = null;
+    produccion_send['fecha_equivalente'] = null;
+    produccion_send['detalles_produccion_attributes'] = detalle;
+
+    console.log(produccion_send);
+    try {
+      const res = await this.dbServ.createProduccion(produccion_send).toPromise();
+      this.succes();
+    } catch (error) {
+      console.error(error);
+
+      if (error.error) {
+        // this.mostrarErrores(error.error.msg);
+        this.dbServ.toastError(error.error.msg, 'Error');
+      } else {
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+      }
+    }
   }
+
   succes() {
     this.dbServ.toastSuccess('Producción registrada.', 'Correcto');
     this.tipoModal;
     this.decisionModalP('cancelarP');
     this.borrar();
   }
+
   mostrarErrores(arg) {
     for (const error in arg) {
       if (arg.hasOwnProperty(error)) {

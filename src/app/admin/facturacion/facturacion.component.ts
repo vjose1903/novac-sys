@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
@@ -20,6 +20,31 @@ import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
   styleUrls: ['./facturacion.component.scss'],
 })
 export class FacturacionComponent implements OnInit, OnDestroy {
+  @HostListener('window:keydown', ['$event'])
+  @HostListener('window:keyup', ['$event'])
+  handleKeyboardEvent(event: any) {
+    // arriba 38
+    // abajo 40
+    // enter 13
+    event.stopPropagation();
+    const key = event.keyCode;
+
+    if (event.type === 'keydown') {
+      if (!this.secuenciaKeys.includes(key)) {
+        this.secuenciaKeys.push(key);
+      }
+    } else if (event.type === 'keyup') {
+      const conbinacion = _.join(this.secuenciaKeys, '_');
+      this.secuenciaKeys = [];
+
+      if (conbinacion === '91_80') {
+        this.imprimirFactura();
+      }
+    }
+  }
+
+  secuenciaKeys = [];
+
   form: FormGroup;
   fecha;
   modo_factura = 'normal';
@@ -242,6 +267,41 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
 
+  checkCambiosModoyCondicionFactura(arg) {
+    const sali_de = arg.id;
+    const valor = arg.value;
+
+    console.log('sali_de ', sali_de);
+    console.log('valor ', valor);
+    if (this.metodo === 'venta') {
+      setTimeout(() => {
+        console.log('entre en  ', document.activeElement.id);
+        const voy_a = document.activeElement.id;
+        const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
+        let buscar = false;
+        if (sali_de === 'venta' && valor === 'viaje' && voy_a !== 'fecha_equivalente' && nombre === 'Cliente contado') {
+          buscar = true;
+        }
+        if (sali_de === 'venta' && valor === 'adelantada' && nombre === 'Cliente contado') {
+          buscar = true;
+        }
+        if (sali_de === 'venta' && valor === 'normal' && voy_a !== 'nom' && voy_a !== 'dir') {
+          this.iniciarFactura('cod-0');
+        }
+
+        // viaje
+        // adelantada
+
+        if (sali_de === 'condicion' && valor === 'Crédito' && nombre === 'Cliente contado') {
+          buscar = true;
+        }
+        if (buscar) {
+          this.abrirModalFiltro();
+        }
+      }, 250);
+    }
+  }
+
   getCalculos(arg) {
     this.TOTAL = parseFloat(arg.Total);
     this.calcularBruto();
@@ -406,12 +466,16 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
 
     if (campo === 'cod-0' && valor !== null) {
-      if (this.condicion_fact !== 'Crédito') {
-        this.enfocarInput(campo);
-        this.propietario_factura = this.form.value;
-      } else {
-        this.dbServ.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
-      }
+      this.iniciarFactura(campo);
+    }
+  }
+
+  iniciarFactura(campo) {
+    if (this.condicion_fact !== 'Crédito') {
+      this.enfocarInput(campo);
+      this.propietario_factura = this.form.value;
+    } else {
+      this.dbServ.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
     }
   }
 
@@ -564,6 +628,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     }
     this.tipoModal = '';
+  }
+  selectFecha(arg) {
+    setTimeout(() => {
+      this.enfocarInput(arg);
+    }, 250);
   }
 
   selectModoFactura(arg) {

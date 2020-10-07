@@ -86,7 +86,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.necesarioStar();
 
     this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
-      if (res !== undefined && res !== null) {
+      if (res && res.tipo_modal === 'buscarArticulo') {
         this.LLenarRowDespuesDeFiltro(res);
       }
     });
@@ -244,10 +244,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
         if (!excede) {
           const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
           this.filtrarArticulo(obj);
-
-          setTimeout(() => {
-            GLOBAL.enfocarInput(sigInput);
-          }, 150);
         } else {
           GLOBAL.enfocarInput('can-' + index);
           GLOBAL.selectContenido('can-' + index);
@@ -324,7 +320,14 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       } else {
         this.llenarArrayUnidades(ARTICULO, false);
       }
-      GLOBAL.enfocarInput('can-' + i);
+      const codigo = (this.control.controls[i] as any).controls['cod'].value;
+      const cantidad = (this.control.controls[i] as any).controls['can'].value;
+
+      if (codigo && cantidad) {
+        GLOBAL.enfocarInput('uni-' + i);
+      } else {
+        GLOBAL.enfocarInput('can-' + i);
+      }
     }
   }
 
@@ -336,20 +339,18 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.UnidadesArticulo.push({ value: 'Medida', cantidad: art.contenido[art.medida] });
 
     if (art.contenido_articulos.length === 0 || (art.descripcion !== 'Producto terminado' && art.vendido_en !== 'Saco')) {
-      this.UnidadesArticulo.push({ value: art.medida, cantidad: art.contenido[art.medida] });
+      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
     }
 
-    art.contenido_articulos.forEach((element) => {
-      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-        if (art.vendido_en === 'Saco') {
-          this.entrarSacosAUnidades();
-        }
+    if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
+      if (art.vendido_en === 'Saco') {
+        this.entrarSacosAUnidades();
       }
-    });
+    }
+
     if (detallable) {
       this.articuloDetallable(art);
     }
-    console.log('this.UnidadesArticulo ', this.UnidadesArticulo);
   }
 
   articuloDetallable(art) {

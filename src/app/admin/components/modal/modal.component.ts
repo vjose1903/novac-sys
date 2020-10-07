@@ -273,6 +273,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     const obj = {
       data: articulo,
       index: this.index,
+      tipo_modal: this.tipoModal,
     };
 
     this.mServ.getArticuloFiltradoPorCodigo(obj);

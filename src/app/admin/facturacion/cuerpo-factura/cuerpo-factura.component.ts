@@ -93,14 +93,16 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     });
 
     this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
-      if (res !== undefined && res !== null) {
+      console.log(res);
+
+      if (res && res.tipo_modal === 'buscarArticulo') {
         this.LLenarRowDespuesDeFiltro(res);
       }
     });
 
     this.subEsc = this.mServ.PRESSESC.subscribe((res) => {
       if (res !== undefined && res !== null) {
-        this.enfocarInput('cod-' + res);
+        GLOBAL.enfocarInput('cod-' + res);
       }
     });
 
@@ -211,6 +213,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
     return res;
   }
+
+  enfocarInput(arg) {
+    GLOBAL.enfocarInput(arg);
+  }
   // =============================================
   //  RESETEAR FORMULARIO
   // =============================================
@@ -289,14 +295,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
         if (!excede) {
           const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [] };
-          this.filtrarArticulo(obj);
-
-          setTimeout(() => {
-            this.enfocarInput(sigInput);
-          }, 150);
+          this.filtrarArticulo(obj, true, sigInput);
         } else {
-          this.enfocarInput('can-' + index);
-          this.selectContenido('can-' + index);
+          GLOBAL.enfocarInput('can-' + index);
+          GLOBAL.selectContenido('can-' + index);
           setTimeout(() => {
             (this.control.controls[index] as any).controls['uni'].setValue(null);
           }, 2);
@@ -316,19 +318,19 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       if (!excede) {
         if (unidad === '' || unidad === null) {
           setTimeout(() => {
-            this.enfocarInput('uni-' + i);
+            GLOBAL.enfocarInput('uni-' + i);
           }, 5);
         } else {
           this.aumentarSecuencia();
           if (this.metodo === 'venta') {
-            this.enfocarInput('cod-' + index);
+            GLOBAL.enfocarInput('cod-' + index);
           } else {
-            this.enfocarInput('pre-' + i);
+            GLOBAL.enfocarInput('pre-' + i);
           }
         }
       } else {
-        this.enfocarInput('can-' + i);
-        this.selectContenido('can-' + i);
+        GLOBAL.enfocarInput('can-' + i);
+        GLOBAL.selectContenido('can-' + i);
         setTimeout(() => {
           (this.control.controls[i] as any).controls['uni'].setValue(null);
         }, 2);
@@ -337,11 +339,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     if (input === 'can-' && codigo !== '') {
       if (codigo === null) {
-        this.enfocarInput('cod-' + i);
-        this.selectContenido('cod-' + i);
+        GLOBAL.enfocarInput('cod-' + i);
+        GLOBAL.selectContenido('cod-' + i);
       } else {
         const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [] };
-        this.desEnfocarInput('cod-' + i);
+        GLOBAL.desEnfocarInput('cod-' + i);
         this.filtrarArticulo(obj);
         // }
       }
@@ -356,9 +358,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   //   if (ARTICULO[0] === undefined) {
   //     this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
   //     setTimeout(() => {
-  //       this.enfocarInput('cod-' + i);
+  //       GLOBAL.enfocarInput('cod-' + i);
   //     }, 5);
-  //     this.selectContenido('cod-' + i);
+  //     GLOBAL.selectContenido('cod-' + i);
   //   } else {
   //     const cantidades = ARTICULO[0].cantidades;
   //     if (this.metodo === 'venta' && ARTICULO[0].existencia === 0) {
@@ -368,8 +370,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   //         this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
   //       }
   //       setTimeout(() => {
-  //         this.enfocarInput('cod-' + i);
-  //         this.selectContenido('cod-' + i);
+  //         GLOBAL.enfocarInput('cod-' + i);
+  //         GLOBAL.selectContenido('cod-' + i);
   //       }, 5);
   //     } else {
   //       if (ARTICULO[0].existencia > 0 && ARTICULO[0].aviso_existencia > cantidades[ARTICULO[0].medida_alerta]) {
@@ -553,30 +555,17 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
       this.calcularTotalRow(i);
     } else {
-      this.enfocarInput('can-' + i);
-      this.selectContenido('can-' + i);
+      GLOBAL.enfocarInput('can-' + i);
+      GLOBAL.selectContenido('can-' + i);
       setTimeout(() => {
         (this.control.controls[i] as any).controls['uni'].setValue(null);
       }, 250);
     }
   }
 
-  desEnfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.blur();
-  }
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.focus();
-  }
-  selectContenido(arg) {
-    this.element = document.getElementById(arg);
-    this.element.select();
-  }
-
   verificarSecuencia(i, input?) {
     if (this.secuencia < i) {
-      this.enfocarInput(this.inputSecuencia);
+      GLOBAL.enfocarInput(this.inputSecuencia);
     }
 
     if (!input) {
@@ -655,7 +644,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       //
       if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
         this.dbServ.toastError('Precio introducido es invalido', 'ERROR');
-        this.enfocarInput('pre-' + i);
+        GLOBAL.enfocarInput('pre-' + i);
       } else {
         //
         if (splitPrecio.length === 2) {
@@ -787,11 +776,15 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   //  MODAL PARA FILTRAR ARTICULOS
   // =============================================
 
-  async filtrarArticulo(arg) {
+  async filtrarArticulo(arg, is_saltar = false, sigInput = '') {
     await this.mServ.modalTipo('buscarArticulo');
     await this.mServ.ModalSeleccion(arg);
     await this.mServ.mostrarModal(true);
     await this.mServ.ModalTablaHeight(true);
+
+    if (is_saltar) {
+      GLOBAL.enfocarInput(sigInput);
+    }
   }
 
   reinicarVarModal() {
@@ -833,7 +826,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   //     this.articulo_detallable(arg);
   //   }
   //   const sigInput = 'can-' + arg.index;
-  //   this.enfocarInput(sigInput);
+  //   GLOBAL.enfocarInput(sigInput);
   // }
 
   setInputDrop(arg) {
@@ -853,8 +846,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
 
       setTimeout(() => {
-        this.enfocarInput('cod-' + i);
-        this.selectContenido('cod-' + i);
+        GLOBAL.enfocarInput('cod-' + i);
+        GLOBAL.selectContenido('cod-' + i);
       }, 5);
     } else {
       const cantidades = ARTICULO.cantidades;
@@ -887,12 +880,15 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
       this.setInputDrop(i);
 
-      if (ARTICULO.is_detallable) {
-        this.llenarArrayUnidades(ARTICULO, true);
+      this.llenarArrayUnidades(ARTICULO, ARTICULO.is_detallable);
+      const codigo = (this.control.controls[i] as any).controls['cod'].value;
+      const cantidad = (this.control.controls[i] as any).controls['can'].value;
+
+      if (codigo && cantidad) {
+        GLOBAL.enfocarInput('uni-' + i);
       } else {
-        this.llenarArrayUnidades(ARTICULO, false);
+        GLOBAL.enfocarInput('can-' + i);
       }
-      this.enfocarInput('can-' + i);
     }
   }
 
@@ -904,21 +900,21 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.drop = true;
     this.UnidadesArticulo = [];
     this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
-    console.log('art ', art);
 
-    if (art.contenido_articulos.length === 0 || (art.descripcion !== 'Producto terminado' && art.vendido_en !== 'Saco')) {
+    if (this.metodo === 'venta' && (art.contenido_articulos.length === 0 || (art.descripcion !== 'Producto terminado' && art.vendido_en !== 'Saco'))) {
       this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
     }
 
-    art.contenido_articulos.forEach((element) => {
-      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-        if (art.vendido_en === 'Saco' && this.metodo === 'venta') {
-          this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
-        } else {
-          this.medidasCuandoCompra(art);
-        }
+    if (this.metodo === 'compra') {
+      this.medidasCuandoCompra(art);
+    }
+
+    if (this.metodo === 'venta' && (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima')) {
+      if (art.vendido_en === 'Saco') {
+        this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
       }
-    });
+    }
+
     if (detallable) {
       this.articuloDetallable(art);
     }
@@ -941,7 +937,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const res = (cant / 100) * precio;
     return GLOBAL.redondearAdos(res);
   }
+
   medidasCuandoCompra(art) {
+    this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
+
     art.contenido_articulos.forEach((element) => {
       this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: art.contenido[element.medida] });
     });
@@ -952,7 +951,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     this.mServ.ModalIndex(undefined);
     setTimeout(() => {
-      this.enfocarInput('cod-' + arg);
+      GLOBAL.enfocarInput('cod-' + arg);
       this.mServ.mostrarModal(false);
     }, 100);
 

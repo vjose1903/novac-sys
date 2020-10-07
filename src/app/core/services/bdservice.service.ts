@@ -142,10 +142,10 @@ export class DBservice {
   // HISTORICO PRODUCCIONES
   // =====================================================================
   getProducciones() {
-    return this.peticion('historico_produccions', 'get');
+    return this.peticion('producciones', 'get');
   }
   createProduccion(arg) {
-    return this.peticion('historico_produccions', 'post', JSON.stringify(arg));
+    return this.peticion('producciones', 'post', JSON.stringify(arg));
   }
 
   // =====================================================================

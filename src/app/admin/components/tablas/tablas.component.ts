@@ -37,7 +37,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     if (this.focusRow && this.ready) {
       const key = event.keyCode;
-      console.log('key ', key);
       if (key === 38) {
         event.stopPropagation();
         this.ARRIBA();
