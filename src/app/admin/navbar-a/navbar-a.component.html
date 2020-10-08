@@ -36,6 +36,10 @@
       <div class="menuList">
         <img [ngClass]="actualTab == 'ingresos' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="navegar(7)" />
         <h5 [ngClass]="actualTab == 'ingresos' ? 'tituloMenuA' : 'tituloMenu'"><strong>Ingresos</strong></h5>
+        <div [ngClass]="actualTab == 'ingresos' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
+          <h4 class="opcion" (click)="navegar('ingreso')">Reibo ingresos</h4>
+          <h4 class="opcion" (click)="navegar('viajes')">Viajes</h4>
+        </div>
       </div>
 
       <div class="menuList">
@@ -133,7 +137,7 @@
         </li> -->
     </mat-toolbar>
 
-    <div class="" style="padding: 0.5rem 1rem 2rem 1rem; height: calc(100% - 60px) ; overflow-y: auto;">
+    <div class="" style="padding: 0.5rem 1rem 2rem 1rem; height: calc(100% - 60px); overflow-y: auto">
       <router-outlet></router-outlet>
       <!-- rutas -->
     </div>

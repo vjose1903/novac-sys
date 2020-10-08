@@ -22,7 +22,7 @@
           [ngClass]="{
             tdHover: tablaHover,
             tdNoHover: !tablaHover,
-            'bg-selected': !focusRow && dato.id == seleccionado,
+            'bg-selected': !focusRow && dato.id === seleccionado_id,
             'bg-light': focusRow && RowElement.id == IDROW
           }"
           style="cursor: pointer"

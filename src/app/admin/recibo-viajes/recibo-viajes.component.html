@@ -1,0 +1,74 @@
+<div class="row">
+  <div class="col-12">
+    <h4>Listado de viajes</h4>
+  </div>
+  <div class="col-md-7">
+    <div #cardTabla class="card cardListados p-3">
+      <app-tablas
+        *ngIf="viajes && info"
+        [info]="info"
+        [seleccionado]="viaje_selected"
+        [data]="viajes"
+        [alto]="altoDiv"
+        [focusRow]="false"
+        [ROW]="'viaje-'"
+        (clickRow)="verViaje($event)"
+        (paginateChange)="getViajes($event)"
+      ></app-tablas>
+      <!-- (DevolverInfo)="editarItem($event)" -->
+      <!-- (DELETE)="abrirModal($event)" -->
+    </div>
+  </div>
+
+  <div class="col-md-5">
+    <div>
+      <span *ngIf="viajes_pendientes_cant > 0" class="badge red text-white debe mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
+      <span *ngIf="viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge blue text-white debe mb-3">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
+      <span *ngIf="viajes?.length === 0" class="badge green text-white debe mb-3">No tiene viajes pendientes</span>
+
+      <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant === 0" class="badge green text-white debe mb-3">Todos los viajes fueron completados</span>
+
+      <div *ngIf="viajes?.length > 0 && viajes_completados_cant > 0">
+        <div class="d-flex justify-content-between">
+          <span class="negrita">Porcentaje de viajes completos</span>
+
+          <div>
+            <span class="negrita">{{ viajes_completados_cant }} / </span>
+            <span class="negrita gris">{{ viajes_cant }}</span>
+          </div>
+        </div>
+        <p-progressBar [value]="viajes_cant_porciento"></p-progressBar>
+      </div>
+    </div>
+    <hr class="rayaA mt-2" />
+
+    <div *ngIf="viaje_selected.id !== -1" class="mt-4">
+      <div class="card sombra">
+        <div class="card-header">
+          <h4 class="negrita">Viaje seleccionado</h4>
+        </div>
+        <div class="card-body">
+          <span class="d-flex">
+            <h5 class="negrita">Viaje para:</h5>
+            &nbsp;&nbsp;
+            <h5>{{ viaje_selected.cliente.nombre }}</h5>
+          </span>
+          <span class="d-flex">
+            <h5 class="negrita">Total facturado:</h5>
+            &nbsp;&nbsp;
+            <h5>{{ formatoNumero(viaje_selected.total_factura) }}</h5>
+          </span>
+          <hr class="rayaA mt-2" />
+          <div class="d-flex justify-content-end">
+            <input (click)="accion(false)" class="btn btn-blanco mr-2" value="Cancelar" />
+            <input
+              (click)="accion(true)"
+              class="btn {{ viaje_selected.fecha_completada !== null ? 'btn-amarillo' : 'btn-verde' }}"
+              value="{{ viaje_selected.fecha_completada !== null ? 'Revertir transación' : 'Completar transación' }}"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -103,9 +103,15 @@ export class DBservice {
   createFacturas(arg) {
     return this.peticion('cabecera_facturas', 'post', JSON.stringify(arg));
   }
+
+  getViajesByCompletada(arg, page, per_page, paginado, estado = false) {
+    return this.peticion(`cabecera_facturas/custom/viajes/${estado}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  }
+
   getFacturas() {
     return this.peticion('cabecera_facturas', 'get');
   }
+
   getFacturaById(id) {
     return this.peticion(`cabecera_facturas/${id}`, 'get');
   }

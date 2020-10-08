@@ -42,6 +42,7 @@ import { ModalHistorialPagosComponent } from './ingresos/modal-historial-pagos/m
 import { ConduceComponent } from './conduce/conduce.component';
 import { ModalSeleccinarArticuloComponent } from './conduce/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 import { NgInitDirective } from '../directives/ngInit';
+import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
 
 @NgModule({
   declarations: [
@@ -73,6 +74,7 @@ import { NgInitDirective } from '../directives/ngInit';
     ModalHistorialPagosComponent,
     ConduceComponent,
     ModalSeleccinarArticuloComponent,
+    ReciboViajesComponent,
 
   ],
   imports: [

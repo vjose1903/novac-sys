@@ -6,16 +6,6 @@
   }
 }
 
-::ng-deep .ui-progressbar-value {
-  background-color: #45e465d1 !important;
-  &:hover {
-    background-color: #3bc65785 !important;
-  }
-}
-::ng-deep .ui-progressbar {
-  box-shadow: 3px 3px 11px 0px #00000061;
-}
-
 .gris {
   color: #779882c4;
 }
@@ -33,4 +23,3 @@
   letter-spacing: 1px;
   box-shadow: 1px 1px 1px black;
 }
-

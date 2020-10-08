@@ -20,6 +20,7 @@ import { BuscarFacturaComponent } from './admin/manipular facturas/buscar-factur
 import { NotasCredDebComponent } from './admin/manipular facturas/notas-cred-deb/notas-cred-deb.component';
 import { NcfComponent } from './admin/registros/ncf/ncf.component';
 import { ConduceComponent } from './admin/conduce/conduce.component';
+import { ReciboViajesComponent } from './admin/recibo-viajes/recibo-viajes.component';
 
 const routes: Routes = [
   {
@@ -77,6 +78,10 @@ const routes: Routes = [
       {
         path: 'conduce',
         component: ConduceComponent,
+      },
+      {
+        path: 'viajes',
+        component: ReciboViajesComponent,
       },
     ],
   },

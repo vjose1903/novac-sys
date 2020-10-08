@@ -587,7 +587,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         if (this.TOTAL === 0) {
           this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
-          if (this.condicion_fact === 'Crédito') {
+          if (this.condicion_fact === 'Crédito' || this.is_viaje) {
             this.mServ.modalTipo('imprimir');
             this.tipoModal = 'imprimir';
             this.abrirModal();
@@ -906,6 +906,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
 
     cabecera_fact['fecha_equivalente'] = fecha_equi;
+    cabecera_fact['fecha_completada'] = this.modo_factura === 'viaje' ? null : fecha_equi;
 
     if (this.condicion_fact === 'Crédito') {
       let fecha_venci;
@@ -942,7 +943,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['estado'] = true;
     cabecera_fact['is_adelantada'] = this.is_adelantada;
     cabecera_fact['is_viaje'] = this.is_viaje;
-    cabecera_fact['is_completada'] = this.modo_factura === 'viaje' ? false : true;
     cabecera_fact['is_nota'] = false;
 
     if (this.metodo === 'venta') {

@@ -22,6 +22,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @ViewChild('paginationDiv', { static: false }) paginationDiv: ElementRef;
 
   restoAHeigthDiv: any;
+  seleccionado_id: any;
 
   @HostListener('input') oninput() {
     this.searchItems();
@@ -509,6 +510,13 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   ngOnChanges(simpleChanges) {
+    console.log(simpleChanges);
+
+    if (simpleChanges.seleccionado) {
+      if (simpleChanges.seleccionado.currentValue) {
+        this.seleccionado_id = simpleChanges.seleccionado.currentValue.id;
+      }
+    }
     if (simpleChanges.alto) {
       if (simpleChanges.alto.currentValue) {
         this.calcularAlto();
