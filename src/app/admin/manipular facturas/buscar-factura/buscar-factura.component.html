@@ -84,7 +84,7 @@
     <div *ngIf="mostrarListaFacturas()" class="row">
       <div class="col-12">
         <div id="cardTabla" class="card card-padding sombra ingreCard" style="height: 53vh">
-          <app-tablas [info]="info" [alto]="altoDiv" (clickIcon)="selectFactura($event)" [data]="facturas" (getInfoChange)="selectFactura($event)" [focusRow]="false"></app-tablas>
+          <app-tablas [info]="info" (clickIcon)="selectFactura($event)" [data]="facturas" (getInfoChange)="selectFactura($event)" [focusRow]="false"></app-tablas>
         </div>
       </div>
     </div>

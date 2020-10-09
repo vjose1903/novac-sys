@@ -15,13 +15,14 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 })
 export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @ViewChild(MdbTableDirective, { static: false }) mdbTable: MdbTableDirective;
+  @ViewChild('dinamicTable', { static: false }) dinamicTable: ElementRef;
   cantiTootip: string;
   ready = false;
 
   @ViewChild('searchDiv', { static: false }) searchDiv: ElementRef;
   @ViewChild('paginationDiv', { static: false }) paginationDiv: ElementRef;
+  @ViewChild('titulosHeader', { static: false }) titulosHeader: ElementRef;
 
-  restoAHeigthDiv: any;
   seleccionado_id: any;
 
   @HostListener('input') oninput() {
@@ -69,6 +70,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   // inputs
 
+  @Input() is_modal = false;
   @Input() metodo = null;
   @Input() paraFiltroArticulos = null;
   @Input() paraFiltroClientes;
@@ -77,7 +79,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() tablaHover = true;
   @Input() search = true;
   @Input() paginate = true;
-  @Input() quitarAScorll = 110;
+  @Input() quitarAScorll = 20;
   @Input() botones = {
     titulo: false,
     borrar: false,
@@ -123,7 +125,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         }
       }
     });
-
     // if (this.search) {
     //   setTimeout(() => {
     //     this.element = document.getElementById('search') as HTMLElement;
@@ -133,29 +134,44 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   calcularAlto() {
-    if (this.alto) {
-      setTimeout(() => {
-        if (this.search && this.paginate) {
-          // si tiene paginacion y buscador
-          this.restoAHeigthDiv = this.searchDiv.nativeElement.offsetHeight + this.paginationDiv.nativeElement.offsetHeight + this.quitarAScorll;
-        } else if (this.search && !this.paginate) {
-          // si solo buscador
-          this.restoAHeigthDiv = this.searchDiv.nativeElement.offsetHeight + this.quitarAScorll;
-        } else if (!this.search && this.paginate) {
-          // si solo paginacion
-          this.restoAHeigthDiv = this.paginationDiv.nativeElement.offsetHeight + this.quitarAScorll;
-        } else if (!this.search && !this.paginate) {
-          // si no tiene ni paginacion ni buscador
-          this.restoAHeigthDiv = this.quitarAScorll;
-        }
+    const filterHeight = this.searchDiv ? this.searchDiv.nativeElement.offsetHeight : 0;
+    const paginationHeight = this.paginationDiv ? this.paginationDiv.nativeElement.offsetHeight : 0;
 
-        this.alto -= this.restoAHeigthDiv;
-      }, 20);
-    }
+    let paddingCard = this.dinamicTable ? this.dinamicTable.nativeElement.offsetTop : 0;
+    paddingCard *= 2;
+    const titulosHeigth = this.titulosHeader ? this.titulosHeader.nativeElement.offsetHeight : 0;
+
+    let altoDiv = this.dinamicTable ? this.dinamicTable.nativeElement.parentElement.parentElement.offsetHeight : 0;
+    console.log('paddingCard ', paddingCard);
+    console.log('titulosHeigth ', titulosHeigth);
+    console.log('altoDiv ', altoDiv);
+    console.log('filterHeight ', filterHeight);
+    console.log('paginationHeight ', paginationHeight);
+
+    let restoAHeigthDiv = 0;
+    setTimeout(() => {
+      if (this.search && this.paginate) {
+        // si tiene paginacion y buscador
+        restoAHeigthDiv = filterHeight + paginationHeight + titulosHeigth;
+      } else if (this.search && !this.paginate) {
+        // si solo buscador
+        restoAHeigthDiv = filterHeight + titulosHeigth;
+      } else if (!this.search && this.paginate) {
+        // si solo paginacion
+        restoAHeigthDiv = paginationHeight + titulosHeigth;
+      } else if (!this.search && !this.paginate) {
+        // si no tiene ni paginacion ni buscador
+        restoAHeigthDiv = titulosHeigth;
+      }
+
+      this.alto = altoDiv - restoAHeigthDiv - this.quitarAScorll - paddingCard;
+      console.log(`${altoDiv} - ${restoAHeigthDiv} - ${this.quitarAScorll} - ${paddingCard}  = ${this.alto}`);
+    }, 20);
   }
 
   async ngAfterViewInit() {
     this.cdRef.detectChanges();
+    // this.calcularAlto();
   }
 
   mouseMoveEvent(event, row, column, id) {
@@ -273,7 +289,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.NUM = 0;
 
     this.alto = undefined;
-    this.restoAHeigthDiv = undefined;
     this.searchText = '';
   }
 
@@ -512,19 +527,18 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   ngOnChanges(simpleChanges) {
     console.log(simpleChanges);
 
+    if (simpleChanges.data && simpleChanges.info) {
+      if (simpleChanges.data.currentValue && simpleChanges.info.currentValue) {
+        setTimeout(() => {
+          this.calcularAlto();
+        }, 250);
+      }
+    }
     if (simpleChanges.seleccionado) {
       if (simpleChanges.seleccionado.currentValue) {
         this.seleccionado_id = simpleChanges.seleccionado.currentValue.id;
       }
     }
-    if (simpleChanges.alto) {
-      if (simpleChanges.alto.currentValue) {
-        this.calcularAlto();
-      }
-    }
-    // if (simpleChanges['data'].firstChange === false) {
-    //   this.waitForChange();
-    // }
   }
 
   async waitForChange() {

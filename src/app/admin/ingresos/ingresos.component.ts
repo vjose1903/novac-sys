@@ -109,7 +109,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
   detalleYtotal: any;
   Devuelta: any;
   forma_pago: any;
-  altoDiv: number;
 
   sub: Subscription;
   subDeci: Subscription;
@@ -218,14 +217,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
     return monto;
   }
 
-  calcularHeigth() {
-    setTimeout(() => {
-      this.altoDiv = document.getElementById('cardTabla').offsetHeight - 18;
-      console.log('this.altoDiv ', this.altoDiv);
-      console.log(document.getElementById('cardTabla'));
-    }, 10);
-  }
-
   async pedirFacturasPorCliente(cliente_id) {
     this.Facturas = undefined;
     this.totalFacturado = 0;
@@ -283,7 +274,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
       this.tServ.Func_total_paginas(obj);
 
-      this.calcularHeigth();
       console.log(total);
     } catch (error) {
       console.error(error);

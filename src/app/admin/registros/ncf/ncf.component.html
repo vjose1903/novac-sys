@@ -26,7 +26,7 @@
         <div class="col-md-6">
           <div class="form-group mt-4">
             <label class="control-label">Desde: <span style="color: red">*</span></label>
-            <input type="number" class="form-control" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')"/>
+            <input type="number" class="form-control" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')" />
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="desdeAlert">Debe de seleccionar una fecha</div>
           </div>
         </div>
@@ -104,12 +104,11 @@
 
   <div class="col-md-7">
     <h4>Listado articulos</h4>
-    <div #cardTabla class="card cardListados">
+    <div class="card cardListados">
       <app-tablas
         *ngIf="listaNCF && info"
         [info]="info"
         [data]="listaNCF"
-        [alto]="altoDiv"
         [focusRow]="false"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"

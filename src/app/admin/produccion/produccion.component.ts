@@ -14,7 +14,7 @@ import { filter } from 'lodash';
   templateUrl: './produccion.component.html',
   styleUrls: ['./produccion.component.scss'],
 })
-export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ProduccionComponent implements OnInit, OnDestroy {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
 
   // listaArticulos: any;
@@ -22,7 +22,6 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
   cantidad_producir;
   medida_producir;
   articuloSelected: any;
-  altoDiv = 500;
 
   lista_produccion = [];
   ingredientes = [];
@@ -57,13 +56,6 @@ export class ProduccionComponent implements OnInit, OnDestroy, AfterViewInit {
     });
     this.enfocarInput('articulo_id');
     this.getProductosTerminados();
-  }
-
-  ngAfterViewInit() {
-    setTimeout(() => {
-      this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
-      this.altoDiv += 20;
-    }, 10);
   }
 
   ngOnDestroy() {

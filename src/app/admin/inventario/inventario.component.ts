@@ -13,7 +13,7 @@ import { obj_paginate, TablasService } from '../components/tablas/tablas.service
   templateUrl: './inventario.component.html',
   styleUrls: ['./inventario.component.scss'],
 })
-export class InventarioComponent implements OnInit, OnDestroy, AfterViewInit {
+export class InventarioComponent implements OnInit, OnDestroy {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
   // =============================================
   //  TABLAS
@@ -53,7 +53,6 @@ export class InventarioComponent implements OnInit, OnDestroy, AfterViewInit {
   filtrado = false;
   filtro = 'todos';
   subDeci: Subscription;
-  altoDiv;
   palabra_buscar;
   constructor(
     private artServ: ObservableServcie,
@@ -76,11 +75,6 @@ export class InventarioComponent implements OnInit, OnDestroy, AfterViewInit {
         this.decisionModal(res);
       }
     });
-  }
-
-  ngAfterViewInit() {
-    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
-    this.altoDiv -= 65;
   }
 
   ngOnDestroy() {

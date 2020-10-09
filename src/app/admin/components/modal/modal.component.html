@@ -308,7 +308,7 @@
     (onHide)="reinicioModal()"
     blockScroll="true"
   >
-    <app-modal-historial-pagos *ngIf="altoDiv" [alto]="altoDiv" [pagos]="seleccionModal"></app-modal-historial-pagos>
+    <app-modal-historial-pagos [pagos]="seleccionModal"></app-modal-historial-pagos>
   </p-dialog>
   <!-- ================================================================================================================================ -->
   <!-- FILTRAR ARTICULO -->
@@ -338,7 +338,6 @@
       (clickRow)="devolverCLick($event)"
       [info]="infoArticulos"
       [data]="seleccionModal"
-      [alto]="altoDiv"
       [search]="false"
       (noArticulo)="noArticulo()"
       (paginateChange)="renovarDataFiltros($event)"
@@ -369,7 +368,6 @@
       *ngIf="seleccionModal"
       [paraFiltroClientes]="tipoModal === 'buscarCliente' ? paraFiltroClientes : paraFiltroSuplidor"
       [focusRow]="true"
-      [alto]="altoDiv"
       (clickRow)="devolverCLick($event)"
       [info]="tipoModal === 'buscarCliente' ? infoCliente : infoSuplidor"
       [data]="seleccionModal"

@@ -1,139 +1,141 @@
-<div #searchDiv *ngIf="search" class="searchDiv">
-  <label class="search-label" for="search">Busqueda </label>
-  <input [(ngModel)]="searchText" id="search" class="search-input" />
-</div>
+<div #dinamicTable>
+  <div #searchDiv *ngIf="search" class="searchDiv">
+    <label class="search-label" for="search">Busqueda </label>
+    <input [(ngModel)]="searchText" id="search" class="search-input" />
+  </div>
 
-<!-- <div style="border-radius: 10px 10px 0px 0px;" class="tableBodyScroll"> -->
-<div style="border-radius: 10px 10px 0px 0px" class="tableBodyScroll" [ngStyle]="{ height: alto + 'px' }">
-  <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" small="true" id="VICtablas">
-    <thead class="text-center" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
-      <tr>
-        <th id="{{ row.titulo }}" *ngFor="let row of info">{{ row.titulo }}</th>
-        <th *ngIf="botones.titulo">Acciones</th>
-      </tr>
-    </thead>
-    <tbody [ngStyle]="{ height: alto + 'px' }">
-      <ng-container *ngIf="data">
-        <tr
-          mdbTableCol
-          *ngFor="let dato of data | paginate: { id: id_tabla, itemsPerPage: mostrar, currentPage: pagActual, totalItems: total_registros }; index as i"
-          class="text-center"
-          id="{{ ROW }}{{ i }}"
-          [ngClass]="{
-            tdHover: tablaHover,
-            tdNoHover: !tablaHover,
-            'bg-selected': !focusRow && dato.id === seleccionado_id,
-            'bg-light': focusRow && RowElement.id == IDROW
-          }"
-          style="cursor: pointer"
-          #RowElement
-          (click)="clickROW(dato)"
-        >
-          <td *ngFor="let column of info; let j = index" class="tableTD" id="td-{{ column.key }}-{{ i }}">
-            <span
-              id="{{ column.key }}-{{ i }}"
-              *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero"
-              style="width: 100%"
-              class="text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
-            >
-              {{ dato[column.key] }}
-            </span>
-
-            <ng-template #cantiTool>
-              <div *ngIf="lookOters(dato[column.key]).Hijo === undefined" style="max-width: 21rem">
-                <span> {{ lookOters(dato[column.key]).Padre }} </span><br />
-              </div>
-
-              <div *ngIf="lookOters(dato[column.key]).Hijo" style="max-width: 21rem">
-                <span> {{ lookOters(dato[column.key]).Padre }} </span> <br />
-                <span>{{ lookOters(dato[column.key]).Hijo }}</span> <br />
-              </div>
-            </ng-template>
-
-            <span
-              id="{{ column.key }}-{{ i }}"
-              [mdbTooltip]="cantiTool"
-              placement="{{ i != 0 ? 'top' : 'botton' }}"
-              *ngIf="column.tipo !== 'check' && column.tipo !== 'input' && column.cantidades && !column.formatoNumero"
-              style="width: 100%"
-            >
-              {{ lookprincipal(dato[column.key]) }}
-            </span>
-
-            <span *ngIf="column.isIcon && dato._destroy !== '1'">
-              <i
-                id="{{ column.key }}-{{ i }}"
-                (click)="iconBtn(column.key, i)"
-                class="{{ dato[column.key] }} {{ dato.iconHover ? 'c-pointer' : '' }}   text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
-                (mouseenter)="mouseMoveEvent('hover', dato, column.key, $event.target.id)"
-                (mouseleave)="mouseMoveEvent('leave', dato, column.key, $event.target.id)"
-              ></i>
-            </span>
-
-            <span
-              id="{{ column.key }}-{{ i }}"
-              *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && column.formatoNumero && !column.cantidades"
-              style="width: 100%"
-            >
-              {{ formatoNumero(dato[column.key]) }}
-            </span>
-
-            <span *ngIf="!column.isIcon && column.tipo === 'check' && column.tipo !== 'input'">
-              <div class="from-group">
-                <input class="apple-switch ml-2" [disabled]="disabledInput(column.disable, i)" type="checkbox" (change)="changeValorCheck(column.key, i)" [checked]="dato[column.key]" />
-                <span class="ml-2 subirLabelCheck">{{ column.title }}</span>
-              </div>
-            </span>
-
-            <span *ngIf="column.tipo === 'input' && column.tipo !== 'check'">
-              <div *ngIf="!column.checkNumber">
-                <input
-                  class="form-control m-0 inputTabla"
-                  id="inputNu-{{ i }}"
-                  [min]="dato.min_ ? dato.min_ : 0"
-                  [max]="dato.max_ ? dato.max_ : null"
-                  type="{{ column.inputType ? column.inputType : 'text' }}"
-                  [value]="dato[column.key]"
-                  [disabled]="disabledInput(column.disable, i)"
-                  (keyup)="changeValorInput(column.key, i, $event.target.value)"
-                  (change)="changeValorInput(column.key, i, $event.target.value)"
-                />
-              </div>
-              <div *ngIf="column.checkNumber">
-                <input
-                  class="form-control m-0 inputTabla"
-                  type="text"
-                  id="input-{{ i }}"
-                  [value]="dato[column.key]"
-                  (blur)="revisarPrecio(i, $event.target.value, column.key, 'input-' + i)"
-                  [disabled]="disabledInput(column.disable, i)"
-                  (keyup)="changeValorInput(column.key, i, $event.target.value)"
-                  (change)="changeValorInput(column.key, i, $event.target.value)"
-                />
-              </div>
-            </span>
-          </td>
-
-          <td class="btnAccion tableTD" *ngIf="botones.titulo">
-            <app-btnacciones [row]="dato" [i]="i" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
-          </td>
+  <!-- <div style="border-radius: 10px 10px 0px 0px;" class="tableBodyScroll"> -->
+  <div style="border-radius: 10px 10px 0px 0px" class="tableBodyScroll" [ngStyle]="{ height: alto + 'px' }">
+    <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" small="true" id="VICtablas">
+      <thead class="text-center" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
+        <tr #titulosHeader>
+          <th id="{{ row.titulo }}" *ngFor="let row of info">{{ row.titulo }}</th>
+          <th *ngIf="botones.titulo">Acciones</th>
         </tr>
-      </ng-container>
-    </tbody>
-    <tfoot class="grey lighten-5 w-100"></tfoot>
-  </table>
-  <div *ngIf="paginate" #paginationDiv class="Pietabla d-flex flex-row-reverse">
-    <pagination-controls nextLabel="Siguiente" previousLabel="Anterior" class="my-pagination mr-3" [id]="id_tabla" (pageChange)="pageChange($event)"></pagination-controls>
+      </thead>
+      <tbody [ngStyle]="{ height: alto + 'px' }">
+        <ng-container *ngIf="data">
+          <tr
+            mdbTableCol
+            *ngFor="let dato of data | paginate: { id: id_tabla, itemsPerPage: mostrar, currentPage: pagActual, totalItems: total_registros }; index as i"
+            class="text-center"
+            id="{{ ROW }}{{ i }}"
+            [ngClass]="{
+              tdHover: tablaHover,
+              tdNoHover: !tablaHover,
+              'bg-selected': !focusRow && dato.id === seleccionado_id,
+              'bg-light': focusRow && RowElement.id == IDROW
+            }"
+            style="cursor: pointer"
+            #RowElement
+            (click)="clickROW(dato)"
+          >
+            <td *ngFor="let column of info; let j = index" class="tableTD" id="td-{{ column.key }}-{{ i }}">
+              <span
+                id="{{ column.key }}-{{ i }}"
+                *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero"
+                style="width: 100%"
+                class="text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
+              >
+                {{ dato[column.key] }}
+              </span>
 
-    <div class="btn-group" dropdown [dropup]="true">
-      <button id="button-dropup" dropdownToggle type="button" class="btn btn-peque btn-verde dropdown-toggle" aria-controls="dropdown-dropup">
-        {{ mostrar }} registros <span class="caret"></span>
-      </button>
-      <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-dropup">
-        <li *ngFor="let i of listaMostrar" role="menuitem" (click)="cambiaMostrar(i)">
-          <a class="dropdown-item"> {{ i }} registros</a>
-        </li>
-      </ul>
+              <ng-template #cantiTool>
+                <div *ngIf="lookOters(dato[column.key]).Hijo === undefined" style="max-width: 21rem">
+                  <span> {{ lookOters(dato[column.key]).Padre }} </span><br />
+                </div>
+
+                <div *ngIf="lookOters(dato[column.key]).Hijo" style="max-width: 21rem">
+                  <span> {{ lookOters(dato[column.key]).Padre }} </span> <br />
+                  <span>{{ lookOters(dato[column.key]).Hijo }}</span> <br />
+                </div>
+              </ng-template>
+
+              <span
+                id="{{ column.key }}-{{ i }}"
+                [mdbTooltip]="cantiTool"
+                placement="{{ i != 0 ? 'top' : 'botton' }}"
+                *ngIf="column.tipo !== 'check' && column.tipo !== 'input' && column.cantidades && !column.formatoNumero"
+                style="width: 100%"
+              >
+                {{ lookprincipal(dato[column.key]) }}
+              </span>
+
+              <span *ngIf="column.isIcon && dato._destroy !== '1'">
+                <i
+                  id="{{ column.key }}-{{ i }}"
+                  (click)="iconBtn(column.key, i)"
+                  class="{{ dato[column.key] }} {{ dato.iconHover ? 'c-pointer' : '' }}   text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
+                  (mouseenter)="mouseMoveEvent('hover', dato, column.key, $event.target.id)"
+                  (mouseleave)="mouseMoveEvent('leave', dato, column.key, $event.target.id)"
+                ></i>
+              </span>
+
+              <span
+                id="{{ column.key }}-{{ i }}"
+                *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && column.formatoNumero && !column.cantidades"
+                style="width: 100%"
+              >
+                {{ formatoNumero(dato[column.key]) }}
+              </span>
+
+              <span *ngIf="!column.isIcon && column.tipo === 'check' && column.tipo !== 'input'">
+                <div class="from-group">
+                  <input class="apple-switch ml-2" [disabled]="disabledInput(column.disable, i)" type="checkbox" (change)="changeValorCheck(column.key, i)" [checked]="dato[column.key]" />
+                  <span class="ml-2 subirLabelCheck">{{ column.title }}</span>
+                </div>
+              </span>
+
+              <span *ngIf="column.tipo === 'input' && column.tipo !== 'check'">
+                <div *ngIf="!column.checkNumber">
+                  <input
+                    class="form-control m-0 inputTabla"
+                    id="inputNu-{{ i }}"
+                    [min]="dato.min_ ? dato.min_ : 0"
+                    [max]="dato.max_ ? dato.max_ : null"
+                    type="{{ column.inputType ? column.inputType : 'text' }}"
+                    [value]="dato[column.key]"
+                    [disabled]="disabledInput(column.disable, i)"
+                    (keyup)="changeValorInput(column.key, i, $event.target.value)"
+                    (change)="changeValorInput(column.key, i, $event.target.value)"
+                  />
+                </div>
+                <div *ngIf="column.checkNumber">
+                  <input
+                    class="form-control m-0 inputTabla"
+                    type="text"
+                    id="input-{{ i }}"
+                    [value]="dato[column.key]"
+                    (blur)="revisarPrecio(i, $event.target.value, column.key, 'input-' + i)"
+                    [disabled]="disabledInput(column.disable, i)"
+                    (keyup)="changeValorInput(column.key, i, $event.target.value)"
+                    (change)="changeValorInput(column.key, i, $event.target.value)"
+                  />
+                </div>
+              </span>
+            </td>
+
+            <td class="btnAccion tableTD" *ngIf="botones.titulo">
+              <app-btnacciones [row]="dato" [i]="i" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+      <tfoot class="grey lighten-5 w-100"></tfoot>
+    </table>
+    <div *ngIf="paginate" #paginationDiv class="Pietabla d-flex flex-row-reverse">
+      <pagination-controls nextLabel="Siguiente" previousLabel="Anterior" class="my-pagination mr-3" [id]="id_tabla" (pageChange)="pageChange($event)"></pagination-controls>
+
+      <div class="btn-group" dropdown [dropup]="true">
+        <button id="button-dropup" dropdownToggle type="button" class="btn btn-peque btn-verde dropdown-toggle" aria-controls="dropdown-dropup">
+          {{ mostrar }} registros <span class="caret"></span>
+        </button>
+        <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-dropup">
+          <li *ngFor="let i of listaMostrar" role="menuitem" (click)="cambiaMostrar(i)">
+            <a class="dropdown-item"> {{ i }} registros</a>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>

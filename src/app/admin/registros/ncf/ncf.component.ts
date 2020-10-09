@@ -18,10 +18,7 @@ import { obj_paginate, TablasService } from '../../components/tablas/tablas.serv
   templateUrl: './ncf.component.html',
   styleUrls: ['./ncf.component.scss'],
 })
-export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
-  altoDiv;
-
+export class NcfComponent implements OnInit, OnDestroy {
   titulo;
   form;
   boton = 'Ingresar';
@@ -126,10 +123,6 @@ export class NcfComponent implements OnInit, OnDestroy, AfterViewInit {
         this.decisionModal(res);
       }
     });
-  }
-
-  ngAfterViewInit() {
-    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }
 
   ngOnDestroy(): void {

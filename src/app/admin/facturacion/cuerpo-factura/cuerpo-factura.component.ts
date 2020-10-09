@@ -343,6 +343,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         GLOBAL.selectContenido('cod-' + i);
       } else {
         const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [] };
+        console.log(obj);
+
         GLOBAL.desEnfocarInput('cod-' + i);
         this.filtrarArticulo(obj);
         // }
@@ -891,6 +893,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
     }
   }
+
 
   llenarArrayUnidades(art, detallable) {
     this.drop = true;

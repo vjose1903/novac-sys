@@ -69,7 +69,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   facturaAdelantadaSelected;
   CuerpoConduce = [];
-  altoDiv: number;
+
   constructor(private mServ: ModalService, private _ipc: IpcService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private tServ: TablasService) {}
 
   ngOnInit() {
@@ -574,13 +574,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  calcularHeigth() {
-    setTimeout(() => {
-      console.log(document.getElementById('cardTabla'));
-      this.altoDiv = document.getElementById('cardTabla').offsetHeight;
-    }, 10);
-  }
-
   async BuscarFacturasAdelantadas(id) {
     try {
       this.facturas_adelantadas = await this.dbServ
@@ -606,9 +599,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
         )
         .toPromise();
 
-      if (this.facturas_adelantadas.length > 0) {
-        this.calcularHeigth();
-      }
+      // if (this.facturas_adelantadas.length > 0) {
+      //   this.calcularHeigth();
+      // }
     } catch (error) {}
   }
 

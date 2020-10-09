@@ -17,9 +17,7 @@ import { obj_paginate, TablasService } from '../../components/tablas/tablas.serv
   templateUrl: './registro-clientes.component.html',
   styleUrls: ['./registro-clientes.component.scss'],
 })
-export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
-
+export class RegistroClientesComponent implements OnInit, OnDestroy {
   titulo = '';
   boton = '';
   form: FormGroup;
@@ -56,7 +54,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
   vendedores;
   subDeci: Subscription;
 
-  altoDiv;
   obj_paginate_ = obj_paginate;
 
   constructor(
@@ -142,6 +139,34 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
       });
 
       this.listaClientes = res.data;
+      this.listaClientes = [
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+        ...this.listaClientes,
+      ];
       const obj = {
         total: res.total_registros,
         tabla: 'listaClientes',
@@ -154,10 +179,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy, AfterViewIn
   }
   ngOnDestroy() {
     this.subDeci.unsubscribe();
-  }
-
-  ngAfterViewInit() {
-    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }
 
   checkNumbers(arg) {

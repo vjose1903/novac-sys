@@ -11,7 +11,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
   templateUrl: './recibo-viajes.component.html',
   styleUrls: ['./recibo-viajes.component.scss'],
 })
-export class ReciboViajesComponent implements OnInit, AfterViewInit {
+export class ReciboViajesComponent implements OnInit {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
   viajes;
   viaje_selected = { id: -1 } as any;
@@ -35,7 +35,6 @@ export class ReciboViajesComponent implements OnInit, AfterViewInit {
       formatoNumero: true,
     },
   ];
-  altoDiv: any;
   viajes_pendientes_cant = 0;
   viajes_completados_cant = 0;
   viajes_cant_porciento: any;
@@ -44,10 +43,6 @@ export class ReciboViajesComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.necesarioStart();
-  }
-
-  ngAfterViewInit() {
-    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }
 
   necesarioStart() {

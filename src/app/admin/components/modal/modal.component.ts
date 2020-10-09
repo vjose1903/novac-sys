@@ -109,7 +109,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   subShow: Subscription;
   subTipo: Subscription;
   subSelec: Subscription;
-  subCalcularHeigth: Subscription;
+  // subCalcularHeigth: Subscription;
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
@@ -121,15 +121,15 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       }
     });
 
-    this.subCalcularHeigth = this.mServ.CALCULARHEIGHT.subscribe((res) => {
-      if (res) {
-        setTimeout(() => {
-          if (document.getElementsByClassName('ui-dialog-content') && document.getElementsByClassName('ui-dialog-content')[0]) {
-            this.altoDiv = (document.getElementsByClassName('ui-dialog-content')[0] as any).offsetHeight + 30;
-          }
-        }, 10);
-      }
-    });
+    // this.subCalcularHeigth = this.mServ.CALCULARHEIGHT.subscribe((res) => {
+    //   if (res) {
+    //     setTimeout(() => {
+    //       if (document.getElementsByClassName('ui-dialog-content') && document.getElementsByClassName('ui-dialog-content')[0]) {
+    //         this.altoDiv = (document.getElementsByClassName('ui-dialog-content')[0] as any).offsetHeight + 30;
+    //       }
+    //     }, 10);
+    //   }
+    // });
 
     this.subTipo = this.mServ.TIPOMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
@@ -200,7 +200,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.subShow.unsubscribe();
     this.subTipo.unsubscribe();
     this.subSelec.unsubscribe();
-    this.subCalcularHeigth.unsubscribe();
+    // this.subCalcularHeigth.unsubscribe();
+    this.reinicioModal();
   }
 
   ngOnChanges() {
@@ -236,6 +237,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.mostrarModal(false);
     this.mServ.ModalSeleccion(undefined);
     this.mServ.ModalTablaHeight(false);
+    this.mServ.ModalObj(undefined);
+    this.mServ.ModalIndex(undefined);
+    this.mServ.getArticuloFiltradoPorCodigo(undefined);
     this.paraFiltroArticulos = undefined;
     this.paraFiltroClientes = undefined;
     this.paraFiltroSuplidor = undefined;

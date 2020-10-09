@@ -16,10 +16,7 @@ import { obj_paginate, TablasService } from '../../components/tablas/tablas.serv
   templateUrl: './registro-articulos.component.html',
   styleUrls: ['./registro-articulos.component.scss'],
 })
-export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
-  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
-
-  altoDiv;
+export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges {
   titulo = '';
   boton = '';
   form: FormGroup;
@@ -113,6 +110,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
       const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, 'todos').toPromise();
 
       this.listaArticulos = res.data;
+      this.listaArticulos = [...this.listaArticulos, ...this.listaArticulos, ...this.listaArticulos];
       const obj = {
         total: res.total_registros,
         tabla: 'listaArticulos',
@@ -121,10 +119,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges,
     } catch (error) {
       this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
     }
-  }
-
-  ngAfterViewInit() {
-    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }
 
   ngOnChanges() {

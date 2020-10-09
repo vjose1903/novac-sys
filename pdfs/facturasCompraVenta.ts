@@ -5,11 +5,30 @@ import { logoADM } from '../files';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
+function getPageMargin(data) {
+  let margins = [];
+
+  if (data.FACTURA_DE === 'venta') {
+    if (data.condicion === 'Contado') {
+      margins = [10, 170, 5, 30];
+    } else {
+      margins = [10, 180, 5, 30];
+    }
+  } else {
+    if (data.condicion === 'Contado') {
+      margins = [10, 170, 5, 30];
+    } else {
+      margins = [10, 181, 5, 30];
+    }
+  }
+
+  return margins;
+}
 
 export function makeFacturaVenta(data) {
   const dd = {
     pageSize: { width: 816, height: 528 },
-    pageMargins: data.condicion === 'Contado' ? [10, 170, 5, 30] : [10, 180, 5, 30],
+    pageMargins: getPageMargin(data),
     header: cabeceraFacturaVenta(data),
     content: contenidoFacturaVenta(data),
     footer: (currentPage, pageCount) => {

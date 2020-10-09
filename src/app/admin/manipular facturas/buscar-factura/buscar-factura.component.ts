@@ -15,8 +15,6 @@ import { obj_paginate, TablasService } from '../../components/tablas/tablas.serv
   styleUrls: ['./buscar-factura.component.scss'],
 })
 export class BuscarFacturaComponent implements OnInit, OnDestroy {
-  altoDiv;
-
   facturas: any;
   campoSelected: string;
   clienteBuscado: any;
@@ -262,15 +260,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     return res;
   }
 
-  calcularHeigth() {
-    setTimeout(() => {
-      console.log(document.getElementById('cardTabla'));
-
-      this.altoDiv = document.getElementById('cardTabla').offsetHeight;
-      this.altoDiv -= 20;
-    }, 10);
-  }
-
   async pedirFactura(campo, valor) {
     try {
       console.log('campo ', campo);
@@ -284,9 +273,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
         this.facturaSelected = this.facturas[0];
         this.abrirModal(this.facturas[0], 'mostrarFactura');
-        if (campo !== '2') {
-          this.calcularHeigth();
-        }
       } else {
         this.dbServ.toastError('La factura buscada no existe', 'ERROR');
       }
@@ -339,8 +325,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         } else if (this.campo === '3') {
           this.dbServ.toastError('No existen facturas con este numero.', 'ERROR');
         }
-      } else {
-        this.calcularHeigth();
       }
     } catch (error) {
       console.error(error);

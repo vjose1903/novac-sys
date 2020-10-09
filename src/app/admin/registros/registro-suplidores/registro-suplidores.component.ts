@@ -14,10 +14,7 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
   templateUrl: './registro-suplidores.component.html',
   styleUrls: ['./registro-suplidores.component.scss'],
 })
-export class RegistroSuplidoresComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
-  altoDiv;
-
+export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
   form: FormGroup;
   titulo = '';
   boton = '';
@@ -120,9 +117,6 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy, AfterView
     } catch (error) {
       this.dbServ.toastError('Error buscando suplidores registrados.', 'ERROR');
     }
-  }
-  ngAfterViewInit() {
-    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }
 
   ngOnDestroy(): void {

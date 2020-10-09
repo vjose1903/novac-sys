@@ -114,10 +114,10 @@
     <div #cardTabla class="card card-padding-1 sombra heightPmax">
       <div>
         <app-tablas
+          *ngIf="lista_produccion"
           [info]="info"
           [data]="lista_produccion"
           [search]="false"
-          [alto]="altoDiv"
           [focusRow]="false"
           [botones]="botones"
           (DevolverInfo)="editarItem($event)"

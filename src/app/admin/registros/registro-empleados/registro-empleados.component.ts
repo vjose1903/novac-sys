@@ -16,10 +16,7 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
   templateUrl: './registro-empleados.component.html',
   styleUrls: ['./registro-empleados.component.scss'],
 })
-export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
-  altoDiv;
-
+export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
   form: FormGroup;
   titulo = '';
   boton = '';
@@ -144,9 +141,6 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy, AfterViewI
     } catch (error) {
       this.dbServ.toastError('Error buscando empleados registrados.', 'ERROR');
     }
-  }
-  ngAfterViewInit() {
-    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
   }
 
   ngOnDestroy(): void {

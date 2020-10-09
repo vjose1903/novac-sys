@@ -1,27 +1,3 @@
 
 
 
-<div #cardTabla class="card cardListados">
-[alto]="altoDiv"
-
-------------------------------------------------
-
-AfterViewInit
-
-@ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
-altoDiv;
-
-ngAfterViewInit() {
-    this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
-  }
-
-
-------------------------------------------------
-
-  calcularHeigth() {
-    setTimeout(() => {
-      console.log(document.getElementById('cardTabla'));
-
-      this.altoDiv = document.getElementById('cardTabla').offsetHeight;
-    }, 10);
-  }

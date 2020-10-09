@@ -17,9 +17,6 @@ import { ModalService } from '../../components/modal/modal.service';
   styleUrls: ['./notas-cred-deb.component.scss'],
 })
 export class NotasCredDebComponent implements OnInit, OnDestroy {
-  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
-  altoDiv;
-
   factura;
   idFactura: any;
   tipoNota: any;
@@ -78,11 +75,6 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     this.necesarioStart();
   }
 
-  calculateHeigth() {
-    setTimeout(() => {
-      this.altoDiv = this.cardTabla.nativeElement.offsetHeight;
-    }, 10);
-  }
   resetVariables() {
     this.mServ.ModalDecision(false);
     this.mServ.modalTipo(undefined);
@@ -240,8 +232,6 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
         temp.push(detalle);
       }
       this.detalleFacturas = temp;
-
-      this.calculateHeigth();
     } catch (error) {
       console.error(error);
       this.dbServ.toastError('Error mostrando factura elegida', 'ERROR');
