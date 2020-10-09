@@ -139,9 +139,17 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     let paddingCard = this.dinamicTable ? this.dinamicTable.nativeElement.offsetTop : 0;
     paddingCard *= 2;
+
     const titulosHeigth = this.titulosHeader ? this.titulosHeader.nativeElement.offsetHeight : 0;
 
-    let altoDiv = this.dinamicTable ? this.dinamicTable.nativeElement.parentElement.parentElement.offsetHeight : 0;
+    const altoDiv = this.dinamicTable
+      ? this.dinamicTable.nativeElement.parentElement.parentElement.offsetHeight > 0
+        ? this.dinamicTable.nativeElement.parentElement.parentElement.offsetHeight
+        : this.dinamicTable.nativeElement.parentElement.parentElement.parentElement.offsetHeight
+      : 0;
+
+    console.log(this.dinamicTable);
+
     console.log('paddingCard ', paddingCard);
     console.log('titulosHeigth ', titulosHeigth);
     console.log('altoDiv ', altoDiv);

@@ -245,30 +245,6 @@
   </p-dialog>
 
   <!-- ================================================================================================================================ -->
-  <!--  SELECCIONAR LOS ARTICULOS DEL CONDUCE DE FACTURAS ADELANTADAS -->
-  <!-- ================================================================================================================================ -->
-
-  <p-dialog
-    *ngIf="tipoModal === 'seleccionar_articulos_adelantados'"
-    header="Confirmar"
-    [draggable]="false"
-    [(visible)]="showModal"
-    [modal]="false"
-    [responsive]="true"
-    [style]="{ width: '900px', minWidth: '200px' }"
-    [minY]="70"
-    [baseZIndex]="10000"
-    (onHide)="reinicioModal()"
-    blockScroll="true"
-  >
-    <app-modal-seleccinar-articulo [articulos]="seleccionModal" (getArtculos)="devolverCLick($event)"></app-modal-seleccinar-articulo>
-
-    <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
-    </p-footer>
-  </p-dialog>
-  <!-- ================================================================================================================================ -->
   <!--  IMPRIMIR  FACTURA-->
   <!-- ================================================================================================================================ -->
 
@@ -310,6 +286,32 @@
   >
     <app-modal-historial-pagos [pagos]="seleccionModal"></app-modal-historial-pagos>
   </p-dialog>
+
+  <!-- ================================================================================================================================ -->
+  <!--  SELECCIONAR LOS ARTICULOS DEL CONDUCE DE FACTURAS ADELANTADAS -->
+  <!-- ================================================================================================================================ -->
+
+  <p-dialog
+    *ngIf="tipoModal === 'seleccionar_articulos_adelantados'"
+    header="Confirmar"
+    [draggable]="false"
+    [(visible)]="showModal"
+    [modal]="false"
+    [responsive]="true"
+    [style]="{ width: '900px', height: '400px' }"
+    [minY]="70"
+    [baseZIndex]="10000"
+    (onHide)="reinicioModal()"
+    blockScroll="true"
+  >
+    <app-modal-seleccinar-articulo [articulos]="seleccionModal" (getArtculos)="devolverCLick($event)"></app-modal-seleccinar-articulo>
+
+    <p-footer>
+      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
+      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+    </p-footer>
+  </p-dialog>
+
   <!-- ================================================================================================================================ -->
   <!-- FILTRAR ARTICULO -->
   <!-- ================================================================================================================================ -->
