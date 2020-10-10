@@ -105,9 +105,9 @@
                         <input
                           type="number"
                           min="0"
-                          class="form-control entrada"
+                          class="form-control entrada {{ verSiExcede(i) ? 'badAlert' : '' }}"
                           id="can-{{ i }}"
-                          (click)="verificarSecuencia(i)"
+                          (click)="verificarSecuencia(i, true)"
                           (keydown.enter)="saltar('uni-', i)"
                           formControlName="can"
                           (blur)="verificarRow(i)"
@@ -124,7 +124,7 @@
                           type="text"
                           class="form-control entrada"
                           id="uni-{{ i }}"
-                          (click)="verificarSecuencia(i, 'unidad')"
+                          (click)="verificarSecuencia(i, true)"
                           (keydown.enter)="saltar('cod-', i)"
                           formControlName="uni"
                           (blur)="verificarRow(i)"
@@ -164,10 +164,10 @@
 
       <div class="row my-4">
         <div class="col-2">
-          <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (click)="cancelarConduce(1)"></app-btncircular>
+          <app-btncircular [alto]="'100px'" [accion]="'Imprimir Conduce'" [nombreImg]="'printer'" (click)="imprimirConduce()"></app-btncircular>
         </div>
         <div class="col-2">
-          <app-btncircular [alto]="'100px'" [accion]="'Imprimir Conduce'" [nombreImg]="'printer'" (click)="imprimirConduce()"></app-btncircular>
+          <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (click)="cancelarConduce(1)"></app-btncircular>
         </div>
       </div>
     </div>

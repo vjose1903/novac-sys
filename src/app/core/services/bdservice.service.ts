@@ -337,9 +337,10 @@ export class DBservice {
       this.toastr.success(msg || '', titulo || '');
     }
   }
-  toastError(msg?, titulo?) {
+  toastError(msg?, titulo?, excepcion?) {
     const msg_ = msg;
-    if (this.ultimoMensajeMostrado !== msg_) {
+
+    if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
       this.ultimoMensajeMostrado = msg_;
       this.toastr.error(msg || '', titulo || '');
     }

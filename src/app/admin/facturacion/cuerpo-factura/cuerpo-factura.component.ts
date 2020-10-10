@@ -290,7 +290,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
         let excede = false;
         if (unidad && unidad !== '') {
-          excede = await this.checkCantidadExede(i, unidad, 'change');
+          excede = await this.checkCantidadExede(i, 'change');
         }
 
         if (!excede) {
@@ -313,7 +313,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         index++;
       }
 
-      const excede = await this.checkCantidadExede(i, unidad, 'saltar');
+      const excede = await this.checkCantidadExede(i, 'saltar');
 
       if (!excede) {
         if (unidad === '' || unidad === null) {
@@ -477,7 +477,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.inputDrop = 'uni-' + arg;
   }
 
-  async checkCantidadExede(i, unidad, lugar) {
+  async checkCantidadExede(i, lugar) {
     let cantidad = 0;
     const descripcion = (this.control.controls[i] as any).controls['des'].value;
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
@@ -549,7 +549,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const costoDetalle = this.UnidadesArticulo[indiceDetalle].costo;
     const unidad = this.UnidadesArticulo[indiceDetalle].value;
 
-    const excede = await this.checkCantidadExede(i, unidad, 'change');
+    const excede = await this.checkCantidadExede(i, 'change');
 
     if (!excede) {
       (this.control.controls[i] as any).controls['uni'].setValue(unidad);
@@ -893,7 +893,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
     }
   }
-
 
   llenarArrayUnidades(art, detallable) {
     this.drop = true;

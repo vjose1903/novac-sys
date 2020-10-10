@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, OnChanges } from '@angular/core';
 import { ModalService } from '../components/modal/modal.service';
 import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
@@ -16,7 +16,7 @@ import { IpcService } from '../../core/services/ipc.service';
   templateUrl: './conduce.component.html',
   styleUrls: ['./conduce.component.scss'],
 })
-export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
   listaClientes;
 
   cliente;
@@ -46,6 +46,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   subArticuloFiltro: Subscription;
   subEsc: Subscription;
   subInde: Subscription;
+  subWidth: Subscription;
 
   info = [
     {
@@ -69,6 +70,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   facturaAdelantadaSelected;
   CuerpoConduce = [];
+  rowsExcede = [];
 
   constructor(private mServ: ModalService, private _ipc: IpcService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private tServ: TablasService) {}
 
@@ -88,6 +90,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
       if (res && res.tipo_modal === 'buscarArticulo') {
         this.LLenarRowDespuesDeFiltro(res);
+        GLOBAL.enfocarInput('can-' + res.index);
       }
     });
 
@@ -103,12 +106,13 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
           //
         } else if (res && res.tipo_modal === 'buscarArticulo') {
           this.LLenarRowDespuesDeFiltro(res);
+          GLOBAL.enfocarInput('can-' + res.index);
           //
         } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
           console.log(res);
 
           // mirar aqui el res
-          this.llenarConduce(res.body);
+          this.llenarConduce(res.data.body);
         }
         setTimeout(() => {
           this.resetModalVaribales();
@@ -158,6 +162,10 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  ngOnChanges(simpleChanges) {
+    console.log('-----> ', simpleChanges);
+  }
+
   resetModalVaribales() {
     this.mServ.ModalObj(undefined);
     this.mServ.ModalSeleccion(undefined);
@@ -178,6 +186,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subArticuloFiltro.unsubscribe();
     this.subEsc.unsubscribe();
     this.subInde.unsubscribe();
+    // this.subWidth.unsubscribe();
 
     this.mServ.modalTipo(undefined);
     this.mServ.ModalSeleccion(undefined);
@@ -226,6 +235,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
         GLOBAL.selectContenido('cod-' + i);
       } else {
         const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
+
         GLOBAL.desEnfocarInput('cod-' + i);
         this.filtrarArticulo(obj);
         // }
@@ -234,8 +244,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (input === 'uni-') {
       if (cantidad !== '' && cantidad !== '0' && cantidad !== 0 && cantidad !== null && codigo !== '' && codigo !== null && codigo !== undefined) {
-        // this.setInputDrop(i);
-
         let excede = false;
         if (unidad && unidad !== '') {
           excede = await this.checkCantidadExede(i, 'change');
@@ -243,7 +251,10 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
         if (!excede) {
           const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
-          this.filtrarArticulo(obj);
+          this.filtrarArticulo(obj, true, sigInput);
+          setTimeout(() => {
+            GLOBAL.enfocarInput('uni-' + i);
+          }, 150);
         } else {
           GLOBAL.enfocarInput('can-' + index);
           GLOBAL.selectContenido('can-' + index);
@@ -322,11 +333,36 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       const codigo = (this.control.controls[i] as any).controls['cod'].value;
       const cantidad = (this.control.controls[i] as any).controls['can'].value;
+      const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
 
-      if (codigo && cantidad) {
-        GLOBAL.enfocarInput('uni-' + i);
+      // if (!detalle_factura_id) {
+      //   if (codigo && cantidad) {
+      //     GLOBAL.enfocarInput('uni-' + i);
+      //   } else {
+      //     GLOBAL.enfocarInput('can-' + i);
+      //   }
+      // }
+    }
+  }
+
+  async checkMedidasArray(i) {
+    console.log('entro');
+
+    const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
+    const codigo = (this.control.controls[i] as any).controls['cod'].value;
+    if (codigo && detalle_factura_id) {
+      let articulo;
+      try {
+        articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, 'todos').toPromise();
+      } catch (error) {
+        console.error(error);
+      }
+      console.log('articulo ', articulo);
+
+      if (articulo.is_detallable) {
+        this.llenarArrayUnidades(articulo, true);
       } else {
-        GLOBAL.enfocarInput('can-' + i);
+        this.llenarArrayUnidades(articulo, false);
       }
     }
   }
@@ -392,18 +428,23 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   // =============================================
   //  MODAL PARA FILTRAR ARTICULOS
   // =============================================
-  async filtrarArticulo(arg) {
+  async filtrarArticulo(arg, is_saltar = false, sigInput = '') {
     await this.mServ.modalTipo('buscarArticulo');
     await this.mServ.ModalSeleccion(arg);
     await this.mServ.mostrarModal(true);
     await this.mServ.ModalTablaHeight(true);
-  }
 
+    if (is_saltar) {
+      GLOBAL.enfocarInput(sigInput);
+    }
+  }
   // =============================================
-  async checkCantidadExede(i, lugar) {
+  async checkCantidadExede(i, lugar, art = '') {
     let cantidad = 0;
     const descripcion = (this.control.controls[i] as any).controls['des'].value;
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
+
+    this.rowsExcede = _.difference(this.rowsExcede, [i]);
     let articulo;
     console.log('trabajando en el row ', i);
 
@@ -449,8 +490,15 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     try {
       const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();
 
+      console.log(res);
+
       if (res.excede) {
-        this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+        if (art) {
+          this.dbServ.toastError('Cantidad de ' + art + ' introducida excede la cantidad en inventario, favor de cambiar la cantidad', 'ERROR', true);
+        } else {
+          this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+        }
+
         return true;
       } else {
         return false;
@@ -470,20 +518,28 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   removeItem(i: number) {
+    console.log('i ', i);
+
     this.control.removeAt(i);
   }
 
-  verificarSecuencia(i, input?) {
+  verificarSecuencia(i, check?) {
+    console.log('this.secuencia ', this.secuencia);
+    console.log('i  ', i);
+    console.log('this.inputSecuencia  ', this.inputSecuencia);
+
     if (this.secuencia < i) {
+      console.log('entro');
+
       GLOBAL.enfocarInput(this.inputSecuencia);
     }
 
-    if (!input) {
+    if (!check) {
       this.drop = false;
     }
 
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
-    if (input === 'unidad' && codigo !== '' && codigo !== null && codigo !== undefined) {
+    if (check && codigo !== '' && codigo !== null && codigo !== undefined) {
       this.verificarRow(i);
       const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
       this.filtrarArticulo(obj);
@@ -513,6 +569,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     const cantidad = (this.control.controls[i] as any).controls['can'].value;
     const unidad = (this.control.controls[i] as any).controls['uni'].value;
     let cantidadMinima = 1;
+    console.log('this.UnidadesArticulo ', this.UnidadesArticulo);
 
     if (unidad && cantidad && this.UnidadesArticulo.length > 0) {
       cantidadMinima = this.UnidadesArticulo.filter((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad))[0].cantidad;
@@ -722,17 +779,17 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   llenarConduce(articulos) {
     for (let i = 0; i < this.control.controls.length; i++) {
-      const element = this.control.controls[i].value;
+      const row = this.control.controls[i].value;
 
       for (let j = 0; j < articulos.length; j++) {
         const articulo = articulos[j];
+        const existe = this.control.value.find((d) => d.articulo_id === articulo.articulo_id);
 
-        const existe = this.control.value.find((d) => d.id === articulo.id);
-
-        if (element.des && element.cod) {
-          if (element.id === articulo.id && articulo.destroy === 1) {
+        if (row.des && row.cod) {
+          if (row.articulo_id === articulo.articulo_id) {
             this.indexRemove = i;
             this.procesoQuitarArticulo();
+            this.llenarFila(articulo, i);
           }
         } else {
           if (!existe && articulo.destroy !== 1) {
@@ -743,28 +800,52 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  llenarFila(element, i) {
+  verSiExcede(i) {
+    return this.rowsExcede.includes(i);
+  }
+
+  async llenarFila(element, i) {
+    const cant_actual = element.cantidad - element.retirado;
+    const multiplo = element.cantidad_en_unidades / element.cantidad;
+
+    const cant_en_unidades_actual = cant_actual * multiplo;
+
     (this.control.controls[i] as any).controls['detalle_factura_id'].setValue(element.id);
-    (this.control.controls[i] as any).controls['articulo_id'].setValue(element.id);
+    (this.control.controls[i] as any).controls['articulo_id'].setValue(element.articulo_id);
     (this.control.controls[i] as any).controls['cod'].setValue(element.codigo);
 
-    (this.control.controls[i] as any).controls['can'].setValue(element.cantidad - element.retirado);
+    (this.control.controls[i] as any).controls['can'].setValue(cant_actual);
+    (this.control.controls[i] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
+
     (this.control.controls[i] as any).controls['des'].setValue(_.capitalize(element.articulo));
     if (element.peso_saco) {
       (this.control.controls[i] as any).controls['uni'].setValue('Saco de ' + element.peso_saco + ' libras');
     } else {
       (this.control.controls[i] as any).controls['uni'].setValue(element.unidad);
     }
+
+    setTimeout(async () => {
+      const excede = await this.checkCantidadExede(i, 'change', element.articulo);
+
+      if (excede) {
+        this.rowsExcede.push(i);
+      }
+    }, 100);
     this.aumentarSecuencia();
+    console.log(this.control.controls[i]);
   }
 
   async ParsearCuerpo() {
     this.CuerpoConduce = [];
+    let res = true;
+    console.log(this.control.value);
+
     for (let i = 0; i < this.control.value.length; i++) {
       const element = this.control.value[i];
       if (element.cod && element.uni && element.can) {
         try {
           element['articulo'] = await this.dbServ.getArticulosFiltrados(element.cod, 0, 0, true, false, 'todos').toPromise();
+          console.log(element['articulo']);
         } catch (error) {}
 
         // element['articulo'] = this.listaArticulos.filter((art) => art.codigo === element.cod)[0].id;
@@ -776,23 +857,32 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit {
           cantidad_en_unidades: element.cantidad_en_unidades,
           unidad: element.uni,
         });
+        const excede = await this.checkCantidadExede(i, 'change', element.articulo.nombre);
+        console.log('excede ', excede);
+
+        if (excede && res) {
+          res = false;
+        }
       } else {
         break;
       }
     }
+    return res;
   }
 
   async imprimirConduce() {
     if (!this.cliente) {
       this.dbServ.toastWarning('Conduce no tiene cliente', 'Aviso');
     } else {
-      await this.ParsearCuerpo();
-      console.log('this.CuerpoConduce ', this.CuerpoConduce);
+      const cuerpoBien = await this.ParsearCuerpo();
 
-      if (this.CuerpoConduce.length === 0) {
-        this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
-      } else {
-        this.abrirModalDinamicText('Seguro que desea imprimir el conduce', 2);
+      console.log('this.CuerpoConduce ', this.CuerpoConduce);
+      if (cuerpoBien) {
+        if (this.CuerpoConduce.length === 0) {
+          this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
+        } else {
+          this.abrirModalDinamicText('Seguro que desea imprimir el conduce', 2);
+        }
       }
     }
   }
