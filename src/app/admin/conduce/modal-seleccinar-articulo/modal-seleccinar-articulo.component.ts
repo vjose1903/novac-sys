@@ -14,13 +14,13 @@ import { ModalService } from '../../components/modal/modal.service';
 })
 export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
   @Input() articulos;
-  @Output() getArtculos = new EventEmitter<any>();
+  @Output() getArticulos = new EventEmitter<any>();
 
   @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
   info = [
     {
       titulo: 'Articulo',
-      key: 'articulo',
+      key: 'descripcion',
     },
     {
       titulo: 'Cantidad',
@@ -32,7 +32,7 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
     },
     {
       titulo: 'Retirado',
-      key: 'retirado',
+      key: 'retirado_mostrar',
     },
     {
       titulo: 'Seleccione',
@@ -53,6 +53,15 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.articulos = GLOBAL.duplicarJson(this.articulos);
+    this.articulos.map(async (arti) => {
+      const medida = arti.retirado === 0 ? '' : arti.retirado < 100 ? 'LBS' : 'QTL';
+      const cantidad = arti.retirado < 100 ? arti.retirado : arti.retirado / 100;
+
+      arti.retirado_mostrar = cantidad + ' ' + medida;
+
+      return arti;
+    });
+
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res) {
         this.mandarArticulos();
@@ -67,7 +76,7 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
   }
 
   mandarArticulos() {
-    this.getArtculos.emit({ body: this.articulos_selected });
+    this.getArticulos.emit({ body: this.articulos_selected });
   }
 
   resetLista() {

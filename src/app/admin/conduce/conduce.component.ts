@@ -90,7 +90,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
       if (res && res.tipo_modal === 'buscarArticulo') {
         this.LLenarRowDespuesDeFiltro(res);
-        GLOBAL.enfocarInput('can-' + res.index);
+        setTimeout(() => {
+          GLOBAL.enfocarInput('can-' + res.index);
+        }, 10);
       }
     });
 
@@ -106,11 +108,11 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
           //
         } else if (res && res.tipo_modal === 'buscarArticulo') {
           this.LLenarRowDespuesDeFiltro(res);
-          GLOBAL.enfocarInput('can-' + res.index);
+          setTimeout(() => {
+            GLOBAL.enfocarInput('can-' + res.index);
+          }, 10);
           //
         } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
-          console.log(res);
-
           // mirar aqui el res
           this.llenarConduce(res.data.body);
         }
@@ -170,14 +172,19 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     this.mServ.ModalObj(undefined);
     this.mServ.ModalSeleccion(undefined);
     this.mServ.ModalDecision(undefined);
+    this.mServ.modalTipo(undefined);
+    this.mServ.ModalIndex(undefined);
+
+    this.mServ.mostrarModal(false);
     this.tipoModal = undefined;
   }
 
   noArticuloEncontrado(arg) {
     this.dbServ.toastError('Articulo no creado', 'ERROR');
-
     GLOBAL.enfocarInput('cod-' + arg);
-    this.mServ.ModalIndex(undefined);
+    setTimeout(() => {
+      this.resetModalVaribales();
+    }, 10);
   }
 
   ngOnDestroy() {
@@ -186,11 +193,8 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     this.subArticuloFiltro.unsubscribe();
     this.subEsc.unsubscribe();
     this.subInde.unsubscribe();
-    // this.subWidth.unsubscribe();
 
-    this.mServ.modalTipo(undefined);
-    this.mServ.ModalSeleccion(undefined);
-    this.mServ.mostrarModal(false);
+    this.resetModalVaribales();
   }
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
@@ -209,6 +213,19 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   async procesoQuitarArticulo() {
     await this.removeItem(this.indexRemove);
     await this.disminuirSecuencia();
+    await this.chequearExcede();
+  }
+  async chequearExcede() {
+    for (let i = 0; i < this.control.value.length; i++) {
+      const element = this.control.value[i];
+
+      if (element.cod) {
+        const excede = await this.checkCantidadExede(i, 'change', element.des);
+      } else {
+        this.rowsExcede = _.difference(this.rowsExcede, [i]);
+      }
+      console.log(this.rowsExcede);
+    }
   }
 
   disminuirSecuencia() {
@@ -224,6 +241,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
     const unidad = (this.control.controls[i] as any).controls['uni'].value;
     const cantidad = (this.control.controls[i] as any).controls['can'].value;
+    const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
 
     if (i >= 10 && input === 'cod-') {
       this.addItem(i);
@@ -250,17 +268,23 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
         }
 
         if (!excede) {
-          const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
-          this.filtrarArticulo(obj, true, sigInput);
-          setTimeout(() => {
-            GLOBAL.enfocarInput('uni-' + i);
-          }, 150);
+          if (detalle_factura_id) {
+            GLOBAL.enfocarInput('cod-' + (index + 1));
+          } else {
+            const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
+            this.filtrarArticulo(obj, true, sigInput);
+            setTimeout(() => {
+              GLOBAL.enfocarInput('uni-' + index);
+            }, 100);
+          }
         } else {
           GLOBAL.enfocarInput('can-' + index);
           GLOBAL.selectContenido('can-' + index);
-          setTimeout(() => {
-            (this.control.controls[index] as any).controls['uni'].setValue(null);
-          }, 2);
+          if (!detalle_factura_id) {
+            setTimeout(() => {
+              (this.control.controls[index] as any).controls['uni'].setValue(null);
+            }, 2);
+          }
         }
       }
     }
@@ -345,32 +369,29 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     }
   }
 
-  async checkMedidasArray(i) {
-    console.log('entro');
+  // async checkMedidasArray(i) {
+  //   const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
+  //   const codigo = (this.control.controls[i] as any).controls['cod'].value;
+  //   if (codigo && detalle_factura_id) {
+  //     let articulo;
+  //     try {
+  //       articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, 'todos').toPromise();
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //     console.log('articulo ', articulo);
 
-    const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
-    const codigo = (this.control.controls[i] as any).controls['cod'].value;
-    if (codigo && detalle_factura_id) {
-      let articulo;
-      try {
-        articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, 'todos').toPromise();
-      } catch (error) {
-        console.error(error);
-      }
-      console.log('articulo ', articulo);
-
-      if (articulo.is_detallable) {
-        this.llenarArrayUnidades(articulo, true);
-      } else {
-        this.llenarArrayUnidades(articulo, false);
-      }
-    }
-  }
+  //     if (articulo.is_detallable) {
+  //       this.llenarArrayUnidades(articulo, true);
+  //     } else {
+  //       this.llenarArrayUnidades(articulo, false);
+  //     }
+  //   }
+  // }
 
   llenarArrayUnidades(art, detallable) {
     this.drop = true;
 
-    this.drop = true;
     this.UnidadesArticulo = [];
     this.UnidadesArticulo.push({ value: 'Medida', cantidad: art.contenido[art.medida] });
 
@@ -446,7 +467,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
 
     this.rowsExcede = _.difference(this.rowsExcede, [i]);
     let articulo;
-    console.log('trabajando en el row ', i);
 
     try {
       articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, 'todos').toPromise();
@@ -490,8 +510,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     try {
       const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();
 
-      console.log(res);
-
       if (res.excede) {
         if (art) {
           this.dbServ.toastError('Cantidad de ' + art + ' introducida excede la cantidad en inventario, favor de cambiar la cantidad', 'ERROR', true);
@@ -524,10 +542,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   }
 
   verificarSecuencia(i, check?) {
-    console.log('this.secuencia ', this.secuencia);
-    console.log('i  ', i);
-    console.log('this.inputSecuencia  ', this.inputSecuencia);
-
     if (this.secuencia < i) {
       console.log('entro');
 
@@ -539,10 +553,16 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     }
 
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
+    const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
     if (check && codigo !== '' && codigo !== null && codigo !== undefined) {
-      this.verificarRow(i);
-      const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
-      this.filtrarArticulo(obj);
+      console.log('detalle_factura_id ', detalle_factura_id);
+      console.log('!detalle_factura_id ', !detalle_factura_id);
+
+      if (!detalle_factura_id) {
+        this.verificarRow(i);
+        const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
+        this.filtrarArticulo(obj);
+      }
     }
   }
 
@@ -565,13 +585,28 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     }
   }
 
-  calculateCantidadEnUnidades(i) {
+  async calculateCantidadEnUnidades(i) {
     const cantidad = (this.control.controls[i] as any).controls['can'].value;
     const unidad = (this.control.controls[i] as any).controls['uni'].value;
+    const codigo = (this.control.controls[i] as any).controls['cod'].value;
+    const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
     let cantidadMinima = 1;
+    let articulo;
+
+    if (detalle_factura_id) {
+      try {
+        articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, 'todos').toPromise();
+      } catch (error) {}
+
+      if (articulo.is_detallable) {
+        this.llenarArrayUnidades(articulo, true);
+      } else {
+        this.llenarArrayUnidades(articulo, false);
+      }
+    }
     console.log('this.UnidadesArticulo ', this.UnidadesArticulo);
 
-    if (unidad && cantidad && this.UnidadesArticulo.length > 0) {
+    if (unidad && cantidad && this.UnidadesArticulo && this.UnidadesArticulo.length > 0) {
       cantidadMinima = this.UnidadesArticulo.filter((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad))[0].cantidad;
       (this.control.controls[i] as any).controls['cantidad_en_unidades'].setValue(cantidad * cantidadMinima);
     }
@@ -594,6 +629,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       uni: [null],
       des: [null],
       can: [null],
+      max_can: [9007199254740991],
       cantidad_en_unidades: [null],
       secuencia: [i],
     });
@@ -777,23 +813,28 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     // this.llenarConduce(articulos_parsed);
   }
 
-  llenarConduce(articulos) {
-    for (let i = 0; i < this.control.controls.length; i++) {
-      const row = this.control.controls[i].value;
+  llenarConduce(rows) {
+    for (let j = 0; j < rows.length; j++) {
+      const row = rows[j];
 
-      for (let j = 0; j < articulos.length; j++) {
-        const articulo = articulos[j];
-        const existe = this.control.value.find((d) => d.articulo_id === articulo.articulo_id);
+      for (let i = 0; i < this.control.controls.length; i++) {
+        const control = this.control.controls[i].value;
 
-        if (row.des && row.cod) {
-          if (row.articulo_id === articulo.articulo_id) {
-            this.indexRemove = i;
-            this.procesoQuitarArticulo();
-            this.llenarFila(articulo, i);
+        const existe = this.control.value.find((d) => d.detalle_factura_id === row.id);
+
+        if (control.des && control.cod) {
+          if (!control.detalle_factura_id && control.articulo_id === row.articulo_id) {
+            const splitUnidad = _.split(control.uni, ' ');
+
+            if (row.peso_saco && row.peso_saco === splitUnidad[2]) {
+              this.llenarFila(row, i);
+            } else if (row.unidad === control.uni) {
+              this.llenarFila(row, i);
+            }
           }
         } else {
-          if (!existe && articulo.destroy !== 1) {
-            this.llenarFila(articulo, i);
+          if (!existe && row.destroy !== 1) {
+            this.llenarFila(row, i);
           }
         }
       }
@@ -815,14 +856,20 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     (this.control.controls[i] as any).controls['cod'].setValue(element.codigo);
 
     (this.control.controls[i] as any).controls['can'].setValue(cant_actual);
+    (this.control.controls[i] as any).controls['max_can'].setValue(cant_actual);
     (this.control.controls[i] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
 
     (this.control.controls[i] as any).controls['des'].setValue(_.capitalize(element.articulo));
+    let uni = '';
+
     if (element.peso_saco) {
-      (this.control.controls[i] as any).controls['uni'].setValue('Saco de ' + element.peso_saco + ' libras');
+      uni = 'Saco de ' + element.peso_saco + ' libras';
     } else {
-      (this.control.controls[i] as any).controls['uni'].setValue(element.unidad);
+      uni = element.unidad;
     }
+
+    (this.control.controls[i] as any).controls['uni'].setValue(uni);
+    (this.control.controls[i] as any).controls['uni'].disable();
 
     setTimeout(async () => {
       const excede = await this.checkCantidadExede(i, 'change', element.articulo);
@@ -832,32 +879,75 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       }
     }, 100);
     this.aumentarSecuencia();
-    console.log(this.control.controls[i]);
   }
 
+  excedeMaxCan(i) {
+    const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
+    const max_can = (this.control.controls[i] as any).controls['max_can'].value;
+    const can = (this.control.controls[i] as any).controls['can'].value;
+    if (detalle_factura_id && can > max_can) {
+      this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR', true);
+      (this.control.controls[i] as any).controls['can'].setValue(max_can);
+      GLOBAL.enfocarInput('can-' + i);
+    }
+  }
+
+  getMaxCan(i) {
+    const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
+    const max_can = (this.control.controls[i] as any).controls['max_can'].value;
+    if (detalle_factura_id) {
+      return max_can;
+    } else {
+      return 9007199254740991;
+    }
+  }
+
+  p() {
+    console.log(this.control);
+
+    for (let i = 0; i < this.control.value.length; i++) {
+      const element = this.control.value[i];
+      if (element.des) {
+        console.log(element);
+      } else {
+        break;
+      }
+    }
+  }
   async ParsearCuerpo() {
     this.CuerpoConduce = [];
     let res = true;
     console.log(this.control.value);
 
-    for (let i = 0; i < this.control.value.length; i++) {
-      const element = this.control.value[i];
-      if (element.cod && element.uni && element.can) {
+    // for (let i = 0; i < this.control.value.length; i++) {
+    //   const element = this.control.value[i];
+    for (let i = 0; i < this.control.controls.length; i++) {
+      const control = this.control.controls[i] as any;
+
+      const codigo_ = control.controls['cod'].value;
+      const unidad_ = control.controls['uni'].value;
+      const cantidad_ = control.controls['can'].value;
+
+      console.log('codigo_', codigo_);
+      console.log('unidad_', unidad_);
+      console.log('cantidad_', cantidad_);
+
+      if (codigo_ && unidad_ && cantidad_) {
         try {
-          element['articulo'] = await this.dbServ.getArticulosFiltrados(element.cod, 0, 0, true, false, 'todos').toPromise();
-          console.log(element['articulo']);
+          control['articulo'] = await this.dbServ.getArticulosFiltrados(codigo_, 0, 0, true, false, 'todos').toPromise();
+          console.log(control['articulo']);
         } catch (error) {}
 
-        // element['articulo'] = this.listaArticulos.filter((art) => art.codigo === element.cod)[0].id;
+        // control['articulo'] = this.listaArticulos.filter((art) => art.codigo === control.cod)[0].id;
 
         this.CuerpoConduce.push({
-          detalle_factura_id: element.detalle_factura_id ? element.detalle_factura_id : null,
-          articulo_id: element.articulo.id,
-          cantidad: element.can,
-          cantidad_en_unidades: element.cantidad_en_unidades,
-          unidad: element.uni,
+          detalle_factura_id: control.controls['detalle_factura_id'].value ? control.controls['detalle_factura_id'].value : null,
+          articulo_id: control.controls['articulo_id'].value,
+          cantidad: cantidad_,
+          cantidad_en_unidades: control.controls['cantidad_en_unidades'].value,
+          unidad: unidad_,
         });
-        const excede = await this.checkCantidadExede(i, 'change', element.articulo.nombre);
+        const excede = await this.checkCantidadExede(i, 'change', control.articulo.nombre);
         console.log('excede ', excede);
 
         if (excede && res) {
@@ -927,19 +1017,42 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     }
   }
 
+  resetForm() {
+    for (let i = 0; i < this.control.controls.length; i++) {
+      const control = this.control.controls[i].value;
+
+      if (control.des && control.cod) {
+        (this.control.controls[i] as any).controls['detalle_factura_id'].setValue(null);
+        (this.control.controls[i] as any).controls['articulo_id'].setValue(null);
+        (this.control.controls[i] as any).controls['cod'].setValue(null);
+
+        (this.control.controls[i] as any).controls['des'].setValue(null);
+        (this.control.controls[i] as any).controls['can'].setValue(null);
+        (this.control.controls[i] as any).controls['max_can'].setValue(9007199254740991);
+        (this.control.controls[i] as any).controls['cantidad_en_unidades'].setValue(null);
+        (this.control.controls[i] as any).controls['uni'].setValue(null);
+        (this.control.controls[i] as any).controls['uni'].enable();
+      }
+    }
+  }
+
+  borrar() {
+    this.resetForm();
+    this.cliente = undefined;
+    this.facturas_adelantadas_wait = [];
+    this.facturas_adelantadas = [];
+    this.secuencia = 0;
+    this.inputSecuencia = 'cod-0';
+    this.inputDrop = 'uni-0';
+    this.facturaAdelantadaSelected = undefined;
+    this.rowsExcede = [];
+  }
+
   cancelarConduce(secuencia) {
     if (secuencia === 1) {
       this.abrirModalDinamicText('Conduce no terminado, ¿Desea cancelarlo?', null);
     } else {
-      this.form.reset();
-      this.cliente = undefined;
-      this.facturas_adelantadas_wait = [];
-      this.facturas_adelantadas = [];
-      this.secuencia = 0;
-      this.inputSecuencia = 'cod-0';
-      this.inputDrop = 'uni-0';
-      this.facturaAdelantadaSelected = undefined;
-
+      this.borrar();
       (document.getElementById('clienteI') as any).value = '';
       setTimeout(() => {
         GLOBAL.enfocarInput('clienteI');

@@ -110,8 +110,10 @@
                           (click)="verificarSecuencia(i, true)"
                           (keydown.enter)="saltar('uni-', i)"
                           formControlName="can"
+                          [max]="getMaxCan(i)"
                           (blur)="verificarRow(i)"
                           (blur)="calculateCantidadEnUnidades(i)"
+                          (blur)="excedeMaxCan(i)"
                         />
                       </div>
                     </td>
@@ -168,6 +170,9 @@
         </div>
         <div class="col-2">
           <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (click)="cancelarConduce(1)"></app-btncircular>
+        </div>
+        <div class="col-2">
+          <button (click)="p()">check cuerpo</button>
         </div>
       </div>
     </div>

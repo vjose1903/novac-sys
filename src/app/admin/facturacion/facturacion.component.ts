@@ -666,8 +666,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     if (this.metodo === 'venta') {
       this.CuerpoFactura.map((articulo) => {
-        articulo.retirado = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad;
-        articulo.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad;
+        articulo.retirado = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
+        articulo.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
         return articulo;
       });
     }

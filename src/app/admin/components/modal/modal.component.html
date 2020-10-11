@@ -304,7 +304,7 @@
     (onHide)="reinicioModal()"
     blockScroll="true"
   >
-    <app-modal-seleccinar-articulo [articulos]="seleccionModal" (getArtculos)="devolverCLick($event)"></app-modal-seleccinar-articulo>
+    <app-modal-seleccinar-articulo [articulos]="seleccionModal" (getArticulos)="devolverCLick($event)"></app-modal-seleccinar-articulo>
 
     <p-footer>
       <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
