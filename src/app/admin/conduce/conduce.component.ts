@@ -164,9 +164,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     });
   }
 
-  ngOnChanges(simpleChanges) {
-    console.log('-----> ', simpleChanges);
-  }
+  ngOnChanges(simpleChanges) {}
 
   resetModalVaribales() {
     this.mServ.ModalObj(undefined);
@@ -224,7 +222,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       } else {
         this.rowsExcede = _.difference(this.rowsExcede, [i]);
       }
-      console.log(this.rowsExcede);
     }
   }
 
@@ -292,7 +289,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     if (input === 'cod-') {
       index++;
       const excede = await this.checkCantidadExede(i, 'saltar');
-      console.log('excede ', excede);
 
       if (!excede) {
         if (unidad === '' || unidad === null) {
@@ -379,7 +375,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   //     } catch (error) {
   //       console.error(error);
   //     }
-  //     console.log('articulo ', articulo);
 
   //     if (articulo.is_detallable) {
   //       this.llenarArrayUnidades(articulo, true);
@@ -536,15 +531,11 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   }
 
   removeItem(i: number) {
-    console.log('i ', i);
-
     this.control.removeAt(i);
   }
 
   verificarSecuencia(i, check?) {
     if (this.secuencia < i) {
-      console.log('entro');
-
       GLOBAL.enfocarInput(this.inputSecuencia);
     }
 
@@ -555,9 +546,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
     const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
     if (check && codigo !== '' && codigo !== null && codigo !== undefined) {
-      console.log('detalle_factura_id ', detalle_factura_id);
-      console.log('!detalle_factura_id ', !detalle_factura_id);
-
       if (!detalle_factura_id) {
         this.verificarRow(i);
         const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
@@ -604,7 +592,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
         this.llenarArrayUnidades(articulo, false);
       }
     }
-    console.log('this.UnidadesArticulo ', this.UnidadesArticulo);
 
     if (unidad && cantidad && this.UnidadesArticulo && this.UnidadesArticulo.length > 0) {
       cantidadMinima = this.UnidadesArticulo.filter((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad))[0].cantidad;
@@ -903,12 +890,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   }
 
   p() {
-    console.log(this.control);
-
     for (let i = 0; i < this.control.value.length; i++) {
       const element = this.control.value[i];
       if (element.des) {
-        console.log(element);
       } else {
         break;
       }
@@ -917,7 +901,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   async ParsearCuerpo() {
     this.CuerpoConduce = [];
     let res = true;
-    console.log(this.control.value);
 
     // for (let i = 0; i < this.control.value.length; i++) {
     //   const element = this.control.value[i];
@@ -928,14 +911,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       const unidad_ = control.controls['uni'].value;
       const cantidad_ = control.controls['can'].value;
 
-      console.log('codigo_', codigo_);
-      console.log('unidad_', unidad_);
-      console.log('cantidad_', cantidad_);
-
       if (codigo_ && unidad_ && cantidad_) {
         try {
           control['articulo'] = await this.dbServ.getArticulosFiltrados(codigo_, 0, 0, true, false, 'todos').toPromise();
-          console.log(control['articulo']);
         } catch (error) {}
 
         // control['articulo'] = this.listaArticulos.filter((art) => art.codigo === control.cod)[0].id;
@@ -948,7 +926,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
           unidad: unidad_,
         });
         const excede = await this.checkCantidadExede(i, 'change', control.articulo.nombre);
-        console.log('excede ', excede);
 
         if (excede && res) {
           res = false;
@@ -966,7 +943,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     } else {
       const cuerpoBien = await this.ParsearCuerpo();
 
-      console.log('this.CuerpoConduce ', this.CuerpoConduce);
       if (cuerpoBien) {
         if (this.CuerpoConduce.length === 0) {
           this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
@@ -987,7 +963,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     cabecera_conduce['detalle_conduces_attributes'] = this.CuerpoConduce;
     try {
       const res = await this.dbServ.createConduce(cabecera_conduce).toPromise();
-      console.log('res conduce ', res);
 
       // this.resetVariables();
 
@@ -999,8 +974,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       this._ipc.send('print', obj);
 
       await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-        console.log(res);
-
         if (res.status === 'si') {
           this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
           this.cancelarConduce(2);
