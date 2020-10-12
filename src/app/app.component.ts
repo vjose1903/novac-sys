@@ -21,7 +21,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   displayPercent = false;
   tiempo_restante: number;
   tiempo_restante_mostrar: string;
-  
+
   constructor(
     private _ipc: IpcService,
     private dbServ: DBservice,
@@ -86,15 +86,20 @@ export class AppComponent implements OnInit, AfterViewInit {
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
       if (res && res.body) {
         console.log(res);
-        this.tiempo_restante = (res.body.transferred / res.body.total) / 60;
+        this.tiempo_restante = (res.body.bytesPerSecond / res.body.total) / 60;
         this.tiempo_restante_mostrar = this.tiempo_restante <= 60 ? this.tiempo_restante + ' Min' : this.tiempo_restante + ' Seg'
 
-        res.body.transferred = parseFloat(GLOBAL.redondearAdos(res.body.transferred/1000000));
-        res.body.total = parseFloat(GLOBAL.redondearAdos(res.body.total/1000000));
+        res.body.transferred = parseFloat(GLOBAL.redondearAdos(res.body.transferred / 1000000));
+        res.body.total = parseFloat(GLOBAL.redondearAdos(res.body.total / 1000000));
         res.body.percent = parseFloat(GLOBAL.redondearAdos(res.body.percent));
 
         this.objProgress = res.body;
         document.getElementById('modalProgress').click()
+        document.getElementById('ui-dialog').click()
+        document.getElementById('ui-dialog-titlebar').click()
+        document.getElementById('ui-dialog-titlebar').focus()
+        console.log(document.getElementById('ui-dialog-titlebar'));
+
         console.log(res);
       }
     });
