@@ -8,9 +8,30 @@ html,
 body {
   margin: 0;
   padding: 0;
-
   height: 100%;
 }
+
+@font-face {
+  font-family: "poppins_regular";
+  src: url("assets/fonts/Poppins-Regular.ttf") format("version") /* Modern Browsers */;
+}
+@font-face {
+  font-family: "poppins_semibold";
+  src: url("assets/fonts/Poppins-SemiBold.ttf") format("version") /* Modern Browsers */;
+}
+@font-face {
+  font-family: "poppins_bold";
+  src: url("assets/fonts/Poppins-Bold.ttf") format("version") /* Modern Browsers */;
+}
+@font-face {
+  font-family: "poppins_medium";
+  src: url("assets/fonts/Poppins-Medium.ttf") format("version") /* Modern Browsers */;
+}
+@font-face {
+  font-family: "poppins_light";
+  src: url("assets/fonts/Poppins-Light.ttf") format("version") /* Modern Browsers */;
+}
+
 .UPPERCASE {
   text-transform: uppercase;
 }

@@ -17,8 +17,8 @@
   <div class="d-flex justify-content-between mb-2">
     <span class="negrita">Descargando...</span>
     <div class="mr-2">
-      <span class="negrita">{{ objProgress?.transferred }} / </span>
-      <span class="negrita gris">{{ objProgress?.total }}</span>
+      <span class="negrita">{{ objProgress?.transferred }} Mb / </span>
+      <span class="negrita gris">{{ objProgress?.total }} Mb</span>
     </div>
   </div>
   <p-progressBar [value]="objProgress?.percent"></p-progressBar>

@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit {
   loginForm: FormGroup;
   errorC = '';
   errorU = '';
+  versionApp: any;
 
   constructor(
     private dbServ: DBservice,
@@ -35,6 +36,14 @@ export class HomeComponent implements OnInit {
       usuario: null,
       password: null,
     });
+    this.searchVersion()
+  }
+
+  async searchVersion() {
+    this._ipc.send('getVersion')
+    await this._ipc.on('versionResponse', (event, arg) => {
+      this.versionApp = arg
+    })
   }
 
   // =================================================================

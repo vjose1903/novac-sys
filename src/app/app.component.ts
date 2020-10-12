@@ -95,7 +95,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.objProgress = res.body;
         document.getElementById('modalProgress').click()
         console.log(res);
-        console.log(' this.displayPercent ',this.displayPercent );
       }
     });
 
