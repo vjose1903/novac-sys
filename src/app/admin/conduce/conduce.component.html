@@ -49,7 +49,7 @@
   <!-- ================================================================================================================================================ -->
   <!-- ================================================================================================================================================ -->
   <div *ngIf="cliente" class="col-12 mt-3">
-    <div class="card sombra bordeRedondeado" style="height: 39rem">
+    <div class="card sombra bordeRedondeado" style="height: 37rem">
       <table #tituloFactTable="mdbTable" mdbTable class="table m-auto" small="true">
         <thead>
           <tr class="text-center">
@@ -170,9 +170,6 @@
         </div>
         <div class="col-2">
           <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (click)="cancelarConduce(1)"></app-btncircular>
-        </div>
-        <div class="col-2">
-          <button (click)="p()">check cuerpo</button>
         </div>
       </div>
     </div>
