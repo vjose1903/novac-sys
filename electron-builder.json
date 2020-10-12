@@ -20,10 +20,10 @@
     "!tslint.json"
   ],
   "extraFiles": [
-    "./fonts/*",
-    "./print/*",
-    "./pdfs/*",
-    "./icons/*",
+    "./fonts/**/*",
+    "./print/**/*",
+    "./myPdf/**/*",
+    "./icons/**",
     "./node_modules/electron/*",
     "./electron-builder/*",
     "./electron-chromedriver/*",

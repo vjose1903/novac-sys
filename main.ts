@@ -4,17 +4,9 @@ import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
 const pdfmake = require('pdfmake/src/printer');
-import * as facturasCompraVenta from './pdfs/facturasCompraVenta';
-import * as recibosIngresos from './pdfs/recibosIngresos';
-import * as conduces from './pdfs/conduce';
-const electronInstaller = require('electron-winstaller');
-
-// this should be placed at top of main.js to handle setup events quickly
-// if (handleSquirrelEvent(app)) {
-//   // squirrel event handled and app will exit in 1000ms, so don't do anything else
-//   console.log('el diablo');
-//   // return;
-// }
+const facturasCompraVenta = require(`${__dirname}/myPdf/facturasCompraVenta`);
+const recibosIngresos = require(`${__dirname}/myPdf/recibosIngresos`);
+const conduces = require(`${__dirname}/myPdf/conduce`);
 
 // tslint:disable-next-line: one-variable-per-declaration
 let win, serve;
@@ -61,7 +53,7 @@ function createWindow() {
   }
 
   if (serve) {
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
   }
 
   // Emitted when the window is closed.
@@ -112,8 +104,6 @@ ipcMain.on('print', (event: any, oPdf) => {
   const data = oPdf.data;
   const type = oPdf.type;
 
-  console.log('data', data);
-
   switch (type) {
     case 'recibo_ingreso':
       obj = recibosIngresos.makeRecibo(data);
@@ -145,75 +135,6 @@ function returnErrorPDF() {
 }
 
 // ==========================================================================================================================================================
-// ==========================================================================================================================================================
-// SQUIRREL ELECTRON
-// ==========================================================================================================================================================
-
-function handleSquirrelEvent(application) {
-  if (process.argv.length === 1) {
-    return false;
-  }
-
-  const ChildProcess = require('child_process');
-  const path = require('path');
-
-  const appFolder = path.resolve(process.execPath, '..');
-  const rootAtomFolder = path.resolve(appFolder, '..');
-  const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
-  const exeName = path.basename(process.execPath);
-
-  const spawn = (command, args) => {
-    let spawnedProcess, error;
-
-    try {
-      spawnedProcess = ChildProcess.spawn(command, args, {
-        detached: true,
-      });
-    } catch (error) {}
-
-    return spawnedProcess;
-  };
-
-  const spawnUpdate = function (args) {
-    return spawn(updateDotExe, args);
-  };
-
-  const squirrelEvent = process.argv[1];
-  switch (squirrelEvent) {
-    case '--squirrel-install':
-    case '--squirrel-updated':
-      // Optionally do things such as:
-      // - Add your .exe to the PATH
-      // - Write to the registry for things like file associations and
-      //   explorer context menus
-
-      // Install desktop and start menu shortcuts
-      spawnUpdate(['--createShortcut', exeName]);
-
-      setTimeout(application.quit, 1000);
-      return true;
-
-    case '--squirrel-uninstall':
-      // Undo anything you did in the --squirrel-install and
-      // --squirrel-updated handlers
-
-      // Remove desktop and start menu shortcuts
-      spawnUpdate(['--removeShortcut', exeName]);
-
-      setTimeout(application.quit, 1000);
-      return true;
-
-    case '--squirrel-obsolete':
-      // This is called on the outgoing version of your app before
-      // we update to the new version - it's the opposite of
-      // --squirrel-updated
-
-      application.quit();
-      return true;
-  }
-}
-
-// ==========================================================================================================================================================
 // MAKE PDF
 // ==========================================================================================================================================================
 
@@ -231,6 +152,9 @@ function makePdf(dd, file) {
       bolditalics: path + font_dir + type_font + '-BoldItalic.ttf',
     },
   };
+
+  console.log(' fontDescriptors ', fontDescriptors);
+
   const printer = new pdfmake(fontDescriptors);
 
   // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
@@ -272,19 +196,25 @@ function imprimir(cFileName) {
   // exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\adm-agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
 }
 function PathApp() {
-  if (process.platform === 'darwin') {
+  // if (process.platform === 'darwin') {
     return app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.getName().toLowerCase())) + app.getName() + '/';
-  } else {
-    return (
-      app.getPath('exe').substr(
-        0,
-        app
-          .getPath('exe')
-          .toLowerCase()
-          .indexOf(app.getName().toLowerCase() + '.exe'),
-      ) +
-      app.getName() +
-      '/'
-    );
-  }
+  // } else {
+  //   console.log('AQUIIIIIIII --->  ',app.getPath('exe'))
+  //   console.log('--->  ', app.getName())
+  //   console.log('--->  ', app.getPath('exe')
+  //   .toLowerCase()
+  //   .indexOf(app.getName().toLowerCase() + '.exe'))
+  //   console.log('=-=--=-=-=-=-=-=-=-=-=-=-=-')
+  //   return (
+  //     app.getPath('exe').substr(
+  //       0,
+  //       app
+  //         .getPath('exe')
+  //         .toLowerCase()
+  //         .indexOf(app.getName().toLowerCase()),
+  //     ) +
+  //     app.getName() +
+  //     '/'
+  //   );
+  // }
 }
