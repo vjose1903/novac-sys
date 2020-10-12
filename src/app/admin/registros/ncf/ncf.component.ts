@@ -235,7 +235,7 @@ export class NcfComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectTipoFactura() {
+  selectTipoFactura(a) {
     this.aletarTipoArticulo = false;
   }
   saltar(input) {}

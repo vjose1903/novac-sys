@@ -1,5 +1,5 @@
 {
-  "productName": "ADM-agroindustrial",
+  "productName": "adm-agroindustrial",
   "directories": {
     "output": "release/"
   },
@@ -20,9 +20,9 @@
     "!tslint.json"
   ],
   "extraFiles": [
-    "fonts/*",
-    "print/*",
-    "pdfs/*",
+    "./fonts/*",
+    "./print/*",
+    "./pdfs/*",
     "./icons/*",
     "./node_modules/electron/*",
     "./electron-builder/*",
@@ -48,7 +48,7 @@
   ],
   "win": {
     "icon": "./icons/win/icon.ico",
-    "target": ["portable"]
+    "target": ["NSIS"]
   },
   "mac": {
     "icon": "./icons/mac/icon.icns",

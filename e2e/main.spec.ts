@@ -3,7 +3,7 @@ import {SpectronClient} from 'spectron';
 
 import commonSetup from './common-setup';
 
-describe('ADM-agroindustrial App', function () {
+describe('adm-agroindustrial App', function () {
   commonSetup.apply(this);
 
   let browser: any;

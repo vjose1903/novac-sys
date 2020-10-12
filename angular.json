@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ADM-agroindustrial": {
+    "adm-agroindustrial": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -29,7 +29,7 @@
               "node_modules/@fortawesome/fontawesome-free/scss/solid.scss",
               "node_modules/@fortawesome/fontawesome-free/scss/regular.scss",
               "node_modules/@fortawesome/fontawesome-free/scss/brands.scss",
-              
+
               "node_modules/angular-bootstrap-md/assets/scss/bootstrap/bootstrap.scss",
               "node_modules/angular-bootstrap-md/assets/scss/mdb.scss",
 
@@ -79,21 +79,21 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ADM-agroindustrial:build"
+            "browserTarget": "adm-agroindustrial:build"
           },
           "configurations": {
             "dev": {
-              "browserTarget": "ADM-agroindustrial:build:dev"
+              "browserTarget": "adm-agroindustrial:build:dev"
             },
             "production": {
-              "browserTarget": "ADM-agroindustrial:build:production"
+              "browserTarget": "adm-agroindustrial:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ADM-agroindustrial:build"
+            "browserTarget": "adm-agroindustrial:build"
           }
         },
         "test": {
@@ -117,7 +117,7 @@
         }
       }
     },
-    "ADM-agroindustrial-e2e": {
+    "adm-agroindustrial-e2e": {
       "root": "e2e",
       "projectType": "application",
       "architect": {
@@ -131,7 +131,7 @@
       }
     }
   },
-  "defaultProject": "ADM-agroindustrial",
+  "defaultProject": "adm-agroindustrial",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
