@@ -42,6 +42,7 @@ function createWindow() {
       plugins: true,
     },
   });
+
   if (serve) {
     contents = win.webContents;
     require('electron-reload')(__dirname, {
@@ -58,9 +59,7 @@ function createWindow() {
     );
   }
 
-  if (serve) {
-    // win.webContents.openDevTools();
-  }
+  win.setMenuBarVisibility(false)
 
   // Emitted when the window is closed.
   win.on('closed', () => {
