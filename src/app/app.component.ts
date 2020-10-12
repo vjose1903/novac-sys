@@ -21,6 +21,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   displayPercent = false;
   tiempo_restante: number;
   tiempo_restante_mostrar: string;
+  
   constructor(
     private _ipc: IpcService,
     private dbServ: DBservice,

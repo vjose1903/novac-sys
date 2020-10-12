@@ -113,7 +113,7 @@ autoUpdater.on('checking-for-update', () => {
 
 autoUpdater.on('update-available', (info) => {
   if (win) {
-    win.webContents.send('update-available', { msg: 'DESCARGA DISPONIBLE!!!', body: info });
+    win.webContents.send('update-available', { msg: 'ACTUALIZACION DISPONIBLE!!!', body: info });
   }
   const dialogOpts: any = {
     type: 'info',
