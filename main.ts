@@ -3,12 +3,12 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 const pdfmake = require('pdfmake/src/printer');
 import * as facturasCompraVenta from './pdfs/facturasCompraVenta';
 import * as recibosIngresos from './pdfs/recibosIngresos';
 import * as conduces from './pdfs/conduce';
-import { logoADM } from './files';
+
+const electronInstaller = require('electron-winstaller');
 
 // tslint:disable-next-line: one-variable-per-declaration
 let win, serve;
