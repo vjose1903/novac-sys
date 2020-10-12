@@ -114,9 +114,9 @@ autoUpdater.on('checking-for-update', () => {
 autoUpdater.on('update-available', (info) => {
   const dialogOpts: any = {
     type: 'info',
-    buttons: ['No', 'Si'],
+    buttons: ['ok'],
     title: 'Actualización disponible',
-    message: 'VjPOS presenta una nueva actualizacion desea descargarla ahora.',
+    message: 'VjPOS presenta una nueva actualizacion se empezara a descargar ahora.',
     detail: `Version: ${info.version} Fecha de actualizacion: ${fecha(info.releaseDate)}`,
   };
 

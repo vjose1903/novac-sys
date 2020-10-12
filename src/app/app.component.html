@@ -1,4 +1,5 @@
-<div id="fondoC" *ngIf="loading" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
+<div id="fondoC" *ngIf="loading" [ngClass]="{ fadeIn: loading, fadeOut: !loading }"
+  class="h-100 w-100 position-absolute backnegro">
   <img class="img-fluid logoLoading rubberBand" src="assets/img/admLogo_opt.png" alt="" />
   <span class="text"> CARGANDO ... </span>
 </div>
@@ -11,17 +12,8 @@
   <p style="font-size: 3rem; color: white">{{ 'Por favor espere!...' | translate }}</p>
 </ngx-spinner> -->
 
-<p-dialog
-  header="Porcentaje de descarga"
-  [(visible)]="displayPercent"
-  [positionTop]="780"
-  [positionLeft]="610"
-  [modal]="true"
-  [style]="{ width: '50vw' }"
-  [baseZIndex]="10000"
-  [draggable]="false"
-  [resizable]="false"
->
+<p-dialog id="modalProgress" header="Porcentaje de descarga" [(visible)]="displayPercent" [positionTop]="780" [positionLeft]="610"
+  [modal]="true" [style]="{ width: '50vw' }" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
   <div class="d-flex justify-content-between mb-2">
     <span class="negrita">Descargando...</span>
     <div class="mr-2">
@@ -30,7 +22,7 @@
     </div>
   </div>
   <p-progressBar [value]="objProgress?.percent"></p-progressBar>
-        <div class="mr-2">
-          <span class="negrita">Tiempo restante: {{ tiempo_restante_mostrar }} </span>
-        </div>
+  <div class="mr-2">
+    <span class="negrita">Tiempo restante: {{ tiempo_restante_mostrar }} </span>
+  </div>
 </p-dialog>

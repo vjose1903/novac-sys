@@ -92,6 +92,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         res.body.percent = parseFloat(GLOBAL.redondearAdos(res.body.percent));
 
         this.objProgress = res.body;
+        document.getElementById('modalProgress').click()
         console.log(res);
         console.log(' this.displayPercent ',this.displayPercent );
       }
