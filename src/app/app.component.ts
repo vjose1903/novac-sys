@@ -84,14 +84,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
       if (res && res.body) {
         this.displayPercent = true;
-
-        res.body.transferred = GLOBAL.redondearAdos(res.body.transferred);
-        res.body.total = GLOBAL.redondearAdos(res.body.total);
-        res.body.percent = GLOBAL.redondearAdos(res.body.percent);
-
-        this.objProgress = res.body;
         this.tiempo_restante = (res.body.transferred / res.body.total) / 60;
         this.tiempo_restante_mostrar = this.tiempo_restante <= 60 ? this.tiempo_restante + ' Min' : this.tiempo_restante + ' Seg'
+
+        res.body.transferred = parseFloat(GLOBAL.redondearAdos(res.body.transferred/1000000));
+        res.body.total = parseFloat(GLOBAL.redondearAdos(res.body.total/1000000));
+        res.body.percent = parseFloat(GLOBAL.redondearAdos(res.body.percent));
+
+        this.objProgress = res.body;
         console.log(res);
         console.log(' this.displayPercent ',this.displayPercent );
       }
