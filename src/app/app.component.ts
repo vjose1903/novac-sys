@@ -23,7 +23,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   tiempo_restante_mostrar: string;
 
   constructor(
-    private _ipc: IpcService,
+    public _ipc: IpcService,
     private dbServ: DBservice,
     private loaderServ: LoaderService,
     private spinner: NgxSpinnerService,
@@ -85,7 +85,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
       if (res && res.body) {
-        console.log(res);
+        console.log('Antes---> ',JSON.stringify(res.body));
         this.tiempo_restante = (res.body.bytesPerSecond / res.body.total) / 60;
         this.tiempo_restante_mostrar = this.tiempo_restante <= 60 ? this.tiempo_restante + ' Min' : this.tiempo_restante + ' Seg'
 
@@ -94,13 +94,15 @@ export class AppComponent implements OnInit, AfterViewInit {
         res.body.percent = parseFloat(GLOBAL.redondearAdos(res.body.percent));
 
         this.objProgress = res.body;
+
+        this._ipc.objPercent = res.body
         document.getElementById('modalProgress').click()
         document.getElementById('ui-dialog').click()
         document.getElementById('ui-dialog-titlebar').click()
         document.getElementById('ui-dialog-titlebar').focus()
         console.log(document.getElementById('ui-dialog-titlebar'));
 
-        console.log(res);
+        console.log('Despues --->', JSON.stringify(res.body));
       }
     });
 

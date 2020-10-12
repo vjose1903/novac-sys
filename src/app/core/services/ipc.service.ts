@@ -9,6 +9,9 @@ export class IpcService {
   private printers = new BehaviorSubject<any>(undefined);
   PRINTERS = this.printers.asObservable();
 
+
+  objPercent
+
   constructor() {
     if (window.require) {
       try {
