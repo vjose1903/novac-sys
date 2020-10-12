@@ -19,6 +19,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   noServer = false;
   objProgress;
   displayPercent = false;
+  tiempo_restante: number;
+  tiempo_restante_mostrar: string;
   constructor(
     private _ipc: IpcService,
     private dbServ: DBservice,
@@ -88,8 +90,11 @@ export class AppComponent implements OnInit, AfterViewInit {
         res.body.percent = GLOBAL.redondearAdos(res.body.percent);
 
         this.objProgress = res.body;
+        this.tiempo_restante = (res.body.transferred / res.body.total) / 60;
+        this.tiempo_restante_mostrar = this.tiempo_restante <= 60 ? this.tiempo_restante + ' Min' : this.tiempo_restante + ' Seg'
+        console.log(res);
+        console.log(' this.displayPercent ',this.displayPercent );
       }
-      console.log(res);
     });
 
     this._ipc.on('update-downloaded', (event: Electron.IpcMessageEvent, res) => {

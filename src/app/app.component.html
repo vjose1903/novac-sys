@@ -14,7 +14,7 @@
 <p-dialog
   header="Porcentaje de descarga"
   [(visible)]="displayPercent"
-  [positionTop]="870"
+  [positionTop]="780"
   [positionLeft]="610"
   [modal]="true"
   [style]="{ width: '50vw' }"
@@ -30,4 +30,7 @@
     </div>
   </div>
   <p-progressBar [value]="objProgress?.percent"></p-progressBar>
+        <div class="mr-2">
+          <span class="negrita">Tiempo restante: {{ tiempo_restante_mostrar }} </span>
+        </div>
 </p-dialog>
