@@ -112,6 +112,9 @@ autoUpdater.on('checking-for-update', () => {
 });
 
 autoUpdater.on('update-available', (info) => {
+  if (win) {
+    win.webContents.send('update-available', { msg: 'DESCARGA DISPONIBLE!!!', body: info });
+  }
   const dialogOpts: any = {
     type: 'info',
     buttons: ['ok'],
@@ -121,12 +124,6 @@ autoUpdater.on('update-available', (info) => {
   };
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (win) {
-      win.webContents.send('update-available', { msg: 'descargando actualizacion...', body: returnValue });
-    }
-    if (returnValue.response === 0) {
-      return;
-    }
   });
 });
 
