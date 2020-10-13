@@ -19,9 +19,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   noServer = false;
   objProgress;
   displayPercent = false;
-  tiempo_restante: number;
-  tiempo_restante_mostrar: string;
-
+  tiempo_restante
+  objPercent
+  
   constructor(
     public _ipc: IpcService,
     private dbServ: DBservice,
@@ -90,16 +90,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
       if (res && res.body) {
         console.log('Antes---> ', JSON.stringify(res.body));
-
-        const tiempo_segundos = res.body.total / res.body.bytesPerSecond
-
-        this.tiempo_restante = tiempo_segundos > 60 ? (tiempo_segundos) / 60 : tiempo_segundos;
-        this.tiempo_restante_mostrar = tiempo_segundos > 60 ? this.tiempo_restante + ' Min' : this.tiempo_restante + ' Seg'
-
+        this.tiempo_restante = this.timeConvert(res.body.total / res.body.bytesPerSecond)
+        
         res.body.transferred = parseFloat(GLOBAL.redondearAdos(res.body.transferred / 1000000));
         res.body.total = parseFloat(GLOBAL.redondearAdos(res.body.total / 1000000));
         res.body.percent = parseFloat(GLOBAL.redondearAdos(res.body.percent));
-        this.duplicarDataProgreso(res.body)
+        
+        this.objPercent = res.body
+        document.getElementById('imagenLogo').click();
         
         console.log('Despues --->', JSON.stringify(res.body));
       }
@@ -119,8 +117,18 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
   }
   
+  timeConvert(d) {
+    d = Number(d);
+    const h = Math.floor(d / 3600);
+    const m = Math.floor((d % 3600) / 60);
+    const s = Math.floor((d % 3600) % 60);
+
+    const hDisplay = h > 0 ? h + (h === 1 ? ' hora, ' : ' horas, ') : '';
+    const mDisplay = m > 0 ? m + (m === 1 ? ' minuto, ' : ' minutos, ') : '';
+    const sDisplay = s > 0 ? s + (s === 1 ? ' segundo' : ' segundos') : '';
+    return hDisplay + mDisplay + sDisplay;
+  }
   duplicarDataProgreso(json){
-    this._ipc.objPercent = GLOBAL.duplicarJson(json)
   }
 
   ngAfterViewInit() {

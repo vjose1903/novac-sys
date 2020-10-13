@@ -17,12 +17,12 @@
   <div class="d-flex justify-content-between mb-2">
     <span class="negrita">Descargando actualizacion...</span>
     <div class="mr-2">
-      <span class="negrita">{{ _ipc.objPercent?.transferred }} Mb / </span>
-      <span class="negrita gris">{{ _ipc.objPercent?.total }} Mb</span>
+      <span class="negrita">{{ objPercent?.transferred }} Mb / </span>
+      <span class="negrita gris">{{ objPercent?.total }} Mb</span>
     </div>
   </div>
-  <p-progressBar [value]="_ipc.objPercent?.percent"></p-progressBar>
+  <p-progressBar [value]="objPercent?.percent"></p-progressBar>
   <div class="mr-2">
-    <span class="negrita">Tiempo restante: {{ tiempo_restante_mostrar }} </span>
+    <span class="negrita">Tiempo restante: {{ tiempo_restante }} </span>
   </div>
 </p-dialog>
