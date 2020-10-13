@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var _ = require("lodash");
-var moment = require("moment");
-var files_1 = require("../files");
-var numLetra = require("../numero_letras");
+var fun_ = require("./utils/funciones");
+var _ = require("" + fun_.getFuncionalPath(true, '/lodash'));
+var moment = require("" + fun_.getFuncionalPath(true, '/moment'));
+var files_1 = require("./utils/files");
+var numLetra = require("" + fun_.getFuncionalPath(false, '/utils/numero_letras'));
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
@@ -347,4 +348,3 @@ function hora(a) {
     var horaFormato = moment(a).format('hh:mm a');
     return horaFormato;
 }
-//# sourceMappingURL=recibosIngresos.js.map

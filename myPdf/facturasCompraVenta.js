@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var _ = require("lodash");
-var moment = require("moment");
-var files_1 = require("../files");
+var fun_ = require("./utils/funciones");
+var _ = require("" + fun_.getFuncionalPath(true, '/lodash'));
+var moment = require("" + fun_.getFuncionalPath(true, '/moment'));
+var files_1 = require("./utils/files");
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
@@ -451,4 +452,3 @@ function hora(a) {
     var horaFormato = moment(a).format('hh:mm a');
     return horaFormato;
 }
-//# sourceMappingURL=facturasCompraVenta.js.map

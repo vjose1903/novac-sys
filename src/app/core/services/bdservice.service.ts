@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 export class DBservice {
   // url = 'http://admservidor.ddns.net:3000';
   // url = 'http://localhost:3000';
+  // url = 'http://192.168.1.14:3000';
   url = 'http://192.168.0.123:3000';
   ultimoMensajeMostrado: any;
 

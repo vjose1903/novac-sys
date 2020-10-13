@@ -1,6 +1,7 @@
-import * as _ from 'lodash';
-import * as moment from 'moment';
-import { logoADM } from '../files';
+import * as fun_  from './utils/funciones';
+const _ = require(`${fun_.getFuncionalPath(true, '/lodash')}`);
+const moment = require(`${fun_.getFuncionalPath(true, '/moment')}`);
+import { logoADM } from './utils/files';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA

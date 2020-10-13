@@ -4,9 +4,14 @@ import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
 const pdfmake = require('pdfmake/src/printer');
-const facturasCompraVenta = require(`${__dirname}/myPdf/facturasCompraVenta`);
-const recibosIngresos = require(`${__dirname}/myPdf/recibosIngresos`);
-const conduces = require(`${__dirname}/myPdf/conduce`);
+
+const facturasCompraVenta = require(`${getFuncionalPath('/myPdf/facturasCompraVenta.js')}`);
+const recibosIngresos = require(`${getFuncionalPath('/myPdf/recibosIngresos.js')}`);
+const conduce = require(`${getFuncionalPath('/myPdf/conduce.js')}`);
+
+// import { makeFacturaVenta } from './mypdf/facturasCompraVenta';
+// import { makeRecibo } from './mypdf/recibosIngresos';
+// import { makeConduce } from './mypdf/conduce';
 
 // tslint:disable-next-line: one-variable-per-declaration
 let win, serve;
@@ -35,7 +40,6 @@ function createWindow() {
       plugins: true,
     },
   });
-
   if (serve) {
     contents = win.webContents;
     require('electron-reload')(__dirname, {
@@ -106,15 +110,15 @@ ipcMain.on('print', (event: any, oPdf) => {
 
   switch (type) {
     case 'recibo_ingreso':
-      obj = recibosIngresos.makeRecibo(data);
+      obj = facturasCompraVenta.makeRecibo(data);
       break;
 
     case 'conduce':
-      obj = conduces.makeConduce(data);
+      obj = recibosIngresos.makeConduce(data);
       break;
 
     case 'facturacion':
-      obj = facturasCompraVenta.makeFacturaVenta(data);
+      obj = conduce.makeFacturaVenta(data);
       break;
 
     default:
@@ -142,7 +146,7 @@ function makePdf(dd, file) {
   const type_font = process.platform === 'darwin' ? 'roboto/Roboto' : 'roboto\\Roboto';
   const font_dir = process.platform === 'darwin' ? 'fonts/' : 'fonts\\';
 
-  const path = process.platform === 'darwin' ? PathApp() : PathApp().replace('/', '\\');
+  const path = getFuncionalPath()
 
   const fontDescriptors = {
     Roboto: {
@@ -158,7 +162,7 @@ function makePdf(dd, file) {
   const printer = new pdfmake(fontDescriptors);
 
   // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
-  const cFileName = file;
+  const cFileName = getFuncionalPath('/'+file);
   try {
     const pdfDoc = printer.createPdfKitDocument(dd);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
@@ -181,9 +185,9 @@ function imprimir(cFileName) {
   // "C:\Users\User\Desktop\factura.pdf" "EPSON LX-350 ESC/P"
   // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
 
-  var foxitPath = PathApp() + 'print\\FoxitReaderPortable.exe';
+  var foxitPath = getFuncionalPath() + 'print\\FoxitReaderPortable.exe';
 
-  exec(`${foxitPath} /t "${PathApp()}factura.pdf"`, (error, stdout, stderr) => {
+  exec(`${foxitPath} /t "${getFuncionalPath('/'+cFileName)}"`, (error, stdout, stderr) => {
     if (error) {
       win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err: error });
       return;
@@ -195,26 +199,55 @@ function imprimir(cFileName) {
   });
   // exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\adm-agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
 }
-function PathApp() {
+
+
+export function getFuncionalPath(addToPath = '') {
+  let path_temp
+  let path_resolved
+
+  let args_ = process.argv.slice(1);
+  let serve_ = args_.some((val) => val === '--serve');
+
+  if (serve_) {
+    console.log('');
+    console.error('-=-=-=-=-=-=-=-= DESARROLLO -=-=-=-=-=-=-=-=-=-');
+
+    path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
+
+  } else {
+    console.error('-=-=-=-=-=-=-=-= PRODUCCION -=-=-=-=-=-=-=-=-=-');
+    path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar.unpacked';
+  }
+  path_temp = path_temp + addToPath
+
+  path_resolved = process.platform === 'darwin' ? path_temp : path_temp.split("/").join("\\");
+
+  console.log('path_resolved ',path_resolved);
+  
+  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=');
+  return path_resolved
+}
+
+function PathAdd() {
   // if (process.platform === 'darwin') {
-    return app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.getName().toLowerCase())) + app.getName() + '/';
-  // } else {
+  let path = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar.unpacked/';
+  let path_resolved = process.platform === 'darwin' ? path : path.split("/").join("\\")
+
+  console.log(path_resolved);
+  return path_resolved
   //   console.log('AQUIIIIIIII --->  ',app.getPath('exe'))
-  //   console.log('--->  ', app.getName())
-  //   console.log('--->  ', app.getPath('exe')
-  //   .toLowerCase()
-  //   .indexOf(app.getName().toLowerCase() + '.exe'))
-  //   console.log('=-=--=-=-=-=-=-=-=-=-=-=-=-')
-  //   return (
-  //     app.getPath('exe').substr(
-  //       0,
-  //       app
-  //         .getPath('exe')
-  //         .toLowerCase()
-  //         .indexOf(app.getName().toLowerCase()),
-  //     ) +
-  //     app.getName() +
-  //     '/'
-  //   );
-  // }
+  //   console.log('--->  ', app.name)
+
+  // return (
+  //  app.getPath('exe').substr(
+  //     0,
+  //     app
+  //      .getPath('exe')
+  //       .toLowerCase()
+  //       .indexOf(app.name.toLowerCase()),
+  //   ) +
+  //  app.name +
+  //  '/resources/app.asar.unpacked/'
+  // );
+
 }
