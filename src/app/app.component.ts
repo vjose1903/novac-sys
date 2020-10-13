@@ -76,6 +76,10 @@ export class AppComponent implements OnInit, AfterViewInit {
       console.log(res);
     });
     this._ipc.on('update-error', (event: Electron.IpcMessageEvent, res) => {
+      if (res) {
+        this.dbServ.toastError(res.msg, 'ERRROR')
+        this.displayPercent = false;
+      }
       console.log(res);
     });
     this._ipc.on('update-available', (event: Electron.IpcMessageEvent, res) => {
@@ -85,32 +89,33 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
       if (res && res.body) {
-        console.log('Antes---> ',JSON.stringify(res.body));
-        this.tiempo_restante = (res.body.bytesPerSecond / res.body.total) / 60;
-        this.tiempo_restante_mostrar = this.tiempo_restante <= 60 ? this.tiempo_restante + ' Min' : this.tiempo_restante + ' Seg'
+        console.log('Antes---> ', JSON.stringify(res.body));
+
+        const tiempo_segundos = res.body.total / res.body.bytesPerSecond
+
+        this.tiempo_restante = tiempo_segundos > 60 ? (tiempo_segundos) / 60 : tiempo_segundos;
+        this.tiempo_restante_mostrar = tiempo_segundos > 60 ? this.tiempo_restante + ' Min' : this.tiempo_restante + ' Seg'
 
         res.body.transferred = parseFloat(GLOBAL.redondearAdos(res.body.transferred / 1000000));
         res.body.total = parseFloat(GLOBAL.redondearAdos(res.body.total / 1000000));
         res.body.percent = parseFloat(GLOBAL.redondearAdos(res.body.percent));
+        this.duplicarDataProgreso(res.body)
 
-        this.objProgress = res.body;
-
-        this._ipc.objPercent = res.body
         document.getElementById('modalProgress').click()
         document.getElementById('ui-dialog').click()
         document.getElementById('ui-dialog-titlebar').click()
         document.getElementById('ui-dialog-titlebar').focus()
         console.log(document.getElementById('ui-dialog-titlebar'));
-
+        
         console.log('Despues --->', JSON.stringify(res.body));
       }
     });
-
+    
     this._ipc.on('update-downloaded', (event: Electron.IpcMessageEvent, res) => {
       this.displayPercent = false;
       console.log(res);
     });
-
+    
     this._ipc.on('log', (event: Electron.IpcMessageEvent, res) => {
       console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
       console.log('MAIN LOG');
@@ -118,6 +123,10 @@ export class AppComponent implements OnInit, AfterViewInit {
       console.log(res);
       console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
     });
+  }
+  
+  duplicarDataProgreso(json){
+    this._ipc.objPercent = GLOBAL.duplicarJson(json)
   }
 
   ngAfterViewInit() {

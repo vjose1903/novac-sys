@@ -126,8 +126,6 @@ autoUpdater.on('update-available', (info) => {
     detail: `Version: ${info.version} Fecha de actualizacion: ${fecha(info.releaseDate)}`,
   };
 
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-  });
 });
 
 autoUpdater.on('download-progress', (progress) => {

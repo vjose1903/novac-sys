@@ -13,7 +13,9 @@
     "oneClick": false,
     "perMachine": true,
     "installerSidebar": "./icons/installer.bmp",
-    "uninstallerSidebar": "./icons/desinstaller.bmp"
+    "uninstallerSidebar": "./icons/desinstaller.bmp",
+    "artifactName": "adm.setup.${ext}",
+    "uninstallDisplayName": "adm"
   },
   "mac": {
     "icon": "./icons/mac/icon.icns",
