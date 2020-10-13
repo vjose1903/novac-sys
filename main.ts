@@ -122,8 +122,8 @@ autoUpdater.on('update-available', (info) => {
     type: 'info',
     buttons: ['ok'],
     title: 'Actualización disponible',
-    message: 'VjPOS presenta una nueva actualizacion se empezara a descargar ahora.',
-    detail: `Version: ${info.version} Fecha de actualizacion: ${fecha(info.releaseDate)}`,
+    message: 'VjPOS presenta una nueva actualizacion se empezará a descargar ahora.',
+    detail: `Version a descargar: ${info.version}`,
   };
 
 });

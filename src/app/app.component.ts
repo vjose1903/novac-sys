@@ -100,12 +100,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         res.body.total = parseFloat(GLOBAL.redondearAdos(res.body.total / 1000000));
         res.body.percent = parseFloat(GLOBAL.redondearAdos(res.body.percent));
         this.duplicarDataProgreso(res.body)
-
-        document.getElementById('modalProgress').click()
-        document.getElementById('ui-dialog').click()
-        document.getElementById('ui-dialog-titlebar').click()
-        document.getElementById('ui-dialog-titlebar').focus()
-        console.log(document.getElementById('ui-dialog-titlebar'));
         
         console.log('Despues --->', JSON.stringify(res.body));
       }

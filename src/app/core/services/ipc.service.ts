@@ -10,7 +10,12 @@ export class IpcService {
   PRINTERS = this.printers.asObservable();
 
 
-  objPercent
+  objPercent = {
+    transferred: 0,
+    total: 0,
+    percent: 0,
+    bytesPerSecond: 0,
+  }
 
   constructor() {
     if (window.require) {
