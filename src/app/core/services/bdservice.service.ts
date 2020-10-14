@@ -4,15 +4,13 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AppConfig } from '../../../environments/environment';
 import * as _ from 'lodash';
 @Injectable({
   providedIn: 'root',
 })
 export class DBservice {
-  // url = 'http://admservidor.ddns.net:3000';
-  // url = 'http://localhost:3000';
-  // url = 'http://192.168.1.14:3000';
-  url = 'http://192.168.0.123:3000';
+  url = AppConfig.url_server;
   ultimoMensajeMostrado: any;
 
   constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}

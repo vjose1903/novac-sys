@@ -1,4 +1,5 @@
 export const AppConfig = {
   production: false,
-  environment: 'LOCAL'
+  environment: 'LOCAL',
+  url_server:'http://admservidor.ddns.net:3000'
 };

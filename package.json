@@ -1,6 +1,6 @@
 {
   "name": "adm-agroindustrial",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Sistema inventario y facturacion ADM agroindustrial",
   "author": {
     "name": "Victor Vasquez",
@@ -99,6 +99,7 @@
     "bootstrap": "^4.3.1",
     "chart.js": "^2.7.2",
     "child_process": "^1.0.2",
+    "electron-log": "^4.2.4",
     "electron-updater": "^4.3.5",
     "fontawesome": "^5.6.3",
     "hammerjs": "~2.0.8",
