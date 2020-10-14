@@ -35,5 +35,11 @@
     "target": [
       "AppImage"
     ]
-  }
+  },
+  "publish": [
+    {
+    "provider": "generic",
+    "url": "http://admservidor.ddns.net:3000/actualizacion"
+    }
+    ]
 }
