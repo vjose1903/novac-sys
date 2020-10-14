@@ -105,6 +105,7 @@ autoUpdater.logger = require('electron-log');
 autoUpdater.logger.transports.file.level = 'info';
 
 autoUpdater.on('checking-for-update', () => {
+  win.webContents.send('checking-for-update', { msg: 'verificando actualizacion...' });
   console.log('checking-for-update');
 });
 
@@ -122,7 +123,8 @@ autoUpdater.on('update-available', (info) => {
   };
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) autoUpdater.quitAndInstall();
+    win.webContents.send('update-available', { msg: 'descargando actualizacion...', body: returnValue });
+    // if (returnValue.response === 0) autoUpdater.quitAndInstall();
   });
 });
 
@@ -131,6 +133,7 @@ autoUpdater.on('update-not-available', (info) => {
 });
 
 autoUpdater.on('download-progress', (progress) => {
+  win.webContents.send('download-progress', { msg: 'descarga porciento...', body: progress });
   console.log('download-progress', Math.floor(progress.percent));
 });
 
@@ -145,11 +148,13 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (returnValue.response === 0) autoUpdater.quitAndInstall();
+    win.webContents.send('update-downloaded', { msg: 'descarga finalizada...', body: returnValue });
   });
   // autoUpdater.quitAndInstall();
 });
 
 autoUpdater.on('error', (error) => {
+  win.webContents.send('update-error', { msg: 'error descargando actualizacion...', body: error });
   console.error('error', error);
 });
 

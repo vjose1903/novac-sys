@@ -6,6 +6,7 @@ import { ObservableServcie } from './core/services/observables.service';
 import { DBservice } from './core/services/bdservice.service';
 import { LoaderService } from './loader/loader.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { IpcService } from './core/services/ipc.service';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +16,14 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class AppComponent implements OnInit, AfterViewInit {
   loading = false;
   noServer = false;
-  constructor(private dbServ: DBservice, private loaderServ: LoaderService, private spinner: NgxSpinnerService, private cdRef: ChangeDetectorRef, public electronService: ElectronService) {
+  constructor(
+    private _ipc: IpcService,
+    private dbServ: DBservice,
+    private loaderServ: LoaderService,
+    private spinner: NgxSpinnerService,
+    private cdRef: ChangeDetectorRef,
+    public electronService: ElectronService,
+  ) {
     // setInterval(() => {
     //   this.buscarNoServer();
     // }, 20000);
@@ -57,6 +65,24 @@ export class AppComponent implements OnInit, AfterViewInit {
     // this.dbServ.getSecuenciaFacturas().subscribe(res => {
     //   this.obsServ.next_secuencia_factura(res);
     // });
+
+    this._ipc.on(' checking-for-update', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+    });
+    this._ipc.on('update-error', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+    });
+    this._ipc.on('update-available', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+    });
+
+    this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+    });
+
+    this._ipc.on('update-downloaded', (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+    });
   }
 
   ngAfterViewInit() {
