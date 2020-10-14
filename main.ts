@@ -156,7 +156,7 @@ autoUpdater.on('error', (error) => {
 // ==========================================================================================================================================================
 ipcMain.on('printerNames', (event: any, arg) => {
   // name of function
-  var printersName = win.webContents.getPrinters();
+  const printersName = win.webContents.getPrinters();
   event.sender.send('printersNameRes', printersName);
 });
 
@@ -238,12 +238,12 @@ function makePdf(dd, file) {
 }
 
 function imprimir(cFileName) {
-  // var args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
+  // const args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
   const { exec } = require('child_process');
   // "C:\Users\User\Desktop\factura.pdf" "EPSON LX-350 ESC/P"
   // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
 
-  var foxitPath = getFuncionalPath() + 'print\\FoxitReaderPortable.exe';
+  const foxitPath = getFuncionalPath() + 'print\\FoxitReaderPortable.exe';
 
   exec(`${foxitPath} /t "${getFuncionalPath('/' + cFileName)}"`, (error, stdout, stderr) => {
     if (error) {
@@ -255,15 +255,14 @@ function imprimir(cFileName) {
       win.webContents.send('printRes', { msg: 'Factura impresa correctamente!!', status: 'si' });
     }
   });
-  // exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\adm-agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
 }
 
 export function getFuncionalPath(addToPath = '') {
   let path_temp;
   let path_resolved;
 
-  let args_ = process.argv.slice(1);
-  let serve_ = args_.some((val) => val === '--serve');
+  const args_ = process.argv.slice(1);
+  const serve_ = args_.some((val) => val === '--serve');
 
   if (serve_) {
     console.log('');
@@ -286,8 +285,8 @@ export function getFuncionalPath(addToPath = '') {
 
 function PathAdd() {
   // if (process.platform === 'darwin') {
-  let path = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar.unpacked/';
-  let path_resolved = process.platform === 'darwin' ? path : path.split('/').join('\\');
+  const path = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar.unpacked/';
+  const path_resolved = process.platform === 'darwin' ? path : path.split('/').join('\\');
 
   console.log(path_resolved);
   return path_resolved;
