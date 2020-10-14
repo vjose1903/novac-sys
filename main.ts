@@ -1,19 +1,17 @@
-import { app, BrowserWindow, screen, ipcMain, IpcMessageEvent } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, IpcMessageEvent, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
+const autoUpdater = require('electron-updater').autoUpdater;
 const pdfmake = require('pdfmake/src/printer');
 
 const facturasCompraVenta = require(`${getFuncionalPath('/myPdf/facturasCompraVenta.js')}`);
 const recibosIngresos = require(`${getFuncionalPath('/myPdf/recibosIngresos.js')}`);
 const conduce = require(`${getFuncionalPath('/myPdf/conduce.js')}`);
 
-// import { makeFacturaVenta } from './mypdf/facturasCompraVenta';
-// import { makeRecibo } from './mypdf/recibosIngresos';
-// import { makeConduce } from './mypdf/conduce';
-
-// tslint:disable-next-line: one-variable-per-declaration
+// tslint:disable: curly
+// tslint:disable: one-variable-per-declaration
 let win, serve;
 const args = process.argv.slice(1);
 serve = args.some((val) => val === '--serve');
@@ -23,6 +21,9 @@ let contents;
 export let inicioRuta = __dirname;
 
 function createWindow() {
+  // autoUpdater.checkForUpdates();
+  autoUpdater.checkForUpdatesAndNotify();
+
   const electronScreen = screen;
   const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
@@ -95,7 +96,64 @@ try {
   // Catch Error
   throw e;
 }
+// ==========================================================================================================================================================
+// AUTO UPDATE
+// ==========================================================================================================================================================
 
+autoUpdater.logger = require('electron-log');
+
+autoUpdater.logger.transports.file.level = 'info';
+
+autoUpdater.on('checking-for-update', () => {
+  console.log('checking-for-update');
+});
+
+autoUpdater.on('update-available', (info) => {
+  console.log('update-available');
+  console.log('Version ', info.version);
+  console.log('Release Date ', info.releaseDate);
+
+  const dialogOpts: any = {
+    type: 'info',
+    buttons: ['Ok'],
+    title: 'Actualización',
+    message: 'Descargando...',
+    detail: `Version: ${info.version} Realease Date: ${info.releaseDate}`,
+  };
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) autoUpdater.quitAndInstall();
+  });
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  console.log('update-not-available');
+});
+
+autoUpdater.on('download-progress', (progress) => {
+  console.log('download-progress', Math.floor(progress.percent));
+});
+
+autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Reiniciar', 'Luego'],
+    title: 'Actualizacion',
+    message: process.platform === 'win32' ? releaseNotes : releaseName,
+    detail: 'Tiene actualizaciones pendientes...',
+  };
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) autoUpdater.quitAndInstall();
+  });
+  // autoUpdater.quitAndInstall();
+});
+
+autoUpdater.on('error', (error) => {
+  console.error('error', error);
+});
+
+// ==========================================================================================================================================================
 ipcMain.on('printerNames', (event: any, arg) => {
   // name of function
   var printersName = win.webContents.getPrinters();
@@ -146,7 +204,7 @@ function makePdf(dd, file) {
   const type_font = process.platform === 'darwin' ? 'roboto/Roboto' : 'roboto\\Roboto';
   const font_dir = process.platform === 'darwin' ? 'fonts/' : 'fonts\\';
 
-  const path = getFuncionalPath()
+  const path = getFuncionalPath();
 
   const fontDescriptors = {
     Roboto: {
@@ -162,7 +220,7 @@ function makePdf(dd, file) {
   const printer = new pdfmake(fontDescriptors);
 
   // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
-  const cFileName = getFuncionalPath('/'+file);
+  const cFileName = getFuncionalPath('/' + file);
   try {
     const pdfDoc = printer.createPdfKitDocument(dd);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
@@ -187,7 +245,7 @@ function imprimir(cFileName) {
 
   var foxitPath = getFuncionalPath() + 'print\\FoxitReaderPortable.exe';
 
-  exec(`${foxitPath} /t "${getFuncionalPath('/'+cFileName)}"`, (error, stdout, stderr) => {
+  exec(`${foxitPath} /t "${getFuncionalPath('/' + cFileName)}"`, (error, stdout, stderr) => {
     if (error) {
       win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err: error });
       return;
@@ -200,10 +258,9 @@ function imprimir(cFileName) {
   // exec(`"C:\\Program Files\\Adobe\\Reader 10.0\\Reader\\AcroRd32.exe" /t "C:\\Users\\User\\Documents\\proyectos\\adm-agroindustrial\\test.pdf" "EPSON LX-350 ESC/P"`, (error, stdout, stderr) => { });
 }
 
-
 export function getFuncionalPath(addToPath = '') {
-  let path_temp
-  let path_resolved
+  let path_temp;
+  let path_resolved;
 
   let args_ = process.argv.slice(1);
   let serve_ = args_.some((val) => val === '--serve');
@@ -213,28 +270,27 @@ export function getFuncionalPath(addToPath = '') {
     console.error('-=-=-=-=-=-=-=-= DESARROLLO -=-=-=-=-=-=-=-=-=-');
 
     path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
-
   } else {
     console.error('-=-=-=-=-=-=-=-= PRODUCCION -=-=-=-=-=-=-=-=-=-');
     path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar.unpacked';
   }
-  path_temp = path_temp + addToPath
+  path_temp = path_temp + addToPath;
 
-  path_resolved = process.platform === 'darwin' ? path_temp : path_temp.split("/").join("\\");
+  path_resolved = process.platform === 'darwin' ? path_temp : path_temp.split('/').join('\\');
 
-  console.log('path_resolved ',path_resolved);
-  
+  console.log('path_resolved ', path_resolved);
+
   console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=');
-  return path_resolved
+  return path_resolved;
 }
 
 function PathAdd() {
   // if (process.platform === 'darwin') {
   let path = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar.unpacked/';
-  let path_resolved = process.platform === 'darwin' ? path : path.split("/").join("\\")
+  let path_resolved = process.platform === 'darwin' ? path : path.split('/').join('\\');
 
   console.log(path_resolved);
-  return path_resolved
+  return path_resolved;
   //   console.log('AQUIIIIIIII --->  ',app.getPath('exe'))
   //   console.log('--->  ', app.name)
 
@@ -249,5 +305,4 @@ function PathAdd() {
   //  app.name +
   //  '/resources/app.asar.unpacked/'
   // );
-
 }

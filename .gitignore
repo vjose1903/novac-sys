@@ -13,6 +13,8 @@ src/**/*.js
 
 # dependencies
 /node_modules
+/actualizacion
+actualizacion.zip
 
 # IDEs and editors
 /.idea
