@@ -197,25 +197,25 @@ ipcMain.on('print', (event: any, oPdf) => {
   const data = oPdf.data;
   const type = oPdf.type;
 
-  puts(oPdf, 190);
-  puts(`${facturasCompraVenta} -- ${getFuncionalPath('/myPdf/facturasCompraVenta.js')}`);
-  puts(`${recibosIngresos} -- ${getFuncionalPath('/myPdf/recibosIngresos.js')}`);
-  puts(`${conduce} -- ${getFuncionalPath('/myPdf/conduce.js')}`);
+  puts(oPdf, 200);
+  getFuncionalPath('/myPdf/facturasCompraVenta.js')
+  getFuncionalPath('/myPdf/recibosIngresos.js')
+  getFuncionalPath('/myPdf/conduce.js')
   try {
     switch (type) {
       case 'recibo_ingreso':
-        puts(facturasCompraVenta)
-        obj = facturasCompraVenta.makeRecibo(data);
+        puts(JSON.stringify(recibosIngresos))
+        obj = recibosIngresos.makeRecibo(data);
         break;
 
       case 'conduce':
-        puts(recibosIngresos)
-        obj = recibosIngresos.makeConduce(data);
+        puts(JSON.stringify(conduce))
+        obj = conduce.makeConduce(data);
         break;
 
       case 'facturacion':
-        puts(conduce)
-        obj = conduce.makeFacturaVenta(data);
+        puts(JSON.stringify(facturasCompraVenta))
+        obj = facturasCompraVenta.makeFacturaVenta(data);
         break;
 
       default:
@@ -223,7 +223,7 @@ ipcMain.on('print', (event: any, oPdf) => {
         break;
     }
 
-    puts(obj, 210);
+    puts(obj, 226);
     if (todo_true) {
       const dd = obj.doc;
       const file = obj.file;
@@ -246,25 +246,22 @@ function returnErrorPDF() {
 // ==========================================================================================================================================================
 
 function makePdf(dd, file) {
-  const type_font = process.platform === 'darwin' ? 'roboto/Roboto' : 'roboto\\Roboto';
-  const font_dir = process.platform === 'darwin' ? 'fonts/' : 'fonts\\';
 
-  const path = getFuncionalPath();
+  const font_dir = getFuncionalPath('/fonts/roboto/Roboto');
 
   const fontDescriptors = {
     Roboto: {
-      normal: path + font_dir + type_font + '-Regular.ttf',
-      bold: path + font_dir + type_font + '-Bold.ttf',
-      italics: path + font_dir + type_font + '-Italic.ttf',
-      bolditalics: path + font_dir + type_font + '-BoldItalic.ttf',
+      normal: font_dir+'-Regular.ttf',
+      bold: font_dir+'-Bold.ttf',
+      italics: font_dir+'-Italic.ttf',
+      bolditalics: font_dir+'-BoldItalic.ttf',
     },
   };
-
-  console.log(' fontDescriptors ', fontDescriptors);
 
   const printer = new pdfmake(fontDescriptors);
 
   // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
+  puts('path donde guardara el pdf');
   const cFileName = getFuncionalPath('/' + file);
   try {
     const pdfDoc = printer.createPdfKitDocument(dd);
@@ -277,7 +274,7 @@ function makePdf(dd, file) {
   } catch (err) {
     console.log('::::::::ERROR::::::::');
     console.log(err);
-    puts(err, 258);
+    puts(err, 280);
     win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false, error: err });
   }
 }

@@ -26,8 +26,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     // arriba 38
     // abajo 40
     // enter 13
+    // control 17
+    // shift 16
+    // alt 18
     event.stopPropagation();
     const key = event.keyCode;
+console.log(key);
 
     if (event.type === 'keydown') {
       if (!this.secuenciaKeys.includes(key)) {
@@ -37,7 +41,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       const conbinacion = _.join(this.secuenciaKeys, '_');
       this.secuenciaKeys = [];
 
-      if (conbinacion === '91_80') {
+      if (conbinacion === '17_80') {
         this.imprimirFactura();
       }
     }
