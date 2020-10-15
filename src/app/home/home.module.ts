@@ -8,16 +8,10 @@ import { SharedModule } from '../shared/shared.module';
 import { AngularModule } from '../modules/angular.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { MdBootstrapModule } from '../modules/md-bootstrap.module';
+import { PrimengModule } from '../modules/primeng.module';
 
 @NgModule({
   declarations: [HomeComponent],
-  imports: [
-    CommonModule,
-    SharedModule,
-    HomeRoutingModule,
-    AngularModule,
-    MDBBootstrapModule,
-    MdBootstrapModule,
-  ]
+  imports: [PrimengModule, CommonModule, SharedModule, HomeRoutingModule, AngularModule, MDBBootstrapModule, MdBootstrapModule],
 })
 export class HomeModule {}

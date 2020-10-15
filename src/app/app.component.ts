@@ -7,6 +7,7 @@ import { DBservice } from './core/services/bdservice.service';
 import { LoaderService } from './loader/loader.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { IpcService } from './core/services/ipc.service';
+import { GLOBAL } from './core/services/GLOBAL';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,8 @@ import { IpcService } from './core/services/ipc.service';
 export class AppComponent implements OnInit, AfterViewInit {
   loading = false;
   noServer = false;
+  objProgress;
+  displayPercent = false;
   constructor(
     private _ipc: IpcService,
     private dbServ: DBservice,
@@ -77,10 +80,20 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
 
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
+      if (res && res.body) {
+        this.displayPercent = true;
+
+        res.body.transferred = GLOBAL.redondearAdos(res.body.transferred);
+        res.body.total = GLOBAL.redondearAdos(res.body.total);
+        res.body.percent = GLOBAL.redondearAdos(res.body.percent);
+
+        this.objProgress = res.body;
+      }
       console.log(res);
     });
 
     this._ipc.on('update-downloaded', (event: Electron.IpcMessageEvent, res) => {
+      this.displayPercent = false;
       console.log(res);
     });
 

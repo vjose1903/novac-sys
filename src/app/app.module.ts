@@ -32,6 +32,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { LoaderService } from './loader/loader.service';
 import { LoaderInterceptor } from './loader/loader.interceptor';
 import { NgInitDirective } from './directives/ngInit';
+import { PrimengModule } from './modules/primeng.module';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -45,6 +46,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     //  UploadImgComponent
   ],
   imports: [
+    PrimengModule,
     BrowserModule,
     FormsModule,
     HttpClientModule,

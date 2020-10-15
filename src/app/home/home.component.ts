@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit {
   loginForm: FormGroup;
   errorC = '';
   errorU = '';
+
   constructor(
     private dbServ: DBservice,
     private pdfServ: PdfService,

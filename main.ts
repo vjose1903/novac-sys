@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 const autoUpdater = require('electron-updater').autoUpdater;
 const pdfmake = require('pdfmake/src/printer');
 
@@ -112,28 +113,22 @@ autoUpdater.on('checking-for-update', () => {
 });
 
 autoUpdater.on('update-available', (info) => {
-  console.log('update-available');
-  console.log('Version ', info.version);
-  console.log('Release Date ', info.releaseDate);
-
   const dialogOpts: any = {
     type: 'info',
-    buttons: ['Ok'],
-    title: 'Actualización',
-    message: 'Descargando...',
-    detail: `Version: ${info.version} Realease Date: ${info.releaseDate}`,
+    buttons: ['No', 'Si'],
+    title: 'Actualización disponible',
+    message: 'VjPOS presenta una nueva actualizacion desea descargarla ahora.',
+    detail: `Version: ${info.version} Fecha de actualizacion: ${fecha(info.releaseDate)}`,
   };
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (win) {
       win.webContents.send('update-available', { msg: 'descargando actualizacion...', body: returnValue });
     }
-    // if (returnValue.response === 0) autoUpdater.quitAndInstall();
+    if (returnValue.response === 0) {
+      return;
+    }
   });
-});
-
-autoUpdater.on('update-not-available', (info) => {
-  console.log('update-not-available');
 });
 
 autoUpdater.on('download-progress', (progress) => {
@@ -147,9 +142,9 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   const dialogOpts = {
     type: 'info',
     buttons: ['Reiniciar', 'Luego'],
-    title: 'Actualizacion',
+    title: 'Actualizacion descargada',
     message: process.platform === 'win32' ? releaseNotes : releaseName,
-    detail: 'Tiene actualizaciones pendientes...',
+    detail: 'Para que las actualizaciones sean efectivas debe de reiniciar la aplicacion.',
   };
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
@@ -159,6 +154,10 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     }
   });
   // autoUpdater.quitAndInstall();
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  console.log('update-not-available');
 });
 
 autoUpdater.on('error', (error) => {
@@ -176,24 +175,22 @@ ipcMain.on('printerNames', (event: any, arg) => {
 
 ipcMain.on('getVersion', (event: any, arg) => {
   // name of function
-  
-  var pjson = require('./package.json')
-  console.log( '----> ',pjson.version);
-  event.reply('versionResponse', pjson.version)
-});
 
+  var pjson = require('./package.json');
+  console.log('----> ', pjson.version);
+  event.reply('versionResponse', pjson.version);
+});
 
 function puts(msg_, linea_ = undefined) {
   if (win) {
-
-    let obj
+    let obj;
     if (linea_) {
       obj = {
         linea: linea_,
-        msg: msg_
-      }
+        msg: msg_,
+      };
     } else {
-      obj = msg_
+      obj = msg_;
     }
     win.webContents.send('log', obj);
   }
@@ -209,17 +206,14 @@ ipcMain.on('print', (event: any, oPdf) => {
   try {
     switch (type) {
       case 'recibo_ingreso':
-        
         obj = recibosIngresos.makeRecibo(data);
         break;
 
       case 'conduce':
-        
         obj = conduce.makeConduce(data);
         break;
 
       case 'facturacion':
-        
         obj = facturasCompraVenta.makeFacturaVenta(data);
         break;
 
@@ -228,12 +222,10 @@ ipcMain.on('print', (event: any, oPdf) => {
         break;
     }
 
-    
     if (todo_true) {
       const dd = obj.doc;
       const file = obj.file;
       makePdf(dd, file);
-
     } else {
       returnErrorPDF();
     }
@@ -251,15 +243,14 @@ function returnErrorPDF() {
 // ==========================================================================================================================================================
 
 function makePdf(dd, file) {
-
   const font_dir = getFuncionalPath('/fonts/roboto/Roboto');
 
   const fontDescriptors = {
     Roboto: {
-      normal: font_dir+'-Regular.ttf',
-      bold: font_dir+'-Bold.ttf',
-      italics: font_dir+'-Italic.ttf',
-      bolditalics: font_dir+'-BoldItalic.ttf',
+      normal: font_dir + '-Regular.ttf',
+      bold: font_dir + '-Bold.ttf',
+      italics: font_dir + '-Italic.ttf',
+      bolditalics: font_dir + '-BoldItalic.ttf',
     },
   };
 
@@ -332,25 +323,8 @@ export function getFuncionalPath(addToPath = '') {
   return path_resolved;
 }
 
-function PathAdd() {
-  // if (process.platform === 'darwin') {
-  const path = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar.unpacked/';
-  const path_resolved = process.platform === 'darwin' ? path : path.split('/').join('\\');
-
-  console.log(path_resolved);
-  return path_resolved;
-  //   console.log('AQUIIIIIIII --->  ',app.getPath('exe'))
-  //   console.log('--->  ', app.name)
-
-  // return (
-  //  app.getPath('exe').substr(
-  //     0,
-  //     app
-  //      .getPath('exe')
-  //       .toLowerCase()
-  //       .indexOf(app.name.toLowerCase()),
-  //   ) +
-  //  app.name +
-  //  '/resources/app.asar.unpacked/'
-  // );
+function fecha(a: any) {
+  moment.locale('es');
+  const fechaFormato = moment(a).format('DD/MM/YYYY');
+  return fechaFormato;
 }

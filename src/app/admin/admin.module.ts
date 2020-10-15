@@ -4,8 +4,6 @@ import { AppRoutingModule } from '../app-routing.module';
 import { AngularModule } from '../modules/angular.module';
 import { NgxBootstrapModule } from '../modules/ngx-bootstrap.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
-import { DialogModule } from 'primeng/dialog';
-import { ProgressBarModule } from 'primeng/progressbar';
 
 // componentes
 import { HomeAdminComponent } from './home/homeAdmin.component';
@@ -43,6 +41,7 @@ import { ConduceComponent } from './conduce/conduce.component';
 import { ModalSeleccinarArticuloComponent } from './conduce/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 import { NgInitDirective } from '../directives/ngInit';
 import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
+import { PrimengModule } from '../modules/primeng.module';
 
 @NgModule({
   declarations: [
@@ -75,11 +74,9 @@ import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
     ConduceComponent,
     ModalSeleccinarArticuloComponent,
     ReciboViajesComponent,
-
   ],
   imports: [
-    DialogModule,
-    ProgressBarModule,
+    PrimengModule,
     TablasModule,
     CommonModule,
     AppRoutingModule,
