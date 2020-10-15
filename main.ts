@@ -174,6 +174,15 @@ ipcMain.on('printerNames', (event: any, arg) => {
   const printersName = win.webContents.getPrinters();
 });
 
+ipcMain.on('getVersion', (event: any, arg) => {
+  // name of function
+  
+  var pjson = require('./package.json')
+  console.log( '----> ',pjson.version);
+  event.reply('versionResponse', pjson.version)
+});
+
+
 function puts(msg_, linea_ = undefined) {
   if (win) {
 
@@ -197,24 +206,20 @@ ipcMain.on('print', (event: any, oPdf) => {
   const data = oPdf.data;
   const type = oPdf.type;
 
-  puts(oPdf, 200);
-  getFuncionalPath('/myPdf/facturasCompraVenta.js')
-  getFuncionalPath('/myPdf/recibosIngresos.js')
-  getFuncionalPath('/myPdf/conduce.js')
   try {
     switch (type) {
       case 'recibo_ingreso':
-        puts(JSON.stringify(recibosIngresos))
+        
         obj = recibosIngresos.makeRecibo(data);
         break;
 
       case 'conduce':
-        puts(JSON.stringify(conduce))
+        
         obj = conduce.makeConduce(data);
         break;
 
       case 'facturacion':
-        puts(JSON.stringify(facturasCompraVenta))
+        
         obj = facturasCompraVenta.makeFacturaVenta(data);
         break;
 
@@ -223,7 +228,7 @@ ipcMain.on('print', (event: any, oPdf) => {
         break;
     }
 
-    puts(obj, 226);
+    
     if (todo_true) {
       const dd = obj.doc;
       const file = obj.file;

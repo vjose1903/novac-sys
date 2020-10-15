@@ -32,6 +32,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   PrintersInstall: any;
   OpenPrinterMenu = false;
   imgUser: string;
+  versionApp: any;
   // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
   constructor(
     private dbServ: DBservice,
@@ -58,6 +59,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
     .pipe(map((result) => result.matches));
 
   ngOnInit() {
+
     this.usuario = JSON.parse(this.dbServ.getEmpleado());
 
     if (this.usuario.sexo === 'm') {
@@ -72,13 +74,22 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         this.PrintersInstall = res;
       }
     });
+    this.searchVersion()
   }
+
+  async searchVersion() {
+    this._ipc.send('getVersion')
+    await this._ipc.on('versionResponse', (event, arg) => {
+      this.versionApp = arg
+    })
+  }
+  
   ngOnDestroy() {
     // this.sub.unsubscribe();
   }
 
   element: HTMLElement;
-  ngAfterViewInit() {}
+  ngAfterViewInit() { }
 
   stop(e) {
     this.OpenPrinterMenu = true;
@@ -230,7 +241,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         break;
     }
   }
-  modalConfig() {}
+  modalConfig() { }
   // ===========================================================================
   // MODAL
   // ===========================================================================
