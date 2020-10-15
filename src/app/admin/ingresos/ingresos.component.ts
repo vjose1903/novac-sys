@@ -12,7 +12,7 @@ import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../components/tablas/tablas.component';
 import { ModalService } from '../components/modal/modal.service';
 import { obj_paginate, TablasService } from '../components/tablas/tablas.service';
-import { recibo_de_ingreso } from '../../../assets/facturas';
+import { recibo_de_ingreso } from 'assets/facturas';
 import { IpcService } from '../../core/services/ipc.service';
 
 @Component({

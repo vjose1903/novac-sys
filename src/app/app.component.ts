@@ -83,6 +83,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     this._ipc.on('update-downloaded', (event: Electron.IpcMessageEvent, res) => {
       console.log(res);
     });
+
+    this._ipc.on('log', (event: Electron.IpcMessageEvent, res) => {
+      console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
+      console.log('MAIN LOG');
+      console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
+      console.log(res);
+      console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
+    });
   }
 
   ngAfterViewInit() {
