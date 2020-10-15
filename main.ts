@@ -164,26 +164,47 @@ ipcMain.on('printerNames', (event: any, arg) => {
   const printersName = win.webContents.getPrinters();
 });
 
-function puts(msg) {
-  win.webContents.send('log', msg);
+function puts(msg_, linea_ = undefined) {
+  if (win) {
+
+    let obj
+    if (linea_) {
+      obj = {
+        linea: linea_,
+        msg: msg_
+      }
+    } else {
+      obj = msg_
+    }
+    win.webContents.send('log', obj);
+  }
 }
 
 ipcMain.on('print', (event: any, oPdf) => {
   let obj;
   let todo_true = true;
+
   const data = oPdf.data;
   const type = oPdf.type;
+
+  puts(oPdf, 190);
+  puts(`${facturasCompraVenta} -- ${getFuncionalPath('/myPdf/facturasCompraVenta.js')}`);
+  puts(`${recibosIngresos} -- ${getFuncionalPath('/myPdf/recibosIngresos.js')}`);
+  puts(`${conduce} -- ${getFuncionalPath('/myPdf/conduce.js')}`);
   try {
     switch (type) {
       case 'recibo_ingreso':
+        puts(facturasCompraVenta)
         obj = facturasCompraVenta.makeRecibo(data);
         break;
 
       case 'conduce':
+        puts(recibosIngresos)
         obj = recibosIngresos.makeConduce(data);
         break;
 
       case 'facturacion':
+        puts(conduce)
         obj = conduce.makeFacturaVenta(data);
         break;
 
@@ -191,19 +212,18 @@ ipcMain.on('print', (event: any, oPdf) => {
         todo_true = false;
         break;
     }
+
+    puts(obj, 210);
+    if (todo_true) {
+      const dd = obj.doc;
+      const file = obj.file;
+      makePdf(dd, file);
+
+    } else {
+      returnErrorPDF();
+    }
   } catch (error) {
-    const line = /\(file:[\w\d/.-]+:([\d]+)/.exec(new Error().stack)[1];
-    error['linea_error_dinamic1'] = line;
-    error['linea_error_dinamic2'] = line + 3;
-    error['linea_error'] = 199;
-    puts(error);
-  }
-  if (todo_true) {
-    const dd = obj.doc;
-    const file = obj.file;
-    makePdf(dd, file);
-  } else {
-    returnErrorPDF();
+    puts(error, 207);
   }
 });
 
@@ -247,11 +267,7 @@ function makePdf(dd, file) {
   } catch (err) {
     console.log('::::::::ERROR::::::::');
     console.log(err);
-    const line = /\(file:[\w\d/.-]+:([\d]+)/.exec(new Error().stack)[1];
-    err['linea_error_dinamic1'] = line;
-    err['linea_error_dinamic2'] = line + 3;
-    err['linea_error'] = 254;
-    puts(err);
+    puts(err, 258);
     win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false, error: err });
   }
 }
@@ -266,11 +282,7 @@ function imprimir(cFileName) {
 
   exec(`${foxitPath} /t "${getFuncionalPath('/' + cFileName)}"`, (error, stdout, stderr) => {
     if (error) {
-      const line = /\(file:[\w\d/.-]+:([\d]+)/.exec(new Error().stack)[1];
-      error['linea_error_dinamic1'] = line;
-      error['linea_error_dinamic2'] = line + 3;
-      error['linea_error'] = 273;
-      puts(error);
+      puts(error, 273);
       win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err: error });
       return;
     } else {
