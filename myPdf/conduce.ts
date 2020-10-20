@@ -1,6 +1,4 @@
 import * as fun_  from './utils/funciones';
-const _ = require(`${fun_.getFuncionalPath(true, '/lodash')}`);
-const moment = require(`${fun_.getFuncionalPath(true, '/moment')}`);
 import { logoADM } from './utils/files';
 
 // ==========================================================================================================================================================
@@ -90,7 +88,7 @@ function cabeceraConduce(data) {
       columns: [
         [
           {
-            text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: _.capitalize(data.cliente.nombre) + ' ' + _.capitalize(data.cliente.apellido) }],
+            text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: fun_.my_capitalize(data.cliente.nombre) + ' ' + fun_.my_capitalize(data.cliente.apellido) }],
             margin: [0, 0, 0, 0],
           },
           {
@@ -113,8 +111,8 @@ function cabeceraConduce(data) {
           {
             text: [
               { text: 'Fecha: ', fontSize: 12, bold: true },
-              { text: fechaParse(data.fecha_equivalente), fontSize: 12 },
-              { text: ' - ' + hora(data.fecha_equivalente), fontSize: 12 },
+              { text: fun_.my_dateFormater(data.fecha_equivalente), fontSize: 12 },
+              { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), fontSize: 12 },
             ],
             margin: [70, 0, 0, 0],
           },
@@ -122,7 +120,7 @@ function cabeceraConduce(data) {
           {
             text: [
               { text: 'Doc No: ', fontSize: 12, bold: true },
-              { text: _.padStart(data.numero_conduce, 8, '0'), fontSize: 12 },
+              { text: fun_.my_padStart(data.numero_conduce, 8, '0'), fontSize: 12 },
             ],
             margin: [70, 3, 0, 0],
           },
@@ -200,7 +198,7 @@ function contenidoConduce(data) {
 
     row.push(
       { text: i + 1, pageBreak: br_ ? 'before' : 'none' },
-      { text: numFormatTwoDecimals(detalle.cantidad), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 10, 0] },
+      { text: fun_.numFormatTwoDecimals(detalle.cantidad), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 10, 0] },
       { text: detalle.unidad, pageBreak: br_ ? 'before' : 'none', alignment: 'right', margin: [0, 0, 50, 0] },
       { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none', alignment: 'left' },
     );
@@ -233,7 +231,7 @@ function contenidoConduce(data) {
     {
       text: [
         { text: 'Realizado Por :  ', style: 'letra11', bold: true },
-        { text: _.capitalize(data.user.nombre) + ' ' + _.capitalize(data.user.apellido), style: 'letra11' },
+        { text: fun_.my_capitalize(data.user.nombre) + ' ' + fun_.my_capitalize(data.user.apellido), style: 'letra11' },
       ],
 
       margin: [5, 5, 0, 0],
@@ -284,59 +282,6 @@ function contenidoConduce(data) {
   ];
 
   return content;
-}
-
-// ==========================================================================================================================================================
-
-function redondearAdos(num) {
-  const string = num + '';
-  const splitStr = _.split(string, '.');
-
-  let enteros = splitStr[0];
-
-  const splitEnteros = _.split(enteros, ',');
-
-  enteros = _.join(splitEnteros, '');
-
-  let tempdecimales = splitStr[1];
-  if (splitStr.length === 1) {
-    tempdecimales = '00';
-  }
-
-  const decimales = tempdecimales.substring(0, 2);
-  const Arreglo = [enteros, decimales];
-  const numStr = _.join(Arreglo, '.');
-
-  return parseFloat(numStr).toFixed(2);
-}
-
-function formatearNumero(nStr) {
-  if (nStr !== undefined) {
-    nStr += '';
-    const x = nStr.split('.');
-    let x1 = x[0];
-    const x2 = x.length > 1 ? '.' + x[1] : '';
-    const rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-    }
-    return x1 + x2;
-  }
-}
-// =========================================================================================================
-function numFormatTwoDecimals(num) {
-  return formatearNumero(redondearAdos(num));
-}
-
-function fechaParse(a: any) {
-  moment.locale('es');
-  const fechaFormato = moment(a).format('DD/MM/YYYY');
-  return fechaFormato;
-}
-function hora(a: any) {
-  moment.locale('es');
-  const horaFormato = moment(a).format('hh:mm a');
-  return horaFormato;
 }
 
 

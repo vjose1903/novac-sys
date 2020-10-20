@@ -1,8 +1,6 @@
+import * as numLetra  from './utils/numero_letras';
 import * as fun_  from './utils/funciones';
-const _ = require(`${fun_.getFuncionalPath(true, '/lodash')}`);
-const moment = require(`${fun_.getFuncionalPath(true, '/moment')}`);
 import { logoADM } from './utils/files';
-const numLetra = require(`${fun_.getFuncionalPath(false, '/utils/numero_letras')}`);
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
@@ -91,7 +89,7 @@ function cabeceraRecibo(data) {
       columns: [
         [
           {
-            text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: _.capitalize(data.cliente.nombre) + ' ' + _.capitalize(data.cliente.apellido) }],
+          text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: fun_.my_capitalize(data.cliente.nombre) + ' ' + fun_.my_capitalize(data.cliente.apellido) }],
             margin: [0, 0, 0, 0],
           },
           {
@@ -114,8 +112,8 @@ function cabeceraRecibo(data) {
           {
             text: [
               { text: 'Fecha: ', fontSize: 12, bold: true },
-              { text: fechaParse(data.fecha_equivalente), fontSize: 12 },
-              { text: ' - ' + hora(data.fecha_equivalente), fontSize: 12 },
+              { text: fun_.my_dateFormater(data.fecha_equivalente), fontSize: 12 },
+              { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), fontSize: 12 },
             ],
             margin: [60, 0, 0, 0],
           },
@@ -123,7 +121,7 @@ function cabeceraRecibo(data) {
           {
             text: [
               { text: 'Doc No: ', fontSize: 12, bold: true },
-              { text: _.padStart(data.numero_recibo, 8, '0'), fontSize: 12 },
+              { text: fun_.my_padStart(data.numero_recibo, 8, '0'), fontSize: 12 },
             ],
             margin: [60, 3, 0, 0],
           },
@@ -131,7 +129,7 @@ function cabeceraRecibo(data) {
       ],
     },
     {
-      text: [{ text: 'Recibido: ', fontSize: 12, bold: true }, { text: numFormatTwoDecimals(data.total) }, { text: ` - ${_.capitalize(numero_letra)}` }],
+      text: [{ text: 'Recibido: ', fontSize: 12, bold: true }, { text: fun_.numFormatTwoDecimals(data.total) }, { text: ` - ${fun_.my_capitalize(numero_letra)}` }],
       margin: [15, 3, 0, 0],
     },
     { canvas: [{ type: 'rect', x: 10, y: 5, w: 795, h: 2, color: '#000000' }] },
@@ -209,20 +207,20 @@ function contenidoRecibo(data) {
   const tempBody = [];
   data.detalle_recibos.forEach((detalle, i) => {
     const row = [];
-    const tipo = _.split(detalle.descripcion, ' ')[0];
-    const valor = _.split(detalle.descripcion, ' ')[1];
-    const fecha = _.split(detalle.descripcion, ' ')[2];
+    const tipo = fun_.my_stringSplit(detalle.descripcion, ' ')[0];
+    const valor = fun_.my_stringSplit(detalle.descripcion, ' ')[1];
+    const fecha = fun_.my_stringSplit(detalle.descripcion, ' ')[2];
 
     const br_ = i !== 0 && i % 10 === 0;
 
     row.push(
       { text: i + 1, pageBreak: br_ ? 'before' : 'none' },
-      { text: fechaParse(fecha), pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
+      { text:  fun_.my_dateFormater(fecha), pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
       { text: valor, pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
-      { text: numFormatTwoDecimals(detalle.total_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
-      { text: numFormatTwoDecimals(detalle.balance_anterior_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
-      { text: numFormatTwoDecimals(detalle.deposito), pageBreak: br_ ? 'before' : 'none', alignment: 'right' },
-      { text: numFormatTwoDecimals(detalle.balance_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 20, 0] },
+      { text: fun_.numFormatTwoDecimals(detalle.total_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
+      { text: fun_.numFormatTwoDecimals(detalle.balance_anterior_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
+      { text: fun_.numFormatTwoDecimals(detalle.deposito), pageBreak: br_ ? 'before' : 'none', alignment: 'right' },
+      { text: fun_.numFormatTwoDecimals(detalle.balance_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 20, 0] },
     );
     tempBody.push(row);
   });
@@ -253,7 +251,7 @@ function contenidoRecibo(data) {
     {
       text: [
         { text: 'Realizado Por :  ', style: 'letra11', bold: true },
-        { text: _.capitalize(data.user.nombre) + ' ' + _.capitalize(data.user.apellido), style: 'letra11' },
+        { text: fun_.my_capitalize(data.user.nombre) + ' ' + fun_.my_capitalize(data.user.apellido), style: 'letra11' },
       ],
 
       margin: [5, 5, 0, 0],
@@ -306,7 +304,7 @@ function contenidoRecibo(data) {
                             text: 'TOTAL RD$:         ',
                             bold: true,
                           },
-                          { text: numFormatTwoDecimals(data.total), fontSize: 12 },
+                          { text: fun_.numFormatTwoDecimals(data.total), fontSize: 12 },
                         ],
                       },
                     ],
@@ -320,151 +318,8 @@ function contenidoRecibo(data) {
       ],
       unbreakable: true,
     },
-    //   margin: [0, 5, 0, 0],
-    // },
-    // // -----------------------
-    // {
-    //   stack: [
-    //     {
-    //       columns: [
-    //         [
-    //           {
-    //             stack: [
-    //               {
-    //                 canvas: [
-    //                   {
-    //                     type: 'rect',
-    //                     x: 10,
-    //                     y: 0,
-    //                     w: 140,
-    //                     h: 1,
-    //                     color: '#000000',
-    //                   },
-    //                   {
-    //                     type: 'rect',
-    //                     x: 200,
-    //                     y: 0,
-    //                     w: 140,
-    //                     h: 1,
-    //                     color: '#000000',
-    //                   },
-    //                 ],
-    //                 margin: [0, 80, 0, 0],
-    //               },
-    //               {
-    //                 columns: [
-    //                   [
-    //                     {
-    //                       text: [{ text: 'Revisada Por', style: 'letra12', bold: true }],
-    //                       margin: [45, 5, 0, 0],
-    //                     },
-    //                   ],
-    //                   [
-    //                     {
-    //                       text: [{ text: 'Cliente', style: 'letra12', bold: true }],
-    //                       margin: [45, 5, 0, 0],
-    //                     },
-    //                   ],
-    //                 ],
-    //               },
-    //             ],
-    //             margin: [0, -40, 0, 0],
-    //           },
-    //         ],
-    //         [
-    //           {
-    //             margin: [0, -12, 0, 0],
-    //             table: {
-    //               widths: ['*', 'auto'],
-    //               body: [
-    //                 [
-    //                   { text: 'Bruto RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-    //                   { text: numFormatTwoDecimals(data.Bruto), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
-    //                 ],
-    //                 [
-    //                   { text: 'Itbis RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-    //                   { text: numFormatTwoDecimals(data.itbis), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
-    //                 ],
-    //                 [
-    //                   { text: 'Descuento RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-    //                   { text: numFormatTwoDecimals(data.descuento), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
-    //                 ],
-    //                 [
-    //                   { text: 'TOTAL RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-    //                   { text: numFormatTwoDecimals(data.total_factura), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
-    //                 ],
-    //                 data.FACTURA_DE === 'compra' || data.FACTURA_DE === 'nota'
-    //                   ? [{ text: '' }, { text: '' }]
-    //                   : [
-    //                       { text: 'Devuelta RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-    //                       { text: numFormatTwoDecimals(data.devuelta), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
-    //                     ],
-    //               ],
-    //             },
-    //             layout: 'noBorders',
-    //             // margin: [585, 3, 0, 0],
-    //           },
-    //         ],
-    //       ],
-    //     },
-    //   ],
-    //   unbreakable: true,
-    // },
-    // // -----------------------
+  
   ];
 
   return content;
-}
-
-// ==========================================================================================================================================================
-
-function redondearAdos(num) {
-  const string = num + '';
-  const splitStr = _.split(string, '.');
-
-  let enteros = splitStr[0];
-
-  const splitEnteros = _.split(enteros, ',');
-
-  enteros = _.join(splitEnteros, '');
-
-  let tempdecimales = splitStr[1];
-  if (splitStr.length === 1) {
-    tempdecimales = '00';
-  }
-
-  const decimales = tempdecimales.substring(0, 2);
-  const Arreglo = [enteros, decimales];
-  const numStr = _.join(Arreglo, '.');
-
-  return parseFloat(numStr).toFixed(2);
-}
-
-function formatearNumero(nStr) {
-  if (nStr !== undefined) {
-    nStr += '';
-    const x = nStr.split('.');
-    let x1 = x[0];
-    const x2 = x.length > 1 ? '.' + x[1] : '';
-    const rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-    }
-    return x1 + x2;
-  }
-}
-// =========================================================================================================
-function numFormatTwoDecimals(num) {
-  return formatearNumero(redondearAdos(num));
-}
-
-function fechaParse(a: any) {
-  moment.locale('es');
-  const fechaFormato = moment(a).format('DD/MM/YYYY');
-  return fechaFormato;
-}
-function hora(a: any) {
-  moment.locale('es');
-  const horaFormato = moment(a).format('hh:mm a');
-  return horaFormato;
 }

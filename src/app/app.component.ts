@@ -19,9 +19,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   noServer = false;
   objProgress;
   displayPercent = false;
-  tiempo_restante
-  objPercent
-  
+  tiempo_restante;
+  objPercent;
+
   constructor(
     public _ipc: IpcService,
     private dbServ: DBservice,
@@ -77,11 +77,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this._ipc.on('update-error', (event: Electron.IpcMessageEvent, res) => {
       if (res) {
-        this.dbServ.toastError(res.msg, 'ERRROR')
+        this.dbServ.toastError(res.msg, 'ERRROR');
         this.displayPercent = false;
       }
       console.log(res);
     });
+
     this._ipc.on('update-available', (event: Electron.IpcMessageEvent, res) => {
       console.log(res);
       this.displayPercent = true;
@@ -90,24 +91,24 @@ export class AppComponent implements OnInit, AfterViewInit {
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
       if (res && res.body) {
         console.log('Antes---> ', JSON.stringify(res.body));
-        this.tiempo_restante = this.timeConvert(res.body.total / res.body.bytesPerSecond)
-        
+        this.tiempo_restante = this.timeConvert(res.body.total / res.body.bytesPerSecond);
+
         res.body.transferred = parseFloat(GLOBAL.redondearAdos(res.body.transferred / 1000000));
         res.body.total = parseFloat(GLOBAL.redondearAdos(res.body.total / 1000000));
         res.body.percent = parseFloat(GLOBAL.redondearAdos(res.body.percent));
-        
-        this.objPercent = res.body
+
+        this.objPercent = res.body;
         document.getElementById('imagenLogo').click();
-        
+
         console.log('Despues --->', JSON.stringify(res.body));
       }
     });
-    
+
     this._ipc.on('update-downloaded', (event: Electron.IpcMessageEvent, res) => {
       this.displayPercent = false;
       console.log(res);
     });
-    
+
     this._ipc.on('log', (event: Electron.IpcMessageEvent, res) => {
       console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
       console.log('MAIN LOG');
@@ -116,7 +117,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
     });
   }
-  
+
   timeConvert(d) {
     d = Number(d);
     const h = Math.floor(d / 3600);
@@ -128,8 +129,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     const sDisplay = s > 0 ? s + (s === 1 ? ' segundo' : ' segundos') : '';
     return hDisplay + mDisplay + sDisplay;
   }
-  duplicarDataProgreso(json){
-  }
+  duplicarDataProgreso(json) {}
 
   ngAfterViewInit() {
     this.cdRef.detectChanges();

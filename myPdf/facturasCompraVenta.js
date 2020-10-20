@@ -1,8 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var fun_ = require("./utils/funciones");
-var _ = require("" + fun_.getFuncionalPath(true, '/lodash'));
-var moment = require("" + fun_.getFuncionalPath(true, '/moment'));
 var files_1 = require("./utils/files");
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
@@ -25,9 +23,12 @@ function getPageMargin(data) {
             margins = [10, 181, 5, 30];
         }
     }
+    console.log('@@@@@@@@@@@@@@@@@@2  margins', margins);
     return margins;
 }
 function makeFacturaVenta(data) {
+    console.log('---------ENTROOOO---------');
+    console.log('data ', data);
     var dd = {
         pageSize: { width: 816, height: 528 },
         pageMargins: getPageMargin(data),
@@ -76,6 +77,7 @@ function makeFacturaVenta(data) {
         doc: dd,
         file: 'factura.pdf',
     };
+    console.log('/////////// ', obj);
     return obj;
 }
 exports.makeFacturaVenta = makeFacturaVenta;
@@ -98,7 +100,7 @@ function cabeceraFacturaVenta(data) {
                     data.FACTURA_DE === 'nota'
                         ? { text: '' }
                         : {
-                            text: 'FACTURA A ' + _.toUpper(data.condicion),
+                            text: 'FACTURA A ' + data.condicion.toUpperCase(),
                             alignment: 'right',
                             bold: true,
                             style: 'letra14',
@@ -187,8 +189,8 @@ function cabeceraFacturaVenta(data) {
                             {
                                 text: [
                                     { text: 'Fecha : ', style: 'letra11' },
-                                    { text: fecha(data.fecha_equivalente), style: 'letra11' },
-                                    { text: ' - ' + hora(data.fecha_equivalente), style: 'letra11' },
+                                    { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra11' },
+                                    { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra11' },
                                 ],
                                 margin: [85, -10, 0, 0],
                             },
@@ -197,7 +199,7 @@ function cabeceraFacturaVenta(data) {
                                 : {
                                     text: [
                                         { text: 'Fecha vencimiento : ', style: 'letra11' },
-                                        { text: fecha(data.fecha_vencimiento), style: 'letra11' },
+                                        { text: fun_.my_dateFormater(data.fecha_vencimiento), style: 'letra11' },
                                     ],
                                     margin: [85, 3, 0, 0],
                                 },
@@ -211,14 +213,18 @@ function cabeceraFacturaVenta(data) {
                             {
                                 text: [
                                     { text: 'Doc No : ', style: 'letra11' },
-                                    { text: _.padStart(data.numero_factura, 8, '0'), style: 'letra11' },
+                                    { text: fun_.my_padStart(data.numero_factura, 8, '0'), style: 'letra11' },
                                 ],
                                 margin: [85, 3, 0, 0],
                             },
                             {
                                 text: [
                                     { text: 'Valida hasta : ', style: 'letra11' },
-                                    data.tipo_factura_id === 3 ? { text: 'No aplica.', style: 'letra11' } : data.FACTURA_DE === 'compra' ? { text: ' ' } : { text: fecha(data.fecha_valida), style: 'letra11' },
+                                    data.tipo_factura_id === 3
+                                        ? { text: 'No aplica.', style: 'letra11' }
+                                        : data.FACTURA_DE === 'compra'
+                                            ? { text: ' ' }
+                                            : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra11' },
                                 ],
                                 margin: [85, 3, 0, 0],
                             },
@@ -265,6 +271,7 @@ function cabeceraFacturaVenta(data) {
             layout: 'headerLineOnly',
         },
     ];
+    console.log('////////////////// header', header);
     return header;
 }
 // ==========================================================================================================================================================
@@ -272,19 +279,19 @@ function cabeceraFacturaVenta(data) {
 // =========================================================~=================================================================================================
 function calcularPrecio(cant, precio, tipo) {
     var res = cant * precio;
-    return redondearAdos(res);
+    return fun_.redondearAdos(res);
 }
 function contenidoFacturaVenta(data) {
     var tempBody = [];
     data.detalle_facturas.forEach(function (detalle, i) {
         var row = [];
         var br_ = i !== 0 && i % 10 === 0;
-        row.push({ text: i + 1, pageBreak: br_ ? 'before' : 'none' }, { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none' }, { text: numFormatTwoDecimals(detalle.cantidad), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' }, { text: detalle.unidad, alignment: 'center', pageBreak: br_ ? 'before' : 'none' }, {
-            text: numFormatTwoDecimals(data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? detalle.precio : detalle.costo),
+        row.push({ text: i + 1, pageBreak: br_ ? 'before' : 'none' }, { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none' }, { text: fun_.numFormatTwoDecimals(detalle.cantidad), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' }, { text: detalle.unidad, alignment: 'center', pageBreak: br_ ? 'before' : 'none' }, {
+            text: fun_.numFormatTwoDecimals(data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? detalle.precio : detalle.costo),
             alignment: 'right',
             margin: [0, 0, 14, 0],
             pageBreak: br_ ? 'before' : 'none',
-        }, { text: numFormatTwoDecimals(detalle.itbis), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' }, { text: numFormatTwoDecimals(detalle.total), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' });
+        }, { text: fun_.numFormatTwoDecimals(detalle.itbis), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' }, { text: fun_.numFormatTwoDecimals(detalle.total), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' });
         tempBody.push(row);
     });
     var content = [
@@ -376,25 +383,25 @@ function contenidoFacturaVenta(data) {
                                     body: [
                                         [
                                             { text: 'Bruto RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-                                            { text: numFormatTwoDecimals(data.Bruto), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
+                                            { text: fun_.numFormatTwoDecimals(data.Bruto), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
                                         ],
                                         [
                                             { text: 'Itbis RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-                                            { text: numFormatTwoDecimals(data.itbis), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
+                                            { text: fun_.numFormatTwoDecimals(data.itbis), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
                                         ],
                                         [
                                             { text: 'Descuento RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-                                            { text: numFormatTwoDecimals(data.descuento), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
+                                            { text: fun_.numFormatTwoDecimals(data.descuento), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
                                         ],
                                         [
                                             { text: 'TOTAL RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-                                            { text: numFormatTwoDecimals(data.total_factura), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
+                                            { text: fun_.numFormatTwoDecimals(data.total_factura), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
                                         ],
                                         data.FACTURA_DE === 'compra' || data.FACTURA_DE === 'nota'
                                             ? [{ text: '' }, { text: '' }]
                                             : [
                                                 { text: 'Devuelta RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-                                                { text: numFormatTwoDecimals(data.devuelta), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
+                                                { text: fun_.numFormatTwoDecimals(data.devuelta), style: 'letra11', alignment: 'right', margin: [0, 0, 40, 0] },
                                             ],
                                     ],
                                 },
@@ -407,48 +414,6 @@ function contenidoFacturaVenta(data) {
             unbreakable: true,
         },
     ];
+    console.log('////////////////// content', content);
     return content;
-}
-// ==========================================================================================================================================================
-function redondearAdos(num) {
-    var string = num + '';
-    var splitStr = _.split(string, '.');
-    var enteros = splitStr[0];
-    var splitEnteros = _.split(enteros, ',');
-    enteros = _.join(splitEnteros, '');
-    var tempdecimales = splitStr[1];
-    if (splitStr.length === 1) {
-        tempdecimales = '00';
-    }
-    var decimales = tempdecimales.substring(0, 2);
-    var Arreglo = [enteros, decimales];
-    var numStr = _.join(Arreglo, '.');
-    return parseFloat(numStr).toFixed(2);
-}
-function formatearNumero(nStr) {
-    if (nStr !== undefined) {
-        nStr += '';
-        var x = nStr.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
-}
-// =========================================================================================================
-function numFormatTwoDecimals(num) {
-    return formatearNumero(redondearAdos(num));
-}
-function fecha(a) {
-    moment.locale('es');
-    var fechaFormato = moment(a).format('DD/MM/YYYY');
-    return fechaFormato;
-}
-function hora(a) {
-    moment.locale('es');
-    var horaFormato = moment(a).format('hh:mm a');
-    return horaFormato;
 }

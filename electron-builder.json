@@ -3,26 +3,25 @@
   "directories": {
     "output": "release/"
   },
+  "files": ["**/*","./myPdf/**/*", "!**/*.ts", "!actualizacion/**/*", "!ADM-dataBase ER.mdj", "!actualizacion.zip", "!print"],
   "win": {
-    "icon": "./icons/win/icon.ico",
-    "asarUnpack": ["./fonts/**/*", "./print/**/*", "./myPdf/**/*", "./icons/**/*", "./node_modules/lodash/**/*", "./node_modules/moment/**/*"],
+    "icon": "./src/assets/icons/win/icon.ico",
+    "asarUnpack":["./descomprimirFonts.bat"],
     "target": ["NSIS"]
   },
   "nsis": {
     "allowToChangeInstallationDirectory": true,
     "oneClick": false,
     "perMachine": true,
-    "installerSidebar": "./icons/installer.bmp",
-    "uninstallerSidebar": "./icons/desinstaller.bmp",
-    "artifactName": "adm.setup.${ext}",
-    "uninstallDisplayName": "adm"
+    "installerSidebar": "./src/assets/icons/installer.bmp",
+    "uninstallerSidebar": "./src/assets/icons/desinstaller.bmp"
   },
   "mac": {
-    "icon": "./icons/mac/icon.icns",
+    "icon": "./src/assets/icons/mac/icon.icns",
     "target": ["dmg"]
   },
   "linux": {
-    "icon": "./icons/mac/icon.icns",
+    "icon": "./src/assets/icons/mac/icon.icns",
     "target": ["AppImage"]
   },
   "publish": [

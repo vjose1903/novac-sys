@@ -4,12 +4,14 @@ import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+var request = require('request');
+
 const autoUpdater = require('electron-updater').autoUpdater;
 const pdfmake = require('pdfmake/src/printer');
 
-const facturasCompraVenta = require(`${getFuncionalPath('/myPdf/facturasCompraVenta.js')}`);
-const recibosIngresos = require(`${getFuncionalPath('/myPdf/recibosIngresos.js')}`);
-const conduce = require(`${getFuncionalPath('/myPdf/conduce.js')}`);
+import * as facturasCompraVenta from './myPdf/facturasCompraVenta.js';
+import * as recibosIngresos from './myPdf/recibosIngresos.js';
+import * as conduce from './myPdf/conduce.js';
 
 // tslint:disable: curly
 // tslint:disable: one-variable-per-declaration
@@ -23,6 +25,8 @@ export let inicioRuta = __dirname;
 
 function createWindow() {
   // autoUpdater.checkForUpdates();
+  verificarSumastra();
+  verificarFonts();
   autoUpdater.checkForUpdatesAndNotify();
 
   const electronScreen = screen;
@@ -58,11 +62,10 @@ function createWindow() {
       }),
     );
   }
-  
+
   win.webContents.openDevTools();
 
-
-  win.setMenuBarVisibility(false)
+  win.setMenuBarVisibility(false);
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -125,7 +128,6 @@ autoUpdater.on('update-available', (info) => {
     message: 'VjPOS presenta una nueva actualizacion se empezará a descargar ahora.',
     detail: `Version a descargar: ${info.version}`,
   };
-
 });
 
 autoUpdater.on('download-progress', (progress) => {
@@ -178,6 +180,47 @@ ipcMain.on('getVersion', (event: any, arg) => {
   event.reply('versionResponse', pjson.version);
 });
 
+function verificarSumastra() {
+  if (!fs.existsSync(getFuncionalPath('/print'))) {
+    fs.mkdir(getFuncionalPath('/print'), { recursive: true }, (err) => {
+      if (err) {
+        throw err;
+      } else {
+        downloadFile('http://admservidor.ddns.net:3000/sumastra/lp.exe', '/print', 'lp.exe');
+      }
+    });
+  } else {
+    if (!fs.existsSync(getFuncionalPath('/print/lp.exe'))) {
+      downloadFile('http://admservidor.ddns.net:3000/sumastra/lp.exe', '/print', 'lp.exe');
+    }
+  }
+}
+
+async function verificarFonts() {
+  if (!fs.existsSync(getFuncionalPath('/fonts'))) {
+    await downloadFile('http://admservidor.ddns.net:3000/fonts/fonts.zip', '', 'fonts.zip');
+    const { exec } = require('child_process');
+
+    exec(`${getFuncionalPath('/app.asar.unpacked/descomprimirFonts.bat')}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+    });
+    //powershell Expand-Archive fonts.zip -DestinationPath fonts
+  }
+}
+
+function downloadFile(archive_url, path, file_) {
+  const http = require('http');
+  const fs = require('fs');
+
+  const file = fs.createWriteStream(getFuncionalPath(`${path}/${file_}`));
+  const request = http.get(archive_url, (response) => {
+    response.pipe(file);
+  });
+}
+
 function puts(msg_, linea_ = undefined) {
   if (win) {
     let obj;
@@ -227,7 +270,7 @@ ipcMain.on('print', (event: any, oPdf) => {
       returnErrorPDF();
     }
   } catch (error) {
-    puts(error, 207);
+    puts(error, 259);
   }
 });
 
@@ -254,7 +297,6 @@ function makePdf(dd, file) {
   const printer = new pdfmake(fontDescriptors);
 
   // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
-  puts('path donde guardara el pdf');
   const cFileName = getFuncionalPath('/' + file);
   try {
     const pdfDoc = printer.createPdfKitDocument(dd);
@@ -293,7 +335,7 @@ function imprimir(cFileName) {
   });
 }
 
-export function getFuncionalPath(addToPath = '') {
+export function getFuncionalPath(addToPath = '', pack = false) {
   let path_temp;
   let path_resolved;
 
@@ -303,11 +345,14 @@ export function getFuncionalPath(addToPath = '') {
   if (serve_) {
     console.log('');
     console.error('-=-=-=-=-=-=-=-= DESARROLLO -=-=-=-=-=-=-=-=-=-');
-
     path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
   } else {
     console.error('-=-=-=-=-=-=-=-= PRODUCCION -=-=-=-=-=-=-=-=-=-');
-    path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar.unpacked';
+    if (pack) {
+      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar';
+    } else {
+      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
+    }
   }
   path_temp = path_temp + addToPath;
 

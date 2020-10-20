@@ -1,5 +1,4 @@
-<div id="fondoC" *ngIf="loading" [ngClass]="{ fadeIn: loading, fadeOut: !loading }"
-  class="h-100 w-100 position-absolute backnegro">
+<div id="fondoC" *ngIf="loading" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
   <img class="img-fluid logoLoading rubberBand" src="assets/img/admLogo_opt.png" alt="" />
   <span class="text"> CARGANDO ... </span>
 </div>
@@ -12,8 +11,20 @@
   <p style="font-size: 3rem; color: white">{{ 'Por favor espere!...' | translate }}</p>
 </ngx-spinner> -->
 
-<p-dialog id="modalProgress" closable="false" closeOnEscape="false" header="Porcentaje de descarga" [(visible)]="displayPercent" [positionTop]="780" [positionLeft]="610"
-  [modal]="true" [style]="{ width: '50vw' }" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
+<p-dialog
+  id="modalProgress"
+  closable="false"
+  closeOnEscape="false"
+  header="Porcentaje de descarga"
+  [(visible)]="displayPercent"
+  [positionTop]="780"
+  [positionLeft]="610"
+  [modal]="true"
+  [style]="{ width: '50vw' }"
+  [baseZIndex]="10000"
+  [draggable]="false"
+  [resizable]="false"
+>
   <div class="d-flex justify-content-between mb-2">
     <span class="negrita">Descargando actualizacion...</span>
     <div class="mr-2">
