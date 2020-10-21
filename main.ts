@@ -198,41 +198,68 @@ function verificarSumastra() {
   }
   verificarElemento('/sumastra/lp.exe', '/print', '/lp.exe', '/lp', false, false, 'Sumastra', 0);
 }
-escarga 
+
 function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, callback) {
   // const interval = setInterval(() => {
   console.log(`empezando a descomprimir archivo ${path_local_extension}`);
   console.log(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`);
 
- // cmd(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd(path_local_sin_extension)}"`, (res) => {
+  // cmd(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd(path_local_sin_extension)}"`, (res) => {
   cmd(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`, (res) => {
     if (res.status) {
-      cmd(`del ${pathAdd(path_local_extension)}`, async (res_borrado) => {funcion deen el server ar
-        if (res_borrado.status) {
-          console.log('-----------------------------------');
-          console.log('|    DESCOMPRESION FONTS EXITO    |');
-          console.log('-----------------------------------');
-          callback({
-            status: true,
-            msg: 'archivo descomprimido correctamente',
-          });
-          //clearInterval(interval);
-        } else {
-          console.log('ERROR  aquiiii descomprimir');
+      callback({
+        status: true,
+        msg: 'archivo descomprimido correctamente',
+      });
 
-          callback({
-            status: false,
-            msg: 'error descomprimiendo archivo',
-          });
-        }
+      //cmd(`del ${pathAdd(path_local_extension)}`, async (res_borrado) => {
+      //  if (res_borrado.status) {
+      //    console.log('-----------------------------------');
+      //    console.log('|    DESCOMPRESION FONTS EXITO    |');
+      //    console.log('-----------------------------------');
+      //    callback({
+      //      status: true,
+      //      msg: 'archivo descomprimido correctamente',
+      //    });
+      //    //clearInterval(interval);
+      //  } else {
+      //    console.log('ERROR  aquiiii descomprimir');
+      //  
+      //    callback({
+      //      status: false,
+      //      msg: 'error descomprimiendo archivo',
+      //    });
+      //  }
+      //});
+    }else{
+      
+      callback({
+        status: false,
+        msg: 'error descomprimiendo archivo',
       });
     }
   });
   // }, 2000);
 }
 
-function borrado_de_archivos_malos(path_arciho_borrar, path_carpeta_borrar, is_carpeta, callback) {
-  cmd(`del ${pathAdd(`${path_arciho_borrar}`)} ${is_carpeta ? `&& rmdir /s /q ${pathAdd(`${path_carpeta_borrar}`)}` : ''}`, async (res_borrado_distinto) => {
+//function borrado_de_archivos_malos(path_arciho_borrar, path_carpeta_borrar, is_carpeta, callback) {
+function borrado_de_archivos_malos(archivos, callback) {
+
+  let command=''
+
+  for (let i = 0; i < archivos.length; i++) {
+    const file = archivos[i];
+    if(file.is_carpeta){
+      command += `${i!== 0 ? '&&':''} rmdir /s /q ${file.path}`
+    }else{
+      command += `${i!== 0 ? '&&':''} del ${file.path}`
+    }
+  }
+
+  //const command_ = `del ${pathAdd(`${path_arciho_borrar}`)} ${is_carpeta ? `&& rmdir /s /q ${pathAdd(`${path_carpeta_borrar}`)} -Force` : ''}`;
+  console.log('command  ====> ', command);
+
+  cmd(command, async (res_borrado_distinto) => {
     console.log('res_borrado_distinto -->', res_borrado_distinto);
 
     if (res_borrado_distinto.status) {
@@ -332,7 +359,7 @@ function compararMD5(path_local_content, path_local_extension, md5_servidor, pat
       console.log(' ');
       borrado_de_archivos_malos(path_local_extension, path_local_sin_extension, is_carpeta, (res_del) => {
         console.log('MMMMMMMMM  ', res_del);
-        
+
         if (res_del.status) {
           procesoDescarga(path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
           console.log(`---------- borrado de archivos exitoso`);
@@ -365,8 +392,6 @@ async function procesoDescarga(path_local_extension, path_local_content, paht_se
         console.log('---------- md5_local ', md5_local);
         console.log(' ');
         console.log('---------- md5_servidor ', md5_servidor);
-        console.log(' ');
-        console.log('---------- res_local_before_descarga.status ', res_local_before_descarga.status);
         console.log(' ');
         console.log('---------- descomprimir ', descomprimir);
         console.log(' ');
