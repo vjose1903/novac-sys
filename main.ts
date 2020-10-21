@@ -16,6 +16,8 @@ import * as conduce from './myPdf/conduce.js';
 // tslint:disable: curly
 // tslint:disable: one-variable-per-declaration
 let win, serve;
+let contador_descarga_fonts = 0;
+let contador_descarga_print = 0;
 const args = process.argv.slice(1);
 serve = args.some((val) => val === '--serve');
 
@@ -26,7 +28,7 @@ export let inicioRuta = __dirname;
 function createWindow() {
   // autoUpdater.checkForUpdates();
   verificarSumastra();
-  verificarFonts();
+  verificarElemento('/fonts/fonts.zip', '', '/fonts.zip', '/fonts', true, true, 'Fuentes', 0);
   autoUpdater.checkForUpdatesAndNotify();
 
   const electronScreen = screen;
@@ -181,44 +183,308 @@ ipcMain.on('getVersion', (event: any, arg) => {
 });
 
 function verificarSumastra() {
-  if (!fs.existsSync(getFuncionalPath('/print'))) {
-    fs.mkdir(getFuncionalPath('/print'), { recursive: true }, (err) => {
+  let md5_servidor;
+
+  if (!fs.existsSync(pathAdd('/print'))) {
+    fs.mkdir(pathAdd('/print'), { recursive: true }, (err) => {
       if (err) {
         throw err;
       } else {
-        downloadFile('http://admservidor.ddns.net:3000/sumastra/lp.exe', '/print', 'lp.exe');
+        console.log('------------- Carpeta print creada -------------');
       }
     });
   } else {
-    if (!fs.existsSync(getFuncionalPath('/print/lp.exe'))) {
-      downloadFile('http://admservidor.ddns.net:3000/sumastra/lp.exe', '/print', 'lp.exe');
-    }
+    console.log('------------- Carpeta print existe no es necesario crearla -------------');
   }
+  verificarElemento('/sumastra/lp.exe', '/print', '/lp.exe', '/lp', false, false, 'Sumastra', 0);
 }
 
-async function verificarFonts() {
-  if (!fs.existsSync(getFuncionalPath('/fonts'))) {
-    await downloadFile('http://admservidor.ddns.net:3000/fonts/fonts.zip', '', 'fonts.zip');
-    const { exec } = require('child_process');
+function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, callback) {
+  // const interval = setInterval(() => {
+  console.log(`empezando a descomprimir archivo ${path_local_extension}`);
+  console.log(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd(path_local_sin_extension)}"`);
 
-    exec(`${getFuncionalPath('/app.asar.unpacked/descomprimirFonts.bat')}`, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`exec error: ${error}`);
+  cmd(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd(path_local_sin_extension)}"`, (res) => {
+    if (res.status) {
+      cmd(`del ${pathAdd(path_local_extension)}`, async (res_borrado) => {
+        if (res_borrado.status) {
+          console.log('-----------------------------------');
+          console.log('|    DESCOMPRESION FONTS EXITO    |');
+          console.log('-----------------------------------');
+          callback({
+            status: true,
+            msg: 'archivo descomprimido correctamente',
+          });
+          //clearInterval(interval);
+        } else {
+          console.log('ERROR  aquiiii descomprimir');
+
+          callback({
+            status: false,
+            msg: 'error descomprimiendo archivo',
+          });
+        }
+      });
+    }
+  });
+  // }, 2000);
+}
+
+function borrado_de_archivos_malos(path_arciho_borrar, path_carpeta_borrar, is_carpeta, callback) {
+  cmd(`del ${pathAdd(`${path_arciho_borrar}`)} ${is_carpeta ? `&& rmdir /s /q ${pathAdd(`/${path_carpeta_borrar}`)}` : ''}`, async (res_borrado_distinto) => {
+    console.log('res_borrado_distinto -->', res_borrado_distinto);
+
+    if (res_borrado_distinto.status) {
+      callback({
+        status: true,
+        msg: 'Elemento borrado correctamente',
+      });
+    } else {
+      callback({
+        status: false,
+        msg: 'Error borrando elemento',
+      });
+    }
+  });
+}
+
+async function verificarElemento(paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter) {
+  console.log(`/////===== VERIFICANDO ${nombre_err.toUpperCase()} =====/////`);
+
+  let lRetornar = false;
+  let descargar_archivo = false;
+
+  let md5_servidor;
+  // cmd('ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/fonts/fonts.zip"', async (res_servidor) => {
+  cmd(`ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public${paht_server}`, async (res_servidor) => {
+    if (res_servidor.status) {
+      md5_servidor = res_servidor.STDOUT.split(' ')[0];
+      console.log(`---------- md5 ${path_local_extension} servidor `, md5_servidor);
+      console.log(' ');
+
+      console.log('---------- path a ver si existe ---> ', pathAdd(`${path_local_content}${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}`));
+      console.log(' ');
+
+      console.log(' ');
+
+      if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}`))) {
+        console.log('---------- El elemento ' + `${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}` + ' no existe, Procediendo a descarga');
+        console.log(' ');
+
+        descargar_archivo = true;
+      } else {
+        console.log('////////---------- El elemento ' + `${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}` + ' si existe -----------////////');
+        if (descomprimir) {
+          console.log(
+            '---------- El elemento ' + `${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}` + ' es una carpeta precediendo a comprimirla para comparar los md5',
+          );
+          console.log(' ');
+          cmd(`powershell "Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}" "${pathAdd(`${path_local_sin_extension}.zip`)}"`, (res_compresion) => {
+            if (!res_compresion.status) {
+              lRetornar = true;
+              console.log(`---------- Error comprimiento el elemento ${path_local_extension}`);
+              console.log(' ');
+            } else {
+              console.log(`---------- El elemento ${path_local_extension} comprimido correctamente`);
+              console.log(' ');
+            }
+          });
+        }
+      }
+
+      console.log('---------- !descargar_archivo ', !descargar_archivo);
+      console.log(' ');
+      console.log('---------- !lRetornar ', !lRetornar);
+      console.log(' ');
+
+      if (!descargar_archivo && !lRetornar) {
+        console.log(`---------- Procediendo a comparar los md5`);
+        console.log(' ');
+        console.log(`---------- Path donde esta el md5 a comparar --> ${pathAdd(`${path_local_content}${path_local_extension}`)}  `);
+        console.log(' ');
+        cmd(`CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`, (res_local) => {
+          const md5_local = res_local.STDOUT.split('\r\n')[1];
+          console.log('---------- md5_servidor ', md5_servidor);
+          console.log(' ');
+          console.log('---------- md5_local ', md5_local);
+          console.log(' ');
+
+          if (md5_local !== md5_servidor) {
+            console.log(`---------- Los md5 son diferentes procediendo a borrar elementos para descargarlos denuevo`);
+            console.log(' ');
+            borrado_de_archivos_malos(path_local_extension, path_local_sin_extension, is_carpeta, (res) => {
+              if (res.status) {
+                descargar_archivo = true;
+                console.log(`---------- borrado de archivos exitoso`);
+                console.log(' ');
+              } else {
+                lRetornar = true;
+                console.log(`---------- borrado de archivos fallido`);
+                console.log(' ');
+              }
+            });
+          }
+        });
+      }
+
+      if (lRetornar) {
+        win.webContents.send('err_descarga', {
+          msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
+          status: 'no',
+        });
         return;
       }
-    });
-    //powershell Expand-Archive fonts.zip -DestinationPath fonts
-  }
+
+      let descarga_exito = true;
+
+      if (descargar_archivo) {
+        console.log(`---------- procediendo a descargar el archivo ${path_local_extension}`);
+        console.log(' ');
+        await downloadFile(`http://admservidor.ddns.net:3000${paht_server}`, path_local_content, path_local_extension, (res) => {
+          if (res.status) {
+            console.log(`---------- Creando el md5 de ${path_local_extension} --->  ${pathAdd(`${path_local_content}${path_local_extension}`)}   `);
+            console.log(' ');
+
+            cmd(`CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`, (res_local_before_descarga) => {
+              const md5_local = res_local_before_descarga.STDOUT.split('\r\n')[1];
+              console.log(`---------- md5 de ${path_local_extension} local`);
+              console.log(' ');
+
+              console.log('---------- md5_local ', md5_local);
+              console.log(' ');
+              console.log('---------- md5_servidor ', md5_servidor);
+              console.log(' ');
+              console.log('---------- res_local_before_descarga.status ', res_local_before_descarga.status);
+              console.log(' ');
+              console.log('---------- descomprimir ', descomprimir);
+              console.log(' ');
+
+              if (res_local_before_descarga.status) {
+                if (md5_servidor === md5_local) {
+                  if (descomprimir) {
+                    esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, (res) => {
+                      if (res.status) {
+                        console.log(`---------- DESCARGA EXITOSA`);
+                        console.log(' ');
+                      } else {
+                        win.webContents.send('err_descarga', {
+                          msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
+                          status: 'no',
+                        });
+                        return;
+                      }
+                    });
+                  } else {
+                    console.log(`---------- DESCARGA EXITOSA`);
+                    console.log(' ');
+                  }
+                } else {
+                  descarga_exito = false;
+                }
+              }
+            });
+          } else {
+            descarga_exito = false;
+          }
+        });
+
+        if (!descarga_exito) {
+          counter++;
+          if (counter <= 3) {
+            console.log(`---------- fallo en la descarga de ${path_local_extension} intento numero ${counter}`);
+            console.log(' ');
+            verificarElemento(paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter);
+          } else {
+            console.log(`---------- Elemento ${path_local_extension} no se puede descargar comunicarse con Victor hablame despacio`);
+            console.log(' ');
+            win.webContents.send('err_descarga', {
+              msg: `Error descargando archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Victor Jose Vasquez Santos.`,
+              status: 'no',
+            });
+          }
+        }
+      }
+    }
+    return;
+  });
 }
 
-function downloadFile(archive_url, path, file_) {
+function cmd(command, callback) {
+  const { exec } = require('child_process');
+  exec(command, (error, stdout, stderr) => {
+    let obj;
+    if (error) {
+      obj = {
+        status: false,
+        msg: error,
+      };
+
+      callback(obj);
+    } else {
+      obj = {
+        status: true,
+        msg: 'Comando realizado correctamente',
+        STDOUT: stdout,
+        STDERR: stderr,
+      };
+      callback(obj);
+    }
+  });
+}
+
+function downloadFile_(archive_url, path, file_) {
   const http = require('http');
   const fs = require('fs');
-
-  const file = fs.createWriteStream(getFuncionalPath(`${path}/${file_}`));
+  let count = 0;
+  const file = fs.createWriteStream(pathAdd(`${path}/${file_}`));
   const request = http.get(archive_url, (response) => {
+    count++;
+    console.log('//////// descarga //////// ' + count);
+
+    console.log(response);
+
     response.pipe(file);
   });
+}
+
+function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
+  // Save variable to know progress
+  var received_bytes = 0;
+  var total_bytes = 0;
+
+  var req = request({
+    method: 'GET',
+    uri: archive_url,
+  });
+
+  console.log(`ruta donde se descargara el elemento ${pathAdd(`${path}${file_}`)}`);
+
+  var out = fs.createWriteStream(pathAdd(`${path}${file_}`));
+  req.pipe(out);
+
+  req.on('response', function (data) {
+    // Change the total bytes value to get progress later.
+    total_bytes = parseInt(data.headers['content-length']);
+  });
+
+  req.on('data', function (chunk) {
+    // Update the received bytes
+    received_bytes += chunk.length;
+
+    showProgress(received_bytes, total_bytes);
+  });
+
+  req.on('end', function () {
+    callback({
+      status: true,
+      msg: 'descarga finalizada',
+    });
+  });
+}
+
+function showProgress(received, total) {
+  var percentage = (received * 100) / total;
+  console.log(percentage + '% | ' + received + ' bytes out of ' + total + ' bytes.');
 }
 
 function puts(msg_, linea_ = undefined) {
@@ -232,6 +498,8 @@ function puts(msg_, linea_ = undefined) {
     } else {
       obj = msg_;
     }
+    //console.log('puts.caller -->',puts.caller)
+
     win.webContents.send('log', obj);
   }
 }
@@ -283,7 +551,7 @@ function returnErrorPDF() {
 // ==========================================================================================================================================================
 
 function makePdf(dd, file) {
-  const font_dir = getFuncionalPath('/fonts/roboto/Roboto');
+  const font_dir = pathAdd('/fonts/roboto/Roboto');
 
   const fontDescriptors = {
     Roboto: {
@@ -297,7 +565,7 @@ function makePdf(dd, file) {
   const printer = new pdfmake(fontDescriptors);
 
   // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
-  const cFileName = getFuncionalPath('/' + file);
+  const cFileName = pathAdd('/' + file);
   try {
     const pdfDoc = printer.createPdfKitDocument(dd);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
@@ -320,9 +588,9 @@ function imprimir(cFileName) {
   // "C:\Users\User\Desktop\factura.pdf" "EPSON LX-350 ESC/P"
   // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
 
-  const foxitPath = getFuncionalPath() + 'print\\FoxitReaderPortable.exe';
+  const foxitPath = pathAdd() + 'print\\FoxitReaderPortable.exe';
 
-  exec(`${foxitPath} /t "${getFuncionalPath('/' + cFileName)}"`, (error, stdout, stderr) => {
+  exec(`${foxitPath} /t "${pathAdd('/' + cFileName)}"`, (error, stdout, stderr) => {
     if (error) {
       puts(error, 273);
       win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err: error });
@@ -335,7 +603,7 @@ function imprimir(cFileName) {
   });
 }
 
-export function getFuncionalPath(addToPath = '', pack = false) {
+export function pathAdd(addToPath = '', pack = false) {
   let path_temp;
   let path_resolved;
 
@@ -343,11 +611,8 @@ export function getFuncionalPath(addToPath = '', pack = false) {
   const serve_ = args_.some((val) => val === '--serve');
 
   if (serve_) {
-    console.log('');
-    console.error('-=-=-=-=-=-=-=-= DESARROLLO -=-=-=-=-=-=-=-=-=-');
     path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
   } else {
-    console.error('-=-=-=-=-=-=-=-= PRODUCCION -=-=-=-=-=-=-=-=-=-');
     if (pack) {
       path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar';
     } else {
@@ -355,13 +620,7 @@ export function getFuncionalPath(addToPath = '', pack = false) {
     }
   }
   path_temp = path_temp + addToPath;
-
   path_resolved = process.platform === 'darwin' ? path_temp : path_temp.split('/').join('\\');
-
-  puts('path_resolved -->' + path_resolved);
-  console.log('path_resolved ', path_resolved);
-
-  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=');
   return path_resolved;
 }
 
