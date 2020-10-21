@@ -41,8 +41,8 @@ TIMEOUT 3  > nul
 
 echo. 
 echo "----- comprimiendo archivo actualizacion -----"
-echo "powershell 'Compress-Archive actualizacion actualizacion.zip'"
-powershell "Compress-Archive actualizacion actualizacion.zip"
+echo "powershell 'Compress-Archive actualizacion actualizacion.zip' -Update"
+powershell "Compress-Archive actualizacion actualizacion.zip" -Update
 echo.
 echo.
 TIMEOUT 3  > nul

@@ -27,7 +27,7 @@ export let inicioRuta = __dirname;
 
 function createWindow() {
   // autoUpdater.checkForUpdates();
-  verificarSumastra();
+  // verificarSumastra();
   verificarElemento('/fonts/fonts.zip', '', '/fonts.zip', '/fonts', true, true, 'Fuentes', 0);
   autoUpdater.checkForUpdatesAndNotify();
 
@@ -198,15 +198,16 @@ function verificarSumastra() {
   }
   verificarElemento('/sumastra/lp.exe', '/print', '/lp.exe', '/lp', false, false, 'Sumastra', 0);
 }
-
+escarga 
 function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, callback) {
   // const interval = setInterval(() => {
   console.log(`empezando a descomprimir archivo ${path_local_extension}`);
-  console.log(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd(path_local_sin_extension)}"`);
+  console.log(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`);
 
-  cmd(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd(path_local_sin_extension)}"`, (res) => {
+ // cmd(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd(path_local_sin_extension)}"`, (res) => {
+  cmd(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`, (res) => {
     if (res.status) {
-      cmd(`del ${pathAdd(path_local_extension)}`, async (res_borrado) => {
+      cmd(`del ${pathAdd(path_local_extension)}`, async (res_borrado) => {funcion deen el server ar
         if (res_borrado.status) {
           console.log('-----------------------------------');
           console.log('|    DESCOMPRESION FONTS EXITO    |');
@@ -231,7 +232,7 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
 }
 
 function borrado_de_archivos_malos(path_arciho_borrar, path_carpeta_borrar, is_carpeta, callback) {
-  cmd(`del ${pathAdd(`${path_arciho_borrar}`)} ${is_carpeta ? `&& rmdir /s /q ${pathAdd(`/${path_carpeta_borrar}`)}` : ''}`, async (res_borrado_distinto) => {
+  cmd(`del ${pathAdd(`${path_arciho_borrar}`)} ${is_carpeta ? `&& rmdir /s /q ${pathAdd(`${path_carpeta_borrar}`)}` : ''}`, async (res_borrado_distinto) => {
     console.log('res_borrado_distinto -->', res_borrado_distinto);
 
     if (res_borrado_distinto.status) {
@@ -258,6 +259,7 @@ async function verificarElemento(paht_server, path_local_content, path_local_ext
   // cmd('ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/fonts/fonts.zip"', async (res_servidor) => {
   cmd(`ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public${paht_server}`, async (res_servidor) => {
     if (res_servidor.status) {
+      console.log(0);
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
       console.log(`---------- md5 ${path_local_extension} servidor `, md5_servidor);
       console.log(' ');
@@ -270,7 +272,7 @@ async function verificarElemento(paht_server, path_local_content, path_local_ext
       if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}`))) {
         console.log('---------- El elemento ' + `${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}` + ' no existe, Procediendo a descarga');
         console.log(' ');
-
+        procesoDescarga(path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
         descargar_archivo = true;
       } else {
         console.log('////////---------- El elemento ' + `${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}` + ' si existe -----------////////');
@@ -279,134 +281,148 @@ async function verificarElemento(paht_server, path_local_content, path_local_ext
             '---------- El elemento ' + `${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}` + ' es una carpeta precediendo a comprimirla para comparar los md5',
           );
           console.log(' ');
-          cmd(`powershell "Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}" "${pathAdd(`${path_local_sin_extension}.zip`)}"`, (res_compresion) => {
+          console.log(
+            `########## powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_sin_extension}.zip`)}" -Update #########`,
+          );
+
+          cmd(`powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_sin_extension}.zip`)}" -Update`, (res_compresion) => {
             if (!res_compresion.status) {
-              lRetornar = true;
               console.log(`---------- Error comprimiento el elemento ${path_local_extension}`);
               console.log(' ');
+              retornarMensajeErrorVeiricandoElementos(nombre_err);
             } else {
               console.log(`---------- El elemento ${path_local_extension} comprimido correctamente`);
               console.log(' ');
+              compararMD5(path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
             }
           });
         }
       }
 
-      console.log('---------- !descargar_archivo ', !descargar_archivo);
-      console.log(' ');
-      console.log('---------- !lRetornar ', !lRetornar);
-      console.log(' ');
-
-      if (!descargar_archivo && !lRetornar) {
-        console.log(`---------- Procediendo a comparar los md5`);
-        console.log(' ');
-        console.log(`---------- Path donde esta el md5 a comparar --> ${pathAdd(`${path_local_content}${path_local_extension}`)}  `);
-        console.log(' ');
-        cmd(`CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`, (res_local) => {
-          const md5_local = res_local.STDOUT.split('\r\n')[1];
-          console.log('---------- md5_servidor ', md5_servidor);
-          console.log(' ');
-          console.log('---------- md5_local ', md5_local);
-          console.log(' ');
-
-          if (md5_local !== md5_servidor) {
-            console.log(`---------- Los md5 son diferentes procediendo a borrar elementos para descargarlos denuevo`);
-            console.log(' ');
-            borrado_de_archivos_malos(path_local_extension, path_local_sin_extension, is_carpeta, (res) => {
-              if (res.status) {
-                descargar_archivo = true;
-                console.log(`---------- borrado de archivos exitoso`);
-                console.log(' ');
-              } else {
-                lRetornar = true;
-                console.log(`---------- borrado de archivos fallido`);
-                console.log(' ');
-              }
-            });
-          }
-        });
+      if (!descargar_archivo && !lRetornar && !descomprimir) {
+        compararMD5(path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
       }
-
-      if (lRetornar) {
-        win.webContents.send('err_descarga', {
-          msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
-          status: 'no',
-        });
-        return;
-      }
-
-      let descarga_exito = true;
 
       if (descargar_archivo) {
-        console.log(`---------- procediendo a descargar el archivo ${path_local_extension}`);
-        console.log(' ');
-        await downloadFile(`http://admservidor.ddns.net:3000${paht_server}`, path_local_content, path_local_extension, (res) => {
-          if (res.status) {
-            console.log(`---------- Creando el md5 de ${path_local_extension} --->  ${pathAdd(`${path_local_content}${path_local_extension}`)}   `);
-            console.log(' ');
-
-            cmd(`CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`, (res_local_before_descarga) => {
-              const md5_local = res_local_before_descarga.STDOUT.split('\r\n')[1];
-              console.log(`---------- md5 de ${path_local_extension} local`);
-              console.log(' ');
-
-              console.log('---------- md5_local ', md5_local);
-              console.log(' ');
-              console.log('---------- md5_servidor ', md5_servidor);
-              console.log(' ');
-              console.log('---------- res_local_before_descarga.status ', res_local_before_descarga.status);
-              console.log(' ');
-              console.log('---------- descomprimir ', descomprimir);
-              console.log(' ');
-
-              if (res_local_before_descarga.status) {
-                if (md5_servidor === md5_local) {
-                  if (descomprimir) {
-                    esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, (res) => {
-                      if (res.status) {
-                        console.log(`---------- DESCARGA EXITOSA`);
-                        console.log(' ');
-                      } else {
-                        win.webContents.send('err_descarga', {
-                          msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
-                          status: 'no',
-                        });
-                        return;
-                      }
-                    });
-                  } else {
-                    console.log(`---------- DESCARGA EXITOSA`);
-                    console.log(' ');
-                  }
-                } else {
-                  descarga_exito = false;
-                }
-              }
-            });
-          } else {
-            descarga_exito = false;
-          }
-        });
-
-        if (!descarga_exito) {
-          counter++;
-          if (counter <= 3) {
-            console.log(`---------- fallo en la descarga de ${path_local_extension} intento numero ${counter}`);
-            console.log(' ');
-            verificarElemento(paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter);
-          } else {
-            console.log(`---------- Elemento ${path_local_extension} no se puede descargar comunicarse con Victor hablame despacio`);
-            console.log(' ');
-            win.webContents.send('err_descarga', {
-              msg: `Error descargando archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Victor Jose Vasquez Santos.`,
-              status: 'no',
-            });
-          }
-        }
       }
     }
     return;
   });
+}
+
+function compararMD5(path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
+  console.log(`---------- Procediendo a comparar los md5`);
+  console.log(' ');
+  console.log(`---------- Path donde esta el md5 a comparar --> ${pathAdd(`${path_local_content}${path_local_extension}`)}  `);
+  console.log(' ');
+  console.log(`CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5       <================`);
+
+  cmd(`CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`, (res_local) => {
+    console.log(1);
+    console.log('res_local =>', res_local);
+
+    const md5_local = res_local.STDOUT.split('\r\n')[1];
+    console.log('---------- md5_servidor ', md5_servidor);
+    console.log(' ');
+    console.log('---------- md5_local ', md5_local);
+    console.log(' ');
+
+    if (md5_local !== md5_servidor) {
+      console.log(`---------- Los md5 son diferentes procediendo a borrar elementos para descargarlos denuevo`);
+      console.log(' ');
+      borrado_de_archivos_malos(path_local_extension, path_local_sin_extension, is_carpeta, (res_del) => {
+        console.log('MMMMMMMMM  ', res_del);
+        
+        if (res_del.status) {
+          procesoDescarga(path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
+          console.log(`---------- borrado de archivos exitoso`);
+          console.log(' ');
+        } else {
+          retornarMensajeErrorVeiricandoElementos(nombre_err);
+          console.log(`---------- borrado de archivos fallido`);
+          console.log(' ');
+        }
+      });
+    }
+  });
+}
+
+async function procesoDescarga(path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta) {
+  let descarga_exito = true;
+  console.log(`---------- procediendo a descargar el archivo ${path_local_extension}`);
+  console.log(' ');
+  await downloadFile(`http://admservidor.ddns.net:3000${paht_server}`, path_local_content, path_local_extension, (res) => {
+    if (res.status) {
+      console.log(`---------- Creando el md5 de ${path_local_extension} --->  ${pathAdd(`${path_local_content}${path_local_extension}`)}   `);
+      console.log(' ');
+
+      cmd(`CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`, (res_local_before_descarga) => {
+        console.log(2);
+        const md5_local = res_local_before_descarga.STDOUT.split('\r\n')[1];
+        console.log(`---------- md5 de ${path_local_extension} local`);
+        console.log(' ');
+
+        console.log('---------- md5_local ', md5_local);
+        console.log(' ');
+        console.log('---------- md5_servidor ', md5_servidor);
+        console.log(' ');
+        console.log('---------- res_local_before_descarga.status ', res_local_before_descarga.status);
+        console.log(' ');
+        console.log('---------- descomprimir ', descomprimir);
+        console.log(' ');
+
+        if (res_local_before_descarga.status) {
+          if (md5_servidor === md5_local) {
+            if (descomprimir) {
+              esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, (res) => {
+                if (res.status) {
+                  console.log(`---------- DESCARGA EXITOSA`);
+                  console.log(' ');
+                } else {
+                  win.webContents.send('err_descarga', {
+                    msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
+                    status: 'no',
+                  });
+                  return;
+                }
+              });
+            } else {
+              console.log(`---------- DESCARGA EXITOSA`);
+              console.log(' ');
+            }
+          } else {
+            descarga_exito = false;
+          }
+        }
+      });
+    } else {
+      descarga_exito = false;
+    }
+  });
+
+  if (!descarga_exito) {
+    counter++;
+    if (counter <= 3) {
+      console.log(`---------- fallo en la descarga de ${path_local_extension} intento numero ${counter}`);
+      console.log(' ');
+      verificarElemento(paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter);
+    } else {
+      console.log(`---------- Elemento ${path_local_extension} no se puede descargar comunicarse con Victor hablame despacio`);
+      console.log(' ');
+      win.webContents.send('err_descarga', {
+        msg: `Error descargando archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Victor Jose Vasquez Santos.`,
+        status: 'no',
+      });
+    }
+  }
+}
+
+function retornarMensajeErrorVeiricandoElementos(nombre_err) {
+  win.webContents.send('err_descarga', {
+    msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
+    status: 'no',
+  });
+  return;
 }
 
 function cmd(command, callback) {
@@ -429,21 +445,6 @@ function cmd(command, callback) {
       };
       callback(obj);
     }
-  });
-}
-
-function downloadFile_(archive_url, path, file_) {
-  const http = require('http');
-  const fs = require('fs');
-  let count = 0;
-  const file = fs.createWriteStream(pathAdd(`${path}/${file_}`));
-  const request = http.get(archive_url, (response) => {
-    count++;
-    console.log('//////// descarga //////// ' + count);
-
-    console.log(response);
-
-    response.pipe(file);
   });
 }
 
