@@ -27,9 +27,6 @@ export let inicioRuta = __dirname;
 
 function createWindow() {
   // autoUpdater.checkForUpdates();
-  // verificarSumastra();
-  verificarElemento('/fonts/fonts.zip', '', '/fonts.zip', '/fonts', true, true, 'Fuentes', 0);
-  autoUpdater.checkForUpdatesAndNotify();
 
   const electronScreen = screen;
   const size = electronScreen.getPrimaryDisplay().workAreaSize;
@@ -68,6 +65,24 @@ function createWindow() {
   win.webContents.openDevTools();
 
   win.setMenuBarVisibility(false);
+
+  const aFiles_malos = [
+    {
+      path: pathAdd('/fonts.zip'),
+      is_carpeta: false,
+    },
+    {
+      path: pathAdd('/fonts/roboto'),
+      is_carpeta: true,
+    },
+    {
+      path: pathAdd('/fonts'),
+      is_carpeta: true,
+    },
+  ];
+  verificarElemento(aFiles_malos, '/fonts/fonts.zip', '', '/fonts.zip', '/fonts', true, true, 'Fuentes', 0);
+  verificarSumastra();
+  autoUpdater.checkForUpdatesAndNotify();
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -177,14 +192,12 @@ ipcMain.on('printerNames', (event: any, arg) => {
 ipcMain.on('getVersion', (event: any, arg) => {
   // name of function
 
-  var pjson = require('./package.json');
+  const pjson = require('./package.json');
   console.log('----> ', pjson.version);
   event.reply('versionResponse', pjson.version);
 });
 
 function verificarSumastra() {
-  let md5_servidor;
-
   if (!fs.existsSync(pathAdd('/print'))) {
     fs.mkdir(pathAdd('/print'), { recursive: true }, (err) => {
       if (err) {
@@ -196,43 +209,49 @@ function verificarSumastra() {
   } else {
     console.log('------------- Carpeta print existe no es necesario crearla -------------');
   }
-  verificarElemento('/sumastra/lp.exe', '/print', '/lp.exe', '/lp', false, false, 'Sumastra', 0);
+
+  const aFiles_malos = [
+    {
+      path: pathAdd('/lp.exe'),
+      is_carpeta: false,
+    },
+  ];
+
+  verificarElemento(aFiles_malos, '/sumastra/lp.exe', '/print', '/lp.exe', '/lp', false, false, 'Sumastra', 0);
 }
 
 function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, callback) {
   // const interval = setInterval(() => {
   console.log(`empezando a descomprimir archivo ${path_local_extension}`);
-  console.log(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`);
 
-  // cmd(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd(path_local_sin_extension)}"`, (res) => {
-  cmd(`powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`, (res) => {
+  const command =
+    process.platform === 'darwin'
+      ? `unzip "${pathAdd(path_local_extension)}" -d "${pathAdd()}"`
+      : `powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`;
+
+  console.log(`===== command ====> `, command);
+  cmd(command, (res) => {
     if (res.status) {
-      callback({
-        status: true,
-        msg: 'archivo descomprimido correctamente',
-      });
+      cmd(`del ${pathAdd(path_local_extension)}`, async (res_borrado) => {
+        if (res_borrado.status) {
+          console.log('-----------------------------------');
+          console.log(`    DESCOMPRESION ${path_local_extension.toUpperCase()} EXITO    `);
+          console.log('-----------------------------------');
+          callback({
+            status: true,
+            msg: 'archivo descomprimido y borrado del zip correctamente',
+          });
+          // clearInterval(interval);
+        } else {
+          console.log('ERROR  aquiiii descomprimir');
 
-      //cmd(`del ${pathAdd(path_local_extension)}`, async (res_borrado) => {
-      //  if (res_borrado.status) {
-      //    console.log('-----------------------------------');
-      //    console.log('|    DESCOMPRESION FONTS EXITO    |');
-      //    console.log('-----------------------------------');
-      //    callback({
-      //      status: true,
-      //      msg: 'archivo descomprimido correctamente',
-      //    });
-      //    //clearInterval(interval);
-      //  } else {
-      //    console.log('ERROR  aquiiii descomprimir');
-      //  
-      //    callback({
-      //      status: false,
-      //      msg: 'error descomprimiendo archivo',
-      //    });
-      //  }
-      //});
-    }else{
-      
+          callback({
+            status: false,
+            msg: `error borrando ${path_local_extension}`,
+          });
+        }
+      });
+    } else {
       callback({
         status: false,
         msg: 'error descomprimiendo archivo',
@@ -242,21 +261,21 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
   // }, 2000);
 }
 
-//function borrado_de_archivos_malos(path_arciho_borrar, path_carpeta_borrar, is_carpeta, callback) {
+// function borrado_de_archivos_malos(path_arciho_borrar, path_carpeta_borrar, is_carpeta, callback) {
 function borrado_de_archivos_malos(archivos, callback) {
-
-  let command=''
+  let command = '';
 
   for (let i = 0; i < archivos.length; i++) {
     const file = archivos[i];
-    if(file.is_carpeta){
-      command += `${i!== 0 ? '&&':''} rmdir /s /q ${file.path}`
-    }else{
-      command += `${i!== 0 ? '&&':''} del ${file.path}`
+
+    if (file.is_carpeta) {
+      command += `${i !== 0 ? ' && ' : ''}` + `${process.platform === 'darwin' ? `rm -rf ${file.path}` : `rmdir /s /q ${file.path}`}`;
+    } else {
+      command += `${i !== 0 ? ' && ' : ''}` + `${process.platform === 'darwin' ? `rm -rf ${file.path}` : `del ${file.path}`}`;
     }
   }
 
-  //const command_ = `del ${pathAdd(`${path_arciho_borrar}`)} ${is_carpeta ? `&& rmdir /s /q ${pathAdd(`${path_carpeta_borrar}`)} -Force` : ''}`;
+  // const command_ = `del ${pathAdd(`${path_arciho_borrar}`)} ${is_carpeta ? `&& rmdir /s /q ${pathAdd(`${path_carpeta_borrar}`)} -Force` : ''}`;
   console.log('command  ====> ', command);
 
   cmd(command, async (res_borrado_distinto) => {
@@ -276,15 +295,14 @@ function borrado_de_archivos_malos(archivos, callback) {
   });
 }
 
-async function verificarElemento(paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter) {
+async function verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter) {
   console.log(`/////===== VERIFICANDO ${nombre_err.toUpperCase()} =====/////`);
 
-  let lRetornar = false;
   let descargar_archivo = false;
 
   let md5_servidor;
   // cmd('ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/fonts/fonts.zip"', async (res_servidor) => {
-  cmd(`ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public${paht_server}`, async (res_servidor) => {
+  cmd(`ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public${paht_server}"`, async (res_servidor) => {
     if (res_servidor.status) {
       console.log(0);
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
@@ -299,7 +317,7 @@ async function verificarElemento(paht_server, path_local_content, path_local_ext
       if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}`))) {
         console.log('---------- El elemento ' + `${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}` + ' no existe, Procediendo a descarga');
         console.log(' ');
-        procesoDescarga(path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
+        procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
         descargar_archivo = true;
       } else {
         console.log('////////---------- El elemento ' + `${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}` + ' si existe -----------////////');
@@ -308,11 +326,21 @@ async function verificarElemento(paht_server, path_local_content, path_local_ext
             '---------- El elemento ' + `${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}` + ' es una carpeta precediendo a comprimirla para comparar los md5',
           );
           console.log(' ');
-          console.log(
-            `########## powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_sin_extension}.zip`)}" -Update #########`,
-          );
 
-          cmd(`powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_sin_extension}.zip`)}" -Update`, (res_compresion) => {
+          const command =
+            process.platform === 'darwin'
+              ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_sin_extension)}" -x "*.DS_Store"`
+              : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_sin_extension}.zip`)}" -Update`;
+
+          console.log(`===== command ====> `, command);
+
+          cmd('pwd', (res_pwd) => {
+            console.log('res_pwd ===> ', res_pwd);
+          });
+
+          cmd(command, (res_compresion) => {
+            console.log('{{{{{{{{{{{{{{{ ', res_compresion);
+
             if (!res_compresion.status) {
               console.log(`---------- Error comprimiento el elemento ${path_local_extension}`);
               console.log(' ');
@@ -320,35 +348,32 @@ async function verificarElemento(paht_server, path_local_content, path_local_ext
             } else {
               console.log(`---------- El elemento ${path_local_extension} comprimido correctamente`);
               console.log(' ');
-              compararMD5(path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
+              compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
             }
           });
         }
       }
 
-      if (!descargar_archivo && !lRetornar && !descomprimir) {
-        compararMD5(path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
+      if (!descargar_archivo && !descomprimir) {
+        compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
       }
-
-      if (descargar_archivo) {
-      }
+    } else {
+      console.log(res_servidor);
     }
     return;
   });
 }
 
-function compararMD5(path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
-  console.log(`---------- Procediendo a comparar los md5`);
-  console.log(' ');
-  console.log(`---------- Path donde esta el md5 a comparar --> ${pathAdd(`${path_local_content}${path_local_extension}`)}  `);
-  console.log(' ');
-  console.log(`CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5       <================`);
+function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
+  const command =
+    process.platform === 'darwin'
+      ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
+      : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
-  cmd(`CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`, (res_local) => {
-    console.log(1);
+  cmd(command, (res_local) => {
     console.log('res_local =>', res_local);
 
-    const md5_local = res_local.STDOUT.split('\r\n')[1];
+    const md5_local = process.platform === 'darwin' ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
     console.log('---------- md5_servidor ', md5_servidor);
     console.log(' ');
     console.log('---------- md5_local ', md5_local);
@@ -357,11 +382,13 @@ function compararMD5(path_local_content, path_local_extension, md5_servidor, pat
     if (md5_local !== md5_servidor) {
       console.log(`---------- Los md5 son diferentes procediendo a borrar elementos para descargarlos denuevo`);
       console.log(' ');
-      borrado_de_archivos_malos(path_local_extension, path_local_sin_extension, is_carpeta, (res_del) => {
+      // borrado_de_archivos_malos(path_local_extension, path_local_sin_extension, is_carpeta, (res_del) => {
+
+      borrado_de_archivos_malos(aFiles_malos, (res_del) => {
         console.log('MMMMMMMMM  ', res_del);
 
         if (res_del.status) {
-          procesoDescarga(path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
+          procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
           console.log(`---------- borrado de archivos exitoso`);
           console.log(' ');
         } else {
@@ -374,7 +401,7 @@ function compararMD5(path_local_content, path_local_extension, md5_servidor, pat
   });
 }
 
-async function procesoDescarga(path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta) {
+async function procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta) {
   let descarga_exito = true;
   console.log(`---------- procediendo a descargar el archivo ${path_local_extension}`);
   console.log(' ');
@@ -383,9 +410,15 @@ async function procesoDescarga(path_local_extension, path_local_content, paht_se
       console.log(`---------- Creando el md5 de ${path_local_extension} --->  ${pathAdd(`${path_local_content}${path_local_extension}`)}   `);
       console.log(' ');
 
-      cmd(`CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`, (res_local_before_descarga) => {
-        console.log(2);
-        const md5_local = res_local_before_descarga.STDOUT.split('\r\n')[1];
+      const command =
+        process.platform === 'darwin'
+          ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
+          : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+
+      cmd(command, (res_local_before_descarga) => {
+        console.log('res_local_before_descarga =>', res_local_before_descarga);
+
+        const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
         console.log(`---------- md5 de ${path_local_extension} local`);
         console.log(' ');
 
@@ -430,7 +463,7 @@ async function procesoDescarga(path_local_extension, path_local_content, paht_se
     if (counter <= 3) {
       console.log(`---------- fallo en la descarga de ${path_local_extension} intento numero ${counter}`);
       console.log(' ');
-      verificarElemento(paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter);
+      verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter);
     } else {
       console.log(`---------- Elemento ${path_local_extension} no se puede descargar comunicarse con Victor hablame despacio`);
       console.log(' ');
@@ -475,32 +508,32 @@ function cmd(command, callback) {
 
 function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
   // Save variable to know progress
-  var received_bytes = 0;
-  var total_bytes = 0;
+  let received_bytes = 0;
+  let total_bytes = 0;
 
-  var req = request({
+  const req = request({
     method: 'GET',
     uri: archive_url,
   });
 
   console.log(`ruta donde se descargara el elemento ${pathAdd(`${path}${file_}`)}`);
 
-  var out = fs.createWriteStream(pathAdd(`${path}${file_}`));
+  const out = fs.createWriteStream(pathAdd(`${path}${file_}`));
   req.pipe(out);
 
-  req.on('response', function (data) {
+  req.on('response', (data) => {
     // Change the total bytes value to get progress later.
     total_bytes = parseInt(data.headers['content-length']);
   });
 
-  req.on('data', function (chunk) {
+  req.on('data', (chunk) => {
     // Update the received bytes
     received_bytes += chunk.length;
 
     showProgress(received_bytes, total_bytes);
   });
 
-  req.on('end', function () {
+  req.on('end', () => {
     callback({
       status: true,
       msg: 'descarga finalizada',
@@ -509,7 +542,7 @@ function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
 }
 
 function showProgress(received, total) {
-  var percentage = (received * 100) / total;
+  const percentage = (received * 100) / total;
   console.log(percentage + '% | ' + received + ' bytes out of ' + total + ' bytes.');
 }
 
@@ -524,7 +557,7 @@ function puts(msg_, linea_ = undefined) {
     } else {
       obj = msg_;
     }
-    //console.log('puts.caller -->',puts.caller)
+    // console.log('puts.caller -->',puts.caller)
 
     win.webContents.send('log', obj);
   }
