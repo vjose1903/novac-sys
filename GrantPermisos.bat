@@ -2,13 +2,14 @@
 
 for /f %%j in ('powershell pwd') do set dir=%%j
 
-for /f %%i in ('whoami') do set current_user=%%i
+set current_user=%username%
 
 echo "el directorio es %dir%"
-echo "el usuario es %current_user%"
+echo "el usuario es (%current_user%")
 
-echo icacls %dir% /grant[:r] %current_user%:(F)
-icacls %dir% /grant[:r] %current_user%:(F)
+echo icacls c:\adm-agroindustrial\fonts /grant "%current_user%":(F) /t /c
+
+icacls c:\adm-agroindustrial\fonts /grant[:r] "%current_user%":(f) /t /c
 pause
 
 

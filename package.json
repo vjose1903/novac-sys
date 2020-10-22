@@ -99,6 +99,7 @@
     "bootstrap": "^4.3.1",
     "chart.js": "^2.7.2",
     "child_process": "^1.0.2",
+    "del": "^6.0.0",
     "electron-dl": "^3.0.2",
     "electron-log": "^4.2.4",
     "electron-updater": "^4.3.5",

@@ -66,22 +66,9 @@ function createWindow() {
 
   win.setMenuBarVisibility(false);
 
-  const aFiles_malos = [
-    {
-      path: pathAdd('/fonts.zip'),
-      is_carpeta: false,
-    },
-    {
-      path: pathAdd('/fonts/roboto'),
-      is_carpeta: true,
-    },
-    {
-      path: pathAdd('/fonts'),
-      is_carpeta: true,
-    },
-  ];
+  const aFiles_malos = [pathAdd('/fonts.zip'), pathAdd('/fonts')];
   verificarElemento(aFiles_malos, '/fonts/fonts.zip', '', '/fonts.zip', '/fonts', true, true, 'Fuentes', 0);
-  verificarSumastra();
+  // verificarSumastra();
   autoUpdater.checkForUpdatesAndNotify();
 
   // Emitted when the window is closed.
@@ -210,12 +197,7 @@ function verificarSumastra() {
     console.log('------------- Carpeta print existe no es necesario crearla -------------');
   }
 
-  const aFiles_malos = [
-    {
-      path: pathAdd('/lp.exe'),
-      is_carpeta: false,
-    },
-  ];
+  const aFiles_malos = [pathAdd('/lp.exe')];
 
   verificarElemento(aFiles_malos, '/sumastra/lp.exe', '/print', '/lp.exe', '/lp', false, false, 'Sumastra', 0);
 }
@@ -262,37 +244,38 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
 }
 
 // function borrado_de_archivos_malos(path_arciho_borrar, path_carpeta_borrar, is_carpeta, callback) {
-function borrado_de_archivos_malos(archivos, callback) {
-  let command = '';
+// function borrado_de_archivos_malos(archivos, callback) {
+//   let command = '';
+//
+//   for (let i = 0; i < archivos.length; i++) {
+//     const file = archivos[i];
+//
+//     if (file.is_carpeta) {
+//       command += `${i !== 0 ? ' && ' : ''}` + `${process.platform === 'darwin' ? `rm -rf ${file.path}` : `rmdir /s /q ${file.path}`}`;
+//     } else {
+//       command += `${i !== 0 ? ' && ' : ''}` + `${process.platform === 'darwin' ? `rm -rf ${file.path}` : `del ${file.path}`}`;
+//     }
+//   }
+async function borrado_de_archivos_malos(archivos, callback) {
+  const del = require('del');
 
-  for (let i = 0; i < archivos.length; i++) {
-    const file = archivos[i];
+  // delete directory recursively
 
-    if (file.is_carpeta) {
-      command += `${i !== 0 ? ' && ' : ''}` + `${process.platform === 'darwin' ? `rm -rf ${file.path}` : `rmdir /s /q ${file.path}`}`;
-    } else {
-      command += `${i !== 0 ? ' && ' : ''}` + `${process.platform === 'darwin' ? `rm -rf ${file.path}` : `del ${file.path}`}`;
-    }
+  try {
+    await del(archivos);
+
+    console.log(`Borrado de ${archivos}`);
+    callback({
+      status: true,
+      msg: 'Elementos borrado correctamente',
+    });
+  } catch (err) {
+    console.error(`Error borrando ${archivos}.`);
+    callback({
+      status: false,
+      msg: err,
+    });
   }
-
-  // const command_ = `del ${pathAdd(`${path_arciho_borrar}`)} ${is_carpeta ? `&& rmdir /s /q ${pathAdd(`${path_carpeta_borrar}`)} -Force` : ''}`;
-  console.log('command  ====> ', command);
-
-  cmd(command, async (res_borrado_distinto) => {
-    console.log('res_borrado_distinto -->', res_borrado_distinto);
-
-    if (res_borrado_distinto.status) {
-      callback({
-        status: true,
-        msg: 'Elemento borrado correctamente',
-      });
-    } else {
-      callback({
-        status: false,
-        msg: 'Error borrando elemento',
-      });
-    }
-  });
 }
 
 async function verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter) {
