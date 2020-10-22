@@ -12,7 +12,6 @@ import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../components/tablas/tablas.component';
 import { ModalService } from '../components/modal/modal.service';
 import { obj_paginate, TablasService } from '../components/tablas/tablas.service';
-import { recibo_de_ingreso } from 'assets/facturas';
 import { IpcService } from '../../core/services/ipc.service';
 
 @Component({
@@ -393,13 +392,12 @@ export class IngresosComponent implements OnInit, OnDestroy {
     const empleado = JSON.parse(this.dbServ.getEmpleado());
 
     // const tipo = this.tipoFacturas.filter((val) => val.descripcion === this.tipo_recibo)[0];
-    const tipo = { id: 2 };
     const obj = {
       cliente_id: this.clienteAdepositar.id,
       user_id: empleado.id,
       total: 0,
       forma_pago: this.forma_pago,
-      tipo_recibo_id: tipo.id,
+      tipo_factura_id: 17,
       devuelta: this.Devuelta,
       numero_recibo: null,
     };
