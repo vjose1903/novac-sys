@@ -12,6 +12,7 @@ const pdfmake = require('pdfmake/src/printer');
 import * as facturasCompraVenta from './myPdf/facturasCompraVenta.js';
 import * as recibosIngresos from './myPdf/recibosIngresos.js';
 import * as conduce from './myPdf/conduce.js';
+import { AppConfig } from './src/environments/environment.js';
 
 // tslint:disable: curly
 // tslint:disable: one-variable-per-declaration
@@ -388,7 +389,7 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
   let descarga_exito = true;
   console.log(`---------- procediendo a descargar el archivo ${path_local_extension}`);
   console.log(' ');
-  await downloadFile(`http://admservidor.ddns.net:3000${paht_server}`, path_local_content, path_local_extension, (res) => {
+  await downloadFile(`${AppConfig.url_server}${paht_server}`, path_local_content, path_local_extension, (res) => {
     if (res.status) {
       console.log(`---------- Creando el md5 de ${path_local_extension} --->  ${pathAdd(`${path_local_content}${path_local_extension}`)}   `);
       console.log(' ');

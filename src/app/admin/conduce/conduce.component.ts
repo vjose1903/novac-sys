@@ -617,6 +617,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       des: [null],
       can: [null],
       max_can: [9007199254740991],
+      can_original: [0],
       cantidad_en_unidades: [null],
       secuencia: [i],
     });
@@ -803,6 +804,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   llenarConduce(rows) {
     for (let j = 0; j < rows.length; j++) {
       const row = rows[j];
+      console.log('row ==> ', row);
 
       for (let i = 0; i < this.control.controls.length; i++) {
         const control = this.control.controls[i].value;
@@ -833,10 +835,17 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   }
 
   async llenarFila(element, i) {
-    const cant_actual = element.cantidad - element.retirado;
+    const cant_en_unidades_actual = element.cantidad_en_unidades - element.retirado;
     const multiplo = element.cantidad_en_unidades / element.cantidad;
+    const cant_actual = cant_en_unidades_actual / multiplo;
 
-    const cant_en_unidades_actual = cant_actual * multiplo;
+    // const cant_en_unidades_actual = cant_en_unidades_actual * multiplo;
+
+    console.log('element.cantidad_en_unidades ==>', element.cantidad_en_unidades);
+    console.log('element.retirado ==>', element.retirado);
+    console.log('cant_en_unidades_actual ==>', cant_en_unidades_actual);
+    console.log('cant_actual ==>', cant_actual);
+    console.log(`calulo ==> ${cant_en_unidades_actual} / ${multiplo} `, cant_en_unidades_actual / multiplo);
 
     (this.control.controls[i] as any).controls['detalle_factura_id'].setValue(element.id);
     (this.control.controls[i] as any).controls['articulo_id'].setValue(element.articulo_id);
@@ -844,6 +853,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
 
     (this.control.controls[i] as any).controls['can'].setValue(cant_actual);
     (this.control.controls[i] as any).controls['max_can'].setValue(cant_actual);
+    (this.control.controls[i] as any).controls['can_original'].setValue(element.cantidad);
     (this.control.controls[i] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
 
     (this.control.controls[i] as any).controls['des'].setValue(_.capitalize(element.articulo));
@@ -871,9 +881,14 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   excedeMaxCan(i) {
     const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
     const max_can = (this.control.controls[i] as any).controls['max_can'].value;
+    const can_original = (this.control.controls[i] as any).controls['can_original'].value;
     const can = (this.control.controls[i] as any).controls['can'].value;
     if (detalle_factura_id && can > max_can) {
-      this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR', true);
+      if (can_original > max_can) {
+        this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad restante de la factura ', 'ERROR', true);
+      } else {
+        this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR', true);
+      }
       (this.control.controls[i] as any).controls['can'].setValue(max_can);
       GLOBAL.enfocarInput('can-' + i);
     }
@@ -1002,6 +1017,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
         (this.control.controls[i] as any).controls['des'].setValue(null);
         (this.control.controls[i] as any).controls['can'].setValue(null);
         (this.control.controls[i] as any).controls['max_can'].setValue(9007199254740991);
+        (this.control.controls[i] as any).controls['can_original'].setValue(0);
         (this.control.controls[i] as any).controls['cantidad_en_unidades'].setValue(null);
         (this.control.controls[i] as any).controls['uni'].setValue(null);
         (this.control.controls[i] as any).controls['uni'].enable();

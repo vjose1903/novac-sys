@@ -35,6 +35,10 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
       key: 'retirado_mostrar',
     },
     {
+      titulo: 'Restante',
+      key: 'restante_mostrar',
+    },
+    {
       titulo: 'Seleccione',
       tipo: 'check',
       key: 'select',
@@ -56,8 +60,13 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
     this.articulos.map(async (arti) => {
       const medida = arti.retirado === 0 ? '' : arti.retirado < 100 ? 'LBS' : 'QTL';
       const cantidad = arti.retirado < 100 ? arti.retirado : arti.retirado / 100;
+      const multiplo = arti.cantidad_en_unidades / arti.cantidad;
+      const cant_en_unidades_actual = arti.cantidad_en_unidades - arti.retirado;
+      const cant_restante = cant_en_unidades_actual / multiplo;
 
       arti.retirado_mostrar = cantidad + ' ' + medida;
+
+      arti.restante_mostrar = cant_restante + ' ' + medida;
 
       return arti;
     });
