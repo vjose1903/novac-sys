@@ -139,34 +139,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       });
 
       this.listaClientes = res.data;
-      this.listaClientes = [
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-        ...this.listaClientes,
-      ];
+    
       const obj = {
         total: res.total_registros,
         tabla: 'listaClientes',
