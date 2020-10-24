@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { DBservice } from '../../core/services/bdservice.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
@@ -9,7 +10,7 @@ import { ModalService } from '../components/modal/modal.service';
   styleUrls: ['./homeAdmin.component.scss'],
 })
 export class HomeAdminComponent implements OnInit {
-  constructor(private dbServ: DBservice, private mServ: ModalService) {}
+  constructor(private dbServ: DBservice, private mServ: ModalService, private http: HttpClient) {}
   cedula = null;
   ngOnInit() {}
   p() {

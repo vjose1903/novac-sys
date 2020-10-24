@@ -15,7 +15,7 @@ import { RegistroClientesComponent } from './admin/registros/registro-clientes/r
 import { RegistroSuplidoresComponent } from './admin/registros/registro-suplidores/registro-suplidores.component';
 import { ProduccionComponent } from './admin/produccion/produccion.component';
 import { InventarioComponent } from './admin/inventario/inventario.component';
-import { IngresosComponent } from './admin/ingresos/ingresos.component';
+import { IngresosComponent } from './admin/recibo-ingresos/ingresos.component';
 import { BuscarFacturaComponent } from './admin/manipular facturas/buscar-factura/buscar-factura.component';
 import { NotasCredDebComponent } from './admin/manipular facturas/notas-cred-deb/notas-cred-deb.component';
 import { NcfComponent } from './admin/registros/ncf/ncf.component';

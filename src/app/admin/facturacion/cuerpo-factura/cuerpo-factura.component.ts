@@ -175,6 +175,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
     return res;
   }
+
   readDescuento() {
     let res = true;
     if (this.metodo === 'venta' && this.propietario !== null) {
@@ -221,6 +222,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   //  RESETEAR FORMULARIO
   // =============================================
   RESETCUERPO() {
+    for (let i = 0; i < this.control.controls.length; i++) {
+      (this.control.controls[i] as any).controls['descuento_porciento'].enable();
+    }
+
     this.form.reset();
     this.TOTAL = 0;
     this.ITBIS = 0;
@@ -251,6 +256,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       tot: [null],
       secuencia: [i],
       cantidad_en_unidades: [0],
+      is_materia_prima: [false],
     });
   }
 
@@ -674,6 +680,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   calcularDescuento(i) {
+    const codido = (this.control.controls[i] as any).controls['cod'].value;
     const precioTEMP = (this.control.controls[i] as any).controls['pre'].value;
     const precio = GLOBAL.desformatear(precioTEMP);
     const cantidad = (this.control.controls[i] as any).controls['can'].value;
@@ -684,13 +691,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     let calculoDesc = 0;
     let nuevoTotal = 0;
 
-    if (descuento === 0 || descuento === '0' || descuento === null || descuento === undefined) {
+    if (codido && (descuento === 0 || descuento === '0' || descuento === null || descuento === undefined)) {
       (this.control.controls[i] as any).controls['descuento_porciento'].reset();
       const total = precio * cantidad;
       (this.control.controls[i] as any).controls['tot'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(total)));
     }
 
-    if (precio !== '' && precio !== null && cantidad !== '' && cantidad != null && descuento !== '' && descuento !== ' ' && descuento !== null && descuento !== undefined) {
+    if (codido && precio && cantidad && descuento) {
       descuento = descuento / 100;
 
       calculoDesc = precio * descuento * cantidad;
@@ -875,8 +882,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       if (this.metodo === 'venta') {
         if (ARTICULO.descripcion === 'Materia prima') {
           (this.control.controls[i] as any).controls['descuento_porciento'].disable();
+          (this.control.controls[i] as any).controls['is_materia_prima'].setValue(true);
         } else {
           (this.control.controls[i] as any).controls['descuento_porciento'].enable();
+          (this.control.controls[i] as any).controls['is_materia_prima'].setValue(false);
         }
       }
 

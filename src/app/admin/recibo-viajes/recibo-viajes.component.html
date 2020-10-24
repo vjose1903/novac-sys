@@ -1,9 +1,9 @@
-<div class="row">
+recibo de ingresos y recibo de viajes creo que listo<div class="row">
   <div class="col-12">
     <h4>Listado de viajes</h4>
   </div>
   <div class="col-md-7">
-    <div #cardTabla class="card cardListados p-3">
+    <div id="cardTabla" #cardTabla class="card cardListados p-3">
       <app-tablas
         *ngIf="viajes && info"
         [info]="info"
@@ -41,7 +41,7 @@
     </div>
     <hr class="rayaA mt-2" />
 
-    <div *ngIf="viaje_selected.id !== -1" class="mt-4">
+    <div *ngIf="viaje_selected?.id !== -1" class="mt-4">
       <div class="card sombra">
         <div class="card-header">
           <h4 class="negrita">Viaje seleccionado</h4>
@@ -50,21 +50,52 @@
           <span class="d-flex">
             <h5 class="negrita">Viaje para:</h5>
             &nbsp;&nbsp;
-            <h5>{{ viaje_selected.cliente.nombre }}</h5>
+            <h5>{{ viaje_selected?.cliente.nombre }}</h5>
           </span>
           <span class="d-flex">
             <h5 class="negrita">Total facturado:</h5>
             &nbsp;&nbsp;
-            <h5>{{ formatoNumero(viaje_selected.total_factura) }}</h5>
+            <h5>{{ formatoNumero(viaje_selected?.total_factura) }}</h5>
           </span>
+
+          <span *ngIf="monto_pendiente > 0" class="d-flex">
+            <h5 class="negrita text-red">Monto pendiente:</h5>
+            &nbsp;&nbsp;
+            <h5>{{ formatoNumero(monto_pendiente) }}</h5>
+          </span>
+
+          <div *ngIf="viaje_selected?.pagos?.length > 0">
+            <hr class="rayaA mt-2" />
+            <div class="d-flex justify-content-between">
+              <span class="negrita">Porcentaje de pago</span>
+              <div>
+                <span class="negrita">RD${{ formatoNumero(totalPagado) }} / </span>
+                <span class="negrita gris">RD${{ formatoNumero(viaje_selected?.total_factura) }}</span>
+              </div>
+            </div>
+            <p-progressBar class="mb-2" [value]="totalPagadoPorciento"></p-progressBar>
+
+            <hr class="rayaA mt-2" />
+          </div>
+
+          <div class="form-group mt-4">
+            <label class="control-label">Viaje realizado por: <span style="color: red">*</span></label>
+            <select [(ngModel)]="chofer_id" class="form-control" (blur)="checkChofer()" (focus)="entroEnChofer()">
+              <option *ngFor="let item of choferes" value="{{ item.id }}">{{ item.nombre }}</option>
+              <option *ngIf="!is_choferes_register" disable>No tiene Choferes registrados</option>
+            </select>
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!is_chofer_selected && salio_en_chofer">Debe de seleccionar un chofer</div>
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!is_choferes_register">Debe de registrar un chofer</div>
+          </div>
+
           <hr class="rayaA mt-2" />
+
           <div class="d-flex justify-content-end">
-            <input (click)="accion(false)" class="btn btn-blanco mr-2" value="Cancelar" />
-            <input
-              (click)="accion(true)"
-              class="btn {{ viaje_selected.fecha_completada !== null ? 'btn-amarillo' : 'btn-verde' }}"
-              value="{{ viaje_selected.fecha_completada !== null ? 'Revertir transación' : 'Completar transación' }}"
-            />
+            <button (click)="accion(false)" class="btn btn-blanco mr-2">Cancelar</button>
+
+            <button [disabled]="!is_chofer_selected" (click)="accion(true)" class="btn {{ viaje_selected.fecha_completada !== null ? 'btn-amarillo' : 'btn-verde' }}">
+              {{ viaje_selected.fecha_completada !== null ? 'Revertir transación' : 'Recibir efectivo' }}
+            </button>
           </div>
         </div>
       </div>

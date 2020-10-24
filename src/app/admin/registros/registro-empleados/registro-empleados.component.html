@@ -107,7 +107,7 @@
           <div class="row">
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-5">
               <label for="" class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
-              <input type="text" [bsConfig]="dpConfig" placeholder="mm/dd/aaaa" class="form-control" formControlName="fecha_nacimiento" #dp="bsDatepicker" placement="top" bsDatepicker />
+              <input type="text" [bsConfig]="dpConfig" placeholder="dd/mm/aaaa" class="form-control" formControlName="fecha_nacimiento" #dp="bsDatepicker" placement="top" bsDatepicker />
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
@@ -124,7 +124,8 @@
                   <option value="" disabled selected hidden>Role</option>
                   <option value="A">Administrador</option>
                   <option value="V">Vendedor</option>
-                  <option value="U">Usuario</option>
+                  <option value="U">Cajero</option>
+                  <option value="C">Chofer</option>
                 </select>
                 <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['role'].valid && (form.controls['role'].dirty || form.controls['role'].touched)">
                   Debe de seleccionar el role
@@ -163,7 +164,7 @@
   </div>
   <div class="col-md-6">
     <h4>Listado empleados</h4>
-    <div #cardTabla class="card cardListados">
+    <div id="cardTabla" #cardTabla class="card cardListados">
       <app-tablas
         *ngIf="listaEmpleados && info"
         [info]="info"

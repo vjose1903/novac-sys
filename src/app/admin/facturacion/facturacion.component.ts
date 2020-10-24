@@ -31,7 +31,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     // alt 18
     event.stopPropagation();
     const key = event.keyCode;
-console.log(key);
+    console.log(key);
 
     if (event.type === 'keydown') {
       if (!this.secuenciaKeys.includes(key)) {
@@ -274,31 +274,43 @@ console.log(key);
   checkCambiosModoyCondicionFactura(arg) {
     const sali_de = arg.id;
     const valor = arg.value;
+    const condicion = this.condicion_fact;
+    let buscar = false;
 
-    console.log('sali_de ', sali_de);
-    console.log('valor ', valor);
     if (this.metodo === 'venta') {
       setTimeout(() => {
         console.log('entre en  ', document.activeElement.id);
         const voy_a = document.activeElement.id;
         const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
-        let buscar = false;
-        if (sali_de === 'venta' && valor === 'viaje' && voy_a !== 'fecha_equivalente' && nombre === 'Cliente contado') {
+        if (sali_de === 'venta' && (valor === 'viaje' || valor === 'normal') && voy_a !== 'fecha_equivalente' && nombre === 'Cliente contado') {
+          console.log(1);
+
           buscar = true;
         }
         if (sali_de === 'venta' && valor === 'adelantada' && nombre === 'Cliente contado') {
+          console.log(2);
           buscar = true;
         }
-        if (sali_de === 'venta' && valor === 'normal' && voy_a !== 'nom' && voy_a !== 'dir') {
+        if (sali_de === 'venta' && condicion === 'Contado' && valor === 'normal' && voy_a !== 'nom' && voy_a !== 'dir') {
+          console.log(3);
           this.iniciarFactura('cod-0');
         }
 
-        // viaje
-        // adelantada
-
-        if (sali_de === 'condicion' && valor === 'Crédito' && nombre === 'Cliente contado') {
+        // if (sali_de === 'venta' && condicion === 'Crédito' && voy_a !== 'fecha_equivalente' && nombre === 'Cliente contado') {
+        //   console.log(4);
+        //   buscar = true;
+        // }
+        if (sali_de === 'fecha_equivalente' && condicion === 'Crédito' && nombre === 'Cliente contado') {
+          console.log(5);
           buscar = true;
         }
+        console.log('sali_de ', sali_de);
+        console.log('valor ', valor);
+        console.log('metodo ', this.metodo);
+        console.log('condicion ', condicion);
+        console.log('nombre ', nombre);
+        console.log('voy_a ', voy_a);
+        console.log('buscar => ', buscar);
         if (buscar) {
           this.abrirModalFiltro();
         }
@@ -910,7 +922,7 @@ console.log(key);
     }
 
     cabecera_fact['fecha_equivalente'] = fecha_equi;
-    cabecera_fact['fecha_completada'] = this.modo_factura === 'viaje' ? null : fecha_equi;
+    // cabecera_fact['fecha_completada'] = this.modo_factura === 'viaje' ? null : fecha_equi;
 
     if (this.condicion_fact === 'Crédito') {
       let fecha_venci;
@@ -919,15 +931,14 @@ console.log(key);
       } else {
         fecha_venci = moment(this.fecha_vencimiento).format('DD/MM/YYYY');
       }
-
       cabecera_fact['fecha_vencimiento'] = fecha_venci;
       cabecera_fact['pagada'] = false;
       cabecera_fact['balance'] = GLOBAL.redondearAdos(this.TOTAL);
       cabecera_fact['devuelta'] = 0;
     } else {
-      cabecera_fact['pagada'] = true;
-      cabecera_fact['balance'] = 0;
-      cabecera_fact['devuelta'] = this.Devuelta;
+      cabecera_fact['pagada'] = this.is_viaje ? false : true;
+      cabecera_fact['balance'] = this.is_viaje ? GLOBAL.redondearAdos(this.TOTAL) : 0;
+      cabecera_fact['devuelta'] = this.is_viaje ? 0 : this.Devuelta;
     }
 
     cabecera_fact['fecha_valida'] = this.paqueteComprobante

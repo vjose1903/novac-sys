@@ -24,8 +24,8 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   element: HTMLElement;
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
-  rolesF = { V: 'Vendedora', A: 'Administradora', U: 'Usuario' };
-  rolesM = { V: 'Vendedor', A: 'Administrador', U: 'Usuario' };
+  rolesF = { V: 'Vendedora', A: 'Administradora', U: 'Cajera', C: 'Chofer' };
+  rolesM = { V: 'Vendedor', A: 'Administrador', U: 'Cajero', C: 'Chofer' };
 
   info = [
     {

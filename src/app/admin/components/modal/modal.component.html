@@ -17,10 +17,11 @@
   >
     <p>Desea remover {{ seleccionModal.nombre }} de la lista</p>
     <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
+
   <!-- ================================================================================================================================ -->
   <!-- ELIMINAR -->
   <!-- ================================================================================================================================ -->
@@ -40,8 +41,8 @@
   >
     <p>Desea eliminar {{ seleccionModal.nombre }}</p>
     <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
 
@@ -143,8 +144,8 @@
   >
     <p>Seguro que desea cancelar la produccion</p>
     <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -166,8 +167,8 @@
   >
     <p>Existen articulos con costos distintos desea que se actualicen los costos automaticamente?</p>
     <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -189,8 +190,8 @@
   >
     <p>Seguro que desea cancelar la busqueda de factura</p>
     <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -214,8 +215,8 @@
       Seguro que desea cancelar la factura <b *ngIf="identificadorFact">{{ identificadorFact }}</b>
     </p>
     <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -239,8 +240,8 @@
       Seguro que desea remover el articulo <b class="negrita">{{ seleccionModal.nombre }}</b>
     </p>
     <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
 
@@ -263,8 +264,8 @@
   >
     <p>Seguro que desea imprimir la factura</p>
     <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
   <!-- ================================================================================================================================ -->
@@ -307,8 +308,8 @@
     <app-modal-seleccinar-articulo [articulos]="seleccionModal" (getArticulos)="devolverCLick($event)"></app-modal-seleccinar-articulo>
 
     <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
 
@@ -402,10 +403,11 @@
     <div class="p-2">
       <app-formar-factura [factura]="seleccionModal"></app-formar-factura>
     </div>
+
     <p-footer>
       <ng-container class="p-1" *ngIf="lugar === 'anular_factura'">
-        <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="Cerrar" />
-        <input (click)="accion(true)" type="submit" class="btn" value="Anular factura" id="btn-verde" />
+        <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
+        <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">Anular factura</button>
       </ng-container>
       <ng-container class="p-1" *ngIf="lugar !== 'anular_factura'">
         <div class="d-flex justify-content-between">
@@ -422,8 +424,8 @@
             </span>
           </div>
           <div>
-            <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-            <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+            <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+            <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
           </div>
         </div>
       </ng-container>
@@ -451,8 +453,8 @@
       {{ texto }}
     </p>
     <p-footer>
-      <input (click)="accion(false)" type="submit" class="btn btn-blanco mr-2" value="NO" />
-      <input (click)="accion(true)" type="submit" class="btn" value="SI" id="btn-verde" />
+      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
 </div>

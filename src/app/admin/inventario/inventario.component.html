@@ -1,5 +1,4 @@
 <div #cardTabla class="cardPrincipal sinPadding tamano">
-
   <div class="bordes info d-flex justify-content-between">
     <div class="text-center">
       <span class="w-100"> Cantidad de productos en inventario </span>
@@ -25,8 +24,18 @@
         <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
       </select>
     </div>
-    <app-tablas *ngIf="listaArticulos" [info]="info" [data]="listaArticulos" [focusRow]="false" [search]="true"
-      [paginate]="true" [botones]="botones" (DevolverInfo)="movimientoInventario($event)"
-      (paginateChange)="getArticulos($event)"></app-tablas>
+    <div id="cardTabla">
+      <app-tablas
+        *ngIf="listaArticulos"
+        [info]="info"
+        [data]="listaArticulos"
+        [focusRow]="false"
+        [search]="true"
+        [paginate]="true"
+        [botones]="botones"
+        (DevolverInfo)="movimientoInventario($event)"
+        (paginateChange)="getArticulos($event)"
+      ></app-tablas>
+    </div>
   </div>
 </div>

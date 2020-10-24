@@ -165,7 +165,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       }
 
       this.alto = altoDiv - restoAHeigthDiv - this.quitarAScorll - paddingCard;
-      console.log(`${altoDiv} - ${restoAHeigthDiv} - ${this.quitarAScorll} - ${paddingCard}  = ${this.alto}`);
     }, 20);
   }
 
@@ -175,23 +174,25 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   mouseMoveEvent(event, row, column, id) {
-    row.iconsMoveEvents.forEach((moveEvent) => {
-      if (column === moveEvent.key) {
-        if (event === 'hover') {
-          for (let i = 0; i < moveEvent.hover.length; i++) {
-            const overEvent = moveEvent.hover[i];
-            GLOBAL.ModificarClass(id, moveEvent.leave[i], 'remove');
-            GLOBAL.ModificarClass(id, overEvent, 'add');
-          }
-        } else {
-          for (let i = 0; i < moveEvent.leave.length; i++) {
-            const overEvent = moveEvent.leave[i];
-            GLOBAL.ModificarClass(id, moveEvent.hover[i], 'remove');
-            GLOBAL.ModificarClass(id, overEvent, 'add');
+    if (row.iconsMoveEvents) {
+      row.iconsMoveEvents.forEach((moveEvent) => {
+        if (column === moveEvent.key) {
+          if (event === 'hover') {
+            for (let i = 0; i < moveEvent.hover.length; i++) {
+              const overEvent = moveEvent.hover[i];
+              GLOBAL.ModificarClass(id, moveEvent.leave[i], 'remove');
+              GLOBAL.ModificarClass(id, overEvent, 'add');
+            }
+          } else {
+            for (let i = 0; i < moveEvent.leave.length; i++) {
+              const overEvent = moveEvent.leave[i];
+              GLOBAL.ModificarClass(id, moveEvent.hover[i], 'remove');
+              GLOBAL.ModificarClass(id, overEvent, 'add');
+            }
           }
         }
-      }
-    });
+      });
+    }
   }
 
   async necesarioStart() {
@@ -212,12 +213,14 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     for (let i = 0; i < this.info.length; i++) {
       const info = this.info[i];
+
       if (info.customClass) {
         for (let j = 0; j < info.estilos.length; j++) {
           const estilos = info.estilos[j];
           const key = Object.keys(estilos)[0];
           const value = Object.values(estilos)[0];
           const columna = document.getElementById(info.titulo) as any;
+
           columna.style[key] = value;
         }
       }
@@ -294,8 +297,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   resetInput(referencia, destino, i, formatear, especifico?) {
     if (referencia === 'especificar') {
-      console.log('especifico ', especifico);
-
       this.data[i][destino] = especifico;
     } else {
       const copia = GLOBAL.duplicarJson(this.data[i][referencia]);
@@ -525,8 +526,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   ngOnChanges(simpleChanges) {
-    console.log(simpleChanges);
-
     if (simpleChanges.data && simpleChanges.info) {
       if (simpleChanges.data.currentValue && simpleChanges.info.currentValue) {
         setTimeout(() => {

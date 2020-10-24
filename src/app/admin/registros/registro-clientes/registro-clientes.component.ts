@@ -117,7 +117,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   }
 
   getVendedores() {
-    this.dbServ.getVendedores().subscribe((res) => {
+    this.dbServ.getUserByRole('V').subscribe((res) => {
       this.vendedores = res;
     });
   }
@@ -139,7 +139,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       });
 
       this.listaClientes = res.data;
-    
+
       const obj = {
         total: res.total_registros,
         tabla: 'listaClientes',

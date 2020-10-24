@@ -39,7 +39,7 @@
             <tr>
               <td *ngIf="propietario" class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
                 <!-- <div class="hoverZone"></div> -->
-                <i class="fas fa-ban text-red btnBorrar" (click)="modalRemover(i)"></i>
+                <i class="far fa-trash-alt text-red btnBorrar" (click)="modalRemover(i)"></i>
               </td>
               <!--  ::::::::::::  CODIGO  ::::::::::::  -->
               <td class="COD td0padding">
@@ -53,6 +53,7 @@
                     (keydown.enter)="saltar($event, 'can-', i)"
                     formControlName="cod"
                     (blur)="verificarRow(i)"
+                    tabindex="-1"
                   />
                 </div>
               </td>
@@ -70,6 +71,7 @@
                     (keydown.enter)="saltar($event, 'uni-', i)"
                     formControlName="can"
                     (blur)="calcularTotalRow(i) && verificarRow(i)"
+                    tabindex="-1"
                   />
                 </div>
               </td>
@@ -87,6 +89,7 @@
                     (keydown.enter)="saltar($event, metodo === 'venta' ? 'cod-' : 'pre-', i)"
                     formControlName="uni"
                     (blur)="calcularTotalRow(i) && verificarRow(i)"
+                    tabindex="-1"
                   />
 
                   <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
@@ -100,6 +103,7 @@
                       id="uni-{{ i }}"
                       (keydown.enter)="saltar($event, metodo === 'venta' ? 'cod-' : 'pre-', i)"
                       (blur)="calcularTotalRow(i) && verificarRow(i)"
+                      tabindex="-1"
                     >
                       <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
                     </select>
@@ -110,7 +114,7 @@
               <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
               <td class="DES td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada inDES" id="des-{{ i }}" formControlName="des" readonly="true" />
+                  <input type="text" class="form-control entrada inDES" id="des-{{ i }}" formControlName="des" readonly="true" tabindex="-1" />
                 </div>
               </td>
 
@@ -128,6 +132,7 @@
                     (blur)="calcularDescuento(i)"
                     (emptied)="calcularDescuento(i)"
                     [readOnly]="readDescuento()"
+                    tabindex="-1"
                   />
                 </div>
               </td>
@@ -144,14 +149,15 @@
                     id="pre-{{ i }}"
                     formControlName="pre"
                     [readOnly]="readPrecio()"
+                    tabindex="-1"
                   />
                 </div>
               </td>
 
               <td class="TOT td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada inTOT campoNumeros" id="tot-{{ i }}" formControlName="tot" readonly="true" />
-                  <input type="hidden" [value]="i" formControlName="secuencia" />
+                  <input type="text" class="form-control entrada inTOT campoNumeros" id="tot-{{ i }}" formControlName="tot" readonly="true" tabindex="-1" />
+                  <input type="hidden" [value]="i" formControlName="secuencia" tabindex="-1" />
                 </div>
               </td>
             </tr>

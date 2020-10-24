@@ -314,16 +314,17 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         return a.id > b.id ? 1 : -1;
       });
       this.facturas = GLOBAL.duplicarJson(busqueda);
+      console.log('this.facturas ', this.facturas);
 
       if (this.facturas.length === 0) {
         if (this.campo === '1') {
           if (this.tipo_factura_id === '0') {
-            this.dbServ.toastError('Este cliente no tiene facturas a su nombre', 'ERROR');
+            this.dbServ.toastError('Este cliente no tiene facturas a credito a su nombre', 'ERROR', true);
           } else {
-            this.dbServ.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
+            this.dbServ.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR', true);
           }
         } else if (this.campo === '3') {
-          this.dbServ.toastError('No existen facturas con este numero.', 'ERROR');
+          this.dbServ.toastError('No existen facturas con este numero.', 'ERROR', true);
         }
       }
     } catch (error) {

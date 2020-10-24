@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
@@ -115,10 +115,6 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
           this.articulos_selected.push(articulo);
         }
       }
-
-      console.log('_x_ ', _x_);
-      console.log('articulo ', articulo);
-      console.log('this.articulos_selected ', this.articulos_selected);
     }
   }
 

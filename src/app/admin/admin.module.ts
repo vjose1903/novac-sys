@@ -22,7 +22,7 @@ import { PaswordConfirmDirective } from '../core/directive/pasword-confirm-direc
 import { ProduccionComponent } from './produccion/produccion.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MovimientosFormComponent } from './inventario/movimientos-form/movimientos-form.component';
-import { IngresosComponent } from './ingresos/ingresos.component';
+import { IngresosComponent } from './recibo-ingresos/ingresos.component';
 import { FormCantidadEfectivoComponent } from './facturacion/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
@@ -36,7 +36,7 @@ import { UploadImgComponent } from './components/upload-img/upload-img.component
 import { PendienteFormComponent } from './components/pendiente-form/pendiente-form.component';
 import { FormarFacturaComponent } from './components/formar-factura/formar-factura.component';
 import { TablasModule } from './components/tablas/tablas.module';
-import { ModalHistorialPagosComponent } from './ingresos/modal-historial-pagos/modal-historial-pagos.component';
+import { ModalHistorialPagosComponent } from './recibo-ingresos/modal-historial-pagos/modal-historial-pagos.component';
 import { ConduceComponent } from './conduce/conduce.component';
 import { ModalSeleccinarArticuloComponent } from './conduce/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 import { NgInitDirective } from '../directives/ngInit';

@@ -227,7 +227,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   getDevuelta(arg) {
-    const obj = { devuelta: arg.devuelta, forma_pago: arg.forma_pago, decision_cambio: arg.decision_cambio };
+    const obj = { dinero: arg.dinero, devuelta: arg.devuelta, forma_pago: arg.forma_pago, decision_cambio: arg.decision_cambio };
     this.devolverCLick(obj);
     this.reinicioModal();
   }

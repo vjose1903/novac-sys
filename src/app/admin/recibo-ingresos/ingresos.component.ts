@@ -37,11 +37,13 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   info = [
     {
-      titulo: '',
+      titulo: '1',
       key: 'historyPagos',
       text_color: 'colorEstado',
       isIcon: true,
       color: true,
+      customClass: true,
+      estilos: [{ width: '2rem' }, { color: '#8ef3a3' }],
     },
     {
       titulo: 'NCF',
@@ -245,10 +247,13 @@ export class IngresosComponent implements OnInit, OnDestroy {
                 val.historyPagos = val.pagos.length > 0 ? 'fas fa-comment-dollar' : 'far fa-comment';
                 val.colorEstado = val.pagos.length > 0 ? 'black' : 'gris-claro';
                 val.iconHover = val.pagos.length > 0 ? true : false;
+                val.customStyles = [{ 'td-historyPagos': { estilos: [{ width: '2rem' }] } }];
 
                 val.pagos.forEach((abono) => {
                   this.totalPagado += abono.deposito;
                 });
+
+                console.log('val.pagos ', val.pagos);
 
                 this.totalFacturado += val.total_factura;
                 this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
@@ -266,6 +271,9 @@ export class IngresosComponent implements OnInit, OnDestroy {
       this.Facturas.forEach((element) => {
         total += element.balance;
       });
+
+      console.log(';;;;;;;;;; this.Facturas ', this.Facturas);
+
       const obj = {
         total: this.Facturas.lenght,
         tabla: 'facturasPendientes',
@@ -284,25 +292,25 @@ export class IngresosComponent implements OnInit, OnDestroy {
   }
 
   clickVerPagos(arg) {
-    const pagos = arg.pagos;
-    console.log(arg);
+    if (arg.column === 'historyPagos') {
+      const pagos = this.Facturas[arg.index].pagos;
+      if (pagos.length > 0) {
+        for (let i = 0; i < pagos.length; i++) {
+          const pago = pagos[i];
+          pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
+          pago.recibo_created_at = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
+        }
+        this.mServ.modalTipo('historial_pago');
+        this.mServ.ModalTablaHeight(true);
 
-    if (pagos.length > 0) {
-      for (let i = 0; i < pagos.length; i++) {
-        const pago = pagos[i];
-        pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
-        pago.recibo_created_at = moment(pago.recibo_created_at).format('DD/MM/YYYY');
+        const obj = {
+          total: pagos.length,
+          tabla: 'historial_pago',
+        };
+
+        this.tServ.Func_total_paginas(obj);
+        this.abrirModal(pagos);
       }
-      this.mServ.modalTipo('historial_pago');
-      this.mServ.ModalTablaHeight(true);
-
-      const obj = {
-        total: pagos.length,
-        tabla: 'historial_pago',
-      };
-
-      this.tServ.Func_total_paginas(obj);
-      this.abrirModal(pagos);
     }
   }
 
@@ -515,6 +523,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
       console.log('this.recibiendo ', this.recibiendo);
     });
   }
+
   modificarFacturaSelected(item) {
     const index = _.findIndex(this.facturas_selected, (fact: any) => {
       return fact.id === item.body[item.index].id;

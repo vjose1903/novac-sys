@@ -15,10 +15,11 @@
               (keydown.enter)="abrirModalFiltro($event.target.value)"
               (focus)="$event.target.select()"
               placeholder="Nombre Cliente"
-              class="form-control mb-4"
+              class="form-control mb-4 inputE"
               autocomplete="off"
               [disabled]="cliente"
               value=""
+              tabindex="-1"
             />
           </div>
         </div>
@@ -41,6 +42,7 @@
             [data]="facturas_adelantadas"
             [focusRow]="false"
             (clickRow)="SeleccionarFactruaAdelantada($event)"
+            tabindex="-1"
           ></app-tablas>
         </div>
       </div>
@@ -82,7 +84,7 @@
                   <tr>
                     <td class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
                       <!-- <div class="hoverZone"></div> -->
-                      <i class="fas fa-ban text-red btnBorrar" (click)="modalRemover(i)"></i>
+                      <i class="far fa-trash-alt text-red btnBorrar" (click)="modalRemover(i)"></i>
                     </td>
                     <!--  ::::::::::::  CODIGO  ::::::::::::  -->
                     <td class="COD td0padding">
@@ -96,6 +98,7 @@
                           formControlName="cod"
                           (blur)="verificarRow(i)"
                           (blur)="calculateCantidadEnUnidades(i)"
+                          tabindex="-1"
                         />
                       </div>
                     </td>
@@ -114,6 +117,7 @@
                           (blur)="verificarRow(i)"
                           (blur)="calculateCantidadEnUnidades(i)"
                           (blur)="excedeMaxCan(i)"
+                          tabindex="-1"
                         />
                       </div>
                     </td>
@@ -131,6 +135,7 @@
                           formControlName="uni"
                           (blur)="verificarRow(i)"
                           (blur)="calculateCantidadEnUnidades(i)"
+                          tabindex="-1"
                         />
 
                         <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
@@ -143,6 +148,7 @@
                             (keydown.enter)="saltar('cod-', i)"
                             (blur)="verificarRow(i)"
                             (blur)="calculateCantidadEnUnidades(i)"
+                            tabindex="-1"
                           >
                             <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
                           </select>
@@ -153,7 +159,7 @@
                     <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
                     <td class="DES td0padding">
                       <div class="from-group">
-                        <input type="text" class="form-control entrada inDES" id="des-{{ i }}" formControlName="des" readonly="true" />
+                        <input type="text" class="form-control entrada inDES" id="des-{{ i }}" formControlName="des" readonly="true" tabindex="-1" />
                       </div>
                     </td>
                   </tr>

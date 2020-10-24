@@ -201,8 +201,8 @@ export class DBservice {
   getEmpleados() {
     return this.peticion('users', 'get');
   }
-  getVendedores() {
-    return this.peticion('users/vendedores', 'get');
+  getUserByRole(role) {
+    return this.peticion(`users/by_role/${role}`, 'get');
   }
 
   updateEmpleados(arg) {

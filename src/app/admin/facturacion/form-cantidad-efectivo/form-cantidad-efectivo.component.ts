@@ -14,6 +14,8 @@ import { ModalService } from '../../components/modal/modal.service';
 export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
   @Input() tipo = 'devuelta';
   @Input() data;
+  @Input() debe_cubrir = true;
+
   element: any;
   devuelta;
   efectivo: string;
@@ -46,8 +48,8 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
       this.enfocarInput(campo);
     }
     if (campo === 'send') {
-      if (this.efectivo < this.data.total_factura) {
-        this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR');
+      if (this.tipo !== 'no_devuelta' && this.efectivo < this.data.total_factura) {
+        this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR', true);
         this.enfocarInput('inputEfectivo');
       } else {
         this.enfocarInput('btnSend');
@@ -144,13 +146,15 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
     const devuelta_ = GLOBAL.desformatear(this.devuelta);
     const efectivo = GLOBAL.desformatear(this.efectivo);
     const obj = {
+      dinero: efectivo,
       devuelta: this.devuelta ? devuelta_ : 0,
       forma_pago: this.formaPago,
       decision_cambio: this.cambiar_articulos === 'si' ? true : false,
     };
     console.log('total > efectivo', 'total ', total, 'efectivo ', efectivo, total > efectivo);
+    console.log('tipo => ', this.tipo);
 
-    if (this.factura_de === 'venta' && total > efectivo) {
+    if (this.factura_de === 'venta' && this.tipo !== 'no_devuelta' && total > efectivo) {
       this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR');
     } else {
       if (this.factura_de === 'compra') {
