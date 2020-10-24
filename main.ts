@@ -613,8 +613,8 @@ function makePdf(dd, file) {
     const pdfDoc = printer.createPdfKitDocument(dd);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
       console.log('finizu');
-      win.webContents.send('printRes', { msg: 'Pruebas', status: 'si', body: dd, sbody: JSON.stringify(dd) });
-      // imprimir(cFileName);
+      // win.webContents.send('printRes', { msg: 'Pruebas', status: 'si', body: dd, sbody: JSON.stringify(dd) });
+       imprimir(cFileName);
     });
     pdfDoc.end();
   } catch (err) {
