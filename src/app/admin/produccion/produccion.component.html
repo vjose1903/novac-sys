@@ -10,7 +10,7 @@
               <select
                 [(ngModel)]="articulo_id"
                 (keydown.enter)="saltar('cantidad_producir')"
-                class="form-control entrada"
+                class="form-control inputE"
                 style="border-radius: 0"
                 (change)="getIngredients()"
                 id="articulo_id"
@@ -33,8 +33,8 @@
                   id="cantidad_producir"
                   [(ngModel)]="cantidad_producir"
                   (focus)="$event.target.select()"
-                  placeholder="Cantidad para alertar"
-                  class="form-control mb-4"
+                  placeholder="Cantidad a producir"
+                  class="form-control mb-4 inputE"
                   autocomplete="off"
                   (blur)="calcularCantidadAProduccir()"
                 />
@@ -43,7 +43,7 @@
               <div class="col-8">
                 <select
                   (keydown.enter)="saltar('agregar')"
-                  class="form-control"
+                  class="form-control inputE"
                   [(ngModel)]="medida_producir"
                   id="medida_producir"
                   (change)="calcularCantidadAProduccir()"
@@ -111,7 +111,7 @@
     </div>
   </div>
   <div class="col-12">
-    <div id="cardTabla"  #cardTabla class="card card-padding-1 sombra heightPmax">
+    <div id="cardTabla" #cardTabla class="card card-padding-1 sombra heightPmax">
       <div>
         <app-tablas
           *ngIf="lista_produccion"

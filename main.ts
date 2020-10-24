@@ -626,14 +626,13 @@ function makePdf(dd, file) {
 }
 
 function imprimir(cFileName) {
-  // const args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
   const { exec } = require('child_process');
-  // "C:\Users\User\Desktop\factura.pdf" "EPSON LX-350 ESC/P"
-  // exec(`${sumatrapdf_path} -print-to-default -print-settings "" ${cFileName}`, (error, stdout, stderr) => { });
 
-  const foxitPath = pathAdd() + 'print\\FoxitReaderPortable.exe';
-
-  exec(`${foxitPath} /t "${pathAdd('/' + cFileName)}"`, (error, stdout, stderr) => {
+  const sumatrapdf_path = pathAdd('/print/lp.exe');
+  // const bat = require.resolve(sumatrapdf_path);
+  // const profile = require.resolve('../profiles/app.profile.js');
+  const args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
+  exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,monochrome" -silent ${cFileName}`, (error, stdout, stderr) => {
     if (error) {
       puts(error, 273);
       win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err: error });

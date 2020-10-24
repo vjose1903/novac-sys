@@ -29,6 +29,7 @@
         <div [ngClass]="actualTab == 'nota' ? 'subMenuFacturaA' : 'subMenuFactura'">
           <h4 class="opcion" (click)="navegar('buscarFactura', 'nota_credito')">Nota de Crédito</h4>
           <h4 class="opcion" (click)="navegar('buscarFactura', 'nota_debito')">Nota de Débito</h4>
+          <h4 class="opcion" (click)="navegar('buscarFactura', 'solo_ver')">Visualizar</h4>
           <!-- <h4 class="opcion" (click)="navegar('buscarFactura', 'anular_factura')">Anular factura</h4> -->
         </div>
       </div>
@@ -67,7 +68,7 @@
         <img [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/inventario.png" alt="Inventario" (click)="navegar(4)" />
         <h5 [ngClass]="actualTab == 'inventario' ? 'tituloMenuA' : 'tituloMenu'"><strong>Inventario</strong></h5>
       </div>
-
+      <!--
       <div class="menuList">
         <img [ngClass]="actualTab == 'reporte' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png" alt="Reportes" (click)="navegar(5)" />
         <h5 [ngClass]="actualTab == 'reporte' ? 'tituloMenuA' : 'tituloMenu'"><strong>Reporte</strong></h5>
@@ -80,7 +81,7 @@
         <div [ngClass]="actualTab == 'mantenimiento' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
           <h4 class="opcion" (click)="navegar('permisos')">Roles Usuarios</h4>
         </div>
-      </div>
+      </div> -->
     </mat-nav-list>
   </mat-sidenav>
 

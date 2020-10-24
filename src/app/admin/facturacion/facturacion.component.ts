@@ -282,10 +282,17 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         console.log('entre en  ', document.activeElement.id);
         const voy_a = document.activeElement.id;
         const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
-        if (sali_de === 'venta' && (valor === 'viaje' || valor === 'normal') && voy_a !== 'fecha_equivalente' && nombre === 'Cliente contado') {
-          console.log(1);
-
-          buscar = true;
+        console.log('sali_de ', sali_de);
+        console.log('valor ', valor);
+        console.log('metodo ', this.metodo);
+        console.log('nombre ', nombre);
+        console.log('voy_a ', voy_a);
+        console.log('condicion ', condicion);
+        if (sali_de === 'venta' && condicion === 'Crédito' && nombre === 'Cliente contado') {
+          if (voy_a !== 'fecha_equivalente' && voy_a === 'nom') {
+            console.log(1);
+            buscar = true;
+          }
         }
         if (sali_de === 'venta' && valor === 'adelantada' && nombre === 'Cliente contado') {
           console.log(2);
@@ -296,20 +303,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
           this.iniciarFactura('cod-0');
         }
 
-        // if (sali_de === 'venta' && condicion === 'Crédito' && voy_a !== 'fecha_equivalente' && nombre === 'Cliente contado') {
-        //   console.log(4);
-        //   buscar = true;
-        // }
         if (sali_de === 'fecha_equivalente' && condicion === 'Crédito' && nombre === 'Cliente contado') {
           console.log(5);
           buscar = true;
         }
-        console.log('sali_de ', sali_de);
-        console.log('valor ', valor);
-        console.log('metodo ', this.metodo);
-        console.log('condicion ', condicion);
-        console.log('nombre ', nombre);
-        console.log('voy_a ', voy_a);
+
         console.log('buscar => ', buscar);
         if (buscar) {
           this.abrirModalFiltro();
@@ -433,7 +431,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
         this.enfocarInput(campo);
       } else {
-        this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
+        this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR', true);
       }
     }
 
@@ -447,7 +445,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
     if (campo === 'pago') {
       if (this.metodo === 'compra' && !this.tipos_costosYgastos.includes(valor)) {
-        this.dbServ.toastError('El tipo de costo y gasto introducido es incorrecto.', 'ERROR');
+        this.dbServ.toastError('El tipo de costo y gasto introducido es incorrecto.', 'ERROR', true);
       } else {
         this.CostoYgasto = valor;
         if (this.condicion_fact === 'Contado') {
@@ -473,7 +471,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       if (this.validarRayaAbajo()) {
         this.abrirModalFiltro();
       } else {
-        this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso');
+        this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso', true);
       }
     }
 
@@ -491,7 +489,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.enfocarInput(campo);
       this.propietario_factura = this.form.value;
     } else {
-      this.dbServ.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
+      this.dbServ.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso', true);
     }
   }
 
@@ -592,16 +590,16 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   async imprimirFactura() {
     if (!this.propietario_factura) {
       if (this.metodo === 'compra') {
-        this.dbServ.toastWarning('Factura no tiene suplidor', 'Aviso');
+        this.dbServ.toastWarning('Factura no tiene suplidor', 'Aviso', true);
       } else {
-        this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
+        this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso', true);
       }
     } else {
       if (this.CuerpoFactura.length === 0) {
-        this.dbServ.toastWarning('Factura incompleta!!!', 'Aviso');
+        this.dbServ.toastWarning('Factura incompleta!!!', 'Aviso', true);
       } else {
         if (this.TOTAL === 0) {
-          this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso');
+          this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso', true);
         } else {
           if (this.condicion_fact === 'Crédito' || this.is_viaje) {
             this.mServ.modalTipo('imprimir');
@@ -897,7 +895,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
           const res = await this.dbServ.editarArticulo(articulo).toPromise();
         } catch (error) {
           console.error(error);
-          this.dbServ.toastError('Error actualizando costos articulos.', 'ERROR');
+          this.dbServ.toastError('Error actualizando costos articulos.', 'ERROR', true);
         }
       }
     }
@@ -986,7 +984,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
       await this.CancelarFactura();
 
-      this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO');
+      this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO', true);
       res['FACTURA_DE'] = this.metodo;
       const obj = {
         data: res,
@@ -998,12 +996,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
         if (res.status) {
         } else {
-          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
         }
       });
     } catch (error) {
       console.error(error);
-      this.dbServ.toastError(error.error.msg, 'ERROR');
+      this.dbServ.toastError(error.error.msg, 'ERROR', true);
     }
   }
 }

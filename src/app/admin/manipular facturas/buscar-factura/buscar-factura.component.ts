@@ -112,7 +112,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.BuscarPara = this.route.snapshot.params['para'];
     if (this.BuscarPara === 'nota_credito') {
       this.tipo_factu_nota = '04';
-    } else {
+    } else if (this.BuscarPara === 'nota_debito') {
       this.tipo_factu_nota = '03';
     }
     this.necesarioStart();
@@ -215,6 +215,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       this.Para = ' Nota de crédito';
     } else if (this.BuscarPara === 'nota_debito') {
       this.Para = ' Nota de débito';
+    } else if (this.BuscarPara === 'solo_ver') {
+      this.Para = ' Visualizar';
     }
   }
 
@@ -236,7 +238,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   async necesarioStart() {
     await this.getTipoFacturas();
 
-    if (this.BuscarPara !== 'anular_factura') {
+    if (this.BuscarPara === 'nota_credito' && this.BuscarPara === 'nota_debito') {
       await this.getPaqueteComprobante();
     }
 

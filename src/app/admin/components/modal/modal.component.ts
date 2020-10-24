@@ -20,7 +20,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   paraFiltroClientes: any;
   paraFiltroSuplidor: any;
   tituloModal;
-  lugar: any;
+  mostrar_para: any;
   identificadorFact: any;
   tipoDevuelta: any;
   cant_notas_credito = 0;
@@ -167,7 +167,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         }
 
         if (this.tipoModal === 'mostrarFactura' && res) {
-          this.lugar = res.mostrarFacturaPara;
+          this.mostrar_para = res.mostrarFacturaPara;
 
           if (this.seleccionModal.tiene_nota && this.seleccionModal.notas.length > 0) {
             for (let i = 0; i < this.seleccionModal.notas.length; i++) {

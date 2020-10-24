@@ -330,9 +330,9 @@ export class DBservice {
   // =====================================================================
   // TOASTS
   // =====================================================================
-  toastSuccess(msg?, titulo?) {
+  toastSuccess(msg?, titulo?, excepcion?) {
     const msg_ = msg;
-    if (this.ultimoMensajeMostrado !== msg_) {
+    if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
       this.ultimoMensajeMostrado = msg_;
       this.toastr.success(msg || '', titulo || '');
     }
@@ -345,9 +345,9 @@ export class DBservice {
       this.toastr.error(msg || '', titulo || '');
     }
   }
-  toastWarning(msg?, titulo?) {
+  toastWarning(msg?, titulo?, excepcion?) {
     const msg_ = msg;
-    if (this.ultimoMensajeMostrado !== msg_) {
+    if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
       this.ultimoMensajeMostrado = msg_;
       this.toastr.warning(msg || '', titulo || '');
     }
