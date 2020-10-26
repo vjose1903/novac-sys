@@ -36,38 +36,47 @@ export class HomeComponent implements OnInit {
       usuario: null,
       password: null,
     });
-    this.searchVersion()
+    this.searchVersion();
   }
 
   async searchVersion() {
-    this._ipc.send('getVersion')
+    this._ipc.send('getVersion');
     await this._ipc.on('versionResponse', (event, arg) => {
-      this.versionApp = arg
-    })
+      this.versionApp = arg;
+    });
   }
 
   // =================================================================
   // LOGIN
   // =================================================================
   login(form: any) {
-    this.dbServ.login(form.value).subscribe(
-      (res) => {
-        this.errorC = '';
-        this.errorU = '';
-        this.dbServ.toastSuccess('', 'Correcto');
-        this.getPrintersName();
-      },
-      (err) => {
-        if (err.error.errors[0] === 'Usuario ingresado no existe') {
-          this.errorU = 'usuario no existe.';
-        } else if (err.error.errors[0] === 'Contraseña incorrecta') {
-          this.errorC = 'contraseña invalida';
-          this.errorU = '';
-        } else {
-          this.mostrarErrores(err.error.errors);
-        }
-      },
-    );
+    this.dbServ
+      .login(form.value)
+      .then((res) => {
+        console.log('res =>>', res);
+      })
+      .catch((err) => {
+        console.log('fdsdfgdgfhfg0: ', err);
+      });
+
+    // .subscribe(
+    //   (res) => {
+    //     // this.errorC = '';
+    //     // this.errorU = '';
+    //     // this.dbServ.toastSuccess('', 'Correcto');
+    //     // this.getPrintersName();
+    //   },
+    //   (err) => {
+    //     // if (err.error.errors[0] === 'Usuario ingresado no existe') {
+    //     //   this.errorU = 'usuario no existe.';
+    //     // } else if (err.error.errors[0] === 'Contraseña incorrecta') {
+    //     //   this.errorC = 'contraseña invalida';
+    //     //   this.errorU = '';
+    //     // } else {
+    //     //   this.mostrarErrores(err.error.errors);
+    //     // }
+    //   },
+    // );
   }
 
   mostrarErrores(arg) {

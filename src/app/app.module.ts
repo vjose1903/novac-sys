@@ -33,6 +33,7 @@ import { LoaderService } from './loader/loader.service';
 import { LoaderInterceptor } from './loader/loader.interceptor';
 import { NgInitDirective } from './directives/ngInit';
 import { PrimengModule } from './modules/primeng.module';
+import { InterceptorService } from './loader/interceptor.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -72,7 +73,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     NgxBootstrapModule,
   ],
   exports: [AngularModule, MDBBootstrapModule, AdminModule, BrowserAnimationsModule, NgxBootstrapModule],
-  providers: [LoaderService, { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true }],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }],
   bootstrap: [AppComponent],
 })
 export class AppModule {

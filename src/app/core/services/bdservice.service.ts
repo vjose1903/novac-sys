@@ -14,24 +14,35 @@ export class DBservice {
   ultimoMensajeMostrado: any;
 
   constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}
+
+  request(endpoint, method, data?: any): Observable<any> {
+    console.log('AQUIII');
+
+    switch (method.toUpperCase()) {
+      case 'GET':
+      case 'DELETE':
+        return this.http[method](`${this.url}/${endpoint}`).pipe(
+          map((val) => {
+            return val;
+          }),
+        );
+        break;
+      case 'POST':
+      case 'PATCH':
+        return this.http[method](`${this.url}/${endpoint}`, data).pipe(
+          map((val) => {
+            return val;
+          }),
+        );
+        break;
+    }
+  }
+
   peticion(ruta: string, metodo: string, json?: string): Observable<any> {
-    const xhttp = new XMLHttpRequest();
     if (metodo === 'get' || metodo === 'delete') {
-      return this.http[metodo](`${this.url}/${ruta}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + this.getAuthToken(),
-          Accept: 'Application/json',
-        },
-      });
+      return this.http[metodo](`${this.url}/${ruta}`);
     } else {
-      return this.http[metodo](`${this.url}/${ruta}`, json || '', {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + this.getAuthToken(),
-          Accept: 'Application/json',
-        },
-      });
+      return this.http[metodo](`${this.url}/${ruta}`, json || '');
     }
   }
 
@@ -39,11 +50,6 @@ export class DBservice {
     // set obs true
     if (metodo === 'get' || metodo === 'delete') {
       return this.http[metodo](`${this.url}/${ruta}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + this.getAuthToken(),
-          Accept: 'Application/json',
-        },
         params: { spinner: 'no' },
       }).pipe(
         map((val) => {
@@ -54,11 +60,6 @@ export class DBservice {
       );
     } else {
       return this.http[metodo](`${this.url}/${ruta}`, json || '', {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + this.getAuthToken(),
-          Accept: 'Application/json',
-        },
         params: { spinner: 'no' },
       }).pipe(
         map((val) => {
@@ -72,21 +73,14 @@ export class DBservice {
   getAuthToken() {
     return localStorage.getItem('token') || '';
   }
+
   saveAuthUser(userInfo) {
     // localStorage.setIteADMm('token', token);
     localStorage.setItem('userInfo', JSON.stringify(userInfo));
   }
 
-  login(arg): Observable<any> {
-    return this.peticion('auth/sign_in', 'post', arg).pipe(
-      map((val) => {
-        if (val.data) {
-          this.saveAuthUser(val.data);
-          this.router.navigate(['/admin']);
-        }
-        return val;
-      }),
-    );
+  async login(arg): Promise<Observable<any>> {
+    return await this.request('auth/sign_in', 'post', arg).toPromise()
   }
 
   // =====================================================================
