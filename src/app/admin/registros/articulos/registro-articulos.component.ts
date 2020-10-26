@@ -4,12 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as moment from 'moment';
-import { ObservableServcie } from '../../../core/services/observables.service';
 import { map } from 'rxjs/operators';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
+import { FunctionService } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -55,9 +55,9 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   listaMateriasPrimas;
 
   constructor(
-    private artServ: ObservableServcie,
     private dbServ: DBservice,
     private cdRef: ChangeDetectorRef,
+    private fun: FunctionService,
     private fb: FormBuilder,
     private router: Router,
     private mServ: ModalService,
@@ -65,7 +65,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   ) {}
 
   ngOnInit() {
-    this.usuario = JSON.parse(this.dbServ.getEmpleado());
+    this.usuario = this.fun.getUser();
 
     this.createForm();
     this.FORM = this.form.controls;

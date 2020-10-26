@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AppRoutingModule } from '../app-routing.module';
+
 import { AngularModule } from '../modules/angular.module';
 import { NgxBootstrapModule } from '../modules/ngx-bootstrap.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
@@ -42,6 +42,7 @@ import { ModalSeleccinarArticuloComponent } from './conduce/modal-seleccinar-art
 import { NgInitDirective } from '../directives/ngInit';
 import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
 import { PrimengModule } from '../modules/primeng.module';
+import { AppRoutingModule } from '../app.routing';
 
 @NgModule({
   declarations: [

@@ -10,8 +10,9 @@ import { get } from 'http';
 
 import { DBservice } from '../../core/services/bdservice.service';
 import { IpcService } from '../../core/services/ipc.service';
-import { ObservableServcie } from '../../core/services/observables.service';
+
 import * as moment from 'moment';
+import { FunctionService } from '../../core/services/functions.service';
 
 @Component({
   selector: 'app-navbar-a',
@@ -31,16 +32,18 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   usuario;
   PrintersInstall: any;
   OpenPrinterMenu = false;
-  imgUser: string;
+  // imgUser: string;
+  imgUser = 'assets/img/userH.png';
   versionApp: any;
+  noServer = false;
   // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
   constructor(
+    private fun: FunctionService,
     private dbServ: DBservice,
     private breakpointObserver: BreakpointObserver,
     public usuariosServices: UsuariosService,
     private router: Router,
     private _ipc: IpcService,
-    private obsServ: ObservableServcie,
   ) {
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
@@ -53,43 +56,66 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // imagenCuenta = 'http://localhost:3000/api/photos/this.usuariosServices.profile.fotoPerfil';
-  isHandset$: Observable<boolean> = this.breakpointObserver
-    .observe(Breakpoints.Handset)
-
-    .pipe(map((result) => result.matches));
-
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
+  lRun = false;
   ngOnInit() {
-
-    this.usuario = JSON.parse(this.dbServ.getEmpleado());
-
-    if (this.usuario.sexo === 'm') {
-      this.imgUser = 'assets/img/userH.png';
-    } else {
-      this.imgUser = 'assets/img/userM.png';
-    }
-
     this.mantenimiento = true;
     this._ipc.PRINTERS.subscribe((res) => {
       if (res !== undefined) {
         this.PrintersInstall = res;
       }
     });
-    this.searchVersion()
+    const token = this.fun.getAuthToken();
+    console.log('token ', token);
+
+    // console.log('token desde appcompnent => ', token);
+    if (token) {
+      this.dbServ
+        .validateToken()
+        .then((res) => {
+          console.log('validando token, ', res.data);
+          this.setUser(res.data);
+          this.lRun = true;
+        })
+        .catch((err) => {
+          console.log('error validando token: ', err);
+
+          if (err.status === 0) {
+            this.noServer = true;
+          } else {
+            this.fun.logout();
+            this.noServer = false;
+          }
+        });
+    } else {
+      this.fun.logout();
+    }
+    this.searchVersion();
   }
 
   async searchVersion() {
-    this._ipc.send('getVersion')
+    this._ipc.send('getVersion');
     await this._ipc.on('versionResponse', (event, arg) => {
-      this.versionApp = arg
-    })
+      this.versionApp = arg;
+    });
   }
-  
+
   ngOnDestroy() {
     // this.sub.unsubscribe();
   }
-
+  setUser(user) {
+    this.usuario = user;
+    this.fun.setUser(user);
+    console.log('this.usuario ', this.usuario);
+  }
   element: HTMLElement;
-  ngAfterViewInit() { }
+  ngAfterViewInit() {
+    // if (this.usuario.sexo === 'm') {
+    //   this.imgUser = 'assets/img/userH.png';
+    // } else {
+    //   this.imgUser = 'assets/img/userM.png';
+    // }
+  }
 
   stop(e) {
     this.OpenPrinterMenu = true;
@@ -117,8 +143,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   // CERRAR SESION
   // =================================================================================
   logOut() {
-    this.usuariosServices.deleteToken();
-    this.usuariosServices.profile = null;
+    this.fun.logout();
     this.router.navigateByUrl('/');
   }
 
@@ -129,6 +154,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
       this.router.navigate(['/admin/mantCentro', 'INS']);
     }
   }
+
   // =================================================================================
   // NAVEGAR
   // =================================================================================
@@ -241,7 +267,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         break;
     }
   }
-  modalConfig() { }
+  modalConfig() {}
   // ===========================================================================
   // MODAL
   // ===========================================================================

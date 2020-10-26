@@ -15,29 +15,6 @@ export class DBservice {
 
   constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}
 
-  request(endpoint, method, data?: any): Observable<any> {
-    console.log('AQUIII');
-
-    switch (method.toUpperCase()) {
-      case 'GET':
-      case 'DELETE':
-        return this.http[method](`${this.url}/${endpoint}`).pipe(
-          map((val) => {
-            return val;
-          }),
-        );
-        break;
-      case 'POST':
-      case 'PATCH':
-        return this.http[method](`${this.url}/${endpoint}`, data).pipe(
-          map((val) => {
-            return val;
-          }),
-        );
-        break;
-    }
-  }
-
   peticion(ruta: string, metodo: string, json?: string): Observable<any> {
     if (metodo === 'get' || metodo === 'delete') {
       return this.http[metodo](`${this.url}/${ruta}`);
@@ -51,36 +28,20 @@ export class DBservice {
     if (metodo === 'get' || metodo === 'delete') {
       return this.http[metodo](`${this.url}/${ruta}`, {
         params: { spinner: 'no' },
-      }).pipe(
-        map((val) => {
-          // set obs false
-
-          return val;
-        }),
-      );
+      });
     } else {
       return this.http[metodo](`${this.url}/${ruta}`, json || '', {
         params: { spinner: 'no' },
-      }).pipe(
-        map((val) => {
-          // set obs false
-          return val;
-        }),
-      );
+      });
     }
   }
 
-  getAuthToken() {
-    return localStorage.getItem('token') || '';
+  async validateToken() {
+    return await this.peticion('auth/validate_token', 'get').toPromise();
   }
 
-  saveAuthUser(userInfo) {
-    // localStorage.setIteADMm('token', token);
-    localStorage.setItem('userInfo', JSON.stringify(userInfo));
-  }
-
-  async login(arg): Promise<Observable<any>> {
-    return await this.request('auth/sign_in', 'post', arg).toPromise()
+  async login(arg) {
+    return await this.peticion('auth/sign_in', 'post', arg).toPromise();
   }
 
   // =====================================================================

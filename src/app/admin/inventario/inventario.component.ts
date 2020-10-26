@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild, OnDestroy, AfterViewInit, ElementRef } from '@angular/core';
-import { ObservableServcie } from '../../core/services/observables.service';
+
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -55,7 +55,6 @@ export class InventarioComponent implements OnInit, OnDestroy {
   subDeci: Subscription;
   palabra_buscar;
   constructor(
-    private artServ: ObservableServcie,
     private dbServ: DBservice,
     private cdRef: ChangeDetectorRef,
     private fb: FormBuilder,

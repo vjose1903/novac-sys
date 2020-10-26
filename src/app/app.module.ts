@@ -8,8 +8,6 @@ import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 
-import { AppRoutingModule } from './app-routing.module';
-
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -18,7 +16,7 @@ import { AppComponent } from './app.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
 // modulos
-import { HomeModule } from './home/home.module';
+import { HomeModule } from './login/login.module';
 import { AdminModule } from './admin/admin.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxBootstrapModule } from './modules/ngx-bootstrap.module';
@@ -34,6 +32,7 @@ import { LoaderInterceptor } from './loader/loader.interceptor';
 import { NgInitDirective } from './directives/ngInit';
 import { PrimengModule } from './modules/primeng.module';
 import { InterceptorService } from './loader/interceptor.service';
+import { AppRoutingModule } from './app.routing';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {

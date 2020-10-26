@@ -5,7 +5,6 @@ import * as moment from 'moment';
 import { DBservice } from '../../core/services/bdservice.service';
 import { map, filter } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { ObservableServcie } from '../../core/services/observables.service';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
@@ -13,6 +12,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
+import { FunctionService } from '../../core/services/functions.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -109,7 +109,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   constructor(
     private _ipc: IpcService,
     private mServ: ModalService,
-    private obsServ: ObservableServcie,
+    private fun: FunctionService,
     private dbServ: DBservice,
     private fb: FormBuilder,
     private pdfServ: PdfService,
@@ -137,7 +137,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.usuario = JSON.parse(this.dbServ.getEmpleado());
+    this.usuario = this.fun.getUser();
 
     this.metodo = this.route.snapshot.params['tipo'];
 
@@ -901,7 +901,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
   async IMPRIMIR() {
-    const empleado = JSON.parse(this.dbServ.getEmpleado());
+    const empleado = this.fun.getUser();
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
     const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));

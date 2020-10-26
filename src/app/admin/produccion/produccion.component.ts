@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { ObservableServcie } from '../../core/services/observables.service';
+
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,6 +8,7 @@ import { ModalService } from '../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { filter } from 'lodash';
+import { FunctionService } from '../../core/services/functions.service';
 
 @Component({
   selector: 'app-produccion',
@@ -44,7 +45,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   listaProductos: any;
   articuloEditando: any;
 
-  constructor(private artServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {}
+  constructor(private dbServ: DBservice, private fb: FormBuilder, private fun: FunctionService, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
@@ -347,7 +348,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     const obj = JSON.parse(JSON.stringify(this.lista_produccion));
     const produccion_send = {};
 
-    const empleado = JSON.parse(this.dbServ.getEmpleado());
+    const empleado = this.fun.getUser();
 
     const detalle = [];
 

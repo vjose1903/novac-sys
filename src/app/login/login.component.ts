@@ -10,12 +10,13 @@ import { IpcService } from '../core/services/ipc.service';
 import { PdfService } from '../core/services/pdf/pdf.service';
 
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, recibo_de_ingreso, venta_credito_valor_fiscal, venta_credito_consumo } from '../../assets/facturas';
+import { FunctionService } from '../core/services/functions.service';
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   errorC = '';
   errorU = '';
@@ -23,11 +24,10 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private dbServ: DBservice,
-    private pdfServ: PdfService,
-    private toastr: ToastrService,
+
     private fb: FormBuilder,
     private router: Router,
-    private usuariosServices: UsuariosService,
+    private fun: FunctionService,
     private _ipc: IpcService,
   ) {}
 
@@ -53,30 +53,20 @@ export class HomeComponent implements OnInit {
     this.dbServ
       .login(form.value)
       .then((res) => {
-        console.log('res =>>', res);
+        console.log('res ==> ', res);
+        console.log(res.data);
+
+        this.fun.setUser(res.data);
+        this.router.navigateByUrl('/admin');
       })
       .catch((err) => {
-        console.log('fdsdfgdgfhfg0: ', err);
+        if (err.status === 0) {
+          this.dbServ.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR', true);
+        } else {
+          this.dbServ.toastError('Datos de acceso proporcionados estan incorrectos', 'ERROR', true);
+        }
+        console.log(err);
       });
-
-    // .subscribe(
-    //   (res) => {
-    //     // this.errorC = '';
-    //     // this.errorU = '';
-    //     // this.dbServ.toastSuccess('', 'Correcto');
-    //     // this.getPrintersName();
-    //   },
-    //   (err) => {
-    //     // if (err.error.errors[0] === 'Usuario ingresado no existe') {
-    //     //   this.errorU = 'usuario no existe.';
-    //     // } else if (err.error.errors[0] === 'Contraseña incorrecta') {
-    //     //   this.errorC = 'contraseña invalida';
-    //     //   this.errorU = '';
-    //     // } else {
-    //     //   this.mostrarErrores(err.error.errors);
-    //     // }
-    //   },
-    // );
   }
 
   mostrarErrores(arg) {

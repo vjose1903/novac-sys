@@ -1,3 +1,7 @@
+<div id="fondoC" *ngIf="noServer" class="h-100 w-100 position-absolute backnegro">
+  <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
+</div>
+
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav
     #drawer
@@ -104,8 +108,8 @@
           </a>
           <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
             <div class="dropdown-header">
-              <h2>{{ usuario.nombre }}</h2>
-              <p>{{ usuario.email }}</p>
+              <h2>{{ usuario?.nombre }}</h2>
+              <p>{{ usuario?.email }}</p>
             </div>
             <!-- <li role="menuitem"><a class="dropdown-item" href="#">Nombre admin</a> admin@gmail.com </li> -->
             <li class="divider dropdown-divider"></li>

@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, OnChanges } from '@angular/core';
 import { ModalService } from '../components/modal/modal.service';
-import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { map } from 'rxjs/operators';
@@ -10,6 +9,7 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { TablasService, obj_paginate } from '../components/tablas/tablas.service';
 import { IpcService } from '../../core/services/ipc.service';
+import { FunctionService } from '../../core/services/functions.service';
 
 @Component({
   selector: 'app-conduce',
@@ -72,7 +72,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   CuerpoConduce = [];
   rowsExcede = [];
 
-  constructor(private mServ: ModalService, private _ipc: IpcService, private obsServ: ObservableServcie, private dbServ: DBservice, private fb: FormBuilder, private tServ: TablasService) {}
+  constructor(private mServ: ModalService, private _ipc: IpcService, private fun: FunctionService, private dbServ: DBservice, private fb: FormBuilder, private tServ: TablasService) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -970,7 +970,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   }
 
   async sendData() {
-    const empleado = JSON.parse(this.dbServ.getEmpleado());
+    const empleado = this.fun.getUser();
 
     const cabecera_conduce = {};
     cabecera_conduce['user_id'] = empleado.id;

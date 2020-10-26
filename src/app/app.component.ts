@@ -2,9 +2,9 @@ import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/co
 import { ElectronService } from './core/services';
 import { DBservice } from './core/services/bdservice.service';
 import { LoaderService } from './loader/loader.service';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { IpcService } from './core/services/ipc.service';
 import { GLOBAL } from './core/services/GLOBAL';
+import { FunctionService } from './core/services/functions.service';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +13,7 @@ import { GLOBAL } from './core/services/GLOBAL';
 })
 export class AppComponent implements OnInit, AfterViewInit {
   loading = false;
-  noServer = false;
+
   objProgress;
   displayPercent = false;
   tiempo_restante;
@@ -23,48 +23,18 @@ export class AppComponent implements OnInit, AfterViewInit {
     public _ipc: IpcService,
     private dbServ: DBservice,
     private loaderServ: LoaderService,
-    private spinner: NgxSpinnerService,
-    private cdRef: ChangeDetectorRef,
+    private fun: FunctionService,
     public electronService: ElectronService,
+    private cdRef: ChangeDetectorRef,
   ) {
-    // setInterval(() => {
-    //   this.buscarNoServer();
-    // }, 20000);
-
     this.loaderServ.isLoading.subscribe((v) => {
       setTimeout(() => {
-        // this.loading = true;
         this.loading = v;
       }, 5);
-
-      // if (this.loading) {
-      //   document.getElementById('fondoC').classList.add('fadeIn');
-      // } else {
-      //   document.getElementById('fondoC').classList.add('fadeOut');
-      // }
     });
   }
 
-  buscarNoServer() {
-    this.dbServ.getTipoArticuloById(1).subscribe(
-      (res) => {
-        if (this.noServer) {
-          window.location.reload();
-        }
-        this.noServer = false;
-      },
-      (err) => {
-        if (err.status === 0) {
-          this.noServer = true;
-        } else {
-          this.noServer = false;
-        }
-      },
-    );
-  }
-
   ngOnInit(): void {
-    this.buscarNoServer();
     // this.dbServ.getSecuenciaFacturas().subscribe(res => {
     //   this.obsServ.next_secuencia_factura(res);
     // });
@@ -126,6 +96,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     const sDisplay = s > 0 ? s + (s === 1 ? ' segundo' : ' segundos') : '';
     return hDisplay + mDisplay + sDisplay;
   }
+
   duplicarDataProgreso(json) {}
 
   ngAfterViewInit() {

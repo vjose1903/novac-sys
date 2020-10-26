@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
-import { ObservableServcie } from '../../../core/services/observables.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -56,15 +55,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
 
   obj_paginate_ = obj_paginate;
 
-  constructor(
-    private artServ: ObservableServcie,
-    private dbServ: DBservice,
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private mServ: ModalService,
-    private tServ: TablasService,
-  ) {
+  constructor(private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService, private tServ: TablasService) {
     // setInterval(() => {
     //   console.log(this.cardTabla.nativeElement.offsetHeight);
     // }, 1000);

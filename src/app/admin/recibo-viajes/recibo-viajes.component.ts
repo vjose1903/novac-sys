@@ -7,6 +7,7 @@ import { obj_paginate } from '../components/tablas/tablas.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { ModalService } from '../components/modal/modal.service';
 import { Subscription } from 'rxjs';
+import { FunctionService } from '../../core/services/functions.service';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -53,7 +54,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   totalPagado = 0;
   totalPagadoPorciento = 0;
   monto_pendiente = 0;
-  constructor(private dbServ: DBservice, private mServ: ModalService) {}
+  constructor(private dbServ: DBservice, private mServ: ModalService, private fun: FunctionService) {}
 
   ngOnInit() {
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
@@ -221,7 +222,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
 
   IMPRIMIR() {
     console.log('-------- aqui imprimir -------');
-    const empleado = JSON.parse(this.dbServ.getEmpleado());
+    const empleado = this.fun.getUser();
 
     console.log(this.viaje_selected.cliente_id);
 

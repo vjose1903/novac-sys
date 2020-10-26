@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { ObservableServcie } from '../../core/services/observables.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -13,6 +12,7 @@ import { TablasComponent } from '../components/tablas/tablas.component';
 import { ModalService } from '../components/modal/modal.service';
 import { obj_paginate, TablasService } from '../components/tablas/tablas.service';
 import { IpcService } from '../../core/services/ipc.service';
+import { FunctionService } from '../../core/services/functions.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -124,7 +124,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   constructor(
     private config: NgSelectConfig,
     private mServ: ModalService,
-    private obsServ: ObservableServcie,
+    private fun: FunctionService,
     private dbServ: DBservice,
     private fb: FormBuilder,
     private _ipc: IpcService,
@@ -397,7 +397,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   }
 
   sendIngreso() {
-    const empleado = JSON.parse(this.dbServ.getEmpleado());
+    const empleado = this.fun.getUser();
 
     // const tipo = this.tipoFacturas.filter((val) => val.descripcion === this.tipo_recibo)[0];
     const obj = {

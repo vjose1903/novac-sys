@@ -10,7 +10,7 @@ import { RegistroEmpleadosComponent } from './admin/registros/registro-empleados
 import { NavbarAComponent } from './admin/navbar-a/navbar-a.component';
 
 // home
-import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './login/login.component';
 import { RegistroClientesComponent } from './admin/registros/registro-clientes/registro-clientes.component';
 import { RegistroSuplidoresComponent } from './admin/registros/registro-suplidores/registro-suplidores.component';
 import { ProduccionComponent } from './admin/produccion/produccion.component';
@@ -21,8 +21,15 @@ import { NotasCredDebComponent } from './admin/manipular facturas/notas-cred-deb
 import { NcfComponent } from './admin/registros/ncf/ncf.component';
 import { ConduceComponent } from './admin/conduce/conduce.component';
 import { ReciboViajesComponent } from './admin/recibo-viajes/recibo-viajes.component';
+import { AuthGuard } from './core/guard/auth.guard';
+import { IsLoginGuard } from './core/guard/is-login.guard';
 
 const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'auth/login',
+    pathMatch: 'full',
+  },
   {
     path: 'admin',
     component: NavbarAComponent,
@@ -84,14 +91,12 @@ const routes: Routes = [
         component: ReciboViajesComponent,
       },
     ],
+    canActivate: [AuthGuard],
   },
   {
-    path: 'usuario',
-    component: HomeAdminComponent,
-  },
-  {
-    path: '',
-    component: HomeComponent,
+    path: 'auth/login',
+    component: LoginComponent,
+    canActivate: [IsLoginGuard],
   },
   {
     path: '**',

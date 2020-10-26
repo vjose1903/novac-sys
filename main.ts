@@ -61,15 +61,15 @@ function createWindow() {
         slashes: true,
       }),
     );
+    const aFiles_malos = [pathAdd('/fonts.zip'), pathAdd('/fonts')];
+    verificarElemento(aFiles_malos, '/fonts/fonts.zip', '', '/fonts.zip', '/fonts', true, true, 'Fuentes', 0);
+    verificarSumastra();
   }
 
   // win.webContents.openDevTools();
 
   win.setMenuBarVisibility(false);
 
-  const aFiles_malos = [pathAdd('/fonts.zip'), pathAdd('/fonts')];
-  verificarElemento(aFiles_malos, '/fonts/fonts.zip', '', '/fonts.zip', '/fonts', true, true, 'Fuentes', 0);
-  // verificarSumastra();
   autoUpdater.checkForUpdatesAndNotify();
 
   // Emitted when the window is closed.
@@ -614,7 +614,7 @@ function makePdf(dd, file) {
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
       console.log('finizu');
       // win.webContents.send('printRes', { msg: 'Pruebas', status: 'si', body: dd, sbody: JSON.stringify(dd) });
-       imprimir(cFileName);
+      imprimir(cFileName);
     });
     pdfDoc.end();
   } catch (err) {
