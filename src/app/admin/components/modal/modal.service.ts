@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnChanges } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class ModalService {
   private tipoModal = new BehaviorSubject<any>(undefined);
-  private showModal = new BehaviorSubject<boolean>(undefined);
+  private showModal = new BehaviorSubject<boolean>(false);
   private calcularHeight = new BehaviorSubject<boolean>(false);
   private seleccionModal = new BehaviorSubject<any>(undefined);
   private decisionModal = new BehaviorSubject<any>(undefined);

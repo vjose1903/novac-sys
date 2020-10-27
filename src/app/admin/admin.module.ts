@@ -43,6 +43,7 @@ import { NgInitDirective } from '../directives/ngInit';
 import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
 import { PrimengModule } from '../modules/primeng.module';
 import { AppRoutingModule } from '../app.routing';
+import { ReportesComponent } from './reportes/reportes.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { AppRoutingModule } from '../app.routing';
     ConduceComponent,
     ModalSeleccinarArticuloComponent,
     ReciboViajesComponent,
+    ReportesComponent,
   ],
   imports: [
     PrimengModule,

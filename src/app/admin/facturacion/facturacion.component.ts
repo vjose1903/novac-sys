@@ -569,6 +569,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
       this.mServ.ModalSeleccion(obj);
     }
+
     setTimeout(() => {
       this.mServ.mostrarModal(true);
     }, 250);
@@ -643,6 +644,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
     this.tipoModal = '';
   }
+
   selectFecha(arg) {
     setTimeout(() => {
       this.enfocarInput(arg);

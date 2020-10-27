@@ -27,11 +27,9 @@ export class InterceptorService implements HttpInterceptor {
     return next.handle(request).pipe(
       map((event) => {
         if (event instanceof HttpResponse) {
-          console.log('-->', event);
           ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {
             const headerValue = event.headers.get(header);
             if (headerValue !== null && localStorage.getItem(header) == null) {
-              console.log(header + ' : ' + headerValue);
               localStorage.setItem(header, headerValue);
             }
           });
@@ -41,9 +39,9 @@ export class InterceptorService implements HttpInterceptor {
       }),
 
       catchError((response: HttpErrorResponse) => {
-        if (response.status === 401) {
-          console.log('response ===> ', response);
-        }
+        // if (response.status === 401) {
+        // }
+        console.log('response ===> ', response);
         return throwError(response);
       }),
       finalize(() => {
