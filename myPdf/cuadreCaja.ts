@@ -6,47 +6,55 @@ import { logoADM } from './utils/files';
 // ==========================================================================================================================================================
 
 export function makeCuadre(data) {
-  const dd = {
-    pageSize: { width: 816, height: 528 },
-    pageMargins: [10, 159.5, 10, 30],
-    header: cabeceraReporte(data),
-    content: contenidoReporte(data),
-    footer: (currentPage, pageCount) => {
-      return [
-        {
-          text: 'pag: ' + currentPage.toString() + ' de ' + pageCount,
-          alignment: 'right',
-          margin: [0, 0, 30, 0],
+  try {
+    const dd = {
+      pageSize: { width: 816, height: 528 },
+      pageMargins: [10, 159.5, 10, 30],
+      header: cabeceraReporte(data),
+      content: contenidoReporte(data),
+      footer: (currentPage, pageCount) => {
+        return [
+          {
+            text: 'pag: ' + currentPage.toString() + ' de ' + pageCount,
+            alignment: 'right',
+            margin: [0, 0, 30, 0],
+          },
+        ];
+      },
+      images: {
+        logo: logoADM,
+      },
+      styles: {
+        letra10: {
+          fontSize: 10,
         },
-      ];
-    },
-    images: {
-      logo: logoADM,
-    },
-    styles: {
-      letra10: {
-        fontSize: 10,
+        letra11: {
+          fontSize: 11,
+        },
+        letra12: {
+          fontSize: 12,
+        },
+        letra13: {
+          fontSize: 13,
+        },
+        letra14: {
+          fontSize: 14,
+        },
+        letra17: {
+          fontSize: 17,
+        },
       },
-      letra11: {
-        fontSize: 11,
-      },
-      letra12: {
-        fontSize: 12,
-      },
-      letra14: {
-        fontSize: 14,
-      },
-      letra17: {
-        fontSize: 17,
-      },
-    },
-  };
+    };
 
-  const obj = {
-    doc: dd,
-    file: 'conduce.pdf',
-  };
-  return obj;
+    const obj = {
+      doc: dd,
+      file: 'cuadre.pdf',
+      type: 'base64',
+    };
+    return obj;
+  } catch (error) {
+    return error;
+  }
 }
 
 // ====================================================================================================================================================
@@ -93,28 +101,36 @@ function cabeceraReporte(data) {
         ],
         [
           {
-            text: [{ text: '27/10/2020', fontSize: 14, bold: true }],
-            margin: [0, 25, 20, 0],
-            alignment: 'right',
-          },
-          {
-            text: [
+            margin: [0, 30, 30, 0],
+            stack: [
               {
-                text: [{ text: 'no: ', fontSize: 11, bold: false }],
-                margin: [0, 5, 20, 0],
                 alignment: 'right',
+                text: [
+                  { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra14', bold: true },
+                  { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra14', bold: true },
+                ],
               },
-              { text: fun_.my_padStart(data.numero_reporte, 8, '0'), style: 'letra11' },
-            ],
-          },
-          {
-            text: [
+
               {
-                text: [{ text: 'realizado por: ', fontSize: 11, bold: false }],
-                margin: [0, 5, 20, 0],
                 alignment: 'right',
+                text: [
+                  {
+                    text: [{ text: 'no: ', style: 'letra13', bold: false }],
+                    alignment: 'right',
+                  },
+                  { text: fun_.my_padStart(data.numero_reporte, 8, '0'), style: 'letra13', alignment: 'right' },
+                ],
               },
-              { text: fun_.my_capitalize(data.user.nombre) + ' ' + fun_.my_capitalize(data.user.apellido), style: 'letra11' },
+              {
+                alignment: 'right',
+                text: [
+                  {
+                    text: [{ text: 'Realizado por: ', style: 'letra13', bold: false }],
+                    alignment: 'right',
+                  },
+                  { text: data.usuario, style: 'letra13', alignment: 'right' },
+                ],
+              },
             ],
           },
         ],

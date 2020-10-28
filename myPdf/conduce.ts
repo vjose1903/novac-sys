@@ -1,4 +1,4 @@
-import * as fun_  from './utils/funciones';
+import * as fun_ from './utils/funciones';
 import { logoADM } from './utils/files';
 
 // ==========================================================================================================================================================
@@ -45,6 +45,7 @@ export function makeConduce(data) {
   const obj = {
     doc: dd,
     file: 'conduce.pdf',
+    type: 'file',
   };
   return obj;
 }
@@ -283,5 +284,3 @@ function contenidoConduce(data) {
 
   return content;
 }
-
-

@@ -23,6 +23,7 @@ import { ConduceComponent } from './admin/conduce/conduce.component';
 import { ReciboViajesComponent } from './admin/recibo-viajes/recibo-viajes.component';
 import { AuthGuard } from './core/guard/auth.guard';
 import { IsLoginGuard } from './core/guard/is-login.guard';
+import { ReportesComponent } from './admin/reportes/reportes.component';
 
 const routes: Routes = [
   {
@@ -89,6 +90,10 @@ const routes: Routes = [
       {
         path: 'viajes',
         component: ReciboViajesComponent,
+      },
+      {
+        path: 'reportes',
+        component: ReportesComponent,
       },
     ],
     canActivate: [AuthGuard],

@@ -1,5 +1,5 @@
-import * as numLetra  from './utils/numero_letras';
-import * as fun_  from './utils/funciones';
+import * as numLetra from './utils/numero_letras';
+import * as fun_ from './utils/funciones';
 import { logoADM } from './utils/files';
 
 // ==========================================================================================================================================================
@@ -46,6 +46,7 @@ export function makeRecibo(data) {
   const obj = {
     doc: dd,
     file: 'reciboI.pdf',
+    type: 'file',
   };
   return obj;
 }
@@ -89,7 +90,7 @@ function cabeceraRecibo(data) {
       columns: [
         [
           {
-          text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: fun_.my_capitalize(data.cliente.nombre) + ' ' + fun_.my_capitalize(data.cliente.apellido) }],
+            text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: fun_.my_capitalize(data.cliente.nombre) + ' ' + fun_.my_capitalize(data.cliente.apellido) }],
             margin: [0, 0, 0, 0],
           },
           {
@@ -215,7 +216,7 @@ function contenidoRecibo(data) {
 
     row.push(
       { text: i + 1, pageBreak: br_ ? 'before' : 'none' },
-      { text:  fun_.my_dateFormater(fecha), pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
+      { text: fun_.my_dateFormater(fecha), pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
       { text: valor, pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
       { text: fun_.numFormatTwoDecimals(detalle.total_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
       { text: fun_.numFormatTwoDecimals(detalle.balance_anterior_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
@@ -318,7 +319,6 @@ function contenidoRecibo(data) {
       ],
       unbreakable: true,
     },
-  
   ];
 
   return content;

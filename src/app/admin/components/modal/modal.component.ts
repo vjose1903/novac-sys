@@ -4,6 +4,7 @@ import { ModalService } from './modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { TablasService, obj_paginate } from '../tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 
 @Component({
   selector: 'app-modal',
@@ -12,7 +13,7 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 })
 export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
   altoDiv;
-
+  pdfSrc = 'https://vadimdez.github.io/ng2-pdf-viewer/assets/pdf-test.pdf';
   showModal = false;
 
   seleccionModal: any;
@@ -103,7 +104,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       key: 'direccion',
     },
   ];
-  constructor(private mServ: ModalService, private dbServ: DBservice, private tServ: TablasService) {}
+  constructor(private mServ: ModalService, private dbServ: DBservice, private tServ: TablasService, private pdfService: NgxExtendedPdfViewerService) {}
 
   element: HTMLElement;
   subShow: Subscription;
@@ -114,6 +115,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
       if (res !== undefined && res !== null && !this.paraFiltroArticulos && !this.paraFiltroClientes) {
+        console.log('show ==> ', res);
         this.showModal = res;
       }
       if (res === false) {

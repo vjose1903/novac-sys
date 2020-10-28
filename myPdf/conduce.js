@@ -44,6 +44,7 @@ function makeConduce(data) {
     var obj = {
         doc: dd,
         file: 'conduce.pdf',
+        type: 'file',
     };
     return obj;
 }

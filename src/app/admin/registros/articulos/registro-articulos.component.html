@@ -1,7 +1,7 @@
 <div class="row" style="height: calc(100% - 60px)">
   <div class="col-md-6 contenedorRegistro">
     <!-- <div class=""> -->
-    <h4>{{ titulo }}</h4>
+    <h4 class="negrita">{{ titulo }}</h4>
     <div class="card card-padding sombra">
       <form [formGroup]="form" (submit)="submit(form)">
         <div class="row">
@@ -623,7 +623,7 @@
 
   <div class="col-md-6">
     <h4>Listado articulos</h4>
-    <div id="cardTabla"  class="card cardListados">
+    <div id="cardTabla" class="card cardListados">
       <app-tablas
         *ngIf="listaArticulos && info"
         [info]="info"

@@ -8,17 +8,21 @@ var request = require('request');
 
 const autoUpdater = require('electron-updater').autoUpdater;
 const pdfmake = require('pdfmake/src/printer');
+const pdfMake = require('pdfmake/build/pdfmake.js');
+const pdfFonts = require('pdfmake/build/vfs_fonts.js');
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import * as facturasCompraVenta from './myPdf/facturasCompraVenta.js';
-import * as recibosIngresos from './myPdf/recibosIngresos.js';
-import * as conduce from './myPdf/conduce.js';
+import * as facturasCompraVenta from './myPdf/facturasCompraVenta';
+import * as recibosIngresos from './myPdf/recibosIngresos';
+import * as conduce from './myPdf/conduce';
+import * as cuadreCaja from './myPdf/cuadreCaja';
 import { AppConfig } from './src/environments/environment.js';
+import { pdfBase64Prueba } from './myPdf/utils/files';
 
 // tslint:disable: curly
 // tslint:disable: one-variable-per-declaration
 let win, serve;
-let contador_descarga_fonts = 0;
-let contador_descarga_print = 0;
+
 const args = process.argv.slice(1);
 serve = args.some((val) => val === '--serve');
 
@@ -185,6 +189,10 @@ ipcMain.on('getVersion', (event: any, arg) => {
   event.reply('versionResponse', pjson.version);
 });
 
+ipcMain.on('getAppDir', (event: any, arg) => {
+  event.reply('getAppDirResponse', pathAdd());
+});
+
 function verificarSumastra() {
   if (!fs.existsSync(pathAdd('/print'))) {
     fs.mkdir(pathAdd('/print'), { recursive: true }, (err) => {
@@ -244,19 +252,6 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
   // }, 2000);
 }
 
-// function borrado_de_archivos_malos(path_arciho_borrar, path_carpeta_borrar, is_carpeta, callback) {
-// function borrado_de_archivos_malos(archivos, callback) {
-//   let command = '';
-//
-//   for (let i = 0; i < archivos.length; i++) {
-//     const file = archivos[i];
-//
-//     if (file.is_carpeta) {
-//       command += `${i !== 0 ? ' && ' : ''}` + `${process.platform === 'darwin' ? `rm -rf ${file.path}` : `rmdir /s /q ${file.path}`}`;
-//     } else {
-//       command += `${i !== 0 ? ' && ' : ''}` + `${process.platform === 'darwin' ? `rm -rf ${file.path}` : `del ${file.path}`}`;
-//     }
-//   }
 async function borrado_de_archivos_malos(archivos, callback) {
   const del = require('del');
 
@@ -547,6 +542,12 @@ function puts(msg_, linea_ = undefined) {
   }
 }
 
+ipcMain.on('printReporte', (event: any, oPdf) => {
+  const base64 = oPdf.base64;
+  const filename = oPdf.filename;
+  generatePdfFileFormBase64(filename, base64);
+});
+
 ipcMain.on('print', (event: any, oPdf) => {
   let obj;
   let todo_true = true;
@@ -568,6 +569,10 @@ ipcMain.on('print', (event: any, oPdf) => {
         obj = facturasCompraVenta.makeFacturaVenta(data);
         break;
 
+      case 'cuadre_caja':
+        obj = cuadreCaja.makeCuadre(data);
+        break;
+
       default:
         todo_true = false;
         break;
@@ -576,24 +581,26 @@ ipcMain.on('print', (event: any, oPdf) => {
     if (todo_true) {
       const dd = obj.doc;
       const file = obj.file;
-      makePdf(dd, file);
+      const type = obj.type;
+
+      makeDocDefinition(dd, file, type);
     } else {
       returnErrorPDF();
     }
   } catch (error) {
-    puts(error, 259);
+    puts(obj, 'error pdf');
   }
 });
 
 function returnErrorPDF() {
-  win.webContents.send('printRes', { msg: 'Error creando el pdf.', status: 'no' });
+  win.webContents.send('printRes', { msg: 'Error escribiendo el pdf.', status: 'no' });
 }
 
 // ==========================================================================================================================================================
 // MAKE PDF
 // ==========================================================================================================================================================
 
-function makePdf(dd, file) {
+function makeDocDefinition(dd, file, type = 'file') {
   const font_dir = pathAdd('/fonts/roboto/Roboto');
 
   const fontDescriptors = {
@@ -609,23 +616,61 @@ function makePdf(dd, file) {
 
   // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
   const cFileName = pathAdd('/' + file);
+
+  if (type === 'file') {
+    generatePdfFile(printer, cFileName, dd);
+  } else if (type === 'base64') {
+    createPdfbase64(pdfMake, dd, file);
+  }
+}
+
+function generatePdfFileFormBase64(cFileName, base64) {
+  const FileName = pathAdd('/' + cFileName);
   try {
-    const pdfDoc = printer.createPdfKitDocument(dd);
+    fs.writeFile(FileName, base64, { encoding: 'base64' }, (err) => {
+      console.log('File created');
+      imprimir(cFileName, 'reporte');
+    });
+  } catch (err) {
+    console.log('::::::::ERROR::::::::');
+    console.log(err);
+    puts(err, 'createPdfFileFormBase64');
+    win.webContents.send('printReporteRes', { msg: 'Error generando reporte!!', status: false, error: err });
+  }
+}
+
+function generatePdfFile(printer, cFileName, docDefinition) {
+  try {
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
     pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
       console.log('finizu');
       // win.webContents.send('printRes', { msg: 'Pruebas', status: 'si', body: dd, sbody: JSON.stringify(dd) });
-      imprimir(cFileName);
+      imprimir(cFileName, 'otro');
     });
     pdfDoc.end();
   } catch (err) {
     console.log('::::::::ERROR::::::::');
     console.log(err);
     puts(err, 280);
-    win.webContents.send('printRes', { msg: 'Error creando factura!!', status: false, error: err });
+    win.webContents.send('printRes', { msg: 'Error generando factura!!', status: false, error: err });
   }
 }
 
-function imprimir(cFileName) {
+function createPdfbase64(pdfMake, docDefinition, file_) {
+  try {
+    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+    pdfDocGenerator.getBase64((data) => {
+      win.webContents.send('printRes', { msg: 'Pdf Base64 correcto', file: file_, status: 'si', body: data, sbody: JSON.stringify(data) });
+    });
+  } catch (error) {
+    console.log('::::::::ERROR::::::::');
+    console.log(error);
+    puts(error, 280);
+    win.webContents.send('printRes', { msg: 'Error generando factura!!', status: false, ERROR: error });
+  }
+}
+
+function imprimir(cFileName, tipo) {
   const { exec } = require('child_process');
 
   const sumatrapdf_path = pathAdd('/print/lp.exe');
@@ -634,13 +679,29 @@ function imprimir(cFileName) {
   const args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
   exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,monochrome" -silent ${cFileName}`, (error, stdout, stderr) => {
     if (error) {
-      puts(error, 273);
-      win.webContents.send('printRes', { msg: 'Error imprimiendo Factura!!', status: 'no', err: error });
+      puts(error, 'imprimir');
+      let msg_ = '';
+
+      if (tipo === 'reporte') {
+        msg_ = 'Error imprimiendo Reporte!!';
+      } else {
+        msg_ = 'Error imprimiendo Factura!!';
+      }
+
+      win.webContents.send('printRes', { msg: msg_, status: 'no', err: error });
       return;
     } else {
       console.log('stdout  ', stdout);
       console.log('stderr  ', stderr);
-      win.webContents.send('printRes', { msg: 'Factura impresa correctamente!!', status: 'si' });
+      let msg_;
+
+      if (tipo === 'reporte') {
+        msg_ = 'Reporte impreso correctamente!!';
+      } else {
+        msg_ = 'Factura impresa correctamente!!';
+      }
+
+      win.webContents.send('printRes', { msg: msg_, status: 'no', STDOUT: stdout });
     }
   });
 }
@@ -664,10 +725,4 @@ export function pathAdd(addToPath = '', pack = false) {
   path_temp = path_temp + addToPath;
   path_resolved = process.platform === 'darwin' ? path_temp : path_temp.split('/').join('\\');
   return path_resolved;
-}
-
-function fecha(a: any) {
-  moment.locale('es');
-  const fechaFormato = moment(a).format('DD/MM/YYYY');
-  return fechaFormato;
 }

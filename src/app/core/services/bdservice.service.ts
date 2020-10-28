@@ -19,6 +19,11 @@ export class DBservice {
     if (metodo === 'get' || metodo === 'delete') {
       return this.http[metodo](`${this.url}/${ruta}`);
     } else {
+      console.log('metodo ==> ', metodo);
+      console.log('url ==> ', this.url);
+      console.log('ruta ==> ', ruta);
+      console.log('json ==> ', json);
+
       return this.http[metodo](`${this.url}/${ruta}`, json || '');
     }
   }
@@ -42,6 +47,14 @@ export class DBservice {
 
   async login(arg) {
     return await this.peticion('auth/sign_in', 'post', arg).toPromise();
+  }
+
+  // =====================================================================
+  // Reportes
+  // =====================================================================
+
+  createCuadreCaja() {
+    return this.peticion('cuadre_cajas', 'get');
   }
 
   // =====================================================================

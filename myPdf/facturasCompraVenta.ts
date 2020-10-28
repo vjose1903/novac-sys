@@ -76,6 +76,7 @@ export function makeFacturaVenta(data) {
   const obj = {
     doc: dd,
     file: 'factura.pdf',
+    type: 'file',
   };
   console.log('/////////// ', obj);
 

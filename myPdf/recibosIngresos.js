@@ -45,6 +45,7 @@ function makeRecibo(data) {
     var obj = {
         doc: dd,
         file: 'reciboI.pdf',
+        type: 'file',
     };
     return obj;
 }
