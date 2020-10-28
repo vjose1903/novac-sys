@@ -117,6 +117,7 @@ export class NcfComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.titulo = 'Paquetes de numeros comprobantes fiscales';
     this.necesarioStart();
+
     this.setDateInputs(new Date());
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
@@ -130,23 +131,33 @@ export class NcfComponent implements OnInit, OnDestroy {
   }
 
   text(arg) {
-    this.setDateInputs(arg);
+    this.setDateInputs(new Date());
   }
 
-  calculateFechaValida() {
-    setTimeout(() => {
-      const anio = moment(this.fechaCompra).add(1, 'year').format('YYYY');
-      const newFecha = '12/31/' + anio;
+  // calculateFechaValida() {
+  //   console.log(this.fechaCompra);
 
-      this.fechaValidez = newFecha;
-    }, 50);
-  }
+  //   setTimeout(() => {
+  //     const anio = moment(this.fechaCompra).add(1, 'year').format('YYYY');
+
+  //     const newFecha = moment('12/31/' + anio).format('DD/MM/YYYY');
+  //     console.log(newFecha);
+
+  //     this.fechaValidez = newFecha;
+  //   }, 50);
+  // }
 
   setDateInputs(actual) {
-    this.fechaCompra = actual;
-    const anio = moment(this.fechaCompra).add(1, 'year').format('YYYY');
-    const newFecha = '12/31/' + anio;
-    this.fechaValidez = newFecha;
+    console.log('actual ', actual);
+    actual = moment(actual).format('MM/DD/YYYY');
+    const anio = moment(new Date(actual)).add(1, 'year').format('YYYY');
+
+    console.log('coñooooo ', anio);
+
+    const newFecha = moment('12/31/' + anio).format('MM/DD/YYYY');
+    console.log('newFecha --> ', newFecha);
+    this.fechaCompra = moment(actual).format('DD/MM/YYYY');
+    this.fechaValidez = moment(newFecha).format('DD/MM/YYYY');
   }
 
   async necesarioStart() {
@@ -176,7 +187,6 @@ export class NcfComponent implements OnInit, OnDestroy {
 
       const res = await this.dbServ.getPaquetesNCFFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
-      console.log('lista_tipos_facturas ', this.lista_tipos_facturas);
       const tempNCF = [];
       res.data.forEach((ncf) => {
         if (ncf.tipo_factura_id !== 1 && ncf.tipo_factura_id !== 3) {
@@ -238,6 +248,7 @@ export class NcfComponent implements OnInit, OnDestroy {
   selectTipoFactura(a) {
     this.aletarTipoArticulo = false;
   }
+
   saltar(input) {}
 
   async submit() {
@@ -299,6 +310,7 @@ export class NcfComponent implements OnInit, OnDestroy {
   }
 
   atras() {}
+
   borrar() {
     this.is_editando = false;
     this.ncfSelected = undefined;

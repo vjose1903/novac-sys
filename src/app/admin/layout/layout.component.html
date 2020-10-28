@@ -16,9 +16,9 @@
       <!-- <img src="" class="img-fluid" /> -->
     </mat-toolbar>
     <mat-nav-list class="text-center">
-      <div class="menuList mt-5">
+      <div class="menuList1 mt-5">
         <img [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/factura.png" alt="Facturacion" (click)="navegar(2)" />
-        <h5 [ngClass]="actualTab == 'factura' ? 'tituloMenuA' : 'tituloMenu'"><strong>Facturacion</strong></h5>
+        <h5 [ngClass]="actualTab == 'factura' ? 'tituloMenuA1' : 'tituloMenu1'"><strong>Facturación</strong></h5>
 
         <div [ngClass]="actualTab == 'factura' ? 'subMenuFacturaA' : 'subMenuFactura'">
           <h4 class="opcion" (click)="navegar('venta')">Venta</h4>

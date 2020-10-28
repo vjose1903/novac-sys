@@ -23,6 +23,10 @@ $bodyfont: "Poppins";
   padding: 0;
   transform: translate(-37px, -8px);
   position: absolute;
+  &:hover {
+    cursor: pointer;
+    color: #0f6d22;
+  }
 }
 
 /* ============================================== */
@@ -124,6 +128,19 @@ $bodyfont: "Poppins";
     transform: scale(0.7) translate(-13px, -9rem);
   }
 }
+
+.menuList1 {
+  list-style: none;
+  .tituloMenu1 {
+    transform: scale(0);
+    transition: all 0.2s;
+  }
+
+  &:hover .tituloMenu1,
+  .tituloMenuA1 {
+    transform: scale(0.8) translate(-0.2rem, -7.6rem);
+  }
+}
 .menuList2 {
   list-style: none;
   .tituloMenu2 {
@@ -185,7 +202,7 @@ mat-list-item {
 }
 
 .sidenav {
-  width: 6.5rem;
+  width: 7rem;
 }
 
 // titulito de menu

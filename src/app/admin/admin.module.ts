@@ -7,7 +7,7 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
 // componentes
 import { HomeAdminComponent } from './home/homeAdmin.component';
-import { NavbarAComponent } from './navbar-a/navbar-a.component';
+import { NavbarAComponent } from './layout/layout.component';
 
 import { InventarioComponent } from './inventario/inventario.component';
 import { RegistroArticulosComponent } from './registros/articulos/registro-articulos.component';

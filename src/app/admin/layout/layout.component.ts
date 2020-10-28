@@ -15,9 +15,9 @@ import * as moment from 'moment';
 import { FunctionService } from '../../core/services/functions.service';
 
 @Component({
-  selector: 'app-navbar-a',
-  templateUrl: './navbar-a.component.html',
-  styleUrls: ['./navbar-a.component.scss'],
+  selector: 'app-layout',
+  templateUrl: './layout.component.html',
+  styleUrls: ['./layout.component.scss'],
 })
 export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   mantenimiento: boolean;
@@ -73,13 +73,10 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
       this.dbServ
         .validateToken()
         .then((res) => {
-          console.log('validando token, ', res.data);
           this.setUser(res.data);
           this.lRun = true;
         })
         .catch((err) => {
-          console.log('error validando token: ', err);
-
           if (err.status === 0) {
             this.noServer = true;
           } else {

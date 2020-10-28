@@ -45,12 +45,12 @@
               [bsConfig]="dpConfig"
               placeholder="dd/mm/aaaa"
               class="form-control"
-              value="{{ fechaCompra | date: 'dd/MM/yyyy' }}"
+              [value]="fechaCompra"
               [(ngModel)]="fechaCompra"
               #dp="bsDatepicker"
               placement="bottom"
               bsDatepicker
-              (ngModelChange)="calculateFechaValida()"
+              (ngModelChange)="setDateInputs(fechaCompra)"
             />
           </div>
         </div>
@@ -61,12 +61,12 @@
               type="text"
               [bsConfig]="dpConfigValidez"
               placeholder="dd/mm/aaaa"
-              value="{{ fechaValidez | date: 'dd/MM/yyyy' }}"
+              [value]="fechaValidez"
               class="form-control"
               [(ngModel)]="fechaValidez"
               #dp="bsDatepicker"
               placement="bottom"
-              (focus)="calculateFechaValida()"
+              (focus)="setDateInputs(fechaCompra)"
               bsDatepicker
             />
           </div>
@@ -104,7 +104,7 @@
 
   <div class="col-md-7">
     <h4>Listado articulos</h4>
-    <div id="cardTabla"  class="card cardListados">
+    <div id="cardTabla" class="card cardListados">
       <app-tablas
         *ngIf="listaNCF && info"
         [info]="info"

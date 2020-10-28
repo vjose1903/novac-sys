@@ -7,7 +7,7 @@ import { HomeAdminComponent } from './admin/home/homeAdmin.component';
 import { FacturacionComponent } from './admin/facturacion/facturacion.component';
 import { RegistroArticulosComponent } from './admin/registros/articulos/registro-articulos.component';
 import { RegistroEmpleadosComponent } from './admin/registros/registro-empleados/registro-empleados.component';
-import { NavbarAComponent } from './admin/navbar-a/navbar-a.component';
+import { NavbarAComponent } from './admin/layout/layout.component';
 
 // home
 import { LoginComponent } from './login/login.component';

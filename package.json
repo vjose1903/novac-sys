@@ -57,9 +57,9 @@
     "conventional-changelog-cli": "2.0.21",
     "core-js": "3.1.3",
     "electron": "^7.1.7",
+    "electron-builder": "^22.9.1",
     "electron-reload": "1.4.0",
     "electron-winstaller": "^4.0.1",
-    "electron-builder": "^22.9.1",
     "jasmine-core": "3.4.0",
     "jasmine-spec-reporter": "4.2.1",
     "karma": "4.1.0",
@@ -76,7 +76,7 @@
     "typescript": "~3.5.3",
     "wait-on": "3.2.0",
     "webdriver-manager": "12.1.5",
-    "zone.js": "0.9.1"
+    "zone.js": "^0.11.2"
   },
   "engines": {
     "node": ">=10.9.0"

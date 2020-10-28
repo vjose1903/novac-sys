@@ -1,5 +1,5 @@
 <div class="row" style="height: calc(100% - 60px)">
-  <div class="col-md-6 contenedorRegistro">
+  <div class="col-5 contenedorRegistro pr-0">
     <!-- <div class=""> -->
     <h4 class="negrita">{{ titulo }}</h4>
     <div class="card card-padding">
@@ -103,7 +103,7 @@
         </div>
 
         <div class="row mt-4">
-          <div class="col-md-3">
+          <div class="col-6">
             <div class="from-group">
               <label class="control-label">Telefono: <span style="color: red">*</span></label>
               <input type="text" class="form-control" [textMask]="{ mask: phoneMask }" formControlName="telefono" placeholder="(___) ___-____" autocomplete="off" />
@@ -114,41 +114,38 @@
             </div>
           </div>
 
-          <div class="col-md-5">
-            <div class="row">
-              <div class="col-6 pl-0">
-                <div class="form-group">
-                  <label class="control-label">Sexo: <span style="color: red">*</span></label>
-                  <select formControlName="sexo" class="form-control">
-                    <option value="" disabled selected hidden>Sexo</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                  </select>
-                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['sexo'].valid && (form.controls['sexo'].dirty || form.controls['sexo'].touched)">
-                    Debe de seleccionar el sexo
-                  </div>
-                </div>
-              </div>
-              <div class="col-6 p-0">
-                <div class="form-group">
-                  <label class="control-label">Dias credito: <span style="color: red">*</span></label>
-                  <select formControlName="limite_credito" class="form-control">
-                    <option value="" disabled selected hidden>Limite</option>
-                    <option value="15">15 dias</option>
-                    <option value="30">30 dias</option>
-                  </select>
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['limite_credito'].valid && (form.controls['limite_credito'].dirty || form.controls['limite_credito'].touched)"
-                  >
-                    Debe de seleccionar limite de credito
-                  </div>
-                </div>
+          <div class="col-6 pl-0">
+            <div class="form-group">
+              <label class="control-label">Sexo: <span style="color: red">*</span></label>
+              <select formControlName="sexo" class="form-control">
+                <option value="" disabled selected hidden>Sexo</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['sexo'].valid && (form.controls['sexo'].dirty || form.controls['sexo'].touched)">
+                Debe de seleccionar el sexo
               </div>
             </div>
           </div>
-          <div class="col-4">
+          <div class="col-6">
+            <div class="form-group">
+              <label class="control-label">Dias credito: <span style="color: red">*</span></label>
+              <select formControlName="limite_credito" class="form-control">
+                <option value="" disabled selected hidden>Limite</option>
+                <option value="15">15 dias</option>
+                <option value="30">30 dias</option>
+              </select>
+              <div
+                class="alerta text-danger ml-1"
+                style="font-size: 12px"
+                *ngIf="!form.controls['limite_credito'].valid && (form.controls['limite_credito'].dirty || form.controls['limite_credito'].touched)"
+              >
+                Debe de seleccionar limite de credito
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6 pl-0">
             <div class="from-group">
               <label class="control-label">Limite de credito: <span style="color: red">*</span></label>
 
@@ -206,9 +203,9 @@
     </div>
     <!-- </div> -->
   </div>
-  <div class="col-md-6">
+  <div class="col-7">
     <h4>Listado clientes</h4>
-    <div id="cardTabla"  class="card cardListados">
+    <div id="cardTabla" class="card cardListados">
       <app-tablas
         *ngIf="listaClientes && info"
         [info]="info"

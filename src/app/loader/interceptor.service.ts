@@ -20,6 +20,7 @@ export class InterceptorService implements HttpInterceptor {
           client: `${localStorage.getItem('client')}`,
           expiry: `${localStorage.getItem('expiry')}`,
           uid: `${localStorage.getItem('uid')}`,
+          'token-type': `${localStorage.getItem('token-type')}`,
         },
       });
     }
@@ -41,7 +42,7 @@ export class InterceptorService implements HttpInterceptor {
       catchError((response: HttpErrorResponse) => {
         // if (response.status === 401) {
         // }
-        console.log('response ===> ', response);
+
         return throwError(response);
       }),
       finalize(() => {

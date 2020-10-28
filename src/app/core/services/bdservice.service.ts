@@ -16,15 +16,21 @@ export class DBservice {
   constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}
 
   peticion(ruta: string, metodo: string, json?: string): Observable<any> {
+    const xhttp = new XMLHttpRequest();
     if (metodo === 'get' || metodo === 'delete') {
-      return this.http[metodo](`${this.url}/${ruta}`);
+      return this.http[metodo](`${this.url}/${ruta}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'Application/json',
+        },
+      });
     } else {
-      console.log('metodo ==> ', metodo);
-      console.log('url ==> ', this.url);
-      console.log('ruta ==> ', ruta);
-      console.log('json ==> ', json);
-
-      return this.http[metodo](`${this.url}/${ruta}`, json || '');
+      return this.http[metodo](`${this.url}/${ruta}`, json || '', {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'Application/json',
+        },
+      });
     }
   }
 
@@ -32,14 +38,64 @@ export class DBservice {
     // set obs true
     if (metodo === 'get' || metodo === 'delete') {
       return this.http[metodo](`${this.url}/${ruta}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'Application/json',
+        },
         params: { spinner: 'no' },
-      });
+      }).pipe(
+        map((val) => {
+          // set obs false
+
+          return val;
+        }),
+      );
     } else {
       return this.http[metodo](`${this.url}/${ruta}`, json || '', {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'Application/json',
+        },
         params: { spinner: 'no' },
-      });
+      }).pipe(
+        map((val) => {
+          // set obs false
+          return val;
+        }),
+      );
     }
   }
+
+  // peticion(ruta: string, metodo: string, json?: string): Observable<any> {
+  //   if (metodo === 'get' || metodo === 'delete') {
+  //     return this.http[metodo](`${this.url}/${ruta}`);
+  //   } else {
+  //     console.log('metodo ==> ', metodo);
+  //     console.log('url ==> ', this.url);
+  //     console.log('ruta ==> ', ruta);
+  //     console.log('json ==> ', json);
+
+  //     return this.http[metodo](`${this.url}/${ruta}`, json || '', {
+  //       headers: {
+  //         'Conten-Type': 'application/json',
+  //         Accept: 'Application/json',
+  //       },
+  //     });
+  //   }
+  // }
+
+  // peticionSinLoad(ruta: string, metodo: string, json?: string): Observable<any> {
+  //   // set obs true
+  //   if (metodo === 'get' || metodo === 'delete') {
+  //     return this.http[metodo](`${this.url}/${ruta}`, {
+  //       params: { spinner: 'no' },
+  //     });
+  //   } else {
+  //     return this.http[metodo](`${this.url}/${ruta}`, json || '', {
+  //       params: { spinner: 'no' },
+  //     });
+  //   }
+  // }
 
   async validateToken() {
     return await this.peticion('auth/validate_token', 'get').toPromise();
@@ -152,6 +208,8 @@ export class DBservice {
     return this.peticion('nombreSuplidores', 'get');
   }
   createSuplidor(arg) {
+    console.log('aquiiiiii ---> ', arg);
+
     return this.peticion('suplidores', 'post', JSON.stringify(arg));
   }
   editarSuplidor(arg) {

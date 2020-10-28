@@ -212,6 +212,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
     });
     obj.documentos_de_identidad_attributes = documentos_identidad;
     obj.estado = true;
+
     // entra aqui si el formato de un documento de identidad esta mal
     if (devolver) {
       Fail.forEach((doc) => {
