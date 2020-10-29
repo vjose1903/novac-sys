@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import { AppConfig } from '../../../../environments/environment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 @Component({
   selector: 'app-formar-factura',
@@ -9,9 +10,13 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 })
 export class FormarFacturaComponent implements OnInit {
   @Input() factura;
+  num_telefono = AppConfig.num_telefono;
+  rnc = AppConfig.rnc;
   constructor() {}
 
   ngOnInit() {
+    console.log('======== factura ======> ', this.factura);
+
     // this.factura.detalle_facturas = [
     //   ...this.factura.detalle_facturas,
     //   ...this.factura.detalle_facturas,

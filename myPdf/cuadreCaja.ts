@@ -1,5 +1,6 @@
 import * as fun_ from './utils/funciones';
 import { logoADM } from './utils/files';
+import { AppConfig } from '../src/environments/environment.js';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
@@ -39,6 +40,9 @@ export function makeCuadre(data) {
         },
         letra14: {
           fontSize: 14,
+        },
+        letra15: {
+          fontSize: 15,
         },
         letra17: {
           fontSize: 17,
@@ -80,7 +84,7 @@ function cabeceraReporte(data) {
                 text: 'ADM Agroindustrial S.R.L',
                 alignment: 'center',
                 bold: true,
-                fontSize: 17,
+                style: 'letra17',
               },
               {
                 text: 'Autopista Duarte Km0 El Higuero, La Vega',
@@ -90,9 +94,9 @@ function cabeceraReporte(data) {
               {
                 text: [
                   { text: 'Telefono: ', fontSize: 9, bold: true },
-                  { text: '809-572-0060 ', fontSize: 9 },
+                  { text: AppConfig.num_telefono + ' ', fontSize: 9 },
                   { text: ' RNC: ', fontSize: 9, bold: true },
-                  { text: '131-99603-5', fontSize: 9 },
+                  { text: AppConfig.rnc, fontSize: 9 },
                 ],
                 alignment: 'center',
               },
@@ -137,7 +141,7 @@ function cabeceraReporte(data) {
       ],
     },
     {
-      text: [{ text: 'Cuadre de caja', fontSize: 17, bold: true }],
+      text: [{ text: 'Cuadre de caja', style: 'letra17', bold: true }],
       margin: [0, 30, 0, 0],
       alignment: 'center',
     },
@@ -181,13 +185,13 @@ function contenidoReporte(data) {
                     text: 'Descripción',
                     alignment: 'left',
                     bold: true,
-                    fontSize: 17,
+                    style: 'letra17',
                   },
                   {
                     text: 'Monto',
                     alignment: 'right',
                     bold: true,
-                    fontSize: 17,
+                    style: 'letra17',
                   },
                 ],
                 [
@@ -195,43 +199,27 @@ function contenidoReporte(data) {
                     text: 'Total facturado a contado:',
                     alignment: 'left',
                     bold: true,
-                    fontSize: 15,
+                    style: 'letra15',
                   },
-                  {
-                    margin: [0, 3, 0, 0],
-                    text: '723,747.34',
-                    alignment: 'right',
-                    fontSize: 13,
-                  },
+                  { text: fun_.numFormatTwoDecimals(data.total_venta_contado), style: 'letra13', alignment: 'right', margin: [0, 3, 0, 0] },
                 ],
                 [
                   {
                     text: 'Total recibo de ingreso:',
                     alignment: 'left',
                     bold: true,
-                    fontSize: 15,
+                    style: 'letra15',
                   },
-                  {
-                    margin: [0, 3, 0, 0],
-                    text: '55,321.72',
-                    alignment: 'right',
-                    fontSize: 13,
-                  },
+                  { text: fun_.numFormatTwoDecimals(data.total_recibo_ingreso), style: 'letra13', alignment: 'right', margin: [0, 3, 0, 0] },
                 ],
                 [
                   {
                     text: 'Total en caja:',
                     alignment: 'left',
                     bold: true,
-                    fontSize: 15,
+                    style: 'letra15',
                   },
-                  {
-                    margin: [0, 3, 0, 0],
-                    text: '779,069.06',
-                    alignment: 'right',
-                    fontSize: 14,
-                    bold: true,
-                  },
+                  { text: fun_.numFormatTwoDecimals(data.total_general), style: 'letra13', alignment: 'right', margin: [0, 3, 0, 0] },
                 ],
                 [
                   {
@@ -240,12 +228,7 @@ function contenidoReporte(data) {
                     alignment: 'left',
                     fontSize: 16,
                   },
-                  {
-                    margin: [0, 20, 0, 0],
-                    text: '0.00',
-                    alignment: 'right',
-                    fontSize: 13,
-                  },
+                  { text: fun_.numFormatTwoDecimals(data.total_venta_credito), style: 'letra13', alignment: 'right', margin: [0, 3, 0, 0] },
                 ],
               ],
             },

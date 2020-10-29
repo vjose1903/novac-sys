@@ -2,13 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var fun_ = require("./utils/funciones");
 var files_1 = require("./utils/files");
+var environment_js_1 = require("../src/environments/environment.js");
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 function makeConduce(data) {
     var dd = {
         pageSize: { width: 816, height: 528 },
-        pageMargins: [10, 169.5, 10, 30],
+        pageMargins: [10, 153, 10, 30],
         header: cabeceraConduce(data),
         content: contenidoConduce(data),
         footer: function (currentPage, pageCount) {
@@ -74,9 +75,9 @@ function cabeceraConduce(data) {
                 {
                     text: [
                         { text: 'Telefono: ', fontSize: 9, bold: true },
-                        { text: '809-572-0060 ', fontSize: 9 },
+                        { text: environment_js_1.AppConfig.num_telefono + ' ', fontSize: 9 },
                         { text: ' RNC: ', fontSize: 9, bold: true },
-                        { text: '131-99603-5', fontSize: 9 },
+                        { text: environment_js_1.AppConfig.rnc, fontSize: 9 },
                     ],
                     alignment: 'center',
                 },

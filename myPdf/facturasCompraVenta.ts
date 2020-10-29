@@ -1,5 +1,6 @@
 import * as fun_ from './utils/funciones';
 import { logoADM } from './utils/files';
+import { AppConfig } from '../src/environments/environment.js';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
@@ -8,26 +9,22 @@ function getPageMargin(data) {
 
   if (data.FACTURA_DE === 'venta') {
     if (data.condicion === 'Contado') {
-      margins = [10, 170, 5, 30];
+      margins = [10, 152, 5, 30];
     } else {
-      margins = [10, 180, 5, 30];
+      margins = [10, 162, 5, 30];
     }
   } else {
     if (data.condicion === 'Contado') {
-      margins = [10, 170, 5, 30];
+      margins = [10, 153, 5, 30];
     } else {
-      margins = [10, 181, 5, 30];
+      margins = [10, 165, 5, 30];
     }
   }
-  console.log('@@@@@@@@@@@@@@@@@@2  margins', margins);
 
   return margins;
 }
 
 export function makeFacturaVenta(data) {
-  console.log('---------ENTROOOO---------');
-  console.log('data ', data);
-
   const dd = {
     pageSize: { width: 816, height: 528 },
     pageMargins: getPageMargin(data),
@@ -128,9 +125,9 @@ function cabeceraFacturaVenta(data) {
         {
           text: [
             { text: 'Telefono: ', style: 'letra10' },
-            { text: '809-573-0060 ', style: 'letra10' },
-            { text: ' RNC: ', style: 'letra10' },
-            { text: '131-99603-5', style: 'letra10' },
+            { text: AppConfig.num_telefono + ' ', style: 'letra10' },
+            { text: ' RNC: ', bold: true, style: 'letra10' },
+            { text: AppConfig.rnc, style: 'letra10' },
           ],
           alignment: 'center',
         },

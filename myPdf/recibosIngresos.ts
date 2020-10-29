@@ -1,6 +1,7 @@
 import * as numLetra from './utils/numero_letras';
 import * as fun_ from './utils/funciones';
 import { logoADM } from './utils/files';
+import { AppConfig } from '../src/environments/environment.js';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
@@ -9,7 +10,7 @@ import { logoADM } from './utils/files';
 export function makeRecibo(data) {
   const dd = {
     pageSize: { width: 816, height: 528 },
-    pageMargins: [10, 184, 10, 30],
+    pageMargins: [10, 165, 10, 30],
     header: cabeceraRecibo(data),
     content: contenidoRecibo(data),
     footer: (currentPage, pageCount) => {
@@ -77,9 +78,9 @@ function cabeceraRecibo(data) {
         {
           text: [
             { text: 'Telefono: ', fontSize: 9, bold: true },
-            { text: '809-572-0060 ', fontSize: 9 },
-            { text: ' RNC: ', fontSize: 9, bold: true },
-            { text: '131-99603-5', fontSize: 9 },
+            { text: AppConfig.num_telefono + ' ', fontSize: 9 },
+            { text: ' RNC: ', bold: true, fontSize: 9 },
+            { text: AppConfig.rnc, fontSize: 9 },
           ],
           alignment: 'center',
         },

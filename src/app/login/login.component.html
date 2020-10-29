@@ -26,9 +26,11 @@
             <button class="waves-light" mdbWavesEffect id="boton" class="btn btn-success text-center"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
           </div>
         </form>
-        <!--<button class="waves-light" mdbWavesEffect id="boton" (click)="printTest()" class="btn btn-warning text-center"><i class="fas fa-sign-in-alt"></i> print</button>
-        <button class="waves-light" mdbWavesEffect id="boton" (click)="pruebaRecibo()" class="btn btn-danger text-center"><i class="fas fa-sign-in-alt"></i> print</button>
-        <button class="waves-light" mdbWavesEffect id="boton" (click)="pruebaConduce()" class="btn btn-primary text-center"><i class="fas fa-sign-in-alt"></i> print</button>-->
+        <div class="d-flex justify-content-center my-2">
+          <button class="waves-light" mdbWavesEffect (click)="printTest()" class="btn btn-warning text-center">factura compra venta</button>
+          <button class="waves-light" mdbWavesEffect (click)="pruebaRecibo()" class="btn btn-danger text-center">recibo</button>
+          <button class="waves-light" mdbWavesEffect (click)="pruebaConduce()" class="btn btn-primary text-center">conduce</button>
+        </div>
       </mdb-card-body>
       <div class="text-center" style="width: 100%">
         <span class="version"> VjPOS v{{ versionApp }} </span>

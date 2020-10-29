@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var fun_ = require("./utils/funciones");
 var files_1 = require("./utils/files");
+var environment_js_1 = require("../src/environments/environment.js");
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
@@ -9,26 +10,23 @@ function getPageMargin(data) {
     var margins = [];
     if (data.FACTURA_DE === 'venta') {
         if (data.condicion === 'Contado') {
-            margins = [10, 170, 5, 30];
+            margins = [10, 152, 5, 30];
         }
         else {
-            margins = [10, 180, 5, 30];
+            margins = [10, 162, 5, 30];
         }
     }
     else {
         if (data.condicion === 'Contado') {
-            margins = [10, 170, 5, 30];
+            margins = [10, 153, 5, 30];
         }
         else {
-            margins = [10, 181, 5, 30];
+            margins = [10, 165, 5, 30];
         }
     }
-    console.log('@@@@@@@@@@@@@@@@@@2  margins', margins);
     return margins;
 }
 function makeFacturaVenta(data) {
-    console.log('---------ENTROOOO---------');
-    console.log('data ', data);
     var dd = {
         pageSize: { width: 816, height: 528 },
         pageMargins: getPageMargin(data),
@@ -126,9 +124,9 @@ function cabeceraFacturaVenta(data) {
                 {
                     text: [
                         { text: 'Telefono: ', style: 'letra10' },
-                        { text: '809-573-0060 ', style: 'letra10' },
-                        { text: ' RNC: ', style: 'letra10' },
-                        { text: '131-99603-5', style: 'letra10' },
+                        { text: environment_js_1.AppConfig.num_telefono + ' ', style: 'letra10' },
+                        { text: ' RNC: ', bold: true, style: 'letra10' },
+                        { text: environment_js_1.AppConfig.rnc, style: 'letra10' },
                     ],
                     alignment: 'center',
                 },

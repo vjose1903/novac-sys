@@ -3,7 +3,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 var request = require('request');
 
 const autoUpdater = require('electron-updater').autoUpdater;
@@ -17,7 +16,6 @@ import * as recibosIngresos from './myPdf/recibosIngresos';
 import * as conduce from './myPdf/conduce';
 import * as cuadreCaja from './myPdf/cuadreCaja';
 import { AppConfig } from './src/environments/environment.js';
-import { pdfBase64Prueba } from './myPdf/utils/files';
 
 // tslint:disable: curly
 // tslint:disable: one-variable-per-declaration
@@ -65,8 +63,6 @@ function createWindow() {
         slashes: true,
       }),
     );
-    const aFiles_malos = [pathAdd('/fonts.zip'), pathAdd('/fonts')];
-    verificarElemento(aFiles_malos, '/fonts/fonts.zip', '', '/fonts.zip', '/fonts', true, true, 'Fuentes', 0);
     verificarSumastra();
   }
 
@@ -582,8 +578,8 @@ ipcMain.on('print', (event: any, oPdf) => {
       const dd = obj.doc;
       const file = obj.file;
       const type = obj.type;
-
-      makeDocDefinition(dd, file, type);
+      createPdfbase64(dd, file, type);
+      // makeDocDefinition(dd, file, type);
     } else {
       returnErrorPDF();
     }
@@ -600,36 +596,12 @@ function returnErrorPDF() {
 // MAKE PDF
 // ==========================================================================================================================================================
 
-function makeDocDefinition(dd, file, type = 'file') {
-  const font_dir = pathAdd('/fonts/roboto/Roboto');
-
-  const fontDescriptors = {
-    Roboto: {
-      normal: font_dir + '-Regular.ttf',
-      bold: font_dir + '-Bold.ttf',
-      italics: font_dir + '-Italic.ttf',
-      bolditalics: font_dir + '-BoldItalic.ttf',
-    },
-  };
-
-  const printer = new pdfmake(fontDescriptors);
-
-  // win.webContents.send('printRes', { msg: 'prueba', doc: JSON.stringify(dd), datos: data });
-  const cFileName = pathAdd('/' + file);
-
-  if (type === 'file') {
-    generatePdfFile(printer, cFileName, dd);
-  } else if (type === 'base64') {
-    createPdfbase64(pdfMake, dd, file);
-  }
-}
-
-function generatePdfFileFormBase64(cFileName, base64) {
+function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
   const FileName = pathAdd('/' + cFileName);
   try {
     fs.writeFile(FileName, base64, { encoding: 'base64' }, (err) => {
       console.log('File created');
-      imprimir(cFileName, 'reporte');
+      imprimir(cFileName, type);
     });
   } catch (err) {
     console.log('::::::::ERROR::::::::');
@@ -639,28 +611,15 @@ function generatePdfFileFormBase64(cFileName, base64) {
   }
 }
 
-function generatePdfFile(printer, cFileName, docDefinition) {
-  try {
-    const pdfDoc = printer.createPdfKitDocument(docDefinition);
-    pdfDoc.pipe(fs.createWriteStream(cFileName)).on('finish', () => {
-      console.log('finizu');
-      // win.webContents.send('printRes', { msg: 'Pruebas', status: 'si', body: dd, sbody: JSON.stringify(dd) });
-      imprimir(cFileName, 'otro');
-    });
-    pdfDoc.end();
-  } catch (err) {
-    console.log('::::::::ERROR::::::::');
-    console.log(err);
-    puts(err, 280);
-    win.webContents.send('printRes', { msg: 'Error generando factura!!', status: false, error: err });
-  }
-}
-
-function createPdfbase64(pdfMake, docDefinition, file_) {
+function createPdfbase64(docDefinition, file_, type) {
   try {
     const pdfDocGenerator = pdfMake.createPdf(docDefinition);
     pdfDocGenerator.getBase64((data) => {
-      win.webContents.send('printRes', { msg: 'Pdf Base64 correcto', file: file_, status: 'si', body: data, sbody: JSON.stringify(data) });
+      if (type === 'file') {
+        generatePdfFileFormBase64(file_, data, type);
+      } else {
+        win.webContents.send('printRes', { msg: 'Pdf Base64 correcto', file: file_, status: 'si', body: data, sbody: JSON.stringify(data) });
+      }
     });
   } catch (error) {
     console.log('::::::::ERROR::::::::');

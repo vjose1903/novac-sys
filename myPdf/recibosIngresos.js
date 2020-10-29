@@ -3,13 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var numLetra = require("./utils/numero_letras");
 var fun_ = require("./utils/funciones");
 var files_1 = require("./utils/files");
+var environment_js_1 = require("../src/environments/environment.js");
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 function makeRecibo(data) {
     var dd = {
         pageSize: { width: 816, height: 528 },
-        pageMargins: [10, 184, 10, 30],
+        pageMargins: [10, 165, 10, 30],
         header: cabeceraRecibo(data),
         content: contenidoRecibo(data),
         footer: function (currentPage, pageCount) {
@@ -76,9 +77,9 @@ function cabeceraRecibo(data) {
                 {
                     text: [
                         { text: 'Telefono: ', fontSize: 9, bold: true },
-                        { text: '809-572-0060 ', fontSize: 9 },
-                        { text: ' RNC: ', fontSize: 9, bold: true },
-                        { text: '131-99603-5', fontSize: 9 },
+                        { text: environment_js_1.AppConfig.num_telefono + ' ', fontSize: 9 },
+                        { text: ' RNC: ', bold: true, fontSize: 9 },
+                        { text: environment_js_1.AppConfig.rnc, fontSize: 9 },
                     ],
                     alignment: 'center',
                 },
