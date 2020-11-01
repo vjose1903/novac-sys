@@ -228,7 +228,7 @@ function contenidoReporte(data) {
                     alignment: 'left',
                     fontSize: 16,
                   },
-                  { text: fun_.numFormatTwoDecimals(data.total_venta_credito), style: 'letra13', alignment: 'right', margin: [0, 3, 0, 0] },
+                  { text: fun_.numFormatTwoDecimals(data.total_venta_credito), style: 'letra13', alignment: 'right', margin: [0, 17, 0, 0] },
                 ],
               ],
             },

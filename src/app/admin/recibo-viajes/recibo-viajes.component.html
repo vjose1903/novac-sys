@@ -1,6 +1,6 @@
-recibo de ingresos y recibo de viajes creo que listo<div class="row">
+<div class="row">
   <div class="col-12">
-    <h4>Listado de viajes</h4>
+    <h4 class="negrita">Listado de viajes</h4>
   </div>
   <div class="col-md-7">
     <div id="cardTabla" #cardTabla class="card cardListados p-3">
@@ -48,20 +48,20 @@ recibo de ingresos y recibo de viajes creo que listo<div class="row">
         </div>
         <div class="card-body">
           <span class="d-flex">
-            <h5 class="negrita">Viaje para:</h5>
+            <h6 class="negrita">Viaje para:</h6>
             &nbsp;&nbsp;
-            <h5>{{ viaje_selected?.cliente.nombre }}</h5>
+            <h6>{{ viaje_selected?.cliente.nombre }}</h6>
           </span>
           <span class="d-flex">
-            <h5 class="negrita">Total facturado:</h5>
+            <h6 class="negrita">Total facturado:</h6>
             &nbsp;&nbsp;
-            <h5>{{ formatoNumero(viaje_selected?.total_factura) }}</h5>
+            <h6>{{ formatoNumero(viaje_selected?.total_factura) }}</h6>
           </span>
 
           <span *ngIf="monto_pendiente > 0" class="d-flex">
-            <h5 class="negrita text-red">Monto pendiente:</h5>
+            <h6 class="negrita text-red">Monto pendiente:</h6>
             &nbsp;&nbsp;
-            <h5>{{ formatoNumero(monto_pendiente) }}</h5>
+            <h6>{{ formatoNumero(monto_pendiente) }}</h6>
           </span>
 
           <div *ngIf="viaje_selected?.pagos?.length > 0">
@@ -84,7 +84,7 @@ recibo de ingresos y recibo de viajes creo que listo<div class="row">
               <option *ngFor="let item of choferes" value="{{ item.id }}">{{ item.nombre }}</option>
               <option *ngIf="!is_choferes_register" disable>No tiene Choferes registrados</option>
             </select>
-            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!is_chofer_selected && salio_en_chofer">Debe de seleccionar un chofer</div>
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="is_choferes_register && !is_chofer_selected && salio_en_chofer">Debe de seleccionar un chofer</div>
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!is_choferes_register">Debe de registrar un chofer</div>
           </div>
 
@@ -93,9 +93,8 @@ recibo de ingresos y recibo de viajes creo que listo<div class="row">
           <div class="d-flex justify-content-end">
             <button (click)="accion(false)" class="btn btn-blanco mr-2">Cancelar</button>
 
-            <button [disabled]="!is_chofer_selected" (click)="accion(true)" class="btn {{ viaje_selected.fecha_completada !== null ? 'btn-amarillo' : 'btn-verde' }}">
-              {{ viaje_selected.fecha_completada !== null ? 'Revertir transación' : 'Recibir efectivo' }}
-            </button>
+            <button [disabled]="!is_chofer_selected || viaje_selected.fecha_completada" (click)="accion(true, 'cambio')" class="btn btn-verde">Recibir efectivo</button>
+            <button *ngIf="ultimo_pago?.is_ultimo" (click)="accion(true, 'dinamico_texto')" class="btn btn-amarillo ml-2">Reversar ultima transacción</button>
           </div>
         </div>
       </div>

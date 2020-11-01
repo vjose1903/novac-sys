@@ -102,6 +102,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   FechaFacturaAtrasada;
   fecha_vencimiento = new Date();
   fecha_equivalente = new Date();
+  fecha_viaje = new Date();
   articulosAcambiar = [];
   newCuerpo: any[];
   paqueteComprobante: any;
@@ -702,6 +703,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.FechaFacturaAtrasada = null;
     this.fecha_equivalente = new Date();
     this.fecha_vencimiento = new Date();
+    this.fecha_viaje = new Date();
     this.modo_factura = 'normal';
     this.is_adelantada = false;
     this.is_viaje = false;
@@ -913,7 +915,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     cabecera_fact['forma_pago'] = this.forma_pago;
 
     let fecha_equi;
-    if (this.is_adelantada) {
+    if (this.FacturaAtrasada) {
       fecha_equi = this.FechaFacturaAtrasada;
     } else if (this.is_viaje) {
       fecha_equi = this.fecha_equivalente;
@@ -921,8 +923,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       fecha_equi = null;
     }
 
+    cabecera_fact['fecha_viaje'] = this.is_viaje ? this.fecha_viaje : null;
     cabecera_fact['fecha_equivalente'] = fecha_equi;
-    // cabecera_fact['fecha_completada'] = this.modo_factura === 'viaje' ? null : fecha_equi;
 
     if (this.condicion_fact === 'Crédito') {
       let fecha_venci;

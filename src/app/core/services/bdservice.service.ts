@@ -332,6 +332,10 @@ export class DBservice {
   createRecibo(arg) {
     return this.peticion('recibos_ingresos', 'post', JSON.stringify(arg));
   }
+
+  revertirLastReciboByFacturaId(id) {
+    return this.peticion(`recibos_ingresos/revertir/${id}`, 'get');
+  }
   // =====================================================================
   // FACTURAS
   // =====================================================================

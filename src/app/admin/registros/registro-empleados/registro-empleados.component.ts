@@ -30,18 +30,14 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
   info = [
     {
       titulo: 'Nombre',
-      key: 'nombre',
-    },
-    {
-      titulo: 'Apellido',
-      key: 'apellido',
+      key: 'nombreCompleto',
     },
     {
       titulo: 'Telefono',
       key: 'telefono',
     },
     {
-      titulo: 'Doc. identidad',
+      titulo: 'Cedula',
       key: 'documento_identidad', // ojo
     },
     {
@@ -123,6 +119,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
       const res = await this.dbServ.getEmpleadosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
       res.data.map((cli) => {
+        cli.nombreCompleto = cli.nombre + ' ' + cli.apellido;
         cli.role_ = cli.sexo === 'm' ? this.rolesM[cli.role] : this.rolesF[cli.role];
         cli.documentos_de_identidad.map((docu) => {
           if (docu.principal) {
@@ -164,7 +161,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
 
   fecha(a: any) {
     moment.locale('es');
-    const fechaFormato = moment(a).format('MM/DD/YYYY');
+    const fechaFormato = moment(a).format('DD/MM/YYYY');
     return fechaFormato;
   }
 
@@ -219,25 +216,30 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
             this.dbServ.toastSuccess('Usuario Editado', 'Correcto');
 
             const docu = res.data.documentos_de_identidad.filter((doc) => doc.principal === true);
+            res.data.nombreCompleto = res.data.nombre + ' ' + res.data.apellido;
             res.data.documento_identidad = docu[0].documento;
             res.data.role_ = res.data.sexo === 'm' ? this.rolesM[res.data.role] : this.rolesF[res.data.role];
+            console.log('res =>> ', res);
 
             this.listaEmpleados[this.indexSeleccionado] = res.data;
             this.borrar();
             console.log(res);
           },
           (err) => {
-            this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
+            console.log('err ==> ', err);
+
+            this.dbServ.toastError(err.error.msg, 'ERROR', true);
           },
         );
       } else {
         this.dbServ.createEmpleados(objSend).subscribe(
           (res) => {
             const docu = res.data.documentos_de_identidad.filter((doc) => doc.principal === true);
+            res.data.nombreCompleto = res.data.nombre + ' ' + res.data.apellido;
             res.data.documento_identidad = docu[0].documento;
             res.data.role_ = res.data.sexo === 'm' ? this.rolesM[res.data.role] : this.rolesF[res.data.role];
 
-            console.log(res);
+            console.log('res =>> ', res);
             this.listaEmpleados = [...this.listaEmpleados, res.data];
             this.dbServ.toastSuccess('Usuario Creado', 'Correcto');
             this.form.reset();

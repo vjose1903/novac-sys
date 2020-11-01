@@ -33,7 +33,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   PrintersInstall: any;
   OpenPrinterMenu = false;
   // imgUser: string;
-  imgUser = 'assets/img/userH.png';
+  imgUser = 'assets/img/transparente.png';
   versionApp: any;
   noServer = false;
   // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
@@ -74,6 +74,11 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         .validateToken()
         .then((res) => {
           this.setUser(res.data);
+          if (res.data.sexo === 'm') {
+            this.imgUser = 'assets/img/userH.png';
+          } else {
+            this.imgUser = 'assets/img/userM.png';
+          }
           this.lRun = true;
         })
         .catch((err) => {
@@ -103,16 +108,9 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   setUser(user) {
     this.usuario = user;
     this.fun.setUser(user);
-    console.log('this.usuario ', this.usuario);
   }
   element: HTMLElement;
-  ngAfterViewInit() {
-    // if (this.usuario.sexo === 'm') {
-    //   this.imgUser = 'assets/img/userH.png';
-    // } else {
-    //   this.imgUser = 'assets/img/userM.png';
-    // }
-  }
+  ngAfterViewInit() {}
 
   stop(e) {
     this.OpenPrinterMenu = true;

@@ -386,14 +386,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       if (condicion.campo2) {
         if (this.data[i][condicion.campo] && !this.data[i][condicion.campo2]) {
           res = false;
-        } else {
-          res = true;
         }
       } else {
         if (this.data[i][condicion.campo]) {
           res = false;
-        } else {
-          res = true;
         }
       }
     } else {

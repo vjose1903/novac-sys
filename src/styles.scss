@@ -159,6 +159,11 @@ body {
 .control-label {
   font-weight: bold !important;
 }
+
+.text-sombra1 {
+  text-shadow: 1px 1px 1px #000000b3;
+}
+
 .text-green {
   color: green !important;
 }
@@ -167,6 +172,9 @@ body {
 }
 .text-red {
   color: #ff0000 !important;
+}
+.text-yellow {
+  color: #ffc400 !important;
 }
 .text-black {
   color: #000000 !important;
@@ -211,6 +219,10 @@ input[type="text"] {
     cursor: pointer;
   }
 }
+input[type="checkbox"]:disabled {
+  filter: brightness(0.91) !important;
+}
+
 input[type="checkbox"]:disabled,
 input[type="text"]:disabled {
   filter: grayscale(74%);

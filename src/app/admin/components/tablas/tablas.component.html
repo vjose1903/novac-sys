@@ -24,7 +24,8 @@
               tdHover: tablaHover,
               tdNoHover: !tablaHover,
               'bg-selected': !focusRow && dato.id === seleccionado_id,
-              'bg-light': focusRow && RowElement.id == IDROW
+              'bg-light': focusRow && RowElement.id == IDROW,
+              'bg-more-light': dato.subrayar
             }"
             style="cursor: pointer"
             #RowElement

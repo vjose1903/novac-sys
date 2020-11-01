@@ -16,15 +16,16 @@ import { FunctionService } from '../../core/services/functions.service';
 })
 export class ReciboViajesComponent implements OnInit, OnDestroy {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
-  viajes;
-  viaje_selected = { id: -1 } as any;
-  chofer_id;
-  is_chofer_selected = false;
-  is_choferes_register = false;
-  choferes: any;
-  salio_en_chofer = false;
-
   info = [
+    {
+      titulo: '1',
+      key: 'estatus',
+      text_color: 'colorEstado',
+      isIcon: true,
+      color: true,
+      customClass: true,
+      estilos: [{ width: '1.5rem' }, { color: '#8ef3a3' }],
+    },
     {
       titulo: 'Fecha Fact.',
       key: 'fecha',
@@ -43,16 +44,26 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
       formatoNumero: true,
     },
   ];
+  viajes;
+  viaje_selected = { id: -1 } as any;
+  ultimo_pago;
+  chofer_id;
+  is_chofer_selected = false;
+  is_choferes_register = false;
+  choferes: any;
+  salio_en_chofer = false;
+
   viajes_pendientes_cant = 0;
   viajes_completados_cant = 0;
   viajes_cant_porciento: any;
   viajes_cant: any;
   tipoModal: string;
   subObj: Subscription;
+  subDeci: Subscription;
   forma_pago: any;
   total_recibido: any;
   totalPagado = 0;
-  totalPagadoPorciento = 0;
+  totalPagadoPorciento: any = 0;
   monto_pendiente = 0;
   constructor(private dbServ: DBservice, private mServ: ModalService, private fun: FunctionService) {}
 
@@ -67,6 +78,14 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
         this.mServ.ModalObj(undefined);
       }
     });
+
+    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
+      if (res !== undefined) {
+        this.reversarUltimaTransaccion(res);
+
+        this.mServ.ModalDecision(undefined);
+      }
+    });
     this.necesarioStart();
   }
 
@@ -77,6 +96,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subObj.unsubscribe();
+    this.subDeci.unsubscribe();
   }
 
   formatoNumero(num) {
@@ -93,6 +113,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   }
 
   async getViajes(e) {
+    this.viajes = undefined;
     try {
       const page = e.page;
       const per_page = e.per_page;
@@ -104,6 +125,9 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
       res.data.map((fact) => {
         const pago_a_tiempo = fact.condicion === 'Contado' ? true : fact.fecha_vencimiento > fechaA ? true : false;
 
+        fact.estatus = fact.fecha_completada ? 'fas fa-check' : fact.pagos.length > 0 ? 'far fa-check-square' : 'far fa-square';
+        fact.colorEstado = fact.fecha_completada ? 'green' : fact.pagos.length > 0 ? 'yellow' : 'red';
+        fact.customStyles = [{ 'td-estatus': { estilos: [{ width: '1.5rem' }] } }];
         fact.cliente_mostrar = fact.cliente.nombre;
         fact.fecha = moment(fact.fecha_equivalente).format('DD-MM-YYYY');
         fact.total_factura = this.recalcularMonto(fact.total_factura, fact.notas);
@@ -113,22 +137,25 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
         return fact;
       });
 
-      // this.viajes = [];
       this.viajes = res.data;
       this.viajes_cant = res.total_registros ? res.total_registros : 0;
 
       this.viajes_completados_cant = this.viajes.filter((v) => v.fecha_completada !== null).length;
       this.viajes_pendientes_cant = this.viajes.filter((v) => v.fecha_completada === null).length;
 
-      console.log();
-
       setTimeout(() => {
         this.viajes_cant_porciento = (this.viajes_completados_cant / this.viajes_cant) * 100;
+        this.viajes_cant_porciento = GLOBAL.numFormatTwoDecimals(this.viajes_cant_porciento);
       }, 5);
 
-      console.log('this.viajes ', this.viajes);
-      console.log('this.viajes_pendientes_cant ', this.viajes_pendientes_cant);
+      this.viajes.sort((a, b) => {
+        return a.id > b.id ? 1 : -1;
+      });
+
+      console.log(';;;;;;;;;; this.viajes ', this.viajes);
     } catch (error) {
+      console.error(error);
+
       if (error.error) {
         this.dbServ.toastError(error.error.msg, 'ERROR');
       } else {
@@ -165,7 +192,10 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
 
     this.monto_pendiente = this.viaje_selected.total_factura - this.totalPagado;
     this.totalPagadoPorciento = (this.totalPagado / this.viaje_selected.total_factura) * 100;
-    this.totalPagadoPorciento = parseFloat(GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento));
+    this.totalPagadoPorciento = GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento);
+
+    const lengthpagos = this.viaje_selected.pagos.length;
+    this.ultimo_pago = this.viaje_selected.pagos[lengthpagos - 1];
 
     console.log(arg);
   }
@@ -185,14 +215,37 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
     return monto;
   }
 
-  accion(bool) {
+  accion(bool, tipo) {
     if (bool) {
-      const obj = { total_factura: this.viaje_selected.total_factura, devuelta: 0, tipo__: 'no_devuelta', factura_de: 'venta' };
-      this.mServ.modalTipo('cambio');
-      this.tipoModal = 'cambio';
+      let obj = {};
+      if (tipo === 'cambio') {
+        obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo__: 'no_devuelta', factura_de: 'venta' };
+        this.tipoModal = tipo;
+      } else if (tipo === 'dinamico_texto') {
+        this.tipoModal = 'reversar_transaccion';
+        this.mServ.modalTipo('dinamico_texto');
+        obj['texto_modal'] = 'Seguro de que desea reversar la ultima transaccion realizada a la factura ' + this.viaje_selected.numero_comprobante;
+      }
+
+      this.mServ.modalTipo(tipo);
       this.abrirModal(obj);
     } else {
-      this.viaje_selected = { id: -1 };
+      if (tipo === 'cambio') {
+        this.resetVariables();
+      }
+    }
+  }
+
+  async reversarUltimaTransaccion(arg) {
+    if (arg) {
+      try {
+        const res = await this.dbServ.revertirLastReciboByFacturaId(this.viaje_selected.id).toPromise();
+
+        this.getViajes(obj_paginate);
+        this.resetVariables();
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 
@@ -278,6 +331,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
     );
   }
   resetVariables() {
+    this.ultimo_pago = undefined;
     this.viaje_selected = { id: -1 };
     this.chofer_id = undefined;
     this.is_chofer_selected = false;

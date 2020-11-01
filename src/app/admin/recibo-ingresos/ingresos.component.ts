@@ -47,6 +47,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
     },
     {
       titulo: 'NCF',
+      customClass: true,
+      estilos: [{ width: '7rem' }],
       key: 'numero_comprobante',
     },
     {
@@ -55,6 +57,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
     },
     {
       titulo: 'Fecha Vencimiento',
+      text_color: 'colorFecha',
       key: 'fechaV',
       color: true,
     },
@@ -72,10 +75,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
       titulo: 'Seleccione',
       tipo: 'check',
       key: 'select',
-
+      customClass: true,
+      estilos: [{ width: '6rem' }],
       disable: {
-        getDisabled: false,
-        campo: '',
+        getDisabled: true,
+        campo: 'is_viaje',
       },
       title: '',
     },
@@ -83,6 +87,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
       titulo: 'Pago Total',
       tipo: 'check',
       key: 'pagoT',
+      customClass: true,
+      estilos: [{ width: '6rem' }],
       disable: {
         getDisabled: true,
         campo: 'select',
@@ -182,18 +188,22 @@ export class IngresosComponent implements OnInit, OnDestroy {
     } else {
       select = true;
     }
+
     this.Facturas.forEach((fact, j) => {
       if (select) {
-        if (fact.select) {
-          this.Facturas[j].pagoT = true;
+        if (fact.is_viaje && fact.select) {
+          this.Facturas[j].pagoT = false;
           this.Facturas[j].select = false;
-          this.tablas.resetInput('balance', 'monto', j, true);
+          this.Facturas[j].monto = 0;
+
+          this.tablas.resetInput('especificar', 'monto', j, true, 0);
 
           const i = this.facturas_selected.indexOf(fact);
           _.pullAt(this.facturas_selected, i);
         }
       } else {
-        if (!fact.select) {
+        if (fact.is_viaje && !fact.select) {
+          this.Facturas[j].monto = GLOBAL.numFormatTwoDecimals(this.Facturas[j].total_factura);
           this.Facturas[j].select = true;
           this.facturas_selected.push(fact);
         }
@@ -234,24 +244,34 @@ export class IngresosComponent implements OnInit, OnDestroy {
               (fact = fact.map((val) => {
                 val.secuencia = _.padStart(val.numero_factura, 8, '0');
                 val.fecha = moment(val.fecha_equivalente).format('DD-MM-YYYY');
-                val.fechaV = moment(val.fecha_vencimiento).format('DD-MM-YYYY');
+                val.fechaV = val.condicion === 'Crédito' ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : null;
                 val.select = false;
                 val.pagoT = false;
                 val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
-                val.text_color = val.fecha_vencimiento < fechaA ? 'red' : 'black';
+                val.colorFecha = moment(val.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
 
                 val.balance = this.recalcularMonto(val.balance, val.notas);
                 val.total_factura = this.recalcularMonto(val.total_factura, val.notas);
                 val.monto = 0;
                 // val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
-                val.historyPagos = val.pagos.length > 0 ? 'fas fa-comment-dollar' : 'far fa-comment';
-                val.colorEstado = val.pagos.length > 0 ? 'black' : 'gris-claro';
-                val.iconHover = val.pagos.length > 0 ? true : false;
-                val.customStyles = [{ 'td-historyPagos': { estilos: [{ width: '2rem' }] } }];
+
+                val.historyPagos = val.is_viaje ? 'fas fa-truck-moving' : val.pagos.length > 0 ? 'fas fa-comment-dollar' : 'far fa-comment';
+                val.colorEstado = val.is_viaje ? 'green' : val.pagos.length > 0 ? 'black' : 'gris-claro';
+                val.iconHover = val.is_viaje ? false : val.pagos.length > 0 ? true : false;
+
+                val.customStyles = [
+                  { 'td-historyPagos': { estilos: [{ width: '2rem' }, { 'font-size': '1.2rem' }] } },
+                  { 'td-select': { estilos: [{ width: '6rem' }] } },
+                  { 'td-pagoT': { estilos: [{ width: '6rem' }] } },
+                  { 'td-numero_comprobante': { estilos: [{ width: '7rem' }] } },
+                ];
 
                 val.pagos.forEach((abono) => {
                   this.totalPagado += abono.deposito;
                 });
+
+                val.subrayar = val.is_viaje;
+                val.is_viaje = !val.is_viaje;
 
                 console.log('val.pagos ', val.pagos);
 
@@ -517,6 +537,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
     this.restando = 0;
 
     this.facturas_selected.forEach((factura) => {
+      console.log('factura ', factura);
+
       this.recibiendo += GLOBAL.desformatear(factura.monto);
 
       this.restando = this.clienteAdepositar.balance - this.recibiendo;
