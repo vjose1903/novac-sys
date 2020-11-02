@@ -39,14 +39,16 @@ export function my_dateFormater(str) {
 
 // =========================================================================================================
 export function my_houreFormater(str) {
-  let dateObj = new Date(str);
+  const dateObj = new Date(str);
 
   let hours = dateObj.getHours();
-  let minutes = dateObj.getMinutes();
-  let ampm = hours >= 12 ? 'pm' : 'am';
+  const minutes = dateObj.getMinutes();
+  const ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12;
   hours = hours ? hours : 12;
-  return `${hours}:${minutes} ${ampm}`;
+
+  const res = `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
+  return res;
 }
 
 // =========================================================================================================

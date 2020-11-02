@@ -10,6 +10,7 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
 import { FunctionService } from '../../../core/services/functions.service';
+import { LoaderService } from '../../../loader/loader.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -32,7 +33,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   listaTipoArticulos: any;
   tipoModal: string;
 
-  usuario: any;
   optionsAlerta: any[];
   alertaMedida: any;
 
@@ -52,7 +52,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   subDeci: Subscription;
   obj_paginate_ = obj_paginate;
   vendido_en: any;
-  listaMateriasPrimas;
+  listaMateriasPrimas = [];
 
   constructor(
     private dbServ: DBservice,
@@ -62,11 +62,10 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     private router: Router,
     private mServ: ModalService,
     private tServ: TablasService,
+    private loaderService: LoaderService,
   ) {}
 
   ngOnInit() {
-    this.usuario = this.fun.getUser();
-
     this.createForm();
     this.FORM = this.form.controls;
 
@@ -87,13 +86,27 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   async necesarioStart() {
     await this.getArticulos(this.obj_paginate_);
     this.getTipoArticulos();
-    this.getMateriasP();
   }
 
-  getMateriasP() {
-    this.dbServ.getMateriasPrimas().subscribe((res) => {
-      this.listaMateriasPrimas = GLOBAL.duplicarJson(res);
-    });
+  getMateriasP(callback = (arg) => {}) {
+    console.log('mmg');
+
+    this.loaderService.isLoading.next(true);
+    this.dbServ.getMateriasPrimas().subscribe(
+      (res) => {
+        this.loaderService.isLoading.next(false);
+        this.listaMateriasPrimas = GLOBAL.duplicarJson(res);
+        callback({
+          status: true,
+        });
+      },
+      (err) => {
+        callback({
+          status: false,
+        });
+        this.loaderService.isLoading.next(false);
+      },
+    );
   }
 
   getTipoArticulos() {
@@ -125,16 +138,19 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.cdRef.detectChanges();
   }
 
-  selectTipoArticulo(tipo) {
+  async selectTipoArticulo(tipo) {
     const Tipo = this.listaTipoArticulos.filter((val) => val.id === _.parseInt(tipo));
     this.TIPOARTICULO = Tipo[0].descripcion;
 
-    if (this.TIPOARTICULO === 'Producto terminado') {
-      this.addItem();
-      this.form.controls.medida.setValue('Quintal');
-      this.fillDropAlerta('Quintal');
-      this.is_combo = true;
-      this.getMateriasP();
+    if (_.lowerCase(this.TIPOARTICULO) === 'producto terminado') {
+      console.log('entrooo');
+
+      await this.getMateriasP((res) => {
+        this.addItem();
+        this.form.controls.medida.setValue('Quintal');
+        this.fillDropAlerta('Quintal');
+        this.is_combo = true;
+      });
     } else {
       this.ARRAY_FORMULA = ([] as unknown) as FormArray;
       this.is_combo = false;
@@ -304,6 +320,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.ARRAY_FORMULA.value.forEach((element, i) => {
       this.removeItem(0);
     });
+    console.log('this.ARRAY_FORMULA ==> ', this.ARRAY_FORMULA);
   }
 
   addItem(): void {
@@ -650,17 +667,19 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.MEDIDACAJA = '';
 
     if (articulo.is_combo) {
-      this.numIngredientes = articulo.formulas_productos_terminados.length;
+      this.getMateriasP((res) => {
+        this.numIngredientes = articulo.formulas_productos_terminados.length;
 
-      this.is_combo = true;
-      // articulo.formulas_productos_terminados.forEach((ingredient, i) => {
-      // });
-      this.TIPOARTICULO = 'Producto terminado';
-      this.form.controls.medida.setValue('Quintal');
-      this.fillDropAlerta('Quintal');
-      articulo.formulas_productos_terminados.forEach((ingredient, i) => {
-        this.addItem();
-        this.fillFormula(ingredient, i);
+        this.is_combo = true;
+        // articulo.formulas_productos_terminados.forEach((ingredient, i) => {
+        // });
+        this.TIPOARTICULO = 'Producto terminado';
+        this.form.controls.medida.setValue('Quintal');
+        this.fillDropAlerta('Quintal');
+        articulo.formulas_productos_terminados.forEach((ingredient, i) => {
+          this.addItem();
+          this.fillFormula(ingredient, i);
+        });
       });
     } else {
       this.is_combo = false;
@@ -806,7 +825,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     const x = GLOBAL.duplicarJson(form.value);
 
     const obj = {
-      user_id: this.usuario.id,
+      user_id: this.fun.getUser().id,
       tipo_articulo_id: _.parseInt(x.tipo_articulo_id),
       nombre: x.nombre,
       costo_principal: GLOBAL.desformatear(x.costo_principal),
@@ -835,23 +854,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
       this.dbServ.editarArticulo(obj).subscribe(
         (res) => {
-          const temp = GLOBAL.duplicarJson(this.listaArticulos);
-          this.listaArticulos = [];
+          this.getArticulos(obj_paginate);
 
-          const i = _.findIndex(temp, (art: any) => {
-            if (art.id === obj['id']) {
-              return true;
-            }
-          });
-
-          res['contenido_articulos'] = res['contenido_articulos_attributes'];
-          res['formulas_productos_terminados'] = res['formulas_productos_terminados_attributes'];
-          res['codigo'] = _.padStart(res.id, 5, '0');
-          delete res['formulas_productos_terminados_attributes'];
-          delete res['contenido_articulos_attributes'];
-
-          temp[i] = res;
-          this.listaArticulos = GLOBAL.duplicarJson(temp);
           this.borrar();
 
           this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
@@ -865,8 +869,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     } else {
       this.dbServ.createArticulo(obj).subscribe(
         (res) => {
-          this.listaArticulos = [...this.listaArticulos, res];
-          // this.artServ.next_articulo([...this.listaArticulos, res]);
+          this.getArticulos(obj_paginate);
+
           this.borrar();
           this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
         },

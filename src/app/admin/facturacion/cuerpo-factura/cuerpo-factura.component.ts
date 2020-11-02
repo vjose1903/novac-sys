@@ -1,8 +1,9 @@
 import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectionStrategy, OnDestroy, OnChanges, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
+import * as moment from 'moment';
+import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { ModalService } from '../../components/modal/modal.service';
@@ -45,14 +46,27 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   @Output() sendCalculos = new EventEmitter<any>();
   @Output() sendDescuento = new EventEmitter<any>();
   @Output() getCuerpoFactura = new EventEmitter<any>();
+  @Output() getFechaFactura = new EventEmitter<any>();
   subDeci: Subscription;
   subObj: Subscription;
   subArticuloFiltro: Subscription;
   subEsc: Subscription;
   subInde: Subscription;
   tipoModal: string;
+
+  FechaFactura: string;
+
   constructor(private dbServ: DBservice, private mServ: ModalService, private fb: FormBuilder, private route: ActivatedRoute) {
     // this.rowFactura = new FormArray([new FormControl()]);
+  }
+
+  formarFechaFactura(date) {
+    const hora = moment(date).hour();
+    const minutos = moment(date).minutes();
+    const fechaTemp = moment(date).format('YYYY-MM-DD');
+
+    this.FechaFactura = fechaTemp + ' ' + hora + ':' + minutos;
+    this.getFechaFactura.emit(this.FechaFactura);
   }
 
   ngOnInit() {
@@ -81,6 +95,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (this.tipoModal === 'removerArticulo' && res) {
         this.procesoQuitarArticulo();
+        this.mServ.ModalDecision(undefined);
+      }
+      if (res !== undefined && res.bool) {
+        this.formarFechaFactura(res.Date);
+        this.mServ.ModalDecision(undefined);
       }
     });
 

@@ -206,7 +206,7 @@
         <div class="cuadroTotal">RD$ {{ formatoNumero(TOTAL) }}</div>
         <div *ngIf="FacturaAtrasada" class="encabezadoRigth fechaA">
           <span class="w-100 text-danger letrasT">
-            Factura atrasada, fecha: <strong> {{ FechaFacturaAtrasada }}</strong>
+            Factura atrasada, fecha: <strong> {{ FechaFactura }}</strong>
           </span>
         </div>
       </div>
@@ -216,6 +216,7 @@
     <app-cuerpo-factura
       [propietario]="propietario_factura"
       [metodo]="metodo"
+      (getFechaFactura)="getFechaFactura($event)"
       (getCuerpoFactura)="getCuerpoFactura($event)"
       (sendDescuento)="getDescuento($event)"
       (sendCalculos)="getCalculos($event)"

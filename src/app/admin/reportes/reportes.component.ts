@@ -13,6 +13,7 @@ import { ModalService } from '../components/modal/modal.service';
 export class ReportesComponent implements OnInit, OnDestroy {
   pdfSrc: any;
   fileName: any;
+  tipoModal: string;
   constructor(private _ipc: IpcService, private mServ: ModalService, private dbServ: DBservice) {}
   appDir;
   subDeci: Subscription;
@@ -85,15 +86,30 @@ export class ReportesComponent implements OnInit, OnDestroy {
       // }, 1000);
     } catch (error) {
       console.error(error);
+      this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }
 
   resetVariables() {
     this.pdfSrc = undefined;
     this.fileName = undefined;
+    this.tipoModal = undefined;
+  }
+
+  abrirModal(tipo) {
+    const obj = {};
+    if (tipo === 'cuadre') {
+      this.tipoModal = tipo;
+      this.mServ.modalTipo('dinamico_texto');
+      obj['texto_modal'] = 'Seguro de que desea realizar el cuadre de caja.';
+    }
+    this.mServ.modalTipo('dinamico_texto');
+    this.mServ.ModalSeleccion(obj);
+    this.mServ.mostrarModal(true);
   }
 
   abrirModalReporte(obj) {
+    this.tipoModal = 'visor_pdf';
     this.mServ.modalTipo('visor_pdf');
     this.mServ.ModalSeleccion(obj);
 
@@ -101,12 +117,19 @@ export class ReportesComponent implements OnInit, OnDestroy {
   }
 
   decisionModal(decision) {
+    console.log('decision ==> ', decision);
+    console.log('this.tipoModal ==> ', this.tipoModal);
+
     if (decision) {
-      const obj = {
-        base64: this.pdfSrc,
-        filename: this.fileName,
-      };
-      this._ipc.send('printReporte', obj);
+      if (this.tipoModal === 'visor_pdf') {
+        const obj = {
+          base64: this.pdfSrc,
+          filename: this.fileName,
+        };
+        this._ipc.send('printReporte', obj);
+      } else if (this.tipoModal === 'cuadre') {
+        this.makeCuadre();
+      }
     }
     this.resetVariables();
   }

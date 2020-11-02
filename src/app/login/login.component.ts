@@ -91,8 +91,8 @@ export class LoginComponent implements OnInit {
 
   async printTest() {
     // const data_ = compra_credito_valor_fiscal;
-    const data_ = compra_contado_valor_fiscal;
-    // const data_ = venta_credito_consumo;
+    // const data_ = compra_contado_valor_fiscal;
+    const data_ = venta_credito_consumo;
 
     console.log('data_ ', data_);
 

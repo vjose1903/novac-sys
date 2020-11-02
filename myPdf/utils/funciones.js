@@ -45,7 +45,8 @@ function my_houreFormater(str) {
     var ampm = hours >= 12 ? 'pm' : 'am';
     hours = hours % 12;
     hours = hours ? hours : 12;
-    return hours + ":" + minutes + " " + ampm;
+    var res = "" + (hours < 10 ? '0' : '') + hours + ":" + (minutes < 10 ? '0' : '') + minutes + " " + ampm;
+    return res;
 }
 exports.my_houreFormater = my_houreFormater;
 // =========================================================================================================

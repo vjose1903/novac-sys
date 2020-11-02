@@ -20,6 +20,11 @@ import { FunctionService } from '../../core/services/functions.service';
   styleUrls: ['./facturacion.component.scss'],
 })
 export class FacturacionComponent implements OnInit, OnDestroy {
+  hora: number;
+  minutos: number;
+  fecha_busqueda_articulos: string;
+  time: { hour: number; minute: number };
+  FechaFactura: string;
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
@@ -82,6 +87,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   listaSuplidores: any;
   TiposCostosGastos: string;
   tipos_costosYgastos: string[];
+
   medidas = {
     Libra: 'Libras',
     Quintal: 'Quintales',
@@ -99,7 +105,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   subObj: Subscription;
   subDeci: Subscription;
   FacturaAtrasada = false;
-  FechaFacturaAtrasada;
+  // FechaFactura = moment().format('YYYY-MM-DD');
   fecha_vencimiento = new Date();
   fecha_equivalente = new Date();
   fecha_viaje = new Date();
@@ -235,10 +241,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== undefined) {
         this.decisionModal(res);
-        this.mServ.ModalDecision(undefined);
-      }
-      if (res !== undefined && res.bool) {
-        this.filterArticulosByDate(res.Date);
         this.mServ.ModalDecision(undefined);
       }
     });
@@ -618,6 +620,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
             if (this.articulosAcambiar.length > 0) {
               articulos_a_cambiar = true;
             }
+
             const obj = { total_factura: this.TOTAL, devuelta: 0, tipo__: 'devuelta', factura_de: this.metodo, cambios_articulos: articulos_a_cambiar };
             this.mServ.modalTipo('cambio');
             this.tipoModal = 'cambio';
@@ -700,7 +703,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.modalTipo(null);
     this.mServ.ModalSeleccion(null);
     this.FacturaAtrasada = false;
-    this.FechaFacturaAtrasada = null;
+    // this.FechaFactura = null;
+    // this.FechaFactura = moment().format('YYYY-MM-DD');
     this.fecha_equivalente = new Date();
     this.fecha_vencimiento = new Date();
     this.fecha_viaje = new Date();
@@ -874,14 +878,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     return GLOBAL.redondearAdos(pre);
   }
 
-  async filterArticulosByDate(date) {
-    this.FacturaAtrasada = true;
-    this.FechaFacturaAtrasada = moment(date).format('DD/MM/YYYY');
-    try {
-      // this.listaArticulos = await this.dbServ.getArticulosByDate(date).toPromise();
-    } catch (error) {
-      this.dbServ.toastError('Algo salio mal buscando historico de articulos', 'ERROR');
-    }
+  getFechaFactura(arg) {
+    this.FechaFactura = arg;
   }
 
   parsearDetalleComprarDetallesCompra(cuerpo) {
@@ -916,9 +914,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     let fecha_equi;
     if (this.FacturaAtrasada) {
-      fecha_equi = this.FechaFacturaAtrasada;
-    } else if (this.is_viaje) {
-      fecha_equi = this.fecha_equivalente;
+      fecha_equi = this.FechaFactura;
     } else {
       fecha_equi = null;
     }
