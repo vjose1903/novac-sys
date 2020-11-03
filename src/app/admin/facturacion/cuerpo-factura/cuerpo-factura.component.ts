@@ -37,6 +37,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   sacos = [25, 50, 100];
   indexRemove;
+  @Input() FechaFactura;
   @Input() propietario;
   @Input() metodo;
 
@@ -54,19 +55,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   subInde: Subscription;
   tipoModal: string;
 
-  FechaFactura: string;
-
   constructor(private dbServ: DBservice, private mServ: ModalService, private fb: FormBuilder, private route: ActivatedRoute) {
     // this.rowFactura = new FormArray([new FormControl()]);
-  }
-
-  formarFechaFactura(date) {
-    const hora = moment(date).hour();
-    const minutos = moment(date).minutes();
-    const fechaTemp = moment(date).format('YYYY-MM-DD');
-
-    this.FechaFactura = fechaTemp + ' ' + hora + ':' + minutos;
-    this.getFechaFactura.emit(this.FechaFactura);
   }
 
   ngOnInit() {
@@ -97,23 +87,15 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         this.procesoQuitarArticulo();
         this.mServ.ModalDecision(undefined);
       }
-      if (res !== undefined && res.bool) {
-        this.formarFechaFactura(res.Date);
-        this.mServ.ModalDecision(undefined);
-      }
     });
 
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      console.log('res ', res);
-
       if (res && res.tipo_modal === 'buscarArticulo') {
         this.LLenarRowDespuesDeFiltro(res);
       }
     });
 
     this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
-      console.log(res);
-
       if (res && res.tipo_modal === 'buscarArticulo') {
         this.LLenarRowDespuesDeFiltro(res);
       }
@@ -319,7 +301,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         }
 
         if (!excede) {
-          const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [] };
+          const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
           this.filtrarArticulo(obj, true, sigInput);
         } else {
           GLOBAL.enfocarInput('can-' + index);
@@ -367,8 +349,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         GLOBAL.enfocarInput('cod-' + i);
         GLOBAL.selectContenido('cod-' + i);
       } else {
-        const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [] };
-        console.log(obj);
+        const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
 
         GLOBAL.desEnfocarInput('cod-' + i);
         this.filtrarArticulo(obj);
@@ -508,7 +489,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
     let articulo;
     try {
-      articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, 'todos').toPromise();
+      articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
     } catch (error) {}
 
     for (let index = 0; index < this.control.controls.length; index++) {
@@ -544,8 +525,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (lugar === 'saltar') {
       i--;
     }
-
-    console.log('cantidad a comparar ', cantidad);
 
     try {
       const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();
@@ -603,7 +582,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     if (input === 'unidad' && codigo !== '' && codigo !== null && codigo !== undefined) {
       this.setInputDrop(i);
 
-      const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [] };
+      const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
       this.filtrarArticulo(obj);
     }
   }

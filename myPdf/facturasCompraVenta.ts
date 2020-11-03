@@ -75,7 +75,6 @@ export function makeFacturaVenta(data) {
     file: 'factura.pdf',
     type: 'file',
   };
-  console.log('/////////// ', obj);
 
   return obj;
 }
@@ -277,7 +276,6 @@ function cabeceraFacturaVenta(data) {
       layout: 'headerLineOnly',
     },
   ];
-  console.log('////////////////// header', header);
 
   return header;
 }
@@ -435,6 +433,5 @@ function contenidoFacturaVenta(data) {
     },
     // -----------------------
   ];
-  console.log('////////////////// content', content);
   return content;
 }

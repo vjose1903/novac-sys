@@ -25,6 +25,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   fecha_busqueda_articulos: string;
   time: { hour: number; minute: number };
   FechaFactura: string;
+  FechaFacturaMostrar: string;
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
@@ -36,7 +37,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     // alt 18
     event.stopPropagation();
     const key = event.keyCode;
-    console.log(key);
 
     if (event.type === 'keydown') {
       if (!this.secuenciaKeys.includes(key)) {
@@ -137,13 +137,28 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         dateInputFormat: 'DD/MM/YYYY',
       },
     );
+    setInterval(() => {
+      this.fecha = GLOBAL.my_dateFormater(new Date()) + ' - ' + GLOBAL.my_houreFormater(new Date());
+    }, 1000);
   }
 
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num)) + '  ';
   }
 
+  formarFechaFactura(date) {
+    const hora = moment(date).hour();
+    const minutos = moment(date).minutes();
+    const fechaTemp = moment(date).format('YYYY-MM-DD');
+
+    // this.FechaFacturaMostrar = moment(date).format('DD/MM/YYYY');
+
+    this.FechaFactura = fechaTemp + ' ' + hora + ':' + minutos;
+    this.FechaFacturaMostrar = GLOBAL.my_dateFormater(this.FechaFactura) + ' - ' + GLOBAL.my_houreFormater(this.FechaFactura);
+  }
+
   ngOnInit() {
+    this.formarFechaFactura(new Date());
     this.usuario = this.fun.getUser();
 
     this.metodo = this.route.snapshot.params['tipo'];
@@ -197,7 +212,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.tipos_costosYgastos = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
       this.labelSearch = 'Suplidor';
     }
-    this.fecha = moment().format('DD/MM/YYYY');
+
     // this.fecha = moment().format('DD/MM/YYYY');
 
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
@@ -243,6 +258,11 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         this.decisionModal(res);
         this.mServ.ModalDecision(undefined);
       }
+      if (res !== undefined && res.bool) {
+        this.formarFechaFactura(res.Date);
+        this.FacturaAtrasada = true;
+        this.mServ.ModalDecision(undefined);
+      }
     });
 
     setTimeout(() => {
@@ -282,36 +302,24 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     if (this.metodo === 'venta') {
       setTimeout(() => {
-        console.log('entre en  ', document.activeElement.id);
         const voy_a = document.activeElement.id;
         const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
-        console.log('sali_de ', sali_de);
-        console.log('valor ', valor);
-        console.log('metodo ', this.metodo);
-        console.log('nombre ', nombre);
-        console.log('voy_a ', voy_a);
-        console.log('condicion ', condicion);
         if (sali_de === 'venta' && condicion === 'Crédito' && nombre === 'Cliente contado') {
           if (voy_a !== 'fecha_equivalente' && voy_a === 'nom') {
-            console.log(1);
             buscar = true;
           }
         }
         if (sali_de === 'venta' && valor === 'adelantada' && nombre === 'Cliente contado') {
-          console.log(2);
           buscar = true;
         }
         if (sali_de === 'venta' && condicion === 'Contado' && valor === 'normal' && voy_a !== 'nom' && voy_a !== 'dir') {
-          console.log(3);
           this.iniciarFactura('cod-0');
         }
 
         if (sali_de === 'fecha_equivalente' && condicion === 'Crédito' && nombre === 'Cliente contado') {
-          console.log(5);
           buscar = true;
         }
 
-        console.log('buscar => ', buscar);
         if (buscar) {
           this.abrirModalFiltro();
         }
@@ -696,6 +704,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   CancelarFactura() {
     this.articulosAcambiar = [];
     this.newCuerpo = undefined;
+    this.FechaFacturaMostrar = undefined;
     this.propietario_factura = null;
     this.NCFcompra = null;
     this.CostoYgasto = null;
@@ -703,14 +712,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.modalTipo(null);
     this.mServ.ModalSeleccion(null);
     this.FacturaAtrasada = false;
-    // this.FechaFactura = null;
-    // this.FechaFactura = moment().format('YYYY-MM-DD');
     this.fecha_equivalente = new Date();
     this.fecha_vencimiento = new Date();
     this.fecha_viaje = new Date();
     this.modo_factura = 'normal';
     this.is_adelantada = false;
     this.is_viaje = false;
+    this.formarFechaFactura(new Date());
 
     if (this.metodo === 'venta') {
       this.form.patchValue({
@@ -804,7 +812,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       let articulo;
       let codigo = 0;
       try {
-        articulo = await this.dbServ.getArticulosFiltrados(row.cod, 0, 0, true, false, 'todos').toPromise();
+        articulo = await this.dbServ.getArticulosFiltrados(row.cod, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
       } catch (error) {}
 
       // const articulo = JSON.parse(JSON.stringify(Articulo[0]));
@@ -876,10 +884,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   calcularNuevosPrecios(cant, precio) {
     const pre = precio / cant;
     return GLOBAL.redondearAdos(pre);
-  }
-
-  getFechaFactura(arg) {
-    this.FechaFactura = arg;
   }
 
   parsearDetalleComprarDetallesCompra(cuerpo) {

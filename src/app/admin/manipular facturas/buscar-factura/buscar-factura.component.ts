@@ -134,9 +134,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     });
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      console.log('res ', res);
-      console.log('tipoModal ', this.tipoModal);
-
       if (res) {
         if (this.tipoModal === 'mostrarFactura') {
           if (this.BuscarPara === 'anular_factura') {
@@ -208,7 +205,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     }
   }
   completarTituloPag() {
-    console.log(this.BuscarPara);
     if (this.BuscarPara === 'anular_factura') {
       this.Para = ' Anular factura';
     } else if (this.BuscarPara === 'nota_credito') {
@@ -264,12 +260,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   async pedirFactura(campo, valor) {
     try {
-      console.log('campo ', campo);
-
       this.facturas = undefined;
       const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id).toPromise();
       this.facturas = GLOBAL.duplicarJson(busqueda);
-      console.log(this.facturas);
 
       if (this.facturas.length > 0) {
         this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
@@ -316,7 +309,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         return a.id > b.id ? 1 : -1;
       });
       this.facturas = GLOBAL.duplicarJson(busqueda);
-      console.log('this.facturas ', this.facturas);
 
       if (this.facturas.length === 0) {
         if (this.campo === '1') {
@@ -392,8 +384,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   }
 
   selectFactura(item) {
-    console.log(item);
-
     if (item.column === 'select') {
       this.facturaSelected = undefined;
 
@@ -452,7 +442,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         } else {
           if (this.tipo_factura_id === '0') {
             this.pedirFacturaModal(this.campo, valor);
-            console.log('aqui');
           } else {
             this.pedirFactura(this.campo, valor);
           }
@@ -487,8 +476,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     }
   }
   async CancelarFactura() {
-    console.log('cancelando');
-
     try {
       const res = await this.dbServ.cancelarFactura(this.facturaSelected.id).toPromise();
       const temp = GLOBAL.duplicarJson(this.facturas);
@@ -497,7 +484,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       temp[this.indexSelected].estado = false;
       temp[this.indexSelected].select = false;
       this.facturas = temp;
-      console.log(res);
     } catch (error) {
       console.error(error);
     }

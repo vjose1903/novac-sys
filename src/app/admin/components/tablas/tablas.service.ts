@@ -24,7 +24,6 @@ export class TablasService {
 
   setData(arg) {
     this.data = arg;
-    // console.log('data seteada en el servicio', this.data);
   }
 
   getDATA(): Observable<any> {

@@ -71,8 +71,17 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   facturaAdelantadaSelected;
   CuerpoConduce = [];
   rowsExcede = [];
+  FechaConduce: string;
 
   constructor(private mServ: ModalService, private _ipc: IpcService, private fun: FunctionService, private dbServ: DBservice, private fb: FormBuilder, private tServ: TablasService) {}
+
+  formarFechaFactura(date) {
+    const hora = moment(date).hour();
+    const minutos = moment(date).minutes();
+    const fechaTemp = moment(date).format('YYYY-MM-DD');
+
+    this.FechaConduce = fechaTemp + ' ' + hora + ':' + minutos;
+  }
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -199,6 +208,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   }
 
   async necesarioStar() {
+    await this.formarFechaFactura(new Date());
     GLOBAL.enfocarInput('clienteI');
   }
   aumentarSecuencia() {
@@ -249,7 +259,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
         GLOBAL.enfocarInput('cod-' + i);
         GLOBAL.selectContenido('cod-' + i);
       } else {
-        const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
+        const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [], fecha_articulo: this.FechaConduce };
 
         GLOBAL.desEnfocarInput('cod-' + i);
         this.filtrarArticulo(obj);
@@ -268,7 +278,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
           if (detalle_factura_id) {
             GLOBAL.enfocarInput('cod-' + (index + 1));
           } else {
-            const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
+            const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [], fecha_articulo: this.FechaConduce };
             this.filtrarArticulo(obj, true, sigInput);
             setTimeout(() => {
               GLOBAL.enfocarInput('uni-' + index);
@@ -465,7 +475,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     let articulo;
 
     try {
-      articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, 'todos').toPromise();
+      articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaConduce, 'todos').toPromise();
     } catch (error) {}
 
     for (let index = 0; index < this.control.controls.length; index++) {
@@ -549,7 +559,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     if (check && codigo !== '' && codigo !== null && codigo !== undefined) {
       if (!detalle_factura_id) {
         this.verificarRow(i);
-        const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [] };
+        const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [], fecha_articulo: this.FechaConduce };
         this.filtrarArticulo(obj);
       }
     }
@@ -584,7 +594,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
 
     if (detalle_factura_id) {
       try {
-        articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, 'todos').toPromise();
+        articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaConduce, 'todos').toPromise();
       } catch (error) {}
 
       if (articulo.is_detallable) {
@@ -805,7 +815,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   llenarConduce(rows) {
     for (let j = 0; j < rows.length; j++) {
       const row = rows[j];
-      console.log('row ==> ', row);
 
       for (let i = 0; i < this.control.controls.length; i++) {
         const control = this.control.controls[i].value;
@@ -841,12 +850,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     const cant_actual = cant_en_unidades_actual / multiplo;
 
     // const cant_en_unidades_actual = cant_en_unidades_actual * multiplo;
-
-    console.log('element.cantidad_en_unidades ==>', element.cantidad_en_unidades);
-    console.log('element.retirado ==>', element.retirado);
-    console.log('cant_en_unidades_actual ==>', cant_en_unidades_actual);
-    console.log('cant_actual ==>', cant_actual);
-    console.log(`calulo ==> ${cant_en_unidades_actual} / ${multiplo} `, cant_en_unidades_actual / multiplo);
 
     (this.control.controls[i] as any).controls['detalle_factura_id'].setValue(element.id);
     (this.control.controls[i] as any).controls['articulo_id'].setValue(element.articulo_id);
@@ -929,7 +932,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
 
       if (codigo_ && unidad_ && cantidad_) {
         try {
-          control['articulo'] = await this.dbServ.getArticulosFiltrados(codigo_, 0, 0, true, false, 'todos').toPromise();
+          control['articulo'] = await this.dbServ.getArticulosFiltrados(codigo_, 0, 0, true, false, this.FechaConduce, 'todos').toPromise();
         } catch (error) {}
 
         // control['articulo'] = this.listaArticulos.filter((art) => art.codigo === control.cod)[0].id;

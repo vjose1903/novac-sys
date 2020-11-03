@@ -16,6 +16,30 @@ export class GLOBAL {
     }
   }
   // =========================================================================================================
+
+  static my_dateFormater(str) {
+    const dateObj = new Date(str);
+    const month = dateObj.getMonth() + 1;
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const year = dateObj.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
+
+  // =========================================================================================================
+  static my_houreFormater(str) {
+    const dateObj = new Date(str);
+
+    let hours = dateObj.getHours();
+    const minutes = dateObj.getMinutes();
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+
+    const res = `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
+    return res;
+  }
+  // =========================================================================================================
   static numFormatTwoDecimals(num) {
     return this.formatearNumero(this.redondearAdos(num));
   }

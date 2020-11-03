@@ -127,7 +127,7 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
         this.accion(obj);
       },
       (err) => {
-        console.log(err.error);
+        console.error(err.error);
         this.mostrarErrores(err.error);
         // this.dbServ.toastError(err.error, 'Error');
       },

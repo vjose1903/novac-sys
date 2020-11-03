@@ -141,9 +141,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         this.searchCardTabla(tablaContent.parentElement, restar);
       } else {
         let paddingCard = tablaContent.offsetTop;
-        // paddingCard *= 2;
-        console.log('paddingCard ==> ', paddingCard);
-        console.log('tablaContent.offsetHeight ==> ', tablaContent.offsetHeight);
+        paddingCard *= 2;
 
         this.alto = tablaContent.offsetHeight - restar - paddingCard;
       }
@@ -180,13 +178,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
       // this.alto = altoDiv - restoAHeigthDiv - this.quitarAScorll - paddingCard;
       const restar = restoAHeigthDiv + this.quitarAScorll;
-      console.log(this.dinamicTable);
 
-      console.log('filterHeight==> ', filterHeight);
-      console.log('paginationHeight==> ', paginationHeight);
-      console.log('titulosHeigth==> ', titulosHeigth);
-      console.log('restoAHeigthDiv==> ', restoAHeigthDiv);
-      console.log('quitarAScorll==> ', this.quitarAScorll);
       this.searchCardTabla(this.dinamicTable.nativeElement, restar);
     }, 20);
   }

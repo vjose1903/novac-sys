@@ -70,8 +70,6 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipo_modal === 'cambio') {
-        console.log(res.data);
-
         this.forma_pago = res.data.forma_pago;
         this.total_recibido = res.data.dinero;
         this.IMPRIMIR();
@@ -107,8 +105,6 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
     this.dbServ.getUserByRole('C').subscribe((res) => {
       this.choferes = res;
       this.is_choferes_register = this.choferes.length > 0 ? true : false;
-      console.log('choferes ', this.choferes);
-      console.log('is_choferes_register ', this.is_choferes_register);
     });
   }
 
@@ -151,8 +147,6 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
       this.viajes.sort((a, b) => {
         return a.id > b.id ? 1 : -1;
       });
-
-      console.log(';;;;;;;;;; this.viajes ', this.viajes);
     } catch (error) {
       console.error(error);
 
@@ -196,8 +190,6 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
 
     const lengthpagos = this.viaje_selected.pagos.length;
     this.ultimo_pago = this.viaje_selected.pagos[lengthpagos - 1];
-
-    console.log(arg);
   }
 
   recalcularMonto(monto_original, notas) {
@@ -274,10 +266,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   }
 
   IMPRIMIR() {
-    console.log('-------- aqui imprimir -------');
     const empleado = this.fun.getUser();
-
-    console.log(this.viaje_selected.cliente_id);
 
     const obj = {
       cliente_id: this.viaje_selected.cliente_id,
@@ -291,11 +280,9 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
     };
 
     obj['detalle_recibos_attributes'] = this.formarDetalle();
-    console.log(obj);
 
     this.dbServ.createRecibo(obj).subscribe(
       async (res) => {
-        console.log(res);
         const obj = {
           data: res,
           type: 'recibo_ingreso',
@@ -308,7 +295,6 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
         // this._ipc.send('print', obj);
 
         // await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-        //   console.log(res);
 
         //   if (res.status) {
         //   } else {
@@ -318,9 +304,6 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
       },
       (err) => {
         console.error(err);
-        console.log('-----');
-        console.log('-----');
-        console.log('-----');
 
         if (err.error) {
           this.dbServ.toastError(err.error.msg, 'ERROR');

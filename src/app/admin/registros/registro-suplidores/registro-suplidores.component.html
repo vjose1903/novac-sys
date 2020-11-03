@@ -142,6 +142,7 @@
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
         (DELETE)="abrirModal($event)"
+        [quitarAScorll]="-20"
         [data]="listaSuplidores"
         (paginateChange)="getSuplidores($event)"
         [focusRow]="false"

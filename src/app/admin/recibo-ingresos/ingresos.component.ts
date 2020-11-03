@@ -273,8 +273,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
                 val.subrayar = val.is_viaje;
                 val.is_viaje = !val.is_viaje;
 
-                console.log('val.pagos ', val.pagos);
-
                 this.totalFacturado += val.total_factura;
                 this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
                 this.totalPagadoPorciento = parseFloat(GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento));
@@ -292,16 +290,12 @@ export class IngresosComponent implements OnInit, OnDestroy {
         total += element.balance;
       });
 
-      console.log(';;;;;;;;;; this.Facturas ', this.Facturas);
-
       const obj = {
         total: this.Facturas.lenght,
         tabla: 'facturasPendientes',
       };
 
       this.tServ.Func_total_paginas(obj);
-
-      console.log(total);
     } catch (error) {
       console.error(error);
       this.dbServ.toastError(error, 'ERROR');
@@ -432,11 +426,9 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
     obj.total = this.detalleYtotal.total_recibo;
     obj['detalle_recibos_attributes'] = this.detalleYtotal.detalle;
-    console.log(obj);
 
     this.dbServ.createRecibo(obj).subscribe(
       async (res) => {
-        console.log(res);
         const obj = {
           data: res,
           type: 'recibo_ingreso',
@@ -449,8 +441,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
         this._ipc.send('print', obj);
 
         await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-          console.log(res);
-
           if (res.status) {
           } else {
             this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
@@ -459,9 +449,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
       },
       (err) => {
         console.error(err);
-        console.log('-----');
-        console.log('-----');
-        console.log('-----');
 
         if (err.error) {
           this.dbServ.toastError(err.error.msg, 'ERROR');
@@ -537,12 +524,9 @@ export class IngresosComponent implements OnInit, OnDestroy {
     this.restando = 0;
 
     this.facturas_selected.forEach((factura) => {
-      console.log('factura ', factura);
-
       this.recibiendo += GLOBAL.desformatear(factura.monto);
 
       this.restando = this.clienteAdepositar.balance - this.recibiendo;
-      console.log('this.recibiendo ', this.recibiendo);
     });
   }
 

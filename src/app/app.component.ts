@@ -39,25 +39,20 @@ export class AppComponent implements OnInit, AfterViewInit {
     //   this.obsServ.next_secuencia_factura(res);
     // });
 
-    this._ipc.on(' checking-for-update', (event: Electron.IpcMessageEvent, res) => {
-      console.log(res);
-    });
+    this._ipc.on(' checking-for-update', (event: Electron.IpcMessageEvent, res) => {});
     this._ipc.on('update-error', (event: Electron.IpcMessageEvent, res) => {
       if (res) {
         this.dbServ.toastError(res.msg, 'ERRROR');
         this.displayPercent = false;
       }
-      console.log(res);
     });
 
     this._ipc.on('update-available', (event: Electron.IpcMessageEvent, res) => {
-      console.log(res);
       this.displayPercent = true;
     });
 
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
       if (res && res.body) {
-        console.log('Antes---> ', JSON.stringify(res.body));
         this.tiempo_restante = this.timeConvert(res.body.total / res.body.bytesPerSecond);
 
         res.body.transferred = parseFloat(GLOBAL.redondearAdos(res.body.transferred / 1000000));
@@ -66,23 +61,14 @@ export class AppComponent implements OnInit, AfterViewInit {
 
         this.objPercent = res.body;
         document.getElementById('imagenLogo').click();
-
-        console.log('Despues --->', JSON.stringify(res.body));
       }
     });
 
     this._ipc.on('update-downloaded', (event: Electron.IpcMessageEvent, res) => {
       this.displayPercent = false;
-      console.log(res);
     });
 
-    this._ipc.on('log', (event: Electron.IpcMessageEvent, res) => {
-      console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
-      console.log('MAIN LOG');
-      console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
-      console.log(res);
-      console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
-    });
+    this._ipc.on('log', (event: Electron.IpcMessageEvent, res) => {});
   }
 
   timeConvert(d) {

@@ -53,6 +53,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   obj_paginate_ = obj_paginate;
   vendido_en: any;
   listaMateriasPrimas = [];
+  FechaFactura: string;
 
   constructor(
     private dbServ: DBservice,
@@ -84,13 +85,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   async necesarioStart() {
+    await this.formarFechaFactura(new Date());
     await this.getArticulos(this.obj_paginate_);
     this.getTipoArticulos();
   }
 
   getMateriasP(callback = (arg) => {}) {
-    console.log('mmg');
-
     this.loaderService.isLoading.next(true);
     this.dbServ.getMateriasPrimas().subscribe(
       (res) => {
@@ -115,12 +115,20 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     });
   }
 
+  formarFechaFactura(date) {
+    const hora = moment(date).hour();
+    const minutos = moment(date).minutes();
+    const fechaTemp = moment(date).format('YYYY-MM-DD');
+
+    this.FechaFactura = fechaTemp + ' ' + hora + ':' + minutos;
+  }
+
   async getArticulos(e) {
     try {
       const page = e.page;
       const per_page = e.per_page;
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
-      const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, 'todos').toPromise();
+      const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.FechaFactura, 'todos').toPromise();
 
       this.listaArticulos = res.data;
       // this.listaArticulos = [...this.listaArticulos, ...this.listaArticulos, ...this.listaArticulos];
@@ -143,8 +151,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.TIPOARTICULO = Tipo[0].descripcion;
 
     if (_.lowerCase(this.TIPOARTICULO) === 'producto terminado') {
-      console.log('entrooo');
-
       await this.getMateriasP((res) => {
         this.addItem();
         this.form.controls.medida.setValue('Quintal');
@@ -320,7 +326,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.ARRAY_FORMULA.value.forEach((element, i) => {
       this.removeItem(0);
     });
-    console.log('this.ARRAY_FORMULA ==> ', this.ARRAY_FORMULA);
   }
 
   addItem(): void {
@@ -335,15 +340,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     // } else {
     control.removeAt(i);
     // }
-    console.log('control ', control.value[i]);
   }
 
   getCosto(id, i) {
     const control = this.form.controls['rowFormula'] as FormArray;
 
-    console.log('this.listaMateriasPrimas ', this.listaMateriasPrimas);
     const MateriaPrima = this.listaMateriasPrimas.filter((val) => val.id === _.parseInt(id))[0];
-    console.log('MateriaPrima ', MateriaPrima);
 
     const costo = MateriaPrima.costo;
     const precio = MateriaPrima.precio;
@@ -657,7 +659,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   editarItem(item) {
     const articulo = item.ARG;
-    console.log('articulo ', articulo);
 
     this.borrar();
     this.ProductoEditando = item.ARG;
@@ -847,7 +848,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       obj['otros_costos'] = x.otros_costos;
       obj['formulas_productos_terminados_attributes'] = this.formarFormula();
     }
-    console.log('obj ', obj);
 
     if (x.id) {
       obj['id'] = x.id;

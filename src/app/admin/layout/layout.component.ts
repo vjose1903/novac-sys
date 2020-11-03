@@ -58,6 +58,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   // imagenCuenta = 'http://localhost:3000/api/photos/this.usuariosServices.profile.fotoPerfil';
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
   lRun = false;
+
   ngOnInit() {
     this.mantenimiento = true;
     this._ipc.PRINTERS.subscribe((res) => {
@@ -66,9 +67,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
     const token = this.fun.getAuthToken();
-    console.log('token ', token);
 
-    // console.log('token desde appcompnent => ', token);
     if (token) {
       this.dbServ
         .validateToken()
@@ -118,19 +117,15 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   selectPrinter(name) {
-    console.log(name);
     this.OpenPrinterMenu = false;
   }
   closePrinterMenu() {
     this.OpenPrinterMenu = false;
   }
 
-  prueba1(hi: any) {
-    console.log(hi._animationState);
-  }
+  prueba1(hi: any) {}
 
   mostarSubmenu(x: string) {
-    console.log(this.mantenimiento);
     this.mantenimiento = !this.mantenimiento;
   }
 

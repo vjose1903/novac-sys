@@ -37,13 +37,8 @@ export class LoaderInterceptor implements HttpInterceptor {
       const subscription = next.handle(req).subscribe(
         (event) => {
           if (event instanceof HttpResponse) {
-            console.log('event ', event);
-
             ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {
-              console.log(event.headers.keys());
               const headerValue = event.headers.get(header);
-
-              console.log('headerValue -->', headerValue);
 
               if (headerValue !== null && localStorage.getItem(header) == null) {
                 localStorage.setItem(header, headerValue);
@@ -51,9 +46,8 @@ export class LoaderInterceptor implements HttpInterceptor {
             });
 
             this.removeRequest(req);
-            console.log('req ====> ', req);
+
             observer.next(event);
-            console.log('observer ====> ', observer);
           }
         },
         (err) => {

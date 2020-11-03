@@ -30,9 +30,6 @@ export class PdfService {
   // CABECERA
   // ==========================================================================================================================================================
   cabeceraFacturaVenta(data) {
-    console.log('cliente ', data.cliente);
-    console.log('factura de ', data.FACTURA_DE);
-
     const header = [
       {
         columns: [
@@ -381,8 +378,6 @@ export class PdfService {
   // ==========================================================================================================================================================
 
   async makeFacturaVenta(data) {
-    console.log('data 00 ', data);
-
     const DD = {
       pageSize: { width: 760, height: 480 },
       pageMargins: data.condicion === 'Contado' ? [10, 190, 0, 40] : [10, 173, 0, 40],
@@ -390,8 +385,6 @@ export class PdfService {
       content: await this.contenidoFacturaVenta(data),
 
       footer: (currentPage, pageCount) => {
-        console.log('currentPage ', currentPage);
-
         return [
           {
             text: 'pag: ' + currentPage.toString() + ' de ' + pageCount,

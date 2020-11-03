@@ -70,10 +70,6 @@ export class DBservice {
   //   if (metodo === 'get' || metodo === 'delete') {
   //     return this.http[metodo](`${this.url}/${ruta}`);
   //   } else {
-  //     console.log('metodo ==> ', metodo);
-  //     console.log('url ==> ', this.url);
-  //     console.log('ruta ==> ', ruta);
-  //     console.log('json ==> ', json);
 
   //     return this.http[metodo](`${this.url}/${ruta}`, json || '', {
   //       headers: {
@@ -208,8 +204,6 @@ export class DBservice {
     return this.peticion('nombreSuplidores', 'get');
   }
   createSuplidor(arg) {
-    console.log('aquiiiiii ---> ', arg);
-
     return this.peticion('suplidores', 'post', JSON.stringify(arg));
   }
   editarSuplidor(arg) {
@@ -280,8 +274,11 @@ export class DBservice {
   }
 
   getArticulosFiltrados(arg, page, per_page, paginado, compra = false, fecha, tipo = 'todos') {
-    return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}&fecha={}`, 'get');
+    return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}&fecha=${fecha}`, 'get');
   }
+  // getArticulosFiltrados(arg, page, per_page, paginado, compra = false, tipo = 'todos') {
+  //   return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}`, 'get');
+  // }
 
   createArticulo(arg) {
     return this.peticion('articulos', 'post', JSON.stringify(arg));
@@ -308,7 +305,7 @@ export class DBservice {
   }
 
   getArticulosByDate(date) {
-    return this.peticion(`articulos/historico/${date}/0`, 'get');
+    return this.peticion(`articulos/historico/${date}`, 'get');
   }
 
   getTipoArticuloById(id) {

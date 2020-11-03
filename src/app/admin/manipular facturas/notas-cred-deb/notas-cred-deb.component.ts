@@ -62,7 +62,6 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res) {
-        console.log('decision modal');
         this.decisionModal(res);
       }
     });
@@ -98,7 +97,6 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
     const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
     this.paqueteComprobante = paquete.body;
-    console.log(this.paqueteComprobante);
   }
   async getPropietario(id) {
     if (id) {
@@ -110,9 +108,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           direccion: cliente.direccion,
           rnc: documento.documento,
         };
-      } catch (error) {
-        console.error(error);
-      }
+      } catch (error) {}
     } else {
       this.propietario_factura = {
         nombre: this.factura.NoCliente_nombre,
@@ -228,13 +224,11 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
             this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
           }
         }
-        console.log('detalle ', detalle);
 
         temp.push(detalle);
       }
       this.detalleFacturas = temp;
     } catch (error) {
-      console.error(error);
       this.dbServ.toastError('Error mostrando factura elegida', 'ERROR');
     }
   }
@@ -466,12 +460,11 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     if (this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
-    console.log(cabecera_fact);
+
     try {
       const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
-      console.log(res);
+
       await this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
-        console.log('printRes=====> ', res);
         if (res.status) {
           this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
           this.resetVariables();
@@ -483,7 +476,6 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
       res['FACTURA_DE'] = 'nota';
       this._ipc.send('print', res);
     } catch (error) {
-      console.error(error);
       this.dbServ.toastError(error.statusText, 'ERROR');
     }
   }

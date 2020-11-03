@@ -242,7 +242,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
               this.borrar();
             },
             (err) => {
-              console.log(err);
+              console.error(err);
 
               this.mostrarErrores(err.error);
             },
@@ -264,7 +264,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
               this.borrar();
             },
             (err) => {
-              console.log(err);
+              console.error(err);
 
               this.mostrarErrores(err.error);
             },
@@ -297,7 +297,6 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
   // =================================================================
 
   abrirModal(arg?) {
-    console.log(arg);
     this.seleccionModal = arg.ARG;
     this.indexBorrar = arg.INDEX;
     this.mServ.modalTipo('borrar');
@@ -319,7 +318,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
           this.decisionModal = null;
         },
         (err) => {
-          console.log(err);
+          console.error(err);
           this.mostrarErrores(err.error);
         },
       );

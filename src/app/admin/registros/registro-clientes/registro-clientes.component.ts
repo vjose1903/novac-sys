@@ -57,7 +57,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
 
   constructor(private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService, private tServ: TablasService) {
     // setInterval(() => {
-    //   console.log(this.cardTabla.nativeElement.offsetHeight);
     // }, 1000);
   }
 
@@ -354,7 +353,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
                 this.enfocarInput('campoNombre');
               },
               (err) => {
-                console.log(err);
                 this.mostrarErrores(err.error);
               },
             );
@@ -375,7 +373,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
                 this.borrar();
               },
               (err) => {
-                console.log(err);
                 this.mostrarErrores(err.error);
               },
             );
@@ -447,8 +444,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
     },
   ];
   abrirModal(arg?) {
-    console.log(arg);
-
     this.indexBorrar = arg.INDEX;
     this.mServ.modalTipo('borrar');
     this.tipoModal = 'borrar';
@@ -469,7 +464,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
           this.decisionModal = null;
         },
         (err) => {
-          console.log(err);
           this.mostrarErrores(err.error);
         },
       );

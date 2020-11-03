@@ -27,6 +27,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   cant_notas_credito = 0;
   cant_notas_debito = 0;
   index;
+  fecha_articulo: any;
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
@@ -115,7 +116,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
       if (res !== undefined && res !== null && !this.paraFiltroArticulos && !this.paraFiltroClientes) {
-        console.log('show ==> ', res);
         this.showModal = res;
       }
       if (res === false) {
@@ -150,16 +150,17 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.paraFiltroArticulos = res.filtrarArticulo;
         this.paraFiltroClientes = res.filtrarCliente;
         this.paraFiltroSuplidor = res.filtrarSuplidor;
+        this.fecha_articulo = res.fecha_articulo;
         this.metodo = res.metodo;
         this.identificadorFact = res.identificadorFact;
         this.index = res.index;
 
         if (this.paraFiltroArticulos) {
-          this.renovarDataFiltros(obj_paginate, this.paraFiltroArticulos);
+          this.renovarDataFiltros(obj_paginate, this.paraFiltroArticulos, this.fecha_articulo);
         } else if (this.paraFiltroClientes) {
-          this.renovarDataFiltros(obj_paginate, this.paraFiltroClientes);
+          this.renovarDataFiltros(obj_paginate, this.paraFiltroClientes, this.fecha_articulo);
         } else if (this.paraFiltroSuplidor) {
-          this.renovarDataFiltros(obj_paginate, this.paraFiltroSuplidor);
+          this.renovarDataFiltros(obj_paginate, this.paraFiltroSuplidor, this.fecha_articulo);
         }
 
         if (this.tipoModal === 'buscarCliente') {
@@ -287,7 +288,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.reinicioModal();
   }
 
-  async renovarDataFiltros(e, buscando?) {
+  async renovarDataFiltros(e, buscando?, fecha_articulo?) {
     const page = e.page;
     const per_page = e.per_page;
     let palabra_a_buscar = ' ';
@@ -301,7 +302,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       try {
         const is_compra = this.metodo === 'compra' ? true : false;
 
-        const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, 'todos').toPromise();
+        const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, fecha_articulo, 'todos').toPromise();
 
         if (res.data) {
           this.seleccionModal = res.data;

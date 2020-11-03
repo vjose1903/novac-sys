@@ -23,7 +23,6 @@ export class ChangePasswordComponent implements OnInit, AfterViewInit {
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
-    console.log(this.user);
     this.form = this.fb.group({
       password: [null, Validators.minLength(5)],
       confirmPassword: [null, Validators.minLength(5)],
@@ -37,7 +36,6 @@ export class ChangePasswordComponent implements OnInit, AfterViewInit {
 
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
-    console.log(this.element);
 
     this.element.focus();
   }

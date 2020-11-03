@@ -203,7 +203,6 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
     objTemp.documentos_de_identidad_attributes = documentos_identidad;
     objTemp.estado = true;
     const objSend = _.omit(objTemp, ['cedula']);
-    // console.log(objSend);
 
     if (!this.editando && objSend.password === null) {
       this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
@@ -219,15 +218,11 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
             res.data.nombreCompleto = res.data.nombre + ' ' + res.data.apellido;
             res.data.documento_identidad = docu[0].documento;
             res.data.role_ = res.data.sexo === 'm' ? this.rolesM[res.data.role] : this.rolesF[res.data.role];
-            console.log('res =>> ', res);
 
             this.listaEmpleados[this.indexSeleccionado] = res.data;
             this.borrar();
-            console.log(res);
           },
           (err) => {
-            console.log('err ==> ', err);
-
             this.dbServ.toastError(err.error.msg, 'ERROR', true);
           },
         );
@@ -239,14 +234,12 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
             res.data.documento_identidad = docu[0].documento;
             res.data.role_ = res.data.sexo === 'm' ? this.rolesM[res.data.role] : this.rolesF[res.data.role];
 
-            console.log('res =>> ', res);
             this.listaEmpleados = [...this.listaEmpleados, res.data];
             this.dbServ.toastSuccess('Usuario Creado', 'Correcto');
             this.form.reset();
             this.enfocarInput('campoNombre');
           },
           (err) => {
-            console.log(err);
             this.mostrarErrores(err.error.errors.full_messages);
             // this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
           },
@@ -256,7 +249,6 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
   }
 
   abrirModal(arg?) {
-    console.log(arg);
     this.mServ.modalTipo('borrar');
     this.indexBorrar = arg.INDEX;
     this.seleccionModal = arg.ARG;
@@ -286,7 +278,6 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
           this.decisionModal = null;
         },
         (err) => {
-          console.log(err.error.errors);
           this.mostrarErrores(err.error.errors);
         },
       );

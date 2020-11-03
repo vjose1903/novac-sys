@@ -5,6 +5,7 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../components/modal/modal.service';
 import { obj_paginate, TablasService } from '../components/tablas/tablas.service';
@@ -54,6 +55,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
   filtro = 'todos';
   subDeci: Subscription;
   palabra_buscar;
+  FechaFactura: string;
   constructor(
     private dbServ: DBservice,
     private cdRef: ChangeDetectorRef,
@@ -84,8 +86,17 @@ export class InventarioComponent implements OnInit, OnDestroy {
   }
 
   async necesarioParaEmpezar() {
+    await this.formarFechaFactura(new Date());
     await this.getArticulos(obj_paginate);
     await this.calcularGananciasCostos();
+  }
+
+  formarFechaFactura(date) {
+    const hora = moment(date).hour();
+    const minutos = moment(date).minutes();
+    const fechaTemp = moment(date).format('YYYY-MM-DD');
+
+    this.FechaFactura = fechaTemp + ' ' + hora + ':' + minutos;
   }
 
   async getArticulos(e) {
@@ -93,7 +104,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
       const page = e.page;
       const per_page = e.per_page;
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
-      const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.filtro).toPromise();
+      const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.FechaFactura, this.filtro).toPromise();
       this.palabra_buscar = palabra_a_buscar;
 
       this.listaArticulos = GLOBAL.duplicarJson(res.data);

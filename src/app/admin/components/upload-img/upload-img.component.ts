@@ -34,11 +34,9 @@ export class UploadImgComponent implements OnInit {
       };
 
       this.dbServ.subirFoto(obj).subscribe(
-        res => {
-          console.log(res);
-        },
-        err => {
-          console.log(err);
+        (res) => {},
+        (err) => {
+          console.error(err);
         },
       );
     } else {
@@ -54,12 +52,11 @@ export class UploadImgComponent implements OnInit {
     if (files && files.length > 0) {
       reader.readAsDataURL(file);
 
-      reader.onload = e => {
+      reader.onload = (e) => {
         const bas64 = reader.result.toString().split(',')[1];
         this.FILE_NAME = files[0].name;
         this.BASE_64 = bas64;
         this.imageSrc = reader.result;
-        console.log(reader.result);
       };
     }
     const img = {

@@ -53,9 +53,6 @@ export class LoginComponent implements OnInit {
     this.dbServ
       .login(form.value)
       .then((res) => {
-        console.log('res ==> ', res);
-        console.log(res.data);
-
         this.fun.setUser(res.data);
         this.router.navigateByUrl('/admin');
       })
@@ -65,13 +62,10 @@ export class LoginComponent implements OnInit {
         } else {
           this.dbServ.toastError('Datos de acceso proporcionados estan incorrectos', 'ERROR', true);
         }
-        console.log(err);
       });
   }
 
   mostrarErrores(arg) {
-    console.log('---------------');
-
     for (const error in arg) {
       if (arg.hasOwnProperty(error)) {
         const element = arg[error];
@@ -94,19 +88,14 @@ export class LoginComponent implements OnInit {
     // const data_ = compra_contado_valor_fiscal;
     const data_ = venta_credito_consumo;
 
-    console.log('data_ ', data_);
-
     const obj = {
       data: data_,
       type: 'facturacion',
     };
-    console.log(obj);
 
     this._ipc.send('print', obj);
 
     await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      console.log(res);
-
       if (res.status) {
       } else {
         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
@@ -117,7 +106,6 @@ export class LoginComponent implements OnInit {
   async pruebaRecibo() {
     const data_ = recibo_de_ingreso;
 
-    console.log('data_ ', data_);
     // const DD = await this.pdfServ.makeFacturaVenta(data);
     const obj = {
       data: data_,
@@ -126,8 +114,6 @@ export class LoginComponent implements OnInit {
     this._ipc.send('print', obj);
 
     await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      console.log(res);
-
       if (res.status) {
       } else {
         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
@@ -137,7 +123,6 @@ export class LoginComponent implements OnInit {
   async pruebaConduce() {
     const data_ = conduce;
 
-    console.log('data_ ', data_);
     // const DD = await this.pdfServ.makeFacturaVenta(data);
     const obj = {
       data: data_,
@@ -146,8 +131,6 @@ export class LoginComponent implements OnInit {
     this._ipc.send('print', obj);
 
     await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      console.log(res);
-
       if (res.status) {
       } else {
         this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');

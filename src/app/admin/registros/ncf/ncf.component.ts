@@ -135,27 +135,21 @@ export class NcfComponent implements OnInit, OnDestroy {
   }
 
   // calculateFechaValida() {
-  //   console.log(this.fechaCompra);
 
   //   setTimeout(() => {
   //     const anio = moment(this.fechaCompra).add(1, 'year').format('YYYY');
 
   //     const newFecha = moment('12/31/' + anio).format('DD/MM/YYYY');
-  //     console.log(newFecha);
 
   //     this.fechaValidez = newFecha;
   //   }, 50);
   // }
 
   setDateInputs(actual) {
-    console.log('actual ', actual);
     actual = moment(actual).format('MM/DD/YYYY');
     const anio = moment(new Date(actual)).add(1, 'year').format('YYYY');
 
-    console.log('coñooooo ', anio);
-
     const newFecha = moment('12/31/' + anio).format('MM/DD/YYYY');
-    console.log('newFecha --> ', newFecha);
     this.fechaCompra = moment(actual).format('DD/MM/YYYY');
     this.fechaValidez = moment(newFecha).format('DD/MM/YYYY');
   }
@@ -263,7 +257,6 @@ export class NcfComponent implements OnInit, OnDestroy {
       estado: false,
       usado: false,
     };
-    // console.log(obj);
 
     try {
       const res = await this.dbServ.PaqueteNCF(obj).toPromise();
@@ -279,8 +272,6 @@ export class NcfComponent implements OnInit, OnDestroy {
 
       if (this.is_editando) {
         this.dbServ.toastSuccess('Comprobante editado', 'CORRECTO');
-        console.log('index ', this.indexSelected);
-        console.log('editando ', this.listaNCF[this.indexSelected]);
         setTimeout(() => {
           this.listaNCF[this.indexSelected] = GLOBAL.duplicarJson(res);
         }, 5);
@@ -293,7 +284,6 @@ export class NcfComponent implements OnInit, OnDestroy {
         });
       }
       this.borrar();
-      console.log(res);
     } catch (error) {
       console.error(error);
       this.dbServ.toastError(error.error.msg, 'ERROR');
@@ -334,8 +324,6 @@ export class NcfComponent implements OnInit, OnDestroy {
   }
 
   editarItem(item) {
-    console.log(item);
-
     this.indexSelected = item.INDEX;
     this.is_editando = true;
     if (item.METODO === 'editar') {
@@ -355,10 +343,7 @@ export class NcfComponent implements OnInit, OnDestroy {
     this.mServ.mostrarModal(true);
   }
   decisionModal(arg) {
-    console.log(arg);
     if (arg && this.seleccionModal) {
-      console.log('BORRANDO');
-
       this.dbServ.deleteNCF(this.seleccionModal.id).subscribe(
         (res) => {
           this.dbServ.toastSuccess('comprobante para ' + this.seleccionModal.tipoC + ' numero: ' + this.seleccionModal.codigo + ' borrado', 'CORRECTO');
@@ -366,7 +351,6 @@ export class NcfComponent implements OnInit, OnDestroy {
           this.tipoModal = '';
         },
         (err) => {
-          console.log(err);
           this.mostrarErrores(err.error);
         },
       );

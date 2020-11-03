@@ -12,6 +12,8 @@
   position: absolute;
   ~ .labelBtn {
     transform: translate(0rem, 0rem) scale(0);
+    position: absolute;
+    width: max-content;
   }
 
   filter: grayscale(50%);
@@ -19,7 +21,7 @@
     filter: grayscale(0%);
     cursor: pointer;
     ~ .labelBtn {
-      transform: translate(0rem, 3.2rem) scale(1);
+      transform: translate(0rem, 6.8rem) scale(1);
     }
   }
 

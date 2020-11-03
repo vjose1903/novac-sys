@@ -15,8 +15,6 @@ export class FormarFacturaComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    console.log('======== factura ======> ', this.factura);
-
     // this.factura.detalle_facturas = [
     //   ...this.factura.detalle_facturas,
     //   ...this.factura.detalle_facturas,

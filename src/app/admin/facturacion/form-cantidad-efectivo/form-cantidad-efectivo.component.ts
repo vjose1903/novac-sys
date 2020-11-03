@@ -151,8 +151,6 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
       forma_pago: this.formaPago,
       decision_cambio: this.cambiar_articulos === 'si' ? true : false,
     };
-    console.log('total > efectivo', 'total ', total, 'efectivo ', efectivo, total > efectivo);
-    console.log('tipo => ', this.tipo);
 
     if (this.factura_de === 'venta' && this.tipo !== 'no_devuelta' && total > efectivo) {
       this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR');

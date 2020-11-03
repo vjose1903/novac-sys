@@ -206,7 +206,7 @@
         <div class="cuadroTotal">RD$ {{ formatoNumero(TOTAL) }}</div>
         <div *ngIf="FacturaAtrasada" class="encabezadoRigth fechaA">
           <span class="w-100 text-danger letrasT">
-            Factura atrasada, fecha: <strong> {{ FechaFactura }}</strong>
+            Factura atrasada, fecha: <strong> {{ FechaFacturaMostrar }}</strong>
           </span>
         </div>
       </div>
@@ -216,7 +216,7 @@
     <app-cuerpo-factura
       [propietario]="propietario_factura"
       [metodo]="metodo"
-      (getFechaFactura)="getFechaFactura($event)"
+      [FechaFactura]="FechaFactura"
       (getCuerpoFactura)="getCuerpoFactura($event)"
       (sendDescuento)="getDescuento($event)"
       (sendCalculos)="getCalculos($event)"
@@ -224,7 +224,7 @@
   </div>
   <div class="pieFactura">
     <div class="row">
-      <div class="col-2">
+      <div class="col-2 ml-4">
         <app-btncircular [alto]="'100px'" [accion]="'Imprimir Factura'" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
       </div>
       <div class="col-2">
@@ -234,7 +234,7 @@
         <app-btncircular [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (click)="ingresarFecha()"></app-btncircular>
       </div>
 
-      <div class="col-6 d-flex justify-content-end">
+      <div class="col-5 d-flex justify-content-end">
         <div class="d-block mostrarNumeros">
           <div class="row">
             <div class="col-6">

@@ -77,8 +77,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   }
 
   async getIngredients() {
-    console.log(typeof this.articulo_id);
-    console.log(this.articulo_id);
+
+
 
     if (this.articulo_id !== '-1') {
       try {
@@ -273,7 +273,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.disableOption('prod-' + this.articulo_id, true);
     this.articuloEditando = undefined;
     this.borrar();
-    console.log('lista_produccion ', this.lista_produccion);
+
   }
 
   editarItem(item) {
@@ -353,7 +353,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     const detalle = [];
 
     obj.forEach((produccion, i) => {
-      console.log(produccion);
+
 
       detalle.push({
         articulo_id: produccion.articulo_id,
@@ -368,7 +368,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     produccion_send['fecha_equivalente'] = null;
     produccion_send['detalles_produccion_attributes'] = detalle;
 
-    console.log(produccion_send);
+
     try {
       const res = await this.dbServ.createProduccion(produccion_send).toPromise();
       this.succes();

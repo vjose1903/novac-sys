@@ -81,7 +81,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
       //     titulo: 'Cuadre de caja',
       //     height: '37rem',
       //   };
-      //   console.log('voy a abrir el modal');
+
       //   this.abrirModalReporte(obj);
       // }, 1000);
     } catch (error) {
@@ -117,9 +117,6 @@ export class ReportesComponent implements OnInit, OnDestroy {
   }
 
   decisionModal(decision) {
-    console.log('decision ==> ', decision);
-    console.log('this.tipoModal ==> ', this.tipoModal);
-
     if (decision) {
       if (this.tipoModal === 'visor_pdf') {
         const obj = {
