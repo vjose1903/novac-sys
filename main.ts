@@ -63,8 +63,8 @@ function createWindow() {
         slashes: true,
       }),
     );
-    verificarSumastra();
   }
+  verificarSumastra();
 
   // win.webContents.openDevTools();
 
@@ -187,6 +187,7 @@ ipcMain.on('getAppDir', (event: any, arg) => {
 
 function verificarSumastra() {
   if (!fs.existsSync(pathAdd('/print'))) {
+    
     fs.mkdir(pathAdd('/print'), { recursive: true }, (err) => {
       if (err) {
         throw err;
@@ -242,7 +243,7 @@ async function borrado_de_archivos_malos(archivos, callback) {
 
   try {
     await del(archivos);
-
+    
     callback({
       status: true,
       msg: 'Elementos borrado correctamente',
@@ -266,6 +267,7 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
 
       if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}`))) {
+        
         procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
         descargar_archivo = true;
       } else {
@@ -297,14 +299,16 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
 }
 
 function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
-  const command =
-    process.platform === 'darwin'
-      ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
-      : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
+  
+  const command =
+  process.platform === 'darwin'
+  ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
+  : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+  
   cmd(command, (res_local) => {
     const md5_local = process.platform === 'darwin' ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
-
+    
     if (md5_local !== md5_servidor) {
       borrado_de_archivos_malos(aFiles_malos, (res_del) => {
         if (res_del.status) {
@@ -328,9 +332,10 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
           : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
       cmd(command, (res_local_before_descarga) => {
-        const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
-
+        
+        
         if (res_local_before_descarga.status) {
+          const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
           if (md5_servidor === md5_local) {
             if (descomprimir) {
               esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, (res) => {
@@ -343,8 +348,7 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
                   return;
                 }
               });
-            } else {
-            }
+            } 
           } else {
             descarga_exito = false;
           }
@@ -366,6 +370,7 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
       });
     }
   }
+  
 }
 
 function retornarMensajeErrorVeiricandoElementos(nombre_err) {
@@ -434,6 +439,7 @@ function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
 
 function showProgress(received, total) {
   const percentage = (received * 100) / total;
+  
 }
 
 function puts(msg_, linea_ = undefined) {
