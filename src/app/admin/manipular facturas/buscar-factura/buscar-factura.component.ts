@@ -234,7 +234,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   async necesarioStart() {
     await this.getTipoFacturas();
 
-    if (this.BuscarPara === 'nota_credito' && this.BuscarPara === 'nota_debito') {
+    if (this.BuscarPara === 'nota_credito' || this.BuscarPara === 'nota_debito') {
       await this.getPaqueteComprobante();
     }
 

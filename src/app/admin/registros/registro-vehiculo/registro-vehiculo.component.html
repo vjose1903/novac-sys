@@ -1,0 +1,66 @@
+<div class="row" style="height: calc(100% - 60px)">
+  <div class="col-6 contenedorRegistro">
+    <!-- <div class=""> -->
+    <h4>{{ titulo }}</h4>
+
+    <div class="card card-padding sombra">
+      <form [formGroup]="form" (submit)="submit(form)">
+        <div class="row">
+          <div class="col-6">
+            <div class="form-group">
+              <label class="control-label">Propietario: <span style="color: red">*</span></label>
+              <ng-select formControlName="user_id" (change)="selectPropietario()" [items]="listaPropietarios" bindLabel="nombreCompleto" bindValue="id" [clearable]="false">
+                <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
+                  <div>
+                    <span>{{ item.nombreCompleto }} </span>
+                  </div>
+                </ng-template>
+              </ng-select>
+            </div>
+          </div>
+
+          <div class="col-6 colUnico">
+            <div class="form-group">
+              <label class="control-label">Marca: <span style="color: red">*</span></label>
+              <input (focus)="$event.target.select()" type="text" formControlName="marca" placeholder="Introduzca marca" class="form-control" autocomplete="off" id="marca" />
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="form-group">
+              <label class="control-label">Modelo: <span style="color: red">*</span></label>
+              <input (focus)="$event.target.select()" type="text" formControlName="modelo" placeholder="Introduzca modelo" class="form-control" autocomplete="off" id="modelo" />
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="row">
+        <div class="col-12 mt-3">
+          <div class="from-group">
+            <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a>
+            <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+            <input [disabled]="!form.valid" (click)="submit(form)" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6">
+    <h4>Listado articulos</h4>
+
+    <div class="card cardListados">
+      <app-tablas
+        *ngIf="listaVehiculos && info"
+        [info]="info"
+        [data]="listaVehiculos"
+        [focusRow]="false"
+        [quitarAScorll]="-20"
+        [botones]="botones"
+        (DevolverInfo)="editarItem($event)"
+        (paginateChange)="getVehiculos($event)"
+        (DELETE)="abrirModal($event)"
+      ></app-tablas>
+    </div>
+  </div>
+</div>

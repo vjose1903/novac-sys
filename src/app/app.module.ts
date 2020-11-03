@@ -43,6 +43,7 @@ export function HttpLoaderFactory(http: HttpClient) {
   declarations: [
     AppComponent,
     NgInitDirective,
+
     //  UploadImgComponent
   ],
   imports: [

@@ -46,6 +46,7 @@ import { AppRoutingModule } from '../app.routing';
 import { ReportesComponent } from './reportes/reportes.component';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { RegistroVehiculoComponent } from './registros/registro-vehiculo/registro-vehiculo.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     UploadImgComponent,
     ValidateRayaAbajo,
     RegistroSuplidoresComponent,
+    RegistroVehiculoComponent,
     ProduccionComponent,
     PendienteFormComponent,
     MovimientosFormComponent,
