@@ -162,7 +162,7 @@ autoUpdater.on('update-not-available', (info) => {});
 
 autoUpdater.on('error', (error) => {
   if (win) {
-    win.webContents.send('update-error', { msg: 'error descargando actualizacion...', body: error });
+    win.webContents.send('update-error', { msg: 'Error descargando actualizacion...', body: error });
   }
   console.error('error', error);
 });

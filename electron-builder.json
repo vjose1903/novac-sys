@@ -27,7 +27,7 @@
   "publish": [
     {
       "provider": "generic",
-      "url": "http://admservidor.ddns.net:8000/actualizacion"
+      "url": "http://admservidor.ddns.net:9090/actualizacion"
     }
   ]
 }
