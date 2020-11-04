@@ -158,7 +158,7 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   // autoUpdater.quitAndInstall();
 });
 
-autoUpdater.on('update-not-available', (info) => {});
+autoUpdater.on('update-not-available', (info) => { });
 
 autoUpdater.on('error', (error) => {
   if (win) {
@@ -186,11 +186,15 @@ ipcMain.on('getAppDir', (event: any, arg) => {
 });
 
 function verificarSumastra() {
+  console.log('inicio verificacion');
+
   if (!fs.existsSync(pathAdd('/print'))) {
+    console.log(' no existe carpeta');
     fs.mkdir(pathAdd('/print'), { recursive: true }, (err) => {
       if (err) {
         throw err;
       } else {
+        console.log('carpeta creada ');
       }
     });
   } else {
@@ -236,13 +240,14 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
 }
 
 async function borrado_de_archivos_malos(archivos, callback) {
+  console.log('Inicio de borrado de archivos malos');
   const del = require('del');
 
   // delete directory recursively
 
   try {
     await del(archivos);
-
+    console.log('archivos borrados exitosamente');
     callback({
       status: true,
       msg: 'Elementos borrado correctamente',
@@ -260,22 +265,25 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
   let descargar_archivo = false;
 
   let md5_servidor;
-
+  console.log('antes de buscar el md5 del servidor');
   cmd(`ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public${paht_server}"`, async (res_servidor) => {
     if (res_servidor.status) {
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
 
       if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}`))) {
+        console.log(`${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`} No existe procediendo a descarga`);
         procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
         descargar_archivo = true;
       } else {
+        console.log(`${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`} existe procediendo a comparar los md5 `);
+
         if (descomprimir) {
           const command =
             process.platform === 'darwin'
               ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_sin_extension)}" -x "*.DS_Store"`
               : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_sin_extension}.zip`)}" -Update`;
 
-          cmd('pwd', (res_pwd) => {});
+          cmd('pwd', (res_pwd) => { });
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -297,22 +305,37 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
 }
 
 function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
+  console.log(' inicio de comparar los md5');
+
   const command =
     process.platform === 'darwin'
       ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
       : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
+  console.log(' comando ===>  ', command);
   cmd(command, (res_local) => {
-    const md5_local = process.platform === 'darwin' ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
+    console.log('res_local ==> ',res_local);
+    
+    if (res_local.status) {
 
-    if (md5_local !== md5_servidor) {
-      borrado_de_archivos_malos(aFiles_malos, (res_del) => {
-        if (res_del.status) {
-          procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
-        } else {
-          retornarMensajeErrorVeiricandoElementos(nombre_err);
-        }
-      });
+      const md5_local = process.platform === 'darwin' ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
+      console.log(`md5 local --> ${md5_local}`);
+      console.log(`md5 servidor --> ${md5_servidor}`);
+      if (md5_local !== md5_servidor) {
+        console.log('Los md5 son diferentes procediendo a borrar los archivos actuales para descargarlos nuevamente');
+        borrado_de_archivos_malos(aFiles_malos, (res_del) => {
+          if (res_del.status) {
+
+            console.log('antes de descargar el archivo');
+
+            procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
+          } else {
+            retornarMensajeErrorVeiricandoElementos(nombre_err);
+          }
+        });
+      }
+    } else {
+      retornarMensajeErrorVeiricandoElementos(nombre_err);
     }
   });
 }
@@ -320,16 +343,22 @@ function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5
 async function procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta) {
   let descarga_exito = true;
 
-  await downloadFile(`${AppConfig.url_server}${paht_server}`, path_local_content, path_local_extension, (res) => {
+  await downloadFile(`${AppConfig.url_descargas}${paht_server}`, path_local_content, path_local_extension, (res) => {
     if (res.status) {
+      console.log('archivo descargado antes de crear el md5');
       const command =
         process.platform === 'darwin'
           ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
           : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
+          console.log('command --> ', command);
       cmd(command, (res_local_before_descarga) => {
+        
         if (res_local_before_descarga.status) {
+
           const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
+          console.log(`md5 local --> ${md5_local}`);
+          console.log(`md5 servidor --> ${md5_servidor}`);
           if (md5_servidor === md5_local) {
             if (descomprimir) {
               esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, (res) => {
@@ -346,6 +375,9 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
           } else {
             descarga_exito = false;
           }
+        }
+        else{
+          retornarMensajeErrorVeiricandoElementos(nombre_err); 
         }
       });
     } else {
@@ -397,8 +429,11 @@ function cmd(command, callback) {
   });
 }
 
-function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
+function downloadFile(archive_url, path, file_, callback = (arg) => { }) {
   // Save variable to know progress
+  console.log('dentro de downloadfile');
+  console.log('archive_url----> ',archive_url);
+  
   let received_bytes = 0;
   let total_bytes = 0;
 
@@ -432,6 +467,8 @@ function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
 
 function showProgress(received, total) {
   const percentage = (received * 100) / total;
+  console.log('percentage --> ', percentage);
+
 }
 
 function puts(msg_, linea_ = undefined) {
