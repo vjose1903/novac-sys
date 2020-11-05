@@ -579,8 +579,8 @@ function imprimir(cFileName, tipo) {
   const sumatrapdf_path = pathAdd('/print/lp.exe');
   // const bat = require.resolve(sumatrapdf_path);
   // const profile = require.resolve('../profiles/app.profile.js');
-  const args = ['-print-to-default', '-print-settings "noscale,monochrome"', '-silent', cFileName];
-  exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,monochrome" -silent ${cFileName}`, (error, stdout, stderr) => {
+  const args = ['-print-to-default', '-print-settings "noscale,monochrome,"', '-silent', cFileName];
+  exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,monochrome,landscape,paper=VJPOS" -silent ${cFileName}`, (error, stdout, stderr) => {
     if (error) {
       puts(error, 'imprimir');
       let msg_ = '';
