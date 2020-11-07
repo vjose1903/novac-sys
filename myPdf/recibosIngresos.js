@@ -9,7 +9,7 @@ var environment_js_1 = require("../src/environments/environment.js");
 // ==========================================================================================================================================================
 function makeRecibo(data) {
     var dd = {
-        pageSize: { width: 926.37, height: 399.57 },
+        pageSize: { width: 927, height: 400 },
         pageMargins: [10, 165, 10, 30],
         header: cabeceraRecibo(data),
         content: contenidoRecibo(data),

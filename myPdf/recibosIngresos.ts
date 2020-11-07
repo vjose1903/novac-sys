@@ -9,7 +9,7 @@ import { AppConfig } from '../src/environments/environment.js';
 
 export function makeRecibo(data) {
   const dd = {
-    pageSize: { width: 927, height: 399.57 },
+    pageSize: { width: 927, height: 400 },
     pageMargins: [10, 165, 10, 30],
     header: cabeceraRecibo(data),
     content: contenidoRecibo(data),

@@ -8,7 +8,7 @@ var environment_js_1 = require("../src/environments/environment.js");
 // ==========================================================================================================================================================
 function makeConduce(data) {
     var dd = {
-        pageSize: { width: 816, height: 528 },
+        pageSize: { width: 850, height: 400 },
         pageMargins: [10, 153, 10, 30],
         header: cabeceraConduce(data),
         content: contenidoConduce(data),

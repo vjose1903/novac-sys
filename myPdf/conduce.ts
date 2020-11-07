@@ -8,7 +8,7 @@ import { AppConfig } from '../src/environments/environment.js';
 
 export function makeConduce(data) {
   const dd = {
-    pageSize: { width: 816, height: 528 },
+    pageSize: { width: 850, height: 400 },
     pageMargins: [10, 153, 10, 30],
     header: cabeceraConduce(data),
     content: contenidoConduce(data),
