@@ -9,7 +9,7 @@ import { AppConfig } from '../src/environments/environment.js';
 export function makeCuadre(data) {
   try {
     const dd = {
-      pageSize: { width: 816, height: 528 },
+      pageSize: { width: 990, height: 398 },
       pageMargins: [10, 159.5, 10, 30],
       header: cabeceraReporte(data),
       content: contenidoReporte(data),
@@ -26,23 +26,17 @@ export function makeCuadre(data) {
         logo: logoADM,
       },
       styles: {
-        letra10: {
-          fontSize: 10,
-        },
         letra11: {
           fontSize: 11,
+        },
+        letra11_5: {
+          fontSize: 11.5,
         },
         letra12: {
           fontSize: 12,
         },
-        letra13: {
-          fontSize: 13,
-        },
         letra14: {
           fontSize: 14,
-        },
-        letra15: {
-          fontSize: 15,
         },
         letra17: {
           fontSize: 17,
@@ -93,10 +87,10 @@ function cabeceraReporte(data) {
               },
               {
                 text: [
-                  { text: 'Telefono: ', fontSize: 9, bold: true },
-                  { text: AppConfig.num_telefono + ' ', fontSize: 9 },
-                  { text: ' RNC: ', fontSize: 9, bold: true },
-                  { text: AppConfig.rnc, fontSize: 9 },
+                  { text: 'Telefono: ', style: 'letra11', bold: true },
+                  { text: AppConfig.num_telefono + ' ', style: 'letra11' },
+                  { text: ' RNC: ', style: 'letra11', bold: true },
+                  { text: AppConfig.rnc, style: 'letra11' },
                 ],
                 alignment: 'center',
               },

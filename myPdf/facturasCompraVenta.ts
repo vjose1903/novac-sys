@@ -11,7 +11,7 @@ function getPageMargin(data) {
     if (data.condicion === 'Contado') {
       margins = [0, 152, 0, 30];
     } else {
-      margins = [0, 180, 0, 30];
+      margins = [0, 170, 0, 30];
     }
   } else {
     if (data.condicion === 'Contado') {
@@ -26,7 +26,7 @@ function getPageMargin(data) {
 
 export function makeFacturaVenta(data) {
   const dd = {
-    pageSize: { width: 1000, height: 398 },
+    pageSize: { width: 990, height: 398 },
     pageMargins: getPageMargin(data),
     header: cabeceraFacturaVenta(data),
     content: contenidoFacturaVenta(data),
@@ -52,11 +52,11 @@ export function makeFacturaVenta(data) {
       logo: logoADM,
     },
     styles: {
-      letra10: {
-        fontSize: 10,
-      },
       letra11: {
         fontSize: 11,
+      },
+      letra11_5: {
+        fontSize: 11.5,
       },
       letra12: {
         fontSize: 12,
@@ -90,8 +90,7 @@ function cabeceraFacturaVenta(data) {
           {
             image: 'logo',
             width: 72,
-            height:60,
-            opacity: 1,
+            height: 45,
             margin: [90, 12, 0, 0],
           },
         ],
@@ -110,7 +109,7 @@ function cabeceraFacturaVenta(data) {
       ],
     },
     {
-      margin: [0, -62, 0, 0],
+      margin: [0, -40, 0, 0],
       stack: [
         {
           text: 'ADM Agroindustrial S.R.L',
@@ -173,10 +172,10 @@ function cabeceraFacturaVenta(data) {
                 margin: [0, 1, 0, 0],
                 alignment: 'center',
               }
-              : { text: '' },
-              
+            : { text: '' },
+
           data.FACTURA_DE === 'nota'
-          ? {
+            ? {
                 text: [
                   { text: 'Aplicada a: ', style: 'letra11' },
                   { text: data.aplicada_a, style: 'letra11' },
@@ -188,7 +187,7 @@ function cabeceraFacturaVenta(data) {
         ],
         [
           {
-            margin: data.condicion === 'Contado' ? [0, 0, 0, 0] : [0, -5, 0, 0],
+            margin: data.condicion === 'Contado' ? [60, 0, 0, 0] : [60, -5, 0, 0],
             stack: [
               {
                 text: [
@@ -245,7 +244,7 @@ function cabeceraFacturaVenta(data) {
           type: 'rect',
           x: 10,
           y: 3,
-          w: 900,
+          w: 970,
           h: 2,
           color: '#000000',
         },
@@ -259,8 +258,8 @@ function cabeceraFacturaVenta(data) {
         widths: [30, 245, '*', '*', '*', '*', '*'],
         body: [
           [
-            { text: ' #', bold: true, margin: [4, 0, 0, 0] },
-            { text: 'Articulo', bold: true, margin: [-10, 0, 0, 0] },
+            { text: ' #', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
+            { text: 'Articulo', bold: true, margin: [-5, 0, 0, 0] },
             { text: 'Cantidad', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
             { text: 'Unidad', bold: true, alignment: 'center', margin: [0, 0, 15, 0] },
             data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
@@ -297,7 +296,7 @@ function contenidoFacturaVenta(data) {
     const br_ = i !== 0 && i % 10 === 0;
 
     row.push(
-      { text: i + 1, pageBreak: br_ ? 'before' : 'none' },
+      { text: i + 1, alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
       { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none' },
       { text: fun_.numFormatTwoDecimals(detalle.cantidad), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
       { text: detalle.unidad, alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
@@ -319,7 +318,7 @@ function contenidoFacturaVenta(data) {
         widths: [30, 245, '*', '*', '*', '*', '*'],
         body: tempBody,
       },
-      margin: data.condicion === 'Contado' ? [0, -2, 10, 0] : [0, -2, 10, 0],
+      margin: data.condicion === 'Contado' ? [10, -2, 10, 0] : [10, -2, 10, 0],
       layout: {
         hLineWidth: (i, node) => {
           return i % 10 === 0 && node.table.body.length !== i ? 0 : i === node.table.body.length ? 2 : 1;
@@ -342,7 +341,7 @@ function contenidoFacturaVenta(data) {
         data.vendedor ? { text: '    Vendedor :  ', style: 'letra11', bold: true } : { text: '' },
         data.vendedor ? { text: data.vendedor, style: 'letra11' } : { text: '' },
       ],
-      margin: [0, 5, 0, 0],
+      margin: [20, 5, 0, 0],
     },
     // -----------------------
     {
@@ -358,15 +357,15 @@ function contenidoFacturaVenta(data) {
                         type: 'rect',
                         x: 10,
                         y: 0,
-                        w: 140,
+                        w: 160,
                         h: 1,
                         color: '#000000',
                       },
                       {
                         type: 'rect',
-                        x: 200,
+                        x: 250,
                         y: 0,
-                        w: 140,
+                        w: 160,
                         h: 1,
                         color: '#000000',
                       },
@@ -378,13 +377,13 @@ function contenidoFacturaVenta(data) {
                       [
                         {
                           text: [{ text: 'Revisada Por', style: 'letra12', bold: true }],
-                          margin: [45, 5, 0, 0],
+                          margin: [50, 5, 0, 0],
                         },
                       ],
                       [
                         {
                           text: [{ text: 'Cliente', style: 'letra12', bold: true }],
-                          margin: [45, 5, 0, 0],
+                          margin: [65, 5, 0, 0],
                         },
                       ],
                     ],
@@ -400,26 +399,26 @@ function contenidoFacturaVenta(data) {
                   widths: ['*', 'auto'],
                   body: [
                     [
-                      { text: 'Bruto RD$: ', style: 'letra12', bold: true, alignment: 'right' },
-                      { text: fun_.numFormatTwoDecimals(data.Bruto), style: 'letra12', alignment: 'right', margin: [0, 0, 40, 0] },
+                      { text: 'Bruto RD$: ', style: 'letra11_5', bold: true, alignment: 'right' },
+                      { text: fun_.numFormatTwoDecimals(data.Bruto), style: 'letra11_5', alignment: 'right', margin: [0, 0, 29, 0] },
                     ],
                     [
-                      { text: 'Itbis RD$: ', style: 'letra12', bold: true, alignment: 'right' },
-                      { text: fun_.numFormatTwoDecimals(data.itbis), style: 'letra12', alignment: 'right', margin: [0, 0, 40, 0] },
+                      { text: 'Itbis RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                      { text: fun_.numFormatTwoDecimals(data.itbis), style: 'letra11_5', alignment: 'right', margin: [0, -2, 29, 0] },
                     ],
                     [
-                      { text: 'Descuento RD$: ', style: 'letra12', bold: true, alignment: 'right' },
-                      { text: fun_.numFormatTwoDecimals(data.descuento), style: 'letra12', alignment: 'right', margin: [0, 0, 40, 0] },
+                      { text: 'Descuento RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                      { text: fun_.numFormatTwoDecimals(data.descuento), style: 'letra11_5', alignment: 'right', margin: [0, -2, 29, 0] },
                     ],
                     [
-                      { text: 'TOTAL RD$: ', style: 'letra12', bold: true, alignment: 'right' },
-                      { text: fun_.numFormatTwoDecimals(data.total_factura), style: 'letra12', alignment: 'right', margin: [0, 0, 40, 0] },
+                      { text: 'TOTAL RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                      { text: fun_.numFormatTwoDecimals(data.total_factura), style: 'letra11_5', alignment: 'right', margin: [0, -2, 29, 0] },
                     ],
                     data.FACTURA_DE === 'compra' || data.FACTURA_DE === 'nota'
                       ? [{ text: '' }, { text: '' }]
                       : [
-                          { text: 'Devuelta RD$: ', style: 'letra12', bold: true, alignment: 'right' },
-                          { text: fun_.numFormatTwoDecimals(data.devuelta), style: 'letra12', alignment: 'right', margin: [0, 0, 40, 0] },
+                          { text: 'Devuelta RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                          { text: fun_.numFormatTwoDecimals(data.devuelta), style: 'letra11_5', alignment: 'right', margin: [0, -2, 29, 0] },
                         ],
                   ],
                 },

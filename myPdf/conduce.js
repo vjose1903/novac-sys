@@ -8,7 +8,7 @@ var environment_js_1 = require("../src/environments/environment.js");
 // ==========================================================================================================================================================
 function makeConduce(data) {
     var dd = {
-        pageSize: { width: 850, height: 400 },
+        pageSize: { width: 990, height: 398 },
         pageMargins: [10, 153, 10, 30],
         header: cabeceraConduce(data),
         content: contenidoConduce(data),
@@ -25,11 +25,11 @@ function makeConduce(data) {
             logo: files_1.logoADM,
         },
         styles: {
-            letra10: {
-                fontSize: 10,
-            },
             letra11: {
                 fontSize: 11,
+            },
+            letra11_5: {
+                fontSize: 11.5,
             },
             letra12: {
                 fontSize: 12,
@@ -60,7 +60,7 @@ function cabeceraConduce(data) {
             columns: [[{ image: 'logo', width: 72, opacity: 0.85, margin: [90, 12, 0, 0] }]],
         },
         {
-            margin: [0, -62, 0, 0],
+            margin: [0, -40, 0, 0],
             stack: [
                 {
                     text: 'ADM Agroindustrial S.R.L',
@@ -74,10 +74,10 @@ function cabeceraConduce(data) {
                 },
                 {
                     text: [
-                        { text: 'Telefono: ', fontSize: 9, bold: true },
-                        { text: environment_js_1.AppConfig.num_telefono + ' ', fontSize: 9 },
-                        { text: ' RNC: ', fontSize: 9, bold: true },
-                        { text: environment_js_1.AppConfig.rnc, fontSize: 9 },
+                        { text: 'Telefono: ', style: 'letra11', bold: true },
+                        { text: environment_js_1.AppConfig.num_telefono + ' ', style: 'letra11' },
+                        { text: ' RNC: ', style: 'letra11', bold: true },
+                        { text: environment_js_1.AppConfig.rnc, style: 'letra11' },
                     ],
                     alignment: 'center',
                 },
@@ -220,7 +220,7 @@ function contenidoConduce(data) {
                 { text: 'Realizado Por :  ', style: 'letra11', bold: true },
                 { text: fun_.my_capitalize(data.user.nombre) + ' ' + fun_.my_capitalize(data.user.apellido), style: 'letra11' },
             ],
-            margin: [5, 5, 0, 0],
+            margin: [10, 5, 0, 0],
         },
         {
             stack: [

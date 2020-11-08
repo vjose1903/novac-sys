@@ -9,7 +9,7 @@ var environment_js_1 = require("../src/environments/environment.js");
 // ==========================================================================================================================================================
 function makeRecibo(data) {
     var dd = {
-        pageSize: { width: 927, height: 400 },
+        pageSize: { width: 990, height: 398 },
         pageMargins: [10, 165, 10, 30],
         header: cabeceraRecibo(data),
         content: contenidoRecibo(data),
@@ -26,11 +26,11 @@ function makeRecibo(data) {
             logo: files_1.logoADM,
         },
         styles: {
-            letra10: {
-                fontSize: 10,
-            },
             letra11: {
                 fontSize: 11,
+            },
+            letra11_5: {
+                fontSize: 11.5,
             },
             letra12: {
                 fontSize: 12,
@@ -62,7 +62,7 @@ function cabeceraRecibo(data) {
             columns: [[{ image: 'logo', width: 72, opacity: 0.85, margin: [90, 12, 0, 0] }]],
         },
         {
-            margin: [0, -62, 0, 0],
+            margin: [0, -40, 0, 0],
             stack: [
                 {
                     text: 'ADM Agroindustrial S.R.L',
@@ -76,10 +76,10 @@ function cabeceraRecibo(data) {
                 },
                 {
                     text: [
-                        { text: 'Telefono: ', fontSize: 9, bold: true },
-                        { text: environment_js_1.AppConfig.num_telefono + ' ', fontSize: 9 },
-                        { text: ' RNC: ', bold: true, fontSize: 9 },
-                        { text: environment_js_1.AppConfig.rnc, fontSize: 9 },
+                        { text: 'Telefono: ', style: 'letra11', bold: true },
+                        { text: environment_js_1.AppConfig.num_telefono + ' ', style: 'letra11' },
+                        { text: ' RNC: ', bold: true, style: 'letra11' },
+                        { text: environment_js_1.AppConfig.rnc, style: 'letra11' },
                     ],
                     alignment: 'center',
                 },
