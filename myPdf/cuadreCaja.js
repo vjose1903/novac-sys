@@ -10,7 +10,7 @@ function makeCuadre(data) {
     try {
         var dd = {
             pageSize: { width: 990, height: 398 },
-            pageMargins: [10, 159.5, 10, 30],
+            pageMargins: [0, 159.5, 0, 30],
             header: cabeceraReporte(data),
             content: contenidoReporte(data),
             footer: function (currentPage, pageCount) {

@@ -10,7 +10,7 @@ import { AppConfig } from '../src/environments/environment.js';
 export function makeRecibo(data) {
   const dd = {
     pageSize: { width: 990, height: 398 },
-    pageMargins: [10, 165, 10, 30],
+    pageMargins: [0, 173, 0, 30],
     header: cabeceraRecibo(data),
     content: contenidoRecibo(data),
     footer: (currentPage, pageCount) => {
@@ -44,7 +44,16 @@ function cabeceraRecibo(data) {
   const numero_letra = numLetra.NumeroALetras(data.total);
   const header = [
     {
-      columns: [[{ image: 'logo', width: 72, opacity: 0.85, margin: [90, 12, 0, 0] }]],
+      columns: [
+        [
+          {
+            image: 'logo',
+            width: 72,
+            height: 45,
+            margin: [90, 12, 0, 0],
+          },
+        ],
+      ],
     },
     {
       margin: [0, -40, 0, 0],
@@ -101,7 +110,7 @@ function cabeceraRecibo(data) {
               { text: fun_.my_dateFormater(data.fecha_equivalente), fontSize: 12 },
               { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), fontSize: 12 },
             ],
-            margin: [60, 0, 0, 0],
+            margin: [150, 0, 0, 0],
           },
 
           {
@@ -109,7 +118,7 @@ function cabeceraRecibo(data) {
               { text: 'Doc No: ', fontSize: 12, bold: true },
               { text: fun_.my_padStart(data.numero_recibo, 8, '0'), fontSize: 12 },
             ],
-            margin: [60, 3, 0, 0],
+            margin: [150, 3, 0, 0],
           },
         ],
       ],
@@ -129,6 +138,7 @@ function cabeceraRecibo(data) {
             {
               text: '#',
               style: 'tableHeader',
+              alignment: 'center',
               bold: true,
               margin: [4, 0, 0, 0],
             },
@@ -197,10 +207,10 @@ function contenidoRecibo(data) {
     const valor = fun_.my_stringSplit(detalle.descripcion, ' ')[1];
     const fecha = fun_.my_stringSplit(detalle.descripcion, ' ')[2];
 
-    const br_ = i !== 0 && i % 10 === 0;
+    const br_ = i !== 0 && i % 6 === 0;
 
     row.push(
-      { text: i + 1, pageBreak: br_ ? 'before' : 'none' },
+      { text: i + 1, alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
       { text: fun_.my_dateFormater(fecha), pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
       { text: valor, pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
       { text: fun_.numFormatTwoDecimals(detalle.total_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
@@ -213,23 +223,23 @@ function contenidoRecibo(data) {
 
   const content = [
     {
-      margin: [0, 0, 0, 0],
+      margin: [10, 0, 10, 0],
       table: {
         widths: [24, '*', '*', '*', '*', '*', '*'],
         body: tempBody,
       },
 
       layout: {
-        hLineWidth: function (i, node) {
-          return i % 10 === 0 && node.table.body.length !== 10 ? 0 : i === node.table.body.length ? 2 : 1;
+        hLineWidth: (i, node) => {
+          return i % 6 === 0 && node.table.body.length !== 6 ? 0 : i === node.table.body.length ? 2 : 1;
         },
-        vLineWidth: function (i, node) {
+        vLineWidth: (i, node) => {
           return 0;
         },
-        hLineColor: function (i, node) {
+        hLineColor: (i, node) => {
           return i === node.table.body.length ? 'black' : 'gray';
         },
-        vLineColor: function (i, node) {
+        vLineColor: (i, node) => {
           return 'black';
         },
       },
@@ -240,7 +250,7 @@ function contenidoRecibo(data) {
         { text: fun_.my_capitalize(data.user.nombre) + ' ' + fun_.my_capitalize(data.user.apellido), style: 'letra11' },
       ],
 
-      margin: [5, 5, 0, 0],
+      margin: [20, 5, 0, 0],
     },
     {
       stack: [
@@ -268,7 +278,7 @@ function contenidoRecibo(data) {
                       [
                         {
                           text: [{ text: 'Entregado Por', fontSize: 12, bold: true }],
-                          margin: [50, 5, 0, 0],
+                          margin: [5, 5, 0, 0],
                         },
                       ],
                     ],

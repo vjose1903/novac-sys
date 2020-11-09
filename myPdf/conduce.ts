@@ -9,7 +9,7 @@ import { AppConfig } from '../src/environments/environment.js';
 export function makeConduce(data) {
   const dd = {
     pageSize: { width: 990, height: 398 },
-    pageMargins: [10, 163, 10, 30],
+    pageMargins: [0, 163, 0, 30],
     header: cabeceraConduce(data),
     content: contenidoConduce(data),
     footer: function (currentPage, pageCount) {
@@ -106,7 +106,7 @@ function cabeceraConduce(data) {
         ],
         [
           {
-            text: [{ text: 'Conduce de mercancia', style: 'letra14' }],
+            text: [{ text: 'Conduce de mercancia', style: 'letra14', bold: true }],
             margin: [0, 15, 0, 0],
             alignment: 'center',
           },
@@ -118,7 +118,7 @@ function cabeceraConduce(data) {
               { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra12' },
               { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra12' },
             ],
-            margin: [70, 0, 0, 0],
+            margin: [150, 0, 0, 0],
           },
 
           {
@@ -126,7 +126,7 @@ function cabeceraConduce(data) {
               { text: 'Doc No: ', style: 'letra12' },
               { text: fun_.my_padStart(data.numero_conduce, 8, '0'), style: 'letra12' },
             ],
-            margin: [70, 3, 0, 0],
+            margin: [150, 3, 0, 0],
           },
         ],
       ],
@@ -212,7 +212,7 @@ function contenidoConduce(data) {
 
   const content = [
     {
-      margin: [0, -2, 0, 0],
+      margin: [10, -2, 10, 0],
       table: {
         widths: [23, 60, 120, '*'],
         body: tempBody,
@@ -239,7 +239,7 @@ function contenidoConduce(data) {
         { text: fun_.my_capitalize(data.user.nombre) + ' ' + fun_.my_capitalize(data.user.apellido), style: 'letra11' },
       ],
 
-      margin: [10, 5, 0, 0],
+      margin: [20, 5, 0, 0],
     },
     {
       stack: [
@@ -275,7 +275,7 @@ function contenidoConduce(data) {
             [
               {
                 text: [{ text: 'Cliente', style: 'letra12', bold: true }],
-                margin: [-170, 5, 0, 0],
+                margin: [-195, 5, 0, 0],
               },
             ],
           ],

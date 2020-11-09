@@ -7,18 +7,10 @@ import { AppConfig } from '../src/environments/environment.js';
 function getPageMargin(data) {
   let margins = [];
 
-  if (data.FACTURA_DE === 'venta') {
-    if (data.condicion === 'Contado') {
-      margins = [0, 152, 0, 30];
-    } else {
-      margins = [0, 168, 0, 30];
-    }
+  if (data.condicion === 'Contado') {
+    margins = [0, 158, 0, 30];
   } else {
-    if (data.condicion === 'Contado') {
-      margins = [0, 153, 0, 30];
-    } else {
-      margins = [0, 165, 0, 30];
-    }
+    margins = [0, 168, 0, 30];
   }
 
   return margins;
