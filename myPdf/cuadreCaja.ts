@@ -1,5 +1,5 @@
 import * as fun_ from './utils/funciones';
-import { logoADM } from './utils/files';
+import { logoADM, styles_ } from './utils/files';
 import { AppConfig } from '../src/environments/environment.js';
 
 // ==========================================================================================================================================================
@@ -25,23 +25,7 @@ export function makeCuadre(data) {
       images: {
         logo: logoADM,
       },
-      styles: {
-        letra11: {
-          fontSize: 11,
-        },
-        letra11_5: {
-          fontSize: 11.5,
-        },
-        letra12: {
-          fontSize: 12,
-        },
-        letra14: {
-          fontSize: 14,
-        },
-        letra17: {
-          fontSize: 17,
-        },
-      },
+      styles: styles_,
     };
 
     const obj = {
@@ -59,104 +43,108 @@ export function makeCuadre(data) {
 // CABECERA
 // ====================================================================================================================================================
 function cabeceraReporte(data) {
-  const header = [
-    {
-      columns: [
-        [
+  try {
+    const header = [
+      {
+        columns: [
+          [
+            {
+              image: 'logo',
+              width: 72,
+              height: 45,
+              margin: [90, 12, 0, 0],
+            },
+          ],
+          [
+            {
+              margin: [0, 23, 0, 0],
+              stack: [
+                {
+                  text: 'ADM Agroindustrial S.R.L',
+                  alignment: 'center',
+                  bold: true,
+                  style: 'letra17',
+                },
+                {
+                  text: 'Autopista Duarte Km0 El Higuero, La Vega',
+                  alignment: 'center',
+                  fontSize: 11,
+                },
+                {
+                  text: [
+                    { text: 'Telefono: ', style: 'letra11', bold: true },
+                    { text: AppConfig.num_telefono + ' ', style: 'letra11' },
+                    { text: ' RNC: ', style: 'letra11', bold: true },
+                    { text: AppConfig.rnc, style: 'letra11' },
+                  ],
+                  alignment: 'center',
+                },
+              ],
+            },
+          ],
+          [
+            {
+              margin: [0, 30, 30, 0],
+              stack: [
+                {
+                  alignment: 'right',
+                  text: [
+                    { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra14', bold: true },
+                    { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra14', bold: true },
+                  ],
+                },
+
+                {
+                  alignment: 'right',
+                  text: [
+                    {
+                      text: [{ text: 'no: ', fontSize: 13, bold: false }],
+                      alignment: 'right',
+                    },
+                    { text: fun_.my_padStart(data.numero_reporte, 8, '0'), fontSize: 13, alignment: 'right' },
+                  ],
+                },
+                {
+                  alignment: 'right',
+                  text: [
+                    {
+                      text: [{ text: 'Realizado por: ', fontSize: 13, bold: false }],
+                      alignment: 'right',
+                    },
+                    { text: data.usuario, fontSize: 13, alignment: 'right' },
+                  ],
+                },
+              ],
+            },
+          ],
+        ],
+      },
+      {
+        text: [{ text: 'Cuadre de caja', style: 'letra17', bold: true }],
+        margin: [0, 30, 0, 0],
+        alignment: 'center',
+      },
+      // =============================================================
+      {
+        canvas: [
           {
-            image: 'logo',
-            width: 72,
-            opacity: 0.85,
-            margin: [90, 12, 0, 0],
+            type: 'rect',
+            x: 395,
+            y: 5,
+            w: 200,
+            h: 2,
+            color: '#000000',
           },
         ],
-        [
-          {
-            margin: [0, 23, 0, 0],
-            stack: [
-              {
-                text: 'ADM Agroindustrial S.R.L',
-                alignment: 'center',
-                bold: true,
-                style: 'letra17',
-              },
-              {
-                text: 'Autopista Duarte Km0 El Higuero, La Vega',
-                alignment: 'center',
-                fontSize: 11,
-              },
-              {
-                text: [
-                  { text: 'Telefono: ', style: 'letra11', bold: true },
-                  { text: AppConfig.num_telefono + ' ', style: 'letra11' },
-                  { text: ' RNC: ', style: 'letra11', bold: true },
-                  { text: AppConfig.rnc, style: 'letra11' },
-                ],
-                alignment: 'center',
-              },
-            ],
-          },
-        ],
-        [
-          {
-            margin: [0, 30, 30, 0],
-            stack: [
-              {
-                alignment: 'right',
-                text: [
-                  { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra14', bold: true },
-                  { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra14', bold: true },
-                ],
-              },
+      },
 
-              {
-                alignment: 'right',
-                text: [
-                  {
-                    text: [{ text: 'no: ', style: 'letra13', bold: false }],
-                    alignment: 'right',
-                  },
-                  { text: fun_.my_padStart(data.numero_reporte, 8, '0'), style: 'letra13', alignment: 'right' },
-                ],
-              },
-              {
-                alignment: 'right',
-                text: [
-                  {
-                    text: [{ text: 'Realizado por: ', style: 'letra13', bold: false }],
-                    alignment: 'right',
-                  },
-                  { text: data.usuario, style: 'letra13', alignment: 'right' },
-                ],
-              },
-            ],
-          },
-        ],
-      ],
-    },
-    {
-      text: [{ text: 'Cuadre de caja', style: 'letra17', bold: true }],
-      margin: [0, 30, 0, 0],
-      alignment: 'center',
-    },
-    // =============================================================
-    {
-      canvas: [
-        {
-          type: 'rect',
-          x: 310,
-          y: 5,
-          w: 970,
-          h: 2,
-          color: '#000000',
-        },
-      ],
-    },
+      // =============================================================
+    ];
 
-    // =============================================================
-  ];
-
-  return header;
+    return header;
+  } catch (error) {
+    throw error;
+  }
 }
 
 // ================================================================================================================================================
@@ -195,7 +183,7 @@ function contenidoReporte(data) {
                     bold: true,
                     style: 'letra15',
                   },
-                  { text: fun_.numFormatTwoDecimals(data.total_venta_contado), style: 'letra13', alignment: 'right', margin: [0, 3, 0, 0] },
+                  { text: fun_.numFormatTwoDecimals(data.total_venta_contado), fontSize: 13, alignment: 'right', margin: [0, 3, 0, 0] },
                 ],
                 [
                   {
@@ -204,7 +192,7 @@ function contenidoReporte(data) {
                     bold: true,
                     style: 'letra15',
                   },
-                  { text: fun_.numFormatTwoDecimals(data.total_recibo_ingreso), style: 'letra13', alignment: 'right', margin: [0, 3, 0, 0] },
+                  { text: fun_.numFormatTwoDecimals(data.total_recibo_ingreso), fontSize: 13, alignment: 'right', margin: [0, 3, 0, 0] },
                 ],
                 [
                   {
@@ -213,7 +201,7 @@ function contenidoReporte(data) {
                     bold: true,
                     style: 'letra15',
                   },
-                  { text: fun_.numFormatTwoDecimals(data.total_general), style: 'letra13', alignment: 'right', margin: [0, 3, 0, 0] },
+                  { text: fun_.numFormatTwoDecimals(data.total_general), fontSize: 13, alignment: 'right', margin: [0, 3, 0, 0] },
                 ],
                 [
                   {
@@ -222,7 +210,7 @@ function contenidoReporte(data) {
                     alignment: 'left',
                     fontSize: 16,
                   },
-                  { text: fun_.numFormatTwoDecimals(data.total_venta_credito), style: 'letra13', alignment: 'right', margin: [0, 17, 0, 0] },
+                  { text: fun_.numFormatTwoDecimals(data.total_venta_credito), fontSize: 13, alignment: 'right', margin: [0, 17, 0, 0] },
                 ],
               ],
             },

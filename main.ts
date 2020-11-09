@@ -158,7 +158,7 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   // autoUpdater.quitAndInstall();
 });
 
-autoUpdater.on('update-not-available', (info) => { });
+autoUpdater.on('update-not-available', (info) => {});
 
 autoUpdater.on('error', (error) => {
   if (win) {
@@ -283,7 +283,7 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
               ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_sin_extension)}" -x "*.DS_Store"`
               : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_sin_extension}.zip`)}" -Update`;
 
-          cmd('pwd', (res_pwd) => { });
+          cmd('pwd', (res_pwd) => {});
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -314,10 +314,9 @@ function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5
 
   console.log(' comando ===>  ', command);
   cmd(command, (res_local) => {
-    console.log('res_local ==> ',res_local);
-    
-    if (res_local.status) {
+    console.log('res_local ==> ', res_local);
 
+    if (res_local.status) {
       const md5_local = process.platform === 'darwin' ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
       console.log(`md5 local --> ${md5_local}`);
       console.log(`md5 servidor --> ${md5_servidor}`);
@@ -325,7 +324,6 @@ function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5
         console.log('Los md5 son diferentes procediendo a borrar los archivos actuales para descargarlos nuevamente');
         borrado_de_archivos_malos(aFiles_malos, (res_del) => {
           if (res_del.status) {
-
             console.log('antes de descargar el archivo');
 
             procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
@@ -351,11 +349,9 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
           ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
           : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
-          console.log('command --> ', command);
+      console.log('command --> ', command);
       cmd(command, (res_local_before_descarga) => {
-        
         if (res_local_before_descarga.status) {
-
           const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
           console.log(`md5 local --> ${md5_local}`);
           console.log(`md5 servidor --> ${md5_servidor}`);
@@ -375,9 +371,8 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
           } else {
             descarga_exito = false;
           }
-        }
-        else{
-          retornarMensajeErrorVeiricandoElementos(nombre_err); 
+        } else {
+          retornarMensajeErrorVeiricandoElementos(nombre_err);
         }
       });
     } else {
@@ -429,11 +424,11 @@ function cmd(command, callback) {
   });
 }
 
-function downloadFile(archive_url, path, file_, callback = (arg) => { }) {
+function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
   // Save variable to know progress
   console.log('dentro de downloadfile');
-  console.log('archive_url----> ',archive_url);
-  
+  console.log('archive_url----> ', archive_url);
+
   let received_bytes = 0;
   let total_bytes = 0;
 
@@ -468,7 +463,6 @@ function downloadFile(archive_url, path, file_, callback = (arg) => { }) {
 function showProgress(received, total) {
   const percentage = (received * 100) / total;
   console.log('percentage --> ', percentage);
-
 }
 
 function puts(msg_, linea_ = undefined) {
@@ -499,6 +493,9 @@ ipcMain.on('print', (event: any, oPdf) => {
 
   const data = oPdf.data;
   const type = oPdf.type;
+  const reimprimir = oPdf.data.reimprimir ? true : false;
+  console.log('data ', data);
+  console.log('type ', type);
 
   try {
     switch (type) {
@@ -527,7 +524,9 @@ ipcMain.on('print', (event: any, oPdf) => {
       const dd = obj.doc;
       const file = obj.file;
       const type = obj.type;
-      createPdfbase64(dd, file, type);
+      console.log('Antes de crear el pdf');
+
+      createPdfbase64(dd, file, type, reimprimir);
       // makeDocDefinition(dd, file, type);
     } else {
       returnErrorPDF();
@@ -557,19 +556,26 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
   }
 }
 
-function createPdfbase64(docDefinition, file_, type) {
+function createPdfbase64(docDefinition, file_, type, reimprimir_) {
   try {
+    console.log('file_ -> ', file_);
+    console.log('type -> ', type);
+
     const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+    console.log('############');
     pdfDocGenerator.getBase64((data) => {
       if (type === 'file') {
         generatePdfFileFormBase64(file_, data, type);
       } else {
-        win.webContents.send('printRes', { msg: 'Pdf Base64 correcto', file: file_, status: 'si', body: data, sbody: JSON.stringify(data) });
+        console.log('respondiendo con : ', data);
+
+        win.webContents.send('printRes', { msg: 'Pdf Base64 correcto', file: file_, status: 'si', reimprimir: reimprimir_, body: data, sbody: JSON.stringify(data) });
       }
     });
   } catch (error) {
     puts(error, 280);
-    win.webContents.send('printRes', { msg: 'Error generando factura!!', status: false, ERROR: error });
+    returnErrorPDF();
+    throw error;
   }
 }
 

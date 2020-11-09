@@ -1,6 +1,6 @@
 import * as numLetra from './utils/numero_letras';
 import * as fun_ from './utils/funciones';
-import { logoADM } from './utils/files';
+import { logoADM, styles_ } from './utils/files';
 import { AppConfig } from '../src/environments/environment.js';
 
 // ==========================================================================================================================================================
@@ -25,23 +25,7 @@ export function makeRecibo(data) {
     images: {
       logo: logoADM,
     },
-    styles: {
-      letra11: {
-        fontSize: 11,
-      },
-      letra11_5: {
-        fontSize: 11.5,
-      },
-      letra12: {
-        fontSize: 12,
-      },
-      letra14: {
-        fontSize: 14,
-      },
-      letra17: {
-        fontSize: 17,
-      },
-    },
+    styles: styles_,
   };
 
   const obj = {

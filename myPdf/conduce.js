@@ -24,23 +24,7 @@ function makeConduce(data) {
         images: {
             logo: files_1.logoADM,
         },
-        styles: {
-            letra11: {
-                fontSize: 11,
-            },
-            letra11_5: {
-                fontSize: 11.5,
-            },
-            letra12: {
-                fontSize: 12,
-            },
-            letra14: {
-                fontSize: 14,
-            },
-            letra17: {
-                fontSize: 17,
-            },
-        },
+        styles: files_1.styles_,
     };
     var obj = {
         doc: dd,

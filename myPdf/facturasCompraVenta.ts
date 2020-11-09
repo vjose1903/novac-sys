@@ -1,5 +1,5 @@
 import * as fun_ from './utils/funciones';
-import { logoADM } from './utils/files';
+import { logoADM, styles_ } from './utils/files';
 import { AppConfig } from '../src/environments/environment.js';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
@@ -11,7 +11,7 @@ function getPageMargin(data) {
     if (data.condicion === 'Contado') {
       margins = [0, 152, 0, 30];
     } else {
-      margins = [0, 170, 0, 30];
+      margins = [0, 168, 0, 30];
     }
   } else {
     if (data.condicion === 'Contado') {
@@ -51,23 +51,7 @@ export function makeFacturaVenta(data) {
     images: {
       logo: logoADM,
     },
-    styles: {
-      letra11: {
-        fontSize: 11,
-      },
-      letra11_5: {
-        fontSize: 11.5,
-      },
-      letra12: {
-        fontSize: 12,
-      },
-      letra14: {
-        fontSize: 14,
-      },
-      letra17: {
-        fontSize: 17,
-      },
-    },
+    styles: styles_,
   };
 
   const obj = {
@@ -272,7 +256,7 @@ function cabeceraFacturaVenta(data) {
           [1, 'Sample value 1', 'value 2', 'value 3', 'value 4', 'value 5', 'value 6'],
         ],
       },
-      margin: [10, 0, 15, 0],
+      margin: [10, 0, 10, 0],
       layout: 'headerLineOnly',
     },
   ];
@@ -293,7 +277,7 @@ function contenidoFacturaVenta(data) {
   data.detalle_facturas.forEach((detalle, i) => {
     const row = [];
 
-    const br_ = i !== 0 && i % 10 === 0;
+    const br_ = i !== 0 && i % 5 === 0;
 
     row.push(
       { text: i + 1, alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
@@ -321,7 +305,7 @@ function contenidoFacturaVenta(data) {
       margin: data.condicion === 'Contado' ? [10, -2, 10, 0] : [10, -2, 10, 0],
       layout: {
         hLineWidth: (i, node) => {
-          return i % 10 === 0 && node.table.body.length !== i ? 0 : i === node.table.body.length ? 2 : 1;
+          return i % 5 === 0 && node.table.body.length !== 5 ? 0 : i === node.table.body.length ? 2 : 1;
         },
         vLineWidth: (i, node) => {
           return 0;

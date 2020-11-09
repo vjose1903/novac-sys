@@ -30,7 +30,8 @@ export class ReportesComponent implements OnInit, OnDestroy {
           obj = {
             pdfSrc: res.body,
             titulo: 'Cuadre de caja',
-            height: '37rem',
+            height: '25rem',
+            reimprimir: res.reimprimir,
             fileName: res.file.split('.')[0],
           };
         }
@@ -73,6 +74,8 @@ export class ReportesComponent implements OnInit, OnDestroy {
         data: res.body,
         type: 'cuadre_caja',
       };
+      console.log('res.body --> ', res.body);
+
       this._ipc.send('print', obj);
 
       // setTimeout(() => {
@@ -86,7 +89,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
       // }, 1000);
     } catch (error) {
       console.error(error);
-      this.dbServ.toastError(error.error.msg, 'ERROR');
+      this.dbServ.toastError(error.error.msg, 'ERROR', true);
     }
   }
 

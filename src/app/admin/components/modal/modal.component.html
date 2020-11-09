@@ -495,7 +495,7 @@
     ></ngx-extended-pdf-viewer>
     <p-footer>
       <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
-      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">Imprimir</button>
+      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">{{ seleccionModal?.reimprimir ? 'Reimprimir' : 'Imprimir' }}</button>
     </p-footer>
   </p-dialog>
 </div>

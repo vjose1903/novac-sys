@@ -13,7 +13,7 @@ function getPageMargin(data) {
             margins = [0, 152, 0, 30];
         }
         else {
-            margins = [0, 170, 0, 30];
+            margins = [0, 168, 0, 30];
         }
     }
     else {
@@ -53,23 +53,7 @@ function makeFacturaVenta(data) {
         images: {
             logo: files_1.logoADM,
         },
-        styles: {
-            letra11: {
-                fontSize: 11,
-            },
-            letra11_5: {
-                fontSize: 11.5,
-            },
-            letra12: {
-                fontSize: 12,
-            },
-            letra14: {
-                fontSize: 14,
-            },
-            letra17: {
-                fontSize: 17,
-            },
-        },
+        styles: files_1.styles_,
     };
     var obj = {
         doc: dd,
@@ -265,7 +249,7 @@ function cabeceraFacturaVenta(data) {
                     [1, 'Sample value 1', 'value 2', 'value 3', 'value 4', 'value 5', 'value 6'],
                 ],
             },
-            margin: [10, 0, 15, 0],
+            margin: [10, 0, 10, 0],
             layout: 'headerLineOnly',
         },
     ];
@@ -282,7 +266,7 @@ function contenidoFacturaVenta(data) {
     var tempBody = [];
     data.detalle_facturas.forEach(function (detalle, i) {
         var row = [];
-        var br_ = i !== 0 && i % 10 === 0;
+        var br_ = i !== 0 && i % 5 === 0;
         row.push({ text: i + 1, alignment: 'center', pageBreak: br_ ? 'before' : 'none' }, { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none' }, { text: fun_.numFormatTwoDecimals(detalle.cantidad), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' }, { text: detalle.unidad, alignment: 'center', pageBreak: br_ ? 'before' : 'none' }, {
             text: fun_.numFormatTwoDecimals(data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? detalle.precio : detalle.costo),
             alignment: 'right',
@@ -301,7 +285,7 @@ function contenidoFacturaVenta(data) {
             margin: data.condicion === 'Contado' ? [10, -2, 10, 0] : [10, -2, 10, 0],
             layout: {
                 hLineWidth: function (i, node) {
-                    return i % 10 === 0 && node.table.body.length !== i ? 0 : i === node.table.body.length ? 2 : 1;
+                    return i % 5 === 0 && node.table.body.length !== 5 ? 0 : i === node.table.body.length ? 2 : 1;
                 },
                 vLineWidth: function (i, node) {
                     return 0;
