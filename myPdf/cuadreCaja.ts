@@ -174,6 +174,7 @@ function contenidoReporte(data) {
                     alignment: 'right',
                     bold: true,
                     style: 'letra17',
+                     margin: [0, 0, 20, 0]
                   },
                 ],
                 [
@@ -183,7 +184,7 @@ function contenidoReporte(data) {
                     bold: true,
                     style: 'letra15',
                   },
-                  { text: fun_.numFormatTwoDecimals(data.total_venta_contado), fontSize: 13, alignment: 'right', margin: [0, 3, 0, 0] },
+                  { text: fun_.numFormatTwoDecimals(data.total_venta_contado), fontSize: 13, alignment: 'right', margin: [0, 3, 20, 0] },
                 ],
                 [
                   {
@@ -192,7 +193,7 @@ function contenidoReporte(data) {
                     bold: true,
                     style: 'letra15',
                   },
-                  { text: fun_.numFormatTwoDecimals(data.total_recibo_ingreso), fontSize: 13, alignment: 'right', margin: [0, 3, 0, 0] },
+                  { text: fun_.numFormatTwoDecimals(data.total_recibo_ingreso), fontSize: 13, alignment: 'right', margin: [0, 3, 20, 0] },
                 ],
                 [
                   {
@@ -201,7 +202,7 @@ function contenidoReporte(data) {
                     bold: true,
                     style: 'letra15',
                   },
-                  { text: fun_.numFormatTwoDecimals(data.total_general), fontSize: 13, alignment: 'right', margin: [0, 3, 0, 0] },
+                  { text: fun_.numFormatTwoDecimals(data.total_general), fontSize: 13, alignment: 'right', margin: [0, 3, 20, 0] },
                 ],
                 [
                   {
@@ -210,7 +211,7 @@ function contenidoReporte(data) {
                     alignment: 'left',
                     fontSize: 16,
                   },
-                  { text: fun_.numFormatTwoDecimals(data.total_venta_credito), fontSize: 13, alignment: 'right', margin: [0, 17, 0, 0] },
+                  { text: fun_.numFormatTwoDecimals(data.total_venta_credito), fontSize: 13, alignment: 'right', margin: [0, 19, 20, 0] },
                 ],
               ],
             },
