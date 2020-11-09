@@ -206,7 +206,7 @@ function contenidoReporte(data) {
                                         alignment: 'left',
                                         fontSize: 16,
                                     },
-                                    { text: fun_.numFormatTwoDecimals(data.total_venta_credito), fontSize: 13, alignment: 'right', margin: [0, 17, 20, 0] },
+                                    { text: fun_.numFormatTwoDecimals(data.total_venta_credito), fontSize: 13, alignment: 'right', margin: [0, 19, 20, 0] },
                                 ],
                             ],
                         },

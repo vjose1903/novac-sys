@@ -171,6 +171,8 @@ autoUpdater.on('error', (error) => {
 ipcMain.on('printerNames', (event: any, arg) => {
   // name of function
   const printersName = win.webContents.getPrinters();
+
+  event.reply('printersNameRes', printersName);
 });
 
 ipcMain.on('getVersion', (event: any, arg) => {
@@ -186,7 +188,6 @@ ipcMain.on('getAppDir', (event: any, arg) => {
 });
 
 function verificarSumastra() {
-
   if (!fs.existsSync(pathAdd('/print'))) {
     fs.mkdir(pathAdd('/print'), { recursive: true }, (err) => {
       if (err) {
@@ -268,7 +269,6 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
         procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
         descargar_archivo = true;
       } else {
-
         if (descomprimir) {
           const command =
             process.platform === 'darwin'
@@ -297,20 +297,17 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
 }
 
 function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
-
   const command =
     process.platform === 'darwin'
       ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
       : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
   cmd(command, (res_local) => {
-
     if (res_local.status) {
       const md5_local = process.platform === 'darwin' ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
       if (md5_local !== md5_servidor) {
         borrado_de_archivos_malos(aFiles_malos, (res_del) => {
           if (res_del.status) {
-
             procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
           } else {
             retornarMensajeErrorVeiricandoElementos(nombre_err);
@@ -533,13 +530,11 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
 
 function createPdfbase64(docDefinition, file_, type, reimprimir_) {
   try {
-
     const pdfDocGenerator = pdfMake.createPdf(docDefinition);
     pdfDocGenerator.getBase64((data) => {
       if (type === 'file') {
         generatePdfFileFormBase64(file_, data, type);
       } else {
-
         win.webContents.send('printRes', { msg: 'Pdf Base64 correcto', file: file_, status: 'si', reimprimir: reimprimir_, body: data, sbody: JSON.stringify(data) });
       }
     });
@@ -558,7 +553,7 @@ function imprimir(cFileName, tipo) {
   // const profile = require.resolve('../profiles/app.profile.js');
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
-  exec(`${sumatrapdf_path} -print-to-default -print-settings "landscape,noscale,paper=VJPOS" -silent ${cFileName}`, (error, stdout, stderr) => {
+  exec(`${sumatrapdf_path} -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent ${cFileName}`, (error, stdout, stderr) => {
     if (error) {
       puts(error, 'imprimir');
       let msg_ = '';

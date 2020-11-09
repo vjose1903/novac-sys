@@ -92,6 +92,18 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
       this.fun.logout();
     }
     this.searchVersion();
+    this.getPrintersName();
+  }
+
+  async getPrintersName() {
+    this._ipc.send('printerNames');
+    console.log('mmg auiiiiiiii');
+
+    await this._ipc.on('printersNameRes', (event: Electron.IpcMessageEvent, res) => {
+      console.log('printersss----> ', res);
+
+      this._ipc.PRINTERS_NEW(res);
+    });
   }
 
   async searchVersion() {

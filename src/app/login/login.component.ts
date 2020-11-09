@@ -75,13 +75,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  getPrintersName() {
-    this._ipc.on('printersNameRes', (event: Electron.IpcMessageEvent, res) => {
-      this._ipc.PRINTERS_NEW(res);
-    });
 
-    this._ipc.send('printerNames');
-  }
 
   async printTest() {
     // const data_ = compra_credito_valor_fiscal;
