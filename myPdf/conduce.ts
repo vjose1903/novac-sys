@@ -9,7 +9,7 @@ import { AppConfig } from '../src/environments/environment.js';
 export function makeConduce(data) {
   const dd = {
     pageSize: { width: 990, height: 398 },
-    pageMargins: [10, 153, 10, 30],
+    pageMargins: [10, 163, 10, 30],
     header: cabeceraConduce(data),
     content: contenidoConduce(data),
     footer: function (currentPage, pageCount) {
@@ -59,7 +59,16 @@ function cabeceraConduce(data) {
 
   const header = [
     {
-      columns: [[{ image: 'logo', width: 72, opacity: 0.85, margin: [90, 12, 0, 0] }]],
+      columns: [
+        [
+          {
+            image: 'logo',
+            width: 72,
+            height: 45,
+            margin: [90, 12, 0, 0],
+          },
+        ],
+      ],
     },
     {
       margin: [0, -40, 0, 0],
@@ -68,7 +77,7 @@ function cabeceraConduce(data) {
           text: 'ADM Agroindustrial S.R.L',
           alignment: 'center',
           bold: true,
-          fontSize: 17,
+          style: 'letra17',
         },
         {
           text: 'Autopista Duarte Km0 El Higuero, La Vega',
@@ -76,9 +85,9 @@ function cabeceraConduce(data) {
         },
         {
           text: [
-            { text: 'Telefono: ', style: 'letra11', bold: true },
+            { text: 'Telefono: ', style: 'letra11  ' },
             { text: AppConfig.num_telefono + ' ', style: 'letra11' },
-            { text: ' RNC: ', style: 'letra11', bold: true },
+            { text: ' RNC: ', bold: true, style: 'letra11' },
             { text: AppConfig.rnc, style: 'letra11' },
           ],
           alignment: 'center',
@@ -90,21 +99,30 @@ function cabeceraConduce(data) {
       columns: [
         [
           {
-            text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: fun_.my_capitalize(data.cliente.nombre) + ' ' + fun_.my_capitalize(data.cliente.apellido) }],
+            text: [
+              { text: 'Cliente: ', style: 'letra12' },
+              { text: fun_.my_capitalize(data.cliente.nombre) + ' ' + fun_.my_capitalize(data.cliente.apellido), style: 'letra12' },
+            ],
             margin: [0, 0, 0, 0],
           },
           {
-            text: [{ text: 'Rnc cliente: ', fontSize: 12, bold: true }, { text: rncCliente }],
+            text: [
+              { text: 'Rnc cliente: ', style: 'letra12' },
+              { text: rncCliente, style: 'letra12' },
+            ],
             margin: [0, 3, 0, 0],
           },
           {
-            text: [{ text: 'Dirección: ', fontSize: 12, bold: true }, { text: data.cliente.direccion }],
+            text: [
+              { text: 'Dirección: ', style: 'letra12' },
+              { text: data.cliente.direccion, style: 'letra12' },
+            ],
             margin: [0, 3, 0, 0],
           },
         ],
         [
           {
-            text: [{ text: 'Conduce de mercancia', fontSize: 14, bold: true }],
+            text: [{ text: 'Conduce de mercancia', style: 'letra14' }],
             margin: [0, 15, 0, 0],
             alignment: 'center',
           },
@@ -112,17 +130,17 @@ function cabeceraConduce(data) {
         [
           {
             text: [
-              { text: 'Fecha: ', fontSize: 12, bold: true },
-              { text: fun_.my_dateFormater(data.fecha_equivalente), fontSize: 12 },
-              { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), fontSize: 12 },
+              { text: 'Fecha: ', style: 'letra12' },
+              { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra12' },
+              { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra12' },
             ],
             margin: [70, 0, 0, 0],
           },
 
           {
             text: [
-              { text: 'Doc No: ', fontSize: 12, bold: true },
-              { text: fun_.my_padStart(data.numero_conduce, 8, '0'), fontSize: 12 },
+              { text: 'Doc No: ', style: 'letra12' },
+              { text: fun_.my_padStart(data.numero_conduce, 8, '0'), style: 'letra12' },
             ],
             margin: [70, 3, 0, 0],
           },
@@ -135,7 +153,7 @@ function cabeceraConduce(data) {
           type: 'rect',
           x: 10,
           y: 5,
-          w: 795,
+          w: 970,
           h: 2,
           color: '#000000',
         },
@@ -151,6 +169,7 @@ function cabeceraConduce(data) {
             {
               text: '#',
               style: 'tableHeader',
+              alignment: 'center',
               bold: true,
               margin: [4, 0, 0, 0],
             },
@@ -165,7 +184,7 @@ function cabeceraConduce(data) {
               text: 'Unidad',
               style: 'tableHeader',
               bold: true,
-              alignment: 'right',
+              alignment: 'left',
               margin: [0, 0, 60, 0],
             },
             {
@@ -196,12 +215,12 @@ function contenidoConduce(data) {
   data.detalle_conduces.forEach((detalle, i) => {
     const row = [];
 
-    const br_ = i !== 0 && i % 12 === 0;
+    const br_ = i !== 0 && i % 6 === 0;
 
     row.push(
-      { text: i + 1, pageBreak: br_ ? 'before' : 'none' },
+      { text: i + 1, pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
       { text: fun_.numFormatTwoDecimals(detalle.cantidad), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 10, 0] },
-      { text: detalle.unidad, pageBreak: br_ ? 'before' : 'none', alignment: 'right', margin: [0, 0, 50, 0] },
+      { text: detalle.unidad, pageBreak: br_ ? 'before' : 'none', alignment: 'left', margin: [50, 0, 0, 0] },
       { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none', alignment: 'left' },
     );
     tempBody.push(row);
@@ -216,16 +235,16 @@ function contenidoConduce(data) {
       },
 
       layout: {
-        hLineWidth: function (i, node) {
-          return i % 12 === 0 && node.table.body.length !== 12 ? 0 : i === node.table.body.length ? 2 : 1;
+        hLineWidth: (i, node) => {
+          return i % 6 === 0 && node.table.body.length !== 6 ? 0 : i === node.table.body.length ? 2 : 1;
         },
-        vLineWidth: function (i, node) {
+        vLineWidth: (i, node) => {
           return 0;
         },
-        hLineColor: function (i, node) {
+        hLineColor: (i, node) => {
           return i === node.table.body.length ? 'black' : 'gray';
         },
-        vLineColor: function (i, node) {
+        vLineColor: (i, node) => {
           return 'black';
         },
       },
@@ -244,35 +263,35 @@ function contenidoConduce(data) {
           canvas: [
             {
               type: 'rect',
-              x: 40,
-              y: 45,
-              w: 140,
+              x: 10,
+              y: 0,
+              w: 160,
               h: 1,
               color: '#000000',
             },
             {
               type: 'rect',
-              x: 305,
-              y: 45,
-              w: 140,
+              x: 250,
+              y: 0,
+              w: 160,
               h: 1,
               color: '#000000',
             },
           ],
-          margin: [0, 30, 0, 0],
+          margin: [0, 80, 0, 0],
         },
         {
           columns: [
             [
               {
-                text: [{ text: 'Revisada Por', fontSize: 12, bold: true }],
-                margin: [75, 5, 0, 0],
+                text: [{ text: 'Revisada Por', style: 'letra12', bold: true }],
+                margin: [50, 5, 0, 0],
               },
             ],
             [
               {
-                text: [{ text: 'Cliente', fontSize: 12, bold: true }],
-                margin: [-37, 5, 0, 0],
+                text: [{ text: 'Cliente', style: 'letra12', bold: true }],
+                margin: [-170, 5, 0, 0],
               },
             ],
           ],

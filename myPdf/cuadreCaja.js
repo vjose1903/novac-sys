@@ -145,7 +145,7 @@ function cabeceraReporte(data) {
                     type: 'rect',
                     x: 310,
                     y: 5,
-                    w: 200,
+                    w: 970,
                     h: 2,
                     color: '#000000',
                 },

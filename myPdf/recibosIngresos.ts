@@ -134,7 +134,7 @@ function cabeceraRecibo(data) {
       text: [{ text: 'Recibido: ', fontSize: 12, bold: true }, { text: fun_.numFormatTwoDecimals(data.total) }, { text: ` - ${fun_.my_capitalize(numero_letra)}` }],
       margin: [15, 3, 0, 0],
     },
-    { canvas: [{ type: 'rect', x: 10, y: 5, w: 795, h: 2, color: '#000000' }] },
+    { canvas: [{ type: 'rect', x: 10, y: 5, w: 970, h: 2, color: '#000000' }] },
     {
       margin: [10, 0, 10, 0],
       table: {
