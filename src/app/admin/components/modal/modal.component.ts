@@ -105,7 +105,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       key: 'direccion',
     },
   ];
-  constructor(private mServ: ModalService, private dbServ: DBservice, private tServ: TablasService, private pdfService: NgxExtendedPdfViewerService) {}
+  constructor(private mServ: ModalService, private dbServ: DBservice, private tServ: TablasService, private pdfService: NgxExtendedPdfViewerService) { }
 
   element: HTMLElement;
   subShow: Subscription;
@@ -115,12 +115,20 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
+      console.log('res para el modal -------', res);
+      console.log('this.paraFiltroArticulos -------', this.paraFiltroArticulos);
+      console.log('this.paraFiltroClientes -------', this.paraFiltroClientes);
+
       if (res !== undefined && res !== null && !this.paraFiltroArticulos && !this.paraFiltroClientes) {
         this.showModal = res;
+        console.log('showModal ', this.showModal);
       }
+
       if (res === false) {
         this.showModal = res;
       }
+
+
     });
 
     // this.subCalcularHeigth = this.mServ.CALCULARHEIGHT.subscribe((res) => {
@@ -136,6 +144,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.subTipo = this.mServ.TIPOMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.tipoModal = res;
+        console.log('tipoModal ', this.tipoModal);
       }
     });
 
@@ -147,6 +156,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           this.seleccionModal = res;
         }
         console.log('this.seleccionModal ####### ', this.seleccionModal);
+
 
         this.paraFiltroArticulos = res.filtrarArticulo;
         this.paraFiltroClientes = res.filtrarCliente;
@@ -198,7 +208,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     });
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() { }
 
   ngOnDestroy() {
     this.subShow.unsubscribe();
@@ -208,8 +218,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.reinicioModal();
   }
 
-  ngOnChanges() {
-    // if (this.seleccionModal) {
+  ngOnChanges(simpleChanges) {
+      // if (this.seleccionModal) {
     //   if (this.tipoModal === 'buscar') {
     //     this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
     //   }
@@ -247,6 +257,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.paraFiltroArticulos = undefined;
     this.paraFiltroClientes = undefined;
     this.paraFiltroSuplidor = undefined;
+    console.log('!!!!!!!! REINICIO !!!!!!!');
+
   }
 
   devolverCLick(arg) {

@@ -56,10 +56,10 @@ AssociateSilently = false
 CheckForUpdates = true
 RememberOpenedFiles = true
 EnableTeXEnhancements = false
-DefaultDisplayMode = continuous
-DefaultZoom = fit content
+DefaultDisplayMode = automatic
+DefaultZoom = fit page
 WindowState = 1
-WindowPos = 801 139 760 977
+WindowPos = 0 0 0 0
 ShowToc = true
 SidebarDx = 0
 TocDy = 0
@@ -67,46 +67,6 @@ ShowStartPage = true
 UseTabs = true
 
 FileStates [
-	[
-		FilePath = C:\adm-agroindustrial\reciboI.pdf
-		Favorites [
-		]
-		IsPinned = false
-		IsMissing = false
-		OpenCount = 2
-		UseDefaultState = false
-		DisplayMode = continuous
-		ScrollPos = -1 -1
-		PageNo = 1
-		Zoom = fit width
-		Rotation = 0
-		WindowState = 1
-		WindowPos = 801 139 760 977
-		ShowToc = false
-		SidebarDx = 0
-		DisplayR2L = false
-		ReparseIdx = 0
-	]
-	[
-		FilePath = C:\Users\USER\adm-agroindustrial\factura.pdf
-		Favorites [
-		]
-		IsPinned = false
-		IsMissing = true
-		OpenCount = 0
-		UseDefaultState = false
-		DisplayMode = continuous
-		ScrollPos = -1 -1
-		PageNo = 1
-		Zoom = fit page
-		Rotation = 0
-		WindowState = 1
-		WindowPos = 260 0 760 984
-		ShowToc = false
-		SidebarDx = 0
-		DisplayR2L = false
-		ReparseIdx = 0
-	]
 ]
 SessionData [
 ]
@@ -114,4 +74,3 @@ TimeOfLastUpdateCheck = 0 0
 OpenCountWeek = 514
 
 # Settings after this line have not been recognized by the current version
-Rotation = 90

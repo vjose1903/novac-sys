@@ -644,6 +644,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.mServ.ModalSeleccion(arg);
     }
     this.mServ.mostrarModal(true);
+    console.log('abrir modal');
+    
   }
 
   decisionModal(arg) {
