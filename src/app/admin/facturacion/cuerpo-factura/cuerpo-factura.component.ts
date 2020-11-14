@@ -468,6 +468,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   aumentarSecuencia() {
     this.secuencia++;
+
     this.inputSecuencia = 'cod-' + this.secuencia;
     this.inputDrop = 'uni-' + this.secuencia;
     this.drop = false;
@@ -570,6 +571,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   verificarSecuencia(i, input?) {
+    console.log('this.secuencia ', this.secuencia);
+    console.log('i ', i);
+
     if (this.secuencia < i) {
       GLOBAL.enfocarInput(this.inputSecuencia);
     }
@@ -607,6 +611,16 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       (this.control.controls[i] as any).controls['tot'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(tot)));
 
       (this.control.controls[i] as any).controls['cantidad_en_unidades'].setValue(cantidad * cantidadMinima);
+      console.log(' ');
+      console.log('------------------------------------------');
+      console.log(' Descripcion ', (this.control.controls[i] as any).controls['des'].value);
+      console.log('------------------------------------------');
+
+      console.log('cantidad_en_unidades ==> ', (this.control.controls[i] as any).controls['cantidad_en_unidades'].value);
+      console.log('cantidad_ ==> ', cantidad);
+      console.log('------------------------------------------');
+      console.log(' ');
+
       this.calculosTotalesGenerales();
     }
   }
@@ -909,8 +923,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.drop = true;
     this.UnidadesArticulo = [];
     this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
+    console.log(art);
 
-    if (this.metodo === 'venta' && (art.contenido_articulos.length === 0 || (art.descripcion !== 'Producto terminado' && art.vendido_en !== 'Saco'))) {
+    if (this.metodo === 'venta' && (art.contenido_articulos.length === 0 || art.medida !== 'Quintal')) {
       this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
     }
 

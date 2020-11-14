@@ -376,25 +376,25 @@ function contenidoFacturaVenta(data) {
                   body: [
                     [
                       { text: 'Bruto RD$: ', style: 'letra11_5', bold: true, alignment: 'right' },
-                      { text: fun_.numFormatTwoDecimals(data.Bruto), style: 'letra11_5', alignment: 'right', margin: [0, 0, 29, 0] },
+                      { text: fun_.numFormatTwoDecimals(data.Bruto), style: 'letra11_5', alignment: 'right', margin: [0, 0, data.detalle_facturas.length <= 5 ? 29 : 49, 0] },
                     ],
                     [
                       { text: 'Itbis RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                      { text: fun_.numFormatTwoDecimals(data.itbis), style: 'letra11_5', alignment: 'right', margin: [0, -2, 29, 0] },
+                      { text: fun_.numFormatTwoDecimals(data.itbis), style: 'letra11_5', alignment: 'right', margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0] },
                     ],
                     [
                       { text: 'Descuento RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                      { text: fun_.numFormatTwoDecimals(data.descuento), style: 'letra11_5', alignment: 'right', margin: [0, -2, 29, 0] },
+                      { text: fun_.numFormatTwoDecimals(data.descuento), style: 'letra11_5', alignment: 'right', margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0] },
                     ],
                     [
                       { text: 'TOTAL RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                      { text: fun_.numFormatTwoDecimals(data.total_factura), style: 'letra11_5', alignment: 'right', margin: [0, -2, 29, 0] },
+                      { text: fun_.numFormatTwoDecimals(data.total_factura), style: 'letra11_5', alignment: 'right', margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0] },
                     ],
                     data.FACTURA_DE === 'compra' || data.FACTURA_DE === 'nota'
                       ? [{ text: '' }, { text: '' }]
                       : [
                           { text: 'Devuelta RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                          { text: fun_.numFormatTwoDecimals(data.devuelta), style: 'letra11_5', alignment: 'right', margin: [0, -2, 29, 0] },
+                          { text: fun_.numFormatTwoDecimals(data.devuelta), style: 'letra11_5', alignment: 'right', margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0] },
                         ],
                   ],
                 },

@@ -24,6 +24,7 @@ import { ReciboViajesComponent } from './admin/recibo-viajes/recibo-viajes.compo
 import { AuthGuard } from './core/guard/auth.guard';
 import { IsLoginGuard } from './core/guard/is-login.guard';
 import { ReportesComponent } from './admin/reportes/reportes.component';
+import { RegistroVehiculoComponent } from './admin/registros/registro-vehiculo/registro-vehiculo.component';
 
 const routes: Routes = [
   {
@@ -50,6 +51,10 @@ const routes: Routes = [
       {
         path: 'empleados',
         component: RegistroEmpleadosComponent,
+      },
+      {
+        path: 'camiones',
+        component: RegistroVehiculoComponent,
       },
       {
         path: 'produccion',

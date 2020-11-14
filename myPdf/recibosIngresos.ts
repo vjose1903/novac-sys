@@ -293,7 +293,7 @@ function contenidoRecibo(data) {
                   body: [
                     [
                       {
-                        margin: [0, 0, 25, 0],
+                        margin: [0, 0, data.detalle_recibos.length <= 6 ? 25 : 45, 0],
                         alignment: 'right',
                         text: [
                           {

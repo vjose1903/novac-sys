@@ -24,10 +24,14 @@ export class InventarioComponent implements OnInit, OnDestroy {
     {
       titulo: 'Cod.',
       key: 'codigo',
+      customClass: true,
+      estilos: [{ width: '4rem' }],
     },
     {
       titulo: 'Articulo',
       key: 'nombre',
+      customClass: true,
+      estilos: [{ width: '35rem' }, { 'text-align': 'left' }, { 'padding-left': '2rem' }],
     },
     {
       titulo: 'Cantidad',
@@ -101,18 +105,58 @@ export class InventarioComponent implements OnInit, OnDestroy {
 
   async getArticulos(e) {
     try {
+      // this.listaArticulos = [];
       const page = e.page;
       const per_page = e.per_page;
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+
+      console.log('page ', page);
+      console.log('per_page ', per_page);
+      console.log('palabra_a_buscar ', palabra_a_buscar);
+      console.log('this.FechaFactura ', this.FechaFactura);
+
       const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.FechaFactura, this.filtro).toPromise();
       this.palabra_buscar = palabra_a_buscar;
 
+      res.data.map(async (arti) => {
+        arti.customStyles = {
+          'td-codigo': {
+            width: '4rem',
+          },
+          'td-nombre': {
+            width: '35rem',
+            'text-align': 'left',
+            'padding-left': '2rem',
+          },
+        };
+      });
+
       this.listaArticulos = GLOBAL.duplicarJson(res.data);
+
+      // this.listaArticulos = [
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      //   ...this.listaArticulos,
+      // ];
 
       const obj = {
         total: res.total_registros,
         tabla: 'listaArticulos',
       };
+
+      // const obj = {
+      //   total: this.listaArticulos.length,
+      //   tabla: 'listaArticulos',
+      // };
 
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
@@ -148,16 +192,20 @@ export class InventarioComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
-
+  p() {
+    console.log(obj_paginate);
+  }
   async decisionModal(arg) {
     if (arg.bool) {
       const temp = JSON.parse(JSON.stringify(this.listaArticulos));
-      this.listaArticulos = undefined;
 
-      temp[this.indexSelected] = [];
+      this.getArticulos(obj_paginate);
+      // this.listaArticulos = undefined;
 
-      temp[this.indexSelected] = JSON.parse(JSON.stringify(arg.body));
-      this.listaArticulos = JSON.parse(JSON.stringify(temp));
+      // temp[this.indexSelected] = [];
+
+      // temp[this.indexSelected] = JSON.parse(JSON.stringify(arg.body));
+      // this.listaArticulos = JSON.parse(JSON.stringify(temp));
     }
   }
 }

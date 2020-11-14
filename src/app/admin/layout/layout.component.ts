@@ -97,11 +97,8 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async getPrintersName() {
     this._ipc.send('printerNames');
-    console.log('mmg auiiiiiiii');
 
     await this._ipc.on('printersNameRes', (event: Electron.IpcMessageEvent, res) => {
-      console.log('printersss----> ', res);
-
       this._ipc.PRINTERS_NEW(res);
     });
   }
@@ -263,6 +260,11 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
       case 'suplidores':
         this.actualTab = 'home';
         this.router.navigate(['/admin/suplidores']);
+        break;
+
+      case 'camiones':
+        this.actualTab = 'home';
+        this.router.navigate(['/admin/camiones']);
         break;
 
       default:

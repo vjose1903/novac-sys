@@ -72,12 +72,11 @@ export class RegistroVehiculoComponent implements OnInit {
   existencia_label_mostrar = { label: 'Unidad', nivel: 1 };
   existencia_value_mostrar: any = 1;
   is_unico = false;
+  marcas = [];
 
   constructor(private dbServ: DBservice, private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
-    this.usuario = JSON.parse(this.dbServ.getEmpleado());
-
     this.getVehiculos(obj_paginate);
 
     this.dbServ.getNombresSuplidores().subscribe((res) => {
@@ -86,9 +85,8 @@ export class RegistroVehiculoComponent implements OnInit {
 
     this.createForm();
     this.FORM = this.form.controls;
-    GLOBAL.enfocarInput('user_id');
 
-    this.titulo = 'Registro de articulos';
+    this.titulo = 'Registro de camiones';
     this.boton = 'Registrar';
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
@@ -96,6 +94,11 @@ export class RegistroVehiculoComponent implements OnInit {
         this.decisionModal(res);
       }
     });
+    GLOBAL.enfocarInput('user_id');
+  }
+  ngOnDestroy() {
+    this.borrar();
+    this.subDeci.unsubscribe();
   }
 
   prueba() {}
@@ -107,6 +110,15 @@ export class RegistroVehiculoComponent implements OnInit {
     try {
       // const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
       // this.listaVehiculos = res.data;
+    } catch (error) {
+      this.dbServ.toastError('Error buscando articulos', 'ERROR');
+    }
+  }
+
+  async getMarcas(e) {
+    try {
+      const res = await this.dbServ.getMarcas().toPromise();
+      this.marcas = res.data;
     } catch (error) {
       this.dbServ.toastError('Error buscando articulos', 'ERROR');
     }
@@ -150,10 +162,6 @@ export class RegistroVehiculoComponent implements OnInit {
     this.boton = 'Registrar';
   }
   selectPropietario() {}
-  ngOnDestroy() {
-    this.borrar();
-    this.subDeci.unsubscribe();
-  }
 
   // =============================================
   //  BOTON ATRAS
@@ -167,7 +175,7 @@ export class RegistroVehiculoComponent implements OnInit {
     // this.borrar();
     // this.is_editando = true;
     // this.ProductoEditando = item.ARG;
-    // this.titulo = 'Editar producto: ' + articulo.nombre;
+    // this.titulo = 'Editar Camion: ' + articulo.nombre;
     // this.boton = 'Editar';
     // this.indexEditar = item.INDEX;
     // console.log(articulo);
@@ -211,6 +219,15 @@ export class RegistroVehiculoComponent implements OnInit {
     this.mServ.mostrarModal(true);
   }
 
+  abrirModalFormulario(arg?) {
+    this.seleccionModal = arg;
+
+    this.mServ.modalTipo('crud_marca_modelo');
+    this.tipoModal = 'crud_marca_modelo';
+    this.mServ.ModalSeleccion(arg);
+    this.mServ.mostrarModal(true);
+  }
+
   decisionModal(arg) {
     if (arg) {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
@@ -242,7 +259,7 @@ export class RegistroVehiculoComponent implements OnInit {
     // const x = GLOBAL.duplicarJson(form.value);
     // console.log('x ', x);
     // const obj = {
-    //   user_id: this.usuario.id,
+    // user_id: this.fun.getUser().id,
     //   tipo_articulo_id: _.parseInt(x.tipo_articulo_id),
     //   nombre: x.nombre,
     //   costo_principal: GLOBAL.desformatear(x.costo_principal),

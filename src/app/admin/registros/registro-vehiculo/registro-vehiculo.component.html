@@ -9,7 +9,7 @@
           <div class="col-6">
             <div class="form-group">
               <label class="control-label">Propietario: <span style="color: red">*</span></label>
-              <ng-select formControlName="user_id" (change)="selectPropietario()" [items]="listaPropietarios" bindLabel="nombreCompleto" bindValue="id" [clearable]="false">
+              <ng-select id="user_id" formControlName="user_id" (change)="selectPropietario()" [items]="listaPropietarios" bindLabel="nombreCompleto" bindValue="id" [clearable]="false">
                 <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                   <div>
                     <span>{{ item.nombreCompleto }} </span>
@@ -44,10 +44,14 @@
         </div>
       </div>
     </div>
+    <div class="mt-4 p-2">
+      <a class="btn mr-2" id="btn-gris" (click)="abrirModalFormulario('marcas')">Marcas</a>
+      <a class="btn mr-2" id="btn-gris" (click)="abrirModalFormulario('modelos')">Modelos</a>
+    </div>
   </div>
 
   <div class="col-6">
-    <h4>Listado articulos</h4>
+    <h4>Listado camiones</h4>
 
     <div class="card cardListados">
       <app-tablas

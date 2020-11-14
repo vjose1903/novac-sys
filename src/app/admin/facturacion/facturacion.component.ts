@@ -94,6 +94,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     Caja: 'Cajas',
     Paquete: 'Paquetes',
     Unidad: 'Unidades',
+    Saco: 'Sacos',
   };
   // listaArticulos: any;
   usuario: any;
@@ -645,7 +646,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
     this.mServ.mostrarModal(true);
     console.log('abrir modal');
-    
+
   }
 
   decisionModal(arg) {

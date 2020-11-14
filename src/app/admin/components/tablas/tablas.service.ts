@@ -5,7 +5,7 @@ export const DATATABLE = new BehaviorSubject<any>({});
 
 export const obj_paginate = {
   page: 1,
-  per_page: 10,
+  per_page: 20,
   searchText: '',
 };
 

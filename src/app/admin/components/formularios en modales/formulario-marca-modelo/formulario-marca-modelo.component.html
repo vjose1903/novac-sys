@@ -1,0 +1,116 @@
+<!-- <div class="row" style="height: calc(100% - 60px);"> -->
+<div class="row" style="height: 100%">
+  <div class="col-12" style="max-height: 2rem">
+    <h4>{{ tituloTabla }}</h4>
+  </div>
+  <div class="col-md-6 contenedorRegistro">
+    <div class="card card-padding sombra">
+      <form [formGroup]="form">
+        <div class="row">
+          <div *ngIf="tipo_formulario !== 'modelos'" class="col-md-12">
+            <div class="form-group">
+              <label class="control-label">{{ campo1 }}: <span style="color: red">*</span></label>
+              <input
+                (keyup)="capitalice('descripcion', $event.target.value)"
+                (focus)="$event.target.select()"
+                type="text"
+                id="descripcion"
+                formControlName="descripcion"
+                class="form-control mb-2"
+                autocomplete="off"
+              />
+              <div
+                class="alerta position-absolute text-danger ml-1"
+                style="font-size: 12px"
+                *ngIf="!form.controls['descripcion'].valid && (form.controls['descripcion'].dirty || form.controls['descripcion'].touched)"
+              >
+                Este Campo es obligatorio
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="tipo_formulario === 'modelos'" class="col-md-12">
+            <div class="form-group">
+              <label class="control-label">Marca: <span style="color: red">*</span></label>
+              <ng-select id="marca_modal" formControlName="marca_id" [items]="listaMarcas" bindLabel="descripcion" bindValue="id" [clearable]="false">
+                <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
+                  <div>
+                    <span>{{ item.descripcion }} </span>
+                  </div>
+                </ng-template>
+              </ng-select>
+            </div>
+          </div>
+          <div *ngIf="tipo_formulario === 'modelos'" class="col-md-12">
+            <div class="form-group">
+              <label class="control-label">Modelo: <span style="color: red">*</span></label>
+              <input
+                (keyup)="capitalice('descripcion', $event.target.value)"
+                (focus)="$event.target.select()"
+                type="text"
+                id="descripcion"
+                formControlName="descripcion"
+                class="form-control mb-2"
+                autocomplete="off"
+              />
+              <div
+                class="alerta position-absolute text-danger ml-1"
+                style="font-size: 12px"
+                *ngIf="!form.controls['descripcion'].valid && (form.controls['descripcion'].dirty || form.controls['descripcion'].touched)"
+              >
+                Este Campo es obligatorio
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="row">
+        <div class="col-md-12 mt-3">
+          <div class="from-group">
+            <a class="btn mr-2" id="btn-gris" (click)="accion(false)">Salir</a>
+            <a *ngIf="editando" class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
+            <input [disabled]="!form.valid" (click)="submit()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6" style="height: calc(100% - 2.5rem)">
+    <div id="cardTabla" style="height: 100%">
+      <app-tablas
+        *ngIf="listado && info"
+        [info]="info"
+        [data]="listado"
+        [focusRow]="false"
+        [botones]="botones"
+        (DevolverInfo)="editarItem($event)"
+        (ESTADO)="abrirModal($event)"
+        [id_tabla]="'tabla_frm_marca_modelo'"
+        (paginateChange)="pedirNuevaData($event)"
+      ></app-tablas>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showModal" class="overlay">
+  <p-dialog
+    *ngIf="tipoModal === 'borrar' && seleccionModal"
+    header="Confirmar"
+    [(visible)]="showModal"
+    [responsive]="true"
+    [style]="{ width: '350px', minWidth: '200px' }"
+    [baseZIndex]="12000"
+    (onHide)="reinicioModal()"
+    blockScroll="true"
+    positionTop="10"
+  >
+    <p *ngIf="tipo_formulario !== 'modelos'">Desea remover {{ seleccionModal.descripcion }} de la lista</p>
+    <p *ngIf="tipo_formulario == 'modelos'">Desea remover {{ seleccionModal.marca.descripcion }} {{ seleccionModal.descripcion }} de la lista</p>
+    <p-footer>
+      <button type="button" mdbBtn (click)="reinicioModal(false)" class="btn-peque btn-light">No</button>
+      <button type="button" mdbBtn (click)="decisionBorrar(true)" class="btn-peque btn-success">Si</button>
+    </p-footer>
+  </p-dialog>
+</div>

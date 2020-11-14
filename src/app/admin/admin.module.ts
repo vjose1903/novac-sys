@@ -23,18 +23,17 @@ import { ProduccionComponent } from './produccion/produccion.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MovimientosFormComponent } from './inventario/movimientos-form/movimientos-form.component';
 import { IngresosComponent } from './recibo-ingresos/ingresos.component';
-import { FormCantidadEfectivoComponent } from './facturacion/form-cantidad-efectivo/form-cantidad-efectivo.component';
+
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { BuscarFacturaComponent } from './manipular facturas/buscar-factura/buscar-factura.component';
 import { NotasCredDebComponent } from './manipular facturas/notas-cred-deb/notas-cred-deb.component';
 import { NcfComponent } from './registros/ncf/ncf.component';
-import { ChangePasswordComponent } from './components/change-password/change-password.component';
+
 import { ModalComponent } from './components/modal/modal.component';
 import { BTNcircularComponent } from './components/btncircular/btncircular.component';
 import { UploadImgComponent } from './components/upload-img/upload-img.component';
-import { PendienteFormComponent } from './components/pendiente-form/pendiente-form.component';
-import { FormarFacturaComponent } from './components/formar-factura/formar-factura.component';
+
 import { TablasModule } from './components/tablas/tablas.module';
 import { ModalHistorialPagosComponent } from './recibo-ingresos/modal-historial-pagos/modal-historial-pagos.component';
 import { ConduceComponent } from './conduce/conduce.component';
@@ -47,6 +46,11 @@ import { ReportesComponent } from './reportes/reportes.component';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { RegistroVehiculoComponent } from './registros/registro-vehiculo/registro-vehiculo.component';
+import { ChangePasswordComponent } from './components/formularios en modales/change-password/change-password.component';
+import { FormarFacturaComponent } from './components/formularios en modales/formar-factura/formar-factura.component';
+import { FormularioMarcaModeloComponent } from './components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
+import { PendienteFormComponent } from './components/formularios en modales/pendiente-form/pendiente-form.component';
+import { FormCantidadEfectivoComponent } from './facturacion/form-cantidad-efectivo/form-cantidad-efectivo.component';
 
 @NgModule({
   declarations: [
@@ -81,6 +85,7 @@ import { RegistroVehiculoComponent } from './registros/registro-vehiculo/registr
     ModalSeleccinarArticuloComponent,
     ReciboViajesComponent,
     ReportesComponent,
+    FormularioMarcaModeloComponent,
   ],
   imports: [
     PrimengModule,

@@ -18,6 +18,41 @@ import { LoaderService } from '../../../loader/loader.service';
   styleUrls: ['./registro-articulos.component.scss'],
 })
 export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges {
+  // =============================================
+  //  TABLAS
+  // =============================================
+
+  info = [
+    {
+      titulo: 'Cod.',
+      key: 'codigo',
+      customClass: true,
+      estilos: [{ width: '3rem' }],
+    },
+    {
+      titulo: 'Articulo',
+      key: 'nombre',
+      customClass: true,
+      estilos: [{ width: '13rem' }, { 'text-align': 'left' }, { 'padding-left': '1.5rem' }],
+    },
+    {
+      titulo: 'Medida',
+      key: 'medida',
+      customClass: true,
+      estilos: [{ width: '4rem' }],
+    },
+    {
+      titulo: 'Precio',
+      key: 'precio_principal',
+      formatoNumero: true,
+    },
+  ];
+  botones = {
+    titulo: true,
+    borrar: true,
+    editar: true,
+  };
+
   titulo = '';
   boton = '';
   form: FormGroup;
@@ -53,6 +88,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   obj_paginate_ = obj_paginate;
   vendido_en: any;
   listaMateriasPrimas = [];
+  vendidoEn = [
+    { backend: 'Unidad', front: 'Unidad' },
+    { backend: 'Saco', front: 'Saco' },
+    { backend: 'Galon', front: 'Galón' },
+  ];
   FechaFactura: string;
 
   constructor(
@@ -112,6 +152,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   getTipoArticulos() {
     this.dbServ.getTipoArticulos().subscribe((res) => {
       this.listaTipoArticulos = GLOBAL.duplicarJson(res);
+      console.log(this.listaTipoArticulos);
     });
   }
 
@@ -125,10 +166,15 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   async getArticulos(e) {
     try {
+      this.listaArticulos = [];
       const page = e.page;
       const per_page = e.per_page;
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
       const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.FechaFactura, 'todos').toPromise();
+
+      res.data.map(async (arti) => {
+        arti.customStyles = { 'td-codigo': { width: '3rem' }, 'td-nombre': { width: '13rem', 'text-align': 'left', 'padding-left': '1.5rem' }, 'td-medida': { width: '4rem' } };
+      });
 
       this.listaArticulos = res.data;
       // this.listaArticulos = [...this.listaArticulos, ...this.listaArticulos, ...this.listaArticulos];
@@ -136,6 +182,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
         total: res.total_registros,
         tabla: 'listaArticulos',
       };
+      console.log(this.listaArticulos);
+
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
       this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
@@ -156,6 +204,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
         this.form.controls.medida.setValue('Quintal');
         this.fillDropAlerta('Quintal');
         this.is_combo = true;
+        this.form.controls.costo_principal.reset(null);
+        this.form.controls.precio_principal.reset(null);
       });
     } else {
       this.ARRAY_FORMULA = ([] as unknown) as FormArray;
@@ -168,17 +218,17 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   }
   createForm() {
     this.form = this.fb.group({
-      nombre: [null],
-      tipo_articulo_id: [null],
-      medida: [null],
-      costo_principal: [null],
-      precio_principal: [null],
+      nombre: [null, Validators.required],
+      tipo_articulo_id: [null, Validators.required],
+      medida: [null, Validators.required],
+      costo_principal: [null, Validators.required],
+      precio_principal: [null, Validators.required],
       is_detallable: [false],
       fecha_ingreso: [new Date()],
-      aviso_existencia: [null],
+      aviso_existencia: [null, Validators.required],
       calcular_itbis: [false],
       existencia: [0],
-      medida_alerta: [null],
+      medida_alerta: [null, Validators.required],
       cantidad_contenido_padre: [null],
       medida_contenido_padre: [null],
       precio_padre: [null],
@@ -189,7 +239,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       id: [null],
       id_contenido_padre: [null],
       id_contenido_hijo: [null],
-      vendido_en: [null],
+      vendido_en: [null, Validators.required],
 
       referencia_padre: [null],
       referencia_hijo: [null],
@@ -281,14 +331,14 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   resetCompradoEn(value) {
-    this.FORM.medida_contenido_padre.value = null;
-    this.FORM.medida_contenido_hijo.value = null;
-    this.FORM.cantidad_contenido_padre.value = null;
-    this.FORM.cantidad_contenido_hijo.value = null;
+    this.form.controls.medida_contenido_padre.setValue(null);
+    this.form.controls.medida_contenido_hijo.setValue(null);
+    this.form.controls.cantidad_contenido_padre.setValue(null);
+    this.form.controls.cantidad_contenido_hijo.setValue(null);
 
-    this.FORM.precio_padre.value = null;
-    this.FORM.precio_libra.value = null;
-    this.FORM.precio_hijo.value = null;
+    this.form.controls.precio_padre.setValue(null);
+    this.form.controls.precio_libra.setValue(null);
+    this.form.controls.precio_hijo.setValue(null);
 
     this.FORM.rowFormula.reset();
 
@@ -485,102 +535,93 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     let res = true;
     const FORM = this.form.controls;
 
-    if (this.ARRAY_FORMULA.length === 0) {
-      if (
-        FORM.nombre.value !== null &&
-        FORM.tipo_articulo_id.value !== null &&
-        FORM.medida.value !== null &&
-        FORM.costo_principal.value !== null &&
-        FORM.precio_principal.value !== null &&
-        FORM.aviso_existencia.value !== null &&
-        FORM.medida_alerta.value !== null
-      ) {
-        if (this.COMPRADOEN === 'Unidad' || this.COMPRADOEN === 'Libra') {
-          res = false;
-        }
-
-        if (this.COMPRADOEN === 'Quintal') {
-          if (FORM.cantidad_contenido_padre.value !== null && (FORM.precio_padre.value !== null) !== null && FORM.costo_padre.value !== null) {
-            res = false;
-          } else {
-            res = true;
-          }
-        }
-
-        if (FORM.tipo_articulo_id.value === '2') {
-          if (FORM.vendido_en.value) {
-            res = false;
-          } else {
-            res = true;
-          }
-        }
-
-        if (this.COMPRADOEN === 'Caja') {
-          if (this.MEDIDACAJA === 'Unidad') {
-            if (FORM.medida_contenido_padre.value !== null && FORM.cantidad_contenido_padre !== null && (FORM.precio_padre !== null) !== null && FORM.costo_padre !== null) {
-              res = false;
-            } else {
-              res = true;
-            }
-          } else {
-            if (
-              FORM.medida_contenido_hijo.value !== null &&
-              FORM.medida_contenido_padre.value !== null &&
-              FORM.cantidad_contenido_padre.value !== null &&
-              (FORM.precio_padre.value !== null) !== null &&
-              FORM.costo_padre.value !== null &&
-              FORM.cantidad_contenido_hijo.value !== null &&
-              (FORM.precio_hijo.value !== null) !== null &&
-              FORM.costo_hijo.value !== null
-            ) {
-              res = false;
-            } else {
-              res = true;
-            }
-          }
-        }
-      }
-      if (this.Ispaquete) {
+    if (this.form.valid) {
+      if (this.form.controls['tipo_articulo_id'].value === '3') {
         res = true;
+
+        this.ARRAY_FORMULA.controls.forEach((row, i) => {
+          if ((row as any).controls['articulo_id'].value && (row as any).controls['cantidad_formula'].value) {
+            res = false;
+          } else {
+            res = true;
+          }
+        });
+      } else {
+        res = false;
       }
     } else {
-      if (
-        FORM.nombre.value !== null &&
-        FORM.tipo_articulo_id.value !== null &&
-        FORM.medida.value !== null &&
-        FORM.costo_principal.value !== null &&
-        FORM.precio_principal.value !== null &&
-        FORM.aviso_existencia.value !== null &&
-        FORM.medida_alerta.value !== null
-      ) {
-        if (this.ARRAY_FORMULA.controls.length > 0) {
-          this.ARRAY_FORMULA.controls.forEach((row, i) => {
-            if (
-              (row as any).controls['articulo_id'].value !== null &&
-              (row as any).controls['cantidad_formula'].value !== null &&
-              (row as any).controls['articulo_id'].value !== undefined &&
-              (row as any).controls['cantidad_formula'].value !== undefined &&
-              (row as any).controls['articulo_id'].value !== ' ' &&
-              (row as any).controls['cantidad_formula'].value !== ' ' &&
-              (row as any).controls['articulo_id'].value !== '' &&
-              (row as any).controls['cantidad_formula'].value !== ''
-            ) {
-              res = false;
-            } else {
-              res = true;
-            }
-          });
-        }
-      }
+      res = true;
     }
+    // if (this.ARRAY_FORMULA.length === 0) {
+    //     if (this.COMPRADOEN === 'Unidad') {
+    //       res = false;
+    //     }
+
+    //     if (this.COMPRADOEN === 'Quintal') {
+    //       if (FORM.cantidad_contenido_padre.value !== null && (FORM.precio_padre.value !== null) !== null && FORM.costo_padre.value !== null) {
+    //         res = false;
+    //       } else {
+    //         res = true;
+    //       }
+    //     }
+
+    //     if (FORM.tipo_articulo_id.value === '2') {
+    //       if (FORM.vendido_en.value) {
+    //         res = false;
+    //       } else {
+    //         res = true;
+    //       }
+    //     }
+
+    //     if (this.COMPRADOEN === 'Caja') {
+    //       if (this.MEDIDACAJA === 'Unidad') {
+    //         if (FORM.medida_contenido_padre.value !== null && FORM.cantidad_contenido_padre !== null && (FORM.precio_padre !== null) !== null && FORM.costo_padre !== null) {
+    //           res = false;
+    //         } else {
+    //           res = true;
+    //         }
+    //       } else {
+    //         if (
+    //           FORM.medida_contenido_hijo.value !== null &&
+    //           FORM.medida_contenido_padre.value !== null &&
+    //           FORM.cantidad_contenido_padre.value !== null &&
+    //           (FORM.precio_padre.value !== null) !== null &&
+    //           FORM.costo_padre.value !== null &&
+    //           FORM.cantidad_contenido_hijo.value !== null &&
+    //           (FORM.precio_hijo.value !== null) !== null &&
+    //           FORM.costo_hijo.value !== null
+    //         ) {
+    //           res = false;
+    //         } else {
+    //           res = true;
+    //         }
+    //       }
+    //     }
+    //   }
+    //   if (this.Ispaquete) {
+    //     res = true;
+    //   }
+    // } else {
+    //   if (this.form.valid) {
+    //     if (this.ARRAY_FORMULA.controls.length > 0) {
+    //       this.ARRAY_FORMULA.controls.forEach((row, i) => {
+    //         if ((row as any).controls['articulo_id'].value && (row as any).controls['cantidad_formula'].value) {
+    //           res = false;
+    //         } else {
+    //           res = true;
+    //         }
+    //       });
+    //     }
+    //   }
+    // }
     return res;
   }
 
   fillDropAlerta(medida) {
     if (medida === 'Quintal') {
       this.optionsAlerta = ['Quintal', 'Libra'];
-    } else if (medida === 'Libra') {
-      this.optionsAlerta = ['Libra'];
+    } else if (medida === 'Saco') {
+      this.optionsAlerta = ['Saco', 'Libra'];
     } else if (medida === 'Caja') {
       this.optionsAlerta = ['Caja', 'Paquete', 'Unidad'];
     } else if (medida === 'Unidad') {
@@ -765,7 +806,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   formarContenido() {
     const x = GLOBAL.duplicarJson(this.form.value);
 
-    if (x.medida === 'Quintal') {
+    if (x.medida === 'Quintal' || x.medida === 'Saco') {
       x.medida_contenido_padre = 'Libra';
     }
 
@@ -773,8 +814,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       referencia: null,
       id: x.id_contenido_padre,
       costo: _.isString(x.costo_padre) ? parseFloat(x.costo_padre) : x.costo_padre,
-      precio: GLOBAL.desformatear(x.medida === 'Caja' ? x.precio_padre : x.precio_libra),
-      cantidad: x.medida === 'Caja' ? x.cantidad_contenido_padre : 100,
+      precio: GLOBAL.desformatear(x.medida === 'Caja' || x.medida === 'Saco' ? x.precio_padre : x.precio_libra),
+      cantidad: x.medida === 'Caja' || x.medida === 'Saco' ? x.cantidad_contenido_padre : 100,
       medida: x.medida_contenido_padre,
       condicion: 'padre',
     };
@@ -968,33 +1009,4 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       }
     }
   }
-
-  // =============================================
-  //  TABLAS
-  // =============================================
-
-  info = [
-    {
-      titulo: 'Cod.',
-      key: 'codigo',
-    },
-    {
-      titulo: 'Articulo',
-      key: 'nombre',
-    },
-    {
-      titulo: 'Medida',
-      key: 'medida',
-    },
-    {
-      titulo: 'Precio',
-      key: 'precio_principal',
-      formatoNumero: true,
-    },
-  ];
-  botones = {
-    titulo: true,
-    borrar: true,
-    editar: true,
-  };
 }

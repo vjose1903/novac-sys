@@ -12,7 +12,16 @@ export class InterceptorService implements HttpInterceptor {
   constructor(public loaderService: LoaderService, private fun: FunctionService) {}
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.fun.getAuthToken();
-    this.loaderService.isLoading.next(true);
+    const spinner = request.params.get('spinner');
+
+    if (spinner && spinner === 'no') {
+      // remove parameter spinner y no ejecuta el loader
+      request.params.delete('spinner');
+    } else {
+      // Activa el loader
+      this.loaderService.isLoading.next(true);
+    }
+
     if (token) {
       request = request.clone({
         setHeaders: {

@@ -25,7 +25,7 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
   @Input() data;
   @Output() cancel = new EventEmitter<any>();
   medidas;
-  plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades' };
+  plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
   constructor(private dbServ: DBservice, private fun: FunctionService, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {

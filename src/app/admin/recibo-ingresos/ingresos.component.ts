@@ -259,12 +259,12 @@ export class IngresosComponent implements OnInit, OnDestroy {
                 val.colorEstado = val.is_viaje ? 'green' : val.pagos.length > 0 ? 'black' : 'gris-claro';
                 val.iconHover = val.is_viaje ? false : val.pagos.length > 0 ? true : false;
 
-                val.customStyles = [
-                  { 'td-historyPagos': { estilos: [{ width: '2rem' }, { 'font-size': '1.2rem' }] } },
-                  { 'td-select': { estilos: [{ width: '6rem' }] } },
-                  { 'td-pagoT': { estilos: [{ width: '6rem' }] } },
-                  { 'td-numero_comprobante': { estilos: [{ width: '7rem' }] } },
-                ];
+                val.customStyles = {
+                  'td-historyPagos': { width: '2rem', 'font-size': '1.2rem' },
+                  'td-select': { width: '6rem' },
+                  'td-pagoT': { width: '6rem' },
+                  'td-numero_comprobante': { width: '7rem' },
+                };
 
                 val.pagos.forEach((abono) => {
                   this.totalPagado += abono.deposito;

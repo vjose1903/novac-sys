@@ -123,7 +123,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
 
         fact.estatus = fact.fecha_completada ? 'fas fa-check' : fact.pagos.length > 0 ? 'far fa-check-square' : 'far fa-square';
         fact.colorEstado = fact.fecha_completada ? 'green' : fact.pagos.length > 0 ? 'yellow' : 'red';
-        fact.customStyles = [{ 'td-estatus': { estilos: [{ width: '1.5rem' }] } }];
+        fact.customStyles = { 'td-estatus': { width: '1.5rem' } };
         fact.cliente_mostrar = fact.cliente.nombre;
         fact.fecha = moment(fact.fecha_equivalente).format('DD-MM-YYYY');
         fact.total_factura = this.recalcularMonto(fact.total_factura, fact.notas);

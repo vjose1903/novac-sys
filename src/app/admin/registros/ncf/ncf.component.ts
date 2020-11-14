@@ -31,6 +31,8 @@ export class NcfComponent implements OnInit, OnDestroy {
     {
       titulo: 'Cod.',
       key: 'codigo',
+      customClass: true,
+      estilos: [{ width: '3rem' }],
     },
     {
       titulo: 'Tipo',
@@ -54,6 +56,8 @@ export class NcfComponent implements OnInit, OnDestroy {
       text_color: 'colorUsado',
       isIcon: true,
       color: true,
+      customClass: true,
+      estilos: [{ width: '3.5rem' }],
     },
     {
       titulo: 'Activo',
@@ -61,6 +65,8 @@ export class NcfComponent implements OnInit, OnDestroy {
       text_color: 'colorEstado',
       isIcon: true,
       color: true,
+      customClass: true,
+      estilos: [{ width: '3.5rem' }],
     },
   ];
   botones = {
@@ -193,6 +199,8 @@ export class NcfComponent implements OnInit, OnDestroy {
           ncf.colorEstado = ncf.estado ? 'green' : 'red';
           ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
+
+          ncf.customStyles = { 'td-usado_': { width: '3.5rem' }, 'td-codigo': { width: '3rem' }, 'td-estado_': { width: '3.5rem' } };
 
           tempNCF.push(ncf);
         }

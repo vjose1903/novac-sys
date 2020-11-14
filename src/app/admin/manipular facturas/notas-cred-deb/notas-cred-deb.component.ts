@@ -198,12 +198,13 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
         detalle['cant'] = detalle.cantidad;
         detalle['cant_nota'] = 0;
 
-        detalle['customStyles'] = [
-          { 'td-select': { estilos: [{ width: '6rem' }] } },
-          { 'td-cantidad': { estilos: [{ width: '5rem' }] } },
-          { 'td-total_nota': { estilos: [{ width: '8rem' }] } },
-          { 'td-cant_nota': { estilos: [{ width: '8rem' }] } },
-        ];
+        detalle['customStyles'] = {
+          'td-select': { width: '6rem' },
+          'td-cantidad': { width: '5rem' },
+          'td-total_nota': { width: '8rem' },
+          'td-cant_nota': { width: '8rem' },
+        };
+
         if (this.tipoNota === 'credito') {
           detalle['min_'] = 0;
           detalle['max_'] = detalle.cantidad;

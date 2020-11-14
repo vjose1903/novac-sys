@@ -65,6 +65,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     Caja: 'Cajas',
     Paquete: 'Paquetes',
     Unidad: 'Unidades',
+    Saco: 'Sacos',
   };
   paginate_info = obj_paginate;
 
@@ -224,49 +225,13 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     if (this.paraFiltroClientes) {
       this.searchText = await this.paraFiltroClientes;
     }
-    // ================================================
 
-    for (let i = 0; i < this.info.length; i++) {
-      const info = this.info[i];
+    // this.changeStylesRows();
+    this.changeStylesTitles();
 
-      if (info.customClass) {
-        for (let j = 0; j < info.estilos.length; j++) {
-          const estilos = info.estilos[j];
-          const key = Object.keys(estilos)[0];
-          const value = Object.values(estilos)[0];
-          const columna = document.getElementById(info.titulo) as any;
-
-          columna.style[key] = value;
-        }
-      }
-    }
-
-    // recorrer la data
-    for (let i = 0; i < this.data.length; i++) {
-      const data = this.data[i];
-
-      if (data.customStyles) {
-        // recorrer el arreglo de estilos para ese row
-        for (let k = 0; k < data.customStyles.length; k++) {
-          const cStyle = data.customStyles[k];
-          const span_titulo = Object.keys(cStyle)[0];
-          const value_span = Object.values(cStyle)[0];
-          const estilos = (value_span as any).estilos;
-          // recorrer el arreglo de estilos para cada columna
-          for (let j = 0; j < estilos.length; j++) {
-            const style = estilos[j];
-            const key = Object.keys(style)[0];
-            const value = Object.values(style)[0];
-            const span = span_titulo + '-' + i;
-            const span_ = document.getElementById(span) as any;
-            span_.style[key] = value;
-          }
-        }
-      }
-    }
-    // ================================================
     setTimeout(() => {
       this.ready = true;
+      console.log(this.data);
     }, 250);
   }
 
@@ -308,8 +273,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     this.alto = undefined;
     this.searchText = '';
-    this.reinicioModal.emit()
-    
+    this.reinicioModal.emit();
   }
 
   resetInput(referencia, destino, i, formatear, especifico?) {
@@ -358,7 +322,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   pagActual = 1;
   mostrar = this.paginate_info.per_page;
-  listaMostrar = [10, 15, 20];
+  listaMostrar = [20, 40, 60];
   total_registros;
 
   cambiaMostrar(num: number) {
@@ -383,6 +347,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const temp = GLOBAL.duplicarJson(this.ROW + '0');
     this.IDROW = null;
     this.pagActual = arg;
+    console.log('this.pagActual ---> ', this.pagActual);
 
     this.paginate_info = {
       page: arg,
@@ -538,7 +503,87 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[0])) + '  ' + fin;
   }
 
+  getStyle(column, i) {
+    if (this.data) {
+      const styles = this.data[i] ? (this.data[i].customStyles ? this.data[i].customStyles[`td-${column}`] : {}) : {};
+      return styles;
+    } else {
+      return {};
+    }
+  }
+
+  changeStylesRows() {
+    // recorrer la data
+    for (let i = 0; i < this.data.length; i++) {
+      const data = this.data[i];
+
+      if (data.customStyles) {
+        // recorrer el arreglo de estilos para ese row
+
+        for (let k = 0; k < data.customStyles.length; k++) {
+          const cStyle = data.customStyles[k];
+          const span_titulo = Object.keys(cStyle)[0];
+          const value_span = Object.values(cStyle)[0];
+          const estilos = (value_span as any).estilos;
+          let list_estilos = '';
+
+          // recorrer el arreglo de estilos para cada columna
+          for (let j = 0; j < estilos.length; j++) {
+            const style = estilos[j];
+            const key = Object.keys(style)[0];
+            const value = Object.values(style)[0];
+            list_estilos += `${key}: ${value} !important; `;
+          }
+          const span = span_titulo + '-' + i;
+          const span_ = document.getElementById(span) as any;
+
+          if (span_) {
+            console.log(span_);
+
+            span_.setAttribute('style', list_estilos);
+          }
+        }
+      }
+    }
+  }
+  changeStylesTitles() {
+    for (let i = 0; i < this.info.length; i++) {
+      const info = this.info[i];
+
+      if (info.customClass) {
+        let list_estilos_titulos = '';
+        for (let j = 0; j < info.estilos.length; j++) {
+          const estilos = info.estilos[j];
+          const key = Object.keys(estilos)[0];
+          const value = Object.values(estilos)[0];
+
+          // columna.style[key] = value;
+          list_estilos_titulos += `${key}: ${value} !important; `;
+        }
+
+        const columna = document.getElementById(info.titulo) as any;
+
+        if (columna) {
+          columna.setAttribute('style', list_estilos_titulos);
+        }
+      }
+    }
+  }
+
   ngOnChanges(simpleChanges) {
+    if (simpleChanges.data && simpleChanges.data.currentValue) {
+      // ================================================
+      // CUSTOM STYLES
+      // ================================================
+      setTimeout(() => {
+        console.log('#########');
+        // this.changeStylesRows();
+        this.changeStylesTitles();
+        console.log('#########');
+      }, 1);
+      // ================================================
+    }
+
     if (simpleChanges.data && simpleChanges.info) {
       if (simpleChanges.data.currentValue && simpleChanges.info.currentValue) {
         setTimeout(() => {

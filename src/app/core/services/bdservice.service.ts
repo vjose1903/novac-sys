@@ -355,6 +355,59 @@ export class DBservice {
   }
 
   // =====================================================================
+  // MARCAS
+  // =====================================================================
+
+  getMarcas() {
+    return this.peticion(`marcas`, 'get');
+  }
+
+  updateMarca(arg) {
+    const id = arg.id;
+
+    return this.peticion('marcas/' + id, 'patch', JSON.stringify(arg));
+  }
+
+  createMarca(arg) {
+    return this.peticion('marcas', 'post', JSON.stringify(arg));
+  }
+
+  getMarcasFiltradas(arg, page, per_page, paginado) {
+    return this.peticionSinLoad(`marcas/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  }
+
+  // =====================================================================
+  // MODELOS
+  // =====================================================================
+
+  createModelo(arg) {
+    return this.peticion('modelos', 'post', JSON.stringify(arg));
+  }
+
+  updateModelo(arg) {
+    const id = arg.id;
+    return this.peticion('modelos/' + id, 'patch', JSON.stringify(arg));
+  }
+
+  getModelosFiltrados(arg, page, per_page, paginado) {
+    return this.peticionSinLoad(`modelos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  }
+
+  getModelos(page, per_page, paginado) {
+    return this.peticionSinLoad(`modelos?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  }
+
+  getModelosByMarca(marca) {
+    return this.peticionSinLoad(`modelos/por_marca/${marca}`, 'get');
+  }
+
+  // =====================================================================
+  // DELETE
+  // =====================================================================
+  deleteItem(id, item) {
+    return this.peticion(`${item}/${id}`, 'delete');
+  }
+  // =====================================================================
   // TOASTS
   // =====================================================================
   toastSuccess(msg?, titulo?, excepcion?) {

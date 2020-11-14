@@ -298,7 +298,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
                 val.select = 'far fa-eye-slash';
 
                 val.iconsMoveEvents = [{ key: 'select', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
-                val.customStyles = [{ select: { estilos: [{ 'font-size': '1.5rem' }] } }, { 'td-estatus': { estilos: [{ width: '2rem' }] } }];
+                // val.customStyles = [{ select: { estilos: [{ 'font-size': '1.5rem' }] } }, { 'td-estatus': { estilos: [{ width: '2rem' }] } }];
+                val.customStyles = { select: { 'font-size': '1.5rem' }, 'td-estatus': { width: '2rem' } };
 
                 return val;
               })),
