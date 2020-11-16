@@ -215,7 +215,7 @@ export class NcfComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error(error);
 
-      this.dbServ.toastError('Error buscando Paquetes de NCF registrados.', 'ERROR');
+      this.dbServ.toastError('Error buscando Paquetes de NCF registrados.', 'ERROR', true);
     }
   }
 
@@ -294,7 +294,7 @@ export class NcfComponent implements OnInit, OnDestroy {
       this.borrar();
     } catch (error) {
       console.error(error);
-      this.dbServ.toastError(error.error.msg, 'ERROR');
+      this.dbServ.toastError(error.error.msg, 'ERROR', true);
     }
   }
   abilitarBtnSend() {
@@ -367,7 +367,7 @@ export class NcfComponent implements OnInit, OnDestroy {
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR');
+        this.dbServ.toastError(error, 'ERROR', true);
       });
     } else {
       for (const key in arg) {
@@ -375,7 +375,7 @@ export class NcfComponent implements OnInit, OnDestroy {
           const element = arg[key];
 
           if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR');
+            this.dbServ.toastError(element, 'ERROR', true);
           }
         }
       }

@@ -218,6 +218,10 @@ export class DBservice {
   // USUARIOS
   // =====================================================================
 
+  getEmpleadosNames() {
+    return this.peticion('users/custom/names', 'get');
+  }
+
   getEmpleados() {
     return this.peticion('users', 'get');
   }
@@ -402,6 +406,22 @@ export class DBservice {
   }
 
   // =====================================================================
+  // CAMIONES
+  // =====================================================================
+  createVehiculos(arg) {
+    return this.peticion('vehiculos', 'post', JSON.stringify(arg));
+  }
+
+  updateVehiculos(arg) {
+    const id = arg.id;
+    return this.peticion('vehiculos/' + id, 'patch', JSON.stringify(arg));
+  }
+
+  getVehiculosFiltrados(arg, page, per_page, paginado) {
+    return this.peticionSinLoad(`vehiculos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  }
+
+  // =====================================================================
   // DELETE
   // =====================================================================
   deleteItem(id, item) {
@@ -410,7 +430,7 @@ export class DBservice {
   // =====================================================================
   // TOASTS
   // =====================================================================
-  toastSuccess(msg?, titulo?, excepcion?) {
+  toastSuccess(msg?, titulo?, excepcion = true) {
     const msg_ = msg;
     if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
       this.ultimoMensajeMostrado = msg_;

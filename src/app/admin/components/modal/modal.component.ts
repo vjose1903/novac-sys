@@ -117,23 +117,12 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
       if (res !== undefined && res !== null && !this.paraFiltroArticulos && !this.paraFiltroClientes) {
         this.showModal = res;
-        console.log('showModal ', this.showModal);
       }
 
       if (res === false) {
         this.showModal = res;
       }
     });
-
-    // this.subCalcularHeigth = this.mServ.CALCULARHEIGHT.subscribe((res) => {
-    //   if (res) {
-    //     setTimeout(() => {
-    //       if (document.getElementsByClassName('ui-dialog-content') && document.getElementsByClassName('ui-dialog-content')[0]) {
-    //         this.altoDiv = (document.getElementsByClassName('ui-dialog-content')[0] as any).offsetHeight + 30;
-    //       }
-    //     }, 10);
-    //   }
-    // });
 
     this.subTipo = this.mServ.TIPOMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
@@ -212,6 +201,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   ngOnChanges(simpleChanges) {
+    console.log('TMM--> ', simpleChanges);
     // if (this.seleccionModal) {
     //   if (this.tipoModal === 'buscar') {
     //     this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
@@ -325,7 +315,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         }
       } catch (error) {
         console.error(error);
-        this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
+        this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);
+        this.mServ.mostrarModal(false);
       }
     } else if (this.paraFiltroClientes) {
       try {
@@ -335,7 +326,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         if (res.data.length === 0) {
           this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO');
-          this.reinicioModal();
+          this.mServ.mostrarModal(false);
+          // this.reinicioModal();
         } else {
           res.data.map(async (cli) => {
             cli.nombre = GLOBAL.Capitalice(cli.nombre);
@@ -357,7 +349,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         }
       } catch (error) {
         console.error(error);
-        this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
+        this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
+        this.mServ.mostrarModal(false);
       }
     } else if (this.paraFiltroSuplidor) {
       try {
@@ -373,6 +366,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         if (res.data.length === 0) {
           this.dbServ.toastWarning('No existe suplidor con el nombre introducido', 'AVISO');
+          this.mServ.mostrarModal(false);
         }
         const obj = {
           total: res.total_registros,
@@ -381,7 +375,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.tServ.Func_total_paginas(obj);
       } catch (error) {
         console.error(error);
-        this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
+        this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
+        this.mServ.mostrarModal(false);
       }
     }
   }

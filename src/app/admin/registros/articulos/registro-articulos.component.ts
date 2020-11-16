@@ -186,7 +186,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
-      this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
+      this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);
     }
   }
 
@@ -899,11 +899,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
           this.borrar();
 
-          this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
+          this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto', true);
         },
         (err) => {
           this.mostrarErrores(err.error);
-          // this.dbServ.toastError(err.error, 'Error');
+          // this.dbServ.toastError(err.error, 'Error', true);
         },
       );
       //
@@ -913,11 +913,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
           this.getArticulos(obj_paginate);
 
           this.borrar();
-          this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
+          this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto', true);
         },
         (err) => {
           this.mostrarErrores(err.error);
-          // this.dbServ.toastError(err.error, 'Error');
+          // this.dbServ.toastError(err.error, 'Error', true);
         },
       );
     }
@@ -926,7 +926,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR');
+        this.dbServ.toastError(error, 'ERROR', true);
       });
     } else {
       for (const key in arg) {
@@ -934,7 +934,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
           const element = arg[key];
 
           if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR');
+            this.dbServ.toastError(element, 'ERROR', true);
           }
         }
       }
@@ -983,7 +983,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       }
       //
       if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
-        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
+        this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
         this.enfocarInput(id);
       } else {
         //

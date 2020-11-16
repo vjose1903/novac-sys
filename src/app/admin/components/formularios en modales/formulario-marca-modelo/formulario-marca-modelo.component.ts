@@ -67,7 +67,7 @@ export class FormularioMarcaModeloComponent implements OnInit {
       this.componente = 'reg_modelos';
       this.tituloTabla = 'Modelos';
       this.campo1 = 'Marca';
-      // this.getMarcas();
+      this.getMarcas();
 
       // this.enfocarInput('marca');
 
@@ -92,10 +92,13 @@ export class FormularioMarcaModeloComponent implements OnInit {
     }, 200);
   }
 
-  getMarcas(e) {
-    // this.dbServ.getMarcasFiltradas(,0, 0, false).subscribe((res) => {
-    //   this.listaMarcas = GLOBAL.duplicarJson(res);
-    // });
+  getMarcas() {
+    // const page = e.page;
+    // const per_page = e.per_page;
+    // const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+    this.dbServ.getMarcasFiltradas(' ', 0, 0, false).subscribe((res) => {
+      this.listaMarcas = GLOBAL.duplicarJson(res);
+    });
   }
 
   capitalice(control, arg) {
@@ -115,19 +118,20 @@ export class FormularioMarcaModeloComponent implements OnInit {
 
     if (this.componente === 'reg_modelos') {
       try {
-        const res = await this.dbServ.getModelosFiltrados(palabra_a_buscar, arg.page, arg.per_page, true).toPromise();
+        const res_modelos = await this.dbServ.getModelosFiltrados(palabra_a_buscar, arg.page, arg.per_page, true).toPromise();
+        const res_marcas = await this.dbServ.getModelosFiltrados(palabra_a_buscar, arg.page, arg.per_page, true).toPromise();
 
-        res.data.map((obj) => {
+        res_modelos.data.map((obj) => {
           obj.marca_nombre = obj.marca.descripcion;
           return obj;
         });
 
-        this.listado = res.data;
-        this.tServ.Func_total_paginas(res.total_registros);
+        this.listado = res_modelos.data;
+        this.tServ.Func_total_paginas(res_modelos.total_registros);
       } catch (error) {
         console.error(error);
 
-        this.dbServ.toastError('Error buscando modelos', 'ERROR');
+        this.dbServ.toastError('Error buscando modelos', 'ERROR', true);
       }
     } else if (this.componente === 'reg_marcas') {
       try {
@@ -138,7 +142,7 @@ export class FormularioMarcaModeloComponent implements OnInit {
       } catch (error) {
         console.error(error);
 
-        this.dbServ.toastError('Error buscando marcas', 'ERROR');
+        this.dbServ.toastError('Error buscando marcas', 'ERROR', true);
       }
     }
   }
@@ -181,7 +185,7 @@ export class FormularioMarcaModeloComponent implements OnInit {
           this.enfocarInput('descripcion');
         }
       } catch (error) {
-        this.dbServ.toastError('Error editando item ', 'ERROR');
+        this.dbServ.toastError('Error editando item ', 'ERROR', true);
       }
     } else {
       // ------------------------------------------- CREANDO -------------------------------------------
@@ -256,7 +260,7 @@ export class FormularioMarcaModeloComponent implements OnInit {
         this.listado = temp;
         this.reinicioModal();
       } catch (error) {
-        this.dbServ.toastError('Error eliminando ' + tipo_e, 'ERROR');
+        this.dbServ.toastError('Error eliminando ' + tipo_e, 'ERROR', true);
       }
     }
   }

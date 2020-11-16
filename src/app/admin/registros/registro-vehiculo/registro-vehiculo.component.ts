@@ -20,69 +20,28 @@ export class RegistroVehiculoComponent implements OnInit {
   titulo = '';
   boton = '';
   form: FormGroup;
-
-  isDetallable = false;
-  medida: boolean;
-
-  articuloSelected;
-
-  vendersePorSelected;
+  phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   listaVehiculos;
   FORM: any;
-  listaTipoArticulos: any;
-  listaSuplidores: any;
+
   tipoModal: string;
   indexEditar: any;
-  usuario: any;
 
-  alertaMedida: any;
-
-  Ispaquete = false;
   seleccionModal: any;
   indexBorrar: any;
-  TIPOARTICULO: any;
 
-  ARRAY_FORMULA: FormArray;
-  COMPRADOEN: any;
-  MEDIDACAJA: any;
-  is_combo = false;
-  numIngredientes: any;
-  Recalcular = false;
-  ProductoEditando: any;
   subDeci: Subscription;
-  listaMarcas: any;
+  listaMarcas = [];
   is_editando = false;
 
   listaPropietarios = [];
 
-  medida_principal = { label: 'Unidad', nivel: 1 };
-
-  listaMedidas = [
-    { descripcion: 'Paquete', id: 'paquete', nivel: 2 },
-    { descripcion: 'Unidad', id: 'unidad', nivel: 1 },
-  ];
-
-  medidas = {
-    caja: 'Cajas',
-    paquete: 'Paquetes',
-    unidad: 'Unidades',
-  };
-  optionsAlerta = [{ label: 'Unidad', nivel: 1 }];
-  medidaCostoPrincipal = 'unitario';
-  existencia_label_mostrar = { label: 'Unidad', nivel: 1 };
-  existencia_value_mostrar: any = 1;
-  is_unico = false;
-  marcas = [];
+  listaModelos: any;
+  vehiculoEditando: any;
 
   constructor(private dbServ: DBservice, private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private mServ: ModalService) {}
 
   ngOnInit() {
-    this.getVehiculos(obj_paginate);
-
-    this.dbServ.getNombresSuplidores().subscribe((res) => {
-      this.listaSuplidores = GLOBAL.duplicarJson(res);
-    });
-
     this.createForm();
     this.FORM = this.form.controls;
 
@@ -95,32 +54,57 @@ export class RegistroVehiculoComponent implements OnInit {
       }
     });
     GLOBAL.enfocarInput('user_id');
+    this.necesarioStart();
   }
+
   ngOnDestroy() {
     this.borrar();
     this.subDeci.unsubscribe();
   }
 
-  prueba() {}
+  async necesarioStart() {
+    await this.getVehiculos(obj_paginate);
+    await this.getPropietarios();
+    await this.getMarcas();
+  }
 
+  async getPropietarios() {
+    const res = await this.dbServ.getEmpleadosNames().toPromise();
+    res.map((val) => {
+      val.nombreCompleto = val.nombre + ' ' + val.apellido;
+      return val;
+    });
+
+    res.push({ id: -1, nombreCompleto: 'No empleado' });
+
+    this.listaPropietarios = res;
+  }
   async getVehiculos(e) {
     const page = e.page;
     const per_page = e.per_page;
     const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
     try {
-      // const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
-      // this.listaVehiculos = res.data;
+      const res = await this.dbServ.getVehiculosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+      res.data.map((val) => {
+        val.nombreCompleto = `${val.propietario.nombre} ${val.propietario.apellido}`;
+        return val;
+      });
+      this.listaVehiculos = res.data;
+
+      this.listaVehiculos.sort((a, b) => {
+        return a.id > b.id ? 1 : -1;
+      });
     } catch (error) {
-      this.dbServ.toastError('Error buscando articulos', 'ERROR');
+      this.dbServ.toastError('Error buscando camiones', 'ERROR', true);
     }
   }
 
-  async getMarcas(e) {
+  async getMarcas() {
     try {
       const res = await this.dbServ.getMarcas().toPromise();
-      this.marcas = res.data;
+      this.listaMarcas = res;
     } catch (error) {
-      this.dbServ.toastError('Error buscando articulos', 'ERROR');
+      this.dbServ.toastError('Error buscando articulos', 'ERROR', true);
     }
   }
 
@@ -130,9 +114,14 @@ export class RegistroVehiculoComponent implements OnInit {
 
   createForm() {
     this.form = this.fb.group({
+      id: [null],
       user_id: [null, Validators.required],
       marca: [null, Validators.required],
       modelo: [null, Validators.required],
+      anio: [null, Validators.compose([Validators.required, Validators.minLength(4)])],
+      nombre_no_empleado: [{ value: null, disabled: true }, Validators.required],
+      apellido_no_empleado: [{ value: null, disabled: true }, Validators.required],
+      telefono_no_empleado: [{ value: null, disabled: true }, Validators.required],
     });
   }
 
@@ -154,14 +143,47 @@ export class RegistroVehiculoComponent implements OnInit {
   }
 
   borrar() {
-    this.ProductoEditando = null;
+    this.vehiculoEditando = null;
     this.form.reset();
+    this.restartCampo('nombre_no_empleado');
+    this.restartCampo('apellido_no_empleado');
+    this.restartCampo('telefono_no_empleado');
     GLOBAL.enfocarInput('user_id');
 
-    this.titulo = 'Registro de vehiculos';
+    this.titulo = 'Registro de camiones';
     this.boton = 'Registrar';
   }
-  selectPropietario() {}
+  selectPropietario() {
+    if (this.form.controls.user_id.value === -1) {
+      this.form.controls.nombre_no_empleado.enable();
+      this.form.controls.apellido_no_empleado.enable();
+      this.form.controls.telefono_no_empleado.enable();
+    } else {
+      this.restartCampo('nombre_no_empleado');
+      this.restartCampo('apellido_no_empleado');
+      this.restartCampo('telefono_no_empleado');
+    }
+  }
+
+  restartCampo(campo) {
+    this.form.controls[campo].disable();
+
+    this.form.controls[campo].reset(null);
+  }
+
+  async selectMarca(callback = (arg) => {}) {
+    try {
+      const marca_selected_id = this.form.controls.marca.value;
+      if (marca_selected_id) {
+        const res = await this.dbServ.getModelosByMarca(marca_selected_id).toPromise();
+        this.listaModelos = res;
+        callback(true);
+      }
+    } catch (error) {
+      callback(false);
+      this.dbServ.toastError('Error seleccionando marca.', 'ERROR', true);
+    }
+  }
 
   // =============================================
   //  BOTON ATRAS
@@ -171,43 +193,31 @@ export class RegistroVehiculoComponent implements OnInit {
   }
 
   async editarItem(item) {
-    // const articulo = item.ARG;
-    // this.borrar();
-    // this.is_editando = true;
-    // this.ProductoEditando = item.ARG;
-    // this.titulo = 'Editar Camion: ' + articulo.nombre;
-    // this.boton = 'Editar';
-    // this.indexEditar = item.INDEX;
-    // console.log(articulo);
-    // await this.form.patchValue(articulo);
-    // if (articulo.unico) {
-    //   this.form.controls.unico.setValue(true);
-    //   await this.marcarCheck('unico');
-    // }
-    // if (articulo.is_detallable) {
-    //   setTimeout(() => {
-    //     this.form.controls.is_detallable.setValue(true);
-    //     this.marcarCheck('detallable');
-    //   }, 10);
-    // }
-    // this.form.controls.costo_principal.setValue(GLOBAL.numFormatTwoDecimal(articulo.costo_principal));
-    // this.form.controls.precio_principal.setValue(GLOBAL.numFormatTwoDecimal(articulo.precio_principal));
-    // this.medidaCostoPrincipal = articulo.medida === 'unidad' ? 'unitario' : 'paquete';
-    // articulo.contenido_articulos.forEach((contenido) => {
-    //   if (contenido.condicion === 'hijo') {
-    //     // this.form.controls.cantidad_contenido_hijo.setValue(contenido.cantidad);
-    //     // this.form.controls.medida_contenido_hijo.setValue(contenido.medida);
-    //     // this.form.controls.precio_hijo.setValue(GLOBAL.numFormatTwoDecimal(contenido.precio)));
-    //     // this.form.controls.costo_hijo.setValue(contenido.costo);
-    //     // this.form.controls.id_contenido_hijo.setValue(contenido.id);
-    //     // this.form.controls.referencia_hijo.setValue(contenido.referencia);
-    //   } else {
-    //     this.form.controls.cantidad_padre.setValue(contenido.cantidad);
-    //     this.form.controls.precio_padre.setValue(GLOBAL.numFormatTwoDecimal(contenido.precio));
-    //     this.form.controls.costo_padre.setValue(GLOBAL.numFormatTwoDecimal(contenido.costo));
-    //     this.form.controls.id_contenido_padre.setValue(contenido.id);
-    //   }
-    // });
+    const vehiculo = item.ARG;
+    this.borrar();
+    this.is_editando = true;
+    this.vehiculoEditando = item.ARG;
+
+    this.titulo = `Editar Camion: ${vehiculo.marca} ${vehiculo.modelo}  de: ${vehiculo.nombreCompleto}`;
+    this.boton = 'Editar';
+
+    await this.form.patchValue(vehiculo);
+
+    if (!vehiculo.user_id) {
+      this.form.controls.user_id.setValue(-1);
+    }
+
+    const marca_id = this.listaMarcas.find((marca) => marca.descripcion === vehiculo.marca).id;
+
+    this.form.controls.marca.setValue(marca_id);
+    this.selectMarca((res) => {
+      if (res) {
+        const modelo_id = this.listaModelos.find((modelo) => modelo.descripcion === vehiculo.modelo).id;
+        this.form.controls.modelo.setValue(modelo_id);
+      }
+    });
+
+    this.selectPropietario();
   }
 
   abrirModal(arg?) {
@@ -255,76 +265,45 @@ export class RegistroVehiculoComponent implements OnInit {
   //  Crear articulo
   // =============================================
 
-  submit(form) {
-    // const x = GLOBAL.duplicarJson(form.value);
-    // console.log('x ', x);
-    // const obj = {
-    // user_id: this.fun.getUser().id,
-    //   tipo_articulo_id: _.parseInt(x.tipo_articulo_id),
-    //   nombre: x.nombre,
-    //   costo_principal: GLOBAL.desformatear(x.costo_principal),
-    //   precio_principal: GLOBAL.desformatear(x.precio_principal),
-    //   suplidor_id: x.suplidor_id,
-    //   medida: x.medida,
-    //   is_detallable: x.is_detallable,
-    //   existencia: x.medida === 'paquete' ? x.existencia : 1,
-    //   estado: true,
-    //   marca_id: x.marca_id,
-    //   modelo_id: x.modelo_id,
-    //   identificador: x.identificador,
-    //   color: x.color,
-    //   unico: x.unico,
-    //   aviso_existencia: x.aviso_existencia,
-    //   agotado: x.agotado,
-    //   is_combo: false,
-    //   medida_alerta: x.medida_alerta,
-    //   contenido_articulos_attributes: this.formarContenido(),
-    //   codigo: x.codigo,
-    // };
-    // console.log('obj ', obj);
-    // if (x.id) {
-    //   obj['id'] = x.id;
-    //   this.dbServ.editarArticulo(obj).subscribe(
-    //     (res) => {
-    //       console.log('res ===>', res);
-    //       const temp = GLOBAL.duplicarJson(this.listaVehiculos);
-    //       this.listaVehiculos = [];
-    //       res['contenido_articulos'] = res['contenido_articulos_attributes'];
-    //       res['codigo'] = _.padStart(res.id, 5, '0');
-    //       console.log('res antes ', res);
-    //       const cant = res.cantidades[res.medida];
-    //       res.existencia_mostrar = _.toString(cant) + ' ' + (cant === 1 ? _.capitalize(res.medida) : this.medidas[res.medida]);
-    //       delete res['contenido_articulos_attributes'];
-    //       temp[this.indexEditar] = res;
-    //       this.listaVehiculos = GLOBAL.duplicarJson(temp);
-    //       this.borrar();
-    //       console.log('res despues ', res);
-    //       this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto');
-    //     },
-    //     (err) => {
-    //       this.mostrarErrores(err.error);
-    //     },
-    //   );
-    // } else {
-    //   this.dbServ.createArticulo(obj).subscribe(
-    //     (res) => {
-    //       console.log('res ', res);
-    //       console.log('this.listaVehiculos ', this.listaVehiculos);
-    //       this.listaVehiculos = [...this.listaVehiculos, res];
-    //       this.borrar();
-    //       this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto');
-    //     },
-    //     (err) => {
-    //       this.mostrarErrores(err.error);
-    //     },
-    //   );
-    // }
+  async submit(form) {
+    const x = GLOBAL.duplicarJson(form.value);
+    const obj = {
+      user_id: x.user_id !== -1 ? x.user_id : null,
+
+      marca: this.listaMarcas.find((marca) => marca.id === x.marca).descripcion,
+      modelo: this.listaModelos.find((modelo) => modelo.id === x.modelo).descripcion,
+      anio: x.anio,
+
+      nombre_no_empleado: x.nombre_no_empleado,
+      apellido_no_empleado: x.apellido_no_empleado,
+      telefono_no_empleado: x.telefono_no_empleado,
+    };
+    let msg_error = '';
+    try {
+      if (x.id) {
+        msg_error = 'Error editando vehiculo';
+        obj['id'] = x.id;
+        const res = await this.dbServ.updateVehiculos(obj).toPromise();
+
+        this.dbServ.toastSuccess('Vehiculo editando con exito.', 'Correcto');
+      } else {
+        msg_error = 'Error registrando vehiculo';
+
+        const res = await this.dbServ.createVehiculos(obj).toPromise();
+
+        this.dbServ.toastSuccess('Vehiculo registrado con exito.', 'Correcto');
+      }
+      this.borrar();
+      this.getVehiculos(obj_paginate);
+    } catch (error) {
+      this.dbServ.toastError(msg_error, 'ERROR', true);
+    }
   }
 
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR');
+        this.dbServ.toastError(error, 'ERROR'), true;
       });
     } else {
       for (const key in arg) {
@@ -332,7 +311,7 @@ export class RegistroVehiculoComponent implements OnInit {
           const element = arg[key];
 
           if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR');
+            this.dbServ.toastError(element, 'ERROR', true);
           }
         }
       }
@@ -346,7 +325,7 @@ export class RegistroVehiculoComponent implements OnInit {
   info = [
     {
       titulo: 'Propietario',
-      key: 'user_id',
+      key: 'nombreCompleto',
     },
     {
       titulo: 'Marca',

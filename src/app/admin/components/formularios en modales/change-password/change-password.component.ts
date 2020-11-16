@@ -47,7 +47,7 @@ export class ChangePasswordComponent implements OnInit, AfterViewInit {
     const objTemp = JSON.parse(JSON.stringify(form));
 
     if (objTemp.password === null) {
-      this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
+      this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR', true);
     } else {
       const objT = this.user;
       const obj = _.omit(objT, ['', 'uid', 'sign_in_count', 'created_at', 'updated_at', 'documentos_de_identidad', 'documento_identidad']);
@@ -59,7 +59,7 @@ export class ChangePasswordComponent implements OnInit, AfterViewInit {
           this.cancel.emit(false);
         },
         (err) => {
-          this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
+          this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo, true);
         },
       );
     }

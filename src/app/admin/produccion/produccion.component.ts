@@ -69,9 +69,9 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this.listaProductos = res;
     } catch (error) {
       if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
+        this.dbServ.toastError(error.error.msg, 'ERROR', true);
       } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
     }
   }
@@ -88,9 +88,9 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         this.ingredientes = res;
       } catch (error) {
         if (error.error) {
-          this.dbServ.toastError(error.error.msg, 'ERROR');
+          this.dbServ.toastError(error.error.msg, 'ERROR', true);
         } else {
-          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
         }
       }
     }
@@ -218,16 +218,16 @@ export class ProduccionComponent implements OnInit, OnDestroy {
             this.cantidad_producir = null;
             this.ingredientesParaProduccion = [];
 
-            this.dbServ.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR');
+            this.dbServ.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR', true);
             this.enfocarInput('cantidad_producir');
           } else {
             this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj, articulo_id: ingre.articulo_id });
           }
         } catch (error) {
           if (error.error) {
-            this.dbServ.toastError(error.error.msg, 'ERROR');
+            this.dbServ.toastError(error.error.msg, 'ERROR', true);
           } else {
-            this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+            this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
           }
         }
       });
@@ -379,7 +379,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         // this.mostrarErrores(error.error.msg);
         this.dbServ.toastError(error.error.msg, 'Error');
       } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
     }
   }
@@ -395,7 +395,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     for (const error in arg) {
       if (arg.hasOwnProperty(error)) {
         const element = arg[error];
-        this.dbServ.toastError(element, 'Error');
+        this.dbServ.toastError(element, 'Error', true);
       }
     }
   }

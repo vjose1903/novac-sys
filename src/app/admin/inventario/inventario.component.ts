@@ -78,12 +78,14 @@ export class InventarioComponent implements OnInit, OnDestroy {
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
         this.decisionModal(res);
+        this.mServ.ModalDecision(undefined);
       }
     });
   }
 
   ngOnDestroy() {
     this.subDeci.unsubscribe();
+    this.FechaFactura = undefined;
   }
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
@@ -160,7 +162,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
 
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
-      this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
+      this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);
     }
   }
 

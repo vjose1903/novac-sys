@@ -1,13 +1,13 @@
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
-import { DBservice } from '../../../core/services/bdservice.service';
+import { DBservice } from '../../../../core/services/bdservice.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
-import { ValidateRayaAbajo } from '../../../directives/validaciones';
-import { GLOBAL } from '../../../core/services/GLOBAL';
-import { ModalService } from '../../components/modal/modal.service';
-import { FunctionService } from '../../../core/services/functions.service';
+import { ValidateRayaAbajo } from '../../../../directives/validaciones';
+import { GLOBAL } from '../../../../core/services/GLOBAL';
+import { ModalService } from '../../modal/modal.service';
+import { FunctionService } from '../../../../core/services/functions.service';
 
 @Component({
   selector: 'app-movimientos-form',
@@ -129,7 +129,7 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
       (err) => {
         console.error(err.error);
         this.mostrarErrores(err.error);
-        // this.dbServ.toastError(err.error, 'Error');
+        // this.dbServ.toastError(err.error, 'Error', true);
       },
     );
   }
@@ -137,7 +137,7 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
     for (const error in arg) {
       if (arg.hasOwnProperty(error)) {
         const element = arg[error];
-        this.dbServ.toastError(element, 'Error');
+        this.dbServ.toastError(element, 'Error', true);
       }
     }
   }

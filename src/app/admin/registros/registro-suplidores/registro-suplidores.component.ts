@@ -115,7 +115,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
 
       this.listaSuplidores = res.data;
     } catch (error) {
-      this.dbServ.toastError('Error buscando suplidores registrados.', 'ERROR');
+      this.dbServ.toastError('Error buscando suplidores registrados.', 'ERROR', true);
     }
   }
 
@@ -216,12 +216,12 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
     // entra aqui si el formato de un documento de identidad esta mal
     if (devolver) {
       Fail.forEach((doc) => {
-        this.dbServ.toastError('Formato de ' + doc + ' incorrecto', 'ERROR');
+        this.dbServ.toastError('Formato de ' + doc + ' incorrecto', 'ERROR', true);
       });
       // entra aqui si pasa la validacion de documento de identidad
     } else {
       if (this.doc_principal === undefined || this.doc_principal === null || this.doc_principal === ' ' || this.doc_principal === '') {
-        this.dbServ.toastError('Debe de seleccionar un documento de identidad como principal', 'ERROR');
+        this.dbServ.toastError('Debe de seleccionar un documento de identidad como principal', 'ERROR', true);
 
         // paso todas las validaciones
       } else {
@@ -277,7 +277,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR');
+        this.dbServ.toastError(error, 'ERROR', true);
       });
     } else {
       for (const key in arg) {
@@ -285,7 +285,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
           const element = arg[key];
 
           if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR');
+            this.dbServ.toastError(element, 'ERROR', true);
           }
         }
       }

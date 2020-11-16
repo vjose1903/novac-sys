@@ -187,7 +187,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   }
 
   noArticuloEncontrado(arg) {
-    this.dbServ.toastError('Articulo no creado', 'ERROR');
+    this.dbServ.toastError('Articulo no creado', 'ERROR', true);
     GLOBAL.enfocarInput('cod-' + arg);
     setTimeout(() => {
       this.resetModalVaribales();
@@ -520,7 +520,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
         if (art) {
           this.dbServ.toastError('Cantidad de ' + art + ' introducida excede la cantidad en inventario, favor de cambiar la cantidad', 'ERROR', true);
         } else {
-          this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+          this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR', true);
         }
 
         return true;
@@ -529,9 +529,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       }
     } catch (error) {
       if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
+        this.dbServ.toastError(error.error.msg, 'ERROR', true);
       } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
     }
   }
@@ -997,14 +997,14 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
           this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
           this.cancelarConduce(2);
         } else {
-          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
         }
       });
     } catch (error) {
       if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
+        this.dbServ.toastError(error.error.msg, 'ERROR', true);
       } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
     }
   }

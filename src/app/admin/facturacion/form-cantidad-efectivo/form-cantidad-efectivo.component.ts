@@ -102,7 +102,7 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
       }
       //
       if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
-        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
+        this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
         this.enfocarInput(input);
       } else {
         //
@@ -153,7 +153,7 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
     };
 
     if (this.factura_de === 'venta' && this.tipo !== 'no_devuelta' && total > efectivo) {
-      this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR');
+      this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR', true);
     } else {
       if (this.factura_de === 'compra') {
         if (this.cambiar_articulos !== undefined) {

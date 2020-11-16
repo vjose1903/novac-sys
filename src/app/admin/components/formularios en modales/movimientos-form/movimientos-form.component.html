@@ -8,7 +8,13 @@
   <div class="col-12">
     <div class="form-group">
       <label class="control-label">Tipo movimiento: </label>
-      <select id="tipo_movimiento" (keydown.enter)="saltar(tipo_movimiento === 'entrada' ? 'medida' : 'tipo_salida')" [(ngModel)]="tipo_movimiento" class="form-control" (change)="selectTipoMov()">
+      <select
+        id="tipo_movimiento"
+        (keydown.enter)="saltar(tipo_movimiento === 'entrada' ? 'medida' : 'tipo_salida')"
+        [(ngModel)]="tipo_movimiento"
+        class="form-control"
+        (change)="selectTipoMov()"
+      >
         <option value="entrada">Entrada</option>
         <option value="salida">Salida</option>
       </select>
@@ -20,6 +26,7 @@
       <label class="control-label">Tipo de salida: </label>
       <select id="tipo_salida" (keydown.enter)="saltar('medida')" [(ngModel)]="tipo_salida" class="form-control">
         <option value="perdida">Perdida</option>
+        <option value="caduco">Caducó</option>
         <option value="producto_defectuoso">Producto defectuoso</option>
       </select>
     </div>

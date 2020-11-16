@@ -421,7 +421,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       }
       //
       if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
-        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
+        this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
         this.enfocarInput(input);
       } else {
         //

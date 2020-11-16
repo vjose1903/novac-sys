@@ -531,16 +531,16 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();
 
       if (this.metodo === 'venta' && res.excede) {
-        this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+        this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR', true);
         return true;
       } else {
         return false;
       }
     } catch (error) {
       if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
+        this.dbServ.toastError(error.error.msg, 'ERROR', true);
       } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
     }
   }
@@ -663,7 +663,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
       //
       if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
-        this.dbServ.toastError('Precio introducido es invalido', 'ERROR');
+        this.dbServ.toastError('Precio introducido es invalido', 'ERROR', true);
         GLOBAL.enfocarInput('pre-' + i);
       } else {
         //
@@ -971,7 +971,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   noArticuloEncontrado(arg) {
-    this.dbServ.toastError('Articulo no creado', 'ERROR');
+    this.dbServ.toastError('Articulo no creado', 'ERROR', true);
 
     this.mServ.ModalIndex(undefined);
     setTimeout(() => {

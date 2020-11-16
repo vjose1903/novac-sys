@@ -48,10 +48,16 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   viaje_selected = { id: -1 } as any;
   ultimo_pago;
   chofer_id;
+  camion_id;
   is_chofer_selected = false;
   is_choferes_register = false;
-  choferes: any;
+
+  is_camiones_register = false;
+  is_camion_selected = false;
+  camiones = [];
+  choferes = [];
   salio_en_chofer = false;
+  salio_en_camion = false;
 
   viajes_pendientes_cant = 0;
   viajes_completados_cant = 0;
@@ -65,6 +71,8 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   totalPagado = 0;
   totalPagadoPorciento: any = 0;
   monto_pendiente = 0;
+  have_incidencia = false;
+  incidencia = '';
   constructor(private dbServ: DBservice, private mServ: ModalService, private fun: FunctionService) {}
 
   ngOnInit() {
@@ -90,6 +98,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   necesarioStart() {
     this.getViajes(obj_paginate);
     this.getChoferes();
+    this.getCamiones();
   }
 
   ngOnDestroy() {
@@ -105,6 +114,12 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
     this.dbServ.getUserByRole('C').subscribe((res) => {
       this.choferes = res;
       this.is_choferes_register = this.choferes.length > 0 ? true : false;
+    });
+  }
+  async getCamiones() {
+    this.dbServ.getVehiculosFiltrados(' ', 0, 0, false).subscribe((res) => {
+      this.camiones = res;
+      this.is_camiones_register = this.camiones.length > 0 ? true : false;
     });
   }
 
@@ -151,12 +166,14 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
       console.error(error);
 
       if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
+        this.dbServ.toastError(error.error.msg, 'ERROR', true);
       } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
     }
   }
+
+  // ----------------------------------------
   checkChofer() {
     if (this.choferes.length > 0) {
       if (this.chofer_id) {
@@ -172,6 +189,34 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
 
   entroEnChofer() {
     this.salio_en_chofer = false;
+  }
+  // ----------------------------------------
+  checkCamion() {
+    if (this.camiones.length > 0) {
+      if (this.camion_id) {
+        this.is_camion_selected = true;
+      } else {
+        this.is_camion_selected = false;
+      }
+    } else {
+      this.is_camion_selected = false;
+    }
+    this.salio_en_camion = true;
+  }
+
+  entroEnCamion() {
+    this.salio_en_camion = false;
+  }
+  // ----------------------------------------
+
+  abilitarRecibir() {
+    let res = false;
+    if (this.is_chofer_selected && this.is_camion_selected) {
+      res = false;
+    } else {
+      res = true;
+    }
+    return res;
   }
 
   verViaje(arg) {
@@ -222,7 +267,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
       this.mServ.modalTipo(tipo);
       this.abrirModal(obj);
     } else {
-      if (tipo === 'cambio') {
+      if (tipo === 'cambio' || tipo === 'cancelar') {
         this.resetVariables();
       }
     }
@@ -277,6 +322,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
       devuelta: 0,
       numero_recibo: null,
       chofer: Number(this.chofer_id),
+      vehiculo_id: Number(this.camion_id),
     };
 
     obj['detalle_recibos_attributes'] = this.formarDetalle();
@@ -306,9 +352,9 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
         console.error(err);
 
         if (err.error) {
-          this.dbServ.toastError(err.error.msg, 'ERROR');
+          this.dbServ.toastError(err.error.msg, 'ERROR', true);
         } else {
-          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
         }
       },
     );
@@ -317,13 +363,17 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
     this.ultimo_pago = undefined;
     this.viaje_selected = { id: -1 };
     this.chofer_id = undefined;
+    this.camion_id = undefined;
     this.is_chofer_selected = false;
-    this.is_choferes_register = false;
+    this.is_camion_selected = false;
     this.salio_en_chofer = false;
+    this.salio_en_camion = false;
+    this.have_incidencia = false;
     this.forma_pago = undefined;
     this.total_recibido = undefined;
     this.monto_pendiente = 0;
     this.totalPagado = 0;
     this.totalPagadoPorciento = 0;
+    this.incidencia = '';
   }
 }

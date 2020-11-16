@@ -298,7 +298,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
       console.error(error);
-      this.dbServ.toastError(error, 'ERROR');
+      this.dbServ.toastError(error, 'ERROR', true);
     }
   }
   async necesarioStart() {
@@ -400,7 +400,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
-      this.dbServ.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
+      this.dbServ.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR', true);
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo__: 'devuelta' };
@@ -443,7 +443,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
         await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
           if (res.status) {
           } else {
-            this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+            this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
           }
         });
       },
@@ -451,9 +451,9 @@ export class IngresosComponent implements OnInit, OnDestroy {
         console.error(err);
 
         if (err.error) {
-          this.dbServ.toastError(err.error.msg, 'ERROR');
+          this.dbServ.toastError(err.error.msg, 'ERROR', true);
         } else {
-          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
         }
       },
     );

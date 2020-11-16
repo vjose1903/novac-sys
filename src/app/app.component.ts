@@ -42,7 +42,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this._ipc.on(' checking-for-update', (event: Electron.IpcMessageEvent, res) => {});
     this._ipc.on('update-error', (event: Electron.IpcMessageEvent, res) => {
       if (res) {
-        this.dbServ.toastError(res.msg, 'ERRROR');
+        this.dbServ.toastError(res.msg, 'ERRROR', true);
         this.displayPercent = false;
       }
     });

@@ -201,7 +201,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     } catch (error) {
       this.existenComprobantes = true;
       console.error(error);
-      this.dbServ.toastError(error.error.msg, 'ERROR');
+      this.dbServ.toastError(error.error.msg, 'ERROR', true);
     }
   }
   completarTituloPag() {
@@ -269,7 +269,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         this.facturaSelected = this.facturas[0];
         this.abrirModal(this.facturas[0], 'mostrarFactura');
       } else {
-        this.dbServ.toastError('La factura buscada no existe', 'ERROR');
+        this.dbServ.toastError('La factura buscada no existe', 'ERROR', true);
       }
     } catch (error) {
       console.error(error);

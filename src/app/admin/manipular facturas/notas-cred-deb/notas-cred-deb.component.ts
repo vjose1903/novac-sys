@@ -220,9 +220,9 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           detalle['contenidos'] = contenido;
         } catch (error) {
           if (error.error) {
-            this.dbServ.toastError(error.error.msg, 'ERROR');
+            this.dbServ.toastError(error.error.msg, 'ERROR', true);
           } else {
-            this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
+            this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
           }
         }
 
@@ -230,7 +230,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
       }
       this.detalleFacturas = temp;
     } catch (error) {
-      this.dbServ.toastError('Error mostrando factura elegida', 'ERROR');
+      this.dbServ.toastError('Error mostrando factura elegida', 'ERROR', true);
     }
   }
 
@@ -275,7 +275,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     if (info.cambio === 'cant_nota') {
       if (this.tipoNota === 'credito') {
         if (entidad.cant_nota > entidad.cant) {
-          this.dbServ.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
+          this.dbServ.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR', true);
           this.tablas.enfocarInput('inputNu-' + info.index);
           setTimeout(() => {
             this.tablas.resetInput('cant', 'cant_nota', info.index, false);
@@ -471,13 +471,13 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           this.resetVariables();
           window.history.back();
         } else {
-          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
         }
       });
       res['FACTURA_DE'] = 'nota';
       this._ipc.send('print', res);
     } catch (error) {
-      this.dbServ.toastError(error.statusText, 'ERROR');
+      this.dbServ.toastError(error.statusText, 'ERROR', true);
     }
   }
 }

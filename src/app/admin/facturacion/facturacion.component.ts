@@ -421,7 +421,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
           }
           return 'si';
         } catch (error) {
-          this.dbServ.toastError(error.error.msg, 'ERROR');
+          this.dbServ.toastError(error.error.msg, 'ERROR', true);
           this.enfocarInput('tipoFact');
           return 'no';
         }
@@ -873,7 +873,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     for (const error in arg) {
       if (arg.hasOwnProperty(error)) {
         const element = arg[error];
-        this.dbServ.toastError(element, 'Error');
+        this.dbServ.toastError(element, 'Error', true);
       }
     }
   }

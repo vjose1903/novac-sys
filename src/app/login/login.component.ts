@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit {
       if (arg.hasOwnProperty(error)) {
         const element = arg[error];
 
-        this.dbServ.toastError(element, 'Error');
+        this.dbServ.toastError(element, 'Error', true);
       }
     }
   }
@@ -92,7 +92,7 @@ export class LoginComponent implements OnInit {
     await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
       if (res.status) {
       } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
       }
     });
   }
@@ -110,7 +110,7 @@ export class LoginComponent implements OnInit {
     await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
       if (res.status) {
       } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
       }
     });
   }
@@ -128,7 +128,7 @@ export class LoginComponent implements OnInit {
     await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
       if (res.status) {
       } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
       }
     });
   }

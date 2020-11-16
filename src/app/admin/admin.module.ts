@@ -21,7 +21,7 @@ import { FiltroParaNgforPipe } from '../core/pipe/filtro-para-ngfor.pipe';
 import { PaswordConfirmDirective } from '../core/directive/pasword-confirm-directive.directive';
 import { ProduccionComponent } from './produccion/produccion.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { MovimientosFormComponent } from './inventario/movimientos-form/movimientos-form.component';
+import { MovimientosFormComponent } from './components/formularios en modales/movimientos-form/movimientos-form.component';
 import { IngresosComponent } from './recibo-ingresos/ingresos.component';
 
 import { NgSelectModule } from '@ng-select/ng-select';

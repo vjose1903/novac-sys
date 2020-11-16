@@ -137,7 +137,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       this.tServ.Func_total_paginas(obj);
       this.quitarContadoDeLista();
     } catch (error) {
-      this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
+      this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
     }
   }
   ngOnDestroy() {
@@ -184,7 +184,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       }
       //
       if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
-        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
+        this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
         this.enfocarInput(id);
       } else {
         //
@@ -310,17 +310,17 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
     // entra aqui si el formato de un documento de identidad esta mal
     if (devolver) {
       Fail.forEach((doc) => {
-        this.dbServ.toastError('Formato de ' + doc + ' incorrecto', 'ERROR');
+        this.dbServ.toastError('Formato de ' + doc + ' incorrecto', 'ERROR', true);
       });
       // entra aqui si pasa la validacion de documento de identidad
     } else {
       // entra aqui si no selecciono un documento como principal
       if (!cedulaCorrecta) {
         // if (false) {
-        this.dbServ.toastError('Cedula introducida incorrecta', 'ERROR');
+        this.dbServ.toastError('Cedula introducida incorrecta', 'ERROR', true);
       } else {
         if (this.doc_principal === undefined || this.doc_principal === null || this.doc_principal === ' ' || this.doc_principal === '') {
-          this.dbServ.toastError('Debe de seleccionar un documento de identidad como principal', 'ERROR');
+          this.dbServ.toastError('Debe de seleccionar un documento de identidad como principal', 'ERROR', true);
 
           // paso todas las validaciones
         } else {
@@ -406,7 +406,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR');
+        this.dbServ.toastError(error, 'ERROR', true);
       });
     } else {
       for (const key in arg) {
@@ -414,7 +414,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
           const element = arg[key];
 
           if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR');
+            this.dbServ.toastError(element, 'ERROR', true);
           }
         }
       }

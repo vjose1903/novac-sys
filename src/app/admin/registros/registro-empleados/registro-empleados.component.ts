@@ -136,7 +136,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
       };
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
-      this.dbServ.toastError('Error buscando empleados registrados.', 'ERROR');
+      this.dbServ.toastError('Error buscando empleados registrados.', 'ERROR', true);
     }
   }
 
@@ -205,7 +205,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
     const objSend = _.omit(objTemp, ['cedula']);
 
     if (!this.editando && objSend.password === null) {
-      this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
+      this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR', true);
     } else {
       if (objSend.id) {
         objSend['id'] = objSend.id;
@@ -287,7 +287,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR');
+        this.dbServ.toastError(error, 'ERROR', true);
       });
     } else {
       for (const key in arg) {
@@ -295,7 +295,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
           const element = arg[key];
 
           if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR');
+            this.dbServ.toastError(element, 'ERROR', true);
           }
         }
       }
