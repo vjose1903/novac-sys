@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
-import { GLOBAL } from '../../core/services/GLOBAL';
+import { GLOBAL, tipos_facturas } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
@@ -26,6 +26,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   time: { hour: number; minute: number };
   FechaFactura: string;
   FechaFacturaMostrar: string;
+  action: any;
+  id_factura: any;
+  factura_a_editar;
+  tipos_de_facturas = tipos_facturas;
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
@@ -163,6 +167,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.usuario = this.fun.getUser();
 
     this.metodo = this.route.snapshot.params['tipo'];
+    this.action = this.route.snapshot.params['action'];
+    this.id_factura = this.route.snapshot.params['id'];
 
     this.propietario_factura = null;
 
@@ -273,6 +279,26 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.dbServ.getTiposFacturas().subscribe((res) => {
       this.lista_tipos_facturas = res;
     });
+
+    if (this.action === 'update') {
+      this.factura_a_editar = {};
+      this.buscarFacturaEditar();
+    }
+  }
+
+  async buscarFacturaEditar() {
+    const res = await this.dbServ.getFacturaById(this.id_factura).toPromise();
+    this.factura_a_editar = res;
+    this.propietario_factura = res.cliente;
+    this.propietario_factura['id'] = res.cliente_id;
+
+    this.form.patchValue(res.cliente);
+
+    this.tipoFactura = this.tipos_de_facturas[_.lowerCase(res.tipo_factura)];
+
+    this.modo_factura = res.is_viaje ? 'viaje' : res.is_adelantada ? 'adelantada' : 'normal';
+
+    console.log('FACTURA A EDITAR ==> ', res);
   }
 
   ngOnDestroy(): void {
@@ -523,7 +549,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   activarNombreDireccion() {
     let res = false;
-    if (this.metodo === 'compra') {
+    if (this.metodo === 'compra' || this.factura_a_editar) {
       res = true;
     } else {
       res = false;
@@ -646,7 +672,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
     this.mServ.mostrarModal(true);
     console.log('abrir modal');
-
   }
 
   decisionModal(arg) {

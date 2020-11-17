@@ -576,10 +576,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       // CUSTOM STYLES
       // ================================================
       setTimeout(() => {
-        console.log('#########');
-        // this.changeStylesRows();
         this.changeStylesTitles();
-        console.log('#########');
       }, 1);
       // ================================================
     }

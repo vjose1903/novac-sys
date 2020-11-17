@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   errorC = '';
   errorU = '';
-  versionApp: any;
+  versionApp = '';
 
   constructor(
     private dbServ: DBservice,
@@ -44,6 +44,10 @@ export class LoginComponent implements OnInit {
     await this._ipc.on('versionResponse', (event, arg) => {
       this.versionApp = arg;
     });
+  }
+
+  getVersion() {
+    return this.versionApp;
   }
 
   // =================================================================
@@ -74,8 +78,6 @@ export class LoginComponent implements OnInit {
       }
     }
   }
-
-
 
   async printTest() {
     // const data_ = compra_credito_valor_fiscal;

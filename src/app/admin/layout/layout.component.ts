@@ -85,6 +85,9 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
             this.noServer = true;
           } else {
             this.fun.logout();
+
+            this.router.navigateByUrl('/auth/login');
+
             this.noServer = false;
           }
         });
@@ -108,6 +111,9 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
     await this._ipc.on('versionResponse', (event, arg) => {
       this.versionApp = arg;
     });
+  }
+  getVersion() {
+    return this.versionApp;
   }
 
   ngOnDestroy() {
@@ -206,7 +212,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         this.router.navigateByUrl('/admin');
         this.actualTab = 'home';
         setTimeout(() => {
-          this.router.navigate(['/admin/factura/venta']);
+          this.router.navigate(['/admin/factura/venta/new/0']);
         }, 5);
         break;
 
@@ -214,7 +220,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         this.router.navigateByUrl('/admin');
         this.actualTab = 'home';
         setTimeout(() => {
-          this.router.navigate(['/admin/factura/compra']);
+          this.router.navigate(['/admin/factura/compra/new/0']);
         }, 5);
         break;
 

@@ -83,6 +83,8 @@ export class RegistroVehiculoComponent implements OnInit {
     const page = e.page;
     const per_page = e.per_page;
     const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+    console.log(`(${palabra_a_buscar})`);
+
     try {
       const res = await this.dbServ.getVehiculosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
       res.data.map((val) => {

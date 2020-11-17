@@ -41,7 +41,7 @@ const routes: Routes = [
         component: HomeAdminComponent,
       },
       {
-        path: 'factura/:tipo',
+        path: 'factura/:tipo/:action/:id',
         component: FacturacionComponent,
       },
       {

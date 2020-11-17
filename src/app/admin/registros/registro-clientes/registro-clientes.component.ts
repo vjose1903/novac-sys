@@ -339,17 +339,11 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
             obj.cuenta = obj.cuenta;
             this.dbServ.createCliente(obj).subscribe(
               (res) => {
-                const obj = JSON.parse(JSON.stringify(res));
-                obj.documentos_de_identidad.map((docu) => {
-                  if (docu.principal) {
-                    obj.documento_identidad = docu.documento;
-                  }
-                });
-                this.listaClientes = [...this.listaClientes, obj];
 
-                this.doc_principal = 'cedula';
                 this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
-                this.form.reset();
+                this.getClientes(obj_paginate);
+                this.borrar();
+
                 this.enfocarInput('campoNombre');
               },
               (err) => {
@@ -360,16 +354,9 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
             obj.cuenta = 0;
             this.dbServ.editarCliente(obj).subscribe(
               (res) => {
-                const obj = JSON.parse(JSON.stringify(res));
-                obj.documentos_de_identidad.map((docu) => {
-                  if (docu.principal) {
-                    obj.documento_identidad = docu.documento;
-                  }
-                });
-                this.listaClientes[this.indexSeleccionado] = obj;
 
-                this.doc_principal = 'cedula';
-
+                this.getClientes(obj_paginate);
+                this.enfocarInput('campoNombre');
                 this.borrar();
               },
               (err) => {

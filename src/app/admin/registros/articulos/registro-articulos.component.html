@@ -502,7 +502,7 @@
             <div class="from-group">
               <label class="control-label text-transparent">medida </label>
               <select (keydown.enter)="saltar('precioPadre')" id="medidaPadre" formControlName="medida_contenido_padre" (change)="seleccionarContenidoCaja()" class="form-control" value="">
-                <option value="" disabled selected hidden>Seleccione</option>
+                <option value="" disabled selected>Seleccione</option>
                 <option *ngIf="form.controls['medida'].value === 'Saco'" value="Libra">Libra</option>
                 <option *ngIf="form.controls['medida'].value === 'Caja'" value="Paquete">Paquete</option>
                 <option *ngIf="form.controls['medida'].value === 'Caja'" value="Unidad">Unidad</option>
@@ -635,7 +635,7 @@
     <h4>Listado articulos</h4>
     <div id="cardTabla" class="card cardListados">
       <app-tablas
-        *ngIf="listaArticulos && listaArticulos?.length > 0 && info"
+        *ngIf="listaArticulos && info"
         [info]="info"
         [data]="listaArticulos"
         [focusRow]="false"

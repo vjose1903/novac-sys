@@ -52,6 +52,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     {
       titulo: 'Numero Fact',
       key: 'secuencia',
+      customClass: true,
+      estilos: [{ width: '7rem' }],
     },
     {
       titulo: 'Tipo',
@@ -60,10 +62,14 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     {
       titulo: 'Comprobante',
       key: 'numero_comprobante',
+      customClass: true,
+      estilos: [{ width: '7rem' }],
     },
     {
       titulo: 'Condicion',
       key: 'condicion',
+      customClass: true,
+      estilos: [{ width: '6rem' }],
     },
     {
       titulo: 'Fecha Facturacion',
@@ -144,6 +150,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
             setTimeout(() => {
               this.abrirModal(this.facturaSelected, 'cancelar');
             }, 10);
+          } else if (this.BuscarPara === 'solo_ver') {
+            this.editarFactura();
           } else {
             this.mServ.ModalDecision(undefined);
             const url = `/admin/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
@@ -299,7 +307,13 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
                 val.iconsMoveEvents = [{ key: 'select', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
                 // val.customStyles = [{ select: { estilos: [{ 'font-size': '1.5rem' }] } }, { 'td-estatus': { estilos: [{ width: '2rem' }] } }];
-                val.customStyles = { select: { 'font-size': '1.5rem' }, 'td-estatus': { width: '2rem' } };
+                val.customStyles = {
+                  'td-select': { 'font-size': '1.5rem' },
+                  'td-condicion': { width: '6rem' },
+                  'td-secuencia': { width: '7rem' },
+                  'td-numero_comprobante': { width: '7rem' },
+                  'td-estatus': { width: '2rem' },
+                };
 
                 return val;
               })),
@@ -369,6 +383,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
   abrirModal(arg, tipo) {
     const obj = arg;
+
     this.tipoModal = tipo;
     this.mServ.modalTipo(tipo);
     this.mServ.ModalSeleccion(obj);
@@ -388,13 +403,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     if (item.column === 'select') {
       this.facturaSelected = undefined;
 
-      // this.facturas.forEach((fact, j) => {
-      //   if (j !== item.index) {
-      //     if (fact.select) {
-      //       this.facturaSelected = undefined;
-      //     }
-      //   }
-      // });
       this.facturaSelected = this.facturas[item.index];
       this.indexSelected = item.index;
 
@@ -467,7 +475,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     const element = document.getElementById(arg) as any;
     element.select();
   }
-
+  editarFactura() {
+    this.router.navigateByUrl(`/admin/factura/venta/update/${this.facturaSelected.id}`);
+  }
   decisionesModal() {
     if (this.BuscarPara === 'anular_factura') {
       this.CancelarFactura();

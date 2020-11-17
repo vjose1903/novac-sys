@@ -18,6 +18,7 @@
               #tipoFact
               (focus)="setWidthPop(true, $event.target)"
               tabindex="-1"
+              [readOnly]="factura_a_editar"
             />
           </div>
 
@@ -30,6 +31,7 @@
               [(ngModel)]="condicion_fact"
               (change)="cambiarTipoVenta($event.target.value)"
               tabindex="-1"
+              [disabled]="factura_a_editar"
             >
               <option value="Contado">Contado</option>
               <option value="Crédito">Crédito</option>
@@ -49,6 +51,7 @@
               [(ngModel)]="CostoYgasto"
               id="costo"
               #costo
+              [readOnly]="factura_a_editar"
               (focus)="setWidthPop(false, $event.target)"
               tabindex="-1"
             />
@@ -65,6 +68,7 @@
             [(ngModel)]="modo_factura"
             (blur)="checkCambiosModoyCondicionFactura($event.target)"
             tabindex="-1"
+            [disabled]="factura_a_editar"
           >
             <option value="" disabled selected>Modo de venta</option>
             <option value="normal">Normal</option>
@@ -88,6 +92,7 @@
             placement="bottom"
             bsDatepicker
             tabindex="-1"
+            [readOnly]="factura_a_editar"
             (blur)="checkCambiosModoyCondicionFactura($event.target)"
           />
         </div>
@@ -103,6 +108,7 @@
             [(ngModel)]="NCFcompra"
             (focus)="trimEndNcf()"
             id="ncf"
+            [readOnly]="factura_a_editar"
             tabindex="-1"
           />
 
@@ -120,6 +126,7 @@
               #dp="bsDatepicker"
               placement="bottom"
               bsDatepicker
+              [readOnly]="factura_a_editar"
               tabindex="-1"
             />
           </div>
@@ -133,7 +140,13 @@
             <h5>
               <strong>{{ labelSearch }}:</strong>
             </h5>
-            <i (click)="abrirModalFiltro()" mdbTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" placement="right" class="fas fa-search ml-3 botonBuscar"></i>
+            <i
+              *ngIf="!factura_a_editar"
+              (click)="abrirModalFiltro()"
+              mdbTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}"
+              placement="right"
+              class="fas fa-search ml-3 botonBuscar"
+            ></i>
           </div>
           <div class="row">
             <div class="col-md-7">
@@ -215,6 +228,8 @@
   <div class="cuerpoFactura mb-2">
     <app-cuerpo-factura
       [propietario]="propietario_factura"
+      [factura]="factura_a_editar"
+      [action]="action"
       [metodo]="metodo"
       [FechaFactura]="FechaFactura"
       (getCuerpoFactura)="getCuerpoFactura($event)"
@@ -231,7 +246,7 @@
         <app-btncircular [alto]="'100px'" [accion]="'Cancelar Factura'" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
       </div>
       <div class="col-2" *ngIf="metodo === 'venta'">
-        <app-btncircular [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (click)="ingresarFecha()"></app-btncircular>
+        <app-btncircular *ngIf="!factura_a_editar" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (click)="ingresarFecha()"></app-btncircular>
       </div>
 
       <div class="col-5 d-flex justify-content-end">

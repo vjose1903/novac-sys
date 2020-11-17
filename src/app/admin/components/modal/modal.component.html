@@ -434,6 +434,7 @@
         </ng-container>
         <ng-container class="p-1" *ngIf="mostrar_para === 'solo_ver'">
           <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
+          <button (click)="accion(true)" type="submit" class="btn btn-verde mr-2">Editar</button>
         </ng-container>
         <ng-container class="p-1" *ngIf="mostrar_para !== 'anular_factura'">
           <div class="d-flex justify-content-between">

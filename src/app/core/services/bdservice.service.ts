@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppConfig } from '../../../environments/environment';
 import * as _ from 'lodash';
+import { FunctionService } from './functions.service';
 @Injectable({
   providedIn: 'root',
 })
@@ -13,7 +14,7 @@ export class DBservice {
   url = AppConfig.url_server;
   ultimoMensajeMostrado: any;
 
-  constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}
+  constructor(private http: HttpClient, private toastr: ToastrService, private router: Router, private fun: FunctionService) {}
 
   peticion(ruta: string, metodo: string, json?: string): Observable<any> {
     const xhttp = new XMLHttpRequest();
@@ -427,29 +428,36 @@ export class DBservice {
   deleteItem(id, item) {
     return this.peticion(`${item}/${id}`, 'delete');
   }
+
   // =====================================================================
   // TOASTS
   // =====================================================================
   toastSuccess(msg?, titulo?, excepcion = true) {
-    const msg_ = msg;
-    if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
-      this.ultimoMensajeMostrado = msg_;
-      this.toastr.success(msg || '', titulo || '');
+    if (this.fun.canToast) {
+      const msg_ = msg;
+      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
+        this.ultimoMensajeMostrado = msg_;
+        this.toastr.success(msg || '', titulo || '');
+      }
     }
   }
   toastError(msg?, titulo?, excepcion?) {
-    const msg_ = msg;
+    if (this.fun.canToast) {
+      const msg_ = msg;
 
-    if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
-      this.ultimoMensajeMostrado = msg_;
-      this.toastr.error(msg || '', titulo || '');
+      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
+        this.ultimoMensajeMostrado = msg_;
+        this.toastr.error(msg || '', titulo || '');
+      }
     }
   }
   toastWarning(msg?, titulo?, excepcion?) {
-    const msg_ = msg;
-    if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
-      this.ultimoMensajeMostrado = msg_;
-      this.toastr.warning(msg || '', titulo || '');
+    if (this.fun.canToast) {
+      const msg_ = msg;
+      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
+        this.ultimoMensajeMostrado = msg_;
+        this.toastr.warning(msg || '', titulo || '');
+      }
     }
   }
 }

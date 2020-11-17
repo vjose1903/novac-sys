@@ -32,7 +32,7 @@ export class NcfComponent implements OnInit, OnDestroy {
       titulo: 'Cod.',
       key: 'codigo',
       customClass: true,
-      estilos: [{ width: '3rem' }],
+      estilos: [{ width: '3.5rem' }],
     },
     {
       titulo: 'Tipo',
@@ -200,7 +200,7 @@ export class NcfComponent implements OnInit, OnDestroy {
           ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
 
-          ncf.customStyles = { 'td-usado_': { width: '3.5rem' }, 'td-codigo': { width: '3rem' }, 'td-estado_': { width: '3.5rem' } };
+          ncf.customStyles = { 'td-usado_': { width: '3.5rem' }, 'td-codigo': { width: '3.5rem' }, 'td-estado_': { width: '3.5rem' } };
 
           tempNCF.push(ncf);
         }
@@ -268,28 +268,12 @@ export class NcfComponent implements OnInit, OnDestroy {
 
     try {
       const res = await this.dbServ.PaqueteNCF(obj).toPromise();
-      res.cantidad = res.hasta - res.desde + 1;
-      res.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === res.tipo_factura_id)[0].descripcion;
-      res.codigo = _.padStart(res.id, 5, '0');
-      res.fecha_compra = moment(res.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
-      res.fecha_valida = moment(res.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
-      res.colorUsado = res.usado ? 'green' : 'red';
-      res.colorEstado = res.estado ? 'green' : 'red';
-      res.estado_ = res.estado ? 'fas fa-check' : 'fas fa-times';
-      res.usado_ = res.usado ? 'fas fa-check' : 'fas fa-times';
 
+      this.getPaquetesNCF(obj_paginate);
       if (this.is_editando) {
         this.dbServ.toastSuccess('Comprobante editado', 'CORRECTO');
-        setTimeout(() => {
-          this.listaNCF[this.indexSelected] = GLOBAL.duplicarJson(res);
-        }, 5);
       } else {
         this.dbServ.toastSuccess('Comprobante ingresado', 'CORRECTO');
-
-        this.listaNCF = [...this.listaNCF, res];
-        this.listaNCF.sort((a, b) => {
-          return a.id > b.id ? 1 : -1;
-        });
       }
       this.borrar();
     } catch (error) {

@@ -5,9 +5,15 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class FunctionService {
+  canToast = false;
+
   currentUser = null;
 
   constructor() {}
+
+  nextCanToast(nextValue) {
+    this.canToast = nextValue;
+  }
 
   setUser(currentUser) {
     this.currentUser = currentUser;

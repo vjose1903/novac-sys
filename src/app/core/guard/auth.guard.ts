@@ -12,7 +12,10 @@ export class AuthGuard implements CanActivate {
     const token = this.fun.getAuthToken();
 
     if (token === null) {
-      this.router.navigate(['/auth/login']);
+      this.fun.logout();
+      setTimeout(() => {
+        this.router.navigateByUrl('/auth/login');
+      }, 250);
       return false;
     }
 

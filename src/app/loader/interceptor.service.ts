@@ -5,12 +5,15 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, tap, map, finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
 import { FunctionService } from '../core/services/functions.service';
+import { DBservice } from '../core/services/bdservice.service';
+import { Router } from '@angular/router';
 // Note: these are only the initial imports. Add more as needed.
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
-  constructor(public loaderService: LoaderService, private fun: FunctionService) {}
+  constructor(public loaderService: LoaderService, private fun: FunctionService, private dbServ: DBservice, private router: Router) {}
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    this.fun.nextCanToast(false);
     const token = this.fun.getAuthToken();
     const spinner = request.params.get('spinner');
 
@@ -45,12 +48,18 @@ export class InterceptorService implements HttpInterceptor {
           });
         }
 
+        this.fun.nextCanToast(true);
         return event;
       }),
 
       catchError((response: HttpErrorResponse) => {
-        // if (response.status === 401) {
-        // }
+        if (response.error.msg === 'Para realizar esta accion debe de iniciar sesión.') {
+          this.dbServ.toastError(response.error.msg, 'ERROR');
+          this.fun.nextCanToast(false);
+          this.fun.logout();
+          this.router.navigateByUrl('/auth/login');
+        }
+        console.log(response);
 
         return throwError(response);
       }),

@@ -37,6 +37,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   sacos = [25, 50, 100];
   indexRemove;
+
+  @Input() factura;
+  @Input() action;
   @Input() FechaFactura;
   @Input() propietario;
   @Input() metodo;
@@ -158,16 +161,24 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.mServ.mostrarModal(false);
     this.mServ.ModalTablaHeight(false);
   }
+
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
   }
+
   async procesoQuitarArticulo() {
     await this.sacarDescuento(this.indexRemove);
     await this.removeItem(this.indexRemove);
     await this.calculosTotalesGenerales();
     await this.disminuirSecuencia();
   }
-  ngOnChanges() {}
+
+  ngOnChanges(simpleChanges) {
+    console.log('===> ', simpleChanges);
+    if (simpleChanges.factura && simpleChanges.factura.currentValue && this.action === 'update' && _.hasIn(this.factura, 'id')) {
+      this.llenarFactura(this.factura.detalle_facturas);
+    }
+  }
 
   readPrecio() {
     let res = true;
@@ -271,6 +282,54 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   // =============================================
+  //  MODIFICAR FACTURA
+  // =============================================
+  llenarFactura(rows) {
+    for (let j = 0; j < rows.length; j++) {
+      const row = rows[j];
+
+      const cant_en_unidades_actual = row.cantidad_en_unidades;
+      const multiplo = row.cantidad_en_unidades / row.cantidad;
+      const cant_actual = cant_en_unidades_actual / multiplo;
+
+      (this.control.controls[j] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(row.precio));
+      (this.control.controls[j] as any).controls['costo'].setValue(GLOBAL.numFormatTwoDecimals(row.costo));
+
+      (this.control.controls[j] as any).controls['descuento_porciento'].setValue(row.descuento_porciento > 0 ? row.descuento_porciento : null);
+      (this.control.controls[j] as any).controls['descuento_valor'].setValue(row.descuento_valor);
+      (this.control.controls[j] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(row.total));
+
+      (this.control.controls[j] as any).controls['articulo_id'].setValue(row.articulo_id);
+      (this.control.controls[j] as any).controls['cod'].setValue(row.codigo);
+
+      (this.control.controls[j] as any).controls['can'].setValue(cant_actual);
+      (this.control.controls[j] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
+
+      (this.control.controls[j] as any).controls['des'].setValue(_.capitalize(row.articulo));
+
+      if (row.tipo === 'Materia prima') {
+        (this.control.controls[j] as any).controls['descuento_porciento'].disable();
+        (this.control.controls[j] as any).controls['is_materia_prima'].setValue(true);
+      } else {
+        (this.control.controls[j] as any).controls['descuento_porciento'].enable();
+        (this.control.controls[j] as any).controls['is_materia_prima'].setValue(false);
+      }
+
+      let uni = '';
+      if (row.peso_saco) {
+        uni = 'Saco de ' + row.peso_saco + ' libras';
+      } else {
+        uni = row.unidad;
+      }
+
+      (this.control.controls[j] as any).controls['uni'].setValue(uni);
+
+      this.calcularTotalRow(j);
+      this.aumentarSecuencia();
+    }
+  }
+
+  // =============================================
   //  BOTON ATRAS
   // =============================================
   atras() {
@@ -357,65 +416,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
     }
   }
-
-  // buscarArticuloPorCodigo(i, codigo, input?) {
-  //   let precioQuintal;
-  //   this.inputDrop = 'uni-' + i;
-
-  //   // const ARTICULO = this.listaArticulos.filter((articulo) => articulo.codigo === codigo);
-  //   if (ARTICULO[0] === undefined) {
-  //     this.dbServ.toastError('El codigo introducido no existe', 'ERROR');
-  //     setTimeout(() => {
-  //       GLOBAL.enfocarInput('cod-' + i);
-  //     }, 5);
-  //     GLOBAL.selectContenido('cod-' + i);
-  //   } else {
-  //     const cantidades = ARTICULO[0].cantidades;
-  //     if (this.metodo === 'venta' && ARTICULO[0].existencia === 0) {
-  //       if (ARTICULO[0].descripcion === 'Producto terminado') {
-  //         this.dbServ.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
-  //       } else {
-  //         this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
-  //       }
-  //       setTimeout(() => {
-  //         GLOBAL.enfocarInput('cod-' + i);
-  //         GLOBAL.selectContenido('cod-' + i);
-  //       }, 5);
-  //     } else {
-  //       if (ARTICULO[0].existencia > 0 && ARTICULO[0].aviso_existencia > cantidades[ARTICULO[0].medida_alerta]) {
-  //         if (input === 'can-') {
-  //           this.dbServ.toastWarning(
-  //             'Solo quedan ' + cantidades[ARTICULO[0].medida_alerta] + ' ' + ARTICULO[0].medida_alerta + ' de este producto, debe de aumentar el inventario!!!',
-  //             'AVISO',
-  //           );
-  //         }
-  //       }
-
-  //       const arti = ARTICULO[0].contenido_articulos.filter((art) => art.medida === 'Quintal');
-
-  //       if (arti.length !== 0) {
-  //         precioQuintal = arti[0].precio;
-  //       }
-
-  //       if (ARTICULO[0].descripcion === 'Materia prima') {
-  //         (this.control.controls[i] as any).controls['descuento_porciento'].disable();
-  //       } else {
-  //         (this.control.controls[i] as any).controls['descuento_porciento'].enable();
-  //       }
-  //       (this.control.controls[i] as any).controls['des'].setValue(ARTICULO[0].nombre);
-  //       this.verificarRow(i);
-  //       if (this.metodo === 'venta') {
-  //         if (ARTICULO[0].is_detallable) {
-  //           this.articulo_detallable(ARTICULO[0]);
-  //         } else {
-  //           this.articulo_no_detallable(ARTICULO[0]);
-  //         }
-  //       } else {
-  //         this.articulo_detallable(ARTICULO[0]);
-  //       }
-  //     }
-  //   }
-  // }
 
   articulo_detallable(art) {
     const precioQuintal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
@@ -812,43 +812,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.modalSearch = false;
     this.showModal = false;
   }
-
-  // clickRowModal(arg) {
-  //   const index = _.findIndex(this.listaArticulos, (o: any) => {
-  //     return o.codigo === arg.codigo;
-  //   });
-  //   // this.listaArticulos[index].seleccionado = true;
-
-  //   const cantidades = arg.cantidades;
-
-  //   if (arg.existencia > 0 && arg.aviso_existencia > cantidades[arg.medida_alerta]) {
-  //     this.dbServ.toastWarning('Solo quedan ' + cantidades[arg.medida_alerta] + ' ' + arg.medida_alerta + ' de este producto, debe de aumentar el inventario!!!', 'AVISO');
-  //   }
-
-  //   (this.control.controls[arg.index] as any).controls['cod'].setValue(arg.codigo);
-  //   (this.control.controls[arg.index] as any).controls['des'].setValue(arg.nombre);
-
-  //   if (this.metodo === 'venta') {
-  //     if (arg.descripcion === 'Materia prima') {
-  //       (this.control.controls[arg.index] as any).controls['descuento_porciento'].disable();
-  //     } else {
-  //       (this.control.controls[arg.index] as any).controls['descuento_porciento'].enable();
-  //     }
-  //   }
-
-  //   const arti = arg.medida;
-  //   if (this.metodo === 'venta') {
-  //     if (arg.is_detallable) {
-  //       this.articulo_detallable(arg);
-  //     } else {
-  //       this.articulo_no_detallable(arg);
-  //     }
-  //   } else {
-  //     this.articulo_detallable(arg);
-  //   }
-  //   const sigInput = 'can-' + arg.index;
-  //   GLOBAL.enfocarInput(sigInput);
-  // }
 
   setInputDrop(arg) {
     this.inputDrop = 'uni-' + arg;

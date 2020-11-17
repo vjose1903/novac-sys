@@ -228,16 +228,8 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
         if (obj.id === null) {
           this.dbServ.createSuplidor(obj).subscribe(
             (res) => {
-              const obj = JSON.parse(JSON.stringify(res));
+              this.getSuplidores(obj_paginate);
 
-              obj.documentos_de_identidad.map((docu) => {
-                if (docu.principal) {
-                  obj.documento = docu.documento;
-                }
-              });
-              obj.codigo = _.padStart(obj.id, 5, '0');
-
-              this.listaSuplidores = [...this.listaSuplidores, obj];
               this.dbServ.toastSuccess('Suplidor registrado con exito.', 'Correcto');
               this.borrar();
             },
@@ -250,15 +242,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
         } else {
           this.dbServ.editarSuplidor(obj).subscribe(
             (res) => {
-              const obj = JSON.parse(JSON.stringify(res));
-              obj.documentos_de_identidad.map((docu) => {
-                if (docu.principal) {
-                  obj.documento = docu.documento;
-                }
-              });
-              obj.codigo = _.padStart(obj.id, 5, '0');
-
-              this.listaSuplidores[this.indexSelected] = obj;
+              this.getSuplidores(obj_paginate);
 
               this.dbServ.toastSuccess('Suplidor editado con exito.', 'Correcto');
               this.borrar();

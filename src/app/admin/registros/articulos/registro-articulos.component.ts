@@ -166,7 +166,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   async getArticulos(e) {
     try {
-      this.listaArticulos = [];
       const page = e.page;
       const per_page = e.per_page;
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
@@ -208,7 +207,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
         this.form.controls.precio_principal.reset(null);
       });
     } else {
-      this.ARRAY_FORMULA = ([] as unknown) as FormArray;
+      this.resetArray();
       this.is_combo = false;
     }
   }
@@ -549,9 +548,43 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       } else {
         res = false;
       }
+
+      if (this.COMPRADOEN === 'Quintal' || this.COMPRADOEN === 'Saco') {
+        if (FORM.cantidad_contenido_padre.value && FORM.precio_padre.value && FORM.costo_padre.value && FORM.medida_contenido_padre.value) {
+          res = false;
+        } else {
+          res = true;
+        }
+      }
+
+      if (this.COMPRADOEN === 'Caja') {
+        if (this.MEDIDACAJA === 'Unidad') {
+          if (FORM.cantidad_contenido_padre.value && FORM.precio_padre.value && FORM.costo_padre.value && FORM.medida_contenido_padre.value) {
+            res = false;
+          } else {
+            res = true;
+          }
+        } else {
+          if (
+            FORM.cantidad_contenido_padre.value &&
+            FORM.precio_padre.value &&
+            FORM.costo_padre.value &&
+            FORM.medida_contenido_padre.value &&
+            FORM.cantidad_contenido_hijo.value &&
+            FORM.precio_hijo.value &&
+            FORM.costo_hijo.value &&
+            FORM.medida_contenido_hijo.value
+          ) {
+            res = false;
+          } else {
+            res = true;
+          }
+        }
+      }
     } else {
       res = true;
     }
+
     // if (this.ARRAY_FORMULA.length === 0) {
     //     if (this.COMPRADOEN === 'Unidad') {
     //       res = false;

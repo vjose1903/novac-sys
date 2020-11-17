@@ -214,12 +214,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
           (res) => {
             this.dbServ.toastSuccess('Usuario Editado', 'Correcto');
 
-            const docu = res.data.documentos_de_identidad.filter((doc) => doc.principal === true);
-            res.data.nombreCompleto = res.data.nombre + ' ' + res.data.apellido;
-            res.data.documento_identidad = docu[0].documento;
-            res.data.role_ = res.data.sexo === 'm' ? this.rolesM[res.data.role] : this.rolesF[res.data.role];
-
-            this.listaEmpleados[this.indexSeleccionado] = res.data;
+            this.getEmpleados(obj_paginate);
             this.borrar();
           },
           (err) => {
@@ -229,19 +224,16 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
       } else {
         this.dbServ.createEmpleados(objSend).subscribe(
           (res) => {
-            const docu = res.data.documentos_de_identidad.filter((doc) => doc.principal === true);
-            res.data.nombreCompleto = res.data.nombre + ' ' + res.data.apellido;
-            res.data.documento_identidad = docu[0].documento;
-            res.data.role_ = res.data.sexo === 'm' ? this.rolesM[res.data.role] : this.rolesF[res.data.role];
 
-            this.listaEmpleados = [...this.listaEmpleados, res.data];
+            this.getEmpleados(obj_paginate);
             this.dbServ.toastSuccess('Usuario Creado', 'Correcto');
-            this.form.reset();
+
+            this.borrar();
             this.enfocarInput('campoNombre');
           },
           (err) => {
             this.mostrarErrores(err.error.errors.full_messages);
-            // this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo);
+
           },
         );
       }
