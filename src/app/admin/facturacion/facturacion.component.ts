@@ -272,10 +272,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     });
 
-    setTimeout(() => {
-      this.enfocarInput('tipoFact');
-    }, 5);
-
     this.dbServ.getTiposFacturas().subscribe((res) => {
       this.lista_tipos_facturas = res;
     });
@@ -283,6 +279,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (this.action === 'update') {
       this.factura_a_editar = {};
       this.buscarFacturaEditar();
+    } else {
+      setTimeout(() => {
+        this.enfocarInput('tipoFact');
+      }, 5);
     }
   }
 
@@ -297,7 +297,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.tipoFactura = this.tipos_de_facturas[_.lowerCase(res.tipo_factura)];
 
     this.modo_factura = res.is_viaje ? 'viaje' : res.is_adelantada ? 'adelantada' : 'normal';
-
+    this.enfocarInput('cod-0');
     console.log('FACTURA A EDITAR ==> ', res);
   }
 
