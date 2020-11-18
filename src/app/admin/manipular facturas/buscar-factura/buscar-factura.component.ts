@@ -228,6 +228,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
     this.subDeci.unsubscribe();
     this.subEsc.unsubscribe();
+    this.borrar()
   }
 
   async getTipoFacturas() {

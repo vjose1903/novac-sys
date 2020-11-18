@@ -432,10 +432,7 @@
           <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
           <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">Anular factura</button>
         </ng-container>
-        <ng-container class="p-1" *ngIf="mostrar_para === 'solo_ver'">
-          <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
-          <button (click)="accion(true)" type="submit" class="btn btn-verde mr-2">Editar</button>
-        </ng-container>
+
         <ng-container class="p-1" *ngIf="mostrar_para !== 'anular_factura'">
           <div class="d-flex justify-content-between">
             <div>
@@ -450,7 +447,13 @@
                 </span>
               </span>
             </div>
-            <div *ngIf="mostrar_para === 'nota_credito' && mostrar_para === 'nota_debito'">
+
+            <div class="p-1" *ngIf="mostrar_para === 'solo_ver'">
+              <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
+              <button (click)="accion(true)" type="submit" class="btn btn-verde mr-2">Editar</button>
+            </div>
+
+            <div *ngIf="mostrar_para === 'nota_credito' || mostrar_para === 'nota_debito'">
               <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
               <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
             </div>

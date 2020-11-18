@@ -240,6 +240,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.paraFiltroArticulos = undefined;
     this.paraFiltroClientes = undefined;
     this.paraFiltroSuplidor = undefined;
+    this.cant_notas_credito = 0;
+    this.cant_notas_debito = 0;
     console.log('!!!!!!!! REINICIO !!!!!!!');
   }
 

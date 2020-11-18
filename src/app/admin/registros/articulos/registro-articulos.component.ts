@@ -345,6 +345,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.COMPRADOEN = value;
     if (value === 'Quintal') {
       this.calculatePrice();
+      this.form.controls.medida_contenido_padre.setValue('Libra');
     }
     this.fillDropAlerta(value);
   }

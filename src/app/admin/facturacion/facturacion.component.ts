@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, HostListener } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { DBservice } from '../../core/services/bdservice.service';
 import { map, filter } from 'rxjs/operators';
@@ -126,6 +126,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private pdfServ: PdfService,
     private route: ActivatedRoute,
+    private router: Router,
   ) {
     this.form = this.fb.group({
       id: [],
@@ -307,7 +308,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(null);
     this.mServ.ModalTablaHeight(false);
     this.mServ.mostrarModal(false);
-    this.CancelarFactura();
+    this.CancelarFactura('salir');
     this.subObj.unsubscribe();
     this.subDeci.unsubscribe();
   }
@@ -671,7 +672,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.mServ.ModalSeleccion(arg);
     }
     this.mServ.mostrarModal(true);
-    console.log('abrir modal');
   }
 
   decisionModal(arg) {
@@ -679,7 +679,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       if (this.tipoModal === 'imprimir') {
         this.IMPRIMIR();
       } else if (this.tipoModal === 'cancelar') {
-        this.CancelarFactura();
+        this.CancelarFactura('quedar');
       }
     }
     this.tipoModal = '';
@@ -729,52 +729,60 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  CancelarFactura() {
-    this.articulosAcambiar = [];
-    this.newCuerpo = undefined;
-    this.FechaFacturaMostrar = undefined;
-    this.propietario_factura = null;
-    this.NCFcompra = null;
-    this.CostoYgasto = null;
-    this.mServ.ModalObj(null);
-    this.mServ.modalTipo(null);
-    this.mServ.ModalSeleccion(null);
-    this.FacturaAtrasada = false;
-    this.fecha_equivalente = new Date();
-    this.fecha_vencimiento = new Date();
-    this.fecha_viaje = new Date();
-    this.modo_factura = 'normal';
-    this.is_adelantada = false;
-    this.is_viaje = false;
-    this.formarFechaFactura(new Date());
+  CancelarFactura(tipo) {
+    if (tipo === 'quedar') {
+      this.router.navigateByUrl('/admin');
 
-    if (this.metodo === 'venta') {
-      this.form.patchValue({
-        id: 1,
-        nombre: 'Cliente contado',
-        direccion: 'Autopista duarte KM 0 el Higuero',
-        telefono: null,
-      });
-      this.tipoFactura = '02';
+      setTimeout(() => {
+        this.router.navigateByUrl(`/admin/factura/${this.metodo}/new/0`);
+      }, 1);
     } else {
-      this.tipoFactura = '01';
-      this.form.patchValue({
-        id: null,
-        nombre: null,
-        direccion: null,
-        telefono: null,
-      });
+      this.articulosAcambiar = [];
+      this.newCuerpo = undefined;
+      this.FechaFacturaMostrar = undefined;
+      this.propietario_factura = null;
+      this.NCFcompra = null;
+      this.CostoYgasto = null;
+      this.mServ.ModalObj(null);
+      this.mServ.modalTipo(null);
+      this.mServ.ModalSeleccion(null);
+      this.FacturaAtrasada = false;
+      this.fecha_equivalente = new Date();
+      this.fecha_vencimiento = new Date();
+      this.fecha_viaje = new Date();
+      this.modo_factura = 'normal';
+      this.is_adelantada = false;
+      this.is_viaje = false;
+      this.formarFechaFactura(new Date());
+
+      if (this.metodo === 'venta') {
+        this.form.patchValue({
+          id: 1,
+          nombre: 'Cliente contado',
+          direccion: 'Autopista duarte KM 0 el Higuero',
+          telefono: null,
+        });
+        this.tipoFactura = '02';
+      } else {
+        this.tipoFactura = '01';
+        this.form.patchValue({
+          id: null,
+          nombre: null,
+          direccion: null,
+          telefono: null,
+        });
+      }
+
+      this.DESCUENTO = 0.0;
+      this.BRUTO = 0.0;
+      this.TOTAL = 0.0;
+      this.condicion_fact = 'Contado';
+      this.forma_pago = 'Efectivo';
+
+      this.ITBIS = 0;
+      this.cuerpo.RESETCUERPO();
+      this.enfocarInput('tipoFact');
     }
-
-    this.DESCUENTO = 0.0;
-    this.BRUTO = 0.0;
-    this.TOTAL = 0.0;
-    this.condicion_fact = 'Contado';
-    this.forma_pago = 'Efectivo';
-
-    this.ITBIS = 0;
-    this.cuerpo.RESETCUERPO();
-    this.enfocarInput('tipoFact');
   }
   calculatePrice(costo): number {
     if (costo > 0 || costo != null || costo) {
@@ -1014,7 +1022,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     try {
       const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
-      await this.CancelarFactura();
+      await this.CancelarFactura('quedar');
 
       this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO', true);
       res['FACTURA_DE'] = this.metodo;

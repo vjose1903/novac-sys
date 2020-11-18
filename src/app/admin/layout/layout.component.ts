@@ -229,7 +229,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         this.actualTab = 'home';
         setTimeout(() => {
           this.router.navigate(['/admin/buscarFactura/' + accion]);
-        }, 5);
+        }, 25);
         break;
 
       case 'ingreso':
