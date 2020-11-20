@@ -59,7 +59,6 @@ export class InterceptorService implements HttpInterceptor {
           this.fun.logout();
           this.router.navigateByUrl('/auth/login');
         }
-        console.log(response);
 
         return throwError(response);
       }),

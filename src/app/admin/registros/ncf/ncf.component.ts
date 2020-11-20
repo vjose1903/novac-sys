@@ -27,6 +27,9 @@ export class NcfComponent implements OnInit, OnDestroy {
   indexSelected: any;
   tipoModal: string;
   seleccionModal: any;
+  estado = false;
+  usado = false;
+
   info = [
     {
       titulo: 'Cod.',
@@ -264,6 +267,7 @@ export class NcfComponent implements OnInit, OnDestroy {
       fecha_valida: moment(this.fechaValidez).format(),
       estado: false,
       usado: false,
+      status: true,
     };
 
     try {
@@ -294,6 +298,8 @@ export class NcfComponent implements OnInit, OnDestroy {
   atras() {}
 
   borrar() {
+    this.estado = false;
+    this.usado = false;
     this.is_editando = false;
     this.ncfSelected = undefined;
     this.tipo_articulo_id = -1;
@@ -318,10 +324,15 @@ export class NcfComponent implements OnInit, OnDestroy {
   editarItem(item) {
     this.indexSelected = item.INDEX;
     this.is_editando = true;
+
     if (item.METODO === 'editar') {
       this.paqueteSelected = item.ARG;
       this.titulo = ' Editar paquete de NCF numero: ' + item.ARG.codigo + ' de: ' + item.ARG.tipoC;
       this.boton = 'Editar';
+
+      this.estado = item.ARG.estado;
+      this.usado = item.ARG.usado;
+
       this.llenarCampos(item.ARG);
     }
   }
@@ -334,6 +345,7 @@ export class NcfComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
+
   decisionModal(arg) {
     if (arg && this.seleccionModal) {
       this.dbServ.deleteNCF(this.seleccionModal.id).subscribe(

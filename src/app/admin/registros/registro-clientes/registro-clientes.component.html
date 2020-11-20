@@ -196,7 +196,7 @@
           <div class="from-group">
             <!-- <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a> -->
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-            <input [disabled]="!form.valid" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+            <input [disabled]="abilitarSend()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
           </div>
         </div>
       </form>

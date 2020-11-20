@@ -127,7 +127,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.subTipo = this.mServ.TIPOMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
         this.tipoModal = res;
-        console.log('tipoModal ', this.tipoModal);
       }
     });
 
@@ -138,7 +137,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         } else {
           this.seleccionModal = res;
         }
-        console.log('this.seleccionModal ####### ', this.seleccionModal);
 
         this.paraFiltroArticulos = res.filtrarArticulo;
         this.paraFiltroClientes = res.filtrarCliente;
@@ -201,7 +199,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   ngOnChanges(simpleChanges) {
-    console.log('TMM--> ', simpleChanges);
     // if (this.seleccionModal) {
     //   if (this.tipoModal === 'buscar') {
     //     this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
@@ -242,7 +239,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.paraFiltroSuplidor = undefined;
     this.cant_notas_credito = 0;
     this.cant_notas_debito = 0;
-    console.log('!!!!!!!! REINICIO !!!!!!!');
   }
 
   devolverCLick(arg) {

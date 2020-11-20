@@ -112,11 +112,6 @@ export class InventarioComponent implements OnInit, OnDestroy {
       const per_page = e.per_page;
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
-      console.log('page ', page);
-      console.log('per_page ', per_page);
-      console.log('palabra_a_buscar ', palabra_a_buscar);
-      console.log('this.FechaFactura ', this.FechaFactura);
-
       const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.FechaFactura, this.filtro).toPromise();
       this.palabra_buscar = palabra_a_buscar;
 
@@ -194,9 +189,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
-  p() {
-    console.log(obj_paginate);
-  }
+  p() {}
   async decisionModal(arg) {
     if (arg.bool) {
       const temp = JSON.parse(JSON.stringify(this.listaArticulos));

@@ -124,7 +124,6 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   }
 
   async getViajes(e) {
-    this.viajes = undefined;
     try {
       const page = e.page;
       const per_page = e.per_page;

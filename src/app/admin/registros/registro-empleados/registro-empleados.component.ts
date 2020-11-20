@@ -224,7 +224,6 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
       } else {
         this.dbServ.createEmpleados(objSend).subscribe(
           (res) => {
-
             this.getEmpleados(obj_paginate);
             this.dbServ.toastSuccess('Usuario Creado', 'Correcto');
 
@@ -233,7 +232,6 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
           },
           (err) => {
             this.mostrarErrores(err.error.errors.full_messages);
-
           },
         );
       }
@@ -267,7 +265,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
           _.pullAt(this.listaEmpleados, this.indexBorrar);
           this.tipoModal = '';
           this.indexBorrar = -1;
-          this.decisionModal = null;
+          // this.decisionModal = null;
         },
         (err) => {
           this.mostrarErrores(err.error.errors);

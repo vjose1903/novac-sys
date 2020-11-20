@@ -181,6 +181,22 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
     });
   }
 
+  abilitarSend() {
+    let res = true;
+    if (this.form.valid) {
+      res = false;
+
+      if (this.form.controls[this.doc_principal].value && !this.validarRayaAbajo(this.doc_principal)) {
+        res = false;
+      } else {
+        res = true;
+      }
+    } else {
+      res = true;
+    }
+    return res;
+  }
+
   submit(form) {
     const obj = JSON.parse(JSON.stringify(form.value));
     let devolver = false;
@@ -191,10 +207,12 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
       { doc: obj.cedula, descripcion: 'cedula' },
       { doc: obj.rnc, descripcion: 'rnc' },
     ];
+
     if (this.validarRayaAbajo('telefono')) {
       Fail.push('Telefono');
       devolver = true;
     }
+
     temp_documentos_identidad.forEach((element) => {
       //  esto es para saber si el documento de identidad esta mal escrito
       if (this.validarRayaAbajo(element.descripcion)) {

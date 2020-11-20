@@ -126,7 +126,7 @@ export class DBservice {
   }
 
   getViajesByCompletada(arg, page, per_page, paginado, estado = false) {
-    return this.peticion(`cabecera_facturas/custom/viajes/${estado}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticionSinLoad(`cabecera_facturas/custom/viajes/${estado}/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   getFacturas() {
@@ -338,6 +338,7 @@ export class DBservice {
   revertirLastReciboByFacturaId(id) {
     return this.peticion(`recibos_ingresos/revertir/${id}`, 'get');
   }
+
   // =====================================================================
   // FACTURAS
   // =====================================================================
@@ -422,6 +423,11 @@ export class DBservice {
     return this.peticionSinLoad(`vehiculos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
+  eliminarVehiculo(arg) {
+    const id = arg.id;
+    const body = _.omit(arg, ['id']);
+    return this.peticion('vehiculos/delete/' + id, 'patch', JSON.stringify(null));
+  }
   // =====================================================================
   // DELETE
   // =====================================================================

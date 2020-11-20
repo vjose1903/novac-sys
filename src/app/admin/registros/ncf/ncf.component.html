@@ -56,7 +56,7 @@
         </div>
         <div class="col-md-6">
           <div class="form-group mt-4">
-            <label class="control-label">Fecha validez: <span style="color: red">*</span></label>
+            <label class="control-label">Fecha validez: </label>
             <input
               type="text"
               [bsConfig]="dpConfigValidez"
@@ -67,6 +67,7 @@
               #dp="bsDatepicker"
               placement="bottom"
               (focus)="setDateInputs(fechaCompra)"
+              disabled
               bsDatepicker
             />
           </div>

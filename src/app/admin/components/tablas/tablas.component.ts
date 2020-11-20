@@ -231,7 +231,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     setTimeout(() => {
       this.ready = true;
-      console.log(this.data);
     }, 250);
   }
 
@@ -347,7 +346,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const temp = GLOBAL.duplicarJson(this.ROW + '0');
     this.IDROW = null;
     this.pagActual = arg;
-    console.log('this.pagActual ---> ', this.pagActual);
 
     this.paginate_info = {
       page: arg,
@@ -538,8 +536,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           const span_ = document.getElementById(span) as any;
 
           if (span_) {
-            console.log(span_);
-
             span_.setAttribute('style', list_estilos);
           }
         }

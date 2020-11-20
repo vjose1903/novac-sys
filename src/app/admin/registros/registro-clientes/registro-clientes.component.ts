@@ -264,6 +264,23 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  abilitarSend() {
+    let res = true;
+    if (this.form.valid) {
+      res = false;
+
+      if (this.form.controls[this.doc_principal].value && !this.validarRayaAbajo(this.doc_principal)) {
+        res = false;
+      } else {
+        res = true;
+      }
+    } else {
+      res = true;
+    }
+    return res;
+  }
+
   submit(arg) {
     let devolver = false;
     let cedulaCorrecta = false;
@@ -339,7 +356,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
             obj.cuenta = obj.cuenta;
             this.dbServ.createCliente(obj).subscribe(
               (res) => {
-
                 this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
                 this.getClientes(obj_paginate);
                 this.borrar();
@@ -354,7 +370,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
             obj.cuenta = 0;
             this.dbServ.editarCliente(obj).subscribe(
               (res) => {
-
                 this.getClientes(obj_paginate);
                 this.enfocarInput('campoNombre');
                 this.borrar();
@@ -448,7 +463,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
           this.dbServ.toastSuccess('Cliente ' + obj.nombre + ' borrado.', 'CORRECTO');
           _.pullAt(this.listaClientes, this.indexBorrar);
           this.tipoModal = '';
-          this.decisionModal = null;
+          // this.decisionModal = null;
         },
         (err) => {
           this.mostrarErrores(err.error);

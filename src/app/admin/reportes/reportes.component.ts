@@ -74,7 +74,6 @@ export class ReportesComponent implements OnInit, OnDestroy {
         data: res.body,
         type: 'cuadre_caja',
       };
-      console.log('res.body --> ', res.body);
 
       this._ipc.send('print', obj);
 

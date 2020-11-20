@@ -152,7 +152,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   getTipoArticulos() {
     this.dbServ.getTipoArticulos().subscribe((res) => {
       this.listaTipoArticulos = GLOBAL.duplicarJson(res);
-      console.log(this.listaTipoArticulos);
     });
   }
 
@@ -181,7 +180,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
         total: res.total_registros,
         tabla: 'listaArticulos',
       };
-      console.log(this.listaArticulos);
 
       this.tServ.Func_total_paginas(obj);
     } catch (error) {

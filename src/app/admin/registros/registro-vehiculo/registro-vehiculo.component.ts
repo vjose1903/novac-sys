@@ -83,7 +83,6 @@ export class RegistroVehiculoComponent implements OnInit {
     const page = e.page;
     const per_page = e.per_page;
     const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
-    console.log(`(${palabra_a_buscar})`);
 
     try {
       const res = await this.dbServ.getVehiculosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
@@ -124,6 +123,7 @@ export class RegistroVehiculoComponent implements OnInit {
       nombre_no_empleado: [{ value: null, disabled: true }, Validators.required],
       apellido_no_empleado: [{ value: null, disabled: true }, Validators.required],
       telefono_no_empleado: [{ value: null, disabled: true }, Validators.required],
+      estado: [true],
     });
   }
 
@@ -243,12 +243,12 @@ export class RegistroVehiculoComponent implements OnInit {
   decisionModal(arg) {
     if (arg) {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
-      this.dbServ.eliminarArticulo(obj).subscribe(
+      this.dbServ.eliminarVehiculo(obj).subscribe(
         (res) => {
-          this.dbServ.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
-          _.pullAt(this.listaVehiculos, this.indexBorrar);
+          this.dbServ.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
+          this.getVehiculos(obj_paginate);
           this.tipoModal = '';
-          this.decisionModal = null;
+          // this.decisionModal = null;
           this.borrar();
         },
         (err) => {
@@ -275,6 +275,7 @@ export class RegistroVehiculoComponent implements OnInit {
       marca: this.listaMarcas.find((marca) => marca.id === x.marca).descripcion,
       modelo: this.listaModelos.find((modelo) => modelo.id === x.modelo).descripcion,
       anio: x.anio,
+      estado: x.estado,
 
       nombre_no_empleado: x.nombre_no_empleado,
       apellido_no_empleado: x.apellido_no_empleado,
