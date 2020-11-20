@@ -143,7 +143,7 @@ autoUpdater.on('download-progress', (progress) => {
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   const dialogOpts = {
     type: 'info',
-    buttons: ['Reiniciar', 'Luego'],
+    buttons: ['Reiniciar'],
     title: 'Actualizacion descargada',
     message: process.platform === 'win32' ? releaseNotes : releaseName,
     detail: 'Para que las actualizaciones sean efectivas debe de reiniciar la aplicacion.',
