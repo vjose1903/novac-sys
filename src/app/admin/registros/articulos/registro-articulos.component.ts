@@ -328,8 +328,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   resetCompradoEn(value) {
-    this.form.controls.medida_contenido_padre.setValue(null);
-    this.form.controls.medida_contenido_hijo.setValue(null);
+    this.form.controls.medida_contenido_padre.reset(null);
+    this.form.controls.medida_contenido_hijo.reset(null);
     this.form.controls.cantidad_contenido_padre.setValue(null);
     this.form.controls.cantidad_contenido_hijo.setValue(null);
 
@@ -534,10 +534,13 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     const FORM = this.form.controls;
 
     if (this.form.valid) {
+      console.log("this.form.controls['tipo_articulo_id'] ", this.form.controls['tipo_articulo_id']);
       if (this.form.controls['tipo_articulo_id'].value === '3') {
         res = true;
 
         this.ARRAY_FORMULA.controls.forEach((row, i) => {
+          console.log("(row as any).controls['articulo_id'].value ", (row as any).controls['articulo_id'].value);
+          console.log("(row as any).controls['cantidad_formula'].value ", (row as any).controls['cantidad_formula'].value);
           if ((row as any).controls['articulo_id'].value && (row as any).controls['cantidad_formula'].value) {
             res = false;
           } else {
@@ -548,7 +551,16 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
         res = false;
       }
 
+      console.log('------------------------------------------------------------ ');
+      console.log('this.COMPRADOEN ', this.COMPRADOEN);
+      console.log('------------------------------------------------------------ ');
       if (this.COMPRADOEN === 'Quintal' || this.COMPRADOEN === 'Saco') {
+        console.log('------------------------------------------------------------ ');
+        console.log('FORM.cantidad_contenido_padre.value ', FORM.cantidad_contenido_padre.value);
+        console.log('FORM.precio_padre.value ', FORM.precio_padre.value);
+        console.log('FORM.costo_padre.value ', FORM.costo_padre.value);
+        console.log('FORM.medida_contenido_padre.value ', FORM.medida_contenido_padre.value);
+        console.log('------------------------------------------------------------ ');
         if (FORM.cantidad_contenido_padre.value && FORM.precio_padre.value && FORM.costo_padre.value && FORM.medida_contenido_padre.value) {
           res = false;
         } else {
@@ -557,13 +569,34 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       }
 
       if (this.COMPRADOEN === 'Caja') {
+        console.log('------------------------------------------------------------ ');
+        console.log('this.MEDIDACAJA  ', this.MEDIDACAJA);
+        console.log('------------------------------------------------------------ ');
         if (this.MEDIDACAJA === 'Unidad') {
+          console.log('------------------------------------------------------------ ');
+          console.log('FORM.cantidad_contenido_padre.value ', FORM.cantidad_contenido_padre.value);
+          console.log('FORM.precio_padre.value ', FORM.precio_padre.value);
+          console.log('FORM.costo_padre.value ', FORM.costo_padre.value);
+          console.log('FORM.medida_contenido_padre.value ', FORM.medida_contenido_padre.value);
+          console.log('------------------------------------------------------------ ');
           if (FORM.cantidad_contenido_padre.value && FORM.precio_padre.value && FORM.costo_padre.value && FORM.medida_contenido_padre.value) {
             res = false;
           } else {
             res = true;
           }
         } else {
+          console.log('------------------------------------------------------------ ');
+          console.log('FORM.cantidad_contenido_padre.value ', FORM.cantidad_contenido_padre.value);
+          console.log('FORM.precio_padre.value ', FORM.precio_padre.value);
+          console.log('FORM.costo_padre.value ', FORM.costo_padre.value);
+          console.log('FORM.medida_contenido_padre.value ', FORM.medida_contenido_padre.value);
+          console.log('------------------------------------------------------------ ');
+
+          console.log('FORM.cantidad_contenido_hijo.value ', FORM.cantidad_contenido_hijo.value);
+          console.log('FORM.precio_hijo.value ', FORM.precio_hijo.value);
+          console.log('FORM.costo_hijo.value ', FORM.costo_hijo.value);
+          console.log('FORM.medida_contenido_hijo.value ', FORM.medida_contenido_hijo.value);
+          console.log('------------------------------------------------------------ ');
           if (
             FORM.cantidad_contenido_padre.value &&
             FORM.precio_padre.value &&
