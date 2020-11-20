@@ -11,8 +11,8 @@
 
 <p-dialog
   id="modalProgress"
-  closable="false"
-  closeOnEscape="false"
+  [closable]="false"
+  [closeOnEscape]="false"
   header="Porcentaje de descarga"
   [(visible)]="displayPercent"
   [positionTop]="780"
@@ -32,6 +32,7 @@
   </div>
   <p-progressBar [value]="objPercent?.percent"></p-progressBar>
   <div class="mr-2">
-    <span class="negrita">Tiempo restante: {{ tiempo_restante }} </span>
+    <span> </span>
+    <!-- <span class="negrita">Tiempo restante: {{ tiempo_restante }} </span> -->
   </div>
 </p-dialog>
