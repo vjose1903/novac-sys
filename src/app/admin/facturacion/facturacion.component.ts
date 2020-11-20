@@ -159,7 +159,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     // this.FechaFacturaMostrar = moment(date).format('DD/MM/YYYY');
 
-    this.FechaFactura = fechaTemp + ' ' + hora + ':' + minutos;
+    this.FechaFactura = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
     this.FechaFacturaMostrar = GLOBAL.my_dateFormater(this.FechaFactura) + ' - ' + GLOBAL.my_houreFormater(this.FechaFactura);
   }
 

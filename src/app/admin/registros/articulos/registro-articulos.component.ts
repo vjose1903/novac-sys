@@ -150,6 +150,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   getTipoArticulos() {
+    this.listaTipoArticulos = [];
     this.dbServ.getTipoArticulos().subscribe((res) => {
       this.listaTipoArticulos = GLOBAL.duplicarJson(res);
     });
@@ -160,7 +161,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     const minutos = moment(date).minutes();
     const fechaTemp = moment(date).format('YYYY-MM-DD');
 
-    this.FechaFactura = fechaTemp + ' ' + hora + ':' + minutos;
+    this.FechaFactura = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
   }
 
   async getArticulos(e) {
@@ -960,8 +961,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
       this.dbServ.editarArticulo(obj).subscribe(
         (res) => {
-          this.getArticulos(obj_paginate);
-
+          this.necesarioStart();
           this.borrar();
 
           this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto', true);
@@ -975,8 +975,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     } else {
       this.dbServ.createArticulo(obj).subscribe(
         (res) => {
-          this.getArticulos(obj_paginate);
-
+          this.necesarioStart();
           this.borrar();
           this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto', true);
         },

@@ -102,7 +102,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
     const minutos = moment(date).minutes();
     const fechaTemp = moment(date).format('YYYY-MM-DD');
 
-    this.FechaFactura = fechaTemp + ' ' + hora + ':' + minutos;
+    this.FechaFactura = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
   }
 
   async getArticulos(e) {
