@@ -80,7 +80,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     const minutos = moment(date).minutes();
     const fechaTemp = moment(date).format('YYYY-MM-DD');
 
-    this.FechaFactura = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
+    this.FechaConduce = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
   }
 
   ngOnInit() {
