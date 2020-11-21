@@ -87,6 +87,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     editar: false,
     mostrar: false,
   };
+
   @Input() id_tabla = 'tabla';
 
   @Input() seleccionado = -1;

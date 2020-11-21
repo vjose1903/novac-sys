@@ -124,6 +124,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     return item._destroy !== '1';
   }
 
+  async filtrarArticulo(e) {
+    await this.formarFechaFactura(new Date());
+    await this.getArticulos(e);
+  }
+
   async necesarioStart() {
     await this.formarFechaFactura(new Date());
     await this.getArticulos(this.obj_paginate_);
@@ -302,10 +307,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       }
     }
   }
+
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
   }
+
   borrar() {
     this.ProductoEditando = null;
     this.form.reset();
@@ -393,6 +400,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   getCosto(id, i) {
     const control = this.form.controls['rowFormula'] as FormArray;
+    console.log('this.listaMateriasPrimas==> ', this.listaMateriasPrimas);
 
     const MateriaPrima = this.listaMateriasPrimas.filter((val) => val.id === _.parseInt(id))[0];
 

@@ -431,6 +431,9 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
     {
       titulo: 'Nombre',
       key: 'nombre',
+      customClass: true,
+      estilos: [{ 'background-color': 'red' }],
+
     },
     {
       titulo: 'Apellido',
