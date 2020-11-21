@@ -343,13 +343,13 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }, 250);
   }
 
-  pageChange(arg) {
+  pageChange(arg, tipo = '') {
     const temp = GLOBAL.duplicarJson(this.ROW + '0');
     this.IDROW = null;
-    this.pagActual = arg;
+    this.pagActual = tipo === 'filtro' ? 1 : arg;
 
     this.paginate_info = {
-      page: arg,
+      page: tipo === 'filtro' ? 1 : arg,
       per_page: this.mostrar,
       searchText: this.searchText === '' ? ' ' : this.searchText,
     };
@@ -602,7 +602,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     // ------------------------------------------------------------------------------
 
     if (this.searchText === '' || this.searchText === ' ' || this.searchText) {
-      this.pageChange(this.pagActual);
+      this.pageChange(this.pagActual, 'filtro');
     }
 
     // ------------------------------------------------------------------------------
