@@ -414,6 +414,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     console.log(control.value[i]);
 
     try {
+      (control.controls[i] as any).controls['costo_formula'].setValue(undefined);
       const res = await this.dbServ.getCostoArticulo(control.value[i].articulo_id).toPromise();
 
       (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(res.costo));

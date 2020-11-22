@@ -6,12 +6,9 @@ import { map } from 'rxjs/operators';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
 import { UsuariosService } from '../../core/services/usuarios.service';
 
-import { get } from 'http';
-
 import { DBservice } from '../../core/services/bdservice.service';
 import { IpcService } from '../../core/services/ipc.service';
 
-import * as moment from 'moment';
 import { FunctionService } from '../../core/services/functions.service';
 
 @Component({
