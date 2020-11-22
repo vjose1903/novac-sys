@@ -7,13 +7,11 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
-
 .form-control[type="text"],
-.form-control[type="number"]{
+.form-control[type="number"] {
   pointer-events: initial;
-  &:read-only{
+  &:read-only {
     pointer-events: none !important;
-
   }
 }
 
@@ -52,7 +50,12 @@ body {
 }
 
 .subirLabelCheck {
-  transform: translate(10px, 2px);
+  transform: translate(5px, 2px);
+  position: absolute;
+}
+
+.subirLabelCheck_2 {
+  transform: translate(5px, -0.5rem);
   position: absolute;
 }
 

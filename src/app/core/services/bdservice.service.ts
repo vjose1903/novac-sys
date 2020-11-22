@@ -263,9 +263,14 @@ export class DBservice {
   // ARTICULOS
   // =====================================================================
 
+  getCostoArticulo(id, tipo = 'lbs') {
+    return this.peticionSinLoad(`articulos/custom/costo/${tipo}/${id}`, 'get');
+  }
+
   getContenidosArticulos(id) {
     return this.peticion(`articulos/get/contenidos/${id}`, 'get');
   }
+
   getProductosTerminados(id) {
     return this.peticion(`articulos/custom/productos_terminados`, 'get');
   }
@@ -300,6 +305,7 @@ export class DBservice {
     const body = _.omit(arg, ['id']);
     return this.peticion('articulos/delete/' + id, 'patch', JSON.stringify(null));
   }
+
 
   getArticulos() {
     return this.peticion('articulos', 'get');

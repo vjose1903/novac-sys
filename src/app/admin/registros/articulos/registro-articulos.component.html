@@ -7,13 +7,19 @@
         <div class="row">
           <div class="col-12">
             <div class="row">
-              <div class="col-6">
+              <div class="{{ TIPOARTICULO === 'Materia prima' ? 'col-4' : 'col-6' }}">
                 <div class="from-group mb-2">
                   <input formControlName="is_detallable" class="apple-switch ml-2" type="checkbox" />
                   <span class="ml-2 subirLabelCheck">Detallable</span>
                 </div>
               </div>
-              <div class="col-6">
+              <div *ngIf="TIPOARTICULO && TIPOARTICULO !== 'Materia prima'" class="col-4">
+                <div class="from-group mb-2">
+                  <input formControlName="is_materia_prima" class="apple-switch" type="checkbox" />
+                  <span class="ml-1 subirLabelCheck_2">Funciona como materia prima</span>
+                </div>
+              </div>
+              <div class="{{ TIPOARTICULO === 'Materia prima' ? 'col-4' : 'col-6' }}">
                 <!-- <div class="from-group mb-2 ml-2">
                   <input formControlName="calcular_itbis" class="apple-switch ml-2" type="checkbox" />
                   <span class="ml-2 subirLabelCheck">Calcular Itbis</span>
@@ -245,8 +251,8 @@
           <div class="">
             <label class="control-label">Formula (1 QUINTAL) : </label>
             <div class="row mb-2">
-              <div class="col-4">Ingredientes</div>
-              <div class="col-3">Cantidad LBS</div>
+              <div class="col-5">Ingredientes</div>
+              <div class="col-2 p-0">Cant. LBS</div>
               <div class="col-3">Costo</div>
               <div class="col-2"></div>
             </div>
@@ -259,10 +265,27 @@
               <div [formGroupName]="j">
                 <hr *ngIf="j > 0" style="margin: 0.5rem 0rem 0.5rem 0rem; border: 0.5px solid #979797" />
                 <div class="row">
-                  <div class="col-4">
+                  <div class="col-5">
                     <div class="from-group">
                       <div>
-                        <select
+                        <ng-select
+                          id="articulo_id-{{ j }}"
+                          formControlName="articulo_id"
+                          (change)="getCosto(j)"
+                          [items]="listaMateriasPrimas"
+                          bindLabel="nombre"
+                          bindValue="id"
+                          class="custom"
+                          appendTo="body"
+                          [clearable]="false"
+                        >
+                          <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
+                            <div>
+                              <span>{{ item.nombre }} </span>
+                            </div>
+                          </ng-template>
+                        </ng-select>
+                        <!-- <select
                           formControlName="articulo_id"
                           (keydown.enter)="saltar('cantidad_formula-', true, j)"
                           class="form-control entrada"
@@ -272,11 +295,11 @@
                         >
                           <option value="{{ null }}" selected>seleccione materia prima</option>
                           <option *ngFor="let lista of listaMateriasPrimas | callback: filtroFormula" value="{{ lista.id }}">{{ lista.nombre }}</option>
-                        </select>
+                        </select> -->
                       </div>
                     </div>
                   </div>
-                  <div class="col-3">
+                  <div class="col-2 p-0">
                     <div class="from-group">
                       <!-- (keydown.enter)="saltar('send')" -->
                       <input

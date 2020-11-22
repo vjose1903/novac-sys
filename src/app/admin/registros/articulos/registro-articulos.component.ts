@@ -202,6 +202,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     const Tipo = this.listaTipoArticulos.filter((val) => val.id === _.parseInt(tipo));
     this.TIPOARTICULO = Tipo[0].descripcion;
 
+    if (_.lowerCase(this.TIPOARTICULO) === 'materia prima') {
+      this.form.controls.is_materia_prima.setValue(true);
+    } else {
+      this.form.controls.is_materia_prima.setValue(this.ProductoEditando ? this.ProductoEditando.is_materia_prima : false);
+    }
+
     if (_.lowerCase(this.TIPOARTICULO) === 'producto terminado') {
       await this.getMateriasP((res) => {
         this.addItem();
@@ -245,6 +251,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       id_contenido_padre: [null],
       id_contenido_hijo: [null],
       vendido_en: [null, Validators.required],
+      is_materia_prima: [false],
 
       referencia_padre: [null],
       referencia_hijo: [null],
@@ -402,16 +409,23 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     // }
   }
 
-  getCosto(id, i) {
+  async getCosto(i) {
     const control = this.form.controls['rowFormula'] as FormArray;
+    console.log(control.value[i]);
 
-    const MateriaPrima = this.listaMateriasPrimas.filter((val) => val.id === _.parseInt(id))[0];
+    try {
+      const res = await this.dbServ.getCostoArticulo(control.value[i].articulo_id).toPromise();
 
-    const costo = MateriaPrima.costo;
-    const precio = MateriaPrima.precio;
+      (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(res.costo));
+      (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(res.precio));
+    } catch (error) {
+      this.dbServ.toastError('Error buscando el precio de la materia prima.', 'ERROR');
+    }
 
-    (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costo));
-    (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(precio));
+    // const MateriaPrima = this.listaMateriasPrimas.filter((val) => val.id === _.parseInt(id))[0];
+
+    // const costo = MateriaPrima.costo;
+    // const precio = MateriaPrima.precio;
   }
 
   calculateCostoPT() {
@@ -692,7 +706,8 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     let costo;
     if (articulo !== undefined) {
       costo = articulo.costo;
-      if (costo !== GLOBAL.desformatear(x.costo_formula)) {
+
+      if (x.costo_formula && costo !== GLOBAL.desformatear(x.costo_formula)) {
         res = true;
         setTimeout(() => {
           this.Recalcular = true;
@@ -744,6 +759,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   editarItem(item) {
     const articulo = item.ARG;
+    console.log(articulo);
 
     this.borrar();
     this.ProductoEditando = item.ARG;
@@ -751,6 +767,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.boton = 'Editar';
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
+    this.TIPOARTICULO = articulo.descripcion;
 
     if (articulo.is_combo) {
       this.getMateriasP((res) => {
@@ -759,7 +776,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
         this.is_combo = true;
         // articulo.formulas_productos_terminados.forEach((ingredient, i) => {
         // });
-        this.TIPOARTICULO = 'Producto terminado';
         this.form.controls.medida.setValue('Quintal');
         this.fillDropAlerta('Quintal');
         articulo.formulas_productos_terminados.forEach((ingredient, i) => {
@@ -927,6 +943,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       estado: true,
       is_combo: this.is_combo,
       vendido_en: x.vendido_en,
+      is_materia_prima: x.is_materia_prima,
     };
     if (obj.is_combo) {
       obj['vendido_en'] = 'Saco';

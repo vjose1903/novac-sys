@@ -1,3 +1,18 @@
+// .ng-select.custom {
+//   // width: fit-content !important;
+//   > .ng-dropdown-panel {
+//     width: fit-content !important;
+//   }
+// }
+
+// .ng-select.custom ::ng-deep .ng-dropdown-panel {
+//   width: fit-content !important;
+// }
+
+::ng-deep .ng-dropdown-panel.ng-select-bottom {
+  width: fit-content !important;
+}
+
 .areaDetalle {
   background-color: #45e46585;
   padding: 1.5rem 0.1rem 2rem 1rem;
@@ -28,8 +43,7 @@
   }
 }
 
-
-.SCROLLFORMULA{
+.SCROLLFORMULA {
   max-height: 21rem !important;
 }
 
