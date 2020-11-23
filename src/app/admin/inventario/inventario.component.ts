@@ -44,6 +44,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
       formatoNumero: true,
     },
   ];
+  cant_inventario=0
   botones = {
     titulo: true,
     inventario: true,
@@ -92,9 +93,19 @@ export class InventarioComponent implements OnInit, OnDestroy {
   }
 
   async necesarioParaEmpezar() {
+    await this.getCantidadInventario();
     await this.formarFechaFactura(new Date());
     await this.getArticulos(obj_paginate);
     await this.calcularGananciasCostos();
+  }
+
+  async getCantidadInventario() {
+    try {
+      const res = await this.dbServ.getCantidadInventario().toPromise()
+      this.cant_inventario=res.count
+    } catch (error) {
+      this.dbServ.toastError('Error buscando la cantidad de articulos en inventario.', 'ERROR')
+    }
   }
 
   formarFechaFactura(date) {

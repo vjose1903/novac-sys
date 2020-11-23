@@ -263,6 +263,10 @@ export class DBservice {
   // ARTICULOS
   // =====================================================================
 
+  getCantidadInventario() {
+    return this.peticionSinLoad(`articulos/custom/cantidad_inventario`, 'get');
+  }
+
   getCostoArticulo(id, tipo = 'lbs') {
     return this.peticionSinLoad(`articulos/custom/costo/${tipo}/${id}`, 'get');
   }

@@ -228,7 +228,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
     this.subDeci.unsubscribe();
     this.subEsc.unsubscribe();
-    this.borrar()
+    this.borrar('salir')
   }
 
   async getTipoFacturas() {
@@ -390,11 +390,14 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
   }
-  borrar() {
+  borrar(tipo='') {
     this.tipoModal = null;
     this.NCF = null;
     this.facturas = undefined;
-    (document.getElementById('valorI') as any).value = null;
+    if(tipo!=='salir'){
+
+      (document.getElementById('valorI') as any).value = null;
+    }
     this.tipo_factura_id = null;
     this.campo = null;
     this.enfocarInput('campoI');
