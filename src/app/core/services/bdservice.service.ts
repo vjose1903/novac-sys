@@ -110,6 +110,10 @@ export class DBservice {
     return this.peticion('cuadre_cajas', 'get');
   }
 
+  reporteVentas(tipo, condicion, desde = ' ', hasta = ' ') {
+    return this.peticion(`reporte/ventas/${tipo}/${condicion}/${desde}/${hasta}`, 'get');
+  }
+
   // =====================================================================
   // Conduce
   // =====================================================================
@@ -309,7 +313,6 @@ export class DBservice {
     const body = _.omit(arg, ['id']);
     return this.peticion('articulos/delete/' + id, 'patch', JSON.stringify(null));
   }
-
 
   getArticulos() {
     return this.peticion('articulos', 'get');

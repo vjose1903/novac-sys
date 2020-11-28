@@ -17,9 +17,12 @@ export class ReportesComponent implements OnInit, OnDestroy {
   constructor(private _ipc: IpcService, private mServ: ModalService, private dbServ: DBservice) {}
   appDir;
   subDeci: Subscription;
+  titulo_moda_reporte;
   ngOnInit() {
     // this.searchAppDir();
     this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+
       if (res.status === 'si') {
         let obj;
 
@@ -34,7 +37,16 @@ export class ReportesComponent implements OnInit, OnDestroy {
             reimprimir: res.reimprimir,
             fileName: res.file.split('.')[0],
           };
+        } else if (res.file === 'reporte.pdf') {
+          obj = {
+            pdfSrc: res.body,
+            titulo: 'Cuadre de caja',
+            height: '60rem',
+            reimprimir: res.reimprimir,
+            fileName: res.file.split('.')[0],
+          };
         }
+
         this.abrirModalReporte(obj);
         setTimeout(() => {
           this.quitarFocodeElectron();
@@ -96,6 +108,26 @@ export class ReportesComponent implements OnInit, OnDestroy {
     this.pdfSrc = undefined;
     this.fileName = undefined;
     this.tipoModal = undefined;
+  }
+
+  async reporte(tipo) {
+    let res = {} as any;
+    try {
+      if (tipo === 'ventas_diarias') {
+        this.titulo_moda_reporte = 'Reporte de ventas diarias';
+        res = await this.dbServ.reporteVentas(2, 'todos', '2020-11-18', '2020-11-20').toPromise();
+
+        const obj = {
+          data: res,
+          type: 'reporte',
+        };
+        console.log(obj);
+
+        this._ipc.send('print', obj);
+      }
+    } catch (error) {
+      this.dbServ.toastError('Error realizando reporte.', 'ERROR', true);
+    }
   }
 
   abrirModal(tipo) {

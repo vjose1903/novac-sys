@@ -15,6 +15,7 @@ import * as facturasCompraVenta from './myPdf/facturasCompraVenta';
 import * as recibosIngresos from './myPdf/recibosIngresos';
 import * as conduce from './myPdf/conduce';
 import * as cuadreCaja from './myPdf/cuadreCaja';
+import * as reportes from './myPdf/reportes';
 import { AppConfig } from './src/environments/environment.js';
 
 // tslint:disable: curly
@@ -466,6 +467,8 @@ ipcMain.on('print', (event: any, oPdf) => {
   let obj;
   let todo_true = true;
 
+  console.log(oPdf);
+
   const data = oPdf.data;
   const type = oPdf.type;
   const reimprimir = oPdf.data.reimprimir ? true : false;
@@ -488,12 +491,19 @@ ipcMain.on('print', (event: any, oPdf) => {
         obj = cuadreCaja.makeCuadre(data);
         break;
 
+      case 'reporte':
+        console.log('entro en el case de reporte');
+
+        obj = reportes.makeReporte(data);
+        break;
+
       default:
         todo_true = false;
         break;
     }
 
     if (todo_true) {
+      console.log('entro en todo true');
       const dd = obj.doc;
       const file = obj.file;
       const type = obj.type;
@@ -529,12 +539,14 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
 }
 
 function createPdfbase64(docDefinition, file_, type, reimprimir_) {
+  console.log('entro en createPdfbase64');
   try {
     const pdfDocGenerator = pdfMake.createPdf(docDefinition);
     pdfDocGenerator.getBase64((data) => {
       if (type === 'file') {
         generatePdfFileFormBase64(file_, data, type);
       } else {
+        console.log('entro en printRes');
         win.webContents.send('printRes', { msg: 'Pdf Base64 correcto', file: file_, status: 'si', reimprimir: reimprimir_, body: data, sbody: JSON.stringify(data) });
       }
     });
