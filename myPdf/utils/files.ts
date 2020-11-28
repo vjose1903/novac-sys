@@ -3,8 +3,17 @@ export const logoADM =
 
 // ==========
 export const styles_ = {
-  letra11: {
-    fontSize: 11,
+  letra7: {
+    fontSize: 7,
+  },
+  letra8: {
+    fontSize: 8,
+  },
+  letra9: {
+    fontSize: 9,
+  },
+  letra10: {
+    fontSize: 10,
   },
   letra11_5: {
     fontSize: 11.5,
