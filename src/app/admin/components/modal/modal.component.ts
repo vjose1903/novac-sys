@@ -105,7 +105,12 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       key: 'direccion',
     },
   ];
-  constructor(private mServ: ModalService, private dbServ: DBservice, private tServ: TablasService, private pdfService: NgxExtendedPdfViewerService) {}
+  constructor(
+    private mServ: ModalService,
+    private dbServ: DBservice,
+    private tServ: TablasService,
+    private pdfService: NgxExtendedPdfViewerService,
+  ) {}
 
   element: HTMLElement;
   subShow: Subscription;
@@ -239,6 +244,19 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.paraFiltroSuplidor = undefined;
     this.cant_notas_credito = 0;
     this.cant_notas_debito = 0;
+  }
+
+  formReporteAccion(arg) {
+    const bool = arg.bool;
+    const obj_ = arg.obj;
+
+    const obj = {
+      data: obj_,
+      tipo_modal: this.tipoModal,
+    };
+
+    this.mServ.ModalObj(obj);
+    this.reinicioModal();
   }
 
   devolverCLick(arg) {

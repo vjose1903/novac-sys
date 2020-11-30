@@ -8,10 +8,12 @@
     </div>
   </div>
   <div class="col-6"></div>
-  <div class="col-6">
+  <div class="col-6 mt-3">
     <div class="card card-padding sombra">
+      <h3 class="negrita subrayado">Ventas</h3>
       <!-- <span class="bntLetra" (click)="makeCuadre()"><i class="fas fa-cash-register"></i> Cuadre de caja </span> -->
-      <span class="bntLetra" (click)="reporte('ventas_diarias')"><i class="fas fa-cash-register"></i> Relación de ventas diarias</span>
+      <span class="bntLetra" (click)="abrirModal('ventas_diarias')"><i class="fas fa-calendar-day"></i> Relación de ventas diarias</span>
+      <span class="bntLetra" (click)="abrirModal('ventas_rango')"><i class="fas fa-calendar-alt"></i> Relación de ventas por fechas</span>
     </div>
   </div>
 </div>

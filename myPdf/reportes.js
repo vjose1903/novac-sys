@@ -196,7 +196,7 @@ function contenidoReporte(data) {
                                                             bold: true,
                                                         },
                                                         {
-                                                            text: data.total,
+                                                            text: fun_.numFormatTwoDecimals(data.total),
                                                             style: 'letra10',
                                                             bold: true,
                                                         },

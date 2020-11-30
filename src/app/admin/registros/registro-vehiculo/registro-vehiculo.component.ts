@@ -169,7 +169,6 @@ export class RegistroVehiculoComponent implements OnInit {
 
   restartCampo(campo) {
     this.form.controls[campo].disable();
-
     this.form.controls[campo].reset(null);
   }
 

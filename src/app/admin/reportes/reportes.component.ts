@@ -17,7 +17,9 @@ export class ReportesComponent implements OnInit, OnDestroy {
   constructor(private _ipc: IpcService, private mServ: ModalService, private dbServ: DBservice) {}
   appDir;
   subDeci: Subscription;
+  subObj: Subscription;
   titulo_moda_reporte;
+
   ngOnInit() {
     // this.searchAppDir();
     this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
@@ -40,8 +42,8 @@ export class ReportesComponent implements OnInit, OnDestroy {
         } else if (res.file === 'reporte.pdf') {
           obj = {
             pdfSrc: res.body,
-            titulo: 'Cuadre de caja',
-            height: '60rem',
+            titulo: this.titulo_moda_reporte,
+            height: '50rem',
             reimprimir: res.reimprimir,
             fileName: res.file.split('.')[0],
           };
@@ -70,9 +72,17 @@ export class ReportesComponent implements OnInit, OnDestroy {
         this.mServ.ModalDecision(undefined);
       }
     });
+
+    this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
+      if (res) {
+        this.reporte(res.data);
+        this.mServ.ModalObj(undefined);
+      }
+    });
   }
   ngOnDestroy() {
     this.subDeci.unsubscribe();
+    this.subObj.unsubscribe();
   }
 
   quitarFocodeElectron() {
@@ -110,19 +120,20 @@ export class ReportesComponent implements OnInit, OnDestroy {
     this.tipoModal = undefined;
   }
 
-  async reporte(tipo) {
+  async reporte(data) {
     let res = {} as any;
-    try {
-      if (tipo === 'ventas_diarias') {
-        this.titulo_moda_reporte = 'Reporte de ventas diarias';
-        res = await this.dbServ.reporteVentas(2, 'todos', '2020-11-18', '2020-11-20').toPromise();
+    console.log('algo ', data);
 
+    try {
+      if (this.tipoModal === 'ventas_diarias' || this.tipoModal === 'ventas_rango') {
+        const params = `tipo=${data.tipo}&condicion=${data.condicion}&desde=${data.desde}&hasta=${data.hasta}`;
+
+        res = await this.dbServ.makeReportes('ventas', params).toPromise();
         const obj = {
           data: res,
           type: 'reporte',
         };
         console.log(obj);
-
         this._ipc.send('print', obj);
       }
     } catch (error) {
@@ -132,12 +143,20 @@ export class ReportesComponent implements OnInit, OnDestroy {
 
   abrirModal(tipo) {
     const obj = {};
+    this.tipoModal = tipo;
     if (tipo === 'cuadre') {
-      this.tipoModal = tipo;
-      this.mServ.modalTipo('dinamico_texto');
       obj['texto_modal'] = 'Seguro de que desea realizar el cuadre de caja.';
+      this.mServ.modalTipo('dinamico_texto');
+    } else {
+      this.mServ.modalTipo('reportes');
+      if (tipo === 'ventas_diarias') {
+        this.titulo_moda_reporte = 'Reporte de ventas diarias';
+      } else if (tipo === 'ventas_rango') {
+        this.titulo_moda_reporte = 'Reporte de ventas por fechas';
+      }
+      obj['titulo'] = this.titulo_moda_reporte;
+      obj['tipo_reporte'] = tipo;
     }
-    this.mServ.modalTipo('dinamico_texto');
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
   }
