@@ -79,8 +79,7 @@ function createWindow() {
     // Dereference the window object, usually you would store window
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    
-    
+
     event.preventDefault();
   });
 }
@@ -162,7 +161,7 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   // autoUpdater.quitAndInstall();
 });
 
-autoUpdater.on('update-not-available', (info) => { });
+autoUpdater.on('update-not-available', (info) => {});
 
 autoUpdater.on('error', (error) => {
   if (win) {
@@ -299,10 +298,10 @@ async function verificarElemento(
             process.platform === 'darwin'
               ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_sin_extension)}" -x "*.DS_Store"`
               : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(
-                `${path_local_sin_extension}.zip`,
-              )}" -Update`;
+                  `${path_local_sin_extension}.zip`,
+                )}" -Update`;
 
-          cmd('pwd', (res_pwd) => { });
+          cmd('pwd', (res_pwd) => {});
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -495,7 +494,7 @@ function cmd(command, callback) {
   });
 }
 
-function downloadFile(archive_url, path, file_, callback = (arg) => { }) {
+function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
   // Save variable to know progress
 
   let received_bytes = 0;
@@ -533,19 +532,33 @@ function showProgress(received, total) {
   const percentage = (received * 100) / total;
 }
 
-function puts(msg_, linea_ = undefined) {
+async function puts(msg, titulo?) {
   if (win) {
-    let obj;
-    if (linea_) {
-      obj = {
-        linea: linea_,
-        msg: msg_,
-      };
+    const fs = require('fs');
+    const file = 'my_log.txt';
+
+    let texto = '';
+    if (typeof msg === 'object') {
+      texto = JSON.stringify(msg, null, '\t');
+    } else if (typeof msg === 'number') {
+      texto = msg.toString();
     } else {
-      obj = msg_;
+      texto = msg;
     }
 
-    win.webContents.send('log', obj);
+    if (!fs.existsSync(file)) {
+      const stream = fs.createWriteStream(file);
+
+      await stream.once('open', (fd) => {
+        if (titulo) stream.write(`\n` + titulo + '==╗');
+
+        stream.write(texto + `\n`);
+        stream.end();
+      });
+    } else {
+      if (titulo) await fs.appendFile(file, `\n` + titulo + '==╗', (err) => {});
+      await fs.appendFile(file, texto + `\n`, (err) => {});
+    }
   }
 }
 
@@ -555,17 +568,18 @@ ipcMain.on('printReporte', (event: any, oPdf) => {
   generatePdfFileFormBase64(filename, base64);
 });
 
-ipcMain.on('print', (event: any, oPdf) => {
+ipcMain.on('print', async (event: any, oPdf) => {
+  await puts(' --------------- INICIO DE PROCESO DE IMPRESION --------------- ');
   let obj;
   let todo_true = true;
-
-  console.log(oPdf);
 
   const data = oPdf.data;
   const type = oPdf.type;
   const reimprimir = oPdf.data.reimprimir ? true : false;
 
   data['reimprimir'] = reimprimir;
+
+  await puts(data, 'data');
 
   try {
     switch (type) {
@@ -596,18 +610,22 @@ ipcMain.on('print', (event: any, oPdf) => {
     }
 
     if (todo_true) {
-      console.log('entro en todo true');
       const dd = obj.doc;
       const file = obj.file;
       const type = obj.type;
 
+      await puts(dd, 'dd');
+
+      await puts(file, 'file');
+
+      await puts(type, 'type 2');
+
       createPdfbase64(dd, file, type, reimprimir);
-      // makeDocDefinition(dd, file, type);
     } else {
       returnErrorPDF();
     }
   } catch (error) {
-    puts(obj, 'error pdf');
+    puts(obj, 'error en el switch de tipos de archivo para escribir');
   }
 });
 
@@ -626,7 +644,7 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
       imprimir(cFileName, type);
     });
   } catch (err) {
-    puts(err, 'createPdfFileFormBase64');
+    puts(err, 'createPdfFileFormBase64 ERROR');
     win.webContents.send('printReporteRes', { msg: 'Error generando reporte!!', status: false, error: err });
   }
 }
@@ -651,7 +669,7 @@ function createPdfbase64(docDefinition, file_, type, reimprimir_) {
       }
     });
   } catch (error) {
-    puts(error, 280);
+    puts(error, 'createPdfbase64 ERROR');
     returnErrorPDF();
     throw error;
   }
@@ -669,7 +687,7 @@ function imprimir(cFileName, tipo) {
     `${sumatrapdf_path} -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent ${cFileName}`,
     (error, stdout, stderr) => {
       if (error) {
-        puts(error, 'imprimir');
+        puts(error, 'imprimir ERROR');
         let msg_ = '';
 
         if (tipo === 'reporte') {
@@ -681,14 +699,12 @@ function imprimir(cFileName, tipo) {
         win.webContents.send('printRes', { msg: msg_, status: 'no', err: error });
         return;
       } else {
-        let msg_
+        let msg_;
 
         if (tipo === 'reporte') {
           msg_ = 'Reporte impreso correctamente!!';
-
         } else {
           msg_ = 'Factura impresa correctamente!!';
-
         }
 
         win.webContents.send('printRes', { msg: msg_, status: 'si', STDOUT: stdout });
