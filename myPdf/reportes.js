@@ -9,7 +9,7 @@ var environment_js_1 = require("../src/environments/environment.js");
 function makeReporte(data) {
     var dd = {
         // pageSize: { width: 990, height: 398 },
-        pageMargins: [0, 108, 0, 30],
+        pageMargins: [0, data.mostrar_sub_titulo ? 116 : 108, 0, 30],
         header: cabeceraReporte(data),
         content: contenidoReporte(data),
         footer: function (currentPage, pageCount) {
@@ -87,8 +87,15 @@ function cabeceraReporte(data) {
             margin: [0, 15, 0, 0],
             alignment: 'center',
         },
+        data.mostrar_sub_titulo
+            ? {
+                text: data.sub_titulo,
+                style: 'letra10',
+                margin: [15, 10, 0, 0],
+            }
+            : { text: '' },
         {
-            canvas: [{ type: 'rect', x: 10, y: 20, w: 575, h: 1, color: '#000000' }],
+            canvas: [{ type: 'rect', x: 10, y: data.mostrar_sub_titulo ? 5 : 20, w: 575, h: 1.5, color: '#000000' }],
         },
     ];
     return header;

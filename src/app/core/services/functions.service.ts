@@ -9,7 +9,7 @@ export class FunctionService {
 
   currentUser = null;
 
-  constructor() {}
+  // constructor() {}
 
   nextCanToast(nextValue) {
     this.canToast = nextValue;
@@ -27,13 +27,18 @@ export class FunctionService {
     return localStorage.getItem('access-token');
   }
 
-  async logout() {
-    localStorage.removeItem('access-token');
-    localStorage.removeItem('client');
-    localStorage.removeItem('content-type');
-    localStorage.removeItem('expiry');
-    localStorage.removeItem('token-type');
-    localStorage.removeItem('uid');
+  async logout(callback = (arg) => {}) {
+    try {
+      localStorage.removeItem('access-token');
+      localStorage.removeItem('client');
+      localStorage.removeItem('content-type');
+      localStorage.removeItem('expiry');
+      localStorage.removeItem('token-type');
+      localStorage.removeItem('uid');
+      callback(true);
+    } catch (error) {
+      callback(false);
+    }
 
     // this.router.navigateByUrl('/auth/login');
   }

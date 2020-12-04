@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { ModalService } from '../../components/modal/modal.service';
 import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
+import { IpcService } from '../../../core/services/ipc.service';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -36,7 +37,14 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   subDeci: Subscription;
   subEsc: Subscription;
 
-  constructor(private dbServ: DBservice, private mServ: ModalService, private route: ActivatedRoute, private router: Router, private tServ: TablasService) {}
+  constructor(
+    private dbServ: DBservice,
+    private mServ: ModalService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private tServ: TablasService,
+    private _ipc: IpcService,
+  ) {}
   campo = null;
   placeHolder = '';
   info = [
@@ -141,6 +149,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res) {
+        // console.log(res);
+
         if (this.tipoModal === 'mostrarFactura') {
           if (this.BuscarPara === 'anular_factura') {
             this.facturaSelected['identificadorFact'] =
@@ -151,7 +161,16 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
               this.abrirModal(this.facturaSelected, 'cancelar');
             }, 10);
           } else if (this.BuscarPara === 'solo_ver') {
-            this.editarFactura();
+            if (res.tipo === 'reimrimir') {
+              const obj = {
+                data: this.facturaSelected,
+                type: 'facturacion',
+              };
+
+              this._ipc.send('print', obj);
+            } else {
+              this.editarFactura();
+            }
           } else {
             this.mServ.ModalDecision(undefined);
             const url = `/admin/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
@@ -167,6 +186,23 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
           }, 10);
         }
       }
+    });
+
+    this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
+      console.log(res);
+      console.log('res.status==> ', res.status);
+
+      if (res.status === 'si') {
+        this.dbServ.toastSuccess(res.msg, 'CORRECTO', true);
+      } else {
+        console.log('ENTRO EN EL NOOO');
+        this.dbServ.toastError(res.msg, 'ERROR', true);
+      }
+      setTimeout(() => {
+        console.log(document.getElementById('foco_angular'));
+
+        document.getElementById('foco_angular').click();
+      }, 5);
     });
   }
 
@@ -228,7 +264,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
     this.subDeci.unsubscribe();
     this.subEsc.unsubscribe();
-    this.borrar('salir')
+    this.borrar('salir');
   }
 
   async getTipoFacturas() {
@@ -390,12 +426,11 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(obj);
     this.mServ.mostrarModal(true);
   }
-  borrar(tipo='') {
+  borrar(tipo = '') {
     this.tipoModal = null;
     this.NCF = null;
     this.facturas = undefined;
-    if(tipo!=='salir'){
-
+    if (tipo !== 'salir') {
       (document.getElementById('valorI') as any).value = null;
     }
     this.tipo_factura_id = null;
@@ -406,13 +441,14 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   selectFactura(item) {
     if (item.column === 'select') {
       this.facturaSelected = undefined;
+      setTimeout(() => {
+        this.facturaSelected = this.facturas[item.index];
+        this.indexSelected = item.index;
 
-      this.facturaSelected = this.facturas[item.index];
-      this.indexSelected = item.index;
-
-      this.facturaSelected['FACTURA_DE'] = 'venta';
-      this.facturaSelected['mostrarFacturaPara'] = this.BuscarPara;
-      this.abrirModal(this.facturaSelected, 'mostrarFactura');
+        this.facturaSelected['FACTURA_DE'] = 'venta';
+        this.facturaSelected['mostrarFacturaPara'] = this.BuscarPara;
+        this.abrirModal(this.facturaSelected, 'mostrarFactura');
+      }, 5);
     }
   }
 

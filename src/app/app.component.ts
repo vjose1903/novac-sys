@@ -61,6 +61,9 @@ export class AppComponent implements OnInit, AfterViewInit {
 
         this.objPercent = res.body;
         document.getElementById('imagenLogo').click();
+        if (document.getElementById('foco_angular')) {
+          document.getElementById('foco_angular').click();
+        }
       }
     });
 

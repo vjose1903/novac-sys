@@ -9,6 +9,7 @@
     "deprecation": {
       "severity": "warning"
     },
+    "curly": false,
     "component-class-suffix": true,
     "no-shadowed-variable": false,
     "no-inferrable-types": false,

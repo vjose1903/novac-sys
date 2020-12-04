@@ -26,7 +26,12 @@
         </div>
       </div>
       <div class="menuList2">
-        <img [ngClass]="actualTab == 'nota' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'" src="assets/img/notaM.png" alt="Notas" (click)="navegar(8)" />
+        <img
+          [ngClass]="actualTab == 'nota' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'"
+          src="assets/img/notaM.png"
+          alt="Notas"
+          (click)="navegar(8)"
+        />
         <h5 [ngClass]="actualTab == 'nota' ? 'tituloMenuA2' : 'tituloMenu2'"><strong>Manipular facturas</strong></h5>
         <!-- ultimo -->
 
@@ -39,7 +44,12 @@
       </div>
 
       <div class="menuList">
-        <img [ngClass]="actualTab == 'ingresos' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="navegar(7)" />
+        <img
+          [ngClass]="actualTab == 'ingresos' ? 'iconosMenuA' : 'iconosMenu'"
+          src="assets/img/reciboIngreso.png"
+          alt="Facturacion"
+          (click)="navegar(7)"
+        />
         <h5 [ngClass]="actualTab == 'ingresos' ? 'tituloMenuA' : 'tituloMenu'"><strong>Ingresos</strong></h5>
         <div [ngClass]="actualTab == 'ingresos' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
           <h4 class="opcion" (click)="navegar('ingreso')">Recibo ingresos</h4>
@@ -66,11 +76,21 @@
         </div>
       </div>
       <div class="menuList">
-        <img [ngClass]="actualTab == 'produccion' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/produccion.png" alt="Producción" (click)="navegar(6)" />
+        <img
+          [ngClass]="actualTab == 'produccion' ? 'iconosMenuA' : 'iconosMenu'"
+          src="assets/img/produccion.png"
+          alt="Producción"
+          (click)="navegar(6)"
+        />
         <h5 [ngClass]="actualTab == 'produccion' ? 'tituloMenuA' : 'tituloMenu'"><strong>Producción</strong></h5>
       </div>
       <div class="menuList">
-        <img [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/inventario.png" alt="Inventario" (click)="navegar(4)" />
+        <img
+          [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'"
+          src="assets/img/inventario.png"
+          alt="Inventario"
+          (click)="navegar(4)"
+        />
         <h5 [ngClass]="actualTab == 'inventario' ? 'tituloMenuA' : 'tituloMenu'"><strong>Inventario</strong></h5>
       </div>
       <div class="menuList">
@@ -102,6 +122,7 @@
       <!-- ============================================================================================ -->
 
       <div class="right">
+        <mdb-card-img id="foco_angular" class="btn_invisible" src="assets/img/transparente.png" alt="Logo ADM"></mdb-card-img>
         <div class="btn-group" dropdown id="dropCuenta" (onHidden)="closePrinterMenu()" #dropCuenta>
           <a id="button-basic" dropdownToggle class="dropdown-toggle" aria-controls="dropdown-basic">
             <img class="rounded-circle" [src]="imgUser" alt="Admin" />
@@ -144,7 +165,6 @@
     </mat-toolbar>
 
     <div class="" style="padding: 0.5rem 1rem 2rem 1rem; height: calc(100% - 60px); overflow-y: auto">
-      
       <router-outlet></router-outlet>
       <!-- rutas -->
     </div>

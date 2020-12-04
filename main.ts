@@ -17,6 +17,7 @@ import * as conduce from './myPdf/conduce';
 import * as cuadreCaja from './myPdf/cuadreCaja';
 import * as reportes from './myPdf/reportes';
 import { AppConfig } from './src/environments/environment.js';
+import { FunctionService } from './src/app/core/services/functions.service';
 
 // tslint:disable: curly
 // tslint:disable: one-variable-per-declaration
@@ -74,11 +75,18 @@ function createWindow() {
   autoUpdater.checkForUpdatesAndNotify();
 
   // Emitted when the window is closed.
-  win.on('closed', () => {
+
+  win.on('closed', (event) => {
     // Dereference the window object, usually you would store window
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    win = null;
+    const fun = new FunctionService();
+    fun.logout((res) => {
+      if (res) {
+        win = null;
+      }
+    });
+    event.preventDefault();
   });
 }
 
@@ -258,7 +266,17 @@ async function borrado_de_archivos_malos(archivos, callback) {
   }
 }
 
-async function verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter) {
+async function verificarElemento(
+  aFiles_malos,
+  paht_server,
+  path_local_content,
+  path_local_extension,
+  path_local_sin_extension,
+  descomprimir,
+  is_carpeta,
+  nombre_err,
+  counter,
+) {
   let descargar_archivo = false;
 
   let md5_servidor;
@@ -267,14 +285,27 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
 
       if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}`))) {
-        procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
+        procesoDescarga(
+          aFiles_malos,
+          path_local_extension,
+          path_local_content,
+          paht_server,
+          md5_servidor,
+          descomprimir,
+          path_local_sin_extension,
+          nombre_err,
+          counter,
+          is_carpeta,
+        );
         descargar_archivo = true;
       } else {
         if (descomprimir) {
           const command =
             process.platform === 'darwin'
               ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_sin_extension)}" -x "*.DS_Store"`
-              : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_sin_extension}.zip`)}" -Update`;
+              : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(
+                  `${path_local_sin_extension}.zip`,
+                )}" -Update`;
 
           cmd('pwd', (res_pwd) => {});
 
@@ -282,14 +313,36 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
             if (!res_compresion.status) {
               retornarMensajeErrorVeiricandoElementos(nombre_err);
             } else {
-              compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
+              compararMD5(
+                aFiles_malos,
+                path_local_content,
+                path_local_extension,
+                md5_servidor,
+                path_local_sin_extension,
+                is_carpeta,
+                nombre_err,
+                paht_server,
+                descomprimir,
+                counter,
+              );
             }
           });
         }
       }
 
       if (!descargar_archivo && !descomprimir) {
-        compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
+        compararMD5(
+          aFiles_malos,
+          path_local_content,
+          path_local_extension,
+          md5_servidor,
+          path_local_sin_extension,
+          is_carpeta,
+          nombre_err,
+          paht_server,
+          descomprimir,
+          counter,
+        );
       }
     } else {
     }
@@ -297,7 +350,18 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
   });
 }
 
-function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_sin_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
+function compararMD5(
+  aFiles_malos,
+  path_local_content,
+  path_local_extension,
+  md5_servidor,
+  path_local_sin_extension,
+  is_carpeta,
+  nombre_err,
+  paht_server,
+  descomprimir,
+  counter,
+) {
   const command =
     process.platform === 'darwin'
       ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
@@ -309,7 +373,18 @@ function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5
       if (md5_local !== md5_servidor) {
         borrado_de_archivos_malos(aFiles_malos, (res_del) => {
           if (res_del.status) {
-            procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta);
+            procesoDescarga(
+              aFiles_malos,
+              path_local_extension,
+              path_local_content,
+              paht_server,
+              md5_servidor,
+              descomprimir,
+              path_local_sin_extension,
+              nombre_err,
+              counter,
+              is_carpeta,
+            );
           } else {
             retornarMensajeErrorVeiricandoElementos(nombre_err);
           }
@@ -321,7 +396,18 @@ function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5
   });
 }
 
-async function procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_sin_extension, nombre_err, counter, is_carpeta) {
+async function procesoDescarga(
+  aFiles_malos,
+  path_local_extension,
+  path_local_content,
+  paht_server,
+  md5_servidor,
+  descomprimir,
+  path_local_sin_extension,
+  nombre_err,
+  counter,
+  is_carpeta,
+) {
   let descarga_exito = true;
 
   await downloadFile(`${AppConfig.url_descargas}${paht_server}`, path_local_content, path_local_extension, (res) => {
@@ -333,7 +419,8 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
 
       cmd(command, (res_local_before_descarga) => {
         if (res_local_before_descarga.status) {
-          const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
+          const md5_local =
+            process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
           if (md5_servidor === md5_local) {
             if (descomprimir) {
               esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, (res) => {
@@ -362,7 +449,17 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
   if (!descarga_exito) {
     counter++;
     if (counter <= 3) {
-      verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_sin_extension, descomprimir, is_carpeta, nombre_err, counter);
+      verificarElemento(
+        aFiles_malos,
+        paht_server,
+        path_local_content,
+        path_local_extension,
+        path_local_sin_extension,
+        descomprimir,
+        is_carpeta,
+        nombre_err,
+        counter,
+      );
     } else {
       win.webContents.send('err_descarga', {
         msg: `Error descargando archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Victor Jose Vasquez Santos.`,
@@ -473,6 +570,8 @@ ipcMain.on('print', (event: any, oPdf) => {
   const type = oPdf.type;
   const reimprimir = oPdf.data.reimprimir ? true : false;
 
+  data['reimprimir'] = reimprimir;
+
   try {
     switch (type) {
       case 'recibo_ingreso':
@@ -493,7 +592,6 @@ ipcMain.on('print', (event: any, oPdf) => {
 
       case 'reporte':
         console.log('entro en el case de reporte');
-
         obj = reportes.makeReporte(data);
         break;
 
@@ -547,7 +645,14 @@ function createPdfbase64(docDefinition, file_, type, reimprimir_) {
         generatePdfFileFormBase64(file_, data, type);
       } else {
         console.log('entro en printRes');
-        win.webContents.send('printRes', { msg: 'Pdf Base64 correcto', file: file_, status: 'si', reimprimir: reimprimir_, body: data, sbody: JSON.stringify(data) });
+        win.webContents.send('printRes', {
+          msg: 'Pdf Base64 correcto',
+          file: file_,
+          status: 'si',
+          reimprimir: reimprimir_,
+          body: data,
+          sbody: JSON.stringify(data),
+        });
       }
     });
   } catch (error) {
@@ -565,31 +670,34 @@ function imprimir(cFileName, tipo) {
   // const profile = require.resolve('../profiles/app.profile.js');
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
-  exec(`${sumatrapdf_path} -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent ${cFileName}`, (error, stdout, stderr) => {
-    if (error) {
-      puts(error, 'imprimir');
-      let msg_ = '';
+  exec(
+    `${sumatrapdf_path} -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent ${cFileName}`,
+    (error, stdout, stderr) => {
+      if (error) {
+        puts(error, 'imprimir');
+        let msg_ = '';
 
-      if (tipo === 'reporte') {
-        msg_ = 'Error imprimiendo Reporte!!';
+        if (tipo === 'reporte') {
+          msg_ = 'Error imprimiendo Reporte!!';
+        } else {
+          msg_ = 'Error imprimiendo Factura!!';
+        }
+
+        win.webContents.send('printRes', { msg: msg_, status: 'no', err: error });
+        return;
       } else {
-        msg_ = 'Error imprimiendo Factura!!';
+        let msg_;
+
+        if (tipo === 'reporte') {
+          msg_ = 'Reporte impreso correctamente!!';
+        } else {
+          msg_ = 'Factura impresa correctamente!!';
+        }
+
+        win.webContents.send('printRes', { msg: msg_, status: 'no', STDOUT: stdout });
       }
-
-      win.webContents.send('printRes', { msg: msg_, status: 'no', err: error });
-      return;
-    } else {
-      let msg_;
-
-      if (tipo === 'reporte') {
-        msg_ = 'Reporte impreso correctamente!!';
-      } else {
-        msg_ = 'Factura impresa correctamente!!';
-      }
-
-      win.webContents.send('printRes', { msg: msg_, status: 'no', STDOUT: stdout });
-    }
-  });
+    },
+  );
 }
 
 export function pathAdd(addToPath = '', pack = false) {

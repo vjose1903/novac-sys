@@ -220,8 +220,16 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.accion(obj);
   }
 
-  accion(arg) {
-    this.mServ.ModalDecision(arg);
+  accion(arg, tipo_?) {
+    let obj = {};
+
+    if (tipo_) {
+      obj = { tipo: tipo_, body: arg };
+    } else {
+      obj = arg;
+    }
+
+    this.mServ.ModalDecision(obj);
     this.reinicioModal();
   }
 
@@ -250,10 +258,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     const bool = arg.bool;
     const obj_ = arg.obj;
 
-    const obj = {
+    let obj;
+    obj = {
       data: obj_,
       tipo_modal: this.tipoModal,
     };
+
+    if (!bool) obj = undefined;
 
     this.mServ.ModalObj(obj);
     this.reinicioModal();

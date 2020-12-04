@@ -456,6 +456,7 @@
 
           <div class="p-1" *ngIf="mostrar_para === 'solo_ver'">
             <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
+            <button (click)="accion(true, 'reimrimir')" type="submit" class="btn btn-amarillo mr-2">Reimprimir</button>
             <!-- <button (click)="accion(true)" type="submit" class="btn btn-verde mr-2">Editar</button> -->
           </div>
 
@@ -547,14 +548,11 @@
     [style]="{ width: '500px' }"
     (onHide)="accion(false)"
   >
+    <!-- VENTAS ------------------------------------------------------------------------------------------------------------------------------ -->
     <app-form-ventas
       *ngIf="seleccionModal?.tipo_reporte === 'ventas_diarias' || seleccionModal?.tipo_reporte === 'ventas_rango'"
       [tipo_reporte]="seleccionModal?.tipo_reporte"
       (seleccion)="formReporteAccion($event)"
     ></app-form-ventas>
-    <!-- <p-footer>
-      <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
-      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">{{ seleccionModal?.reimprimir ? 'Reimprimir' : 'Imprimir' }}</button>
-    </p-footer> -->
   </p-dialog>
 </div>

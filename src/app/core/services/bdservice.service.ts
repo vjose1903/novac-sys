@@ -467,6 +467,7 @@ export class DBservice {
       }
     }
   }
+
   toastError(msg?, titulo?, excepcion?) {
     if (this.fun.canToast) {
       const msg_ = msg;
@@ -477,6 +478,7 @@ export class DBservice {
       }
     }
   }
+
   toastWarning(msg?, titulo?, excepcion?) {
     if (this.fun.canToast) {
       const msg_ = msg;
