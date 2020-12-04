@@ -8,15 +8,18 @@ function getPageMargin(data) {
   let margins = [];
 
   if (data.condicion === 'Contado') {
-    margins = [0, 158, 0, 30];
+    margins = [0, 161, 0, 30];
   } else {
     margins = [0, 168, 0, 30];
   }
-
+  console.log('margen ==> ',margins);
+  
   return margins;
 }
 
 export function makeFacturaVenta(data) {
+  
+  
   const dd = {
     pageSize: { width: 990, height: 398 },
     pageMargins: getPageMargin(data),

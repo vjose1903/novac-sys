@@ -167,7 +167,7 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   // autoUpdater.quitAndInstall();
 });
 
-autoUpdater.on('update-not-available', (info) => {});
+autoUpdater.on('update-not-available', (info) => { });
 
 autoUpdater.on('error', (error) => {
   if (win) {
@@ -304,10 +304,10 @@ async function verificarElemento(
             process.platform === 'darwin'
               ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_sin_extension)}" -x "*.DS_Store"`
               : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(
-                  `${path_local_sin_extension}.zip`,
-                )}" -Update`;
+                `${path_local_sin_extension}.zip`,
+              )}" -Update`;
 
-          cmd('pwd', (res_pwd) => {});
+          cmd('pwd', (res_pwd) => { });
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -500,7 +500,7 @@ function cmd(command, callback) {
   });
 }
 
-function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
+function downloadFile(archive_url, path, file_, callback = (arg) => { }) {
   // Save variable to know progress
 
   let received_bytes = 0;
@@ -686,15 +686,17 @@ function imprimir(cFileName, tipo) {
         win.webContents.send('printRes', { msg: msg_, status: 'no', err: error });
         return;
       } else {
-        let msg_;
+        let msg_
 
         if (tipo === 'reporte') {
           msg_ = 'Reporte impreso correctamente!!';
+
         } else {
           msg_ = 'Factura impresa correctamente!!';
+
         }
 
-        win.webContents.send('printRes', { msg: msg_, status: 'no', STDOUT: stdout });
+        win.webContents.send('printRes', { msg: msg_, status: 'si', STDOUT: stdout });
       }
     },
   );

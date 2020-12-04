@@ -9,11 +9,12 @@ var environment_js_1 = require("../src/environments/environment.js");
 function getPageMargin(data) {
     var margins = [];
     if (data.condicion === 'Contado') {
-        margins = [0, 158, 0, 30];
+        margins = [0, 161, 0, 30];
     }
     else {
         margins = [0, 168, 0, 30];
     }
+    console.log('margen ==> ', margins);
     return margins;
 }
 function makeFacturaVenta(data) {
