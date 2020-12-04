@@ -17,7 +17,6 @@ import * as conduce from './myPdf/conduce';
 import * as cuadreCaja from './myPdf/cuadreCaja';
 import * as reportes from './myPdf/reportes';
 import { AppConfig } from './src/environments/environment.js';
-import { FunctionService } from './src/app/core/services/functions.service';
 
 // tslint:disable: curly
 // tslint:disable: one-variable-per-declaration
@@ -80,12 +79,8 @@ function createWindow() {
     // Dereference the window object, usually you would store window
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    const fun = new FunctionService();
-    fun.logout((res) => {
-      if (res) {
-        win = null;
-      }
-    });
+    
+    
     event.preventDefault();
   });
 }
