@@ -289,7 +289,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   mostrarListaFacturas() {
     let res = false;
     if (this.facturas && this.facturas.length > 0) {
-      if (this.campo === '1') {
+      if (this.campo === '1' || this.campo === '4') {
         res = true;
       } else if (this.campo === '3' && this.tipo_factura_id === '0') {
         res = true;
@@ -308,6 +308,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       this.facturas = undefined;
       const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id).toPromise();
       this.facturas = GLOBAL.duplicarJson(busqueda);
+      console.log('this.facturas ==> ', this.facturas);
 
       if (this.facturas.length > 0) {
         this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
@@ -332,8 +333,8 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
             (fact) =>
               (fact = fact.map((val) => {
                 val.secuencia = _.padStart(val.numero_factura, 8, '0');
-                val.fecha = moment(val.fecha_equivalente).format('DD-MM-YYYY');
-                val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : '';
+                val.fecha = moment(val.fecha_equivalente).format('DD/MM/YYYY');
+                val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD/MM/YYYY') : '';
                 val.pagoT = true;
                 val.estatus = val.estado ? 'fas fa-check' : 'fas fa-times';
                 val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
@@ -357,9 +358,11 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
           ),
         )
         .toPromise();
-      busqueda.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
-      });
+      if (campo !== '4') {
+        busqueda.sort((a, b) => {
+          return a.id > b.id ? 1 : -1;
+        });
+      }
       this.facturas = GLOBAL.duplicarJson(busqueda);
 
       if (this.facturas.length === 0) {
@@ -406,6 +409,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     } else if (valor === '3') {
       this.campoSelected = 'Numero Factura';
       this.placeHolder = 'Escriba numero de factura';
+    } else if (valor === '4') {
+      this.tipo_factura_id = '0';
+      this.pedirFacturaModal(this.campo, '0');
     }
   }
   abilitarBtns() {

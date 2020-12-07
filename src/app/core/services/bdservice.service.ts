@@ -133,6 +133,10 @@ export class DBservice {
     return this.peticion('cabecera_facturas', 'post', JSON.stringify(arg));
   }
 
+  editarFactura(id, arg) {
+    return this.peticion(`cabecera_facturas/custom/update/${id}`, 'patch', JSON.stringify(arg));
+  }
+
   getViajesByCompletada(arg, page, per_page, paginado, estado = false) {
     return this.peticionSinLoad(`cabecera_facturas/custom/viajes/${estado}/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }

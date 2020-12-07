@@ -175,9 +175,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     if (this.metodo === 'venta') {
       this.tipoFactura = '02';
+      // <span>00 Factura sin comprobante</span><br>\
       this.TiposFacturas =
         '<div style=" max-width: 21rem;" > \
-      <span>00 Factura sin comprobante</span><br>\
       <span>01 Valor fiscal</span><br>\
       <span>02 Factura de consumo</span><br>\
       <span>11 Comprobante de compras</span><br>\
@@ -197,7 +197,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       });
     } else {
       this.tipoFactura = '01';
-      this.TiposFacturas = '<div style=" max-width: 21rem;" > \
+      this.TiposFacturas =
+        '<div style=" max-width: 21rem;" > \
       <span>01 Valor fiscal</span><br>\
       <span>02 Factura de consumo</span><br>\
       </div>';
@@ -234,9 +235,15 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
 
         if (balance > maxCred - 1000 && balance < maxCred) {
-          this.dbServ.toastWarning(`Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
+          this.dbServ.toastWarning(
+            `Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`,
+            'PROXIMO A LIMITE DE CREDITO',
+          );
         } else if (balance > maxCred) {
-          this.dbServ.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
+          this.dbServ.toastError(
+            ` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`,
+            'SOBRE VALOR DE CREDITO',
+          );
         }
       } else if (res && res.tipo_modal === 'buscarSuplidor') {
         this.propietario_factura = res.data;
@@ -290,6 +297,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   async buscarFacturaEditar() {
     const res = await this.dbServ.getFacturaById(this.id_factura).toPromise();
     this.factura_a_editar = res;
+    this.metodo = res.tipo;
     this.propietario_factura = res.cliente;
     this.propietario_factura['id'] = res.cliente_id;
 
@@ -641,7 +649,12 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         if (this.TOTAL === 0) {
           this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso', true);
         } else {
-          if (this.condicion_fact === 'Crédito' || this.is_viaje) {
+          if (this.action === 'update') {
+            const obj = { texto_modal: 'Esta seguro de los cambios realizados a esta factura.' };
+            this.mServ.modalTipo('dinamico_texto');
+            this.tipoModal = 'editar_factura';
+            this.abrirModal(obj);
+          } else if (this.condicion_fact === 'Crédito' || this.is_viaje) {
             this.mServ.modalTipo('imprimir');
             this.tipoModal = 'imprimir';
             this.abrirModal();
@@ -657,7 +670,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
               articulos_a_cambiar = true;
             }
 
-            const obj = { total_factura: this.TOTAL, devuelta: 0, tipo__: 'devuelta', factura_de: this.metodo, cambios_articulos: articulos_a_cambiar };
+            const obj = {
+              total_factura: this.TOTAL,
+              devuelta: 0,
+              tipo__: 'devuelta',
+              factura_de: this.metodo,
+              cambios_articulos: articulos_a_cambiar,
+            };
             this.mServ.modalTipo('cambio');
             this.tipoModal = 'cambio';
             this.abrirModal(obj);
@@ -676,8 +695,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   decisionModal(arg) {
     if (arg) {
-      if (this.tipoModal === 'imprimir') {
-        this.IMPRIMIR();
+      if (this.tipoModal === 'imprimir' || this.tipoModal === 'editar_factura') {
+        this.IMPRIMIR('editar_factura');
       } else if (this.tipoModal === 'cancelar') {
         this.CancelarFactura('quedar');
       }
@@ -942,7 +961,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       }
     }
   }
-  async IMPRIMIR() {
+  async IMPRIMIR(arg?) {
     const empleado = this.fun.getUser();
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
@@ -1021,10 +1040,22 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
 
     try {
-      const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
-      await this.CancelarFactura('quedar');
+      let res;
+      if (arg === 'editar_factura') {
+        console.log('this.factura_a_editar ==> ', this.factura_a_editar);
+        console.log('cabecera_fact ==> ', cabecera_fact);
 
-      this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO', true);
+        res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();
+      } else {
+        res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
+      }
+
+      if (arg === 'editar_factura') {
+        this.dbServ.toastSuccess('Factura editada correctamente.', 'CORRECTO', true);
+      } else {
+        this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO', true);
+      }
+
       res['FACTURA_DE'] = this.metodo;
       const obj = {
         data: res,
@@ -1039,9 +1070,15 @@ export class FacturacionComponent implements OnInit, OnDestroy {
           this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
         }
       });
+
+      await this.CancelarFactura('quedar');
     } catch (error) {
       console.error(error);
-      this.dbServ.toastError(error.error.msg, 'ERROR', true);
+      try {
+        this.dbServ.toastError(error.error.msg, 'ERROR', true);
+      } catch (error) {
+        this.dbServ.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR', true);
+      }
     }
   }
 }

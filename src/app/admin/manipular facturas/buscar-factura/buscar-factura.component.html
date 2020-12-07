@@ -22,21 +22,28 @@
           <option value="1">Por cliente</option>
           <option value="2">Por numero comprobante</option>
           <option value="3">Por numero factura</option>
+          <option value="4">Ultimas 20 facturas</option>
         </select>
       </div>
       <div class="d-flex">
-        <div *ngIf="campo && campo !== '2'" class="form-group mr-3">
+        <div *ngIf="campo && campo !== '2' && campo !== '4'" class="form-group mr-3">
           <label class="control-label">Tipo factura : </label>
 
-          <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar('valorI', $event.target.value)" [disabled]="existenComprobantes">
+          <select
+            id="campoTipoFact"
+            [(ngModel)]="tipo_factura_id"
+            class="form-control inputE"
+            (keydown.enter)="saltar('valorI', $event.target.value)"
+            [disabled]="existenComprobantes"
+          >
             <option [value]="null" selected disabled>Escoger tipo</option>
             <option value="3">Factura de consumo</option>
             <option value="2">Factura con Valor Fiscal</option>
-            <option value="1">Factura sin comprobante</option>
+            <!-- <option value="1">Factura sin comprobante</option> -->
             <option value="0">Todas</option>
           </select>
         </div>
-        <div *ngIf="campo" class="form-group">
+        <div *ngIf="campo && campo !== '4'" class="form-group">
           <label class="control-label">{{ campoSelected + ' ' }} : </label>
           <ng-container *ngIf="campo === '1'">
             <input
@@ -83,8 +90,15 @@
   <div class="col-12 mt-4">
     <div *ngIf="mostrarListaFacturas()" class="row">
       <div class="col-12">
-        <div id="cardTabla" class="card card-padding sombra ingreCard" style="height: 49vh">
-          <app-tablas [info]="info" [quitarAScorll]="60" (clickIcon)="selectFactura($event)" [data]="facturas" (getInfoChange)="selectFactura($event)" [focusRow]="false"></app-tablas>
+        <div id="cardTabla" class="card card-padding sombra ingreCard" style="height: 37.5rem">
+          <app-tablas
+            [info]="info"
+            [quitarAScorll]="60"
+            (clickIcon)="selectFactura($event)"
+            [data]="facturas"
+            (getInfoChange)="selectFactura($event)"
+            [focusRow]="false"
+          ></app-tablas>
         </div>
       </div>
     </div>

@@ -550,14 +550,11 @@ async function puts(msg, titulo?) {
       const stream = fs.createWriteStream(file);
 
       await stream.once('open', (fd) => {
-        if (titulo) stream.write(`\n` + titulo + '==╗');
-
-        stream.write(texto + `\n`);
+        stream.write(titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`);
         stream.end();
       });
     } else {
-      if (titulo) await fs.appendFile(file, `\n` + titulo + '==╗', (err) => {});
-      await fs.appendFile(file, texto + `\n`, (err) => {});
+      await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => {});
     }
   }
 }
@@ -570,6 +567,9 @@ ipcMain.on('printReporte', (event: any, oPdf) => {
 
 ipcMain.on('print', async (event: any, oPdf) => {
   await puts(' --------------- INICIO DE PROCESO DE IMPRESION --------------- ');
+
+  await puts(pathAdd(), 'ruta raiz del proyecto');
+  await puts(pathAdd('/print/lp.exe'), 'ruta sumastra');
   let obj;
   let todo_true = true;
 
