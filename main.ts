@@ -472,6 +472,7 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
 }
 
 function cmd(command, callback) {
+  puts(pathAdd('/'), 'ruta raiz del proyecto')
   const { exec } = require('child_process');
   exec(command, (error, stdout, stderr) => {
     let obj;
