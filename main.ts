@@ -568,8 +568,6 @@ ipcMain.on('printReporte', (event: any, oPdf) => {
 ipcMain.on('print', async (event: any, oPdf) => {
   await puts(' --------------- INICIO DE PROCESO DE IMPRESION --------------- ');
 
-  await puts(pathAdd(), 'ruta raiz del proyecto');
-  await puts(pathAdd('/print/lp.exe'), 'ruta sumastra');
   let obj;
   let todo_true = true;
 
@@ -684,7 +682,7 @@ function imprimir(cFileName, tipo) {
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
   exec(
-    `${sumatrapdf_path} -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent ${cFileName}`,
+    `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${cFileName}"`,
     (error, stdout, stderr) => {
       if (error) {
         puts(error, 'imprimir ERROR');
