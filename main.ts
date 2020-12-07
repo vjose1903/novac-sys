@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
 var request = require('request');
-
+const { exec } = require('child_process');
 const autoUpdater = require('electron-updater').autoUpdater;
 const pdfmake = require('pdfmake/src/printer');
 const pdfMake = require('pdfmake/build/pdfmake.js');
@@ -66,6 +66,8 @@ function createWindow() {
     );
   }
   verificarSumastra();
+  borrarLogs();
+
 
   // win.webContents.openDevTools();
 
@@ -190,6 +192,14 @@ ipcMain.on('getAppDir', (event: any, arg) => {
   event.reply('getAppDirResponse', pathAdd());
 });
 
+function borrarLogs() {
+  setTimeout(() => {
+    const comando = `del "${pathAdd('/my_log.txt')}"`
+    console.log('comando para borrar ==> '+comando)
+    cmd(comando)
+  }, 250);
+}
+
 function verificarSumastra() {
   if (!fs.existsSync(pathAdd('/print'))) {
     fs.mkdir(pathAdd('/print'), { recursive: true }, (err) => {
@@ -240,7 +250,7 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
   // }, 2000);
 }
 
-async function borrado_de_archivos_malos(archivos, callback) {
+async function borrado_de_archivos_malos(archivos, callback = (arg) => { }) {
   const del = require('del');
 
   // delete directory recursively
@@ -252,7 +262,7 @@ async function borrado_de_archivos_malos(archivos, callback) {
       msg: 'Elementos borrado correctamente',
     });
   } catch (err) {
-    console.error(`Error borrando ${archivos}.`);
+    console.error(`Error borrando ${archivos} .`);
     callback({
       status: false,
       msg: err,
@@ -471,14 +481,14 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
   return;
 }
 
-function cmd(command, callback) {
-  puts(pathAdd('/'), 'ruta raiz del proyecto')
-  const { exec } = require('child_process');
+function cmd(command, callback = (arg) => { }) {
   exec(command, (error, stdout, stderr) => {
     let obj;
     if (error) {
       obj = {
         status: false,
+        STDOUT: stdout,
+        STDERR: stderr,
         msg: error,
       };
 
@@ -578,8 +588,6 @@ ipcMain.on('print', async (event: any, oPdf) => {
 
   data['reimprimir'] = reimprimir;
 
-  await puts(data, 'data');
-
   try {
     switch (type) {
       case 'recibo_ingreso':
@@ -613,11 +621,6 @@ ipcMain.on('print', async (event: any, oPdf) => {
       const file = obj.file;
       const type = obj.type;
 
-      await puts(dd, 'dd');
-
-      await puts(file, 'file');
-
-      await puts(type, 'type 2');
 
       createPdfbase64(dd, file, type, reimprimir);
     } else {
@@ -675,7 +678,6 @@ function createPdfbase64(docDefinition, file_, type, reimprimir_) {
 }
 
 function imprimir(cFileName, tipo) {
-  const { exec } = require('child_process');
 
   const sumatrapdf_path = pathAdd('/print/lp.exe');
   // const bat = require.resolve(sumatrapdf_path);
@@ -683,45 +685,30 @@ function imprimir(cFileName, tipo) {
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
   const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${cFileName}"`
-puts(comando,' -----------  comando para imprimir con sumastra ----------- ')
+  puts(comando, ' -----------  comando para imprimir con sumastra ----------- ')
   cmd(comando, (res) => {
     if (res.status) {
       let msg_;
-
       if (tipo === 'reporte') {
-        msg_ = 'Reporte impreso correctamente!!';
+        msg_ = 'Reporte generado correctamente!!';
       } else {
-        msg_ = 'Factura impresa correctamente!!';
+        msg_ = 'Factura generada correctamente!!';
       }
-
       win.webContents.send('printRes', { msg: msg_, status: 'si', STDOUT: res });
-
     } else {
-
       puts(res, 'imprimir ERROR');
       let msg_ = '';
 
       if (tipo === 'reporte') {
-        msg_ = 'Error imprimiendo Reporte!!';
+        msg_ = 'Error generando Reporte!!';
       } else {
-        msg_ = 'Error imprimiendo Factura!!';
+        msg_ = 'Error generando Factura!!';
       }
-
       win.webContents.send('printRes', { msg: msg_, status: 'no', err: res });
       return;
     }
   });
 
-
-
-  // exec(
-  //   comando,
-  //   (error, stdout, stderr) => {
-  //     if (error) {
-  //     } else {
-  //     }
-  //   },
-  // );
 }
 
 export function pathAdd(addToPath = '', pack = false) {
