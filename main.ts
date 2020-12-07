@@ -482,8 +482,13 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
 }
 
 function cmd(command, callback = (arg) => { }) {
+  puts(exec,'libreria exec')
+  puts(command,'comando realizado en la funcion cmd')
   exec(command, (error, stdout, stderr) => {
     let obj;
+    puts(error,'errror en funcion cmd')
+    puts(stdout,'stdout en funcion cmd')
+    puts(stderr,'stderr en funcion cmd')
     if (error) {
       obj = {
         status: false,
@@ -684,9 +689,10 @@ function imprimir(cFileName, tipo) {
   // const profile = require.resolve('../profiles/app.profile.js');
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
-  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${cFileName}"`
+  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent ${cFileName}`
   puts(comando, ' -----------  comando para imprimir con sumastra ----------- ')
   cmd(comando, (res) => {
+    puts(res, 'respuesta impresion');
     if (res.status) {
       let msg_;
       if (tipo === 'reporte') {
@@ -696,7 +702,6 @@ function imprimir(cFileName, tipo) {
       }
       win.webContents.send('printRes', { msg: msg_, status: 'si', STDOUT: res });
     } else {
-      puts(res, 'imprimir ERROR');
       let msg_ = '';
 
       if (tipo === 'reporte') {
