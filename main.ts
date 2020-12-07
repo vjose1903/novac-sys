@@ -161,7 +161,7 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   // autoUpdater.quitAndInstall();
 });
 
-autoUpdater.on('update-not-available', (info) => {});
+autoUpdater.on('update-not-available', (info) => { });
 
 autoUpdater.on('error', (error) => {
   if (win) {
@@ -298,10 +298,10 @@ async function verificarElemento(
             process.platform === 'darwin'
               ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_sin_extension)}" -x "*.DS_Store"`
               : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(
-                  `${path_local_sin_extension}.zip`,
-                )}" -Update`;
+                `${path_local_sin_extension}.zip`,
+              )}" -Update`;
 
-          cmd('pwd', (res_pwd) => {});
+          cmd('pwd', (res_pwd) => { });
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -494,7 +494,7 @@ function cmd(command, callback) {
   });
 }
 
-function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
+function downloadFile(archive_url, path, file_, callback = (arg) => { }) {
   // Save variable to know progress
 
   let received_bytes = 0;
@@ -554,7 +554,7 @@ async function puts(msg, titulo?) {
         stream.end();
       });
     } else {
-      await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => {});
+      await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => { });
     }
   }
 }
@@ -681,34 +681,46 @@ function imprimir(cFileName, tipo) {
   // const profile = require.resolve('../profiles/app.profile.js');
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
-  exec(
-    `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${cFileName}"`,
-    (error, stdout, stderr) => {
-      if (error) {
-        puts(error, 'imprimir ERROR');
-        let msg_ = '';
+  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${cFileName}"`
+puts(comando,' -----------  comando para imprimir con sumastra ----------- ')
+  cmd(comando, (res) => {
+    if (res.status) {
+      let msg_;
 
-        if (tipo === 'reporte') {
-          msg_ = 'Error imprimiendo Reporte!!';
-        } else {
-          msg_ = 'Error imprimiendo Factura!!';
-        }
-
-        win.webContents.send('printRes', { msg: msg_, status: 'no', err: error });
-        return;
+      if (tipo === 'reporte') {
+        msg_ = 'Reporte impreso correctamente!!';
       } else {
-        let msg_;
-
-        if (tipo === 'reporte') {
-          msg_ = 'Reporte impreso correctamente!!';
-        } else {
-          msg_ = 'Factura impresa correctamente!!';
-        }
-
-        win.webContents.send('printRes', { msg: msg_, status: 'si', STDOUT: stdout });
+        msg_ = 'Factura impresa correctamente!!';
       }
-    },
-  );
+
+      win.webContents.send('printRes', { msg: msg_, status: 'si', STDOUT: res });
+
+    } else {
+
+      puts(res, 'imprimir ERROR');
+      let msg_ = '';
+
+      if (tipo === 'reporte') {
+        msg_ = 'Error imprimiendo Reporte!!';
+      } else {
+        msg_ = 'Error imprimiendo Factura!!';
+      }
+
+      win.webContents.send('printRes', { msg: msg_, status: 'no', err: res });
+      return;
+    }
+  });
+
+
+
+  // exec(
+  //   comando,
+  //   (error, stdout, stderr) => {
+  //     if (error) {
+  //     } else {
+  //     }
+  //   },
+  // );
 }
 
 export function pathAdd(addToPath = '', pack = false) {
