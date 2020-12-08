@@ -695,7 +695,7 @@ function imprimir(cFileName, tipo) {
   // const profile = require.resolve('../profiles/app.profile.js');
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
-  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent ${file_path}`
+  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${file_path}"`
   puts(comando, ' -----------  comando para imprimir con sumastra ----------- ')
   cmd(comando, (res) => {
     puts(res, 'respuesta impresion');

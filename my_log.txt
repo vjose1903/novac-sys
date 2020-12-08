@@ -1,0 +1,16 @@
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "C:\Users\USER\CODIGO FUENTE SISTEMA (NO TOCAR)\adm-agroindustrial\print\lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "C:\Users\USER\CODIGO FUENTE SISTEMA (NO TOCAR)\adm-agroindustrial\factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "C:\Users\USER\CODIGO FUENTE SISTEMA (NO TOCAR)\adm-agroindustrial\print\lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "C:\Users\USER\CODIGO FUENTE SISTEMA (NO TOCAR)\adm-agroindustrial\factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": true,
+	"msg": "Comando realizado correctamente",
+	"STDOUT": "",
+	"STDERR": ""
+} 
