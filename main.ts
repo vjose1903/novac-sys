@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
 var request = require('request');
-const { exec } = require('child_process').exec;
+const { exec } = require('child_process');
 const autoUpdater = require('electron-updater').autoUpdater;
 const pdfmake = require('pdfmake/src/printer');
 const pdfMake = require('pdfmake/build/pdfmake.js');
