@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
 var request = require('request');
-const { exec } = require('child_process');
+const { exec } = require('child_process').exec;
 const autoUpdater = require('electron-updater').autoUpdater;
 const pdfmake = require('pdfmake/src/printer');
 const pdfMake = require('pdfmake/build/pdfmake.js');
@@ -482,13 +482,9 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
 }
 
 function cmd(command, callback = (arg) => { }) {
-  puts(exec,'libreria exec')
   puts(command,'comando realizado en la funcion cmd')
   exec(command, (error, stdout, stderr) => {
     let obj;
-    puts(error,'errror en funcion cmd')
-    puts(stdout,'stdout en funcion cmd')
-    puts(stderr,'stderr en funcion cmd')
     if (error) {
       obj = {
         status: false,
