@@ -196,7 +196,7 @@ function borrarLogs() {
   puts('entro enla funcion de borrar log')
   setTimeout(() => {
     puts('ahora va a borrar el archivo log')
-    const comando = `del "${pathAdd('/my_log.txt')}"`
+    const comando = `del "${pathAdd('/my_log.txt', false)}"`
     console.log('comando para borrar ==> '+comando)
     cmd(comando)
   }, 5000);
@@ -547,7 +547,11 @@ function showProgress(received, total) {
 }
 
 async function puts(msg, titulo?) {
+  cmd('dir',(res)=>{
+    puts(res, '----------- dir -----------')
+  })
   if (win) {
+
     const fs = require('fs');
     const file = 'my_log.txt';
 
@@ -714,7 +718,7 @@ function imprimir(cFileName, tipo) {
 
 }
 
-export function pathAdd(addToPath = '', pack = false) {
+export function pathAdd(addToPath = '', resource = true) {
   let path_temp;
   let path_resolved;
 
@@ -724,10 +728,10 @@ export function pathAdd(addToPath = '', pack = false) {
   if (serve_) {
     path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
   } else {
-    if (pack) {
-      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources/app.asar';
-    } else {
+    if (resource) {
       path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
+    } else {
+      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name ;
     }
   }
   path_temp = path_temp + addToPath;
