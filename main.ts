@@ -193,11 +193,13 @@ ipcMain.on('getAppDir', (event: any, arg) => {
 });
 
 function borrarLogs() {
+  puts('entro enla funcion de borrar log')
   setTimeout(() => {
+    puts('ahora va a borrar el archivo log')
     const comando = `del "${pathAdd('/my_log.txt')}"`
     console.log('comando para borrar ==> '+comando)
     cmd(comando)
-  }, 250);
+  }, 5000);
 }
 
 function verificarSumastra() {
