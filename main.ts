@@ -193,13 +193,17 @@ ipcMain.on('getAppDir', (event: any, arg) => {
 });
 
 function borrarLogs() {
+  cmd('dir',(res)=>{
+    puts(res.STDOUT, '----------- dir -----------')
+  })
+
   puts('entro enla funcion de borrar log')
   setTimeout(() => {
     puts('ahora va a borrar el archivo log')
     const comando = `del "${pathAdd('/my_log.txt', false)}"`
     console.log('comando para borrar ==> '+comando)
     cmd(comando)
-  }, 5000);
+  }, 10000);
 }
 
 function verificarSumastra() {
@@ -484,6 +488,7 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
 }
 
 function cmd(command, callback = (arg) => { }) {
+  
   puts(command,'comando realizado en la funcion cmd')
   exec(command, (error, stdout, stderr) => {
     let obj;
@@ -547,9 +552,7 @@ function showProgress(received, total) {
 }
 
 async function puts(msg, titulo?) {
-  cmd('dir',(res)=>{
-    puts(res, '----------- dir -----------')
-  })
+  
   if (win) {
 
     const fs = require('fs');
