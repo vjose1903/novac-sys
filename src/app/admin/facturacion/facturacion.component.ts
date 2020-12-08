@@ -695,7 +695,9 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   decisionModal(arg) {
     if (arg) {
-      if (this.tipoModal === 'imprimir' || this.tipoModal === 'editar_factura') {
+      if (this.tipoModal === 'imprimir') {
+        this.IMPRIMIR();
+      } else if (this.tipoModal === 'editar_factura') {
         this.IMPRIMIR('editar_factura');
       } else if (this.tipoModal === 'cancelar') {
         this.CancelarFactura('quedar');
@@ -1041,6 +1043,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     try {
       let res;
+      console.log('a ver quii===>>> ', arg);
+
       if (arg === 'editar_factura') {
         console.log('this.factura_a_editar ==> ', this.factura_a_editar);
         console.log('cabecera_fact ==> ', cabecera_fact);
