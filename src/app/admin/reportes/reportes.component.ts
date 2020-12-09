@@ -23,8 +23,6 @@ export class ReportesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // this.searchAppDir();
     this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
-      console.log(res);
-
       if (res.status === 'si') {
         let obj;
 
@@ -127,7 +125,6 @@ export class ReportesComponent implements OnInit, OnDestroy {
 
   async reporte(data) {
     let res = {} as any;
-    console.log('algo ', data);
 
     try {
       let tipo = '';

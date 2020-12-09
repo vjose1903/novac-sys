@@ -14,7 +14,6 @@ function getPageMargin(data) {
     else {
         margins = [0, 168, 0, 30];
     }
-    console.log('margen ==> ', margins);
     return margins;
 }
 function makeFacturaVenta(data) {

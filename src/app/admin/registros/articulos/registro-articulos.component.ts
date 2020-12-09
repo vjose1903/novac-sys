@@ -411,7 +411,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   async getCosto(i) {
     const control = this.form.controls['rowFormula'] as FormArray;
-    console.log(control.value[i]);
+
 
     try {
       (control.controls[i] as any).controls['costo_formula'].setValue(undefined);
@@ -760,7 +760,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   editarItem(item) {
     const articulo = item.ARG;
-    console.log(articulo);
+
 
     this.borrar();
     this.ProductoEditando = item.ARG;

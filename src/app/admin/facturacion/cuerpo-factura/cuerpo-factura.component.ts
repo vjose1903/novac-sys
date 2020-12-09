@@ -1,4 +1,15 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectionStrategy, OnDestroy, OnChanges, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  OnDestroy,
+  OnChanges,
+  ElementRef,
+} from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -353,20 +364,20 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       if (cantidad !== '' && cantidad !== '0' && cantidad !== 0 && cantidad !== null && codigo !== '' && codigo !== null && codigo !== undefined) {
         this.setInputDrop(i);
 
-        let excede = false;
         if (unidad && unidad !== '') {
-          excede = await this.checkCantidadExede(i, 'change');
-        }
-
-        if (!excede) {
-          const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
-          this.filtrarArticulo(obj, true, sigInput);
-        } else {
-          GLOBAL.enfocarInput('can-' + index);
-          GLOBAL.selectContenido('can-' + index);
-          setTimeout(() => {
-            (this.control.controls[index] as any).controls['uni'].setValue(null);
-          }, 2);
+          this.checkCantidadExede(i, 'change', (res) => {
+            if (res) {
+              GLOBAL.enfocarInput('can-' + index);
+              GLOBAL.selectContenido('can-' + index);
+              setTimeout(() => {
+                (this.control.controls[index] as any).controls['uni'].setValue(null);
+              }, 2);
+            } else {
+              // const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
+              // this.filtrarArticulo(obj, true, sigInput);
+              GLOBAL.enfocarInput('uni-' + index);
+            }
+          });
         }
       }
     }
@@ -378,28 +389,28 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         index++;
       }
 
-      const excede = await this.checkCantidadExede(i, 'saltar');
-
-      if (!excede) {
-        if (unidad === '' || unidad === null) {
+      this.checkCantidadExede(i, 'saltar', (res) => {
+        if (res) {
+          GLOBAL.enfocarInput('can-' + i);
+          GLOBAL.selectContenido('can-' + i);
           setTimeout(() => {
-            GLOBAL.enfocarInput('uni-' + i);
-          }, 5);
+            (this.control.controls[i] as any).controls['uni'].setValue(null);
+          }, 2);
         } else {
-          this.aumentarSecuencia();
-          if (this.metodo === 'venta') {
-            GLOBAL.enfocarInput('cod-' + index);
+          if (unidad === '' || unidad === null) {
+            setTimeout(() => {
+              GLOBAL.enfocarInput('uni-' + i);
+            }, 5);
           } else {
-            GLOBAL.enfocarInput('pre-' + i);
+            this.aumentarSecuencia();
+            if (this.metodo === 'venta') {
+              GLOBAL.enfocarInput('cod-' + index);
+            } else {
+              GLOBAL.enfocarInput('pre-' + i);
+            }
           }
         }
-      } else {
-        GLOBAL.enfocarInput('can-' + i);
-        GLOBAL.selectContenido('can-' + i);
-        setTimeout(() => {
-          (this.control.controls[i] as any).controls['uni'].setValue(null);
-        }, 2);
-      }
+      });
     }
 
     if (input === 'can-' && codigo !== '') {
@@ -483,7 +494,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.inputDrop = 'uni-' + arg;
   }
 
-  async checkCantidadExede(i, lugar) {
+  async checkCantidadExede(i, lugar, callback = (arg) => {}) {
     let cantidad = 0;
     const descripcion = (this.control.controls[i] as any).controls['des'].value;
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
@@ -531,9 +542,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
       if (this.metodo === 'venta' && res.excede) {
         this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR', true);
-        return true;
+        callback(true);
+        // return true;
       } else {
-        return false;
+        callback(false);
+        // return false;
       }
     } catch (error) {
       if (error.error) {
@@ -541,6 +554,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       } else {
         this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
+      callback(false);
     }
   }
 
@@ -553,20 +567,22 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const costoDetalle = this.UnidadesArticulo[indiceDetalle].costo;
     const unidad = this.UnidadesArticulo[indiceDetalle].value;
 
-    const excede = await this.checkCantidadExede(i, 'change');
-
-    if (!excede) {
-      (this.control.controls[i] as any).controls['uni'].setValue(unidad);
-      (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
-      (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
-      this.calcularTotalRow(i);
-    } else {
-      GLOBAL.enfocarInput('can-' + i);
-      GLOBAL.selectContenido('can-' + i);
-      setTimeout(() => {
-        (this.control.controls[i] as any).controls['uni'].setValue(null);
-      }, 250);
-    }
+    this.checkCantidadExede(i, 'change', (res) => {
+      if (res) {
+        GLOBAL.enfocarInput('can-' + i);
+        GLOBAL.selectContenido('can-' + i);
+        setTimeout(() => {
+          (this.control.controls[i] as any).controls['uni'].setValue(null);
+        }, 250);
+      } else {
+        (this.control.controls[i] as any).controls['uni'].setValue(unidad);
+        (this.control.controls[i] as any).controls['pre'].setValue(
+          GLOBAL.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)),
+        );
+        (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
+        this.calcularTotalRow(i);
+      }
+    });
   }
 
   verificarSecuencia(i, input?) {
@@ -649,7 +665,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         tempdecimales = '00';
       }
       //
-      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
+      if (
+        splitPrecio.length > 2 ||
+        this.checkNumbers(enteros) ||
+        this.checkLongMillares(enteros) ||
+        this.checkNumbers(tempdecimales) ||
+        this.checkLongMillares(tempdecimales)
+      ) {
         this.dbServ.toastError('Precio introducido es invalido', 'ERROR', true);
         GLOBAL.enfocarInput('pre-' + i);
       } else {
@@ -826,12 +848,20 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       if (this.metodo === 'venta' && ARTICULO.existencia > 0 && ARTICULO.aviso_existencia > cantidades[ARTICULO.medida_alerta]) {
         if (ARTICULO.descripcion === 'Producto terminado') {
           this.dbServ.toastWarning(
-            'Solo quedan ' + GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) + ' ' + ARTICULO.medida_alerta + ' de este producto, debe de producir mas!!!',
+            'Solo quedan ' +
+              GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) +
+              ' ' +
+              ARTICULO.medida_alerta +
+              ' de este producto, debe de producir mas!!!',
             'AVISO',
           );
         } else {
           this.dbServ.toastWarning(
-            'Solo quedan ' + GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) + ' ' + ARTICULO.medida_alerta + ' de este producto, debe de aumentar el inventario!!!',
+            'Solo quedan ' +
+              GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) +
+              ' ' +
+              ARTICULO.medida_alerta +
+              ' de este producto, debe de aumentar el inventario!!!',
             'AVISO',
           );
         }
@@ -853,43 +883,56 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
       this.setInputDrop(i);
 
-      this.llenarArrayUnidades(ARTICULO, ARTICULO.is_detallable);
+      this.llenarArrayUnidades(ARTICULO, i);
       const codigo = (this.control.controls[i] as any).controls['cod'].value;
       const cantidad = (this.control.controls[i] as any).controls['can'].value;
 
-      if (codigo && cantidad) {
-        GLOBAL.enfocarInput('uni-' + i);
-      } else {
-        GLOBAL.enfocarInput('can-' + i);
-      }
+      // if (codigo && cantidad) {
+      //   GLOBAL.enfocarInput('uni-' + i);
+      // } else {
+      GLOBAL.enfocarInput('can-' + i);
+      // }
     }
   }
 
-  llenarArrayUnidades(art, detallable) {
-    this.drop = true;
-
-    const precioPrincipal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
-    const costoPrincipal = art.costo_principal;
-    this.drop = true;
-    this.UnidadesArticulo = [];
-    this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
-
-    if (this.metodo === 'venta' && (art.contenido_articulos.length === 0 || art.medida !== 'Quintal')) {
-      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
-    }
-
-    if (this.metodo === 'compra') {
-      this.medidasCuandoCompra(art);
-    }
-
-    if (this.metodo === 'venta' && (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima')) {
-      if (art.vendido_en === 'Saco') {
-        this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+  async llenarArrayUnidades(art?, i?) {
+    const codigo = (this.control.controls[i] as any).controls['cod'].value;
+    if (codigo) {
+      if (!art) {
+        if (codigo) art = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
       }
-    }
 
-    if (detallable) {
-      this.articuloDetallable(art);
+      const detallable = art.is_detallable;
+      this.drop = true;
+
+      const precioPrincipal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
+      const costoPrincipal = art.costo_principal;
+      this.drop = true;
+      this.UnidadesArticulo = [];
+      this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
+
+      if (this.metodo === 'venta' && (art.contenido_articulos.length === 0 || art.medida !== 'Quintal')) {
+        this.UnidadesArticulo.push({
+          value: art.medida,
+          precio: art.precio_principal,
+          costo: art.costo_principal,
+          cantidad: art.contenido[art.medida],
+        });
+      }
+
+      if (this.metodo === 'compra') {
+        this.medidasCuandoCompra(art);
+      }
+
+      if (this.metodo === 'venta' && (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima')) {
+        if (art.vendido_en === 'Saco') {
+          this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+        }
+      }
+
+      if (detallable) {
+        this.articuloDetallable(art);
+      }
     }
   }
 
@@ -902,7 +945,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   entrarSacosAUnidades(precioQuintal, costoQuintal) {
     this.sacos.forEach((saco) => {
       const valor = 'Saco de ' + saco + ' libras';
-      this.UnidadesArticulo.push({ value: valor, precio: this.calcularPrecioSaco(saco, precioQuintal), costo: this.calcularPrecioSaco(saco, costoQuintal), cantidad: saco });
+      this.UnidadesArticulo.push({
+        value: valor,
+        precio: this.calcularPrecioSaco(saco, precioQuintal),
+        costo: this.calcularPrecioSaco(saco, costoQuintal),
+        cantidad: saco,
+      });
     });
   }
 

@@ -37,7 +37,12 @@
         <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
           <tbody>
             <tr>
-              <td *ngIf="propietario" class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
+              <td
+                *ngIf="propietario"
+                class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}"
+                (mouseover)="selectedRow(i, true)"
+                (mouseleave)="selectedRow(i, false)"
+              >
                 <!-- <div class="hoverZone"></div> -->
                 <i class="far fa-trash-alt text-red btnBorrar" (click)="modalRemover(i)"></i>
               </td>
@@ -70,6 +75,7 @@
                     (click)="verificarSecuencia(i)"
                     (keydown.enter)="saltar($event, 'uni-', i)"
                     formControlName="can"
+                    (focus)="llenarArrayUnidades(undefined, i)"
                     (blur)="calcularTotalRow(i) && verificarRow(i)"
                     tabindex="-1"
                   />
@@ -156,7 +162,14 @@
 
               <td class="TOT td0padding">
                 <div class="from-group">
-                  <input type="text" class="form-control entrada inTOT campoNumeros" id="tot-{{ i }}" formControlName="tot" readonly="true" tabindex="-1" />
+                  <input
+                    type="text"
+                    class="form-control entrada inTOT campoNumeros"
+                    id="tot-{{ i }}"
+                    formControlName="tot"
+                    readonly="true"
+                    tabindex="-1"
+                  />
                   <input type="hidden" [value]="i" formControlName="secuencia" tabindex="-1" />
                 </div>
               </td>

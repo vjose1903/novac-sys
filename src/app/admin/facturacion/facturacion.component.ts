@@ -262,7 +262,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
           this.IMPRIMIR();
           this.mServ.ModalObj(undefined);
         } else {
-          this.IMPRIMIR();
+          this.IMPRIMIR(this.action === 'update' ? 'editar_factura' : '');
           this.mServ.ModalObj(undefined);
         }
       }
@@ -307,7 +307,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     this.modo_factura = res.is_viaje ? 'viaje' : res.is_adelantada ? 'adelantada' : 'normal';
     this.enfocarInput('cod-0');
-    console.log('FACTURA A EDITAR ==> ', res);
   }
 
   ngOnDestroy(): void {
@@ -649,12 +648,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         if (this.TOTAL === 0) {
           this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso', true);
         } else {
-          if (this.action === 'update') {
-            const obj = { texto_modal: 'Esta seguro de los cambios realizados a esta factura.' };
-            this.mServ.modalTipo('dinamico_texto');
-            this.tipoModal = 'editar_factura';
-            this.abrirModal(obj);
-          } else if (this.condicion_fact === 'Crédito' || this.is_viaje) {
+          // if (this.action === 'update') {
+          //   const obj = { texto_modal: 'Esta seguro de los cambios realizados a esta factura.' };
+          //   this.mServ.modalTipo('dinamico_texto');
+          //   this.tipoModal = 'editar_factura';
+          //   this.abrirModal(obj);
+          // } else
+          if (this.condicion_fact === 'Crédito' || this.is_viaje) {
             this.mServ.modalTipo('imprimir');
             this.tipoModal = 'imprimir';
             this.abrirModal();
@@ -672,7 +672,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
             const obj = {
               total_factura: this.TOTAL,
-              devuelta: 0,
+              devuelta: this.action === 'update' ? this.factura_a_editar.devuelta + this.factura_a_editar.total_factura : 0,
               tipo__: 'devuelta',
               factura_de: this.metodo,
               cambios_articulos: articulos_a_cambiar,
@@ -697,8 +697,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     if (arg) {
       if (this.tipoModal === 'imprimir') {
         this.IMPRIMIR();
-      } else if (this.tipoModal === 'editar_factura') {
-        this.IMPRIMIR('editar_factura');
+        // } else if (this.tipoModal === 'editar_factura') {
+        //   this.IMPRIMIR('editar_factura');
       } else if (this.tipoModal === 'cancelar') {
         this.CancelarFactura('quedar');
       }
@@ -743,6 +743,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     if (this.metodo === 'venta') {
       this.CuerpoFactura.map((articulo) => {
+        delete articulo.is_materia_prima;
         articulo.retirado = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
         articulo.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
         return articulo;
@@ -1043,12 +1044,8 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     try {
       let res;
-      console.log('a ver quii===>>> ', arg);
 
       if (arg === 'editar_factura') {
-        console.log('this.factura_a_editar ==> ', this.factura_a_editar);
-        console.log('cabecera_fact ==> ', cabecera_fact);
-
         res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();
       } else {
         res = await this.dbServ.createFacturas(cabecera_fact).toPromise();

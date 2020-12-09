@@ -149,8 +149,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res) {
-        // console.log(res);
-
         if (this.tipoModal === 'mostrarFactura') {
           if (this.BuscarPara === 'anular_factura') {
             this.facturaSelected['identificadorFact'] =
@@ -189,18 +187,12 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     });
 
     this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
-      console.log(res);
-      console.log('res.status==> ', res.status);
-
       if (res.status === 'si') {
         this.dbServ.toastSuccess(res.msg, 'CORRECTO', true);
       } else {
-        console.log('ENTRO EN EL NOOO');
         this.dbServ.toastError(res.msg, 'ERROR', true);
       }
       setTimeout(() => {
-        console.log(document.getElementById('foco_angular'));
-
         document.getElementById('foco_angular').click();
       }, 5);
     });
@@ -308,7 +300,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       this.facturas = undefined;
       const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id).toPromise();
       this.facturas = GLOBAL.duplicarJson(busqueda);
-      console.log('this.facturas ==> ', this.facturas);
 
       if (this.facturas.length > 0) {
         this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;

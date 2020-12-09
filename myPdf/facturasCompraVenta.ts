@@ -12,14 +12,11 @@ function getPageMargin(data) {
   } else {
     margins = [0, 168, 0, 30];
   }
-  console.log('margen ==> ',margins);
-  
+
   return margins;
 }
 
 export function makeFacturaVenta(data) {
-  
-  
   const dd = {
     pageSize: { width: 990, height: 398 },
     pageMargins: getPageMargin(data),
@@ -118,22 +115,32 @@ function cabeceraFacturaVenta(data) {
         [
           {
             text: [
-              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: 'Cliente : ', style: 'letra12' } : { text: 'Suplidor : ', style: 'letra12' },
-              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.nombre, style: 'letra12' } : { text: data.suplidor.nombre, style: 'letra12' },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
+                ? { text: 'Cliente : ', style: 'letra12' }
+                : { text: 'Suplidor : ', style: 'letra12' },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
+                ? { text: data.cliente.nombre, style: 'letra12' }
+                : { text: data.suplidor.nombre, style: 'letra12' },
             ],
             margin: [0, 0, 0, 0],
           },
           {
             text: [
-              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: 'Rnc cliente : ', style: 'letra12' } : { text: 'Rnc suplidor : ', style: 'letra12' },
-              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.rnc, style: 'letra12' } : { text: data.suplidor.rnc, style: 'letra12' },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
+                ? { text: 'Rnc cliente : ', style: 'letra12' }
+                : { text: 'Rnc suplidor : ', style: 'letra12' },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
+                ? { text: data.cliente.rnc, style: 'letra12' }
+                : { text: data.suplidor.rnc, style: 'letra12' },
             ],
             margin: [0, 5, 0, 0],
           },
           {
             text: [
               { text: 'Dirección : ', style: 'letra12' },
-              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? { text: data.cliente.direccion, style: 'letra12' } : { text: data.suplidor.direccion, style: 'letra12' },
+              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
+                ? { text: data.cliente.direccion, style: 'letra12' }
+                : { text: data.suplidor.direccion, style: 'letra12' },
             ],
             margin: [0, 5, 0, 0],
           },
@@ -379,25 +386,50 @@ function contenidoFacturaVenta(data) {
                   body: [
                     [
                       { text: 'Bruto RD$: ', style: 'letra11_5', bold: true, alignment: 'right' },
-                      { text: fun_.numFormatTwoDecimals(data.Bruto), style: 'letra11_5', alignment: 'right', margin: [0, 0, data.detalle_facturas.length <= 5 ? 29 : 49, 0] },
+                      {
+                        text: fun_.numFormatTwoDecimals(data.Bruto),
+                        style: 'letra11_5',
+                        alignment: 'right',
+                        margin: [0, 0, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
+                      },
                     ],
                     [
                       { text: 'Itbis RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                      { text: fun_.numFormatTwoDecimals(data.itbis), style: 'letra11_5', alignment: 'right', margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0] },
+                      {
+                        text: fun_.numFormatTwoDecimals(data.itbis),
+                        style: 'letra11_5',
+                        alignment: 'right',
+                        margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
+                      },
                     ],
                     [
                       { text: 'Descuento RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                      { text: fun_.numFormatTwoDecimals(data.descuento), style: 'letra11_5', alignment: 'right', margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0] },
+                      {
+                        text: fun_.numFormatTwoDecimals(data.descuento),
+                        style: 'letra11_5',
+                        alignment: 'right',
+                        margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
+                      },
                     ],
                     [
                       { text: 'TOTAL RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                      { text: fun_.numFormatTwoDecimals(data.total_factura), style: 'letra11_5', alignment: 'right', margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0] },
+                      {
+                        text: fun_.numFormatTwoDecimals(data.total_factura),
+                        style: 'letra11_5',
+                        alignment: 'right',
+                        margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
+                      },
                     ],
                     data.FACTURA_DE === 'compra' || data.FACTURA_DE === 'nota'
                       ? [{ text: '' }, { text: '' }]
                       : [
                           { text: 'Devuelta RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                          { text: fun_.numFormatTwoDecimals(data.devuelta), style: 'letra11_5', alignment: 'right', margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0] },
+                          {
+                            text: fun_.numFormatTwoDecimals(data.devuelta),
+                            style: 'letra11_5',
+                            alignment: 'right',
+                            margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
+                          },
                         ],
                   ],
                 },
