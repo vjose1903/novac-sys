@@ -19,12 +19,21 @@
                   <span class="ml-1 subirLabelCheck_2">Funciona como materia prima</span>
                 </div>
               </div>
-              <div class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }}">
-                <!-- <div class="from-group mb-2 ml-2">
+              <div
+                *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'"
+                class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }}"
+              >
+                <div class="from-group mb-2 ml-2">
+                  <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" />
+                  <span class="ml-2 subirLabelCheck">Calcular saco</span>
+                </div>
+              </div>
+              <!-- <div class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }}">
+                <div class="from-group mb-2 ml-2">
                   <input formControlName="calcular_itbis" class="apple-switch ml-2" type="checkbox" />
                   <span class="ml-2 subirLabelCheck">Calcular Itbis</span>
-                </div> -->
-              </div>
+                </div>
+              </div> -->
             </div>
           </div>
           <div class="col-md-12">
@@ -41,7 +50,11 @@
                 autocomplete="off"
                 id="nombre"
               />
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
+              <div
+                class="alerta text-danger ml-1"
+                style="font-size: 12px"
+                *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)"
+              >
                 Este Campo es obligatorio
               </div>
             </div>
@@ -63,7 +76,9 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['tipo_articulo_id'].valid && (form.controls['tipo_articulo_id'].dirty || form.controls['tipo_articulo_id'].touched)"
+                *ngIf="
+                  !form.controls['tipo_articulo_id'].valid && (form.controls['tipo_articulo_id'].dirty || form.controls['tipo_articulo_id'].touched)
+                "
               >
                 Seleccione tipo de articulo
               </div>
@@ -122,7 +137,11 @@
                 <option value="Caja">Caja</option>
                 <option value="Unidad">Unidad</option>
               </select>
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)">
+              <div
+                class="alerta text-danger ml-1"
+                style="font-size: 12px"
+                *ngIf="!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)"
+              >
                 Seleccione una opcion
               </div>
             </div>
@@ -163,7 +182,9 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)"
+                *ngIf="
+                  !form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)
+                "
               >
                 Este Campo es obligatorio
               </div>
@@ -187,7 +208,9 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)"
+                *ngIf="
+                  !form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)
+                "
               >
                 Este Campo es obligatorio
               </div>
@@ -235,7 +258,9 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)"
+                *ngIf="
+                  !form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)
+                "
               >
                 Este Campo es obligatorio
               </div>
@@ -248,14 +273,14 @@
         <!--  PRODUCTO TERMINADO -->
         <!-- ======================================================================================================================= -->
         <div *ngIf="TIPOARTICULO === 'Producto terminado'">
-          <div class="">
-            <label class="control-label">Formula (1 QUINTAL) : </label>
-            <div class="row mb-2">
-              <div class="col-5">Ingredientes</div>
-              <div class="col-2 p-0">Cant. LBS</div>
-              <div class="col-3">Costo</div>
-              <div class="col-2"></div>
-            </div>
+          <label class="control-label">Formula (1 QUINTAL) : </label>
+          <div class="row mb-2">
+            <div class="col-5">Ingredientes</div>
+            <div class="col-2 p-0">Cant. LBS</div>
+            <div class="col-3">Costo</div>
+            <div class="col-2"></div>
+          </div>
+          <div class="SCROLLFORMULA">
             <div
               [ngClass]="{ 'd-none': Formula['controls']['_destroy'].value === '1' }"
               class="mb-2"
@@ -305,7 +330,13 @@
                       <input
                         (focus)="$event.target.select()"
                         type="text"
-                        (keydown.enter)="saltar(j !== ARRAY_FORMULA.controls.length - 1 ? 'articulo_id-' : 'OtrosG', j !== ARRAY_FORMULA.controls.length - 1 ? true : false, j + 1)"
+                        (keydown.enter)="
+                          saltar(
+                            j !== ARRAY_FORMULA.controls.length - 1 ? 'articulo_id-' : 'OtrosG',
+                            j !== ARRAY_FORMULA.controls.length - 1 ? true : false,
+                            j + 1
+                          )
+                        "
                         (blur)="calculateCostoPT()"
                         id="cantidad_formula-{{ j }}"
                         formControlName="cantidad_formula"
@@ -331,16 +362,27 @@
                   </div>
                   <div class="col-2">
                     <div *ngIf="j === 0" class="d-flex aling justify-content-between">
-                      <i (click)="addItem(j)" mdbTooltip="Agregar Ingrediente" placement="left" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
+                      <i
+                        (click)="addItem(j)"
+                        mdbTooltip="Agregar Ingrediente"
+                        placement="left"
+                        class="fas btnArray fa-plus-square text-blue btnQuitar"
+                      ></i>
                     </div>
                     <div *ngIf="j !== 0" class="d-flex aling justify-content-between">
-                      <i (click)="removeItem(j)" mdbTooltip="Quitar Ingrediente" placement="left" class="fas btnArray fa-minus-square text-danger btnQuitar"></i>
+                      <i
+                        (click)="removeItem(j)"
+                        mdbTooltip="Quitar Ingrediente"
+                        placement="left"
+                        class="fas btnArray fa-minus-square text-danger btnQuitar"
+                      ></i>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
           <hr *ngIf="TIPOARTICULO === 'Producto terminado'" class="raya mt-2" />
 
           <div class="row">
@@ -386,7 +428,9 @@
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"
-                  *ngIf="!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)"
+                  *ngIf="
+                    !form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)
+                  "
                 >
                   Este Campo es obligatorio
                 </div>
@@ -411,7 +455,9 @@
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"
-                  *ngIf="!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)"
+                  *ngIf="
+                    !form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)
+                  "
                 >
                   Este Campo es obligatorio
                 </div>
@@ -451,7 +497,9 @@
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"
-                  *ngIf="!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)"
+                  *ngIf="
+                    !form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)
+                  "
                 >
                   Este Campo es obligatorio
                 </div>
@@ -515,7 +563,10 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['cantidad_contenido_padre'].valid && (form.controls['cantidad_contenido_padre'].dirty || form.controls['cantidad_contenido_padre'].touched)"
+                *ngIf="
+                  !form.controls['cantidad_contenido_padre'].valid &&
+                  (form.controls['cantidad_contenido_padre'].dirty || form.controls['cantidad_contenido_padre'].touched)
+                "
               >
                 Cantidad de la caja
               </div>
@@ -524,7 +575,14 @@
           <div class="col-md-5">
             <div class="from-group">
               <label class="control-label text-transparent">medida </label>
-              <select (keydown.enter)="saltar('precioPadre')" id="medidaPadre" formControlName="medida_contenido_padre" (change)="seleccionarContenidoCaja()" class="form-control" value="">
+              <select
+                (keydown.enter)="saltar('precioPadre')"
+                id="medidaPadre"
+                formControlName="medida_contenido_padre"
+                (change)="seleccionarContenidoCaja()"
+                class="form-control"
+                value=""
+              >
                 <option value="{{ null }}">Seleccione</option>
                 <option *ngIf="form.controls['medida'].value === 'Saco'" value="Libra">Libra</option>
                 <option *ngIf="form.controls['medida'].value === 'Caja'" value="Paquete">Paquete</option>
@@ -535,7 +593,10 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['medida_contenido_padre'].valid && (form.controls['medida_contenido_padre'].dirty || form.controls['medida_contenido_padre'].touched)"
+                *ngIf="
+                  !form.controls['medida_contenido_padre'].valid &&
+                  (form.controls['medida_contenido_padre'].dirty || form.controls['medida_contenido_padre'].touched)
+                "
               >
                 Este Campo es obligatorio
               </div>
@@ -543,7 +604,8 @@
           </div>
           <div class="col-md-4">
             <div class="from-group">
-              <label class="control-label">Precio </label> {{ ' ' }} <label class="control-label">{{ form.controls['medida_contenido_padre'].value }} </label>
+              <label class="control-label">Precio </label> {{ ' ' }}
+              <label class="control-label">{{ form.controls['medida_contenido_padre'].value }} </label>
               <input
                 (keydown.enter)="saltar(form.controls['medida_contenido_padre'].value === 'Paquete' ? 'contenidoHijo' : 'send')"
                 type="text"
@@ -588,7 +650,10 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['cantidad_contenido_hijo'].valid && (form.controls['cantidad_contenido_hijo'].dirty || form.controls['cantidad_contenido_hijo'].touched)"
+                *ngIf="
+                  !form.controls['cantidad_contenido_hijo'].valid &&
+                  (form.controls['cantidad_contenido_hijo'].dirty || form.controls['cantidad_contenido_hijo'].touched)
+                "
               >
                 Cantidad del paquete
               </div>
@@ -606,7 +671,10 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['medida_contenido_hijo'].valid && (form.controls['medida_contenido_hijo'].dirty || form.controls['medida_contenido_hijo'].touched)"
+                *ngIf="
+                  !form.controls['medida_contenido_hijo'].valid &&
+                  (form.controls['medida_contenido_hijo'].dirty || form.controls['medida_contenido_hijo'].touched)
+                "
               >
                 Este Campo es obligatorio
               </div>
@@ -614,7 +682,8 @@
           </div>
           <div class="col-md-4">
             <div class="from-group">
-              <label class="control-label">Precio </label> {{ ' ' }} <label class="control-label">{{ form.controls['medida_contenido_hijo'].value }} </label>
+              <label class="control-label">Precio </label> {{ ' ' }}
+              <label class="control-label">{{ form.controls['medida_contenido_hijo'].value }} </label>
               <input
                 id="precioHijo"
                 (keydown.enter)="saltar('send')"

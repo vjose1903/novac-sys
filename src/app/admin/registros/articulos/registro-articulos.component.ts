@@ -178,7 +178,11 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.FechaFactura, 'todos').toPromise();
 
       res.data.map(async (arti) => {
-        arti.customStyles = { 'td-codigo': { width: '3rem' }, 'td-nombre': { width: '13rem', 'text-align': 'left', 'padding-left': '1.5rem' }, 'td-medida': { width: '4rem' } };
+        arti.customStyles = {
+          'td-codigo': { width: '3rem' },
+          'td-nombre': { width: '13rem', 'text-align': 'left', 'padding-left': '1.5rem' },
+          'td-medida': { width: '4rem' },
+        };
       });
 
       this.listaArticulos = res.data;
@@ -235,6 +239,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       costo_principal: [null, Validators.required],
       precio_principal: [null, Validators.required],
       is_detallable: [false],
+      calcular_saco: [false],
       fecha_ingreso: [new Date()],
       aviso_existencia: [null, Validators.required],
       calcular_itbis: [false],
@@ -412,7 +417,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   async getCosto(i) {
     const control = this.form.controls['rowFormula'] as FormArray;
 
-
     try {
       (control.controls[i] as any).controls['costo_formula'].setValue(undefined);
       const res = await this.dbServ.getCostoArticulo(control.value[i].articulo_id).toPromise();
@@ -438,7 +442,12 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       });
 
       const formulario = this.form.controls;
-      if (formulario.otros_costos.value !== null && formulario.otros_costos.value !== undefined && formulario.otros_costos.value !== '' && formulario.otros_costos.value !== ' ') {
+      if (
+        formulario.otros_costos.value !== null &&
+        formulario.otros_costos.value !== undefined &&
+        formulario.otros_costos.value !== '' &&
+        formulario.otros_costos.value !== ' '
+      ) {
         sumatoriaMult += GLOBAL.desformatear(formulario.otros_costos.value);
         this.form.controls.costo_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(sumatoriaMult)));
         this.calculatePrice();
@@ -530,7 +539,16 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     const costo = GLOBAL.desformatear(costoTemp);
     const cantidadPadre = this.form.value.cantidad_contenido_padre;
 
-    if (Precio > 0 && Precio != null && Precio !== undefined && !isNaN(Precio) && cantidadPadre > 0 && cantidadPadre != null && cantidadPadre !== undefined && !isNaN(cantidadPadre)) {
+    if (
+      Precio > 0 &&
+      Precio != null &&
+      Precio !== undefined &&
+      !isNaN(Precio) &&
+      cantidadPadre > 0 &&
+      cantidadPadre != null &&
+      cantidadPadre !== undefined &&
+      !isNaN(cantidadPadre)
+    ) {
       const PrecioPadre = Precio / cantidadPadre;
       const costoPadre = costo / cantidadPadre;
 
@@ -548,7 +566,16 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     const costoPadreTemp = this.form.value.costo_padre;
     const costoP = GLOBAL.desformatear(costoPadreTemp);
     const cantidadHijo = this.form.value.cantidad_contenido_hijo;
-    if (PrecioP > 0 && PrecioP != null && PrecioP !== undefined && !isNaN(PrecioP) && cantidadHijo > 0 && cantidadHijo != null && cantidadHijo !== undefined && !isNaN(cantidadHijo)) {
+    if (
+      PrecioP > 0 &&
+      PrecioP != null &&
+      PrecioP !== undefined &&
+      !isNaN(PrecioP) &&
+      cantidadHijo > 0 &&
+      cantidadHijo != null &&
+      cantidadHijo !== undefined &&
+      !isNaN(cantidadHijo)
+    ) {
       const PrecioHijo = PrecioP / cantidadHijo;
       const costoHijo = costoP / cantidadHijo;
       this.form.controls.precio_hijo.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(PrecioHijo)));
@@ -761,7 +788,6 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   editarItem(item) {
     const articulo = item.ARG;
 
-
     this.borrar();
     this.ProductoEditando = item.ARG;
     this.titulo = 'Editar producto: ' + articulo.nombre;
@@ -945,6 +971,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
       is_combo: this.is_combo,
       vendido_en: x.vendido_en,
       is_materia_prima: x.is_materia_prima,
+      calcular_saco: x.calcular_saco,
     };
     if (obj.is_combo) {
       obj['vendido_en'] = 'Saco';
@@ -1042,7 +1069,13 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
         tempdecimales = '00';
       }
       //
-      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
+      if (
+        splitPrecio.length > 2 ||
+        this.checkNumbers(enteros) ||
+        this.checkLongMillares(enteros) ||
+        this.checkNumbers(tempdecimales) ||
+        this.checkLongMillares(tempdecimales)
+      ) {
         this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
         this.enfocarInput(id);
       } else {
