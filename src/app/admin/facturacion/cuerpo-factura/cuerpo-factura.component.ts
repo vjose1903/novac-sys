@@ -362,23 +362,20 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
     if (input === 'uni-') {
       if (cantidad !== '' && cantidad !== '0' && cantidad !== 0 && cantidad !== null && codigo !== '' && codigo !== null && codigo !== undefined) {
-        this.setInputDrop(i);
-
-        if (unidad && unidad !== '') {
-          this.checkCantidadExede(i, 'change', (res) => {
-            if (res) {
-              GLOBAL.enfocarInput('can-' + index);
-              GLOBAL.selectContenido('can-' + index);
-              setTimeout(() => {
-                (this.control.controls[index] as any).controls['uni'].setValue(null);
-              }, 2);
-            } else {
-              // const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
-              // this.filtrarArticulo(obj, true, sigInput);
-              GLOBAL.enfocarInput('uni-' + index);
-            }
-          });
-        }
+        this.checkCantidadExede(i, 'change', (res) => {
+          if (res) {
+            GLOBAL.enfocarInput('can-' + index);
+            GLOBAL.selectContenido('can-' + index);
+            setTimeout(() => {
+              (this.control.controls[index] as any).controls['uni'].setValue(null);
+            }, 2);
+          } else {
+            // const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
+            // this.filtrarArticulo(obj, true, sigInput);
+            this.setInputDrop(i);
+            GLOBAL.enfocarInput('uni-' + index);
+          }
+        });
       }
     }
 
