@@ -73,7 +73,14 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   rowsExcede = [];
   FechaConduce: string;
 
-  constructor(private mServ: ModalService, private _ipc: IpcService, private fun: FunctionService, private dbServ: DBservice, private fb: FormBuilder, private tServ: TablasService) {}
+  constructor(
+    private mServ: ModalService,
+    private _ipc: IpcService,
+    private fun: FunctionService,
+    private dbServ: DBservice,
+    private fb: FormBuilder,
+    private tServ: TablasService,
+  ) {}
 
   formarFechaFactura(date) {
     const hora = moment(date).hour();
@@ -341,12 +348,20 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       if (ARTICULO.existencia > 0 && ARTICULO.aviso_existencia > cantidades[ARTICULO.medida_alerta]) {
         if (ARTICULO.descripcion === 'Producto terminado') {
           this.dbServ.toastWarning(
-            'Solo quedan ' + GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) + ' ' + ARTICULO.medida_alerta + ' de este producto, debe de producir mas!!!',
+            'Solo quedan ' +
+              GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) +
+              ' ' +
+              ARTICULO.medida_alerta +
+              ' de este producto, debe de producir mas!!!',
             'AVISO',
           );
         } else {
           this.dbServ.toastWarning(
-            'Solo quedan ' + GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) + ' ' + ARTICULO.medida_alerta + ' de este producto, debe de aumentar el inventario!!!',
+            'Solo quedan ' +
+              GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]) +
+              ' ' +
+              ARTICULO.medida_alerta +
+              ' de este producto, debe de aumentar el inventario!!!',
             'AVISO',
           );
         }
@@ -401,7 +416,12 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     this.UnidadesArticulo.push({ value: 'Medida', cantidad: art.contenido[art.medida] });
 
     if (art.contenido_articulos.length === 0 || (art.descripcion !== 'Producto terminado' && art.vendido_en !== 'Saco')) {
-      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
+      this.UnidadesArticulo.push({
+        value: art.medida,
+        precio: art.precio_principal,
+        costo: art.costo_principal,
+        cantidad: art.contenido[art.medida],
+      });
     }
 
     if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
@@ -446,7 +466,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
 
       this.mServ.mostrarModal(true);
       setTimeout(() => {
-        this.mServ.ModalTablaHeight(true);
+       // this.mServ.ModalTablaHeight(true);
       }, 250);
     }
   }
@@ -654,7 +674,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   }
 
   selectedRow(i, bool) {
-    const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i];
+    const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i, 'pre-' + i, 'tot-' + i, 'desc-' + i];
     lista.forEach((row) => {
       if (this.checkIfArticuloRow(i)) {
         if (bool) {

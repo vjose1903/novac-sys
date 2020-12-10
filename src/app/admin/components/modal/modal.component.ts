@@ -151,18 +151,19 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.identificadorFact = res.identificadorFact;
         this.index = res.index;
 
-        if (this.paraFiltroArticulos) {
-          this.renovarDataFiltros(obj_paginate, this.paraFiltroArticulos, this.fecha_articulo);
-        } else if (this.paraFiltroClientes) {
-          this.renovarDataFiltros(obj_paginate, this.paraFiltroClientes, this.fecha_articulo);
-        } else if (this.paraFiltroSuplidor) {
-          this.renovarDataFiltros(obj_paginate, this.paraFiltroSuplidor, this.fecha_articulo);
-        }
+        // if (this.paraFiltroArticulos) {
+        // } else if (this.paraFiltroClientes) {
+        // } else if (this.paraFiltroSuplidor) {
+        // }
 
-        if (this.tipoModal === 'buscarCliente') {
+        if (this.tipoModal === 'buscarArticulo') {
+          this.renovarDataFiltros(obj_paginate, this.paraFiltroArticulos, this.fecha_articulo);
+        } else if (this.tipoModal === 'buscarCliente') {
           this.tituloModal = 'Buscar cliente';
+          this.renovarDataFiltros(obj_paginate, this.paraFiltroClientes, this.fecha_articulo);
         } else {
           this.tituloModal = 'Buscar suplidor';
+          this.renovarDataFiltros(obj_paginate, this.paraFiltroSuplidor, this.fecha_articulo);
         }
 
         if (this.tipoModal === 'mostrarFactura' && res) {
@@ -243,7 +244,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.modalTipo(undefined);
     this.mServ.mostrarModal(false);
     this.mServ.ModalSeleccion(undefined);
-    this.mServ.ModalTablaHeight(false);
+    // this.mServ.ModalTablaHeight(false);
     this.mServ.ModalObj(undefined);
     this.mServ.ModalIndex(undefined);
     this.mServ.getArticuloFiltradoPorCodigo(undefined);
@@ -314,17 +315,22 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     const page = e.page;
     const per_page = e.per_page;
     let palabra_a_buscar = ' ';
+
     if (buscando) {
       palabra_a_buscar = buscando === '' || buscando === null || buscando === undefined ? ' ' : buscando;
     } else {
       palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
     }
 
-    if (this.paraFiltroArticulos) {
+    console.log(`palabra_a_buscar--> ${typeof palabra_a_buscar} (${palabra_a_buscar})`);
+    console.log('this.tipoModal ==> ', this.tipoModal);
+
+    if (this.tipoModal === 'buscarArticulo') {
       try {
         const is_compra = this.metodo === 'compra' ? true : false;
 
         const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, fecha_articulo, 'todos').toPromise();
+        console.log('articulos --> ', res);
 
         if (res.data) {
           this.seleccionModal = res.data;
@@ -345,16 +351,17 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);
         this.mServ.mostrarModal(false);
       }
-    } else if (this.paraFiltroClientes) {
+    } else if (this.tipoModal === 'buscarCliente') {
       try {
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
-
+        console.log('clientes --> ', res);
         this.seleccionModal = undefined;
 
         if (res.data.length === 0) {
-          this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO');
-          this.mServ.mostrarModal(false);
-          // this.reinicioModal();
+          this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO', true);
+          setTimeout(() => {
+            this.mServ.mostrarModal(false);
+          }, 250);
         } else {
           res.data.map(async (cli) => {
             cli.nombre = GLOBAL.Capitalice(cli.nombre);
@@ -379,9 +386,10 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
         this.mServ.mostrarModal(false);
       }
-    } else if (this.paraFiltroSuplidor) {
+    } else if (this.tipoModal === 'buscarSuplidor') {
       try {
         const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+        console.log('suplidores --> ', res);
 
         this.seleccionModal = undefined;
         res.data.map(async (supli) => {
@@ -392,8 +400,10 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.seleccionModal = res.data;
 
         if (res.data.length === 0) {
-          this.dbServ.toastWarning('No existe suplidor con el nombre introducido', 'AVISO');
-          this.mServ.mostrarModal(false);
+          this.dbServ.toastWarning('No existe suplidor con el nombre introducido', 'AVISO', true);
+          setTimeout(() => {
+            this.mServ.mostrarModal(false);
+          }, 250);
         }
         const obj = {
           total: res.total_registros,

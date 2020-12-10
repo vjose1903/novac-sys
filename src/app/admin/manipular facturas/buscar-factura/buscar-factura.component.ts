@@ -384,7 +384,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(obj);
 
     this.mServ.mostrarModal(true);
-    this.mServ.ModalTablaHeight(true);
+    // this.mServ.ModalTablaHeight(true);
   }
 
   changeSelect(valor) {

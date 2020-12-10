@@ -15,6 +15,7 @@
               class="form-control tipo inputE"
               [(ngModel)]="tipoFactura"
               id="tipoFact"
+              (blur)="checkTipoFactura('condicion', tipoFact.value)"
               #tipoFact
               (focus)="setWidthPop(true, $event.target)"
               tabindex="-1"
@@ -62,7 +63,13 @@
           <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
           <select
             id="venta"
-            (keydown.enter)="saltar(modo_factura === 'normal' ? 'nom' : modo_factura === 'viaje' ? 'fecha_equivalente' : 'buscarCliente', $event.target.value, 'venta')"
+            (keydown.enter)="
+              saltar(
+                modo_factura === 'normal' ? 'nom' : modo_factura === 'viaje' ? 'fecha_equivalente' : 'buscarCliente',
+                $event.target.value,
+                'venta'
+              )
+            "
             (change)="selectModoFactura($event.target.value)"
             class="form-control inputE"
             [(ngModel)]="modo_factura"
@@ -163,7 +170,11 @@
                 tabindex="-1"
               />
               <input id="id" type="hidden" formControlName="id" />
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
+              <div
+                class="alerta text-danger ml-1"
+                style="font-size: 12px"
+                *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)"
+              >
                 Este Campo es obligatorio
               </div>
             </div>
@@ -171,7 +182,16 @@
             <div class="col-md-5">
               <div class="from-group">
                 <span class="control-label titulos">Telefono:</span>
-                <input type="text" class="form-control inputE" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" readonly="true" tabindex="-1" />
+                <input
+                  type="text"
+                  class="form-control inputE"
+                  formControlName="telefono"
+                  placeholder="(___)___-____"
+                  autocomplete="off"
+                  id="inputTelefono"
+                  readonly="true"
+                  tabindex="-1"
+                />
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"
@@ -240,13 +260,29 @@
   <div class="pieFactura">
     <div class="row">
       <div class="col-2 ml-4">
-        <app-btncircular [alto]="'100px'" [accion]="!factura_a_editar ? 'Imprimir Factura' : 'Reimprimir Factura'" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
+        <app-btncircular
+          [alto]="'100px'"
+          [accion]="!factura_a_editar ? 'Imprimir Factura' : 'Reimprimir Factura'"
+          [nombreImg]="'printer'"
+          (click)="imprimirFactura()"
+        ></app-btncircular>
       </div>
       <div class="col-2">
-        <app-btncircular [alto]="'100px'" [accion]="!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
+        <app-btncircular
+          [alto]="'100px'"
+          [accion]="!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'"
+          [nombreImg]="'cancelar'"
+          (click)="cancelarFactura()"
+        ></app-btncircular>
       </div>
       <div class="col-2" *ngIf="metodo === 'venta'">
-        <app-btncircular *ngIf="!factura_a_editar" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (click)="ingresarFecha()"></app-btncircular>
+        <app-btncircular
+          *ngIf="!factura_a_editar"
+          [alto]="'100px'"
+          [accion]="'Ingresar Factura pendientes'"
+          [nombreImg]="'calendar'"
+          (click)="ingresarFecha()"
+        ></app-btncircular>
       </div>
 
       <div class="col-5 d-flex justify-content-end">

@@ -154,12 +154,13 @@
                     (click)="verificarRow(i)"
                     id="pre-{{ i }}"
                     formControlName="pre"
-                    [readOnly]="readPrecio()"
+                    [readOnly]="readPrecio(i)"
                     tabindex="-1"
                   />
                 </div>
               </td>
 
+              <!--  ::::::::::::  PRECIO  ::::::::::::  -->
               <td class="TOT td0padding">
                 <div class="from-group">
                   <input
@@ -173,6 +174,23 @@
                   <input type="hidden" [value]="i" formControlName="secuencia" tabindex="-1" />
                 </div>
               </td>
+              <!--  ::::::::::::  PRECIO  ::::::::::::  -->
+              <!-- <td *ngIf="propietario" class="sombreado2">
+                <div class="btn-group" dropdown id="divDropConfigRow" #dropConfigRow>
+                  <i *ngIf="activarBtnConfigRow(i)" class="fas fa-ellipsis-v btnConfigDis"></i>
+                  <a *ngIf="activarBtnConfigRow(i)" dropdownToggle>
+                    <i class="fas fa-ellipsis-v btnConfig"></i>
+                  </a>
+                  <ul class="dropdown-menu" role="menu" id="dropConfigRow">
+                    <li role="menuitem">
+                      <div class="from-group my-1 ml-2">
+                        <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, $event)" />
+                        <span class="ml-2 subirLabelCheck">Calcular saco</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </td> -->
             </tr>
           </tbody>
         </table>

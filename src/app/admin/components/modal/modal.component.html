@@ -362,18 +362,20 @@
     blockScroll="true"
   >
     <!-- *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos" -->
-    <app-tablas
-      [focusRow]="true"
-      [metodo]="metodo"
-      [paraFiltroArticulos]="paraFiltroArticulos"
-      (clickRow)="devolverCLick($event)"
-      [info]="infoArticulos"
-      [data]="seleccionModal"
-      [search]="false"
-      (noArticulo)="noArticulo()"
-      (paginateChange)="renovarDataFiltros($event)"
-      (reinicioModal)="reinicioModal()"
-    ></app-tablas>
+    <div id="cardTabla" style="height: 100%">
+      <app-tablas
+        [focusRow]="true"
+        [metodo]="metodo"
+        [paraFiltroArticulos]="paraFiltroArticulos"
+        (clickRow)="devolverCLick($event)"
+        [info]="infoArticulos"
+        [data]="seleccionModal"
+        [search]="false"
+        (noArticulo)="noArticulo()"
+        (paginateChange)="renovarDataFiltros($event)"
+        (reinicioModal)="reinicioModal()"
+      ></app-tablas>
+    </div>
   </p-dialog>
 
   <!-- ================================================================================================================================ -->
@@ -395,18 +397,20 @@
     (onShow)="prueba()"
     blockScroll="true"
   >
-    <app-tablas
-      *ngIf="seleccionModal"
-      [paraFiltroClientes]="tipoModal === 'buscarCliente' ? paraFiltroClientes : paraFiltroSuplidor"
-      [focusRow]="true"
-      (clickRow)="devolverCLick($event)"
-      [info]="tipoModal === 'buscarCliente' ? infoCliente : infoSuplidor"
-      [data]="seleccionModal"
-      [search]="true"
-      [ROW]="'cliente'"
-      (paginateChange)="renovarDataFiltros($event)"
-      (reinicioModal)="reinicioModal()"
-    ></app-tablas>
+    <div id="cardTabla" style="height: 100%">
+      <app-tablas
+        *ngIf="seleccionModal"
+        [paraFiltroClientes]="tipoModal === 'buscarCliente' ? paraFiltroClientes : paraFiltroSuplidor"
+        [focusRow]="true"
+        (clickRow)="devolverCLick($event)"
+        [info]="tipoModal === 'buscarCliente' ? infoCliente : infoSuplidor"
+        [data]="seleccionModal"
+        [search]="true"
+        [ROW]="'cliente'"
+        (paginateChange)="renovarDataFiltros($event)"
+        (reinicioModal)="reinicioModal()"
+      ></app-tablas>
+    </div>
   </p-dialog>
   <!-- ================================================================================================================================ -->
   <!-- MOSTRAR FACTURA -->

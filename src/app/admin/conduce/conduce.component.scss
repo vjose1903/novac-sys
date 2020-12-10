@@ -138,44 +138,9 @@
   transform: translate(0px, -153px);
 }
 
-.btnQuitarRow {
-  background-color: rgba(187, 187, 187, 0.842);
-  width: 1rem;
-  margin: 0;
-  padding: 0;
-  > .btnBorrar {
-    transform: translate(0.2rem, -3rem) scale(0);
-    // display: none;
-  }
-  &:hover {
-    cursor: pointer;
-    > .btnBorrar {
-      transform: translate(0rem, 0.3rem) scale(1);
-      display: block;
-      font-size: 1.3rem;
-    }
-  }
-}
 
-.sombreado {
-  background-color: rgba(187, 187, 187, 0.842);
-  width: 1rem;
-  margin: 0;
-  padding: 0;
-  > .btnBorrar {
-    transform: translate(0.2rem, -3rem) scale(0);
-    // display: none;
-  }
-  &:hover {
-    cursor: pointer;
-  }
-}
 .btnBorrar {
   transition: all 0.3s;
-}
-
-.inputOscuro {
-  background-color: rgba(194, 194, 194, 0.753);
 }
 
 // ======================================================

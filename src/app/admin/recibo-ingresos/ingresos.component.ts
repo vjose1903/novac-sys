@@ -315,7 +315,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
           pago.recibo_created_at = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
         }
         this.mServ.modalTipo('historial_pago');
-        this.mServ.ModalTablaHeight(true);
+       // this.mServ.ModalTablaHeight(true);
 
         const obj = {
           total: pagos.length,
@@ -550,7 +550,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
       this.mServ.ModalSeleccion(obj);
       this.mServ.mostrarModal(true);
-      this.mServ.ModalTablaHeight(true);
+      // this.mServ.ModalTablaHeight(true);
     }
   }
 

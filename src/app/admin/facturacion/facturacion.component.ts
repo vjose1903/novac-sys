@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
@@ -19,7 +19,7 @@ import { FunctionService } from '../../core/services/functions.service';
   templateUrl: './facturacion.component.html',
   styleUrls: ['./facturacion.component.scss'],
 })
-export class FacturacionComponent implements OnInit, OnDestroy {
+export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
   hora: number;
   minutos: number;
   fecha_busqueda_articulos: string;
@@ -165,7 +165,6 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.formarFechaFactura(new Date());
-    this.usuario = this.fun.getUser();
 
     this.metodo = this.route.snapshot.params['tipo'];
     this.action = this.route.snapshot.params['action'];
@@ -294,6 +293,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngAfterViewInit() {
+    this.usuario = this.fun.getUser();
+  }
+
   async buscarFacturaEditar() {
     const res = await this.dbServ.getFacturaById(this.id_factura).toPromise();
     this.factura_a_editar = res;
@@ -313,7 +316,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     this.mServ.ModalObj(null);
     this.mServ.modalTipo(null);
     this.mServ.ModalSeleccion(null);
-    this.mServ.ModalTablaHeight(false);
+    // this.mServ.ModalTablaHeight(false);
     this.mServ.mostrarModal(false);
     this.CancelarFactura('salir');
     this.subObj.unsubscribe();
@@ -463,6 +466,18 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
 
+  checkTipoFactura(campo, valor) {
+    if (this.tipos_facturas.includes(valor)) {
+      this.tipoFactura = valor;
+      this.NCFcompra = 'b' + valor;
+      const continuar = this.calcularPorcientoComprobante();
+
+      this.enfocarInput(campo);
+    } else {
+      this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR', true);
+    }
+  }
+
   saltar(campo, valor?, salioDe?) {
     if (campo === 'buscarCliente') {
       this.desEnfocarInput(salioDe);
@@ -470,15 +485,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
 
     if (campo === 'condicion') {
-      if (this.tipos_facturas.includes(valor)) {
-        this.tipoFactura = valor;
-        this.NCFcompra = 'b' + valor;
-        const continuar = this.calcularPorcientoComprobante();
-
-        this.enfocarInput(campo);
-      } else {
-        this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR', true);
-      }
+      this.checkTipoFactura(campo, valor);
     }
 
     if (campo === 'venta') {
@@ -602,7 +609,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.mServ.modalTipo('buscarCliente');
       const obj = {
         data: [],
-        filtrarCliente: ' ',
+        filtrarCliente: null,
       };
       this.mServ.ModalSeleccion(obj);
     } else {
@@ -610,7 +617,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
       const obj = {
         data: [],
-        filtrarSuplidor: ' ',
+        filtrarSuplidor: null,
       };
 
       this.mServ.ModalSeleccion(obj);
@@ -620,7 +627,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
       this.mServ.mostrarModal(true);
     }, 250);
 
-    this.mServ.ModalTablaHeight(true);
+    // this.mServ.ModalTablaHeight(true);
   }
 
   // =============================================
@@ -635,6 +642,10 @@ export class FacturacionComponent implements OnInit, OnDestroy {
   //  MODAL IMPRIMIR
   // =============================================
   async imprimirFactura() {
+    if (!this.usuario) {
+      this.usuario = this.fun.getUser();
+    }
+
     if (!this.propietario_factura) {
       if (this.metodo === 'compra') {
         this.dbServ.toastWarning('Factura no tiene suplidor', 'Aviso', true);
@@ -648,18 +659,13 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         if (this.TOTAL === 0) {
           this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso', true);
         } else {
-          // if (this.action === 'update') {
-          //   const obj = { texto_modal: 'Esta seguro de los cambios realizados a esta factura.' };
-          //   this.mServ.modalTipo('dinamico_texto');
-          //   this.tipoModal = 'editar_factura';
-          //   this.abrirModal(obj);
-          // } else
           if (this.condicion_fact === 'Crédito' || this.is_viaje) {
             this.mServ.modalTipo('imprimir');
             this.tipoModal = 'imprimir';
             this.abrirModal();
           } else {
             let articulos_a_cambiar = false;
+            console.log('declaracion de la variable articulos_a_cambiar ===> ', articulos_a_cambiar);
 
             if (this.metodo === 'compra') {
               const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
@@ -740,6 +746,7 @@ export class FacturacionComponent implements OnInit, OnDestroy {
 
     const obj = JSON.parse(arg);
     this.CuerpoFactura = obj;
+    console.log(this.CuerpoFactura);
 
     if (this.metodo === 'venta') {
       this.CuerpoFactura.map((articulo) => {
@@ -813,13 +820,17 @@ export class FacturacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  calculoMedidaprincipal(roundArticulo, costoRow, precioRow, contenido_articulo, newArticulo) {
-    if (roundArticulo !== costoRow) {
+  calculoMedidaprincipal(costo_db, costoRow, articulo) {
+    const contenido_articulo = articulo.contenido_articulos;
+    console.log('costo_db ==> ', costo_db);
+    console.log('costoRow ==> ', costoRow);
+
+    if (costo_db !== costoRow) {
       let cantPadre;
       let cantHijo;
       const tempContenido = [];
 
-      precioRow = this.calculatePrice(costoRow);
+      let precioRow = this.calculatePrice(costoRow);
       if (contenido_articulo.length > 0) {
         contenido_articulo.forEach((contenido) => {
           let temporal = contenido;
@@ -851,42 +862,44 @@ export class FacturacionComponent implements OnInit, OnDestroy {
         });
       }
 
-      newArticulo.costo_principal = costoRow;
-      newArticulo.precio_principal = precioRow;
-      newArticulo.contenido_articulos_attributes = tempContenido;
-      newArticulo.user_id = this.usuario.id;
+      articulo.costo_principal = costoRow;
+      articulo.precio_principal = precioRow;
+      articulo.contenido_articulos_attributes = tempContenido;
+      articulo.user_id = this.usuario.id;
 
-      const tempEnviar = _.omit(newArticulo, ['created_at', 'updated_at', 'contenido_articulos']);
+      const tempEnviar = _.omit(articulo, ['created_at', 'updated_at', 'contenido_articulos']);
       this.articulosAcambiar.push(tempEnviar);
     }
   }
 
   async revisarPrecios(cuerpoFact) {
     const tempCuerpo = [];
+    this.articulosAcambiar = [];
+    console.log('cuerpoFact --> ', cuerpoFact);
 
     for (let i = 0; i < cuerpoFact.length; i++) {
       const row = cuerpoFact[i];
 
       let articulo;
-      let codigo = 0;
       try {
         articulo = await this.dbServ.getArticulosFiltrados(row.cod, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
-      } catch (error) {}
-
-      // const articulo = JSON.parse(JSON.stringify(Articulo[0]));
+      } catch (error) {
+        console.error(error);
+      }
 
       const contenido_articulo = articulo.contenido_articulos;
+      console.log('row --> ', row);
+
       const costoRow = GLOBAL.desformatear(row.pre);
-      const precioRow = 0;
 
-      const roundArticulo = articulo.costo_principal;
+      const costoPrincipal = articulo.costo_principal;
+      console.log('articulo --> ', articulo);
 
-      const newArticulo = JSON.parse(JSON.stringify(articulo));
       let temp = {};
       let costoA;
       let costoR;
-      const contenidoPadre = contenido_articulo.filter((cont) => cont.condicion === 'padre');
-      const contenidoHijo = contenido_articulo.filter((cont) => cont.condicion === 'hijo');
+      const contenidoPadre = contenido_articulo.filter((cont) => cont.condicion === 'padre')[0];
+      const contenidoHijo = contenido_articulo.filter((cont) => cont.condicion === 'hijo')[0];
 
       let medidaEs = '';
       if (articulo.medida === row.unidad) {
@@ -897,25 +910,32 @@ export class FacturacionComponent implements OnInit, OnDestroy {
           medidaEs = content.condicion;
         }
       });
+      console.log('medidaEs --> ', medidaEs);
+      console.log('contenido_articulo.length --> ', contenido_articulo.length);
+      console.log('row.unidad --> ', row.unidad);
 
-      if (contenido_articulo.length === 0 || row.unidad === 'Caja' || row.unidad === 'Quintal') {
-        this.calculoMedidaprincipal(roundArticulo, costoRow, precioRow, contenido_articulo, newArticulo);
+      // if (contenido_articulo.length === 0 || medidaEs === 'principal' || row.unidad === 'Caja' || row.unidad === 'Quintal') {
+      if (contenido_articulo.length === 0 || medidaEs === 'principal') {
+        console.log('entro directo por que es costo principal');
+
+        this.calculoMedidaprincipal(costoPrincipal, costoRow, articulo);
       } else {
+        console.log('tengo que calcular el costo para que sea como el principal');
         if (medidaEs === 'padre') {
-          costoA = contenidoPadre[0].costo * contenidoPadre[0].cantidad;
-          costoR = contenidoPadre[0].cantidad * costoRow;
+          costoA = contenidoPadre.costo * contenidoPadre.cantidad;
+          costoR = contenidoPadre.cantidad * costoRow;
         } else {
           let MaxContenido = 0;
           if (contenido_articulo.length === 1) {
-            MaxContenido = contenidoPadre[0].cantidad;
-            costoA = contenidoPadre[0].costo * MaxContenido;
+            MaxContenido = contenidoPadre.cantidad;
+            costoA = contenidoPadre.costo * MaxContenido;
           } else {
-            MaxContenido = contenidoPadre[0].cantidad * contenidoHijo[0].cantidad;
-            costoA = contenidoHijo[0].costo * MaxContenido;
+            MaxContenido = contenidoPadre.cantidad * contenidoHijo.cantidad;
+            costoA = contenidoHijo.costo * MaxContenido;
           }
           costoR = MaxContenido * costoRow;
         }
-        this.calculoMedidaprincipal(costoA, costoR, precioRow, contenido_articulo, newArticulo);
+        this.calculoMedidaprincipal(costoA, costoR, articulo);
       }
 
       temp = _.omit(row, ['costo', 'condicion', 'pre', 'cod']);

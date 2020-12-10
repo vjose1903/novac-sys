@@ -138,14 +138,15 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             fila.descuento_valor = fila.descuento_valor ? (fila.descuento_valor !== null ? fila.descuento_valor : 0) : 0;
             fila.descuento_porciento = fila.descuento_porciento ? (fila.descuento_porciento !== null ? fila.descuento_porciento : 0) : 0;
             fila.itbis = 0;
+            fila.calcular_saco = fila.calcular_saco;
             fila.unidad = fila.uni;
             fila.precio = GLOBAL.desformatear(fila.pre);
             fila.costo = GLOBAL.desformatear(fila.costo);
             let obj;
             if (this.metodo === 'venta') {
-              obj = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'tot', 'costo', 'secuencia']);
+              obj = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'tot', 'costo', 'secuencia', 'verificado']);
             } else {
-              obj = _.omit(fila, ['can', 'des', 'uni', 'tot', 'secuencia']);
+              obj = _.omit(fila, ['can', 'des', 'uni', 'tot', 'secuencia', 'verificado']);
             }
 
             if (fila.cantidad && fila.unidad) {
@@ -170,7 +171,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     this.mServ.modalTipo(undefined);
     this.mServ.ModalSeleccion(undefined);
     this.mServ.mostrarModal(false);
-    this.mServ.ModalTablaHeight(false);
+    // this.mServ.ModalTablaHeight(false);
   }
 
   ngAfterViewInit() {
@@ -206,6 +207,18 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     return res;
   }
 
+  async activarBtnConfigRow(i) {
+    let res = false;
+    const element = this.control.controls[i] as any;
+
+    if (element.controls['calcular_saco'].value === true) {
+      res = false;
+    } else {
+      res = true;
+    }
+    return res;
+  }
+
   ModificarClass(item, clase, action) {
     if (action === 'add') {
       document.getElementById(item).classList.add(clase);
@@ -214,8 +227,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
   }
 
+  CalculoSacos(i, e) {
+    console.log(i);
+    e.stopPropagation();
+  }
+
   selectedRow(i, bool) {
-    const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i];
+    const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i, 'pre-' + i, 'desc-' + i, 'tot-' + i];
     lista.forEach((row) => {
       if (this.checkIfArticuloRow(i)) {
         if (bool) {
@@ -226,6 +244,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
     });
   }
+
   checkIfArticuloRow(i) {
     let res = false;
     const element = this.control.controls[i] as any;
@@ -279,6 +298,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       secuencia: [i],
       cantidad_en_unidades: [0],
       is_materia_prima: [false],
+      calcular_saco: [false],
+      verificado: [false],
     });
   }
 
@@ -316,9 +337,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       (this.control.controls[j] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
 
       (this.control.controls[j] as any).controls['des'].setValue(_.capitalize(row.articulo));
+      // (this.control.controls[j] as any).controls['calcular_saco'].setValue(row.calcular_saco);
 
       if (row.tipo === 'Materia prima') {
-        (this.control.controls[j] as any).controls['descuento_porciento'].disable();
+        (this.control.controls[j] as any).controls['descuento_porciento'].disable({ onlySelf: true });
         (this.control.controls[j] as any).controls['is_materia_prima'].setValue(true);
       } else {
         (this.control.controls[j] as any).controls['descuento_porciento'].enable();
@@ -583,6 +605,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   verificarSecuencia(i, input?) {
+    console.log('this.secuencia ==> ', this.secuencia);
+    console.log('i ==> ', i);
+    console.log('input ==> ', input);
+
     if (this.secuencia < i) {
       GLOBAL.enfocarInput(this.inputSecuencia);
     }
@@ -807,7 +833,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     await this.mServ.modalTipo('buscarArticulo');
     await this.mServ.ModalSeleccion(arg);
     await this.mServ.mostrarModal(true);
-    await this.mServ.ModalTablaHeight(true);
+    // await this.mServ.ModalTablaHeight(true);
 
     if (is_saltar) {
       GLOBAL.enfocarInput(sigInput);
@@ -867,6 +893,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       (this.control.controls[i] as any).controls['cod'].setValue(ARTICULO.codigo);
       (this.control.controls[i] as any).controls['des'].setValue(ARTICULO.nombre);
       (this.control.controls[i] as any).controls['articulo_id'].setValue(ARTICULO.id);
+      (this.control.controls[i] as any).controls['calcular_saco'].setValue(ARTICULO.calcular_saco);
 
       if (this.metodo === 'venta') {
         if (ARTICULO.descripcion === 'Materia prima') {

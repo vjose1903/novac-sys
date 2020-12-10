@@ -55,7 +55,14 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
 
   obj_paginate_ = obj_paginate;
 
-  constructor(private dbServ: DBservice, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService, private tServ: TablasService) {
+  constructor(
+    private dbServ: DBservice,
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private mServ: ModalService,
+    private tServ: TablasService,
+  ) {
     // setInterval(() => {
     // }, 1000);
   }
@@ -157,6 +164,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
     }
     return res;
   }
+
   checkLongMillares(num) {
     let res = false;
     const splitNum = _.split(num, ',');
@@ -183,7 +191,13 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
         tempdecimales = '00';
       }
       //
-      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
+      if (
+        splitPrecio.length > 2 ||
+        this.checkNumbers(enteros) ||
+        this.checkLongMillares(enteros) ||
+        this.checkNumbers(tempdecimales) ||
+        this.checkLongMillares(tempdecimales)
+      ) {
         this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
         this.enfocarInput(id);
       } else {
@@ -283,7 +297,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
 
   submit(arg) {
     let devolver = false;
-    let cedulaCorrecta = false;
+    let docCorrecto = false;
 
     const Fail = [];
 
@@ -307,13 +321,20 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
         devolver = true;
       }
       // haciendo la estructura para mandar los documentos a la base de datos
+      let docSplit;
       if (element.doc !== null && element.doc !== ' ' && element.doc !== '') {
         if (element.descripcion === 'cedula') {
-          const cedulaSplit = _.split(element.doc, '-');
+          docSplit = _.split(element.doc, '-');
 
-          const cedulaSinGuiones = _.join(cedulaSplit, '');
-          if (GLOBAL.ValidaCedula(cedulaSinGuiones)) {
-            cedulaCorrecta = true;
+          const docSinGuiones = _.join(docSplit, '');
+          if (GLOBAL.ValidaCedula(docSinGuiones)) {
+            docCorrecto = true;
+          }
+        } else {
+          docSplit = _.split(element.doc, '-');
+          const docSinGuiones = _.join(docSplit, '');
+          if (docSinGuiones.length === 9) {
+            docCorrecto = true;
           }
         }
 
@@ -332,8 +353,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
       // entra aqui si pasa la validacion de documento de identidad
     } else {
       // entra aqui si no selecciono un documento como principal
-      if (!cedulaCorrecta) {
-        // if (false) {
+      if (!docCorrecto) {
         this.dbServ.toastError('Cedula introducida incorrecta', 'ERROR', true);
       } else {
         if (this.doc_principal === undefined || this.doc_principal === null || this.doc_principal === ' ' || this.doc_principal === '') {

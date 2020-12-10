@@ -128,7 +128,7 @@
             <img class="rounded-circle" [src]="imgUser" alt="Admin" />
             Cuenta <span class="caret"></span>
           </a>
-          <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+          <ul id="dropdown-basic" class="dropdown-menu" role="menu" aria-labelledby="button-basic">
             <div class="dropdown-header">
               <h2>{{ usuario?.nombre }}</h2>
               <p>{{ usuario?.email }}</p>
@@ -150,11 +150,11 @@
             </li>
           </ul>
         </div>
-        <div class="selectPrint" [ngClass]="{ open: OpenPrinterMenu }" dropdown>
+        <!-- <div class="selectPrint" [ngClass]="{ open: OpenPrinterMenu }" dropdown>
           <h3 class="dropdown-item" *ngFor="let print of PrintersInstall" (click)="selectPrinter(print.name)">
             {{ print.name }}
           </h3>
-        </div>
+        </div> -->
       </div>
 
       <!--
