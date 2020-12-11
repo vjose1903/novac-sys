@@ -433,7 +433,43 @@ bs-daterangepicker-container {
 }
 
 /* width */
+// ::-webkit-scrollbar {
+//   display: none;
+// }
+
+/* ====================================================== */
+/* SCROLL BAR*/
+/* ====================================================== */
+/* Customize website's scrollbar like Mac OS
+Not supports in Firefox and IE */
+
 ::-webkit-scrollbar {
+  background-color: #fff;
+  width: 10px;
+  &:hover {
+    cursor: pointer !important;
+  }
+}
+
+/* background of the scrollbar except button or resizer */
+::-webkit-scrollbar-track {
+  // background-color: #ffffff00;
+  background-color: inherit;
+}
+
+/* scrollbar itself */
+::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 16px;
+
+  &:hover {
+    cursor: pointer !important;
+    background-color: #919191 !important;
+  }
+}
+
+/* set button(top and bottom of the scrollbar) */
+::-webkit-scrollbar-button {
   display: none;
 }
 

@@ -1083,7 +1083,9 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
         type: 'facturacion',
       };
 
-      this._ipc.send('print', obj);
+      if (this.metodo === 'venta') {
+        this._ipc.send('print', obj);
+      }
 
       await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
         if (res.status) {
@@ -1091,7 +1093,6 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
           this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
         }
       });
-
       await this.CancelarFactura('quedar');
     } catch (error) {
       console.error(error);

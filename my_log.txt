@@ -531,3 +531,234 @@ ahora va a borrar el archivo log
 		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
 	}
 } 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+  -----------  comando para imprimir con sumastra -----------   ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf" 
+
+ respuesta impresion  ==╗ 
+      {
+	"status": false,
+	"STDOUT": "",
+	"STDERR": "/bin/sh: /Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe: Permission denied\n",
+	"msg": {
+		"killed": false,
+		"code": 126,
+		"signal": null,
+		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
+	}
+} 
