@@ -14,7 +14,9 @@ export class ReportesComponent implements OnInit, OnDestroy {
   pdfSrc: any;
   fileName: any;
   tipoModal: string;
+
   constructor(private _ipc: IpcService, private mServ: ModalService, private dbServ: DBservice) {}
+
   appDir;
   subDeci: Subscription;
   subObj: Subscription;
@@ -37,6 +39,8 @@ export class ReportesComponent implements OnInit, OnDestroy {
             reimprimir: res.reimprimir,
             fileName: res.file.split('.')[0],
           };
+          console.log('res --> ', res);
+          console.log('respuesta de print res obj --> ', obj);
         } else if (res.file === 'reporte.pdf') {
           obj = {
             pdfSrc: res.body,
@@ -99,6 +103,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
         data: res.body,
         type: 'cuadre_caja',
       };
+      console.log('peticion cuadre obj --> ', obj);
 
       this._ipc.send('print', obj);
 
