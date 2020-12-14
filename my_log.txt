@@ -762,3 +762,11 @@ ahora va a borrar el archivo log
 		"cmd": "\"/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe\" -print-to-default -print-settings \"landscape,noscale,paper=VJPOS,simplex\" -silent \"/Users/vjose1903/git/personal/adm-agroindustrial/factura.pdf\""
 	}
 } 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
