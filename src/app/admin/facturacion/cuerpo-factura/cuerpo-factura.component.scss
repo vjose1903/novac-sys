@@ -134,7 +134,8 @@
 #dropConfigRow {
   max-width: 250px;
   min-width: 250px;
-  margin: -1rem 0px 0px calc(100% - 257px);
+  // margin: -1rem 0px 0px calc(100% - 257px);
+  margin: -1rem calc(100% - 257px) 0px 0px;
   background: #fff;
   box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.25);
   padding: 4px;
@@ -142,6 +143,9 @@
 
 .btnConfigDis {
   color: #adacac !important;
+  &:hover {
+    cursor: default !important;
+  }
 }
 
 .btnConfig {

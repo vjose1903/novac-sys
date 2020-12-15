@@ -7,6 +7,43 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
+/* boton cuenta */
+#button-basic:hover {
+  text-decoration-line: none;
+  color: #36c080;
+}
+
+/* botones de opciones */
+.dropdown-item {
+  display: block;
+  color: #333;
+  padding: 15px 25px;
+  font-size: 14px;
+  font-family: $bodyfont;
+}
+.dropdown-item:hover {
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
+  color: #fff;
+}
+
+/* dropdown cuerpo */
+#dropdown-basic {
+  max-width: 300px;
+  min-width: 300px;
+  margin: 0rem 0px 0px calc(100% - 280px);
+  background: #fff;
+  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.51);
+  padding: 4px;
+}
+
+.dropdown-header {
+  background-color: #a2f6cf59;
+}
+.dropdown-header h2 {
+  color: black;
+}
+
 .form-control[type="text"],
 .form-control[type="number"] {
   pointer-events: initial;
@@ -543,7 +580,7 @@ Not supports in Firefox and IE */
   vertical-align: inherit !important;
 
   &:hover {
-    cursor: pointer;
+    cursor: default;
   }
 }
 

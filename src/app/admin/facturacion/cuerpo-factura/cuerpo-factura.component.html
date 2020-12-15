@@ -37,15 +37,40 @@
         <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
           <tbody>
             <tr>
-              <td
+              <!--  ::::::::::::  CONFIG  ::::::::::::  -->
+              <td *ngIf="propietario" class="sombreado2">
+                <div class="btn-group" dropdown id="divDropConfigRow" #dropConfigRow>
+                  <i *ngIf="!checkIfArticuloRow(i)" class="fas fa-ellipsis-v btnConfigDis"></i>
+
+                  <a *ngIf="checkIfArticuloRow(i)" dropdownToggle>
+                    <i class="fas fa-ellipsis-v btnConfig"></i>
+                  </a>
+                  <ul class="dropdown-menu" role="menu" id="dropConfigRow">
+                    <li role="menuitem">
+                      <div class="from-group my-1 ml-2">
+                        <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, $event)" />
+                        <span class="ml-2 subirLabelCheck">Calcular saco</span>
+                      </div>
+                    </li>
+
+                    <li role="menuitem">
+                      <a class="dropdown-item" id="dropdown-item" (click)="modalRemover(i, $event)">
+                        <i class="far fa-trash-alt text-red btnBorrar"></i>
+                        Quitar Producto
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+              <!-- <td
                 *ngIf="propietario"
                 class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}"
                 (mouseover)="selectedRow(i, true)"
                 (mouseleave)="selectedRow(i, false)"
               >
-                <!-- <div class="hoverZone"></div> -->
+
                 <i class="far fa-trash-alt text-red btnBorrar" (click)="modalRemover(i)"></i>
-              </td>
+              </td> -->
               <!--  ::::::::::::  CODIGO  ::::::::::::  -->
               <td class="COD td0padding">
                 <div class="from-group">
@@ -174,23 +199,6 @@
                   <input type="hidden" [value]="i" formControlName="secuencia" tabindex="-1" />
                 </div>
               </td>
-              <!--  ::::::::::::  PRECIO  ::::::::::::  -->
-              <!-- <td *ngIf="propietario" class="sombreado2">
-                <div class="btn-group" dropdown id="divDropConfigRow" #dropConfigRow>
-                  <i *ngIf="activarBtnConfigRow(i)" class="fas fa-ellipsis-v btnConfigDis"></i>
-                  <a *ngIf="activarBtnConfigRow(i)" dropdownToggle>
-                    <i class="fas fa-ellipsis-v btnConfig"></i>
-                  </a>
-                  <ul class="dropdown-menu" role="menu" id="dropConfigRow">
-                    <li role="menuitem">
-                      <div class="from-group my-1 ml-2">
-                        <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, $event)" />
-                        <span class="ml-2 subirLabelCheck">Calcular saco</span>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </td> -->
             </tr>
           </tbody>
         </table>
