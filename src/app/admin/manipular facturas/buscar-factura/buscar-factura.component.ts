@@ -295,11 +295,46 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     return res;
   }
 
+  async calcularPrecio(detalle, factura) {
+    if (detalle.calcular_saco) {
+      const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente);
+      const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, fechaFactura, 'todos').toPromise();
+
+      const precio_saco = res.data[0].precio_principal;
+      detalle.precio = detalle.precio + precio_saco;
+      detalle.total = detalle.precio * detalle.cantidad;
+    } else {
+      detalle.precio = detalle.precio;
+    }
+
+    return detalle;
+  }
+
+  formarFechaFactura(date) {
+    const hora = moment(date).hour();
+    const minutos = moment(date).minutes();
+    const fechaTemp = moment(date).format('YYYY-MM-DD');
+
+    return fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
+  }
+
   async pedirFactura(campo, valor) {
     try {
       this.facturas = undefined;
       const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id).toPromise();
+
+      for (let i = 0; i < busqueda.length; i++) {
+        const factura = busqueda[i];
+        for (let j = 0; j < factura.detalle_facturas.length; j++) {
+          let detalle = factura.detalle_facturas[j];
+
+          detalle = await this.calcularPrecio(detalle, factura);
+          console.log(detalle);
+        }
+      }
+
       this.facturas = GLOBAL.duplicarJson(busqueda);
+      console.log('MMG facturas --> ', this.facturas);
 
       if (this.facturas.length > 0) {
         this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
@@ -354,6 +389,17 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
           return a.id > b.id ? 1 : -1;
         });
       }
+
+      for (let i = 0; i < busqueda.length; i++) {
+        const factura = busqueda[i];
+        for (let j = 0; j < factura.detalle_facturas.length; j++) {
+          let detalle = factura.detalle_facturas[j];
+
+          detalle = await this.calcularPrecio(detalle, factura);
+          console.log(detalle);
+        }
+      }
+
       this.facturas = GLOBAL.duplicarJson(busqueda);
 
       if (this.facturas.length === 0) {

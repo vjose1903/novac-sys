@@ -35,7 +35,8 @@
             <span>{{ factura.tipo === 'compra' ? factura.suplidor.rnc : factura.cliente.rnc }}</span>
           </span>
           <span class="d-block">
-            <b class="negrita">Direccion :</b>&nbsp; <span>{{ factura.tipo === 'compra' ? factura.suplidor.direccion : factura.cliente.direccion }}</span>
+            <b class="negrita">Direccion :</b>&nbsp;
+            <span>{{ factura.tipo === 'compra' ? factura.suplidor.direccion : factura.cliente.direccion }}</span>
           </span>
         </div>
       </div>
@@ -45,7 +46,8 @@
       <div class="col-4 d-flex justify-content-center">
         <div class="infoFactura">
           <span class="d-block">
-            <b class="negrita">Fecha :</b>&nbsp; <span>{{ formatoFecha(factura.fecha_equivalente) }}</span> - <span>{{ formatoHora(factura.fecha_equivalente) }}</span>
+            <b class="negrita">Fecha :</b>&nbsp; <span>{{ formatoFecha(factura.fecha_equivalente) }}</span> -
+            <span>{{ formatoHora(factura.fecha_equivalente) }}</span>
           </span>
           <span *ngIf="factura.condicion === 'Crédito'" class="d-block">
             <b class="negrita">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_vencimiento) }}</span>
@@ -83,7 +85,10 @@
         <tbody [ngStyle]="{ 'max-height': '22rem' }">
           <tr *ngFor="let row of factura.detalle_facturas; let i = index">
             <td>{{ i + 1 }}</td>
-            <td>{{ row.descripcion }}</td>
+            <td>
+              {{ row.descripcion }} ({{ row.calcular_saco }})
+              <span *ngIf="!row.calcular_saco"> * </span>
+            </td>
             <td class="text-right">{{ formatoNumero(row.cantidad) }}</td>
             <td class="text-right">{{ row.unidad }}</td>
             <td class="text-right">{{ factura.tipo === 'compra' ? formatoNumero(row.costo) : formatoNumero(row.precio) }}</td>

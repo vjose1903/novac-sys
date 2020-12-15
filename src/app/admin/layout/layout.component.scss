@@ -189,7 +189,7 @@ $bodyfont: "Poppins";
 
 mat-nav-list {
   background-color: #95f0a7;
-  overflow: auto;
+  overflow: hidden auto;
   height: calc(100% - 32px);
 }
 mat-list-item {

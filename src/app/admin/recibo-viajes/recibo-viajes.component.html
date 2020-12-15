@@ -23,11 +23,17 @@
 
   <div class="col-md-5">
     <div>
-      <span *ngIf="viajes_pendientes_cant > 0" class="badge red text-white debe mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
-      <span *ngIf="viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge blue text-white debe mb-3">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
+      <span *ngIf="viajes_pendientes_cant > 0" class="badge red text-white debe mb-3"
+        >Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span
+      >
+      <span *ngIf="viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge blue text-white debe mb-3"
+        >Cantidad de viajes completados {{ viajes_completados_cant }}</span
+      >
       <span *ngIf="viajes?.length === 0" class="badge green text-white debe mb-3">No tiene viajes pendientes</span>
 
-      <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant === 0" class="badge green text-white debe mb-3">Todos los viajes fueron completados</span>
+      <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant === 0" class="badge green text-white debe mb-3"
+        >Todos los viajes fueron completados</span
+      >
 
       <div *ngIf="viajes?.length > 0 && viajes_completados_cant > 0">
         <div class="d-flex justify-content-between">
@@ -82,23 +88,27 @@
 
           <div class="form-group mt-4">
             <label class="control-label">Viaje realizado por: <span style="color: red">*</span></label>
-            <select [(ngModel)]="chofer_id" class="form-control" (blur)="checkChofer()" (focus)="entroEnChofer()">
+            <select [(ngModel)]="chofer_id" class="form-control" (ngModelChange)="checkChofer()" (blur)="checkChofer()" (focus)="entroEnChofer()">
               <option *ngFor="let item of choferes" value="{{ item.id }}">{{ item.nombre }}</option>
               <option *ngIf="!is_choferes_register" disable>No tiene Choferes registrados</option>
             </select>
-            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="is_choferes_register && !is_chofer_selected && salio_en_chofer">Debe de seleccionar un chofer</div>
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="is_choferes_register && !is_chofer_selected && salio_en_chofer">
+              Debe de seleccionar un chofer
+            </div>
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!is_choferes_register">Debe de registrar un chofer</div>
           </div>
 
           <div class="form-group mt-2">
             <label class="control-label">Camion utilizado: <span style="color: red">*</span></label>
-            <select [(ngModel)]="camion_id" class="form-control" (blur)="checkCamion()" (focus)="entroEnCamion()">
+            <select [(ngModel)]="camion_id" class="form-control" (ngModelChange)="checkCamion()" (blur)="checkCamion()" (focus)="entroEnCamion()">
               <option *ngFor="let item of camiones" value="{{ item.id }}">
                 {{ item.marca }} {{ item.modelo }} - {{ item.anio }} ({{ item.propietario.nombre }} {{ item.propietario.apellido }})
               </option>
               <option *ngIf="!is_camiones_register" disable>No tiene camiones registrados</option>
             </select>
-            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="is_camiones_register && !is_camion_selected && salio_en_camion">Debe de seleccionar un camion</div>
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="is_camiones_register && !is_camion_selected && salio_en_camion">
+              Debe de seleccionar un camion
+            </div>
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!is_camiones_register">Debe de registrar un camion</div>
           </div>
 
@@ -121,7 +131,9 @@
             <!-- <button [disabled]="(!is_chofer_selected && !is_camion_selected) || viaje_selected.fecha_completada" (click)="accion(true, 'cambio')" class="btn btn-verde"> -->
 
             <button [disabled]="abilitarRecibir()" (click)="accion(true, 'cambio')" class="btn btn-verde">Recibir efectivo</button>
-            <button *ngIf="ultimo_pago?.is_ultimo" (click)="accion(true, 'dinamico_texto')" class="btn btn-amarillo ml-2">Reversar ultima transacción</button>
+            <button *ngIf="ultimo_pago?.is_ultimo" (click)="accion(true, 'dinamico_texto')" class="btn btn-amarillo ml-2">
+              Reversar ultima transacción
+            </button>
           </div>
         </div>
       </div>

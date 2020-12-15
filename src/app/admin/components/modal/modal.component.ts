@@ -248,6 +248,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.ModalObj(undefined);
     this.mServ.ModalIndex(undefined);
     this.mServ.getArticuloFiltradoPorCodigo(undefined);
+    this.seleccionModal = undefined
     this.paraFiltroArticulos = undefined;
     this.paraFiltroClientes = undefined;
     this.paraFiltroSuplidor = undefined;

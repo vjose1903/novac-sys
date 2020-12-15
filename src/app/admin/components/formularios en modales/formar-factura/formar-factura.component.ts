@@ -25,6 +25,7 @@ export class FormarFacturaComponent implements OnInit {
     //   ...this.factura.detalle_facturas,
     // ];
   }
+
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
   }

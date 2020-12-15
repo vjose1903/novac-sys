@@ -228,8 +228,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   async calcularSacoEnRow(i, operacion, articulo, callback = (arg) => {}) {
-    console.log('------ CALCULANDO SANCO ------');
-
     try {
       const row_unidad = (this.control.controls[i] as any).controls['uni'].value;
       let calculo = 0;
@@ -241,11 +239,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         let peso = 100 / Number(splitUnidad[2]);
 
         if (unity === 'Saco') {
-          console.log('row_unidad --> ', row_unidad);
-          console.log('unity --> ', unity);
-          console.log('peso --> ', peso);
-          console.log('articulo.precio_principal --> ', articulo.precio_principal);
-
           calculo = articulo.precio_principal / peso;
         } else {
           operacion = false;

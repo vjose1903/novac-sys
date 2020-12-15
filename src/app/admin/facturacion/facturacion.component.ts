@@ -984,11 +984,74 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
   }
+
+  // async calcularSacoEnRow(i, articulo, callback = (arg) => {}) {
+  //   try {
+  //     const row_unidad = (this.control.controls[i] as any).controls['uni'].value;
+  //     let calculo = 0;
+  //     if (row_unidad === articulo.medida) {
+  //       calculo = articulo.precio_principal;
+  //     } else {
+  //       const splitUnidad = _.split(row_unidad, ' ');
+  //       let unity = splitUnidad[0];
+  //       let peso = 100 / Number(splitUnidad[2]);
+
+  //       if (unity === 'Saco') {
+  //         calculo = articulo.precio_principal / peso;
+  //       }
+  //     }
+
+  //       const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, this.FechaFactura, 'todos').toPromise();
+  //       const precio_saco = res.data[0].precio_principal;
+  //       const precio = calculo + precio_saco;
+  //       (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
+
+  //       const precio = calculo;
+  //       (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
+
+  //     callback(true);
+  //   } catch (error) {
+  //     this.dbServ.toastError('Error calculando el precio del saco', 'ERROR');
+  //     callback(false);
+  //   }
+  // }
+
+  async checkCuerpoForSendBackend(cuerpo) {
+    for (let i = 0; i < cuerpo.length; i++) {
+      const element = cuerpo[i];
+
+      if (element.calcular_saco) {
+        const row_unidad = element.unidad;
+        let calculo = 0;
+
+        const articulo = await this.dbServ.getOneArticulo(element.articulo_id).toPromise();
+        if (row_unidad === articulo.medida) {
+          calculo = articulo.precio_principal;
+        } else {
+          const splitUnidad = _.split(row_unidad, ' ');
+          let unity = splitUnidad[0];
+          let peso = 100 / Number(splitUnidad[2]);
+
+          if (unity === 'Saco') {
+            calculo = articulo.precio_principal / peso;
+          }
+        }
+
+        element.precio = calculo;
+        element.total = calculo * element.cantidad;
+      }
+    }
+    return cuerpo;
+  }
+
   async IMPRIMIR(arg?) {
     const empleado = this.fun.getUser();
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
-    const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
+    let cuerpo_fact = GLOBAL.duplicarJson(this.CuerpoFactura);
+    if (this.metodo === 'venta') {
+      cuerpo_fact = await this.checkCuerpoForSendBackend(cuerpo_fact);
+    }
 
     const cabecera_fact = {};
     cabecera_fact['condicion'] = this.condicion_fact;

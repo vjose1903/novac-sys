@@ -433,7 +433,7 @@
     blockScroll="true"
   >
     <div class="p-2">
-      <app-formar-factura [factura]="seleccionModal"></app-formar-factura>
+      <app-formar-factura *ngIf="seleccionModal" [factura]="seleccionModal"></app-formar-factura>
     </div>
 
     <p-footer>
