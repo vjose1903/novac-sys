@@ -268,29 +268,35 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
   }
 
-  async CalculoSacos(i, e) {
-    console.log();
-    e.stopPropagation();
+  async CalculoSacos(i, e?) {
     let articulo;
-    const codigo = (this.control.controls[i] as any).controls['cod'].value;
-
     try {
-      articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
+      const unidad = (this.control.controls[i] as any).controls['uni'].value;
+      if (e) {
+        e.stopPropagation();
+      }
+      if (this.metodo === 'venta') {
+        const codigo = (this.control.controls[i] as any).controls['cod'].value;
+        articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
+        if (articulo.calcular_saco) {
+          const row_calcularSaco = (this.control.controls[i] as any).controls['calcular_saco'].value;
+          if (unidad) {
+            this.calcularSacoEnRow(i, row_calcularSaco, articulo, (res) => {
+              if (res) {
+                this.calcularTotalRow(i);
+              }
+            });
+          } else {
+            this.dbServ.toastWarning('Para calcular los sacos debe de seleccionar una unidad', 'AVISO', true);
 
-      if (articulo.calcular_saco) {
-        const row_calcularSaco = (this.control.controls[i] as any).controls['calcular_saco'].value;
-        console.log('row_calcularSaco --> ', row_calcularSaco);
-
-        this.calcularSacoEnRow(i, row_calcularSaco, articulo, (res) => {
-          if (res) {
-            setTimeout(() => {
-              this.calcularTotalRow(i);
-            }, 200);
+            (this.control.controls[i] as any).controls['calcular_saco'].setValue(true);
           }
-        });
-      } else {
-        this.dbServ.toastError('A este articulo no se le calculan los sacos', 'ERROR', true);
-        (this.control.controls[i] as any).controls['calcular_saco'].setValue(false);
+        } else {
+          if (e) {
+            this.dbServ.toastError('A este articulo no se le calculan los sacos', 'ERROR', true);
+          }
+          (this.control.controls[i] as any).controls['calcular_saco'].setValue(false);
+        }
       }
     } catch (error) {}
   }
@@ -577,11 +583,11 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   aumentarSecuencia() {
     this.secuencia++;
-
     this.inputSecuencia = 'cod-' + this.secuencia;
     this.inputDrop = 'uni-' + this.secuencia;
     this.drop = false;
   }
+
   disminuirSecuencia() {
     this.secuencia--;
     this.inputSecuencia = 'cod-' + this.secuencia;
@@ -679,6 +685,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
           GLOBAL.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)),
         );
         (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
+        if (this.metodo === 'venta') {
+          this.CalculoSacos(i);
+        }
         this.calcularTotalRow(i);
       }
     });
@@ -1033,7 +1042,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
 
       if (this.metodo === 'venta' && (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima')) {
-        if (art.vendido_en === 'Saco') {
+        if (art.vendido_en === 'Saco' && art.calcular_saco) {
           this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
         }
       }

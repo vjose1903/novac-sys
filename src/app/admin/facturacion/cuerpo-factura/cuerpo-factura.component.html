@@ -40,13 +40,13 @@
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
               <td *ngIf="propietario" class="sombreado2">
                 <div class="btn-group" dropdown id="divDropConfigRow" #dropConfigRow>
-                  <i *ngIf="!checkIfArticuloRow(i)" class="fas fa-ellipsis-v btnConfigDis"></i>
+                  <i *ngIf="!checkIfArticuloRow(i)" class="fas fa-ellipsis-v btnConfigDis" style="padding: 3px"></i>
 
-                  <a *ngIf="checkIfArticuloRow(i)" dropdownToggle>
+                  <a *ngIf="checkIfArticuloRow(i)" dropdownToggle style="padding: 3px">
                     <i class="fas fa-ellipsis-v btnConfig"></i>
                   </a>
                   <ul class="dropdown-menu" role="menu" id="dropConfigRow">
-                    <li role="menuitem">
+                    <li *ngIf="metodo === 'venta'" role="menuitem">
                       <div class="from-group my-1 ml-2">
                         <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, $event)" />
                         <span class="ml-2 subirLabelCheck">Calcular saco</span>
