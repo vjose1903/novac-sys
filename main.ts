@@ -691,6 +691,7 @@ function imprimir(cFileName, tipo) {
   puts('ENTRO EN LA FUNCION DE IMPRIMIR');
   const sumatrapdf_path = pathAdd('/print/lp.exe');
   const file_path = pathAdd(`/${cFileName}`);
+  puts(tipo, 'EL MALDITO TIPO');
   puts(file_path, 'file_path');
   puts(sumatrapdf_path, 'sumatrapdf_path');
   // const bat = require.resolve(sumatrapdf_path);

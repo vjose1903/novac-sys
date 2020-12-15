@@ -38,7 +38,7 @@
           <tbody>
             <tr>
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
-              <td *ngIf="propietario" class="sombreado2">
+            <!--  <td *ngIf="propietario" class="sombreado2">
                 <div class="btn-group" dropdown id="divDropConfigRow" #dropConfigRow>
                   <i *ngIf="!checkIfArticuloRow(i)" class="fas fa-ellipsis-v btnConfigDis" style="padding: 3px"></i>
 
@@ -61,8 +61,8 @@
                     </li>
                   </ul>
                 </div>
-              </td>
-              <!-- <td
+              </td> -->
+               <td
                 *ngIf="propietario"
                 class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}"
                 (mouseover)="selectedRow(i, true)"
@@ -70,7 +70,7 @@
               >
 
                 <i class="far fa-trash-alt text-red btnBorrar" (click)="modalRemover(i)"></i>
-              </td> -->
+              </td> 
               <!--  ::::::::::::  CODIGO  ::::::::::::  -->
               <td class="COD td0padding">
                 <div class="from-group">
