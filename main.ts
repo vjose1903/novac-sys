@@ -654,6 +654,7 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
   puts(type, 'type');
   try {
     fs.writeFile(FileName, base64, { encoding: 'base64' }, (err) => {
+      puts('PASOO EL METODO QUE CREA EL ARCHIVO PDF');
       imprimir(cFileName, type);
     });
   } catch (err) {
@@ -687,6 +688,7 @@ function createPdfbase64(docDefinition, file_, type, reimprimir_) {
 }
 
 function imprimir(cFileName, tipo) {
+  puts('ENTRO EN LA FUNCION DE IMPRIMIR');
   const sumatrapdf_path = pathAdd('/print/lp.exe');
   const file_path = pathAdd(`/${cFileName}`);
   puts(file_path, 'file_path');
@@ -696,26 +698,31 @@ function imprimir(cFileName, tipo) {
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
   const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${file_path}"`;
-  puts(comando, ' -----------  comando para imprimir con sumastra ----------- ');
   cmd(comando, (res) => {
     puts(res, 'respuesta impresion');
+
     if (res.status) {
       let msg_;
+      let tipo;
       if (tipo === 'reporte') {
         msg_ = 'Reporte generado correctamente!!';
+        tipo = 'printReporteRes';
       } else {
         msg_ = 'Factura generada correctamente!!';
+        tipo = 'printRes';
       }
-      win.webContents.send('printRes', { msg: msg_, status: 'si', STDOUT: res });
+      win.webContents.send(tipo, { msg: msg_, status: 'si', STDOUT: res });
     } else {
       let msg_ = '';
 
       if (tipo === 'reporte') {
         msg_ = 'Error generando Reporte!!';
+        tipo = 'printReporteRes';
       } else {
         msg_ = 'Error generando Factura!!';
+        tipo = 'printRes';
       }
-      win.webContents.send('printRes', { msg: msg_, status: 'no', err: res });
+      win.webContents.send(tipo, { msg: msg_, status: 'no', err: res });
       return;
     }
   });

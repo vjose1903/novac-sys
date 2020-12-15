@@ -59,11 +59,16 @@ export class ReportesComponent implements OnInit, OnDestroy {
     });
 
     this._ipc.on('printReporteRes', async (event: Electron.IpcMessageEvent, res) => {
+      console.log('res --> ', res);
+
       if (res.status === 'si') {
         this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
       } else {
         this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
       }
+      setTimeout(() => {
+        this.quitarFocodeElectron();
+      }, 5);
     });
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
@@ -92,6 +97,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
 
   quitarFocodeElectron() {
     document.getElementById('foco_angular').click();
+    console.log('foco angular --> ', document.getElementById('foco_angular'));
   }
 
   async makeCuadre() {
@@ -207,6 +213,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
       } else if (this.tipoModal === 'cuadre') {
         this.makeCuadre();
       }
+      this.mServ.mostrarModal(false);
     }
     this.resetVariables();
   }

@@ -122,7 +122,6 @@
       <!-- ============================================================================================ -->
 
       <div class="right">
-        <mdb-card-img id="foco_angular" class="btn_invisible" src="assets/img/transparente.png" alt="Logo ADM"></mdb-card-img>
         <div class="btn-group" dropdown id="dropCuenta" (onHidden)="closePrinterMenu()" #dropCuenta>
           <a id="button-basic" dropdownToggle class="dropdown-toggle" aria-controls="dropdown-basic">
             <img class="rounded-circle" [src]="imgUser" alt="Admin" />
@@ -165,6 +164,7 @@
     </mat-toolbar>
 
     <div class="" style="padding: 0.5rem 1rem 2rem 1rem; height: calc(100% - 60px); overflow-y: auto">
+      <mdb-card-img id="foco_angular" class="btn_invisible" src="assets/img/transparente.png" alt="Logo ADM"></mdb-card-img>
       <router-outlet></router-outlet>
       <!-- rutas -->
     </div>
