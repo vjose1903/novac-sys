@@ -68,7 +68,6 @@ function createWindow() {
   verificarSumastra();
   borrarLogs();
 
-
   // win.webContents.openDevTools();
 
   win.setMenuBarVisibility(false);
@@ -163,7 +162,7 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   // autoUpdater.quitAndInstall();
 });
 
-autoUpdater.on('update-not-available', (info) => { });
+autoUpdater.on('update-not-available', (info) => {});
 
 autoUpdater.on('error', (error) => {
   if (win) {
@@ -193,16 +192,16 @@ ipcMain.on('getAppDir', (event: any, arg) => {
 });
 
 function borrarLogs() {
-  cmd('dir',(res)=>{
-    puts(res.STDOUT, '----------- dir -----------')
-  })
+  cmd('dir', (res) => {
+    puts(res.STDOUT, '----------- dir -----------');
+  });
 
-  puts('entro enla funcion de borrar log')
+  puts('entro enla funcion de borrar log');
   setTimeout(() => {
-    puts('ahora va a borrar el archivo log')
-    const comando = `del "${pathAdd('/my_log.txt', false)}"`
-    console.log('comando para borrar ==> '+comando)
-    cmd(comando)
+    puts('ahora va a borrar el archivo log');
+    const comando = `del "${pathAdd('/my_log.txt', false)}"`;
+    console.log('comando para borrar ==> ' + comando);
+    cmd(comando);
   }, 10000);
 }
 
@@ -256,7 +255,7 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
   // }, 2000);
 }
 
-async function borrado_de_archivos_malos(archivos, callback = (arg) => { }) {
+async function borrado_de_archivos_malos(archivos, callback = (arg) => {}) {
   const del = require('del');
 
   // delete directory recursively
@@ -314,10 +313,10 @@ async function verificarElemento(
             process.platform === 'darwin'
               ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_sin_extension)}" -x "*.DS_Store"`
               : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(
-                `${path_local_sin_extension}.zip`,
-              )}" -Update`;
+                  `${path_local_sin_extension}.zip`,
+                )}" -Update`;
 
-          cmd('pwd', (res_pwd) => { });
+          cmd('pwd', (res_pwd) => {});
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -487,9 +486,8 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
   return;
 }
 
-function cmd(command, callback = (arg) => { }) {
-  
-  puts(command,'comando realizado en la funcion cmd')
+function cmd(command, callback = (arg) => {}) {
+  puts(command, 'comando realizado en la funcion cmd');
   exec(command, (error, stdout, stderr) => {
     let obj;
     if (error) {
@@ -513,7 +511,7 @@ function cmd(command, callback = (arg) => { }) {
   });
 }
 
-function downloadFile(archive_url, path, file_, callback = (arg) => { }) {
+function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
   // Save variable to know progress
 
   let received_bytes = 0;
@@ -552,9 +550,7 @@ function showProgress(received, total) {
 }
 
 async function puts(msg, titulo?) {
-  
   if (win) {
-
     const fs = require('fs');
     const file = 'my_log.txt';
 
@@ -575,14 +571,17 @@ async function puts(msg, titulo?) {
         stream.end();
       });
     } else {
-      await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => { });
+      await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => {});
     }
   }
 }
 
-ipcMain.on('printReporte', (event: any, oPdf) => {
+ipcMain.on('printReporte', async (event: any, oPdf) => {
+  await puts(' --------------- INICIO DE PROCESO DE IMPRESION DE REPORTES --------------- ');
   const base64 = oPdf.base64;
   const filename = oPdf.filename;
+  await puts(base64, 'base64');
+  await puts(filename, 'filename');
   generatePdfFileFormBase64(filename, base64);
 });
 
@@ -631,7 +630,6 @@ ipcMain.on('print', async (event: any, oPdf) => {
       const file = obj.file;
       const type = obj.type;
 
-
       createPdfbase64(dd, file, type, reimprimir);
     } else {
       returnErrorPDF();
@@ -651,6 +649,9 @@ function returnErrorPDF() {
 
 function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
   const FileName = pathAdd('/' + cFileName);
+  puts(cFileName, 'cFileName');
+  puts(base64, 'base64');
+  puts(type, 'type');
   try {
     fs.writeFile(FileName, base64, { encoding: 'base64' }, (err) => {
       imprimir(cFileName, type);
@@ -662,14 +663,12 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
 }
 
 function createPdfbase64(docDefinition, file_, type, reimprimir_) {
-  console.log('entro en createPdfbase64');
   try {
     const pdfDocGenerator = pdfMake.createPdf(docDefinition);
     pdfDocGenerator.getBase64((data) => {
       if (type === 'file') {
         generatePdfFileFormBase64(file_, data, type);
       } else {
-        console.log('entro en printRes');
         win.webContents.send('printRes', {
           msg: 'Pdf Base64 correcto',
           file: file_,
@@ -688,15 +687,16 @@ function createPdfbase64(docDefinition, file_, type, reimprimir_) {
 }
 
 function imprimir(cFileName, tipo) {
-
   const sumatrapdf_path = pathAdd('/print/lp.exe');
   const file_path = pathAdd(`/${cFileName}`);
+  puts(file_path, 'file_path');
+  puts(sumatrapdf_path, 'sumatrapdf_path');
   // const bat = require.resolve(sumatrapdf_path);
   // const profile = require.resolve('../profiles/app.profile.js');
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
-  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${file_path}"`
-  puts(comando, ' -----------  comando para imprimir con sumastra ----------- ')
+  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${file_path}"`;
+  puts(comando, ' -----------  comando para imprimir con sumastra ----------- ');
   cmd(comando, (res) => {
     puts(res, 'respuesta impresion');
     if (res.status) {
@@ -719,7 +719,6 @@ function imprimir(cFileName, tipo) {
       return;
     }
   });
-
 }
 
 export function pathAdd(addToPath = '', resource = true) {
@@ -735,7 +734,7 @@ export function pathAdd(addToPath = '', resource = true) {
     if (resource) {
       path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
     } else {
-      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name ;
+      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
     }
   }
   path_temp = path_temp + addToPath;

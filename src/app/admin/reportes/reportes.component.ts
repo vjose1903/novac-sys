@@ -39,8 +39,6 @@ export class ReportesComponent implements OnInit, OnDestroy {
             reimprimir: res.reimprimir,
             fileName: res.file.split('.')[0],
           };
-          console.log('res --> ', res);
-          console.log('respuesta de print res obj --> ', obj);
         } else if (res.file === 'reporte.pdf') {
           obj = {
             pdfSrc: res.body,
@@ -103,19 +101,8 @@ export class ReportesComponent implements OnInit, OnDestroy {
         data: res.body,
         type: 'cuadre_caja',
       };
-      console.log('peticion cuadre obj --> ', obj);
 
       this._ipc.send('print', obj);
-
-      // setTimeout(() => {
-      //   const obj = {
-      //     pdfSrc: pdfBase64Prueba,
-      //     titulo: 'Cuadre de caja',
-      //     height: '37rem',
-      //   };
-
-      //   this.abrirModalReporte(obj);
-      // }, 1000);
     } catch (error) {
       console.error(error);
       this.dbServ.toastError(error.error.msg, 'ERROR', true);
@@ -206,12 +193,16 @@ export class ReportesComponent implements OnInit, OnDestroy {
   }
 
   decisionModal(decision) {
+    console.log('decision          --> ', decision);
+    console.log('this.tipoModal    --> ', this.tipoModal);
     if (decision) {
       if (this.tipoModal === 'visor_pdf') {
         const obj = {
           base64: this.pdfSrc,
           filename: this.fileName,
         };
+        console.log('print Reporte --> ', obj);
+
         this._ipc.send('printReporte', obj);
       } else if (this.tipoModal === 'cuadre') {
         this.makeCuadre();
