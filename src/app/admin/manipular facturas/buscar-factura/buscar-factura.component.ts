@@ -193,7 +193,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         this.dbServ.toastError(res.msg, 'ERROR', true);
       }
       setTimeout(() => {
-        this.mServ.mostrarModal(false)
+        this.mServ.mostrarModal(false);
         document.getElementById('foco_angular').click();
       }, 5);
     });
@@ -257,6 +257,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
     this.subDeci.unsubscribe();
     this.subEsc.unsubscribe();
+    this._ipc.removeListener('printRes');
     this.borrar('salir');
   }
 
@@ -330,12 +331,10 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
           let detalle = factura.detalle_facturas[j];
 
           detalle = await this.calcularPrecio(detalle, factura);
-          console.log(detalle);
         }
       }
 
       this.facturas = GLOBAL.duplicarJson(busqueda);
-      console.log('MMG facturas --> ', this.facturas);
 
       if (this.facturas.length > 0) {
         this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
@@ -397,7 +396,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
           let detalle = factura.detalle_facturas[j];
 
           detalle = await this.calcularPrecio(detalle, factura);
-          console.log(detalle);
         }
       }
 
@@ -480,6 +478,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     this.tipo_factura_id = null;
     this.campo = null;
     this.enfocarInput('campoI');
+    this.mServ.mostrarModal(false);
+    this.mServ.modalTipo(undefined);
+    this.mServ.ModalDecision(undefined);
   }
 
   selectFactura(item) {

@@ -9,13 +9,12 @@ export class IpcService {
   private printers = new BehaviorSubject<any>(undefined);
   PRINTERS = this.printers.asObservable();
 
-
   objPercent = {
     transferred: 0,
     total: 0,
     percent: 0,
     bytesPerSecond: 0,
-  }
+  };
 
   constructor() {
     if (window.require) {
@@ -31,6 +30,13 @@ export class IpcService {
 
   PRINTERS_NEW(nextValue) {
     this.printers.next(nextValue);
+  }
+
+  public removeListener(channel: string): void {
+    if (!this._ipc) {
+      return;
+    }
+    this._ipc.removeAllListeners(channel);
   }
 
   public on(channel: string, listener: any): void {

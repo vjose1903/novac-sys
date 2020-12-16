@@ -53,14 +53,12 @@ export class ReportesComponent implements OnInit, OnDestroy {
       } else {
         this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
       }
-              setTimeout(() => {
-                this.quitarFocodeElectron();
-              }, 5);
+      setTimeout(() => {
+        this.quitarFocodeElectron();
+      }, 5);
     });
 
     this._ipc.on('printReporteRes', async (event: Electron.IpcMessageEvent, res) => {
-      console.log('res --> ', res);
-
       if (res.status === 'si') {
         this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
       } else {
@@ -93,11 +91,12 @@ export class ReportesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subDeci.unsubscribe();
     this.subObj.unsubscribe();
+    this._ipc.removeListener('printRes');
+    this._ipc.removeListener('printReporteRes');
   }
 
   quitarFocodeElectron() {
     document.getElementById('foco_angular').click();
-    console.log('foco angular --> ', document.getElementById('foco_angular'));
   }
 
   async makeCuadre() {
@@ -199,22 +198,21 @@ export class ReportesComponent implements OnInit, OnDestroy {
   }
 
   decisionModal(decision) {
-    console.log('decision          --> ', decision);
-    console.log('this.tipoModal    --> ', this.tipoModal);
     if (decision) {
       if (this.tipoModal === 'visor_pdf') {
         const obj = {
           base64: this.pdfSrc,
           filename: this.fileName,
         };
-        console.log('print Reporte --> ', obj);
 
         this._ipc.send('printReporte', obj);
       } else if (this.tipoModal === 'cuadre') {
         this.makeCuadre();
       }
-      this.mServ.mostrarModal(false);
     }
-    this.resetVariables();
+    setTimeout(() => {
+      this.mServ.mostrarModal(false);
+      this.resetVariables();
+    }, 5);
   }
 }

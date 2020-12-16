@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonsModule, WavesModule } from 'angular-bootstrap-md';
@@ -16,7 +16,7 @@ import { FunctionService } from '../core/services/functions.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   errorC = '';
   errorU = '';
@@ -37,6 +37,10 @@ export class LoginComponent implements OnInit {
       password: null,
     });
     this.searchVersion();
+  }
+
+  ngOnDestroy() {
+    this._ipc.removeListener('printRes');
   }
 
   async searchVersion() {

@@ -209,6 +209,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     this.subInde.unsubscribe();
 
     this.resetModalVaribales();
+    this._ipc.removeListener('printRes');
   }
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
@@ -466,7 +467,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
 
       this.mServ.mostrarModal(true);
       setTimeout(() => {
-       // this.mServ.ModalTablaHeight(true);
+        // this.mServ.ModalTablaHeight(true);
       }, 250);
     }
   }

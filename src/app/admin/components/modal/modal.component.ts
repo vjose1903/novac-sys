@@ -248,7 +248,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.ModalObj(undefined);
     this.mServ.ModalIndex(undefined);
     this.mServ.getArticuloFiltradoPorCodigo(undefined);
-    this.seleccionModal = undefined
+    this.seleccionModal = undefined;
     this.paraFiltroArticulos = undefined;
     this.paraFiltroClientes = undefined;
     this.paraFiltroSuplidor = undefined;
@@ -323,15 +323,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
     }
 
-    console.log(`palabra_a_buscar--> ${typeof palabra_a_buscar} (${palabra_a_buscar})`);
-    console.log('this.tipoModal ==> ', this.tipoModal);
-
     if (this.tipoModal === 'buscarArticulo') {
       try {
         const is_compra = this.metodo === 'compra' ? true : false;
 
         const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, fecha_articulo, 'todos').toPromise();
-        console.log('articulos --> ', res);
 
         if (res.data) {
           this.seleccionModal = res.data;
@@ -355,7 +351,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     } else if (this.tipoModal === 'buscarCliente') {
       try {
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
-        console.log('clientes --> ', res);
         this.seleccionModal = undefined;
 
         if (res.data.length === 0) {
@@ -390,7 +385,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     } else if (this.tipoModal === 'buscarSuplidor') {
       try {
         const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
-        console.log('suplidores --> ', res);
 
         this.seleccionModal = undefined;
         res.data.map(async (supli) => {

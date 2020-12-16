@@ -41,7 +41,13 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
   lista_tipos_facturas: any;
   propietario_factura: any;
   paqueteComprobante;
-  constructor(private dbServ: DBservice, private route: ActivatedRoute, private mServ: ModalService, private _ipc: IpcService, private fun: FunctionService) {}
+  constructor(
+    private dbServ: DBservice,
+    private route: ActivatedRoute,
+    private mServ: ModalService,
+    private _ipc: IpcService,
+    private fun: FunctionService,
+  ) {}
 
   ngOnInit() {
     this.idFactura = this.route.snapshot.params['id'];
@@ -84,6 +90,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subDeci.unsubscribe();
     this.subObj.unsubscribe();
+    this._ipc.removeListener('printRes');
   }
 
   async necesarioStart() {
@@ -428,7 +435,8 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     cabecera_fact['balance'] = 0;
     cabecera_fact['devuelta'] = this.TOTAL * -1;
 
-    cabecera_fact['fecha_valida'] = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
+    cabecera_fact['fecha_valida'] =
+      this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
 
     cabecera_fact['adelantada'] = false;
     cabecera_fact['numero_comprobante'] = null;

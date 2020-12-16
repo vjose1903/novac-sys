@@ -321,6 +321,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.CancelarFactura('salir');
     this.subObj.unsubscribe();
     this.subDeci.unsubscribe();
+    this._ipc.removeListener('printRes');
   }
 
   setWidthPop(bool, e) {
@@ -665,7 +666,6 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
             this.abrirModal();
           } else {
             let articulos_a_cambiar = false;
-            console.log('declaracion de la variable articulos_a_cambiar ===> ', articulos_a_cambiar);
 
             if (this.metodo === 'compra') {
               const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
@@ -746,7 +746,6 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const obj = JSON.parse(arg);
     this.CuerpoFactura = obj;
-    console.log(this.CuerpoFactura);
 
     if (this.metodo === 'venta') {
       this.CuerpoFactura.map((articulo) => {
@@ -822,8 +821,6 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
 
   calculoMedidaprincipal(costo_db, costoRow, articulo) {
     const contenido_articulo = articulo.contenido_articulos;
-    console.log('costo_db ==> ', costo_db);
-    console.log('costoRow ==> ', costoRow);
 
     if (costo_db !== costoRow) {
       let cantPadre;
@@ -875,7 +872,6 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
   async revisarPrecios(cuerpoFact) {
     const tempCuerpo = [];
     this.articulosAcambiar = [];
-    console.log('cuerpoFact --> ', cuerpoFact);
 
     for (let i = 0; i < cuerpoFact.length; i++) {
       const row = cuerpoFact[i];
@@ -888,12 +884,10 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
       }
 
       const contenido_articulo = articulo.contenido_articulos;
-      console.log('row --> ', row);
 
       const costoRow = GLOBAL.desformatear(row.pre);
 
       const costoPrincipal = articulo.costo_principal;
-      console.log('articulo --> ', articulo);
 
       let temp = {};
       let costoA;
@@ -910,17 +904,11 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
           medidaEs = content.condicion;
         }
       });
-      console.log('medidaEs --> ', medidaEs);
-      console.log('contenido_articulo.length --> ', contenido_articulo.length);
-      console.log('row.unidad --> ', row.unidad);
 
       // if (contenido_articulo.length === 0 || medidaEs === 'principal' || row.unidad === 'Caja' || row.unidad === 'Quintal') {
       if (contenido_articulo.length === 0 || medidaEs === 'principal') {
-        console.log('entro directo por que es costo principal');
-
         this.calculoMedidaprincipal(costoPrincipal, costoRow, articulo);
       } else {
-        console.log('tengo que calcular el costo para que sea como el principal');
         if (medidaEs === 'padre') {
           costoA = contenidoPadre.costo * contenidoPadre.cantidad;
           costoR = contenidoPadre.cantidad * costoRow;

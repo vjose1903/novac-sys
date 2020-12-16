@@ -104,6 +104,8 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subObj.unsubscribe();
     this.subDeci.unsubscribe();
+
+    // this._ipc.removeListener('printRes');
   }
 
   formatoNumero(num) {

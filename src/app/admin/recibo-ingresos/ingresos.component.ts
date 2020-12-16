@@ -167,6 +167,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.sub.unsubscribe();
     this.subDeci.unsubscribe();
+    this._ipc.removeListener('printRes');
   }
 
   formatoNumero(num) {
@@ -315,7 +316,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
           pago.recibo_created_at = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
         }
         this.mServ.modalTipo('historial_pago');
-       // this.mServ.ModalTablaHeight(true);
+        // this.mServ.ModalTablaHeight(true);
 
         const obj = {
           total: pagos.length,

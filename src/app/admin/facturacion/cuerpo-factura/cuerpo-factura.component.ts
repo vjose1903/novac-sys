@@ -401,7 +401,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         (this.control.controls[j] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
 
         (this.control.controls[j] as any).controls['des'].setValue(_.capitalize(row.articulo));
-        console.log('row ==> ', row);
 
         (this.control.controls[j] as any).controls['calcular_saco'].setValue(row.calcular_saco);
 
@@ -421,7 +420,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         }
 
         (this.control.controls[j] as any).controls['uni'].setValue(uni);
-        console.log('aqiiiiiii --> ', row.calcular_saco);
 
         if (row.calcular_saco) {
           try {
@@ -687,10 +685,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   verificarSecuencia(i, input?) {
-    console.log('this.secuencia ==> ', this.secuencia);
-    console.log('i ==> ', i);
-    console.log('input ==> ', input);
-
     if (this.secuencia < i) {
       GLOBAL.enfocarInput(this.inputSecuencia);
     }
