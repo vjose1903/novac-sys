@@ -1029,7 +1029,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
 
       if (this.metodo === 'venta' && (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima')) {
-        if (art.vendido_en === 'Saco' && art.calcular_saco) {
+        //if (art.vendido_en === 'Saco' && art.calcular_saco) {
+        if (art.vendido_en === 'Saco') {
           this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
         }
       }
