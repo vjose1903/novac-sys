@@ -193,6 +193,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         this.dbServ.toastError(res.msg, 'ERROR', true);
       }
       setTimeout(() => {
+        this.mServ.mostrarModal(false)
         document.getElementById('foco_angular').click();
       }, 5);
     });

@@ -50,12 +50,12 @@ export class ReportesComponent implements OnInit, OnDestroy {
         }
 
         this.abrirModalReporte(obj);
-        setTimeout(() => {
-          this.quitarFocodeElectron();
-        }, 5);
       } else {
         this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
       }
+              setTimeout(() => {
+                this.quitarFocodeElectron();
+              }, 5);
     });
 
     this._ipc.on('printReporteRes', async (event: Electron.IpcMessageEvent, res) => {

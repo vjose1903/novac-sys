@@ -701,29 +701,34 @@ function imprimir(cFileName, tipo) {
   const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${file_path}"`;
   cmd(comando, (res) => {
     puts(res, 'respuesta impresion');
-
+    
+    let msg_;
+    let tipo_;
     if (res.status) {
-      let msg_;
-      let tipo;
       if (tipo === 'reporte') {
         msg_ = 'Reporte generado correctamente!!';
-        tipo = 'printReporteRes';
+        tipo_ = 'printReporteRes';
       } else {
         msg_ = 'Factura generada correctamente!!';
-        tipo = 'printRes';
+        tipo_ = 'printRes';
       }
-      win.webContents.send(tipo, { msg: msg_, status: 'si', STDOUT: res });
+      console.log(`MALDITO TIPO--> ${tipo_}`)
+      console.log(`SEND ANGULAR ${tipo_} ${msg_}`)
+      puts(`SEND ANGULAR ${tipo_} ${msg_}`);
+      win.webContents.send(tipo_, { msg: msg_, status: 'si', STDOUT: res });
     } else {
-      let msg_ = '';
-
+      
       if (tipo === 'reporte') {
         msg_ = 'Error generando Reporte!!';
-        tipo = 'printReporteRes';
+        tipo_ = 'printReporteRes';
       } else {
         msg_ = 'Error generando Factura!!';
-        tipo = 'printRes';
+        tipo_ = 'printRes';
       }
-      win.webContents.send(tipo, { msg: msg_, status: 'no', err: res });
+      console.log(`ERROR MALDITO TIPO--> ${tipo_}`)
+      console.log(`ERROR SEND ANGULAR ${tipo_} ${msg_}`)
+      puts(`SEND ANGULAR ${tipo_} ${msg_}`);
+      win.webContents.send(tipo_, { msg: msg_, status: 'no', err: res });
       return;
     }
   });
