@@ -352,12 +352,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         return fact;
       });
 
-      if (campo !== '4') {
-        busqueda['data'].sort((a, b) => {
-          return a.id > b.id ? 1 : -1;
-        });
-      }
-
       // for (let i = 0; i < busqueda['data'].length; i++) {
       //   const factura = busqueda['data'][i];
       //   for (let j = 0; j < factura.detalle_facturas.length; j++) {

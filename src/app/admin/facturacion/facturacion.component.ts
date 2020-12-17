@@ -306,6 +306,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.form.patchValue(res.cliente);
 
+    this.condicion_fact = res.condicion;
     this.tipoFactura = this.tipos_de_facturas[_.lowerCase(res.tipo_factura)];
 
     this.modo_factura = res.is_viaje ? 'viaje' : res.is_adelantada ? 'adelantada' : 'normal';
