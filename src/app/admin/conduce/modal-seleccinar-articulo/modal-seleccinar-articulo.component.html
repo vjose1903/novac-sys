@@ -1,3 +1,11 @@
-<div id="cardTabla">
-  <app-tablas [info]="info" [search]="false" [data]="articulos" (getInfoChange)="getInfoChange($event)" [tablaHover]="false" [colorHead]="false" [focusRow]="false"></app-tablas>
+<div id="cardTabla" style="height: 100%">
+  <app-tablas
+    [info]="info"
+    [search]="false"
+    [data]="articulos"
+    (getInfoChange)="getInfoChange($event)"
+    [tablaHover]="false"
+    [colorHead]="false"
+    [focusRow]="false"
+  ></app-tablas>
 </div>

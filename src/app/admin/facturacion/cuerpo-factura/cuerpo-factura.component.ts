@@ -207,18 +207,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     return res;
   }
 
-  async activarBtnConfigRow(i) {
-    let res = false;
-    const element = this.control.controls[i] as any;
-
-    if (element.controls['calcular_saco'].value === true) {
-      res = false;
-    } else {
-      res = true;
-    }
-    return res;
-  }
-
   ModificarClass(item, clase, action) {
     if (action === 'add') {
       document.getElementById(item).classList.add(clase);
@@ -227,10 +215,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
   }
 
-  async calcularSacoEnRow(i, operacion, articulo, callback = (arg) => {}) {
+  async calcularSacoEnRow(i, row, articulo, callback = (arg) => {}) {
     try {
+      const operacion = row.calcular_saco;
+      const se_calcula = row.se_calcula_saco;
       const row_unidad = (this.control.controls[i] as any).controls['uni'].value;
       let calculo = 0;
+
       if (row_unidad === articulo.medida) {
         calculo = articulo.precio_principal;
       } else {
@@ -241,18 +232,24 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         if (unity === 'Saco') {
           calculo = articulo.precio_principal / peso;
         } else {
-          operacion = false;
+          calculo = articulo.contenido_articulos[0].precio;
         }
       }
+
+      const descripcion = (this.control.controls[i] as any).controls['des'].value;
 
       if (operacion) {
         const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, this.FechaFactura, 'todos').toPromise();
         const precio_saco = res.data[0].precio_principal;
         const precio = calculo + precio_saco;
+        (this.control.controls[i] as any).controls['des'].setValue(`${articulo.nombre}`);
         (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
       } else {
         const precio = calculo;
         (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
+        if (se_calcula) {
+          (this.control.controls[i] as any).controls['des'].setValue(`${descripcion}*`);
+        }
       }
       callback(true);
     } catch (error) {
@@ -265,16 +262,19 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     let articulo;
     try {
       const unidad = (this.control.controls[i] as any).controls['uni'].value;
+
       if (e) {
         e.stopPropagation();
       }
       if (this.metodo === 'venta') {
         const codigo = (this.control.controls[i] as any).controls['cod'].value;
         articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
+
         if (articulo.calcular_saco) {
-          const row_calcularSaco = (this.control.controls[i] as any).controls['calcular_saco'].value;
+          const row = (this.control.controls[i] as any).value;
+
           if (unidad) {
-            this.calcularSacoEnRow(i, row_calcularSaco, articulo, (res) => {
+            this.calcularSacoEnRow(i, row, articulo, (res) => {
               if (res) {
                 this.calcularTotalRow(i);
               }
@@ -421,17 +421,18 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
         (this.control.controls[j] as any).controls['uni'].setValue(uni);
 
-        if (row.calcular_saco) {
-          try {
-            this.calcularSacoEnRow(j, row.calcular_saco, articulo, (res) => {
-              if (res) {
-                this.calcularTotalRow(j);
-              }
-            });
-          } catch (error) {}
-        } else {
-          this.calcularTotalRow(j);
-        }
+        // if (row.calcular_saco) {
+
+        try {
+          this.calcularSacoEnRow(j, row, articulo, (res) => {
+            if (res) {
+              this.calcularTotalRow(j);
+            }
+          });
+        } catch (error) {}
+        // } else {
+        //   this.calcularTotalRow(j);
+        // }
 
         this.aumentarSecuencia();
       } catch (error) {}
@@ -676,6 +677,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
           GLOBAL.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)),
         );
         (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
+
         if (this.metodo === 'venta') {
           this.CalculoSacos(i);
         }
@@ -977,7 +979,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
       if (this.metodo === 'venta') {
         if (ARTICULO.descripcion === 'Materia prima') {
-          (this.control.controls[i] as any).controls['descuento_porciento'].disable();
+          (this.control.controls[i] as any).controls['descuento_porciento'].disable({ onlySelf: true });
           (this.control.controls[i] as any).controls['is_materia_prima'].setValue(true);
         } else {
           (this.control.controls[i] as any).controls['descuento_porciento'].enable();
@@ -1029,8 +1031,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       }
 
       if (this.metodo === 'venta' && (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima')) {
-        //if (art.vendido_en === 'Saco' && art.calcular_saco) {
-        if (art.vendido_en === 'Saco') {
+        if (art.vendido_en === 'Saco' && art.calcular_saco) {
           this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
         }
       }

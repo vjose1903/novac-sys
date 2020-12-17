@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../components/tablas/tablas.component';
 import { ModalService } from '../components/modal/modal.service';
-import { obj_paginate, TablasService } from '../components/tablas/tablas.service';
+import { TablasService } from '../components/tablas/tablas.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { FunctionService } from '../../core/services/functions.service';
 
@@ -119,8 +119,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   sub: Subscription;
   subDeci: Subscription;
-
-  obj_paginate_ = obj_paginate;
   totalFacturado: number;
   totalPagado: number;
   totalPagadoPorciento: number;
@@ -143,10 +141,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
     this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipo_modal === 'buscarCliente') {
         this.clienteAdepositar = res.data;
+
         this.clienteAdepositar.balance = this.clienteAdepositar.balance ? this.clienteAdepositar.balance : 0;
 
         (document.getElementById('clienteI') as any).value = res.data.nombre;
-        this.pedirFacturasPorCliente(res.data.id);
+        this.pedirFacturasPorCliente(res.data.id, this.tServ.obj_paginate);
         this.mServ.ModalObj(undefined);
       } else if (res && res.tipo_modal === 'cambio') {
         this.Devuelta = res.data.devuelta;
@@ -229,16 +228,19 @@ export class IngresosComponent implements OnInit, OnDestroy {
     return monto;
   }
 
-  async pedirFacturasPorCliente(cliente_id) {
+  async pedirFacturasPorCliente(cliente_id, e) {
     this.Facturas = undefined;
     this.totalFacturado = 0;
     this.totalPagado = 0;
     this.totalPagadoPorciento = 0;
 
+    const page = e.page;
+    const per_page = e.per_page;
+
     try {
       const fechaA = moment().format('YYYY-MM-DD');
       this.Facturas = await this.dbServ
-        .getFacturasByClienteIdAndPagada(cliente_id, false)
+        .getFacturasByClienteIdAndPagada(cliente_id, false, page, per_page, true)
         .pipe(
           map(
             (fact) =>
@@ -436,7 +438,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
         };
         this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
         this.clienteAdepositar.balance = res.cliente.balance;
-        this.pedirFacturasPorCliente(this.clienteAdepositar.id);
+        this.pedirFacturasPorCliente(this.clienteAdepositar.id, this.tServ.obj_paginate);
         this.resetVariables();
 
         this._ipc.send('print', obj);

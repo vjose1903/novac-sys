@@ -9,6 +9,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { filter } from 'lodash';
 import { FunctionService } from '../../core/services/functions.service';
+import { obj_paginate_default, TablasService } from '../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-produccion',
@@ -45,7 +46,15 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   listaProductos: any;
   articuloEditando: any;
 
-  constructor(private dbServ: DBservice, private fb: FormBuilder, private fun: FunctionService, private actRou: ActivatedRoute, private router: Router, private mServ: ModalService) {}
+  constructor(
+    private dbServ: DBservice,
+    private fb: FormBuilder,
+    private fun: FunctionService,
+    private actRou: ActivatedRoute,
+    private router: Router,
+    private mServ: ModalService,
+    private tServ: TablasService,
+  ) {}
 
   ngOnInit() {
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
@@ -61,6 +70,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subDeci.unsubscribe();
+    this.tServ.obj_paginate = obj_paginate_default;
+    this.tServ.Func_total_paginas(1);
   }
 
   async getProductosTerminados() {
@@ -77,9 +88,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   }
 
   async getIngredients() {
-
-
-
     if (this.articulo_id !== '-1') {
       try {
         const res = await this.dbServ.getIngredientesFormula(this.articulo_id).toPromise();
@@ -218,7 +226,11 @@ export class ProduccionComponent implements OnInit, OnDestroy {
             this.cantidad_producir = null;
             this.ingredientesParaProduccion = [];
 
-            this.dbServ.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR', true);
+            this.dbServ.toastError(
+              'No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre,
+              'ERROR',
+              true,
+            );
             this.enfocarInput('cantidad_producir');
           } else {
             this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj, articulo_id: ingre.articulo_id });
@@ -250,6 +262,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(undefined);
   }
 
+  paginateChange(arg) {
+    console.log(arg);
+  }
+
   agregarAlista() {
     this.ingredientesParaProduccion.forEach((ingre) => {
       ingre.cantidad = this.medida_producir === 'Quintal' ? ingre.existencia.Quintal : ingre.existencia.Quintal;
@@ -270,10 +286,11 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
     this.lista_produccion.push(obj);
 
+    this.tServ.Func_total_paginas(this.lista_produccion.length);
+
     this.disableOption('prod-' + this.articulo_id, true);
     this.articuloEditando = undefined;
     this.borrar();
-
   }
 
   editarItem(item) {
@@ -329,6 +346,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         this.lista_produccion = _.remove(listaTemp, (n) => {
           return n.articulo_id !== this.seleccionModal.articulo_id;
         });
+        this.tServ.Func_total_paginas(this.lista_produccion.length);
       } else {
         this.lista_produccion.forEach((element) => {
           this.disableOption('prod-' + element.articulo_id, false);
@@ -337,6 +355,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         this.borrar();
       }
     }
+    this.tServ.Func_total_paginas(this.lista_produccion.length);
   }
   cancelarProduccion() {
     this.mServ.modalTipo('cancelarP');
@@ -353,8 +372,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     const detalle = [];
 
     obj.forEach((produccion, i) => {
-
-
       detalle.push({
         articulo_id: produccion.articulo_id,
         cantidad: produccion.cantidad,
@@ -367,7 +384,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     produccion_send['numero'] = null;
     produccion_send['fecha_equivalente'] = null;
     produccion_send['detalles_produccion_attributes'] = detalle;
-
 
     try {
       const res = await this.dbServ.createProduccion(produccion_send).toPromise();

@@ -1,9 +1,22 @@
-import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter, OnDestroy, OnChanges, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  AfterViewInit,
+  HostListener,
+  ChangeDetectorRef,
+  Input,
+  Output,
+  EventEmitter,
+  OnDestroy,
+  OnChanges,
+  ElementRef,
+} from '@angular/core';
 import { MdbTableDirective } from 'angular-bootstrap-md';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { TablasService, obj_paginate } from './tablas.service';
+import { obj_paginate_default, TablasService } from './tablas.service';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
@@ -67,7 +80,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     Unidad: 'Unidades',
     Saco: 'Sacos',
   };
-  paginate_info = obj_paginate;
+  paginate_info = this.tServ.obj_paginate;
 
   // inputs
 
@@ -110,8 +123,15 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   subTotalPag: Subscription;
 
   @Input() alto = 200;
+  @Input() pad = true;
 
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private tServ: TablasService) {}
+  constructor(
+    private cdRef: ChangeDetectorRef,
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private dbServ: DBservice,
+    private tServ: TablasService,
+  ) {}
 
   ngOnInit() {
     this.necesarioStart();
@@ -142,8 +162,11 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       if (tablaContent.id !== 'cardTabla') {
         this.searchCardTabla(tablaContent.parentElement, restar);
       } else {
-        let paddingCard = tablaContent.offsetTop;
-        paddingCard *= 2;
+        let paddingCard = 0;
+        if (this.pad) {
+          paddingCard = tablaContent.offsetTop;
+          paddingCard *= 2;
+        }
 
         this.alto = tablaContent.offsetHeight - restar - paddingCard;
       }
@@ -274,6 +297,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.alto = undefined;
     this.searchText = '';
     this.reinicioModal.emit();
+    this.tServ.obj_paginate = obj_paginate_default;
+    this.tServ.Func_total_paginas(1);
   }
 
   resetInput(referencia, destino, i, formatear, especifico?) {
@@ -322,7 +347,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   pagActual = 1;
   mostrar = this.paginate_info.per_page;
-  listaMostrar = [20, 40, 60];
+  listaMostrar = [5, 20, 40, 60];
   total_registros;
 
   cambiaMostrar(num: number) {
@@ -338,6 +363,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     };
 
     this.paginateChange.emit(this.paginate_info);
+    this.tServ.obj_paginate = this.paginate_info;
     setTimeout(() => {
       this.IDROW = temp;
     }, 250);
@@ -355,6 +381,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     };
 
     this.paginateChange.emit(this.paginate_info);
+    this.tServ.obj_paginate = this.paginate_info;
     setTimeout(() => {
       this.IDROW = temp;
     }, 250);
@@ -419,7 +446,13 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         tempdecimales = '00';
       }
       //
-      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
+      if (
+        splitPrecio.length > 2 ||
+        this.checkNumbers(enteros) ||
+        this.checkLongMillares(enteros) ||
+        this.checkNumbers(tempdecimales) ||
+        this.checkLongMillares(tempdecimales)
+      ) {
         this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
         this.enfocarInput(input);
       } else {

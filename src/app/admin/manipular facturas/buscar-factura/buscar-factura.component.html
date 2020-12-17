@@ -22,7 +22,7 @@
           <option value="1">Por cliente</option>
           <option value="2">Por numero comprobante</option>
           <option value="3">Por numero factura</option>
-          <option value="4">Ultimas 20 facturas</option>
+          <option value="4">Ultimas 50 facturas</option>
         </select>
       </div>
       <div class="d-flex">
@@ -94,9 +94,11 @@
           <app-tablas
             [info]="info"
             [quitarAScorll]="60"
+            [id_tabla]="'facturas_parms'"
             (clickIcon)="selectFactura($event)"
             [data]="facturas"
             (getInfoChange)="selectFactura($event)"
+            (paginateChange)="changePaginate($event)"
             [focusRow]="false"
           ></app-tablas>
         </div>

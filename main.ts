@@ -591,6 +591,9 @@ ipcMain.on('print', async (event: any, oPdf) => {
   let obj;
   let todo_true = true;
 
+  console.log('data --> ' + oPdf.data);
+  console.log('type --> ' + oPdf.type);
+  console.log('oPdf.data.reimprimir --> ' + oPdf.data.reimprimir);
   const data = oPdf.data;
   const type = oPdf.type;
   const reimprimir = oPdf.data.reimprimir ? true : false;
@@ -701,7 +704,7 @@ function imprimir(cFileName, tipo) {
   const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${file_path}"`;
   cmd(comando, (res) => {
     puts(res, 'respuesta impresion');
-    
+
     let msg_;
     let tipo_;
     if (res.status) {
@@ -712,12 +715,11 @@ function imprimir(cFileName, tipo) {
         msg_ = 'Factura generada correctamente!!';
         tipo_ = 'printRes';
       }
-      console.log(`MALDITO TIPO--> ${tipo_}`)
-      console.log(`SEND ANGULAR ${tipo_} ${msg_}`)
+      console.log(`MALDITO TIPO--> ${tipo_}`);
+      console.log(`SEND ANGULAR ${tipo_} ${msg_}`);
       puts(`SEND ANGULAR ${tipo_} ${msg_}`);
       win.webContents.send(tipo_, { msg: msg_, status: 'si', STDOUT: res });
     } else {
-      
       if (tipo === 'reporte') {
         msg_ = 'Error generando Reporte!!';
         tipo_ = 'printReporteRes';
@@ -725,8 +727,8 @@ function imprimir(cFileName, tipo) {
         msg_ = 'Error generando Factura!!';
         tipo_ = 'printRes';
       }
-      console.log(`ERROR MALDITO TIPO--> ${tipo_}`)
-      console.log(`ERROR SEND ANGULAR ${tipo_} ${msg_}`)
+      console.log(`ERROR MALDITO TIPO--> ${tipo_}`);
+      console.log(`ERROR SEND ANGULAR ${tipo_} ${msg_}`);
       puts(`SEND ANGULAR ${tipo_} ${msg_}`);
       win.webContents.send(tipo_, { msg: msg_, status: 'no', err: res });
       return;

@@ -6,8 +6,8 @@ import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
-import { obj_paginate } from '../../components/tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { TablasService } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -55,9 +55,14 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
   seleccionModal: any;
   indexBorrar: any;
 
-  obj_paginate_ = obj_paginate;
-
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private mServ: ModalService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private dbServ: DBservice,
+    private mServ: ModalService,
+    private router: Router,
+    private tServ: TablasService,
+  ) {}
 
   ngOnInit() {
     this.titulo = 'Registro de suplidores';
@@ -87,7 +92,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
   }
 
   async nesesarioStart() {
-    await this.getSuplidores(this.obj_paginate_);
+    await this.getSuplidores(this.tServ.obj_paginate);
   }
 
   capitalice(control, arg) {
@@ -246,7 +251,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
         if (obj.id === null) {
           this.dbServ.createSuplidor(obj).subscribe(
             (res) => {
-              this.getSuplidores(obj_paginate);
+              this.getSuplidores(this.tServ.obj_paginate);
 
               this.dbServ.toastSuccess('Suplidor registrado con exito.', 'Correcto');
               this.borrar();
@@ -260,7 +265,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
         } else {
           this.dbServ.editarSuplidor(obj).subscribe(
             (res) => {
-              this.getSuplidores(obj_paginate);
+              this.getSuplidores(this.tServ.obj_paginate);
 
               this.dbServ.toastSuccess('Suplidor editado con exito.', 'Correcto');
               this.borrar();

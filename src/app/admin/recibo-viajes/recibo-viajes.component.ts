@@ -3,11 +3,11 @@ import { map } from 'rxjs/operators';
 import { DBservice } from '../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { obj_paginate } from '../components/tablas/tablas.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { ModalService } from '../components/modal/modal.service';
 import { Subscription } from 'rxjs';
 import { FunctionService } from '../../core/services/functions.service';
+import { TablasService } from '../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -73,7 +73,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   monto_pendiente = 0;
   have_incidencia = false;
   incidencia = '';
-  constructor(private dbServ: DBservice, private mServ: ModalService, private fun: FunctionService) {}
+  constructor(private dbServ: DBservice, private mServ: ModalService, private fun: FunctionService, private tServ: TablasService) {}
 
   ngOnInit() {
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
@@ -96,7 +96,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   }
 
   necesarioStart() {
-    this.getViajes(obj_paginate);
+    this.getViajes(this.tServ.obj_paginate);
     this.getChoferes();
     this.getCamiones();
   }
@@ -279,7 +279,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
       try {
         const res = await this.dbServ.revertirLastReciboByFacturaId(this.viaje_selected.id).toPromise();
 
-        this.getViajes(obj_paginate);
+        this.getViajes(this.tServ.obj_paginate);
         this.resetVariables();
       } catch (error) {
         console.error(error);
@@ -336,7 +336,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
         };
 
         this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
-        this.getViajes(obj_paginate);
+        this.getViajes(this.tServ.obj_paginate);
         this.resetVariables();
 
         // this._ipc.send('print', obj);

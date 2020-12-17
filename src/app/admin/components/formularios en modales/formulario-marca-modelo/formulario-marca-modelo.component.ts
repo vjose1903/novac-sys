@@ -5,7 +5,7 @@ import { GLOBAL } from '../../../../core/services/GLOBAL';
 
 import { ModalService } from '../../../components/modal/modal.service';
 import * as _ from 'lodash';
-import { TablasService, obj_paginate } from '../../../components/tablas/tablas.service';
+import { TablasService } from '../../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-formulario-marca-modelo',
@@ -45,7 +45,7 @@ export class FormularioMarcaModeloComponent implements OnInit {
   tipoModal: string;
   showModal: boolean;
   element;
-  obj_p = obj_paginate;
+  obj_p = this.tServ.obj_paginate;
   constructor(private fb: FormBuilder, private dbServ: DBservice, private mServ: ModalService, private tServ: TablasService) {}
 
   ngOnInit() {

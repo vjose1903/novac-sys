@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { IpcService } from '../../../core/services/ipc.service';
 import { Subscription } from 'rxjs';
@@ -43,15 +43,16 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
   paqueteComprobante;
   constructor(
     private dbServ: DBservice,
-    private route: ActivatedRoute,
+    private activeRoute: ActivatedRoute,
     private mServ: ModalService,
     private _ipc: IpcService,
     private fun: FunctionService,
+    private router: Router,
   ) {}
 
   ngOnInit() {
-    this.idFactura = this.route.snapshot.params['id'];
-    this.tipoNota = this.route.snapshot.params['tipo'];
+    this.idFactura = this.activeRoute.snapshot.params['id'];
+    this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
     this.fecha = moment().format('DD/MM/YYYY');
     this.dbServ.getTiposFacturas().subscribe((res) => {
@@ -100,6 +101,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     await this.getPaqueteComprobante();
     this.factura_aplicada = this.factura.numero_comprobante;
   }
+
   async getPaqueteComprobante() {
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
     const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
@@ -127,7 +129,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
   formarTitulosTabla() {
     this.info = [
       {
-        titulo: 'Seleccione',
+        titulo: ' ',
         tipo: 'check',
         key: 'select',
         disable: {
@@ -136,11 +138,13 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
         },
         title: '',
         customClass: true,
-        estilos: [{ width: '6rem' }],
+        estilos: [{ width: '3rem' }],
       },
       {
         titulo: 'Articulo',
         key: 'descripcion',
+        customClass: true,
+        estilos: [{ 'text-align': 'left' }, { width: '20rem' }],
       },
       {
         titulo: this.tipoNota === 'credito' ? 'Devolver' : 'Aumentar',
@@ -153,7 +157,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           campo: 'select',
         },
         customClass: true,
-        estilos: [{ width: '8rem' }],
+        estilos: [{ width: '6rem' }],
       },
       {
         titulo: 'Cantidad',
@@ -165,6 +169,8 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
       {
         titulo: 'Unidad',
         key: 'unidad',
+        customClass: true,
+        estilos: [{ width: '4.5rem' }],
       },
       {
         titulo: 'Precio',
@@ -196,54 +202,93 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
 
   async getFactura() {
     try {
-      this.factura = await this.dbServ.getFacturaById(this.idFactura).toPromise();
+      this.factura = await this.dbServ.getFacturaById(this.idFactura, '?get_contenidos=true').toPromise();
+      const devueltos = await this.dbServ.getCantidadDevuelto(this.factura.numero_comprobante).toPromise();
+
       const temp = [];
       for (let i = 0; i < this.factura.detalle_facturas.length; i++) {
         const detalle = this.factura.detalle_facturas[i];
 
+        const devueto = devueltos[detalle.id] !== undefined ? devueltos[detalle.id] : 0;
+
         detalle['select'] = false;
-        detalle['cant'] = detalle.cantidad;
+        detalle['cant'] = detalle.cantidad - devueto;
         detalle['cant_nota'] = 0;
 
         detalle['customStyles'] = {
-          'td-select': { width: '6rem' },
+          'td-select': { width: '3rem' },
           'td-cantidad': { width: '5rem' },
-          'td-total_nota': { width: '8rem' },
-          'td-cant_nota': { width: '8rem' },
+          'td-total_nota': { width: '7.3rem' },
+          'td-cant_nota': { width: '6rem' },
+          'td-unidad': { width: '4.5rem' },
+          'td-descripcion': { 'text-align': 'left', width: '20rem' },
         };
 
         if (this.tipoNota === 'credito') {
           detalle['min_'] = 0;
-          detalle['max_'] = detalle.cantidad;
+          detalle['max_'] = detalle.cantidad - devueto;
         } else {
           detalle['min_'] = 0;
           detalle['max_'] = null;
         }
-        detalle['total_nota'] = 0;
 
-        let contenido = {};
-        try {
-          contenido = await this.dbServ.getContenidosArticulos(detalle.articulo_id).toPromise();
-          detalle['contenidos'] = contenido;
-        } catch (error) {
-          if (error.error) {
-            this.dbServ.toastError(error.error.msg, 'ERROR', true);
-          } else {
-            this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
-          }
-        }
+        detalle['total_nota'] = 0;
+        detalle['cantidad'] = detalle.cantidad - devueto;
+
+        // if (detalle.calcular_saco && detalle.se_calcula_saco) {
+        //   this.getPrecioSaco(this.factura, (res) => {
+        //     if (res.estado) {
+        //       detalle['precio'] = detalle['precio'] + res.precio_saco;
+        //       detalle['total'] = detalle['cantidad'] * detalle['precio'];
+        //     }
+        //   });
+        // }
+
+        // let contenido = {};
+        // try {
+        //   contenido = await this.dbServ.getContenidosArticulos(detalle.articulo_id).toPromise();
+        //   detalle['contenidos'] = contenido;
+        // } catch (error) {
+        //   if (error.error) {
+        //     this.dbServ.toastError(error.error.msg, 'ERROR', true);
+        //   } else {
+        //     this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
+        //   }
+        // }
 
         temp.push(detalle);
       }
+
       this.detalleFacturas = temp;
     } catch (error) {
       this.dbServ.toastError('Error mostrando factura elegida', 'ERROR', true);
     }
   }
 
+  formarFechaFactura(date) {
+    const hora = moment(date).hour();
+    const minutos = moment(date).minutes();
+    const fechaTemp = moment(date).format('YYYY-MM-DD');
+
+    return fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
+  }
+
+  async getPrecioSaco(factura, callback = (arg) => {}) {
+    try {
+      const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente);
+      const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, fechaFactura, 'todos').toPromise();
+
+      callback({ estado: true, precio_saco: res.data[0].precio_principal });
+    } catch (error) {
+      this.dbServ.toastError('Error calculando el precio del saco', 'ERROR');
+      callback({ estado: false });
+    }
+  }
+
   getIndexNota(id_) {
     return _.findIndex(this.detalleNota, { id: id_ });
   }
+
   async sumarTotal() {
     let total = 0;
     for (let i = 0; i < this.detalleNota.length; i++) {
@@ -292,6 +337,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
         } else {
           const descuento = entidad.descuento_valor / entidad.cantidad;
+
           const total = entidad.cant_nota * (entidad.precio - descuento);
           entidad.total_nota = this.formatoNumero(total);
         }
@@ -301,6 +347,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
         }
         const descuento = entidad.descuento_valor / entidad.cantidad;
+
         const total = entidad.cant_nota * (entidad.precio - descuento);
         entidad.total_nota = this.formatoNumero(total);
       }
@@ -373,7 +420,8 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
       this.formarNota(res);
     } else if (this.tipoModal === 'cancelar') {
       this.resetVariables();
-      window.history.back();
+
+      this.router.navigateByUrl(`/admin/buscarFactura/nota_${this.tipoNota}`);
     }
   }
 
@@ -399,7 +447,9 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
         if (unidad_ === 'Saco') {
           unidad_ = this.obtenerSaco(element.descripcion, 'descripcion');
         }
+
         const fila = {
+          detalle_factura_nota: element.id,
           articulo_id: element.articulo_id,
           cantidad: element.cant_nota,
           cantidad_en_unidades: element.cantidad_en_unidades_nota,
@@ -409,6 +459,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
           itbis: 0,
           unidad: unidad_,
           precio: GLOBAL.desformatear(element.precio),
+          calcular_saco: element.calcular_saco,
         };
 
         temp.push(fila);
@@ -424,7 +475,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     const cuerpo_fact = this.formarDetallesNota();
 
     const cabecera_fact = {};
-    cabecera_fact['condicion'] = 'contado';
+    cabecera_fact['condicion'] = 'Contado';
     cabecera_fact['forma_pago'] = 'Efectivo';
     cabecera_fact['fecha_equivalente'] = null;
     // cabecera_fact['fecha_vencimiento'] = moment(new Date())
@@ -470,22 +521,28 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
 
-    try {
-      const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
+    // try {
+    //   const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
 
-      await this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
-        if (res.status) {
-          this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
-          this.resetVariables();
-          window.history.back();
-        } else {
-          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
-        }
-      });
-      res['FACTURA_DE'] = 'nota';
-      this._ipc.send('print', res);
-    } catch (error) {
-      this.dbServ.toastError(error.statusText, 'ERROR', true);
-    }
+    //   await this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
+    //     if (res.status === 'si') {
+    //       this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
+    //       this.resetVariables();
+    //       this.router.navigateByUrl(`/admin/buscarFactura/${cabecera_fact['tipo']}`);
+    //     } else {
+    //       this.dbServ.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR', true);
+    //     }
+    //   });
+
+    //   res['FACTURA_DE'] = 'nota';
+
+    //   const obj = {
+    //     data: res,
+    //     type: 'facturacion',
+    //   };
+    //   this._ipc.send('print', obj);
+    // } catch (error) {
+    //   this.dbServ.toastError(error.statusText, 'ERROR', true);
+    // }
   }
 }

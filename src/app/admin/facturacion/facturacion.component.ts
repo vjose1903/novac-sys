@@ -1038,7 +1038,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
 
     let cuerpo_fact = GLOBAL.duplicarJson(this.CuerpoFactura);
     if (this.metodo === 'venta') {
-      cuerpo_fact = await this.checkCuerpoForSendBackend(cuerpo_fact);
+      // cuerpo_fact = await this.checkCuerpoForSendBackend(cuerpo_fact);
     }
 
     const cabecera_fact = {};

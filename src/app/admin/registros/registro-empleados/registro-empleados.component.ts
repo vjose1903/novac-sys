@@ -9,7 +9,7 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
-import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 @Component({
   selector: 'app-registro-empleados',
@@ -59,8 +59,14 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
   indexBorrar: any;
   subDeci: Subscription;
 
-  obj_paginate_ = obj_paginate;
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService, private tServ: TablasService) {
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private dbServ: DBservice,
+    private router: Router,
+    private mServ: ModalService,
+    private tServ: TablasService,
+  ) {
     this.dpConfig = Object.assign(
       {},
       {
@@ -102,7 +108,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
   }
 
   async necesarioStart() {
-    await this.getEmpleados(this.obj_paginate_);
+    await this.getEmpleados(this.tServ.obj_paginate);
   }
 
   capitalice(control, arg) {
@@ -214,7 +220,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
           (res) => {
             this.dbServ.toastSuccess('Usuario Editado', 'Correcto');
 
-            this.getEmpleados(obj_paginate);
+            this.getEmpleados(this.tServ.obj_paginate);
             this.borrar();
           },
           (err) => {
@@ -224,7 +230,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
       } else {
         this.dbServ.createEmpleados(objSend).subscribe(
           (res) => {
-            this.getEmpleados(obj_paginate);
+            this.getEmpleados(this.tServ.obj_paginate);
             this.dbServ.toastSuccess('Usuario Creado', 'Correcto');
 
             this.borrar();

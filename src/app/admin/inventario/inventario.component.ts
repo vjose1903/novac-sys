@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../components/modal/modal.service';
-import { obj_paginate, TablasService } from '../components/tablas/tablas.service';
+import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
@@ -44,7 +44,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
       formatoNumero: true,
     },
   ];
-  cant_inventario=0
+  cant_inventario = 0;
   botones = {
     titulo: true,
     inventario: true,
@@ -87,6 +87,8 @@ export class InventarioComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subDeci.unsubscribe();
     this.FechaFactura = undefined;
+    this.tServ.obj_paginate = obj_paginate_default;
+    this.tServ.Func_total_paginas(1);
   }
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
@@ -95,16 +97,16 @@ export class InventarioComponent implements OnInit, OnDestroy {
   async necesarioParaEmpezar() {
     await this.getCantidadInventario();
     await this.formarFechaFactura(new Date());
-    await this.getArticulos(obj_paginate);
+    await this.getArticulos(this.tServ.obj_paginate);
     await this.calcularGananciasCostos();
   }
 
   async getCantidadInventario() {
     try {
-      const res = await this.dbServ.getCantidadInventario().toPromise()
-      this.cant_inventario=res.count
+      const res = await this.dbServ.getCantidadInventario().toPromise();
+      this.cant_inventario = res.count;
     } catch (error) {
-      this.dbServ.toastError('Error buscando la cantidad de articulos en inventario.', 'ERROR')
+      this.dbServ.toastError('Error buscando la cantidad de articulos en inventario.', 'ERROR');
     }
   }
 
@@ -173,9 +175,9 @@ export class InventarioComponent implements OnInit, OnDestroy {
   }
 
   filtrarArticulos() {
-    obj_paginate['searchText'] = this.palabra_buscar;
+    this.tServ.obj_paginate['searchText'] = this.palabra_buscar;
 
-    this.getArticulos(obj_paginate);
+    this.getArticulos(this.tServ.obj_paginate);
     this.calcularGananciasCostos();
   }
 
@@ -205,7 +207,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
     if (arg.bool) {
       const temp = JSON.parse(JSON.stringify(this.listaArticulos));
 
-      this.getArticulos(obj_paginate);
+      this.getArticulos(this.tServ.obj_paginate);
       // this.listaArticulos = undefined;
 
       // temp[this.indexSelected] = [];

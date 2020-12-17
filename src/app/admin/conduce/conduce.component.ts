@@ -7,7 +7,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { TablasService, obj_paginate } from '../components/tablas/tablas.service';
+import { TablasService } from '../components/tablas/tablas.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { FunctionService } from '../../core/services/functions.service';
 
@@ -38,8 +38,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   sacos = [25, 50, 100];
 
   TOTAL: number;
-
-  obj_paginate_ = obj_paginate;
 
   subDeci: Subscription;
   subObj: Subscription;
@@ -229,8 +227,9 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   async procesoQuitarArticulo() {
     await this.removeItem(this.indexRemove);
     await this.disminuirSecuencia();
-    await this.chequearExcede();
+    // await this.chequearExcede();
   }
+
   async chequearExcede() {
     for (let i = 0; i < this.control.value.length; i++) {
       const element = this.control.value[i];
@@ -277,54 +276,102 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
 
     if (input === 'uni-') {
       if (cantidad !== '' && cantidad !== '0' && cantidad !== 0 && cantidad !== null && codigo !== '' && codigo !== null && codigo !== undefined) {
-        let excede = false;
-        if (unidad && unidad !== '') {
-          excede = await this.checkCantidadExede(i, 'change');
-        }
-
-        if (!excede) {
-          if (detalle_factura_id) {
-            GLOBAL.enfocarInput('cod-' + (index + 1));
-          } else {
-            const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [], fecha_articulo: this.FechaConduce };
-            this.filtrarArticulo(obj, true, sigInput);
-            setTimeout(() => {
-              GLOBAL.enfocarInput('uni-' + index);
-            }, 100);
-          }
-        } else {
-          GLOBAL.enfocarInput('can-' + index);
-          GLOBAL.selectContenido('can-' + index);
-          if (!detalle_factura_id) {
+        this.checkCantidadExede(i, 'change', (res) => {
+          if (res) {
+            GLOBAL.enfocarInput('can-' + index);
+            GLOBAL.selectContenido('can-' + index);
             setTimeout(() => {
               (this.control.controls[index] as any).controls['uni'].setValue(null);
             }, 2);
+          } else {
+            if (detalle_factura_id) {
+              const sig_detalle_factura_id = (this.control.controls[index + 1] as any).controls['detalle_factura_id'].value;
+
+              if (sig_detalle_factura_id) {
+                GLOBAL.enfocarInput('can-' + (index + 1));
+              } else {
+                GLOBAL.enfocarInput('cod-' + (index + 1));
+              }
+            } else {
+              GLOBAL.enfocarInput('uni-' + index);
+            }
           }
-        }
+        });
       }
     }
+
+    // if (input === 'uni-') {
+    //   if (cantidad !== '' && cantidad !== '0' && cantidad !== 0 && cantidad !== null && codigo !== '' && codigo !== null && codigo !== undefined) {
+    //     let excede = false;
+    //     if (unidad && unidad !== '') {
+    //       this.checkCantidadExede(i, 'change',res=>);
+    //     }
+
+    //     if (!excede) {
+
+    //     } else {
+    //       GLOBAL.enfocarInput('can-' + index);
+    //       GLOBAL.selectContenido('can-' + index);
+    //       if (!detalle_factura_id) {
+    //         setTimeout(() => {
+    //           (this.control.controls[index] as any).controls['uni'].setValue(null);
+    //         }, 2);
+    //       }
+    //     }
+    //   }
+    // }
 
     if (input === 'cod-') {
       index++;
-      const excede = await this.checkCantidadExede(i, 'saltar');
 
-      if (!excede) {
-        if (unidad === '' || unidad === null) {
+      this.checkCantidadExede(i, 'saltar', (res) => {
+        if (res) {
+          GLOBAL.enfocarInput('can-' + i);
+          GLOBAL.selectContenido('can-' + i);
           setTimeout(() => {
-            GLOBAL.enfocarInput('uni-' + i);
-          }, 5);
+            (this.control.controls[i] as any).controls['uni'].setValue(null);
+          }, 2);
         } else {
-          this.aumentarSecuencia();
-          GLOBAL.enfocarInput('cod-' + index);
+          if (unidad === '' || unidad === null) {
+            setTimeout(() => {
+              GLOBAL.enfocarInput('uni-' + i);
+            }, 5);
+          } else {
+            this.aumentarSecuencia();
+            const sig_detalle_factura_id = (this.control.controls[index] as any).controls['detalle_factura_id'].value;
+
+            if (sig_detalle_factura_id) {
+              GLOBAL.enfocarInput('can-' + index);
+            } else {
+              GLOBAL.enfocarInput('cod-' + index);
+            }
+          }
         }
-      } else {
-        GLOBAL.enfocarInput('can-' + i);
-        GLOBAL.selectContenido('can-' + i);
-        setTimeout(() => {
-          (this.control.controls[i] as any).controls['uni'].setValue(null);
-        }, 2);
-      }
+      });
     }
+
+    //
+    // if (input === 'cod-') {
+    //   index++;
+    //   this.checkCantidadExede(i, 'saltar', (res) => {
+    //     if (res) {
+    //       GLOBAL.enfocarInput('can-' + i);
+    //       GLOBAL.selectContenido('can-' + i);
+    //       setTimeout(() => {
+    //         (this.control.controls[i] as any).controls['uni'].setValue(null);
+    //       }, 2);
+    //     } else {
+    //       if (unidad === '' || unidad === null) {
+    //         setTimeout(() => {
+    //           GLOBAL.enfocarInput('uni-' + i);
+    //         }, 5);
+    //       } else {
+    //         this.aumentarSecuencia();
+    //         GLOBAL.enfocarInput('cod-' + index);
+    //       }
+    //     }
+    //   });
+    // }
   }
 
   LLenarRowDespuesDeFiltro(obj) {
@@ -487,14 +534,11 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   }
 
   // =============================================
-  async checkCantidadExede(i, lugar, art = '') {
+  async checkCantidadExede(i, lugar, callback = (arg) => {}) {
     let cantidad = 0;
     const descripcion = (this.control.controls[i] as any).controls['des'].value;
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
-
-    this.rowsExcede = _.difference(this.rowsExcede, [i]);
     let articulo;
-
     try {
       articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaConduce, 'todos').toPromise();
     } catch (error) {}
@@ -504,29 +548,28 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       if (cod === null || cod === undefined || cod === '' || cod === ' ') {
         break;
       }
-      let cantidad_en_turno = 0;
-      let unidad_en_turno = '';
+      let cantidadF = 0;
+      let unidadF = '';
 
-      cantidad_en_turno = (this.control.controls[index] as any).controls['can'].value;
-      unidad_en_turno = (this.control.controls[index] as any).controls['uni'].value;
+      cantidadF = (this.control.controls[index] as any).controls['can'].value;
+      unidadF = (this.control.controls[index] as any).controls['uni'].value;
 
-      const splitUnidadF = _.split(unidad_en_turno, ' ');
+      const splitUnidadF = _.split(unidadF, ' ');
       let unity = splitUnidadF[0];
-
       const FindProd = (this.control.controls[index] as any).controls['des'].value;
 
       if (FindProd === descripcion) {
         if (unity === 'Saco' || unity === 'Libra') {
           if (splitUnidadF.length > 1) {
-            cantidad_en_turno = cantidad_en_turno * _.parseInt(splitUnidadF[2]);
+            cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
           }
         }
         if (unity === 'Saco') {
           unity = 'Libra';
         }
 
-        cantidad_en_turno *= articulo.contenido[unity];
-        cantidad += cantidad_en_turno;
+        cantidadF *= articulo.contenido[unity];
+        cantidad += cantidadF;
       }
     }
 
@@ -538,15 +581,12 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();
 
       if (res.excede) {
-        if (art) {
-          this.dbServ.toastError('Cantidad de ' + art + ' introducida excede la cantidad en inventario, favor de cambiar la cantidad', 'ERROR', true);
-        } else {
-          this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR', true);
-        }
-
-        return true;
+        this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR', true);
+        callback(true);
+        // return true;
       } else {
-        return false;
+        callback(false);
+        // return false;
       }
     } catch (error) {
       if (error.error) {
@@ -554,6 +594,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
       } else {
         this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
+      callback(false);
     }
   }
 
@@ -592,17 +633,17 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     });
     const unidad = this.UnidadesArticulo[indiceDetalle].value;
 
-    const execede = await this.checkCantidadExede(i, 'change');
-
-    if (!execede) {
-      (this.control.controls[i] as any).controls['uni'].setValue(unidad);
-    } else {
-      GLOBAL.enfocarInput('can-' + i);
-      GLOBAL.selectContenido('can-' + i);
-      setTimeout(() => {
-        (this.control.controls[i] as any).controls['uni'].setValue(null);
-      }, 250);
-    }
+    this.checkCantidadExede(i, 'change', (res) => {
+      if (res) {
+        GLOBAL.enfocarInput('can-' + i);
+        GLOBAL.selectContenido('can-' + i);
+        setTimeout(() => {
+          (this.control.controls[i] as any).controls['uni'].setValue(null);
+        }, 250);
+      } else {
+        (this.control.controls[i] as any).controls['uni'].setValue(unidad);
+      }
+    });
   }
 
   async calculateCantidadEnUnidades(i) {
@@ -690,7 +731,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   async BuscarFacturasAdelantadas(id) {
     try {
       this.facturas_adelantadas = await this.dbServ
-        .getFacturasByParams('1', id, 0, true)
+        .getFacturasByParams('1', id, 0, true, 0, 0, false)
         .pipe(
           map(
             (fact) =>
@@ -859,10 +900,26 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
         }
       }
     }
+    const sig_detalle_factura_id = (this.control.controls[0] as any).controls['detalle_factura_id'].value;
+
+    if (sig_detalle_factura_id) {
+      GLOBAL.enfocarInput('can-0');
+    } else {
+      GLOBAL.enfocarInput('cod-0');
+    }
   }
 
   verSiExcede(i) {
     return this.rowsExcede.includes(i);
+  }
+
+  disableCamposFactAdelantadas(i) {
+    let res = false;
+    const detalle_factura_id = (this.control.controls[i] as any).controls['detalle_factura_id'].value;
+    if (detalle_factura_id) {
+      res = true;
+    }
+    return res;
   }
 
   async llenarFila(element, i) {
@@ -894,11 +951,11 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     (this.control.controls[i] as any).controls['uni'].disable();
 
     setTimeout(async () => {
-      const excede = await this.checkCantidadExede(i, 'change', element.articulo);
-
-      if (excede) {
-        this.rowsExcede.push(i);
-      }
+      this.checkCantidadExede(i, 'change', (res) => {
+        if (res) {
+          this.rowsExcede.push(i);
+        }
+      });
     }, 100);
     this.aumentarSecuencia();
   }
@@ -965,11 +1022,11 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
           cantidad_en_unidades: control.controls['cantidad_en_unidades'].value,
           unidad: unidad_,
         });
-        const excede = await this.checkCantidadExede(i, 'change', control.articulo.nombre);
-
-        if (excede && res) {
-          res = false;
-        }
+        this.checkCantidadExede(i, 'change', (res) => {
+          if (res) {
+            res = false;
+          }
+        });
       } else {
         break;
       }

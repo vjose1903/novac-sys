@@ -8,7 +8,7 @@ import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { ModalService } from '../../components/modal/modal.service';
-import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/tablas/tablas.service';
 import { IpcService } from '../../../core/services/ipc.service';
 @Component({
   selector: 'app-buscar-factura',
@@ -36,6 +36,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   sub: Subscription;
   subDeci: Subscription;
   subEsc: Subscription;
+  valor: any;
 
   constructor(
     private dbServ: DBservice,
@@ -120,8 +121,6 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   ];
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
-  obj_paginate_ = obj_paginate;
-
   ngOnInit() {
     this.BuscarPara = this.route.snapshot.params['para'];
     if (this.BuscarPara === 'nota_credito') {
@@ -142,7 +141,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       if (res && res.tipo_modal === 'buscarCliente') {
         this.clienteBuscado = res.data;
         (document.getElementById('valorI') as any).value = res.data.nombre;
-        this.pedirFacturaModal('1', res.data.id);
+        this.pedirFactura('1', res.data.id, this.tServ.obj_paginate);
         this.mServ.ModalObj(undefined);
       }
     });
@@ -320,88 +319,67 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     return fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
   }
 
-  async pedirFactura(campo, valor) {
-    try {
-      this.facturas = undefined;
-      const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id).toPromise();
-
-      for (let i = 0; i < busqueda.length; i++) {
-        const factura = busqueda[i];
-        for (let j = 0; j < factura.detalle_facturas.length; j++) {
-          let detalle = factura.detalle_facturas[j];
-
-          detalle = await this.calcularPrecio(detalle, factura);
-        }
-      }
-
-      this.facturas = GLOBAL.duplicarJson(busqueda);
-
-      if (this.facturas.length > 0) {
-        this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
-        this.facturaSelected = this.facturas[0];
-        this.abrirModal(this.facturas[0], 'mostrarFactura');
-      } else {
-        this.dbServ.toastError('La factura buscada no existe', 'ERROR', true);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  async pedirFacturaModal(campo, valor) {
+  async pedirFactura(campo, valor, e) {
     try {
       const fechaA = moment().format('YYYY-MM-DD');
-      this.facturas = undefined;
+      // this.facturas = undefined;
+      const page = e.page;
+      const per_page = e.per_page;
+      const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id, false, page, per_page, true).toPromise();
 
-      const busqueda = await this.dbServ
-        .getFacturasByParams(campo, valor, this.tipo_factura_id)
-        .pipe(
-          map(
-            (fact) =>
-              (fact = fact.map((val) => {
-                val.secuencia = _.padStart(val.numero_factura, 8, '0');
-                val.fecha = moment(val.fecha_equivalente).format('DD/MM/YYYY');
-                val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD/MM/YYYY') : '';
-                val.pagoT = true;
-                val.estatus = val.estado ? 'fas fa-check' : 'fas fa-times';
-                val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
-                val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
-                val.colorEstado = val.estado ? 'green' : 'red';
-                val.selectColor = 'gris-claro';
-                val.select = 'far fa-eye-slash';
+      busqueda['data'].map((fact) => {
+        fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
+        fact.fecha = moment(fact.fecha_equivalente).format('DD/MM/YYYY');
+        fact.fechaV = moment(fact.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
+        fact.pagoT = true;
+        fact.estatus = fact.estado ? 'fas fa-check' : 'fas fa-times';
+        fact.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(fact.balance));
+        fact.pago_a_tiempo = fact.fecha_vencimiento > fechaA ? true : false;
+        fact.colorEstado = fact.estado ? 'green' : 'red';
+        fact.selectColor = 'gris-claro';
+        fact.select = 'far fa-eye-slash';
 
-                val.iconsMoveEvents = [{ key: 'select', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
-                // val.customStyles = [{ select: { estilos: [{ 'font-size': '1.5rem' }] } }, { 'td-estatus': { estilos: [{ width: '2rem' }] } }];
-                val.customStyles = {
-                  'td-select': { 'font-size': '1.5rem' },
-                  'td-condicion': { width: '6rem' },
-                  'td-secuencia': { width: '7rem' },
-                  'td-numero_comprobante': { width: '7rem' },
-                  'td-estatus': { width: '2rem' },
-                };
+        fact.iconsMoveEvents = [{ key: 'select', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
+        // fact.customStyles = [{ select: { estilos: [{ 'font-size': '1.5rem' }] } }, { 'td-estatus': { estilos: [{ width: '2rem' }] } }];
+        fact.customStyles = {
+          'td-select': { 'font-size': '1.5rem' },
+          'td-condicion': { width: '6rem' },
+          'td-secuencia': { width: '7rem' },
+          'td-numero_comprobante': { width: '7rem' },
+          'td-estatus': { width: '2rem' },
+        };
 
-                return val;
-              })),
-          ),
-        )
-        .toPromise();
+        return fact;
+      });
+
       if (campo !== '4') {
-        busqueda.sort((a, b) => {
+        busqueda['data'].sort((a, b) => {
           return a.id > b.id ? 1 : -1;
         });
       }
 
-      for (let i = 0; i < busqueda.length; i++) {
-        const factura = busqueda[i];
-        for (let j = 0; j < factura.detalle_facturas.length; j++) {
-          let detalle = factura.detalle_facturas[j];
+      // for (let i = 0; i < busqueda['data'].length; i++) {
+      //   const factura = busqueda['data'][i];
+      //   for (let j = 0; j < factura.detalle_facturas.length; j++) {
+      //     let detalle = factura.detalle_facturas[j];
 
-          detalle = await this.calcularPrecio(detalle, factura);
+      //     detalle = await this.calcularPrecio(detalle, factura);
+      //   }
+      // }
+      const obj = {
+        total: busqueda.total_registros,
+        tabla: 'facturas_parms',
+      };
+      this.tServ.Func_total_paginas(obj);
+      this.facturas = GLOBAL.duplicarJson(busqueda['data']);
+
+      if (this.facturas.length > 0) {
+        if (this.campo === '2') {
+          this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
+          this.facturaSelected = this.facturas[0];
+          this.abrirModal(this.facturas[0], 'mostrarFactura');
         }
-      }
-
-      this.facturas = GLOBAL.duplicarJson(busqueda);
-
-      if (this.facturas.length === 0) {
+      } else {
         if (this.campo === '1') {
           if (this.tipo_factura_id === '0') {
             this.dbServ.toastError('Este cliente no tiene facturas a credito a su nombre', 'ERROR', true);
@@ -409,7 +387,9 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
             this.dbServ.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR', true);
           }
         } else if (this.campo === '3') {
-          this.dbServ.toastError('No existen facturas con este numero.', 'ERROR', true);
+          this.dbServ.toastError('No existen facturas con este número.', 'ERROR', true);
+        } else if (this.campo === '2') {
+          this.dbServ.toastError('La factura buscada no existe', 'ERROR', true);
         }
       }
     } catch (error) {
@@ -447,9 +427,15 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
       this.placeHolder = 'Escriba numero de factura';
     } else if (valor === '4') {
       this.tipo_factura_id = '0';
-      this.pedirFacturaModal(this.campo, '0');
+      this.valor = '0';
+      this.pedirFactura(this.campo, '0', this.tServ.obj_paginate);
     }
   }
+
+  changePaginate(arg) {
+    this.pedirFactura(this.campo, this.valor, arg);
+  }
+
   abilitarBtns() {
     let res = true;
     if (this.facturaSelected) {
@@ -517,6 +503,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
   }
   saltar(campo, valor) {
     if (valor && this.campo) {
+      this.valor = valor;
       if (campo === 'cliente') {
         if (valor || valor === ' ') {
           this.abrirModalFiltro(valor);
@@ -529,15 +516,15 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
           valor = valor.toUpperCase();
           this.NCF = valor;
           if (this.validarRayaAbajo()) {
-            this.pedirFactura(this.campo, valor);
+            this.pedirFactura(this.campo, valor, this.tServ.obj_paginate);
           } else {
             this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso');
           }
         } else {
           if (this.tipo_factura_id === '0') {
-            this.pedirFacturaModal(this.campo, valor);
+            this.pedirFactura(this.campo, valor, this.tServ.obj_paginate);
           } else {
-            this.pedirFactura(this.campo, valor);
+            this.pedirFactura(this.campo, valor, this.tServ.obj_paginate);
           }
         }
       } else {

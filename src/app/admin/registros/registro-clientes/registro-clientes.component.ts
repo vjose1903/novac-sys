@@ -9,7 +9,7 @@ import { ValidateRayaAbajo } from '../../../directives/validaciones';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
-import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
+import {  TablasService } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -53,7 +53,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   vendedores;
   subDeci: Subscription;
 
-  obj_paginate_ = obj_paginate;
 
   constructor(
     private dbServ: DBservice,
@@ -99,7 +98,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   }
 
   necesarioStart() {
-    this.getClientes(this.obj_paginate_);
+    this.getClientes(this.tServ.obj_paginate);
     this.getVendedores();
   }
 
@@ -377,7 +376,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
             this.dbServ.createCliente(obj).subscribe(
               (res) => {
                 this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
-                this.getClientes(obj_paginate);
+                this.getClientes(this.tServ.obj_paginate);
                 this.borrar();
 
                 this.enfocarInput('campoNombre');
@@ -390,7 +389,7 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
             obj.cuenta = 0;
             this.dbServ.editarCliente(obj).subscribe(
               (res) => {
-                this.getClientes(obj_paginate);
+                this.getClientes(this.tServ.obj_paginate);
                 this.enfocarInput('campoNombre');
                 this.borrar();
               },

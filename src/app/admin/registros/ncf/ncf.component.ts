@@ -11,7 +11,7 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as moment from 'moment';
 import * as dateFormat from 'dateFormat';
 import { ModalService } from '../../components/modal/modal.service';
-import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-ncf',
@@ -92,7 +92,7 @@ export class NcfComponent implements OnInit, OnDestroy {
 
   is_editando = false;
   ncfSelected;
-  obj_paginate_ = obj_paginate;
+
   desdeAlert = false;
   hastaAlert = false;
   constructor(
@@ -165,7 +165,7 @@ export class NcfComponent implements OnInit, OnDestroy {
 
   async necesarioStart() {
     await this.getTiposFacturas();
-    await this.getPaquetesNCF(this.obj_paginate_);
+    await this.getPaquetesNCF(this.tServ.obj_paginate);
   }
 
   async getTiposFacturas() {
@@ -273,7 +273,7 @@ export class NcfComponent implements OnInit, OnDestroy {
     try {
       const res = await this.dbServ.PaqueteNCF(obj).toPromise();
 
-      this.getPaquetesNCF(obj_paginate);
+      this.getPaquetesNCF(this.tServ.obj_paginate);
       if (this.is_editando) {
         this.dbServ.toastSuccess('Comprobante editado', 'CORRECTO');
       } else {
@@ -350,7 +350,10 @@ export class NcfComponent implements OnInit, OnDestroy {
     if (arg && this.seleccionModal) {
       this.dbServ.deleteNCF(this.seleccionModal.id).subscribe(
         (res) => {
-          this.dbServ.toastSuccess('comprobante para ' + this.seleccionModal.tipoC + ' numero: ' + this.seleccionModal.codigo + ' borrado', 'CORRECTO');
+          this.dbServ.toastSuccess(
+            'comprobante para ' + this.seleccionModal.tipoC + ' numero: ' + this.seleccionModal.codigo + ' borrado',
+            'CORRECTO',
+          );
           _.pullAt(this.listaNCF, this.indexSelected);
           this.tipoModal = '';
         },

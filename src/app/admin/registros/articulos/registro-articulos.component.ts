@@ -8,7 +8,7 @@ import { map } from 'rxjs/operators';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
-import { obj_paginate, TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/tablas/tablas.service';
 import { FunctionService } from '../../../core/services/functions.service';
 import { LoaderService } from '../../../loader/loader.service';
 
@@ -85,7 +85,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   ProductoEditando: any;
   clickBtnRe = false;
   subDeci: Subscription;
-  obj_paginate_ = obj_paginate;
+
   vendido_en: any;
   listaMateriasPrimas = [];
   vendidoEn = [
@@ -132,7 +132,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
 
   async necesarioStart() {
     await this.formarFechaFactura(new Date());
-    await this.getArticulos(this.obj_paginate_);
+    await this.getArticulos(this.tServ.obj_paginate);
     this.getTipoArticulos();
   }
 
@@ -205,14 +205,19 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
   async selectTipoArticulo(tipo) {
     const Tipo = this.listaTipoArticulos.filter((val) => val.id === _.parseInt(tipo));
     this.TIPOARTICULO = Tipo[0].descripcion;
+    const tipo_check = _.lowerCase(this.TIPOARTICULO);
 
-    if (_.lowerCase(this.TIPOARTICULO) === 'materia prima') {
+    if (tipo_check === 'materia prima') {
       this.form.controls.is_materia_prima.setValue(true);
     } else {
       this.form.controls.is_materia_prima.setValue(this.ProductoEditando ? this.ProductoEditando.is_materia_prima : false);
     }
 
-    if (_.lowerCase(this.TIPOARTICULO) === 'producto terminado') {
+    if (tipo_check !== 'producto terminado' && tipo_check !== 'materia prima') {
+      this.form.controls.calcular_saco.setValue(false);
+    }
+
+    if (tipo_check === 'producto terminado') {
       await this.getMateriasP((res) => {
         this.addItem();
         this.COMPRADOEN = undefined;

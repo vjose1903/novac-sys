@@ -107,7 +107,7 @@ export class DBservice {
   // =====================================================================
 
   createCuadreCaja() {
-    return this.peticion('cuadre_cajas', 'get');
+    return this.peticion('cuadre_cajas/custom/nuevo', 'post', JSON.stringify({}));
   }
 
   makeReportes(tipo, params) {
@@ -145,8 +145,8 @@ export class DBservice {
     return this.peticion('cabecera_facturas', 'get');
   }
 
-  getFacturaById(id) {
-    return this.peticion(`cabecera_facturas/${id}`, 'get');
+  getFacturaById(id, params = '') {
+    return this.peticion(`cabecera_facturas/${id}${params}`, 'get');
   }
 
   // =====================================================================
@@ -364,21 +364,36 @@ export class DBservice {
   }
 
   // =====================================================================
+  // NOTAS
+  // =====================================================================
+
+  getCantidadDevuelto(aplicadaA) {
+    return this.peticion(`cabecera_facturas/custom/get_cantidad_devuelto/${aplicadaA}`, 'get');
+  }
+
+  // =====================================================================
   // FACTURAS
   // =====================================================================
+
   getTiposFacturas() {
     return this.peticion('tipo_facturas', 'get');
   }
+
   getSecuenciaFacturas() {
     return this.peticion('secuencia_facturas', 'get');
   }
-  getFacturasByClienteIdAndPagada(cliente_id, pagada) {
-    return this.peticion(`cabecera_facturas/cliente/${cliente_id}/pagada/${pagada}`, 'get');
+
+  getFacturasByClienteIdAndPagada(cliente_id, pagada, page, per_page, paginado) {
+    return this.peticion(`cabecera_facturas/cliente/${cliente_id}/pagada/${pagada}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
-  getFacturasByParams(campo, valor, tipo_factura_id, adelantada = false) {
+
+  getFacturasByParams(campo, valor, tipo_factura_id, adelantada = false, page, per_page, paginado) {
     const valor_enc = btoa(valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
-    return this.peticion(`cabecera_facturas/params/${campo}/${VALOR_ENC}/${tipo_factura_id}/${adelantada}`, 'get');
+    return this.peticion(
+      `cabecera_facturas/params/${campo}/${VALOR_ENC}/${tipo_factura_id}/${adelantada}?page=${page}&per_page=${per_page}&paginado=${paginado}`,
+      'get',
+    );
   }
   cancelarFactura(id) {
     return this.peticion(`cabecera_facturas/anular_factura/${id}`, 'post', JSON.stringify({}));

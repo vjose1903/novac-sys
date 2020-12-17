@@ -9,7 +9,7 @@ import { map } from 'rxjs/operators';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
-import { obj_paginate } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-registro-vehiculo',
@@ -39,7 +39,14 @@ export class RegistroVehiculoComponent implements OnInit {
   listaModelos: any;
   vehiculoEditando: any;
 
-  constructor(private dbServ: DBservice, private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private mServ: ModalService) {}
+  constructor(
+    private dbServ: DBservice,
+    private cdRef: ChangeDetectorRef,
+    private fb: FormBuilder,
+    private router: Router,
+    private mServ: ModalService,
+    private tServ: TablasService,
+  ) {}
 
   ngOnInit() {
     this.createForm();
@@ -63,7 +70,7 @@ export class RegistroVehiculoComponent implements OnInit {
   }
 
   async necesarioStart() {
-    await this.getVehiculos(obj_paginate);
+    await this.getVehiculos(this.tServ.obj_paginate);
     await this.getPropietarios();
     await this.getMarcas();
   }
@@ -245,7 +252,7 @@ export class RegistroVehiculoComponent implements OnInit {
       this.dbServ.eliminarVehiculo(obj).subscribe(
         (res) => {
           this.dbServ.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
-          this.getVehiculos(obj_paginate);
+          this.getVehiculos(this.tServ.obj_paginate);
           this.tipoModal = '';
           // this.decisionModal = null;
           this.borrar();
@@ -296,7 +303,7 @@ export class RegistroVehiculoComponent implements OnInit {
         this.dbServ.toastSuccess('Vehiculo registrado con exito.', 'Correcto');
       }
       this.borrar();
-      this.getVehiculos(obj_paginate);
+      this.getVehiculos(this.tServ.obj_paginate);
     } catch (error) {
       this.dbServ.toastError(msg_error, 'ERROR', true);
     }

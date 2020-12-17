@@ -9,7 +9,12 @@ var environment_js_1 = require("../src/environments/environment.js");
 function getPageMargin(data) {
     var margins = [];
     if (data.condicion === 'Contado') {
-        margins = [0, 161, 0, 30];
+        if (data.aplicada_a) {
+            margins = [0, 165, 0, 30];
+        }
+        else {
+            margins = [0, 161, 0, 30];
+        }
     }
     else {
         margins = [0, 168, 0, 30];

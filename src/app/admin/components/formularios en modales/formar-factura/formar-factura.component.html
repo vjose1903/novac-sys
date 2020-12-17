@@ -73,10 +73,10 @@
       <table class="table" mdbTable small="true">
         <thead class="">
           <tr>
-            <th>#</th>
-            <th>Articulo</th>
+            <th style="width: 3rem">#</th>
+            <th style="width: 27rem">Articulo</th>
             <th class="text-right">Cantidad</th>
-            <th class="text-right">Unidad</th>
+            <th style="width: 5rem" class="text-right">Unidad</th>
             <th class="text-right">{{ factura.tipo === 'compra' ? 'Costo' : 'Precio' }}</th>
             <th class="text-right">Itbis</th>
             <th class="text-right">Total</th>
@@ -84,13 +84,13 @@
         </thead>
         <tbody [ngStyle]="{ 'max-height': '22rem' }">
           <tr *ngFor="let row of factura.detalle_facturas; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>
-              {{ row.descripcion }} ({{ row.calcular_saco }})
-              <span *ngIf="!row.calcular_saco"> * </span>
+            <td style="width: 3rem">{{ i + 1 }}</td>
+            <td style="width: 27rem">
+              {{ row.descripcion }}
+              <!-- <span *ngIf="row.se_calcula_saco && !row.calcular_saco"> * </span> -->
             </td>
             <td class="text-right">{{ formatoNumero(row.cantidad) }}</td>
-            <td class="text-right">{{ row.unidad }}</td>
+            <td style="width: 5rem" class="text-right">{{ row.unidad }}</td>
             <td class="text-right">{{ factura.tipo === 'compra' ? formatoNumero(row.costo) : formatoNumero(row.precio) }}</td>
             <td class="text-right">{{ formatoNumero(row.itbis) }}</td>
             <td class="text-right">{{ formatoNumero(row.total) }}</td>

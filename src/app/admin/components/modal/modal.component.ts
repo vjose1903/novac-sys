@@ -2,7 +2,7 @@ import { Component, OnInit, Input, OnChanges, OnDestroy, HostListener, ViewChild
 import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { TablasService, obj_paginate } from '../tablas/tablas.service';
+import { TablasService } from '../tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 
@@ -157,13 +157,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         // }
 
         if (this.tipoModal === 'buscarArticulo') {
-          this.renovarDataFiltros(obj_paginate, this.paraFiltroArticulos, this.fecha_articulo);
+          this.renovarDataFiltros(this.tServ.obj_paginate, this.paraFiltroArticulos, this.fecha_articulo);
         } else if (this.tipoModal === 'buscarCliente') {
           this.tituloModal = 'Buscar cliente';
-          this.renovarDataFiltros(obj_paginate, this.paraFiltroClientes, this.fecha_articulo);
+          this.renovarDataFiltros(this.tServ.obj_paginate, this.paraFiltroClientes, this.fecha_articulo);
         } else {
           this.tituloModal = 'Buscar suplidor';
-          this.renovarDataFiltros(obj_paginate, this.paraFiltroSuplidor, this.fecha_articulo);
+          this.renovarDataFiltros(this.tServ.obj_paginate, this.paraFiltroSuplidor, this.fecha_articulo);
         }
 
         if (this.tipoModal === 'mostrarFactura' && res) {

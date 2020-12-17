@@ -17,7 +17,10 @@
         <ng-container *ngIf="data">
           <tr
             mdbTableCol
-            *ngFor="let dato of data | paginate: { id: id_tabla, itemsPerPage: mostrar, currentPage: pagActual, totalItems: total_registros }; index as i"
+            *ngFor="
+              let dato of data | paginate: { id: id_tabla, itemsPerPage: mostrar, currentPage: pagActual, totalItems: total_registros };
+              index as i
+            "
             class="text-center"
             id="{{ ROW }}{{ i }}"
             [ngClass]="{
@@ -31,7 +34,7 @@
             #RowElement
             (click)="clickROW(dato)"
           >
-            <td *ngFor="let column of info; let j = index" class="tableTD" id="td-{{ column.key }}-{{ i }}" [ngStyle]="getStyle(column.key , i )">
+            <td *ngFor="let column of info; let j = index" class="tableTD" id="td-{{ column.key }}-{{ i }}" [ngStyle]="getStyle(column.key, i)">
               <span
                 id="{{ column.key }}-{{ i }}"
                 *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero"
@@ -66,7 +69,9 @@
                 <i
                   id="{{ column.key }}-{{ i }}"
                   (click)="iconBtn(column.key, i)"
-                  class="{{ dato[column.key] }} {{ dato.iconHover ? 'c-pointer' : '' }}   text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
+                  class="{{ dato[column.key] }} {{ dato.iconHover ? 'c-pointer' : '' }}   text-{{
+                    column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black'
+                  }}"
                   (mouseenter)="mouseMoveEvent('hover', dato, column.key, $event.target.id)"
                   (mouseleave)="mouseMoveEvent('leave', dato, column.key, $event.target.id)"
                 ></i>
@@ -82,7 +87,13 @@
 
               <span *ngIf="!column.isIcon && column.tipo === 'check' && column.tipo !== 'input'">
                 <div class="from-group">
-                  <input class="apple-switch ml-2" [disabled]="disabledInput(column.disable, i)" type="checkbox" (change)="changeValorCheck(column.key, i)" [checked]="dato[column.key]" />
+                  <input
+                    class="apple-switch"
+                    [disabled]="disabledInput(column.disable, i)"
+                    type="checkbox"
+                    (change)="changeValorCheck(column.key, i)"
+                    [checked]="dato[column.key]"
+                  />
                   <span class="ml-2 subirLabelCheck">{{ column.title }}</span>
                 </div>
               </span>
@@ -117,7 +128,14 @@
             </td>
 
             <td id="td-acciones-{{ i }}" class="btnAccion tableTD" *ngIf="botones.titulo">
-              <app-btnacciones [row]="dato" [i]="i" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
+              <app-btnacciones
+                [row]="dato"
+                [i]="i"
+                [data]="data"
+                [botones]="botones"
+                (deleteBTN)="delete($event)"
+                (DevolverInfoBTN)="devolverInfo($event)"
+              ></app-btnacciones>
             </td>
           </tr>
         </ng-container>
@@ -125,13 +143,20 @@
       <tfoot class="grey lighten-5 w-100"></tfoot>
     </table>
     <div *ngIf="paginate" #paginationDiv class="Pietabla d-flex flex-row-reverse">
-      <pagination-controls nextLabel="Siguiente" previousLabel="Anterior" class="my-pagination mr-3" maxSize="5" [id]="id_tabla" (pageChange)="pageChange($event)"></pagination-controls>
+      <pagination-controls
+        nextLabel="Siguiente"
+        previousLabel="Anterior"
+        class="my-pagination mr-3"
+        maxSize="5"
+        [id]="id_tabla"
+        (pageChange)="pageChange($event)"
+      ></pagination-controls>
 
       <div class="btn-group" dropdown [dropup]="true">
         <button id="button-dropup" dropdownToggle type="button" class="btn btn-peque btn-verde dropdown-toggle" aria-controls="dropdown-dropup">
           {{ mostrar }} reg.<span class="caret"></span>
         </button>
-        <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-dropup">
+        <ul id="dropdown-dropup" class="dropdown-menu dropCantReg" role="menu" aria-labelledby="button-dropup">
           <li *ngFor="let i of listaMostrar" role="menuitem" (click)="cambiaMostrar(i)">
             <a class="dropdown-item"> {{ i }} registros</a>
           </li>

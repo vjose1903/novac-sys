@@ -54,7 +54,8 @@ div.pieFactura {
 div.cuerpoFactura.mb-2 {
   position: absolute;
   width: 100%;
-  height: calc(100% - 30vh);
+  // height: calc(100% - 30vh);
+  height: 32rem;
 }
 
 .numerosCalculos {

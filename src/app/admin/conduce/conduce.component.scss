@@ -7,6 +7,11 @@
     border-color: #d4d4d4 !important;
     box-shadow: 1px 1px #d4d4d4 !important;
   }
+  // &:read-only {
+  //   background-color: #e9ecef !important;
+  //   filter: grayscale(74%);
+  //   opacity: 1 !important;
+  // }
 }
 
 .inputE {
@@ -105,7 +110,6 @@
   outline: 0px;
   border-color: #d4d4d4 !important;
   box-shadow: 1px 1px #d4d4d4 !important;
-  background-color: #e9ecef !important;
 }
 .scrollContainer {
   display: flex;
@@ -137,7 +141,6 @@
   height: calc(100% - 37.2vh) !important;
   transform: translate(0px, -153px);
 }
-
 
 .btnBorrar {
   transition: all 0.3s;
