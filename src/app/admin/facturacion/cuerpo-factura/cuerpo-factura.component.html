@@ -48,7 +48,12 @@
                   <ul class="dropdown-menu" role="menu" id="dropConfigRow">
                     <li *ngIf="metodo === 'venta'" role="menuitem">
                       <div class="from-group my-1 ml-2">
-                        <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, $event)" />
+                        <input
+                          formControlName="calcular_saco"
+                          class="apple-switch ml-2"
+                          type="checkbox"
+                          (click)="CalculoSacos(i, 'select', $event)"
+                        />
                         <span class="ml-2 subirLabelCheck">Calcular saco</span>
                       </div>
                     </li>
@@ -94,7 +99,7 @@
                   <input
                     [readOnly]="!propietario"
                     type="number"
-                    min="0"
+                    min="1"
                     class="form-control entrada"
                     id="can-{{ i }}"
                     (click)="verificarSecuencia(i)"

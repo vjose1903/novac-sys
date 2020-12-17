@@ -215,7 +215,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
   }
 
-  async calcularSacoEnRow(i, row, articulo, callback = (arg) => {}) {
+  async calcularSacoEnRow(i, row, articulo, lugar, callback = (arg) => {}) {
+    console.log('i--> ', i);
+    console.log('row--> ', row);
+    console.log('articulo--> ', articulo);
+    console.log('lugar--> ', lugar);
+
     try {
       const operacion = row.calcular_saco;
       const se_calcula = row.se_calcula_saco;
@@ -247,7 +252,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       } else {
         const precio = calculo;
         (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
-        if (se_calcula) {
+        console.log('lugar ==> ', lugar);
+
+        if (se_calcula || lugar === 'select') {
           (this.control.controls[i] as any).controls['des'].setValue(`${descripcion}*`);
         }
       }
@@ -258,7 +265,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     }
   }
 
-  async CalculoSacos(i, e?) {
+  async CalculoSacos(i, lugar, e?) {
     let articulo;
     try {
       const unidad = (this.control.controls[i] as any).controls['uni'].value;
@@ -274,7 +281,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
           const row = (this.control.controls[i] as any).value;
 
           if (unidad) {
-            this.calcularSacoEnRow(i, row, articulo, (res) => {
+            this.calcularSacoEnRow(i, row, articulo, lugar, (res) => {
               if (res) {
                 this.calcularTotalRow(i);
               }
@@ -424,7 +431,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         // if (row.calcular_saco) {
 
         try {
-          this.calcularSacoEnRow(j, row, articulo, (res) => {
+          this.calcularSacoEnRow(j, row, articulo, 'llenarFact', (res) => {
             if (res) {
               this.calcularTotalRow(j);
             }
@@ -679,7 +686,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
 
         if (this.metodo === 'venta') {
-          this.CalculoSacos(i);
+          this.CalculoSacos(i, 'select', undefined);
         }
         this.calcularTotalRow(i);
       }

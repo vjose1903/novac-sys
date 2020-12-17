@@ -521,28 +521,28 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
 
-    // try {
-    //   const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
+    try {
+      const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
 
-    //   await this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
-    //     if (res.status === 'si') {
-    //       this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
-    //       this.resetVariables();
-    //       this.router.navigateByUrl(`/admin/buscarFactura/${cabecera_fact['tipo']}`);
-    //     } else {
-    //       this.dbServ.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR', true);
-    //     }
-    //   });
+      await this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
+        if (res.status === 'si') {
+          this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
+          this.resetVariables();
+          this.router.navigateByUrl(`/admin/buscarFactura/${cabecera_fact['tipo']}`);
+        } else {
+          this.dbServ.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR', true);
+        }
+      });
 
-    //   res['FACTURA_DE'] = 'nota';
+      res['FACTURA_DE'] = 'nota';
 
-    //   const obj = {
-    //     data: res,
-    //     type: 'facturacion',
-    //   };
-    //   this._ipc.send('print', obj);
-    // } catch (error) {
-    //   this.dbServ.toastError(error.statusText, 'ERROR', true);
-    // }
+      const obj = {
+        data: res,
+        type: 'facturacion',
+      };
+      this._ipc.send('print', obj);
+    } catch (error) {
+      this.dbServ.toastError(error.statusText, 'ERROR', true);
+    }
   }
 }
