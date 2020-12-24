@@ -10,14 +10,14 @@ function getPageMargin(data) {
     var margins = [];
     if (data.condicion === 'Contado') {
         if (data.aplicada_a) {
-            margins = [0, 165, 0, 30];
+            margins = [0, 166, 0, 30];
         }
         else {
-            margins = [0, 161, 0, 30];
+            margins = [0, 162, 0, 30];
         }
     }
     else {
-        margins = [0, 168, 0, 30];
+        margins = [0, 169, 0, 30];
     }
     return margins;
 }

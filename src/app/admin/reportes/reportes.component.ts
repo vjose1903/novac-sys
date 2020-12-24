@@ -141,6 +141,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
         data: res,
         type: 'reporte',
       };
+
       this._ipc.send('print', obj);
     } catch (error) {
       this.dbServ.toastError('Error realizando reporte.', 'ERROR', true);
@@ -168,7 +169,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
         this.tipoModal = 'cuentas_cobrar_cliente';
         this.mServ.modalTipo('buscarCliente');
         obj['data'] = [];
-        obj['filtrarCliente'] = ' ';
+        obj['filtrarCliente'] = '';
         //
       } else if (tipo === 'cuentas_cobrar_ant_saldo') {
         this.titulo_moda_reporte = 'Reporte de CxC por antiguedad de saldos';
