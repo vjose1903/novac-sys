@@ -28,6 +28,10 @@ export class GLOBAL {
     }
   }
   // =========================================================================================================
+  static quitarFocodeElectron() {
+    document.getElementById('foco_angular').click();
+  }
+  // =========================================================================================================
 
   static my_dateFormater(str) {
     const dateObj = new Date(str);

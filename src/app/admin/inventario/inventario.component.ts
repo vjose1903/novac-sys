@@ -9,6 +9,7 @@ import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../components/modal/modal.service';
 import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
+import { IpcService } from '../../core/services/ipc.service';
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
@@ -61,6 +62,8 @@ export class InventarioComponent implements OnInit, OnDestroy {
   subDeci: Subscription;
   palabra_buscar;
   FechaFactura: string;
+  pdfSrc: any;
+  fileName: any;
   constructor(
     private dbServ: DBservice,
     private cdRef: ChangeDetectorRef,
@@ -68,6 +71,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
     private actRou: ActivatedRoute,
     private tServ: TablasService,
     private mServ: ModalService,
+    private _ipc: IpcService,
   ) {}
 
   async ngOnInit() {
@@ -78,10 +82,58 @@ export class InventarioComponent implements OnInit, OnDestroy {
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
+        console.log('this.tipoModal --> ', this.tipoModal);
+        if (this.tipoModal === 'visor_pdf') {
+          res = { bool: res };
+        }
+        console.log('res--> ', res);
         this.decisionModal(res);
         this.mServ.ModalDecision(undefined);
       }
     });
+
+    this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
+      if (res.status === 'si') {
+        let obj;
+
+        this.pdfSrc = res.body;
+        this.fileName = res.file;
+
+        obj = {
+          pdfSrc: res.body,
+          titulo: 'Reporte de inventario',
+          height: '55rem',
+          reimprimir: res.reimprimir,
+          fileName: res.file.split('.')[0],
+        };
+
+        this.abrirModalReporte(obj);
+      } else {
+        this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
+      }
+      setTimeout(() => {
+        GLOBAL.quitarFocodeElectron();
+      }, 5);
+    });
+
+    this._ipc.on('printReporteRes', async (event: Electron.IpcMessageEvent, res) => {
+      if (res.status === 'si') {
+        this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
+      } else {
+        this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
+      }
+      setTimeout(() => {
+        GLOBAL.quitarFocodeElectron();
+      }, 5);
+    });
+  }
+
+  abrirModalReporte(obj) {
+    this.tipoModal = 'visor_pdf';
+    this.mServ.modalTipo('visor_pdf');
+    this.mServ.ModalSeleccion(obj);
+
+    this.mServ.mostrarModal(true);
   }
 
   ngOnDestroy() {
@@ -99,6 +151,25 @@ export class InventarioComponent implements OnInit, OnDestroy {
     await this.formarFechaFactura(new Date());
     await this.getArticulos(this.tServ.obj_paginate);
     await this.calcularGananciasCostos();
+  }
+
+  async makeReporte(data) {
+    let res = {} as any;
+
+    try {
+      const tipo = 'inventario';
+      let params = '';
+
+      res = await this.dbServ.makeReportes(tipo, params).toPromise();
+      const obj = {
+        data: res,
+        type: 'reporte',
+      };
+
+      this._ipc.send('print', obj);
+    } catch (error) {
+      this.dbServ.toastError('Error realizando reporte.', 'ERROR', true);
+    }
   }
 
   async getCantidadInventario() {
@@ -194,6 +265,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
       this.gananciaTotal += precio * cantidad;
     }
   }
+
   movimientoInventario(arg) {
     this.indexSelected = arg.INDEX;
     this.mServ.modalTipo('inventario');
@@ -202,18 +274,39 @@ export class InventarioComponent implements OnInit, OnDestroy {
     this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
-  p() {}
+
+  resetVariables() {
+    this.pdfSrc = undefined;
+    this.fileName = undefined;
+    this.tipoModal = undefined;
+  }
+
   async decisionModal(arg) {
     if (arg.bool) {
-      const temp = JSON.parse(JSON.stringify(this.listaArticulos));
+      console.log('this.tipoModal --> ', this.tipoModal);
 
-      this.getArticulos(this.tServ.obj_paginate);
-      // this.listaArticulos = undefined;
+      if (this.tipoModal === 'visor_pdf') {
+        const obj = {
+          base64: this.pdfSrc,
+          filename: this.fileName,
+        };
 
-      // temp[this.indexSelected] = [];
+        console.log('this.pdfSrc ==> ', this.pdfSrc);
+        console.log('this.fileName ==> ', this.fileName);
 
-      // temp[this.indexSelected] = JSON.parse(JSON.stringify(arg.body));
-      // this.listaArticulos = JSON.parse(JSON.stringify(temp));
+        this._ipc.send('printReporte', obj);
+        this.resetVariables();
+      } else {
+        const temp = JSON.parse(JSON.stringify(this.listaArticulos));
+
+        this.getArticulos(this.tServ.obj_paginate);
+        // this.listaArticulos = undefined;
+
+        // temp[this.indexSelected] = [];
+
+        // temp[this.indexSelected] = JSON.parse(JSON.stringify(arg.body));
+        // this.listaArticulos = JSON.parse(JSON.stringify(temp));
+      }
     }
   }
 }

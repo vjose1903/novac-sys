@@ -18,12 +18,14 @@
   </div>
 
   <div class="p-2 mt-2" style="height: inherit">
-    <div class="col-2">
+    <div>
       <select class="form-control filtroArticulos" [(ngModel)]="filtro" (change)="filtrarArticulos()">
         <option value="0" disabled>Filtro por tipo de articulos</option>
         <option value="todos">Todos</option>
         <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
       </select>
+
+      <i class="fas fa-print btn-print" (click)="makeReporte()" mdbTooltip="Reporte de inventario" placement="right"></i>
     </div>
     <div style="height: 100%">
       <app-tablas
