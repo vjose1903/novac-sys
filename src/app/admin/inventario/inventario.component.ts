@@ -153,7 +153,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
     await this.calcularGananciasCostos();
   }
 
-  async makeReporte(data) {
+  async makeReporte() {
     let res = {} as any;
 
     try {

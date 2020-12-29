@@ -8,6 +8,8 @@ echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 echo.
 echo.
 
+cd "C:\Users\victor vasquez\codigo fuente adm\adm-agroindustrial"
+
 echo "----- borrado de la carpet de la ultima release -----"
 echo "rmdir /s /q "actualizacion" "
 rmdir /s /q "actualizacion"
