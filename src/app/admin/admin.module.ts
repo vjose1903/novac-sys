@@ -51,7 +51,7 @@ import { FormarFacturaComponent } from './components/formularios en modales/form
 import { FormularioMarcaModeloComponent } from './components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
 import { PendienteFormComponent } from './components/formularios en modales/pendiente-form/pendiente-form.component';
 import { FormCantidadEfectivoComponent } from './facturacion/form-cantidad-efectivo/form-cantidad-efectivo.component';
-import { FormVentasComponent } from './reportes/form-ventas/form-ventas.component';
+import { FormVentasComponent } from './reportes/form-reportes/form-reportes.component';
 
 @NgModule({
   declarations: [

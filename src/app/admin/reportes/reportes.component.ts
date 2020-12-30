@@ -134,6 +134,10 @@ export class ReportesComponent implements OnInit, OnDestroy {
         params = `tipo=${data.tipo_}&cliente_id=${data.id ? data.id : 1}`;
         tipo = 'cuentas_cobrar';
         //
+      } else if (this.tipoModal === 'recibos') {
+        params = `desde=${data.desde}&hasta=${data.hasta}&tipo_recibo=${data.tipo}&order=ASC`;
+        tipo = 'recibos';
+        //
       }
 
       res = await this.dbServ.makeReportes(tipo, params).toPromise();
@@ -178,8 +182,12 @@ export class ReportesComponent implements OnInit, OnDestroy {
         this.reporte({ tipo_: 1 });
         this.mServ.modalTipo(undefined);
         //
+      } else if (tipo === 'recibos') {
+        this.titulo_moda_reporte = 'Reporte de recibos de ingreso';
+        //
       }
 
+      obj['tipo'] = 'reportes';
       obj['titulo'] = this.titulo_moda_reporte;
       obj['tipo_reporte'] = tipo;
     }

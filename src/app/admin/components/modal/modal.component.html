@@ -553,10 +553,10 @@
     (onHide)="accion(false)"
   >
     <!-- VENTAS ------------------------------------------------------------------------------------------------------------------------------ -->
-    <app-form-ventas
-      *ngIf="seleccionModal?.tipo_reporte === 'ventas_diarias' || seleccionModal?.tipo_reporte === 'ventas_rango'"
+    <app-form-reportes
+      *ngIf="seleccionModal?.tipo === 'reportes'"
       [tipo_reporte]="seleccionModal?.tipo_reporte"
       (seleccion)="formReporteAccion($event)"
-    ></app-form-ventas>
+    ></app-form-reportes>
   </p-dialog>
 </div>

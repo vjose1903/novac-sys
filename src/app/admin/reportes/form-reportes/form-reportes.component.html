@@ -1,6 +1,7 @@
 <form [formGroup]="form">
   <div class="row">
-    <div *ngIf="tipo_reporte === 'ventas_rango'" class="col-6">
+    <!-- ----- DESDE -----  -->
+    <div *ngIf="tipo_reporte === 'ventas_rango' || tipo_reporte === 'recibos'" class="col-6">
       <label class="control-label">Desde: <span style="color: red">*</span> </label>
       <input
         type="text"
@@ -20,7 +21,8 @@
         Este campo es obligatorio
       </div>
     </div>
-    <div *ngIf="tipo_reporte === 'ventas_rango'" class="col-6">
+    <!-- ----- HASTA -----  -->
+    <div *ngIf="tipo_reporte === 'ventas_rango' || tipo_reporte === 'recibos'" class="col-6">
       <label class="control-label">Hasta: <span style="color: red">*</span> </label>
       <input
         type="text"
@@ -40,10 +42,22 @@
         Este campo es obligatorio
       </div>
     </div>
-    <div class="col-12 {{ tipo_reporte === 'ventas_rango' ? 'mt-3' : '' }}">
+    <!-- ----- CONDICION -----  -->
+    <div
+      *ngIf="tipo_reporte === 'ventas_rango' || tipo_reporte === 'ventas_diarias'"
+      class="col-12 {{ tipo_reporte === 'ventas_rango' ? 'mt-3' : '' }}"
+    >
       <label class="control-label">Condicion: <span style="color: red">*</span> </label>
       <select formControlName="condicion" class="form-control">
         <option *ngFor="let condicion of condiciones" value="{{ condicion.id }}">{{ condicion.label }}</option>
+      </select>
+    </div>
+
+    <!-- ----- TIPO -----  -->
+    <div *ngIf="tipo_reporte === 'recibos'" class="col-12 mt-3">
+      <label class="control-label">Tipo: <span style="color: red">*</span> </label>
+      <select formControlName="tipo" class="form-control">
+        <option *ngFor="let tipo of tipos" value="{{ tipo.id }}">{{ tipo.label }}</option>
       </select>
     </div>
   </div>

@@ -5,9 +5,9 @@ import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import * as moment from 'moment';
 
 @Component({
-  selector: 'app-form-ventas',
-  templateUrl: './form-ventas.component.html',
-  styleUrls: ['./form-ventas.component.scss'],
+  selector: 'app-form-reportes',
+  templateUrl: './form-reportes.component.html',
+  styleUrls: ['./form-reportes.component.scss'],
 })
 export class FormVentasComponent implements OnInit {
   @Input() tipo_reporte;
@@ -19,6 +19,12 @@ export class FormVentasComponent implements OnInit {
   condiciones = [
     { id: 'Crédito', label: 'Crédito' },
     { id: 'Contado', label: 'Contado' },
+    { id: 'todos', label: 'Todos' },
+  ];
+
+  tipos = [
+    { id: 'viajes', label: 'Viajes' },
+    { id: 'normal', label: 'Normal' },
     { id: 'todos', label: 'Todos' },
   ];
 
@@ -62,6 +68,10 @@ export class FormVentasComponent implements OnInit {
       this.setValidator('condicion');
       this.setValidator('desde');
       this.setValidator('hasta');
+    } else if (this.tipo_reporte === 'recibos') {
+      this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
+      this.form.controls.hasta.setValue(new Date());
+      this.form.controls.tipo.setValue('todos');
     }
   }
 
