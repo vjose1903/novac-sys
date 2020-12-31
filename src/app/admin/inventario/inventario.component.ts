@@ -102,7 +102,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
         obj = {
           pdfSrc: res.body,
           titulo: 'Reporte de inventario',
-          height: '55rem',
+          height: '83vh',
           reimprimir: res.reimprimir,
           fileName: res.file.split('.')[0],
         };

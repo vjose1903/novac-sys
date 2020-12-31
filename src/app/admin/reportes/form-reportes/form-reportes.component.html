@@ -1,5 +1,26 @@
 <form [formGroup]="form">
   <div class="row">
+    <!-- ----- FECHA -----  -->
+    <div *ngIf="tipo_reporte === 'ventas_productos'" class="col-12">
+      <label class="control-label">Fecha: <span style="color: red">*</span> </label>
+      <input
+        type="text"
+        [bsConfig]="dpConfig"
+        placeholder="dd/mm/aaaa"
+        class="form-control"
+        formControlName="fecha"
+        #dp="bsDatepicker"
+        placement="bottom"
+        bsDatepicker
+      />
+      <div
+        class="alerta text-danger ml-1"
+        style="font-size: 12px"
+        *ngIf="!form.controls['fecha'].valid && (form.controls['fecha'].dirty || form.controls['fecha'].touched)"
+      >
+        Este campo es obligatorio
+      </div>
+    </div>
     <!-- ----- DESDE -----  -->
     <div *ngIf="tipo_reporte === 'ventas_rango' || tipo_reporte === 'recibos'" class="col-6">
       <label class="control-label">Desde: <span style="color: red">*</span> </label>

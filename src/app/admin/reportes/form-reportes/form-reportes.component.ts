@@ -68,6 +68,8 @@ export class FormVentasComponent implements OnInit {
       this.setValidator('condicion');
       this.setValidator('desde');
       this.setValidator('hasta');
+    } else if (this.tipo_reporte === 'ventas_productos') {
+      this.form.controls.fecha.setValue(new Date());
     } else if (this.tipo_reporte === 'recibos') {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
@@ -84,6 +86,7 @@ export class FormVentasComponent implements OnInit {
     this.form = this.fb.group({
       tipo: [null],
       condicion: [null],
+      fecha: [null],
       desde: [null],
       hasta: [null],
     });

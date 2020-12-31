@@ -43,7 +43,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
           obj = {
             pdfSrc: res.body,
             titulo: this.titulo_moda_reporte,
-            height: '55rem',
+            height: '83vh',
             reimprimir: res.reimprimir,
             fileName: res.file.split('.')[0],
           };
@@ -138,6 +138,14 @@ export class ReportesComponent implements OnInit, OnDestroy {
         params = `desde=${data.desde}&hasta=${data.hasta}&tipo_recibo=${data.tipo}&order=ASC`;
         tipo = 'recibos';
         //
+      } else if (this.tipoModal === 'ventas_productos') {
+        params = `fecha=${data.fecha}`;
+        tipo = 'ventas_productos';
+        //
+      } else if (this.tipoModal === 'inventario') {
+        params = ``;
+        tipo = 'inventario';
+        //
       }
 
       res = await this.dbServ.makeReportes(tipo, params).toPromise();
@@ -184,6 +192,14 @@ export class ReportesComponent implements OnInit, OnDestroy {
         //
       } else if (tipo === 'recibos') {
         this.titulo_moda_reporte = 'Reporte de recibos de ingreso';
+        //
+      } else if (tipo === 'ventas_productos') {
+        this.titulo_moda_reporte = 'Reporte de productos vendidos por dia';
+        //
+      } else if (tipo === 'inventario') {
+        this.titulo_moda_reporte = 'Reporte de inventario';
+        abrirModal = false;
+        this.reporte({ tipo_: 1 });
         //
       }
 

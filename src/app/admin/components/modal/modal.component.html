@@ -514,16 +514,12 @@
     [style]="{ width: '900px' }"
     (onHide)="accion(false)"
   >
-    <!-- <pdf-viewer [c-maps-url]="'/'" [src]="seleccionModal?.pdfSrc" [render-text]="seleccionModal?.render_text" style="display: block"></pdf-viewer> -->
-    <!-- <pdf-viewer [c-maps-url]="seleccionModal?.pdfSrc" [render-text]="seleccionModal?.render_text" style="display: block"></pdf-viewer> -->
-    <!-- <ngx-extended-pdf-viewer [src]="seleccionModal?.pdfSrc" useBrowserLocale="true" height="80vh"></ngx-extended-pdf-viewer> -->
-
     <ngx-extended-pdf-viewer
       [showDownloadButton]="false"
       [showOpenFileButton]="false"
       [filenameForDownload]="seleccionModal?.fileName"
       [showSecondaryToolbarButton]="false"
-      [showZoomButtons]="false"
+      [showZoomButtons]="true"
       [showRotateButton]="false"
       [showBookmarkButton]="false"
       [enablePrint]="false"

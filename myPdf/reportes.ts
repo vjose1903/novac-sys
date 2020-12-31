@@ -520,6 +520,7 @@ const t_c = {
       },
     ],
   },
+
   recibos: {
     margin_general: [10, 0, 10, 0],
     break: 40,
@@ -573,6 +574,49 @@ const t_c = {
         style: 'letra10',
         style_body: 'letra10',
         key: 'total',
+        alignment_body: 'right',
+        formato_numero: true,
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
+      },
+    ],
+  },
+  ventas_prod: {
+    margin_general: [10, 0, 10, 0],
+    break: 40,
+    widths: [24, '*', 'auto', 'auto'],
+    info: [
+      {
+        text: '#',
+        alignment_titulo: 'center',
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'index',
+        alignment_body: 'center',
+      },
+      {
+        text: 'Articulo',
+        alignment_titulo: 'left',
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'nombre',
+        alignment_body: 'left',
+      },
+      {
+        text: 'Medida',
+        style: 'letra10',
+        alignment_titulo: 'left',
+        style_body: 'letra10',
+        key: 'medida_mostrar',
+        alignment_body: 'left',
+      },
+
+      {
+        text: 'Total Vendido',
+        alignment_titulo: 'right',
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'total_vendido',
         alignment_body: 'right',
         formato_numero: true,
         margin_titulo: [0, 0, 10, 0],
