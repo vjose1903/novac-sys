@@ -455,26 +455,39 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
                 : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
 
             if (secuencia >= limite) {
-              this.dbServ.toastWarning(msg, 'AVISO');
+              this.dbServ.toastWarning(msg, 'AVISO', true);
             }
           }
-          return 'si';
+          return true;
         } catch (error) {
-          this.dbServ.toastError(error.error.msg, 'ERROR', true);
+          if (error.error.msg) {
+            this.dbServ.toastError(error.error.msg, 'ERROR', true);
+          } else {
+            this.dbServ.toastError('Error calculando la secuencia de comprobantes.', 'AVISO', true);
+          }
+
           this.enfocarInput('tipoFact');
-          return 'no';
+          return false;
         }
       }
     }
   }
 
-  checkTipoFactura(campo, valor) {
+  async checkTipoFactura(campo, valor, check = false) {
     if (this.tipos_facturas.includes(valor)) {
       this.tipoFactura = valor;
       this.NCFcompra = 'b' + valor;
-      const continuar = this.calcularPorcientoComprobante();
 
-      this.enfocarInput(campo);
+      let continuar = true;
+      if (check) {
+        continuar = await this.calcularPorcientoComprobante();
+      }
+
+      if (continuar) {
+        this.enfocarInput(campo);
+      } else {
+        this.enfocarInput('campo');
+      }
     } else {
       this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR', true);
     }

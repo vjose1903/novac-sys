@@ -190,9 +190,6 @@ export class NcfComponent implements OnInit, OnDestroy {
     if (this.filtro === 'todos') {
       this.listaNCF = GLOBAL.duplicarJson(this.listaNCFBack);
     } else {
-      console.log('this.listaNCFBack --> ', this.listaNCFBack);
-      console.log('this.filtro --> ', this.filtro);
-
       this.listaNCF = this.listaNCFBack.filter((pack) => Number(pack.tipo_factura_id) === Number(this.filtro));
     }
   }
@@ -230,7 +227,6 @@ export class NcfComponent implements OnInit, OnDestroy {
 
       this.listaNCF = tempNCF;
       this.listaNCFBack = GLOBAL.duplicarJson(tempNCF);
-      console.log('listaNCF --> ', this.listaNCF);
 
       const obj = {
         total: res.total_registros,
@@ -292,7 +288,6 @@ export class NcfComponent implements OnInit, OnDestroy {
       usado: this.is_editando ? this.usado : false,
       status: true,
     };
-    console.log('obj --> ', obj);
 
     try {
       const res = await this.dbServ.PaqueteNCF(obj).toPromise();
@@ -342,10 +337,6 @@ export class NcfComponent implements OnInit, OnDestroy {
     this.tipo_articulo_id = item.tipo_factura_id;
     this.Desde = item.desde;
     this.Hasta = item.hasta;
-
-    console.log('item --> ', item);
-    console.log('item.fecha_compra --> ', item.fecha_compra);
-    console.log('item.fecha_valida --> ', item.fecha_valida);
 
     this.ncfSelected = GLOBAL.duplicarJson(item);
   }
