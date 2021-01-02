@@ -42,8 +42,8 @@ export class NcfComponent implements OnInit, OnDestroy {
       key: 'tipoC',
     },
     {
-      titulo: 'Cant.',
-      key: 'cantidad',
+      titulo: 'Secuencia',
+      key: 'secuencia_',
     },
     {
       titulo: 'Desde',
@@ -72,11 +72,14 @@ export class NcfComponent implements OnInit, OnDestroy {
       estilos: [{ width: '3.5rem' }],
     },
   ];
+
+  filtro: any = 0;
   botones = {
     titulo: true,
     borrar: true,
     editar: true,
   };
+
   subDeci: Subscription;
   lista_tipos_facturas: any;
 
@@ -95,6 +98,7 @@ export class NcfComponent implements OnInit, OnDestroy {
 
   desdeAlert = false;
   hastaAlert = false;
+  listaNCFBack: any[];
   constructor(
     private dbServ: DBservice,
     private cdRef: ChangeDetectorRef,
@@ -182,6 +186,17 @@ export class NcfComponent implements OnInit, OnDestroy {
     } catch (error) {}
   }
 
+  filtrarNCF() {
+    if (this.filtro === 'todos') {
+      this.listaNCF = GLOBAL.duplicarJson(this.listaNCFBack);
+    } else {
+      console.log('this.listaNCFBack --> ', this.listaNCFBack);
+      console.log('this.filtro --> ', this.filtro);
+
+      this.listaNCF = this.listaNCFBack.filter((pack) => Number(pack.tipo_factura_id) === Number(this.filtro));
+    }
+  }
+
   async getPaquetesNCF(e) {
     try {
       const page = e.page;
@@ -194,10 +209,14 @@ export class NcfComponent implements OnInit, OnDestroy {
       res.data.forEach((ncf) => {
         if (ncf.tipo_factura_id !== 1 && ncf.tipo_factura_id !== 3) {
           ncf.cantidad = ncf.hasta - ncf.desde + 1;
-          ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
+          ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].referencia;
+          ncf.tipoC_ = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
           ncf.codigo = _.padStart(ncf.id, 5, '0');
-          ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
-          ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('MM/DD/YYYY');
+          ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
+          ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
+
+          ncf.secuencia_ = ncf.estado ? ncf.secuencia : '-';
+          ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.colorUsado = ncf.usado ? 'green' : 'red';
           ncf.colorEstado = ncf.estado ? 'green' : 'red';
           ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
@@ -210,10 +229,14 @@ export class NcfComponent implements OnInit, OnDestroy {
       });
 
       this.listaNCF = tempNCF;
+      this.listaNCFBack = GLOBAL.duplicarJson(tempNCF);
+      console.log('listaNCF --> ', this.listaNCF);
+
       const obj = {
         total: res.total_registros,
         tabla: 'listaNCF',
       };
+
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
       console.error(error);
@@ -260,15 +283,16 @@ export class NcfComponent implements OnInit, OnDestroy {
     const obj = {
       id: this.ncfSelected ? this.ncfSelected.id : null,
       tipo_factura_id: this.tipo_articulo_id,
-      secuencia: this.Desde,
       desde: this.Desde,
       hasta: this.Hasta,
-      fecha_compra: moment(this.fechaCompra).format(),
-      fecha_valida: moment(this.fechaValidez).format(),
-      estado: false,
-      usado: false,
+      fecha_compra: moment(this.fechaCompra, 'DD/MM/YYYY').format(),
+      fecha_valida: moment(this.fechaValidez, 'DD/MM/YYYY').format(),
+
+      estado: this.is_editando ? this.estado : false,
+      usado: this.is_editando ? this.usado : false,
       status: true,
     };
+    console.log('obj --> ', obj);
 
     try {
       const res = await this.dbServ.PaqueteNCF(obj).toPromise();
@@ -318,6 +342,11 @@ export class NcfComponent implements OnInit, OnDestroy {
     this.tipo_articulo_id = item.tipo_factura_id;
     this.Desde = item.desde;
     this.Hasta = item.hasta;
+
+    console.log('item --> ', item);
+    console.log('item.fecha_compra --> ', item.fecha_compra);
+    console.log('item.fecha_valida --> ', item.fecha_valida);
+
     this.ncfSelected = GLOBAL.duplicarJson(item);
   }
 
@@ -327,7 +356,7 @@ export class NcfComponent implements OnInit, OnDestroy {
 
     if (item.METODO === 'editar') {
       this.paqueteSelected = item.ARG;
-      this.titulo = ' Editar paquete de NCF numero: ' + item.ARG.codigo + ' de: ' + item.ARG.tipoC;
+      this.titulo = ' Editar paquete de NCF numero: ' + item.ARG.codigo + ' de: ' + item.ARG.tipoC_;
       this.boton = 'Editar';
 
       this.estado = item.ARG.estado;
@@ -336,12 +365,13 @@ export class NcfComponent implements OnInit, OnDestroy {
       this.llenarCampos(item.ARG);
     }
   }
+
   abrirModal(arg?) {
     this.indexSelected = arg.INDEX;
     this.mServ.modalTipo('borrar');
     this.tipoModal = 'borrar';
     this.seleccionModal = arg.ARG;
-    this.seleccionModal.nombre = 'comprobante para ' + arg.ARG.tipoC + ' numero: ' + arg.ARG.codigo;
+    this.seleccionModal.nombre = 'comprobante para ' + arg.ARG.tipoC_ + ' numero: ' + arg.ARG.codigo;
     this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
@@ -351,7 +381,7 @@ export class NcfComponent implements OnInit, OnDestroy {
       this.dbServ.deleteNCF(this.seleccionModal.id).subscribe(
         (res) => {
           this.dbServ.toastSuccess(
-            'comprobante para ' + this.seleccionModal.tipoC + ' numero: ' + this.seleccionModal.codigo + ' borrado',
+            'comprobante para ' + this.seleccionModal.tipoC_ + ' numero: ' + this.seleccionModal.codigo + ' borrado',
             'CORRECTO',
           );
           _.pullAt(this.listaNCF, this.indexSelected);

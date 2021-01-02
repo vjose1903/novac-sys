@@ -66,8 +66,6 @@
               [(ngModel)]="fechaValidez"
               #dp="bsDatepicker"
               placement="bottom"
-              (focus)="setDateInputs(fechaCompra)"
-              disabled
               bsDatepicker
             />
           </div>
@@ -77,13 +75,17 @@
             <div class="col-6">
               <div class="d-flex">
                 <h5>Usado:</h5>
-                <i class="ml-3 mt-1 {{ ncfSelected.usado ? 'fas fa-check' : 'fas fa-times' }} {{ ncfSelected.usado ? 'text-green' : 'text-red' }}"></i>
+                <i
+                  class="ml-3 mt-1 {{ ncfSelected.usado ? 'fas fa-check' : 'fas fa-times' }} {{ ncfSelected.usado ? 'text-green' : 'text-red' }}"
+                ></i>
               </div>
             </div>
             <div class="col-6">
               <div class="d-flex">
                 <h5>Activo:</h5>
-                <i class="ml-3 mt-1 {{ ncfSelected.estado ? 'fas fa-check' : 'fas fa-times' }}  {{ ncfSelected.estado ? 'text-green' : 'text-red' }}"></i>
+                <i
+                  class="ml-3 mt-1 {{ ncfSelected.estado ? 'fas fa-check' : 'fas fa-times' }}  {{ ncfSelected.estado ? 'text-green' : 'text-red' }}"
+                ></i>
               </div>
             </div>
           </div>
@@ -106,6 +108,13 @@
   <div class="col-md-7">
     <h4>Listado articulos</h4>
     <div id="cardTabla" class="card cardListados">
+      <div>
+        <select class="form-control filtroNCF" [(ngModel)]="filtro" (change)="filtrarNCF()">
+          <option value="0" disabled>Filtro por tipo de articulos</option>
+          <option value="todos">Todos</option>
+          <option *ngFor="let tipo of lista_tipos_facturas" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+        </select>
+      </div>
       <app-tablas
         *ngIf="listaNCF && info"
         [info]="info"
