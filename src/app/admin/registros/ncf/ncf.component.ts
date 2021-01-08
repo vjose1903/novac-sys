@@ -212,7 +212,7 @@ export class NcfComponent implements OnInit, OnDestroy {
           ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
           ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
 
-          ncf.secuencia_ = ncf.estado ? ncf.secuencia : '-';
+          ncf.secuencia_ = ncf.estado || ncf.usado ? ncf.secuencia : '-';
           ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.colorUsado = ncf.usado ? 'green' : 'red';
           ncf.colorEstado = ncf.estado ? 'green' : 'red';
@@ -283,7 +283,7 @@ export class NcfComponent implements OnInit, OnDestroy {
       hasta: this.Hasta,
       fecha_compra: moment(this.fechaCompra, 'DD/MM/YYYY').format(),
       fecha_valida: moment(this.fechaValidez, 'DD/MM/YYYY').format(),
-
+      secuencia: this.ncfSelected ? this.ncfSelected.secuencia : this.Desde,
       estado: this.is_editando ? this.estado : false,
       usado: this.is_editando ? this.usado : false,
       status: true,

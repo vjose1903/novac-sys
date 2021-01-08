@@ -591,9 +591,6 @@ ipcMain.on('print', async (event: any, oPdf) => {
   let obj;
   let todo_true = true;
 
-  console.log('data --> ' + oPdf.data);
-  console.log('type --> ' + oPdf.type);
-  console.log('oPdf.data.reimprimir --> ' + oPdf.data.reimprimir);
   const data = oPdf.data;
   const type = oPdf.type;
   const reimprimir = oPdf.data.reimprimir ? true : false;
@@ -701,7 +698,11 @@ function imprimir(cFileName, tipo) {
   // const profile = require.resolve('../profiles/app.profile.js');
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
-  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "landscape,noscale,paper=VJPOS,simplex" -silent "${file_path}"`;
+    const orientation = tipo === 'reporte'? 'Portrait':'landscape'
+    const paper_size = tipo === 'reporte'? 'A4':'VJPOS'
+
+
+  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},noscale,paper=${paper_size},simplex" -silent "${file_path}"`;
   cmd(comando, (res) => {
     puts(res, 'respuesta impresion');
 

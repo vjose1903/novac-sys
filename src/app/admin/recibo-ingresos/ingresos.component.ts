@@ -285,7 +285,6 @@ export class IngresosComponent implements OnInit, OnDestroy {
         )
         .toPromise();
 
-
       this.Facturas.sort((a, b) => {
         return a.id < b.id ? 1 : -1;
       });
