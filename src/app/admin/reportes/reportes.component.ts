@@ -102,6 +102,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
   async makeCuadre() {
     try {
       const res = await this.dbServ.createCuadreCaja().toPromise();
+
       const obj = {
         data: res.body,
         type: 'cuadre_caja',
@@ -122,6 +123,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
 
   async reporte(data) {
     let res = {} as any;
+    console.log('data --> ', data);
 
     try {
       let tipo = '';
@@ -142,6 +144,10 @@ export class ReportesComponent implements OnInit, OnDestroy {
         params = `fecha=${data.fecha}`;
         tipo = 'ventas_productos';
         //
+      } else if (this.tipoModal === 'suplidor_prod') {
+        params = `articulo_id=${data.articulo_id}&desde=${data.desde}&hasta=${data.hasta}`;
+        tipo = 'suplidor_prod';
+        //
       } else if (this.tipoModal === 'inventario') {
         params = ``;
         tipo = 'inventario';
@@ -149,6 +155,8 @@ export class ReportesComponent implements OnInit, OnDestroy {
       }
 
       res = await this.dbServ.makeReportes(tipo, params).toPromise();
+      console.log('res --> ', res);
+
       const obj = {
         data: res,
         type: 'reporte',
@@ -164,6 +172,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
     const obj = {};
     this.tipoModal = tipo;
     let abrirModal = true;
+
     if (tipo === 'cuadre') {
       obj['texto_modal'] = 'Seguro de que desea realizar el cuadre de caja.';
       this.mServ.modalTipo('dinamico_texto');
@@ -196,6 +205,9 @@ export class ReportesComponent implements OnInit, OnDestroy {
       } else if (tipo === 'ventas_productos') {
         this.titulo_moda_reporte = 'Reporte de productos vendidos por dia';
         //
+      } else if (tipo === 'suplidor_prod') {
+        this.titulo_moda_reporte = 'Reporte de suplidor por producto';
+        //
       } else if (tipo === 'inventario') {
         this.titulo_moda_reporte = 'Reporte de inventario';
         abrirModal = false;
@@ -225,10 +237,14 @@ export class ReportesComponent implements OnInit, OnDestroy {
   decisionModal(decision) {
     if (decision) {
       if (this.tipoModal === 'visor_pdf') {
+        console.log('this.filename --> ', this.fileName);
+
         const obj = {
           base64: this.pdfSrc,
           filename: this.fileName,
+          type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte',
         };
+        console.log('obj --> ', obj);
 
         this._ipc.send('printReporte', obj);
       } else if (this.tipoModal === 'cuadre') {

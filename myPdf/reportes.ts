@@ -624,4 +624,38 @@ const t_c = {
       },
     ],
   },
+  suplidor_prod: {
+    margin_general: [10, 0, 10, 0],
+    break: 40,
+    widths: [24, 60, '*'],
+    info: [
+      {
+        text: '#',
+        alignment_titulo: 'center',
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'index',
+        alignment_body: 'center',
+      },
+      {
+        text: 'Fecha',
+        alignment_titulo: 'left',
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'fecha_equivalente',
+        alignment_body: 'left',
+        formato_fecha: true,
+      },
+      {
+        text: 'Suplidor',
+        alignment_titulo: 'left',
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'suplidor_nombre',
+        alignment_body: 'left',
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
+      },
+    ],
+  },
 };

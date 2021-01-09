@@ -580,9 +580,13 @@ ipcMain.on('printReporte', async (event: any, oPdf) => {
   await puts(' --------------- INICIO DE PROCESO DE IMPRESION DE REPORTES --------------- ');
   const base64 = oPdf.base64;
   const filename = oPdf.filename;
+  const type = oPdf.type;
+
   await puts(base64, 'base64');
   await puts(filename, 'filename');
-  generatePdfFileFormBase64(filename, base64);
+  await puts(type, 'type');
+
+  generatePdfFileFormBase64(filename, base64, type);
 });
 
 ipcMain.on('print', async (event: any, oPdf) => {
@@ -698,9 +702,8 @@ function imprimir(cFileName, tipo) {
   // const profile = require.resolve('../profiles/app.profile.js');
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
-    const orientation = tipo === 'reporte'? 'Portrait':'landscape'
-    const paper_size = tipo === 'reporte'? 'A4':'VJPOS'
-
+  const orientation = tipo === 'reporte' ? 'Portrait' : 'landscape';
+  const paper_size = tipo === 'reporte' ? 'carta' : 'VJPOS';
 
   const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},noscale,paper=${paper_size},simplex" -silent "${file_path}"`;
   cmd(comando, (res) => {
