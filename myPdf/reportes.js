@@ -384,7 +384,7 @@ var t_c = {
         margin_general: [10, 0, 10, 0],
         break: 40,
         // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
-        widths: [24, '*', 70, 70, 70, 70, 70, 'auto'],
+        widths: [18, '*', 60, 70, 70, 70, 70, 'auto'],
         info: [
             {
                 text: '#',
@@ -403,12 +403,13 @@ var t_c = {
                 alignment_body: 'left',
             },
             {
-                text: 'RNC',
+                text: 'Fecha',
                 alignment_titulo: 'left',
                 style: 'letra10',
                 style_body: 'letra10',
-                key: 'cliente_rnc',
+                key: 'fecha_equivalente',
                 alignment_body: 'left',
+                formato_fecha: true,
             },
             {
                 text: '0 - 30 Dias',
