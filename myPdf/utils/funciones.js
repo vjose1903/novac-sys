@@ -31,7 +31,7 @@ exports.my_stringJoin = my_stringJoin;
 // =========================================================================================================
 function my_dateFormater(str) {
     var dateObj = new Date(str);
-    var month = dateObj.getMonth() + 1;
+    var month = String(dateObj.getMonth() + 1).padStart(2, '0');
     var day = String(dateObj.getDate()).padStart(2, '0');
     var year = dateObj.getFullYear();
     return day + "/" + month + "/" + year;

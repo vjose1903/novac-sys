@@ -15,7 +15,7 @@ import { RegistroClientesComponent } from './admin/registros/registro-clientes/r
 import { RegistroSuplidoresComponent } from './admin/registros/registro-suplidores/registro-suplidores.component';
 import { ProduccionComponent } from './admin/produccion/produccion.component';
 import { InventarioComponent } from './admin/inventario/inventario.component';
-import { IngresosComponent } from './admin/recibo-ingresos/ingresos.component';
+import { IngresosComponent } from './admin/recibo-ingresos/Formulario/ingresos.component';
 import { BuscarFacturaComponent } from './admin/manipular facturas/buscar-factura/buscar-factura.component';
 import { NotasCredDebComponent } from './admin/manipular facturas/notas-cred-deb/notas-cred-deb.component';
 import { NcfComponent } from './admin/registros/ncf/ncf.component';
@@ -25,6 +25,7 @@ import { AuthGuard } from './core/guard/auth.guard';
 import { IsLoginGuard } from './core/guard/is-login.guard';
 import { ReportesComponent } from './admin/reportes/reportes.component';
 import { RegistroVehiculoComponent } from './admin/registros/registro-vehiculo/registro-vehiculo.component';
+import { ListaRecibosComponent } from './admin/recibo-ingresos/lista-recibos/lista-recibos.component';
 
 const routes: Routes = [
   {
@@ -74,6 +75,10 @@ const routes: Routes = [
       },
       {
         path: 'ingresos',
+        component: ListaRecibosComponent,
+      },
+      {
+        path: 'ingresos/:metodo',
         component: IngresosComponent,
       },
       {

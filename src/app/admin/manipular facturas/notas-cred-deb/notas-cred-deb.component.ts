@@ -535,7 +535,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
       });
 
       res['FACTURA_DE'] = 'nota';
-
+      console.log(JSON.stringify(res));
       const obj = {
         data: res,
         type: 'facturacion',

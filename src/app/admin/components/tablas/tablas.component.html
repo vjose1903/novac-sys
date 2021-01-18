@@ -35,7 +35,11 @@
             (click)="clickROW(dato)"
           >
             <td *ngFor="let column of info; let j = index" class="tableTD" id="td-{{ column.key }}-{{ i }}" [ngStyle]="getStyle(column.key, i)">
+              <!-- <ng-template *ngIf="column.text_tooltip" #tooltip>{{ dato[column.text_tooltip] }} </ng-template> -->
+              <ng-template #tooltip>{{ dato[column.text_tooltip] }} </ng-template>
               <span
+                [mdbTooltip]="column.text_tooltip ? tooltip : ''"
+                placement="{{ i != 0 ? 'top' : 'botton' }}"
                 id="{{ column.key }}-{{ i }}"
                 *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && !column.cantidades && !column.formatoNumero"
                 style="width: 100%"
@@ -65,10 +69,14 @@
                 {{ lookprincipal(dato[column.key]) }}
               </span>
 
-              <span *ngIf="column.isIcon && dato._destroy !== '1'">
+              <span
+                *ngIf="column.isIcon && dato._destroy !== '1'"
+                [mdbTooltip]="column.text_tooltip ? tooltip : ''"
+                placement="{{ i != 0 ? 'top' : 'botton' }}"
+              >
                 <i
                   id="{{ column.key }}-{{ i }}"
-                  (click)="iconBtn(column.key, i)"
+                  (click)="iconBtn(column.key, i, dato)"
                   class="{{ dato[column.key] }} {{ dato.iconHover ? 'c-pointer' : '' }}   text-{{
                     column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black'
                   }}"
@@ -81,11 +89,17 @@
                 id="{{ column.key }}-{{ i }}"
                 *ngIf="!column.isIcon && column.tipo !== 'check' && column.tipo !== 'input' && column.formatoNumero && !column.cantidades"
                 style="width: 100%"
+                [mdbTooltip]="column.text_tooltip ? tooltip : ''"
+                placement="{{ i != 0 ? 'top' : 'botton' }}"
               >
                 {{ formatoNumero(dato[column.key]) }}
               </span>
 
-              <span *ngIf="!column.isIcon && column.tipo === 'check' && column.tipo !== 'input'">
+              <span
+                *ngIf="!column.isIcon && column.tipo === 'check' && column.tipo !== 'input'"
+                [mdbTooltip]="column.text_tooltip ? tooltip : ''"
+                placement="{{ i != 0 ? 'top' : 'botton' }}"
+              >
                 <div class="from-group">
                   <input
                     class="apple-switch"
@@ -98,7 +112,11 @@
                 </div>
               </span>
 
-              <span *ngIf="column.tipo === 'input' && column.tipo !== 'check'">
+              <span
+                *ngIf="column.tipo === 'input' && column.tipo !== 'check'"
+                [mdbTooltip]="column.text_tooltip ? tooltip : ''"
+                placement="{{ i != 0 ? 'top' : 'botton' }}"
+              >
                 <div *ngIf="!column.checkNumber">
                   <input
                     class="form-control m-0 inputTabla"

@@ -576,7 +576,7 @@ async function puts(msg, titulo?) {
   }
 }
 
-ipcMain.on('printReporte', async (event: any, oPdf) => {
+ipcMain.on('printBase64', async (event: any, oPdf) => {
   await puts(' --------------- INICIO DE PROCESO DE IMPRESION DE REPORTES --------------- ');
   const base64 = oPdf.base64;
   const filename = oPdf.filename;
@@ -598,6 +598,7 @@ ipcMain.on('print', async (event: any, oPdf) => {
   const data = oPdf.data;
   const type = oPdf.type;
   const reimprimir = oPdf.data.reimprimir ? true : false;
+  const retunBase64 = oPdf.retunBase64 ? true : false;
 
   data['reimprimir'] = reimprimir;
 
@@ -620,7 +621,6 @@ ipcMain.on('print', async (event: any, oPdf) => {
         break;
 
       case 'reporte':
-        console.log('entro en el case de reporte');
         obj = reportes.makeReporte(data);
         break;
 
@@ -634,7 +634,7 @@ ipcMain.on('print', async (event: any, oPdf) => {
       const file = obj.file;
       const type = obj.type;
 
-      createPdfbase64(dd, file, type, reimprimir);
+      createPdfbase64(dd, file, type, reimprimir, retunBase64);
     } else {
       returnErrorPDF();
     }
@@ -663,17 +663,15 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
     });
   } catch (err) {
     puts(err, 'createPdfFileFormBase64 ERROR');
-    win.webContents.send('printReporteRes', { msg: 'Error generando reporte!!', status: false, error: err });
+    win.webContents.send('printBase64Res', { msg: 'Error generando reporte!!', status: false, error: err });
   }
 }
 
-function createPdfbase64(docDefinition, file_, type, reimprimir_) {
+function createPdfbase64(docDefinition, file_, type, reimprimir_, retunBase64) {
   try {
     const pdfDocGenerator = pdfMake.createPdf(docDefinition);
     pdfDocGenerator.getBase64((data) => {
-      if (type === 'file') {
-        generatePdfFileFormBase64(file_, data, type);
-      } else {
+      if (type === 'base64' || retunBase64) {
         win.webContents.send('printRes', {
           msg: 'Pdf Base64 correcto',
           file: file_,
@@ -682,6 +680,8 @@ function createPdfbase64(docDefinition, file_, type, reimprimir_) {
           body: data,
           sbody: JSON.stringify(data),
         });
+      } else {
+        generatePdfFileFormBase64(file_, data, type);
       }
     });
   } catch (error) {
@@ -714,7 +714,7 @@ function imprimir(cFileName, tipo) {
     if (res.status) {
       if (tipo === 'reporte') {
         msg_ = 'Reporte generado correctamente!!';
-        tipo_ = 'printReporteRes';
+        tipo_ = 'printBase64Res';
       } else {
         msg_ = 'Factura generada correctamente!!';
         tipo_ = 'printRes';
@@ -726,7 +726,7 @@ function imprimir(cFileName, tipo) {
     } else {
       if (tipo === 'reporte') {
         msg_ = 'Error generando Reporte!!';
-        tipo_ = 'printReporteRes';
+        tipo_ = 'printBase64Res';
       } else {
         msg_ = 'Error generando Factura!!';
         tipo_ = 'printRes';

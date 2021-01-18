@@ -30,7 +30,7 @@ export function my_stringJoin(str, target) {
 // =========================================================================================================
 export function my_dateFormater(str) {
   let dateObj = new Date(str);
-  let month = dateObj.getMonth() + 1;
+  let month = String(dateObj.getMonth() + 1).padStart(2, '0');
   let day = String(dateObj.getDate()).padStart(2, '0');
   let year = dateObj.getFullYear();
 

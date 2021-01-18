@@ -84,18 +84,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       this.addItem(index);
     }
 
-    // .pipe(
-    //   map(art => {
-    //     if (art !== undefined) {
-    //       art = art.map(obj => {
-    //         obj.seleccionado = false;
-    //         return obj;
-    //       });
-    //       return art;
-    //     }
-    //   }),
-    // )
-
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (this.tipoModal === 'removerArticulo' && res) {
         this.procesoQuitarArticulo();
@@ -1088,8 +1076,5 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       GLOBAL.enfocarInput('cod-' + arg);
       this.mServ.mostrarModal(false);
     }, 100);
-
-    // this.element = document.getElementById('cod-' + arg) as HTMLElement;
-    // this.element.focus();
   }
 }

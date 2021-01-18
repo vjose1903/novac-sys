@@ -1,0 +1,26 @@
+<div class="row">
+  <div class="col-12 mb-2">
+    <h3 class="negrita">Recibos de ingreso</h3>
+  </div>
+  <div class="col-12 mb-3">
+    <button class="btn btn-verde" (click)="navegar()">Nuevo recibo <i class="fas fa-hand-holding-usd"></i></button>
+  </div>
+  <div class="col-12">
+    <div id="cardTabla" class="card cardListados rec">
+      <!-- <div class="w-100 d-flex justify-content-end">
+        <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+      </div> -->
+      <app-tablas
+        *ngIf="lista_recibos"
+        [info]="info"
+        [data]="lista_recibos"
+        [quitarAScorll]="60"
+        [tablaHover]="true"
+        (clickIcon)="clickIcon($event)"
+        (paginateChange)="filtrarRecibos($event)"
+        [focusRow]="false"
+        [id_tabla]="'recibos_ingreso'"
+      ></app-tablas>
+    </div>
+  </div>
+</div>

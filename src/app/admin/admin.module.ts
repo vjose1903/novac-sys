@@ -22,7 +22,7 @@ import { PaswordConfirmDirective } from '../core/directive/pasword-confirm-direc
 import { ProduccionComponent } from './produccion/produccion.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MovimientosFormComponent } from './components/formularios en modales/movimientos-form/movimientos-form.component';
-import { IngresosComponent } from './recibo-ingresos/ingresos.component';
+import { IngresosComponent } from './recibo-ingresos/Formulario/ingresos.component';
 
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
@@ -35,7 +35,7 @@ import { BTNcircularComponent } from './components/btncircular/btncircular.compo
 import { UploadImgComponent } from './components/upload-img/upload-img.component';
 
 import { TablasModule } from './components/tablas/tablas.module';
-import { ModalHistorialPagosComponent } from './recibo-ingresos/modal-historial-pagos/modal-historial-pagos.component';
+import { ModalHistorialPagosComponent } from './recibo-ingresos/Formulario/modal-historial-pagos/modal-historial-pagos.component';
 import { ConduceComponent } from './conduce/conduce.component';
 import { ModalSeleccinarArticuloComponent } from './conduce/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 import { NgInitDirective } from '../directives/ngInit';
@@ -52,6 +52,7 @@ import { FormularioMarcaModeloComponent } from './components/formularios en moda
 import { PendienteFormComponent } from './components/formularios en modales/pendiente-form/pendiente-form.component';
 import { FormCantidadEfectivoComponent } from './facturacion/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { FormVentasComponent } from './reportes/form-reportes/form-reportes.component';
+import { ListaRecibosComponent } from './recibo-ingresos/lista-recibos/lista-recibos.component';
 
 @NgModule({
   declarations: [
@@ -83,6 +84,7 @@ import { FormVentasComponent } from './reportes/form-reportes/form-reportes.comp
     NcfComponent,
     ModalHistorialPagosComponent,
     ConduceComponent,
+    ListaRecibosComponent,
     ModalSeleccinarArticuloComponent,
     ReciboViajesComponent,
     ReportesComponent,

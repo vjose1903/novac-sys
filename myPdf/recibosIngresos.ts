@@ -10,7 +10,7 @@ import { AppConfig } from '../src/environments/environment.js';
 export function makeRecibo(data) {
   const dd = {
     pageSize: { width: 990, height: 398 },
-    pageMargins: [0, 173, 0, 30],
+    pageMargins: [0, 164, 0, 30],
     header: cabeceraRecibo(data),
     content: contenidoRecibo(data),
     footer: (currentPage, pageCount) => {
@@ -50,13 +50,38 @@ function cabeceraRecibo(data) {
             image: 'logo',
             width: 72,
             height: 45,
-            margin: [90, 12, 0, 0],
+            margin: [90, 15, 0, 0],
+          },
+        ],
+        [
+          {
+            text: 'Recibo de ingresos',
+            fontSize: 14,
+            bold: true,
+            margin: [0, 20, 65, 0],
+            alignment: 'right',
+          },
+          {
+            text: [
+              { text: 'Fecha: ', fontSize: 12, bold: true },
+              { text: fun_.my_dateFormater(data.fecha_equivalente), fontSize: 12 },
+              { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), fontSize: 12 },
+            ],
+            margin: [310, 10, 0, 0],
+          },
+
+          {
+            text: [
+              { text: 'Doc No: ', fontSize: 12, bold: true },
+              { text: fun_.my_padStart(data.numero_recibo, 8, '0'), fontSize: 12 },
+            ],
+            margin: [310, 3, 0, 0],
           },
         ],
       ],
     },
     {
-      margin: [0, -40, 0, 0],
+      margin: [0, -60, 0, 0],
       stack: [
         {
           text: 'ADM Agroindustrial S.R.L',
@@ -80,51 +105,28 @@ function cabeceraRecibo(data) {
       ],
     },
     {
-      margin: [15, 15, 0, 0],
-      columns: [
-        [
-          {
-            text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: fun_.my_capitalize(data.cliente.nombre) + ' ' + fun_.my_capitalize(data.cliente.apellido) }],
-            margin: [0, 0, 0, 0],
-          },
-          {
-            text: [{ text: 'Rnc cliente: ', fontSize: 12, bold: true }, { text: rncCliente }],
-            margin: [0, 3, 0, 0],
-          },
-          {
-            text: [{ text: 'Dirección: ', fontSize: 12, bold: true }, { text: data.cliente.direccion }],
-            margin: [0, 3, 0, 0],
-          },
-        ],
-        [
-          {
-            text: [{ text: 'Recibo de ingresos', fontSize: 14, bold: true }],
-            margin: [0, 15, 0, 0],
-            alignment: 'center',
-          },
-        ],
-        [
-          {
-            text: [
-              { text: 'Fecha: ', fontSize: 12, bold: true },
-              { text: fun_.my_dateFormater(data.fecha_equivalente), fontSize: 12 },
-              { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), fontSize: 12 },
-            ],
-            margin: [150, 0, 0, 0],
-          },
-
-          {
-            text: [
-              { text: 'Doc No: ', fontSize: 12, bold: true },
-              { text: fun_.my_padStart(data.numero_recibo, 8, '0'), fontSize: 12 },
-            ],
-            margin: [150, 3, 0, 0],
-          },
-        ],
+      margin: [15, 5, 0, 0],
+      text: [
+        { text: 'Cliente: ', fontSize: 12, bold: true },
+        { text: `${fun_.my_capitalize(data.cliente.nombre)} ${fun_.my_capitalize(data.cliente.apellido)}` },
       ],
     },
+
     {
-      text: [{ text: 'Recibido: ', fontSize: 12, bold: true }, { text: fun_.numFormatTwoDecimals(data.total) }, { text: ` - ${fun_.my_capitalize(numero_letra)}` }],
+      text: [{ text: 'Rnc cliente: ', fontSize: 12, bold: true }, { text: rncCliente }],
+      margin: [15, 3, 0, 0],
+    },
+    {
+      text: [{ text: 'Dirección: ', fontSize: 12, bold: true }, { text: data.cliente.direccion }],
+      margin: [15, 3, 0, 0],
+    },
+
+    {
+      text: [
+        { text: 'Recibido: ', fontSize: 12, bold: true },
+        { text: fun_.numFormatTwoDecimals(data.total) },
+        { text: ` - ${fun_.my_capitalize(numero_letra)}` },
+      ],
       margin: [15, 3, 0, 0],
     },
     { canvas: [{ type: 'rect', x: 10, y: 5, w: 970, h: 2, color: '#000000' }] },
@@ -214,7 +216,12 @@ function contenidoRecibo(data) {
       { text: fun_.my_dateFormater(fecha), pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
       { text: valor, pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
       { text: fun_.numFormatTwoDecimals(detalle.total_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
-      { text: fun_.numFormatTwoDecimals(detalle.balance_anterior_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
+      {
+        text: fun_.numFormatTwoDecimals(detalle.balance_anterior_factura),
+        alignment: 'right',
+        pageBreak: br_ ? 'before' : 'none',
+        margin: [0, 0, 0, 0],
+      },
       { text: fun_.numFormatTwoDecimals(detalle.deposito), pageBreak: br_ ? 'before' : 'none', alignment: 'right' },
       { text: fun_.numFormatTwoDecimals(detalle.balance_factura), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 20, 0] },
     );

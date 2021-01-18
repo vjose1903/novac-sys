@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { logoADM, pdfBase64Prueba } from '../../../../myPdf/utils/files';
 import { DBservice } from '../../core/services/bdservice.service';
+import { myElectron } from '../../core/services/electron';
 import { IpcService } from '../../core/services/ipc.service';
 import { ModalService } from '../components/modal/modal.service';
 
@@ -10,12 +11,14 @@ import { ModalService } from '../components/modal/modal.service';
   templateUrl: './reportes.component.html',
   styleUrls: ['./reportes.component.scss'],
 })
-export class ReportesComponent implements OnInit, OnDestroy {
+export class ReportesComponent extends myElectron implements OnInit, OnDestroy {
   pdfSrc: any;
   fileName: any;
   tipoModal: string;
 
-  constructor(private _ipc: IpcService, private mServ: ModalService, private dbServ: DBservice) {}
+  constructor(private _ipc: IpcService, private mServ: ModalService, private dbServ: DBservice) {
+    super();
+  }
 
   appDir;
   subDeci: Subscription;
@@ -23,7 +26,6 @@ export class ReportesComponent implements OnInit, OnDestroy {
   titulo_moda_reporte;
 
   ngOnInit() {
-    // this.searchAppDir();
     this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
       if (res.status === 'si') {
         let obj;
@@ -58,7 +60,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
       }, 5);
     });
 
-    this._ipc.on('printReporteRes', async (event: Electron.IpcMessageEvent, res) => {
+    this._ipc.on('printBase64Res', async (event: Electron.IpcMessageEvent, res) => {
       if (res.status === 'si') {
         this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
       } else {
@@ -88,15 +90,12 @@ export class ReportesComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   ngOnDestroy() {
     this.subDeci.unsubscribe();
     this.subObj.unsubscribe();
     this._ipc.removeListener('printRes');
-    this._ipc.removeListener('printReporteRes');
-  }
-
-  quitarFocodeElectron() {
-    document.getElementById('foco_angular').click();
+    this._ipc.removeListener('printBase64Res');
   }
 
   async makeCuadre() {
@@ -246,11 +245,12 @@ export class ReportesComponent implements OnInit, OnDestroy {
         };
         console.log('obj --> ', obj);
 
-        this._ipc.send('printReporte', obj);
+        this._ipc.send('printBase64', obj);
       } else if (this.tipoModal === 'cuadre') {
         this.makeCuadre();
       }
     }
+
     setTimeout(() => {
       this.mServ.mostrarModal(false);
       this.resetVariables();

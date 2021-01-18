@@ -116,7 +116,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
       }, 5);
     });
 
-    this._ipc.on('printReporteRes', async (event: Electron.IpcMessageEvent, res) => {
+    this._ipc.on('printBase64Res', async (event: Electron.IpcMessageEvent, res) => {
       if (res.status === 'si') {
         this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
       } else {
@@ -294,7 +294,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
         console.log('this.pdfSrc ==> ', this.pdfSrc);
         console.log('this.fileName ==> ', this.fileName);
 
-        this._ipc.send('printReporte', obj);
+        this._ipc.send('printBase64', obj);
         this.resetVariables();
       } else {
         const temp = JSON.parse(JSON.stringify(this.listaArticulos));

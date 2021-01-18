@@ -11,13 +11,15 @@ import { Subscription } from 'rxjs';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { FunctionService } from '../../../core/services/functions.service';
 import { LoaderService } from '../../../loader/loader.service';
+import { IpcService } from '../../../core/services/ipc.service';
+import { modalClass } from '../../components/modal/modal';
 
 @Component({
   selector: 'app-registro-articulos',
   templateUrl: './registro-articulos.component.html',
   styleUrls: ['./registro-articulos.component.scss'],
 })
-export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges {
+export class RegistroArticulosComponent extends modalClass implements OnInit, OnDestroy, OnChanges {
   // =============================================
   //  TABLAS
   // =============================================
@@ -101,10 +103,13 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     private fun: FunctionService,
     private fb: FormBuilder,
     private router: Router,
-    private mServ: ModalService,
+    public mServ: ModalService,
     private tServ: TablasService,
     private loaderService: LoaderService,
-  ) {}
+    public _ipc: IpcService,
+  ) {
+    super(mServ, _ipc);
+  }
 
   ngOnInit() {
     this.createForm();
@@ -113,12 +118,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
     this.necesarioStart();
-
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== null && res !== undefined) {
-        this.decisionModal(res);
-      }
-    });
+    this.getInit('decisionModal');
   }
 
   filtroFormula(item) {
@@ -871,6 +871,7 @@ export class RegistroArticulosComponent implements OnInit, OnDestroy, OnChanges 
     this.mServ.ModalSeleccion(arg.ARG);
     this.mServ.mostrarModal(true);
   }
+
   decisionModal(arg) {
     if (arg) {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);

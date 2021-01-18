@@ -4,15 +4,11 @@ import { AppConfig } from '../src/environments/environment.js';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
-function getPageMargin(data) {
+function getPageMargin(data, is_nota, is_contado, is_venta) {
   let margins = [];
 
-  if (data.condicion === 'Contado') {
-    if (data.aplicada_a) {
-      margins = [0, 165, 0, 30];
-    } else {
-      margins = [0, 161, 0, 30];
-    }
+  if (is_contado) {
+    margins = [0, 158, 0, 30];
   } else {
     margins = [0, 174, 0, 30];
   }
@@ -21,11 +17,15 @@ function getPageMargin(data) {
 }
 
 export function makeFacturaVenta(data) {
+  const is_venta = data.FACTURA_DE === 'venta' ? true : false;
+  const is_contado = data.condicion === 'Contado' ? true : false;
+  const is_nota = data.FACTURA_DE === 'nota' ? true : false;
+
   const dd = {
     pageSize: { width: 990, height: 398 },
-    pageMargins: getPageMargin(data),
-    header: cabeceraFacturaVenta(data),
-    content: contenidoFacturaVenta(data),
+    pageMargins: getPageMargin(data, is_nota, is_contado, is_venta),
+    header: cabeceraFacturaVenta(data, is_nota, is_contado, is_venta),
+    content: contenidoFacturaVenta(data, is_nota, is_contado, is_venta),
     footer: (currentPage, pageCount) => {
       return [
         {
@@ -33,8 +33,8 @@ export function makeFacturaVenta(data) {
           alignment: 'right',
           margin: [0, 0, 30, 0],
         },
-        data.FACTURA_DE === 'venta'
-          ? data.condicion === 'Contado'
+        is_venta
+          ? is_contado
             ? { text: '' }
             : {
                 text: 'Después de la fecha de vencimiento de la factura, se generará un 2% de recargo',
@@ -62,7 +62,7 @@ export function makeFacturaVenta(data) {
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraFacturaVenta(data) {
+function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta) {
   const header = [
     {
       columns: [
@@ -75,15 +75,30 @@ function cabeceraFacturaVenta(data) {
           },
         ],
         [
-          data.FACTURA_DE === 'nota'
+          is_nota
             ? { text: '' }
             : {
                 text: 'FACTURA A ' + data.condicion.toUpperCase(),
                 alignment: 'right',
                 bold: true,
                 style: 'letra14',
-                margin: [0, 20, 30],
+                margin: [0, 20, 30, 0],
               },
+          {
+            text: data.tipo_factura,
+            style: 'letra14',
+            margin: [0, is_nota ? 20 : 2, 30, 0],
+            alignment: 'right',
+          },
+
+          is_nota
+            ? {
+                text: `Aplicada a: ${data.aplicada_a}`,
+                style: 'letra11',
+                margin: [0, 2, 30, 0],
+                alignment: 'right',
+              }
+            : { text: '' },
           //
         ],
       ],
@@ -114,116 +129,82 @@ function cabeceraFacturaVenta(data) {
     },
 
     {
-      margin: [15, 15, 0, 0],
-      columns: [
-        [
-          {
-            text: [
-              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
-                ? { text: 'Cliente : ', style: 'letra12' }
-                : { text: 'Suplidor : ', style: 'letra12' },
-              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
-                ? { text: data.cliente.nombre, style: 'letra12' }
-                : { text: data.suplidor.nombre, style: 'letra12' },
-            ],
-            margin: [0, 0, 0, 0],
-          },
-          {
-            text: [
-              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
-                ? { text: 'Rnc cliente : ', style: 'letra12' }
-                : { text: 'Rnc suplidor : ', style: 'letra12' },
-              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
-                ? { text: data.cliente.rnc, style: 'letra12' }
-                : { text: data.suplidor.rnc, style: 'letra12' },
-            ],
-            margin: [0, 5, 0, 0],
-          },
-          {
-            text: [
-              { text: 'Dirección : ', style: 'letra12' },
-              data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
-                ? { text: data.cliente.direccion, style: 'letra12' }
-                : { text: data.suplidor.direccion, style: 'letra12' },
-            ],
-            margin: [0, 5, 0, 0],
-          },
-        ],
-        [
-          {
-            text: [{ text: data.tipo_factura, style: 'letra14' }],
-            margin: [0, 15, 0, 0],
-            alignment: 'center',
-          },
+      margin: [15, 8, 0, 0],
+      text: [
+        {
+          text: [
+            is_venta || is_nota ? { text: 'Cliente : ', style: 'letra12' } : { text: 'Suplidor : ', style: 'letra12' },
+            is_venta || is_nota ? { text: data.cliente.nombre, style: 'letra12' } : { text: data.suplidor.nombre, style: 'letra12' },
+          ],
+        },
+      ],
+    },
 
-          data.FACTURA_DE === 'compra'
-            ? {
-                text: [{ text: '- - - COMPRA - - -', style: 'letra11' }],
-                margin: [0, 1, 0, 0],
-                alignment: 'center',
-              }
-            : { text: '' },
+    {
+      text: [
+        is_venta || is_nota ? { text: 'Rnc cliente : ', style: 'letra12' } : { text: 'Rnc suplidor : ', style: 'letra12' },
+        is_venta || is_nota ? { text: data.cliente.rnc, style: 'letra12' } : { text: data.suplidor.rnc, style: 'letra12' },
+      ],
+      margin: [15, 5, 0, 0],
+    },
 
-          data.FACTURA_DE === 'nota'
-            ? {
-                text: [
-                  { text: 'Aplicada a: ', style: 'letra11' },
-                  { text: data.aplicada_a, style: 'letra11' },
-                ],
-                margin: [0, 1, 0, 0],
-                alignment: 'center',
-              }
-            : { text: '' },
-        ],
-        [
-          {
-            margin: data.condicion === 'Contado' ? [60, 0, 0, 0] : [60, -5, 0, 0],
-            stack: [
-              {
-                text: [
-                  { text: 'Fecha : ', style: 'letra11' },
-                  { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra11' },
-                  { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra11' },
-                ],
-                margin: [85, -10, 0, 0],
-              },
-              (data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' || data.FACTURA_DE === 'compra') && data.condicion === 'Contado'
-                ? { text: '' }
-                : {
-                    text: [
-                      { text: 'Fecha vencimiento : ', style: 'letra11' },
-                      { text: fun_.my_dateFormater(data.fecha_vencimiento), style: 'letra11' },
-                    ],
-                    margin: [85, 3, 0, 0],
-                  },
-              {
-                text: [
-                  { text: 'NCF : ', style: 'letra11' },
-                  { text: data.numero_comprobante, style: 'letra11' },
-                ],
-                margin: [85, 3, 0, 0],
-              },
-              {
-                text: [
-                  { text: 'Doc No : ', style: 'letra11' },
-                  { text: fun_.my_padStart(data.numero_factura, 8, '0'), style: 'letra11' },
-                ],
-                margin: [85, 3, 0, 0],
-              },
-              {
-                text: [
-                  { text: 'Valida hasta : ', style: 'letra11' },
-                  data.tipo_factura_id === 3
-                    ? { text: 'No aplica.', style: 'letra11' }
-                    : data.FACTURA_DE === 'compra'
-                    ? { text: ' ' }
-                    : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra11' },
-                ],
-                margin: [85, 3, 0, 0],
-              },
-            ],
-          },
-        ],
+    {
+      margin: [15, 5, 0, 0],
+      text: [
+        {
+          text: [
+            { text: 'Dirección : ', style: 'letra12' },
+            is_venta || is_nota ? { text: data.cliente.direccion, style: 'letra12' } : { text: data.suplidor.direccion, style: 'letra12' },
+          ],
+        },
+      ],
+    },
+
+    {
+      margin: [710, -50, 0, 0],
+      stack: [
+        {
+          text: [
+            { text: 'Fecha : ', style: 'letra11' },
+            { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra11' },
+            { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra11' },
+          ],
+          margin: [85, -10, 0, 0],
+        },
+        is_contado
+          ? { text: '' }
+          : {
+              text: [
+                { text: 'Fecha vencimiento : ', style: 'letra11' },
+                { text: fun_.my_dateFormater(data.fecha_vencimiento), style: 'letra11' },
+              ],
+              margin: [85, 3, 0, 0],
+            },
+        {
+          text: [
+            { text: 'NCF : ', style: 'letra11' },
+            { text: data.numero_comprobante, style: 'letra11' },
+          ],
+          margin: [85, 3, 0, 0],
+        },
+        {
+          text: [
+            { text: 'Doc No : ', style: 'letra11' },
+            { text: fun_.my_padStart(data.numero_factura, 8, '0'), style: 'letra11' },
+          ],
+          margin: [85, 3, 0, 0],
+        },
+        {
+          text: [
+            { text: 'Valida hasta : ', style: 'letra11' },
+            data.tipo_factura_id === 3
+              ? { text: 'No aplica.', style: 'letra11' }
+              : data.FACTURA_DE === 'compra'
+              ? { text: ' ' }
+              : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra11' },
+          ],
+          margin: [85, 3, 0, 0],
+        },
       ],
     },
 
@@ -252,7 +233,7 @@ function cabeceraFacturaVenta(data) {
             { text: 'Articulo', bold: true, margin: [-5, 0, 0, 0] },
             { text: 'Cantidad', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
             { text: 'Unidad', bold: true, alignment: 'center', margin: [0, 0, 15, 0] },
-            data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota'
+            is_venta || is_nota
               ? { text: 'Precio', bold: true, alignment: 'right', margin: [0, 0, 17, 0] }
               : { text: 'Costo', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
             { text: 'Itbis', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
@@ -278,12 +259,12 @@ function calcularPrecio(cant, precio, tipo) {
   return fun_.redondearAdos(res);
 }
 
-function contenidoFacturaVenta(data) {
+function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
   const tempBody = [];
+  const _break = 6;
   data.detalle_facturas.forEach((detalle, i) => {
     const row = [];
-
-    const br_ = i !== 0 && i % 5 === 0;
+    const br_ = i !== 0 && i % _break === 0;
 
     row.push(
       { text: i + 1, alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
@@ -291,7 +272,7 @@ function contenidoFacturaVenta(data) {
       { text: fun_.numFormatTwoDecimals(detalle.cantidad), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
       { text: detalle.unidad, alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
       {
-        text: fun_.numFormatTwoDecimals(data.FACTURA_DE === 'venta' || data.FACTURA_DE === 'nota' ? detalle.precio : detalle.costo),
+        text: fun_.numFormatTwoDecimals(is_venta || is_nota ? detalle.precio : detalle.costo),
         alignment: 'right',
         margin: [0, 0, 14, 0],
         pageBreak: br_ ? 'before' : 'none',
@@ -308,10 +289,10 @@ function contenidoFacturaVenta(data) {
         widths: [30, 245, '*', '*', '*', '*', '*'],
         body: tempBody,
       },
-      margin: data.condicion === 'Contado' ? [10, -2, 10, 0] : [10, -2, 10, 0],
+      margin: is_contado ? [10, -2, 10, 0] : [10, -2, 10, 0],
       layout: {
         hLineWidth: (i, node) => {
-          return i % 5 === 0 && node.table.body.length !== 5 ? 0 : i === node.table.body.length ? 2 : 1;
+          return i % _break === 0 && node.table.body.length !== _break ? 0 : i === node.table.body.length ? 2 : 1;
         },
         vLineWidth: (i, node) => {
           return 0;
@@ -343,22 +324,8 @@ function contenidoFacturaVenta(data) {
                 stack: [
                   {
                     canvas: [
-                      {
-                        type: 'rect',
-                        x: 10,
-                        y: 0,
-                        w: 160,
-                        h: 1,
-                        color: '#000000',
-                      },
-                      {
-                        type: 'rect',
-                        x: 250,
-                        y: 0,
-                        w: 160,
-                        h: 1,
-                        color: '#000000',
-                      },
+                      { type: 'rect', x: 10, y: 0, w: 160, h: 1, color: '#000000' },
+                      { type: 'rect', x: 250, y: 0, w: 160, h: 1, color: '#000000' },
                     ],
                     margin: [0, 80, 0, 0],
                   },
@@ -424,7 +391,7 @@ function contenidoFacturaVenta(data) {
                         margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
                       },
                     ],
-                    data.FACTURA_DE === 'compra' || data.FACTURA_DE === 'nota'
+                    data.FACTURA_DE === 'compra' || is_nota
                       ? [{ text: '' }, { text: '' }]
                       : [
                           { text: 'Devuelta RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },

@@ -1,18 +1,18 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { DBservice } from '../../core/services/bdservice.service';
+import { DBservice } from '../../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../core/services/GLOBAL';
+import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 import { NgSelectConfig } from '@ng-select/ng-select';
-import { TablasComponent } from '../components/tablas/tablas.component';
-import { ModalService } from '../components/modal/modal.service';
-import { TablasService } from '../components/tablas/tablas.service';
-import { IpcService } from '../../core/services/ipc.service';
-import { FunctionService } from '../../core/services/functions.service';
+import { TablasComponent } from '../../components/tablas/tablas.component';
+import { ModalService } from '../../components/modal/modal.service';
+import { TablasService } from '../../components/tablas/tablas.service';
+import { IpcService } from '../../../core/services/ipc.service';
+import { FunctionService } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -426,6 +426,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
       tipo_factura_id: 17,
       devuelta: this.Devuelta,
       numero_recibo: null,
+      estado: true,
     };
 
     obj.total = this.detalleYtotal.total_recibo;
@@ -437,6 +438,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
           data: res,
           type: 'recibo_ingreso',
         };
+
         this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
         this.clienteAdepositar.balance = res.cliente.balance;
         this.pedirFacturasPorCliente(this.clienteAdepositar.id, this.tServ.obj_paginate);

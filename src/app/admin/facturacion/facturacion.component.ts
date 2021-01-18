@@ -1143,6 +1143,9 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
       }
 
       res['FACTURA_DE'] = this.metodo;
+
+      console.log(JSON.stringify(res));
+
       const obj = {
         data: res,
         type: 'facturacion',

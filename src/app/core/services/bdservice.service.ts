@@ -355,8 +355,21 @@ export class DBservice {
   getTiposRecibos() {
     return this.peticion('tipo_recibos', 'get');
   }
+
   createRecibo(arg) {
     return this.peticion('recibos_ingresos', 'post', JSON.stringify(arg));
+  }
+
+  getRecibosFiltrados(arg, page, per_page, paginado) {
+    return this.peticionSinLoad(`recibos_ingresos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+  }
+
+  getRecibosLimit(cant, loading) {
+    if (loading) {
+      return this.peticion(`recibos_ingresos/get/${cant}`, 'get');
+    } else {
+      return this.peticionSinLoad(`recibos_ingresos/get/${cant}`, 'get');
+    }
   }
 
   revertirLastReciboByFacturaId(id) {

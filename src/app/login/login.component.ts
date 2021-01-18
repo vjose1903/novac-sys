@@ -9,7 +9,15 @@ import { DBservice } from '../core/services/bdservice.service';
 import { IpcService } from '../core/services/ipc.service';
 import { PdfService } from '../core/services/pdf/pdf.service';
 
-import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, recibo_de_ingreso, venta_credito_consumo } from '../../assets/facturas';
+import {
+  compra_contado_valor_fiscal,
+  compra_credito_valor_fiscal,
+  conduce,
+  nota_credito,
+  recibo_de_ingreso,
+  venta_contado_consumo,
+  venta_credito_consumo,
+} from '../../assets/facturas';
 import { FunctionService } from '../core/services/functions.service';
 @Component({
   selector: 'app-login',
@@ -86,7 +94,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   async printTest() {
     // const data_ = compra_credito_valor_fiscal;
     // const data_ = compra_contado_valor_fiscal;
-    const data_ = venta_credito_consumo;
+    // const data_ = venta_credito_consumo;
+    const data_ = venta_contado_consumo;
+    // const data_ = nota_credito;
 
     const obj = {
       data: data_,

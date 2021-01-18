@@ -337,10 +337,11 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.getInfoChange.emit(obj);
   }
 
-  iconBtn(key, i) {
+  iconBtn(key, i, row_) {
     const obj = {
       index: i,
       column: key,
+      row: row_,
     };
     this.clickIcon.emit(obj);
   }
