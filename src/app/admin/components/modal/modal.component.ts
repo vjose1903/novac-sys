@@ -334,6 +334,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           if (this.seleccionModal.length === 0) {
             this.noArticulo();
           }
+          console.log('articulos --> ', res.data);
+
           this.showModal = true;
           const obj = {
             total: res.total_registros,

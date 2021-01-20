@@ -204,11 +204,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   async calcularSacoEnRow(i, row, articulo, lugar, callback = (arg) => {}) {
-    console.log('i--> ', i);
-    console.log('row--> ', row);
-    console.log('articulo--> ', articulo);
-    console.log('lugar--> ', lugar);
-
     try {
       const operacion = row.calcular_saco;
       const se_calcula = row.se_calcula_saco;
@@ -240,7 +235,6 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       } else {
         const precio = calculo;
         (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
-        console.log('lugar ==> ', lugar);
 
         if (se_calcula || lugar === 'select') {
           (this.control.controls[i] as any).controls['des'].setValue(`${descripcion}*`);
@@ -591,6 +585,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     const descripcion = (this.control.controls[i] as any).controls['des'].value;
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
     let articulo;
+
     try {
       articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
     } catch (error) {}
@@ -616,7 +611,9 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
             cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
           }
         }
-        if (unity === 'Saco') {
+
+        if (unity === 'Saco' && articulo.medida !== 'Saco') {
+          console.error('ENTRO EN SACO para cambiarlo a libra');
           unity = 'Libra';
         }
 
@@ -635,17 +632,16 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
       if (this.metodo === 'venta' && res.excede) {
         this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR', true);
         callback(true);
-        // return true;
       } else {
         callback(false);
-        // return false;
       }
     } catch (error) {
       if (error.error) {
         this.dbServ.toastError(error.error.msg, 'ERROR', true);
-      } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
+      // else {
+      //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
+      // }
       callback(false);
     }
   }

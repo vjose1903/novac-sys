@@ -591,8 +591,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     } catch (error) {
       if (error.error) {
         this.dbServ.toastError(error.error.msg, 'ERROR', true);
-      } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
       callback(false);
     }
@@ -1081,8 +1079,6 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     } catch (error) {
       if (error.error) {
         this.dbServ.toastError(error.error.msg, 'ERROR', true);
-      } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
     }
   }

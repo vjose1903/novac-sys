@@ -373,7 +373,11 @@ export class DBservice {
   }
 
   revertirLastReciboByFacturaId(id) {
-    return this.peticion(`recibos_ingresos/revertir/${id}`, 'get');
+    return this.peticion(`recibos_ingresos/revertir/by_factura/${id}`, 'get');
+  }
+
+  revertirReciboById(id) {
+    return this.peticion(`recibos_ingresos/revertir/by_id/${id}`, 'get');
   }
 
   // =====================================================================
@@ -388,6 +392,10 @@ export class DBservice {
   // FACTURAS
   // =====================================================================
 
+  verificateCanUpdateFacturaById(id) {
+    return this.peticion(`cabecera_facturas/custom/canUpdate/:id`, 'get');
+  }
+
   getTiposFacturas() {
     return this.peticion('tipo_facturas', 'get');
   }
@@ -400,6 +408,14 @@ export class DBservice {
     return this.peticion(`cabecera_facturas/cliente/${cliente_id}/pagada/${pagada}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
+  getInfoFacturasByArray(ids, campos) {
+    return this.peticion(`custom/getinfo?campos=${campos}&ids=${ids}`, 'get');
+  }
+
+  getFacturasById(id) {
+    return this.peticion(`cabecera_facturas/${id}`, 'get');
+  }
+
   getFacturasByParams(campo, valor, tipo_factura_id, adelantada = false, page, per_page, paginado) {
     const valor_enc = btoa(valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
@@ -408,6 +424,7 @@ export class DBservice {
       'get',
     );
   }
+
   cancelarFactura(id) {
     return this.peticion(`cabecera_facturas/anular_factura/${id}`, 'post', JSON.stringify({}));
   }

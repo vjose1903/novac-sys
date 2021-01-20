@@ -81,9 +81,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     } catch (error) {
       if (error.error) {
         this.dbServ.toastError(error.error.msg, 'ERROR', true);
-      } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
+      // else {
+      //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
+      // }
     }
   }
 
@@ -97,9 +98,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       } catch (error) {
         if (error.error) {
           this.dbServ.toastError(error.error.msg, 'ERROR', true);
-        } else {
-          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
         }
+        // else {
+        //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
+        // }
       }
     }
   }
@@ -238,9 +240,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         } catch (error) {
           if (error.error) {
             this.dbServ.toastError(error.error.msg, 'ERROR', true);
-          } else {
-            this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
           }
+          //  else {
+          //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
+          // }
         }
       });
     }
@@ -325,16 +328,16 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.mServ.mostrarModal(true);
   }
 
-  abrirModalDinamicText(tipo) {
-    const obj = {};
-    if (tipo === 'confirmar') {
-      this.tipoModal = 'confirmar_produccion';
-      this.mServ.modalTipo('dinamico_texto');
-      obj['texto_modal'] = 'Seguro de que desea confirmar la produccion.';
+    abrirModalDinamicText(tipo) {
+      const obj = {};
+      if (tipo === 'confirmar') {
+        this.tipoModal = 'confirmar_produccion';
+        this.mServ.modalTipo('dinamico_texto');
+        obj['texto_modal'] = 'Seguro de que desea confirmar la produccion.';
+      }
+      this.mServ.ModalSeleccion(obj);
+      this.mServ.mostrarModal(true);
     }
-    this.mServ.ModalSeleccion(obj);
-    this.mServ.mostrarModal(true);
-  }
 
   decisionModalP(bool) {
     const listaTemp = JSON.parse(JSON.stringify(this.lista_produccion));
@@ -394,9 +397,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       if (error.error) {
         // this.mostrarErrores(error.error.msg);
         this.dbServ.toastError(error.error.msg, 'Error');
-      } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
+      //  else {
+      //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
+      // }
     }
   }
 

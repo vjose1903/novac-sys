@@ -38,9 +38,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   seleccionado_id: any;
 
-  @HostListener('input') oninput() {
-    this.searchItems();
-  }
+  // @HostListener('input') oninput() {
+  //   this.searchItems();
+  // }
 
   element: HTMLElement;
 
@@ -533,6 +533,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const keys = _.keys(objeto);
     const values = _.values(objeto);
     const fin = values[0] > 1 ? this.medidas[keys[0]] : keys[0];
+
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[0])) + '  ' + fin;
   }
 

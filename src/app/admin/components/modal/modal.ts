@@ -88,4 +88,16 @@ export class modalClass extends myElectron {
     if (this._lista.includes('')) {
     }
   }
+
+  resetModalVariables() {
+    this.tipoModal = undefined;
+  }
+
+  abrirModal(tipo_modal, tipo, seleccion) {
+    this.tipoModal = tipo_modal;
+    this.mServ.modalTipo(tipo);
+
+    this.mServ.ModalSeleccion(seleccion);
+    this.mServ.mostrarModal(true);
+  }
 }

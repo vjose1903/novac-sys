@@ -132,6 +132,7 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
       const res = await this.dbServ.getViajesByCompletada(palabra_a_buscar, page, per_page, true).toPromise();
+      console.log(' res --> ', res);
 
       const fechaA = moment().format('YYYY-MM-DD');
       res.data.map((fact) => {
@@ -168,9 +169,10 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
 
       if (error.error) {
         this.dbServ.toastError(error.error.msg, 'ERROR', true);
-      } else {
-        this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
       }
+      //  else {
+      //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
+      // }
     }
   }
 
@@ -354,9 +356,10 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
 
         if (err.error) {
           this.dbServ.toastError(err.error.msg, 'ERROR', true);
-        } else {
-          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
         }
+        // else {
+        //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
+        // }
       },
     );
   }

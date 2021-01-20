@@ -656,9 +656,13 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
   puts(cFileName, 'cFileName');
   puts(base64, 'base64');
   puts(type, 'type');
+  console.log(type, 'type');
+  console.log(cFileName, 'cFileName');
+
   try {
     fs.writeFile(FileName, base64, { encoding: 'base64' }, (err) => {
       puts('PASOO EL METODO QUE CREA EL ARCHIVO PDF');
+      console.log('PASOO EL METODO QUE CREA EL ARCHIVO PDF');
       imprimir(cFileName, type);
     });
   } catch (err) {
@@ -698,14 +702,19 @@ function imprimir(cFileName, tipo) {
   puts(tipo, 'EL MALDITO TIPO');
   puts(file_path, 'file_path');
   puts(sumatrapdf_path, 'sumatrapdf_path');
+
   // const bat = require.resolve(sumatrapdf_path);
   // const profile = require.resolve('../profiles/app.profile.js');
   // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
   //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
+
   const orientation = tipo === 'reporte' ? 'Portrait' : 'landscape';
   const paper_size = tipo === 'reporte' ? 'carta' : 'VJPOS';
 
   const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},noscale,paper=${paper_size},simplex" -silent "${file_path}"`;
+
+  console.log('el maldito comando --> ', comando);
+
   cmd(comando, (res) => {
     puts(res, 'respuesta impresion');
 

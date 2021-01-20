@@ -72,7 +72,8 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
     },
   ];
   lista_recibos;
-  tipoModal: string;
+  rowSelected: any;
+
   constructor(public dbServ: DBservice, private router: Router, public _ipc: IpcService, public mServ: ModalService, private tServ: TablasService) {
     super(mServ, _ipc);
   }
@@ -81,7 +82,6 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
 
     this.necesarioStart();
     this.getInit(['printRes', 'decisionModal', 'printBase64Res']);
-    // this.getInit(['printRes']);
   }
 
   ngOnDestroy() {
@@ -91,7 +91,7 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
 
   ipcPrintResponse(res) {
     if (res.status === 'si') {
-      this.fileName = res.file.split('.')[0];
+      this.fileName = res.file;
       this.pdfSrc = res.body;
 
       const obj = {
@@ -99,10 +99,10 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
         titulo: 'Revisión de recibo de ingreso',
         height: '25rem',
         reimprimir: true,
-        fileName: this.fileName,
+        fileName: this.fileName.split('.')[0],
       };
 
-      this.abrirModalReporte(obj);
+      this.abrirModal('visor_pdf', 'visor_pdf', obj);
     } else {
       this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
     }
@@ -110,21 +110,6 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
 
   ipcBase64Resonse(res) {
     console.log('ipcBase64Resonse --> ', res);
-  }
-
-  decisionModal(res) {
-    if (res) {
-      console.log('this.filename --> ', this.fileName);
-
-      const obj = {
-        base64: this.pdfSrc,
-        filename: this.fileName,
-        type: 'recibo_ingreso',
-      };
-      console.log('obj --> ', obj);
-
-      this._ipc.send('printBase64', obj);
-    }
   }
 
   mapeoRecibos(res) {
@@ -159,7 +144,7 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
-    this.getLast50Recibos(true);
+    await this.getLast50Recibos(true);
   }
 
   async getLast50Recibos(load) {
@@ -167,6 +152,7 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
       let res = await this.dbServ.getRecibosLimit(50, load).toPromise();
       res = this.mapeoRecibos(res);
       this.lista_recibos = GLOBAL.duplicarJson(res);
+
       const obj = {};
       obj['total'] = res.length;
       obj['tabla'] = 'listaRecibos';
@@ -181,14 +167,15 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
   }
 
   clickIcon(arg) {
-    console.log(arg);
-
+    this.rowSelected = arg.row;
     switch (arg.column) {
       case 'ver':
         this.getReciboBase64(arg.row);
         break;
 
       case 'anular':
+        const obj = { texto_modal: `Seguro de que desea anular el recibo #${arg.row.numero_recibo}` };
+        this.abrirModal('anular', 'dinamico_texto', obj);
         break;
 
       default:
@@ -223,11 +210,15 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
 
   getReciboBase64(arg) {
     const recibo_selected = _.find(this.lista_recibos, (recibo) => recibo.id === arg.id);
+    // let ids = '';
 
-    recibo_selected.detalle_recibos.map((detalle) => {
-      detalle['total_factura'] = 0;
-      return detalle;
-    });
+    // recibo_selected.detalle_recibos.map((detalle) => {
+    //   ids += detalle['cabecera_factura_id'];
+
+    //   detalle['total_factura'] = 0;
+
+    //   return detalle;
+    // });
 
     const obj = {
       data: recibo_selected,
@@ -238,11 +229,43 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
     this._ipc.send('print', obj);
   }
 
-  abrirModalReporte(obj) {
-    this.tipoModal = 'visor_pdf';
-    this.mServ.modalTipo('visor_pdf');
-    this.mServ.ModalSeleccion(obj);
+  imprimir_base64() {
+    const obj = {
+      base64: this.pdfSrc,
+      filename: this.fileName,
+      type: 'recibo_ingreso',
+    };
 
-    this.mServ.mostrarModal(true);
+    this._ipc.send('printBase64', obj);
+  }
+
+  async anularRecibo(id) {
+    try {
+      const res = await this.dbServ.revertirReciboById(id).toPromise();
+      this.getLast50Recibos(false);
+      this.dbServ.toastSuccess(res.msg, 'CORRECTO');
+    } catch (error) {
+      if (error.error) {
+        this.dbServ.toastError(error.error.msg, 'ERROR');
+      }
+    }
+  }
+
+  decisionModal(res) {
+    if (res) {
+      switch (this.tipoModal) {
+        case 'visor_pdf':
+          this.imprimir_base64();
+          break;
+
+        case 'anular':
+          this.anularRecibo(this.rowSelected.id);
+          break;
+
+        default:
+          break;
+      }
+    }
+    this.rowSelected = undefined;
   }
 }

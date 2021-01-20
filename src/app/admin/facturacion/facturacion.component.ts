@@ -421,6 +421,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async calcularPorcientoComprobante() {
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
+
     if (this.metodo === 'venta') {
       if (this.tipoFactura !== '00' && this.tipoFactura !== '0' && this.tipoFactura !== '02' && this.tipoFactura !== '2') {
         try {
@@ -469,6 +470,8 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
           this.enfocarInput('tipoFact');
           return false;
         }
+      } else {
+        return true;
       }
     }
   }
@@ -486,7 +489,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
       if (continuar) {
         this.enfocarInput(campo);
       } else {
-        this.enfocarInput('campo');
+        this.enfocarInput('tipoFact');
       }
     } else {
       this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR', true);
@@ -500,7 +503,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     if (campo === 'condicion') {
-      this.checkTipoFactura(campo, valor);
+      this.checkTipoFactura(campo, valor, false);
     }
 
     if (campo === 'venta') {
@@ -610,6 +613,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
   }
+
   desEnfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.blur();
@@ -1144,8 +1148,6 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
 
       res['FACTURA_DE'] = this.metodo;
 
-      console.log(JSON.stringify(res));
-
       const obj = {
         data: res,
         type: 'facturacion',
@@ -1167,7 +1169,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
       try {
         this.dbServ.toastError(error.error.msg, 'ERROR', true);
       } catch (error) {
-        this.dbServ.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR', true);
+        console.error('error--> ', error);
       }
     }
   }

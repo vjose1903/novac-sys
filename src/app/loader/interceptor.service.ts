@@ -53,7 +53,10 @@ export class InterceptorService implements HttpInterceptor {
       }),
 
       catchError((response: HttpErrorResponse) => {
-        if (response.error.msg === 'Para realizar esta accion debe de iniciar sesión.') {
+        if (response.error === null) {
+          this.dbServ.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR', true);
+        }
+        if (response.error && response.error.msg === 'Para realizar esta accion debe de iniciar sesión.') {
           this.dbServ.toastError(response.error.msg, 'ERROR');
           this.fun.nextCanToast(false);
           this.fun.logout();

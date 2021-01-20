@@ -458,9 +458,10 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
         if (err.error) {
           this.dbServ.toastError(err.error.msg, 'ERROR', true);
-        } else {
-          this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
         }
+        // else {
+        //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
+        // }
       },
     );
   }
