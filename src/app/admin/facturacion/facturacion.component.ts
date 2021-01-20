@@ -426,6 +426,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.tipoFactura !== '00' && this.tipoFactura !== '0' && this.tipoFactura !== '02' && this.tipoFactura !== '2') {
         try {
           const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
+          console.log('paquete --> ', paquete);
 
           this.paqueteComprobante = paquete.body;
 
@@ -473,6 +474,8 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
       } else {
         return true;
       }
+    } else {
+      return true;
     }
   }
 
@@ -482,14 +485,19 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
       this.NCFcompra = 'b' + valor;
 
       let continuar = true;
+      console.log('check --> ', check);
+
       if (check) {
         continuar = await this.calcularPorcientoComprobante();
-      }
+        console.log('continuar --> ', continuar);
 
-      if (continuar) {
-        this.enfocarInput(campo);
+        if (continuar) {
+          this.enfocarInput(campo);
+        } else {
+          this.enfocarInput('tipoFact');
+        }
       } else {
-        this.enfocarInput('tipoFact');
+        this.enfocarInput(campo);
       }
     } else {
       this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR', true);
