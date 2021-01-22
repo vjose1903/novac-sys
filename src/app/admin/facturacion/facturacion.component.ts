@@ -168,6 +168,8 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.metodo = this.route.snapshot.params['tipo'];
     this.action = this.route.snapshot.params['action'];
+    console.log('INIT ==== this.action   ==> ', this.action);
+
     this.id_factura = this.route.snapshot.params['id'];
 
     this.propietario_factura = null;
@@ -252,6 +254,8 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
       } else if (res && res.tipo_modal === 'cambio') {
         this.Devuelta = res.data.devuelta;
         this.forma_pago = res.data.forma_pago;
+        console.log('this.metodo --> ', this.metodo);
+
         if (this.metodo === 'compra') {
           if (res.data.decision_cambio) {
             this.cambiarCostos();
@@ -261,6 +265,8 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
           this.IMPRIMIR();
           this.mServ.ModalObj(undefined);
         } else {
+          console.log('this.action --> ', this.action);
+
           this.IMPRIMIR(this.action === 'update' ? 'editar_factura' : '');
           this.mServ.ModalObj(undefined);
         }
@@ -728,9 +734,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
   decisionModal(arg) {
     if (arg) {
       if (this.tipoModal === 'imprimir') {
-        this.IMPRIMIR();
-        // } else if (this.tipoModal === 'editar_factura') {
-        //   this.IMPRIMIR('editar_factura');
+        this.IMPRIMIR(this.action === 'update' ? 'editar_factura' : '');
       } else if (this.tipoModal === 'cancelar') {
         this.CancelarFactura('quedar');
       }
@@ -999,37 +1003,6 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  // async calcularSacoEnRow(i, articulo, callback = (arg) => {}) {
-  //   try {
-  //     const row_unidad = (this.control.controls[i] as any).controls['uni'].value;
-  //     let calculo = 0;
-  //     if (row_unidad === articulo.medida) {
-  //       calculo = articulo.precio_principal;
-  //     } else {
-  //       const splitUnidad = _.split(row_unidad, ' ');
-  //       let unity = splitUnidad[0];
-  //       let peso = 100 / Number(splitUnidad[2]);
-
-  //       if (unity === 'Saco') {
-  //         calculo = articulo.precio_principal / peso;
-  //       }
-  //     }
-
-  //       const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, this.FechaFactura, 'todos').toPromise();
-  //       const precio_saco = res.data[0].precio_principal;
-  //       const precio = calculo + precio_saco;
-  //       (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
-
-  //       const precio = calculo;
-  //       (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
-
-  //     callback(true);
-  //   } catch (error) {
-  //     this.dbServ.toastError('Error calculando el precio del saco', 'ERROR');
-  //     callback(false);
-  //   }
-  // }
-
   async checkCuerpoForSendBackend(cuerpo) {
     for (let i = 0; i < cuerpo.length; i++) {
       const element = cuerpo[i];
@@ -1141,6 +1114,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
 
     try {
       let res;
+      console.log('arg --> ', arg);
 
       if (arg === 'editar_factura') {
         res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();

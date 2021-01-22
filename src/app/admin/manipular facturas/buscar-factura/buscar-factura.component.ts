@@ -364,6 +364,7 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
         total: busqueda.total_registros,
         tabla: 'facturas_parms',
       };
+
       this.tServ.Func_total_paginas(obj);
       this.facturas = GLOBAL.duplicarJson(busqueda['data']);
 
