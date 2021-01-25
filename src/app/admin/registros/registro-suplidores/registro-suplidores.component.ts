@@ -138,7 +138,7 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
     }
   }
   atras() {
-    this.router.navigateByUrl('/admin');
+    this.router.navigateByUrl('/admin/dashboard');
   }
   enfocarInput(arg) {
     this.element = document.getElementById(arg) as HTMLElement;

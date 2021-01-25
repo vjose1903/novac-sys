@@ -1,0 +1,69 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { ConduceComponent } from '../conduce/conduce.component';
+import { FacturacionComponent } from '../facturacion/facturacion.component';
+import { HomeAdminComponent } from '../home/homeAdmin.component';
+import { InventarioComponent } from '../inventario/inventario.component';
+import { ProduccionComponent } from '../produccion/produccion.component';
+import { ReportesComponent } from '../reportes/reportes.component';
+import { LayoutComponent } from './layout.component';
+
+const routes: Routes = [
+  {
+    path: 'admin',
+    redirectTo: 'admin/dashboard',
+    pathMatch: 'full',
+  },
+  {
+    path: '',
+    component: LayoutComponent,
+    children: [
+      {
+        path: 'dashboard',
+        component: HomeAdminComponent,
+      },
+      {
+        path: 'factura/:tipo/:action/:id',
+        component: FacturacionComponent,
+      },
+
+      {
+        path: 'produccion',
+        component: ProduccionComponent,
+      },
+      {
+        path: 'registros',
+        loadChildren: () => import('../registros/registros.module').then((m) => m.RegistrosModule),
+      },
+      {
+        path: 'manipular',
+        loadChildren: () => import('../manipular facturas/manipular-facturas.module').then((m) => m.ManipularFacturasModule),
+      },
+      {
+        path: 'recibos',
+        loadChildren: () => import('../recibos/recibos.module').then((m) => m.RecibosModule),
+      },
+
+      {
+        path: 'inventario',
+        component: InventarioComponent,
+      },
+
+      {
+        path: 'conduce',
+        component: ConduceComponent,
+      },
+
+      {
+        path: 'reportes',
+        component: ReportesComponent,
+      },
+    ],
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+})
+export class LayoutRoutingModule {}

@@ -1,13 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonsModule, WavesModule } from 'angular-bootstrap-md';
-import { UsuariosService } from '../core/services/usuarios.service';
 
-import { ToastrService } from 'ngx-toastr';
 import { DBservice } from '../core/services/bdservice.service';
 import { IpcService } from '../core/services/ipc.service';
-import { PdfService } from '../core/services/pdf/pdf.service';
 
 import {
   compra_contado_valor_fiscal,
@@ -70,7 +66,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       .login(form.value)
       .then((res) => {
         this.fun.setUser(res.data);
-        this.router.navigateByUrl('/admin');
+        this.router.navigateByUrl('/admin/dashboard');
       })
       .catch((err) => {
         if (err.status === 0) {

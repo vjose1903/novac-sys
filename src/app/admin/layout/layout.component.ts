@@ -16,7 +16,7 @@ import { FunctionService } from '../../core/services/functions.service';
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
 })
-export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
+export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   mantenimiento: boolean;
 
   sub = new Subscription();
@@ -48,6 +48,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       if (routerEvent instanceof NavigationEnd || routerEvent instanceof NavigationCancel || routerEvent instanceof NavigationError) {
         this.showLoading = false;
+        this.checkRouteActiva();
       }
     });
   }
@@ -109,6 +110,7 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
       this.versionApp = arg;
     });
   }
+
   getVersion() {
     return this.versionApp;
   }
@@ -158,23 +160,32 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // =================================================================================
+  // CHECK ROUTE ACTIVA
+  // =================================================================================
+
+  checkRouteActiva() {
+    const temp_url = document.location.href.split('admin/');
+    if (temp_url[1]) {
+      const url = temp_url[1].split('/')[0];
+      this.actualTab = url;
+    }
+  }
+  // =================================================================================
   // NAVEGAR
   // =================================================================================
   navegar(lugar: any, accion?) {
     switch (lugar) {
       case 1:
         this.actualTab = 'home';
-        this.router.navigateByUrl('/admin');
+        this.router.navigateByUrl('/admin/dashboard');
         break;
 
       case 2:
-        this.actualTab = 'factura';
-        // this.router.navigateByUrl('/admin/factura');
+        this.actualTab = 'factura_select';
         break;
 
       case 3:
-        this.actualTab = 'registro';
-        // this.router.navigateByUrl("/admin/factura")
+        this.actualTab = 'registros_select';
         break;
 
       case 4:
@@ -186,88 +197,92 @@ export class NavbarAComponent implements OnInit, OnDestroy, AfterViewInit {
         this.actualTab = 'reportes';
         this.router.navigateByUrl('/admin/reportes');
         break;
+
+      case 7:
+        this.actualTab = 'recibos_select';
+        break;
+
       case 6:
         this.actualTab = 'produccion';
         this.router.navigateByUrl('/admin/produccion');
         break;
-      case 7:
-        this.actualTab = 'ingresos';
 
-        break;
       case 8:
-        this.actualTab = 'nota';
+        this.actualTab = 'manipular_select';
         break;
+
       case 9:
         this.actualTab = 'mantenimiento';
         break;
+
       case 10:
         this.actualTab = 'conduce';
         this.router.navigateByUrl('/admin/conduce');
         break;
 
       case 'venta':
-        this.router.navigateByUrl('/admin');
-        this.actualTab = 'home';
+        this.router.navigateByUrl('/admin/dashboard');
+        this.actualTab = 'factura';
         setTimeout(() => {
           this.router.navigate(['/admin/factura/venta/new/0']);
         }, 5);
         break;
 
       case 'compra':
-        this.router.navigateByUrl('/admin');
-        this.actualTab = 'home';
+        this.router.navigateByUrl('/admin/dashboard');
+        this.actualTab = 'factura';
+
         setTimeout(() => {
           this.router.navigate(['/admin/factura/compra/new/0']);
         }, 5);
         break;
 
       case 'buscarFactura':
-        this.router.navigateByUrl('/admin');
-        this.actualTab = 'home';
+        this.router.navigateByUrl('/admin/dashboard');
+        this.actualTab = 'manipular';
         setTimeout(() => {
-          this.router.navigate(['/admin/buscarFactura/' + accion]);
+          this.router.navigate(['/admin/manipular/buscarFactura/' + accion]);
         }, 25);
         break;
 
       case 'ingreso':
-        this.router.navigateByUrl('/admin/ingresos');
+        this.router.navigateByUrl('/admin/recibos/ingresos');
+        this.actualTab = 'recibos';
         break;
 
       case 'viajes':
-        this.router.navigateByUrl('/admin/viajes');
+        this.router.navigateByUrl('/admin/recibos/viajes');
+        this.actualTab = 'recibos';
         break;
 
       case 'ncf':
-        // this.router.navigateByUrl('/admin');
-        // this.actualTab = 'home';
-        // setTimeout(() => {
-        this.router.navigate(['/admin/ncf']);
-        // }, 5);
+        this.actualTab = 'registros';
+        this.router.navigate(['/admin/registros/ncf']);
         break;
 
       case 'articulos':
-        this.actualTab = 'home';
-        this.router.navigate(['/admin/articulos']);
+        this.actualTab = 'registros';
+        this.router.navigate(['/admin/registros/articulos']);
         break;
 
       case 'empleados':
-        this.actualTab = 'home';
-        this.router.navigate(['/admin/empleados']);
+        this.actualTab = 'registros';
+        this.router.navigate(['/admin/registros/empleados']);
         break;
 
       case 'clientes':
-        this.actualTab = 'home';
-        this.router.navigate(['/admin/clientes']);
+        this.actualTab = 'registros';
+        this.router.navigate(['/admin/registros/clientes']);
         break;
 
       case 'suplidores':
-        this.actualTab = 'home';
-        this.router.navigate(['/admin/suplidores']);
+        this.actualTab = 'registros';
+        this.router.navigate(['/admin/registros/suplidores']);
         break;
 
       case 'camiones':
-        this.actualTab = 'home';
-        this.router.navigate(['/admin/camiones']);
+        this.actualTab = 'registros';
+        this.router.navigate(['/admin/registros/camiones']);
         break;
 
       default:

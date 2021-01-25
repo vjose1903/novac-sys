@@ -1,11 +1,12 @@
-import { Component, OnInit, OnChanges, Input, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { TablasComponent } from '../../components/tablas/tablas.component';
-import { DBservice } from '../../../core/services/bdservice.service';
-import { GLOBAL } from '../../../core/services/GLOBAL';
-
+import { EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
-import { ModalService } from '../../components/modal/modal.service';
+import { DBservice } from '../../../../core/services/bdservice.service';
+
+import { GLOBAL } from '../../../../core/services/GLOBAL';
+import { ModalService } from '../../modal/modal.service';
+import { TablasComponent } from '../../tablas/tablas.component';
 
 @Component({
   selector: 'app-modal-seleccinar-articulo',

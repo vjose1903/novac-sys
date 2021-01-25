@@ -35,6 +35,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    console.log('estoy en--> ', document.location.href);
+
     // this.dbServ.getSecuenciaFacturas().subscribe(res => {
     //   this.obsServ.next_secuencia_factura(res);
     // });
@@ -72,6 +74,16 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
 
     this._ipc.on('log', (event: Electron.IpcMessageEvent, res) => {});
+
+    this.getPrintersName();
+  }
+
+  getPrintersName() {
+    this._ipc.on('printersNameRes', (event: Electron.IpcMessageEvent, res) => {
+      this._ipc.PRINTERS_NEW(res);
+    });
+
+    this._ipc.send('printerNames');
   }
 
   timeConvert(d) {

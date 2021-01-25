@@ -3,8 +3,8 @@ import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import * as moment from 'moment';
-import { ModalService } from '../../components/modal/modal.service';
-import { DBservice } from '../../../core/services/bdservice.service';
+import { ModalService } from '../../modal/modal.service';
+import { DBservice } from '../../../../core/services/bdservice.service';
 
 @Component({
   selector: 'app-form-reportes',

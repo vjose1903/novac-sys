@@ -5,13 +5,15 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-page-not-found',
   templateUrl: './page-not-found.component.html',
-  styleUrls: ['./page-not-found.component.scss']
+  styleUrls: ['./page-not-found.component.scss'],
 })
 export class PageNotFoundComponent implements OnInit {
-  constructor(private router:Router) {}
+  constructor(private router: Router) {}
 
   ngOnInit() {}
-  home(){
-    this.router.navigate(["/admin"])   
+  home() {
+    console.log('algo');
+
+    this.router.navigate(['/admin/dashboard']);
   }
 }

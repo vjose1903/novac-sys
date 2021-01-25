@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
-import { CssSelector } from '@angular/compiler';
 
 @Component({
   selector: 'app-btncircular',

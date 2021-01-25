@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import '../polyfills';
 
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -16,23 +15,21 @@ import { AppComponent } from './app.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
 // modulos
-import { HomeModule } from './login/login.module';
-import { AdminModule } from './admin/admin.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxBootstrapModule } from './modules/ngx-bootstrap.module';
 import { AngularModule } from './modules/angular.module';
 
 import { ToastrModule } from 'ngx-toastr';
-// import { UploadImgComponent } from './components/upload-img/upload-img.component';
-import { IpcService } from './core/services/ipc.service';
 
 import { NgxSpinnerModule } from 'ngx-spinner';
-import { LoaderService } from './loader/loader.service';
-import { LoaderInterceptor } from './loader/loader.interceptor';
+
 import { NgInitDirective } from './directives/ngInit';
 import { PrimengModule } from './modules/primeng.module';
 import { InterceptorService } from './loader/interceptor.service';
 import { AppRoutingModule } from './app.routing';
+import { CommonModule } from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
+import { PageNotFoundComponent } from './shared/components';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -40,20 +37,15 @@ export function HttpLoaderFactory(http: HttpClient) {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    NgInitDirective,
-
-    //  UploadImgComponent
-  ],
+  declarations: [AppComponent, NgInitDirective, PageNotFoundComponent],
   imports: [
-    PrimengModule,
+    CommonModule,
     BrowserModule,
+    PrimengModule,
     FormsModule,
     HttpClientModule,
     CoreModule,
     SharedModule,
-    HomeModule,
     ToastrModule.forRoot(),
     AppRoutingModule,
     NgxSpinnerModule,
@@ -68,24 +60,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     //modulos
     AngularModule,
     MDBBootstrapModule,
-    AdminModule,
+
     BrowserAnimationsModule,
     NgxBootstrapModule,
   ],
-  exports: [AngularModule, MDBBootstrapModule, AdminModule, BrowserAnimationsModule, NgxBootstrapModule],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }],
   bootstrap: [AppComponent],
 })
-export class AppModule {
-  constructor(private readonly _ipc: IpcService) {
-    this.getPrintersName();
-  }
-
-  getPrintersName() {
-    this._ipc.on('printersNameRes', (event: Electron.IpcMessageEvent, res) => {
-      this._ipc.PRINTERS_NEW(res);
-    });
-
-    this._ipc.send('printerNames');
-  }
-}
+export class AppModule {}

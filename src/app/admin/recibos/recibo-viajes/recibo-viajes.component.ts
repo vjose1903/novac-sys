@@ -1,13 +1,13 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { DBservice } from '../../core/services/bdservice.service';
+import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { GLOBAL } from '../../core/services/GLOBAL';
-import { ModalService } from '../components/modal/modal.service';
+import { GLOBAL } from '../../../core/services/GLOBAL';
+import { ModalService } from '../../components/modal/modal.service';
 import { Subscription } from 'rxjs';
-import { FunctionService } from '../../core/services/functions.service';
-import { TablasService } from '../components/tablas/tablas.service';
+import { FunctionService } from '../../../core/services/functions.service';
+import { TablasService } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-recibo-viajes',

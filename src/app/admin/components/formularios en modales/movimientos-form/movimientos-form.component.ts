@@ -1,10 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
-import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { DBservice } from '../../../../core/services/bdservice.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { map } from 'rxjs/operators';
-import { ValidateRayaAbajo } from '../../../../directives/validaciones';
+
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import { ModalService } from '../../modal/modal.service';
 import { FunctionService } from '../../../../core/services/functions.service';
@@ -26,7 +25,14 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
   @Output() cancel = new EventEmitter<any>();
   medidas;
   plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
-  constructor(private dbServ: DBservice, private fun: FunctionService, private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private mServ: ModalService) {}
+  constructor(
+    private dbServ: DBservice,
+    private fun: FunctionService,
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private mServ: ModalService,
+  ) {}
 
   ngOnInit() {
     this.medidas = _.keys(this.data.cantidades);

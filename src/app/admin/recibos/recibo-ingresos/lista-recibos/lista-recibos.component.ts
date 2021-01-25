@@ -1,13 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DBservice } from '../../../core/services/bdservice.service';
+import { DBservice } from '../../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
-import { IpcService } from '../../../core/services/ipc.service';
-import { ModalService } from '../../components/modal/modal.service';
-import { myElectron } from '../../../core/services/electron';
-import { TablasService } from '../../components/tablas/tablas.service';
-import { GLOBAL } from '../../../core/services/GLOBAL';
-import { modalClass } from '../../components/modal/modal';
+import { IpcService } from '../../../../core/services/ipc.service';
+import { ModalService } from '../../../components/modal/modal.service';
+import { myElectron } from '../../../../core/services/electron';
+import { TablasService } from '../../../components/tablas/tablas.service';
+import { GLOBAL } from '../../../../core/services/GLOBAL';
+import { modalClass } from '../../../components/modal/modal';
 
 @Component({
   selector: 'app-lista-recibos',

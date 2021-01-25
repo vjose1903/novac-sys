@@ -800,7 +800,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
 
   CancelarFactura(tipo) {
     if (tipo === 'quedar') {
-      this.router.navigateByUrl('/admin');
+      this.router.navigateByUrl('/admin/dashboard');
 
       setTimeout(() => {
         this.router.navigateByUrl(`/admin/factura/${this.metodo}/new/0`);

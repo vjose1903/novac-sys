@@ -197,7 +197,7 @@ export class RegistroVehiculoComponent implements OnInit {
   //  BOTON ATRAS
   // =============================================
   atras() {
-    this.router.navigateByUrl('/admin');
+    this.router.navigateByUrl('/admin/dashboard');
   }
 
   async editarItem(item) {

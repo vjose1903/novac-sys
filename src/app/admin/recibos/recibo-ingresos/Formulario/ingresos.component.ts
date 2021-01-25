@@ -1,18 +1,18 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { DBservice } from '../../../core/services/bdservice.service';
+import { DBservice } from '../../../../core/services/bdservice.service';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import { GLOBAL } from '../../../../core/services/GLOBAL';
 import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 import { NgSelectConfig } from '@ng-select/ng-select';
-import { TablasComponent } from '../../components/tablas/tablas.component';
-import { ModalService } from '../../components/modal/modal.service';
-import { TablasService } from '../../components/tablas/tablas.service';
-import { IpcService } from '../../../core/services/ipc.service';
-import { FunctionService } from '../../../core/services/functions.service';
+import { TablasComponent } from '../../../components/tablas/tablas.component';
+import { ModalService } from '../../../components/modal/modal.service';
+import { TablasService } from '../../../components/tablas/tablas.service';
+import { IpcService } from '../../../../core/services/ipc.service';
+import { FunctionService } from '../../../../core/services/functions.service';
 
 @Component({
   selector: 'app-ingresos',

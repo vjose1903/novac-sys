@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 
 import { TranslateModule } from '@ngx-translate/core';
 
-import { PageNotFoundComponent } from './components/';
 import { WebviewDirective } from './directives/';
 
 @NgModule({
-  declarations: [PageNotFoundComponent, WebviewDirective],
+  declarations: [WebviewDirective],
   imports: [CommonModule, TranslateModule],
-  exports: [TranslateModule, WebviewDirective]
+  exports: [TranslateModule, WebviewDirective],
 })
 export class SharedModule {}

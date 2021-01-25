@@ -485,7 +485,7 @@ export class RegistroArticulosComponent extends modalClass implements OnInit, On
   //  BOTON ATRAS
   // =============================================
   atras() {
-    this.router.navigateByUrl('/admin');
+    this.router.navigateByUrl('/admin/dashboard');
   }
 
   // =============================================
