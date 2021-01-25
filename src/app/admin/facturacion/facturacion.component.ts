@@ -344,16 +344,21 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     const sali_de = arg.id;
     const valor = arg.value;
     const condicion = this.condicion_fact;
+    const tipo_factura = this.tipoFactura;
     let buscar = false;
 
     if (this.metodo === 'venta') {
       setTimeout(() => {
         const voy_a = document.activeElement.id;
         const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
+        console.log('voy_a --> ', voy_a);
         if (sali_de === 'venta' && condicion === 'Crédito' && nombre === 'Cliente contado') {
           if (voy_a !== 'fecha_equivalente' && voy_a === 'nom') {
             buscar = true;
           }
+        }
+        if (sali_de === 'venta' && tipo_factura === '01' && voy_a !== 'fecha_equivalente' && nombre === 'Cliente contado') {
+          buscar = true;
         }
         if (sali_de === 'venta' && valor === 'adelantada' && nombre === 'Cliente contado') {
           buscar = true;
@@ -601,7 +606,13 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     } else {
       res = false;
 
-      if (this.is_adelantada || this.condicion_fact === 'Crédito' || this.modo_factura === 'viaje' || this.modo_factura === 'adelantada') {
+      if (
+        this.is_adelantada ||
+        this.condicion_fact === 'Crédito' ||
+        this.modo_factura === 'viaje' ||
+        this.modo_factura === 'adelantada' ||
+        this.tipoFactura === '01'
+      ) {
         res = true;
       } else {
         res = false;
