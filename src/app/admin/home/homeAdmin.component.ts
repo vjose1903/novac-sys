@@ -1,18 +1,34 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DBservice } from '../../core/services/bdservice.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { ModalService } from '../components/modal/modal.service';
+import { LayoutClass } from '../layout/layout';
+import { LayoutService } from '../layout/layout.service';
 
 @Component({
   selector: 'app-homeAdmin',
   templateUrl: './homeAdmin.component.html',
   styleUrls: ['./homeAdmin.component.scss'],
 })
-export class HomeAdminComponent implements OnInit {
-  constructor(private dbServ: DBservice, private mServ: ModalService, private http: HttpClient) {}
+export class HomeAdminComponent extends LayoutClass implements OnInit, OnDestroy {
+  constructor(private dbServ: DBservice, private mServ: ModalService, private http: HttpClient, public layServ: LayoutService) {
+    super(layServ);
+  }
+
+  initCambioMenu() {
+    console.log('aquii');
+
+    this.layServ.nexDecisionCambioMenu(true);
+  }
+
   cedula = null;
-  ngOnInit() {}
+  ngOnInit() {
+    this._init_layout();
+  }
+  ngOnDestroy() {
+    this._destroy_layout();
+  }
   p() {
     // document.getElementById('imgd').classList.add('rubberBand');
   }

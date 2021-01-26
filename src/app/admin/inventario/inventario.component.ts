@@ -10,12 +10,14 @@ import { Subscription } from 'rxjs';
 import { ModalService } from '../components/modal/modal.service';
 import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
 import { IpcService } from '../../core/services/ipc.service';
+import { LayoutService } from '../layout/layout.service';
+import { LayoutClass } from '../layout/layout';
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
   styleUrls: ['./inventario.component.scss'],
 })
-export class InventarioComponent implements OnInit, OnDestroy {
+export class InventarioComponent extends LayoutClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
   // =============================================
   //  TABLAS
@@ -72,9 +74,13 @@ export class InventarioComponent implements OnInit, OnDestroy {
     private tServ: TablasService,
     private mServ: ModalService,
     private _ipc: IpcService,
-  ) {}
+    public layServ: LayoutService,
+  ) {
+    super(layServ);
+  }
 
   async ngOnInit() {
+    this._init_layout();
     this.necesarioParaEmpezar();
     this.dbServ.getTipoArticulos().subscribe((res) => {
       this.tipo_articulos = res;
@@ -137,6 +143,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this._destroy_layout();
     this.subDeci.unsubscribe();
     this.FechaFactura = undefined;
     this.tServ.obj_paginate = obj_paginate_default;

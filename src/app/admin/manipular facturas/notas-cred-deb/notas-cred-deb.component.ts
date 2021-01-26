@@ -11,13 +11,15 @@ import { Subscription } from 'rxjs';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { ModalService } from '../../components/modal/modal.service';
 import { FunctionService } from '../../../core/services/functions.service';
+import { LayoutClass } from '../../layout/layout';
+import { LayoutService } from '../../layout/layout.service';
 
 @Component({
   selector: 'app-notas-cred-deb',
   templateUrl: './notas-cred-deb.component.html',
   styleUrls: ['./notas-cred-deb.component.scss'],
 })
-export class NotasCredDebComponent implements OnInit, OnDestroy {
+export class NotasCredDebComponent extends LayoutClass implements OnInit, OnDestroy {
   factura;
   idFactura: any;
   tipoNota: any;
@@ -48,9 +50,13 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
     private _ipc: IpcService,
     private fun: FunctionService,
     private router: Router,
-  ) {}
+    public layServ: LayoutService,
+  ) {
+    super(layServ);
+  }
 
   ngOnInit() {
+    this._init_layout();
     this.idFactura = this.activeRoute.snapshot.params['id'];
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
@@ -89,6 +95,7 @@ export class NotasCredDebComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this._destroy_layout();
     this.subDeci.unsubscribe();
     this.subObj.unsubscribe();
     this._ipc.removeListener('printRes');

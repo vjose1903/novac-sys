@@ -13,13 +13,15 @@ import { ModalService } from '../../../components/modal/modal.service';
 import { TablasService } from '../../../components/tablas/tablas.service';
 import { IpcService } from '../../../../core/services/ipc.service';
 import { FunctionService } from '../../../../core/services/functions.service';
+import { LayoutClass } from 'src/app/admin/layout/layout';
+import { LayoutService } from 'src/app/admin/layout/layout.service';
 
 @Component({
   selector: 'app-ingresos',
   templateUrl: './ingresos.component.html',
   styleUrls: ['./ingresos.component.scss'],
 })
-export class IngresosComponent implements OnInit, OnDestroy {
+export class IngresosComponent extends LayoutClass implements OnInit, OnDestroy {
   element: any;
   listaClientes;
   clienteAdepositar: any;
@@ -133,11 +135,14 @@ export class IngresosComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private _ipc: IpcService,
     private tServ: TablasService,
+    public layServ: LayoutService,
   ) {
+    super(layServ);
     this.config.notFoundText = 'Articulo no existe';
   }
 
   ngOnInit() {
+    this._init_layout();
     this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipo_modal === 'buscarCliente') {
         this.clienteAdepositar = res.data;
@@ -164,6 +169,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this._destroy_layout();
     this.sub.unsubscribe();
     this.subDeci.unsubscribe();
     this._ipc.removeListener('printRes');

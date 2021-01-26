@@ -10,13 +10,15 @@ import { Subscription } from 'rxjs';
 import { filter } from 'lodash';
 import { FunctionService } from '../../core/services/functions.service';
 import { obj_paginate_default, TablasService } from '../components/tablas/tablas.service';
+import { LayoutClass } from '../layout/layout';
+import { LayoutService } from '../layout/layout.service';
 
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
   styleUrls: ['./produccion.component.scss'],
 })
-export class ProduccionComponent implements OnInit, OnDestroy {
+export class ProduccionComponent extends LayoutClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
 
   // listaArticulos: any;
@@ -48,15 +50,16 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   constructor(
     private dbServ: DBservice,
-    private fb: FormBuilder,
     private fun: FunctionService,
-    private actRou: ActivatedRoute,
-    private router: Router,
     private mServ: ModalService,
     private tServ: TablasService,
-  ) {}
+    public layServ: LayoutService,
+  ) {
+    super(layServ);
+  }
 
   ngOnInit() {
+    this._init_layout();
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined && (this.tipoModal === 'remover' || this.tipoModal === 'cancelarP')) {
         this.decisionModalP(res);
@@ -69,6 +72,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this._destroy_layout();
     this.subDeci.unsubscribe();
     this.tServ.obj_paginate = obj_paginate_default;
     this.tServ.Func_total_paginas(1);
@@ -328,16 +332,16 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.mServ.mostrarModal(true);
   }
 
-    abrirModalDinamicText(tipo) {
-      const obj = {};
-      if (tipo === 'confirmar') {
-        this.tipoModal = 'confirmar_produccion';
-        this.mServ.modalTipo('dinamico_texto');
-        obj['texto_modal'] = 'Seguro de que desea confirmar la produccion.';
-      }
-      this.mServ.ModalSeleccion(obj);
-      this.mServ.mostrarModal(true);
+  abrirModalDinamicText(tipo) {
+    const obj = {};
+    if (tipo === 'confirmar') {
+      this.tipoModal = 'confirmar_produccion';
+      this.mServ.modalTipo('dinamico_texto');
+      obj['texto_modal'] = 'Seguro de que desea confirmar la produccion.';
     }
+    this.mServ.ModalSeleccion(obj);
+    this.mServ.mostrarModal(true);
+  }
 
   decisionModalP(bool) {
     const listaTemp = JSON.parse(JSON.stringify(this.lista_produccion));

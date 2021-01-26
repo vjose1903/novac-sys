@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class ModalService {
+
   private tipoModal = new BehaviorSubject<any>(undefined);
   private showModal = new BehaviorSubject<boolean>(false);
   private calcularHeight = new BehaviorSubject<boolean>(false);

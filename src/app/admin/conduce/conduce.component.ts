@@ -10,13 +10,15 @@ import * as moment from 'moment';
 import { TablasService } from '../components/tablas/tablas.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { FunctionService } from '../../core/services/functions.service';
+import { LayoutClass } from '../layout/layout';
+import { LayoutService } from '../layout/layout.service';
 
 @Component({
   selector: 'app-conduce',
   templateUrl: './conduce.component.html',
   styleUrls: ['./conduce.component.scss'],
 })
-export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+export class ConduceComponent extends LayoutClass implements OnInit, OnDestroy, AfterViewInit, OnChanges {
   listaClientes;
 
   cliente;
@@ -78,7 +80,10 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     private dbServ: DBservice,
     private fb: FormBuilder,
     private tServ: TablasService,
-  ) {}
+    public layServ: LayoutService,
+  ) {
+    super(layServ);
+  }
 
   formarFechaFactura(date) {
     const hora = moment(date).hour();
@@ -89,6 +94,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   }
 
   ngOnInit() {
+    this._init_layout();
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
@@ -181,6 +187,7 @@ export class ConduceComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
   ngOnChanges(simpleChanges) {}
 
   resetModalVaribales() {
+    this._destroy_layout();
     this.mServ.ModalObj(undefined);
     this.mServ.ModalSeleccion(undefined);
     this.mServ.ModalDecision(undefined);

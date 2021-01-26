@@ -1,15 +1,15 @@
-import { Component, OnInit, OnDestroy, ViewChildren, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
-import { UsuariosService } from '../../core/services/usuarios.service';
 
 import { DBservice } from '../../core/services/bdservice.service';
 import { IpcService } from '../../core/services/ipc.service';
 
 import { FunctionService } from '../../core/services/functions.service';
+import { LayoutService } from './layout.service';
 
 @Component({
   selector: 'app-layout',
@@ -33,14 +33,16 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   imgUser = 'assets/img/transparente.png';
   versionApp: any;
   noServer = false;
+  subDeciMenu: Subscription;
+  ruta_a_cambiar = '';
   // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
   constructor(
     private fun: FunctionService,
     private dbServ: DBservice,
     private breakpointObserver: BreakpointObserver,
-    public usuariosServices: UsuariosService,
     private router: Router,
     private _ipc: IpcService,
+    private layServ: LayoutService,
   ) {
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
@@ -53,11 +55,12 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  // imagenCuenta = 'http://localhost:3000/api/photos/this.usuariosServices.profile.fotoPerfil';
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
   lRun = false;
 
   ngOnInit() {
+    // this._init_layout();
+
     this.mantenimiento = true;
     this._ipc.PRINTERS.subscribe((res) => {
       if (res !== undefined) {
@@ -92,6 +95,12 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     } else {
       this.fun.logout();
     }
+
+    this.subDeciMenu = this.layServ.DESICIONCAMBIOMENU.subscribe((res) => {
+      console.log('decision cambio menu ==> ', res);
+      this.decisionCambioMenu(res);
+    });
+
     this.searchVersion();
     this.getPrintersName();
   }
@@ -116,12 +125,14 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy() {
-    // this.sub.unsubscribe();
+    this.subDeciMenu.unsubscribe();
   }
+
   setUser(user) {
     this.usuario = user;
     this.fun.setUser(user);
   }
+
   element: HTMLElement;
   ngAfterViewInit() {}
 
@@ -149,6 +160,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   logOut() {
     this.fun.logout();
     this.router.navigateByUrl('/');
+    // this._destroy_layout();
   }
 
   mantenimientoCuenta(reg: String) {
@@ -173,11 +185,11 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   // =================================================================================
   // NAVEGAR
   // =================================================================================
-  navegar(lugar: any, accion?) {
+  nextCambioMenu(lugar: any, accion?, confirmar?) {
     switch (lugar) {
       case 1:
         this.actualTab = 'home';
-        this.router.navigateByUrl('/admin/dashboard');
+        this.ruta_a_cambiar = '/admin/dashboard';
         break;
 
       case 2:
@@ -190,12 +202,12 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
 
       case 4:
         this.actualTab = 'inventario';
-        this.router.navigateByUrl('/admin/inventario');
+        this.ruta_a_cambiar = '/admin/inventario';
         break;
 
       case 5:
         this.actualTab = 'reportes';
-        this.router.navigateByUrl('/admin/reportes');
+        this.ruta_a_cambiar = '/admin/reportes';
         break;
 
       case 7:
@@ -204,7 +216,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
 
       case 6:
         this.actualTab = 'produccion';
-        this.router.navigateByUrl('/admin/produccion');
+        this.ruta_a_cambiar = '/admin/produccion';
         break;
 
       case 8:
@@ -217,78 +229,97 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
 
       case 10:
         this.actualTab = 'conduce';
-        this.router.navigateByUrl('/admin/conduce');
+        this.ruta_a_cambiar = '/admin/conduce';
         break;
 
       case 'venta':
-        this.router.navigateByUrl('/admin/dashboard');
+        this.ruta_a_cambiar = '/admin/dashboard';
         this.actualTab = 'factura';
         setTimeout(() => {
-          this.router.navigate(['/admin/factura/venta/new/0']);
+          this.ruta_a_cambiar = '/admin/factura/venta/new/0';
         }, 5);
         break;
 
       case 'compra':
-        this.router.navigateByUrl('/admin/dashboard');
+        this.ruta_a_cambiar = '/admin/dashboard';
         this.actualTab = 'factura';
 
         setTimeout(() => {
-          this.router.navigate(['/admin/factura/compra/new/0']);
+          this.ruta_a_cambiar = '/admin/factura/compra/new/0';
         }, 5);
         break;
 
       case 'buscarFactura':
-        this.router.navigateByUrl('/admin/dashboard');
+        this.ruta_a_cambiar = '/admin/dashboard';
         this.actualTab = 'manipular';
         setTimeout(() => {
-          this.router.navigate(['/admin/manipular/buscarFactura/' + accion]);
-        }, 25);
+          this.ruta_a_cambiar = '/admin/manipular/buscarFactura/' + accion;
+        }, 5);
         break;
 
       case 'ingreso':
-        this.router.navigateByUrl('/admin/recibos/ingresos');
+        this.ruta_a_cambiar = '/admin/recibos/ingresos';
         this.actualTab = 'recibos';
         break;
 
       case 'viajes':
-        this.router.navigateByUrl('/admin/recibos/viajes');
+        this.ruta_a_cambiar = '/admin/recibos/viajes';
         this.actualTab = 'recibos';
         break;
 
       case 'ncf':
         this.actualTab = 'registros';
-        this.router.navigate(['/admin/registros/ncf']);
+        this.ruta_a_cambiar = '/admin/registros/ncf';
         break;
 
       case 'articulos':
         this.actualTab = 'registros';
-        this.router.navigate(['/admin/registros/articulos']);
+        this.ruta_a_cambiar = '/admin/registros/articulos';
         break;
 
       case 'empleados':
         this.actualTab = 'registros';
-        this.router.navigate(['/admin/registros/empleados']);
+        this.ruta_a_cambiar = '/admin/registros/empleados';
         break;
 
       case 'clientes':
         this.actualTab = 'registros';
-        this.router.navigate(['/admin/registros/clientes']);
+        this.ruta_a_cambiar = '/admin/registros/clientes';
         break;
 
       case 'suplidores':
         this.actualTab = 'registros';
-        this.router.navigate(['/admin/registros/suplidores']);
+        this.ruta_a_cambiar = '/admin/registros/suplidores';
         break;
 
       case 'camiones':
         this.actualTab = 'registros';
-        this.router.navigate(['/admin/registros/camiones']);
+        this.ruta_a_cambiar = '/admin/registros/camiones';
         break;
 
       default:
         break;
     }
+    if (confirmar) {
+      this.layServ.nexCambioMenu(true);
+    } else {
+      this.router.navigateByUrl(this.ruta_a_cambiar);
+    }
   }
+
+  decisionCambioMenu(decision) {
+    console.log('decision cambio --> ', decision);
+
+    if (decision) {
+      this.router.navigateByUrl(this.ruta_a_cambiar);
+      this.layServ.nexDecisionCambioMenu(false);
+    } else {
+      this.ruta_a_cambiar = '';
+    }
+
+    this.layServ.nexCambioMenu(false);
+  }
+
   modalConfig() {}
   // ===========================================================================
   // MODAL

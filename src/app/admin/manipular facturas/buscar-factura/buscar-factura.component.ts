@@ -10,12 +10,14 @@ import { TablasComponent } from '../../components/tablas/tablas.component';
 import { ModalService } from '../../components/modal/modal.service';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { IpcService } from '../../../core/services/ipc.service';
+import { LayoutClass } from '../../layout/layout';
+import { LayoutService } from '../../layout/layout.service';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
   styleUrls: ['./buscar-factura.component.scss'],
 })
-export class BuscarFacturaComponent implements OnInit, OnDestroy {
+export class BuscarFacturaComponent extends LayoutClass implements OnInit, OnDestroy {
   facturas: any;
   campoSelected: string;
   clienteBuscado: any;
@@ -45,7 +47,10 @@ export class BuscarFacturaComponent implements OnInit, OnDestroy {
     private router: Router,
     private tServ: TablasService,
     private _ipc: IpcService,
-  ) {}
+    public layServ: LayoutService,
+  ) {
+    super(layServ);
+  }
   campo = null;
   placeHolder = '';
   info = [

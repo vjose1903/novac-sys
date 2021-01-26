@@ -1,11 +1,9 @@
-import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, OnChanges } from '@angular/core';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { DBservice } from '../../core/services/bdservice.service';
-import { map, filter } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { PdfService } from '../../core/services/pdf/pdf.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { GLOBAL, tipos_facturas } from '../../core/services/GLOBAL';
@@ -13,13 +11,15 @@ import { Subscription } from 'rxjs';
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import { FunctionService } from '../../core/services/functions.service';
+import { LayoutClass } from '../layout/layout';
+import { LayoutService } from '../layout/layout.service';
 
 @Component({
   selector: 'app-facturacion',
   templateUrl: './facturacion.component.html',
   styleUrls: ['./facturacion.component.scss'],
 })
-export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
+export class FacturacionComponent extends LayoutClass implements OnInit, OnDestroy, AfterViewInit {
   hora: number;
   minutos: number;
   fecha_busqueda_articulos: string;
@@ -30,6 +30,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
   id_factura: any;
   factura_a_editar;
   tipos_de_facturas = tipos_facturas;
+
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
@@ -124,10 +125,11 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     private fun: FunctionService,
     private dbServ: DBservice,
     private fb: FormBuilder,
-    private pdfServ: PdfService,
     private route: ActivatedRoute,
     private router: Router,
+    public layServ: LayoutService,
   ) {
+    super(layServ);
     this.form = this.fb.group({
       id: [],
       nombre: [],
@@ -164,6 +166,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit() {
+    this._init_layout();
     this.formarFechaFactura(new Date());
 
     this.metodo = this.route.snapshot.params['tipo'];
@@ -262,12 +265,12 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
           }
 
           this.CuerpoFactura = this.newCuerpo;
-          this.IMPRIMIR();
+          this.enviarDataBaseDatos();
           this.mServ.ModalObj(undefined);
         } else {
           console.log('this.action --> ', this.action);
 
-          this.IMPRIMIR(this.action === 'update' ? 'editar_factura' : '');
+          this.enviarDataBaseDatos();
           this.mServ.ModalObj(undefined);
         }
       }
@@ -303,6 +306,14 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.usuario = this.fun.getUser();
   }
 
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('va a cambiar el menu');
+      console.log('this.cambioMenu_ ==> ', this.cambioMenu_);
+      this.layServ.nexDecisionCambioMenu(true);
+    }
+  }
+
   async buscarFacturaEditar() {
     const res = await this.dbServ.getFacturaById(this.id_factura).toPromise();
     this.factura_a_editar = res;
@@ -320,6 +331,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
+    this._destroy_layout();
     this.mServ.ModalObj(null);
     this.mServ.modalTipo(null);
     this.mServ.ModalSeleccion(null);
@@ -683,7 +695,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.abrirModal();
   }
   // =============================================
-  //  MODAL IMPRIMIR
+  //  MODAL enviarDataBaseDatos
   // =============================================
   async imprimirFactura() {
     if (!this.usuario) {
@@ -745,7 +757,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
   decisionModal(arg) {
     if (arg) {
       if (this.tipoModal === 'imprimir') {
-        this.IMPRIMIR(this.action === 'update' ? 'editar_factura' : '');
+        this.enviarDataBaseDatos();
       } else if (this.tipoModal === 'cancelar') {
         this.CancelarFactura('quedar');
       }
@@ -1042,7 +1054,7 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     return cuerpo;
   }
 
-  async IMPRIMIR(arg?) {
+  formarData() {
     const empleado = this.fun.getUser();
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
@@ -1122,18 +1134,23 @@ export class FacturacionComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
       cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
     }
+    return cabecera_fact;
+  }
 
+  async enviarDataBaseDatos() {
     try {
+      const cabecera_fact = this.formarData();
       let res;
-      console.log('arg --> ', arg);
+      const metodo = this.action === 'update' ? 'editar_factura' : '';
+      console.log('metodo --> ', metodo);
 
-      if (arg === 'editar_factura') {
+      if (metodo === 'editar_factura') {
         res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();
       } else {
         res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
       }
 
-      if (arg === 'editar_factura') {
+      if (metodo === 'editar_factura') {
         this.dbServ.toastSuccess('Factura editada correctamente.', 'CORRECTO', true);
       } else {
         this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO', true);

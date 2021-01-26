@@ -8,13 +8,15 @@ import { myElectron } from '../../../../core/services/electron';
 import { TablasService } from '../../../components/tablas/tablas.service';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import { modalClass } from '../../../components/modal/modal';
+import { LayoutClass } from 'src/app/admin/layout/layout';
+import { LayoutService } from 'src/app/admin/layout/layout.service';
 
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
   styleUrls: ['./lista-recibos.component.scss'],
 })
-export class ListaRecibosComponent extends modalClass implements OnInit, OnDestroy {
+export class ListaRecibosComponent extends modalClass, LayoutClass implements OnInit, OnDestroy {
   info = [
     {
       titulo: '1',
@@ -74,8 +76,11 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
   lista_recibos;
   rowSelected: any;
 
-  constructor(public dbServ: DBservice, private router: Router, public _ipc: IpcService, public mServ: ModalService, private tServ: TablasService) {
-    super(mServ, _ipc);
+  constructor(public dbServ: DBservice, private router: Router, public _ipc: IpcService, public mServ: ModalService, private tServ: TablasService
+    ,public layServ: LayoutService,
+    ) {
+      super(mServ, _ipc);
+super(layServ);
   }
   async ngOnInit() {
     console.log('lita recibos');
