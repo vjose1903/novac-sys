@@ -16,7 +16,7 @@ import { LayoutService } from 'src/app/admin/layout/layout.service';
   templateUrl: './lista-recibos.component.html',
   styleUrls: ['./lista-recibos.component.scss'],
 })
-export class ListaRecibosComponent extends modalClass, LayoutClass implements OnInit, OnDestroy {
+export class ListaRecibosComponent extends modalClass implements OnInit, OnDestroy {
   info = [
     {
       titulo: '1',
@@ -79,9 +79,7 @@ export class ListaRecibosComponent extends modalClass, LayoutClass implements On
   constructor(public dbServ: DBservice, private router: Router, public _ipc: IpcService, public mServ: ModalService, private tServ: TablasService
     ,public layServ: LayoutService,
     ) {
-      super(mServ, _ipc);
-super(layServ);
-  }
+      super(mServ, _ipc);  }
   async ngOnInit() {
     console.log('lita recibos');
 
