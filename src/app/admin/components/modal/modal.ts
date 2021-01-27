@@ -1,12 +1,11 @@
-import { OnDestroy } from '@angular/core';
-import { OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { DBservice } from '../../../core/services/bdservice.service';
-import { myElectron } from '../../../core/services/electron';
+
 import { IpcService } from '../../../core/services/ipc.service';
+import { LayoutClass } from '../../layout/layout';
+import { LayoutService } from '../../layout/layout.service';
 import { ModalService } from './modal.service';
 
-export class modalClass extends myElectron {
+export class modalClass extends LayoutClass {
   pdfSrc: any;
   fileName: any;
   titulo_moda_reporte: any;
@@ -16,11 +15,16 @@ export class modalClass extends myElectron {
   tipoModal: string;
 
   _lista = [];
-  constructor(public mServ: ModalService, public _ipc: IpcService) {
-    super();
+
+  constructor(public mServ: ModalService, public _ipc: IpcService, public layServ?: LayoutService) {
+    super(layServ);
   }
 
-  getInit(lista_) {
+  _init_modal(lista_) {
+    console.log(' ');
+    console.log(' -------iniciando el modal class -------');
+    console.log(' ');
+
     this._lista = lista_;
     console.log('Inicio de clase modal');
 
@@ -46,6 +50,8 @@ export class modalClass extends myElectron {
 
     if (this._lista.includes('decisionModal')) {
       this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
+        console.log('res ==> ', res);
+
         if (res !== undefined) {
           this.decisionModal(res);
           this.mServ.ModalDecision(undefined);
@@ -63,12 +69,15 @@ export class modalClass extends myElectron {
   ipcPrintResponse(res) {}
   ipcBase64Resonse(res) {}
 
-  decisionModal(res: any) {}
+  decisionModal(res: any) {
+    console.log('aqui si');
+  }
+
   objDevueltoResponse(res) {}
 
   reporte(data: any) {}
 
-  getDestroy() {
+  _destroy_modal() {
     if (this._lista.includes('printRes')) {
       this._ipc.removeListener('printRes');
     }

@@ -11,9 +11,10 @@ import { LayoutService } from '../layout/layout.service';
   templateUrl: './homeAdmin.component.html',
   styleUrls: ['./homeAdmin.component.scss'],
 })
-export class HomeAdminComponent extends LayoutClass implements OnInit, OnDestroy {
+// export class HomeAdminComponent extends LayoutClass implements OnInit, OnDestroy {
+export class HomeAdminComponent implements OnInit, OnDestroy {
   constructor(private dbServ: DBservice, private mServ: ModalService, private http: HttpClient, public layServ: LayoutService) {
-    super(layServ);
+    // super(layServ);
   }
 
   initCambioMenu() {
@@ -24,10 +25,10 @@ export class HomeAdminComponent extends LayoutClass implements OnInit, OnDestroy
 
   cedula = null;
   ngOnInit() {
-    this._init_layout();
+    // this._init_layout();
   }
   ngOnDestroy() {
-    this._destroy_layout();
+    // this._destroy_layout();
   }
   p() {
     // document.getElementById('imgd').classList.add('rubberBand');

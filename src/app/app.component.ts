@@ -3,8 +3,11 @@ import { ElectronService } from './core/services';
 import { DBservice } from './core/services/bdservice.service';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
-import { GLOBAL } from './core/services/GLOBAL';
+import { applyMixins, GLOBAL } from './core/services/GLOBAL';
 import { FunctionService } from './core/services/functions.service';
+import { ProduccionComponent } from './admin/produccion/produccion.component';
+import { modalClass } from './admin/components/modal/modal';
+import { LayoutClass } from './admin/layout/layout';
 
 @Component({
   selector: 'app-root',
@@ -35,6 +38,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    // applyMixins(ProduccionComponent, [modalClass, LayoutClass]);
     console.log('estoy en--> ', document.location.href);
 
     // this.dbServ.getSecuenciaFacturas().subscribe(res => {

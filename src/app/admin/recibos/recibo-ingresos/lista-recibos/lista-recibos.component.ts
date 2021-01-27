@@ -4,19 +4,21 @@ import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { IpcService } from '../../../../core/services/ipc.service';
 import { ModalService } from '../../../components/modal/modal.service';
-import { myElectron } from '../../../../core/services/electron';
+// import { myElectron } from '../../../../core/services/electron';
 import { TablasService } from '../../../components/tablas/tablas.service';
-import { GLOBAL } from '../../../../core/services/GLOBAL';
+import { applyMixins, GLOBAL } from '../../../../core/services/GLOBAL';
 import { modalClass } from '../../../components/modal/modal';
-import { LayoutClass } from 'src/app/admin/layout/layout';
-import { LayoutService } from 'src/app/admin/layout/layout.service';
+import { LayoutClass } from '../../../../admin/layout/layout';
+import { LayoutService } from '../../../../admin/layout/layout.service';
 
+export interface ListaRecibosComponent extends modalClass, LayoutClass {}
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
   styleUrls: ['./lista-recibos.component.scss'],
 })
-export class ListaRecibosComponent extends modalClass, LayoutClass implements OnInit, OnDestroy {
+export class ListaRecibosComponent implements OnInit, OnDestroy {
+  // export class ListaRecibosComponent extends modalClass implements OnInit, OnDestroy {
   info = [
     {
       titulo: '1',
@@ -76,22 +78,29 @@ export class ListaRecibosComponent extends modalClass, LayoutClass implements On
   lista_recibos;
   rowSelected: any;
 
-  constructor(public dbServ: DBservice, private router: Router, public _ipc: IpcService, public mServ: ModalService, private tServ: TablasService
-    ,public layServ: LayoutService,
-    ) {
-      super(mServ, _ipc);
-super(layServ);
+  constructor(
+    public dbServ: DBservice,
+    private router: Router,
+    public _ipc: IpcService,
+    public mServ: ModalService,
+    private tServ: TablasService,
+    public layServ: LayoutService,
+  ) {
+    applyMixins(ListaRecibosComponent, [modalClass, LayoutClass]);
+    // super(mServ, _ipc);
+    // super(layServ);
   }
   async ngOnInit() {
     console.log('lita recibos');
 
     this.necesarioStart();
-    this.getInit(['printRes', 'decisionModal', 'printBase64Res']);
+    this._init_layout();
+    this._init_modal(['printRes', 'decisionModal', 'printBase64Res']);
   }
 
   ngOnDestroy() {
     // this._ipc.removeListener('printRes');
-    this.getDestroy();
+    this._destroy_modal();
   }
 
   ipcPrintResponse(res) {

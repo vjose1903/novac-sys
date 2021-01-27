@@ -1,6 +1,22 @@
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import * as _ from 'lodash';
 
+// export function applyMixins(derivedCtor: any, constructors: any[]) {
+//   constructors.forEach((baseCtor) => {
+//     Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
+//       Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name) || Object.create(null));
+//     });
+//   });
+// }
+
+export function applyMixins(target: any, mixinList: any[]) {
+  mixinList.forEach((mixin) => {
+    Object.getOwnPropertyNames(mixin.prototype).forEach((name) => {
+      Object.defineProperty(target.prototype, name, Object.getOwnPropertyDescriptor(mixin.prototype, name));
+    });
+  });
+}
+
 export const tipos_facturas = {
   'factura sin comprobante': '00',
   'factura con valor fiscal': '01',
@@ -13,6 +29,7 @@ export const tipos_facturas = {
   'comprobante para exportaciones': '16',
   'comprobantes para pago al exterior': '17',
 };
+
 export class GLOBAL {
   static formatearNumero(nStr) {
     if (nStr !== undefined) {
@@ -27,6 +44,8 @@ export class GLOBAL {
       return x1 + x2;
     }
   }
+  // =========================================================================================================
+
   // =========================================================================================================
   static quitarFocodeElectron() {
     document.getElementById('foco_angular').click();

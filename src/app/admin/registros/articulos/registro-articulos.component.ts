@@ -118,7 +118,7 @@ export class RegistroArticulosComponent extends modalClass implements OnInit, On
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
     this.necesarioStart();
-    this.getInit('decisionModal');
+    this._init_modal('decisionModal');
   }
 
   filtroFormula(item) {

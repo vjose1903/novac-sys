@@ -5482,3 +5482,5 @@ ahora va a borrar el archivo log
 
  comando realizado en la funcion cmd  ==╗ 
       del "/Users/vjose1903/git/personal/adm-agroindustrial/my_log.txt" 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  

@@ -1,8 +1,12 @@
 import { Subscription } from 'rxjs';
+import { myElectron } from '../../core/services/electron';
 import { LayoutService } from './layout.service';
 
-export class LayoutClass {
-  constructor(public layServ: LayoutService) {}
+export class LayoutClass extends myElectron {
+  constructor(public layServ?: LayoutService) {
+    super();
+  }
+
   cambioMenu_ = false;
   seCambiara_ = false;
   ruta_a_cambiar = '';

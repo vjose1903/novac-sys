@@ -1,24 +1,40 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 
 import { DBservice } from '../../core/services/bdservice.service';
-import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+
 import * as _ from 'lodash';
 import { ModalService } from '../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
-import { filter } from 'lodash';
+
 import { FunctionService } from '../../core/services/functions.service';
 import { obj_paginate_default, TablasService } from '../components/tablas/tablas.service';
 import { LayoutClass } from '../layout/layout';
 import { LayoutService } from '../layout/layout.service';
+import { modalClass } from '../components/modal/modal';
+import { myElectron } from '../../../app/core/services/electron';
+import { IpcService } from '../../core/services/ipc.service';
+
+// export interface ProduccionComponent extends modalClass, LayoutClass {}
+// export interface ProduccionComponent extends modalClass, LayoutClass {}
+const mix = (Superclass) => new MixinBuilder(Superclass);
+class MixinBuilder {
+  superclass;
+  constructor(superclass) {
+    this.superclass = superclass;
+  }
+
+  with(...mixins) {
+    return mixins.reduce((c, mixin) => mixin(c), this.superclass);
+  }
+}
 
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
   styleUrls: ['./produccion.component.scss'],
 })
-export class ProduccionComponent extends LayoutClass implements OnInit, OnDestroy {
+export class ProduccionComponent extends modalClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
 
   // listaArticulos: any;
@@ -51,29 +67,37 @@ export class ProduccionComponent extends LayoutClass implements OnInit, OnDestro
   constructor(
     private dbServ: DBservice,
     private fun: FunctionService,
-    private mServ: ModalService,
+    public mServ: ModalService,
     private tServ: TablasService,
     public layServ: LayoutService,
+    public _ipc: IpcService,
   ) {
-    super(layServ);
+    super(mServ, _ipc, layServ);
+    // applyMixins(ProduccionComponent, [modalClass, LayoutClass]);
   }
 
   ngOnInit() {
     this._init_layout();
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== null && res !== undefined && (this.tipoModal === 'remover' || this.tipoModal === 'cancelarP')) {
-        this.decisionModalP(res);
-      } else if (res && this.tipoModal === 'confirmar_produccion') {
-        this.confirmarProduccion();
-      }
-    });
+    this._init_modal(['decisionModal']);
+
     this.enfocarInput('articulo_id');
     this.getProductosTerminados();
   }
 
+  decisionModal(res) {
+    console.log('decisionModal ----> ', res);
+
+    if (res !== null && res !== undefined && (this.tipoModal === 'remover' || this.tipoModal === 'cancelarP')) {
+      this.decisionModalP(res);
+    } else if (res && this.tipoModal === 'confirmar_produccion') {
+      this.confirmarProduccion();
+    }
+  }
+
   ngOnDestroy() {
     this._destroy_layout();
-    this.subDeci.unsubscribe();
+    this._destroy_modal();
+    // this.subDeci.unsubscribe();
     this.tServ.obj_paginate = obj_paginate_default;
     this.tServ.Func_total_paginas(1);
   }
@@ -344,6 +368,8 @@ export class ProduccionComponent extends LayoutClass implements OnInit, OnDestro
   }
 
   decisionModalP(bool) {
+    console.log('entro ########');
+
     const listaTemp = JSON.parse(JSON.stringify(this.lista_produccion));
     if (bool) {
       if (this.tipoModal === 'remover') {
