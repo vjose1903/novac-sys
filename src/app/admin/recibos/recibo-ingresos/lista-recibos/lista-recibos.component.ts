@@ -11,14 +11,12 @@ import { modalClass } from '../../../components/modal/modal';
 import { LayoutClass } from '../../../../admin/layout/layout';
 import { LayoutService } from '../../../../admin/layout/layout.service';
 
-export interface ListaRecibosComponent extends modalClass, LayoutClass {}
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
   styleUrls: ['./lista-recibos.component.scss'],
 })
-export class ListaRecibosComponent implements OnInit, OnDestroy {
-  // export class ListaRecibosComponent extends modalClass implements OnInit, OnDestroy {
+export class ListaRecibosComponent extends modalClass implements OnInit, OnDestroy {
   info = [
     {
       titulo: '1',
@@ -86,10 +84,9 @@ export class ListaRecibosComponent implements OnInit, OnDestroy {
     private tServ: TablasService,
     public layServ: LayoutService,
   ) {
-    applyMixins(ListaRecibosComponent, [modalClass, LayoutClass]);
-    // super(mServ, _ipc);
-    // super(layServ);
+    super(mServ, _ipc, layServ);
   }
+
   async ngOnInit() {
     console.log('lita recibos');
 
