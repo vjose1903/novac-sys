@@ -203,17 +203,110 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
       this.layServ.nextCambioMenu(true);
       // }
     }
+
+    // switch (url) {
+    //   // case 'home':
+    //   //   this.ruta_a_cambiar = '/admin/dashboard';
+    //   //   break;
+
+    //   case 'inventario':
+    //     this.ruta_a_cambiar = '/admin/inventario';
+    //     break;
+
+    //   case 'reportes':
+    //     this.ruta_a_cambiar = '/admin/reportes';
+    //     break;
+
+    //   case 'produccion':
+    //     this.actualMenyItem = 'produccion';
+    //     this.ruta_a_cambiar = '/admin/produccion';
+    //     break;
+
+    //   case 'conduce':
+    //     this.actualMenyItem = 'conduce';
+    //     this.ruta_a_cambiar = '/admin/conduce';
+    //     break;
+
+    //   // case 'venta':
+    //   //   this.ruta_a_cambiar = '/admin/dashboard';
+    //   //   this.actualMenyItem = 'factura';
+    //   //   setTimeout(() => {
+    //   //     this.ruta_a_cambiar = '/admin/factura/venta/new/0';
+    //   //   }, 5);
+    //   //   break;
+
+    //   // case 'compra':
+    //   //   this.ruta_a_cambiar = '/admin/dashboard';
+    //   //   this.actualMenyItem = 'factura';
+
+    //   //   setTimeout(() => {
+    //   //     this.ruta_a_cambiar = '/admin/factura/compra/new/0';
+    //   //   }, 5);
+    //   //   break;
+
+    //   case 'buscarFactura':
+    //     this.ruta_a_cambiar = '/admin/dashboard';
+    //     this.actualMenyItem = 'manipular';
+    //     setTimeout(() => {
+    //       this.ruta_a_cambiar = '/admin/manipular/buscarFactura/';
+    //     }, 5);
+    //     break;
+
+    //   case 'ingreso':
+    //     this.ruta_a_cambiar = '/admin/recibos/ingresos';
+    //     this.actualMenyItem = 'recibos';
+    //     break;
+
+    //   case 'viajes':
+    //     this.ruta_a_cambiar = '/admin/recibos/viajes';
+    //     this.actualMenyItem = 'recibos';
+    //     break;
+
+    //   case 'ncf':
+    //     this.actualMenyItem = 'registros';
+    //     this.ruta_a_cambiar = '/admin/registros/ncf';
+    //     break;
+
+    //   case 'articulos':
+    //     this.actualMenyItem = 'registros';
+    //     this.ruta_a_cambiar = '/admin/registros/articulos';
+    //     break;
+
+    //   case 'empleados':
+    //     this.actualMenyItem = 'registros';
+    //     this.ruta_a_cambiar = '/admin/registros/empleados';
+    //     break;
+
+    //   case 'clientes':
+    //     this.actualMenyItem = 'registros';
+    //     this.ruta_a_cambiar = '/admin/registros/clientes';
+    //     break;
+
+    //   case 'suplidores':
+    //     this.actualMenyItem = 'registros';
+    //     this.ruta_a_cambiar = '/admin/registros/suplidores';
+    //     break;
+
+    //   case 'camiones':
+    //     this.actualMenyItem = 'registros';
+    //     this.ruta_a_cambiar = '/admin/registros/camiones';
+    //     break;
+
+    //   default:
+    //     break;
+    // }
   }
 
   decisionCambioMenu(decision) {
     if (decision) {
       this.router.navigateByUrl(this.ruta_a_cambiar);
-      setTimeout(() => (this.ready = true), 20);
+      setTimeout(() => (this.ready = true), 10);
       this.layServ.nextDecisionCambioMenu(false);
     } else {
       this.ruta_a_cambiar = '';
     }
     this.modulo_select = undefined;
+
     this.layServ.nextCambioMenu(false);
   }
 
