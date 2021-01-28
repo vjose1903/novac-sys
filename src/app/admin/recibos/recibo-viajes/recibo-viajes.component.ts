@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { map } from 'rxjs/operators';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -8,13 +7,16 @@ import { ModalService } from '../../components/modal/modal.service';
 import { Subscription } from 'rxjs';
 import { FunctionService } from '../../../core/services/functions.service';
 import { TablasService } from '../../components/tablas/tablas.service';
+import { IpcService } from '../../../core/services/ipc.service';
+import { LayoutService } from '../../layout/layout.service';
+import { mixinClass } from '../../mixinClass';
 
 @Component({
   selector: 'app-recibo-viajes',
   templateUrl: './recibo-viajes.component.html',
   styleUrls: ['./recibo-viajes.component.scss'],
 })
-export class ReciboViajesComponent implements OnInit, OnDestroy {
+export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
   info = [
     {
@@ -73,9 +75,20 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
   monto_pendiente = 0;
   have_incidencia = false;
   incidencia = '';
-  constructor(private dbServ: DBservice, private mServ: ModalService, private fun: FunctionService, private tServ: TablasService) {}
+
+  constructor(
+    private dbServ: DBservice,
+    public _ipc: IpcService,
+    public mServ: ModalService,
+    public layServ: LayoutService,
+    private fun: FunctionService,
+    private tServ: TablasService,
+  ) {
+    super(mServ, _ipc, layServ);
+  }
 
   ngOnInit() {
+    this._init_mixin();
     this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipo_modal === 'cambio') {
         this.forma_pago = res.data.forma_pago;
@@ -95,17 +108,25 @@ export class ReciboViajesComponent implements OnInit, OnDestroy {
     this.necesarioStart();
   }
 
-  necesarioStart() {
-    this.getViajes(this.tServ.obj_paginate);
-    this.getChoferes();
-    this.getCamiones();
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('viajes --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
   }
 
   ngOnDestroy() {
+    this._destroy_mixin();
     this.subObj.unsubscribe();
     this.subDeci.unsubscribe();
 
     // this._ipc.removeListener('printRes');
+  }
+
+  necesarioStart() {
+    this.getViajes(this.tServ.obj_paginate);
+    this.getChoferes();
+    this.getCamiones();
   }
 
   formatoNumero(num) {

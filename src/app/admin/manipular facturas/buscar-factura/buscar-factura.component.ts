@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -10,14 +9,14 @@ import { TablasComponent } from '../../components/tablas/tablas.component';
 import { ModalService } from '../../components/modal/modal.service';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { IpcService } from '../../../core/services/ipc.service';
-import { LayoutClass } from '../../layout/layout';
 import { LayoutService } from '../../layout/layout.service';
+import { mixinClass } from '../../mixinClass';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
   styleUrls: ['./buscar-factura.component.scss'],
 })
-export class BuscarFacturaComponent extends LayoutClass implements OnInit, OnDestroy {
+export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDestroy {
   facturas: any;
   campoSelected: string;
   clienteBuscado: any;
@@ -42,14 +41,14 @@ export class BuscarFacturaComponent extends LayoutClass implements OnInit, OnDes
 
   constructor(
     private dbServ: DBservice,
-    private mServ: ModalService,
+    public mServ: ModalService,
     private route: ActivatedRoute,
     private router: Router,
     private tServ: TablasService,
-    private _ipc: IpcService,
+    public _ipc: IpcService,
     public layServ: LayoutService,
   ) {
-    super(layServ);
+    super(mServ, _ipc, layServ);
   }
   campo = null;
   placeHolder = '';
@@ -127,6 +126,7 @@ export class BuscarFacturaComponent extends LayoutClass implements OnInit, OnDes
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
   ngOnInit() {
+    this._init_mixin();
     this.BuscarPara = this.route.snapshot.params['para'];
     if (this.BuscarPara === 'nota_credito') {
       this.tipo_factu_nota = '04';
@@ -203,6 +203,21 @@ export class BuscarFacturaComponent extends LayoutClass implements OnInit, OnDes
     });
   }
 
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('buscar factura --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+  ngOnDestroy(): void {
+    this._destroy_mixin();
+    this.sub.unsubscribe();
+    this.subDeci.unsubscribe();
+    this.subEsc.unsubscribe();
+    this._ipc.removeListener('printRes');
+    this.borrar('salir');
+  }
+
   async getPaqueteComprobante() {
     try {
       const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipo_factu_nota);
@@ -255,14 +270,6 @@ export class BuscarFacturaComponent extends LayoutClass implements OnInit, OnDes
     } else if (this.BuscarPara === 'solo_ver') {
       this.Para = ' Visualizar';
     }
-  }
-
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
-    this.subDeci.unsubscribe();
-    this.subEsc.unsubscribe();
-    this._ipc.removeListener('printRes');
-    this.borrar('salir');
   }
 
   async getTipoFacturas() {

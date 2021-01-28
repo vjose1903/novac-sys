@@ -106,7 +106,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     },
   ];
   constructor(
-    private mServ: ModalService,
+    public mServ: ModalService,
     private dbServ: DBservice,
     private tServ: TablasService,
     private pdfService: NgxExtendedPdfViewerService,

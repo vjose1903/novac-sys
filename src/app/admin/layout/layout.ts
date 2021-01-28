@@ -36,6 +36,6 @@ export class LayoutClass extends myElectron {
   }
 
   cambiarItemMenu(arg) {
-    this.layServ.nexCambioMenu(arg);
+    this.layServ.nextCambioMenu(arg);
   }
 }

@@ -4,19 +4,17 @@ import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { IpcService } from '../../../../core/services/ipc.service';
 import { ModalService } from '../../../components/modal/modal.service';
-// import { myElectron } from '../../../../core/services/electron';
 import { TablasService } from '../../../components/tablas/tablas.service';
-import { applyMixins, GLOBAL } from '../../../../core/services/GLOBAL';
-import { modalClass } from '../../../components/modal/modal';
-import { LayoutClass } from '../../../../admin/layout/layout';
 import { LayoutService } from '../../../../admin/layout/layout.service';
+import { GLOBAL } from '../../../../core/services/GLOBAL';
+import { mixinClass } from '../../../mixinClass';
 
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
   styleUrls: ['./lista-recibos.component.scss'],
 })
-export class ListaRecibosComponent extends modalClass implements OnInit, OnDestroy {
+export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestroy {
   info = [
     {
       titulo: '1',
@@ -88,16 +86,19 @@ export class ListaRecibosComponent extends modalClass implements OnInit, OnDestr
   }
 
   async ngOnInit() {
-    console.log('lita recibos');
-
+    this._init_mixin({ _lista_subs: ['printRes', 'decisionModal', 'printBase64Res'] });
     this.necesarioStart();
-    this._init_layout();
-    this._init_modal(['printRes', 'decisionModal', 'printBase64Res']);
+  }
+
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('lista ingresos --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
   }
 
   ngOnDestroy() {
-    // this._ipc.removeListener('printRes');
-    this._destroy_modal();
+    this._destroy_mixin();
   }
 
   ipcPrintResponse(res) {

@@ -1,20 +1,22 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
-import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
+import { LayoutService } from '../../layout/layout.service';
+import { IpcService } from '../../../core/services/ipc.service';
+import { mixinClass } from '../../mixinClass';
 
 @Component({
   selector: 'app-registro-suplidores',
   templateUrl: './registro-suplidores.component.html',
   styleUrls: ['./registro-suplidores.component.scss'],
 })
-export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
+export class RegistroSuplidoresComponent extends mixinClass implements OnInit, OnDestroy {
   form: FormGroup;
   titulo = '';
   boton = '';
@@ -59,18 +61,21 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private dbServ: DBservice,
-    private mServ: ModalService,
+    public mServ: ModalService,
     private router: Router,
     private tServ: TablasService,
-  ) {}
+    public layServ: LayoutService,
+    public _ipc: IpcService,
+  ) {
+    super(mServ, _ipc, layServ);
+  }
 
   ngOnInit() {
+    this._init_mixin();
     this.titulo = 'Registro de suplidores';
     this.boton = 'Registrar';
     this.metodo = this.route.snapshot.params['metodo'];
     this.marcarCheck('rnc');
-    // this.titulo = 'Actualizar empleado';
-    // this.boton = 'Actualizar';
 
     this.form = this.fb.group({
       id: [null],
@@ -89,6 +94,18 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
         this.decisionModal(res);
       }
     });
+  }
+
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('suplidores --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this._destroy_mixin();
+    this.subDeci.unsubscribe();
   }
 
   async nesesarioStart() {
@@ -124,9 +141,6 @@ export class RegistroSuplidoresComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.subDeci.unsubscribe();
-  }
   validarRayaAbajo(input) {
     const form = this.form.controls;
     if (form[input] && form[input].value !== null) {

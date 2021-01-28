@@ -36,7 +36,7 @@ export class FormVentasComponent implements OnInit {
   formarFecha = ['suplidor_prod'];
   Fecha: string;
 
-  constructor(private fb: FormBuilder, private mServ: ModalService, private dbServ: DBservice) {
+  constructor(private fb: FormBuilder, public mServ: ModalService, private dbServ: DBservice) {
     this.dpConfig = Object.assign(
       {},
       {

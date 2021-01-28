@@ -69,7 +69,7 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   subInde: Subscription;
   tipoModal: string;
 
-  constructor(private dbServ: DBservice, private mServ: ModalService, private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private dbServ: DBservice, public mServ: ModalService, private fb: FormBuilder, private route: ActivatedRoute) {
     // this.rowFactura = new FormArray([new FormControl()]);
   }
 

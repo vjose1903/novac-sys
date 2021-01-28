@@ -54,7 +54,7 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
   articulos_selected = [];
 
   subDeci: Subscription;
-  constructor(private dbServ: DBservice, private mServ: ModalService) {}
+  constructor(private dbServ: DBservice, public mServ: ModalService) {}
 
   ngOnInit() {
     this.articulos = GLOBAL.duplicarJson(this.articulos);

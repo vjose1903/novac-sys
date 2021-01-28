@@ -1,25 +1,24 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs/operators';
 import { IpcService } from '../../../core/services/ipc.service';
 import { Subscription } from 'rxjs';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { ModalService } from '../../components/modal/modal.service';
 import { FunctionService } from '../../../core/services/functions.service';
-import { LayoutClass } from '../../layout/layout';
 import { LayoutService } from '../../layout/layout.service';
+import { mixinClass } from '../../mixinClass';
 
 @Component({
   selector: 'app-notas-cred-deb',
   templateUrl: './notas-cred-deb.component.html',
   styleUrls: ['./notas-cred-deb.component.scss'],
 })
-export class NotasCredDebComponent extends LayoutClass implements OnInit, OnDestroy {
+export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestroy {
   factura;
   idFactura: any;
   tipoNota: any;
@@ -46,17 +45,17 @@ export class NotasCredDebComponent extends LayoutClass implements OnInit, OnDest
   constructor(
     private dbServ: DBservice,
     private activeRoute: ActivatedRoute,
-    private mServ: ModalService,
-    private _ipc: IpcService,
+    public mServ: ModalService,
+    public _ipc: IpcService,
     private fun: FunctionService,
     private router: Router,
     public layServ: LayoutService,
   ) {
-    super(layServ);
+    super(mServ, _ipc, layServ);
   }
 
   ngOnInit() {
-    this._init_layout();
+    this._init_mixin();
     this.idFactura = this.activeRoute.snapshot.params['id'];
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
@@ -88,17 +87,24 @@ export class NotasCredDebComponent extends LayoutClass implements OnInit, OnDest
     this.necesarioStart();
   }
 
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('notas de credito/ debito --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this._destroy_mixin();
+    this.subDeci.unsubscribe();
+    this.subObj.unsubscribe();
+    this._ipc.removeListener('printRes');
+  }
+
   resetVariables() {
     this.mServ.ModalDecision(false);
     this.mServ.modalTipo(undefined);
     this.mServ.ModalSeleccion(undefined);
-  }
-
-  ngOnDestroy(): void {
-    this._destroy_layout();
-    this.subDeci.unsubscribe();
-    this.subObj.unsubscribe();
-    this._ipc.removeListener('printRes');
   }
 
   async necesarioStart() {

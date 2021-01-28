@@ -12,10 +12,11 @@ export class LayoutService {
 
   constructor() {}
 
-  nexCambioMenu(nextValue) {
+  nextCambioMenu(nextValue) {
     this.initcambioMenu.next(nextValue);
   }
-  nexDecisionCambioMenu(nextValue) {
+
+  nextDecisionCambioMenu(nextValue) {
     this.desicionCambioMenu.next(nextValue);
   }
 }

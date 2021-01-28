@@ -1,22 +1,23 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@angular/core';
-import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
-import * as moment from 'moment';
 
-import { map } from 'rxjs/operators';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { TablasService } from '../../components/tablas/tablas.service';
+import { LayoutService } from '../../layout/layout.service';
+import { IpcService } from '../../../core/services/ipc.service';
+import { mixinClass } from '../../mixinClass';
 
 @Component({
   selector: 'app-registro-vehiculo',
   templateUrl: './registro-vehiculo.component.html',
   styleUrls: ['./registro-vehiculo.component.scss'],
 })
-export class RegistroVehiculoComponent implements OnInit {
+export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   titulo = '';
   boton = '';
   form: FormGroup;
@@ -44,11 +45,16 @@ export class RegistroVehiculoComponent implements OnInit {
     private cdRef: ChangeDetectorRef,
     private fb: FormBuilder,
     private router: Router,
-    private mServ: ModalService,
+    public mServ: ModalService,
     private tServ: TablasService,
-  ) {}
+    public layServ: LayoutService,
+    public _ipc: IpcService,
+  ) {
+    super(mServ, _ipc, layServ);
+  }
 
   ngOnInit() {
+    this._init_mixin();
     this.createForm();
     this.FORM = this.form.controls;
 
@@ -64,7 +70,15 @@ export class RegistroVehiculoComponent implements OnInit {
     this.necesarioStart();
   }
 
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('vehiculo --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
   ngOnDestroy() {
+    this._destroy_mixin();
     this.borrar();
     this.subDeci.unsubscribe();
   }

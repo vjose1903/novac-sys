@@ -20,7 +20,7 @@ export class ChangePasswordComponent implements OnInit, AfterViewInit {
 
   @Output() cancel = new EventEmitter<any>();
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {}
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, public mServ: ModalService) {}
 
   ngOnInit() {
     this.form = this.fb.group({

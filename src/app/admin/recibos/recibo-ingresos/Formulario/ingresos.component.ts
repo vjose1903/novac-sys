@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { DBservice } from '../../../../core/services/bdservice.service';
-import { FormBuilder } from '@angular/forms';
-
 import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
@@ -15,13 +13,14 @@ import { IpcService } from '../../../../core/services/ipc.service';
 import { FunctionService } from '../../../../core/services/functions.service';
 
 import { LayoutService } from '../../../../admin/layout/layout.service';
+import { mixinClass } from '../../../mixinClass';
 
 @Component({
   selector: 'app-ingresos',
   templateUrl: './ingresos.component.html',
   styleUrls: ['./ingresos.component.scss'],
 })
-export class IngresosComponent implements OnInit, OnDestroy {
+export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   element: any;
   listaClientes;
   clienteAdepositar: any;
@@ -129,19 +128,19 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   constructor(
     private config: NgSelectConfig,
-    private mServ: ModalService,
+    public mServ: ModalService,
     private fun: FunctionService,
     private dbServ: DBservice,
-    private fb: FormBuilder,
-    private _ipc: IpcService,
+    public _ipc: IpcService,
     private tServ: TablasService,
     public layServ: LayoutService,
   ) {
+    super(mServ, _ipc, layServ);
     this.config.notFoundText = 'Articulo no existe';
   }
 
   ngOnInit() {
-    // this._init_layout();
+    this._init_mixin();
     this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
       if (res && res.tipo_modal === 'buscarCliente') {
         this.clienteAdepositar = res.data;
@@ -166,9 +165,15 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
     this.necesarioStart();
   }
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('formulario ingreso --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
 
   ngOnDestroy() {
-    // this._destroy_layout();
+    this._destroy_mixin();
     this.sub.unsubscribe();
     this.subDeci.unsubscribe();
     this._ipc.removeListener('printRes');

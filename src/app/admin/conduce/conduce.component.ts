@@ -7,18 +7,18 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { TablasService } from '../components/tablas/tablas.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { FunctionService } from '../../core/services/functions.service';
-import { LayoutClass } from '../layout/layout';
+
 import { LayoutService } from '../layout/layout.service';
+import { mixinClass } from '../mixinClass';
 
 @Component({
   selector: 'app-conduce',
   templateUrl: './conduce.component.html',
   styleUrls: ['./conduce.component.scss'],
 })
-export class ConduceComponent extends LayoutClass implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit, OnChanges {
   listaClientes;
 
   cliente;
@@ -74,15 +74,14 @@ export class ConduceComponent extends LayoutClass implements OnInit, OnDestroy, 
   FechaConduce: string;
 
   constructor(
-    private mServ: ModalService,
-    private _ipc: IpcService,
+    public mServ: ModalService,
+    public _ipc: IpcService,
     private fun: FunctionService,
     private dbServ: DBservice,
     private fb: FormBuilder,
-    private tServ: TablasService,
     public layServ: LayoutService,
   ) {
-    super(layServ);
+    super(mServ, _ipc, layServ);
   }
 
   formarFechaFactura(date) {
@@ -94,7 +93,7 @@ export class ConduceComponent extends LayoutClass implements OnInit, OnDestroy, 
   }
 
   ngOnInit() {
-    this._init_layout();
+    this._init_mixin();
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
@@ -184,10 +183,29 @@ export class ConduceComponent extends LayoutClass implements OnInit, OnDestroy, 
     });
   }
 
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('conduce --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
+  ngOnDestroy() {
+    this._destroy_mixin()
+    this.subDeci.unsubscribe();
+    this.subObj.unsubscribe();
+    this.subArticuloFiltro.unsubscribe();
+    this.subEsc.unsubscribe();
+    this.subInde.unsubscribe();
+
+    this.resetModalVaribales();
+    this._ipc.removeListener('printRes');
+  }
+
   ngOnChanges(simpleChanges) {}
 
   resetModalVaribales() {
-    this._destroy_layout();
+
     this.mServ.ModalObj(undefined);
     this.mServ.ModalSeleccion(undefined);
     this.mServ.ModalDecision(undefined);
@@ -206,16 +224,7 @@ export class ConduceComponent extends LayoutClass implements OnInit, OnDestroy, 
     }, 10);
   }
 
-  ngOnDestroy() {
-    this.subDeci.unsubscribe();
-    this.subObj.unsubscribe();
-    this.subArticuloFiltro.unsubscribe();
-    this.subEsc.unsubscribe();
-    this.subInde.unsubscribe();
 
-    this.resetModalVaribales();
-    this._ipc.removeListener('printRes');
-  }
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
   }

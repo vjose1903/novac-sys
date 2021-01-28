@@ -1,23 +1,23 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { logoADM, pdfBase64Prueba } from '../../../../myPdf/utils/files';
 import { DBservice } from '../../core/services/bdservice.service';
-import { myElectron } from '../../core/services/electron';
 import { IpcService } from '../../core/services/ipc.service';
 import { ModalService } from '../components/modal/modal.service';
+import { LayoutService } from '../layout/layout.service';
+import { mixinClass } from '../mixinClass';
 
 @Component({
   selector: 'app-reportes',
   templateUrl: './reportes.component.html',
   styleUrls: ['./reportes.component.scss'],
 })
-export class ReportesComponent extends myElectron implements OnInit, OnDestroy {
+export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   pdfSrc: any;
   fileName: any;
   tipoModal: string;
 
-  constructor(private _ipc: IpcService, private mServ: ModalService, private dbServ: DBservice) {
-    super();
+  constructor(public _ipc: IpcService, public mServ: ModalService, private dbServ: DBservice, public layServ: LayoutService) {
+    super(mServ, _ipc, layServ);
   }
 
   appDir;
@@ -26,6 +26,7 @@ export class ReportesComponent extends myElectron implements OnInit, OnDestroy {
   titulo_moda_reporte;
 
   ngOnInit() {
+    this._init_mixin();
     this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
       if (res.status === 'si') {
         let obj;
@@ -91,7 +92,15 @@ export class ReportesComponent extends myElectron implements OnInit, OnDestroy {
     });
   }
 
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('reportes --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
   ngOnDestroy() {
+    this._destroy_mixin();
     this.subDeci.unsubscribe();
     this.subObj.unsubscribe();
     this._ipc.removeListener('printRes');

@@ -20,7 +20,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   mantenimiento: boolean;
 
   sub = new Subscription();
-  actualTab;
+  actualMenyItem;
   showLoading = true;
 
   showModal;
@@ -35,13 +35,15 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   noServer = false;
   subDeciMenu: Subscription;
   ruta_a_cambiar = '';
+  modulo_select: any;
+  ready = false;
   // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
   constructor(
     private fun: FunctionService,
     private dbServ: DBservice,
     private breakpointObserver: BreakpointObserver,
     private router: Router,
-    private _ipc: IpcService,
+    public _ipc: IpcService,
     private layServ: LayoutService,
   ) {
     this.router.events.subscribe((routerEvent: Event) => {
@@ -97,7 +99,6 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     this.subDeciMenu = this.layServ.DESICIONCAMBIOMENU.subscribe((res) => {
-      console.log('decision cambio menu ==> ', res);
       this.decisionCambioMenu(res);
     });
 
@@ -134,7 +135,9 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   element: HTMLElement;
-  ngAfterViewInit() {}
+  ngAfterViewInit() {
+    this.ready = true;
+  }
 
   stop(e) {
     this.OpenPrinterMenu = true;
@@ -179,145 +182,39 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     const temp_url = document.location.href.split('admin/');
     if (temp_url[1]) {
       const url = temp_url[1].split('/')[0];
-      this.actualTab = url;
+      this.actualMenyItem = url;
     }
   }
   // =================================================================================
   // NAVEGAR
   // =================================================================================
-  nextCambioMenu(lugar: any, accion?, confirmar?) {
-    switch (lugar) {
-      case 1:
-        this.actualTab = 'home';
-        this.ruta_a_cambiar = '/admin/dashboard';
-        break;
+  nextCambioMenu(subMenu, url) {
+    if (subMenu) this.modulo_select = url;
 
-      case 2:
-        this.actualTab = 'factura_select';
-        break;
+    if (!subMenu) this.ruta_a_cambiar = this.modulo_select ? `/admin/${this.modulo_select}/${url}` : `/admin/${url}`;
 
-      case 3:
-        this.actualTab = 'registros_select';
-        break;
+    this.actualMenyItem = subMenu ? `${this.modulo_select}_select` : `${this.modulo_select}`;
 
-      case 4:
-        this.actualTab = 'inventario';
-        this.ruta_a_cambiar = '/admin/inventario';
-        break;
-
-      case 5:
-        this.actualTab = 'reportes';
-        this.ruta_a_cambiar = '/admin/reportes';
-        break;
-
-      case 7:
-        this.actualTab = 'recibos_select';
-        break;
-
-      case 6:
-        this.actualTab = 'produccion';
-        this.ruta_a_cambiar = '/admin/produccion';
-        break;
-
-      case 8:
-        this.actualTab = 'manipular_select';
-        break;
-
-      case 9:
-        this.actualTab = 'mantenimiento';
-        break;
-
-      case 10:
-        this.actualTab = 'conduce';
-        this.ruta_a_cambiar = '/admin/conduce';
-        break;
-
-      case 'venta':
-        this.ruta_a_cambiar = '/admin/dashboard';
-        this.actualTab = 'factura';
-        setTimeout(() => {
-          this.ruta_a_cambiar = '/admin/factura/venta/new/0';
-        }, 5);
-        break;
-
-      case 'compra':
-        this.ruta_a_cambiar = '/admin/dashboard';
-        this.actualTab = 'factura';
-
-        setTimeout(() => {
-          this.ruta_a_cambiar = '/admin/factura/compra/new/0';
-        }, 5);
-        break;
-
-      case 'buscarFactura':
-        this.ruta_a_cambiar = '/admin/dashboard';
-        this.actualTab = 'manipular';
-        setTimeout(() => {
-          this.ruta_a_cambiar = '/admin/manipular/buscarFactura/' + accion;
-        }, 5);
-        break;
-
-      case 'ingreso':
-        this.ruta_a_cambiar = '/admin/recibos/ingresos';
-        this.actualTab = 'recibos';
-        break;
-
-      case 'viajes':
-        this.ruta_a_cambiar = '/admin/recibos/viajes';
-        this.actualTab = 'recibos';
-        break;
-
-      case 'ncf':
-        this.actualTab = 'registros';
-        this.ruta_a_cambiar = '/admin/registros/ncf';
-        break;
-
-      case 'articulos':
-        this.actualTab = 'registros';
-        this.ruta_a_cambiar = '/admin/registros/articulos';
-        break;
-
-      case 'empleados':
-        this.actualTab = 'registros';
-        this.ruta_a_cambiar = '/admin/registros/empleados';
-        break;
-
-      case 'clientes':
-        this.actualTab = 'registros';
-        this.ruta_a_cambiar = '/admin/registros/clientes';
-        break;
-
-      case 'suplidores':
-        this.actualTab = 'registros';
-        this.ruta_a_cambiar = '/admin/registros/suplidores';
-        break;
-
-      case 'camiones':
-        this.actualTab = 'registros';
-        this.ruta_a_cambiar = '/admin/registros/camiones';
-        break;
-
-      default:
-        break;
-    }
-    if (confirmar) {
-      this.layServ.nexCambioMenu(true);
-    } else {
-      this.router.navigateByUrl(this.ruta_a_cambiar);
+    if (!subMenu) {
+      // if (modulo) {
+      //   this.router.navigateByUrl(this.ruta_a_cambiar);
+      // } else {
+      this.ready = false;
+      this.layServ.nextCambioMenu(true);
+      // }
     }
   }
 
   decisionCambioMenu(decision) {
-    console.log('decision cambio --> ', decision);
-
     if (decision) {
       this.router.navigateByUrl(this.ruta_a_cambiar);
-      this.layServ.nexDecisionCambioMenu(false);
+      setTimeout(() => (this.ready = true), 20);
+      this.layServ.nextDecisionCambioMenu(false);
     } else {
       this.ruta_a_cambiar = '';
     }
-
-    this.layServ.nexCambioMenu(false);
+    this.modulo_select = undefined;
+    this.layServ.nextCambioMenu(false);
   }
 
   modalConfig() {}

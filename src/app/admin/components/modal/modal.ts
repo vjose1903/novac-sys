@@ -20,12 +20,8 @@ export class modalClass extends LayoutClass {
     super(layServ);
   }
 
-  _init_modal(lista_) {
-    console.log(' ');
-    console.log(' -------iniciando el modal class -------');
-    console.log(' ');
-
-    this._lista = lista_;
+  _init_modal(l) {
+    this._lista = l ? (l._lista_subs ? l._lista_subs : []) : [];
     console.log('Inicio de clase modal');
 
     if (this._lista.includes('printRes')) {

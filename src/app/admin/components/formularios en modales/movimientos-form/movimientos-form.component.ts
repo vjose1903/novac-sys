@@ -31,7 +31,7 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private mServ: ModalService,
+    public mServ: ModalService,
   ) {}
 
   ngOnInit() {

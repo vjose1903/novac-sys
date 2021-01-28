@@ -9,32 +9,17 @@ import { Subscription } from 'rxjs';
 
 import { FunctionService } from '../../core/services/functions.service';
 import { obj_paginate_default, TablasService } from '../components/tablas/tablas.service';
-import { LayoutClass } from '../layout/layout';
+
 import { LayoutService } from '../layout/layout.service';
-import { modalClass } from '../components/modal/modal';
-import { myElectron } from '../../../app/core/services/electron';
+
 import { IpcService } from '../../core/services/ipc.service';
-
-// export interface ProduccionComponent extends modalClass, LayoutClass {}
-// export interface ProduccionComponent extends modalClass, LayoutClass {}
-const mix = (Superclass) => new MixinBuilder(Superclass);
-class MixinBuilder {
-  superclass;
-  constructor(superclass) {
-    this.superclass = superclass;
-  }
-
-  with(...mixins) {
-    return mixins.reduce((c, mixin) => mixin(c), this.superclass);
-  }
-}
-
+import { mixinClass } from '../mixinClass';
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
   styleUrls: ['./produccion.component.scss'],
 })
-export class ProduccionComponent extends modalClass implements OnInit, OnDestroy {
+export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
 
   // listaArticulos: any;
@@ -73,15 +58,26 @@ export class ProduccionComponent extends modalClass implements OnInit, OnDestroy
     public _ipc: IpcService,
   ) {
     super(mServ, _ipc, layServ);
-    // applyMixins(ProduccionComponent, [modalClass, LayoutClass]);
   }
 
   ngOnInit() {
-    this._init_layout();
-    this._init_modal(['decisionModal']);
-
+    this._init_mixin({ _lista_subs: ['decisionModal'] });
     this.enfocarInput('articulo_id');
     this.getProductosTerminados();
+  }
+
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('produccion --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
+  ngOnDestroy() {
+    this._destroy_mixin();
+
+    this.tServ.obj_paginate = obj_paginate_default;
+    this.tServ.Func_total_paginas(1);
   }
 
   decisionModal(res) {
@@ -92,14 +88,6 @@ export class ProduccionComponent extends modalClass implements OnInit, OnDestroy
     } else if (res && this.tipoModal === 'confirmar_produccion') {
       this.confirmarProduccion();
     }
-  }
-
-  ngOnDestroy() {
-    this._destroy_layout();
-    this._destroy_modal();
-    // this.subDeci.unsubscribe();
-    this.tServ.obj_paginate = obj_paginate_default;
-    this.tServ.Func_total_paginas(1);
   }
 
   async getProductosTerminados() {

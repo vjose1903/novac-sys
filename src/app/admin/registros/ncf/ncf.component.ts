@@ -1,24 +1,22 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
-import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as moment from 'moment';
-import * as dateFormat from 'dateFormat';
 import { ModalService } from '../../components/modal/modal.service';
 import { TablasService } from '../../components/tablas/tablas.service';
+import { IpcService } from '../../../core/services/ipc.service';
+import { LayoutService } from '../../layout/layout.service';
+import { mixinClass } from '../../mixinClass';
 
 @Component({
   selector: 'app-ncf',
   templateUrl: './ncf.component.html',
   styleUrls: ['./ncf.component.scss'],
 })
-export class NcfComponent implements OnInit, OnDestroy {
+export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   titulo;
   form;
   boton = 'Ingresar';
@@ -101,13 +99,12 @@ export class NcfComponent implements OnInit, OnDestroy {
   listaNCFBack: any[];
   constructor(
     private dbServ: DBservice,
-    private cdRef: ChangeDetectorRef,
-    private fb: FormBuilder,
-    private actRou: ActivatedRoute,
-    private router: Router,
-    private mServ: ModalService,
+    public _ipc: IpcService,
+    public layServ: LayoutService,
+    public mServ: ModalService,
     private tServ: TablasService,
   ) {
+    super(mServ, _ipc, layServ);
     this.dpConfig = Object.assign(
       {},
       {
@@ -128,6 +125,7 @@ export class NcfComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this._init_mixin();
     this.titulo = 'Paquetes de numeros comprobantes fiscales';
     this.necesarioStart();
 
@@ -139,7 +137,15 @@ export class NcfComponent implements OnInit, OnDestroy {
     });
   }
 
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('ncf --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
   ngOnDestroy(): void {
+    this._destroy_mixin();
     this.subDeci.unsubscribe();
   }
 

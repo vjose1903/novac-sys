@@ -1,10 +1,9 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@angular/core';
+import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as moment from 'moment';
-import { map } from 'rxjs/operators';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
@@ -12,14 +11,15 @@ import { TablasService } from '../../components/tablas/tablas.service';
 import { FunctionService } from '../../../core/services/functions.service';
 import { LoaderService } from '../../../loader/loader.service';
 import { IpcService } from '../../../core/services/ipc.service';
-import { modalClass } from '../../components/modal/modal';
+import { LayoutService } from '../../layout/layout.service';
+import { mixinClass } from '../../mixinClass';
 
 @Component({
   selector: 'app-registro-articulos',
   templateUrl: './registro-articulos.component.html',
   styleUrls: ['./registro-articulos.component.scss'],
 })
-export class RegistroArticulosComponent extends modalClass implements OnInit, OnDestroy, OnChanges {
+export class RegistroArticulosComponent extends mixinClass implements OnInit, OnDestroy, OnChanges {
   // =============================================
   //  TABLAS
   // =============================================
@@ -107,8 +107,9 @@ export class RegistroArticulosComponent extends modalClass implements OnInit, On
     private tServ: TablasService,
     private loaderService: LoaderService,
     public _ipc: IpcService,
+    public layServ: LayoutService,
   ) {
-    super(mServ, _ipc);
+    super(mServ, _ipc, layServ);
   }
 
   ngOnInit() {
@@ -118,7 +119,20 @@ export class RegistroArticulosComponent extends modalClass implements OnInit, On
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
     this.necesarioStart();
-    this._init_modal('decisionModal');
+    this._init_mixin({ _lista_subs: ['decisionModal'] });
+  }
+
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('articulos --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
+  ngOnDestroy() {
+    this._destroy_mixin();
+    this.borrar();
+    // this.subDeci.unsubscribe();
   }
 
   filtroFormula(item) {
@@ -374,11 +388,6 @@ export class RegistroArticulosComponent extends modalClass implements OnInit, On
       this.form.controls.medida_contenido_padre.setValue('Libra');
     }
     this.fillDropAlerta(value);
-  }
-
-  ngOnDestroy() {
-    this.borrar();
-    this.subDeci.unsubscribe();
   }
 
   // =============================================

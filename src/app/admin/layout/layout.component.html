@@ -12,118 +12,119 @@
     [opened]="(isHandset$ | async) === false"
   >
     <mat-toolbar>
-      <span class="titulo" (click)="nextCambioMenu(1)">Menu</span>
+      <span class="titulo" (click)="nextCambioMenu(false, 'dashboard')">Menu</span>
       <!-- <img src="" class="img-fluid" /> -->
     </mat-toolbar>
     <mat-nav-list class="text-center">
       <div class="menuList1 mt-5">
         <img
-          [ngClass]="actualTab == 'factura' ? 'iconosMenuA' : 'iconosMenu'"
+          [ngClass]="actualMenyItem == 'factura' ? 'iconosMenuA' : 'iconosMenu'"
           src="assets/img/factura.png"
           alt="Facturacion"
-          (click)="nextCambioMenu(2)"
+          (click)="nextCambioMenu(true, 'factura')"
         />
-        <h5 [ngClass]="actualTab == 'factura' ? 'tituloMenuA1' : 'tituloMenu1'"><strong>Facturación</strong></h5>
+        <h5 [ngClass]="actualMenyItem == 'factura' ? 'tituloMenuA1' : 'tituloMenu1'"><strong>Facturación</strong></h5>
 
-        <div [ngClass]="actualTab == 'factura_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
-          <h4 class="opcion" (click)="nextCambioMenu('venta')">Venta</h4>
-          <h4 class="opcion" (click)="nextCambioMenu('compra')">Compra</h4>
+        <div [ngClass]="actualMenyItem == 'factura_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'venta/new/0')">Venta</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'compra/new/0')">Compra</h4>
         </div>
       </div>
       <div class="menuList2">
         <img
-          [ngClass]="actualTab == 'manipular' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'"
+          [ngClass]="actualMenyItem == 'manipular' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'"
           src="assets/img/notaM.png"
           alt="Notas"
-          (click)="nextCambioMenu(8)"
+          (click)="nextCambioMenu(true, 'manipular')"
         />
-        <h5 [ngClass]="actualTab == 'manipular' ? 'tituloMenuA2' : 'tituloMenu2'"><strong>Manipular facturas</strong></h5>
+        <h5 [ngClass]="actualMenyItem == 'manipular' ? 'tituloMenuA2' : 'tituloMenu2'"><strong>Manipular facturas</strong></h5>
         <!-- ultimo -->
 
-        <div [ngClass]="actualTab == 'manipular_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
-          <h4 class="opcion" (click)="nextCambioMenu('buscarFactura', 'nota_credito')">Nota de Crédito</h4>
-          <h4 class="opcion" (click)="nextCambioMenu('buscarFactura', 'nota_debito')">Nota de Débito</h4>
-          <h4 class="opcion" (click)="nextCambioMenu('buscarFactura', 'solo_ver')">Visualizar</h4>
+        <div [ngClass]="actualMenyItem == 'manipular_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'buscarFactura/nota_credito')">Nota de Crédito</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'buscarFactura/nota_debito')">Nota de Débito</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'buscarFactura/solo_ver')">Visualizar</h4>
+
           <!-- <h4 class="opcion" (click)="nextCambioMenu('buscarFactura', 'anular_factura')">Anular factura</h4> -->
         </div>
       </div>
 
       <div class="menuList">
         <img
-          [ngClass]="actualTab == 'recibos' ? 'iconosMenuA' : 'iconosMenu'"
+          [ngClass]="actualMenyItem == 'recibos' ? 'iconosMenuA' : 'iconosMenu'"
           src="assets/img/reciboIngreso.png"
           alt="Facturacion"
-          (click)="nextCambioMenu(7)"
+          (click)="nextCambioMenu(true, 'recibos')"
         />
-        <h5 [ngClass]="actualTab == 'recibos' ? 'tituloMenuA' : 'tituloMenu'"><strong>Ingresos</strong></h5>
-        <div [ngClass]="actualTab == 'recibos_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-          <h4 class="opcion" (click)="nextCambioMenu('ingreso')">Recibo ingresos</h4>
-          <h4 class="opcion" (click)="nextCambioMenu('viajes')">Viajes</h4>
+        <h5 [ngClass]="actualMenyItem == 'recibos' ? 'tituloMenuA' : 'tituloMenu'"><strong>Ingresos</strong></h5>
+        <div [ngClass]="actualMenyItem == 'recibos_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'ingresos')">Recibo ingresos</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'viajes')">Viajes</h4>
         </div>
       </div>
 
       <div class="menuList">
         <img
-          [ngClass]="actualTab == 'conduce' ? 'iconosMenuA' : 'iconosMenu'"
+          [ngClass]="actualMenyItem == 'conduce' ? 'iconosMenuA' : 'iconosMenu'"
           src="assets/img/conduce.png"
           alt="Facturacion"
-          (click)="nextCambioMenu(10)"
+          (click)="nextCambioMenu(false, 'conduce')"
         />
-        <h5 [ngClass]="actualTab == 'conduce' ? 'tituloMenuA' : 'tituloMenu'"><strong>Conduce</strong></h5>
+        <h5 [ngClass]="actualMenyItem == 'conduce' ? 'tituloMenuA' : 'tituloMenu'"><strong>Conduce</strong></h5>
       </div>
 
       <div class="menuList">
         <img
-          [ngClass]="actualTab == 'registros' ? 'iconosMenuA' : 'iconosMenu'"
+          [ngClass]="actualMenyItem == 'registros' ? 'iconosMenuA' : 'iconosMenu'"
           src="assets/img/registro.png"
           alt="Registros"
-          (click)="nextCambioMenu(3)"
+          (click)="nextCambioMenu(true, 'registros')"
         />
-        <h5 [ngClass]="actualTab == 'registros' ? 'tituloMenuA' : 'tituloMenu'"><strong>Registros</strong></h5>
+        <h5 [ngClass]="actualMenyItem == 'registros' ? 'tituloMenuA' : 'tituloMenu'"><strong>Registros</strong></h5>
 
-        <div [ngClass]="actualTab == 'registros_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-          <h4 class="opcion" (click)="nextCambioMenu('clientes')">Clientes</h4>
-          <h4 class="opcion" (click)="nextCambioMenu('empleados')">Empleados</h4>
-          <h4 class="opcion" (click)="nextCambioMenu('articulos')">Articulos</h4>
-          <h4 class="opcion" (click)="nextCambioMenu('suplidores')">Suplidores</h4>
-          <h4 class="opcion" (click)="nextCambioMenu('camiones')">Camiones</h4>
-          <h4 class="opcion" (click)="nextCambioMenu('ncf')">NCF</h4>
+        <div [ngClass]="actualMenyItem == 'registros_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'clientes')">Clientes</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'empleados')">Empleados</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'articulos')">Articulos</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'suplidores')">Suplidores</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'camiones')">Camiones</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'ncf')">NCF</h4>
         </div>
       </div>
       <div class="menuList">
         <img
-          [ngClass]="actualTab == 'produccion' ? 'iconosMenuA' : 'iconosMenu'"
+          [ngClass]="actualMenyItem == 'produccion' ? 'iconosMenuA' : 'iconosMenu'"
           src="assets/img/produccion.png"
           alt="Producción"
-          (click)="nextCambioMenu(6, null, true)"
+          (click)="nextCambioMenu(false, 'produccion')"
         />
-        <h5 [ngClass]="actualTab == 'produccion' ? 'tituloMenuA' : 'tituloMenu'"><strong>Producción</strong></h5>
+        <h5 [ngClass]="actualMenyItem == 'produccion' ? 'tituloMenuA' : 'tituloMenu'"><strong>Producción</strong></h5>
       </div>
       <div class="menuList">
         <img
-          [ngClass]="actualTab == 'inventario' ? 'iconosMenuA' : 'iconosMenu'"
+          [ngClass]="actualMenyItem == 'inventario' ? 'iconosMenuA' : 'iconosMenu'"
           src="assets/img/inventario.png"
           alt="Inventario"
-          (click)="nextCambioMenu(4)"
+          (click)="nextCambioMenu(false, 'inventario')"
         />
-        <h5 [ngClass]="actualTab == 'inventario' ? 'tituloMenuA' : 'tituloMenu'"><strong>Inventario</strong></h5>
+        <h5 [ngClass]="actualMenyItem == 'inventario' ? 'tituloMenuA' : 'tituloMenu'"><strong>Inventario</strong></h5>
       </div>
       <div class="menuList">
         <img
-          [ngClass]="actualTab == 'reportes' ? 'iconosMenuA' : 'iconosMenu'"
+          [ngClass]="actualMenyItem == 'reportes' ? 'iconosMenuA' : 'iconosMenu'"
           src="assets/img/reporte.png"
           alt="Reportes"
-          (click)="nextCambioMenu(5)"
+          (click)="nextCambioMenu(false, 'reportes')"
         />
-        <h5 [ngClass]="actualTab == 'reportes' ? 'tituloMenuA' : 'tituloMenu'"><strong>Reportes</strong></h5>
+        <h5 [ngClass]="actualMenyItem == 'reportes' ? 'tituloMenuA' : 'tituloMenu'"><strong>Reportes</strong></h5>
       </div>
       <!--
 
       <div class="menuListMant">
-        <img [ngClass]="actualTab == 'mantenimiento' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/mantenimiento.png" alt="Registros" (click)="nextCambioMenu(9)" />
-        <h5 [ngClass]="actualTab == 'mantenimiento' ? 'tituloMenuAMant' : 'tituloMenuMant'"><strong>Mantenimiento</strong></h5>
+        <img [ngClass]="actualMenyItem == 'mantenimiento' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/mantenimiento.png" alt="Registros" (click)="nextCambioMenu('mantenimiento')" />
+        <h5 [ngClass]="actualMenyItem == 'mantenimiento' ? 'tituloMenuAMant' : 'tituloMenuMant'"><strong>Mantenimiento</strong></h5>
 
-        <div [ngClass]="actualTab == 'mantenimiento' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
+        <div [ngClass]="actualMenyItem == 'mantenimiento' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
           <h4 class="opcion" (click)="nextCambioMenu('permisos')">Roles Usuarios</h4>
         </div>
       </div> -->
@@ -185,7 +186,7 @@
 
     <div class="" style="padding: 0.5rem 1rem 2rem 1rem; height: calc(100% - 60px); overflow-y: auto">
       <mdb-card-img id="foco_angular" class="btn_invisible" src="assets/img/transparente.png" alt="Logo ADM"></mdb-card-img>
-      <router-outlet></router-outlet>
+      <router-outlet *ngIf="ready"></router-outlet>
       <!-- rutas -->
     </div>
     <div class="footerCustom">VjPOS {{ getVersion() }} - @2020 Desarrollador: Victor J. Vasquez</div>

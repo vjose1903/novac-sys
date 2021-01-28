@@ -1,8 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, OnDestroy, AfterViewInit, ElementRef } from '@angular/core';
-
+import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
 import { DBservice } from '../../core/services/bdservice.service';
-import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -11,13 +8,13 @@ import { ModalService } from '../components/modal/modal.service';
 import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { LayoutService } from '../layout/layout.service';
-import { LayoutClass } from '../layout/layout';
+import { mixinClass } from '../mixinClass';
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
   styleUrls: ['./inventario.component.scss'],
 })
-export class InventarioComponent extends LayoutClass implements OnInit, OnDestroy {
+export class InventarioComponent extends mixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
   // =============================================
   //  TABLAS
@@ -68,19 +65,16 @@ export class InventarioComponent extends LayoutClass implements OnInit, OnDestro
   fileName: any;
   constructor(
     private dbServ: DBservice,
-    private cdRef: ChangeDetectorRef,
-    private fb: FormBuilder,
-    private actRou: ActivatedRoute,
     private tServ: TablasService,
-    private mServ: ModalService,
-    private _ipc: IpcService,
+    public mServ: ModalService,
+    public _ipc: IpcService,
     public layServ: LayoutService,
   ) {
-    super(layServ);
+    super(mServ, _ipc, layServ);
   }
 
   async ngOnInit() {
-    this._init_layout();
+    this._init_mixin();
     this.necesarioParaEmpezar();
     this.dbServ.getTipoArticulos().subscribe((res) => {
       this.tipo_articulos = res;
@@ -134,6 +128,13 @@ export class InventarioComponent extends LayoutClass implements OnInit, OnDestro
     });
   }
 
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('inventario --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
   abrirModalReporte(obj) {
     this.tipoModal = 'visor_pdf';
     this.mServ.modalTipo('visor_pdf');
@@ -143,7 +144,7 @@ export class InventarioComponent extends LayoutClass implements OnInit, OnDestro
   }
 
   ngOnDestroy() {
-    this._destroy_layout();
+    this._destroy_mixin();
     this.subDeci.unsubscribe();
     this.FechaFactura = undefined;
     this.tServ.obj_paginate = obj_paginate_default;

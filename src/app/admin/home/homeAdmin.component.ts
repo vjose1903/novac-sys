@@ -1,10 +1,9 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DBservice } from '../../core/services/bdservice.service';
+import { IpcService } from '../../core/services/ipc.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { ModalService } from '../components/modal/modal.service';
-import { LayoutClass } from '../layout/layout';
 import { LayoutService } from '../layout/layout.service';
+import { mixinClass } from '../mixinClass';
 
 @Component({
   selector: 'app-homeAdmin',
@@ -12,24 +11,26 @@ import { LayoutService } from '../layout/layout.service';
   styleUrls: ['./homeAdmin.component.scss'],
 })
 // export class HomeAdminComponent extends LayoutClass implements OnInit, OnDestroy {
-export class HomeAdminComponent implements OnInit, OnDestroy {
-  constructor(private dbServ: DBservice, private mServ: ModalService, private http: HttpClient, public layServ: LayoutService) {
-    // super(layServ);
+export class HomeAdminComponent extends mixinClass implements OnInit, OnDestroy {
+  constructor(public _ipc: IpcService, public mServ: ModalService, public layServ: LayoutService) {
+    super(mServ, _ipc, layServ);
   }
 
   initCambioMenu() {
-    console.log('aquii');
-
-    this.layServ.nexDecisionCambioMenu(true);
+    if (this.cambioMenu_) {
+      console.log('home --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
   }
 
   cedula = null;
   ngOnInit() {
-    // this._init_layout();
+    this._init_mixin();
   }
   ngOnDestroy() {
-    // this._destroy_layout();
+    this._destroy_mixin();
   }
+
   p() {
     // document.getElementById('imgd').classList.add('rubberBand');
   }

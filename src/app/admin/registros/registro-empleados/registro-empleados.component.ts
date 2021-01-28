@@ -1,22 +1,23 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
-import { PhotosService } from '../../../core/services/photos.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { LayoutService } from '../../layout/layout.service';
+import { IpcService } from '../../../core/services/ipc.service';
+import { mixinClass } from '../../mixinClass';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
   styleUrls: ['./registro-empleados.component.scss'],
 })
-export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
+export class RegistroEmpleadosComponent extends mixinClass implements OnInit, OnDestroy {
   form: FormGroup;
   titulo = '';
   boton = '';
@@ -61,12 +62,14 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private route: ActivatedRoute,
+    public layServ: LayoutService,
+    public _ipc: IpcService,
     private dbServ: DBservice,
     private router: Router,
-    private mServ: ModalService,
+    public mServ: ModalService,
     private tServ: TablasService,
   ) {
+    super(mServ, _ipc, layServ);
     this.dpConfig = Object.assign(
       {},
       {
@@ -82,8 +85,7 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
     this.titulo = 'Registro de empleados';
     this.boton = 'Registrar';
 
-    // this.titulo = 'Actualizar empleado';
-    // this.boton = 'Actualizar';
+    this._init_mixin();
 
     this.necesarioStart();
     this.form = this.fb.group({
@@ -105,6 +107,18 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
         this.decisionModal(res);
       }
     });
+  }
+
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('empleados --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this._destroy_mixin();
+    this.subDeci.unsubscribe();
   }
 
   async necesarioStart() {
@@ -144,10 +158,6 @@ export class RegistroEmpleadosComponent implements OnInit, OnDestroy {
     } catch (error) {
       this.dbServ.toastError('Error buscando empleados registrados.', 'ERROR', true);
     }
-  }
-
-  ngOnDestroy(): void {
-    this.subDeci.unsubscribe();
   }
 
   atras() {

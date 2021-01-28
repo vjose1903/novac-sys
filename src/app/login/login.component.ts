@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private router: Router,
     private fun: FunctionService,
-    private _ipc: IpcService,
+    public _ipc: IpcService,
   ) {}
 
   ngOnInit() {

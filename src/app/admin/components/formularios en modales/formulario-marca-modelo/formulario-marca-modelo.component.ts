@@ -46,7 +46,7 @@ export class FormularioMarcaModeloComponent implements OnInit {
   showModal: boolean;
   element;
   obj_p = this.tServ.obj_paginate;
-  constructor(private fb: FormBuilder, private dbServ: DBservice, private mServ: ModalService, private tServ: TablasService) {}
+  constructor(private fb: FormBuilder, private dbServ: DBservice, public mServ: ModalService, private tServ: TablasService) {}
 
   ngOnInit() {
     this.createForm();

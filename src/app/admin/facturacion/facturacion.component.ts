@@ -11,15 +11,15 @@ import { Subscription } from 'rxjs';
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import { FunctionService } from '../../core/services/functions.service';
-import { LayoutClass } from '../layout/layout';
 import { LayoutService } from '../layout/layout.service';
+import { mixinClass } from '../mixinClass';
 
 @Component({
   selector: 'app-facturacion',
   templateUrl: './facturacion.component.html',
   styleUrls: ['./facturacion.component.scss'],
 })
-export class FacturacionComponent extends LayoutClass implements OnInit, OnDestroy, AfterViewInit {
+export class FacturacionComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
   hora: number;
   minutos: number;
   fecha_busqueda_articulos: string;
@@ -120,8 +120,8 @@ export class FacturacionComponent extends LayoutClass implements OnInit, OnDestr
   paqueteComprobante: any;
 
   constructor(
-    private _ipc: IpcService,
-    private mServ: ModalService,
+    public _ipc: IpcService,
+    public mServ: ModalService,
     private fun: FunctionService,
     private dbServ: DBservice,
     private fb: FormBuilder,
@@ -129,7 +129,7 @@ export class FacturacionComponent extends LayoutClass implements OnInit, OnDestr
     private router: Router,
     public layServ: LayoutService,
   ) {
-    super(layServ);
+    super(mServ, _ipc, layServ);
     this.form = this.fb.group({
       id: [],
       nombre: [],
@@ -166,7 +166,7 @@ export class FacturacionComponent extends LayoutClass implements OnInit, OnDestr
   }
 
   ngOnInit() {
-    this._init_layout();
+    this._init_mixin();
     this.formarFechaFactura(new Date());
 
     this.metodo = this.route.snapshot.params['tipo'];
@@ -301,17 +301,27 @@ export class FacturacionComponent extends LayoutClass implements OnInit, OnDestr
       }, 5);
     }
   }
-
-  ngAfterViewInit() {
-    this.usuario = this.fun.getUser();
-  }
-
   initCambioMenu() {
     if (this.cambioMenu_) {
-      console.log('va a cambiar el menu');
-      console.log('this.cambioMenu_ ==> ', this.cambioMenu_);
-      this.layServ.nexDecisionCambioMenu(true);
+      console.log('factura --');
+      this.layServ.nextDecisionCambioMenu(true);
     }
+  }
+
+  ngOnDestroy(): void {
+    this._destroy_mixin();
+    this.mServ.ModalObj(null);
+    this.mServ.modalTipo(null);
+    this.mServ.ModalSeleccion(null);
+    // this.mServ.ModalTablaHeight(false);
+    this.mServ.mostrarModal(false);
+    this.CancelarFactura('salir');
+    this.subObj.unsubscribe();
+    this.subDeci.unsubscribe();
+    this._ipc.removeListener('printRes');
+  }
+  ngAfterViewInit() {
+    this.usuario = this.fun.getUser();
   }
 
   async buscarFacturaEditar() {
@@ -328,19 +338,6 @@ export class FacturacionComponent extends LayoutClass implements OnInit, OnDestr
 
     this.modo_factura = res.is_viaje ? 'viaje' : res.is_adelantada ? 'adelantada' : 'normal';
     this.enfocarInput('cod-0');
-  }
-
-  ngOnDestroy(): void {
-    this._destroy_layout();
-    this.mServ.ModalObj(null);
-    this.mServ.modalTipo(null);
-    this.mServ.ModalSeleccion(null);
-    // this.mServ.ModalTablaHeight(false);
-    this.mServ.mostrarModal(false);
-    this.CancelarFactura('salir');
-    this.subObj.unsubscribe();
-    this.subDeci.unsubscribe();
-    this._ipc.removeListener('printRes');
   }
 
   setWidthPop(bool, e) {

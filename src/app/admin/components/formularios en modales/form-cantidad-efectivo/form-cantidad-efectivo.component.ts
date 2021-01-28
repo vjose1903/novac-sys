@@ -24,7 +24,7 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
   @Output() cancel = new EventEmitter<any>();
   factura_de: any;
   cambiar_articulos = undefined;
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, private mServ: ModalService) {}
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, public mServ: ModalService) {}
 
   ngOnInit() {
     this.efectivo = this.formatoNumero(this.data.devuelta);

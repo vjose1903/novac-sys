@@ -1,22 +1,22 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { map } from 'rxjs/operators';
 import { ValidateRayaAbajo } from '../../../directives/validaciones';
-
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
-import {  TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/tablas/tablas.service';
+import { LayoutService } from '../../layout/layout.service';
+import { IpcService } from '../../../core/services/ipc.service';
+import { mixinClass } from '../../mixinClass';
 
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
   styleUrls: ['./registro-clientes.component.scss'],
 })
-export class RegistroClientesComponent implements OnInit, OnDestroy {
+export class RegistroClientesComponent extends mixinClass implements OnInit, OnDestroy {
   titulo = '';
   boton = '';
   form: FormGroup;
@@ -53,20 +53,20 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
   vendedores;
   subDeci: Subscription;
 
-
   constructor(
     private dbServ: DBservice,
     private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private mServ: ModalService,
+
+    public layServ: LayoutService,
+    public _ipc: IpcService,
+    public mServ: ModalService,
     private tServ: TablasService,
   ) {
-    // setInterval(() => {
-    // }, 1000);
+    super(mServ, _ipc, layServ);
   }
 
   ngOnInit() {
+    this._init_mixin();
     this.boton = 'Guardar';
     this.titulo = 'Registro de clientes';
 
@@ -95,6 +95,18 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.marcarCheck('cedula');
     }, 200);
+  }
+
+  initCambioMenu() {
+    if (this.cambioMenu_) {
+      console.log('clientes --');
+      this.layServ.nextDecisionCambioMenu(true);
+    }
+  }
+
+  ngOnDestroy() {
+    this._destroy_mixin();
+    this.subDeci.unsubscribe();
   }
 
   necesarioStart() {
@@ -145,9 +157,6 @@ export class RegistroClientesComponent implements OnInit, OnDestroy {
     } catch (error) {
       this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
     }
-  }
-  ngOnDestroy() {
-    this.subDeci.unsubscribe();
   }
 
   checkNumbers(arg) {
