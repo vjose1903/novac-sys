@@ -16,10 +16,9 @@ export class HomeAdminComponent extends mixinClass implements OnInit, OnDestroy 
     super(mServ, _ipc, layServ);
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('home --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 

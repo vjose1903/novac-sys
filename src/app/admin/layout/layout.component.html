@@ -181,11 +181,12 @@
       PARA PONER LOS LI EN FOR
       <li *ngFor="let choice of items">
           <a class="dropdown-item" href="#">{{choice}}</a>
-        </li> -->
+      </li> -->
     </mat-toolbar>
 
     <div class="" style="padding: 0.5rem 1rem 2rem 1rem; height: calc(100% - 60px); overflow-y: auto">
       <mdb-card-img id="foco_angular" class="btn_invisible" src="assets/img/transparente.png" alt="Logo ADM"></mdb-card-img>
+
       <router-outlet *ngIf="ready"></router-outlet>
       <!-- rutas -->
     </div>

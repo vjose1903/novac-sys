@@ -108,10 +108,9 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     this.necesarioStart();
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('viajes --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 
@@ -153,7 +152,6 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
       const res = await this.dbServ.getViajesByCompletada(palabra_a_buscar, page, per_page, true).toPromise();
-      console.log(' res --> ', res);
 
       const fechaA = moment().format('YYYY-MM-DD');
       res.data.map((fact) => {

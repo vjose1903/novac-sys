@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import * as moment from 'moment';
 import { DBservice } from '../../core/services/bdservice.service';
 import * as _ from 'lodash';
@@ -20,6 +20,7 @@ import { mixinClass } from '../mixinClass';
   styleUrls: ['./facturacion.component.scss'],
 })
 export class FacturacionComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
+  fecha_init = new Date();
   hora: number;
   minutos: number;
   fecha_busqueda_articulos: string;
@@ -30,6 +31,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   id_factura: any;
   factura_a_editar;
   tipos_de_facturas = tipos_facturas;
+  ready = false;
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
@@ -70,7 +72,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   modalSearch: boolean;
   control;
 
-  tipoModal: string;
   condicion_fact = 'Contado';
   forma_pago = 'Efectivo';
   element: HTMLElement;
@@ -109,7 +110,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   Devuelta = 0;
 
   subObj: Subscription;
-  subDeci: Subscription;
   FacturaAtrasada = false;
   // FechaFactura = moment().format('YYYY-MM-DD');
   fecha_vencimiento = new Date();
@@ -130,12 +130,14 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     public layServ: LayoutService,
   ) {
     super(mServ, _ipc, layServ);
+
     this.form = this.fb.group({
       id: [],
       nombre: [],
       direccion: [],
       telefono: [],
     });
+
     this.dpConfig = Object.assign(
       {},
       {
@@ -145,6 +147,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         dateInputFormat: 'DD/MM/YYYY',
       },
     );
+
     setInterval(() => {
       this.fecha = GLOBAL.my_dateFormater(new Date()) + ' - ' + GLOBAL.my_houreFormater(new Date());
     }, 1000);
@@ -166,16 +169,13 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   ngOnInit() {
-    this._init_mixin();
+    this._init_mixin({ _lista_subs: ['decisionModal'] });
     this.formarFechaFactura(new Date());
 
     this.metodo = this.route.snapshot.params['tipo'];
     this.action = this.route.snapshot.params['action'];
-    console.log('INIT ==== this.action   ==> ', this.action);
 
     this.id_factura = this.route.snapshot.params['id'];
-
-    this.propietario_factura = null;
 
     if (this.metodo === 'venta') {
       this.tipoFactura = '02';
@@ -257,7 +257,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       } else if (res && res.tipo_modal === 'cambio') {
         this.Devuelta = res.data.devuelta;
         this.forma_pago = res.data.forma_pago;
-        console.log('this.metodo --> ', this.metodo);
 
         if (this.metodo === 'compra') {
           if (res.data.decision_cambio) {
@@ -268,23 +267,10 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
           this.enviarDataBaseDatos();
           this.mServ.ModalObj(undefined);
         } else {
-          console.log('this.action --> ', this.action);
 
           this.enviarDataBaseDatos();
           this.mServ.ModalObj(undefined);
         }
-      }
-    });
-
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== undefined) {
-        this.decisionModal(res);
-        this.mServ.ModalDecision(undefined);
-      }
-      if (res !== undefined && res.bool) {
-        this.formarFechaFactura(res.Date);
-        this.FacturaAtrasada = true;
-        this.mServ.ModalDecision(undefined);
       }
     });
 
@@ -301,11 +287,52 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       }, 5);
     }
   }
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('factura --');
-      this.layServ.nextDecisionCambioMenu(true);
+
+  initCambioMenu(arg) {
+    if (arg.bool) {
+
+      if (this.checkIfFacturaIniciada()) {
+        this.layServ.nextDecisionCambioMenu({ bool: false, ruta: arg.ruta });
+
+
+        const obj = { texto_modal: 'Estas a punto de salir del modulo de facturación, desea guardar la factura para continuarla luego.' };
+        this.abrirModal('salir_factura', 'dinamico_texto', obj);
+      } else {
+        this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta });
+      }
     }
+  }
+
+  decisionModal(res) {
+    if (res !== undefined) {
+      this.luegoDecision(res);
+      this.mServ.ModalDecision(undefined);
+    }
+    if (res !== undefined && res.bool) {
+      this.formarFechaFactura(res.Date);
+      this.FacturaAtrasada = true;
+      this.mServ.ModalDecision(undefined);
+    }
+  }
+
+  checkIfFacturaIniciada() {
+    let res: boolean;
+
+    if (
+      ((this.metodo === 'venta' && this.tipoFactura === '02') ||
+        (this.metodo === 'compra' && this.tipoFactura === '01' && this.NCFcompra === 'b01')) &&
+      this.condicion_fact === 'Contado' &&
+      this.CostoYgasto === '' &&
+      this.modo_factura === 'normal' &&
+      this.propietario_factura === undefined
+    ) {
+      // this.fecha_viaje === this.fecha_init &&
+      // this.fecha_vencimiento === this.fecha_init &&
+      res = false;
+    } else {
+      res = true;
+    }
+    return res;
   }
 
   ngOnDestroy(): void {
@@ -317,7 +344,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.mServ.mostrarModal(false);
     this.CancelarFactura('salir');
     this.subObj.unsubscribe();
-    this.subDeci.unsubscribe();
     this._ipc.removeListener('printRes');
   }
   ngAfterViewInit() {
@@ -360,7 +386,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       setTimeout(() => {
         const voy_a = document.activeElement.id;
         const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
-        console.log('voy_a --> ', voy_a);
+
         if (sali_de === 'venta' && condicion === 'Crédito' && nombre === 'Cliente contado') {
           if (voy_a !== 'fecha_equivalente' && voy_a === 'nom') {
             buscar = true;
@@ -446,7 +472,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (this.tipoFactura !== '00' && this.tipoFactura !== '0' && this.tipoFactura !== '02' && this.tipoFactura !== '2') {
         try {
           const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
-          console.log('paquete --> ', paquete);
 
           this.paqueteComprobante = paquete.body;
 
@@ -505,11 +530,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.NCFcompra = 'b' + valor;
 
       let continuar = true;
-      console.log('check --> ', check);
 
       if (check) {
         continuar = await this.calcularPorcientoComprobante();
-        console.log('continuar --> ', continuar);
 
         if (continuar) {
           this.enfocarInput(campo);
@@ -687,9 +710,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    this.mServ.modalTipo('cancelar');
-    this.tipoModal = 'cancelar';
-    this.abrirModal();
+    this.abrirModal('cancelar', 'cancelar', null);
   }
   // =============================================
   //  MODAL enviarDataBaseDatos
@@ -713,9 +734,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
           this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso', true);
         } else {
           if (this.condicion_fact === 'Crédito' || this.is_viaje) {
-            this.mServ.modalTipo('imprimir');
-            this.tipoModal = 'imprimir';
-            this.abrirModal();
+            this.abrirModal('imprimir', 'imprimir', null);
           } else {
             let articulos_a_cambiar = false;
 
@@ -735,29 +754,32 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
               factura_de: this.metodo,
               cambios_articulos: articulos_a_cambiar,
             };
-            this.mServ.modalTipo('cambio');
-            this.tipoModal = 'cambio';
-            this.abrirModal(obj);
+
+            this.abrirModal('cambio', 'cambio', obj);
           }
         }
       }
     }
   }
 
-  abrirModal(arg?) {
-    if (arg) {
-      this.mServ.ModalSeleccion(arg);
-    }
-    this.mServ.mostrarModal(true);
-  }
+  // abrirModal(arg?) {
+  //   if (arg) {
+  //     this.mServ.ModalSeleccion(arg);
+  //   }
+  //   this.mServ.mostrarModal(true);
+  // }
 
-  decisionModal(arg) {
+  luegoDecision(arg) {
     if (arg) {
       if (this.tipoModal === 'imprimir') {
         this.enviarDataBaseDatos();
       } else if (this.tipoModal === 'cancelar') {
         this.CancelarFactura('quedar');
       }
+    }
+
+    if (this.tipoModal === 'salir_factura') {
+      this.layServ.nextDecisionCambioMenu(this.info_cambio);
     }
     this.tipoModal = '';
   }
@@ -818,7 +840,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.articulosAcambiar = [];
       this.newCuerpo = undefined;
       this.FechaFacturaMostrar = undefined;
-      this.propietario_factura = null;
+      this.propietario_factura = undefined;
       this.NCFcompra = null;
       this.CostoYgasto = null;
       this.mServ.ModalObj(null);
@@ -992,9 +1014,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   ingresarFecha() {
-    this.mServ.modalTipo('pendiente');
-    this.tipoModal = 'pendiente';
-    this.abrirModal();
+    this.abrirModal('pendiente', 'pendiente', null);
   }
 
   calcularNuevosPrecios(cant, precio) {
@@ -1139,7 +1159,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       const cabecera_fact = this.formarData();
       let res;
       const metodo = this.action === 'update' ? 'editar_factura' : '';
-      console.log('metodo --> ', metodo);
 
       if (metodo === 'editar_factura') {
         res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();

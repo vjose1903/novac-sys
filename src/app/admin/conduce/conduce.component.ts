@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, OnChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { ModalService } from '../components/modal/modal.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
@@ -18,7 +18,7 @@ import { mixinClass } from '../mixinClass';
   templateUrl: './conduce.component.html',
   styleUrls: ['./conduce.component.scss'],
 })
-export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
   listaClientes;
 
   cliente;
@@ -40,13 +40,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   sacos = [25, 50, 100];
 
   TOTAL: number;
-
-  subDeci: Subscription;
-  subObj: Subscription;
-  subArticuloFiltro: Subscription;
-  subEsc: Subscription;
-  subInde: Subscription;
-  subWidth: Subscription;
 
   info = [
     {
@@ -93,7 +86,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   ngOnInit() {
-    this._init_mixin();
+    this._init_mixin({ _lista_subs: ['decisionModal', 'articuloPorCodigo', 'pressEsc', 'articuloPorCodigo', 'pressEsc', 'indexToFocus'] });
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
@@ -105,107 +98,100 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     }
 
     this.necesarioStar();
-
-    this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
-      if (res && res.tipo_modal === 'buscarArticulo') {
-        this.LLenarRowDespuesDeFiltro(res);
-        setTimeout(() => {
-          GLOBAL.enfocarInput('can-' + res.index);
-        }, 10);
-      }
-    });
-
-    this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res) {
-        if (res.tipo_modal === 'buscarCliente') {
-          this.cliente = res.data;
-          (document.getElementById('clienteI') as any).value = res.data.nombre;
-          this.BuscarFacturasAdelantadas(res.data.id);
-          setTimeout(() => {
-            GLOBAL.enfocarInput('cod-0');
-          }, 10);
-          //
-        } else if (res && res.tipo_modal === 'buscarArticulo') {
-          this.LLenarRowDespuesDeFiltro(res);
-          setTimeout(() => {
-            GLOBAL.enfocarInput('can-' + res.index);
-          }, 10);
-          //
-        } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
-          // mirar aqui el res
-          this.llenarConduce(res.data.body);
-        }
-        setTimeout(() => {
-          this.resetModalVaribales();
-        }, 1000);
-      }
-
-      // else if (res && res.tipo_modal === 'cambio') {
-      //   this.Devuelta = res.devuelta;
-      //   this.forma_pago = res.forma_pago;
-      //   this.sendIngreso();
-      //   this.mServ.ModalObj(undefined);
-      // }
-    });
-
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe(async (res) => {
-      if (res) {
-        if (this.tipoModal === 'removerArticulo') {
-          this.procesoQuitarArticulo();
-        }
-        if (this.tipoModal === 'cancelar_conduce') {
-          this.cancelarConduce(2);
-        }
-        if (this.tipoModal === 'conduce_lleno') {
-          await this.form.reset();
-          await this.SeleccionarFactruaAdelantada(this.facturas_adelantadas_wait);
-          this.facturas_adelantadas_wait = [];
-        }
-        if (this.tipoModal === 'imprimir_conduce') {
-          await this.sendData();
-        }
-        setTimeout(() => {
-          this.resetModalVaribales();
-        }, 1000);
-      }
-    });
-
-    this.subEsc = this.mServ.PRESSESC.subscribe((res) => {
-      if (res !== undefined && res !== null) {
-        GLOBAL.enfocarInput('cod-' + res);
-      }
-    });
-
-    this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => {
-      if (res !== undefined && res !== null) {
-        this.noArticuloEncontrado(res);
-      }
-    });
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('conduce --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 
   ngOnDestroy() {
-    this._destroy_mixin()
-    this.subDeci.unsubscribe();
-    this.subObj.unsubscribe();
-    this.subArticuloFiltro.unsubscribe();
-    this.subEsc.unsubscribe();
-    this.subInde.unsubscribe();
+    this._destroy_mixin();
 
     this.resetModalVaribales();
     this._ipc.removeListener('printRes');
   }
 
-  ngOnChanges(simpleChanges) {}
+  async decisionModal(res) {
+    if (res) {
+      if (this.tipoModal === 'removerArticulo') {
+        this.procesoQuitarArticulo();
+      }
+      if (this.tipoModal === 'cancelar_conduce') {
+        this.cancelarConduce(2);
+      }
+      if (this.tipoModal === 'conduce_lleno') {
+        await this.form.reset();
+        await this.SeleccionarFactruaAdelantada(this.facturas_adelantadas_wait);
+        this.facturas_adelantadas_wait = [];
+      }
+      if (this.tipoModal === 'imprimir_conduce') {
+        await this.sendData();
+      }
+      setTimeout(() => {
+        this.resetModalVaribales();
+      }, 1000);
+    }
+  }
+
+  objDevueltoResponse(res) {
+    if (res) {
+      if (res.tipo_modal === 'buscarCliente') {
+        this.cliente = res.data;
+        (document.getElementById('clienteI') as any).value = res.data.nombre;
+        this.BuscarFacturasAdelantadas(res.data.id);
+        setTimeout(() => {
+          GLOBAL.enfocarInput('cod-0');
+        }, 10);
+        //
+      } else if (res && res.tipo_modal === 'buscarArticulo') {
+        this.LLenarRowDespuesDeFiltro(res);
+        setTimeout(() => {
+          GLOBAL.enfocarInput('can-' + res.index);
+        }, 10);
+        //
+      } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
+        // mirar aqui el res
+        this.llenarConduce(res.data.body);
+      }
+      setTimeout(() => {
+        this.resetModalVaribales();
+      }, 1000);
+    }
+  }
+
+  articuloFiltroResponse(res) {
+    if (res && res.tipo_modal === 'buscarArticulo') {
+      this.LLenarRowDespuesDeFiltro(res);
+      setTimeout(() => {
+        GLOBAL.enfocarInput('can-' + res.index);
+      }, 10);
+    }
+  }
+
+  pressEscResponse(res) {
+    if (res !== undefined && res !== null) {
+      GLOBAL.enfocarInput('cod-' + res);
+    }
+  }
+
+  indexToFocusResponse(res) {
+    if (res !== undefined && res !== null) {
+      this.noArticuloEncontrado(res);
+    }
+  }
+
+  ipcPrintResponse(res) {
+    if (res.status === 'si') {
+      this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
+      this.cancelarConduce(2);
+    } else {
+      this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
+    }
+  }
 
   resetModalVaribales() {
-
     this.mServ.ModalObj(undefined);
     this.mServ.ModalSeleccion(undefined);
     this.mServ.ModalDecision(undefined);
@@ -223,7 +209,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       this.resetModalVaribales();
     }, 10);
   }
-
 
   ngAfterViewInit() {
     this.control = this.form.controls['rowFactura'] as FormArray;
@@ -1083,15 +1068,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       };
 
       this._ipc.send('print', obj);
-
-      await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-        if (res.status === 'si') {
-          this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
-          this.cancelarConduce(2);
-        } else {
-          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
-        }
-      });
     } catch (error) {
       if (error.error) {
         this.dbServ.toastError(error.error.msg, 'ERROR', true);

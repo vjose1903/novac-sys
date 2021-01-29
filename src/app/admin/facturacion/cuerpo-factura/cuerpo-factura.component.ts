@@ -314,8 +314,10 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   //  RESETEAR FORMULARIO
   // =============================================
   RESETCUERPO() {
-    for (let i = 0; i < this.control.controls.length; i++) {
-      (this.control.controls[i] as any).controls['descuento_porciento'].enable();
+    if (this.control) {
+      for (let i = 0; i < this.control.controls.length; i++) {
+        (this.control.controls[i] as any).controls['descuento_porciento'].enable();
+      }
     }
 
     this.form.reset();

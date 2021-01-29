@@ -105,12 +105,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       key: 'direccion',
     },
   ];
-  constructor(
-    public mServ: ModalService,
-    private dbServ: DBservice,
-    private tServ: TablasService,
-    private pdfService: NgxExtendedPdfViewerService,
-  ) {}
+  constructor(public mServ: ModalService, private dbServ: DBservice, private tServ: TablasService, private pdfService: NgxExtendedPdfViewerService) {}
 
   element: HTMLElement;
   subShow: Subscription;
@@ -334,7 +329,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           if (this.seleccionModal.length === 0) {
             this.noArticulo();
           }
-          console.log('articulos --> ', res.data);
 
           this.showModal = true;
           const obj = {

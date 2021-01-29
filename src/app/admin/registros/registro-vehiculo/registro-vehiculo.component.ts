@@ -70,10 +70,10 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
     this.necesarioStart();
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('vehiculo --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 

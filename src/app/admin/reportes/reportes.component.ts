@@ -92,10 +92,9 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     });
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('reportes --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 
@@ -131,7 +130,6 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   async reporte(data) {
     let res = {} as any;
-    console.log('data --> ', data);
 
     try {
       let tipo = '';
@@ -163,7 +161,6 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       }
 
       res = await this.dbServ.makeReportes(tipo, params).toPromise();
-      console.log('res --> ', res);
 
       const obj = {
         data: res,
@@ -245,14 +242,11 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   decisionModal(decision) {
     if (decision) {
       if (this.tipoModal === 'visor_pdf') {
-        console.log('this.filename --> ', this.fileName);
-
         const obj = {
           base64: this.pdfSrc,
           filename: this.fileName,
           type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte',
         };
-        console.log('obj --> ', obj);
 
         this._ipc.send('printBase64', obj);
       } else if (this.tipoModal === 'cuadre') {

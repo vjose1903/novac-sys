@@ -38,9 +38,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // applyMixins(ProduccionComponent, [modalClass, LayoutClass]);
-    console.log('estoy en--> ', document.location.href);
-
     // this.dbServ.getSecuenciaFacturas().subscribe(res => {
     //   this.obsServ.next_secuencia_factura(res);
     // });

@@ -82,11 +82,9 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (res !== null && res !== undefined) {
-        console.log('this.tipoModal --> ', this.tipoModal);
         if (this.tipoModal === 'visor_pdf') {
           res = { bool: res };
         }
-        console.log('res--> ', res);
         this.decisionModal(res);
         this.mServ.ModalDecision(undefined);
       }
@@ -128,10 +126,9 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
     });
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('inventario --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 
@@ -291,7 +288,6 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
   async decisionModal(arg) {
     if (arg.bool) {
-      console.log('this.tipoModal --> ', this.tipoModal);
 
       if (this.tipoModal === 'visor_pdf') {
         const obj = {
@@ -299,8 +295,6 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
           filename: this.fileName,
         };
 
-        console.log('this.pdfSrc ==> ', this.pdfSrc);
-        console.log('this.fileName ==> ', this.fileName);
 
         this._ipc.send('printBase64', obj);
         this.resetVariables();

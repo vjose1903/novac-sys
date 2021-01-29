@@ -71,7 +71,6 @@ export class FormVentasComponent implements OnInit {
   }
 
   async getArticulos(arg) {
-    console.log(arg);
     if (arg.term && arg.term !== '') {
       try {
         const is_compra = true;

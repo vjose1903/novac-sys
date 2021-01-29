@@ -12,6 +12,9 @@ export class modalClass extends LayoutClass {
 
   subDeci: Subscription;
   subObj: Subscription;
+  subArticuloFiltro: Subscription;
+  subEsc: Subscription;
+  subInde: Subscription;
   tipoModal: string;
 
   _lista = [];
@@ -20,9 +23,8 @@ export class modalClass extends LayoutClass {
     super(layServ);
   }
 
-  _init_modal(l) {
-    this._lista = l ? (l._lista_subs ? l._lista_subs : []) : [];
-    console.log('Inicio de clase modal');
+  _init_modal(lista) {
+    this._lista = lista;
 
     if (this._lista.includes('printRes')) {
       this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
@@ -45,9 +47,8 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('decisionModal')) {
-      this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-        console.log('res ==> ', res);
 
+      this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
         if (res !== undefined) {
           this.decisionModal(res);
           this.mServ.ModalDecision(undefined);
@@ -60,34 +61,67 @@ export class modalClass extends LayoutClass {
         this.objDevueltoResponse(res);
       });
     }
+
+    if (this._lista.includes('articuloPorCodigo')) {
+      this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
+        this.articuloFiltroResponse(res);
+      });
+    }
+
+    if (this._lista.includes('pressEsc')) {
+      this.subEsc = this.mServ.PRESSESC.subscribe((res) => {
+        this.pressEscResponse(res);
+      });
+    }
+
+    if (this._lista.includes('indexToFocus')) {
+      this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => {
+        this.indexToFocusResponse(res);
+      });
+    }
   }
 
   ipcPrintResponse(res) {}
   ipcBase64Resonse(res) {}
 
   decisionModal(res: any) {
-    console.log('aqui si');
   }
+
+  articuloFiltroResponse(res) {}
+  pressEscResponse(res) {}
+  indexToFocusResponse(res) {}
 
   objDevueltoResponse(res) {}
 
   reporte(data: any) {}
 
   _destroy_modal() {
-    if (this._lista.includes('printRes')) {
+    if (this._lista.includes('printRes') && this._ipc) {
       this._ipc.removeListener('printRes');
     }
 
-    if (this._lista.includes('printBase64Res')) {
+    if (this._lista.includes('printBase64Res') && this._ipc) {
       this._ipc.removeListener('printBase64Res');
     }
 
-    if (this._lista.includes('decisionModal')) {
+    if (this._lista.includes('decisionModal') && this.subDeci) {
       this.subDeci.unsubscribe();
     }
 
-    if (this._lista.includes('objDevuelto')) {
+    if (this._lista.includes('objDevuelto') && this.subObj) {
       this.subObj.unsubscribe();
+    }
+
+    if (this._lista.includes('articuloPorCodigo') && this.subArticuloFiltro) {
+      this.subArticuloFiltro.unsubscribe();
+    }
+
+    if (this._lista.includes('pressEsc') && this.subEsc) {
+      this.subEsc.unsubscribe();
+    }
+
+    if (this._lista.includes('indexToFocus') && this.subInde) {
+      this.subInde.unsubscribe();
     }
 
     if (this._lista.includes('')) {
@@ -99,9 +133,9 @@ export class modalClass extends LayoutClass {
   }
 
   abrirModal(tipo_modal, tipo, seleccion) {
+
     this.tipoModal = tipo_modal;
     this.mServ.modalTipo(tipo);
-
     this.mServ.ModalSeleccion(seleccion);
     this.mServ.mostrarModal(true);
   }

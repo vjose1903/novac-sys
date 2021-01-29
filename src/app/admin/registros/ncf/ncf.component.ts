@@ -137,10 +137,10 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
     });
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('ncf --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 

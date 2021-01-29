@@ -97,10 +97,10 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
     }, 200);
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('clientes --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 

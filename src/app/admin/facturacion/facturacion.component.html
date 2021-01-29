@@ -39,9 +39,9 @@
             </select>
           </div>
 
-          <div *ngIf="metodo === 'compra'" class="col-3 p-0">
+          <div *ngIf="metodo === 'compra'" class="col-3 pl-0">
             <ng-template #tipos_costos><div [innerHtml]="TiposCostosGastos"></div></ng-template>
-            <span class="titulos"><strong>Gasto de:</strong></span>
+            <span class="titulos"><strong>Gasto:</strong></span>
             <input
               placement="right"
               [mdbPopover]="tipos_costos"

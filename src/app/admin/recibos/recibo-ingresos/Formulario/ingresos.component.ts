@@ -165,10 +165,9 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
     this.necesarioStart();
   }
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('formulario ingreso --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 

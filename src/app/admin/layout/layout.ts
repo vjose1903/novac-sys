@@ -7,32 +7,30 @@ export class LayoutClass extends myElectron {
     super();
   }
 
-  cambioMenu_ = false;
-  seCambiara_ = false;
+  info_cambio = {};
   ruta_a_cambiar = '';
 
   subInit: Subscription;
   subDeciMenu: Subscription;
 
   _init_layout() {
-    console.log(' ');
-    console.log(' -------iniciando el layout class -------');
-    console.log(' ');
-
     this.subInit = this.layServ.INITCAMBIOMENU.subscribe((res) => {
-      this.cambioMenu_ = res;
-      if (res) {
-        this.initCambioMenu();
+      if (res && res.bool) {
+        this.info_cambio = res;
+        this.info_cambio['verificar'] = true;
+        this.initCambioMenu(res);
       }
     });
   }
 
-  initCambioMenu() {}
+  initCambioMenu(arg) {}
 
   decisionCambioMenu() {}
 
   _destroy_layout() {
-    this.subInit.unsubscribe();
+    if (this.subInit) {
+      this.subInit.unsubscribe();
+    }
   }
 
   cambiarItemMenu(arg) {

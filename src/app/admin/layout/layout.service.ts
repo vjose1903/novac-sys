@@ -5,8 +5,8 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class LayoutService {
-  private initcambioMenu = new BehaviorSubject<boolean>(false);
-  private desicionCambioMenu = new BehaviorSubject<boolean>(false);
+  private initcambioMenu = new BehaviorSubject<any>(undefined);
+  private desicionCambioMenu = new BehaviorSubject<any>(undefined);
   DESICIONCAMBIOMENU = this.desicionCambioMenu.asObservable();
   INITCAMBIOMENU = this.initcambioMenu.asObservable();
 

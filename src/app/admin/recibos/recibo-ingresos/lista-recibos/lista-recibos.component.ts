@@ -90,10 +90,9 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
     this.necesarioStart();
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('lista ingresos --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 
@@ -198,8 +197,6 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   async filtrarRecibos(e) {
     const obj = {};
     try {
-      console.log('filtrando');
-
       if (e.searchText !== '' && e.searchText !== ' ') {
         const page = e.page;
         const per_page = e.per_page;
@@ -212,7 +209,6 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
         obj['tabla'] = 'listaRecibos';
         this.tServ.Func_total_paginas(obj);
       } else {
-        console.log('ultimos 50');
         this.getLast50Recibos(false);
       }
     } catch (error) {

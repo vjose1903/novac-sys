@@ -122,10 +122,10 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     this._init_mixin({ _lista_subs: ['decisionModal'] });
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('articulos --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 

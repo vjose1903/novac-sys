@@ -203,10 +203,10 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     });
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('buscar factura --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
   ngOnDestroy(): void {

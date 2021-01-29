@@ -96,10 +96,10 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
     });
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('suplidores --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 

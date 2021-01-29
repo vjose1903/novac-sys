@@ -87,10 +87,9 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     this.necesarioStart();
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('notas de credito/ debito --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 
@@ -548,7 +547,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
       });
 
       res['FACTURA_DE'] = 'nota';
-      console.log(JSON.stringify(res));
       const obj = {
         data: res,
         type: 'facturacion',

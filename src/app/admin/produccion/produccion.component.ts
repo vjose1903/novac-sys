@@ -66,10 +66,10 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     this.getProductosTerminados();
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('produccion --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 
@@ -81,7 +81,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   decisionModal(res) {
-    console.log('decisionModal ----> ', res);
 
     if (res !== null && res !== undefined && (this.tipoModal === 'remover' || this.tipoModal === 'cancelarP')) {
       this.decisionModalP(res);
@@ -282,7 +281,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   paginateChange(arg) {
-    console.log(arg);
   }
 
   agregarAlista() {
@@ -356,7 +354,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   decisionModalP(bool) {
-    console.log('entro ########');
 
     const listaTemp = JSON.parse(JSON.stringify(this.lista_produccion));
     if (bool) {

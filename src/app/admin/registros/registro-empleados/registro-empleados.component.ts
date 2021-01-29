@@ -109,10 +109,10 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     });
   }
 
-  initCambioMenu() {
-    if (this.cambioMenu_) {
-      console.log('empleados --');
-      this.layServ.nextDecisionCambioMenu(true);
+  initCambioMenu(arg) {
+    if (arg.bool) {
+
+      this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 
