@@ -36,6 +36,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   subDeciMenu: Subscription;
   modulo_select: any;
   ready = false;
+  _opened = true;
   // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
   constructor(
     private fun: FunctionService,
@@ -113,6 +114,11 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getPrintersName();
   }
 
+  _toggleSidebar() {
+    console.log('cambiando estado del side bar');
+    this._opened = !this._opened;
+  }
+
   async getPrintersName() {
     this._ipc.send('printerNames');
 
@@ -160,10 +166,6 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   prueba1(hi: any) {}
-
-  mostarSubmenu(x: string) {
-    this.mantenimiento = !this.mantenimiento;
-  }
 
   // =================================================================================
   // CERRAR SESION

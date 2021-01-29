@@ -7,6 +7,10 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
+.h-96 {
+  height: 96% !important;
+}
+
 #dropConfigRow {
   max-width: 250px;
   min-width: 250px;

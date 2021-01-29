@@ -61,6 +61,7 @@ $bodyfont: "Poppins";
   height: 100%;
   background-color: #e4e4e4d2;
   overflow: hidden;
+  z-index: 0 !important;
 }
 
 .errorServidor {
@@ -73,6 +74,62 @@ $bodyfont: "Poppins";
   border-radius: 0.5rem;
   padding: 0.5rem 2.5rem;
   box-shadow: 1px 2px 10px 2px #000000a3;
+}
+
+/* ============================================== */
+/*        Menu Facturas                           */
+/* ============================================== */
+span.btn_side_bar_facturas {
+  position: absolute;
+  transform: translate(-1.7rem, 49vh);
+  background-color: #2c822a85;
+  height: 2.5rem;
+  width: 1rem;
+  border-radius: 4.5rem 0rem 0rem 4.5rem;
+  &:hover {
+    background-color: #20551f85;
+    cursor: pointer;
+  }
+  > i#triangualo {
+    margin: 0;
+    color: #f3ee32;
+  }
+}
+#triangualo {
+  transition: all 0.5s;
+}
+
+::ng-deep .my_sidebar {
+  z-index: 1 !important;
+  padding: 0rem 0rem 0rem 0rem;
+  opacity: 1 !important;
+  &.side_open {
+    > .btn_side_bar_facturas {
+      transform: translate(-1.9rem, 49vh) !important;
+      > #triangualo {
+        transform: rotate(180deg) translate(-3px, 0px);
+      }
+    }
+  }
+
+  > .contendioSidebar {
+    > .head {
+      width: 100%;
+      border-bottom: 1px solid #35773282 !important;
+      > .tituloSidebar {
+        font-size: 1.5rem;
+        color: #0b4a18;
+        padding: 0;
+        font-weight: 500;
+      }
+    }
+
+    > .cuerpoContenidoSidar {
+      > no_fact {
+        font-weight: 400;
+      }
+    }
+  }
 }
 
 /* ============================================== */

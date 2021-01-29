@@ -2,6 +2,38 @@
   <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
 </div>
 
+<p-sidebar
+  *ngIf="actualMenyItem == 'factura'"
+  #my_sidebar
+  styleClass="my_sidebar  {{ _opened ? 'side_open' : 'side_closed' }}"
+  [position]="'right'"
+  [visible]="_opened"
+  [modal]="true"
+  [showCloseIcon]="false"
+  [baseZIndex]="1"
+  [dismissible]="true"
+  [closeOnEscape]="true"
+  (visibleChange)="_toggleSidebar()"
+  [blockScroll]="true"
+>
+  <!-- <div *ngIf="PosMenu !== 'top' && DockMenu === true" class="btnMenu"> -->
+
+  <span class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar()">
+    <i id="triangualo" class="fas fa-caret-left text-white"></i>
+  </span>
+
+  <div class="contendioSidebar w-100 h-100">
+    <!-- <app-menu-sidebar [item]="menuls_"></app-menu-sidebar> -->
+    <div class="head w-100">
+      <span class="tituloSidebar">Facturas guardadas</span>
+    </div>
+
+    <div class="cuerpoContenidoSidar w-100 h-96">
+      <h6 class="mt-3 no_fact">No tiene Facturas guardadas por el momento!!</h6>
+    </div>
+  </div>
+</p-sidebar>
+
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav
     #drawer
