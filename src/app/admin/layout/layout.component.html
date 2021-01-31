@@ -18,18 +18,39 @@
 >
   <!-- <div *ngIf="PosMenu !== 'top' && DockMenu === true" class="btnMenu"> -->
 
-  <span class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar()">
+  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar()">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
 
   <div class="contendioSidebar w-100 h-100">
     <!-- <app-menu-sidebar [item]="menuls_"></app-menu-sidebar> -->
     <div class="head w-100">
-      <span class="tituloSidebar">Facturas guardadas</span>
+      <span class="tituloSidebar negrita">Facturas guardadas</span>
     </div>
 
     <div class="cuerpoContenidoSidar w-100 h-96">
-      <h6 class="mt-3 no_fact">No tiene Facturas guardadas por el momento!!</h6>
+      <h6 *ngIf="facturas_localStorage?.length === 0" class="mt-3 no_fact">No tiene Facturas guardadas por el momento!!</h6>
+
+      <ng-container *ngIf="facturas_localStorage?.length > 0">
+        <div class="factura_guardada" *ngFor="let fact of facturas_localStorage">
+          <i class="btn_borrar_factura_gurdada far fa-trash-alt" mdbTooltip="Quitar factura" placement="left"></i>
+          <span class="negrita tipoFactura">{{ fact?.tipo }}</span>
+          <span class="text-gris-oscuro" *ngIf="fact?.action === 'update'"> (Editando)</span>
+          <br />
+          <span class="clienteFactura">
+            <span class="negrita text-gris-oscuro"> &#8226;{{ fact?.tipo === 'venta' ? 'Cliente' : 'Suplidor' }}:</span>
+            {{ fact?.NoCliente_nombre ? fact?.NoCliente_nombre : fact?.cliente.nombre }}
+          </span>
+          <br />
+          <span class="info_factura">
+            <span class="negrita text-gris-oscuro"> &#8226;Articulos:</span> {{ fact?.detalle_facturas_attributes.length }}
+          </span>
+          <br />
+          <span class="info_factura">
+            <span class="negrita text-gris-oscuro"> &#8226;Total facturado:</span> {{ formatoNumero(fact?.total_factura) }}
+          </span>
+        </div>
+      </ng-container>
     </div>
   </div>
 </p-sidebar>
@@ -58,8 +79,8 @@
         <h5 [ngClass]="actualMenyItem == 'factura' ? 'tituloMenuA1' : 'tituloMenu1'"><strong>Facturación</strong></h5>
 
         <div [ngClass]="actualMenyItem == 'factura_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'venta/new/0')">Venta</h4>
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'compra/new/0')">Compra</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'venta/new/0', true)">Venta</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'compra/new/0', true)">Compra</h4>
         </div>
       </div>
       <div class="menuList2">
@@ -73,9 +94,9 @@
         <!-- ultimo -->
 
         <div [ngClass]="actualMenyItem == 'manipular_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'buscarFactura/nota_credito')">Nota de Crédito</h4>
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'buscarFactura/nota_debito')">Nota de Débito</h4>
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'buscarFactura/solo_ver')">Visualizar</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'buscarFactura/nota_credito', true)">Nota de Crédito</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'buscarFactura/nota_debito', true)">Nota de Débito</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'buscarFactura/solo_ver', true)">Visualizar</h4>
 
           <!-- <h4 class="opcion" (click)="nextCambioMenu('buscarFactura', 'anular_factura')">Anular factura</h4> -->
         </div>
@@ -90,8 +111,8 @@
         />
         <h5 [ngClass]="actualMenyItem == 'recibos' ? 'tituloMenuA' : 'tituloMenu'"><strong>Ingresos</strong></h5>
         <div [ngClass]="actualMenyItem == 'recibos_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'ingresos')">Recibo ingresos</h4>
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'viajes')">Viajes</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'ingresos', true)">Recibo ingresos</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'viajes', true)">Viajes</h4>
         </div>
       </div>
 
@@ -115,12 +136,12 @@
         <h5 [ngClass]="actualMenyItem == 'registros' ? 'tituloMenuA' : 'tituloMenu'"><strong>Registros</strong></h5>
 
         <div [ngClass]="actualMenyItem == 'registros_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'clientes')">Clientes</h4>
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'empleados')">Empleados</h4>
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'articulos')">Articulos</h4>
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'suplidores')">Suplidores</h4>
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'camiones')">Camiones</h4>
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'ncf')">NCF</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'clientes', true)">Clientes</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'empleados', true)">Empleados</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'articulos', true)">Articulos</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'suplidores', true)">Suplidores</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'camiones', true)">Camiones</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'ncf', true)">NCF</h4>
         </div>
       </div>
       <div class="menuList">

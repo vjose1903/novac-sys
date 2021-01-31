@@ -16,6 +16,8 @@ export class LayoutClass extends myElectron {
   _init_layout() {
     this.subInit = this.layServ.INITCAMBIOMENU.subscribe((res) => {
       if (res && res.bool) {
+        console.log('Inicio del proceso de cambiar');
+
         this.info_cambio = res;
         this.info_cambio['verificar'] = true;
         this.initCambioMenu(res);

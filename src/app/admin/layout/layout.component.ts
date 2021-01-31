@@ -10,13 +10,15 @@ import { IpcService } from '../../core/services/ipc.service';
 
 import { FunctionService } from '../../core/services/functions.service';
 import { LayoutService } from './layout.service';
+import { mixinClass } from '../mixinClass';
+import { ModalService } from '../components/modal/modal.service';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
 })
-export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
+export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
   mantenimiento: boolean;
 
   sub = new Subscription();
@@ -36,7 +38,9 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   subDeciMenu: Subscription;
   modulo_select: any;
   ready = false;
-  _opened = true;
+  _opened = false;
+  // _opened = true;
+  facturas_localStorage: any;
   // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
   constructor(
     private fun: FunctionService,
@@ -44,9 +48,11 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     private breakpointObserver: BreakpointObserver,
     private router: Router,
     public _ipc: IpcService,
-    private layServ: LayoutService,
+    public layServ: LayoutService,
     private cdRef: ChangeDetectorRef,
+    public mServ: ModalService,
   ) {
+    super(mServ, _ipc, layServ);
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
@@ -70,6 +76,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
         this.PrintersInstall = res;
       }
     });
+
     const token = this.fun.getAuthToken();
 
     if (token) {
@@ -101,11 +108,13 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.subDeciMenu = this.layServ.DESICIONCAMBIOMENU.subscribe((res) => {
       if (res && (res.bool === false || res.bool === true)) {
+        console.log('llego a modal esto:  ', res);
+
         if (res.bool && res.verificar) {
           this.ready = false;
-          setTimeout(() => this.decisionCambioMenu(res), 20);
+          setTimeout(() => this.decisionCambioMenu_(res), 20);
         } else {
-          this.decisionCambioMenu(res);
+          this.decisionCambioMenu_(res);
         }
       }
     });
@@ -148,6 +157,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   element: HTMLElement;
+
   ngAfterViewInit() {
     this.ready = true;
     this.cdRef.detectChanges();
@@ -192,12 +202,40 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     if (temp_url[1]) {
       const url = temp_url[1].split('/')[0];
       this.actualMenyItem = url;
+
+      if (url === 'factura') {
+        this.getFacturasGuardadas();
+      }
     }
+  }
+
+  async getFacturasGuardadas() {
+    this.facturas_localStorage = this.fun.getFacturasguardadas();
+    setTimeout(async () => {
+      if (this.facturas_localStorage.length > 0) {
+        document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.facturas_localStorage.length);
+        for (let i = 0; i < this.facturas_localStorage.length; i++) {
+          const fact = this.facturas_localStorage[i];
+          if (fact.cliente_id) {
+            try {
+              const cliente = await this.dbServ.getClienteById(fact.cliente_id).toPromise();
+              fact['cliente'] = {
+                nombre: `${cliente.nombre} ${cliente.apellido}`,
+                direccion: `${cliente.direccion}`,
+              };
+            } catch (error) {}
+          }
+        }
+      }
+    }, 20);
+
+    console.log('this.facturas_localStorage --> ', this.facturas_localStorage);
   }
   // =================================================================================
   // NAVEGAR
   // =================================================================================
-  nextCambioMenu(subMenu, url) {
+  nextCambioMenu(subMenu, url, lleva_modulo?) {
+    if (!subMenu && !lleva_modulo) this.modulo_select = undefined;
     if (subMenu) this.modulo_select = url;
     let ruta_a_cambiar = '';
     if (!subMenu) ruta_a_cambiar = this.modulo_select ? `/admin/${this.modulo_select}/${url}` : `/admin/${url}`;
@@ -210,7 +248,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  decisionCambioMenu(decision) {
+  decisionCambioMenu_(decision) {
     if (decision.bool) {
       this.router.navigateByUrl(decision.ruta);
 

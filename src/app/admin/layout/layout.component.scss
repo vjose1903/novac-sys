@@ -79,9 +79,21 @@ $bodyfont: "Poppins";
 /* ============================================== */
 /*        Menu Facturas                           */
 /* ============================================== */
+[data-cant-facturas]::after {
+  content: attr(data-cant-facturas);
+  background-color: #fd2543;
+  padding: 0rem 0.2rem;
+  border: 1px solid #8c0a0a;
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-5px, -1.2rem);
+  color: white;
+  font-weight: 600;
+}
+
 span.btn_side_bar_facturas {
   position: absolute;
-  transform: translate(-1.7rem, 49vh);
+  transform: translate(-1.6rem, 49vh);
   background-color: #2c822a85;
   height: 2.5rem;
   width: 1rem;
@@ -95,17 +107,40 @@ span.btn_side_bar_facturas {
     color: #f3ee32;
   }
 }
+
 #triangualo {
-  transition: all 0.5s;
+  transition: all 1s;
+}
+
+.factura_guardada {
+  padding: 0.2rem;
+  border-bottom: 1px solid #d7d7d7;
+  &:hover {
+    cursor: pointer;
+    background-color: #80808020;
+  }
+  > .btn_borrar_factura_gurdada {
+    position: absolute;
+    right: 0;
+    color: gray;
+    transform: translate(-12px, 5px);
+    &:hover {
+      color: #750f0f;
+    }
+  }
+  > .tipoFactura {
+    font-size: 1.3rem;
+    color: #034e03;
+    text-decoration: underline;
+  }
 }
 
 ::ng-deep .my_sidebar {
   z-index: 1 !important;
-  padding: 0rem 0rem 0rem 0rem;
+  padding: 0.5rem !important;
   opacity: 1 !important;
   &.side_open {
     > .btn_side_bar_facturas {
-      transform: translate(-1.9rem, 49vh) !important;
       > #triangualo {
         transform: rotate(180deg) translate(-3px, 0px);
       }

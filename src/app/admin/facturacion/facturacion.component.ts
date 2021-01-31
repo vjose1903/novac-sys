@@ -1,13 +1,13 @@
 import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { DBservice } from '../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { IpcService } from '../../core/services/ipc.service';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { GLOBAL, tipos_facturas } from '../../core/services/GLOBAL';
-import { Subscription } from 'rxjs';
+
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import { FunctionService } from '../../core/services/functions.service';
@@ -20,18 +20,7 @@ import { mixinClass } from '../mixinClass';
   styleUrls: ['./facturacion.component.scss'],
 })
 export class FacturacionComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
-  fecha_init = new Date();
-  hora: number;
-  minutos: number;
-  fecha_busqueda_articulos: string;
-  time: { hour: number; minute: number };
-  FechaFactura: string;
-  FechaFacturaMostrar: string;
-  action: any;
-  id_factura: any;
-  factura_a_editar;
-  tipos_de_facturas = tipos_facturas;
-  ready = false;
+  @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
@@ -59,8 +48,19 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
+  fecha_init = new Date();
+  hora: number;
+  minutos: number;
+  time: { hour: number; minute: number };
+  fecha_busqueda_articulos: string;
+  FechaFactura: string;
+  FechaFacturaMostrar: string;
+  action: any;
+  id_factura: any;
+  factura_a_editar;
+  tipos_de_facturas = tipos_facturas;
+  ready = false;
   secuenciaKeys = [];
-
   form: FormGroup;
   fecha;
   modo_factura = 'normal';
@@ -71,7 +71,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   showModal = false;
   modalSearch: boolean;
   control;
-
   condicion_fact = 'Contado';
   forma_pago = 'Efectivo';
   element: HTMLElement;
@@ -105,11 +104,10 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   // listaArticulos: any;
   usuario: any;
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
-  @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
+
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   Devuelta = 0;
 
-  subObj: Subscription;
   FacturaAtrasada = false;
   // FechaFactura = moment().format('YYYY-MM-DD');
   fecha_vencimiento = new Date();
@@ -153,9 +151,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }, 1000);
   }
 
-  formatoNumero(num) {
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num)) + '  ';
-  }
+
 
   formarFechaFactura(date) {
     const hora = moment(date).hour();
@@ -169,7 +165,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal'] });
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto'] });
     this.formarFechaFactura(new Date());
 
     this.metodo = this.route.snapshot.params['tipo'];
@@ -226,54 +222,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.labelSearch = 'Suplidor';
     }
 
-    // this.fecha = moment().format('DD/MM/YYYY');
-
-    this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res && res.tipo_modal === 'buscarCliente') {
-        this.propietario_factura = res.data;
-
-        this.form.patchValue(this.propietario_factura);
-        this.enfocarInput('cod-0');
-        this.mServ.ModalObj(undefined);
-        const balance = _.parseInt(this.propietario_factura.balance);
-        const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
-
-        if (balance > maxCred - 1000 && balance < maxCred) {
-          this.dbServ.toastWarning(
-            `Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`,
-            'PROXIMO A LIMITE DE CREDITO',
-          );
-        } else if (balance > maxCred) {
-          this.dbServ.toastError(
-            ` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`,
-            'SOBRE VALOR DE CREDITO',
-          );
-        }
-      } else if (res && res.tipo_modal === 'buscarSuplidor') {
-        this.propietario_factura = res.data;
-        this.form.patchValue(this.propietario_factura);
-        this.enfocarInput('cod-0');
-        this.mServ.ModalObj(undefined);
-      } else if (res && res.tipo_modal === 'cambio') {
-        this.Devuelta = res.data.devuelta;
-        this.forma_pago = res.data.forma_pago;
-
-        if (this.metodo === 'compra') {
-          if (res.data.decision_cambio) {
-            this.cambiarCostos();
-          }
-
-          this.CuerpoFactura = this.newCuerpo;
-          this.enviarDataBaseDatos();
-          this.mServ.ModalObj(undefined);
-        } else {
-
-          this.enviarDataBaseDatos();
-          this.mServ.ModalObj(undefined);
-        }
-      }
-    });
-
     this.dbServ.getTiposFacturas().subscribe((res) => {
       this.lista_tipos_facturas = res;
     });
@@ -290,13 +238,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   initCambioMenu(arg) {
     if (arg.bool) {
-
       if (this.checkIfFacturaIniciada()) {
         this.layServ.nextDecisionCambioMenu({ bool: false, ruta: arg.ruta });
 
-
         const obj = { texto_modal: 'Estas a punto de salir del modulo de facturación, desea guardar la factura para continuarla luego.' };
-        this.abrirModal('salir_factura', 'dinamico_texto', obj);
+        this.abrirModal('salir_layout', 'dinamico_texto', obj);
       } else {
         this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta });
       }
@@ -315,16 +261,66 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
+  objDevueltoResponse(res) {
+    if (res && res.tipo_modal === 'buscarCliente') {
+      this.propietario_factura = res.data;
+
+      this.form.patchValue(this.propietario_factura);
+      this.enfocarInput('cod-0');
+      this.mServ.ModalObj(undefined);
+      const balance = _.parseInt(this.propietario_factura.balance);
+      const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
+
+      if (balance > maxCred - 1000 && balance < maxCred) {
+        this.dbServ.toastWarning(
+          `Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`,
+          'PROXIMO A LIMITE DE CREDITO',
+        );
+      } else if (balance > maxCred) {
+        this.dbServ.toastError(
+          ` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`,
+          'SOBRE VALOR DE CREDITO',
+        );
+      }
+      //
+    } else if (res && res.tipo_modal === 'buscarSuplidor') {
+      this.propietario_factura = res.data;
+      this.form.patchValue(this.propietario_factura);
+      this.enfocarInput('cod-0');
+      this.mServ.ModalObj(undefined);
+      //
+    } else if (res && res.tipo_modal === 'cambio') {
+      this.Devuelta = res.data.devuelta;
+      this.forma_pago = res.data.forma_pago;
+
+      if (this.metodo === 'compra') {
+        if (res.data.decision_cambio) {
+          this.cambiarCostos();
+        }
+
+        this.CuerpoFactura = this.newCuerpo;
+        this.enviarDataBaseDatos();
+        this.mServ.ModalObj(undefined);
+      } else {
+        this.enviarDataBaseDatos();
+        this.mServ.ModalObj(undefined);
+      }
+    }
+  }
+
   checkIfFacturaIniciada() {
     let res: boolean;
 
+    const form = this.form.controls as any;
     if (
       ((this.metodo === 'venta' && this.tipoFactura === '02') ||
         (this.metodo === 'compra' && this.tipoFactura === '01' && this.NCFcompra === 'b01')) &&
       this.condicion_fact === 'Contado' &&
       this.CostoYgasto === '' &&
       this.modo_factura === 'normal' &&
-      this.propietario_factura === undefined
+      this.propietario_factura === undefined &&
+      form.nombre.value === 'Cliente contado' &&
+      form.direccion.value === 'Autopista duarte KM 0 el Higuero'
     ) {
       // this.fecha_viaje === this.fecha_init &&
       // this.fecha_vencimiento === this.fecha_init &&
@@ -778,7 +774,22 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       }
     }
 
-    if (this.tipoModal === 'salir_factura') {
+    if (this.tipoModal === 'salir_layout') {
+      if (arg) {
+        if (!this.propietario_factura) {
+          this.propietario_factura = this.form.value;
+        }
+        const facturas_localStorage = this.fun.getFacturasguardadas();
+
+        const factura_a_guardar = this.formarData();
+        factura_a_guardar['factura_id'] = facturas_localStorage.length + 1;
+        factura_a_guardar['action'] = this.action;
+
+        facturas_localStorage.push(factura_a_guardar);
+        this.fun.setFacturasGuardadas(facturas_localStorage);
+      }
+
+      this.info_cambio['bool'] = arg;
       this.layServ.nextDecisionCambioMenu(this.info_cambio);
     }
     this.tipoModal = '';

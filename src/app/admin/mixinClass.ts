@@ -1,3 +1,4 @@
+import { GLOBAL } from '../core/services/GLOBAL';
 import { IpcService } from '../core/services/ipc.service';
 import { modalClass } from './components/modal/modal';
 import { ModalService } from './components/modal/modal.service';
@@ -31,5 +32,9 @@ export class mixinClass extends modalClass {
     if (lista_sub) {
       this._destroy_modal();
     }
+  }
+
+  formatoNumero(num) {
+    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num)) + '  ';
   }
 }

@@ -23,12 +23,22 @@ export class FunctionService {
     return this.currentUser;
   }
 
+  getFacturasguardadas() {
+    return JSON.parse(localStorage.getItem('facturas_guardadas')) || [];
+  }
+
+  setFacturasGuardadas(facturas) {
+    localStorage.removeItem('facturas_guardadas');
+    localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
+  }
+
   getAuthToken() {
     return localStorage.getItem('access-token');
   }
 
   async logout(callback = (arg) => {}) {
     try {
+      localStorage.removeItem('facturas_guardadas');
       localStorage.removeItem('access-token');
       localStorage.removeItem('client');
       localStorage.removeItem('content-type');

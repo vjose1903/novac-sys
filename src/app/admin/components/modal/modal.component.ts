@@ -326,6 +326,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         if (res.data) {
           this.seleccionModal = res.data;
+
           if (this.seleccionModal.length === 0) {
             this.noArticulo();
           }
