@@ -210,15 +210,22 @@ export class DBservice {
   // =====================================================================
   // SUPLIDORES
   // =====================================================================
+  getSuplidorById(id) {
+    return this.peticion(`suplidores/${id}`, 'get');
+  }
+
   getSuplidores() {
     return this.peticion('suplidores', 'get');
   }
+
   getNombresSuplidores() {
     return this.peticion('nombreSuplidores', 'get');
   }
+
   createSuplidor(arg) {
     return this.peticion('suplidores', 'post', JSON.stringify(arg));
   }
+
   editarSuplidor(arg) {
     return this.peticion('suplidores/' + arg.id, 'patch', JSON.stringify(arg));
   }

@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-
+import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
 
 import { DBservice } from '../../core/services/bdservice.service';
@@ -18,20 +18,13 @@ import { ModalService } from '../components/modal/modal.service';
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
 })
-export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
-  mantenimiento: boolean;
-
-  sub = new Subscription();
+export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, AfterContentChecked {
   actualMenyItem;
   showLoading = true;
 
-  showModal;
-  tipoModal: any;
-  seleccionModal: any;
   usuario;
   PrintersInstall: any;
   OpenPrinterMenu = false;
-  // imgUser: string;
   imgUser = 'assets/img/transparente.png';
   versionApp: any;
   noServer = false;
@@ -39,11 +32,10 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   modulo_select: any;
   ready = false;
   _opened = false;
-  // _opened = true;
   facturas_localStorage: any;
-  // @ViewChild('dropCuenta', { static: true }) dropCuentaa;
+
   constructor(
-    private fun: FunctionService,
+    public fun: FunctionService,
     private dbServ: DBservice,
     private breakpointObserver: BreakpointObserver,
     private router: Router,
@@ -68,9 +60,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   lRun = false;
 
   ngOnInit() {
-    // this._init_layout();
+    this._init_mixin({ _lista_subs: ['decisionModal'] });
 
-    this.mantenimiento = true;
     this._ipc.PRINTERS.subscribe((res) => {
       if (res !== undefined) {
         this.PrintersInstall = res;
@@ -123,6 +114,17 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.getPrintersName();
   }
 
+  ngOnDestroy() {
+    this._destroy_mixin();
+    this.subDeciMenu.unsubscribe();
+  }
+
+  decisionModal(arg) {
+    if (this.tipoModal === 'quitar_factura' && arg) {
+      this.quitarFacturaGuardada();
+    }
+  }
+
   _toggleSidebar() {
     console.log('cambiando estado del side bar');
     this._opened = !this._opened;
@@ -147,10 +149,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     return this.versionApp;
   }
 
-  ngOnDestroy() {
-    this.subDeciMenu.unsubscribe();
-  }
-
   setUser(user) {
     this.usuario = user;
     this.fun.setUser(user);
@@ -158,7 +156,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
   element: HTMLElement;
 
-  ngAfterViewInit() {
+  ngAfterContentChecked() {
     this.ready = true;
     this.cdRef.detectChanges();
   }
@@ -175,7 +173,29 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.OpenPrinterMenu = false;
   }
 
-  prueba1(hi: any) {}
+  getNombreFacturaGuardada(fact: any) {
+    let nombre = '';
+    if (fact) {
+      if (fact.tipo === 'venta') nombre = fact['NoCliente_nombre'] ? fact['NoCliente_nombre'] : fact['cliente']['nombre'];
+      else if (fact['suplidor']) nombre = fact['suplidor']['nombre'];
+    }
+    return nombre;
+  }
+
+  abrirModalFacturaGuardada(fact) {
+    const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.' };
+    this.seleccionModal = fact;
+    this.abrirModal('quitar_factura', 'dinamico_texto', obj);
+  }
+
+  quitarFacturaGuardada() {
+    const index = _.findIndex(this.facturas_localStorage, (o: any) => {
+      return o.factura_id == this.seleccionModal.factura_id;
+    });
+    _.pullAt(this.facturas_localStorage, index);
+
+    this.fun.setFacturasGuardadas(this.facturas_localStorage);
+  }
 
   // =================================================================================
   // CERRAR SESION
@@ -216,6 +236,13 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
         document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.facturas_localStorage.length);
         for (let i = 0; i < this.facturas_localStorage.length; i++) {
           const fact = this.facturas_localStorage[i];
+          if (fact.suplidor_id) {
+            const suplidor = await this.dbServ.getSuplidorById(fact.cliente_id).toPromise();
+            fact['suplidor'] = {
+              nombre: `${suplidor.nombre} ${suplidor.apellido}`,
+              direccion: `${suplidor.direccion}`,
+            };
+          }
           if (fact.cliente_id) {
             try {
               const cliente = await this.dbServ.getClienteById(fact.cliente_id).toPromise();
@@ -226,6 +253,9 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
             } catch (error) {}
           }
         }
+        this.facturas_localStorage.sort((a, b) => {
+          return a.factura_id > b.factura_id ? 1 : -1;
+        });
       }
     }, 20);
 

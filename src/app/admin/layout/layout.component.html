@@ -32,23 +32,35 @@
       <h6 *ngIf="facturas_localStorage?.length === 0" class="mt-3 no_fact">No tiene Facturas guardadas por el momento!!</h6>
 
       <ng-container *ngIf="facturas_localStorage?.length > 0">
-        <div class="factura_guardada" *ngFor="let fact of facturas_localStorage">
-          <i class="btn_borrar_factura_gurdada far fa-trash-alt" mdbTooltip="Quitar factura" placement="left"></i>
-          <span class="negrita tipoFactura">{{ fact?.tipo }}</span>
-          <span class="text-gris-oscuro" *ngIf="fact?.action === 'update'"> (Editando)</span>
-          <br />
-          <span class="clienteFactura">
-            <span class="negrita text-gris-oscuro"> &#8226;{{ fact?.tipo === 'venta' ? 'Cliente' : 'Suplidor' }}:</span>
-            {{ fact?.NoCliente_nombre ? fact?.NoCliente_nombre : fact?.cliente.nombre }}
-          </span>
-          <br />
-          <span class="info_factura">
-            <span class="negrita text-gris-oscuro"> &#8226;Articulos:</span> {{ fact?.detalle_facturas_attributes.length }}
-          </span>
-          <br />
-          <span class="info_factura">
-            <span class="negrita text-gris-oscuro"> &#8226;Total facturado:</span> {{ formatoNumero(fact?.total_factura) }}
-          </span>
+        <div #divFact class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage">
+          <div
+            [ngStyle]="{ height: divFact.offsetHeight + 'px' }"
+            class="colorsito bg-raya-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}{{ fact?.action === 'update' ? '-orange' : '' }}"
+          ></div>
+
+          <div class="info_fact">
+            <i
+              class="btn_borrar_factura_gurdada far fa-trash-alt"
+              (click)="abrirModalFacturaGuardada(fact)"
+              mdbTooltip="Quitar factura"
+              placement="left"
+            ></i>
+            <span
+              class="negrita text-separado-2 texto-borde-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}
+              texto-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}"
+              >{{ my_capitalize(fact?.tipo) }}</span
+            >
+            <span class="text-gris-oscuro" *ngIf="fact?.action === 'update'"> (Editando)</span>
+            <br />
+            <span class="clienteFactura">
+              <span class="negrita"> {{ fact?.tipo === 'venta' ? 'Cliente' : 'Suplidor' }}:</span>
+              {{ getNombreFacturaGuardada(fact) }}
+            </span>
+            <br />
+            <span class="info_factura"> <span class="negrita"> Articulos:</span> {{ fact?.detalle_facturas_attributes.length }} </span>
+            <br />
+            <span class="info_factura"> <span class="negrita"> Total facturado:</span> {{ formatoNumero(fact?.total_factura) }} </span>
+          </div>
         </div>
       </ng-container>
     </div>

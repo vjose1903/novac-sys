@@ -9,6 +9,7 @@ export class modalClass extends LayoutClass {
   pdfSrc: any;
   fileName: any;
   titulo_moda_reporte: any;
+  seleccionModal;
 
   subDeci: Subscription;
   subObj: Subscription;
@@ -47,10 +48,11 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('decisionModal')) {
-
       this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
         if (res !== undefined) {
           this.decisionModal(res);
+          this.seleccionModal = undefined;
+          this.tipoModal = undefined;
           this.mServ.ModalDecision(undefined);
         }
       });
@@ -84,8 +86,7 @@ export class modalClass extends LayoutClass {
   ipcPrintResponse(res) {}
   ipcBase64Resonse(res) {}
 
-  decisionModal(res: any) {
-  }
+  decisionModal(res: any) {}
 
   articuloFiltroResponse(res) {}
   pressEscResponse(res) {}
@@ -133,7 +134,6 @@ export class modalClass extends LayoutClass {
   }
 
   abrirModal(tipo_modal, tipo, seleccion) {
-
     this.tipoModal = tipo_modal;
     this.mServ.modalTipo(tipo);
     this.mServ.ModalSeleccion(seleccion);

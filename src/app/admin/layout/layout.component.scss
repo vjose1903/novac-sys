@@ -112,26 +112,70 @@ span.btn_side_bar_facturas {
   transition: all 1s;
 }
 
+.texto-green {
+  color: #2c942cc9;
+}
+.texto-yellow {
+  color: #f5e206c9;
+}
+
+.texto-borde-green {
+  -webkit-text-stroke: 1px #257d25ac;
+}
+.texto-borde-yellow {
+  -webkit-text-stroke: 1px #a99c0eaf;
+}
+
+.bg-raya-green {
+  background-color: #38ab38c9;
+  border: 1px solid #257d25a5;
+}
+.bg-raya-yellow {
+  background-color: #f5e206c9;
+  border: 1px solid #a99c0e9f;
+}
+.bg-raya-yellow-orange {
+  background: linear-gradient(180deg, #f3ee32 0%, #f3ee32 43%, #ffa400 100%);
+}
+.bg-raya-green-orange {
+  background: linear-gradient(180deg, #38ab38c9 0%, #38ab38c9 43%, #ffa400 100%);
+}
+
+.tipoFactura:first-letter {
+  text-transform: uppercase;
+  color: red !important;
+}
+
 .factura_guardada {
-  padding: 0.2rem;
-  border-bottom: 1px solid #d7d7d7;
-  &:hover {
-    cursor: pointer;
-    background-color: #80808020;
-  }
-  > .btn_borrar_factura_gurdada {
+  .colorsito {
     position: absolute;
-    right: 0;
-    color: gray;
-    transform: translate(-12px, 5px);
-    &:hover {
-      color: #750f0f;
-    }
+    width: 0.4rem;
+    border-radius: 5px 0px 0px 5px;
   }
-  > .tipoFactura {
-    font-size: 1.3rem;
-    color: #034e03;
-    text-decoration: underline;
+
+  .info_fact {
+    padding: 0.2rem 0.2rem 0.2rem 0.5rem;
+    border: 1px solid #d7d7d7;
+    border-radius: 5px;
+    box-shadow: 1.5px 0.5px 2.4px #8080806e;
+
+    &:hover {
+      cursor: pointer;
+      background-color: #80808020;
+    }
+    > .btn_borrar_factura_gurdada {
+      position: absolute;
+      right: 0;
+      color: gray;
+      transform: translate(-12px, 5px);
+      &:hover {
+        color: #750f0f;
+      }
+    }
+    > .tipoFactura {
+      font-size: 1.3rem;
+      color: #034e03;
+    }
   }
 }
 
@@ -151,6 +195,7 @@ span.btn_side_bar_facturas {
     > .head {
       width: 100%;
       border-bottom: 1px solid #35773282 !important;
+      margin-bottom: 1rem;
       > .tituloSidebar {
         font-size: 1.5rem;
         color: #0b4a18;
@@ -160,7 +205,7 @@ span.btn_side_bar_facturas {
     }
 
     > .cuerpoContenidoSidar {
-      > no_fact {
+      > .no_fact {
         font-weight: 400;
       }
     }

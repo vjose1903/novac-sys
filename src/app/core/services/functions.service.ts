@@ -30,6 +30,11 @@ export class FunctionService {
   setFacturasGuardadas(facturas) {
     localStorage.removeItem('facturas_guardadas');
     localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
+
+    const btn_side = document.getElementById('btn_side_facturas');
+    if (btn_side) {
+      btn_side.setAttribute('data-cant-facturas', facturas.length);
+    }
   }
 
   getAuthToken() {

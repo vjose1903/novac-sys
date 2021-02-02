@@ -28,6 +28,7 @@ export class mixinClass extends modalClass {
 
   _destroy_mixin() {
     this._destroy_layout();
+
     const lista_sub = this.argumentos_mixin ? (this.argumentos_mixin._lista_subs ? this.argumentos_mixin._lista_subs : []) : [];
     if (lista_sub) {
       this._destroy_modal();
@@ -36,5 +37,10 @@ export class mixinClass extends modalClass {
 
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num)) + '  ';
+  }
+
+  my_capitalize(str) {
+    const ultimoCaracter = str.length + 1;
+    return str.substr(0, 1).toUpperCase() + str.substr(1, ultimoCaracter).toLowerCase();
   }
 }

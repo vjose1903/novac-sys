@@ -151,8 +151,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }, 1000);
   }
 
-
-
   formarFechaFactura(date) {
     const hora = moment(date).hour();
     const minutos = moment(date).minutes();
@@ -776,23 +774,39 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     if (this.tipoModal === 'salir_layout') {
       if (arg) {
-        if (!this.propietario_factura) {
-          this.propietario_factura = this.form.value;
-        }
-        const facturas_localStorage = this.fun.getFacturasguardadas();
-
-        const factura_a_guardar = this.formarData();
-        factura_a_guardar['factura_id'] = facturas_localStorage.length + 1;
-        factura_a_guardar['action'] = this.action;
-
-        facturas_localStorage.push(factura_a_guardar);
-        this.fun.setFacturasGuardadas(facturas_localStorage);
+        this.agregarFacturaALocalStorage();
       }
 
-      this.info_cambio['bool'] = arg;
+      this.info_cambio['bool'] = true;
       this.layServ.nextDecisionCambioMenu(this.info_cambio);
     }
-    this.tipoModal = '';
+  }
+
+  agregarFacturaALocalStorage() {
+    if (!this.propietario_factura) {
+      this.propietario_factura = this.form.value;
+    }
+    const facturas_localStorage = this.fun.getFacturasguardadas();
+
+    const factura_a_guardar = this.formarData();
+
+    if (facturas_localStorage.length > 0) {
+      console.log('ANTES facturas_localStorage --> ', facturas_localStorage);
+
+      facturas_localStorage.sort((a, b) => {
+        return a.factura_id > b.factura_id ? 1 : -1;
+      });
+      console.log('DESPUES facturas_localStorage --> ', facturas_localStorage);
+
+      console.log('_.last(facturas_localStorage) --> ', _.last(facturas_localStorage));
+      factura_a_guardar['factura_id'] = (_.last(facturas_localStorage) as any).factura_id + 1;
+    } else {
+      factura_a_guardar['factura_id'] = 1;
+    }
+    factura_a_guardar['action'] = this.action;
+
+    facturas_localStorage.push(factura_a_guardar);
+    this.fun.setFacturasGuardadas(facturas_localStorage);
   }
 
   selectFecha(arg) {
