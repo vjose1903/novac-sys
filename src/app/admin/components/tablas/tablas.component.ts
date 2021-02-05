@@ -15,11 +15,12 @@ import {
 import { MdbTableDirective } from 'angular-bootstrap-md';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { fromEvent, Subscription } from 'rxjs';
 import { obj_paginate_default, TablasService } from './tablas.service';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-tablas',
@@ -35,7 +36,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @ViewChild('searchDiv', { static: false }) searchDiv: ElementRef;
   @ViewChild('paginationDiv', { static: false }) paginationDiv: ElementRef;
   @ViewChild('titulosHeader', { static: false }) titulosHeader: ElementRef;
-
+  @ViewChild('searchInput', { static: false }) searchInput: ElementRef;
   seleccionado_id: any;
 
   // @HostListener('input') oninput() {
@@ -209,6 +210,14 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   async ngAfterViewInit() {
+    // console.log('this.searchInput --> ', this.searchInput);
+
+    // fromEvent(this.searchInput.nativeElement, 'input')
+    //   .pipe(map((event: Event) => (event.target as HTMLInputElement).value))
+    //   .pipe(debounceTime(3000))
+    //   .pipe(distinctUntilChanged())
+    //   .subscribe((data) => this.searchItems());
+
     this.cdRef.detectChanges();
     // this.calcularAlto();
   }
@@ -629,6 +638,17 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   async waitForChange() {
     await this.setDATATABLE();
+  }
+
+  timeout: any = null;
+  awaitTyping(event) {
+    clearTimeout(this.timeout);
+    var $this = this;
+    this.timeout = setTimeout(function () {
+      if (event.keyCode != 13) {
+        $this.searchItems();
+      }
+    }, 250);
   }
 
   async searchItems() {
