@@ -147,6 +147,7 @@ span.btn_side_bar_facturas {
 }
 
 .factura_guardada {
+  position: relative;
   .colorsito {
     position: absolute;
     width: 0.4rem;
@@ -181,7 +182,7 @@ span.btn_side_bar_facturas {
 
 ::ng-deep .my_sidebar {
   z-index: 1 !important;
-  padding: 0.5rem !important;
+  padding: 0.5rem 0rem 0.5rem 0.5rem !important;
   opacity: 1 !important;
   &.side_open {
     > .btn_side_bar_facturas {
@@ -192,6 +193,7 @@ span.btn_side_bar_facturas {
   }
 
   > .contendioSidebar {
+    overflow: hidden;
     > .head {
       width: 100%;
       border-bottom: 1px solid #35773282 !important;
@@ -205,6 +207,7 @@ span.btn_side_bar_facturas {
     }
 
     > .cuerpoContenidoSidar {
+      overflow: auto;
       > .no_fact {
         font-weight: 400;
       }

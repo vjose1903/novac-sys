@@ -163,7 +163,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto'] });
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printRes'] });
     this.formarFechaFactura(new Date());
 
     this.metodo = this.route.snapshot.params['tipo'];
@@ -232,6 +232,32 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         this.enfocarInput('tipoFact');
       }, 5);
     }
+  }
+
+  ngOnDestroy(): void {
+    this._destroy_mixin();
+    this.mServ.ModalObj(null);
+    this.mServ.modalTipo(null);
+    this.mServ.ModalSeleccion(null);
+    // this.mServ.ModalTablaHeight(false);
+    this.mServ.mostrarModal(false);
+    this.CancelarFactura('salir');
+  }
+
+  ngAfterViewInit() {
+    this.usuario = this.fun.getUser();
+  }
+
+  ipcPrintResponse(res) {
+    console.log(res);
+    if (res.status === 'si') {
+    } else {
+      this.dbServ.toastError('ERROR: imprimiendo factura.', 'ERROR', true);
+    }
+  }
+
+  rellenarFacturaGuardada() {
+    console.log('factura ya en el componente de facturacion -->', this.facturaGuardada);
   }
 
   initCambioMenu(arg) {
@@ -310,15 +336,22 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     let res: boolean;
 
     const form = this.form.controls as any;
+    console.log('this.metodo --> ', this.metodo);
+    console.log('this.metodo --> ', this.metodo);
+    console.log('this.metodo --> ', this.metodo);
+    console.log('this.metodo --> ', this.metodo);
+    console.log('this.metodo --> ', this.metodo);
+
     if (
-      ((this.metodo === 'venta' && this.tipoFactura === '02') ||
+      ((this.metodo === 'venta' &&
+        this.tipoFactura === '02' &&
+        form.nombre.value === 'Cliente contado' &&
+        form.direccion.value === 'Autopista duarte KM 0 el Higuero') ||
         (this.metodo === 'compra' && this.tipoFactura === '01' && this.NCFcompra === 'b01')) &&
       this.condicion_fact === 'Contado' &&
       this.CostoYgasto === '' &&
       this.modo_factura === 'normal' &&
-      this.propietario_factura === undefined &&
-      form.nombre.value === 'Cliente contado' &&
-      form.direccion.value === 'Autopista duarte KM 0 el Higuero'
+      this.propietario_factura === undefined
     ) {
       // this.fecha_viaje === this.fecha_init &&
       // this.fecha_vencimiento === this.fecha_init &&
@@ -327,21 +360,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       res = true;
     }
     return res;
-  }
-
-  ngOnDestroy(): void {
-    this._destroy_mixin();
-    this.mServ.ModalObj(null);
-    this.mServ.modalTipo(null);
-    this.mServ.ModalSeleccion(null);
-    // this.mServ.ModalTablaHeight(false);
-    this.mServ.mostrarModal(false);
-    this.CancelarFactura('salir');
-    this.subObj.unsubscribe();
-    this._ipc.removeListener('printRes');
-  }
-  ngAfterViewInit() {
-    this.usuario = this.fun.getUser();
   }
 
   async buscarFacturaEditar() {
@@ -1208,12 +1226,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         this._ipc.send('print', obj);
       }
 
-      await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-        if (res.status) {
-        } else {
-          this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
-        }
-      });
       await this.CancelarFactura('quedar');
     } catch (error) {
       console.error(error);

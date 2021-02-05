@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, AfterViewInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -18,7 +18,7 @@ import { ModalService } from '../components/modal/modal.service';
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
 })
-export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, AfterContentChecked {
+export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, AfterContentChecked, AfterViewInit {
   actualMenyItem;
   showLoading = true;
 
@@ -30,7 +30,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   noServer = false;
   subDeciMenu: Subscription;
   modulo_select: any;
-  ready = false;
+  ready;
   _opened = false;
   facturas_localStorage: any;
 
@@ -99,8 +99,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
     this.subDeciMenu = this.layServ.DESICIONCAMBIOMENU.subscribe((res) => {
       if (res && (res.bool === false || res.bool === true)) {
-        console.log('llego a modal esto:  ', res);
-
         if (res.bool && res.verificar) {
           this.ready = false;
           setTimeout(() => this.decisionCambioMenu_(res), 20);
@@ -126,7 +124,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   }
 
   _toggleSidebar() {
-    console.log('cambiando estado del side bar');
     this._opened = !this._opened;
   }
 
@@ -154,10 +151,12 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.fun.setUser(user);
   }
 
-  element: HTMLElement;
+  ngAfterViewInit() {
+    this.ready = true;
+    this.cdRef.detectChanges();
+  }
 
   ngAfterContentChecked() {
-    this.ready = true;
     this.cdRef.detectChanges();
   }
 
@@ -195,6 +194,11 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     _.pullAt(this.facturas_localStorage, index);
 
     this.fun.setFacturasGuardadas(this.facturas_localStorage);
+  }
+  pasarFacturaAfacturacion(fact) {
+    console.log('PASANDO--> ', fact);
+
+    this.layServ.nextFacturaGurdada(fact);
   }
 
   // =================================================================================
@@ -258,8 +262,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
         });
       }
     }, 20);
-
-    console.log('this.facturas_localStorage --> ', this.facturas_localStorage);
   }
   // =================================================================================
   // NAVEGAR
