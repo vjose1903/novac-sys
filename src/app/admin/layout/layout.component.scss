@@ -173,6 +173,13 @@ span.btn_side_bar_facturas {
         color: #750f0f;
       }
     }
+    > .if_viaje {
+      position: absolute;
+      right: -6px;
+      bottom: 11px;
+      color: #54b5544d;
+      font-size: 1.5rem;
+    }
     > .tipoFactura {
       font-size: 1.3rem;
       color: #034e03;

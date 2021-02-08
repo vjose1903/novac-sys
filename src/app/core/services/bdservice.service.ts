@@ -352,8 +352,12 @@ export class DBservice {
     return this.peticion('tipo_articulos', 'get');
   }
 
-  getOneArticulo(id: number | string) {
-    return this.peticion(`articulos/${id}`, 'get');
+  getOneArticulo(id: number | string, sinLoad?) {
+    if (sinLoad) {
+      return this.peticionSinLoad(`articulos/${id}`, 'get');
+    } else {
+      return this.peticion(`articulos/${id}`, 'get');
+    }
   }
 
   // =====================================================================

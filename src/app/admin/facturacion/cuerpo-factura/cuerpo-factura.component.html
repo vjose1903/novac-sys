@@ -38,7 +38,7 @@
           <tbody>
             <tr>
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
-              <td *ngIf="propietario" class="sombreado2">
+              <td *ngIf="propietario" class="sombreado2" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
                 <div class="btn-group" dropdown id="divDropConfigRow" #dropConfigRow>
                   <i *ngIf="!checkIfArticuloRow(i)" class="fas fa-ellipsis-v btnConfigDis" style="padding: 3px"></i>
 

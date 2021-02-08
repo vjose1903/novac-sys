@@ -175,8 +175,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   getNombreFacturaGuardada(fact: any) {
     let nombre = '';
     if (fact) {
-      if (fact.tipo === 'venta') nombre = fact['NoCliente_nombre'] ? fact['NoCliente_nombre'] : fact['cliente']['nombre'];
-      else if (fact['suplidor']) nombre = fact['suplidor']['nombre'];
+      if (fact.tipo === 'venta') nombre = fact['NoCliente_nombre'] ? fact['NoCliente_nombre'] : fact['cliente'] ? fact['cliente']['nombre'] : '';
+      else if (fact['suplidor']) nombre = fact['suplidor'] ? fact['suplidor']['nombre'] : '';
     }
     return nombre;
   }
@@ -196,8 +196,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.fun.setFacturasGuardadas(this.facturas_localStorage);
   }
   pasarFacturaAfacturacion(fact) {
-    console.log('PASANDO--> ', fact);
-
     this.layServ.nextFacturaGurdada(fact);
   }
 
@@ -238,13 +236,16 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     setTimeout(async () => {
       if (this.facturas_localStorage.length > 0) {
         document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.facturas_localStorage.length);
+
         for (let i = 0; i < this.facturas_localStorage.length; i++) {
           const fact = this.facturas_localStorage[i];
           if (fact.suplidor_id) {
-            const suplidor = await this.dbServ.getSuplidorById(fact.cliente_id).toPromise();
+            const suplidor = await this.dbServ.getSuplidorById(fact.suplidor_id).toPromise();
             fact['suplidor'] = {
               nombre: `${suplidor.nombre} ${suplidor.apellido}`,
               direccion: `${suplidor.direccion}`,
+              telefono: `${suplidor.telefono}`,
+              id: suplidor.id,
             };
           }
           if (fact.cliente_id) {
@@ -253,6 +254,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
               fact['cliente'] = {
                 nombre: `${cliente.nombre} ${cliente.apellido}`,
                 direccion: `${cliente.direccion}`,
+                telefono: `${cliente.telefono}`,
+                id: cliente.id,
               };
             } catch (error) {}
           }
@@ -261,6 +264,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
           return a.factura_id > b.factura_id ? 1 : -1;
         });
       }
+      console.log('facturas_localStorage --> ', this.facturas_localStorage);
     }, 20);
   }
   // =================================================================================

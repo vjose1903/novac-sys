@@ -1,30 +1,20 @@
-import {
-  Component,
-  OnInit,
-  AfterViewInit,
-  Input,
-  Output,
-  EventEmitter,
-  ChangeDetectionStrategy,
-  OnDestroy,
-  OnChanges,
-  ElementRef,
-} from '@angular/core';
-import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, OnDestroy, OnChanges } from '@angular/core';
+import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import * as moment from 'moment';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { ModalService } from '../../components/modal/modal.service';
+import { mixinClass } from '../../mixinClass';
+import { IpcService } from '../../../core/services/ipc.service';
+import { LayoutService } from '../../layout/layout.service';
 
 @Component({
   selector: 'app-cuerpo-factura',
   templateUrl: './cuerpo-factura.component.html',
   styleUrls: ['./cuerpo-factura.component.scss'],
 })
-export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   form: FormGroup;
   ARRAY_ROWFACTURAS;
 
@@ -69,7 +59,14 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   subInde: Subscription;
   tipoModal: string;
 
-  constructor(private dbServ: DBservice, public mServ: ModalService, private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(
+    private dbServ: DBservice,
+    public mServ: ModalService,
+    private fb: FormBuilder,
+    public _ipc: IpcService,
+    public layServ: LayoutService,
+  ) {
+    super(mServ, _ipc, layServ);
     // this.rowFactura = new FormArray([new FormControl()]);
   }
 
@@ -104,8 +101,8 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
     });
 
     this.subEsc = this.mServ.PRESSESC.subscribe((res) => {
-      if (res !== undefined && res !== null) {
-        GLOBAL.enfocarInput('cod-' + res);
+      if (res !== undefined && res !== null && res !== {}) {
+        setTimeout(() => GLOBAL.enfocarInput('cod-' + res), 250);
       }
     });
 
@@ -298,11 +295,13 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
 
   checkIfArticuloRow(i) {
     let res = false;
-    const element = this.control.controls[i] as any;
-    if (element.controls['des'].value || element.controls['cod'].value) {
-      res = true;
-    } else {
-      res = false;
+    if (this.control) {
+      const element = this.control.controls[i] as any;
+      if (element.controls['des'].value || element.controls['cod'].value) {
+        res = true;
+      } else {
+        res = false;
+      }
     }
     return res;
   }
@@ -368,12 +367,23 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
   // =============================================
   //  MODIFICAR FACTURA
   // =============================================
-  async llenarFactura(rows) {
+  async llenarFactura(rows, is_guardada?) {
+    this.RESETCUERPO();
+    this.logRed('Llenando las filas del cuerpo de la factura');
+    console.log('rows --> ', rows);
+    this.logRed('--------------------------------------------');
+
     for (let j = 0; j < rows.length; j++) {
       const row = rows[j];
       let articulo;
+      console.log('-> ', row);
+
       try {
-        articulo = await this.dbServ.getArticulosFiltrados(row.codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
+        if (is_guardada) {
+          articulo = await this.dbServ.getOneArticulo(row.articulo_id, true).toPromise();
+        } else {
+          articulo = await this.dbServ.getArticulosFiltrados(row.codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
+        }
         const cant_en_unidades_actual = row.cantidad_en_unidades;
         const multiplo = row.cantidad_en_unidades / row.cantidad;
         const cant_actual = cant_en_unidades_actual / multiplo;
@@ -386,12 +396,12 @@ export class CuerpoFacturaComponent implements OnInit, OnChanges, AfterViewInit,
         (this.control.controls[j] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(row.total));
 
         (this.control.controls[j] as any).controls['articulo_id'].setValue(row.articulo_id);
-        (this.control.controls[j] as any).controls['cod'].setValue(row.codigo);
+        (this.control.controls[j] as any).controls['cod'].setValue(articulo.codigo);
 
         (this.control.controls[j] as any).controls['can'].setValue(cant_actual);
         (this.control.controls[j] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
 
-        (this.control.controls[j] as any).controls['des'].setValue(_.capitalize(row.articulo));
+        (this.control.controls[j] as any).controls['des'].setValue(_.capitalize(articulo.nombre));
 
         (this.control.controls[j] as any).controls['calcular_saco'].setValue(row.calcular_saco);
 

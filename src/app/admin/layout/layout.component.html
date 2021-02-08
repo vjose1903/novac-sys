@@ -23,7 +23,6 @@
   </span>
 
   <div class="contendioSidebar w-100 h-100">
-
     <div class="head w-100">
       <span class="tituloSidebar negrita">Facturas guardadas</span>
     </div>
@@ -39,6 +38,7 @@
           ></div>
 
           <div class="info_fact">
+            <i class="fas fa-truck-moving {{ fact.is_viaje ? 'if_viaje' : 'd-none' }}"></i>
             <i
               class="btn_borrar_factura_gurdada far fa-trash-alt"
               (click)="abrirModalFacturaGuardada(fact)"
@@ -47,7 +47,7 @@
             ></i>
             <span
               class="negrita text-separado-2 texto-borde-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}
-              texto-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}"
+            texto-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}"
               >{{ my_capitalize(fact?.tipo) }}</span
             >
             <span class="text-gris-oscuro" *ngIf="fact?.action === 'update'"> (Editando)</span>
@@ -56,6 +56,8 @@
               <span class="negrita"> {{ fact?.tipo === 'venta' ? 'Cliente' : 'Suplidor' }}:</span>
               {{ getNombreFacturaGuardada(fact) }}
             </span>
+            <br />
+            <span class="info_factura"> <span class="negrita"> Condición:</span> {{ fact?.condicion }} </span>
             <br />
             <span class="info_factura"> <span class="negrita"> Articulos:</span> {{ fact?.detalle_facturas_attributes.length }} </span>
             <br />

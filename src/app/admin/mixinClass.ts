@@ -43,4 +43,20 @@ export class mixinClass extends modalClass {
     const ultimoCaracter = str.length + 1;
     return str.substr(0, 1).toUpperCase() + str.substr(1, ultimoCaracter).toLowerCase();
   }
+
+  logBlue(text: any) {
+    console.log(`%c ${text}`, 'background: #00000000; color: #5580da');
+  }
+
+  logYellow(text: any) {
+    console.log(`%c ${text}`, 'background: #00000000; color: #dada55');
+  }
+
+  logRed(text: any) {
+    console.log(`%c ${text}`, 'background: #00000000; color: #da555f');
+  }
+
+  logGreen(text: any) {
+    console.log(`%c ${text}`, 'background: #00000000; color: #55da56');
+  }
 }

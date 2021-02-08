@@ -145,7 +145,7 @@
         <form [formGroup]="form">
           <div class="d-flex" style="height: 1.7rem">
             <h5>
-              <strong>{{ labelSearch }}:</strong>
+              <strong>{{ metodo === 'venta' ? 'Cliente' : 'Suplidor' }}:</strong>
             </h5>
             <i
               *ngIf="!factura_a_editar"
@@ -258,33 +258,44 @@
     ></app-cuerpo-factura>
   </div>
   <div class="pieFactura">
-    <div class="row">
-      <div class="col-2 ml-4">
-        <app-btncircular
-          [alto]="'100px'"
-          [accion]="!factura_a_editar ? 'Imprimir Factura' : 'Reimprimir Factura'"
-          [nombreImg]="'printer'"
-          (click)="imprimirFactura()"
-        ></app-btncircular>
+    <div class="row mx-0">
+      <div class="col-7">
+        <div class="row">
+          <div class="{{ metodo === 'venta' ? 'col-3' : 'col-4' }} ">
+            <app-btncircular
+              [alto]="'100px'"
+              [accion]="!factura_a_editar ? 'Imprimir Factura' : 'Reimprimir Factura'"
+              [nombreImg]="'printer'"
+              (click)="imprimirFactura()"
+            ></app-btncircular>
+          </div>
+          <div class="{{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
+            <app-btncircular
+              [alto]="'100px'"
+              [accion]="!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'"
+              [nombreImg]="'cancelar'"
+              (click)="cancelarFactura()"
+            ></app-btncircular>
+          </div>
+          <div class="{{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
+            <app-btncircular
+              [alto]="'100px'"
+              [accion]="'Archivar Factura'"
+              [nombreImg]="'guardarFactura'"
+              (click)="archivarFactura()"
+            ></app-btncircular>
+          </div>
+          <div class="{{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">
+            <app-btncircular
+              *ngIf="!factura_a_editar"
+              [alto]="'100px'"
+              [accion]="'Ingresar Factura pendientes'"
+              [nombreImg]="'calendar'"
+              (click)="ingresarFecha()"
+            ></app-btncircular>
+          </div>
+        </div>
       </div>
-      <div class="col-2">
-        <app-btncircular
-          [alto]="'100px'"
-          [accion]="!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'"
-          [nombreImg]="'cancelar'"
-          (click)="cancelarFactura()"
-        ></app-btncircular>
-      </div>
-      <div class="col-2" *ngIf="metodo === 'venta'">
-        <app-btncircular
-          *ngIf="!factura_a_editar"
-          [alto]="'100px'"
-          [accion]="'Ingresar Factura pendientes'"
-          [nombreImg]="'calendar'"
-          (click)="ingresarFecha()"
-        ></app-btncircular>
-      </div>
-
       <div class="col-5 d-flex justify-content-end">
         <div class="d-block mostrarNumeros">
           <div class="row">

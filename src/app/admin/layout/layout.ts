@@ -36,7 +36,6 @@ export class LayoutClass extends myElectron {
 
         this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((res) => {
           if (res) {
-            console.log('reciviendo factura en la clase layout', res);
             this.facturaGuardada = res;
             this.rellenarFacturaGuardada();
           }
