@@ -13,6 +13,7 @@ import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import { FunctionService } from '../../core/services/functions.service';
 import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
+import { FacturacionService } from './facturacion.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -55,7 +56,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   FechaFacturaMostrar: string;
   action: any;
   factura_a_editar;
-  ready = false;
   secuenciaKeys = [];
   form: FormGroup;
   fecha;
@@ -63,7 +63,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   is_adelantada = false;
   is_viaje = false;
   ITBIS = 0;
-  control;
   condicion_fact = 'Contado';
   forma_pago = 'Efectivo';
   propietario_factura;
@@ -77,7 +76,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   lista_tipos_facturas;
   NCFcompra;
   CostoYgasto = '';
-  metodo: any;
+  metodo;
 
   TiposCostosGastos: string;
   tipos_costosYgastos: string[];
@@ -90,7 +89,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     Unidad: 'Unidades',
     Saco: 'Sacos',
   };
-  // listaArticulos: any;
   usuario: any;
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
@@ -114,6 +112,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     private route: ActivatedRoute,
     private router: Router,
     public layServ: LayoutService,
+    public factServ: FacturacionService,
   ) {
     super(mServ, _ipc, layServ);
 
@@ -152,6 +151,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   ngOnInit() {
     this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printRes'] });
+
+    this.rellenarVariables();
+  }
+
+  rellenarVariables() {
     this.formarFechaFactura(new Date());
 
     this.metodo = this.route.snapshot.params['tipo'];
@@ -159,56 +163,46 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     const id_factura = this.route.snapshot.params['id'];
 
+    this.dbServ.getTiposFacturas().subscribe((res) => {
+      this.lista_tipos_facturas = res;
+    });
+
+    this.action = undefined;
+    this.factura_a_editar = undefined;
+    this.modo_factura = 'normal';
+    this.is_adelantada = false;
+    this.is_viaje = false;
+    this.condicion_fact = 'Contado';
+    this.forma_pago = 'Efectivo';
+    this.propietario_factura = undefined;
+    this.CuerpoFactura = [];
+    this.DESCUENTO = 0.0;
+    this.BRUTO = 0.0;
+    this.TOTAL = 0.0;
+    this.ITBIS = 0;
+    this.NCFcompra = undefined;
+    this.CostoYgasto = '';
+
+    this.factServ.setTipos(this.metodo, (res) => {
+      if (res) {
+        this.tipoFactura = this.factServ.tipoFactura;
+        this.TiposFacturas = this.factServ.TiposFacturas;
+        this.tipos_facturas = this.factServ.tipos_facturas;
+        this.TiposCostosGastos = this.factServ.TiposCostosGastos;
+        this.tipos_costosYgastos = this.factServ.tipos_costosYgastos;
+      }
+    });
+
     if (this.metodo === 'venta') {
-      this.tipoFactura = '02';
-      // <span>00 Factura sin comprobante</span><br>\
-      this.TiposFacturas =
-        '<div style=" max-width: 21rem;" > \
-      <span>01 Valor fiscal</span><br>\
-      <span>02 Factura de consumo</span><br>\
-      <span>11 Comprobante de compras</span><br>\
-      <span>12 Registro de unico ingreso</span><br>\
-      <span>13 Comprobante para gastos menores</span><br>\
-      <span>14 Comprobante de regimen especiales</span><br>\
-      <span>15 Comprobante gubernamental</span><br>\
-      <span>16 Comprobante para exportaciones</span><br>\
-      <span>17 Comprobantes para pago al exterior</span><br>\
-      </div>';
-      this.tipos_facturas = ['00', '01', '02', '11', '12', '13', '14', '15', '16', '17'];
       this.form.patchValue({
         id: 1,
         nombre: 'Cliente contado',
         direccion: 'Autopista duarte KM 0 el Higuero',
+        telefono: null,
       });
     } else {
-      this.tipoFactura = '01';
-      this.TiposFacturas =
-        '<div style=" max-width: 21rem;" > \
-      <span>01 Valor fiscal</span><br>\
-      <span>02 Factura de consumo</span><br>\
-      </div>';
-
-      this.TiposCostosGastos =
-        '<div style=" max-width: 30rem; min-width: 30rem;" > \
-      <span>1 Gastos de personal </span><br>\
-      <span>2 Gastos de trabajos, suministros y servicios</span><br>\
-      <span>3 Arrendamientos</span><br>\
-      <span>4 Gastos de activos fijos</span><br>\
-      <span>5 Gastos de representación</span><br>\
-      <span>6 Gastos deducciones admitidas</span><br>\
-      <span>7 Gastos financieros</span><br>\
-      <span>8 Gastos extraordinarios</span><br>\
-      <span>9 Compras y gastos que forman parte del costo de venta</span><br>\
-      <span>10 Adquisiciones de activos</span><br>\
-      <span>11 Gastos de Seguros</span><br>\
-      </div>';
-      this.tipos_facturas = ['01', '02'];
-      this.tipos_costosYgastos = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
+      this.form.reset();
     }
-
-    this.dbServ.getTiposFacturas().subscribe((res) => {
-      this.lista_tipos_facturas = res;
-    });
 
     if (this.action === 'update') {
       this.factura_a_editar = {};
@@ -226,7 +220,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.mServ.modalTipo(null);
     this.mServ.ModalSeleccion(null);
     this.mServ.mostrarModal(false);
-    this.CancelarFactura('salir');
   }
 
   ngAfterViewInit() {
@@ -323,11 +316,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     let res: boolean;
 
     const form = this.form.controls as any;
-    console.log('this.metodo --> ', this.metodo);
-    console.log('this.metodo --> ', this.metodo);
-    console.log('this.metodo --> ', this.metodo);
-    console.log('this.metodo --> ', this.metodo);
-    console.log('this.metodo --> ', this.metodo);
 
     if (
       ((this.metodo === 'venta' &&
@@ -799,7 +787,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (this.tipoModal === 'imprimir') {
         this.enviarDataBaseDatos();
       } else if (this.tipoModal === 'cancelar') {
-        this.CancelarFactura('quedar');
+        this.resetVariables();
       }
     }
 
@@ -814,7 +802,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (arg) {
         this.agregarFacturaALocalStorage();
         setTimeout(() => {
-          // this.CancelarFactura('quedar');
+          this.resetVariables();
         }, 250);
       }
     }
@@ -892,60 +880,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  CancelarFactura(tipo) {
-    if (tipo === 'quedar') {
-      this.router.navigateByUrl('/admin/dashboard');
-      setTimeout(() => {
-        this.router.navigateByUrl(`/admin/factura/${this.metodo}/new/0`);
-      }, 250);
-    } else {
-      this.articulosAcambiar = [];
-      this.newCuerpo = undefined;
-      this.FechaFacturaMostrar = undefined;
-      this.propietario_factura = undefined;
-      this.NCFcompra = null;
-      this.CostoYgasto = null;
-      this.mServ.ModalObj(null);
-      this.mServ.modalTipo(null);
-      this.mServ.ModalSeleccion(null);
-      this.FacturaAtrasada = false;
-      this.fecha_equivalente = new Date();
-      this.fecha_vencimiento = new Date();
-      this.fecha_viaje = new Date();
-      this.modo_factura = 'normal';
-      this.is_adelantada = false;
-      this.is_viaje = false;
-      this.formarFechaFactura(new Date());
-
-      if (this.metodo === 'venta') {
-        this.form.patchValue({
-          id: 1,
-          nombre: 'Cliente contado',
-          direccion: 'Autopista duarte KM 0 el Higuero',
-          telefono: null,
-        });
-        this.tipoFactura = '02';
-      } else {
-        this.tipoFactura = '01';
-        this.form.patchValue({
-          id: null,
-          nombre: null,
-          direccion: null,
-          telefono: null,
-        });
-      }
-
-      this.DESCUENTO = 0.0;
-      this.BRUTO = 0.0;
-      this.TOTAL = 0.0;
-      this.condicion_fact = 'Contado';
-      this.forma_pago = 'Efectivo';
-
-      this.ITBIS = 0;
-      this.cuerpo.RESETCUERPO();
-      this.enfocarInput('tipoFact');
-    }
+  resetVariables() {
+    this.rellenarVariables();
+    this.cuerpo.RESETCUERPO();
   }
+
   calculatePrice(costo): number {
     if (costo > 0 || costo != null || costo) {
       const precio = costo / 0.9;
@@ -1246,7 +1185,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         this._ipc.send('print', obj);
       }
 
-      await this.CancelarFactura('quedar');
+      await this.resetVariables();
     } catch (error) {
       console.error(error);
       try {

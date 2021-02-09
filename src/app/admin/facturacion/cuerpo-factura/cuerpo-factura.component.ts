@@ -71,16 +71,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   ngOnInit() {
-    this.form = this.fb.group({
-      rowFactura: this.fb.array([this.createItem(0)]),
-    });
-
-    this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
-
-    for (let index = 1; index <= 22; index++) {
-      this.addItem(index);
-    }
-
+    this.rellenarVariables();
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (this.tipoModal === 'removerArticulo' && res) {
         this.procesoQuitarArticulo();
@@ -145,8 +136,40 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     });
   }
 
+  rellenarVariables() {
+    this.form = undefined;
+    this.ARRAY_ROWFACTURAS = undefined;
+    this.seleccionModal = undefined;
+    this.showModal = false;
+    this.modalSearch = true;
+    this.UnidadesArticulo = [];
+    this.drop = false;
+    this.precioDetalle = undefined;
+    this.TOTAL = 0;
+    this.ITBIS = 0;
+    this.secuencia = 0;
+    this.inputSecuencia = 'cod-0';
+    this.inputDrop = 'uni-0';
+    this.control = undefined;
+    this.llevaDescuento = undefined;
+    this.DESCUENTO = 0;
+    this.listaDeDescuentos = [];
+    this.sacos = [25, 50, 100];
+    this.indexRemove = undefined;
+
+    this.form = this.fb.group({
+      rowFactura: this.fb.array([this.createItem(0)]),
+    });
+
+    this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
+
+    for (let index = 1; index <= 22; index++) {
+      this.addItem(index);
+    }
+  }
+
   ngOnDestroy() {
-    this.RESETCUERPO();
+    this.rellenarVariables();
     this.subDeci.unsubscribe();
     this.subObj.unsubscribe();
     this.subEsc.unsubscribe();
@@ -186,7 +209,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   readDescuento() {
     let res = true;
-    if (this.metodo === 'venta' && this.propietario !== null) {
+
+    if (this.metodo === 'venta' && this.propietario) {
       res = false;
     }
     return res;
@@ -368,7 +392,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   //  MODIFICAR FACTURA
   // =============================================
   async llenarFactura(rows, is_guardada?) {
-    this.RESETCUERPO();
+    this.rellenarVariables();
     this.logRed('Llenando las filas del cuerpo de la factura');
     console.log('rows --> ', rows);
     this.logRed('--------------------------------------------');
