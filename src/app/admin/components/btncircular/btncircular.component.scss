@@ -17,13 +17,16 @@
   }
 
   filter: grayscale(50%);
+
   &:hover {
-    filter: grayscale(0%);
-    cursor: pointer;
+    cursor: not-allowed;
     ~ .labelBtn {
       transform: translate(0rem, 6.8rem) scale(1);
     }
   }
 
-  //   margin: auto auto;
+  &.active:hover {
+    cursor: pointer !important;
+    filter: grayscale(0%);
+  }
 }

@@ -7,7 +7,7 @@ export class LayoutClass extends myElectron {
     super();
   }
 
-  facturaGuardada = {};
+  facturaGuardada: any = undefined;
   info_cambio = {};
   ruta_a_cambiar = '';
   url_actual = '';
@@ -15,6 +15,7 @@ export class LayoutClass extends myElectron {
   subInit: Subscription;
   subDeciMenu: Subscription;
   subFactG: Subscription;
+  subRefresh: Subscription;
 
   _init_layout() {
     this.subInit = this.layServ.INITCAMBIOMENU.subscribe((res) => {

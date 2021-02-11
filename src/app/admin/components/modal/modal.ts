@@ -16,6 +16,8 @@ export class modalClass extends LayoutClass {
   subArticuloFiltro: Subscription;
   subEsc: Subscription;
   subInde: Subscription;
+  subRefresh: Subscription;
+  subSacar: Subscription;
   tipoModal: string;
 
   _lista = [];
@@ -81,6 +83,22 @@ export class modalClass extends LayoutClass {
         this.indexToFocusResponse(res);
       });
     }
+
+    if (this._lista.includes('refreshFacturas')) {
+      this.subRefresh = this.layServ.REFRESHFACTURAS.subscribe((res) => {
+        if (res) {
+          this.refreshResponse(res);
+        }
+      });
+    }
+
+    if (this._lista.includes('sacarFacturas')) {
+      this.subRefresh = this.layServ.SACARFACTURA.subscribe((res) => {
+        if (res) {
+          this.sacarResponse(res);
+        }
+      });
+    }
   }
 
   ipcPrintResponse(res) {}
@@ -93,6 +111,8 @@ export class modalClass extends LayoutClass {
   indexToFocusResponse(res) {}
 
   objDevueltoResponse(res) {}
+  refreshResponse(res) {}
+  sacarResponse(res) {}
 
   reporte(data: any) {}
 
@@ -123,6 +143,14 @@ export class modalClass extends LayoutClass {
 
     if (this._lista.includes('indexToFocus') && this.subInde) {
       this.subInde.unsubscribe();
+    }
+
+    if (this._lista.includes('refreshFacturas')) {
+      this.subRefresh.unsubscribe();
+    }
+
+    if (this._lista.includes('sacarFacturas')) {
+      this.subSacar.unsubscribe();
     }
 
     if (this._lista.includes('')) {

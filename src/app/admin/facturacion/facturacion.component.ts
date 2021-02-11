@@ -134,7 +134,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     );
 
     setInterval(() => {
-      this.fecha = GLOBAL.my_dateFormater(new Date()) + ' - ' + GLOBAL.my_houreFormater(new Date());
+      this.fecha = this.my_timeDateFormater(new Date());
     }, 1000);
   }
 
@@ -150,22 +150,12 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printRes'] });
-
     this.rellenarVariables();
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printRes'] });
   }
 
   rellenarVariables() {
     this.formarFechaFactura(new Date());
-
-    this.metodo = this.route.snapshot.params['tipo'];
-    this.action = this.route.snapshot.params['action'];
-
-    const id_factura = this.route.snapshot.params['id'];
-
-    this.dbServ.getTiposFacturas().subscribe((res) => {
-      this.lista_tipos_facturas = res;
-    });
 
     this.action = undefined;
     this.factura_a_editar = undefined;
@@ -182,6 +172,16 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.ITBIS = 0;
     this.NCFcompra = undefined;
     this.CostoYgasto = '';
+    this.facturaGuardada = undefined;
+
+    this.metodo = this.route.snapshot.params['tipo'];
+    this.action = this.route.snapshot.params['action'];
+
+    const id_factura = this.route.snapshot.params['id'];
+
+    this.dbServ.getTiposFacturas().subscribe((res) => {
+      this.lista_tipos_facturas = res;
+    });
 
     this.factServ.setTipos(this.metodo, (res) => {
       if (res) {
@@ -235,9 +235,10 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   rellenarFacturaGuardada() {
-    console.log('factura ya en el componente de facturacion -->', this.facturaGuardada);
-    this.rellenarCampos(null, 'fact_guardada', this.facturaGuardada);
-    this.cuerpo.llenarFactura(this.facturaGuardada['detalle_facturas_attributes'], true);
+    try {
+      this.rellenarCampos(null, 'fact_guardada', this.facturaGuardada);
+      this.cuerpo.llenarFactura(this.facturaGuardada['detalle_facturas_attributes'], true);
+    } catch (error) {}
   }
 
   initCambioMenu(arg) {
@@ -303,10 +304,12 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         }
 
         this.CuerpoFactura = this.newCuerpo;
-        this.enviarDataBaseDatos();
+        this.revisarLocalStorage();
+        // this.enviarABaseDatos();
+
         this.mServ.ModalObj(undefined);
       } else {
-        this.enviarDataBaseDatos();
+        this.enviarABaseDatos();
         this.mServ.ModalObj(undefined);
       }
     }
@@ -338,6 +341,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   async rellenarCampos(id, tipo?, fact?) {
     let res;
     this.propietario_factura = {};
+
     if (tipo === 'editar') {
       res = await this.dbServ.getFacturaById(id).toPromise();
       this.factura_a_editar = res;
@@ -383,6 +387,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     this.modo_factura = res.is_viaje ? 'viaje' : res.is_adelantada ? 'adelantada' : 'normal';
     this.enfocarInput('cod-0');
+    console.log('this.factura_a_editar ==> ', this.factura_a_editar);
   }
 
   setWidthPop(bool, e) {
@@ -726,7 +731,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.abrirModal('cancelar', 'cancelar', null);
   }
   // =============================================
-  //  MODAL enviarDataBaseDatos
+  //  MODAL enviarABaseDatos
   // =============================================
   async imprimirFactura() {
     if (!this.usuario) {
@@ -785,9 +790,12 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   luegoDecision(arg) {
     if (arg) {
       if (this.tipoModal === 'imprimir') {
-        this.enviarDataBaseDatos();
+        this.enviarABaseDatos();
       } else if (this.tipoModal === 'cancelar') {
-        this.resetVariables();
+        if (this.action !== 'update') this.resetVariables();
+        if (this.action === 'update') {
+          this.router.navigateByUrl(`/admin/factura/${this.metodo}/new/0`).then(() => this.resetVariables());
+        }
       }
     }
 
@@ -803,6 +811,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         this.agregarFacturaALocalStorage();
         setTimeout(() => {
           this.resetVariables();
+          this.layServ.nextRefresh(true);
         }, 250);
       }
     }
@@ -831,8 +840,13 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   archivarFactura() {
-    const obj = { texto_modal: 'Seguro que desea archivar esta factura para continuarla luego.' };
-    this.abrirModal('archivar_factura', 'dinamico_texto', obj);
+    const facturas_localStorage = this.fun.getFacturasguardadas();
+    const is_guardada = _.findIndex(facturas_localStorage, (fact: any) => fact.factura_id === this.facturaGuardada.factura_id);
+
+    if (is_guardada === -1) {
+      const obj = { texto_modal: 'Seguro que desea archivar esta factura para continuarla luego.' };
+      this.abrirModal('archivar_factura', 'dinamico_texto', obj);
+    }
   }
 
   selectFecha(arg) {
@@ -1072,6 +1086,15 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     return cuerpo;
   }
 
+  revisarLocalStorage() {
+    console.log('this.facturaGuardada --> ', this.facturaGuardada);
+    const facturas_localStorage = this.fun.getFacturasguardadas();
+    const is_guardada = _.findIndex(facturas_localStorage, (fact: any) => fact.factura_id === this.facturaGuardada.factura_id);
+    if (this.facturaGuardada && is_guardada !== -1) {
+      // quitarFacturaGuardada;
+    }
+  }
+
   formarData() {
     const empleado = this.fun.getUser();
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
@@ -1155,7 +1178,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     return cabecera_fact;
   }
 
-  async enviarDataBaseDatos() {
+  async enviarABaseDatos() {
     try {
       const cabecera_fact = this.formarData();
 
@@ -1184,6 +1207,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (this.metodo === 'venta') {
         this._ipc.send('print', obj);
       }
+
+      this.revisarLocalStorage();
 
       await this.resetVariables();
     } catch (error) {

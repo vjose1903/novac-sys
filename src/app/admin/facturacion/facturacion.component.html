@@ -280,9 +280,10 @@
           <div class="{{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
             <app-btncircular
               [alto]="'100px'"
-              [accion]="'Archivar Factura'"
+              [accion]="facturaGuardada ? 'Factura ya está archivada' : 'Archivar Factura'"
               [nombreImg]="'guardarFactura'"
               (click)="archivarFactura()"
+              [disable]="facturaGuardada"
             ></app-btncircular>
           </div>
           <div class="{{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">

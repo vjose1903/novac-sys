@@ -10,6 +10,7 @@ export class BTNcircularComponent implements OnInit, AfterViewInit {
   @Input() accion;
   @Input() alto;
   @Input() ancho;
+  @Input() disable = false;
 
   @Output() click = new EventEmitter<any>();
   element: HTMLElement;

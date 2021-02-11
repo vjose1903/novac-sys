@@ -72,6 +72,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   ngOnInit() {
     this.rellenarVariables();
+
     this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
       if (this.tipoModal === 'removerArticulo' && res) {
         this.procesoQuitarArticulo();
@@ -136,8 +137,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     });
   }
 
-  rellenarVariables() {
-    this.form = undefined;
+  async rellenarVariables(callback = (arg) => {}) {
     this.ARRAY_ROWFACTURAS = undefined;
     this.seleccionModal = undefined;
     this.showModal = false;
@@ -160,16 +160,30 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
-
     this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
-
     for (let index = 1; index <= 22; index++) {
-      this.addItem(index);
+      await this.addItem(index);
+    }
+
+    setTimeout(async () => {
+      this.control = this.form.controls['rowFactura'] as FormArray;
+      callback(true);
+    }, 250);
+  }
+
+  ngAfterViewInit() {
+    // this.control = this.form.controls['rowFactura'] as FormArray;
+  }
+
+  ngOnChanges(simpleChanges) {
+    console.log('simpleChanges --> ', simpleChanges);
+
+    if (simpleChanges.factura && simpleChanges.factura.currentValue && this.action === 'update' && _.hasIn(this.factura, 'id')) {
+      this.llenarFactura(this.factura.detalle_facturas);
     }
   }
 
   ngOnDestroy() {
-    this.rellenarVariables();
     this.subDeci.unsubscribe();
     this.subObj.unsubscribe();
     this.subEsc.unsubscribe();
@@ -182,21 +196,11 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     // this.mServ.ModalTablaHeight(false);
   }
 
-  ngAfterViewInit() {
-    this.control = this.form.controls['rowFactura'] as FormArray;
-  }
-
   async procesoQuitarArticulo() {
     await this.sacarDescuento(this.indexRemove);
     await this.removeItem(this.indexRemove);
     await this.calculosTotalesGenerales();
     await this.disminuirSecuencia();
-  }
-
-  ngOnChanges(simpleChanges) {
-    if (simpleChanges.factura && simpleChanges.factura.currentValue && this.action === 'update' && _.hasIn(this.factura, 'id')) {
-      this.llenarFactura(this.factura.detalle_facturas);
-    }
   }
 
   readPrecio() {
@@ -392,76 +396,81 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   //  MODIFICAR FACTURA
   // =============================================
   async llenarFactura(rows, is_guardada?) {
-    this.rellenarVariables();
-    this.logRed('Llenando las filas del cuerpo de la factura');
-    console.log('rows --> ', rows);
-    this.logRed('--------------------------------------------');
+    this.rellenarVariables(async (res) => {
+      this.logRed(`RESPUESTA DEL RELLENO --> ${res}`);
 
-    for (let j = 0; j < rows.length; j++) {
-      const row = rows[j];
-      let articulo;
-      console.log('-> ', row);
+      if (res) {
+        this.logRed('Llenando las filas del cuerpo de la factura');
+        console.log('rows --> ', rows);
+        this.logRed('--------------------------------------------');
 
-      try {
-        if (is_guardada) {
-          articulo = await this.dbServ.getOneArticulo(row.articulo_id, true).toPromise();
-        } else {
-          articulo = await this.dbServ.getArticulosFiltrados(row.codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
-        }
-        const cant_en_unidades_actual = row.cantidad_en_unidades;
-        const multiplo = row.cantidad_en_unidades / row.cantidad;
-        const cant_actual = cant_en_unidades_actual / multiplo;
+        for (let j = 0; j < rows.length; j++) {
+          const row = rows[j];
+          let articulo;
+          console.log('row --> ', row);
+          console.log('this.control.controls[j] as any) --> ', this.control.controls[j] as any);
 
-        (this.control.controls[j] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(row.precio));
-        (this.control.controls[j] as any).controls['costo'].setValue(GLOBAL.numFormatTwoDecimals(row.costo));
-
-        (this.control.controls[j] as any).controls['descuento_porciento'].setValue(row.descuento_porciento > 0 ? row.descuento_porciento : null);
-        (this.control.controls[j] as any).controls['descuento_valor'].setValue(row.descuento_valor);
-        (this.control.controls[j] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(row.total));
-
-        (this.control.controls[j] as any).controls['articulo_id'].setValue(row.articulo_id);
-        (this.control.controls[j] as any).controls['cod'].setValue(articulo.codigo);
-
-        (this.control.controls[j] as any).controls['can'].setValue(cant_actual);
-        (this.control.controls[j] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
-
-        (this.control.controls[j] as any).controls['des'].setValue(_.capitalize(articulo.nombre));
-
-        (this.control.controls[j] as any).controls['calcular_saco'].setValue(row.calcular_saco);
-
-        if (row.tipo === 'Materia prima') {
-          (this.control.controls[j] as any).controls['descuento_porciento'].disable({ onlySelf: true });
-          (this.control.controls[j] as any).controls['is_materia_prima'].setValue(true);
-        } else {
-          (this.control.controls[j] as any).controls['descuento_porciento'].enable();
-          (this.control.controls[j] as any).controls['is_materia_prima'].setValue(false);
-        }
-
-        let uni = '';
-        if (row.peso_saco) {
-          uni = 'Saco de ' + row.peso_saco + ' libras';
-        } else {
-          uni = row.unidad;
-        }
-
-        (this.control.controls[j] as any).controls['uni'].setValue(uni);
-
-        // if (row.calcular_saco) {
-
-        try {
-          this.calcularSacoEnRow(j, row, articulo, 'llenarFact', (res) => {
-            if (res) {
-              this.calcularTotalRow(j);
+          try {
+            if (is_guardada) {
+              articulo = await this.dbServ.getOneArticulo(row.articulo_id, true).toPromise();
+            } else {
+              articulo = await this.dbServ.getArticulosFiltrados(row.codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
             }
-          });
-        } catch (error) {}
-        // } else {
-        //   this.calcularTotalRow(j);
-        // }
 
-        this.aumentarSecuencia();
-      } catch (error) {}
-    }
+            const cant_en_unidades_actual = row.cantidad_en_unidades;
+            const multiplo = row.cantidad_en_unidades / row.cantidad;
+            const cant_actual = cant_en_unidades_actual / multiplo;
+
+            (this.control.controls[j] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(row.precio));
+            (this.control.controls[j] as any).controls['costo'].setValue(GLOBAL.numFormatTwoDecimals(row.costo));
+
+            (this.control.controls[j] as any).controls['descuento_porciento'].setValue(row.descuento_porciento > 0 ? row.descuento_porciento : null);
+            (this.control.controls[j] as any).controls['descuento_valor'].setValue(row.descuento_valor);
+            (this.control.controls[j] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(row.total));
+
+            (this.control.controls[j] as any).controls['articulo_id'].setValue(row.articulo_id);
+            (this.control.controls[j] as any).controls['cod'].setValue(articulo.codigo);
+
+            (this.control.controls[j] as any).controls['can'].setValue(cant_actual);
+            (this.control.controls[j] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
+
+            (this.control.controls[j] as any).controls['des'].setValue(_.capitalize(articulo.nombre));
+
+            (this.control.controls[j] as any).controls['calcular_saco'].setValue(row.calcular_saco);
+
+            if (row.tipo === 'Materia prima') {
+              (this.control.controls[j] as any).controls['descuento_porciento'].disable({ onlySelf: true });
+              (this.control.controls[j] as any).controls['is_materia_prima'].setValue(true);
+            } else {
+              (this.control.controls[j] as any).controls['descuento_porciento'].enable();
+              (this.control.controls[j] as any).controls['is_materia_prima'].setValue(false);
+            }
+
+            let uni = '';
+            if (row.peso_saco) {
+              uni = 'Saco de ' + row.peso_saco + ' libras';
+            } else {
+              uni = row.unidad;
+            }
+
+            (this.control.controls[j] as any).controls['uni'].setValue(uni);
+
+            try {
+              this.calcularSacoEnRow(j, row, articulo, 'llenarFact', (res) => {
+                if (res) {
+                  this.calcularTotalRow(j);
+                }
+              });
+            } catch (error) {}
+            // } else {
+            //   this.calcularTotalRow(j);
+            // }
+
+            this.aumentarSecuencia();
+          } catch (error) {}
+        }
+      }
+    });
   }
 
   // =============================================

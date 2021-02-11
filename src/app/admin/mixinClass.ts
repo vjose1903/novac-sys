@@ -35,28 +35,71 @@ export class mixinClass extends modalClass {
     }
   }
 
+  // =========================================================================================================
+  my_timeDateFormater(str) {
+    return `${this.my_dateFormater(str)} - ${this.my_houreFormater(str)}`;
+  }
+  // =========================================================================================================
+  my_dateFormater(str) {
+    let dateObj = new Date(str);
+    let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    let day = String(dateObj.getDate()).padStart(2, '0');
+    let year = dateObj.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
+
+  // =========================================================================================================
+  my_houreFormater(str) {
+    const dateObj = new Date(str);
+
+    let hours = dateObj.getHours();
+    const minutes = dateObj.getMinutes();
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+
+    const res = `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
+    return res;
+  }
+
+  // =========================================================================================================
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num)) + '  ';
   }
 
+  // =========================================================================================================
   my_capitalize(str) {
     const ultimoCaracter = str.length + 1;
     return str.substr(0, 1).toUpperCase() + str.substr(1, ultimoCaracter).toLowerCase();
   }
 
-  logBlue(text: any) {
+  // =========================================================================================================
+  logBlue(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #5580da');
+    if (body) {
+      console.log(body);
+    }
   }
 
-  logYellow(text: any) {
+  logYellow(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #dada55');
+    if (body) {
+      console.log(body);
+    }
   }
 
-  logRed(text: any) {
+  logRed(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #da555f');
+    if (body) {
+      console.log(body);
+    }
   }
 
-  logGreen(text: any) {
+  logGreen(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #55da56');
+    if (body) {
+      console.log(body);
+    }
   }
 }

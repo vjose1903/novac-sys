@@ -60,7 +60,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   lRun = false;
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal'] });
+    this._init_mixin({ _lista_subs: ['decisionModal', 'refreshFacturas', 'sacarFacturas'] });
 
     this._ipc.PRINTERS.subscribe((res) => {
       if (res !== undefined) {
@@ -187,16 +187,29 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.abrirModal('quitar_factura', 'dinamico_texto', obj);
   }
 
-  quitarFacturaGuardada() {
-    const index = _.findIndex(this.facturas_localStorage, (o: any) => {
-      return o.factura_id == this.seleccionModal.factura_id;
-    });
-    _.pullAt(this.facturas_localStorage, index);
+  quitarFacturaGuardada(fact?) {
+    let index;
 
-    this.fun.setFacturasGuardadas(this.facturas_localStorage);
+    if (!fact) index = _.findIndex(this.facturas_localStorage, (o: any) => o.factura_id === this.seleccionModal.factura_id);
+    if (!fact) index = _.findIndex(this.facturas_localStorage, (o: any) => o.factura_id === fact.factura_id);
+
+    console.log('index --> ', index);
+
+    // _.pullAt(this.facturas_localStorage, index);
+
+    // this.fun.setFacturasGuardadas(this.facturas_localStorage);
   }
+
   pasarFacturaAfacturacion(fact) {
     this.layServ.nextFacturaGurdada(fact);
+  }
+
+  refreshResponse() {
+    this.getFacturasGuardadas();
+  }
+
+  sacarResponse(res) {
+    this.quitarFacturaGuardada(res);
   }
 
   // =================================================================================

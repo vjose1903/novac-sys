@@ -7,13 +7,27 @@ import { BehaviorSubject } from 'rxjs';
 export class LayoutService {
   private initcambioMenu = new BehaviorSubject<any>(undefined);
   private desicionCambioMenu = new BehaviorSubject<any>(undefined);
+
   private facturaGuardada = new BehaviorSubject<any>(undefined);
+  private refresFacturas = new BehaviorSubject<boolean>(false);
+  private sacarFactura = new BehaviorSubject<boolean>(false);
 
   DESICIONCAMBIOMENU = this.desicionCambioMenu.asObservable();
   INITCAMBIOMENU = this.initcambioMenu.asObservable();
+
   FACTURAGUARDADA = this.facturaGuardada.asObservable();
+  REFRESHFACTURAS = this.refresFacturas.asObservable();
+  SACARFACTURA = this.sacarFactura.asObservable();
 
   constructor() {}
+
+  nextSacar(nextValue) {
+    this.sacarFactura.next(nextValue);
+  }
+
+  nextRefresh(nextValue) {
+    this.refresFacturas.next(nextValue);
+  }
 
   nextFacturaGurdada(nextValue) {
     this.facturaGuardada.next(nextValue);
