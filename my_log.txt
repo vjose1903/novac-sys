@@ -6030,3 +6030,23 @@ ahora va a borrar el archivo log
 
  comando realizado en la funcion cmd  ==╗ 
       md5sum "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      dir 
+
+entro enla funcion de borrar log 
+
+ ----------- dir -----------  ==╗ 
+       
+
+ahora va a borrar el archivo log 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/my_log.txt" 
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  
+
+ --------------- INICIO DE PROCESO DE IMPRESION ---------------  

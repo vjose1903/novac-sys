@@ -29,7 +29,7 @@ export class LayoutService {
     this.refresFacturas.next(nextValue);
   }
 
-  nextFacturaGurdada(nextValue) {
+  nextFacturaGuardada(nextValue) {
     this.facturaGuardada.next(nextValue);
   }
 

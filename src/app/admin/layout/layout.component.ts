@@ -191,17 +191,30 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     let index;
 
     if (!fact) index = _.findIndex(this.facturas_localStorage, (o: any) => o.factura_id === this.seleccionModal.factura_id);
-    if (!fact) index = _.findIndex(this.facturas_localStorage, (o: any) => o.factura_id === fact.factura_id);
+    if (fact) index = _.findIndex(this.facturas_localStorage, (o: any) => o.factura_id === fact.factura_id);
 
-    console.log('index --> ', index);
+    _.pullAt(this.facturas_localStorage, index);
 
-    // _.pullAt(this.facturas_localStorage, index);
+    this.fun.setFacturasGuardadas(this.facturas_localStorage);
+  }
 
-    // this.fun.setFacturasGuardadas(this.facturas_localStorage);
+  checkWhereIs(arg, callback = (arg) => {}) {
+    const temp_url = document.location.href.split('admin/');
+    if (temp_url[1]) {
+      const url = temp_url[1].split('/')[1];
+      if (url !== arg) {
+        this.layServ.nextDecisionCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
+      }
+    }
+    callback(true);
   }
 
   pasarFacturaAfacturacion(fact) {
-    this.layServ.nextFacturaGurdada(fact);
+    this.checkWhereIs(fact.tipo, (res) => {
+      if (res) {
+        this.layServ.nextFacturaGuardada(fact);
+      }
+    });
   }
 
   refreshResponse() {

@@ -227,7 +227,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   ipcPrintResponse(res) {
-    console.log(res);
     if (res.status === 'si') {
     } else {
       this.dbServ.toastError('ERROR: imprimiendo factura.', 'ERROR', true);
@@ -238,15 +237,37 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     try {
       this.rellenarCampos(null, 'fact_guardada', this.facturaGuardada);
       this.cuerpo.llenarFactura(this.facturaGuardada['detalle_facturas_attributes'], true);
+      this.getCuerpoFactura(this.facturaGuardada['detalle_facturas_attributes'], true);
     } catch (error) {}
   }
 
   initCambioMenu(arg) {
     if (arg.bool) {
       if (this.checkIfFacturaIniciada()) {
+        let obj;
         this.layServ.nextDecisionCambioMenu({ bool: false, ruta: arg.ruta });
+        if (this.facturaGuardada) {
+          const factura_id = GLOBAL.duplicarJson(this.facturaGuardada.factura_id);
+          delete this.facturaGuardada.factura_id;
+          delete this.facturaGuardada.cliente;
+          delete this.facturaGuardada.suplidor;
+          const comparar = this.facturaGuardada;
 
-        const obj = { texto_modal: 'Estas a punto de salir del modulo de facturación, desea guardar la factura para continuarla luego.' };
+          // this.info_cambio['bool'] = true;
+          const factura_a_guardar = this.formarFacturaAGuardar();
+          console.log('comparar --> ', JSON.stringify(comparar));
+          console.log('factura_a_guardar --> ', JSON.stringify(factura_a_guardar));
+
+          if (JSON.stringify(comparar) === JSON.stringify(factura_a_guardar)) {
+            this.dbServ.toastWarning('Esta factura esta archivada para poder utilizarla luego.', 'AVISO');
+          } else {
+            obj = { texto_modal: 'Esta factura ya se encuentra archivada desea sobreescribirla.' };
+            this.abrirModal('salir_layout', 'dinamico_texto', obj);
+          }
+        } else {
+          obj = { texto_modal: 'Estas a punto de salir del modulo de facturación, desea guardar la factura para continuarla luego.' };
+        }
+
         this.abrirModal('salir_layout', 'dinamico_texto', obj);
       } else {
         this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta });
@@ -305,10 +326,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
         this.CuerpoFactura = this.newCuerpo;
         this.revisarLocalStorage();
-        // this.enviarABaseDatos();
+        this.enviarABaseDatos();
 
         this.mServ.ModalObj(undefined);
       } else {
+        this.revisarLocalStorage();
         this.enviarABaseDatos();
         this.mServ.ModalObj(undefined);
       }
@@ -338,9 +360,29 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     return res;
   }
 
+  setPropietario(arg) {
+    if (arg.tipo === 'venta') {
+      if (arg.cliente) this.propietario_factura['id'] = arg.cliente_id;
+      else {
+        arg['cliente'] = {
+          direccion: arg['NoCliente_direccion'],
+          nombre: arg['NoCliente_nombre'],
+          telefono: '',
+        };
+      }
+      this.propietario_factura = arg.cliente;
+      this.form.patchValue(arg.cliente);
+    } else {
+      this.propietario_factura['id'] = arg.suplidor_id;
+      this.propietario_factura = arg.suplidor;
+      this.form.patchValue(arg.suplidor);
+    }
+  }
+
   async rellenarCampos(id, tipo?, fact?) {
     let res;
     this.propietario_factura = {};
+    console.log('fact --> ', fact);
 
     if (tipo === 'editar') {
       res = await this.dbServ.getFacturaById(id).toPromise();
@@ -350,24 +392,13 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     } else {
       res = fact;
 
-      if (res.cliente) {
-        this.propietario_factura['id'] = res.cliente_id;
-      } else {
-        res['cliente'] = {
-          direccion: res['NoCliente_direccion'],
-          nombre: res['NoCliente_nombre'],
-          telefono: '',
-        };
-      }
-      this.propietario_factura = res.cliente;
+      this.setPropietario(res);
 
       const tipo = _.find(this.lista_tipos_facturas, (fact) => fact.id === res['tipo_factura_id']);
       res['tipo_factura'] = tipo ? tipo['descripcion'] : '';
     }
 
     this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
-    this.form.patchValue(res.cliente);
-    console.log('llenando-->', res);
 
     if (res.is_viaje) {
       this.fecha_viaje = new Date(res.fecha_viaje);
@@ -385,9 +416,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     this.condicion_fact = res.condicion;
 
+    this.NCFcompra = res.tipo === 'compra' ? res.numero_comprobante : undefined;
+    this.CostoYgasto = res.tipo === 'compra' ? res.costoYgasto : '';
+
     this.modo_factura = res.is_viaje ? 'viaje' : res.is_adelantada ? 'adelantada' : 'normal';
     this.enfocarInput('cod-0');
-    console.log('this.factura_a_editar ==> ', this.factura_a_editar);
   }
 
   setWidthPop(bool, e) {
@@ -780,13 +813,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  // abrirModal(arg?) {
-  //   if (arg) {
-  //     this.mServ.ModalSeleccion(arg);
-  //   }
-  //   this.mServ.mostrarModal(true);
-  // }
-
   luegoDecision(arg) {
     if (arg) {
       if (this.tipoModal === 'imprimir') {
@@ -817,13 +843,19 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
+  formarFacturaAGuardar() {
+    const factura_a_guardar = this.formarData();
+    factura_a_guardar['action'] = this.action;
+    return factura_a_guardar;
+  }
+
   agregarFacturaALocalStorage() {
     if (!this.propietario_factura) {
       this.propietario_factura = this.form.value;
     }
     const facturas_localStorage = this.fun.getFacturasguardadas();
 
-    const factura_a_guardar = this.formarData();
+    const factura_a_guardar = this.formarFacturaAGuardar();
 
     if (facturas_localStorage.length > 0) {
       facturas_localStorage.sort((a, b) => {
@@ -833,19 +865,25 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     } else {
       factura_a_guardar['factura_id'] = 1;
     }
-    factura_a_guardar['action'] = this.action;
 
     facturas_localStorage.push(factura_a_guardar);
     this.fun.setFacturasGuardadas(facturas_localStorage);
   }
 
   archivarFactura() {
-    const facturas_localStorage = this.fun.getFacturasguardadas();
-    const is_guardada = _.findIndex(facturas_localStorage, (fact: any) => fact.factura_id === this.facturaGuardada.factura_id);
+    if (this.checkIfFacturaIniciada()) {
+      let is_guardada = -1;
+      if (this.facturaGuardada) {
+        const facturas_localStorage = this.fun.getFacturasguardadas();
+        is_guardada = _.findIndex(facturas_localStorage, (fact: any) => fact.factura_id === this.facturaGuardada.factura_id);
+      }
 
-    if (is_guardada === -1) {
-      const obj = { texto_modal: 'Seguro que desea archivar esta factura para continuarla luego.' };
-      this.abrirModal('archivar_factura', 'dinamico_texto', obj);
+      if (is_guardada === -1) {
+        const obj = { texto_modal: 'Seguro que desea archivar esta factura para continuarla luego.' };
+        this.abrirModal('archivar_factura', 'dinamico_texto', obj);
+      }
+    } else {
+      this.dbServ.toastWarning('Debe de iniciar una factura para archivarla', 'AVISO');
     }
   }
 
@@ -878,10 +916,16 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     return x;
   }
 
-  getCuerpoFactura(arg) {
+  getCuerpoFactura(arg, recuperar?) {
     this.CuerpoFactura = [];
+    let obj;
 
-    const obj = JSON.parse(arg);
+    if (!recuperar) {
+      obj = JSON.parse(arg);
+    } else {
+      obj = arg;
+    }
+
     this.CuerpoFactura = obj;
 
     if (this.metodo === 'venta') {
@@ -1087,11 +1131,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   revisarLocalStorage() {
-    console.log('this.facturaGuardada --> ', this.facturaGuardada);
     const facturas_localStorage = this.fun.getFacturasguardadas();
     const is_guardada = _.findIndex(facturas_localStorage, (fact: any) => fact.factura_id === this.facturaGuardada.factura_id);
+
     if (this.facturaGuardada && is_guardada !== -1) {
-      // quitarFacturaGuardada;
+      this.layServ.nextSacar(this.facturaGuardada);
     }
   }
 

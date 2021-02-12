@@ -39,6 +39,7 @@ export class LayoutClass extends myElectron {
           if (res) {
             this.facturaGuardada = res;
             this.rellenarFacturaGuardada();
+            this.layServ.nextFacturaGuardada(undefined);
           }
         });
       }
