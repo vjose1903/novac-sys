@@ -241,34 +241,47 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     } catch (error) {}
   }
 
+  // factura_a_guardar -->  {"condicion":"Crédito","forma_pago":"Efectivo","fecha_viaje":null,"fecha_equivalente":null,"fecha_vencimiento":"15/03/2021","pagada":false,"balance":23500,"devuelta":0,"fecha_valida":"30/12/2022","tipo_factura_id":2,"numero_comprobante":null,"costoYgasto":null,"numero_factura":null,"total_factura":23500,"Bruto":23500,"itbis":0,"descuento":0,"estado":true,"is_adelantada":false,"is_viaje":false,"is_nota":false,"cliente_id":7,"detalle_facturas_attributes":[{"id":null,"articulo_id":209,"descuento_valor":0,"cantidad_en_unidades":2500,"calcular_saco":true,"cantidad":100,"total":23500,"descuento_porciento":0,"itbis":0,"unidad":"Saco de 25 libras","precio":235,"retirado":2500,"retirado_en_venta":2500}],"FACTURA_DE":13,"tipo":"venta","user_id":1,"tiene_nota":false,"vendedor_id":"2","action":"new"}
+  // comparar -->           {"condicion":"Crédito","forma_pago":"Efectivo","fecha_viaje":null,"fecha_equivalente":null,"fecha_vencimiento":"15/03/2021","pagada":false,"balance":23500,"devuelta":0,"fecha_valida":"30/12/2022","tipo_factura_id":2,"numero_comprobante":null,"costoYgasto":null,"numero_factura":null,"total_factura":23500,"Bruto":23500,"itbis":0,"descuento":0,"estado":true,"is_adelantada":false,"is_viaje":false,"is_nota":false,"cliente_id":7,"detalle_facturas_attributes":[{"id":null,"articulo_id":209,"descuento_valor":0,"cantidad_en_unidades":2500,"calcular_saco":true,"cantidad":100,"total":23500,"descuento_porciento":0,"itbis":0,"unidad":"Saco de 25 libras","precio":235,"retirado":2500,"retirado_en_venta":2500}],"FACTURA_DE":13,"tipo":"venta","user_id":1,"tiene_nota":false,"vendedor_id":2,"action":"new"}
+
   initCambioMenu(arg) {
     if (arg.bool) {
       if (this.checkIfFacturaIniciada()) {
         let obj;
+        let abrirModal = false;
+        let factura_id;
         this.layServ.nextDecisionCambioMenu({ bool: false, ruta: arg.ruta });
         if (this.facturaGuardada) {
-          const factura_id = GLOBAL.duplicarJson(this.facturaGuardada.factura_id);
+          factura_id = GLOBAL.duplicarJson(this.facturaGuardada.factura_id);
+
           delete this.facturaGuardada.factura_id;
           delete this.facturaGuardada.cliente;
           delete this.facturaGuardada.suplidor;
+          delete this.facturaGuardada.tipo_factura;
           const comparar = this.facturaGuardada;
 
-          // this.info_cambio['bool'] = true;
           const factura_a_guardar = this.formarFacturaAGuardar();
-          console.log('comparar --> ', JSON.stringify(comparar));
-          console.log('factura_a_guardar --> ', JSON.stringify(factura_a_guardar));
 
           if (JSON.stringify(comparar) === JSON.stringify(factura_a_guardar)) {
-            this.dbServ.toastWarning('Esta factura esta archivada para poder utilizarla luego.', 'AVISO');
+            this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
           } else {
             obj = { texto_modal: 'Esta factura ya se encuentra archivada desea sobreescribirla.' };
             this.abrirModal('salir_layout', 'dinamico_texto', obj);
+            abrirModal = true;
           }
         } else {
           obj = { texto_modal: 'Estas a punto de salir del modulo de facturación, desea guardar la factura para continuarla luego.' };
+          abrirModal = true;
         }
 
-        this.abrirModal('salir_layout', 'dinamico_texto', obj);
+        if (abrirModal) {
+          this.facturaGuardada['factura_id'] = factura_id;
+
+          this.abrirModal('salir_layout', 'dinamico_texto', obj);
+        } else {
+          this.info_cambio['bool'] = true;
+          this.layServ.nextDecisionCambioMenu(this.info_cambio);
+        }
       } else {
         this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta });
       }
@@ -399,6 +412,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
 
     this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
+    await this.calcularPorcientoComprobante();
 
     if (res.is_viaje) {
       this.fecha_viaje = new Date(res.fecha_viaje);
@@ -849,25 +863,41 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     return factura_a_guardar;
   }
 
+  reemplazarFactura(facturas_localStorage) {
+    const index = _.findIndex(facturas_localStorage, (facts: any) => facts.factura_id === this.facturaGuardada.factura_id);
+    const factura_sobreescrita = this.formarFacturaAGuardar();
+    factura_sobreescrita['factura_id'] = this.facturaGuardada.factura_id;
+    console.log('factura_sobreescrita  --> ', factura_sobreescrita);
+    console.log('factura anterior  --> ', facturas_localStorage[index]);
+
+    facturas_localStorage[index] = factura_sobreescrita;
+
+    // this.fun.setFacturasGuardadas(facturas_localStorage);
+  }
+
   agregarFacturaALocalStorage() {
     if (!this.propietario_factura) {
       this.propietario_factura = this.form.value;
     }
+    let factura_a_guardar;
     const facturas_localStorage = this.fun.getFacturasguardadas();
-
-    const factura_a_guardar = this.formarFacturaAGuardar();
-
-    if (facturas_localStorage.length > 0) {
-      facturas_localStorage.sort((a, b) => {
-        return a.factura_id > b.factura_id ? 1 : -1;
-      });
-      factura_a_guardar['factura_id'] = (_.last(facturas_localStorage) as any).factura_id + 1;
+    if (this.facturaGuardada) {
+      this.reemplazarFactura(facturas_localStorage);
     } else {
-      factura_a_guardar['factura_id'] = 1;
-    }
+      factura_a_guardar = this.formarFacturaAGuardar();
 
-    facturas_localStorage.push(factura_a_guardar);
-    this.fun.setFacturasGuardadas(facturas_localStorage);
+      if (facturas_localStorage.length > 0) {
+        facturas_localStorage.sort((a, b) => {
+          return a.factura_id > b.factura_id ? 1 : -1;
+        });
+        factura_a_guardar['factura_id'] = (_.last(facturas_localStorage) as any).factura_id + 1;
+      } else {
+        factura_a_guardar['factura_id'] = 1;
+      }
+
+      facturas_localStorage.push(factura_a_guardar);
+      this.fun.setFacturasGuardadas(facturas_localStorage);
+    }
   }
 
   archivarFactura() {
@@ -936,6 +966,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         return articulo;
       });
     }
+
+    console.log('get cuerpo ', this.CuerpoFactura);
   }
 
   resetVariables() {
@@ -1142,6 +1174,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   formarData() {
     const empleado = this.fun.getUser();
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
+    console.log('this.CuerpoFactura --> ', this.CuerpoFactura);
 
     let cuerpo_fact = GLOBAL.duplicarJson(this.CuerpoFactura);
     if (this.metodo === 'venta') {
@@ -1217,7 +1250,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     cabecera_fact['tiene_nota'] = false;
 
     if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
-      cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
+      cabecera_fact['vendedor_id'] = Number(this.propietario_factura.vendedor_id);
     }
     return cabecera_fact;
   }

@@ -80,8 +80,17 @@ export class GLOBAL {
   }
 
   // =========================================================================================================
-  static duplicarJson(json) {
-    return JSON.parse(JSON.stringify(json));
+  static duplicarJson(json, viejo = true) {
+    if (viejo) {
+      return JSON.parse(JSON.stringify(json));
+    } else {
+      if (Array.isArray(json)) {
+        return _.cloneDeep(json);
+      } else {
+        const target = typeof json === 'object' ? {} : '';
+        return Object.assign(target, json);
+      }
+    }
   }
   // =========================================================================================================
 

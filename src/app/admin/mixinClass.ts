@@ -78,28 +78,28 @@ export class mixinClass extends modalClass {
   logBlue(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #5580da');
     if (body) {
-      console.log(body);
+      console.log(GLOBAL.duplicarJson(body));
     }
   }
 
   logYellow(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #dada55');
     if (body) {
-      console.log(body);
+      console.log(GLOBAL.duplicarJson(body));
     }
   }
 
   logRed(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #da555f');
     if (body) {
-      console.log(body);
+      console.log(GLOBAL.duplicarJson(body));
     }
   }
 
   logGreen(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #55da56');
     if (body) {
-      console.log(body);
+      console.log(GLOBAL.duplicarJson(body));
     }
   }
 }

@@ -271,6 +271,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
               nombre: `${suplidor.nombre} ${suplidor.apellido}`,
               direccion: `${suplidor.direccion}`,
               telefono: `${suplidor.telefono}`,
+              limite_credito: `${suplidor.limite_credito}`,
               id: suplidor.id,
             };
           }
@@ -281,6 +282,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
                 nombre: `${cliente.nombre} ${cliente.apellido}`,
                 direccion: `${cliente.direccion}`,
                 telefono: `${cliente.telefono}`,
+                limite_credito: `${cliente.limite_credito}`,
+                vendedor_id: `${Number(cliente.vendedor_id)}`,
                 id: cliente.id,
               };
             } catch (error) {}
@@ -290,7 +293,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
           return a.factura_id > b.factura_id ? 1 : -1;
         });
       }
-      console.log('facturas_localStorage --> ', this.facturas_localStorage);
     }, 20);
   }
   // =================================================================================

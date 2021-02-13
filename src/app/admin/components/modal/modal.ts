@@ -1,4 +1,5 @@
 import { Subscription } from 'rxjs';
+import { GLOBAL } from '../../../core/services/GLOBAL';
 
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutClass } from '../../layout/layout';
@@ -21,6 +22,7 @@ export class modalClass extends LayoutClass {
   tipoModal: string;
 
   _lista = [];
+  copySeleccion: any;
 
   constructor(public mServ: ModalService, public _ipc: IpcService, public layServ?: LayoutService) {
     super(layServ);

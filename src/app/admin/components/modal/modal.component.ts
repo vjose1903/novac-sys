@@ -3,8 +3,9 @@ import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { TablasService } from '../tablas/tablas.service';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+
 import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
+import { GLOBAL } from '../../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-modal',
