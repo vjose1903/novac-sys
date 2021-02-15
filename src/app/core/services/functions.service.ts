@@ -56,4 +56,20 @@ export class FunctionService {
 
     // this.router.navigateByUrl('/auth/login');
   }
+
+  logBlue(text: any, body?) {
+    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body ? body : '');
+  }
+
+  logYellow(text: any, body?) {
+    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body ? body : '');
+  }
+
+  logRed(text: any, body?) {
+    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body ? body : '');
+  }
+
+  logGreen(text: any, body?) {
+    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body ? body : '');
+  }
 }

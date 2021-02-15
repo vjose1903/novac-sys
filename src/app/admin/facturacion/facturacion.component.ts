@@ -195,7 +195,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     if (this.metodo === 'venta') {
       this.form.patchValue({
-        id: 1,
+        id: null,
         nombre: 'Cliente contado',
         direccion: 'Autopista duarte KM 0 el Higuero',
         telefono: null,
@@ -233,16 +233,61 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  rellenarFacturaGuardada() {
+  rellenarFacturaGuardada(callback = (arg) => {}) {
+    let factura_id;
+    let obj;
+    let abrirModal = false;
+
+    if (this.checkIfFacturaIniciada()) {
+      if (this.facturaGuardada) {
+        factura_id = GLOBAL.duplicarJson(this.facturaGuardada.factura_id);
+        const son_iguales = this.compararFacturaGuardada();
+
+        if (!son_iguales) {
+          obj = { texto_modal: 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?' };
+          abrirModal = true;
+        }
+      } else {
+        obj = { texto_modal: '¿Desea archivar la factura que esta en proceso?' };
+        abrirModal = true;
+      }
+      if (abrirModal) {
+        this.abrirModal('desplegar_factura', 'dinamico_texto', obj);
+      }
+    } else {
+      this.procesoRelleno();
+    }
+    callback(true);
+  }
+
+  procesoRelleno() {
     try {
       this.rellenarCampos(null, 'fact_guardada', this.facturaGuardada);
-      this.cuerpo.llenarFactura(this.facturaGuardada['detalle_facturas_attributes'], true);
-      this.getCuerpoFactura(this.facturaGuardada['detalle_facturas_attributes'], true);
+      this.cuerpo.llenarFactura(this.facturaGuardada['detalle_facturas_attributes'], true, (res) => {
+        setTimeout(() => {
+          this.getCuerpoFactura(this.facturaGuardada['detalle_facturas_attributes'], true);
+        }, 250);
+      });
     } catch (error) {}
   }
 
-  // factura_a_guardar -->  {"condicion":"Crédito","forma_pago":"Efectivo","fecha_viaje":null,"fecha_equivalente":null,"fecha_vencimiento":"15/03/2021","pagada":false,"balance":23500,"devuelta":0,"fecha_valida":"30/12/2022","tipo_factura_id":2,"numero_comprobante":null,"costoYgasto":null,"numero_factura":null,"total_factura":23500,"Bruto":23500,"itbis":0,"descuento":0,"estado":true,"is_adelantada":false,"is_viaje":false,"is_nota":false,"cliente_id":7,"detalle_facturas_attributes":[{"id":null,"articulo_id":209,"descuento_valor":0,"cantidad_en_unidades":2500,"calcular_saco":true,"cantidad":100,"total":23500,"descuento_porciento":0,"itbis":0,"unidad":"Saco de 25 libras","precio":235,"retirado":2500,"retirado_en_venta":2500}],"FACTURA_DE":13,"tipo":"venta","user_id":1,"tiene_nota":false,"vendedor_id":"2","action":"new"}
-  // comparar -->           {"condicion":"Crédito","forma_pago":"Efectivo","fecha_viaje":null,"fecha_equivalente":null,"fecha_vencimiento":"15/03/2021","pagada":false,"balance":23500,"devuelta":0,"fecha_valida":"30/12/2022","tipo_factura_id":2,"numero_comprobante":null,"costoYgasto":null,"numero_factura":null,"total_factura":23500,"Bruto":23500,"itbis":0,"descuento":0,"estado":true,"is_adelantada":false,"is_viaje":false,"is_nota":false,"cliente_id":7,"detalle_facturas_attributes":[{"id":null,"articulo_id":209,"descuento_valor":0,"cantidad_en_unidades":2500,"calcular_saco":true,"cantidad":100,"total":23500,"descuento_porciento":0,"itbis":0,"unidad":"Saco de 25 libras","precio":235,"retirado":2500,"retirado_en_venta":2500}],"FACTURA_DE":13,"tipo":"venta","user_id":1,"tiene_nota":false,"vendedor_id":2,"action":"new"}
+  compararFacturaGuardada() {
+    delete this.facturaGuardada.factura_id;
+    delete this.facturaGuardada.cliente;
+    delete this.facturaGuardada.suplidor;
+    delete this.facturaGuardada.tipo_factura;
+
+    const comparar = this.facturaGuardada;
+
+    const factura_a_guardar = this.formarFacturaAGuardar();
+
+    if (JSON.stringify(comparar) === JSON.stringify(factura_a_guardar)) {
+      this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   initCambioMenu(arg) {
     if (arg.bool) {
@@ -254,29 +299,19 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         if (this.facturaGuardada) {
           factura_id = GLOBAL.duplicarJson(this.facturaGuardada.factura_id);
 
-          delete this.facturaGuardada.factura_id;
-          delete this.facturaGuardada.cliente;
-          delete this.facturaGuardada.suplidor;
-          delete this.facturaGuardada.tipo_factura;
-          const comparar = this.facturaGuardada;
+          const son_iguales = this.compararFacturaGuardada();
 
-          const factura_a_guardar = this.formarFacturaAGuardar();
-
-          if (JSON.stringify(comparar) === JSON.stringify(factura_a_guardar)) {
-            this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
-          } else {
-            obj = { texto_modal: 'Esta factura ya se encuentra archivada desea sobreescribirla.' };
-            this.abrirModal('salir_layout', 'dinamico_texto', obj);
+          if (!son_iguales) {
+            obj = { texto_modal: 'Esta factura ya se encuentra archivada ¿desea sobreescribirla?' };
             abrirModal = true;
           }
         } else {
-          obj = { texto_modal: 'Estas a punto de salir del modulo de facturación, desea guardar la factura para continuarla luego.' };
+          obj = { texto_modal: 'Estas a punto de salir del modulo de facturación, ¿desea guardar la factura para continuarla luego?' };
           abrirModal = true;
         }
 
         if (abrirModal) {
           this.facturaGuardada['factura_id'] = factura_id;
-
           this.abrirModal('salir_layout', 'dinamico_texto', obj);
         } else {
           this.info_cambio['bool'] = true;
@@ -378,6 +413,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (arg.cliente) this.propietario_factura['id'] = arg.cliente_id;
       else {
         arg['cliente'] = {
+          id: null,
           direccion: arg['NoCliente_direccion'],
           nombre: arg['NoCliente_nombre'],
           telefono: '',
@@ -395,7 +431,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   async rellenarCampos(id, tipo?, fact?) {
     let res;
     this.propietario_factura = {};
-    console.log('fact --> ', fact);
 
     if (tipo === 'editar') {
       res = await this.dbServ.getFacturaById(id).toPromise();
@@ -846,6 +881,12 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
       this.info_cambio['bool'] = true;
       this.layServ.nextDecisionCambioMenu(this.info_cambio);
+    } else if (this.tipoModal === 'desplegar_factura') {
+      if (arg) {
+        this.agregarFacturaALocalStorage();
+      }
+
+      this.procesoRelleno();
     } else if (this.tipoModal === 'archivar_factura') {
       if (arg) {
         this.agregarFacturaALocalStorage();
@@ -867,12 +908,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     const index = _.findIndex(facturas_localStorage, (facts: any) => facts.factura_id === this.facturaGuardada.factura_id);
     const factura_sobreescrita = this.formarFacturaAGuardar();
     factura_sobreescrita['factura_id'] = this.facturaGuardada.factura_id;
-    console.log('factura_sobreescrita  --> ', factura_sobreescrita);
-    console.log('factura anterior  --> ', facturas_localStorage[index]);
-
     facturas_localStorage[index] = factura_sobreescrita;
 
-    // this.fun.setFacturasGuardadas(facturas_localStorage);
+    this.fun.setFacturasGuardadas(facturas_localStorage);
   }
 
   agregarFacturaALocalStorage() {
@@ -909,7 +947,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       }
 
       if (is_guardada === -1) {
-        const obj = { texto_modal: 'Seguro que desea archivar esta factura para continuarla luego.' };
+        const obj = { texto_modal: '¿Seguro que desea archivar esta factura para continuarla luego?' };
         this.abrirModal('archivar_factura', 'dinamico_texto', obj);
       }
     } else {
@@ -966,8 +1004,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         return articulo;
       });
     }
-
-    console.log('get cuerpo ', this.CuerpoFactura);
   }
 
   resetVariables() {
@@ -1174,7 +1210,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   formarData() {
     const empleado = this.fun.getUser();
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
-    console.log('this.CuerpoFactura --> ', this.CuerpoFactura);
 
     let cuerpo_fact = GLOBAL.duplicarJson(this.CuerpoFactura);
     if (this.metodo === 'venta') {
@@ -1232,7 +1267,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     cabecera_fact['is_nota'] = false;
 
     if (this.metodo === 'venta') {
-      if (this.propietario_factura && this.propietario_factura.id === 1) {
+      if (this.propietario_factura && this.propietario_factura.id === null) {
         cabecera_fact['cliente_id'] = null;
         cabecera_fact['NoCliente_nombre'] = this.form.controls.nombre.value;
         cabecera_fact['NoCliente_direccion'] = this.form.controls.direccion.value;

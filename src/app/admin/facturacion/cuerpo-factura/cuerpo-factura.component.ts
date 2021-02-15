@@ -8,6 +8,7 @@ import { ModalService } from '../../components/modal/modal.service';
 import { mixinClass } from '../../mixinClass';
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutService } from '../../layout/layout.service';
+import { FunctionService } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -65,6 +66,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     private fb: FormBuilder,
     public _ipc: IpcService,
     public layServ: LayoutService,
+    public fun: FunctionService,
   ) {
     super(mServ, _ipc, layServ);
     // this.rowFactura = new FormArray([new FormControl()]);
@@ -103,38 +105,45 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         this.noArticuloEncontrado(res);
       }
     });
+  }
 
+  escucharCambiosEnForm() {
     this.form.valueChanges.subscribe((res) => {
-      const detalle_factura = [];
       if (res !== undefined && res !== null) {
-        res.rowFactura.forEach((fila) => {
-          if (fila !== undefined) {
-            fila.articulo_id = fila.articulo_id;
-            fila.cantidad = fila.can;
-            fila.total = GLOBAL.desformatear(fila.tot);
-            fila.descuento_valor = fila.descuento_valor ? (fila.descuento_valor !== null ? fila.descuento_valor : 0) : 0;
-            fila.descuento_porciento = fila.descuento_porciento ? (fila.descuento_porciento !== null ? fila.descuento_porciento : 0) : 0;
-            fila.itbis = 0;
-            fila.calcular_saco = fila.calcular_saco;
-            fila.unidad = fila.uni;
-            fila.precio = GLOBAL.desformatear(fila.pre);
-            fila.costo = GLOBAL.desformatear(fila.costo);
-            let obj;
-            if (this.metodo === 'venta') {
-              obj = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'tot', 'costo', 'secuencia', 'verificado']);
-            } else {
-              obj = _.omit(fila, ['can', 'des', 'uni', 'tot', 'secuencia', 'verificado']);
-            }
-
-            if (fila.cantidad && fila.unidad) {
-              detalle_factura.push(JSON.parse(JSON.stringify(obj)));
-            }
-          }
-        });
-
-        this.getCuerpoFactura.emit(JSON.stringify(detalle_factura));
+        this.emitirCambiosForm(res);
       }
     });
+  }
+
+  arreglarCuerpo() {}
+
+  emitirCambiosForm(res) {
+    const detalle_factura = [];
+    res.rowFactura.forEach((fila) => {
+      if (fila !== undefined) {
+        fila.articulo_id = fila.articulo_id;
+        fila.cantidad = fila.can;
+        fila.total = GLOBAL.desformatear(fila.tot);
+        fila.descuento_valor = fila.descuento_valor ? (fila.descuento_valor !== null ? fila.descuento_valor : 0) : 0;
+        fila.descuento_porciento = fila.descuento_porciento ? (fila.descuento_porciento !== null ? fila.descuento_porciento : 0) : 0;
+        fila.itbis = 0;
+        fila.calcular_saco = fila.calcular_saco;
+        fila.unidad = fila.uni;
+        fila.precio = GLOBAL.desformatear(fila.pre);
+        fila.costo = GLOBAL.desformatear(fila.costo);
+        let obj;
+        if (this.metodo === 'venta') {
+          obj = _.omit(fila, ['cod', 'can', 'des', 'uni', 'pre', 'tot', 'costo', 'secuencia', 'verificado']);
+        } else {
+          obj = _.omit(fila, ['can', 'des', 'uni', 'tot', 'secuencia', 'verificado']);
+        }
+
+        if (fila.cantidad && fila.unidad) {
+          detalle_factura.push(JSON.parse(JSON.stringify(obj)));
+        }
+      }
+    });
+    this.getCuerpoFactura.emit(JSON.stringify(detalle_factura));
   }
 
   async rellenarVariables(callback = (arg) => {}) {
@@ -160,6 +169,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
+
     this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
     for (let index = 1; index <= 22; index++) {
       await this.addItem(index);
@@ -168,6 +178,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     setTimeout(async () => {
       this.control = this.form.controls['rowFactura'] as FormArray;
       callback(true);
+
+      this.escucharCambiosEnForm();
     }, 250);
   }
 
@@ -176,8 +188,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   ngOnChanges(simpleChanges) {
-    console.log('simpleChanges --> ', simpleChanges);
-
     if (simpleChanges.factura && simpleChanges.factura.currentValue && this.action === 'update' && _.hasIn(this.factura, 'id')) {
       this.llenarFactura(this.factura.detalle_facturas);
     }
@@ -395,20 +405,12 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   // =============================================
   //  MODIFICAR FACTURA
   // =============================================
-  async llenarFactura(rows, is_guardada?) {
+  async llenarFactura(rows, is_guardada?, callback = (arg) => {}) {
     this.rellenarVariables(async (res) => {
-      this.logRed(`RESPUESTA DEL RELLENO --> ${res}`);
-
       if (res) {
-        this.logRed('Llenando las filas del cuerpo de la factura');
-        console.log('rows --> ', rows);
-        this.logRed('--------------------------------------------');
-
         for (let j = 0; j < rows.length; j++) {
           const row = rows[j];
           let articulo;
-          console.log('row --> ', row);
-          console.log('this.control.controls[j] as any) --> ', this.control.controls[j] as any);
 
           try {
             if (is_guardada) {
@@ -469,6 +471,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             this.aumentarSecuencia();
           } catch (error) {}
         }
+        callback(true);
+      } else {
+        callback(false);
       }
     });
   }

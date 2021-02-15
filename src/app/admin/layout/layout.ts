@@ -33,8 +33,12 @@ export class LayoutClass extends myElectron {
       if (this.url_actual === 'factura') {
         this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((res) => {
           if (res) {
-            this.facturaGuardada = res;
-            this.rellenarFacturaGuardada();
+            this.rellenarFacturaGuardada((res) => {
+              if (res) {
+                this.facturaGuardada = res;
+              }
+            });
+
             this.layServ.nextFacturaGuardada(undefined);
           }
         });
@@ -42,16 +46,16 @@ export class LayoutClass extends myElectron {
     }
   }
 
-  rellenarFacturaGuardada() {}
+  rellenarFacturaGuardada(callback = (arg) => {}) {}
   initCambioMenu(arg) {}
 
   decisionCambioMenu() {}
 
   _destroy_layout() {
     if (this.subInit) {
-      this.subInit.unsubscribe();
+      if (this.subInit) this.subInit.unsubscribe();
 
-      if (this.url_actual === 'factura') this.subFactG.unsubscribe();
+      if (this.url_actual === 'factura' && this.subFactG) this.subFactG.unsubscribe();
     }
   }
 
