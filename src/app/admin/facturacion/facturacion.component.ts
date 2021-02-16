@@ -239,9 +239,14 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     let abrirModal = false;
 
     if (this.checkIfFacturaIniciada()) {
+      this.fun.logGreen('CALLBACK PARA SETEAR LA FACTURA GUARDADA');
+      callback(true);
+      this.fun.logGreen('DESPUES DEL CALLBACK');
+      this.fun.logRed('this.facturaGuardada ---> ', this.facturaGuardada);
       if (this.facturaGuardada) {
         factura_id = GLOBAL.duplicarJson(this.facturaGuardada.factura_id);
         const son_iguales = this.compararFacturaGuardada();
+        console.log('son_iguales --> ', son_iguales);
 
         if (!son_iguales) {
           obj = { texto_modal: 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?' };
@@ -251,6 +256,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         obj = { texto_modal: '¿Desea archivar la factura que esta en proceso?' };
         abrirModal = true;
       }
+      this.fun.logBlue('abrirModal --> ', abrirModal);
       if (abrirModal) {
         this.abrirModal('desplegar_factura', 'dinamico_texto', obj);
       }
@@ -262,10 +268,13 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   procesoRelleno() {
     try {
+      console.log('this.facturaGuardada --> ', this.facturaGuardada);
+
       this.rellenarCampos(null, 'fact_guardada', this.facturaGuardada);
       this.cuerpo.llenarFactura(this.facturaGuardada['detalle_facturas_attributes'], true, (res) => {
         setTimeout(() => {
           this.getCuerpoFactura(this.facturaGuardada['detalle_facturas_attributes'], true);
+          this.layServ.nextRefresh(true);
         }, 250);
       });
     } catch (error) {}
@@ -373,12 +382,12 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         }
 
         this.CuerpoFactura = this.newCuerpo;
-        this.revisarLocalStorage();
+        // this.revisarLocalStorage();
         this.enviarABaseDatos();
 
         this.mServ.ModalObj(undefined);
       } else {
-        this.revisarLocalStorage();
+        // this.revisarLocalStorage();
         this.enviarABaseDatos();
         this.mServ.ModalObj(undefined);
       }
@@ -409,6 +418,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   setPropietario(arg) {
+    console.log('----- setPropietario -----');
+    console.log('arg ==> ', arg);
+
     if (arg.tipo === 'venta') {
       if (arg.cliente) this.propietario_factura['id'] = arg.cliente_id;
       else {
@@ -882,17 +894,19 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.info_cambio['bool'] = true;
       this.layServ.nextDecisionCambioMenu(this.info_cambio);
     } else if (this.tipoModal === 'desplegar_factura') {
+      this.fun.logYellow('arg ---> ', arg);
       if (arg) {
         this.agregarFacturaALocalStorage();
       }
-
-      this.procesoRelleno();
+      setTimeout(() => {
+        this.procesoRelleno();
+      }, 250);
     } else if (this.tipoModal === 'archivar_factura') {
       if (arg) {
         this.agregarFacturaALocalStorage();
         setTimeout(() => {
-          this.resetVariables();
           this.layServ.nextRefresh(true);
+          this.resetVariables();
         }, 250);
       }
     }
@@ -904,38 +918,54 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     return factura_a_guardar;
   }
 
-  reemplazarFactura(facturas_localStorage) {
+  reemplazarFactura() {
+    const facturas_localStorage = this.fun.getFacturasguardadas();
     const index = _.findIndex(facturas_localStorage, (facts: any) => facts.factura_id === this.facturaGuardada.factura_id);
     const factura_sobreescrita = this.formarFacturaAGuardar();
-    factura_sobreescrita['factura_id'] = this.facturaGuardada.factura_id;
-    facturas_localStorage[index] = factura_sobreescrita;
 
-    this.fun.setFacturasGuardadas(facturas_localStorage);
+    if (index !== -1) {
+      factura_sobreescrita['factura_id'] = this.facturaGuardada.factura_id;
+      facturas_localStorage[index] = factura_sobreescrita;
+      this.fun.setFacturasGuardadas(facturas_localStorage);
+    } else {
+      this.pushFacturaToLocalStorage();
+    }
   }
 
   agregarFacturaALocalStorage() {
+    this.fun.logRed('propietario_factura ---> ', this.propietario_factura);
     if (!this.propietario_factura) {
       this.propietario_factura = this.form.value;
     }
-    let factura_a_guardar;
-    const facturas_localStorage = this.fun.getFacturasguardadas();
+
     if (this.facturaGuardada) {
-      this.reemplazarFactura(facturas_localStorage);
+      this.reemplazarFactura();
     } else {
-      factura_a_guardar = this.formarFacturaAGuardar();
-
-      if (facturas_localStorage.length > 0) {
-        facturas_localStorage.sort((a, b) => {
-          return a.factura_id > b.factura_id ? 1 : -1;
-        });
-        factura_a_guardar['factura_id'] = (_.last(facturas_localStorage) as any).factura_id + 1;
-      } else {
-        factura_a_guardar['factura_id'] = 1;
-      }
-
-      facturas_localStorage.push(factura_a_guardar);
-      this.fun.setFacturasGuardadas(facturas_localStorage);
+      this.pushFacturaToLocalStorage();
     }
+  }
+
+  pushFacturaToLocalStorage() {
+    const facturas_localStorage = this.fun.getFacturasguardadas();
+    const factura_a_guardar = this.formarFacturaAGuardar();
+
+    if (facturas_localStorage.length > 0) {
+      facturas_localStorage.sort((a, b) => {
+        return a.factura_id > b.factura_id ? 1 : -1;
+      });
+      factura_a_guardar['factura_id'] = (_.last(facturas_localStorage) as any).factura_id + 1;
+    } else {
+      factura_a_guardar['factura_id'] = 1;
+    }
+
+    this.fun.logBlue('ANTES facturas_localStorage --> ', facturas_localStorage);
+    this.fun.logRed('factura_a_guardar --> ', factura_a_guardar);
+    facturas_localStorage.push(factura_a_guardar);
+    this.fun.logGreen('DESPUES facturas_localStorage --> ', facturas_localStorage);
+    this.fun.logYellow('-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-');
+    this.fun.logYellow(' SETEANDO FACTURA EN LOCALSTORAGE');
+    this.fun.logYellow('-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-');
+    this.fun.setFacturasGuardadas(facturas_localStorage);
   }
 
   archivarFactura() {
@@ -1007,8 +1037,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   resetVariables() {
-    this.rellenarVariables();
     this.cuerpo.RESETCUERPO();
+    this.rellenarVariables();
   }
 
   calculatePrice(costo): number {
@@ -1319,8 +1349,13 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (this.metodo === 'venta') {
         this._ipc.send('print', obj);
       }
+      console.log('this.facturaGuardada --> ', this.facturaGuardada);
 
-      this.revisarLocalStorage();
+      if (this.facturaGuardada) {
+        this.revisarLocalStorage();
+      }
+
+      console.log('venta');
 
       await this.resetVariables();
     } catch (error) {

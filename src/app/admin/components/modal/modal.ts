@@ -147,11 +147,11 @@ export class modalClass extends LayoutClass {
       this.subInde.unsubscribe();
     }
 
-    if (this._lista.includes('refreshFacturas')) {
+    if (this._lista.includes('refreshFacturas') && this.subRefresh) {
       this.subRefresh.unsubscribe();
     }
 
-    if (this._lista.includes('sacarFacturas')) {
+    if (this._lista.includes('sacarFacturas') && this.subSacar) {
       this.subSacar.unsubscribe();
     }
 

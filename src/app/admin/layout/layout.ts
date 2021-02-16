@@ -31,11 +31,13 @@ export class LayoutClass extends myElectron {
       this.url_actual = temp_url[1].split('/')[0];
 
       if (this.url_actual === 'factura') {
-        this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((res) => {
-          if (res) {
+        this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((fact) => {
+          if (fact) {
             this.rellenarFacturaGuardada((res) => {
               if (res) {
-                this.facturaGuardada = res;
+                console.log('llenando la facturaGuardada');
+
+                this.facturaGuardada = fact;
               }
             });
 
