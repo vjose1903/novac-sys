@@ -31,7 +31,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   articuloEnTurnoid = null;
   medidaEnTurno = null;
 
-  @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
+  @ViewChild(TablasComponent) tablas: TablasComponent;
   // =============================================
   //  TABLAS
   // =============================================
@@ -173,9 +173,9 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._destroy_mixin();
-    this.sub.unsubscribe();
-    this.subDeci.unsubscribe();
-    this._ipc.removeListener('printRes');
+    if (this.sub) this.sub.unsubscribe();
+    if (this.subDeci) this.subDeci.unsubscribe();
+    if (this._ipc) this._ipc.removeListener('printRes');
   }
 
   formatoNumero(num) {

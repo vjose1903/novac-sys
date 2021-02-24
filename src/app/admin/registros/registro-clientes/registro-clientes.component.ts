@@ -106,7 +106,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
 
   ngOnDestroy() {
     this._destroy_mixin();
-    this.subDeci.unsubscribe();
+    if (this.subDeci) this.subDeci.unsubscribe();
   }
 
   necesarioStart() {

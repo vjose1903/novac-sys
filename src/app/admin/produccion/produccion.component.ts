@@ -20,7 +20,7 @@ import { mixinClass } from '../mixinClass';
   styleUrls: ['./produccion.component.scss'],
 })
 export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy {
-  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
+  @ViewChild('cardTabla') cardTabla: ElementRef;
 
   // listaArticulos: any;
   articulo_id = '-1' as any;

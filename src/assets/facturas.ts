@@ -447,6 +447,7 @@ export const recibo_de_ingreso = {
   },
   tipo_recibo: null,
 };
+
 export const venta_contado_consumo = {
   id: 159,
   tipo_factura_id: 3,
@@ -1658,5 +1659,322 @@ export const conduce = {
     //   cantidad_en_unidades: 125,
     //   id: 14,
     // },
+  ],
+};
+
+export const ventas_productos_rango = {
+  titulo_reporte: 'Reporte de ventas por producto',
+  tipo_reporte: 'ventas_prod',
+  fecha: '19/02/2021 - 10:24',
+  realizado_por: 'Mari Santos',
+  mostrar_total: true,
+  total: 289975.0,
+  mostrar_sub_titulo: true,
+  sub_titulo: 'Fecha: 10/12/2020',
+  tipo_tabla: 'agrupado',
+  contenido_reporte: [
+    {
+      titulo_grupo: 'Materia prima',
+      contenido: [
+        {
+          id: 165,
+          cantidad_en_unidades: 200,
+          nombre: 'AFRECHO DE ARROZ ',
+          total_vendido: 1230.0,
+          contenido: {
+            Saco: 125,
+            Libra: 1,
+          },
+          medida_mostrar: '1.60 Sacos',
+        },
+        {
+          id: 214,
+          cantidad_en_unidades: 100,
+          nombre: 'Calcio ',
+          total_vendido: 140.0,
+          contenido: {
+            Saco: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '1.00 Saco',
+        },
+        {
+          id: 98,
+          cantidad_en_unidades: 100,
+          nombre: 'Grasa Amarilla ',
+          total_vendido: 2125.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '1.00 Quintal',
+        },
+        {
+          id: 208,
+          cantidad_en_unidades: 3600,
+          nombre: 'Harina de Soya  (Sin saco)',
+          total_vendido: 52560.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '36.00 Quintales',
+        },
+        {
+          id: 69,
+          cantidad_en_unidades: 100,
+          nombre: 'MAGRO CRECIMIENTO',
+          total_vendido: 1350.0,
+          contenido: {
+            Saco: 40,
+            Libra: 1,
+          },
+          medida_mostrar: '2.50 Sacos',
+        },
+        {
+          id: 209,
+          cantidad_en_unidades: 5100,
+          nombre: 'Maiz Entero  (Sin saco)',
+          total_vendido: 36210.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '51.00 Quintales',
+        },
+        {
+          id: 108,
+          cantidad_en_unidades: 44,
+          nombre: 'NUCLEO MARRANO ENG. CON FITASA',
+          total_vendido: 750.0,
+          contenido: {
+            Saco: 44,
+            Libra: 1,
+          },
+          medida_mostrar: '1.00 Saco',
+        },
+        {
+          id: 166,
+          cantidad_en_unidades: 1800,
+          nombre: 'TRIGO (Sin saco)',
+          total_vendido: 11040.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '18.00 Quintales',
+        },
+      ],
+      total_grupo: 105405.0,
+    },
+    {
+      titulo_grupo: 'Otros',
+      contenido: [
+        {
+          id: 233,
+          cantidad_en_unidades: 100,
+          nombre: 'Mano de Obra ',
+          total_vendido: 4000.0,
+          contenido: {
+            Unidad: 1,
+          },
+          medida_mostrar: '100.00 Unidades',
+        },
+        {
+          id: 235,
+          cantidad_en_unidades: 101,
+          nombre: 'Transporte ',
+          total_vendido: 3300.0,
+          contenido: {
+            Unidad: 1,
+          },
+          medida_mostrar: '101.00 Unidades',
+        },
+      ],
+      total_grupo: 7300.0,
+    },
+    {
+      titulo_grupo: 'Producto terminado',
+      contenido: [
+        {
+          id: 212,
+          cantidad_en_unidades: 200,
+          nombre: 'Crecimiento Plus  (Sin saco)',
+          total_vendido: 2180.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '2.00 Quintales',
+        },
+        {
+          id: 218,
+          cantidad_en_unidades: 600,
+          nombre: 'Crecimiento Superior (Sin saco)',
+          total_vendido: 6120.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '6.00 Quintales',
+        },
+        {
+          id: 219,
+          cantidad_en_unidades: 700,
+          nombre: 'Crecimiento de Pollo  (Sin saco)',
+          total_vendido: 7910.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '7.00 Quintales',
+        },
+        {
+          id: 215,
+          cantidad_en_unidades: 1200,
+          nombre: 'Engorde Plus  (Sin saco)',
+          total_vendido: 12420.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '12.00 Quintales',
+        },
+        {
+          id: 217,
+          cantidad_en_unidades: 1300,
+          nombre: 'Engorde Superior (Sin saco)',
+          total_vendido: 12350.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '13.00 Quintales',
+        },
+        {
+          id: 216,
+          cantidad_en_unidades: 900,
+          nombre: 'Fase 3 Plus (Sin saco)',
+          total_vendido: 10350.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '9.00 Quintales',
+        },
+        {
+          id: 210,
+          cantidad_en_unidades: 5110,
+          nombre: 'Maiz Casqueado  (Sin saco)',
+          total_vendido: 38325.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '51.10 Quintales',
+        },
+        {
+          id: 211,
+          cantidad_en_unidades: 11050,
+          nombre: 'Maiz Molido  (Sin saco)',
+          total_vendido: 80665.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '110.50 Quintales',
+        },
+        {
+          id: 231,
+          cantidad_en_unidades: 400,
+          nombre: 'PREÑADA PLUS (Sin saco)',
+          total_vendido: 3680.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '4.00 Quintales',
+        },
+        {
+          id: 230,
+          cantidad_en_unidades: 100,
+          nombre: 'Parida Plus  (Sin saco)',
+          total_vendido: 1250.0,
+          contenido: {
+            Quintal: 100,
+            Libra: 1,
+          },
+          medida_mostrar: '1.00 Quintal',
+        },
+      ],
+      total_grupo: 175250.0,
+    },
+    {
+      titulo_grupo: 'Veterinaria',
+      contenido: [
+        {
+          id: 45,
+          cantidad_en_unidades: 2,
+          nombre: 'CURAMIC AG PLATA 220 ML',
+          total_vendido: 420.0,
+          contenido: {
+            Unidad: 1,
+          },
+          medida_mostrar: '2.00 Unidades',
+        },
+        {
+          id: 41,
+          cantidad_en_unidades: 2,
+          nombre: 'DIARRELAB (SUSPENSION ORAL) 100ML',
+          total_vendido: 470.0,
+          contenido: {
+            Unidad: 1,
+          },
+          medida_mostrar: '2.00 Unidades',
+        },
+        {
+          id: 26,
+          cantidad_en_unidades: 11,
+          nombre: 'INGASO MASTER (FI) 25 KG',
+          total_vendido: 660.0,
+          contenido: {
+            Saco: 55,
+            Libra: 1,
+          },
+          medida_mostrar: '11.00 Libras',
+        },
+        {
+          id: 86,
+          cantidad_en_unidades: 1,
+          nombre: 'RENAVIT 25 ML',
+          total_vendido: 80.0,
+          contenido: {
+            Unidad: 1,
+          },
+          medida_mostrar: '1.00 Unidad',
+        },
+        {
+          id: 88,
+          cantidad_en_unidades: 6,
+          nombre: 'Vitamina B+K (100G)',
+          total_vendido: 150.0,
+          contenido: {
+            Unidad: 1,
+          },
+          medida_mostrar: '6.00 Unidades',
+        },
+        {
+          id: 89,
+          cantidad_en_unidades: 8,
+          nombre: 'Vitamina E+Selenio ',
+          total_vendido: 240.0,
+          contenido: {
+            Unidad: 1,
+          },
+          medida_mostrar: '8.00 Unidades',
+        },
+      ],
+      total_grupo: 2020.0,
+    },
   ],
 };

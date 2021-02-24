@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.numFormatTwoDecimals = exports.formatearNumero = exports.redondearAdos = exports.my_houreFormater = exports.my_dateFormater = exports.my_stringJoin = exports.my_stringSplit = exports.my_padStart = exports.my_capitalize = void 0;
 // =========================================================================================================
 function my_capitalize(str) {
     var ultimoCaracte = str.length + 1;

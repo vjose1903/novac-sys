@@ -22,7 +22,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   clienteBuscado: any;
   listaClientes: unknown;
   facturaSelected: any;
-  @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
+  @ViewChild(TablasComponent) tablas: TablasComponent;
   BuscarPara: any;
   NCF;
   Para: string;
@@ -205,16 +205,15 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
 
   initCambioMenu(arg) {
     if (arg.bool) {
-
       this.layServ.nextDecisionCambioMenu(arg);
     }
   }
   ngOnDestroy(): void {
     this._destroy_mixin();
-    this.sub.unsubscribe();
-    this.subDeci.unsubscribe();
-    this.subEsc.unsubscribe();
-    this._ipc.removeListener('printRes');
+    if (this.sub) this.sub.unsubscribe();
+    if (this.subDeci) this.subDeci.unsubscribe();
+    if (this.subEsc) this.subEsc.unsubscribe();
+    if (this._ipc) this._ipc.removeListener('printRes');
     this.borrar('salir');
   }
 

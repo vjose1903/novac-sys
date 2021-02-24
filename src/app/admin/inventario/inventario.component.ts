@@ -15,7 +15,7 @@ import { mixinClass } from '../mixinClass';
   styleUrls: ['./inventario.component.scss'],
 })
 export class InventarioComponent extends mixinClass implements OnInit, OnDestroy {
-  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
+  @ViewChild('cardTabla') cardTabla: ElementRef;
   // =============================================
   //  TABLAS
   // =============================================
@@ -142,7 +142,8 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
   ngOnDestroy() {
     this._destroy_mixin();
-    this.subDeci.unsubscribe();
+    if (this.subDeci) this.subDeci.unsubscribe();
+
     this.FechaFactura = undefined;
     this.tServ.obj_paginate = obj_paginate_default;
     this.tServ.Func_total_paginas(1);
@@ -288,13 +289,11 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
   async decisionModal(arg) {
     if (arg.bool) {
-
       if (this.tipoModal === 'visor_pdf') {
         const obj = {
           base64: this.pdfSrc,
           filename: this.fileName,
         };
-
 
         this._ipc.send('printBase64', obj);
         this.resetVariables();

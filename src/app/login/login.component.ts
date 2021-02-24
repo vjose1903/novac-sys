@@ -12,9 +12,12 @@ import {
   nota_credito,
   recibo_de_ingreso,
   venta_contado_consumo,
+  ventas_productos_rango,
   venta_credito_consumo,
 } from '../../assets/facturas';
+
 import { FunctionService } from '../core/services/functions.service';
+import { ModalService } from '../admin/components/modal/modal.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -25,6 +28,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   errorC = '';
   errorU = '';
   versionApp = '';
+  tipo_prueba = 'otro';
 
   constructor(
     private dbServ: DBservice,
@@ -33,6 +37,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private router: Router,
     private fun: FunctionService,
     public _ipc: IpcService,
+    public mServ: ModalService,
   ) {}
 
   ngOnInit() {
@@ -41,6 +46,36 @@ export class LoginComponent implements OnInit, OnDestroy {
       password: null,
     });
     this.searchVersion();
+
+    this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
+      console.log('event--> ', event);
+      console.log('res--> ', res);
+
+      if (this.tipo_prueba !== 'otro') {
+        const obj = {
+          pdfSrc: res.body,
+          titulo: 'PRUEBA REPORTE',
+          height: '83vh',
+          reimprimir: res.reimprimir,
+          fileName: res.file.split('.')[0],
+        };
+        this.abrirModalReporte(obj);
+      }
+
+      if (res.status) {
+      } else {
+        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
+      }
+    });
+  }
+
+  abrirModalReporte(obj) {
+    console.log('obj --> ', obj);
+
+    this.mServ.modalTipo('visor_pdf');
+    this.mServ.ModalSeleccion(obj);
+
+    this.mServ.mostrarModal(true);
   }
 
   ngOnDestroy() {
@@ -99,14 +134,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       type: 'facturacion',
     };
 
+    this.tipo_prueba = obj.type;
     this._ipc.send('print', obj);
-
-    await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      if (res.status) {
-      } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
-      }
-    });
   }
 
   async pruebaRecibo() {
@@ -117,31 +146,34 @@ export class LoginComponent implements OnInit, OnDestroy {
       data: data_,
       type: 'recibo_ingreso',
     };
-    this._ipc.send('print', obj);
 
-    await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      if (res.status) {
-      } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
-      }
-    });
+    this.tipo_prueba = obj.type;
+
+    this._ipc.send('print', obj);
+  }
+
+  async reporteTest() {
+    const data_ = ventas_productos_rango;
+
+    const obj = {
+      data: data_,
+      type: 'reporte',
+    };
+
+    console.log('PREUBA --> ', obj);
+    this.tipo_prueba = obj.type;
+    this._ipc.send('print', obj);
   }
 
   async pruebaConduce() {
     const data_ = conduce;
 
-    // const DD = await this.pdfServ.makeFacturaVenta(data);
     const obj = {
       data: data_,
       type: 'conduce',
     };
-    this._ipc.send('print', obj);
 
-    await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      if (res.status) {
-      } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
-      }
-    });
+    this.tipo_prueba = obj.type;
+    this._ipc.send('print', obj);
   }
 }

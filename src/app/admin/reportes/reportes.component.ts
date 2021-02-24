@@ -100,10 +100,10 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._destroy_mixin();
-    this.subDeci.unsubscribe();
-    this.subObj.unsubscribe();
-    this._ipc.removeListener('printRes');
-    this._ipc.removeListener('printBase64Res');
+    if (this.subDeci) this.subDeci.unsubscribe();
+    if (this.subObj) this.subObj.unsubscribe();
+    if (this._ipc) this._ipc.removeListener('printRes');
+    if (this._ipc) this._ipc.removeListener('printBase64Res');
   }
 
   async makeCuadre() {
@@ -147,7 +147,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         tipo = 'recibos';
         //
       } else if (this.tipoModal === 'ventas_productos') {
-        params = `fecha=${data.fecha}`;
+        params = data.tipo === '1' ? `desde=${data.fecha}` : (params = `desde=${data.fecha}&hasta=${data.hasta}`);
         tipo = 'ventas_productos';
         //
       } else if (this.tipoModal === 'suplidor_prod') {

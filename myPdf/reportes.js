@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeReporte = void 0;
 var fun_ = require("./utils/funciones");
 var files_1 = require("./utils/files");
 var environment_js_1 = require("../src/environments/environment.js");

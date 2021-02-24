@@ -193,9 +193,10 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   ngAfterViewInit() {}
 
   ngOnDestroy() {
-    this.subShow.unsubscribe();
-    this.subTipo.unsubscribe();
-    this.subSelec.unsubscribe();
+    if (this.subShow) this.subShow.unsubscribe();
+    if (this.subTipo) this.subTipo.unsubscribe();
+    if (this.subSelec) this.subSelec.unsubscribe();
+
     // this.subCalcularHeigth.unsubscribe();
     this.reinicioModal();
   }

@@ -114,7 +114,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
   ngOnDestroy() {
     this._destroy_mixin();
-    this.subDeciMenu.unsubscribe();
+    if (this.subDeciMenu) this.subDeciMenu.unsubscribe();
   }
 
   decisionModal(arg) {

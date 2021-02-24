@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ModalSeleccinarArticuloComponent } from './modal-seleccinar-articulo.component';
 
@@ -6,7 +6,7 @@ describe('ModalSeleccinarArticuloComponent', () => {
   let component: ModalSeleccinarArticuloComponent;
   let fixture: ComponentFixture<ModalSeleccinarArticuloComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ModalSeleccinarArticuloComponent ]
     })

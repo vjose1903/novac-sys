@@ -25,7 +25,7 @@ export class PaswordConfirmDirective {
     if (controlToCompare) {
       const subscription: Subscription = controlToCompare.valueChanges.subscribe(() => {
         control.updateValueAndValidity();
-        subscription.unsubscribe();
+        if (subscription) subscription.unsubscribe();
       });
     }
     return controlToCompare && controlToCompare.value !== control.value ? { compares: true } : null;

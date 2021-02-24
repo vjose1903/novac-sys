@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { BTNcircularComponent } from './btncircular.component';
 
@@ -6,7 +6,7 @@ describe('BTNcircularComponent', () => {
   let component: BTNcircularComponent;
   let fixture: ComponentFixture<BTNcircularComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ BTNcircularComponent ]
     })

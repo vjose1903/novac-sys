@@ -24,11 +24,7 @@ export class FormVentasComponent implements OnInit {
     { id: 'todos', label: 'Todos' },
   ];
 
-  tipos = [
-    { id: 'viajes', label: 'Viajes' },
-    { id: 'normal', label: 'Normal' },
-    { id: 'todos', label: 'Todos' },
-  ];
+  tipos;
 
   filtro_articulo;
   listaArticulos = [];
@@ -111,7 +107,10 @@ export class FormVentasComponent implements OnInit {
       this.setValidator('desde');
       this.setValidator('hasta');
     } else if (this.tipo_reporte === 'ventas_productos') {
-      this.form.controls.fecha.setValue(new Date());
+      this.tipos = [
+        { id: '1', label: 'Dia único' },
+        { id: '2', label: 'Rango fechas' },
+      ];
     } else if (this.tipo_reporte === 'suplidor_prod') {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
@@ -119,6 +118,23 @@ export class FormVentasComponent implements OnInit {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
       this.form.controls.tipo.setValue('todos');
+      this.tipos = [
+        { id: 'viajes', label: 'Viajes' },
+        { id: 'normal', label: 'Normal' },
+        { id: 'todos', label: 'Todos' },
+      ];
+    }
+  }
+
+  changeTipo() {
+    const control = this.form.controls;
+    if (this.tipo_reporte === 'ventas_productos') {
+      if (control.tipo.value === '1') {
+        this.form.controls.fecha.setValue(new Date());
+      } else {
+        this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
+        this.form.controls.hasta.setValue(new Date());
+      }
     }
   }
 

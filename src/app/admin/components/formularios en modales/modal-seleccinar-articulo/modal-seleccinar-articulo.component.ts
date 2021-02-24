@@ -17,7 +17,7 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
   @Input() articulos;
   @Output() getArticulos = new EventEmitter<any>();
 
-  @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
+  @ViewChild(TablasComponent) tablas: TablasComponent;
   info = [
     {
       titulo: 'Articulo',
@@ -81,7 +81,7 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
     });
   }
   ngOnDestroy(): void {
-    this.subDeci.unsubscribe();
+    if (this.subDeci) this.subDeci.unsubscribe();
     this.resetLista();
   }
 

@@ -72,7 +72,6 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
 
   initCambioMenu(arg) {
     if (arg.bool) {
-
       this.layServ.nextDecisionCambioMenu(arg);
     }
   }
@@ -80,7 +79,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   ngOnDestroy() {
     this._destroy_mixin();
     this.borrar();
-    this.subDeci.unsubscribe();
+    if (this.subDeci) this.subDeci.unsubscribe();
   }
 
   async necesarioStart() {

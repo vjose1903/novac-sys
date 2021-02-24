@@ -17,7 +17,7 @@ import { mixinClass } from '../../mixinClass';
   styleUrls: ['./recibo-viajes.component.scss'],
 })
 export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestroy {
-  @ViewChild('cardTabla', { static: false }) cardTabla: ElementRef;
+  @ViewChild('cardTabla') cardTabla: ElementRef;
   info = [
     {
       titulo: '1',
@@ -116,8 +116,8 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
 
   ngOnDestroy() {
     this._destroy_mixin();
-    this.subObj.unsubscribe();
-    this.subDeci.unsubscribe();
+    if (this.subObj) this.subObj.unsubscribe();
+    if (this.subDeci) this.subDeci.unsubscribe();
 
     // this._ipc.removeListener('printRes');
   }

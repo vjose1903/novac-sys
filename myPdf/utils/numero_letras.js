@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.NumeroALetras = void 0;
 function Unidades(num) {
     switch (num) {
         case 1:

@@ -139,14 +139,13 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
 
   initCambioMenu(arg) {
     if (arg.bool) {
-
       this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 
   ngOnDestroy(): void {
     this._destroy_mixin();
-    this.subDeci.unsubscribe();
+    if (this.subDeci) this.subDeci.unsubscribe();
   }
 
   text(arg) {

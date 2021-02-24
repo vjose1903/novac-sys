@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeRecibo = void 0;
 var numLetra = require("./utils/numero_letras");
 var fun_ = require("./utils/funciones");
 var files_1 = require("./utils/files");

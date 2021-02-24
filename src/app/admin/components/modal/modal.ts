@@ -119,41 +119,23 @@ export class modalClass extends LayoutClass {
   reporte(data: any) {}
 
   _destroy_modal() {
-    if (this._lista.includes('printRes') && this._ipc) {
-      this._ipc.removeListener('printRes');
-    }
+    if (this._lista.includes('printRes') && this._ipc) this._ipc.removeListener('printRes');
 
-    if (this._lista.includes('printBase64Res') && this._ipc) {
-      this._ipc.removeListener('printBase64Res');
-    }
+    if (this._lista.includes('printBase64Res') && this._ipc) this._ipc.removeListener('printBase64Res');
 
-    if (this._lista.includes('decisionModal') && this.subDeci) {
-      this.subDeci.unsubscribe();
-    }
+    if (this._lista.includes('decisionModal') && this.subDeci) this.subDeci.unsubscribe();
 
-    if (this._lista.includes('objDevuelto') && this.subObj) {
-      this.subObj.unsubscribe();
-    }
+    if (this._lista.includes('objDevuelto') && this.subObj) this.subObj.unsubscribe();
 
-    if (this._lista.includes('articuloPorCodigo') && this.subArticuloFiltro) {
-      this.subArticuloFiltro.unsubscribe();
-    }
+    if (this._lista.includes('articuloPorCodigo') && this.subArticuloFiltro) this.subArticuloFiltro.unsubscribe();
 
-    if (this._lista.includes('pressEsc') && this.subEsc) {
-      this.subEsc.unsubscribe();
-    }
+    if (this._lista.includes('pressEsc') && this.subEsc) this.subEsc.unsubscribe();
 
-    if (this._lista.includes('indexToFocus') && this.subInde) {
-      this.subInde.unsubscribe();
-    }
+    if (this._lista.includes('indexToFocus') && this.subInde) this.subInde.unsubscribe();
 
-    if (this._lista.includes('refreshFacturas') && this.subRefresh) {
-      this.subRefresh.unsubscribe();
-    }
+    if (this._lista.includes('refreshFacturas') && this.subRefresh) this.subRefresh.unsubscribe();
 
-    if (this._lista.includes('sacarFacturas') && this.subSacar) {
-      this.subSacar.unsubscribe();
-    }
+    if (this._lista.includes('sacarFacturas') && this.subSacar) this.subSacar.unsubscribe();
 
     if (this._lista.includes('')) {
     }

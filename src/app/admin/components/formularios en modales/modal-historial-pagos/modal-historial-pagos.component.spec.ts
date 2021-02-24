@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ModalHistorialPagosComponent } from './modal-historial-pagos.component';
 
@@ -6,7 +6,7 @@ describe('ModalHistorialPagosComponent', () => {
   let component: ModalHistorialPagosComponent;
   let fixture: ComponentFixture<ModalHistorialPagosComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ModalHistorialPagosComponent ]
     })

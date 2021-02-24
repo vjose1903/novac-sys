@@ -35,7 +35,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   detalleFacturas: any;
   detalleNota = [];
   subDeci: Subscription;
-  @ViewChild(TablasComponent, { static: false }) tablas: TablasComponent;
+  @ViewChild(TablasComponent) tablas: TablasComponent;
   tipoModal: string;
   subObj: Subscription;
   tipoFactura: any;
@@ -95,8 +95,9 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
   ngOnDestroy(): void {
     this._destroy_mixin();
-    this.subDeci.unsubscribe();
-    this.subObj.unsubscribe();
+    if (this.subDeci) this.subDeci.unsubscribe();
+    if (this.subObj) this.subObj.unsubscribe();
+
     this._ipc.removeListener('printRes');
   }
 

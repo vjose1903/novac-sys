@@ -194,11 +194,11 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   ngOnDestroy() {
-    this.subDeci.unsubscribe();
-    this.subObj.unsubscribe();
-    this.subEsc.unsubscribe();
-    this.subInde.unsubscribe();
-    this.subArticuloFiltro.unsubscribe();
+    if (this.subDeci) this.subDeci.unsubscribe();
+    if (this.subObj) this.subObj.unsubscribe();
+    if (this.subEsc) this.subEsc.unsubscribe();
+    if (this.subInde) this.subInde.unsubscribe();
+    if (this.subArticuloFiltro) this.subArticuloFiltro.unsubscribe();
 
     this.mServ.modalTipo(undefined);
     this.mServ.ModalSeleccion(undefined);

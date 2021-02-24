@@ -27,15 +27,15 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
   styleUrls: ['./tablas.component.scss'],
 })
 export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  @ViewChild(MdbTableDirective, { static: false }) mdbTable: MdbTableDirective;
-  @ViewChild('dinamicTable', { static: false }) dinamicTable: ElementRef;
+  @ViewChild(MdbTableDirective) mdbTable: MdbTableDirective;
+  @ViewChild('dinamicTable') dinamicTable: ElementRef;
   cantiTootip: string;
   ready = false;
 
-  @ViewChild('searchDiv', { static: false }) searchDiv: ElementRef;
-  @ViewChild('paginationDiv', { static: false }) paginationDiv: ElementRef;
-  @ViewChild('titulosHeader', { static: false }) titulosHeader: ElementRef;
-  @ViewChild('searchInput', { static: false }) searchInput: ElementRef;
+  @ViewChild('searchDiv') searchDiv: ElementRef;
+  @ViewChild('paginationDiv') paginationDiv: ElementRef;
+  @ViewChild('titulosHeader') titulosHeader: ElementRef;
+  @ViewChild('searchInput') searchInput: ElementRef;
   seleccionado_id: any;
 
   // @HostListener('input') oninput() {

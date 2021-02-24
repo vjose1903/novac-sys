@@ -111,14 +111,14 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
 
   initCambioMenu(arg) {
     if (arg.bool) {
-
       this.layServ.nextDecisionCambioMenu(arg);
     }
   }
 
   ngOnDestroy(): void {
     this._destroy_mixin();
-    this.subDeci.unsubscribe();
+
+    if (this.subDeci) this.subDeci.unsubscribe();
   }
 
   async necesarioStart() {
