@@ -4,15 +4,17 @@ exports.makeReporte = void 0;
 var fun_ = require("./utils/funciones");
 var files_1 = require("./utils/files");
 var environment_js_1 = require("../src/environments/environment.js");
+var configuracion_tablas_1 = require("./configuracion_tablas");
 // ==========================================================================================================================================================
 // UNIR REPORTE
 // ==========================================================================================================================================================
 function makeReporte(data) {
+    var configuration = configuracion_tablas_1.getConfiguration(data.tipo_reporte);
     var dd = {
         // pageSize: { width: 990, height: 398 },
         pageMargins: [0, data.mostrar_sub_titulo ? 118.5 : 111.5, 0, 30],
         header: cabeceraReporte(data),
-        content: contenidoReporte(data),
+        content: contenidoReporte(data, configuration),
         footer: function (currentPage, pageCount) {
             return [
                 {
@@ -123,10 +125,10 @@ function cabeceraReporte(data) {
 // ==========================================================================================================================================================
 // CONTENIDO
 // =========================================================~=================================================================================================
-function contenidoReporte(data) {
+function contenidoReporte(data, configuration) {
     var titulos = [];
     var body = [];
-    t_c[data.tipo_reporte].info.forEach(function (titulo, i) {
+    configuration.info.forEach(function (titulo, i) {
         titulos.push({
             text: titulo.text,
             alignment: titulo.alignment_titulo,
@@ -138,9 +140,9 @@ function contenidoReporte(data) {
     body.push(titulos);
     data.contenido_reporte.forEach(function (detalle, j) {
         var row = [];
-        var brk = data.mostrar_sub_titulo ? t_c[data.tipo_reporte].break - 1 : t_c[data.tipo_reporte].break;
+        var brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
         var br_ = j !== 0 && j % brk === 0;
-        t_c[data.tipo_reporte].info.forEach(function (info, i) {
+        configuration.info.forEach(function (info, i) {
             var obj = {};
             var text_ = '';
             if (info.key === 'index') {
@@ -172,13 +174,13 @@ function contenidoReporte(data) {
         {
             table: {
                 headerRows: 1,
-                widths: t_c[data.tipo_reporte].widths,
+                widths: configuration.widths,
                 body: body,
             },
-            margin: t_c[data.tipo_reporte].margin_general,
+            margin: configuration.margin_general,
             layout: {
                 hLineWidth: function (i, node) {
-                    var brk = data.mostrar_sub_titulo ? t_c[data.tipo_reporte].break - 1 : t_c[data.tipo_reporte].break;
+                    var brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
                     return i % brk === 0 && node.table.body.length !== brk ? 0 : i === node.table.body.length || i === 1 ? 1.5 : 1;
                 },
                 vLineWidth: function (i, node) {
@@ -196,7 +198,7 @@ function contenidoReporte(data) {
             ? {
                 stack: [
                     {
-                        margin: [0, 5, data.contenido_reporte.length <= t_c[data.tipo_reporte].break ? 24 : 43, 0],
+                        margin: [0, 5, data.contenido_reporte.length <= configuration.break ? 24 : 43, 0],
                         columns: [
                             [],
                             [

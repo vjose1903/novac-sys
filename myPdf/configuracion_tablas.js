@@ -1,0 +1,502 @@
+"use strict";
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// CONFIGURACION DE LAS TABLAS DE REPORTES
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getConfiguration = void 0;
+function getConfiguration(tipo_reporte) {
+    return t_c[tipo_reporte];
+}
+exports.getConfiguration = getConfiguration;
+var t_c = {
+    // --------------------------------------
+    // VENTAS
+    // --------------------------------------
+    ventas: {
+        margin_general: [10, 0, 10, 0],
+        break: 40,
+        widths: [24, 60, 73, 53, '*', 'auto'],
+        info: [
+            {
+                text: '#',
+                alignment_titulo: 'center',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'index',
+                alignment_body: 'center',
+            },
+            {
+                text: 'Fecha',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'fecha_equivalente',
+                alignment_body: 'left',
+                formato_fecha: true,
+            },
+            {
+                text: 'Factura',
+                style: 'letra10',
+                alignment_titulo: 'left',
+                style_body: 'letra10',
+                key: 'numero_comprobante',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Condición',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'condicion',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Cliente',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'cliente_nombre',
+                alignment_body: 'left',
+            },
+            // {
+            //   text: 'Descuento',
+            //   alignment_titulo: 'right',
+            //   margin_titulo: [0, 0, 20, 0],
+            //   margin_body: [0, 0, 20, 0],
+            //   style: 'letra10',
+            //   style_body: 'letra10',
+            //   key: 'descuento',
+            //   alignment_body: 'right',
+            //   formato_numero: true,
+            // },
+            {
+                text: 'Total Venta',
+                margin_titulo: [0, 0, 10, 0],
+                margin_body: [0, 0, 10, 0],
+                alignment_titulo: 'right',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'total_factura',
+                alignment_body: 'right',
+                formato_numero: true,
+            },
+        ],
+    },
+    // --------------------------------------
+    // CUENTAS POR COBRAR
+    // --------------------------------------
+    cxc: {
+        margin_general: [10, 0, 10, 0],
+        break: 40,
+        // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
+        widths: [24, 60, 73, 53, '*', 'auto'],
+        info: [
+            {
+                text: '#',
+                alignment_titulo: 'center',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'index',
+                alignment_body: 'center',
+            },
+            {
+                text: 'Fecha',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'fecha_equivalente',
+                alignment_body: 'left',
+                formato_fecha: true,
+            },
+            {
+                text: 'Factura',
+                style: 'letra10',
+                alignment_titulo: 'left',
+                style_body: 'letra10',
+                key: 'numero_comprobante',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Condición',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'condicion',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Cliente',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'cliente_nombre',
+                alignment_body: 'left',
+            },
+            // {
+            //   text: 'Descuento',
+            //   alignment_titulo: 'right',
+            //   margin_titulo: [0, 0, 20, 0],
+            //   margin_body: [0, 0, 20, 0],
+            //   style: 'letra10',
+            //   style_body: 'letra10',
+            //   key: 'descuento',
+            //   alignment_body: 'right',
+            //   formato_numero: true,
+            // },
+            {
+                text: 'Pendiente',
+                margin_titulo: [0, 0, 10, 0],
+                margin_body: [0, 0, 10, 0],
+                alignment_titulo: 'right',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'balance',
+                alignment_body: 'right',
+                formato_numero: true,
+            },
+        ],
+    },
+    //
+    //
+    //
+    //
+    // --------------------------------------
+    // CUENTAS POR COBRAR ANTIGUEDAD SALDO
+    // --------------------------------------
+    cxc_ant: {
+        margin_general: [10, 0, 10, 0],
+        break: 40,
+        // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
+        widths: [18, '*', 60, 70, 70, 70, 70, 'auto'],
+        info: [
+            {
+                text: '#',
+                alignment_titulo: 'center',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'index',
+                alignment_body: 'center',
+            },
+            {
+                text: 'Cliente',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'cliente_nombre',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Fecha',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'fecha_equivalente',
+                alignment_body: 'left',
+                formato_fecha: true,
+            },
+            {
+                text: '0 - 30 Dias',
+                style: 'letra10',
+                alignment_titulo: 'left',
+                style_body: 'letra10',
+                key: 'cero_to_treinta',
+                alignment_body: 'left',
+            },
+            {
+                text: '31 - 60 Dias',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'treinta_uno_to_sesenta',
+                alignment_body: 'left',
+            },
+            {
+                text: '61 - 90 Dias',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'sesenta_uno_to_noventa',
+                alignment_body: 'left',
+            },
+            {
+                text: 'mas 91 Dias',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'noventa_uno_to_more',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Pendiente',
+                margin_titulo: [0, 0, 10, 0],
+                margin_body: [0, 0, 10, 0],
+                alignment_titulo: 'right',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'balance',
+                alignment_body: 'right',
+                formato_numero: true,
+            },
+        ],
+    },
+    // --------------------------------------
+    // INVENTARIO
+    // --------------------------------------
+    inventario: {
+        margin_general: [10, 0, 10, 0],
+        break: 40,
+        widths: [24, 35, '*', 'auto', 'auto'],
+        info: [
+            {
+                text: '#',
+                alignment_titulo: 'center',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'index',
+                alignment_body: 'center',
+            },
+            {
+                text: 'Cod.',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'codigo',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Articulo',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'nombre',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Cantidad',
+                style: 'letra10',
+                alignment_titulo: 'center',
+                style_body: 'letra10',
+                key: 'cantidad_principal',
+                alignment_body: 'center',
+            },
+            {
+                text: 'Precio',
+                alignment_titulo: 'right',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'precio_principal',
+                alignment_body: 'right',
+                formato_numero: true,
+                margin_titulo: [0, 0, 10, 0],
+                margin_body: [0, 0, 10, 0],
+            },
+        ],
+    },
+    // --------------------------------------
+    // RECIBOS DE INGRESOS
+    // --------------------------------------
+    recibos: {
+        margin_general: [10, 0, 10, 0],
+        break: 40,
+        widths: [24, 60, 70, '*', 50, 'auto'],
+        info: [
+            {
+                text: '#',
+                alignment_titulo: 'center',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'index',
+                alignment_body: 'center',
+            },
+            {
+                text: 'Fecha',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'fecha_equivalente',
+                alignment_body: 'left',
+                formato_fecha: true,
+            },
+            {
+                text: 'Factura',
+                style: 'letra10',
+                alignment_titulo: 'left',
+                style_body: 'letra10',
+                key: 'factura',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Cliente',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'cliente_nombre',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Tipo',
+                style: 'letra10',
+                alignment_titulo: 'center',
+                style_body: 'letra10',
+                key: 'tipo_recibo',
+                alignment_body: 'center',
+            },
+            {
+                text: 'Recibido',
+                alignment_titulo: 'right',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'total',
+                alignment_body: 'right',
+                formato_numero: true,
+                margin_titulo: [0, 0, 10, 0],
+                margin_body: [0, 0, 10, 0],
+            },
+        ],
+    },
+    // --------------------------------------
+    // VENTAS POR PRODUCTO UN DIA
+    // --------------------------------------
+    ventas_prod_one: {
+        margin_general: [10, 0, 10, 0],
+        break: 40,
+        widths: [24, '*', 'auto', 'auto'],
+        info: [
+            {
+                text: '#',
+                alignment_titulo: 'center',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'index',
+                alignment_body: 'center',
+            },
+            {
+                text: 'Articulo',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'nombre',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Medida',
+                style: 'letra10',
+                alignment_titulo: 'left',
+                style_body: 'letra10',
+                key: 'medida_mostrar',
+                alignment_body: 'left',
+            },
+            {
+                text: 'Total Vendido',
+                alignment_titulo: 'right',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'total_vendido',
+                alignment_body: 'right',
+                formato_numero: true,
+                margin_titulo: [0, 0, 10, 0],
+                margin_body: [0, 0, 10, 0],
+            },
+        ],
+    },
+    // --------------------------------------
+    // VENTAS POR PRODUCTO RANGO
+    // --------------------------------------
+    ventas_prod_range: {
+        margin_general: [10, 0, 10, 0],
+        first: {
+            break: 40,
+            only_titulo: true,
+            widths: ['auto'],
+            info: [
+                {
+                    text: 'key_case',
+                    alignment_titulo: 'left',
+                    style: 'letra10',
+                    style_body: 'letra10',
+                    key: 'titulo_grupo',
+                    alignment_body: 'left',
+                    margin_titulo: [10, 0, 0, 0],
+                },
+            ],
+        },
+        second: {
+            break: 40,
+            widths: [24, '*', 'auto', 'auto'],
+            info: [
+                {
+                    text: '#',
+                    alignment_titulo: 'center',
+                    style: 'letra10',
+                    style_body: 'letra10',
+                    key: 'index',
+                    alignment_body: 'center',
+                },
+                {
+                    text: 'Articulo',
+                    alignment_titulo: 'left',
+                    style: 'letra10',
+                    style_body: 'letra10',
+                    key: 'nombre',
+                    alignment_body: 'left',
+                },
+                {
+                    text: 'Medida',
+                    style: 'letra10',
+                    alignment_titulo: 'left',
+                    style_body: 'letra10',
+                    key: 'medida_mostrar',
+                    alignment_body: 'left',
+                },
+                {
+                    text: 'Total Vendido',
+                    alignment_titulo: 'right',
+                    style: 'letra10',
+                    style_body: 'letra10',
+                    key: 'total_vendido',
+                    alignment_body: 'right',
+                    formato_numero: true,
+                    margin_titulo: [0, 0, 10, 0],
+                    margin_body: [0, 0, 10, 0],
+                },
+            ],
+        },
+    },
+    // --------------------------------------
+    // SUPLIDOR POR PRODUCTO
+    // --------------------------------------
+    suplidor_prod: {
+        margin_general: [10, 0, 10, 0],
+        break: 40,
+        widths: [24, 60, '*'],
+        info: [
+            {
+                text: '#',
+                alignment_titulo: 'center',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'index',
+                alignment_body: 'center',
+            },
+            {
+                text: 'Fecha',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'fecha_equivalente',
+                alignment_body: 'left',
+                formato_fecha: true,
+            },
+            {
+                text: 'Suplidor',
+                alignment_titulo: 'left',
+                style: 'letra10',
+                style_body: 'letra10',
+                key: 'suplidor_nombre',
+                alignment_body: 'left',
+                margin_titulo: [0, 0, 10, 0],
+                margin_body: [0, 0, 10, 0],
+            },
+        ],
+    },
+};
