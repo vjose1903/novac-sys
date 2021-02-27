@@ -124,7 +124,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
   initCambioMenu(arg) {
     if (arg.bool) {
-
       this.layServ.nextDecisionCambioMenu(arg);
     }
   }
@@ -799,10 +798,12 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     (control.controls[i] as any).controls['id'].setValue(ingredient.id ? ingredient.id : null);
   }
 
-  editarItem(item) {
+  async editarItem(item) {
     const articulo = item.ARG;
+    console.log('articulo --> ', articulo);
 
     this.borrar();
+    this.form.patchValue(articulo);
     this.ProductoEditando = item.ARG;
     this.titulo = 'Editar producto: ' + articulo.nombre;
     this.boton = 'Editar';
@@ -819,10 +820,12 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
         // });
         this.form.controls.medida.setValue('Quintal');
         this.fillDropAlerta('Quintal');
-        articulo.formulas_productos_terminados.forEach((ingredient, i) => {
+
+        for (let i = 0; i < articulo.formulas_productos_terminados.length; i++) {
+          const ingredient = articulo.formulas_productos_terminados[i];
           this.addItem();
           this.fillFormula(ingredient, i);
-        });
+        }
       });
     } else {
       this.is_combo = false;
@@ -834,36 +837,40 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     }
 
     this.fillDropAlerta(articulo.medida);
-
-    articulo.contenido_articulos.forEach((contenido) => {
-      if (articulo.contenido_articulos.length === 1) {
-        if (articulo.contenido_articulos[0].medida === 'Libra') {
-          this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
-          this.form.controls.costo_padre.setValue(contenido.costo);
-          this.form.controls.id_contenido_padre.setValue(contenido.id);
+    setTimeout(() => {
+      for (let j = 0; j < articulo.contenido_articulos.length; j++) {
+        const contenido = articulo.contenido_articulos[j];
+        if (articulo.contenido_articulos.length === 1) {
+          if (articulo.contenido_articulos[0].medida === 'Libra') {
+            this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
+            this.form.controls.costo_padre.setValue(contenido.costo);
+            this.form.controls.id_contenido_padre.setValue(contenido.id);
+          } else {
+            this.form.controls.precio_unidad.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
+            this.form.controls.costo_padre.setValue(contenido.costo);
+            this.form.controls.id_contenido_padre.setValue(contenido.id);
+          }
+        }
+        if (contenido.condicion === 'hijo') {
+          this.form.controls.cantidad_contenido_hijo.setValue(contenido.cantidad);
+          this.form.controls.medida_contenido_hijo.setValue(contenido.medida);
+          this.form.controls.precio_hijo.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
+          this.form.controls.costo_hijo.setValue(contenido.costo);
+          this.form.controls.id_contenido_hijo.setValue(contenido.id);
+          this.form.controls.referencia_hijo.setValue(contenido.referencia);
         } else {
-          this.form.controls.precio_unidad.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
+          this.form.controls.cantidad_contenido_padre.setValue(contenido.cantidad);
+          this.form.controls.medida_contenido_padre.setValue(contenido.medida);
+
+          this.form.controls.precio_padre.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
           this.form.controls.costo_padre.setValue(contenido.costo);
           this.form.controls.id_contenido_padre.setValue(contenido.id);
         }
       }
-      if (contenido.condicion === 'hijo') {
-        this.form.controls.cantidad_contenido_hijo.setValue(contenido.cantidad);
-        this.form.controls.medida_contenido_hijo.setValue(contenido.medida);
-        this.form.controls.precio_hijo.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
-        this.form.controls.costo_hijo.setValue(contenido.costo);
-        this.form.controls.id_contenido_hijo.setValue(contenido.id);
-        this.form.controls.referencia_hijo.setValue(contenido.referencia);
-      } else {
-        this.form.controls.cantidad_contenido_padre.setValue(contenido.cantidad);
-        this.form.controls.medida_contenido_padre.setValue(contenido.medida);
-        this.form.controls.precio_padre.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
-        this.form.controls.costo_padre.setValue(contenido.costo);
-        this.form.controls.id_contenido_padre.setValue(contenido.id);
-      }
-    });
+    }, 2);
+
     articulo['tipo_articulo_id'] = articulo['tipo_articulo_id'] + '';
-    this.form.patchValue(articulo);
+
     // this.selectTipoArticulo(articulo.tipo_articulo_id);
     if (articulo.is_combo) {
       this.form.controls.otros_costos.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.otros_costos)));

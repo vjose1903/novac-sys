@@ -1664,8 +1664,8 @@ export const conduce = {
 
 export const ventas_productos_rango = {
   titulo_reporte: 'Reporte de ventas por producto',
-  tipo_reporte: 'ventas_prod',
-  fecha: '19/02/2021 - 10:24',
+  tipo_reporte: 'ventas_prod_range',
+  fecha: '27/02/2021 - 01:03',
   realizado_por: 'Mari Santos',
   mostrar_total: true,
   total: 289975.0,
@@ -1675,7 +1675,8 @@ export const ventas_productos_rango = {
   contenido_reporte: [
     {
       titulo_grupo: 'Materia prima',
-      contenido: [
+      mostrar_total: false,
+      contenido_grupo: [
         {
           id: 165,
           cantidad_en_unidades: 200,
@@ -1765,11 +1766,11 @@ export const ventas_productos_rango = {
           medida_mostrar: '18.00 Quintales',
         },
       ],
-      total_grupo: 105405.0,
     },
     {
       titulo_grupo: 'Otros',
-      contenido: [
+      mostrar_total: false,
+      contenido_grupo: [
         {
           id: 233,
           cantidad_en_unidades: 100,
@@ -1791,11 +1792,11 @@ export const ventas_productos_rango = {
           medida_mostrar: '101.00 Unidades',
         },
       ],
-      total_grupo: 7300.0,
     },
     {
       titulo_grupo: 'Producto terminado',
-      contenido: [
+      mostrar_total: false,
+      contenido_grupo: [
         {
           id: 212,
           cantidad_en_unidades: 200,
@@ -1907,11 +1908,11 @@ export const ventas_productos_rango = {
           medida_mostrar: '1.00 Quintal',
         },
       ],
-      total_grupo: 175250.0,
     },
     {
       titulo_grupo: 'Veterinaria',
-      contenido: [
+      mostrar_total: false,
+      contenido_grupo: [
         {
           id: 45,
           cantidad_en_unidades: 2,
@@ -1974,7 +1975,6 @@ export const ventas_productos_rango = {
           medida_mostrar: '8.00 Unidades',
         },
       ],
-      total_grupo: 2020.0,
     },
   ],
 };

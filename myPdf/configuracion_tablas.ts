@@ -18,6 +18,7 @@ const t_c = {
       {
         text: '#',
         alignment_titulo: 'center',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'index',
@@ -26,6 +27,7 @@ const t_c = {
       {
         text: 'Fecha',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'fecha_equivalente',
@@ -36,6 +38,7 @@ const t_c = {
         text: 'Factura',
         style: 'letra10',
         alignment_titulo: 'left',
+        noWrap: true,
         style_body: 'letra10',
         key: 'numero_comprobante',
         alignment_body: 'left',
@@ -43,6 +46,7 @@ const t_c = {
       {
         text: 'Condición',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'condicion',
@@ -51,6 +55,7 @@ const t_c = {
       {
         text: 'Cliente',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'cliente_nombre',
@@ -72,6 +77,7 @@ const t_c = {
         margin_titulo: [0, 0, 10, 0],
         margin_body: [0, 0, 10, 0],
         alignment_titulo: 'right',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'total_factura',
@@ -92,6 +98,7 @@ const t_c = {
       {
         text: '#',
         alignment_titulo: 'center',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'index',
@@ -100,6 +107,7 @@ const t_c = {
       {
         text: 'Fecha',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'fecha_equivalente',
@@ -110,6 +118,7 @@ const t_c = {
         text: 'Factura',
         style: 'letra10',
         alignment_titulo: 'left',
+        noWrap: true,
         style_body: 'letra10',
         key: 'numero_comprobante',
         alignment_body: 'left',
@@ -117,6 +126,7 @@ const t_c = {
       {
         text: 'Condición',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'condicion',
@@ -125,6 +135,7 @@ const t_c = {
       {
         text: 'Cliente',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'cliente_nombre',
@@ -146,6 +157,7 @@ const t_c = {
         margin_titulo: [0, 0, 10, 0],
         margin_body: [0, 0, 10, 0],
         alignment_titulo: 'right',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'balance',
@@ -170,6 +182,7 @@ const t_c = {
       {
         text: '#',
         alignment_titulo: 'center',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'index',
@@ -178,6 +191,7 @@ const t_c = {
       {
         text: 'Cliente',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'cliente_nombre',
@@ -186,6 +200,7 @@ const t_c = {
       {
         text: 'Fecha',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'fecha_equivalente',
@@ -196,6 +211,7 @@ const t_c = {
         text: '0 - 30 Dias',
         style: 'letra10',
         alignment_titulo: 'left',
+        noWrap: true,
         style_body: 'letra10',
         key: 'cero_to_treinta',
         alignment_body: 'left',
@@ -203,6 +219,7 @@ const t_c = {
       {
         text: '31 - 60 Dias',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'treinta_uno_to_sesenta',
@@ -211,6 +228,7 @@ const t_c = {
       {
         text: '61 - 90 Dias',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'sesenta_uno_to_noventa',
@@ -219,6 +237,7 @@ const t_c = {
       {
         text: 'mas 91 Dias',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'noventa_uno_to_more',
@@ -230,6 +249,7 @@ const t_c = {
         margin_titulo: [0, 0, 10, 0],
         margin_body: [0, 0, 10, 0],
         alignment_titulo: 'right',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'balance',
@@ -249,6 +269,7 @@ const t_c = {
       {
         text: '#',
         alignment_titulo: 'center',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'index',
@@ -257,6 +278,7 @@ const t_c = {
       {
         text: 'Cod.',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'codigo',
@@ -265,6 +287,7 @@ const t_c = {
       {
         text: 'Articulo',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'nombre',
@@ -274,6 +297,7 @@ const t_c = {
         text: 'Cantidad',
         style: 'letra10',
         alignment_titulo: 'center',
+        noWrap: true,
         style_body: 'letra10',
         key: 'cantidad_principal',
         alignment_body: 'center',
@@ -281,6 +305,7 @@ const t_c = {
       {
         text: 'Precio',
         alignment_titulo: 'right',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'precio_principal',
@@ -303,6 +328,7 @@ const t_c = {
       {
         text: '#',
         alignment_titulo: 'center',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'index',
@@ -311,6 +337,7 @@ const t_c = {
       {
         text: 'Fecha',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'fecha_equivalente',
@@ -321,6 +348,7 @@ const t_c = {
         text: 'Factura',
         style: 'letra10',
         alignment_titulo: 'left',
+        noWrap: true,
         style_body: 'letra10',
         key: 'factura',
         alignment_body: 'left',
@@ -328,6 +356,7 @@ const t_c = {
       {
         text: 'Cliente',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'cliente_nombre',
@@ -337,6 +366,7 @@ const t_c = {
         text: 'Tipo',
         style: 'letra10',
         alignment_titulo: 'center',
+        noWrap: true,
         style_body: 'letra10',
         key: 'tipo_recibo',
         alignment_body: 'center',
@@ -345,6 +375,7 @@ const t_c = {
       {
         text: 'Recibido',
         alignment_titulo: 'right',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'total',
@@ -357,114 +388,80 @@ const t_c = {
   },
 
   // --------------------------------------
-  // VENTAS POR PRODUCTO UN DIA
+  // VENTAS POR PRODUCTO
   // --------------------------------------
-  ventas_prod_one: {
-    margin_general: [10, 0, 10, 0],
-    break: 40,
-    widths: [24, '*', 'auto', 'auto'],
+  ventas_prod: {
     info: [
       {
-        text: '#',
-        alignment_titulo: 'center',
-        style: 'letra10',
-        style_body: 'letra10',
-        key: 'index',
-        alignment_body: 'center',
+        margin_general: [10, 0, 10, 0],
+        break: 40,
+        only_titulo: true,
+        fill_rowIndex: 0,
+        widths: ['*'],
+        info: [
+          {
+            text: null,
+            alignment_titulo: 'left',
+            noWrap: true,
+            style: 'letra10',
+            style_body: 'letra10',
+            fillColor: '#dcdcdc',
+            key: 'titulo_grupo',
+            alignment_body: 'left',
+            margin_titulo: [10, 0, 0, 0],
+          },
+        ],
       },
       {
-        text: 'Articulo',
-        alignment_titulo: 'left',
-        style: 'letra10',
-        style_body: 'letra10',
-        key: 'nombre',
-        alignment_body: 'left',
-      },
-      {
-        text: 'Medida',
-        style: 'letra10',
-        alignment_titulo: 'left',
-        style_body: 'letra10',
-        key: 'medida_mostrar',
-        alignment_body: 'left',
-      },
+        margin_general: [10, 0, 10, 0],
+        break: 40,
+        widths: [24, '*', 'auto', 'auto'],
+        info: [
+          {
+            text: '#',
+            alignment_titulo: 'center',
+            noWrap: true,
+            style: 'letra10',
+            style_body: 'letra10',
+            key: 'index',
+            alignment_body: 'center',
+          },
+          {
+            text: 'Articulo',
+            alignment_titulo: 'left',
+            noWrap: true,
+            style: 'letra10',
+            style_body: 'letra10',
+            key: 'nombre',
+            alignment_body: 'left',
+          },
+          {
+            text: 'Medida',
+            style: 'letra10',
+            alignment_titulo: 'left',
+            noWrap: true,
+            style_body: 'letra10',
+            key: 'medida_mostrar',
+            alignment_body: 'left',
+            margin_titulo: [0, 0, 20, 0],
+            margin_body: [0, 0, 20, 0],
+          },
 
-      {
-        text: 'Total Vendido',
-        alignment_titulo: 'right',
-        style: 'letra10',
-        style_body: 'letra10',
-        key: 'total_vendido',
-        alignment_body: 'right',
-        formato_numero: true,
-        margin_titulo: [0, 0, 10, 0],
-        margin_body: [0, 0, 10, 0],
+          {
+            text: 'Total Vendido',
+            alignment_titulo: 'right',
+            noWrap: true,
+            style: 'letra10',
+            style_body: 'letra10',
+            key: 'total_vendido',
+            alignment_body: 'right',
+            formato_numero: true,
+            margin_titulo: [0, 0, 10, 0],
+            margin_body: [0, 0, 10, 0],
+          },
+        ],
       },
     ],
-  },
-  // --------------------------------------
-  // VENTAS POR PRODUCTO RANGO
-  // --------------------------------------
-  ventas_prod_range: {
-    margin_general: [10, 0, 10, 0],
-    first: {
-      break: 40,
-      only_titulo: true,
-      widths: ['auto'],
-      info: [
-        {
-          text: 'key_case',
-          alignment_titulo: 'left',
-          style: 'letra10',
-          style_body: 'letra10',
-          key: 'titulo_grupo',
-          alignment_body: 'left',
-          margin_titulo: [10, 0, 0, 0],
-        },
-      ],
-    },
-    second: {
-      break: 40,
-      widths: [24, '*', 'auto', 'auto'],
-      info: [
-        {
-          text: '#',
-          alignment_titulo: 'center',
-          style: 'letra10',
-          style_body: 'letra10',
-          key: 'index',
-          alignment_body: 'center',
-        },
-        {
-          text: 'Articulo',
-          alignment_titulo: 'left',
-          style: 'letra10',
-          style_body: 'letra10',
-          key: 'nombre',
-          alignment_body: 'left',
-        },
-        {
-          text: 'Medida',
-          style: 'letra10',
-          alignment_titulo: 'left',
-          style_body: 'letra10',
-          key: 'medida_mostrar',
-          alignment_body: 'left',
-        },
-
-        {
-          text: 'Total Vendido',
-          alignment_titulo: 'right',
-          style: 'letra10',
-          style_body: 'letra10',
-          key: 'total_vendido',
-          alignment_body: 'right',
-          formato_numero: true,
-          margin_titulo: [0, 0, 10, 0],
-          margin_body: [0, 0, 10, 0],
-        },
-      ],
-    },
   },
 
   // --------------------------------------
@@ -478,6 +475,7 @@ const t_c = {
       {
         text: '#',
         alignment_titulo: 'center',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'index',
@@ -486,6 +484,7 @@ const t_c = {
       {
         text: 'Fecha',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'fecha_equivalente',
@@ -495,6 +494,7 @@ const t_c = {
       {
         text: 'Suplidor',
         alignment_titulo: 'left',
+        noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
         key: 'suplidor_nombre',

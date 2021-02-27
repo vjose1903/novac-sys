@@ -147,7 +147,10 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         tipo = 'recibos';
         //
       } else if (this.tipoModal === 'ventas_productos') {
-        params = data.tipo === '1' ? `desde=${data.fecha}` : (params = `desde=${data.fecha}&hasta=${data.hasta}`);
+        console.log('data --> ', data);
+
+        params = data.tipo === '1' ? `desde=${data.fecha}` : (params = `desde=${data.desde}&hasta=${data.hasta}`);
+        console.log('params --> ', params);
         tipo = 'ventas_productos';
         //
       } else if (this.tipoModal === 'suplidor_prod') {

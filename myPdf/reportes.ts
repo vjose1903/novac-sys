@@ -1,13 +1,16 @@
-import * as fun_ from './utils/funciones';
 import { logoADM, styles_ } from './utils/files';
 import { AppConfig } from '../src/environments/environment.js';
 import { getConfiguration } from './configuracion_tablas';
+import { getContentWithTablaNormal } from './tabla_normal';
+import { getContentWithTablaAgrupada } from './tabla_agrupada';
 
 // ==========================================================================================================================================================
 // UNIR REPORTE
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
+  console.log('data.tipo_reporte --> ', data.tipo_reporte);
+
   const configuration = getConfiguration(data.tipo_reporte);
   const dd = {
     // pageSize: { width: 990, height: 398 },
@@ -116,9 +119,12 @@ function cabeceraReporte(data) {
             margin: [15, 10, 0, 0],
           }
         : { text: '' },
+
+      // data.tipo_tabla === 'normal' ?
       {
         canvas: [{ type: 'rect', x: 10, y: data.mostrar_sub_titulo ? 5 : 20, w: 575, h: 1.5, color: '#000000' }],
       },
+      // : { text: '' },
     ];
   };
 
@@ -130,121 +136,19 @@ function cabeceraReporte(data) {
 // =========================================================~=================================================================================================
 
 function contenidoReporte(data, configuration) {
-  const titulos = [];
-  const body = [];
+  let content = [];
+  console.log('data.tipo_tabla --> ', data.tipo_tabla);
 
-  configuration.info.forEach((titulo, i) => {
-    titulos.push({
-      text: titulo.text,
-      alignment: titulo.alignment_titulo,
-      style: titulo.style,
-      bold: true,
-      margin: titulo.margin_titulo ? titulo.margin_titulo : [0, 0, 0, 0],
-    });
-  });
-  body.push(titulos);
+  if (data.tipo_tabla === 'agrupado') {
+    console.log(':::::::::::: TABLA AGUPADA :::::::::::: ');
 
-  data.contenido_reporte.forEach((detalle, j) => {
-    const row = [];
-
-    const brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
-
-    const br_ = j !== 0 && j % brk === 0;
-
-    configuration.info.forEach((info, i) => {
-      let obj = {};
-      let text_ = '';
-
-      if (info.key === 'index') {
-        text_ = j + 1;
-      } else {
-        if (info.formato_fecha) {
-          text_ = fun_.my_dateFormater(detalle[info.key]);
-        } else if (info.formato_numero) {
-          text_ = fun_.numFormatTwoDecimals(detalle[info.key]);
-        } else {
-          text_ = detalle[info.key];
-        }
-      }
-      obj = {
-        text: text_,
-        alignment: info.alignment_body,
-        margin: info.margin_body ? info.margin_body : [0, 0, 0, 0],
-        style: info.style_body,
-        pageBreak: br_ ? 'before' : 'none',
-      };
-
-      row.push(obj);
-    });
-
-    body.push(row);
-  });
-
-  var content = [
-    {
-      table: {
-        headerRows: 1,
-        widths: configuration.widths,
-        body: body,
-      },
-      margin: configuration.margin_general,
-      layout: {
-        hLineWidth: function (i, node) {
-          const brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
-          return i % brk === 0 && node.table.body.length !== brk ? 0 : i === node.table.body.length || i === 1 ? 1.5 : 1;
-        },
-        vLineWidth: function (i, node) {
-          return 0;
-        },
-        hLineColor: function (i, node) {
-          return i === node.table.body.length || i === 1 ? 'black' : 'gray';
-        },
-        vLineColor: function (i, node) {
-          return 'black';
-        },
-      },
-    },
-    data.mostrar_total
-      ? {
-          stack: [
-            {
-              margin: [0, 5, data.contenido_reporte.length <= configuration.break ? 24 : 43, 0],
-              columns: [
-                [],
-                [
-                  {
-                    table: {
-                      widths: ['*'],
-                      body: [
-                        [
-                          {
-                            alignment: 'right',
-                            text: [
-                              {
-                                text: 'TOTAL RD$:         ',
-                                style: 'letra10',
-                                bold: true,
-                              },
-                              {
-                                text: fun_.numFormatTwoDecimals(data.total),
-                                style: 'letra10',
-                                bold: true,
-                              },
-                            ],
-                          },
-                        ],
-                      ],
-                    },
-                    layout: 'noBorders',
-                  },
-                ],
-              ],
-            },
-          ],
-          unbreakable: true,
-        }
-      : { text: '' },
-  ];
+    console.log('configuration --> ', configuration);
+    content = getContentWithTablaAgrupada(configuration, data);
+    console.log('coño');
+  } else {
+    console.log(':::::::::::: TABLA NORMAL :::::::::::: ');
+    content = getContentWithTablaNormal(configuration, data);
+  }
 
   return content;
 }
