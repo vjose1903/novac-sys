@@ -37,7 +37,8 @@ export class PendienteFormComponent implements OnInit {
   ngOnInit() {
     this.hora = moment().hour();
     this.minutos = moment().minutes();
-    this.fecha = moment().format('MM/DD/YYYY');
+
+    this.fecha = new Date();
 
     this.time = { hour: this.hora, minute: this.minutos };
   }
