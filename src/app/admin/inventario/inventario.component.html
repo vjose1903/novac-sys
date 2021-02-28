@@ -1,4 +1,4 @@
-<div id="cardTabla" class="cardPrincipal sinPadding tamano">
+<div #cardTabla id="cardTabla" class="cardPrincipal sinPadding tamano">
   <div class="bordes info justify-content-between">
     <div class="text-center">
       <span style="font-size: 1.2rem"> Cantidad de productos en inventario </span>
@@ -30,11 +30,11 @@
     <div style="height: 100%">
       <app-tablas
         *ngIf="listaArticulos"
-        [info]="info"
+        [padre]="cardTabla" [info]="info"
         [data]="listaArticulos"
         [focusRow]="false"
         [search]="true"
-        [quitarAScorll]="80"
+        [quitarAScorll]="40"
         [paginate]="true"
         [botones]="botones"
         (DevolverInfo)="movimientoInventario($event)"

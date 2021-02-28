@@ -16,6 +16,7 @@ var t_c = {
         margin_general: [10, 0, 10, 0],
         break: 40,
         widths: [24, 60, 73, 53, '*', 'auto'],
+        mostrar_total: true,
         info: [
             {
                 text: '#',
@@ -96,6 +97,7 @@ var t_c = {
         break: 40,
         // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
         widths: [24, 60, 73, 53, '*', 'auto'],
+        mostrar_total: true,
         info: [
             {
                 text: '#',
@@ -180,6 +182,7 @@ var t_c = {
         break: 40,
         // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
         widths: [18, '*', 60, 70, 70, 70, 70, 'auto'],
+        mostrar_total: true,
         info: [
             {
                 text: '#',
@@ -324,6 +327,7 @@ var t_c = {
         margin_general: [10, 0, 10, 0],
         break: 40,
         widths: [24, 60, 70, '*', 50, 'auto'],
+        mostrar_total: true,
         info: [
             {
                 text: '#',
@@ -386,58 +390,7 @@ var t_c = {
         ],
     },
     // --------------------------------------
-    // VENTAS POR PRODUCTO UN DIA
-    // --------------------------------------
-    ventas_prod_one: {
-        margin_general: [10, 0, 10, 0],
-        break: 40,
-        widths: [24, '*', 'auto', 'auto'],
-        info: [
-            {
-                text: '#',
-                alignment_titulo: 'center',
-                noWrap: true,
-                style: 'letra10',
-                style_body: 'letra10',
-                key: 'index',
-                alignment_body: 'center',
-            },
-            {
-                text: 'Articulo',
-                alignment_titulo: 'left',
-                noWrap: true,
-                style: 'letra10',
-                style_body: 'letra10',
-                key: 'nombre',
-                alignment_body: 'left',
-            },
-            {
-                text: 'Medida',
-                style: 'letra10',
-                alignment_titulo: 'left',
-                noWrap: true,
-                style_body: 'letra10',
-                key: 'medida_mostrar',
-                alignment_body: 'left',
-                margin_titulo: [0, 0, 20, 0],
-                margin_body: [0, 0, 20, 0],
-            },
-            {
-                text: 'Total Vendido',
-                alignment_titulo: 'right',
-                noWrap: true,
-                style: 'letra10',
-                style_body: 'letra10',
-                key: 'total_vendido',
-                alignment_body: 'right',
-                formato_numero: true,
-                margin_titulo: [0, 0, 10, 0],
-                margin_body: [0, 0, 10, 0],
-            },
-        ],
-    },
-    // --------------------------------------
-    // VENTAS POR PRODUCTO RANGO
+    // VENTAS POR PRODUCTO
     // --------------------------------------
     ventas_prod: {
         info: [
@@ -463,8 +416,10 @@ var t_c = {
             },
             {
                 margin_general: [10, 0, 10, 0],
+                isBreak: false,
                 break: 40,
                 widths: [24, '*', 'auto', 'auto'],
+                mostrar_total: true,
                 info: [
                     {
                         text: '#',

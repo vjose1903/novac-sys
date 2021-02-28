@@ -15,13 +15,14 @@ function makeTablaNormal(configuration, data, index_data, index_info) {
     console.log('data --> ', data);
     console.log('index_data --> ', index_data);
     console.log('index_info --> ', index_info);
+    var data_ = data.tipo_tabla === 'normal' ? data : data.contenido_reporte[index_data];
+    var contendio_ = data.tipo_tabla === 'normal' ? data.contenido_reporte : data.contenido_reporte[index_data].contenido_grupo;
     var titulos = [];
     var body = [];
     configuration.info.forEach(function (titulo_config, i) {
         try {
-            console.log('titulo_config --> ', titulo_config);
             var obj_titulo = {
-                text: configuration.only_titulo ? data.contenido_reporte[index_data][titulo_config.key] : titulo_config.text,
+                text: configuration.only_titulo ? data_[titulo_config.key] : titulo_config.text,
                 alignment: titulo_config.alignment_titulo,
                 style: titulo_config.style,
                 bold: true,
@@ -41,50 +42,59 @@ function makeTablaNormal(configuration, data, index_data, index_info) {
     //     canvas: [{ type: 'rect', x: 10, y: data.mostrar_sub_titulo ? 5 : 20, w: 575, h: 1.5, color: '#000000' }],
     //   });
     // }
-    body.push(titulos);
-    if (data.tipo_tabla === 'normal') {
-        data.contenido_reporte.forEach(function (detalle, j) {
+    if (contendio_.length > 0 || configuration.only_titulo) {
+        body.push(titulos);
+    }
+    if (contendio_.length > 0 && !configuration.only_titulo) {
+        console.log('CONFIGURATION.WIDTHS --> ', configuration.widths);
+        contendio_.forEach(function (detalle, j) {
             var row = formarCuerpo(data, configuration, detalle, j);
             body.push(row);
         });
     }
-    else if (data.tipo_tabla === 'agrupado' && !configuration.only_titulo) {
-        data.contenido_reporte[index_data].contenido_grupo.forEach(function (detalle, j) {
-            var row = formarCuerpo(data, configuration, detalle, j);
-            body.push(row);
-        });
-    }
-    console.log('CONFIGURATION.WIDTHS --> ', configuration.widths);
+    // } else if (data.tipo_tabla === 'agrupado' && !configuration.only_titulo) {
+    //   data.contenido_reporte[index_data].contenido_grupo.forEach((detalle, j) => {
+    //     const row = formarCuerpo(data, configuration, detalle, j);
+    //     body.push(row);
+    //   });
+    // }
     var content = [
-        {
-            table: {
-                headerRows: 1,
-                widths: configuration.widths,
-                body: body,
-            },
-            margin: configuration.margin_general,
-            layout: {
-                hLineWidth: function (i, node) {
-                    var brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
-                    return i % brk === 0 && node.table.body.length !== brk ? 0 : i === node.table.body.length || i === 1 ? 1.5 : 1;
+        contendio_.length > 0 || configuration.only_titulo
+            ? {
+                table: {
+                    headerRows: 1,
+                    widths: configuration.widths,
+                    body: body,
                 },
-                vLineWidth: function (i, node) {
-                    return 0;
+                margin: configuration.margin_general,
+                layout: {
+                    hLineWidth: function (i, node) {
+                        // const brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
+                        var brk = configuration.break;
+                        if (configuration.isBreak) {
+                            return i == 0 ? 0 : 1 === 1 ? 1.5 : 1;
+                        }
+                        else {
+                            return i % brk === 0 && node.table.body.length !== brk ? 0 : i === node.table.body.length || i === 1 ? 1.5 : 1;
+                        }
+                    },
+                    vLineWidth: function (i, node) {
+                        return 0;
+                    },
+                    hLineColor: function (i, node) {
+                        return i === node.table.body.length || i === 1 ? 'black' : 'gray';
+                    },
+                    vLineColor: function (i, node) {
+                        return 'black';
+                    },
                 },
-                hLineColor: function (i, node) {
-                    return i === node.table.body.length || i === 1 ? 'black' : 'gray';
-                },
-                vLineColor: function (i, node) {
-                    return 'black';
-                },
-            },
-        },
-        (data.tipo_tabla === 'normal' && data.total > 0.99999) ||
-            (data.tipo_tabla === 'agrupado' && data.contenido_reporte[index_data].mostrar_total && data.contenido_reporte[index_data].total_grupo > 0.99999)
+            }
+            : { text: '' },
+        configuration.mostrar_total && data.total > 0.99999
             ? {
                 stack: [
                     {
-                        margin: [0, 5, data.contenido_reporte.length <= configuration.break ? 24 : 43, 0],
+                        margin: [0, 5, contendio_.length <= configuration.break ? 24 : 43, 0],
                         columns: [
                             [],
                             [
@@ -102,7 +112,7 @@ function makeTablaNormal(configuration, data, index_data, index_info) {
                                                             bold: true,
                                                         },
                                                         {
-                                                            text: fun_.numFormatTwoDecimals(data.total),
+                                                            text: fun_.numFormatTwoDecimals(data_.total),
                                                             style: 'letra10',
                                                             bold: true,
                                                         },
@@ -121,10 +131,6 @@ function makeTablaNormal(configuration, data, index_data, index_info) {
             }
             : { text: '' },
     ];
-    console.log('content --> ', content);
-    console.log('content[0].table --> ', content[0].table);
-    console.log('content[0].table.body --> ', content[0].table.body);
-    console.log(' ');
     console.log('------------------------------------------------------------------------------------------------------------------- ');
     console.log(' ');
     return content;
@@ -157,7 +163,7 @@ function formarCuerpo(data, configuration, detalle, j) {
             margin: info.margin_body ? info.margin_body : [0, 0, 0, 0],
             style: info.style_body,
             noWrap: info.noWrap,
-            pageBreak: br_ ? 'before' : 'none',
+            pageBreak: configuration.isBreak ? (br_ ? 'before' : 'none') : 'none',
         };
         if (info.fillColor)
             obj['fillColor'] = info.fillColor;

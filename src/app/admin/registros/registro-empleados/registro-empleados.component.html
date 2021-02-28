@@ -18,7 +18,11 @@
                   autocomplete="off"
                   autofocus
                 />
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
+                <div
+                  class="alerta text-danger ml-1"
+                  style="font-size: 12px"
+                  *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)"
+                >
                   Este Campo es obligatorio
                 </div>
               </div>
@@ -50,7 +54,11 @@
               <div class="from-group">
                 <label class="control-label">Usuario: <span style="color: red">*</span></label>
                 <input type="text" formControlName="usuario" placeholder="Introduzca usuario" class="form-control" autocomplete="off" />
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['usuario'].valid && (form.controls['usuario'].dirty || form.controls['usuario'].touched)">
+                <div
+                  class="alerta text-danger ml-1"
+                  style="font-size: 12px"
+                  *ngIf="!form.controls['usuario'].valid && (form.controls['usuario'].dirty || form.controls['usuario'].touched)"
+                >
                   Introduzca un usuario
                 </div>
               </div>
@@ -63,7 +71,11 @@
                   <option value="m">Masculino</option>
                   <option value="f">Femenino</option>
                 </select>
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['sexo'].valid && (form.controls['sexo'].dirty || form.controls['sexo'].touched)">
+                <div
+                  class="alerta text-danger ml-1"
+                  style="font-size: 12px"
+                  *ngIf="!form.controls['sexo'].valid && (form.controls['sexo'].dirty || form.controls['sexo'].touched)"
+                >
                   Debe de seleccionar el sexo
                 </div>
               </div>
@@ -71,7 +83,14 @@
             <div class="col-5">
               <div class="from-group">
                 <label class="control-label">Telefono: <span style="color: red">*</span></label>
-                <input type="text" class="form-control" [textMask]="{ mask: phoneMask }" formControlName="telefono" placeholder="(___) ___-____" autocomplete="off" />
+                <input
+                  type="text"
+                  class="form-control"
+                  [textMask]="{ mask: phoneMask }"
+                  formControlName="telefono"
+                  placeholder="(___) ___-____"
+                  autocomplete="off"
+                />
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"
@@ -88,7 +107,11 @@
               <div class="form-group">
                 <label class="control-label">Email:</label>
                 <input type="text" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['email'].valid && (form.controls['email'].dirty || form.controls['email'].touched)">
+                <div
+                  class="alerta text-danger ml-1"
+                  style="font-size: 12px"
+                  *ngIf="!form.controls['email'].valid && (form.controls['email'].dirty || form.controls['email'].touched)"
+                >
                   Introduzca un email valido
                 </div>
               </div>
@@ -96,8 +119,19 @@
             <div class="col-6">
               <div class="form-group">
                 <label class="control-label">Cedula <span style="color: red">*</span></label>
-                <input type="text" [textMask]="{ mask: cedulaMask }" class="form-control" formControlName="cedula" placeholder="___-_______-_" autocomplete="off" />
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['cedula'].valid && (form.controls['cedula'].dirty || form.controls['cedula'].touched)">
+                <input
+                  type="text"
+                  [textMask]="{ mask: cedulaMask }"
+                  class="form-control"
+                  formControlName="cedula"
+                  placeholder="___-_______-_"
+                  autocomplete="off"
+                />
+                <div
+                  class="alerta text-danger ml-1"
+                  style="font-size: 12px"
+                  *ngIf="!form.controls['cedula'].valid && (form.controls['cedula'].dirty || form.controls['cedula'].touched)"
+                >
                   Introduzca un cedula valido
                 </div>
               </div>
@@ -107,11 +141,22 @@
           <div class="row">
             <div class="col-5">
               <label class="control-label">Fecha nac...: <span style="color: red">*</span> </label>
-              <input type="text" [bsConfig]="dpConfig" placeholder="dd/mm/aaaa" class="form-control" formControlName="fecha_nacimiento" #dp="bsDatepicker" placement="top" bsDatepicker />
+              <input
+                type="text"
+                [bsConfig]="dpConfig"
+                placeholder="dd/mm/aaaa"
+                class="form-control"
+                formControlName="fecha_nacimiento"
+                #dp="bsDatepicker"
+                placement="top"
+                bsDatepicker
+              />
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['fecha_nacimiento'].valid && (form.controls['fecha_nacimiento'].dirty || form.controls['fecha_nacimiento'].touched)"
+                *ngIf="
+                  !form.controls['fecha_nacimiento'].valid && (form.controls['fecha_nacimiento'].dirty || form.controls['fecha_nacimiento'].touched)
+                "
               >
                 Este campo es obligatorio
               </div>
@@ -127,7 +172,11 @@
                   <option value="U">Cajero</option>
                   <option value="C">Chofer</option>
                 </select>
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['role'].valid && (form.controls['role'].dirty || form.controls['role'].touched)">
+                <div
+                  class="alerta text-danger ml-1"
+                  style="font-size: 12px"
+                  *ngIf="!form.controls['role'].valid && (form.controls['role'].dirty || form.controls['role'].touched)"
+                >
                   Debe de seleccionar el role
                 </div>
               </div>
@@ -164,10 +213,10 @@
   </div>
   <div class="col-7">
     <h4>Listado empleados</h4>
-    <div id="cardTabla" #cardTabla class="card cardListados">
+    <div #cardTabla id="cardTabla" class="card cardListados">
       <app-tablas
         *ngIf="listaEmpleados && info"
-        [info]="info"
+        [padre]="cardTabla" [info]="info"
         [data]="listaEmpleados"
         [focusRow]="false"
         [quitarAScorll]="-20"

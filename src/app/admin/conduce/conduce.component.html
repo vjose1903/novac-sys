@@ -32,10 +32,10 @@
         <h3>Ventas adelantadas</h3>
       </div>
       <div class="col-12">
-        <div id="cardTabla" class="card sombra bordeRedondeado factAdelantadas">
+        <div #cardTabla id="cardTabla" class="card sombra bordeRedondeado factAdelantadas">
           <app-tablas
             *ngIf="facturas_adelantadas && info"
-            [info]="info"
+            [padre]="cardTabla" [info]="info"
             [ROW]="'row_adelantada'"
             [search]="false"
             [paginate]="false"

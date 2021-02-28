@@ -59,7 +59,14 @@
         </div>
         <div class="pl-3">
           <a class="btn mr-2 btn-blanco" (click)="borrar()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
-          <input [disabled]="abilitarBtnAgregar()" (click)="agregarAlista()" type="submit" class="btn" value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}" id="btn-verde" />
+          <input
+            [disabled]="abilitarBtnAgregar()"
+            (click)="agregarAlista()"
+            type="submit"
+            class="btn"
+            value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}"
+            id="btn-verde"
+          />
         </div>
       </div>
     </div>
@@ -78,7 +85,12 @@
               <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
 
               <div class="d-flex justify-content-end" style="width: 100%">
-                <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'" [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
+                <span
+                  *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'"
+                  [mdbTooltip]="cantiTool"
+                  placement="{{ i != 0 ? 'top' : 'botton' }}"
+                  class="cantidadInve"
+                >
                   {{ lookprincipal(ingrediente.existencia) }}
                 </span>
                 <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Libra'" class="cantidadInve">
@@ -97,7 +109,12 @@
               <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
 
               <div class="d-flex justify-content-end" style="width: 100%">
-                <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'" [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
+                <span
+                  *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'"
+                  [mdbTooltip]="cantiTool"
+                  placement="{{ i != 0 ? 'top' : 'botton' }}"
+                  class="cantidadInve"
+                >
                   {{ lookprincipal(ingrediente.existencia) }}
                 </span>
                 <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Libra'" class="cantidadInve">
@@ -111,13 +128,15 @@
     </div>
   </div>
   <div class="col-12">
-    <div id="cardTabla" #cardTabla class="card card-padding-1 sombra heightPmax">
+    <div #cardTabla id="cardTabla" class="card card-padding-1 sombra heightPmax">
       <div>
         <app-tablas
           *ngIf="lista_produccion"
+          [padre]="cardTabla"
           [info]="info"
           [data]="lista_produccion"
           [search]="false"
+          [quitarAScorll]="50"
           [focusRow]="false"
           [botones]="botones"
           (DevolverInfo)="editarItem($event)"
@@ -128,7 +147,14 @@
     </div>
     <div class="d-flex justify-content-end mt-4">
       <input [disabled]="abilitarBtnConfirmar()" (click)="cancelarProduccion()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar')" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      <input
+        [disabled]="abilitarBtnConfirmar()"
+        (click)="abrirModalDinamicText('confirmar')"
+        type="submit"
+        class="btn"
+        value="Confirmar"
+        id="btn-verde"
+      />
     </div>
   </div>
 </div>

@@ -141,10 +141,7 @@ function contenidoReporte(data, configuration) {
 
   if (data.tipo_tabla === 'agrupado') {
     console.log(':::::::::::: TABLA AGUPADA :::::::::::: ');
-
-    console.log('configuration --> ', configuration);
     content = getContentWithTablaAgrupada(configuration, data);
-    console.log('coño');
   } else {
     console.log(':::::::::::: TABLA NORMAL :::::::::::: ');
     content = getContentWithTablaNormal(configuration, data);

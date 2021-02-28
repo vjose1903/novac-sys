@@ -1,5 +1,6 @@
-<div id="cardTabla" style="height: 100%">
+<div #cardTabla id="cardTabla" style="height: 100%">
   <app-tablas
+    [padre]="cardTabla"
     [info]="info"
     [search]="false"
     [data]="articulos"

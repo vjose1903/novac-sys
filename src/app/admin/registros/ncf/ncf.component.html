@@ -107,7 +107,7 @@
 
   <div class="col-md-7">
     <h4>Listado articulos</h4>
-    <div id="cardTabla" class="card cardListados">
+    <div #cardTabla id="cardTabla" class="card cardListados">
       <div>
         <select class="form-control filtroNCF" [(ngModel)]="filtro" (change)="filtrarNCF()">
           <option value="0" disabled>Filtro por tipo de articulos</option>
@@ -117,7 +117,7 @@
       </div>
       <app-tablas
         *ngIf="listaNCF && info"
-        [info]="info"
+        [padre]="cardTabla" [info]="info"
         [data]="listaNCF"
         [focusRow]="false"
         [quitarAScorll]="-20"

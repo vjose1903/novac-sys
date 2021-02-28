@@ -90,9 +90,9 @@
   <div class="col-12 mt-4">
     <div *ngIf="mostrarListaFacturas()" class="row">
       <div class="col-12">
-        <div id="cardTabla" class="card card-padding sombra ingreCard" style="height: 37.5rem">
+        <div #cardTabla id="cardTabla" class="card card-padding sombra ingreCard" style="height: 37.5rem">
           <app-tablas
-            [info]="info"
+            [padre]="cardTabla" [info]="info"
             [quitarAScorll]="60"
             [id_tabla]="'facturas_parms'"
             (clickIcon)="selectFactura($event)"

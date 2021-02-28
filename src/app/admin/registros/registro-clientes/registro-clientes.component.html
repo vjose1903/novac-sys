@@ -262,10 +262,10 @@
   </div>
   <div class="col-7">
     <h4>Listado clientes</h4>
-    <div id="cardTabla" class="card cardListados">
+    <div #cardTabla id="cardTabla" class="card cardListados">
       <app-tablas
         *ngIf="listaClientes && info"
-        [info]="info"
+        [padre]="cardTabla" [info]="info"
         [data]="listaClientes"
         [botones]="botones"
         [quitarAScorll]="-20"

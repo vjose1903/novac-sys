@@ -14,6 +14,7 @@ const t_c = {
     margin_general: [10, 0, 10, 0],
     break: 40,
     widths: [24, 60, 73, 53, '*', 'auto'],
+    mostrar_total: true,
     info: [
       {
         text: '#',
@@ -94,6 +95,7 @@ const t_c = {
     break: 40,
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
     widths: [24, 60, 73, 53, '*', 'auto'],
+    mostrar_total: true,
     info: [
       {
         text: '#',
@@ -178,6 +180,7 @@ const t_c = {
     break: 40,
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
     widths: [18, '*', 60, 70, 70, 70, 70, 'auto'],
+    mostrar_total: true,
     info: [
       {
         text: '#',
@@ -324,6 +327,7 @@ const t_c = {
     margin_general: [10, 0, 10, 0],
     break: 40,
     widths: [24, 60, 70, '*', 50, 'auto'],
+    mostrar_total: true,
     info: [
       {
         text: '#',
@@ -414,8 +418,10 @@ const t_c = {
       },
       {
         margin_general: [10, 0, 10, 0],
+        isBreak: false,
         break: 40,
         widths: [24, '*', 'auto', 'auto'],
+        mostrar_total: true,
         info: [
           {
             text: '#',

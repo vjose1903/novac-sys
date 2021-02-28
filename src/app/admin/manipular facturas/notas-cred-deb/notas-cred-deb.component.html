@@ -73,13 +73,13 @@
     </div>
 
     <!-- ======================================================================================================== -->
-    <div id="cardTabla" class="cuerpoFactura mb-2">
+    <div #cardTabla id="cardTabla" class="cuerpoFactura mb-2">
       <app-tablas
         *ngIf="detalleFacturas"
         [search]="false"
         [paginate]="false"
         [tablaHover]="false"
-        [info]="info"
+        [padre]="cardTabla" [info]="info"
         (getInfoChange)="getInfoChange($event)"
         [data]="detalleFacturas"
         [focusRow]="false"

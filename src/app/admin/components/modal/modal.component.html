@@ -354,7 +354,7 @@
     [focusOnShow]="true"
     [modal]="false"
     [responsive]="true"
-    [style]="{ width: '900px', height: '400px' }"
+    [style]="{ width: '900px', height: '500px' }"
     [minY]="70"
     (onHide)="reinicioModal()"
     id="tablaSearch"
@@ -362,13 +362,15 @@
     blockScroll="true"
   >
     <!-- *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos" -->
-    <div id="cardTabla" style="height: 100%">
+    <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
         [focusRow]="true"
         [metodo]="metodo"
         [paraFiltroArticulos]="paraFiltroArticulos"
         (clickRow)="devolverCLick($event)"
         [info]="infoArticulos"
+        [pad]="false"
+        [padre]="cardTabla"
         [data]="seleccionModal"
         [search]="false"
         (noArticulo)="noArticulo()"
@@ -391,19 +393,21 @@
     [focusOnShow]="true"
     [modal]="false"
     [responsive]="true"
-    [style]="{ width: '900px', height: '400px' }"
+    [style]="{ width: '900px', height: '500px' }"
     [minY]="70"
     (onHide)="reinicioModal()"
     (onShow)="prueba()"
     blockScroll="true"
   >
-    <div id="cardTabla" style="height: 100%">
+    <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
         *ngIf="seleccionModal"
         [paraFiltroClientes]="tipoModal === 'buscarCliente' ? paraFiltroClientes : paraFiltroSuplidor"
         [focusRow]="true"
         (clickRow)="devolverCLick($event)"
         [info]="tipoModal === 'buscarCliente' ? infoCliente : infoSuplidor"
+        [pad]="false"
+        [padre]="cardTabla"
         [data]="seleccionModal"
         [search]="true"
         [ROW]="'cliente'"

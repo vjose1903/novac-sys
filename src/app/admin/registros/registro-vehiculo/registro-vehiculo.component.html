@@ -9,7 +9,15 @@
           <div class="col-12">
             <div class="form-group">
               <label class="control-label">Propietario: <span style="color: red">*</span></label>
-              <ng-select id="user_id" formControlName="user_id" (change)="selectPropietario()" [items]="listaPropietarios" bindLabel="nombreCompleto" bindValue="id" [clearable]="false">
+              <ng-select
+                id="user_id"
+                formControlName="user_id"
+                (change)="selectPropietario()"
+                [items]="listaPropietarios"
+                bindLabel="nombreCompleto"
+                bindValue="id"
+                [clearable]="false"
+              >
                 <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                   <div>
                     <span>{{ item.nombreCompleto }} </span>
@@ -35,7 +43,10 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['nombre_no_empleado'].valid && (form.controls['nombre_no_empleado'].dirty || form.controls['nombre_no_empleado'].touched)"
+                *ngIf="
+                  !form.controls['nombre_no_empleado'].valid &&
+                  (form.controls['nombre_no_empleado'].dirty || form.controls['nombre_no_empleado'].touched)
+                "
               >
                 Introduzca el nombre
               </div>
@@ -59,7 +70,10 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['apellido_no_empleado'].valid && (form.controls['apellido_no_empleado'].dirty || form.controls['apellido_no_empleado'].touched)"
+                *ngIf="
+                  !form.controls['apellido_no_empleado'].valid &&
+                  (form.controls['apellido_no_empleado'].dirty || form.controls['apellido_no_empleado'].touched)
+                "
               >
                 Introduzca el apellido
               </div>
@@ -69,12 +83,22 @@
           <div class="col-6" *ngIf="form.controls['user_id'].value === -1">
             <div class="form-group">
               <label class="control-label">Telefono: <span style="color: red">*</span></label>
-              <input type="text" class="form-control" [textMask]="{ mask: phoneMask }" formControlName="telefono_no_empleado" placeholder="(___) ___-____" autocomplete="off" />
+              <input
+                type="text"
+                class="form-control"
+                [textMask]="{ mask: phoneMask }"
+                formControlName="telefono_no_empleado"
+                placeholder="(___) ___-____"
+                autocomplete="off"
+              />
 
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="!form.controls['telefono_no_empleado'].valid && (form.controls['telefono_no_empleado'].dirty || form.controls['telefono_no_empleado'].touched)"
+                *ngIf="
+                  !form.controls['telefono_no_empleado'].valid &&
+                  (form.controls['telefono_no_empleado'].dirty || form.controls['telefono_no_empleado'].touched)
+                "
               >
                 Introduzca el numero de telefono
               </div>
@@ -89,7 +113,15 @@
             <div class="form-group">
               <label class="control-label">Marca: <span style="color: red">*</span></label>
               <!-- <input (focus)="$event.target.select()" type="text" formControlName="marca" placeholder="Introduzca marca" class="form-control" autocomplete="off" id="marca" /> -->
-              <ng-select id="marca" formControlName="marca" (change)="selectMarca()" [items]="listaMarcas" bindLabel="descripcion" bindValue="id" [clearable]="false">
+              <ng-select
+                id="marca"
+                formControlName="marca"
+                (change)="selectMarca()"
+                [items]="listaMarcas"
+                bindLabel="descripcion"
+                bindValue="id"
+                [clearable]="false"
+              >
                 <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                   <div>
                     <span>{{ item.descripcion }} </span>
@@ -116,9 +148,22 @@
           <div class="col-6">
             <div class="form-group">
               <label class="control-label">Año: <span style="color: red">*</span></label>
-              <input (focus)="$event.target.select()" type="text" formControlName="anio" placeholder="Introduzca año" class="form-control" autocomplete="off" id="anio" maxlength="4" />
+              <input
+                (focus)="$event.target.select()"
+                type="text"
+                formControlName="anio"
+                placeholder="Introduzca año"
+                class="form-control"
+                autocomplete="off"
+                id="anio"
+                maxlength="4"
+              />
 
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['anio'].valid && (form.controls['anio'].dirty || form.controls['anio'].touched)">
+              <div
+                class="alerta text-danger ml-1"
+                style="font-size: 12px"
+                *ngIf="!form.controls['anio'].valid && (form.controls['anio'].dirty || form.controls['anio'].touched)"
+              >
                 <span *ngIf="form.controls['anio'].errors.minlength">Año incompleto</span>
                 <span *ngIf="form.controls['anio'].errors.required">Introduzca el año</span>
               </div>
@@ -149,6 +194,7 @@
     <div class="card cardListados">
       <app-tablas
         *ngIf="listaVehiculos && info"
+        [padre]="cardTabla"
         [info]="info"
         [data]="listaVehiculos"
         [focusRow]="false"
