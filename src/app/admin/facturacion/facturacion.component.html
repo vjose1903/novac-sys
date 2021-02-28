@@ -15,6 +15,7 @@
               class="form-control tipo inputE"
               [(ngModel)]="tipoFactura"
               id="tipoFact"
+
               (blur)="checkTipoFactura('condicion', tipoFact.value, true)"
               #tipoFact
               (focus)="setWidthPop(true, $event.target)"
