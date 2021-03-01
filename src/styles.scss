@@ -7,6 +7,11 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
+html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
+  right: 2px !important;
+  top: 0 !important;
+}
+
 .h-96 {
   height: 96% !important;
 }
@@ -407,9 +412,6 @@ input[type="text"]:disabled {
 /* ====================================================== */
 /* MODAL */
 /* ====================================================== */
-// body .p-dialog {
-//   z-index: 99999999 !important;
-// }
 
 body .p-dialog .p-dialog-header {
   background-color: #94e6aa !important;
@@ -501,7 +503,7 @@ input.apple-switch:checked:after {
 
 bs-datepicker-container,
 bs-daterangepicker-container {
-  z-index: 999999 !important;
+  z-index: 10016 !important;
 }
 
 .btn.btn-link {

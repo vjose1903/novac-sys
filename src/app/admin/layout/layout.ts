@@ -1,4 +1,5 @@
 import { Subscription } from 'rxjs';
+import { GLOBAL } from '../../core/services/GLOBAL';
 import { myElectron } from '../../core/services/electron';
 import { LayoutService } from './layout.service';
 
@@ -7,7 +8,7 @@ export class LayoutClass extends myElectron {
     super();
   }
 
-  facturaGuardada: any = undefined;
+  public facturaGuardada: any = undefined;
   info_cambio = {};
   ruta_a_cambiar = '';
   url_actual = '';
@@ -35,9 +36,8 @@ export class LayoutClass extends myElectron {
           if (fact) {
             this.rellenarFacturaGuardada((res) => {
               if (res) {
-                console.log('llenando la facturaGuardada');
-
                 this.facturaGuardada = fact;
+                this.layServ.factura_guardada = GLOBAL.duplicarJson(fact);
               }
             });
 

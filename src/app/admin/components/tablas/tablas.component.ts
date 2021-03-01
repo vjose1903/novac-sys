@@ -180,9 +180,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const paginationHeight = this.paginationDiv ? this.paginationDiv.nativeElement.offsetHeight : 0;
 
     const titulosHeigth = this.titulosHeader ? this.titulosHeader.nativeElement.offsetHeight : 0;
-    console.log('this.searchDiv   --> ', this.searchDiv);
-    console.log('this.paginationDiv   --> ', this.paginationDiv);
-    console.log('this.titulosHeader   --> ', this.titulosHeader);
 
     // const altoDiv = this.dinamicTable
     //   ? this.dinamicTable.nativeElement.parentElement.parentElement.offsetHeight > 0
@@ -209,32 +206,20 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       // this.alto = altoDiv - restoAHeigthDiv - this.quitarAScorll - paddingCard;
       const restar = restoAHeigthDiv + this.quitarAScorll;
 
-      console.log('paginationHeight                --> ', paginationHeight);
-      console.log('titulosHeigth                   --> ', titulosHeigth);
-      console.log('filterHeight                    --> ', filterHeight);
-      console.log('this.quitarAScorll              --> ', this.quitarAScorll);
-      console.log('restar                          --> ', restar);
-      console.log('this.padre                      --> ', this.padre);
-      console.log('this.padre.offsetHeight         --> ', this.padre.offsetHeight);
-      console.log('this.pad                        --> ', this.pad);
-
       let paddingCard = 0;
       if (this.pad) {
         paddingCard = this.padre.offsetTop;
-        console.log('this.padre.offsetTop             --> ', this.padre.offsetTop);
+
         paddingCard *= 2;
       }
-      console.log('paddingCard                     --> ', paddingCard);
 
       this.alto = this.padre.offsetHeight - restar - paddingCard;
-      console.log('this.alto                       --> ', this.alto);
+
       // this.searchCardTabla(this.dinamicTable.nativeElement, restar);
     }, 20);
   }
 
   async ngAfterViewInit() {
-    // console.log('this.searchInput --> ', this.searchInput);
-
     // fromEvent(this.searchInput.nativeElement, 'input')
     //   .pipe(map((event: Event) => (event.target as HTMLInputElement).value))
     //   .pipe(debounceTime(3000))

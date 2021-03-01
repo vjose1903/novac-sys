@@ -31,9 +31,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     private cdRef: ChangeDetectorRef,
   ) {
     this.loaderServ.isLoading.subscribe((v) => {
-      setTimeout(() => {
-        this.loading = v;
-      }, 5);
+      // setTimeout(() => {
+      this.loading = v;
+      // }, 5);
     });
   }
 

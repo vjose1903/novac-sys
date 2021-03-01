@@ -9,14 +9,14 @@ import { map } from 'rxjs/operators';
 export class LoaderInterceptor implements HttpInterceptor {
   private requests: HttpRequest<any>[] = [];
 
-  constructor(private loaderService: LoaderService) {}
+  constructor(private loadServ: LoaderService) {}
   removeRequest(req: HttpRequest<any>) {
     const i = this.requests.indexOf(req);
 
     if (i >= 0) {
       this.requests.splice(i, 1);
     }
-    this.loaderService.isLoading.next(this.requests.length > 0);
+    this.loadServ.isLoading.next(this.requests.length > 0);
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -29,7 +29,7 @@ export class LoaderInterceptor implements HttpInterceptor {
       req.params.delete('spinner');
     } else {
       // Execute interceptor
-      this.loaderService.isLoading.next(true);
+      this.loadServ.isLoading.next(true);
     }
 
     // tslint:disable-next-line: deprecation

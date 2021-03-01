@@ -105,7 +105,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     private router: Router,
     public mServ: ModalService,
     private tServ: TablasService,
-    private loaderService: LoaderService,
+    private loadServ: LoaderService,
     public _ipc: IpcService,
     public layServ: LayoutService,
   ) {
@@ -150,10 +150,10 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   getMateriasP(callback = (arg) => {}) {
-    this.loaderService.isLoading.next(true);
+    this.loadServ.isLoading.next(true);
     this.dbServ.getMateriasPrimas().subscribe(
       (res) => {
-        this.loaderService.isLoading.next(false);
+        this.loadServ.isLoading.next(false);
         this.listaMateriasPrimas = GLOBAL.duplicarJson(res);
         callback({
           status: true,
@@ -163,7 +163,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
         callback({
           status: false,
         });
-        this.loaderService.isLoading.next(false);
+        this.loadServ.isLoading.next(false);
       },
     );
   }
@@ -800,7 +800,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
   async editarItem(item) {
     const articulo = item.ARG;
-    console.log('articulo --> ', articulo);
 
     this.borrar();
     this.form.patchValue(articulo);

@@ -9,11 +9,6 @@ export function getTablaNormal(configuration, data, index_data?, index_info?) {
 }
 
 export function makeTablaNormal(configuration, data, index_data?, index_info?) {
-  console.log('configuration --> ', configuration);
-  console.log('data --> ', data);
-  console.log('index_data --> ', index_data);
-  console.log('index_info --> ', index_info);
-
   const data_ = data.tipo_tabla === 'normal' ? data : data.contenido_reporte[index_data];
   const contendio_ = data.tipo_tabla === 'normal' ? data.contenido_reporte : data.contenido_reporte[index_data].contenido_grupo;
 
@@ -38,28 +33,34 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
     }
   });
 
-  // if (data.tipo_tabla === 'agrupado') {
-  //   body.push({
-  //     canvas: [{ type: 'rect', x: 10, y: data.mostrar_sub_titulo ? 5 : 20, w: 575, h: 1.5, color: '#000000' }],
-  //   });
-  // }
+  if (data.tipo_tabla === 'agrupado') {
+    console.log('::::::::::::: configuration.pageOrientation --> ', configuration.pageOrientation);
+    console.log('::::::::::::: WIDTH --> ', configuration.pageOrientation ? (configuration.pageOrientation === 'portrait' ? 575 : 825) : 575);
+
+    body.push({
+      canvas: [
+        {
+          type: 'rect',
+          x: 10,
+          y: 0,
+          w: configuration.pageOrientation ? (configuration.pageOrientation === 'portrait' ? 575 : 820) : 575,
+          h: 1.5,
+          color: '#000000',
+        },
+      ],
+    });
+  }
+
   if (contendio_.length > 0 || configuration.only_titulo) {
     body.push(titulos);
   }
 
   if (contendio_.length > 0 && !configuration.only_titulo) {
-    console.log('CONFIGURATION.WIDTHS --> ', configuration.widths);
     contendio_.forEach((detalle, j) => {
       const row = formarCuerpo(data, configuration, detalle, j);
       body.push(row);
     });
   }
-  // } else if (data.tipo_tabla === 'agrupado' && !configuration.only_titulo) {
-  //   data.contenido_reporte[index_data].contenido_grupo.forEach((detalle, j) => {
-  //     const row = formarCuerpo(data, configuration, detalle, j);
-  //     body.push(row);
-  //   });
-  // }
 
   var content = [
     contendio_.length > 0 || configuration.only_titulo
@@ -136,8 +137,6 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
       : { text: '' },
   ];
 
-  console.log('------------------------------------------------------------------------------------------------------------------- ');
-  console.log(' ');
   return content;
 }
 

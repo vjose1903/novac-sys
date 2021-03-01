@@ -52,10 +52,11 @@ function createWindow() {
 
   if (serve) {
     contents = win.webContents;
+
     require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`),
     });
-    win.loadURL('http://localhost:4200');
+    win.loadURL('http://localhost:5220');
   } else {
     win.loadURL(
       url.format({
@@ -200,7 +201,6 @@ function borrarLogs() {
   setTimeout(() => {
     puts('ahora va a borrar el archivo log');
     const comando = `del "${pathAdd('/my_log.txt', false)}"`;
-    console.log('comando para borrar ==> ' + comando);
     cmd(comando);
   }, 10000);
 }
@@ -552,7 +552,7 @@ function showProgress(received, total) {
 async function puts(msg, titulo?) {
   if (win) {
     const fs = require('fs');
-    const file = 'my_log.txt';
+    const file = 'log/my_log.txt';
 
     let texto = '';
     if (typeof msg === 'object') {
@@ -656,13 +656,10 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
   puts(cFileName, 'cFileName');
   puts(base64, 'base64');
   puts(type, 'type');
-  console.log(type, 'type');
-  console.log(cFileName, 'cFileName');
 
   try {
     fs.writeFile(FileName, base64, { encoding: 'base64' }, (err) => {
       puts('PASOO EL METODO QUE CREA EL ARCHIVO PDF');
-      console.log('PASOO EL METODO QUE CREA EL ARCHIVO PDF');
       imprimir(cFileName, type);
     });
   } catch (err) {
@@ -713,8 +710,6 @@ function imprimir(cFileName, tipo) {
 
   const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},noscale,paper=${paper_size},simplex" -silent "${file_path}"`;
 
-  console.log('el maldito comando --> ', comando);
-
   cmd(comando, (res) => {
     puts(res, 'respuesta impresion');
 
@@ -728,8 +723,6 @@ function imprimir(cFileName, tipo) {
         msg_ = 'Factura generada correctamente!!';
         tipo_ = 'printRes';
       }
-      console.log(`MALDITO TIPO--> ${tipo_}`);
-      console.log(`SEND ANGULAR ${tipo_} ${msg_}`);
       puts(`SEND ANGULAR ${tipo_} ${msg_}`);
       win.webContents.send(tipo_, { msg: msg_, status: 'si', STDOUT: res });
     } else {
@@ -740,8 +733,6 @@ function imprimir(cFileName, tipo) {
         msg_ = 'Error generando Factura!!';
         tipo_ = 'printRes';
       }
-      console.log(`ERROR MALDITO TIPO--> ${tipo_}`);
-      console.log(`ERROR SEND ANGULAR ${tipo_} ${msg_}`);
       puts(`SEND ANGULAR ${tipo_} ${msg_}`);
       win.webContents.send(tipo_, { msg: msg_, status: 'no', err: res });
       return;

@@ -48,9 +48,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.searchVersion();
 
     this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      console.log('event--> ', event);
-      console.log('res--> ', res);
-
       if (this.tipo_prueba !== 'otro') {
         const obj = {
           pdfSrc: res.body,
@@ -70,8 +67,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   abrirModalReporte(obj) {
-    console.log('obj --> ', obj);
-
     this.mServ.modalTipo('visor_pdf');
     this.mServ.ModalSeleccion(obj);
 
@@ -160,7 +155,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       type: 'reporte',
     };
 
-    console.log('PREUBA --> ', obj);
     this.tipo_prueba = obj.type;
     this._ipc.send('print', obj);
   }

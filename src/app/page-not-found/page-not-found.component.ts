@@ -12,8 +12,6 @@ export class PageNotFoundComponent implements OnInit {
 
   ngOnInit() {}
   home() {
-    console.log('algo');
-
     this.router.navigate(['/admin/dashboard']);
   }
 }

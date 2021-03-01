@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { LoaderService } from '../../loader/loader.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { IpcService } from '../../core/services/ipc.service';
 import { ModalService } from '../components/modal/modal.service';
@@ -16,7 +17,13 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   fileName: any;
   tipoModal: string;
 
-  constructor(public _ipc: IpcService, public mServ: ModalService, private dbServ: DBservice, public layServ: LayoutService) {
+  constructor(
+    public _ipc: IpcService,
+    public mServ: ModalService,
+    private dbServ: DBservice,
+    public layServ: LayoutService,
+    public loadServ: LoaderService,
+  ) {
     super(mServ, _ipc, layServ);
   }
 
@@ -52,7 +59,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
           };
         }
 
-        this.abrirModalReporte(obj);
+        this.abrirVisorPdf(obj);
       } else {
         this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
       }
@@ -83,10 +90,10 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       if (res && res.tipo_modal === 'buscarCliente') {
         if (this.tipoModal === 'cuentas_cobrar_cliente') {
           res.data.tipo_ = 2;
-          this.reporte(res.data);
+          this.makePdf(res.data);
         }
       } else if (res && res.tipo_modal !== 'buscarCliente') {
-        this.reporte(res.data);
+        this.makePdf(res.data);
         this.mServ.ModalObj(undefined);
       }
     });
@@ -128,7 +135,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     this.tipoModal = undefined;
   }
 
-  async reporte(data) {
+  async makePdf(data) {
     let res = {} as any;
 
     try {
@@ -147,10 +154,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         tipo = 'recibos';
         //
       } else if (this.tipoModal === 'ventas_productos') {
-        console.log('data --> ', data);
-
         params = data.tipo === '1' ? `desde=${data.fecha}` : (params = `desde=${data.desde}&hasta=${data.hasta}`);
-        console.log('params --> ', params);
         tipo = 'ventas_productos';
         //
       } else if (this.tipoModal === 'suplidor_prod') {
@@ -164,7 +168,8 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       }
 
       res = await this.dbServ.makeReportes(tipo, params).toPromise();
-
+      // aqui poner el loader
+      this.loadServ.isLoading.next(true);
       const obj = {
         data: res,
         type: 'reporte',
@@ -204,7 +209,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         this.titulo_moda_reporte = 'Reporte de CxC por antiguedad de saldos';
         this.tipoModal = 'cuentas_cobrar_ant_saldo';
         abrirModal = false;
-        this.reporte({ tipo_: 1 });
+        this.makePdf({ tipo_: 1 });
         this.mServ.modalTipo(undefined);
         //
       } else if (tipo === 'recibos') {
@@ -219,7 +224,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       } else if (tipo === 'inventario') {
         this.titulo_moda_reporte = 'Reporte de inventario';
         abrirModal = false;
-        this.reporte({ tipo_: 1 });
+        this.makePdf({ tipo_: 1 });
         //
       }
 
@@ -234,11 +239,11 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     }
   }
 
-  abrirModalReporte(obj) {
+  abrirVisorPdf(obj) {
     this.tipoModal = 'visor_pdf';
     this.mServ.modalTipo('visor_pdf');
     this.mServ.ModalSeleccion(obj);
-
+    this.loadServ.isLoading.next(false);
     this.mServ.mostrarModal(true);
   }
 

@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
-  constructor(public loaderService: LoaderService, private fun: FunctionService, private dbServ: DBservice, private router: Router) {}
+  constructor(public loadServ: LoaderService, private fun: FunctionService, private dbServ: DBservice, private router: Router) {}
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     this.fun.nextCanToast(false);
     const token = this.fun.getAuthToken();
@@ -22,7 +22,7 @@ export class InterceptorService implements HttpInterceptor {
       request.params.delete('spinner');
     } else {
       // Activa el loader
-      this.loaderService.isLoading.next(true);
+      this.loadServ.isLoading.next(true);
     }
 
     if (token) {
@@ -66,7 +66,7 @@ export class InterceptorService implements HttpInterceptor {
         return throwError(response);
       }),
       finalize(() => {
-        this.loaderService.isLoading.next(false);
+        this.loadServ.isLoading.next(false);
       }),
     );
     // return next.handle(request).pipe(

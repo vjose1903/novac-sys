@@ -12,6 +12,7 @@ import { FunctionService } from '../../core/services/functions.service';
 import { LayoutService } from './layout.service';
 import { mixinClass } from '../mixinClass';
 import { ModalService } from '../components/modal/modal.service';
+import { GLOBAL } from '../../core/services/GLOBAL';
 
 @Component({
   selector: 'app-layout',
@@ -19,6 +20,7 @@ import { ModalService } from '../components/modal/modal.service';
   styleUrls: ['./layout.component.scss'],
 })
 export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, AfterContentChecked, AfterViewInit {
+  actualMenyItemBack;
   actualMenyItem;
   showLoading = true;
 
@@ -33,6 +35,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   ready;
   _opened = false;
   facturas_localStorage: any;
+  factGuardada = undefined;
 
   constructor(
     public fun: FunctionService,
@@ -140,6 +143,10 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     await this._ipc.on('versionResponse', (event, arg) => {
       this.versionApp = arg;
     });
+  }
+
+  checkFacturaGuardada() {
+    this.factGuardada = this.layServ.factura_guardada;
   }
 
   getVersion() {
@@ -250,6 +257,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     if (temp_url[1]) {
       const url = temp_url[1].split('/')[0];
       this.actualMenyItem = url;
+      this.actualMenyItemBack = GLOBAL.duplicarJson(this.actualMenyItem);
 
       if (url === 'factura') {
         this.getFacturasGuardadas();
@@ -325,6 +333,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     } else {
       this.ready = true;
     }
+
+    this.checkRouteActiva();
 
     this.modulo_select = undefined;
   }

@@ -119,9 +119,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
     }
   }
 
-  ipcBase64Resonse(res) {
-    console.log('ipcBase64Resonse --> ', res);
-  }
+  ipcBase64Resonse(res) {}
 
   mapeoRecibos(res) {
     res.map((recibo) => {

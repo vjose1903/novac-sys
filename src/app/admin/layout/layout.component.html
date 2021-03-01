@@ -1,9 +1,11 @@
+{{ checkFacturaGuardada() }}
+
 <div id="fondoC" *ngIf="noServer" class="h-100 w-100 position-absolute backnegro">
   <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
 </div>
 
 <p-sidebar
-  *ngIf="actualMenyItem == 'factura'"
+  *ngIf="actualMenyItemBack == 'factura'"
   #my_sidebar
   styleClass="my_sidebar  {{ _opened ? 'side_open' : 'side_closed' }}"
   [position]="'right'"
@@ -33,11 +35,12 @@
       <ng-container *ngIf="facturas_localStorage?.length > 0">
         <div #divFact class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="pasarFacturaAfacturacion(fact)">
           <div
+            *ngIf="divFact.offsetHeight"
             [ngStyle]="{ height: divFact.offsetHeight + 'px' }"
             class="colorsito bg-raya-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}{{ fact?.action === 'update' ? '-orange' : '' }}"
           ></div>
 
-          <div class="info_fact">
+          <div class="info_fact h-100 {{ factGuardada?.factura_id === fact?.factura_id ? 'activa' : '' }}">
             <i class="fas fa-truck-moving {{ fact.is_viaje ? 'if_viaje' : 'd-none' }}"></i>
             <i
               class="btn_borrar_factura_gurdada far fa-trash-alt"
@@ -48,8 +51,8 @@
             <span
               class="negrita text-mayuscula text-separado-2 texto-borde-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}
             texto-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}"
-              >{{ my_capitalize(fact?.tipo) }}</span
-            >
+              >{{ my_capitalize(fact?.tipo) }}
+            </span>
             <span class="text-gris-oscuro" *ngIf="fact?.action === 'update'"> (Editando)</span>
             <br />
             <span class="clienteFactura">

@@ -177,7 +177,8 @@ const t_c = {
   // --------------------------------------
   cxc_ant: {
     margin_general: [10, 0, 10, 0],
-    break: 40,
+    pageOrientation: 'landscape',
+    break: 25,
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
     widths: [18, '*', 60, 70, 70, 70, 70, 'auto'],
     mostrar_total: true,
