@@ -56,6 +56,7 @@ function createWindow() {
     require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`),
     });
+
     win.loadURL('http://localhost:5220');
   } else {
     win.loadURL(
@@ -200,7 +201,7 @@ function borrarLogs() {
   puts('entro enla funcion de borrar log');
   setTimeout(() => {
     puts('ahora va a borrar el archivo log');
-    const comando = `del "${pathAdd('/my_log.txt', false)}"`;
+    const comando = `del "${pathAdd('log/my_log.txt', false)}"`;
     cmd(comando);
   }, 10000);
 }

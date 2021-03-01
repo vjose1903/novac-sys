@@ -1,2 +1,2 @@
-(node_modules|plugins|src|log)
+(node_modules|plugins|src|log|resources|print|reload)
 

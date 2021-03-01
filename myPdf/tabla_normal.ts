@@ -35,7 +35,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
 
   if (data.tipo_tabla === 'agrupado') {
     console.log('::::::::::::: configuration.pageOrientation --> ', configuration.pageOrientation);
-    console.log('::::::::::::: WIDTH --> ', configuration.pageOrientation ? (configuration.pageOrientation === 'portrait' ? 575 : 825) : 575);
+    console.log('::::::::::::: WIDTH --> ', configuration.pageOrientation ? (configuration.pageOrientation === 'portrait' ? 575 : 823) : 575);
 
     body.push({
       canvas: [
@@ -43,7 +43,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
           type: 'rect',
           x: 10,
           y: 0,
-          w: configuration.pageOrientation ? (configuration.pageOrientation === 'portrait' ? 575 : 820) : 575,
+          w: configuration.pageOrientation ? (configuration.pageOrientation === 'portrait' ? 575 : 823) : 575,
           h: 1.5,
           color: '#000000',
         },
