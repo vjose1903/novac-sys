@@ -10,11 +10,14 @@ import { getContentWithTablaAgrupada } from './tabla_agrupada';
 
 export function makeReporte(data) {
   const configuration = getConfiguration(data.tipo_reporte);
+  const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const dd = {
     // pageSize: { width: 990, height: 398 },
     pageMargins: [0, data.mostrar_sub_titulo ? 118.5 : 111.5, 0, 30],
-    pageOrientation: configuration.pageOrientation ? configuration.pageOrientation : 'portrait',
-    header: cabeceraReporte(data, configuration),
+
+    pageOrientation: pageO,
+
+    header: cabeceraReporte(data, pageO),
     content: contenidoReporte(data, configuration),
     footer: (currentPage, pageCount) => {
       return [
@@ -37,13 +40,14 @@ export function makeReporte(data) {
     file: 'reporte.pdf',
     type: 'base64',
   };
+
   return obj;
 }
 
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraReporte(data, configuration) {
+function cabeceraReporte(data, pageO) {
   const header = (currentPage, pageCount) => {
     const pag = currentPage.toString() + ' de ' + pageCount;
     return [
@@ -85,7 +89,7 @@ function cabeceraReporte(data, configuration) {
                 { text: pag, style: 'letra10' },
               ],
               alignment: 'left',
-              margin: [60, 19, 0, 0],
+              margin: [pageO === '' ? 60 : 80, 19, 0, 0],
             },
             {
               text: [
@@ -93,7 +97,7 @@ function cabeceraReporte(data, configuration) {
                 { text: data.fecha, style: 'letra10' },
               ],
               alignment: 'left',
-              margin: [60, 3, 0, 0],
+              margin: [pageO === '' ? 60 : 80, 3, 0, 0],
             },
             {
               text: [
@@ -101,7 +105,7 @@ function cabeceraReporte(data, configuration) {
                 { text: data.realizado_por, style: 'letra10' },
               ],
               alignment: 'left',
-              margin: [60, 3, 0, 0],
+              margin: [pageO === '' ? 60 : 80, 3, 0, 0],
             },
           ],
         ],
@@ -126,7 +130,7 @@ function cabeceraReporte(data, configuration) {
                 type: 'rect',
                 x: 10,
                 y: data.mostrar_sub_titulo ? 5 : 20,
-                w: configuration.pageOrientation ? (configuration.pageOrientation === 'portrait' ? 575 : 820) : 575,
+                w: pageO === 'portrait' ? 575 : 823,
                 h: 1.5,
                 color: '#000000',
               },

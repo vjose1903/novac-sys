@@ -27,14 +27,14 @@
           <div class="form-group mt-4">
             <label class="control-label">Desde: <span style="color: red">*</span></label>
             <input type="number" class="form-control" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')" />
-            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="desdeAlert">Debe de seleccionar una fecha</div>
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="desdeAlert">Campo obligatorio.</div>
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group mt-4">
             <label class="control-label">Hasta: <span style="color: red">*</span></label>
             <input type="number" class="form-control" [(ngModel)]="Hasta" (keyup)="checkInputs('hasta')" (blur)="checkInputs('hasta')" />
-            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="hastaAlert">Debe de seleccionar una fecha</div>
+            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="hastaAlert">Campo obligatorio.</div>
           </div>
         </div>
         <div class="col-md-6">
@@ -117,7 +117,8 @@
       </div>
       <app-tablas
         *ngIf="listaNCF && info"
-        [padre]="cardTabla" [info]="info"
+        [padre]="cardTabla"
+        [info]="info"
         [data]="listaNCF"
         [focusRow]="false"
         [quitarAScorll]="-20"

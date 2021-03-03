@@ -1,4 +1,4 @@
-<div #cardTabla id="cardTabla" style="height: 100%">
+<div #cardTabla id="cardTabla" style="height: 100%; position: relative">
   <app-tablas
     [padre]="cardTabla"
     [info]="info"
@@ -6,6 +6,7 @@
     [data]="articulos"
     (getInfoChange)="getInfoChange($event)"
     [tablaHover]="false"
+    [pad]="false"
     [colorHead]="false"
     [focusRow]="false"
   ></app-tablas>

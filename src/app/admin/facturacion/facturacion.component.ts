@@ -9,11 +9,12 @@ import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.componen
 import { GLOBAL, tipos_facturas } from '../../core/services/GLOBAL';
 
 import { ModalService } from '../components/modal/modal.service';
-import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
+import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { FunctionService } from '../../core/services/functions.service';
 import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
 import { FacturacionService } from './facturacion.service';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -112,6 +113,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     private route: ActivatedRoute,
     private router: Router,
     public layServ: LayoutService,
+    private localeService: BsLocaleService,
+    private pdfServ: PdfService,
     public factServ: FacturacionService,
   ) {
     super(mServ, _ipc, layServ);
@@ -150,8 +153,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   ngOnInit() {
+    this.localeService.use('es');
     this.rellenarVariables();
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printRes'] });
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
   }
 
   rellenarVariables() {
@@ -225,13 +229,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   ngAfterViewInit() {
     this.usuario = this.fun.getUser();
-  }
-
-  ipcPrintResponse(res) {
-    if (res.status === 'si') {
-    } else {
-      this.dbServ.toastError('ERROR: imprimiendo factura.', 'ERROR', true);
-    }
   }
 
   rellenarFacturaGuardada(callback = (arg) => {}) {
@@ -1335,12 +1332,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
       }
 
-      if (metodo === 'editar_factura') {
-        this.dbServ.toastSuccess('Factura editada correctamente.', 'CORRECTO', true);
-      } else {
-        this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO', true);
-      }
-
       res['FACTURA_DE'] = this.metodo;
 
       const obj = {
@@ -1349,7 +1340,17 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       };
 
       if (this.metodo === 'venta') {
-        this._ipc.send('print', obj);
+        this.pdfServ.generatePdf(obj, (res) => {
+          if (res.status === 'si') {
+            const objBase = {
+              base64: res.body,
+              filename: res.file,
+              type: 'facturacion',
+            };
+
+            this._ipc.send('printBase64', objBase);
+          }
+        });
       }
 
       if (this.facturaGuardada) {
@@ -1364,6 +1365,19 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       } catch (error) {
         console.error('error--> ', error);
       }
+    }
+  }
+
+  async ipcBase64Resonse(res) {
+    if (res.status === 'si') {
+      const metodo = this.action === 'update' ? 'editar_factura' : '';
+      if (metodo === 'editar_factura') {
+        this.dbServ.toastSuccess('Factura editada correctamente.', 'CORRECTO', true);
+      } else {
+        this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO', true);
+      }
+    } else {
+      this.dbServ.toastError('Error imprimiendo la factura.', 'ERROR', true);
     }
   }
 }

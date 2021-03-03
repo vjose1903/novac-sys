@@ -31,16 +31,6 @@ export class modalClass extends LayoutClass {
   _init_modal(lista) {
     this._lista = lista;
 
-    if (this._lista.includes('printRes')) {
-      this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
-        this.ipcPrintResponse(res);
-
-        setTimeout(() => {
-          this.quitarFocodeElectron();
-        }, 5);
-      });
-    }
-
     if (this._lista.includes('printBase64Res')) {
       this._ipc.on('printBase64Res', async (event: Electron.IpcMessageEvent, res) => {
         this.ipcBase64Resonse(res);
@@ -103,7 +93,6 @@ export class modalClass extends LayoutClass {
     }
   }
 
-  ipcPrintResponse(res) {}
   ipcBase64Resonse(res) {}
 
   decisionModal(res: any) {}
@@ -119,8 +108,6 @@ export class modalClass extends LayoutClass {
   reporte(data: any) {}
 
   _destroy_modal() {
-    if (this._lista.includes('printRes') && this._ipc) this._ipc.removeListener('printRes');
-
     if (this._lista.includes('printBase64Res') && this._ipc) this._ipc.removeListener('printBase64Res');
 
     if (this._lista.includes('decisionModal') && this.subDeci) this.subDeci.unsubscribe();

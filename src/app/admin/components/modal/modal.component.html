@@ -80,7 +80,6 @@
     [minY]="80"
     (onHide)="reinicioModal()"
     blockScroll="true"
-    positionTop="200"
   >
     <app-formulario-marca-modelo [tipo_formulario]="seleccionModal" (accion_)="accion($event)"></app-formulario-marca-modelo>
     <!-- <p-footer>
@@ -327,17 +326,22 @@
     [(visible)]="showModal"
     [modal]="false"
     [responsive]="true"
-    [style]="{ width: '900px', height: '400px' }"
+    [style]="{ width: '900px', height: '500px' }"
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
     blockScroll="true"
+    contentStyleClass="seleccionar_articulos_adelantados"
   >
-    <app-modal-seleccinar-articulo [articulos]="seleccionModal" (getArticulos)="devolverCLick($event)"></app-modal-seleccinar-articulo>
+    <app-modal-seleccinar-articulo
+      [articulos]="seleccionModal"
+      (getArticulos)="devolverCLick($event)"
+      [returnArticulos]="returnArticulosSeleccionado"
+    ></app-modal-seleccinar-articulo>
 
     <p-footer>
       <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
-      <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">SI</button>
+      <button (click)="selectArticulosAdelantados(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
 

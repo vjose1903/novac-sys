@@ -33,24 +33,6 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
     }
   });
 
-  if (data.tipo_tabla === 'agrupado') {
-    console.log('::::::::::::: configuration.pageOrientation --> ', configuration.pageOrientation);
-    console.log('::::::::::::: WIDTH --> ', configuration.pageOrientation ? (configuration.pageOrientation === 'portrait' ? 575 : 823) : 575);
-
-    body.push({
-      canvas: [
-        {
-          type: 'rect',
-          x: 10,
-          y: 0,
-          w: configuration.pageOrientation ? (configuration.pageOrientation === 'portrait' ? 575 : 823) : 575,
-          h: 1.5,
-          color: '#000000',
-        },
-      ],
-    });
-  }
-
   if (contendio_.length > 0 || configuration.only_titulo) {
     body.push(titulos);
   }

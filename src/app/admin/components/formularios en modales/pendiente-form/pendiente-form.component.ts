@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
+import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { DBservice } from '../../../../core/services/bdservice.service';
 import { ModalService } from '../../modal/modal.service';
 
@@ -22,7 +22,7 @@ export class PendienteFormComponent implements OnInit {
   @Output() cancel = new EventEmitter<any>();
   @Output() getDate = new EventEmitter<any>();
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, public mServ: ModalService) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, public mServ: ModalService, private localeService: BsLocaleService) {
     this.dpConfig = Object.assign(
       {},
       {
@@ -35,6 +35,7 @@ export class PendienteFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.localeService.use('es');
     this.hora = moment().hour();
     this.minutos = moment().minutes();
 

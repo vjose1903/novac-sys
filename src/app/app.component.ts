@@ -1,57 +1,39 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { ElectronService } from './core/services';
+import { Component, OnInit, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
 import { DBservice } from './core/services/bdservice.service';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
-import { applyMixins, GLOBAL } from './core/services/GLOBAL';
-import { FunctionService } from './core/services/functions.service';
-import { ProduccionComponent } from './admin/produccion/produccion.component';
-import { modalClass } from './admin/components/modal/modal';
-import { LayoutClass } from './admin/layout/layout';
+import { GLOBAL } from './core/services/GLOBAL';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class AppComponent implements OnInit, AfterContentChecked {
   loading = false;
-
   objProgress;
-  displayPercent = false;
+  visible = false;
   tiempo_restante;
   objPercent;
 
-  constructor(
-    public _ipc: IpcService,
-    private dbServ: DBservice,
-    private loaderServ: LoaderService,
-    private fun: FunctionService,
-    public electronService: ElectronService,
-    private cdRef: ChangeDetectorRef,
-  ) {
-    this.loaderServ.isLoading.subscribe((v) => {
-      // setTimeout(() => {
-      this.loading = v;
-      // }, 5);
-    });
-  }
+  constructor(public _ipc: IpcService, private dbServ: DBservice, private loaderServ: LoaderService, private cdRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    // this.dbServ.getSecuenciaFacturas().subscribe(res => {
-    //   this.obsServ.next_secuencia_factura(res);
-    // });
+    this.loaderServ.isLoading.subscribe((v) => {
+      this.loading = v;
+    });
 
     this._ipc.on(' checking-for-update', (event: Electron.IpcMessageEvent, res) => {});
+
     this._ipc.on('update-error', (event: Electron.IpcMessageEvent, res) => {
       if (res) {
         this.dbServ.toastError(res.msg, 'ERRROR', true);
-        this.displayPercent = false;
+        this.visible = false;
       }
     });
 
     this._ipc.on('update-available', (event: Electron.IpcMessageEvent, res) => {
-      this.displayPercent = true;
+      this.visible = true;
     });
 
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
@@ -63,7 +45,9 @@ export class AppComponent implements OnInit, AfterViewInit {
         res.body.percent = parseFloat(GLOBAL.redondearAdos(res.body.percent));
 
         this.objPercent = res.body;
+
         document.getElementById('imagenLogo').click();
+
         if (document.getElementById('foco_angular')) {
           document.getElementById('foco_angular').click();
         }
@@ -71,7 +55,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
 
     this._ipc.on('update-downloaded', (event: Electron.IpcMessageEvent, res) => {
-      this.displayPercent = false;
+      this.visible = false;
     });
 
     this._ipc.on('log', (event: Electron.IpcMessageEvent, res) => {});
@@ -101,7 +85,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   duplicarDataProgreso(json) {}
 
-  ngAfterViewInit() {
+  ngAfterContentChecked() {
     this.cdRef.detectChanges();
   }
 }

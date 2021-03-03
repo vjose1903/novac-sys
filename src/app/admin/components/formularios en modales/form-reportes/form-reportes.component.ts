@@ -1,7 +1,7 @@
 import { EventEmitter } from '@angular/core';
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
+import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as moment from 'moment';
 import { ModalService } from '../../modal/modal.service';
 import { DBservice } from '../../../../core/services/bdservice.service';
@@ -32,7 +32,7 @@ export class FormVentasComponent implements OnInit {
   formarFecha = ['suplidor_prod'];
   Fecha: string;
 
-  constructor(private fb: FormBuilder, public mServ: ModalService, private dbServ: DBservice) {
+  constructor(private fb: FormBuilder, public mServ: ModalService, private dbServ: DBservice, private localeService: BsLocaleService) {
     this.dpConfig = Object.assign(
       {},
       {
@@ -45,6 +45,7 @@ export class FormVentasComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.localeService.use('es');
     this.necesarioStart();
   }
 

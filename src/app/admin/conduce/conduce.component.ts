@@ -12,6 +12,7 @@ import { FunctionService } from '../../core/services/functions.service';
 
 import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-conduce',
@@ -73,6 +74,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     private dbServ: DBservice,
     private fb: FormBuilder,
     public layServ: LayoutService,
+    public pdfServ: PdfService,
   ) {
     super(mServ, _ipc, layServ);
   }
@@ -86,7 +88,19 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'articuloPorCodigo', 'pressEsc', 'articuloPorCodigo', 'pressEsc', 'indexToFocus'] });
+    this._init_mixin({
+      _lista_subs: [
+        'decisionModal',
+        'objDevuelto',
+        'articuloPorCodigo',
+        'pressEsc',
+        'articuloPorCodigo',
+        'pressEsc',
+        'indexToFocus',
+        'printBase64Res',
+      ],
+    });
+
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
@@ -110,7 +124,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     this._destroy_mixin();
 
     this.resetModalVaribales();
-    this._ipc.removeListener('printRes');
   }
 
   async decisionModal(res) {
@@ -137,6 +150,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   objDevueltoResponse(res) {
     if (res) {
+      console.log('res --> ', res);
+
       if (res.tipo_modal === 'buscarCliente') {
         this.cliente = res.data;
         (document.getElementById('clienteI') as any).value = res.data.nombre;
@@ -179,15 +194,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   indexToFocusResponse(res) {
     if (res !== undefined && res !== null) {
       this.noArticuloEncontrado(res);
-    }
-  }
-
-  ipcPrintResponse(res) {
-    if (res.status === 'si') {
-      this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
-      this.cancelarConduce(2);
-    } else {
-      this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
     }
   }
 
@@ -874,6 +880,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   llenarConduce(rows) {
+    console.log('rows --> ', rows);
+
     for (let j = 0; j < rows.length; j++) {
       const row = rows[j];
 
@@ -1067,11 +1075,32 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         type: 'conduce',
       };
 
-      this._ipc.send('print', obj);
+      this.pdfServ.generatePdf(obj, (res) => {
+        console.log('res --> ', res);
+
+        if (res.status === 'si') {
+          const objBase = {
+            base64: res.body,
+            filename: res.file,
+            type: 'conduce',
+          };
+          this._ipc.send('printBase64', objBase);
+        }
+      });
+
+      this.cancelarConduce(2);
     } catch (error) {
       if (error.error) {
         this.dbServ.toastError(error.error.msg, 'ERROR', true);
       }
+    }
+  }
+
+  ipcBase64Resonse(res) {
+    if (res.status === 'si') {
+      this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
+    } else {
+      this.dbServ.toastError(res.msg, 'ERROR', true);
     }
   }
 

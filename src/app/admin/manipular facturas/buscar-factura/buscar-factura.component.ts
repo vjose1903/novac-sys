@@ -11,6 +11,7 @@ import { TablasService } from '../../components/tablas/tablas.service';
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
+import { PdfService } from '../../../core/services/pdf/pdf.service';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -33,10 +34,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   tipo_factu_nota: any;
   paqueteComprobante: any;
   tipo_factura_id = null;
-
-  sub: Subscription;
-  subDeci: Subscription;
-  subEsc: Subscription;
   valor: any;
 
   constructor(
@@ -47,6 +44,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     private tServ: TablasService,
     public _ipc: IpcService,
     public layServ: LayoutService,
+    public pdfServ: PdfService,
   ) {
     super(mServ, _ipc, layServ);
   }
@@ -126,81 +124,97 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
   ngOnInit() {
-    this._init_mixin();
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'pressEsc'] });
     this.BuscarPara = this.route.snapshot.params['para'];
+
     if (this.BuscarPara === 'nota_credito') {
       this.tipo_factu_nota = '04';
     } else if (this.BuscarPara === 'nota_debito') {
       this.tipo_factu_nota = '03';
     }
+
     this.necesarioStart();
     this.completarTituloPag();
+  }
 
-    this.subEsc = this.mServ.PRESSESC.subscribe((res) => {
-      if (res !== undefined && res !== null) {
-        this.enfocarInput('valorI');
-      }
-    });
+  ipcBase64Resonse(res) {
+    if (res.status === 'si') {
+      this.dbServ.toastSuccess(res.msg, 'CORRECTO', true);
+    } else {
+      this.dbServ.toastError(res.msg, 'ERROR', true);
+    }
+    setTimeout(() => {
+      this.mServ.mostrarModal(false);
+    }, 5);
+  }
 
-    this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res && res.tipo_modal === 'buscarCliente') {
-        this.clienteBuscado = res.data;
-        (document.getElementById('valorI') as any).value = res.data.nombre;
-        this.pedirFactura('1', res.data.id, this.tServ.obj_paginate);
-        this.mServ.ModalObj(undefined);
-      }
-    });
+  objDevueltoResponse(res) {
+    if (res && res.tipo_modal === 'buscarCliente') {
+      this.clienteBuscado = res.data;
+      (document.getElementById('valorI') as any).value = res.data.nombre;
+      this.pedirFactura('1', res.data.id, this.tServ.obj_paginate);
+      this.mServ.ModalObj(undefined);
+    }
+  }
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res) {
-        if (this.tipoModal === 'mostrarFactura') {
-          if (this.BuscarPara === 'anular_factura') {
-            this.facturaSelected['identificadorFact'] =
-              this.campo === '2'
-                ? ' con el comprobante fiscal ' + this.facturaSelected.numero_comprobante
-                : ' con el numero de factura ' + this.formatoNumeroFactura(this.facturaSelected.numero_factura);
-            setTimeout(() => {
-              this.abrirModal(this.facturaSelected, 'cancelar');
-            }, 10);
-          } else if (this.BuscarPara === 'solo_ver') {
-            if (res.tipo === 'reimrimir') {
-              const obj = {
-                data: this.facturaSelected,
-                type: 'facturacion',
-              };
+  pressEscResponse(res) {
+    if (res !== undefined && res !== null) {
+      this.enfocarInput('valorI');
+    }
+  }
 
-              this._ipc.send('print', obj);
-            } else {
-              this.editarFactura();
-            }
-          } else {
-            this.mServ.ModalDecision(undefined);
-            const url = `/admin/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
-            this.router.navigateByUrl(url);
-          }
-        } else if (this.tipoModal === 'cancelarBusqueda') {
-          this.decisionesModal();
-        }
-      } else {
-        if (this.tipoModal === 'cancelar') {
-          setTimeout(() => {
-            this.abrirModal(this.facturas[0], 'mostrarFactura');
-          }, 10);
-        }
-      }
-    });
+  reimprimirFactura(obj) {
+    this.pdfServ.generatePdf(obj, (res) => {
+      console.log('res --> ', res);
 
-    this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
       if (res.status === 'si') {
-        this.dbServ.toastSuccess(res.msg, 'CORRECTO', true);
-      } else {
-        this.dbServ.toastError(res.msg, 'ERROR', true);
+        const objBase = {
+          base64: res.body,
+          filename: res.file,
+          type: 'conduce',
+        };
+        this._ipc.send('printBase64', objBase);
       }
-      setTimeout(() => {
-        this.mServ.mostrarModal(false);
-        document.getElementById('foco_angular').click();
-      }, 5);
     });
+  }
+
+  decisionModal(res) {
+    if (res) {
+      if (this.tipoModal === 'mostrarFactura') {
+        if (this.BuscarPara === 'anular_factura') {
+          this.facturaSelected['identificadorFact'] =
+            this.campo === '2'
+              ? ' con el comprobante fiscal ' + this.facturaSelected.numero_comprobante
+              : ' con el numero de factura ' + this.formatoNumeroFactura(this.facturaSelected.numero_factura);
+          setTimeout(() => {
+            this.abrirModal(this.facturaSelected, 'cancelar');
+          }, 10);
+        } else if (this.BuscarPara === 'solo_ver') {
+          if (res.tipo === 'reimrimir') {
+            const obj = {
+              data: this.facturaSelected,
+              type: 'facturacion',
+            };
+
+            this.reimprimirFactura(obj);
+          } else {
+            this.editarFactura();
+          }
+        } else {
+          this.mServ.ModalDecision(undefined);
+          const url = `/admin/manipular/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
+          this.router.navigateByUrl(url);
+        }
+      } else if (this.tipoModal === 'cancelarBusqueda') {
+        this.decisionesModal();
+      }
+    } else {
+      if (this.tipoModal === 'cancelar') {
+        setTimeout(() => {
+          this.abrirModal(this.facturas[0], 'mostrarFactura');
+        }, 10);
+      }
+    }
   }
 
   initCambioMenu(arg) {
@@ -208,12 +222,9 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       this.layServ.nextDecisionCambioMenu(arg);
     }
   }
+
   ngOnDestroy(): void {
     this._destroy_mixin();
-    if (this.sub) this.sub.unsubscribe();
-    if (this.subDeci) this.subDeci.unsubscribe();
-    if (this.subEsc) this.subEsc.unsubscribe();
-    if (this._ipc) this._ipc.removeListener('printRes');
     this.borrar('salir');
   }
 

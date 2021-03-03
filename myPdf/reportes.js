@@ -11,11 +11,12 @@ var tabla_agrupada_1 = require("./tabla_agrupada");
 // ==========================================================================================================================================================
 function makeReporte(data) {
     var configuration = configuracion_tablas_1.getConfiguration(data.tipo_reporte);
+    var pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
     var dd = {
         // pageSize: { width: 990, height: 398 },
         pageMargins: [0, data.mostrar_sub_titulo ? 118.5 : 111.5, 0, 30],
-        pageOrientation: configuration.pageOrientation ? configuration.pageOrientation : 'portrait',
-        header: cabeceraReporte(data, configuration),
+        pageOrientation: pageO,
+        header: cabeceraReporte(data, pageO),
         content: contenidoReporte(data, configuration),
         footer: function (currentPage, pageCount) {
             return [
@@ -43,7 +44,7 @@ exports.makeReporte = makeReporte;
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraReporte(data, configuration) {
+function cabeceraReporte(data, pageO) {
     var header = function (currentPage, pageCount) {
         var pag = currentPage.toString() + ' de ' + pageCount;
         return [
@@ -84,7 +85,7 @@ function cabeceraReporte(data, configuration) {
                                 { text: pag, style: 'letra10' },
                             ],
                             alignment: 'left',
-                            margin: [60, 19, 0, 0],
+                            margin: [pageO === '' ? 60 : 80, 19, 0, 0],
                         },
                         {
                             text: [
@@ -92,7 +93,7 @@ function cabeceraReporte(data, configuration) {
                                 { text: data.fecha, style: 'letra10' },
                             ],
                             alignment: 'left',
-                            margin: [60, 3, 0, 0],
+                            margin: [pageO === '' ? 60 : 80, 3, 0, 0],
                         },
                         {
                             text: [
@@ -100,7 +101,7 @@ function cabeceraReporte(data, configuration) {
                                 { text: data.realizado_por, style: 'letra10' },
                             ],
                             alignment: 'left',
-                            margin: [60, 3, 0, 0],
+                            margin: [pageO === '' ? 60 : 80, 3, 0, 0],
                         },
                     ],
                 ],
@@ -124,7 +125,7 @@ function cabeceraReporte(data, configuration) {
                             type: 'rect',
                             x: 10,
                             y: data.mostrar_sub_titulo ? 5 : 20,
-                            w: configuration.pageOrientation ? (configuration.pageOrientation === 'portrait' ? 575 : 820) : 575,
+                            w: pageO === 'portrait' ? 575 : 823,
                             h: 1.5,
                             color: '#000000',
                         },

@@ -7,6 +7,10 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
+.ng-dropdown-panel {
+  z-index: 99999 !important;
+}
+
 html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
   right: 2px !important;
   top: 0 !important;
@@ -578,25 +582,24 @@ Not supports in Firefox and IE */
 .my-pagination {
   font-size: 12px;
   margin-bottom: 0;
-}
-
-.my-pagination {
   margin: 0;
   padding: 0;
-}
+  & .current {
+    background: #4ee488 !important;
+  }
 
-.my-pagination .current {
-  background: #4ee488 !important;
-}
+  & .my-pagination .current:hover {
+    background: hsl(139, 55%, 42%) !important;
+    cursor: pointer;
+  }
+  & .pagination-next > a:hover {
+    color: #30a756 !important;
+    cursor: pointer;
+  }
 
-.my-pagination .current:hover {
-  background: #30a756 !important;
-  cursor: pointer;
-}
-
-.my-pagination .pagination-next > a:hover {
-  color: #30a756 !important;
-  cursor: pointer;
+  & .ngx-pagination {
+    margin-bottom: 0rem !important;
+  }
 }
 
 .my-pagination .pagination-next > a:hover,

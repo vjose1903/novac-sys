@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
+import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -68,6 +68,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     private router: Router,
     public mServ: ModalService,
     private tServ: TablasService,
+    private localeService: BsLocaleService,
   ) {
     super(mServ, _ipc, layServ);
     this.dpConfig = Object.assign(
@@ -82,6 +83,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   }
 
   ngOnInit() {
+    this.localeService.use('es');
     this.titulo = 'Registro de empleados';
     this.boton = 'Registrar';
 

@@ -9,17 +9,21 @@ var child;
 child = proc.spawn(electron, process.argv.slice(2, process.argc));
 const readline = require('readline');
 
-var settings = fs.existsSync('../.electromonrc') ? fs.readFileSync('../.electromonrc', 'utf-8') : '';
+var config = __dirname.split('/reload')[0] + '/.electromonrc';
+
+console.log(fs.existsSync(config) ? ' --- CONFIGURACION ENCONTRADA --- ' : '--- CONFIGURACION NO ENCONTRADA ---');
+
+var settings = fs.existsSync(config) ? fs.readFileSync(config, 'utf-8') : '';
 watch.watchTree('.', { ignoreDotFiles: true }, function (f, curr, prev) {
   if (typeof f == 'object' && prev === null && curr === null) {
     // Finished walking the tree
   } else {
     if (settings != '') {
       if (RegExp(settings.replace(/\n/g, '')).test(f) == false) {
-        debounce(restart(), 500);
+        procesoRestart();
       }
     } else {
-      debounce(restart(), 500);
+      procesoRestart();
     }
   }
 });
@@ -35,7 +39,8 @@ console.log('::::::::::::  Iniciando Electron App @' + process.cwd() + ' :::::::
 
 rl.on('line', (cmd) => {
   if (cmd == 'rs') {
-    restart();
+    procesoRestart();
+    // restart();
   }
 });
 
@@ -43,22 +48,26 @@ rl.on('SIGINT', (cmd) => {
   cerrarApp('VUELVA PRONTO.');
 });
 
-function restart() {
+function procesoRestart() {
   my_cmd('echo ::::: CONVIRTIENDO A JAVASCRIPT :::::: && tsc -p tsconfig-serve.json', function (res) {
-    setTimeout(function () {
-      if (res.status) {
-        console.log('Restarting');
-        child.stdin.pause();
-        child.kill();
-        child = proc.spawn(electron, process.argv.slice(2, process.argc));
-        settings = fs.existsSync('../.electromonrc') ? fs.readFileSync('../.electromonrc', 'utf-8') : '';
-        child.stdout.pipe(process.stdout);
-      } else {
-        console.log(res);
-        cerrarApp('POR ERROR AL MOMENTO DE CONVERTIR A JAVASCRIPT.');
-      }
-    }, 2000);
+    if (res.status) {
+      setTimeout(function () {
+        debounce(restart(), 500);
+      }, 2000);
+    } else {
+      console.log(res);
+      cerrarApp('POR ERROR AL MOMENTO DE CONVERTIR A JAVASCRIPT.');
+    }
   });
+}
+
+function restart() {
+  console.log('Restarting');
+  child.stdin.pause();
+  child.kill();
+  child = proc.spawn(electron, process.argv.slice(2, process.argc));
+  settings = fs.existsSync(config) ? fs.readFileSync(config, 'utf-8') : '';
+  child.stdout.pipe(process.stdout);
 }
 
 function cerrarApp(params) {

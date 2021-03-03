@@ -5,7 +5,7 @@ export function getContentWithTablaAgrupada(configuracion, data) {
 
   for (let i = 0; i < data.contenido_reporte.length; i++) {
     // const detalle = data.contenido_reporte[i];
-    const cont_ = [];
+    let cont_ = [];
 
     for (let j = 0; j < configuracion.info.length; j++) {
       const config = configuracion.info[j];
@@ -13,6 +13,7 @@ export function getContentWithTablaAgrupada(configuracion, data) {
       cont_.push(getTablaNormal(config, data, i, j));
     }
 
+    cont_ = [getRaya(configuracion), ...cont_];
     if (data.contenido_reporte[i].titulo_grupo === 'TOTAL GENERAL') {
       content.push({
         stack: cont_,
@@ -24,4 +25,20 @@ export function getContentWithTablaAgrupada(configuracion, data) {
   }
 
   return content;
+}
+
+function getRaya(configuracion) {
+  const pageO = configuracion['pageOrient'] ? configuracion['pageOrient'] : 'portrait';
+  return {
+    canvas: [
+      {
+        type: 'rect',
+        x: 10,
+        y: 0,
+        w: pageO === 'portrait' ? 575 : 823,
+        h: 1.5,
+        color: '#000000',
+      },
+    ],
+  };
 }

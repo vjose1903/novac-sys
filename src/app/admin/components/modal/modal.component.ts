@@ -29,7 +29,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   cant_notas_debito = 0;
   index;
   fecha_articulo: any;
-
+  returnArticulosSeleccionado = false;
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       const obj = {
@@ -88,6 +88,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       key: 'direccion',
     },
   ];
+
   infoSuplidor = [
     {
       titulo: 'Nombre',
@@ -209,9 +210,10 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     // }
   }
 
-  // TablaChange(change) {
-  //   this.mServ.func_tabla_modal_change(change);
-  // }
+  selectArticulosAdelantados() {
+    this.returnArticulosSeleccionado = true;
+    setTimeout(() => (this.returnArticulosSeleccionado = false), 250);
+  }
 
   getDatePendiente(date) {
     const obj = { bool: true, Date: date };
@@ -245,6 +247,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.ModalObj(undefined);
     this.mServ.ModalIndex(undefined);
     this.mServ.getArticuloFiltradoPorCodigo(undefined);
+
     this.seleccionModal = undefined;
     this.paraFiltroArticulos = undefined;
     this.paraFiltroClientes = undefined;
@@ -280,6 +283,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     }
 
     this.mServ.ModalObj(obj);
+    if (this.tipoModal === 'seleccionar_articulos_adelantados') {
+      this.accion(false);
+    }
   }
 
   noArticulo() {

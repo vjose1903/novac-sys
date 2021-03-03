@@ -901,7 +901,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
           this.dbServ.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
           _.pullAt(this.listaArticulos, i);
           this.tipoModal = '';
-          this.decisionModal = null;
+          // this.decisionModal = null;
           this.borrar();
         },
         (err) => {

@@ -12,6 +12,7 @@ import { ModalService } from '../../components/modal/modal.service';
 import { FunctionService } from '../../../core/services/functions.service';
 import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
+import { PdfService } from '../../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -34,10 +35,8 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   info = [];
   detalleFacturas: any;
   detalleNota = [];
-  subDeci: Subscription;
   @ViewChild(TablasComponent) tablas: TablasComponent;
   tipoModal: string;
-  subObj: Subscription;
   tipoFactura: any;
   lista_tipos_facturas: any;
   propietario_factura: any;
@@ -50,12 +49,13 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     private fun: FunctionService,
     private router: Router,
     public layServ: LayoutService,
+    public pdfServ: PdfService,
   ) {
     super(mServ, _ipc, layServ);
   }
 
   ngOnInit() {
-    this._init_mixin();
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
     this.idFactura = this.activeRoute.snapshot.params['id'];
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
@@ -72,19 +72,22 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
       this.tipoFactura = '03';
     }
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res) {
-        this.decisionModal(res);
-      }
-    });
-
-    this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res && res.tipo_modal === 'cambio') {
-        this.decisionModal(res.data);
-        this.mServ.ModalObj(undefined);
-      }
-    });
     this.necesarioStart();
+  }
+
+  objDevueltoResponse(res) {
+    if (res && res.tipo_modal === 'cambio') {
+      this.decisionModal(res.data);
+      this.mServ.ModalObj(undefined);
+    }
+  }
+
+  ipcBase64Resonse(res) {
+    if (res.status === 'si') {
+      this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
+    } else {
+      this.dbServ.toastError(res.msg, 'ERROR', true);
+    }
   }
 
   initCambioMenu(arg) {
@@ -95,10 +98,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
   ngOnDestroy(): void {
     this._destroy_mixin();
-    if (this.subDeci) this.subDeci.unsubscribe();
-    if (this.subObj) this.subObj.unsubscribe();
-
-    this._ipc.removeListener('printRes');
   }
 
   resetVariables() {
@@ -319,8 +318,12 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async checkCantidadEnUnidades() {
+    console.log(' this.detalleNota --> ', this.detalleNota);
+
     for (let i = 0; i < this.detalleNota.length; i++) {
       const detalle = this.detalleNota[i];
+      console.log(' detalle --> ', detalle);
+
       if (!detalle.cantidad_en_unidades_nota) {
         detalle.cantidad_en_unidades_nota = 0;
       }
@@ -337,6 +340,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   async getInfoChange(info) {
     const entidad = info.body[info.index];
     entidad.cant_nota = parseFloat(entidad.cant_nota);
+
     if (info.cambio === 'cant_nota') {
       if (this.tipoNota === 'credito') {
         if (entidad.cant_nota > entidad.cant) {
@@ -429,12 +433,14 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async decisionModal(res) {
-    if (this.tipoModal === 'cambio') {
-      this.formarNota(res);
-    } else if (this.tipoModal === 'cancelar') {
-      this.resetVariables();
+    if (res) {
+      if (this.tipoModal === 'cambio') {
+        this.formarNota(res);
+      } else if (this.tipoModal === 'cancelar') {
+        this.resetVariables();
 
-      this.router.navigateByUrl(`/admin/buscarFactura/nota_${this.tipoNota}`);
+        this.router.navigateByUrl(`/admin/buscarFactura/nota_${this.tipoNota}`);
+      }
     }
   }
 
@@ -537,24 +543,31 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     try {
       const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
 
-      await this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
-        if (res.status === 'si') {
-          this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
-          this.resetVariables();
-          this.router.navigateByUrl(`/admin/buscarFactura/${cabecera_fact['tipo']}`);
-        } else {
-          this.dbServ.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR', true);
-        }
-      });
-
       res['FACTURA_DE'] = 'nota';
       const obj = {
         data: res,
         type: 'facturacion',
       };
-      this._ipc.send('print', obj);
+
+      this.imprimirNota(obj);
+
+      this.resetVariables();
+      this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
     } catch (error) {
       this.dbServ.toastError(error.statusText, 'ERROR', true);
     }
+  }
+
+  imprimirNota(obj) {
+    this.pdfServ.generatePdf(obj, (res) => {
+      if (res.status === 'si') {
+        const objBase = {
+          base64: res.body,
+          filename: res.file,
+          type: 'facturacion',
+        };
+        this._ipc.send('printBase64', objBase);
+      }
+    });
   }
 }

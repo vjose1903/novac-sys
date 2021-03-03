@@ -3,10 +3,11 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as _ from 'lodash';
+
 var request = require('request');
 const { exec } = require('child_process');
 const autoUpdater = require('electron-updater').autoUpdater;
-const pdfmake = require('pdfmake/src/printer');
+
 const pdfMake = require('pdfmake/build/pdfmake.js');
 const pdfFonts = require('pdfmake/build/vfs_fonts.js');
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -52,11 +53,9 @@ function createWindow() {
 
   if (serve) {
     contents = win.webContents;
-
     require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`),
     });
-
     win.loadURL('http://localhost:5220');
   } else {
     win.loadURL(
@@ -583,6 +582,10 @@ ipcMain.on('printBase64', async (event: any, oPdf) => {
   const filename = oPdf.filename;
   const type = oPdf.type;
 
+  console.log('base64 --> ', base64);
+  console.log('filename --> ', filename);
+  console.log('type --> ', type);
+
   await puts(base64, 'base64');
   await puts(filename, 'filename');
   await puts(type, 'type');
@@ -694,17 +697,8 @@ function createPdfbase64(docDefinition, file_, type, reimprimir_, retunBase64) {
 }
 
 function imprimir(cFileName, tipo) {
-  puts('ENTRO EN LA FUNCION DE IMPRIMIR');
   const sumatrapdf_path = pathAdd('/print/lp.exe');
   const file_path = pathAdd(`/${cFileName}`);
-  puts(tipo, 'EL MALDITO TIPO');
-  puts(file_path, 'file_path');
-  puts(sumatrapdf_path, 'sumatrapdf_path');
-
-  // const bat = require.resolve(sumatrapdf_path);
-  // const profile = require.resolve('../profiles/app.profile.js');
-  // const args = ['-print-to-default', '-print-settings "landscape,fit,"', '-silent', cFileName];
-  //exec(`${sumatrapdf_path} -print-to-default -print-settings "noscale,landscape" -silent ${cFileName}`, (error, stdout, stderr) => {
 
   const orientation = tipo === 'reporte' ? 'Portrait' : 'landscape';
   const paper_size = tipo === 'reporte' ? 'carta' : 'VJPOS';
@@ -714,26 +708,24 @@ function imprimir(cFileName, tipo) {
   cmd(comando, (res) => {
     puts(res, 'respuesta impresion');
 
-    let msg_;
-    let tipo_;
+    let msg_ = 'PDF impreso correctamente!!';
+    let tipo_ = 'printBase64Res';
     if (res.status) {
-      if (tipo === 'reporte') {
-        msg_ = 'Reporte generado correctamente!!';
-        tipo_ = 'printBase64Res';
-      } else {
-        msg_ = 'Factura generada correctamente!!';
-        tipo_ = 'printRes';
-      }
+      // if (tipo === 'reporte') {
+      // } else {
+      //   msg_ = 'Factura generada correctamente!!';
+      //   tipo_ = 'printRes';
+      // }
       puts(`SEND ANGULAR ${tipo_} ${msg_}`);
       win.webContents.send(tipo_, { msg: msg_, status: 'si', STDOUT: res });
     } else {
-      if (tipo === 'reporte') {
-        msg_ = 'Error generando Reporte!!';
-        tipo_ = 'printBase64Res';
-      } else {
-        msg_ = 'Error generando Factura!!';
-        tipo_ = 'printRes';
-      }
+      // if (tipo === 'reporte') {
+      msg_ = 'Error imprimiento PDF!!';
+      // } else {
+      //   msg_ = 'Error generando Factura!!';
+      //   tipo_ = 'printRes';
+      // }
+
       puts(`SEND ANGULAR ${tipo_} ${msg_}`);
       win.webContents.send(tipo_, { msg: msg_, status: 'no', err: res });
       return;

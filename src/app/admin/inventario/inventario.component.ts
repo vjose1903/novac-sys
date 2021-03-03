@@ -9,6 +9,8 @@ import { TablasService, obj_paginate_default } from '../components/tablas/tablas
 import { IpcService } from '../../core/services/ipc.service';
 import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
+import { PdfService } from '../../core/services/pdf/pdf.service';
+import { LoaderService } from '../../../app/loader/loader.service';
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
@@ -58,77 +60,67 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   seleccionModal: any;
   filtrado = false;
   filtro = 'todos';
-  subDeci: Subscription;
+
   palabra_buscar;
   FechaFactura: string;
   pdfSrc: any;
   fileName: any;
+
   constructor(
     private dbServ: DBservice,
     private tServ: TablasService,
     public mServ: ModalService,
     public _ipc: IpcService,
     public layServ: LayoutService,
+    public pdfServ: PdfService,
+    public loadServ: LoaderService,
   ) {
     super(mServ, _ipc, layServ);
   }
 
   async ngOnInit() {
-    this._init_mixin();
+    this._init_mixin({ _lista_subs: ['decisionModal', 'printBase64Res'] });
     this.necesarioParaEmpezar();
     this.dbServ.getTipoArticulos().subscribe((res) => {
       this.tipo_articulos = res;
-    });
-
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== null && res !== undefined) {
-        if (this.tipoModal === 'visor_pdf') {
-          res = { bool: res };
-        }
-        this.decisionModal(res);
-        this.mServ.ModalDecision(undefined);
-      }
-    });
-
-    this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
-      if (res.status === 'si') {
-        let obj;
-
-        this.pdfSrc = res.body;
-        this.fileName = res.file;
-
-        obj = {
-          pdfSrc: res.body,
-          titulo: 'Reporte de inventario',
-          height: '83vh',
-          reimprimir: res.reimprimir,
-          fileName: res.file.split('.')[0],
-        };
-
-        this.abrirModalReporte(obj);
-      } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
-      }
-      setTimeout(() => {
-        GLOBAL.quitarFocodeElectron();
-      }, 5);
-    });
-
-    this._ipc.on('printBase64Res', async (event: Electron.IpcMessageEvent, res) => {
-      if (res.status === 'si') {
-        this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
-      } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
-      }
-      setTimeout(() => {
-        GLOBAL.quitarFocodeElectron();
-      }, 5);
     });
   }
 
   initCambioMenu(arg) {
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
+    }
+  }
+
+  async ipcBase64Resonse(res) {
+    if (res.status === 'si') {
+      this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
+    } else {
+      this.dbServ.toastError(res.msg, 'ERROR', true);
+    }
+
+    setTimeout(() => {
+      GLOBAL.quitarFocodeElectron();
+    }, 5);
+  }
+
+  async decisionModal(arg) {
+    if (this.tipoModal === 'visor_pdf') {
+      arg = { bool: arg };
+    }
+
+    if (arg.bool) {
+      if (this.tipoModal === 'visor_pdf') {
+        const obj = {
+          base64: this.pdfSrc,
+          filename: this.fileName,
+        };
+
+        this._ipc.send('printBase64', obj);
+        this.resetVariables();
+      } else {
+        this.getArticulos(this.tServ.obj_paginate);
+      }
     }
   }
 
@@ -142,12 +134,12 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
   ngOnDestroy() {
     this._destroy_mixin();
-    if (this.subDeci) this.subDeci.unsubscribe();
 
     this.FechaFactura = undefined;
     this.tServ.obj_paginate = obj_paginate_default;
     this.tServ.Func_total_paginas(1);
   }
+
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
   }
@@ -171,11 +163,29 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
         data: res,
         type: 'reporte',
       };
-
-      this._ipc.send('print', obj);
+      this.loadServ.isLoading.next(true);
+      this.generarPdf(obj);
+      // this._ipc.send('print', obj);
     } catch (error) {
       this.dbServ.toastError('Error realizando reporte.', 'ERROR', true);
     }
+  }
+
+  generarPdf(obj) {
+    this.pdfServ.generatePdf(obj, (res) => {
+      if (res.status === 'si') {
+        obj = {
+          pdfSrc: res.body,
+          titulo: 'Reporte de inventario',
+          height: '83vh',
+          reimprimir: res.reimprimir,
+          fileName: res.file.split('.')[0],
+        };
+
+        this.loadServ.isLoading.next(false);
+        this.abrirModalReporte(obj);
+      }
+    });
   }
 
   async getCantidadInventario() {
@@ -285,29 +295,5 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
     this.pdfSrc = undefined;
     this.fileName = undefined;
     this.tipoModal = undefined;
-  }
-
-  async decisionModal(arg) {
-    if (arg.bool) {
-      if (this.tipoModal === 'visor_pdf') {
-        const obj = {
-          base64: this.pdfSrc,
-          filename: this.fileName,
-        };
-
-        this._ipc.send('printBase64', obj);
-        this.resetVariables();
-      } else {
-        const temp = JSON.parse(JSON.stringify(this.listaArticulos));
-
-        this.getArticulos(this.tServ.obj_paginate);
-        // this.listaArticulos = undefined;
-
-        // temp[this.indexSelected] = [];
-
-        // temp[this.indexSelected] = JSON.parse(JSON.stringify(arg.body));
-        // this.listaArticulos = JSON.parse(JSON.stringify(temp));
-      }
-    }
   }
 }

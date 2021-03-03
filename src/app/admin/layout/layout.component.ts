@@ -48,6 +48,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     public mServ: ModalService,
   ) {
     super(mServ, _ipc, layServ);
+
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;

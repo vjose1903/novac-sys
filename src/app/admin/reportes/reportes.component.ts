@@ -6,6 +6,7 @@ import { IpcService } from '../../core/services/ipc.service';
 import { ModalService } from '../components/modal/modal.service';
 import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-reportes',
@@ -23,6 +24,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     private dbServ: DBservice,
     public layServ: LayoutService,
     public loadServ: LoaderService,
+    public pdfServ: PdfService,
   ) {
     super(mServ, _ipc, layServ);
   }
@@ -58,6 +60,8 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
             fileName: res.file.split('.')[0],
           };
         }
+
+        console.log(res);
 
         this.abrirVisorPdf(obj);
       } else {
@@ -175,10 +179,46 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         type: 'reporte',
       };
 
-      this._ipc.send('print', obj);
+      this.generarPdf(obj);
+
+      // this._ipc.send('print', obj);
     } catch (error) {
       this.dbServ.toastError('Error realizando reporte.', 'ERROR', true);
     }
+  }
+
+  generarPdf(obj) {
+    this.pdfServ.generatePdf(obj, (res) => {
+      if (res.status === 'si') {
+        let obj;
+
+        this.pdfSrc = res.body;
+        this.fileName = res.file;
+
+        if (res.file === 'cuadre.pdf') {
+          obj = {
+            pdfSrc: res.body,
+            titulo: 'Cuadre de caja',
+            height: '25rem',
+            reimprimir: res.reimprimir,
+            fileName: res.file.split('.')[0],
+          };
+        } else if (res.file === 'reporte.pdf') {
+          obj = {
+            pdfSrc: res.body,
+            titulo: this.titulo_moda_reporte,
+            height: '83vh',
+            reimprimir: res.reimprimir,
+            fileName: res.file.split('.')[0],
+          };
+        }
+
+        this.abrirVisorPdf(obj);
+      } else {
+        this.loadServ.isLoading.next(false);
+        this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
+      }
+    });
   }
 
   abrirModal(tipo) {

@@ -1,4 +1,4 @@
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, OnChanges } from '@angular/core';
 import { Component, OnInit, OnDestroy, Input, Output, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
@@ -6,18 +6,17 @@ import { DBservice } from '../../../../core/services/bdservice.service';
 
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import { ModalService } from '../../modal/modal.service';
-import { TablasComponent } from '../../tablas/tablas.component';
 
 @Component({
   selector: 'app-modal-seleccinar-articulo',
   templateUrl: './modal-seleccinar-articulo.component.html',
   styleUrls: ['./modal-seleccinar-articulo.component.scss'],
 })
-export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
+export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnChanges {
   @Input() articulos;
+  @Input() returnArticulos;
   @Output() getArticulos = new EventEmitter<any>();
 
-  @ViewChild(TablasComponent) tablas: TablasComponent;
   info = [
     {
       titulo: 'Articulo',
@@ -72,21 +71,22 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
       return arti;
     });
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res) {
-        this.mandarArticulos();
-      } else {
-        this.resetLista();
-      }
-    });
+    // this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
+    //   if (res) this.mandarArticulos();
+    //   else this.resetLista();
+    // });
   }
+
+  ngOnChanges(simpleChanges) {
+    console.log(simpleChanges);
+    if (simpleChanges && simpleChanges.returnArticulos && simpleChanges.returnArticulos.currentValue) {
+      this.getArticulos.emit({ body: this.articulos_selected });
+    }
+  }
+
   ngOnDestroy(): void {
     if (this.subDeci) this.subDeci.unsubscribe();
     this.resetLista();
-  }
-
-  mandarArticulos() {
-    this.getArticulos.emit({ body: this.articulos_selected });
   }
 
   resetLista() {
@@ -94,20 +94,23 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
   }
 
   getInfoChange(item) {
+    console.log('item --> ', item);
+
     if (item.cambio === 'select') {
       const articulo = item.body[item.index];
 
       const _x_ = _.findIndex(this.articulos_selected, (arti) => {
         return arti.id === articulo.id;
       });
+
       if (!item.value) {
         if (this.articulos_selected[_x_]) {
           this.articulos_selected[_x_].destroy = 1;
         } else {
           articulo.destroy = 1;
-
           this.articulos_selected.push(articulo);
         }
+
         // _.pullAt(this.articulos_selected, i);
       } else {
         if (_x_ !== -1) {
@@ -116,6 +119,7 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy {
           this.articulos_selected.push(articulo);
         }
       }
+      console.log('this.articulos_selected --> ', this.articulos_selected);
     }
   }
 

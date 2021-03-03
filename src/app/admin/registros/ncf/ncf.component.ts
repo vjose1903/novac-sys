@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
-import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
+import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as moment from 'moment';
 import { ModalService } from '../../components/modal/modal.service';
@@ -103,6 +103,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
     public layServ: LayoutService,
     public mServ: ModalService,
     private tServ: TablasService,
+    private localeService: BsLocaleService,
   ) {
     super(mServ, _ipc, layServ);
     this.dpConfig = Object.assign(
@@ -125,6 +126,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.localeService.use('es');
     this._init_mixin();
     this.titulo = 'Paquetes de numeros comprobantes fiscales';
     this.necesarioStart();

@@ -18,6 +18,7 @@ import {
 
 import { FunctionService } from '../core/services/functions.service';
 import { ModalService } from '../admin/components/modal/modal.service';
+import { PdfService } from '../core/services/pdf/pdf.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -38,6 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private fun: FunctionService,
     public _ipc: IpcService,
     public mServ: ModalService,
+    public pdfServ: PdfService,
   ) {}
 
   ngOnInit() {
@@ -47,29 +49,28 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
     this.searchVersion();
 
-    this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-      if (this.tipo_prueba !== 'otro') {
-        const obj = {
-          pdfSrc: res.body,
-          titulo: 'PRUEBA REPORTE',
-          height: '83vh',
-          reimprimir: res.reimprimir,
-          fileName: res.file.split('.')[0],
-        };
-        this.abrirModalReporte(obj);
-      }
+    // this._ipc.on('printBase64Res', async (event: Electron.IpcMessageEvent, res) => {
+    //   console.log('res --> ', res);
 
-      if (res.status) {
-      } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
-      }
-    });
+    //   const obj = {
+    //     pdfSrc: res.body,
+    //     titulo: 'PRUEBA REPORTE',
+    //     height: '83vh',
+    //     reimprimir: res.reimprimir,
+    //     fileName: res.file.split('.')[0],
+    //   };
+    //   this.abrirModalReporte(obj);
+
+    //   if (res.status) {
+    //   } else {
+    //     this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
+    //   }
+    // });
   }
 
   abrirModalReporte(obj) {
     this.mServ.modalTipo('visor_pdf');
     this.mServ.ModalSeleccion(obj);
-
     this.mServ.mostrarModal(true);
   }
 
@@ -168,6 +169,34 @@ export class LoginComponent implements OnInit, OnDestroy {
     };
 
     this.tipo_prueba = obj.type;
-    this._ipc.send('print', obj);
+
+    this.generar(obj);
+  }
+
+  generar(obj) {
+    this.pdfServ.generatePdf(obj, (res) => {
+      console.log('res --> ', res);
+      console.log('this.tipo_prueba --> ', this.tipo_prueba);
+
+      if (res.status === 'si') {
+        const objBase = {
+          base64: res.body,
+          filename: res.file,
+          type: this.tipo_prueba,
+        };
+
+        const obj = {
+          pdfSrc: res.body,
+          titulo: 'PRUEBA REPORTE',
+          height: '83vh',
+          reimprimir: res.reimprimir,
+          fileName: res.file.split('.')[0],
+        };
+        this.abrirModalReporte(obj);
+        console.log('mandando a imprimir');
+
+        // this._ipc.send('printBase64', objBase);
+      }
+    });
   }
 }
