@@ -40,15 +40,15 @@ function createWindow() {
   win = new BrowserWindow({
     x: 0,
     y: 0,
+    webPreferences: {
+      nodeIntegration: true,
+      preload: path.join(__dirname, 'preload.js'),
+    },
     icon: process.platform === 'darwin' ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
     width: size.width,
     height: size.height,
     minWidth: size.width,
     minHeight: size.height,
-    webPreferences: {
-      nodeIntegration: true,
-      plugins: true,
-    },
   });
 
   if (serve) {
@@ -57,6 +57,7 @@ function createWindow() {
       electron: require(`${__dirname}/node_modules/electron`),
     });
     win.loadURL('http://localhost:5220');
+    win.webContents.openDevTools();
   } else {
     win.loadURL(
       url.format({

@@ -17,15 +17,24 @@ export class IpcService {
   };
 
   constructor() {
+    console.log('window --> ', window);
+    console.log('window.require --> ', window.require);
+
     if (window.require) {
       try {
-        this._ipc = window.require('electron').ipcRenderer;
+        // this._ipc = this.require('electron');
+        // this._ipc = window.require('electron').ipcRenderer;
+        this._ipc = (<any>window).require('electron').ipcRenderer;
       } catch (e) {
         throw e;
       }
     } else {
       console.warn("Electron's IPC was not loaded");
     }
+  }
+
+  require(module: string) {
+    return window['require'](module).ipcRenderer;
   }
 
   PRINTERS_NEW(nextValue) {

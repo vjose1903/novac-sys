@@ -14,10 +14,7 @@ src/**/*.js
 # dependencies
 /node_modules
 /actualizacion
-<<<<<<< HEAD
-=======
 actualizacion.zip
->>>>>>> origin/actualizaciones
 
 # IDEs and editors
 /.idea

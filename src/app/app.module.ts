@@ -3,10 +3,9 @@ import '../polyfills';
 
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppComponent } from './app.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -41,7 +40,6 @@ defineLocale('es', esLocale);
     //modulos
     AngularModule,
     MDBBootstrapModule,
-
     BrowserAnimationsModule,
     NgxBootstrapModule,
   ],

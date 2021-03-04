@@ -33,7 +33,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   constructor(
     private dbServ: DBservice,
-
     private fb: FormBuilder,
     private router: Router,
     private fun: FunctionService,
@@ -47,25 +46,15 @@ export class LoginComponent implements OnInit, OnDestroy {
       usuario: null,
       password: null,
     });
+
+    this._ipc.on('versionResponse', (event, arg) => {
+      this.versionApp = arg;
+      setTimeout(() => {
+        this.quitarFocoElectron();
+      }, 25);
+    });
+
     this.searchVersion();
-
-    // this._ipc.on('printBase64Res', async (event: Electron.IpcMessageEvent, res) => {
-    //   console.log('res --> ', res);
-
-    //   const obj = {
-    //     pdfSrc: res.body,
-    //     titulo: 'PRUEBA REPORTE',
-    //     height: '83vh',
-    //     reimprimir: res.reimprimir,
-    //     fileName: res.file.split('.')[0],
-    //   };
-    //   this.abrirModalReporte(obj);
-
-    //   if (res.status) {
-    //   } else {
-    //     this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
-    //   }
-    // });
   }
 
   abrirModalReporte(obj) {
@@ -80,9 +69,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   async searchVersion() {
     this._ipc.send('getVersion');
-    await this._ipc.on('versionResponse', (event, arg) => {
-      this.versionApp = arg;
-    });
+  }
+
+  quitarFocoElectron() {
+    document.getElementById('imagenLogo').click();
   }
 
   getVersion() {
