@@ -5,7 +5,6 @@ import { DBservice } from '../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { ModalService } from '../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
-import { Subscription } from 'rxjs';
 
 import { FunctionService } from '../../core/services/functions.service';
 import { obj_paginate_default, TablasService } from '../components/tablas/tablas.service';
@@ -45,7 +44,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   seleccionModal: any;
   indexBorrar: any;
   tipoModal: string;
-  subDeci: Subscription;
+
   listaProductos: any;
   articuloEditando: any;
 
@@ -67,7 +66,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   initCambioMenu(arg) {
-
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
     }
@@ -81,7 +79,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   decisionModal(res) {
-
     if (res !== null && res !== undefined && (this.tipoModal === 'remover' || this.tipoModal === 'cancelarP')) {
       this.decisionModalP(res);
     } else if (res && this.tipoModal === 'confirmar_produccion') {
@@ -280,8 +277,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     this.mServ.ModalSeleccion(undefined);
   }
 
-  paginateChange(arg) {
-  }
+  paginateChange(arg) {}
 
   agregarAlista() {
     this.ingredientesParaProduccion.forEach((ingre) => {
@@ -354,7 +350,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   decisionModalP(bool) {
-
     const listaTemp = JSON.parse(JSON.stringify(this.lista_produccion));
     if (bool) {
       if (this.tipoModal === 'remover') {

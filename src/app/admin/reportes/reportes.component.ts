@@ -30,77 +30,10 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   appDir;
-  subDeci: Subscription;
-  subObj: Subscription;
   titulo_moda_reporte;
 
   ngOnInit() {
-    this._init_mixin();
-    this._ipc.on('printRes', async (event: Electron.IpcMessageEvent, res) => {
-      if (res.status === 'si') {
-        let obj;
-
-        this.pdfSrc = res.body;
-        this.fileName = res.file;
-
-        if (res.file === 'cuadre.pdf') {
-          obj = {
-            pdfSrc: res.body,
-            titulo: 'Cuadre de caja',
-            height: '25rem',
-            reimprimir: res.reimprimir,
-            fileName: res.file.split('.')[0],
-          };
-        } else if (res.file === 'reporte.pdf') {
-          obj = {
-            pdfSrc: res.body,
-            titulo: this.titulo_moda_reporte,
-            height: '83vh',
-            reimprimir: res.reimprimir,
-            fileName: res.file.split('.')[0],
-          };
-        }
-
-        console.log(res);
-
-        this.abrirVisorPdf(obj);
-      } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
-      }
-      setTimeout(() => {
-        this.quitarFocodeElectron();
-      }, 5);
-    });
-
-    this._ipc.on('printBase64Res', async (event: Electron.IpcMessageEvent, res) => {
-      if (res.status === 'si') {
-        this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
-      } else {
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
-      }
-      setTimeout(() => {
-        this.quitarFocodeElectron();
-      }, 5);
-    });
-
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== undefined) {
-        this.decisionModal(res);
-        this.mServ.ModalDecision(undefined);
-      }
-    });
-
-    this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res && res.tipo_modal === 'buscarCliente') {
-        if (this.tipoModal === 'cuentas_cobrar_cliente') {
-          res.data.tipo_ = 2;
-          this.makePdf(res.data);
-        }
-      } else if (res && res.tipo_modal !== 'buscarCliente') {
-        this.makePdf(res.data);
-        this.mServ.ModalObj(undefined);
-      }
-    });
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
   }
 
   initCambioMenu(arg) {
@@ -109,12 +42,30 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     }
   }
 
+  ipcBase64Resonse(res) {
+    if (res.status === 'si') {
+      this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
+    } else {
+      this.dbServ.toastError(res.msg, 'ERROR', true);
+    }
+  }
+
+  objDevueltoResponse(res) {
+    if (res && res.tipo_modal === 'buscarCliente') {
+      if (this.tipoModal === 'cuentas_cobrar_cliente') {
+        res.data.tipo_ = 2;
+        this.makePdf(res.data);
+      }
+    } else if (res && res.tipo_modal !== 'buscarCliente') {
+      this.makePdf(res.data);
+      this.mServ.ModalObj(undefined);
+    }
+  }
+
   ngOnDestroy() {
     this._destroy_mixin();
     if (this.subDeci) this.subDeci.unsubscribe();
     if (this.subObj) this.subObj.unsubscribe();
-    if (this._ipc) this._ipc.removeListener('printRes');
-    if (this._ipc) this._ipc.removeListener('printBase64Res');
   }
 
   async makeCuadre() {
@@ -125,8 +76,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         data: res.body,
         type: 'cuadre_caja',
       };
-
-      this._ipc.send('print', obj);
+      this.generarPdf(obj);
     } catch (error) {
       console.error(error);
       this.dbServ.toastError(error.error.msg, 'ERROR', true);
@@ -180,8 +130,6 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       };
 
       this.generarPdf(obj);
-
-      // this._ipc.send('print', obj);
     } catch (error) {
       this.dbServ.toastError('Error realizando reporte.', 'ERROR', true);
     }

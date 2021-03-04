@@ -1,0 +1,27 @@
+public pdfServ: PdfService,
+
+
+
+
+  this.pdfServ.generatePdf(obj, (res) => {
+        console.log('res --> ', res);
+
+        if (res.status === 'si') {
+          const objBase = {
+            base64: res.body,
+            filename: res.file,
+            type: 'conduce',
+          };
+          this._ipc.send('printBase64', objBase);
+        }
+      });
+
+
+  objDevueltoResponse(res) {}
+  decisionModal(res: any) {}
+
+  this._init_mixin({ _lista_subs: ['decisionModal']});
+  this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto'] });
+  this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
+
+

@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { Subscription } from 'rxjs';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from 'moment';

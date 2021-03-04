@@ -4,7 +4,6 @@ import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../core/services/GLOBAL';
-import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { IpcService } from '../../core/services/ipc.service';
@@ -1067,14 +1066,14 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     cabecera_conduce['detalle_conduces_attributes'] = this.CuerpoConduce;
     try {
       const res = await this.dbServ.createConduce(cabecera_conduce).toPromise();
-
-      // this.resetVariables();
+      this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
 
       const obj = {
         data: res,
         type: 'conduce',
       };
 
+      this.cancelarConduce(2);
       this.pdfServ.generatePdf(obj, (res) => {
         console.log('res --> ', res);
 
@@ -1087,8 +1086,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
           this._ipc.send('printBase64', objBase);
         }
       });
-
-      this.cancelarConduce(2);
     } catch (error) {
       if (error.error) {
         this.dbServ.toastError(error.error.msg, 'ERROR', true);
@@ -1098,7 +1095,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   ipcBase64Resonse(res) {
     if (res.status === 'si') {
-      this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
     } else {
       this.dbServ.toastError(res.msg, 'ERROR', true);
     }

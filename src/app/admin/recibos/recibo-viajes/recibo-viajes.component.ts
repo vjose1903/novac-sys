@@ -4,7 +4,6 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { ModalService } from '../../components/modal/modal.service';
-import { Subscription } from 'rxjs';
 import { FunctionService } from '../../../core/services/functions.service';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { IpcService } from '../../../core/services/ipc.service';
@@ -66,8 +65,6 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   viajes_cant_porciento: any;
   viajes_cant: any;
   tipoModal: string;
-  subObj: Subscription;
-  subDeci: Subscription;
   forma_pago: any;
   total_recibido: any;
   totalPagado = 0;
@@ -88,23 +85,8 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   }
 
   ngOnInit() {
-    this._init_mixin();
-    this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res && res.tipo_modal === 'cambio') {
-        this.forma_pago = res.data.forma_pago;
-        this.total_recibido = res.data.dinero;
-        this.IMPRIMIR();
-        this.mServ.ModalObj(undefined);
-      }
-    });
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto'] });
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== undefined) {
-        this.reversarUltimaTransaccion(res);
-
-        this.mServ.ModalDecision(undefined);
-      }
-    });
     this.necesarioStart();
   }
 
@@ -114,12 +96,23 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     }
   }
 
+  decisionModal(res: any) {
+    if (res !== undefined) {
+      this.reversarUltimaTransaccion(res);
+    }
+  }
+
+  objDevueltoResponse(res) {
+    if (res && res.tipo_modal === 'cambio') {
+      this.forma_pago = res.data.forma_pago;
+      this.total_recibido = res.data.dinero;
+      this.IMPRIMIR();
+      this.mServ.ModalObj(undefined);
+    }
+  }
+
   ngOnDestroy() {
     this._destroy_mixin();
-    if (this.subObj) this.subObj.unsubscribe();
-    if (this.subDeci) this.subDeci.unsubscribe();
-
-    // this._ipc.removeListener('printRes');
   }
 
   necesarioStart() {
@@ -359,16 +352,6 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
         this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
         this.getViajes(this.tServ.obj_paginate);
         this.resetVariables();
-
-        // this._ipc.send('print', obj);
-
-        // await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-
-        //   if (res.status) {
-        //   } else {
-        //     this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
-        //   }
-        // });
       },
       (err) => {
         console.error(err);
@@ -376,12 +359,10 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
         if (err.error) {
           this.dbServ.toastError(err.error.msg, 'ERROR', true);
         }
-        // else {
-        //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
-        // }
       },
     );
   }
+
   resetVariables() {
     this.ultimo_pago = undefined;
     this.viaje_selected = { id: -1 };

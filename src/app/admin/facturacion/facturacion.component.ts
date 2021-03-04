@@ -1328,9 +1328,17 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
       if (metodo === 'editar_factura') {
         res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();
+        this.dbServ.toastSuccess('Factura editada correctamente.', 'CORRECTO', true);
       } else {
         res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
+        this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO', true);
       }
+
+      if (this.facturaGuardada) {
+        this.revisarLocalStorage();
+      }
+
+      await this.resetVariables();
 
       res['FACTURA_DE'] = this.metodo;
 
@@ -1352,12 +1360,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
           }
         });
       }
-
-      if (this.facturaGuardada) {
-        this.revisarLocalStorage();
-      }
-
-      await this.resetVariables();
     } catch (error) {
       console.error(error);
       try {
@@ -1370,12 +1372,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   async ipcBase64Resonse(res) {
     if (res.status === 'si') {
-      const metodo = this.action === 'update' ? 'editar_factura' : '';
-      if (metodo === 'editar_factura') {
-        this.dbServ.toastSuccess('Factura editada correctamente.', 'CORRECTO', true);
-      } else {
-        this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO', true);
-      }
     } else {
       this.dbServ.toastError('Error imprimiendo la factura.', 'ERROR', true);
     }

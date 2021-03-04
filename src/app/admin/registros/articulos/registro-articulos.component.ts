@@ -6,7 +6,6 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import * as moment from 'moment';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
-import { Subscription } from 'rxjs';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { FunctionService } from '../../../core/services/functions.service';
 import { LoaderService } from '../../../loader/loader.service';
@@ -86,7 +85,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   Recalcular = false;
   ProductoEditando: any;
   clickBtnRe = false;
-  subDeci: Subscription;
 
   vendido_en: any;
   listaMateriasPrimas = [];

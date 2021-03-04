@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
-import { Subscription } from 'rxjs';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as moment from 'moment';
@@ -78,7 +77,6 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
     editar: true,
   };
 
-  subDeci: Subscription;
   lista_tipos_facturas: any;
 
   fechaCompra;
@@ -127,16 +125,11 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.localeService.use('es');
-    this._init_mixin();
+    this._init_mixin({ _lista_subs: ['decisionModal'] });
     this.titulo = 'Paquetes de numeros comprobantes fiscales';
     this.necesarioStart();
 
     this.setDateInputs(new Date());
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== null && res !== undefined) {
-        this.decisionModal(res);
-      }
-    });
   }
 
   initCambioMenu(arg) {
@@ -147,7 +140,6 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._destroy_mixin();
-    if (this.subDeci) this.subDeci.unsubscribe();
   }
 
   text(arg) {
@@ -375,20 +367,22 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   decisionModal(arg) {
-    if (arg && this.seleccionModal) {
-      this.dbServ.deleteNCF(this.seleccionModal.id).subscribe(
-        (res) => {
-          this.dbServ.toastSuccess(
-            'comprobante para ' + this.seleccionModal.tipoC_ + ' numero: ' + this.seleccionModal.codigo + ' borrado',
-            'CORRECTO',
-          );
-          _.pullAt(this.listaNCF, this.indexSelected);
-          this.tipoModal = '';
-        },
-        (err) => {
-          this.mostrarErrores(err.error);
-        },
-      );
+    if (arg !== null && arg !== undefined) {
+      if (arg && this.seleccionModal) {
+        this.dbServ.deleteNCF(this.seleccionModal.id).subscribe(
+          (res) => {
+            this.dbServ.toastSuccess(
+              'comprobante para ' + this.seleccionModal.tipoC_ + ' numero: ' + this.seleccionModal.codigo + ' borrado',
+              'CORRECTO',
+            );
+            _.pullAt(this.listaNCF, this.indexSelected);
+            this.tipoModal = '';
+          },
+          (err) => {
+            this.mostrarErrores(err.error);
+          },
+        );
+      }
     }
   }
   mostrarErrores(arg) {

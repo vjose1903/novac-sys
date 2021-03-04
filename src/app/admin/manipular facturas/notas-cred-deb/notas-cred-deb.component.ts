@@ -6,7 +6,6 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IpcService } from '../../../core/services/ipc.service';
-import { Subscription } from 'rxjs';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { ModalService } from '../../components/modal/modal.service';
 import { FunctionService } from '../../../core/services/functions.service';
@@ -327,13 +326,15 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
       if (!detalle.cantidad_en_unidades_nota) {
         detalle.cantidad_en_unidades_nota = 0;
       }
+      // console.log('se_calcula_saco--> ', se_calcula_saco);
 
-      if (detalle.unidad === 'Saco') {
+      if (detalle.unidad === 'Saco' && detalle.se_calcula_saco) {
         const peso = this.obtenerSaco(detalle.descripcion, 'peso');
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * peso;
       } else {
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * detalle.contenidos[detalle.unidad];
       }
+      console.log('DETALLE ==> ', detalle);
     }
   }
 
@@ -439,7 +440,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
       } else if (this.tipoModal === 'cancelar') {
         this.resetVariables();
 
-        this.router.navigateByUrl(`/admin/buscarFactura/nota_${this.tipoNota}`);
+        this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
       }
     }
   }
@@ -448,6 +449,8 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     let num = '' as any;
     const split = _.split(descripcion, '(')[1];
     const splitFinal = _.split(split, ' ')[0];
+    console.log('tipo --> ', tipo);
+
     if (tipo === 'descripcion') {
       num = 'Saco de ' + splitFinal + ' libras';
     } else {

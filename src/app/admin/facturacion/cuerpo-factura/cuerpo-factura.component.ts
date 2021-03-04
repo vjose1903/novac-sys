@@ -1,6 +1,5 @@
 import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, OnDestroy, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
@@ -46,18 +45,11 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   @Input() propietario;
   @Input() metodo;
 
-  // subObjDevueltoModal: Subscription;
-  // subIndexToFocusModal: Subscription;
-
   @Output() sendCalculos = new EventEmitter<any>();
   @Output() sendDescuento = new EventEmitter<any>();
   @Output() getCuerpoFactura = new EventEmitter<any>();
   @Output() getFechaFactura = new EventEmitter<any>();
-  subDeci: Subscription;
-  subObj: Subscription;
-  subArticuloFiltro: Subscription;
-  subEsc: Subscription;
-  subInde: Subscription;
+
   tipoModal: string;
 
   constructor(
@@ -73,38 +65,37 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   ngOnInit() {
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'articuloPorCodigo', 'pressEsc', 'indexToFocus'] });
     this.rellenarVariables();
+  }
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (this.tipoModal === 'removerArticulo' && res) {
-        this.procesoQuitarArticulo();
-        this.mServ.ModalDecision(undefined);
-      }
-    });
+  decisionModal(res) {
+    if (this.tipoModal === 'removerArticulo' && res) {
+      this.procesoQuitarArticulo();
+      this.mServ.ModalDecision(undefined);
+    }
+  }
 
-    this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res && res.tipo_modal === 'buscarArticulo') {
-        this.LLenarRowDespuesDeFiltro(res);
-      }
-    });
+  articuloFiltroResponse(res) {
+    this.objDevueltoResponse(res);
+  }
 
-    this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
-      if (res && res.tipo_modal === 'buscarArticulo') {
-        this.LLenarRowDespuesDeFiltro(res);
-      }
-    });
+  objDevueltoResponse(res) {
+    if (res && res.tipo_modal === 'buscarArticulo') {
+      this.LLenarRowDespuesDeFiltro(res);
+    }
+  }
 
-    this.subEsc = this.mServ.PRESSESC.subscribe((res) => {
-      if (res !== undefined && res !== null && res !== {}) {
-        setTimeout(() => GLOBAL.enfocarInput('cod-' + res), 250);
-      }
-    });
+  pressEscResponse(res) {
+    if (res !== undefined && res !== null && res !== {}) {
+      setTimeout(() => GLOBAL.enfocarInput('cod-' + res), 250);
+    }
+  }
 
-    this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => {
-      if (res !== undefined && res !== null) {
-        this.noArticuloEncontrado(res);
-      }
-    });
+  indexToFocusResponse(res) {
+    if (res !== undefined && res !== null) {
+      this.noArticuloEncontrado(res);
+    }
   }
 
   escucharCambiosEnForm() {
@@ -115,7 +106,14 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     });
   }
 
-  arreglarCuerpo() {}
+  ngOnDestroy() {
+    this._destroy_mixin();
+
+    this.mServ.modalTipo(undefined);
+    this.mServ.ModalSeleccion(undefined);
+    this.mServ.mostrarModal(false);
+    // this.mServ.ModalTablaHeight(false);
+  }
 
   emitirCambiosForm(res) {
     const detalle_factura = [];
@@ -191,19 +189,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     if (simpleChanges.factura && simpleChanges.factura.currentValue && this.action === 'update' && _.hasIn(this.factura, 'id')) {
       this.llenarFactura(this.factura.detalle_facturas);
     }
-  }
-
-  ngOnDestroy() {
-    if (this.subDeci) this.subDeci.unsubscribe();
-    if (this.subObj) this.subObj.unsubscribe();
-    if (this.subEsc) this.subEsc.unsubscribe();
-    if (this.subInde) this.subInde.unsubscribe();
-    if (this.subArticuloFiltro) this.subArticuloFiltro.unsubscribe();
-
-    this.mServ.modalTipo(undefined);
-    this.mServ.ModalSeleccion(undefined);
-    this.mServ.mostrarModal(false);
-    // this.mServ.ModalTablaHeight(false);
   }
 
   async procesoQuitarArticulo() {

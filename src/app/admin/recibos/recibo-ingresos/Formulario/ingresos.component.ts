@@ -4,7 +4,6 @@ import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import * as moment from 'moment';
-import { Subscription } from 'rxjs';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../../../components/tablas/tablas.component';
 import { ModalService } from '../../../components/modal/modal.service';
@@ -14,6 +13,7 @@ import { FunctionService } from '../../../../core/services/functions.service';
 
 import { LayoutService } from '../../../../admin/layout/layout.service';
 import { mixinClass } from '../../../mixinClass';
+import { PdfService } from '../../../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -77,7 +77,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       tipo: 'check',
       key: 'select',
       customClass: true,
-      estilos: [{ width: '6rem' }],
+      estilos: [{ width: '7rem' }],
       disable: {
         getDisabled: true,
         campo: 'is_viaje',
@@ -118,8 +118,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   Devuelta: any;
   forma_pago: any;
 
-  sub: Subscription;
-  subDeci: Subscription;
   totalFacturado: number;
   totalPagado: number;
   totalPagadoPorciento: number;
@@ -134,37 +132,18 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     public _ipc: IpcService,
     private tServ: TablasService,
     public layServ: LayoutService,
+    public pdfServ: PdfService,
   ) {
     super(mServ, _ipc, layServ);
     this.config.notFoundText = 'Articulo no existe';
   }
 
   ngOnInit() {
-    this._init_mixin();
-    this.sub = this.mServ.OBJDEVUELTO.subscribe((res) => {
-      if (res && res.tipo_modal === 'buscarCliente') {
-        this.clienteAdepositar = res.data;
-
-        this.clienteAdepositar.balance = this.clienteAdepositar.balance ? this.clienteAdepositar.balance : 0;
-
-        (document.getElementById('clienteI') as any).value = res.data.nombre;
-        this.pedirFacturasPorCliente(res.data.id, this.tServ.obj_paginate);
-        this.mServ.ModalObj(undefined);
-      } else if (res && res.tipo_modal === 'cambio') {
-        this.Devuelta = res.data.devuelta;
-        this.forma_pago = res.data.forma_pago;
-        this.sendIngreso();
-        this.mServ.ModalObj(undefined);
-      }
-    });
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res && this.tipoModal === 'cancelar_ingreso') {
-        this.cancelarIgreso();
-      }
-    });
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
 
     this.necesarioStart();
   }
+
   initCambioMenu(arg) {
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
@@ -173,9 +152,29 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._destroy_mixin();
-    if (this.sub) this.sub.unsubscribe();
-    if (this.subDeci) this.subDeci.unsubscribe();
-    if (this._ipc) this._ipc.removeListener('printRes');
+  }
+
+  decisionModal(res: any) {
+    if (res && this.tipoModal === 'cancelar_ingreso') {
+      this.cancelarIgreso();
+    }
+  }
+
+  objDevueltoResponse(res) {
+    if (res && res.tipo_modal === 'buscarCliente') {
+      this.clienteAdepositar = res.data;
+
+      this.clienteAdepositar.balance = this.clienteAdepositar.balance ? this.clienteAdepositar.balance : 0;
+
+      (document.getElementById('clienteI') as any).value = res.data.nombre;
+      this.pedirFacturasPorCliente(res.data.id, this.tServ.obj_paginate);
+      this.mServ.ModalObj(undefined);
+    } else if (res && res.tipo_modal === 'cambio') {
+      this.Devuelta = res.data.devuelta;
+      this.forma_pago = res.data.forma_pago;
+      this.sendIngreso();
+      this.mServ.ModalObj(undefined);
+    }
   }
 
   formatoNumero(num) {
@@ -423,7 +422,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     }
   }
 
-  sendIngreso() {
+  async sendIngreso() {
     const empleado = this.fun.getUser();
 
     // const tipo = this.tipoFacturas.filter((val) => val.descripcion === this.tipo_recibo)[0];
@@ -441,39 +440,44 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     obj.total = this.detalleYtotal.total_recibo;
     obj['detalle_recibos_attributes'] = this.detalleYtotal.detalle;
 
-    this.dbServ.createRecibo(obj).subscribe(
-      async (res) => {
-        const obj = {
-          data: res,
-          type: 'recibo_ingreso',
-        };
+    try {
+      const res = await this.dbServ.createRecibo(obj).toPromise();
 
-        this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
-        this.clienteAdepositar.balance = res.cliente.balance;
-        this.pedirFacturasPorCliente(this.clienteAdepositar.id, this.tServ.obj_paginate);
-        this.resetVariables();
+      this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
+      this.clienteAdepositar.balance = res.cliente.balance;
 
-        this._ipc.send('print', obj);
+      this.pedirFacturasPorCliente(this.clienteAdepositar.id, this.tServ.obj_paginate);
+      this.resetVariables();
 
-        await this._ipc.on('printRes', (event: Electron.IpcMessageEvent, res) => {
-          if (res.status) {
-          } else {
-            this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
-          }
-        });
-      },
-      (err) => {
-        console.error(err);
+      const obj_print = {
+        data: res,
+        type: 'recibo_ingreso',
+      };
 
-        if (err.error) {
-          this.dbServ.toastError(err.error.msg, 'ERROR', true);
+      this.pdfServ.generatePdf(obj_print, (res) => {
+        console.log('res --> ', res);
+
+        if (res.status === 'si') {
+          const objBase = {
+            base64: res.body,
+            filename: res.file,
+            type: 'recibo_ingreso',
+          };
+          this._ipc.send('printBase64', objBase);
         }
-        // else {
-        //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
-        // }
-      },
-    );
+      });
+    } catch (error) {
+      this.dbServ.toastError(error.error.msg, 'ERROR', true);
+    }
   }
+
+  ipcBase64Resonse(res) {
+    if (res.status === 'si') {
+    } else {
+      this.dbServ.toastError(res.msg, 'ERROR', true);
+    }
+  }
+
   resetVariables() {
     this.forma_pago = null;
     this.Devuelta = null;
