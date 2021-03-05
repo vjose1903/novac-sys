@@ -156,7 +156,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   ngOnInit() {
     this.localeService.use('es');
     this.rellenarVariables();
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
+    this._init_mixin({ component: 'cabeza_factura', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
   }
 
   rellenarVariables() {
@@ -224,10 +224,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   ngOnDestroy(): void {
     this._destroy_mixin();
-    this.mServ.ModalObj(null);
-    this.mServ.modalTipo(null);
-    this.mServ.ModalSeleccion(null);
-    this.mServ.mostrarModal(false);
   }
 
   ngAfterViewInit() {
@@ -347,22 +343,20 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   decisionModal(res) {
     if (res !== undefined) {
       this.luegoDecision(res);
-      this.mServ.ModalDecision(undefined);
     }
     if (res !== undefined && res.bool) {
       this.formarFechaFactura(res.Date);
       this.FacturaAtrasada = true;
-      this.mServ.ModalDecision(undefined);
     }
   }
 
   objDevueltoResponse(res) {
+    console.log('objDevueltoResponse  factura_cabeza --> ', res);
     if (res && res.tipo_modal === 'buscarCliente') {
       this.propietario_factura = res.data;
 
       this.form.patchValue(this.propietario_factura);
       this.enfocarInput('cod-0');
-      this.mServ.ModalObj(undefined);
       const balance = _.parseInt(this.propietario_factura.balance);
       const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
 
@@ -382,7 +376,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.propietario_factura = res.data;
       this.form.patchValue(this.propietario_factura);
       this.enfocarInput('cod-0');
-      this.mServ.ModalObj(undefined);
       //
     } else if (res && res.tipo_modal === 'cambio') {
       this.Devuelta = res.data.devuelta;
@@ -392,16 +385,10 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         if (res.data.decision_cambio) {
           this.cambiarCostos();
         }
-
         this.CuerpoFactura = this.newCuerpo;
-        // this.revisarLocalStorage();
         this.enviarABaseDatos();
-
-        this.mServ.ModalObj(undefined);
       } else {
-        // this.revisarLocalStorage();
         this.enviarABaseDatos();
-        this.mServ.ModalObj(undefined);
       }
     }
   }

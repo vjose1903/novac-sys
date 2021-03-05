@@ -168,12 +168,10 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
       (document.getElementById('clienteI') as any).value = res.data.nombre;
       this.pedirFacturasPorCliente(res.data.id, this.tServ.obj_paginate);
-      this.mServ.ModalObj(undefined);
     } else if (res && res.tipo_modal === 'cambio') {
       this.Devuelta = res.data.devuelta;
       this.forma_pago = res.data.forma_pago;
       this.sendIngreso();
-      this.mServ.ModalObj(undefined);
     }
   }
 
@@ -481,9 +479,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     this.Devuelta = null;
     this.detalleYtotal = undefined;
     this.facturas_selected = [];
-    this.mServ.ModalDecision(false);
-    this.mServ.modalTipo(undefined);
-    this.mServ.ModalSeleccion(undefined);
   }
 
   enfocarInput(arg) {

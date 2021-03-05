@@ -31,18 +31,22 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   fecha_articulo: any;
   returnArticulosSeleccionado = false;
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+    console.log('presione esc en el modal');
+    console.log('this.showModal --> ', this.showModal);
+
     if (this.showModal) {
+      this.showModal = false;
       const obj = {
         total: 0,
         tabla: 'tabla',
       };
+
       this.tServ.Func_total_paginas(obj);
       this.mServ.func_tabla_modal_change(undefined);
+
       if (this.tipoModal === 'buscarArticulo') {
         this.mServ.pressEsc(this.index);
-        setTimeout(() => {
-          this.mServ.pressEsc(undefined);
-        }, 1000);
+        setTimeout(() => this.mServ.pressEsc(undefined), 1000);
       } else {
         this.mServ.pressEsc({});
       }
@@ -117,12 +121,20 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
-      if (res !== undefined && res !== null && !this.paraFiltroArticulos && !this.paraFiltroClientes) {
-        this.showModal = res;
-      }
+      console.log('subscribe showModal==> ', res);
 
-      if (res === false) {
-        this.showModal = res;
+      if (res !== undefined && res !== null) {
+        if (!this.paraFiltroArticulos && !this.paraFiltroClientes && !this.paraFiltroSuplidor) {
+          this.showModal = res;
+        }
+
+        if (res === false) {
+          this.showModal = res;
+          console.log('Quien manda es showModal');
+          this.mServ.mostrarModal(undefined);
+        }
+      } else {
+        this.showModal = false;
       }
     });
 
@@ -240,14 +252,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   reinicioModal() {
-    this.mServ.modalTipo(undefined);
-    this.mServ.mostrarModal(false);
-    this.mServ.ModalSeleccion(undefined);
-    // this.mServ.ModalTablaHeight(false);
-    this.mServ.ModalObj(undefined);
-    this.mServ.ModalIndex(undefined);
-    this.mServ.getArticuloFiltradoPorCodigo(undefined);
-
     this.seleccionModal = undefined;
     this.paraFiltroArticulos = undefined;
     this.paraFiltroClientes = undefined;
@@ -267,6 +271,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     };
 
     if (!bool) obj = undefined;
+    console.log('<-- mandando desde formReporteAccion --> ');
 
     this.mServ.ModalObj(obj);
     this.reinicioModal();
@@ -282,10 +287,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       obj['index'] = this.index;
     }
 
+    console.log('<-- mandando desde devolverCLick --> ');
     this.mServ.ModalObj(obj);
-    if (this.tipoModal === 'seleccionar_articulos_adelantados') {
-      this.accion(false);
-    }
   }
 
   noArticulo() {
@@ -326,8 +329,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
     }
 
-    if (this.tipoModal === 'buscarArticulo') {
-      try {
+    try {
+      if (this.tipoModal === 'buscarArticulo') {
         const is_compra = this.metodo === 'compra' ? true : false;
 
         const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, fecha_articulo, 'todos').toPromise();
@@ -337,9 +340,10 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
           if (this.seleccionModal.length === 0) {
             this.noArticulo();
+            return;
           }
 
-          this.showModal = true;
+          this.mostrarModalLuegoDeBuscarData();
           const obj = {
             total: res.total_registros,
             tabla: 'filtroArticulos',
@@ -348,21 +352,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         } else {
           this.articuloFiltradoPorCodigo(res);
         }
-      } catch (error) {
-        console.error(error);
-        this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);
-        this.mServ.mostrarModal(false);
-      }
-    } else if (this.tipoModal === 'buscarCliente') {
-      try {
+      } else if (this.tipoModal === 'buscarCliente') {
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
         this.seleccionModal = undefined;
 
         if (res.data.length === 0) {
           this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO', true);
-          setTimeout(() => {
-            this.mServ.mostrarModal(false);
-          }, 250);
+          setTimeout(() => {}, 250);
         } else {
           res.data.map(async (cli) => {
             cli.nombre = GLOBAL.Capitalice(cli.nombre);
@@ -373,22 +369,15 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           });
 
           this.seleccionModal = res.data;
-          setTimeout(() => {
-            this.showModal = true;
-          }, 250);
+          this.mostrarModalLuegoDeBuscarData();
+
           const obj = {
             total: res.total_registros,
             tabla: 'filtroCliente',
           };
           this.tServ.Func_total_paginas(obj);
         }
-      } catch (error) {
-        console.error(error);
-        this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
-        this.mServ.mostrarModal(false);
-      }
-    } else if (this.tipoModal === 'buscarSuplidor') {
-      try {
+      } else if (this.tipoModal === 'buscarSuplidor') {
         const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
         this.seleccionModal = undefined;
@@ -398,23 +387,32 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           return supli;
         });
         this.seleccionModal = res.data;
+        this.mostrarModalLuegoDeBuscarData();
 
         if (res.data.length === 0) {
           this.dbServ.toastWarning('No existe suplidor con el nombre introducido', 'AVISO', true);
-          setTimeout(() => {
-            this.mServ.mostrarModal(false);
-          }, 250);
         }
         const obj = {
           total: res.total_registros,
           tabla: 'filtroSuplidor',
         };
         this.tServ.Func_total_paginas(obj);
-      } catch (error) {
-        console.error(error);
-        this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
-        this.mServ.mostrarModal(false);
       }
+    } catch (error) {
+      console.error(error);
+      if (this.tipoModal === 'buscarArticulo') this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);
+      if (this.tipoModal === 'buscarCliente') this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
+      if (this.tipoModal === 'buscarSuplidor') this.dbServ.toastError('Error buscando suplidor registrados.', 'ERROR', true);
+      setTimeout(() => {
+        console.log('manda filtro en modales');
+        this.mServ.mostrarModal(false);
+      }, 250);
     }
+  }
+
+  mostrarModalLuegoDeBuscarData() {
+    setTimeout(() => {
+      this.showModal = true;
+    }, 250);
   }
 }

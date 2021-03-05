@@ -72,7 +72,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   quitarFocoElectron() {
-    document.getElementById('imagenLogo').click();
+    if (document.getElementById('imagenLogo')) document.getElementById('imagenLogo').click();
   }
 
   getVersion() {

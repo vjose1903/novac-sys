@@ -109,7 +109,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
       this.forma_pago = res.data.forma_pago;
       this.total_recibido = res.data.dinero;
       this.IMPRIMIR();
-      this.mServ.ModalObj(undefined);
+
     }
   }
 

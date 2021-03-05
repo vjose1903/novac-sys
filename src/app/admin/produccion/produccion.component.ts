@@ -272,9 +272,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     this.cantidad_producir = null;
     this.articuloEditando = undefined;
     this.enfocarInput('articulo_id');
-    this.mServ.ModalDecision(false);
-    this.mServ.modalTipo(undefined);
-    this.mServ.ModalSeleccion(undefined);
   }
 
   paginateChange(arg) {}

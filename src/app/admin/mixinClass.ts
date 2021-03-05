@@ -15,7 +15,8 @@ type lista_sub =
   | 'sacarFacturas';
 
 interface mixinInit {
-  _lista_subs: Array<lista_sub>;
+  component?: String;
+  _lista_subs?: Array<lista_sub>;
 }
 
 export class mixinClass extends modalClass {
@@ -50,13 +51,19 @@ export class mixinClass extends modalClass {
     return `${this.my_dateFormater(str)} - ${this.my_houreFormater(str)}`;
   }
   // =========================================================================================================
-  my_dateFormater(str) {
+  my_dateFormater(str, front = true) {
+    str = str + '';
     let dateObj = new Date(str);
+
     let month = String(dateObj.getMonth() + 1).padStart(2, '0');
     let day = String(dateObj.getDate()).padStart(2, '0');
     let year = dateObj.getFullYear();
-
-    return `${day}/${month}/${year}`;
+    if (front) {
+      str = `${day}/${month}/${year}`;
+    } else {
+      str = `${year}-${month}-${day}`;
+    }
+    return str;
   }
 
   // =========================================================================================================

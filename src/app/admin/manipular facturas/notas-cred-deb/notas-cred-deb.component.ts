@@ -77,7 +77,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   objDevueltoResponse(res) {
     if (res && res.tipo_modal === 'cambio') {
       this.decisionModal(res.data);
-      this.mServ.ModalObj(undefined);
     }
   }
 
@@ -97,12 +96,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
   ngOnDestroy(): void {
     this._destroy_mixin();
-  }
-
-  resetVariables() {
-    this.mServ.ModalDecision(false);
-    this.mServ.modalTipo(undefined);
-    this.mServ.ModalSeleccion(undefined);
   }
 
   async necesarioStart() {
@@ -433,8 +426,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
       if (this.tipoModal === 'cambio') {
         this.formarNota(res);
       } else if (this.tipoModal === 'cancelar') {
-        this.resetVariables();
-
         this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
       }
     }
@@ -548,7 +539,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
       this.imprimirNota(obj);
 
-      this.resetVariables();
       this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
     } catch (error) {
       this.dbServ.toastError(error.statusText, 'ERROR', true);

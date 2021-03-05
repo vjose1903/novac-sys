@@ -142,9 +142,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     } else {
       this.dbServ.toastError(res.msg, 'ERROR', true);
     }
-    setTimeout(() => {
-      this.mServ.mostrarModal(false);
-    }, 5);
   }
 
   objDevueltoResponse(res) {
@@ -152,7 +149,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       this.clienteBuscado = res.data;
       (document.getElementById('valorI') as any).value = res.data.nombre;
       this.pedirFactura('1', res.data.id, this.tServ.obj_paginate);
-      this.mServ.ModalObj(undefined);
     }
   }
 
@@ -198,7 +194,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
             this.editarFactura();
           }
         } else {
-          this.mServ.ModalDecision(undefined);
           const url = `/admin/manipular/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
           this.router.navigateByUrl(url);
         }
@@ -478,9 +473,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     this.tipo_factura_id = null;
     this.campo = null;
     this.enfocarInput('campoI');
-    this.mServ.mostrarModal(false);
-    this.mServ.modalTipo(undefined);
-    this.mServ.ModalDecision(undefined);
+    console.log('manda buscar factura');
   }
 
   selectFactura(item) {

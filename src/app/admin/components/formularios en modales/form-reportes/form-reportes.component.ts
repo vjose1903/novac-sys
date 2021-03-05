@@ -47,11 +47,13 @@ export class FormVentasComponent implements OnInit {
   ngOnInit() {
     this.localeService.use('es');
     this.necesarioStart();
+    console.log('this.tipo_reporte --> ', this.tipo_reporte);
   }
 
   async necesarioStart() {
     await this.createForm();
     await this.agregateValidators();
+
     if (this.formarFecha.includes(this.tipo_reporte)) {
       this.formarFechaFactura(new Date());
     }
@@ -96,7 +98,9 @@ export class FormVentasComponent implements OnInit {
   }
 
   agregateValidators() {
-    if (this.tipo_reporte === 'ventas_diarias') {
+    if (this.tipo_reporte === 'cuadre') {
+      this.form.controls.fecha.setValue(new Date());
+    } else if (this.tipo_reporte === 'ventas_diarias') {
       this.form.controls.tipo.setValue(1);
       this.setValidator('condicion');
     } else if (this.tipo_reporte === 'ventas_rango') {

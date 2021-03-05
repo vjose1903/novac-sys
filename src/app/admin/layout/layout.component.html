@@ -18,8 +18,6 @@
   (visibleChange)="_toggleSidebar()"
   [blockScroll]="true"
 >
-  <!-- <div *ngIf="PosMenu !== 'top' && DockMenu === true" class="btnMenu"> -->
-
   <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar()">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
@@ -229,11 +227,8 @@
               <h2>{{ usuario?.nombre }}</h2>
               <p>{{ usuario?.email }}</p>
             </div>
-            <!-- <li role="menuitem"><a class="dropdown-item" href="#">Nombre admin</a> admin@gmail.com </li> -->
             <li class="divider dropdown-divider"></li>
-            <!-- <li role="menuitem" [routerLink]="['/admin/cuenta']">
-              <a class="dropdown-item"><i class="fas fa-address-card"></i>Perfil</a>
-            </li> -->
+
             <!-- <li role="menuitem" (click)="modalConfig()">
               <a class="dropdown-item"><i class="fas fa-cogs"></i>Configuraciones</a>
             </li> -->

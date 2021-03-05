@@ -66,13 +66,16 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   ngOnInit() {
     this.rellenarVariables();
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'articuloPorCodigo', 'pressEsc', 'indexToFocus'] });
+
+    this._init_mixin({
+      component: 'cuerpo_factura',
+      _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'articuloPorCodigo', 'pressEsc', 'indexToFocus'],
+    });
   }
 
   decisionModal(res) {
     if (this.tipoModal === 'removerArticulo' && res) {
       this.procesoQuitarArticulo();
-      this.mServ.ModalDecision(undefined);
     }
   }
 
@@ -108,11 +111,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   ngOnDestroy() {
     this._destroy_mixin();
-
-    this.mServ.modalTipo(undefined);
-    this.mServ.ModalSeleccion(undefined);
-    this.mServ.mostrarModal(false);
-    // this.mServ.ModalTablaHeight(false);
   }
 
   emitirCambiosForm(res) {
@@ -469,7 +467,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             } else {
               this.calcularTotalRow(j);
             }
-
 
             this.aumentarSecuencia();
           } catch (error) {}
@@ -1119,11 +1116,5 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   noArticuloEncontrado(arg) {
     this.dbServ.toastError('Articulo no creado', 'ERROR', true);
-
-    this.mServ.ModalIndex(undefined);
-    setTimeout(() => {
-      GLOBAL.enfocarInput('cod-' + arg);
-      this.mServ.mostrarModal(false);
-    }, 100);
   }
 }

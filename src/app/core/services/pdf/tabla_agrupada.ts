@@ -9,11 +9,10 @@ export function getContentWithTablaAgrupada(configuracion, data) {
 
     for (let j = 0; j < configuracion.info.length; j++) {
       const config = configuracion.info[j];
-
       cont_.push(getTablaNormal(config, data, i, j));
     }
+    if (i > 0) cont_ = [getRaya(configuracion), ...cont_];
 
-    cont_ = [getRaya(configuracion), ...cont_];
     if (data.contenido_reporte[i].titulo_grupo === 'TOTAL GENERAL') {
       content.push({
         stack: cont_,

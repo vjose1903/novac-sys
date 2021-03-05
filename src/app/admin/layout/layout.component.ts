@@ -370,27 +370,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.modulo_select = undefined;
   }
 
-  modalConfig() {}
-  // ===========================================================================
-  // MODAL
-  // ===========================================================================
 
-  // reiniciarVarModal() {
-  //   TIPOMODAL.next('');
-  //   SHOWMODAL.next(false);
-  //   SELECCIONMODAL.next({});
-  // }
 
-  // BtnModal(arg) {
-  //   DECISIONMODAL.next(arg);
-  //   this.reiniciarVarModal();
-  // }
-
-  // clickRowModal(arg) {
-  //   OBJDEVUELTO.next(arg);
-  // }
-
-  // noArticuloEncontrado(arg) {
-  //   INDEXTOFOCUS.next(arg);
-  // }
 }

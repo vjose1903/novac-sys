@@ -47,19 +47,30 @@ export class modalClass extends LayoutClass {
           this.seleccionModal = undefined;
           this.tipoModal = undefined;
           this.mServ.ModalDecision(undefined);
+          console.log('Quien manda es decisionModal ');
+          this.mServ.mostrarModal(undefined);
         }
       });
     }
 
     if (this._lista.includes('objDevuelto')) {
-      this.subObj = this.mServ.OBJDEVUELTO.subscribe((res) => {
+      this.subObj = this.mServ.OBJDEVUELTO.subscribe(async (res) => {
         this.objDevueltoResponse(res);
+        if (res !== undefined) {
+          console.log('Quien manda es objDevuelto--> ', JSON.parse(JSON.stringify(res)));
+          await this.mServ.mostrarModal(undefined);
+          await this.mServ.ModalObj(undefined);
+        }
       });
     }
 
     if (this._lista.includes('articuloPorCodigo')) {
       this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
         this.articuloFiltroResponse(res);
+        if (res !== undefined) {
+          console.log('Quien manda es articuloPorCodigo ');
+          this.mServ.mostrarModal(undefined);
+        }
       });
     }
 
@@ -72,6 +83,10 @@ export class modalClass extends LayoutClass {
     if (this._lista.includes('indexToFocus')) {
       this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => {
         this.indexToFocusResponse(res);
+        if (res !== undefined) {
+          console.log('Quien manda es indexToFocus ');
+          this.mServ.mostrarModal(undefined);
+        }
       });
     }
 

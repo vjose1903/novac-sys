@@ -41,7 +41,7 @@
 
     <!-- ----- FECHA -----  -->
 
-    <div *ngIf="tipo_reporte === 'ventas_productos' && form.controls.tipo.value === '1'" class="col-12 mt-3">
+    <div *ngIf="(tipo_reporte === 'ventas_productos' && form.controls.tipo.value === '1') || tipo_reporte === 'cuadre'" class="col-12 mt-3">
       <label class="control-label">Fecha: <span style="color: red">*</span> </label>
       <input
         type="text"

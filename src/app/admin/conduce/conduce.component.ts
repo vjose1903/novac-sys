@@ -195,13 +195,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   resetModalVaribales() {
-    this.mServ.ModalObj(undefined);
-    this.mServ.ModalSeleccion(undefined);
-    this.mServ.ModalDecision(undefined);
-    this.mServ.modalTipo(undefined);
-    this.mServ.ModalIndex(undefined);
-
-    this.mServ.mostrarModal(false);
     this.tipoModal = undefined;
   }
 
@@ -517,9 +510,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       this.mServ.ModalSeleccion(obj);
 
       this.mServ.mostrarModal(true);
-      setTimeout(() => {
-        // this.mServ.ModalTablaHeight(true);
-      }, 250);
     }
   }
 
