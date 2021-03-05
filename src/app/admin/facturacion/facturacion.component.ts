@@ -23,6 +23,7 @@ import { PdfService } from '../../core/services/pdf/pdf.service';
 })
 export class FacturacionComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
+  factura_para_comparar: any;
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
@@ -61,22 +62,22 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   form: FormGroup;
   fecha;
   modo_factura = 'normal';
-  is_adelantada = false;
-  is_viaje = false;
-  ITBIS = 0;
-  condicion_fact = 'Contado';
-  forma_pago = 'Efectivo';
+  is_adelantada;
+  is_viaje;
+  ITBIS;
+  condicion_fact;
+  forma_pago;
   propietario_factura;
-  tipos_facturas = [];
+  tipos_facturas;
   public TiposFacturas: string;
-  CuerpoFactura = [];
-  DESCUENTO = 0.0;
-  BRUTO = 0.0;
-  TOTAL = 0.0;
+  CuerpoFactura;
+  DESCUENTO;
+  BRUTO;
+  TOTAL;
   tipoFactura;
   lista_tipos_facturas;
   NCFcompra;
-  CostoYgasto = '';
+  CostoYgasto;
   metodo;
 
   TiposCostosGastos: string;
@@ -180,6 +181,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.layServ.factura_guardada = undefined;
 
     this.metodo = this.route.snapshot.params['tipo'];
+    console.log('this.metodo --> ', this.metodo);
+
     this.action = this.route.snapshot.params['action'];
 
     const id_factura = this.route.snapshot.params['id'];
@@ -236,33 +239,29 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     let obj;
     let abrirModal = false;
     let procesoRelleno = false;
+    this.factura_para_comparar = GLOBAL.duplicarJson(this.facturaGuardada, false);
+    console.log('inicial--> ', this.factura_para_comparar);
 
     if (this.checkIfFacturaIniciada()) {
       if (this.facturaGuardada) {
-        factura_id = GLOBAL.duplicarJson(this.facturaGuardada.factura_id);
-        const son_iguales = this.compararFacturaGuardada();
+        factura_id = GLOBAL.duplicarJson(this.factura_para_comparar.factura_id);
 
-        if (!son_iguales) {
-          obj = { texto_modal: 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?' };
-          abrirModal = true;
-        } else {
-          procesoRelleno = true;
-        }
+        this.facturasSonIguales((res) => {
+          if (!res) {
+            obj = { texto_modal: 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?' };
+            this.abrirModal('desplegar_factura', 'dinamico_texto', obj);
+          } else {
+            this.procesoRelleno();
+          }
+        });
       } else {
         obj = { texto_modal: '¿Desea archivar la factura que esta en proceso?' };
-        abrirModal = true;
-      }
-
-      callback(true);
-      if (abrirModal) {
         this.abrirModal('desplegar_factura', 'dinamico_texto', obj);
       }
+
+      callback(true);
     } else {
       callback(true);
-      procesoRelleno = true;
-    }
-
-    if (procesoRelleno) {
       this.procesoRelleno();
     }
   }
@@ -279,26 +278,31 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     } catch (error) {}
   }
 
-  compararFacturaGuardada() {
-    delete this.facturaGuardada.factura_id;
-    delete this.facturaGuardada.cliente;
-    delete this.facturaGuardada.suplidor;
-    delete this.facturaGuardada.tipo_factura;
+  facturasSonIguales(callback = (arg) => {}) {
+    delete this.factura_para_comparar.factura_id;
+    delete this.factura_para_comparar.cliente;
+    delete this.factura_para_comparar.suplidor;
+    delete this.factura_para_comparar.tipo_factura;
+    delete this.factura_para_comparar.fecha_valida;
 
-    const comparar = this.facturaGuardada;
-
-    const factura_a_guardar = this.formarFacturaAGuardar();
-
+    const comparar = this.factura_para_comparar;
     console.log('comparar --> ', JSON.stringify(comparar));
+
+    const factura_a_guardar = this.formarFacturaAGuardar() as any;
+    delete factura_a_guardar.fecha_valida;
     console.log('factura_a_guardar --> ', JSON.stringify(factura_a_guardar));
 
     if (JSON.stringify(comparar) === JSON.stringify(factura_a_guardar)) {
       this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
-      return true;
+
+      callback(true);
     } else {
-      return false;
+      callback(false);
     }
   }
+
+  // comparar          -->  {"condicion":"Contado","forma_pago":"Efectivo","fecha_viaje":null,"fecha_equivalente":null,"pagada":true,"balance":0,"devuelta":0,"tipo_factura_id":2,"numero_comprobante":"b0100000042","costoYgasto":"9","numero_factura":null,"total_factura":75000,"Bruto":75000,"itbis":0,"descuento":0,"estado":true,"is_adelantada":false,"is_viaje":false,"is_nota":false,"suplidor_id":1,"detalle_facturas_attributes":[{"id":null,"articulo_id":209,"cod":"00209","pre":"750.00","costo":750,"descuento_porciento":0,"descuento_valor":0,"cantidad_en_unidades":10000,"is_materia_prima":null,"calcular_saco":true,"cantidad":100,"total":75000,"itbis":0,"unidad":"Quintal","precio":750}],"FACTURA_DE":14,"tipo":"compra","user_id":1,"tiene_nota":false,"action":"new"}
+  // factura_a_guardar -->  {"condicion":"Contado","forma_pago":"Efectivo","fecha_viaje":null,"fecha_equivalente":null,"pagada":true,"balance":0,"devuelta":0,"tipo_factura_id":2,"numero_comprobante":"b0100000042","costoYgasto":"9","numero_factura":null,"total_factura":75000,"Bruto":75000,"itbis":0,"descuento":0,"estado":true,"is_adelantada":false,"is_viaje":false,"is_nota":false,"suplidor_id":1,"detalle_facturas_attributes":[{"id":null,"articulo_id":209,"cod":"00209","pre":"750.00","costo":750,"descuento_porciento":0,"descuento_valor":0,"cantidad_en_unidades":100,"is_materia_prima":false,"calcular_saco":true,"cantidad":100,"total":75000,"itbis":0,"unidad":"Quintal","precio":750}],"FACTURA_DE":14,"tipo":"compra","user_id":1,"tiene_nota":false,"action":"new"}
 
   initCambioMenu(arg) {
     if (arg.bool) {
@@ -307,30 +311,36 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         let abrirModal = false;
         let factura_id;
         this.layServ.nextDecisionCambioMenu({ bool: false, ruta: arg.ruta });
+        this.factura_para_comparar = GLOBAL.duplicarJson(this.facturaGuardada, false);
         if (this.facturaGuardada) {
           factura_id = GLOBAL.duplicarJson(this.facturaGuardada.factura_id);
 
-          const son_iguales = this.compararFacturaGuardada();
-
-          if (!son_iguales) {
-            obj = { texto_modal: 'Esta factura ya se encuentra archivada ¿desea sobreescribirla?' };
-            abrirModal = true;
-          }
+          this.facturasSonIguales((res) => {
+            if (!res) {
+              obj = { texto_modal: 'Esta factura ya se encuentra archivada ¿desea sobreescribirla?' };
+              abrirModal = true;
+            }
+            this.procesoCambio(abrirModal, factura_id, obj);
+            return;
+          });
         } else {
           obj = { texto_modal: 'Estas a punto de salir del modulo de facturación, ¿desea guardar la factura para continuarla luego?' };
           abrirModal = true;
         }
-
-        if (abrirModal) {
-          this.facturaGuardada['factura_id'] = factura_id;
-          this.abrirModal('salir_layout', 'dinamico_texto', obj);
-        } else {
-          this.info_cambio['bool'] = true;
-          this.layServ.nextDecisionCambioMenu(this.info_cambio);
-        }
+        this.procesoCambio(abrirModal, factura_id, obj);
       } else {
         this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta });
       }
+    }
+  }
+
+  procesoCambio(abrirModal, factura_id, obj) {
+    if (abrirModal) {
+      this.facturaGuardada['factura_id'] = factura_id;
+      this.abrirModal('salir_layout', 'dinamico_texto', obj);
+    } else {
+      this.info_cambio['bool'] = true;
+      this.layServ.nextDecisionCambioMenu(this.info_cambio);
     }
   }
 
@@ -416,18 +426,14 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.modo_factura === 'normal' &&
       this.propietario_factura === undefined
     ) {
-      console.log('::: factura cambio :::');
       res = false;
     } else {
-      console.log('::: factura no cambio :::');
       res = true;
     }
     return res;
   }
 
   setPropietario(arg) {
-    console.log('arg --> ', arg);
-
     if (arg.tipo === 'venta') {
       if (arg.cliente) this.propietario_factura['id'] = arg.cliente_id;
       else {
@@ -464,6 +470,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       const tipo = _.find(this.lista_tipos_facturas, (fact) => fact.id === res['tipo_factura_id']);
       res['tipo_factura'] = tipo ? tipo['descripcion'] : '';
     }
+    this.metodo = res.tipo;
+    console.log('LLENANDO METODO ==> ', this.metodo);
 
     this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
     await this.calcularPorcientoComprobante();
@@ -479,8 +487,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     } else {
       this.fecha_vencimiento = new Date();
     }
-
-    this.metodo = res.tipo;
 
     this.condicion_fact = res.condicion;
 
@@ -593,6 +599,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
           const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
 
           this.paqueteComprobante = paquete.body;
+          console.log('this.paqueteComprobante --> ', this.paqueteComprobante);
 
           if (this.paqueteComprobante.fecha_valida !== null) {
             const desde = this.paqueteComprobante.desde;
@@ -1006,7 +1013,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   // =============================================
 
   isPart(obj) {
-    const x = _.findIndex(this.CuerpoFactura, (o) => {
+    const x = _.findIndex(this.CuerpoFactura, (o: any) => {
       return o.des === obj.des;
     });
 

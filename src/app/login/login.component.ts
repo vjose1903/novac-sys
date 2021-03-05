@@ -165,9 +165,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   generar(obj) {
     this.pdfServ.generatePdf(obj, (res) => {
-      console.log('res --> ', res);
-      console.log('this.tipo_prueba --> ', this.tipo_prueba);
-
       if (res.status === 'si') {
         const objBase = {
           base64: res.body,
@@ -183,7 +180,6 @@ export class LoginComponent implements OnInit, OnDestroy {
           fileName: res.file.split('.')[0],
         };
         this.abrirModalReporte(obj);
-        console.log('mandando a imprimir');
 
         // this._ipc.send('printBase64', objBase);
       }

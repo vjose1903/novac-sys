@@ -17,9 +17,6 @@ export class IpcService {
   };
 
   constructor() {
-    console.log('window --> ', window);
-    console.log('window.require --> ', window.require);
-
     if (window.require) {
       try {
         // this._ipc = this.require('electron');

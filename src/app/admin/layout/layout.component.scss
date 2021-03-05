@@ -2,6 +2,32 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
 
 $bodyfont: "Poppins";
+::ng-deep .my_tabView {
+  & .p-tabview-panels {
+    border: 0px solid transparent !important;
+  }
+
+  & .p-tabview-nav li {
+    margin-right: 0 !important;
+    & .p-tabview-nav-link {
+      border: 1px solid #c8c8c8 !important;
+      border-color: #c8c8c866 !important;
+      background: transparent !important;
+      color: #333333;
+      padding: 0.5rem 2rem !important;
+      border-bottom: 2px solid #b6b6b6 !important;
+      &:focus {
+        box-shadow: 0 0 0 0rem transparent !important;
+      }
+    }
+    &.p-highlight .p-tabview-nav-link {
+      background: #007ad900 !important;
+      border-color: #c8c8c866 !important;
+      color: #42c05b !important;
+      border-bottom: 2px solid #42c05b !important;
+    }
+  }
+}
 
 /* ============================================== */
 /*        FOOTER                                  */
@@ -195,7 +221,7 @@ span.btn_side_bar_facturas {
 }
 
 ::ng-deep .my_sidebar {
-  z-index: 1020 !important;
+  z-index: 1030 !important;
   padding: 0.5rem 0rem 0.5rem 0.5rem !important;
   opacity: 1 !important;
   &.side_open {

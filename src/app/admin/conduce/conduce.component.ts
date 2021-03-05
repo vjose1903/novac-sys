@@ -149,8 +149,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   objDevueltoResponse(res) {
     if (res) {
-      console.log('res --> ', res);
-
       if (res.tipo_modal === 'buscarCliente') {
         this.cliente = res.data;
         (document.getElementById('clienteI') as any).value = res.data.nombre;
@@ -879,8 +877,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   llenarConduce(rows) {
-    console.log('rows --> ', rows);
-
     for (let j = 0; j < rows.length; j++) {
       const row = rows[j];
 
@@ -1075,8 +1071,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
       this.cancelarConduce(2);
       this.pdfServ.generatePdf(obj, (res) => {
-        console.log('res --> ', res);
-
         if (res.status === 'si') {
           const objBase = {
             base64: res.body,

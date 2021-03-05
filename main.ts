@@ -583,10 +583,6 @@ ipcMain.on('printBase64', async (event: any, oPdf) => {
   const filename = oPdf.filename;
   const type = oPdf.type;
 
-  console.log('base64 --> ', base64);
-  console.log('filename --> ', filename);
-  console.log('type --> ', type);
-
   await puts(base64, 'base64');
   await puts(filename, 'filename');
   await puts(type, 'type');

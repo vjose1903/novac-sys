@@ -78,7 +78,6 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnCh
   }
 
   ngOnChanges(simpleChanges) {
-    console.log(simpleChanges);
     if (simpleChanges && simpleChanges.returnArticulos && simpleChanges.returnArticulos.currentValue) {
       this.getArticulos.emit({ body: this.articulos_selected });
     }
@@ -94,8 +93,6 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnCh
   }
 
   getInfoChange(item) {
-    console.log('item --> ', item);
-
     if (item.cambio === 'select') {
       const articulo = item.body[item.index];
 
@@ -119,7 +116,6 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnCh
           this.articulos_selected.push(articulo);
         }
       }
-      console.log('this.articulos_selected --> ', this.articulos_selected);
     }
   }
 

@@ -22,20 +22,24 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, AfterContentChecked, AfterViewInit {
   actualMenyItemBack;
   actualMenyItem;
-  showLoading = true;
+  showLoading;
 
   usuario;
   PrintersInstall: any;
-  OpenPrinterMenu = false;
-  imgUser = 'assets/img/transparente.png';
+  OpenPrinterMenu;
+  imgUser;
   versionApp: any;
-  noServer = false;
+  noServer;
   subDeciMenu: Subscription;
   modulo_select: any;
   ready;
-  _opened = false;
+  _opened;
   facturas_localStorage: any;
-  factGuardada = undefined;
+  factGuardada;
+  isHandset$: Observable<boolean>;
+  lRun;
+  activeIndex;
+  initNavigate;
 
   constructor(
     public fun: FunctionService,
@@ -52,18 +56,22 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
+        this.initNavigate = true;
       }
       if (routerEvent instanceof NavigationEnd || routerEvent instanceof NavigationCancel || routerEvent instanceof NavigationError) {
         this.showLoading = false;
-        this.checkRouteActiva();
+        if (this.initNavigate) {
+          this.checkRouteActiva();
+          console.log('TERMINO NAVEGACION');
+
+          this.initNavigate = false;
+        }
       }
     });
   }
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
-  lRun = false;
-
   ngOnInit() {
+    this.initVariables();
     this._init_mixin({ _lista_subs: ['decisionModal', 'refreshFacturas', 'sacarFacturas'] });
 
     this._ipc.PRINTERS.subscribe((res) => {
@@ -102,6 +110,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     }
 
     this.subDeciMenu = this.layServ.DESICIONCAMBIOMENU.subscribe((res) => {
+      console.log('DESICIONCAMBIOMENU --> ', res);
+
       if (res && (res.bool === false || res.bool === true)) {
         if (res.bool && res.verificar) {
           this.ready = false;
@@ -114,6 +124,18 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
     this.searchVersion();
     this.getPrintersName();
+  }
+
+  initVariables() {
+    this.showLoading = true;
+    this.OpenPrinterMenu = false;
+    this.imgUser = 'assets/img/transparente.png';
+    this.noServer = false;
+    this._opened = false;
+    this.factGuardada = undefined;
+    this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
+    this.activeIndex = 0;
+    this.lRun = false;
   }
 
   ngOnDestroy() {
@@ -189,10 +211,11 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     return nombre;
   }
 
-  abrirModalFacturaGuardada(fact) {
+  abrirModalFacturaGuardada(fact, e) {
     const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.' };
     this.seleccionModal = fact;
     this.abrirModal('quitar_factura', 'dinamico_texto', obj);
+    e.stopPropagation();
   }
 
   quitarFacturaGuardada(fact?) {
@@ -206,21 +229,24 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.fun.setFacturasGuardadas(this.facturas_localStorage);
   }
 
-  checkWhereIs(arg, callback = (arg) => {}) {
+  checkWhereIs(arg?, callback = (arg) => {}) {
     const temp_url = document.location.href.split('admin/');
-    if (temp_url[1]) {
-      const url = temp_url[1].split('/')[1];
-      if (url !== arg) {
-        this.layServ.nextDecisionCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
-      }
+    const url = temp_url[1].split('/')[1];
+
+    if (url !== arg) {
+      this.layServ.nextCambioMenu({ bool: true, verificar: true, ruta: `/admin/factura/${arg}/new/0` });
+      callback(true);
+    } else {
+      callback(true);
     }
-    callback(true);
   }
 
   pasarFacturaAfacturacion(fact) {
     this.checkWhereIs(fact.tipo, (res) => {
       if (res) {
+        // setTimeout(() => {
         this.layServ.nextFacturaGuardada(fact);
+        //     }, 250);
       }
     });
   }
@@ -257,17 +283,23 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     const temp_url = document.location.href.split('admin/');
     if (temp_url[1]) {
       const url = temp_url[1].split('/')[0];
+      const tipo = temp_url[1].split('/')[1];
       this.actualMenyItem = url;
       this.actualMenyItemBack = GLOBAL.duplicarJson(this.actualMenyItem);
 
       if (url === 'factura') {
         this.getFacturasGuardadas();
+        this.activeIndex = tipo === 'venta' ? 0 : 1;
       }
     }
   }
 
   async getFacturasGuardadas() {
+    console.log('this.activeIndex --> ', this.activeIndex);
+
     this.facturas_localStorage = this.fun.getFacturasguardadas();
+    this.facturas_localStorage = _.filter(this.facturas_localStorage, (o: any) => o.tipo === (this.activeIndex === 0 ? 'venta' : 'compra'));
+
     setTimeout(async () => {
       if (this.facturas_localStorage.length > 0) {
         document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.facturas_localStorage.length);
@@ -277,7 +309,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
           if (fact.suplidor_id) {
             const suplidor = await this.dbServ.getSuplidorById(fact.suplidor_id).toPromise();
             fact['suplidor'] = {
-              nombre: `${suplidor.nombre} ${suplidor.apellido}`,
+              nombre: `${suplidor.nombre} ${suplidor.apellido ? suplidor.apellido : ''}`,
               direccion: `${suplidor.direccion}`,
               telefono: `${suplidor.telefono}`,
               limite_credito: `${suplidor.limite_credito}`,
@@ -288,7 +320,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
             try {
               const cliente = await this.dbServ.getClienteById(fact.cliente_id).toPromise();
               fact['cliente'] = {
-                nombre: `${cliente.nombre} ${cliente.apellido}`,
+                nombre: `${cliente.nombre} ${cliente.apellido ? cliente.apellido : ''}`,
                 direccion: `${cliente.direccion}`,
                 telefono: `${cliente.telefono}`,
                 limite_credito: `${cliente.limite_credito}`,
@@ -334,8 +366,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     } else {
       this.ready = true;
     }
-
-    this.checkRouteActiva();
 
     this.modulo_select = undefined;
   }

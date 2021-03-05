@@ -51,28 +51,28 @@
 // ====================================================
 
 .tiCOD {
-  max-width: 1.005rem;
+  width: 10%;
 }
 .tiCAN {
-  max-width: 1rem;
+  width: 9%;
+}
+.tiUNI {
+  width: 10%;
+  text-align: left;
 }
 .tiDES {
-  max-width: 3.9rem;
+  width: 39%;
 }
 .tiDESC {
-  max-width: 1rem;
+  width: 8%;
   padding: 0rem 0rem 0.5rem 1rem;
 }
 
-.tiUNI {
-  max-width: 1.3rem;
-  text-align: left;
-}
 .tiPRE {
-  max-width: 1rem;
+  width: 11%;
 }
 .tiTOT {
-  max-width: 1.4rem;
+  width: 13%;
 }
 
 .inDES,

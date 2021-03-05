@@ -9,10 +9,6 @@ import { AppConfig } from '../../../../environments/environment';
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
-  // console.log('data--> ', data);
-  console.log('data.tipo_tabla--> ', data.tipo_tabla);
-  console.log('data.mostrar_sub_titulo--> ', data.mostrar_sub_titulo);
-
   const configuration = getConfiguration(data.tipo_reporte);
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const dd = {

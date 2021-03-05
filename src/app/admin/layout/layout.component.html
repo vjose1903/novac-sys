@@ -33,9 +33,15 @@
       <h6 *ngIf="facturas_localStorage?.length === 0" class="mt-3 no_fact">No tiene Facturas guardadas por el momento!!</h6>
 
       <ng-container *ngIf="facturas_localStorage?.length > 0">
+        <div class="mt-2"></div>
+        <p-tabView [(activeIndex)]="activeIndex" styleClass="my_tabView" (onChange)="checkWhereIs($event.index === 0 ? 'venta' : 'compra')">
+          <p-tabPanel header="Venta"> </p-tabPanel>
+          <p-tabPanel header="Compra"> </p-tabPanel>
+        </p-tabView>
+
         <div #divFact class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="pasarFacturaAfacturacion(fact)">
           <div
-            *ngIf="divFact.offsetHeight"
+            *ngIf="divFact?.offsetHeight"
             [ngStyle]="{ height: divFact.offsetHeight + 'px' }"
             class="colorsito bg-raya-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}{{ fact?.action === 'update' ? '-orange' : '' }}"
           ></div>
@@ -44,7 +50,7 @@
             <i class="fas fa-truck-moving {{ fact.is_viaje ? 'if_viaje' : 'd-none' }}"></i>
             <i
               class="btn_borrar_factura_gurdada far fa-trash-alt"
-              (click)="abrirModalFacturaGuardada(fact)"
+              (click)="abrirModalFacturaGuardada(fact, $event)"
               mdbTooltip="Quitar factura"
               placement="left"
             ></i>

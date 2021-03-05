@@ -1,5 +1,4 @@
 import { Subscription } from 'rxjs';
-import { GLOBAL } from '../../../core/services/GLOBAL';
 
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutClass } from '../../layout/layout';

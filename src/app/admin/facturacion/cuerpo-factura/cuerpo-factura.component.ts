@@ -19,24 +19,24 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   ARRAY_ROWFACTURAS;
 
   seleccionModal;
-  showModal = false;
-  modalSearch = true;
-  UnidadesArticulo = [];
-  drop = false;
+  showModal;
+  modalSearch;
+  UnidadesArticulo;
+  drop;
 
   precioDetalle;
-  TOTAL = 0;
-  ITBIS = 0;
+  TOTAL;
+  ITBIS;
 
-  secuencia = 0;
-  inputSecuencia = 'cod-0';
-  inputDrop = 'uni-0';
+  secuencia;
+  inputSecuencia;
+  inputDrop;
   control;
   llevaDescuento;
-  DESCUENTO = 0;
-  listaDeDescuentos = [];
+  DESCUENTO;
+  listaDeDescuentos;
 
-  sacos = [25, 50, 100];
+  sacos;
   indexRemove;
 
   @Input() factura;
@@ -65,8 +65,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'articuloPorCodigo', 'pressEsc', 'indexToFocus'] });
     this.rellenarVariables();
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'articuloPorCodigo', 'pressEsc', 'indexToFocus'] });
   }
 
   decisionModal(res) {
@@ -186,9 +186,13 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   ngOnChanges(simpleChanges) {
+    console.log('simpleChanges --> ', simpleChanges);
+
     if (simpleChanges.factura && simpleChanges.factura.currentValue && this.action === 'update' && _.hasIn(this.factura, 'id')) {
       this.llenarFactura(this.factura.detalle_facturas);
     }
+
+    console.log('KKKKK METODO --> ', this.metodo);
   }
 
   async procesoQuitarArticulo() {
@@ -390,7 +394,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   // =============================================
   //  MODIFICAR FACTURA
   // =============================================
-  async llenarFactura(rows, is_guardada?, callback = (arg) => {}) {
+  async llenarFactura(rows, is_guardada?, metodo?, callback = (arg) => {}) {
+    console.log('LLENAR FACTURA CUERPO');
+
     this.rellenarVariables(async (res) => {
       if (res) {
         for (let j = 0; j < rows.length; j++) {
@@ -408,7 +414,17 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             const multiplo = row.cantidad_en_unidades / row.cantidad;
             const cant_actual = cant_en_unidades_actual / multiplo;
 
-            (this.control.controls[j] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(row.precio));
+            console.log('row --> ', row);
+            console.log('::::::::: metodo --> ', this.metodo);
+            console.log(
+              '::::::::: a poner en precio / costo --> ',
+              this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo),
+            );
+
+            (this.control.controls[j] as any).controls['pre'].setValue(
+              this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo),
+            );
+
             (this.control.controls[j] as any).controls['costo'].setValue(GLOBAL.numFormatTwoDecimals(row.costo));
 
             (this.control.controls[j] as any).controls['descuento_porciento'].setValue(row.descuento_porciento > 0 ? row.descuento_porciento : null);
@@ -442,16 +458,18 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
             (this.control.controls[j] as any).controls['uni'].setValue(uni);
 
-            try {
-              this.calcularSacoEnRow(j, row, articulo, 'llenarFact', (res) => {
-                if (res) {
-                  this.calcularTotalRow(j);
-                }
-              });
-            } catch (error) {}
-            // } else {
-            //   this.calcularTotalRow(j);
-            // }
+            if (this.metodo === 'venta') {
+              try {
+                this.calcularSacoEnRow(j, row, articulo, 'llenarFact', (res) => {
+                  if (res) {
+                    this.calcularTotalRow(j);
+                  }
+                });
+              } catch (error) {}
+            } else {
+              this.calcularTotalRow(j);
+            }
+
 
             this.aumentarSecuencia();
           } catch (error) {}
@@ -682,7 +700,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   async selectMedidaChange(arg, i) {
-    const indiceDetalle = _.findIndex(this.UnidadesArticulo, (o) => {
+    const indiceDetalle = _.findIndex(this.UnidadesArticulo, (o: any) => {
       return o.value === arg;
     });
 

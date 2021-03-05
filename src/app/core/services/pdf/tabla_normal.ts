@@ -58,7 +58,6 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
             hLineWidth: function (i, node) {
               const brk = data.mostrar_sub_titulo ? configuration.break : configuration.break + 1;
               // const brk = configuration.break;
-              console.log('brk --> ', brk);
 
               if (configuration.isBreak) {
                 return i % brk === 0 && node.table.body.length !== brk ? 0 : i === node.table.body.length || i === 1 ? 1.5 : 1;

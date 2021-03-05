@@ -455,8 +455,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       };
 
       this.pdfServ.generatePdf(obj_print, (res) => {
-        console.log('res --> ', res);
-
         if (res.status === 'si') {
           const objBase = {
             base64: res.body,

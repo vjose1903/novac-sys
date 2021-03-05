@@ -22,7 +22,7 @@ import { FacturacionComponent } from '../facturacion/facturacion.component';
 import { HomeAdminComponent } from '../home/homeAdmin.component';
 import { InventarioComponent } from '../inventario/inventario.component';
 import { ProduccionComponent } from '../produccion/produccion.component';
-
+import { TabViewModule } from 'primeng/tabview';
 import { ReportesComponent } from '../reportes/reportes.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
@@ -49,7 +49,7 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
     PrimengModule,
     TablasModule,
     CommonModule,
-
+    TabViewModule,
     AngularModule,
     BtncircularModule,
     NgxBootstrapModule,

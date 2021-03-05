@@ -19,8 +19,6 @@ export class PdfService {
   constructor(private dbServ: DBservice) {}
 
   generatePdf(oPdf, callback = (arg) => {}) {
-    console.log(' --------------- INICIO DE PROCESO CREAR PDF --------------- ');
-
     let obj;
     let todo_true = true;
     const data = oPdf.data;
@@ -48,8 +46,6 @@ export class PdfService {
           break;
 
         case 'reporte':
-          console.log('entro aquiii');
-
           obj = reportes.makeReporte(data);
           break;
 
@@ -68,12 +64,12 @@ export class PdfService {
         });
       } else {
         const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
-        this.dbServ.toastError('Generando el PDF.', 'ERROR', true);
+        this.dbServ.toastError('Error generando el pdf.', 'ERROR', true);
         callback(respuesta);
       }
     } catch (error) {
-      const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de archivo para escribir.', status: 'no', body: error });
-      this.dbServ.toastError('Generando el PDF.', 'ERROR', true);
+      const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de pdf.', status: 'no', body: error });
+      this.dbServ.toastError('ERROR en el switch de tipos de pdf.', 'ERROR', true);
       callback(respuesta);
     }
   }
@@ -117,23 +113,4 @@ export class PdfService {
 
     return obj;
   }
-
-  // generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
-
-  //   const FileName = pathAdd('/' + cFileName);
-
-  //   console.log('cFileName--> ', cFileName);
-  //   console.log('base64--> ', base64);
-  //   console.log('type--> ', type);
-
-  //   try {
-  //     fs.writeFile(FileName, base64, { encoding: 'base64' }, (err) => {
-  //       puts('PASOO EL METODO QUE CREA EL ARCHIVO PDF');
-  //       imprimir(cFileName, type);
-  //     });
-  //   } catch (err) {
-  //     puts(err, 'createPdfFileFormBase64 ERROR');
-  //     win.webContents.send('printBase64Res', { msg: 'Error generando reporte!!', status: false, error: err });
-  //   }
-  // }
 }

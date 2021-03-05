@@ -9,6 +9,7 @@ import { TablasService } from '../../components/tablas/tablas.service';
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
+import { PdfService } from '../../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -80,12 +81,13 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     public layServ: LayoutService,
     private fun: FunctionService,
     private tServ: TablasService,
+    public pdfServ: PdfService,
   ) {
     super(mServ, _ipc, layServ);
   }
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto'] });
+    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
 
     this.necesarioStart();
   }
@@ -325,7 +327,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     this.mServ.mostrarModal(true);
   }
 
-  IMPRIMIR() {
+  async IMPRIMIR() {
     const empleado = this.fun.getUser();
 
     const obj = {
@@ -341,26 +343,38 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     };
 
     obj['detalle_recibos_attributes'] = this.formarDetalle();
+    try {
+      const res = await this.dbServ.createRecibo(obj).toPromise();
 
-    this.dbServ.createRecibo(obj).subscribe(
-      async (res) => {
-        const obj = {
-          data: res,
-          type: 'recibo_ingreso',
-        };
+      this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
+      this.getViajes(this.tServ.obj_paginate);
+      this.resetVariables();
 
-        this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
-        this.getViajes(this.tServ.obj_paginate);
-        this.resetVariables();
-      },
-      (err) => {
-        console.error(err);
+      const obj_print = {
+        data: res,
+        type: 'recibo_ingreso',
+      };
 
-        if (err.error) {
-          this.dbServ.toastError(err.error.msg, 'ERROR', true);
+      this.pdfServ.generatePdf(obj_print, (res) => {
+        if (res.status === 'si') {
+          const objBase = {
+            base64: res.body,
+            filename: res.file,
+            type: 'recibo_ingreso',
+          };
+          this._ipc.send('printBase64', objBase);
         }
-      },
-    );
+      });
+    } catch (error) {
+      this.dbServ.toastError(error.error.msg, 'ERROR', true);
+    }
+  }
+
+  ipcBase64Resonse(res) {
+    if (res.status === 'si') {
+    } else {
+      this.dbServ.toastError(res.msg, 'ERROR', true);
+    }
   }
 
   resetVariables() {

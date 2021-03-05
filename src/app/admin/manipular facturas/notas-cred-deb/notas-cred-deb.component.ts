@@ -317,16 +317,12 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async checkCantidadEnUnidades() {
-    console.log(' this.detalleNota --> ', this.detalleNota);
-
     for (let i = 0; i < this.detalleNota.length; i++) {
       const detalle = this.detalleNota[i];
-      console.log(' detalle --> ', detalle);
 
       if (!detalle.cantidad_en_unidades_nota) {
         detalle.cantidad_en_unidades_nota = 0;
       }
-      // console.log('se_calcula_saco--> ', se_calcula_saco);
 
       if (detalle.unidad === 'Saco' && detalle.se_calcula_saco) {
         const peso = this.obtenerSaco(detalle.descripcion, 'peso');
@@ -334,7 +330,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
       } else {
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * detalle.contenidos[detalle.unidad];
       }
-      console.log('DETALLE ==> ', detalle);
     }
   }
 
@@ -449,7 +444,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     let num = '' as any;
     const split = _.split(descripcion, '(')[1];
     const splitFinal = _.split(split, ' ')[0];
-    console.log('tipo --> ', tipo);
 
     if (tipo === 'descripcion') {
       num = 'Saco de ' + splitFinal + ' libras';

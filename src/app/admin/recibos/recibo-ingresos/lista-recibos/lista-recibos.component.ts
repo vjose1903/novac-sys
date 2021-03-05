@@ -86,7 +86,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async ngOnInit() {
-    this._init_mixin({ _lista_subs: ['printRes', 'decisionModal', 'printBase64Res'] });
+    this._init_mixin({ _lista_subs: ['decisionModal', 'printBase64Res'] });
     this.necesarioStart();
   }
 
