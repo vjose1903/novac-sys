@@ -1,6 +1,6 @@
 {
   "name": "adm-agroindustrial",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Sistema facturacion e inventario VjPOS, Para ADM agroindustrial",
   "author": {
     "name": "Victor Jose Vásquez Santos",
@@ -24,7 +24,7 @@
     "web": "npm run postinstall:web && ng serve -o",
     "electron:serve-tsc": "echo ::::: CONVIRTIENDO A JAVASCRIPT ::::::  && tsc -p tsconfig-serve.json",
     "electromon:serve": "wait-on http-get://localhost:5220/ && npm run electron:serve-tsc && node reload/my_electromon.js . --serve",
-    "electron:serve": "wait-on http-get://localhost:5220/ && npm run electron:serve-tsc && electron  --no-sandbox . --serve",
+    "electron:serve": "wait-on http-get://localhost:5220/ && npm run electron:serve-tsc && electron . --serve",
     "electron:local": "npm run build:prod && electron .",
     "electron:linux": "npm run build:prod && electron-builder build --linux",
     "electron:windows": "npm run build:prod && electron-builder build --windows",

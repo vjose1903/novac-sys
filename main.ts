@@ -12,11 +12,6 @@ const pdfMake = require('pdfmake/build/pdfmake.js');
 const pdfFonts = require('pdfmake/build/vfs_fonts.js');
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import * as facturasCompraVenta from './myPdf/facturasCompraVenta';
-import * as recibosIngresos from './myPdf/recibosIngresos';
-import * as conduce from './myPdf/conduce';
-import * as cuadreCaja from './myPdf/cuadreCaja';
-import * as reportes from './myPdf/reportes';
 import { AppConfig } from './src/environments/environment.js';
 
 // tslint:disable: curly
@@ -67,6 +62,7 @@ function createWindow() {
       }),
     );
   }
+
   verificarSumastra();
   borrarLogs();
 
@@ -174,6 +170,7 @@ autoUpdater.on('error', (error) => {
 });
 
 // ==========================================================================================================================================================
+
 ipcMain.on('printerNames', (event: any, arg) => {
   // name of function
   const printersName = win.webContents.getPrinters();
@@ -194,16 +191,21 @@ ipcMain.on('getAppDir', (event: any, arg) => {
 });
 
 function borrarLogs() {
-  cmd('dir', (res) => {
-    puts(res.STDOUT, '----------- dir -----------');
-  });
+  const carpeta = pathAdd('/log');
 
-  puts('entro enla funcion de borrar log');
-  setTimeout(() => {
-    puts('ahora va a borrar el archivo log');
-    const comando = `del "${pathAdd('log/my_log.txt', false)}"`;
-    cmd(comando);
-  }, 10000);
+  if (!fs.existsSync(carpeta)) {
+    fs.mkdir(carpeta, { recursive: true }, (err) => {
+      if (err) {
+        throw err;
+      }
+    });
+  } else {
+    // ya se creo la carpeta log
+    setTimeout(() => {
+      const comando = `del "${pathAdd('log/my_log.txt')}"`;
+      cmd(comando);
+    }, 10000);
+  }
 }
 
 function verificarSumastra() {
@@ -316,8 +318,6 @@ async function verificarElemento(
               : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(
                   `${path_local_sin_extension}.zip`,
                 )}" -Update`;
-
-          cmd('pwd', (res_pwd) => {});
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -551,22 +551,20 @@ function showProgress(received, total) {
 }
 
 async function puts(msg, titulo?) {
+  // cmd('ls');
   if (win) {
     const fs = require('fs');
 
-    const file = 'log/my_log.txt';
+    const carpeta = pathAdd('/log');
+    const file = pathAdd('/log/my_log.txt');
 
     let texto = '';
-    if (typeof msg === 'object') {
-      texto = JSON.stringify(msg, null, '\t');
-    } else if (typeof msg === 'number') {
-      texto = msg.toString();
-    } else {
-      texto = msg;
-    }
+    if (typeof msg === 'object') texto = JSON.stringify(msg, null, '\t');
+    else if (typeof msg === 'number') texto = msg.toString();
+    else texto = msg;
 
-    if (!fs.existsSync('/log')) {
-      fs.mkdir('/log', { recursive: true }, (err) => {
+    if (!fs.existsSync(carpeta)) {
+      fs.mkdir(carpeta, { recursive: true }, (err) => {
         if (err) {
           throw err;
         } else {
@@ -593,75 +591,16 @@ async function escribirLogs(file, titulo, texto) {
 }
 
 ipcMain.on('printBase64', async (event: any, oPdf) => {
-  await puts(' --------------- INICIO DE PROCESO DE IMPRESION DE REPORTES --------------- ');
   const base64 = oPdf.base64;
   const filename = oPdf.filename;
   const type = oPdf.type;
 
-  await puts(base64, 'base64');
-  await puts(filename, 'filename');
-  await puts(type, 'type');
+  // await puts(base64, 'base64');
+  // await puts(filename, 'filename');
+  // await puts(type, 'type');
 
   generatePdfFileFormBase64(filename, base64, type);
 });
-
-ipcMain.on('print', async (event: any, oPdf) => {
-  await puts(' --------------- INICIO DE PROCESO DE IMPRESION --------------- ');
-
-  let obj;
-  let todo_true = true;
-
-  const data = oPdf.data;
-  const type = oPdf.type;
-  const reimprimir = oPdf.data.reimprimir ? true : false;
-  const retunBase64 = oPdf.retunBase64 ? true : false;
-
-  data['reimprimir'] = reimprimir;
-
-  try {
-    switch (type) {
-      case 'recibo_ingreso':
-        obj = recibosIngresos.makeRecibo(data);
-        break;
-
-      case 'conduce':
-        obj = conduce.makeConduce(data);
-        break;
-
-      case 'facturacion':
-        obj = facturasCompraVenta.makeFacturaVenta(data);
-        break;
-
-      case 'cuadre_caja':
-        obj = cuadreCaja.makeCuadre(data);
-        break;
-
-      case 'reporte':
-        obj = reportes.makeReporte(data);
-        break;
-
-      default:
-        todo_true = false;
-        break;
-    }
-
-    if (todo_true) {
-      const dd = obj.doc;
-      const file = obj.file;
-      const type = obj.type;
-
-      createPdfbase64(dd, file, type, reimprimir, retunBase64);
-    } else {
-      returnErrorPDF();
-    }
-  } catch (error) {
-    puts(obj, 'error en el switch de tipos de archivo para escribir');
-  }
-});
-
-function returnErrorPDF() {
-  win.webContents.send('printRes', { msg: 'Error escribiendo el pdf.', status: 'no' });
-}
 
 // ==========================================================================================================================================================
 // MAKE PDF
@@ -669,46 +608,18 @@ function returnErrorPDF() {
 
 function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
   const FileName = pathAdd('/' + cFileName);
-  puts(cFileName, 'cFileName');
-  puts(base64, 'base64');
-  puts(type, 'type');
 
   try {
     fs.writeFile(FileName, base64, { encoding: 'base64' }, (err) => {
-      puts('PASOO EL METODO QUE CREA EL ARCHIVO PDF');
       imprimir(cFileName, type);
     });
   } catch (err) {
-    puts(err, 'createPdfFileFormBase64 ERROR');
     win.webContents.send('printBase64Res', { msg: 'Error generando reporte!!', status: false, error: err });
   }
 }
 
-function createPdfbase64(docDefinition, file_, type, reimprimir_, retunBase64) {
-  try {
-    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-    pdfDocGenerator.getBase64((data) => {
-      if (type === 'base64' || retunBase64) {
-        win.webContents.send('printRes', {
-          msg: 'Pdf Base64 correcto',
-          file: file_,
-          status: 'si',
-          reimprimir: reimprimir_,
-          body: data,
-          sbody: JSON.stringify(data),
-        });
-      } else {
-        generatePdfFileFormBase64(file_, data, type);
-      }
-    });
-  } catch (error) {
-    puts(error, 'createPdfbase64 ERROR');
-    returnErrorPDF();
-    throw error;
-  }
-}
-
 function imprimir(cFileName, tipo) {
+  puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${pathAdd(`/${cFileName}`)}`);
   const sumatrapdf_path = pathAdd('/print/lp.exe');
   const file_path = pathAdd(`/${cFileName}`);
 
@@ -718,27 +629,12 @@ function imprimir(cFileName, tipo) {
   const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},noscale,paper=${paper_size},simplex" -silent "${file_path}"`;
 
   cmd(comando, (res) => {
-    puts(res, 'respuesta impresion');
-
     let msg_ = 'PDF impreso correctamente!!';
     let tipo_ = 'printBase64Res';
     if (res.status) {
-      // if (tipo === 'reporte') {
-      // } else {
-      //   msg_ = 'Factura generada correctamente!!';
-      //   tipo_ = 'printRes';
-      // }
-      puts(`SEND ANGULAR ${tipo_} ${msg_}`);
       win.webContents.send(tipo_, { msg: msg_, status: 'si', STDOUT: res });
     } else {
-      // if (tipo === 'reporte') {
       msg_ = 'Error imprimiento PDF!!';
-      // } else {
-      //   msg_ = 'Error generando Factura!!';
-      //   tipo_ = 'printRes';
-      // }
-
-      puts(`SEND ANGULAR ${tipo_} ${msg_}`);
       win.webContents.send(tipo_, { msg: msg_, status: 'no', err: res });
       return;
     }
