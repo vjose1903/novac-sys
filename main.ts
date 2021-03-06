@@ -8,10 +8,6 @@ var request = require('request');
 const { exec } = require('child_process');
 const autoUpdater = require('electron-updater').autoUpdater;
 
-const pdfMake = require('pdfmake/build/pdfmake.js');
-const pdfFonts = require('pdfmake/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 import { AppConfig } from './src/environments/environment.js';
 
 // tslint:disable: curly

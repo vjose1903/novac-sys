@@ -3,7 +3,7 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { GLOBAL } from '../../../core/services/GLOBAL';
-import * as moment from 'moment';
+import * as moment from '../../../../utils/javascript/moment';
 import { ModalService } from '../../components/modal/modal.service';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { IpcService } from '../../../core/services/ipc.service';

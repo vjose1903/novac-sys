@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
-import * as moment from 'moment';
+import * as moment from '../../../../utils/javascript/moment';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';

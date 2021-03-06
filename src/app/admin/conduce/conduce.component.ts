@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from '../../../utils/javascript/moment';
 import { IpcService } from '../../core/services/ipc.service';
 import { FunctionService } from '../../core/services/functions.service';
 

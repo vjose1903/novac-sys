@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from '../../../../utils/javascript/moment';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';

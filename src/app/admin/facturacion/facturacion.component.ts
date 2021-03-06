@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as moment from 'moment';
+import * as moment from '../../../utils/javascript/moment';
 import { DBservice } from '../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { IpcService } from '../../core/services/ipc.service';

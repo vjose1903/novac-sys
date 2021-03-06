@@ -15,3 +15,84 @@ VOY A IMPRIMIR EL ARCHIVO ---> /Users/vjose1903/git/personal/adm-agroindustrial/
 
  comando realizado en la funcion cmd  ==╗ 
       del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      md5sum "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      md5sum "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public/sumastra/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      md5sum "/Users/vjose1903/git/personal/adm-agroindustrial/print/lp.exe" 
+
+ comando realizado en la funcion cmd  ==╗ 
+      del "/Users/vjose1903/git/personal/adm-agroindustrial/log/my_log.txt" 

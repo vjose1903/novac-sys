@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from '../../../../../utils/javascript/moment';
 import { AppConfig } from '../../../../../environments/environment';
 
 import { GLOBAL } from '../../../../core/services/GLOBAL';

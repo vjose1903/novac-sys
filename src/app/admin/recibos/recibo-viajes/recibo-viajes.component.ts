@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from '../../../../utils/javascript/moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { ModalService } from '../../components/modal/modal.service';
 import { FunctionService } from '../../../core/services/functions.service';

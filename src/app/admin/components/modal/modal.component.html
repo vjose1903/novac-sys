@@ -335,7 +335,7 @@
   <!-- ================================================================================================================================ -->
 
   <p-dialog
-    *ngIf="tipoModal === 'buscarArticulo' && seleccionModal && infoArticulos"
+    *ngIf="filtrar && tipoModal === 'buscarArticulo' && seleccionModal && infoArticulos"
     header="Buscar articulo"
     [draggable]="false"
     [(visible)]="showModal"
@@ -352,6 +352,7 @@
     <!-- *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos" -->
     <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
+        *ngIf="seleccionModal"
         [focusRow]="true"
         [metodo]="metodo"
         [paraFiltroArticulos]="paraFiltroArticulos"
@@ -373,7 +374,7 @@
   <!-- ================================================================================================================================ -->
 
   <p-dialog
-    *ngIf="(tipoModal === 'buscarCliente' || tipoModal === 'buscarSuplidor') && seleccionModal && infoCliente"
+    *ngIf="filtrar && (tipoModal === 'buscarCliente' || tipoModal === 'buscarSuplidor') && seleccionModal && infoCliente"
     [header]="tituloModal"
     [draggable]="false"
     [(visible)]="showModal"

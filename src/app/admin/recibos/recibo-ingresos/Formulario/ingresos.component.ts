@@ -3,7 +3,7 @@ import { DBservice } from '../../../../core/services/bdservice.service';
 import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
-import * as moment from 'moment';
+import * as moment from '../../../../../utils/javascript/moment';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../../../components/tablas/tablas.component';
 import { ModalService } from '../../../components/modal/modal.service';

@@ -184,6 +184,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   abrirModal(tipo) {
     const obj = {};
+    let tipo_modal = 'reportes';
     this.tipoModal = tipo;
     let abrirModal = true;
 
@@ -193,17 +194,18 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     //
     else if (tipo === 'cuentas_cobrar_cliente') {
       this.titulo_moda_reporte = 'Reporte de CxC por cliente';
-      this.tipoModal = 'cuentas_cobrar_cliente';
-      this.mServ.modalTipo('buscarCliente');
+      tipo_modal = 'buscarCliente';
+
       obj['data'] = [];
-      obj['filtrarCliente'] = '';
+      obj['filtrarCliente'] = null;
       //
     } else if (tipo === 'cuentas_cobrar_ant_saldo') {
       this.titulo_moda_reporte = 'Reporte de CxC por antiguedad de saldos';
       this.tipoModal = 'cuentas_cobrar_ant_saldo';
       abrirModal = false;
       this.makePdf({ tipo_: 1 });
-      this.mServ.modalTipo(undefined);
+      tipo_modal = undefined;
+      return;
       //
     } else if (tipo === 'recibos') {
       this.titulo_moda_reporte = 'Reporte de recibos de ingreso';
@@ -226,7 +228,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     obj['tipo_reporte'] = tipo;
 
     if (abrirModal) {
-      this.mServ.modalTipo('reportes');
+      this.mServ.modalTipo(tipo_modal);
       this.mServ.ModalSeleccion(obj);
       this.mServ.mostrarModal(true);
     }

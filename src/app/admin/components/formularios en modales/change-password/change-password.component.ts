@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from '../../../../../utils/javascript/moment';
 import { map } from 'rxjs/operators';
 import { DBservice } from '../../../../core/services/bdservice.service';
 import { ModalService } from '../../modal/modal.service';

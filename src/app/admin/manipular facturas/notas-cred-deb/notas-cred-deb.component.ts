@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from '../../../../utils/javascript/moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute, Router } from '@angular/router';

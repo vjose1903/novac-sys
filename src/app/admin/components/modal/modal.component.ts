@@ -3,8 +3,6 @@ import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { TablasService } from '../tablas/tablas.service';
-
-import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 
 @Component({
@@ -14,7 +12,6 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 })
 export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
   altoDiv;
-  pdfSrc = 'https://vadimdez.github.io/ng2-pdf-viewer/assets/pdf-test.pdf';
   showModal = false;
 
   seleccionModal: any;
@@ -30,6 +27,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   index;
   fecha_articulo: any;
   returnArticulosSeleccionado = false;
+  filtrar = false;
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     console.log('presione esc en el modal');
     console.log('this.showModal --> ', this.showModal);
@@ -111,7 +109,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       key: 'direccion',
     },
   ];
-  constructor(public mServ: ModalService, private dbServ: DBservice, private tServ: TablasService, private pdfService: NgxExtendedPdfViewerService) {}
+  constructor(public mServ: ModalService, private dbServ: DBservice, private tServ: TablasService) {}
 
   element: HTMLElement;
   subShow: Subscription;
@@ -135,6 +133,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         }
       } else {
         this.showModal = false;
+        this.reinicioModal();
       }
     });
 
@@ -258,6 +257,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.paraFiltroSuplidor = undefined;
     this.cant_notas_credito = 0;
     this.cant_notas_debito = 0;
+    this.filtrar = true;
   }
 
   formReporteAccion(arg) {
@@ -270,8 +270,10 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       tipo_modal: this.tipoModal,
     };
 
-    if (!bool) obj = undefined;
-    console.log('<-- mandando desde formReporteAccion --> ');
+    if (!bool) {
+      obj = undefined;
+      this.showModal = false;
+    }
 
     this.mServ.ModalObj(obj);
     this.reinicioModal();
@@ -398,6 +400,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         };
         this.tServ.Func_total_paginas(obj);
       }
+      this.filtrar = true;
     } catch (error) {
       console.error(error);
       if (this.tipoModal === 'buscarArticulo') this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);

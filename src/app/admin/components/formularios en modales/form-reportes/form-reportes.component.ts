@@ -2,7 +2,7 @@ import { EventEmitter } from '@angular/core';
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import * as moment from 'moment';
+import * as moment from '../../../../../utils/javascript/moment';
 import { ModalService } from '../../modal/modal.service';
 import { DBservice } from '../../../../core/services/bdservice.service';
 

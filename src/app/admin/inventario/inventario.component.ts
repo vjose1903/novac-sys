@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/co
 import { DBservice } from '../../core/services/bdservice.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from '../../../utils/javascript/moment';
 import { ModalService } from '../components/modal/modal.service';
 import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
 import { IpcService } from '../../core/services/ipc.service';
