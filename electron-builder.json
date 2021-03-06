@@ -3,10 +3,10 @@
   "directories": {
     "output": "release/"
   },
-  "files": ["**/*","./myPdf/**/*", "!**/*.ts", "!actualizacion/**/*", "!ADM-dataBase ER.mdj", "!actualizacion.zip", "!print"],
+  "files": ["**/*", "!myPdf/**/*", "!**/*.ts", "!actualizacion/**/*", "!ADM-dataBase ER.mdj", "!actualizacion.zip", "!print"],
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
-    "asarUnpack":["./descomprimirFonts.bat"],
+    "asarUnpack": [],
     "target": ["NSIS"]
   },
   "nsis": {

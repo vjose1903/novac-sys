@@ -202,7 +202,7 @@ function borrarLogs() {
   } else {
     // ya se creo la carpeta log
     setTimeout(() => {
-      const comando = `del "${pathAdd('log/my_log.txt')}"`;
+      const comando = `del "${pathAdd('/log/my_log.txt')}"`;
       cmd(comando);
     }, 10000);
   }
