@@ -553,6 +553,7 @@ function showProgress(received, total) {
 async function puts(msg, titulo?) {
   if (win) {
     const fs = require('fs');
+
     const file = 'log/my_log.txt';
 
     let texto = '';
@@ -564,16 +565,30 @@ async function puts(msg, titulo?) {
       texto = msg;
     }
 
-    if (!fs.existsSync(file)) {
-      const stream = fs.createWriteStream(file);
-
-      await stream.once('open', (fd) => {
-        stream.write(titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`);
-        stream.end();
+    if (!fs.existsSync('/log')) {
+      fs.mkdir('/log', { recursive: true }, (err) => {
+        if (err) {
+          throw err;
+        } else {
+          escribirLogs(file, titulo, texto);
+        }
       });
     } else {
-      await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => {});
+      escribirLogs(file, titulo, texto);
     }
+  }
+}
+
+async function escribirLogs(file, titulo, texto) {
+  if (!fs.existsSync(file)) {
+    const stream = fs.createWriteStream(file);
+
+    await stream.once('open', (fd) => {
+      stream.write(titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`);
+      stream.end();
+    });
+  } else {
+    await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => {});
   }
 }
 
