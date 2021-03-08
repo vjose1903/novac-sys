@@ -3,7 +3,26 @@
   "directories": {
     "output": "release/"
   },
-  "files": ["**/*", "!myPdf/**/*", "!**/*.ts", "!actualizacion/**/*", "!ADM-dataBase ER.mdj", "!actualizacion.zip", "!print"],
+  "files": [
+    "**/*",
+    "!**/*.ts",
+    "!*.code-workspace",
+    "!LICENSE.md",
+    "!package.json",
+    "!package-lock.json",
+    "!src/",
+    "!e2e/",
+    "!hooks/",
+    "!angular.json",
+    "!_config.yml",
+    "!karma.conf.js",
+    "!tsconfig.json",
+    "!tslint.json",
+    "!actualizacion/**/*",
+    "!ADM-dataBase ER.mdj",
+    "!actualizacion.zip",
+    "!print"
+  ],
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
     "asarUnpack": [],

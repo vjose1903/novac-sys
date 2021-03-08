@@ -1,6 +1,6 @@
 import * as fun_ from './utils/funciones';
 import { logoADM, styles_ } from './utils/files';
-import { AppConfig } from '../../../../environments/environment.js';
+import { AppConfig } from '../../../../environments/environment';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA

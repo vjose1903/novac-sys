@@ -25,7 +25,7 @@
         [items]="listaArticulos"
         bindLabel="nombre"
         bindValue="id"
-        [clearable]="false"
+        [clearable]="true"
         [appendTo]="'body'"
         (search)="getArticulos($event)"
         notFoundText="Articulo no encontrado"
@@ -43,16 +43,7 @@
 
     <div *ngIf="(tipo_reporte === 'ventas_productos' && form.controls.tipo.value === '1') || tipo_reporte === 'cuadre'" class="col-12 mt-3">
       <label class="control-label">Fecha: <span style="color: red">*</span> </label>
-      <input
-        type="text"
-        [bsConfig]="dpConfig"
-        placeholder="dd/mm/aaaa"
-        class="form-control"
-        formControlName="fecha"
-        #dp="bsDatepicker"
-        placement="bottom"
-        bsDatepicker
-      />
+      <input type="text" [bsConfig]="dpConfig" placeholder="dd/mm/aaaa" class="form-control" formControlName="fecha" #dp="bsDatepicker" placement="bottom" bsDatepicker />
       <div
         class="alerta text-danger ml-1"
         style="font-size: 12px"
@@ -73,16 +64,7 @@
       class="col-6 mt-3"
     >
       <label class="control-label">Desde: <span style="color: red">*</span> </label>
-      <input
-        type="text"
-        [bsConfig]="dpConfig"
-        placeholder="dd/mm/aaaa"
-        class="form-control"
-        formControlName="desde"
-        #dp="bsDatepicker"
-        placement="bottom"
-        bsDatepicker
-      />
+      <input type="text" [bsConfig]="dpConfig" placeholder="dd/mm/aaaa" class="form-control" formControlName="desde" #dp="bsDatepicker" placement="bottom" bsDatepicker />
       <div
         class="alerta text-danger ml-1"
         style="font-size: 12px"
@@ -102,16 +84,7 @@
       class="col-6 mt-3"
     >
       <label class="control-label">Hasta: <span style="color: red">*</span> </label>
-      <input
-        type="text"
-        [bsConfig]="dpConfig"
-        placeholder="dd/mm/aaaa"
-        class="form-control"
-        formControlName="hasta"
-        #dp="bsDatepicker"
-        placement="bottom"
-        bsDatepicker
-      />
+      <input type="text" [bsConfig]="dpConfig" placeholder="dd/mm/aaaa" class="form-control" formControlName="hasta" #dp="bsDatepicker" placement="bottom" bsDatepicker />
       <div
         class="alerta text-danger ml-1"
         style="font-size: 12px"

@@ -1,11 +1,9 @@
 import 'reflect-metadata';
 import '../polyfills';
-
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
-import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -18,7 +16,7 @@ import { InterceptorService } from './loader/interceptor.service';
 import { AppRoutingModule } from './app.routing';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
-import { PageNotFoundComponent } from './shared/components';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
@@ -33,11 +31,8 @@ defineLocale('es', esLocale);
     FormsModule,
     HttpClientModule,
     CoreModule,
-    SharedModule,
     ToastrModule.forRoot(),
     AppRoutingModule,
-
-    //modulos
     AngularModule,
     MDBBootstrapModule,
     BrowserAnimationsModule,

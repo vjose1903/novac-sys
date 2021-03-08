@@ -1,29 +1,19 @@
-import { app, BrowserWindow, screen, ipcMain, IpcMessageEvent, dialog } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
-import * as _ from 'lodash';
 
-var request = require('request');
+const request = require('request');
 const { exec } = require('child_process');
 const autoUpdater = require('electron-updater').autoUpdater;
 
-import { AppConfig } from './src/environments/environment.js';
+import { AppConfig } from './src/environments/environment';
 
-// tslint:disable: curly
-// tslint:disable: one-variable-per-declaration
-let win, serve;
+let win: BrowserWindow = null;
+const args = process.argv.slice(1),
+  serve = args.some((val) => val === '--serve');
 
-const args = process.argv.slice(1);
-serve = args.some((val) => val === '--serve');
-
-let contents;
-
-export let inicioRuta = __dirname;
-
-function createWindow() {
-  // autoUpdater.checkForUpdates();
-
+function createWindow(): BrowserWindow {
   const electronScreen = screen;
   const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
@@ -31,24 +21,26 @@ function createWindow() {
   win = new BrowserWindow({
     x: 0,
     y: 0,
+    width: size.width,
+    minWidth: size.width,
+    height: size.height,
+    minHeight: size.height,
+    // icon: process.platform === 'darwin' ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
     webPreferences: {
       nodeIntegration: true,
-      preload: path.join(__dirname, 'preload.js'),
+      allowRunningInsecureContent: serve ? true : false,
+      contextIsolation: false, // false if you want to run 2e2 test with Spectron
+      enableRemoteModule: true, // true if you want to run 2e2 test  with Spectron or use remote module in renderer context (ie. Angular)
     },
-    icon: process.platform === 'darwin' ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
-    width: size.width,
-    height: size.height,
-    minWidth: size.width,
-    minHeight: size.height,
   });
 
   if (serve) {
-    contents = win.webContents;
+    win.webContents.openDevTools();
+
     require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`),
     });
     win.loadURL('http://localhost:5220');
-    win.webContents.openDevTools();
   } else {
     win.loadURL(
       url.format({
@@ -59,31 +51,23 @@ function createWindow() {
     );
   }
 
-  verificarSumastra();
-  borrarLogs();
-
-  // win.webContents.openDevTools();
-
-  win.setMenuBarVisibility(false);
-
-  autoUpdater.checkForUpdatesAndNotify();
-
   // Emitted when the window is closed.
-
-  win.on('closed', (event) => {
+  win.on('closed', () => {
     // Dereference the window object, usually you would store window
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-
-    event.preventDefault();
+    win = null;
   });
+
+  return win;
 }
 
 try {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.on('ready', createWindow);
+  // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
+  app.on('ready', () => setTimeout(createWindow, 400));
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
@@ -103,11 +87,12 @@ try {
   });
 } catch (e) {
   // Catch Error
-  throw e;
+  // throw e;
 }
-// ==========================================================================================================================================================
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // AUTO UPDATE
-// ==========================================================================================================================================================
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 autoUpdater.logger = require('electron-log');
 
@@ -119,11 +104,11 @@ autoUpdater.on('checking-for-update', () => {
   }
 });
 
-autoUpdater.on('update-available', (info) => {
+autoUpdater.on('update-available', (info: any) => {
   if (win) {
     win.webContents.send('update-available', { msg: 'ACTUALIZACION DISPONIBLE!!!', body: info });
   }
-  const dialogOpts: any = {
+  const dialogOpts = {
     type: 'info',
     buttons: ['ok'],
     title: 'Actualización disponible',
@@ -166,6 +151,12 @@ autoUpdater.on('error', (error) => {
 });
 
 // ==========================================================================================================================================================
+//  MIS PROCESOS
+// ==========================================================================================================================================================
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER LOS NOMBRES DE LAS IMPRESORAS DEL SISTEMA
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ipcMain.on('printerNames', (event: any, arg) => {
   // name of function
@@ -173,18 +164,32 @@ ipcMain.on('printerNames', (event: any, arg) => {
 
   event.reply('printersNameRes', printersName);
 });
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// PARA OBTENER LA VERSION DEL PACKAGE.JSON
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ipcMain.on('getVersion', (event: any, arg) => {
   // name of function
-
   const pjson = require('./package.json');
-
   event.reply('versionResponse', pjson.version);
 });
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// PARA IMPRIMIR UN BASE64
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-ipcMain.on('getAppDir', (event: any, arg) => {
-  event.reply('getAppDirResponse', pathAdd());
+ipcMain.on('printBase64', async (event: any, oPdf) => {
+  const base64 = oPdf.base64;
+  const filename = oPdf.filename;
+  const type = oPdf.type;
+
+  // await puts(base64, 'base64');
+  // await puts(filename, 'filename');
+  // await puts(type, 'type');
+  generatePdfFileFormBase64(filename, base64, type);
 });
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// BORRA EL ARCHIVO DE LOGS
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function borrarLogs() {
   const carpeta = pathAdd('/log');
@@ -204,6 +209,9 @@ function borrarLogs() {
   }
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// VEIRIFICA SI SUMASTRA ESTA INSTALADO
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function verificarSumastra() {
   if (!fs.existsSync(pathAdd('/print'))) {
     fs.mkdir(pathAdd('/print'), { recursive: true }, (err) => {
@@ -220,7 +228,10 @@ function verificarSumastra() {
   verificarElemento(aFiles_malos, '/sumastra/lp.exe', '/print', '/lp.exe', '/lp', false, false, 'Sumastra', 0);
 }
 
-function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, callback) {
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// FUNCION QUE SE EJECUTA AL TERMINAR LA DESCARGA DE UN ELEMENTO
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
   // const interval = setInterval(() => {
 
   const command =
@@ -254,6 +265,10 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
   // }, 2000);
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// PARA BORRAR UN ELEMENTO QUE NO ESTE BIEN
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 async function borrado_de_archivos_malos(archivos, callback = (arg) => {}) {
   const del = require('del');
 
@@ -274,12 +289,16 @@ async function borrado_de_archivos_malos(archivos, callback = (arg) => {}) {
   }
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// PARA VERIFICAR SI LOS ELEMENTOS NECESARIOS FUNCIONAN
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 async function verificarElemento(
   aFiles_malos,
   paht_server,
   path_local_content,
   path_local_extension,
-  path_local_sin_extension,
+  path_local_no_extension,
   descomprimir,
   is_carpeta,
   nombre_err,
@@ -292,7 +311,7 @@ async function verificarElemento(
     if (res_servidor.status) {
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
 
-      if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_sin_extension}` : `${path_local_extension}`}`))) {
+      if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_no_extension}` : `${path_local_extension}`}`))) {
         procesoDescarga(
           aFiles_malos,
           path_local_extension,
@@ -300,7 +319,7 @@ async function verificarElemento(
           paht_server,
           md5_servidor,
           descomprimir,
-          path_local_sin_extension,
+          path_local_no_extension,
           nombre_err,
           counter,
           is_carpeta,
@@ -310,10 +329,8 @@ async function verificarElemento(
         if (descomprimir) {
           const command =
             process.platform === 'darwin'
-              ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_sin_extension)}" -x "*.DS_Store"`
-              : `powershell Compress-Archive "${pathAdd(`${path_local_sin_extension}`)}"  -DestinationPath "${pathAdd(
-                  `${path_local_sin_extension}.zip`,
-                )}" -Update`;
+              ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_no_extension)}" -x "*.DS_Store"`
+              : `powershell Compress-Archive "${pathAdd(`${path_local_no_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_no_extension}.zip`)}" -Update`;
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -324,7 +341,7 @@ async function verificarElemento(
                 path_local_content,
                 path_local_extension,
                 md5_servidor,
-                path_local_sin_extension,
+                path_local_no_extension,
                 is_carpeta,
                 nombre_err,
                 paht_server,
@@ -342,7 +359,7 @@ async function verificarElemento(
           path_local_content,
           path_local_extension,
           md5_servidor,
-          path_local_sin_extension,
+          path_local_no_extension,
           is_carpeta,
           nombre_err,
           paht_server,
@@ -355,13 +372,16 @@ async function verificarElemento(
     return;
   });
 }
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// PARA COMPARA MD5 DE ELEMENTOS A VER SI FUNCIONAN
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function compararMD5(
   aFiles_malos,
   path_local_content,
   path_local_extension,
   md5_servidor,
-  path_local_sin_extension,
+  path_local_no_extension,
   is_carpeta,
   nombre_err,
   paht_server,
@@ -386,7 +406,7 @@ function compararMD5(
               paht_server,
               md5_servidor,
               descomprimir,
-              path_local_sin_extension,
+              path_local_no_extension,
               nombre_err,
               counter,
               is_carpeta,
@@ -402,6 +422,10 @@ function compararMD5(
   });
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// PROCESO DE DESCARGA
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 async function procesoDescarga(
   aFiles_malos,
   path_local_extension,
@@ -409,7 +433,7 @@ async function procesoDescarga(
   paht_server,
   md5_servidor,
   descomprimir,
-  path_local_sin_extension,
+  path_local_no_extension,
   nombre_err,
   counter,
   is_carpeta,
@@ -425,11 +449,10 @@ async function procesoDescarga(
 
       cmd(command, (res_local_before_descarga) => {
         if (res_local_before_descarga.status) {
-          const md5_local =
-            process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
+          const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
           if (md5_servidor === md5_local) {
             if (descomprimir) {
-              esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_sin_extension, (res) => {
+              esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, (res) => {
                 if (res.status) {
                 } else {
                   win.webContents.send('err_descarga', {
@@ -455,17 +478,7 @@ async function procesoDescarga(
   if (!descarga_exito) {
     counter++;
     if (counter <= 3) {
-      verificarElemento(
-        aFiles_malos,
-        paht_server,
-        path_local_content,
-        path_local_extension,
-        path_local_sin_extension,
-        descomprimir,
-        is_carpeta,
-        nombre_err,
-        counter,
-      );
+      verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_no_extension, descomprimir, is_carpeta, nombre_err, counter);
     } else {
       win.webContents.send('err_descarga', {
         msg: `Error descargando archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Victor Jose Vasquez Santos.`,
@@ -475,6 +488,10 @@ async function procesoDescarga(
   }
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// MENSAJE DE FALLA EN EL VERIFICADO DE ELEMENTOS
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 function retornarMensajeErrorVeiricandoElementos(nombre_err) {
   win.webContents.send('err_descarga', {
     msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
@@ -483,6 +500,9 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
   return;
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function cmd(command, callback = (arg) => {}) {
   puts(command, 'comando realizado en la funcion cmd');
   exec(command, (error, stdout, stderr) => {
@@ -507,6 +527,10 @@ function cmd(command, callback = (arg) => {}) {
     }
   });
 }
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// FUNCION QUE SE ENCARGA DE DESCARGAR ARCHIVOS
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
   // Save variable to know progress
@@ -542,9 +566,17 @@ function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
   });
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// PARA VER EL PROGRESO DE LA DESCARGA
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 function showProgress(received, total) {
   const percentage = (received * 100) / total;
 }
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// FUNCION QUE SE ENCARGA DE VERIFICAR SI EL ARCHIVO LOG EXISTE
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 async function puts(msg, titulo?) {
   // cmd('ls');
@@ -573,6 +605,9 @@ async function puts(msg, titulo?) {
   }
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// FUNCION QUE SE ENCARGA DE ESCRIBIR EN EL ARCHIVO LOG
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function escribirLogs(file, titulo, texto) {
   if (!fs.existsSync(file)) {
     const stream = fs.createWriteStream(file);
@@ -586,21 +621,9 @@ async function escribirLogs(file, titulo, texto) {
   }
 }
 
-ipcMain.on('printBase64', async (event: any, oPdf) => {
-  const base64 = oPdf.base64;
-  const filename = oPdf.filename;
-  const type = oPdf.type;
-
-  // await puts(base64, 'base64');
-  // await puts(filename, 'filename');
-  // await puts(type, 'type');
-
-  generatePdfFileFormBase64(filename, base64, type);
-});
-
-// ==========================================================================================================================================================
-// MAKE PDF
-// ====================================================================================================n======================================================
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// GENERAR EL PDF
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
   const FileName = pathAdd('/' + cFileName);
@@ -613,6 +636,10 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
     win.webContents.send('printBase64Res', { msg: 'Error generando reporte!!', status: false, error: err });
   }
 }
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// IMPRIMIR EL PDF
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function imprimir(cFileName, tipo) {
   puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${pathAdd(`/${cFileName}`)}`);
@@ -636,6 +663,10 @@ function imprimir(cFileName, tipo) {
     }
   });
 }
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// PARA CREAR LA RUTA CORRECTA EN CASO DE SER COMPILADA O NO
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 export function pathAdd(addToPath = '', resource = true) {
   let path_temp;

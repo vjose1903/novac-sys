@@ -9,5 +9,7 @@ if (AppConfig.production) {
 }
 
 platformBrowserDynamic()
-  .bootstrapModule(AppModule)
+  .bootstrapModule(AppModule, {
+    preserveWhitespaces: false,
+  })
   .catch((err) => console.error(err));

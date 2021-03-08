@@ -3,13 +3,13 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "adm-agroindustrial": {
+    "angular-electron": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
             "outputPath": "dist",
             "index": "src/index.html",
@@ -49,8 +49,10 @@
               "node_modules/animate.css/animate.css",
               "src/styles.scss"
             ],
-            "scripts": ["node_modules/chart.js/dist/Chart.js", "node_modules/hammerjs/hammer.min.js"],
-            "aot": true
+            "scripts": [],
+            "customWebpackConfig": {
+              "path": "./angular.webpack.js"
+            }
           },
           "configurations": {
             "dev": {
@@ -58,6 +60,7 @@
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
+              "aot": false,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": false,
@@ -66,11 +69,21 @@
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.dev.ts"
                 }
-              ],
-              "budgets": [
+              ]
+            },
+            "web": {
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "fileReplacements": [
                 {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.web.ts"
                 }
               ]
             },
@@ -79,6 +92,7 @@
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
+              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
@@ -87,76 +101,72 @@
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
                 }
-              ],
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
               ]
             }
           }
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "browserTarget": "adm-agroindustrial:build"
+            "browserTarget": "angular-electron:build"
           },
           "configurations": {
             "dev": {
-              "browserTarget": "adm-agroindustrial:build:dev"
+              "browserTarget": "angular-electron:build:dev"
+            },
+            "web": {
+              "browserTarget": "angular-electron:build:web"
             },
             "production": {
-              "browserTarget": "adm-agroindustrial:build:production"
+              "browserTarget": "angular-electron:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "adm-agroindustrial:build"
+            "browserTarget": "angular-electron:build"
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular-builders/custom-webpack:karma",
           "options": {
             "main": "src/test.ts",
             "polyfills": "src/polyfills-test.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "scripts": [],
-            "styles": [
-              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "./node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
-              "src/styles.scss"
-            ],
-            "assets": ["src/assets", "src/favicon.ico", "src/favicon.png", "src/favicon.icns", "src/favicon.256x256.png", "src/favicon.512x512.png"]
+            "styles": ["src/styles.scss"],
+            "assets": ["src/assets"],
+            "customWebpackConfig": {
+              "path": "./angular.webpack.js"
+            }
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": ["src/tsconfig.app.json", "src/tsconfig.spec.json"],
-            "exclude": ["**/node_modules/**"]
+            "eslintConfig": ".eslintrc.json",
+            "lintFilePatterns": ["src/**.ts", "main.ts"]
           }
         }
       }
     },
-    "adm-agroindustrial-e2e": {
+    "angular-electron-e2e": {
       "root": "e2e",
       "projectType": "application",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": ["e2e/tsconfig.e2e.json"],
-            "exclude": ["**/node_modules/**"]
+            "eslintConfig": ".eslintrc.json",
+            "lintFilePatterns": ["e2e/**.ts"]
           }
         }
       }
     }
   },
-  "defaultProject": "adm-agroindustrial",
+  "defaultProject": "angular-electron",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",

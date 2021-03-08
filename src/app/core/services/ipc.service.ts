@@ -1,11 +1,19 @@
-import { Injectable } from '@angular/core';
-import { IpcRenderer } from 'electron';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { ipcRenderer, remote, webFrame } from "electron";
+import * as childProcess from "child_process";
+import { BehaviorSubject } from "rxjs";
+import * as fs from "fs";
+
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class IpcService {
-  private _ipc: IpcRenderer | undefined;
+  private _ipc: typeof ipcRenderer;
+  webFrame: typeof webFrame;
+  remote: typeof remote;
+  childProcess: typeof childProcess;
+  fs: typeof fs;
+
   private printers = new BehaviorSubject<any>(undefined);
   PRINTERS = this.printers.asObservable();
 
@@ -16,22 +24,29 @@ export class IpcService {
     bytesPerSecond: 0,
   };
 
+  get isElectron(): boolean {
+    return !!(window && window.process && window.process.type);
+  }
+
   constructor() {
-    if (window.require) {
+    // Conditional imports
+    if (this.isElectron) {
       try {
-        // this._ipc = this.require('electron');
-        // this._ipc = window.require('electron').ipcRenderer;
-        this._ipc = (<any>window).require('electron').ipcRenderer;
-      } catch (e) {
-        throw e;
+        this._ipc = window.require("electron").ipcRenderer;
+        this.webFrame = window.require("electron").webFrame;
+        // If you wan to use remote object, pleanse set enableRemoteModule to true in main.ts
+        // this.remote = window.require('electron').remote;
+
+        this.childProcess = window.require("child_process");
+        this.fs = window.require("fs");
+      } catch (error) {
+        console.error("Electron no se pudo iniciar correctamente");
       }
-    } else {
-      console.warn("Electron's IPC was not loaded");
     }
   }
 
   require(module: string) {
-    return window['require'](module).ipcRenderer;
+    return window["require"](module).ipcRenderer;
   }
 
   PRINTERS_NEW(nextValue) {
