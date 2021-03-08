@@ -166,7 +166,7 @@
       }
     }
   },
-  "defaultProject": "angular-electron",
+  "defaultProject": "adm-agroindustrial",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
