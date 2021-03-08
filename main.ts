@@ -51,6 +51,13 @@ function createWindow(): BrowserWindow {
     );
   }
 
+  verificarSumastra();
+  borrarLogs();
+
+  win.setMenuBarVisibility(false);
+
+  autoUpdater.checkForUpdatesAndNotify();
+
   // Emitted when the window is closed.
   win.on('closed', () => {
     // Dereference the window object, usually you would store window
