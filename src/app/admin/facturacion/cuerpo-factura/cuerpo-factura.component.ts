@@ -8,7 +8,7 @@ import { mixinClass } from '../../mixinClass';
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutService } from '../../layout/layout.service';
 import { FunctionService } from '../../../core/services/functions.service';
-
+import * as moment from '../../../../utils/javascript/moment';
 @Component({
   selector: 'app-cuerpo-factura',
   templateUrl: './cuerpo-factura.component.html',
@@ -51,6 +51,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   @Output() getFechaFactura = new EventEmitter<any>();
 
   tipoModal: string;
+  registroSaco: any;
 
   constructor(
     private dbServ: DBservice,
@@ -180,17 +181,22 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   ngAfterViewInit() {
-    // this.control = this.form.controls['rowFactura'] as FormArray;
+    this.getSaco();
+  }
+
+  async getSaco() {
+    try {
+      const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, this.FechaFactura, 'todos').toPromise();
+      this.registroSaco = res.data[0];
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   ngOnChanges(simpleChanges) {
-    console.log('simpleChanges --> ', simpleChanges);
-
     if (simpleChanges.factura && simpleChanges.factura.currentValue && this.action === 'update' && _.hasIn(this.factura, 'id')) {
       this.llenarFactura(this.factura.detalle_facturas);
     }
-
-    console.log('KKKKK METODO --> ', this.metodo);
   }
 
   async procesoQuitarArticulo() {
@@ -251,7 +257,12 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       if (operacion) {
         const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, this.FechaFactura, 'todos').toPromise();
         const precio_saco = res.data[0].precio_principal;
-        const precio = calculo + precio_saco;
+        let precio = calculo;
+
+        if (moment(this.FechaFactura).format('YYYY-MM-DD') > moment(res.data[0].created_at).format('YYYY-MM-DD')) {
+          precio = calculo + precio_saco;
+        }
+
         (this.control.controls[i] as any).controls['des'].setValue(`${articulo.nombre}`);
         (this.control.controls[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
       } else {
@@ -393,8 +404,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   //  MODIFICAR FACTURA
   // =============================================
   async llenarFactura(rows, is_guardada?, metodo?, callback = (arg) => {}) {
-    console.log('LLENAR FACTURA CUERPO');
-
     this.rellenarVariables(async (res) => {
       if (res) {
         for (let j = 0; j < rows.length; j++) {
@@ -411,13 +420,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             const cant_en_unidades_actual = row.cantidad_en_unidades;
             const multiplo = row.cantidad_en_unidades / row.cantidad;
             const cant_actual = cant_en_unidades_actual / multiplo;
-
-            console.log('row --> ', row);
-            console.log('::::::::: metodo --> ', this.metodo);
-            console.log(
-              '::::::::: a poner en precio / costo --> ',
-              this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo),
-            );
 
             (this.control.controls[j] as any).controls['pre'].setValue(
               this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo),
@@ -719,7 +721,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         );
         (this.control.controls[i] as any).controls['costo'].setValue(costoDetalle);
 
-        if (this.metodo === 'venta') {
+        if (this.metodo === 'venta' && moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.registroSaco.created_at).format('YYYY-MM-DD')) {
           this.CalculoSacos(i, 'select', undefined);
         }
         this.calcularTotalRow(i);

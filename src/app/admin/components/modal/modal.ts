@@ -47,7 +47,6 @@ export class modalClass extends LayoutClass {
           this.seleccionModal = undefined;
           this.tipoModal = undefined;
           this.mServ.ModalDecision(undefined);
-          console.log('Quien manda es decisionModal ');
           this.mServ.mostrarModal(undefined);
         }
       });
@@ -57,7 +56,6 @@ export class modalClass extends LayoutClass {
       this.subObj = this.mServ.OBJDEVUELTO.subscribe(async (res) => {
         this.objDevueltoResponse(res);
         if (res !== undefined) {
-          console.log('Quien manda es objDevuelto--> ', JSON.parse(JSON.stringify(res)));
           await this.mServ.mostrarModal(undefined);
           await this.mServ.ModalObj(undefined);
         }
@@ -68,7 +66,6 @@ export class modalClass extends LayoutClass {
       this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => {
         this.articuloFiltroResponse(res);
         if (res !== undefined) {
-          console.log('Quien manda es articuloPorCodigo ');
           this.mServ.mostrarModal(undefined);
         }
       });
@@ -84,7 +81,6 @@ export class modalClass extends LayoutClass {
       this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => {
         this.indexToFocusResponse(res);
         if (res !== undefined) {
-          console.log('Quien manda es indexToFocus ');
           this.mServ.mostrarModal(undefined);
         }
       });

@@ -67,9 +67,6 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   async makeCuadre(data?) {
     try {
-      console.log('data --> ', data);
-      console.log('data.fecha --> ', data.fecha);
-
       const params = `fecha=${this.my_dateFormater(data.fecha, false)}`;
 
       const res = await this.dbServ.createCuadreCaja(params).toPromise();
@@ -101,10 +98,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         this.makeCuadre(data);
         return;
       } else if (this.tipoModal === 'ventas_diarias' || this.tipoModal === 'ventas_rango') {
-        params = `tipo=${data.tipo}&condicion=${data.condicion}&desde=${this.my_dateFormater(data.desde, false)}&hasta=${this.my_dateFormater(
-          data.hasta,
-          false,
-        )}`;
+        params = `tipo=${data.tipo}&condicion=${data.condicion}&desde=${this.my_dateFormater(data.desde, false)}&hasta=${this.my_dateFormater(data.hasta, false)}`;
         tipo = 'ventas';
         //
       } else if (this.tipoModal === 'cuentas_cobrar_cliente' || this.tipoModal === 'cuentas_cobrar_ant_saldo') {
@@ -112,9 +106,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         tipo = 'cuentas_cobrar';
         //
       } else if (this.tipoModal === 'recibos') {
-        params = `desde=${this.my_dateFormater(data.desde, false)}&hasta=${this.my_dateFormater(data.hasta, false)}&tipo_recibo=${
-          data.tipo
-        }&order=ASC`;
+        params = `desde=${this.my_dateFormater(data.desde, false)}&hasta=${this.my_dateFormater(data.hasta, false)}&tipo_recibo=${data.tipo}&order=ASC`;
         tipo = 'recibos';
         //
       } else if (this.tipoModal === 'ventas_productos') {

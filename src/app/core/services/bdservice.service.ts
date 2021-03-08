@@ -340,9 +340,6 @@ export class DBservice {
     return this.peticion('articulos/custom/materias_primas', 'get');
   }
 
-  getArticulosByDate(date) {
-    return this.peticion(`articulos/historico/${date}`, 'get');
-  }
 
   getTipoArticuloById(id) {
     return this.peticionSinLoad(`tipo_articulos/${id}`, 'get');

@@ -47,7 +47,6 @@ export class FormVentasComponent implements OnInit {
   ngOnInit() {
     this.localeService.use('es');
     this.necesarioStart();
-    console.log('this.tipo_reporte --> ', this.tipo_reporte);
   }
 
   async necesarioStart() {

@@ -29,9 +29,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   returnArticulosSeleccionado = false;
   filtrar = false;
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
-    console.log('presione esc en el modal');
-    console.log('this.showModal --> ', this.showModal);
-
     if (this.showModal) {
       this.showModal = false;
       const obj = {
@@ -119,8 +116,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
-      console.log('subscribe showModal==> ', res);
-
       if (res !== undefined && res !== null) {
         if (!this.paraFiltroArticulos && !this.paraFiltroClientes && !this.paraFiltroSuplidor) {
           this.showModal = res;
@@ -128,7 +123,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         if (res === false) {
           this.showModal = res;
-          console.log('Quien manda es showModal');
           this.mServ.mostrarModal(undefined);
         }
       } else {
@@ -289,7 +283,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       obj['index'] = this.index;
     }
 
-    console.log('<-- mandando desde devolverCLick --> ');
     this.mServ.ModalObj(obj);
   }
 
@@ -407,7 +400,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       if (this.tipoModal === 'buscarCliente') this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
       if (this.tipoModal === 'buscarSuplidor') this.dbServ.toastError('Error buscando suplidor registrados.', 'ERROR', true);
       setTimeout(() => {
-        console.log('manda filtro en modales');
         this.mServ.mostrarModal(false);
       }, 250);
     }

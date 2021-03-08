@@ -62,7 +62,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
         this.showLoading = false;
         if (this.initNavigate) {
           this.checkRouteActiva();
-          console.log('TERMINO NAVEGACION');
 
           this.initNavigate = false;
         }
@@ -110,8 +109,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     }
 
     this.subDeciMenu = this.layServ.DESICIONCAMBIOMENU.subscribe((res) => {
-      console.log('DESICIONCAMBIOMENU --> ', res);
-
       if (res && (res.bool === false || res.bool === true)) {
         if (res.bool && res.verificar) {
           this.ready = false;
@@ -295,8 +292,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   }
 
   async getFacturasGuardadas() {
-    console.log('this.activeIndex --> ', this.activeIndex);
-
     this.facturas_localStorage = this.fun.getFacturasguardadas();
     this.facturas_localStorage = _.filter(this.facturas_localStorage, (o: any) => o.tipo === (this.activeIndex === 0 ? 'venta' : 'compra'));
 
@@ -369,7 +364,4 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
     this.modulo_select = undefined;
   }
-
-
-
 }

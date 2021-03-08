@@ -181,7 +181,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.layServ.factura_guardada = undefined;
 
     this.metodo = this.route.snapshot.params['tipo'];
-    console.log('this.metodo --> ', this.metodo);
 
     this.action = this.route.snapshot.params['action'];
 
@@ -236,7 +235,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     let abrirModal = false;
     let procesoRelleno = false;
     this.factura_para_comparar = GLOBAL.duplicarJson(this.facturaGuardada, false);
-    console.log('inicial--> ', this.factura_para_comparar);
 
     if (this.checkIfFacturaIniciada()) {
       if (this.facturaGuardada) {
@@ -282,11 +280,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     delete this.factura_para_comparar.fecha_valida;
 
     const comparar = this.factura_para_comparar;
-    console.log('comparar --> ', JSON.stringify(comparar));
 
     const factura_a_guardar = this.formarFacturaAGuardar() as any;
     delete factura_a_guardar.fecha_valida;
-    console.log('factura_a_guardar --> ', JSON.stringify(factura_a_guardar));
 
     if (JSON.stringify(comparar) === JSON.stringify(factura_a_guardar)) {
       this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
@@ -351,7 +347,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   objDevueltoResponse(res) {
-    console.log('objDevueltoResponse  factura_cabeza --> ', res);
     if (res && res.tipo_modal === 'buscarCliente') {
       this.propietario_factura = res.data;
 
@@ -361,15 +356,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
 
       if (balance > maxCred - 1000 && balance < maxCred) {
-        this.dbServ.toastWarning(
-          `Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`,
-          'PROXIMO A LIMITE DE CREDITO',
-        );
+        this.dbServ.toastWarning(`Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
       } else if (balance > maxCred) {
-        this.dbServ.toastError(
-          ` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`,
-          'SOBRE VALOR DE CREDITO',
-        );
+        this.dbServ.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
       }
       //
     } else if (res && res.tipo_modal === 'buscarSuplidor') {
@@ -403,10 +392,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     const form = this.form.controls as any;
 
     if (
-      ((this.metodo === 'venta' &&
-        this.tipoFactura === '02' &&
-        form.nombre.value === 'Cliente contado' &&
-        form.direccion.value === 'Autopista duarte KM 0 el Higuero') ||
+      ((this.metodo === 'venta' && this.tipoFactura === '02' && form.nombre.value === 'Cliente contado' && form.direccion.value === 'Autopista duarte KM 0 el Higuero') ||
         (this.metodo === 'compra' && this.tipoFactura === '01' && this.NCFcompra === 'b01')) &&
       this.condicion_fact === 'Contado' &&
       this.CostoYgasto === '' &&
@@ -458,7 +444,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       res['tipo_factura'] = tipo ? tipo['descripcion'] : '';
     }
     this.metodo = res.tipo;
-    console.log('LLENANDO METODO ==> ', this.metodo);
 
     this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
     await this.calcularPorcientoComprobante();
@@ -586,7 +571,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
           const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
 
           this.paqueteComprobante = paquete.body;
-          console.log('this.paqueteComprobante --> ', this.paqueteComprobante);
 
           if (this.paqueteComprobante.fecha_valida !== null) {
             const desde = this.paqueteComprobante.desde;
@@ -751,13 +735,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     } else {
       res = false;
 
-      if (
-        this.is_adelantada ||
-        this.condicion_fact === 'Crédito' ||
-        this.modo_factura === 'viaje' ||
-        this.modo_factura === 'adelantada' ||
-        this.tipoFactura === '01'
-      ) {
+      if (this.is_adelantada || this.condicion_fact === 'Crédito' || this.modo_factura === 'viaje' || this.modo_factura === 'adelantada' || this.tipoFactura === '01') {
         res = true;
       } else {
         res = false;

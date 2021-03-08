@@ -4,15 +4,7 @@ import { modalClass } from './components/modal/modal';
 import { ModalService } from './components/modal/modal.service';
 import { LayoutService } from './layout/layout.service';
 
-type lista_sub =
-  | 'printBase64Res'
-  | 'decisionModal'
-  | 'objDevuelto'
-  | 'articuloPorCodigo'
-  | 'pressEsc'
-  | 'indexToFocus'
-  | 'refreshFacturas'
-  | 'sacarFacturas';
+type lista_sub = 'printBase64Res' | 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'indexToFocus' | 'refreshFacturas' | 'sacarFacturas';
 
 interface mixinInit {
   component?: String;

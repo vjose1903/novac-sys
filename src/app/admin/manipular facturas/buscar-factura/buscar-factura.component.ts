@@ -473,7 +473,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     this.tipo_factura_id = null;
     this.campo = null;
     this.enfocarInput('campoI');
-    console.log('manda buscar factura');
   }
 
   selectFactura(item) {
