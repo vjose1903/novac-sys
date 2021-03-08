@@ -39,21 +39,19 @@
             <tr>
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
               <td *ngIf="propietario" class="sombreado2" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
-                <div class="btn-group" dropdown id="divDropConfigRow" #dropConfigRow>
-                  <i *ngIf="!checkIfArticuloRow(i)" class="fas fa-ellipsis-v btnConfigDis" style="padding: 3px"></i>
-
-                  <a *ngIf="checkIfArticuloRow(i)" dropdownToggle style="padding: 3px">
+                <div class="btn-group" dropdown #dropRowConfig>
+                  <a *ngIf="checkIfArticuloRow(i)" dropdownToggle style="padding: 3px" (click)="(false)">
                     <i class="fas fa-ellipsis-v btnConfig"></i>
                   </a>
-                  <ul class="dropdown-menu" role="menu" id="dropConfigRow">
+
+                  <a *ngIf="!checkIfArticuloRow(i)" style="padding: 3px">
+                    <i class="fas fa-ellipsis-v btnConfigDis"></i>
+                  </a>
+
+                  <ul class="dropdown-menu" role="menu" id="dropRowConfig">
                     <li *ngIf="metodo === 'venta'" role="menuitem">
                       <div class="from-group my-1 ml-2">
-                        <input
-                          formControlName="calcular_saco"
-                          class="apple-switch ml-2"
-                          type="checkbox"
-                          (click)="CalculoSacos(i, 'select', $event)"
-                        />
+                        <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, 'select', $event)" />
                         <span class="ml-2 subirLabelCheck">Calcular saco</span>
                       </div>
                     </li>
@@ -67,15 +65,7 @@
                   </ul>
                 </div>
               </td>
-              <!-- <td
-                *ngIf="propietario"
-                class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}"
-                (mouseover)="selectedRow(i, true)"
-                (mouseleave)="selectedRow(i, false)"
-              >
 
-                <i class="far fa-trash-alt text-red btnBorrar" (click)="modalRemover(i)"></i>
-              </td>  -->
               <!--  ::::::::::::  CODIGO  ::::::::::::  -->
               <td class="COD td0padding">
                 <div class="from-group">
@@ -193,14 +183,7 @@
               <!--  ::::::::::::  PRECIO  ::::::::::::  -->
               <td class="TOT td0padding">
                 <div class="from-group">
-                  <input
-                    type="text"
-                    class="form-control entrada inTOT campoNumeros"
-                    id="tot-{{ i }}"
-                    formControlName="tot"
-                    readonly="true"
-                    tabindex="-1"
-                  />
+                  <input type="text" class="form-control entrada inTOT campoNumeros" id="tot-{{ i }}" formControlName="tot" readonly="true" tabindex="-1" />
                   <input type="hidden" [value]="i" formControlName="secuencia" tabindex="-1" />
                 </div>
               </td>
