@@ -21,7 +21,9 @@
     "!actualizacion/**/*",
     "!ADM-dataBase ER.mdj",
     "!actualizacion.zip",
-    "!print"
+    "!print",
+    "!log",
+    "!reload"
   ],
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
