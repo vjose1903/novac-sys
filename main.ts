@@ -7,7 +7,7 @@ const request = require('request');
 const { exec } = require('child_process');
 const autoUpdater = require('electron-updater').autoUpdater;
 
-import { AppConfig } from './src/environments/environment';
+import { AppConfig } from './src/environments/environment.js';
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
