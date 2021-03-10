@@ -24,7 +24,7 @@ export class HomeAdminComponent extends mixinClass implements OnInit, OnDestroy 
 
   cedula = null;
   ngOnInit() {
-    this._init_mixin();
+    this._init_mixin({ component: 'home' });
   }
   ngOnDestroy() {
     this._destroy_mixin();
@@ -111,8 +111,6 @@ export class HomeAdminComponent extends mixinClass implements OnInit, OnDestroy 
       usuario: 'Mari Santos',
     };
 
-    this.mServ.modalTipo('mostrarFactura');
-    this.mServ.ModalSeleccion(obj);
-    this.mServ.mostrarModal(true);
+    this.abrirModal('mostrarFactura', obj);
   }
 }

@@ -42,7 +42,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   element: any;
   optionsAlerta = ['Quintal', 'Libra'];
   seleccionModal: any;
-  indexBorrar: any;
   tipoModal: string;
 
   listaProductos: any;
@@ -60,15 +59,13 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'produccion', _lista_subs: ['decisionModal'] });
     this.enfocarInput('articulo_id');
     this.getProductosTerminados();
   }
 
   initCambioMenu(arg) {
-    if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
-    }
+    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
   }
 
   ngOnDestroy() {
@@ -91,12 +88,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       const res = await this.dbServ.getProductosTerminados(this.articulo_id).toPromise();
       this.listaProductos = res;
     } catch (error) {
-      if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR', true);
-      }
-      // else {
-      //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
-      // }
+      if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR', true);
     }
   }
 
@@ -108,12 +100,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
         this.ingredientes = res;
       } catch (error) {
-        if (error.error) {
-          this.dbServ.toastError(error.error.msg, 'ERROR', true);
-        }
-        // else {
-        //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
-        // }
+        if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR', true);
       }
     }
   }
@@ -133,32 +120,24 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
     let cantiTootip = ``;
     if (keys.length > 1) {
-      if (keys.length === 2) {
-        cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
-      } else {
-        cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br> <span>${hijo}</span><br> </div>`;
-      }
-    } else {
-      cantiTootip = `<div style=" max-width: 21rem;" > <span> ${principal} </span><br></div>`;
-    }
+      if (keys.length === 2) cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
+      else cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br> <span>${hijo}</span><br> </div>`;
+    } else cantiTootip = `<div style=" max-width: 21rem;" > <span> ${principal} </span><br></div>`;
+
     return cantiTootip;
   }
   isLibraOrQuintal(objeto) {
     let presentar = 'Quintal';
-    if (objeto.Quintal && objeto.Libra > 100) {
-      presentar = 'Quintal';
-    } else {
-      presentar = 'Libra';
-    }
+    if (objeto.Quintal && objeto.Libra > 100) presentar = 'Quintal';
+    else presentar = 'Libra';
+
     return presentar;
   }
 
   lookprincipal(objeto) {
     const presentar = this.isLibraOrQuintal(objeto);
     let cantidad = 0;
-
     cantidad = objeto[presentar];
-
     const fin = cantidad === 1 ? presentar : this.medidas[presentar];
 
     return GLOBAL.numFormatTwoDecimals(cantidad) + '  ' + fin;
@@ -171,11 +150,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       if (this.articulo_id) {
         const continu = this.abilitarBtnAgregar();
 
-        if (!continu) {
-          setTimeout(() => {
-            this.agregarAlista();
-          }, 250);
-        }
+        if (!continu) setTimeout(() => this.agregarAlista(), 250);
       }
     }
   }
@@ -183,21 +158,20 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     this.element = document.getElementById(arg) as HTMLElement;
     this.element.focus();
   }
+
   disableOption(arg, boolean) {
     (this.element = document.getElementById(arg) as any).disabled = boolean;
   }
+
   abilitarBtnAgregar() {
     let res = true;
-    if (this.articulo_id && this.cantidad_producir && this.medida_producir) {
-      res = false;
-    }
+    if (this.articulo_id && this.cantidad_producir && this.medida_producir) res = false;
     return res;
   }
+
   abilitarBtnConfirmar() {
     let res = true;
-    if (this.lista_produccion.length > 0) {
-      res = false;
-    }
+    if (this.lista_produccion.length > 0) res = false;
     return res;
   }
 
@@ -207,9 +181,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       this.ingredientes.forEach(async (ingre) => {
         let cantidadFormula = ingre.cantidad;
 
-        if (this.medida_producir === 'Libra') {
-          cantidadFormula = cantidadFormula / 100;
-        }
+        if (this.medida_producir === 'Libra') cantidadFormula = cantidadFormula / 100;
 
         let cantidad_calculada = cantidadFormula * this.cantidad_producir;
 
@@ -225,9 +197,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
             if (element.ingredientes.length > 0) {
               for (let j = 0; j < element.ingredientes.length; j++) {
                 const ingrediente = element.ingredientes[j];
-                if (ingrediente.nombre === ingre.nombre) {
-                  cantidad_calculada += ingrediente.cantidad;
-                }
+                if (ingrediente.nombre === ingre.nombre) cantidad_calculada += ingrediente.cantidad;
               }
             }
           }
@@ -240,22 +210,13 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
             this.cantidad_producir = null;
             this.ingredientesParaProduccion = [];
 
-            this.dbServ.toastError(
-              'No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre,
-              'ERROR',
-              true,
-            );
+            this.dbServ.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR', true);
             this.enfocarInput('cantidad_producir');
           } else {
             this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj, articulo_id: ingre.articulo_id });
           }
         } catch (error) {
-          if (error.error) {
-            this.dbServ.toastError(error.error.msg, 'ERROR', true);
-          }
-          //  else {
-          //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
-          // }
+          if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR', true);
         }
       });
     }
@@ -304,9 +265,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   editarItem(item) {
-    if (this.articuloEditando) {
-      this.agregarAlista();
-    }
+    if (this.articuloEditando) this.agregarAlista();
 
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
@@ -321,29 +280,14 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
       this.seleccionModal = item.ARG;
       this.tipoModal = 'remover';
-      this.indexBorrar = item.INDEX;
       this.decisionModalP(true);
     }, 5);
   }
 
-  abrirModal(arg?) {
-    this.seleccionModal = arg.ARG;
-    this.indexBorrar = arg.INDEX;
-    this.mServ.modalTipo('remover');
-    this.tipoModal = 'remover';
-    this.mServ.ModalSeleccion(arg.ARG);
-    this.mServ.mostrarModal(true);
-  }
-
   abrirModalDinamicText(tipo) {
     const obj = {};
-    if (tipo === 'confirmar') {
-      this.tipoModal = 'confirmar_produccion';
-      this.mServ.modalTipo('dinamico_texto');
-      obj['texto_modal'] = 'Seguro de que desea confirmar la produccion.';
-    }
-    this.mServ.ModalSeleccion(obj);
-    this.mServ.mostrarModal(true);
+    if (tipo === 'confirmar') obj['texto_modal'] = 'Seguro de que desea confirmar la produccion.';
+    this.abrirModal('dinamico_texto', obj, 'confirmar_produccion');
   }
 
   decisionModalP(bool) {
@@ -366,11 +310,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       }
     }
     this.tServ.Func_total_paginas(this.lista_produccion.length);
-  }
-  cancelarProduccion() {
-    this.mServ.modalTipo('cancelarP');
-    this.tipoModal = 'cancelarP';
-    this.mServ.mostrarModal(true);
   }
 
   async confirmarProduccion() {
@@ -400,14 +339,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       this.succes();
     } catch (error) {
       console.error(error);
-
-      if (error.error) {
-        // this.mostrarErrores(error.error.msg);
-        this.dbServ.toastError(error.error.msg, 'Error');
-      }
-      //  else {
-      //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
-      // }
+      if (error.error) this.dbServ.toastError(error.error.msg, 'Error');
     }
   }
 

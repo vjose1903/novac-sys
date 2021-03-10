@@ -27,7 +27,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   form: FormGroup;
   ARRAY_ROWARTICULOS: any;
-  tipoModal: string;
   indexRemove: any;
   control: FormArray;
 
@@ -88,16 +87,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   ngOnInit() {
     this._init_mixin({
-      _lista_subs: [
-        'decisionModal',
-        'objDevuelto',
-        'articuloPorCodigo',
-        'pressEsc',
-        'articuloPorCodigo',
-        'pressEsc',
-        'indexToFocus',
-        'printBase64Res',
-      ],
+      component: 'conduce',
+      _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'articuloPorCodigo', 'pressEsc', 'indexToFocus', 'printBase64Res'],
     });
 
     this.form = this.fb.group({
@@ -266,8 +257,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [], fecha_articulo: this.FechaConduce };
 
         GLOBAL.desEnfocarInput('cod-' + i);
-        this.filtrarArticulo(obj);
-        // }
+        this.abrirModal('buscarArticulo', obj);
       }
     }
 
@@ -499,31 +489,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   async abrirModalFiltro(nombre) {
     if (nombre || nombre === ' ') {
-      this.mServ.modalTipo('buscarCliente');
-      this.tipoModal = 'buscarCliente';
-
-      const obj = {
-        data: [],
-        filtrarCliente: nombre,
-      };
-
-      this.mServ.ModalSeleccion(obj);
-
-      this.mServ.mostrarModal(true);
-    }
-  }
-
-  // =============================================
-  //  MODAL PARA FILTRAR ARTICULOS
-  // =============================================
-  async filtrarArticulo(arg, is_saltar = false, sigInput = '') {
-    await this.mServ.modalTipo('buscarArticulo');
-    await this.mServ.ModalSeleccion(arg);
-    await this.mServ.mostrarModal(true);
-    await this.mServ.ModalTablaHeight(true);
-
-    if (is_saltar) {
-      GLOBAL.enfocarInput(sigInput);
+      const obj = { data: [], filtrarCliente: nombre };
+      this.abrirModal('buscarCliente', obj);
     }
   }
 
@@ -614,7 +581,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       if (!detalle_factura_id) {
         this.verificarRow(i);
         const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [], fecha_articulo: this.FechaConduce };
-        this.filtrarArticulo(obj);
+        this.abrirModal('buscarArticulo', obj);
       }
     }
   }
@@ -691,19 +658,13 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   modalRemover(i) {
     const name = (this.control.controls[i] as any).controls['des'].value;
     const unidad = (this.control.controls[i] as any).controls['uni'].value;
-    let obj = {};
-    if (unidad) {
-      obj = { nombre: name + ' (' + unidad + ')' };
-    } else {
-      obj = { nombre: name };
-    }
+    let obj = { nombre: name };
+
+    if (unidad) obj['nombre']['name'] = `(${obj['nombre']['name']} (${unidad})`;
 
     if (name) {
-      this.tipoModal = 'removerArticulo';
       this.indexRemove = i;
-      this.mServ.modalTipo('removerArticulo');
-      this.mServ.ModalSeleccion(obj);
-      this.mServ.mostrarModal(true);
+      this.abrirModal('removerArticulo', obj);
     }
   }
 
@@ -753,23 +714,16 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   async SeleccionarFactruaAdelantada(factura) {
     if (factura) {
-      // if (this.checkIfCuerpoDirty()) {
-      //   this.facturas_adelantadas_wait = GLOBAL.duplicarJson(factura);
-      //   this.abrirModalDinamicText('Conduce no terminado, ¿Desea sobreescribirlo?', 1);
-      // } else {
-      this.mServ.modalTipo('seleccionar_articulos_adelantados');
-      for (let i = 0; i < factura.detalle_facturas.length; i++) {
-        const detalle = factura.detalle_facturas[i];
-
+      factura.detalle_facturas.map((detalle) => {
         const existe = this.control.value.find((d) => d.id === detalle.id);
         if (existe) {
           detalle.select = true;
         } else {
           detalle.select = false;
         }
-      }
-      this.mServ.ModalSeleccion(factura.detalle_facturas);
-      this.mServ.mostrarModal(true);
+        return detalle;
+      });
+      this.abrirModal('seleccionar_articulos_adelantados', factura.detalle_facturas);
       // }
     }
   }
@@ -797,22 +751,15 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     return acu;
   }
 
-  abrirModalDinamicText(texto, tipo) {
+  abrirModalDinamicText(texto, type) {
     const obj = { texto_modal: texto };
-    if (tipo === 1) {
-      this.tipoModal = 'conduce_lleno';
-      this.mServ.modalTipo('dinamico_texto');
-    } else if (tipo === 2) {
-      {
-        this.tipoModal = 'imprimir_conduce';
-        this.mServ.modalTipo('dinamico_texto');
-      }
-    } else {
-      this.tipoModal = 'cancelar_conduce';
-      this.mServ.modalTipo('dinamico_texto');
-    }
-    this.mServ.ModalSeleccion(obj);
-    this.mServ.mostrarModal(true);
+    let tipo_modal;
+
+    if (type === 1) tipo_modal = 'conduce_lleno';
+    else if (type === 2) tipo_modal = 'imprimir_conduce';
+    else tipo_modal = 'cancelar_conduce';
+
+    this.abrirModal('dinamico_texto', obj, tipo_modal);
   }
 
   parsearDetalleModal(articulos) {

@@ -85,6 +85,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   objDevueltoResponse(res) {
+    console.log('donde_estoy -> siensofom');
     if (res && res.tipo_modal === 'buscarArticulo') {
       this.LLenarRowDespuesDeFiltro(res);
     }
@@ -511,8 +512,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
               (this.control.controls[index] as any).controls['uni'].setValue(null);
             }, 2);
           } else {
-            // const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
-            // this.filtrarArticulo(obj, true, sigInput);
             this.setInputDrop(i);
             GLOBAL.enfocarInput('uni-' + index);
           }
@@ -559,7 +558,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
 
         GLOBAL.desEnfocarInput('cod-' + i);
-        this.filtrarArticulo(obj);
+        this.abrirModal('buscarArticulo', obj);
+
         // }
       }
     }
@@ -743,7 +743,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       this.setInputDrop(i);
 
       const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
-      this.filtrarArticulo(obj);
+      this.abrirModal('buscarArticulo', obj);
+
     }
   }
 
@@ -930,40 +931,24 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       this.sendCalculos.emit(obj);
     }
   }
+
   modalRemover(i, e?) {
     const name = (this.control.controls[i] as any).controls['des'].value;
     const unidad = (this.control.controls[i] as any).controls['uni'].value;
     let obj = {};
-    if (unidad) {
-      obj = { nombre: name + ' (' + unidad + ')' };
-    } else {
-      obj = { nombre: name };
-    }
+
+    if (unidad) obj['nombre']['name'] = `(${obj['nombre']['name']} (${unidad})`;
+
     if (name) {
-      this.tipoModal = 'removerArticulo';
       this.indexRemove = i;
-      this.mServ.modalTipo('removerArticulo');
-      this.mServ.ModalSeleccion(obj);
-      this.mServ.mostrarModal(true);
+      this.abrirModal('removerArticulo', obj);
     }
+
     if (e) {
       e.stopPropagation();
     }
   }
-  // =============================================
-  //  MODAL PARA FILTRAR ARTICULOS
-  // =============================================
 
-  async filtrarArticulo(arg, is_saltar = false, sigInput = '') {
-    await this.mServ.modalTipo('buscarArticulo');
-    await this.mServ.ModalSeleccion(arg);
-    await this.mServ.mostrarModal(true);
-    // await this.mServ.ModalTablaHeight(true);
-
-    if (is_saltar) {
-      GLOBAL.enfocarInput(sigInput);
-    }
-  }
 
   reinicarVarModal() {
     this.modalSearch = false;

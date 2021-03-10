@@ -66,7 +66,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
   }
 
   ngOnInit() {
-    this._init_mixin();
+    this._init_mixin({ component: 'reg_cliente' });
     this.boton = 'Guardar';
     this.titulo = 'Registro de clientes';
 
@@ -99,7 +99,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
 
   initCambioMenu(arg) {
     if (arg.bool) {
-
       this.layServ.nextDecisionCambioMenu(arg);
     }
   }
@@ -473,30 +472,19 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
       key: 'documento_identidad', // ojo
     },
   ];
-  abrirModal(arg?) {
-    this.indexBorrar = arg.INDEX;
-    this.mServ.modalTipo('borrar');
-    this.tipoModal = 'borrar';
-    this.seleccionModal = arg.ARG;
-    this.mServ.ModalSeleccion(arg.ARG);
-    this.mServ.mostrarModal(true);
-  }
-  decisionModal(arg) {
+
+  async decisionModal(arg) {
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
       obj['estado'] = false;
       obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
-      this.dbServ.editarCliente(obj).subscribe(
-        (res) => {
-          this.dbServ.toastSuccess('Cliente ' + obj.nombre + ' borrado.', 'CORRECTO');
-          _.pullAt(this.listaClientes, this.indexBorrar);
-          this.tipoModal = '';
-          // this.decisionModal = null;
-        },
-        (err) => {
-          this.mostrarErrores(err.error);
-        },
-      );
+      try {
+        const res = await this.dbServ.editarCliente(obj).toPromise();
+        this.dbServ.toastSuccess('Cliente ' + obj.nombre + ' borrado.', 'CORRECTO');
+        this.getClientes(this.tServ.obj_paginate);
+      } catch (error) {
+        this.mostrarErrores(error.error);
+      }
     }
   }
 }

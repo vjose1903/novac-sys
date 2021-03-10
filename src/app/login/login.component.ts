@@ -180,8 +180,6 @@ export class LoginComponent implements OnInit, OnDestroy {
           fileName: res.file.split('.')[0],
         };
         this.abrirModalReporte(obj);
-
-        // this._ipc.send('printBase64', objBase);
       }
     });
   }

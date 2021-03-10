@@ -65,7 +65,6 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   viajes_completados_cant = 0;
   viajes_cant_porciento: any;
   viajes_cant: any;
-  tipoModal: string;
   forma_pago: any;
   total_recibido: any;
   totalPagado = 0;
@@ -87,7 +86,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   }
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
+    this._init_mixin({ component: 'recibos_viajes', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
 
     this.necesarioStart();
   }
@@ -109,7 +108,6 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
       this.forma_pago = res.data.forma_pago;
       this.total_recibido = res.data.dinero;
       this.IMPRIMIR();
-
     }
   }
 
@@ -271,18 +269,15 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
 
   accion(bool, tipo) {
     if (bool) {
+      let tipoModal = tipo;
       let obj = {};
-      if (tipo === 'cambio') {
-        obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo__: 'no_devuelta', factura_de: 'venta' };
-        this.tipoModal = tipo;
-      } else if (tipo === 'dinamico_texto') {
-        this.tipoModal = 'reversar_transaccion';
-        this.mServ.modalTipo('dinamico_texto');
+      if (tipo === 'cambio') obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo__: 'no_devuelta', factura_de: 'venta' };
+      else if (tipo === 'dinamico_texto') {
+        tipoModal = 'reversar_transaccion';
         obj['texto_modal'] = 'Seguro de que desea reversar la ultima transaccion realizada a la factura ' + this.viaje_selected.numero_comprobante;
       }
 
-      this.mServ.modalTipo(tipo);
-      this.abrirModal(obj);
+      this.abrirModal(tipo, obj, tipoModal);
     } else {
       if (tipo === 'cambio' || tipo === 'cancelar') {
         this.resetVariables();
@@ -318,13 +313,6 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     });
 
     return temp;
-  }
-
-  abrirModal(obj) {
-    if (obj) {
-      this.mServ.ModalSeleccion(obj);
-    }
-    this.mServ.mostrarModal(true);
   }
 
   async IMPRIMIR() {

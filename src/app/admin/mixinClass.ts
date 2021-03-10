@@ -16,23 +16,23 @@ export class mixinClass extends modalClass {
     super(mServ, _ipc, layServ);
   }
 
-  argumentos_mixin;
+  arg_mixin;
 
   _init_mixin(arg?: mixinInit) {
-    this.argumentos_mixin = arg;
-    const lista_sub = this.argumentos_mixin ? (this.argumentos_mixin._lista_subs ? this.argumentos_mixin._lista_subs : []) : [];
+    this.arg_mixin = arg;
+    const lista_sub = this.arg_mixin ? (this.arg_mixin._lista_subs ? this.arg_mixin._lista_subs : []) : [];
 
     this._init_layout();
 
     if (lista_sub) {
-      this._init_modal(lista_sub);
+      this._init_modal(arg);
     }
   }
 
   _destroy_mixin() {
     this._destroy_layout();
 
-    const lista_sub = this.argumentos_mixin ? (this.argumentos_mixin._lista_subs ? this.argumentos_mixin._lista_subs : []) : [];
+    const lista_sub = this.arg_mixin ? (this.arg_mixin._lista_subs ? this.arg_mixin._lista_subs : []) : [];
     if (lista_sub) {
       this._destroy_modal();
     }

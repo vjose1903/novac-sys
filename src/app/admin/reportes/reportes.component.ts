@@ -33,7 +33,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   titulo_moda_reporte;
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
+    this._init_mixin({ component: 'reportes', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
   }
 
   initCambioMenu(arg) {
@@ -174,7 +174,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     });
   }
 
-  abrirModal(tipo) {
+  formarObjModal(tipo) {
     const obj = {};
     let tipo_modal = 'reportes';
     this.tipoModal = tipo;
@@ -219,19 +219,12 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     obj['titulo'] = this.titulo_moda_reporte;
     obj['tipo_reporte'] = tipo;
 
-    if (abrirModal) {
-      this.mServ.modalTipo(tipo_modal);
-      this.mServ.ModalSeleccion(obj);
-      this.mServ.mostrarModal(true);
-    }
+    if (abrirModal) this.abrirModal(tipo_modal, obj);
   }
 
   abrirVisorPdf(obj) {
-    this.tipoModal = 'visor_pdf';
-    this.mServ.modalTipo('visor_pdf');
-    this.mServ.ModalSeleccion(obj);
+    this.abrirModal('visor_pdf', obj);
     this.loadServ.isLoading.next(false);
-    this.mServ.mostrarModal(true);
   }
 
   decisionModal(decision) {

@@ -17,10 +17,7 @@
         <ng-container *ngIf="data">
           <tr
             mdbTableCol
-            *ngFor="
-              let dato of data | paginate: { id: id_tabla, itemsPerPage: mostrar, currentPage: pagActual, totalItems: total_registros };
-              index as i
-            "
+            *ngFor="let dato of data | paginate: { id: id_tabla, itemsPerPage: mostrar, currentPage: pagActual, totalItems: total_registros }; index as i"
             class="text-center"
             id="{{ ROW }}{{ i }}"
             [ngClass]="{
@@ -69,11 +66,7 @@
                 {{ lookprincipal(dato[column.key]) }}
               </span>
 
-              <span
-                *ngIf="column.isIcon && dato._destroy !== '1'"
-                [mdbTooltip]="column.text_tooltip ? tooltip : ''"
-                placement="{{ i != 0 ? 'top' : 'botton' }}"
-              >
+              <span *ngIf="column.isIcon && dato._destroy !== '1'" [mdbTooltip]="column.text_tooltip ? tooltip : ''" placement="{{ i != 0 ? 'top' : 'botton' }}">
                 <i
                   id="{{ column.key }}-{{ i }}"
                   (click)="iconBtn(column.key, i, dato)"

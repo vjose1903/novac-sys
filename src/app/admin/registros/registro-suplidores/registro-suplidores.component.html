@@ -31,14 +31,7 @@
             <div class="col-md-6">
               <div class="from-group mb-2">
                 <label class="control-label">Telefono: <span style="color: red">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  [textMask]="{ mask: phoneMask }"
-                  formControlName="telefono"
-                  placeholder="(___) ___-____"
-                  autocomplete="off"
-                />
+                <input type="text" class="form-control" [textMask]="{ mask: phoneMask }" formControlName="telefono" placeholder="(___) ___-____" autocomplete="off" />
                 <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="validarRayaAbajo('telefono') && form.controls['telefono'].dirty">
                   Telefono incompleto
                 </div>
@@ -55,14 +48,7 @@
             <div class="col-md-6">
               <div>
                 <label class="mr-2">
-                  <input
-                    type="radio"
-                    value="1"
-                    class="mr-1"
-                    name="identificacion"
-                    id="identificacion-cedula"
-                    (click)="changeIdent(true)"
-                  />Cedula</label
+                  <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label
                 >
                 <label>
                   <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="mr-1" (click)="changeIdent(false)" />Rnc
@@ -88,27 +74,16 @@
                     mdbTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}"
                     placement="right"
                   >
-                    <span class="input-group-text"
-                      ><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i
-                    ></span>
+                    <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                     <!-- <i class="far fa-square"></i> -->
                   </div>
                 </div>
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="validarRayaAbajo('cedula') && form.controls['cedula'].dirty">
-                  Cedula incompleta
-                </div>
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="validarRayaAbajo('cedula') && form.controls['cedula'].dirty">Cedula incompleta</div>
               </div>
 
               <div *ngIf="!documento_identidad" class="from-group">
                 <div class="input-group">
-                  <input
-                    type="text"
-                    class="form-control"
-                    [textMask]="{ mask: rncMask }"
-                    formControlName="rnc"
-                    placeholder="___-_____-_"
-                    autocomplete="off"
-                  />
+                  <input type="text" class="form-control" [textMask]="{ mask: rncMask }" formControlName="rnc" placeholder="___-_____-_" autocomplete="off" />
                   <!-- <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['rnc'].valid && (form.controls['rnc'].dirty || form.controls['rnc'].touched)">
                     Este Campo es obligatorio
                   </div> -->
@@ -122,9 +97,7 @@
                     <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                   </div>
                 </div>
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="validarRayaAbajo('rnc') && form.controls['rnc'].dirty">
-                  rnc incompleto
-                </div>
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="validarRayaAbajo('rnc') && form.controls['rnc'].dirty">rnc incompleto</div>
               </div>
             </div>
 
@@ -180,10 +153,11 @@
     <div #cardTabla id="cardTabla" class="card cardListados">
       <app-tablas
         *ngIf="listaSuplidores && info"
-        [padre]="cardTabla" [info]="info"
+        [padre]="cardTabla"
+        [info]="info"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
-        (DELETE)="abrirModal($event)"
+        (DELETE)="abrirModal('borrar', $event.ARG)"
         [quitarAScorll]="-20"
         [data]="listaSuplidores"
         (paginateChange)="getSuplidores($event)"

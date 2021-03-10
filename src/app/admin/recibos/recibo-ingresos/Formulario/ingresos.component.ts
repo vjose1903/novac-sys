@@ -113,7 +113,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   AllSelected = false;
   precioEnTurno: any;
   ExisteMontoMayor: boolean;
-  tipoModal: string;
   detalleYtotal: any;
   Devuelta: any;
   forma_pago: any;
@@ -139,7 +138,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
+    this._init_mixin({ component: 'ingresos', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
 
     this.necesarioStart();
   }
@@ -324,16 +323,12 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
           pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
           pago.recibo_created_at = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
         }
-        this.mServ.modalTipo('historial_pago');
-        // this.mServ.ModalTablaHeight(true);
-
         const obj = {
           total: pagos.length,
           tabla: 'historial_pago',
         };
-
+        this.abrirModal('historial_pago', pagos);
         this.tServ.Func_total_paginas(obj);
-        this.abrirModal(pagos);
       }
     }
   }
@@ -389,23 +384,11 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     return obj;
   }
 
-  abrirModal(arg?) {
-    if (arg) {
-      this.mServ.ModalSeleccion(arg);
-    }
-    this.mServ.mostrarModal(true);
-  }
-
   abrirModalDinamicText(tipo) {
     const obj = {};
-    if (tipo === 'cancelar') {
-      this.tipoModal = 'cancelar_ingreso';
-      this.mServ.modalTipo('dinamico_texto');
+    if (tipo === 'cancelar') obj['texto_modal'] = 'Seguro de que desea cancelar la operacion.';
 
-      obj['texto_modal'] = 'Seguro de que desea cancelar la operacion.';
-    }
-    this.mServ.ModalSeleccion(obj);
-    this.mServ.mostrarModal(true);
+    this.abrirModal('dinamico_texto', obj, 'cancelar_ingreso');
   }
 
   async confirmarIgreso() {
@@ -414,9 +397,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo__: 'devuelta' };
-      this.mServ.modalTipo('cambio');
-      this.tipoModal = 'cambio';
-      this.abrirModal(obj);
+      this.abrirModal('cambio', obj);
     }
   }
 
@@ -555,15 +536,11 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
   async abrirModalFiltro(nombre) {
     if (nombre || nombre === ' ') {
-      this.mServ.modalTipo('buscarCliente');
       const obj = {
         data: [],
         filtrarCliente: nombre,
       };
-
-      this.mServ.ModalSeleccion(obj);
-      this.mServ.mostrarModal(true);
-      // this.mServ.ModalTablaHeight(true);
+      this.abrirModal('buscarCliente', obj);
     }
   }
 

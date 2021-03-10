@@ -15,7 +15,7 @@ import {
 import { MdbTableDirective } from 'angular-bootstrap-md';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { fromEvent, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { obj_paginate_default, TablasService } from './tablas.service';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
@@ -126,17 +126,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() alto = 200;
   @Input() pad = true;
 
-  constructor(
-    private cdRef: ChangeDetectorRef,
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private dbServ: DBservice,
-    private tServ: TablasService,
-  ) {}
+  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private tServ: TablasService) {}
 
   ngOnInit() {
-    this.necesarioStart();
-
     this.subTotalPag = this.tServ.TOTALPAGINAS.subscribe((res) => {
       if (res) {
         if (this.id_tabla !== 'tabla') {
@@ -178,53 +170,53 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   calcularAlto() {
     const filterHeight = this.searchDiv ? this.searchDiv.nativeElement.offsetHeight : 0;
     const paginationHeight = this.paginationDiv ? this.paginationDiv.nativeElement.offsetHeight : 0;
-
     const titulosHeigth = this.titulosHeader ? this.titulosHeader.nativeElement.offsetHeight : 0;
 
-    // const altoDiv = this.dinamicTable
-    //   ? this.dinamicTable.nativeElement.parentElement.parentElement.offsetHeight > 0
-    //     ? this.dinamicTable.nativeElement.parentElement.parentElement.offsetHeight
-    //     : this.dinamicTable.nativeElement.parentElement.parentElement.parentElement.offsetHeight
-    //   : 0;
+    const arrayTamanos = [filterHeight, paginationHeight, titulosHeigth, this.quitarAScorll];
 
-    let restoAHeigthDiv = 0;
     setTimeout(() => {
-      if (this.search && this.paginate) {
-        // si tiene paginacion y buscador
-        restoAHeigthDiv = filterHeight + paginationHeight + titulosHeigth;
-      } else if (this.search && !this.paginate) {
-        // si solo buscador
-        restoAHeigthDiv = filterHeight + titulosHeigth;
-      } else if (!this.search && this.paginate) {
-        // si solo paginacion
-        restoAHeigthDiv = paginationHeight + titulosHeigth;
-      } else if (!this.search && !this.paginate) {
-        // si no tiene ni paginacion ni buscador
-        restoAHeigthDiv = titulosHeigth;
+      //   if (this.search && this.paginate) {
+      //     // si tiene paginacion y buscador
+      //     restoAHeigthDiv = filterHeight + paginationHeight + titulosHeigth;
+      //   } else if (this.search && !this.paginate) {
+      //     // si solo buscador
+      //     restoAHeigthDiv = filterHeight + titulosHeigth;
+      //   } else if (!this.search && this.paginate) {
+      //     // si solo paginacion
+      //     restoAHeigthDiv = paginationHeight + titulosHeigth;
+      //   } else if (!this.search && !this.paginate) {
+      //     // si no tiene ni paginacion ni buscador
+      //     restoAHeigthDiv = titulosHeigth;
+      //   }
+      let restar = 0;
+      for (let i = 0; i < arrayTamanos.length; i++) {
+        const tamano = arrayTamanos[i];
+        restar += tamano;
       }
-
-      // this.alto = altoDiv - restoAHeigthDiv - this.quitarAScorll - paddingCard;
-      const restar = restoAHeigthDiv + this.quitarAScorll;
 
       let paddingCard = 0;
       if (this.pad) {
         paddingCard = this.padre.offsetTop;
-
         paddingCard *= 2;
       }
 
       this.alto = this.padre.offsetHeight - restar - paddingCard;
-
-      // this.searchCardTabla(this.dinamicTable.nativeElement, restar);
     }, 20);
   }
 
   async ngAfterViewInit() {
-    // fromEvent(this.searchInput.nativeElement, 'input')
-    //   .pipe(map((event: Event) => (event.target as HTMLInputElement).value))
-    //   .pipe(debounceTime(3000))
-    //   .pipe(distinctUntilChanged())
-    //   .subscribe((data) => this.searchItems());
+    if (this.data && this.mdbTable && this.info) {
+      this.necesarioStart();
+    } else {
+      const necesarios = [
+        { title: 'DATA', body: this.data },
+        { title: 'MDBTABLE', body: this.mdbTable },
+        { title: 'INFO', body: this.info },
+      ];
+      necesarios.forEach((element) => {
+        if (!element.body) console.error(`LA TABLA NO FUNCIONA SI NO TIENE: ${element.title}`);
+      });
+    }
 
     this.cdRef.detectChanges();
     // this.calcularAlto();
@@ -267,8 +259,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       this.searchText = await this.paraFiltroClientes;
     }
 
-    // this.changeStylesRows();
-    this.changeStylesTitles();
+    // this.changeStylesTitles();
 
     setTimeout(() => {
       this.ready = true;
@@ -281,7 +272,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   llenarArreglos() {
     for (let i = 0; i < this.data.length; i++) {
       const element = this.data[i];
-
       this.elements.push(element);
       this.previous.push(element);
     }
@@ -642,10 +632,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         this.seleccionado_id = simpleChanges.seleccionado.currentValue.id;
       }
     }
-  }
-
-  async waitForChange() {
-    await this.setDATATABLE();
   }
 
   timeout: any = null;

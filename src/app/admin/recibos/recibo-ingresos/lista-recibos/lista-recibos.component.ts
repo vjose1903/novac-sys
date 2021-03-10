@@ -86,7 +86,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'printBase64Res'] });
+    this._init_mixin({ component: 'lista_recibos', _lista_subs: ['decisionModal', 'printBase64Res'] });
     this.necesarioStart();
   }
 
@@ -113,7 +113,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
         fileName: this.fileName.split('.')[0],
       };
 
-      this.abrirModal('visor_pdf', 'visor_pdf', obj);
+      this.abrirModal('visor_pdf', obj);
     } else {
       this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
     }
@@ -184,7 +184,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
 
       case 'anular':
         const obj = { texto_modal: `Seguro de que desea anular el recibo #${arg.row.numero_recibo}` };
-        this.abrirModal('anular', 'dinamico_texto', obj);
+        this.abrirModal('dinamico_texto', obj, 'anular');
         break;
 
       default:

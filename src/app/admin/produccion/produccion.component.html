@@ -140,21 +140,14 @@
           [focusRow]="false"
           [botones]="botones"
           (DevolverInfo)="editarItem($event)"
-          (DELETE)="abrirModal($event)"
+          (DELETE)="abrirModal('remover', $event.ARG)"
           (paginateChange)="paginateChange($event)"
         ></app-tablas>
       </div>
     </div>
     <div class="d-flex justify-content-end mt-4">
-      <input [disabled]="abilitarBtnConfirmar()" (click)="cancelarProduccion()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-      <input
-        [disabled]="abilitarBtnConfirmar()"
-        (click)="abrirModalDinamicText('confirmar')"
-        type="submit"
-        class="btn"
-        value="Confirmar"
-        id="btn-verde"
-      />
+      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModal('cancelarP', null)" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar')" type="submit" class="btn" value="Confirmar" id="btn-verde" />
     </div>
   </div>
 </div>

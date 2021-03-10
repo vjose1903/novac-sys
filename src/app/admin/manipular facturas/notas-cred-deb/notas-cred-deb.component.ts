@@ -54,7 +54,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
+    this._init_mixin({ component: 'notas', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
     this.idFactura = this.activeRoute.snapshot.params['id'];
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
@@ -388,20 +388,12 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   formatoFecha(fecha) {
     return moment(fecha).format('DD/MM/YYYY');
   }
-  abrirModal(arg?) {
-    if (arg) {
-      arg.tipo__ = this.tipoNota;
-      this.mServ.ModalSeleccion(arg);
-    }
-    this.mServ.mostrarModal(true);
-  }
+
   // =============================================
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    this.mServ.modalTipo('cancelar');
-    this.tipoModal = 'cancelar';
-    this.abrirModal();
+    this.abrirModal('cancelar', null);
   }
   // =============================================
   //  MODAL IMPRIMIR
@@ -414,9 +406,8 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
         this.dbServ.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
       } else {
         const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota };
-        this.mServ.modalTipo('cambio');
-        this.tipoModal = 'cambio';
-        this.abrirModal(obj);
+
+        this.abrirModal('cambio', obj);
       }
     }
   }
@@ -493,8 +484,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     cabecera_fact['balance'] = 0;
     cabecera_fact['devuelta'] = this.TOTAL * -1;
 
-    cabecera_fact['fecha_valida'] =
-      this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
+    cabecera_fact['fecha_valida'] = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
 
     cabecera_fact['adelantada'] = false;
     cabecera_fact['numero_comprobante'] = null;

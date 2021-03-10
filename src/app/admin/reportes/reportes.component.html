@@ -4,18 +4,16 @@
     <div class="row">
       <div class="col-12">
         <div class="card card-padding sombra">
-          <span class="bntLetra" (click)="abrirModal('cuadre')"><i class="fas fa-cash-register"></i> Cuadre de caja </span>
+          <span class="bntLetra" (click)="formarObjModal('cuadre')"><i class="fas fa-cash-register"></i> Cuadre de caja </span>
         </div>
       </div>
       <div class="col-12 mt-3">
         <div class="card card-padding sombra">
           <h5 class="negrita subrayado">Ventas</h5>
 
-          <span class="bntLetra" (click)="abrirModal('ventas_diarias')"><i class="fas fa-calendar-day"></i> Relación de ventas diarias</span>
-          <span class="bntLetra" (click)="abrirModal('ventas_rango')"><i class="fas fa-calendar-alt"></i> Relación de ventas por fechas</span>
-          <span class="bntLetra" (click)="abrirModal('ventas_productos')">
-            <i class="fas fa-shopping-basket"></i> Relación de productos vendidos
-          </span>
+          <span class="bntLetra" (click)="formarObjModal('ventas_diarias')"><i class="fas fa-calendar-day"></i> Relación de ventas diarias</span>
+          <span class="bntLetra" (click)="formarObjModal('ventas_rango')"><i class="fas fa-calendar-alt"></i> Relación de ventas por fechas</span>
+          <span class="bntLetra" (click)="formarObjModal('ventas_productos')"> <i class="fas fa-shopping-basket"></i> Relación de productos vendidos </span>
         </div>
       </div>
     </div>
@@ -25,18 +23,18 @@
       <div class="col-12">
         <div class="card card-padding sombra">
           <h5 class="negrita subrayado">Cuentas</h5>
-          <span class="bntLetra" (click)="abrirModal('cuentas_cobrar_cliente')">
+          <span class="bntLetra" (click)="formarObjModal('cuentas_cobrar_cliente')">
             <i class="fas fa-comments-dollar"></i>
             Relación de CxC por cliente
           </span>
-          <span class="bntLetra" (click)="abrirModal('cuentas_cobrar_ant_saldo')">
+          <span class="bntLetra" (click)="formarObjModal('cuentas_cobrar_ant_saldo')">
             <i class="fas fa-comment-dollar"></i> Relación de CxC por antiguedad de saldo
           </span>
         </div>
       </div>
       <div class="col-12 mt-3">
         <div class="card card-padding sombra">
-          <span class="bntLetra" (click)="abrirModal('recibos')"> <i class="fas fa-hand-holding-usd"></i> Recibos ingreso </span>
+          <span class="bntLetra" (click)="formarObjModal('recibos')"> <i class="fas fa-hand-holding-usd"></i> Recibos ingreso </span>
         </div>
       </div>
     </div>
@@ -46,8 +44,8 @@
       <div class="col-12 mt-3">
         <div class="card card-padding sombra">
           <h5 class="negrita subrayado">Productos</h5>
-          <span class="bntLetra" (click)="abrirModal('inventario')"> <i class="fas fa-boxes"></i> Inventario </span>
-          <span class="bntLetra" (click)="abrirModal('suplidor_prod')"> <i class="fas fa-user-tag"></i> Suplidor por producto </span>
+          <span class="bntLetra" (click)="formarObjModal('inventario')"> <i class="fas fa-boxes"></i> Inventario </span>
+          <span class="bntLetra" (click)="formarObjModal('suplidor_prod')"> <i class="fas fa-user-tag"></i> Suplidor por producto </span>
         </div>
       </div>
     </div>

@@ -28,6 +28,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   fecha_articulo: any;
   returnArticulosSeleccionado = false;
   filtrar = false;
+  dataFiltro;
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       this.showModal = false;
@@ -153,11 +154,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.identificadorFact = res.identificadorFact;
         this.index = res.index;
 
-        // if (this.paraFiltroArticulos) {
-        // } else if (this.paraFiltroClientes) {
-        // } else if (this.paraFiltroSuplidor) {
-        // }
-
         if (this.tipoModal === 'buscarArticulo') {
           this.renovarDataFiltros(this.tServ.obj_paginate, this.paraFiltroArticulos, this.fecha_articulo);
         } else if (this.tipoModal === 'buscarCliente') {
@@ -269,6 +265,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       this.showModal = false;
     }
 
+    console.log('quien manda es formReporteAccion');
     this.mServ.ModalObj(obj);
     this.reinicioModal();
   }
@@ -282,6 +279,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     if (this.tipoModal === 'buscarArticulo') {
       obj['index'] = this.index;
     }
+    console.log('quien manda es devolverCLick');
 
     this.mServ.ModalObj(obj);
   }
@@ -331,9 +329,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, fecha_articulo, 'todos').toPromise();
 
         if (res.data) {
-          this.seleccionModal = res.data;
+          this.dataFiltro = res.data;
 
-          if (this.seleccionModal.length === 0) {
+          if (this.dataFiltro.length === 0) {
             this.noArticulo();
             return;
           }
@@ -349,7 +347,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         }
       } else if (this.tipoModal === 'buscarCliente') {
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
-        this.seleccionModal = undefined;
+        this.dataFiltro = undefined;
 
         if (res.data.length === 0) {
           this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO', true);
@@ -363,7 +361,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
             return cli;
           });
 
-          this.seleccionModal = res.data;
+          this.dataFiltro = res.data;
           this.mostrarModalLuegoDeBuscarData();
 
           const obj = {
@@ -375,13 +373,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       } else if (this.tipoModal === 'buscarSuplidor') {
         const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
-        this.seleccionModal = undefined;
+        this.dataFiltro = undefined;
         res.data.map(async (supli) => {
           supli.nombre = GLOBAL.Capitalice(supli.nombre);
           supli.documento_identidad = await supli.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
           return supli;
         });
-        this.seleccionModal = res.data;
+        this.dataFiltro = res.data;
         this.mostrarModalLuegoDeBuscarData();
 
         if (res.data.length === 0) {

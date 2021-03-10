@@ -43,10 +43,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['nombre_no_empleado'].valid &&
-                  (form.controls['nombre_no_empleado'].dirty || form.controls['nombre_no_empleado'].touched)
-                "
+                *ngIf="!form.controls['nombre_no_empleado'].valid && (form.controls['nombre_no_empleado'].dirty || form.controls['nombre_no_empleado'].touched)"
               >
                 Introduzca el nombre
               </div>
@@ -70,10 +67,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['apellido_no_empleado'].valid &&
-                  (form.controls['apellido_no_empleado'].dirty || form.controls['apellido_no_empleado'].touched)
-                "
+                *ngIf="!form.controls['apellido_no_empleado'].valid && (form.controls['apellido_no_empleado'].dirty || form.controls['apellido_no_empleado'].touched)"
               >
                 Introduzca el apellido
               </div>
@@ -95,10 +89,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['telefono_no_empleado'].valid &&
-                  (form.controls['telefono_no_empleado'].dirty || form.controls['telefono_no_empleado'].touched)
-                "
+                *ngIf="!form.controls['telefono_no_empleado'].valid && (form.controls['telefono_no_empleado'].dirty || form.controls['telefono_no_empleado'].touched)"
               >
                 Introduzca el numero de telefono
               </div>
@@ -113,15 +104,7 @@
             <div class="form-group">
               <label class="control-label">Marca: <span style="color: red">*</span></label>
               <!-- <input (focus)="$event.target.select()" type="text" formControlName="marca" placeholder="Introduzca marca" class="form-control" autocomplete="off" id="marca" /> -->
-              <ng-select
-                id="marca"
-                formControlName="marca"
-                (change)="selectMarca()"
-                [items]="listaMarcas"
-                bindLabel="descripcion"
-                bindValue="id"
-                [clearable]="false"
-              >
+              <ng-select id="marca" formControlName="marca" (change)="selectMarca()" [items]="listaMarcas" bindLabel="descripcion" bindValue="id" [clearable]="false">
                 <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                   <div>
                     <span>{{ item.descripcion }} </span>
@@ -183,15 +166,15 @@
       </div>
     </div>
     <div class="mt-4 p-2">
-      <a class="btn mr-2" id="btn-gris" (click)="abrirModalFormulario('marcas')">Marcas</a>
-      <a class="btn mr-2" id="btn-gris" (click)="abrirModalFormulario('modelos')">Modelos</a>
+      <a class="btn mr-2" id="btn-gris" (click)="abrirModal('crud_marca_modelo', 'marcas')">Marcas</a>
+      <a class="btn mr-2" id="btn-gris" (click)="abrirModal('crud_marca_modelo', 'modelos')">Modelos</a>
     </div>
   </div>
 
   <div class="col-7 pl-0">
     <h4>Listado camiones</h4>
 
-    <div class="card cardListados">
+    <div #cardTabla class="card cardListados">
       <app-tablas
         *ngIf="listaVehiculos && info"
         [padre]="cardTabla"
@@ -202,7 +185,7 @@
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
         (paginateChange)="getVehiculos($event)"
-        (DELETE)="abrirModal($event)"
+        (DELETE)="abrirModal('borrar', $event.ARG)"
       ></app-tablas>
     </div>
   </div>

@@ -55,7 +55,6 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   gananciaTotal: number;
   tipo_articulos;
   indexSelected: any;
-  tipoModal: string;
   seleccionModal: any;
   filtrado = false;
   filtro = 'todos';
@@ -78,7 +77,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   async ngOnInit() {
-    this._init_mixin({ _lista_subs: ['decisionModal', 'printBase64Res'] });
+    this._init_mixin({ component: 'inventario', _lista_subs: ['decisionModal', 'printBase64Res'] });
     this.necesarioParaEmpezar();
     this.dbServ.getTipoArticulos().subscribe((res) => {
       this.tipo_articulos = res;
@@ -121,14 +120,6 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
         this.getArticulos(this.tServ.obj_paginate);
       }
     }
-  }
-
-  abrirModalReporte(obj) {
-    this.tipoModal = 'visor_pdf';
-    this.mServ.modalTipo('visor_pdf');
-    this.mServ.ModalSeleccion(obj);
-
-    this.mServ.mostrarModal(true);
   }
 
   ngOnDestroy() {
@@ -182,7 +173,8 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
         };
 
         this.loadServ.isLoading.next(false);
-        this.abrirModalReporte(obj);
+
+        this.abrirModal('visor_pdf', obj);
       }
     });
   }
@@ -283,11 +275,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
   movimientoInventario(arg) {
     this.indexSelected = arg.INDEX;
-    this.mServ.modalTipo('inventario');
-    this.tipoModal = 'inventario';
-    this.seleccionModal = arg.ARG;
-    this.mServ.ModalSeleccion(arg.ARG);
-    this.mServ.mostrarModal(true);
+    this.abrirModal('inventario', arg.ARG);
   }
 
   resetVariables() {

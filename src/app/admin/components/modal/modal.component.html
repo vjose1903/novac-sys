@@ -138,12 +138,7 @@
     (onHide)="reinicioModal()"
     blockScroll="true"
   >
-    <app-form-cantidad-efectivo
-      [tipo]="tipoDevuelta"
-      [data]="seleccionModal"
-      (cancel)="accion(false)"
-      (getDevuelta)="getDevuelta($event)"
-    ></app-form-cantidad-efectivo>
+    <app-form-cantidad-efectivo [tipo]="tipoDevuelta" [data]="seleccionModal" (cancel)="accion(false)" (getDevuelta)="getDevuelta($event)"></app-form-cantidad-efectivo>
   </p-dialog>
   <!-- ================================================================================================================================ -->
   <!--  CANCELAR LA PRODUCCION -->
@@ -349,10 +344,9 @@
     (onShow)="prueba()"
     blockScroll="true"
   >
-    <!-- *ngIf="seleccionModal.listaArticulos.length > 0 && paraFiltroArticulos" -->
     <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
-        *ngIf="seleccionModal"
+        *ngIf="dataFiltro"
         [focusRow]="true"
         [metodo]="metodo"
         [paraFiltroArticulos]="paraFiltroArticulos"
@@ -360,7 +354,7 @@
         [info]="infoArticulos"
         [pad]="false"
         [padre]="cardTabla"
-        [data]="seleccionModal"
+        [data]="dataFiltro"
         [search]="false"
         (noArticulo)="noArticulo()"
         (paginateChange)="renovarDataFiltros($event)"
@@ -374,7 +368,7 @@
   <!-- ================================================================================================================================ -->
 
   <p-dialog
-    *ngIf="filtrar && (tipoModal === 'buscarCliente' || tipoModal === 'buscarSuplidor') && seleccionModal && infoCliente"
+    *ngIf="filtrar && ((tipoModal === 'buscarCliente' && infoCliente) || (tipoModal === 'buscarSuplidor' && infoSuplidor)) && dataFiltro"
     [header]="tituloModal"
     [draggable]="false"
     [(visible)]="showModal"
@@ -389,14 +383,13 @@
   >
     <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
-        *ngIf="seleccionModal"
         [paraFiltroClientes]="tipoModal === 'buscarCliente' ? paraFiltroClientes : paraFiltroSuplidor"
         [focusRow]="true"
         (clickRow)="devolverCLick($event)"
         [info]="tipoModal === 'buscarCliente' ? infoCliente : infoSuplidor"
         [pad]="false"
         [padre]="cardTabla"
-        [data]="seleccionModal"
+        [data]="dataFiltro"
         [search]="true"
         [ROW]="'cliente'"
         (paginateChange)="renovarDataFiltros($event)"

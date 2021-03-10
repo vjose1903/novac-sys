@@ -28,24 +28,26 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       titulo: 'Cod.',
       key: 'codigo',
       customClass: true,
-      estilos: [{ width: '3rem' }],
+      estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }],
     },
     {
       titulo: 'Articulo',
       key: 'nombre',
       customClass: true,
-      estilos: [{ width: '13rem' }, { 'text-align': 'left' }, { 'padding-left': '1.5rem' }],
+      estilos: [{ width: '37%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }],
     },
     {
       titulo: 'Medida',
       key: 'medida',
       customClass: true,
-      estilos: [{ width: '4rem' }],
+      estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }],
     },
     {
       titulo: 'Precio',
       key: 'precio_principal',
       formatoNumero: true,
+      customClass: true,
+      estilos: [{ width: '20%' }],
     },
   ];
   botones = {
@@ -74,7 +76,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
   Ispaquete = false;
   seleccionModal: any;
-  indexBorrar: any;
   TIPOARTICULO: any;
 
   ARRAY_FORMULA: FormArray;
@@ -117,7 +118,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
     this.necesarioStart();
-    this._init_mixin({ _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_articulo', _lista_subs: ['decisionModal'] });
   }
 
   initCambioMenu(arg) {
@@ -190,9 +191,10 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
       res.data.map(async (arti) => {
         arti.customStyles = {
-          'td-codigo': { width: '3rem' },
-          'td-nombre': { width: '13rem', 'text-align': 'left', 'padding-left': '1.5rem' },
-          'td-medida': { width: '4rem' },
+          'td-codigo': { width: '11%' },
+          'td-nombre': { width: '39%', 'text-align': 'left', 'padding-left': '0.5rem' },
+          'td-medida': { width: '13%' },
+          'td-precio_principal': { width: '18%' },
         };
       });
 
@@ -868,21 +870,11 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
     articulo['tipo_articulo_id'] = articulo['tipo_articulo_id'] + '';
 
-    // this.selectTipoArticulo(articulo.tipo_articulo_id);
     if (articulo.is_combo) {
       this.form.controls.otros_costos.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.otros_costos)));
     }
     this.form.controls.costo_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.costo_principal)));
     this.form.controls.precio_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.precio_principal)));
-  }
-
-  abrirModal(arg?) {
-    this.seleccionModal = arg.ARG;
-    this.indexBorrar = arg.INDEX;
-    this.mServ.modalTipo('borrar');
-    this.tipoModal = 'borrar';
-    this.mServ.ModalSeleccion(arg.ARG);
-    this.mServ.mostrarModal(true);
   }
 
   decisionModal(arg) {
@@ -891,15 +883,12 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       this.dbServ.eliminarArticulo(obj).subscribe(
         (res) => {
           const i = _.findIndex(this.listaArticulos, (art: any) => {
-            if (art.id === obj['id']) {
-              return true;
-            }
+            if (art.id === obj['id']) return true;
           });
 
           this.dbServ.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
           _.pullAt(this.listaArticulos, i);
           this.tipoModal = '';
-          // this.decisionModal = null;
           this.borrar();
         },
         (err) => {

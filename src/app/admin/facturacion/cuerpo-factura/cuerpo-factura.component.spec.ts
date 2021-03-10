@@ -6,12 +6,13 @@ describe('CuerpoFacturaComponent', () => {
   let component: CuerpoFacturaComponent;
   let fixture: ComponentFixture<CuerpoFacturaComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ CuerpoFacturaComponent ]
-    })
-    .compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [CuerpoFacturaComponent],
+      }).compileComponents();
+    }),
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(CuerpoFacturaComponent);

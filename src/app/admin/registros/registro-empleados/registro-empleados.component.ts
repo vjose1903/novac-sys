@@ -87,7 +87,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     this.titulo = 'Registro de empleados';
     this.boton = 'Registrar';
 
-    this._init_mixin();
+    this._init_mixin({ component: 'reg_empleados' });
 
     this.necesarioStart();
     this.form = this.fb.group({
@@ -256,22 +256,6 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     }
   }
 
-  abrirModal(arg?) {
-    this.mServ.modalTipo('borrar');
-    this.indexBorrar = arg.INDEX;
-    this.seleccionModal = arg.ARG;
-    this.tipoModal = 'borrar';
-    this.mServ.ModalSeleccion(arg.ARG);
-    this.mServ.mostrarModal(true);
-  }
-
-  cambiarPassword(arg?) {
-    this.mServ.modalTipo('password');
-    this.tipoModal = 'password';
-    this.mServ.ModalSeleccion(this.usuarioSelected);
-    this.mServ.mostrarModal(true);
-  }
-
   decisionModal(arg) {
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
@@ -280,10 +264,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
       this.dbServ.updateEmpleados(obj).subscribe(
         (res) => {
           this.dbServ.toastSuccess('Empleado ' + obj.nombre + ' borrado.', 'CORRECTO');
-          _.pullAt(this.listaEmpleados, this.indexBorrar);
-          this.tipoModal = '';
-          this.indexBorrar = -1;
-          // this.decisionModal = null;
+          this.getEmpleados(this.tServ.obj_paginate);
         },
         (err) => {
           this.mostrarErrores(err.error.errors);

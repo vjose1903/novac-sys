@@ -125,7 +125,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.localeService.use('es');
-    this._init_mixin({ _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_ncf', _lista_subs: ['decisionModal'] });
     this.titulo = 'Paquetes de numeros comprobantes fiscales';
     this.necesarioStart();
 
@@ -356,27 +356,20 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
     }
   }
 
-  abrirModal(arg?) {
+  localAbrirModal(arg?) {
     this.indexSelected = arg.INDEX;
-    this.mServ.modalTipo('borrar');
-    this.tipoModal = 'borrar';
-    this.seleccionModal = arg.ARG;
-    this.seleccionModal.nombre = 'comprobante para ' + arg.ARG.tipoC_ + ' numero: ' + arg.ARG.codigo;
-    this.mServ.ModalSeleccion(arg.ARG);
-    this.mServ.mostrarModal(true);
+    arg.ARG.nombre = 'comprobante para ' + arg.ARG.tipoC_ + ' numero: ' + arg.ARG.codigo;
+    this.abrirModal('borrar', arg.ARG);
   }
 
   decisionModal(arg) {
     if (arg !== null && arg !== undefined) {
-      if (arg && this.seleccionModal) {
-        this.dbServ.deleteNCF(this.seleccionModal.id).subscribe(
+      const obj = GLOBAL.duplicarJson(this.seleccionModal);
+      if (arg && obj) {
+        this.dbServ.deleteNCF(obj.id).subscribe(
           (res) => {
-            this.dbServ.toastSuccess(
-              'comprobante para ' + this.seleccionModal.tipoC_ + ' numero: ' + this.seleccionModal.codigo + ' borrado',
-              'CORRECTO',
-            );
-            _.pullAt(this.listaNCF, this.indexSelected);
-            this.tipoModal = '';
+            this.dbServ.toastSuccess('comprobante para ' + obj.tipoC_ + ' numero: ' + obj.codigo + ' borrado', 'CORRECTO');
+            this.getPaquetesNCF(this.tServ.obj_paginate);
           },
           (err) => {
             this.mostrarErrores(err.error);
@@ -385,6 +378,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
       }
     }
   }
+
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {

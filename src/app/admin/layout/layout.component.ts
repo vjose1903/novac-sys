@@ -71,7 +71,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
   ngOnInit() {
     this.initVariables();
-    this._init_mixin({ _lista_subs: ['decisionModal', 'refreshFacturas', 'sacarFacturas'] });
+    this._init_mixin({ component: 'layout', _lista_subs: ['decisionModal', 'refreshFacturas', 'sacarFacturas'] });
 
     this._ipc.PRINTERS.subscribe((res) => {
       if (res !== undefined) {
@@ -211,7 +211,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   abrirModalFacturaGuardada(fact, e) {
     const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.' };
     this.seleccionModal = fact;
-    this.abrirModal('quitar_factura', 'dinamico_texto', obj);
+    this.abrirModal('dinamico_texto', obj, 'quitar_factura');
     e.stopPropagation();
   }
 

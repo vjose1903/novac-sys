@@ -71,7 +71,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   }
 
   ngOnInit() {
-    this._init_mixin();
+    this._init_mixin({ component: 'reg_suplidores' });
     this.titulo = 'Registro de suplidores';
     this.boton = 'Registrar';
     this.metodo = this.route.snapshot.params['metodo'];
@@ -285,7 +285,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
             },
             (err) => {
               console.error(err);
-
               this.mostrarErrores(err.error);
             },
           );
@@ -312,36 +311,19 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
     }
   }
 
-  // =================================================================
-  // MODAL
-  // =================================================================
-
-  abrirModal(arg?) {
-    this.seleccionModal = arg.ARG;
-    this.indexBorrar = arg.INDEX;
-    this.mServ.modalTipo('borrar');
-    this.tipoModal = 'borrar';
-    this.mServ.ModalSeleccion(arg.ARG);
-    this.mServ.mostrarModal(true);
-  }
-  decisionModal(arg) {
+  async decisionModal(arg) {
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
       obj['estado'] = false;
       obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
-      this.dbServ.editarSuplidor(obj).subscribe(
-        (res) => {
-          this.dbServ.toastSuccess('Empleado ' + obj.nombre + ' borrado.', 'CORRECTO');
-          _.pullAt(this.listaSuplidores, this.indexBorrar);
-          this.tipoModal = '';
-          this.indexBorrar = -1;
-          this.decisionModal = null;
-        },
-        (err) => {
-          console.error(err);
-          this.mostrarErrores(err.error);
-        },
-      );
+
+      try {
+        const res = await this.dbServ.editarSuplidor(obj).toPromise();
+        this.dbServ.toastSuccess('Empleado ' + obj.nombre + ' borrado.', 'CORRECTO');
+        this.getSuplidores(this.tServ.obj_paginate);
+      } catch (error) {
+        this.mostrarErrores(error.error);
+      }
     }
   }
 }

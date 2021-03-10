@@ -54,7 +54,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   }
 
   ngOnInit() {
-    this._init_mixin();
+    this._init_mixin({ component: 'reg_vehiculos' });
     this.createForm();
     this.FORM = this.form.controls;
 
@@ -241,24 +241,6 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
     this.selectPropietario();
   }
 
-  abrirModal(arg?) {
-    this.seleccionModal = arg.ARG;
-    this.indexBorrar = arg.INDEX;
-    this.mServ.modalTipo('borrar');
-    this.tipoModal = 'borrar';
-    this.mServ.ModalSeleccion(arg.ARG);
-    this.mServ.mostrarModal(true);
-  }
-
-  abrirModalFormulario(arg?) {
-    this.seleccionModal = arg;
-
-    this.mServ.modalTipo('crud_marca_modelo');
-    this.tipoModal = 'crud_marca_modelo';
-    this.mServ.ModalSeleccion(arg);
-    this.mServ.mostrarModal(true);
-  }
-
   decisionModal(arg) {
     if (arg) {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
@@ -266,8 +248,6 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
         (res) => {
           this.dbServ.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
           this.getVehiculos(this.tServ.obj_paginate);
-          this.tipoModal = '';
-          // this.decisionModal = null;
           this.borrar();
         },
         (err) => {

@@ -20,10 +20,7 @@
                   <span class="ml-1 subirLabelCheck_2">Funciona como materia prima</span>
                 </div>
               </div>
-              <div
-                *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'"
-                class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }}"
-              >
+              <div *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'" class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }}">
                 <div class="from-group mb-2 ml-2">
                   <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" />
                   <span class="ml-2 subirLabelCheck">Calcular saco</span>
@@ -77,9 +74,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['tipo_articulo_id'].valid && (form.controls['tipo_articulo_id'].dirty || form.controls['tipo_articulo_id'].touched)
-                "
+                *ngIf="!form.controls['tipo_articulo_id'].valid && (form.controls['tipo_articulo_id'].dirty || form.controls['tipo_articulo_id'].touched)"
               >
                 Seleccione tipo de articulo
               </div>
@@ -183,9 +178,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)
-                "
+                *ngIf="!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)"
               >
                 Este Campo es obligatorio
               </div>
@@ -209,9 +202,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)
-                "
+                *ngIf="!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)"
               >
                 Este Campo es obligatorio
               </div>
@@ -259,9 +250,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)
-                "
+                *ngIf="!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)"
               >
                 Este Campo es obligatorio
               </div>
@@ -332,11 +321,7 @@
                         (focus)="$event.target.select()"
                         type="text"
                         (keydown.enter)="
-                          saltar(
-                            j !== ARRAY_FORMULA.controls.length - 1 ? 'articulo_id-' : 'OtrosG',
-                            j !== ARRAY_FORMULA.controls.length - 1 ? true : false,
-                            j + 1
-                          )
+                          saltar(j !== ARRAY_FORMULA.controls.length - 1 ? 'articulo_id-' : 'OtrosG', j !== ARRAY_FORMULA.controls.length - 1 ? true : false, j + 1)
                         "
                         (blur)="calculateCostoPT()"
                         id="cantidad_formula-{{ j }}"
@@ -363,20 +348,10 @@
                   </div>
                   <div class="col-2">
                     <div *ngIf="j === 0" class="d-flex aling justify-content-between">
-                      <i
-                        (click)="addItem(j)"
-                        mdbTooltip="Agregar Ingrediente"
-                        placement="left"
-                        class="fas btnArray fa-plus-square text-blue btnQuitar"
-                      ></i>
+                      <i (click)="addItem(j)" mdbTooltip="Agregar Ingrediente" placement="left" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
                     </div>
                     <div *ngIf="j !== 0" class="d-flex aling justify-content-between">
-                      <i
-                        (click)="removeItem(j)"
-                        mdbTooltip="Quitar Ingrediente"
-                        placement="left"
-                        class="fas btnArray fa-minus-square text-danger btnQuitar"
-                      ></i>
+                      <i (click)="removeItem(j)" mdbTooltip="Quitar Ingrediente" placement="left" class="fas btnArray fa-minus-square text-danger btnQuitar"></i>
                     </div>
                   </div>
                 </div>
@@ -429,9 +404,7 @@
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"
-                  *ngIf="
-                    !form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)
-                  "
+                  *ngIf="!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)"
                 >
                   Este Campo es obligatorio
                 </div>
@@ -456,9 +429,7 @@
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"
-                  *ngIf="
-                    !form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)
-                  "
+                  *ngIf="!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)"
                 >
                   Este Campo es obligatorio
                 </div>
@@ -498,9 +469,7 @@
                 <div
                   class="alerta text-danger ml-1"
                   style="font-size: 12px"
-                  *ngIf="
-                    !form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)
-                  "
+                  *ngIf="!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)"
                 >
                   Este Campo es obligatorio
                 </div>
@@ -593,8 +562,7 @@
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
                 *ngIf="
-                  !form.controls['medida_contenido_padre'].valid &&
-                  (form.controls['medida_contenido_padre'].dirty || form.controls['medida_contenido_padre'].touched)
+                  !form.controls['medida_contenido_padre'].valid && (form.controls['medida_contenido_padre'].dirty || form.controls['medida_contenido_padre'].touched)
                 "
               >
                 Este Campo es obligatorio
@@ -650,8 +618,7 @@
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
                 *ngIf="
-                  !form.controls['cantidad_contenido_hijo'].valid &&
-                  (form.controls['cantidad_contenido_hijo'].dirty || form.controls['cantidad_contenido_hijo'].touched)
+                  !form.controls['cantidad_contenido_hijo'].valid && (form.controls['cantidad_contenido_hijo'].dirty || form.controls['cantidad_contenido_hijo'].touched)
                 "
               >
                 Cantidad del paquete
@@ -670,10 +637,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['medida_contenido_hijo'].valid &&
-                  (form.controls['medida_contenido_hijo'].dirty || form.controls['medida_contenido_hijo'].touched)
-                "
+                *ngIf="!form.controls['medida_contenido_hijo'].valid && (form.controls['medida_contenido_hijo'].dirty || form.controls['medida_contenido_hijo'].touched)"
               >
                 Este Campo es obligatorio
               </div>
@@ -735,7 +699,7 @@
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
         (paginateChange)="filtrarArticulo($event)"
-        (DELETE)="abrirModal($event)"
+        (DELETE)="abrirModal('borrar', $event.ARG)"
       ></app-tablas>
     </div>
   </div>
