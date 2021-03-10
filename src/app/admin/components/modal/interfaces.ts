@@ -8,4 +8,5 @@ export enum VM {
   '_7' = 'mostrarModal',
   '_8' = 'ModalObj',
   '_9' = 'ModalDecision',
+  '_10' = 'metodos',
 }

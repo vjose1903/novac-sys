@@ -31,6 +31,51 @@ export class modalClass extends LayoutClass {
     super(layServ);
   }
 
+  _init_modal(arg) {
+    this.quien_me_llamo = arg.component;
+    console.log('this.quien_me_llamo --> ', this.quien_me_llamo);
+
+    this.metodos[this.quien_me_llamo] = this;
+
+    this._lista = arg._lista_subs ? arg._lista_subs : [];
+
+    if (this._lista.includes('printBase64Res')) {
+      this._ipc.on('printBase64Res', async (event: any, res) => this.run_subscribe('printBase64Res', res));
+    }
+
+    if (this._lista.includes('decisionModal')) {
+      this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => this.run_subscribe('DECISIONMODAL', res));
+    }
+
+    if (this._lista.includes('objDevuelto')) {
+      this.subObj = this.mServ.OBJDEVUELTO.subscribe(async (res) => {
+        console.log('objDevuelto en la clase modal --> ', res);
+
+        this.run_subscribe('OBJDEVUELTO', res);
+      });
+    }
+
+    if (this._lista.includes('articuloPorCodigo')) {
+      this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => this.run_subscribe('ARTICULOFILTRADOPORCODIGO', res));
+    }
+
+    if (this._lista.includes('pressEsc')) {
+      this.subEsc = this.mServ.PRESSESC.subscribe((res) => this.run_subscribe('PRESSESC', res));
+    }
+
+    if (this._lista.includes('indexToFocus')) {
+      this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => this.run_subscribe('PRESSESC', res));
+    }
+
+    if (this._lista.includes('refreshFacturas')) {
+      this.subRefresh = this.layServ.REFRESHFACTURAS.subscribe((res) => this.run_subscribe('PRESSESC', res));
+    }
+
+    if (this._lista.includes('sacarFacturas')) {
+      this.subRefresh = this.layServ.SACARFACTURA.subscribe((res) => this.run_subscribe('SACARFACTURA', res));
+    }
+  }
+
   run_subscribe(observable, res) {
     const _this = this.metodos[modalClass.a_quien_responder];
 
@@ -50,6 +95,8 @@ export class modalClass extends LayoutClass {
           break;
 
         case 'OBJDEVUELTO':
+          console.log('OBJDEVUELTO --> ', res);
+
           _this.objDevueltoResponse(res);
           if (res !== undefined) _this.reiniciarVariables([VM._8, VM._7]);
 
@@ -80,6 +127,7 @@ export class modalClass extends LayoutClass {
   }
 
   reiniciarVariables(list: Array<VM>) {
+    const de_quien_soy = this.quien_me_llamo;
     if (list.includes(VM._1)) this.pdfSrc = undefined; /* pdfSrc */
     if (list.includes(VM._2)) this.fileName = undefined; /* fileName */
     if (list.includes(VM._3)) this.titulo_moda_reporte = undefined; /* titulo_moda_reporte */
@@ -89,49 +137,7 @@ export class modalClass extends LayoutClass {
     if (list.includes(VM._7)) this.mServ.mostrarModal(undefined); /* subMotrar */
     if (list.includes(VM._8)) this.mServ.ModalObj(undefined); /* subObj */
     if (list.includes(VM._9)) this.mServ.ModalDecision(undefined); /* subDeci */
-
-    delete this.metodos[modalClass.a_quien_responder]; /* metodos */
-  }
-
-  _init_modal(arg) {
-    this.quien_me_llamo = arg.component;
-    console.log('this.quien_me_llamo --> ', this.quien_me_llamo);
-
-    this.metodos[this.quien_me_llamo] = this;
-
-    this._lista = arg._lista_subs ? arg._lista_subs : [];
-
-    if (this._lista.includes('printBase64Res')) {
-      this._ipc.on('printBase64Res', async (event: any, res) => this.run_subscribe('printBase64Res', res));
-    }
-
-    if (this._lista.includes('decisionModal')) {
-      this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => this.run_subscribe('DECISIONMODAL', res));
-    }
-
-    if (this._lista.includes('objDevuelto')) {
-      this.subObj = this.mServ.OBJDEVUELTO.subscribe(async (res) => this.run_subscribe('OBJDEVUELTO', res));
-    }
-
-    if (this._lista.includes('articuloPorCodigo')) {
-      this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => this.run_subscribe('ARTICULOFILTRADOPORCODIGO', res));
-    }
-
-    if (this._lista.includes('pressEsc')) {
-      this.subEsc = this.mServ.PRESSESC.subscribe((res) => this.run_subscribe('PRESSESC', res));
-    }
-
-    if (this._lista.includes('indexToFocus')) {
-      this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => this.run_subscribe('PRESSESC', res));
-    }
-
-    if (this._lista.includes('refreshFacturas')) {
-      this.subRefresh = this.layServ.REFRESHFACTURAS.subscribe((res) => this.run_subscribe('PRESSESC', res));
-    }
-
-    if (this._lista.includes('sacarFacturas')) {
-      this.subRefresh = this.layServ.SACARFACTURA.subscribe((res) => this.run_subscribe('SACARFACTURA', res));
-    }
+    if (list.includes(VM._10)) if (de_quien_soy && this.metodos[de_quien_soy]) delete this.metodos[de_quien_soy]; /* metodos */
   }
 
   ipcBase64Resonse(res) {}
@@ -145,6 +151,8 @@ export class modalClass extends LayoutClass {
   reporte(data: any) {}
 
   _destroy_modal() {
+    if (this.quien_me_llamo) this.metodos[this.quien_me_llamo].reiniciarVariables([VM._10]);
+
     if (this._lista.includes('printBase64Res') && this._ipc) this._ipc.removeListener('printBase64Res');
 
     if (this._lista.includes('decisionModal') && this.subDeci) this.subDeci.unsubscribe();
@@ -166,6 +174,10 @@ export class modalClass extends LayoutClass {
   }
 
   abrirModal(tipo, seleccion, tipo_modal?) {
+    modalClass.a_quien_responder = this.quien_me_llamo;
+
+    console.log('modalClass.a_quien_responder --> ', modalClass.a_quien_responder);
+
     this.tipoModal = tipo_modal ? tipo_modal : tipo;
     this.seleccionModal = seleccion;
 
@@ -176,8 +188,5 @@ export class modalClass extends LayoutClass {
     this.mServ.modalTipo(tipo);
     this.mServ.ModalSeleccion(seleccion);
     this.mServ.mostrarModal(true);
-
-    modalClass.a_quien_responder = this.quien_me_llamo;
-    console.log('modalClass.a_quien_responder --> ', modalClass.a_quien_responder);
   }
 }

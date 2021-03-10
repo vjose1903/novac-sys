@@ -69,13 +69,11 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   listaArticulos;
   FORM: any;
   listaTipoArticulos: any;
-  tipoModal: string;
 
   optionsAlerta: any[];
   alertaMedida: any;
 
   Ispaquete = false;
-  seleccionModal: any;
   TIPOARTICULO: any;
 
   ARRAY_FORMULA: FormArray;
@@ -130,7 +128,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   ngOnDestroy() {
     this._destroy_mixin();
     this.borrar();
-    // this.subDeci.unsubscribe();
   }
 
   filtroFormula(item) {

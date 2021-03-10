@@ -25,13 +25,6 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   listaVehiculos;
   FORM: any;
 
-  tipoModal: string;
-  indexEditar: any;
-
-  seleccionModal: any;
-  indexBorrar: any;
-
-  subDeci: Subscription;
   listaMarcas = [];
   is_editando = false;
 
@@ -54,18 +47,13 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_vehiculos' });
+    this._init_mixin({ component: 'reg_vehiculos', _lista_subs: ['decisionModal'] });
     this.createForm();
     this.FORM = this.form.controls;
 
     this.titulo = 'Registro de camiones';
     this.boton = 'Registrar';
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== null && res !== undefined) {
-        this.decisionModal(res);
-      }
-    });
     GLOBAL.enfocarInput('user_id');
     this.necesarioStart();
   }
@@ -79,7 +67,6 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   ngOnDestroy() {
     this._destroy_mixin();
     this.borrar();
-    if (this.subDeci) this.subDeci.unsubscribe();
   }
 
   async necesarioStart() {

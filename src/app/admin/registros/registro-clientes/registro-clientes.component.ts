@@ -47,11 +47,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
     editar: true,
   };
   indexSeleccionado: any;
-  tipoModal: string;
-  seleccionModal: string;
-  indexBorrar: any;
   vendedores;
-  subDeci: Subscription;
 
   constructor(
     private dbServ: DBservice,
@@ -66,7 +62,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_cliente' });
+    this._init_mixin({ component: 'reg_cliente', _lista_subs: ['decisionModal'] });
     this.boton = 'Guardar';
     this.titulo = 'Registro de clientes';
 
@@ -85,16 +81,25 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
       cedula: [null, ValidateRayaAbajo.verificarRayaAbajo],
     });
 
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== null && res !== undefined) {
-        this.decisionModal(res);
-      }
-    });
-
     this.necesarioStart();
     setTimeout(() => {
       this.marcarCheck('cedula');
     }, 200);
+  }
+
+  async decisionModal(arg) {
+    if (arg) {
+      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
+      obj['estado'] = false;
+      obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
+      try {
+        const res = await this.dbServ.editarCliente(obj).toPromise();
+        this.dbServ.toastSuccess('Cliente ' + obj.nombre + ' borrado.', 'CORRECTO');
+        this.getClientes(this.tServ.obj_paginate);
+      } catch (error) {
+        this.mostrarErrores(error.error);
+      }
+    }
   }
 
   initCambioMenu(arg) {
@@ -105,7 +110,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
 
   ngOnDestroy() {
     this._destroy_mixin();
-    if (this.subDeci) this.subDeci.unsubscribe();
   }
 
   necesarioStart() {
@@ -472,19 +476,4 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
       key: 'documento_identidad', // ojo
     },
   ];
-
-  async decisionModal(arg) {
-    if (arg) {
-      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      obj['estado'] = false;
-      obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
-      try {
-        const res = await this.dbServ.editarCliente(obj).toPromise();
-        this.dbServ.toastSuccess('Cliente ' + obj.nombre + ' borrado.', 'CORRECTO');
-        this.getClientes(this.tServ.obj_paginate);
-      } catch (error) {
-        this.mostrarErrores(error.error);
-      }
-    }
-  }
 }

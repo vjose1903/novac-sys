@@ -29,10 +29,11 @@ export class mixinClass extends modalClass {
     }
   }
 
-  _destroy_mixin() {
+  _destroy_mixin(algo?) {
     this._destroy_layout();
 
-    const lista_sub = this.arg_mixin ? (this.arg_mixin._lista_subs ? this.arg_mixin._lista_subs : []) : [];
+    const lista_sub = this.arg_mixin ? (this.arg_mixin._lista_subs ? this.arg_mixin._lista_subs : undefined) : undefined;
+
     if (lista_sub) {
       this._destroy_modal();
     }

@@ -21,8 +21,6 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   boton = 'Ingresar';
   listaNCF;
 
-  indexSelected: any;
-  tipoModal: string;
   seleccionModal: any;
   estado = false;
   usado = false;
@@ -341,7 +339,6 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   editarItem(item) {
-    this.indexSelected = item.INDEX;
     this.is_editando = true;
 
     if (item.METODO === 'editar') {
@@ -357,7 +354,6 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   localAbrirModal(arg?) {
-    this.indexSelected = arg.INDEX;
     arg.ARG.nombre = 'comprobante para ' + arg.ARG.tipoC_ + ' numero: ' + arg.ARG.codigo;
     this.abrirModal('borrar', arg.ARG);
   }

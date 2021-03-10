@@ -58,18 +58,18 @@ export class FunctionService {
   }
 
   logBlue(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body ? body : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? body : '');
   }
 
   logYellow(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body ? body : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? body : '');
   }
 
   logRed(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body ? body : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? body : '');
   }
 
   logGreen(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body ? body : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? body : '');
   }
 }

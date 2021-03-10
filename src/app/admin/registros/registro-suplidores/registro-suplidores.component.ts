@@ -25,7 +25,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   rncMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   listaSuplidores;
-  subDeci: Subscription;
   // =============================================
   //  TABLAS
   // =============================================
@@ -50,12 +49,8 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
     editar: true,
   };
   element: HTMLElement;
-  tipoModal: string;
   documento_identidad = false;
   doc_principal = 'rnc';
-  indexSelected: any;
-  seleccionModal: any;
-  indexBorrar: any;
 
   constructor(
     private fb: FormBuilder,
@@ -71,7 +66,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_suplidores' });
+    this._init_mixin({ component: 'reg_suplidores', _lista_subs: ['decisionModal'] });
     this.titulo = 'Registro de suplidores';
     this.boton = 'Registrar';
     this.metodo = this.route.snapshot.params['metodo'];
@@ -88,12 +83,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
     });
 
     this.nesesarioStart();
-
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== null && res !== undefined) {
-        this.decisionModal(res);
-      }
-    });
   }
 
   initCambioMenu(arg) {
@@ -104,7 +93,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
 
   ngOnDestroy(): void {
     this._destroy_mixin();
-    if (this.subDeci) this.subDeci.unsubscribe();
   }
 
   async nesesarioStart() {
@@ -182,7 +170,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   }
 
   editarItem(item) {
-    this.indexSelected = item.INDEX;
     this.titulo = 'Editar suplidor: ' + item.ARG.nombre;
     this.boton = 'Editar';
     this.form.patchValue(item.ARG);

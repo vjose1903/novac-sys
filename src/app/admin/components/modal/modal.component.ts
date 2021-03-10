@@ -229,9 +229,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     } else {
       obj = arg;
     }
+    console.log('accion en el componente de modal --> ', obj);
 
     this.mServ.ModalDecision(obj);
-    this.reinicioModal();
+
+    setTimeout(() => this.reinicioModal(), 250);
   }
 
   getDevuelta(arg) {

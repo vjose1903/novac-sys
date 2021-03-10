@@ -89,6 +89,10 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   async makePdf(data) {
+    console.log('%c ----- MAKEPDF -----', 'font-size:2rem; color:red');
+    console.log('data --> ', data);
+    console.log('this.tipoModal --> ', this.tipoModal);
+
     let res = {} as any;
 
     try {
@@ -135,6 +139,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       };
 
       this.generarPdf(obj);
+      console.log('%c -------------------', 'font-size:2rem; color:red');
     } catch (error) {
       this.dbServ.toastError('Error realizando reporte.', 'ERROR', true);
     }
@@ -219,7 +224,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     obj['titulo'] = this.titulo_moda_reporte;
     obj['tipo_reporte'] = tipo;
 
-    if (abrirModal) this.abrirModal(tipo_modal, obj);
+    if (abrirModal) this.abrirModal(tipo_modal, obj, tipo);
   }
 
   abrirVisorPdf(obj) {
@@ -228,6 +233,8 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   decisionModal(decision) {
+    console.log('decision en componente RERPORTES ', decision);
+
     if (decision) {
       if (this.tipoModal === 'visor_pdf') {
         const obj = {

@@ -52,13 +52,9 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     editar: true,
   };
   listaEmpleados;
-  tipoModal: string;
-  indexSeleccionado: any;
   editando = false;
   usuarioSelected: any;
-  seleccionModal: any;
   indexBorrar: any;
-  subDeci: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -87,7 +83,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     this.titulo = 'Registro de empleados';
     this.boton = 'Registrar';
 
-    this._init_mixin({ component: 'reg_empleados' });
+    this._init_mixin({ component: 'reg_empleados', _lista_subs: ['decisionModal'] });
 
     this.necesarioStart();
     this.form = this.fb.group({
@@ -104,11 +100,6 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
       // estado: [true],
       role: [null, Validators.required],
     });
-    this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-      if (res !== null && res !== undefined) {
-        this.decisionModal(res);
-      }
-    });
   }
 
   initCambioMenu(arg) {
@@ -119,8 +110,6 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
 
   ngOnDestroy(): void {
     this._destroy_mixin();
-
-    if (this.subDeci) this.subDeci.unsubscribe();
   }
 
   async necesarioStart() {
@@ -184,7 +173,6 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   }
 
   editarItem(item) {
-    this.indexSeleccionado = item.INDEX;
     const doc = item.ARG.documentos_de_identidad.filter((doc) => doc.principal === true);
 
     if (item.ARG.documentos_de_identidad.length > 0 && doc !== [] && doc !== null && doc !== undefined) {

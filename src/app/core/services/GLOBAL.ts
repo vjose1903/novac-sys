@@ -87,7 +87,11 @@ export class GLOBAL {
       if (Array.isArray(json)) {
         return _.cloneDeep(json);
       } else {
+        console.log('json --> ', json);
+
         const target = typeof json === 'object' ? {} : '';
+        console.log('target --> ', target);
+
         return Object.assign(target, json);
       }
     }

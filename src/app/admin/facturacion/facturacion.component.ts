@@ -284,6 +284,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     const factura_a_guardar = this.formarFacturaAGuardar() as any;
     delete factura_a_guardar.fecha_valida;
 
+    console.log('comparar --> ', comparar);
+    console.log('factura_a_guardar --> ', factura_a_guardar);
+
     if (JSON.stringify(comparar) === JSON.stringify(factura_a_guardar)) {
       this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
 
@@ -297,13 +300,21 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   // factura_a_guardar -->  {"condicion":"Contado","forma_pago":"Efectivo","fecha_viaje":null,"fecha_equivalente":null,"pagada":true,"balance":0,"devuelta":0,"tipo_factura_id":2,"numero_comprobante":"b0100000042","costoYgasto":"9","numero_factura":null,"total_factura":75000,"Bruto":75000,"itbis":0,"descuento":0,"estado":true,"is_adelantada":false,"is_viaje":false,"is_nota":false,"suplidor_id":1,"detalle_facturas_attributes":[{"id":null,"articulo_id":209,"cod":"00209","pre":"750.00","costo":750,"descuento_porciento":0,"descuento_valor":0,"cantidad_en_unidades":100,"is_materia_prima":false,"calcular_saco":true,"cantidad":100,"total":75000,"itbis":0,"unidad":"Quintal","precio":750}],"FACTURA_DE":14,"tipo":"compra","user_id":1,"tiene_nota":false,"action":"new"}
 
   initCambioMenu(arg) {
+    this.fun.logYellow('initCambioMenu FACTURACION COMPONENT arg --> ', arg);
+    console.log(' ');
+
     if (arg.bool) {
+      this.fun.logRed('this.checkIfFacturaIniciada() --> ', this.checkIfFacturaIniciada());
       if (this.checkIfFacturaIniciada()) {
         let obj;
         let abrirModal = false;
         let factura_id;
         this.layServ.nextDecisionCambioMenu({ bool: false, ruta: arg.ruta });
+        console.log('this.facturaGuardada --> ',this.facturaGuardada);
+
         this.factura_para_comparar = GLOBAL.duplicarJson(this.facturaGuardada, false);
+        this.fun.logBlue('this.factura_para_comparar --> ', this.factura_para_comparar);
+
         if (this.facturaGuardada) {
           factura_id = GLOBAL.duplicarJson(this.facturaGuardada.factura_id);
 
@@ -311,7 +322,10 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
             if (!res) {
               obj = { texto_modal: 'Esta factura ya se encuentra archivada ¿desea sobreescribirla?' };
               abrirModal = true;
+              console.log('las facturas no son iguales');
             }
+            console.log('las facturas son iguales');
+
             this.procesoCambio(abrirModal, factura_id, obj);
             return;
           });
@@ -327,6 +341,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   procesoCambio(abrirModal, factura_id, obj) {
+    console.log('procesoCambio this.facturaGuardada --> ', this.facturaGuardada);
+
     if (abrirModal) {
       this.facturaGuardada['factura_id'] = factura_id;
       this.abrirModal('dinamico_texto', obj, 'salir_layout');
@@ -404,6 +420,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     } else {
       res = true;
     }
+
     return res;
   }
 
