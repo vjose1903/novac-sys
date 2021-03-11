@@ -33,7 +33,6 @@ export class modalClass extends LayoutClass {
 
   _init_modal(arg) {
     this.quien_me_llamo = arg.component;
-    console.log('this.quien_me_llamo --> ', this.quien_me_llamo);
 
     this.metodos[this.quien_me_llamo] = this;
 
@@ -49,8 +48,6 @@ export class modalClass extends LayoutClass {
 
     if (this._lista.includes('objDevuelto')) {
       this.subObj = this.mServ.OBJDEVUELTO.subscribe(async (res) => {
-        console.log('objDevuelto en la clase modal --> ', res);
-
         this.run_subscribe('OBJDEVUELTO', res);
       });
     }
@@ -95,8 +92,6 @@ export class modalClass extends LayoutClass {
           break;
 
         case 'OBJDEVUELTO':
-          console.log('OBJDEVUELTO --> ', res);
-
           _this.objDevueltoResponse(res);
           if (res !== undefined) _this.reiniciarVariables([VM._8, VM._7]);
 
@@ -176,14 +171,8 @@ export class modalClass extends LayoutClass {
   abrirModal(tipo, seleccion, tipo_modal?) {
     modalClass.a_quien_responder = this.quien_me_llamo;
 
-    console.log('modalClass.a_quien_responder --> ', modalClass.a_quien_responder);
-
     this.tipoModal = tipo_modal ? tipo_modal : tipo;
     this.seleccionModal = seleccion;
-
-    console.log('tipoModal --> ', this.tipoModal);
-    console.log('tipo --> ', tipo);
-    console.log('seleccion --> ', seleccion);
 
     this.mServ.modalTipo(tipo);
     this.mServ.ModalSeleccion(seleccion);

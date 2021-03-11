@@ -20,7 +20,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
   styleUrls: ['./layout.component.scss'],
 })
 export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, AfterContentChecked, AfterViewInit {
-  actualMenyItemBack;
+  actualMenuItemBack;
   actualMenyItem;
   showLoading;
 
@@ -39,7 +39,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   isHandset$: Observable<boolean>;
   lRun;
   activeIndex;
-  initNavigate;
+  initNavigate = true;
 
   constructor(
     public fun: FunctionService,
@@ -58,10 +58,12 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
         this.showLoading = true;
         this.initNavigate = true;
       }
+
       if (routerEvent instanceof NavigationEnd || routerEvent instanceof NavigationCancel || routerEvent instanceof NavigationError) {
         this.showLoading = false;
+
         if (this.initNavigate) {
-          this.checkRouteActiva();
+          setTimeout(() => this.checkRouteActiva(), 250);
 
           this.initNavigate = false;
         }
@@ -112,7 +114,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
       if (res && (res.bool === false || res.bool === true)) {
         if (res.bool && res.verificar) {
           this.ready = false;
-          setTimeout(() => this.decisionCambioMenu_(res), 20);
+
+          setTimeout(() => this.decisionCambioMenu_(res), 30);
         } else {
           this.decisionCambioMenu_(res);
         }
@@ -226,12 +229,21 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.fun.setFacturasGuardadas(this.facturas_localStorage);
   }
 
+  clickTabView(where) {
+    const can = !this.countCantFactSaved(where).disable;
+    if (can) {
+      if (this.activeIndex === (where === 'venta' ? 0 : 1)) {
+        this.checkWhereIs(where);
+      }
+    } else this.activeIndex = where === 'compra' ? 0 : 1;
+  }
+
   checkWhereIs(arg?, callback = (arg) => {}) {
     const temp_url = document.location.href.split('admin/');
     const url = temp_url[1].split('/')[1];
 
     if (url !== arg) {
-      this.layServ.nextCambioMenu({ bool: true, verificar: true, ruta: `/admin/factura/${arg}/new/0` });
+      this.layServ.nextCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
       callback(true);
     } else {
       callback(true);
@@ -282,13 +294,19 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
       const url = temp_url[1].split('/')[0];
       const tipo = temp_url[1].split('/')[1];
       this.actualMenyItem = url;
-      this.actualMenyItemBack = GLOBAL.duplicarJson(this.actualMenyItem);
+
+      this.actualMenuItemBack = GLOBAL.duplicarJson(this.actualMenyItem);
 
       if (url === 'factura') {
         this.getFacturasGuardadas();
         this.activeIndex = tipo === 'venta' ? 0 : 1;
       }
     }
+  }
+
+  countCantFactSaved(tipo) {
+    const array_fact = _.filter(this.fun.getFacturasguardadas(), (o: any) => o.tipo === tipo);
+    return { disable: array_fact.length === 0, cant: array_fact.length };
   }
 
   async getFacturasGuardadas() {
@@ -351,13 +369,11 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   decisionCambioMenu_(decision) {
     if (decision.bool) {
       this.router.navigateByUrl(decision.ruta);
-
+      this.layServ.nextDecisionCambioMenu(undefined);
+      this.layServ.nextCambioMenu(undefined);
       setTimeout(() => {
         this.ready = true;
       }, 20);
-
-      this.layServ.nextDecisionCambioMenu(undefined);
-      this.layServ.nextCambioMenu(undefined);
     } else {
       this.ready = true;
     }

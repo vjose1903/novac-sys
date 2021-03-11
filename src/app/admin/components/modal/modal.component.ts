@@ -229,7 +229,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     } else {
       obj = arg;
     }
-    console.log('accion en el componente de modal --> ', obj);
 
     this.mServ.ModalDecision(obj);
 
@@ -267,7 +266,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       this.showModal = false;
     }
 
-    console.log('quien manda es formReporteAccion');
     this.mServ.ModalObj(obj);
     this.reinicioModal();
   }
@@ -281,7 +279,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     if (this.tipoModal === 'buscarArticulo') {
       obj['index'] = this.index;
     }
-    console.log('quien manda es devolverCLick');
 
     this.mServ.ModalObj(obj);
   }

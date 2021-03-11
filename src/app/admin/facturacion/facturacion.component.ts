@@ -284,9 +284,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     const factura_a_guardar = this.formarFacturaAGuardar() as any;
     delete factura_a_guardar.fecha_valida;
 
-    console.log('comparar --> ', comparar);
-    console.log('factura_a_guardar --> ', factura_a_guardar);
-
     if (JSON.stringify(comparar) === JSON.stringify(factura_a_guardar)) {
       this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
 
@@ -301,7 +298,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   initCambioMenu(arg) {
     this.fun.logYellow('initCambioMenu FACTURACION COMPONENT arg --> ', arg);
-    console.log(' ');
 
     if (arg.bool) {
       this.fun.logRed('this.checkIfFacturaIniciada() --> ', this.checkIfFacturaIniciada());
@@ -310,9 +306,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         let abrirModal = false;
         let factura_id;
         this.layServ.nextDecisionCambioMenu({ bool: false, ruta: arg.ruta });
-        console.log('this.facturaGuardada --> ',this.facturaGuardada);
 
-        this.factura_para_comparar = GLOBAL.duplicarJson(this.facturaGuardada, false);
+        this.factura_para_comparar = GLOBAL.duplicarJson(this.facturaGuardada);
         this.fun.logBlue('this.factura_para_comparar --> ', this.factura_para_comparar);
 
         if (this.facturaGuardada) {
@@ -322,9 +317,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
             if (!res) {
               obj = { texto_modal: 'Esta factura ya se encuentra archivada ¿desea sobreescribirla?' };
               abrirModal = true;
-              console.log('las facturas no son iguales');
             }
-            console.log('las facturas son iguales');
 
             this.procesoCambio(abrirModal, factura_id, obj);
             return;
@@ -335,19 +328,18 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         }
         this.procesoCambio(abrirModal, factura_id, obj);
       } else {
-        this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta });
+        this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta, verificar: true });
       }
     }
   }
 
   procesoCambio(abrirModal, factura_id, obj) {
-    console.log('procesoCambio this.facturaGuardada --> ', this.facturaGuardada);
-
     if (abrirModal) {
-      this.facturaGuardada['factura_id'] = factura_id;
+      if (this.facturaGuardada) this.facturaGuardada['factura_id'] = factura_id;
       this.abrirModal('dinamico_texto', obj, 'salir_layout');
     } else {
       this.info_cambio['bool'] = true;
+      this.info_cambio['verificar'] = true;
       this.layServ.nextDecisionCambioMenu(this.info_cambio);
     }
   }
@@ -363,7 +355,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   objDevueltoResponse(res) {
-    console.log('donde_estoy -> wasakaka');
     if (res && res.tipo_modal === 'buscarCliente') {
       this.propietario_factura = res.data;
 

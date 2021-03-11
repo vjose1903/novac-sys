@@ -82,17 +82,13 @@ export class GLOBAL {
   // =========================================================================================================
   static duplicarJson(json, viejo = true) {
     if (viejo) {
-      return JSON.parse(JSON.stringify(json));
+      return json === undefined ? undefined : JSON.parse(JSON.stringify(json));
     } else {
-      if (Array.isArray(json)) {
-        return _.cloneDeep(json);
+      if (json !== undefined) {
+        if (Array.isArray(json)) return _.cloneDeep(json);
+        else return Object.assign(typeof json === 'object' ? {} : '', json);
       } else {
-        console.log('json --> ', json);
-
-        const target = typeof json === 'object' ? {} : '';
-        console.log('target --> ', target);
-
-        return Object.assign(target, json);
+        return json;
       }
     }
   }

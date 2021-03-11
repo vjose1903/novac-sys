@@ -85,7 +85,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   objDevueltoResponse(res) {
-    console.log('donde_estoy -> siensofom');
     if (res && res.tipo_modal === 'buscarArticulo') {
       this.LLenarRowDespuesDeFiltro(res);
     }
@@ -744,7 +743,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
       const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
       this.abrirModal('buscarArticulo', obj);
-
     }
   }
 
@@ -948,7 +946,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       e.stopPropagation();
     }
   }
-
 
   reinicarVarModal() {
     this.modalSearch = false;

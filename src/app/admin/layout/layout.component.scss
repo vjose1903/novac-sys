@@ -2,6 +2,10 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
 
 $bodyfont: "Poppins";
+::ng-deep .tabViewTootip {
+  z-index: 9999999999 !important;
+}
+
 ::ng-deep .my_tabView {
   & .p-tabview-panels {
     border: 0px solid transparent !important;
@@ -20,12 +24,21 @@ $bodyfont: "Poppins";
         box-shadow: 0 0 0 0rem transparent !important;
       }
     }
+
     &.p-highlight .p-tabview-nav-link {
       background: #007ad900 !important;
       border-color: #c8c8c866 !important;
       color: #42c05b !important;
       border-bottom: 2px solid #42c05b !important;
     }
+  }
+}
+
+::ng-deep .noTabView {
+  a {
+    pointer-events: all !important;
+    cursor: not-allowed !important;
+    color: #a0a0a088 !important;
   }
 }
 

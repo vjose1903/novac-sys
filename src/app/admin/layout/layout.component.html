@@ -5,7 +5,7 @@
 </div>
 
 <p-sidebar
-  *ngIf="actualMenyItemBack == 'factura'"
+  *ngIf="actualMenuItemBack == 'factura'"
   #my_sidebar
   styleClass="my_sidebar  {{ _opened ? 'side_open' : 'side_closed' }}"
   [position]="'right'"
@@ -32,9 +32,32 @@
 
       <ng-container *ngIf="facturas_localStorage?.length > 0">
         <div class="mt-2"></div>
-        <p-tabView [(activeIndex)]="activeIndex" styleClass="my_tabView" (onChange)="checkWhereIs($event.index === 0 ? 'venta' : 'compra')">
-          <p-tabPanel header="Venta"> </p-tabPanel>
-          <p-tabPanel header="Compra"> </p-tabPanel>
+        <p-tabView [(activeIndex)]="activeIndex" styleClass="my_tabView" (onChange)="clickTabView($event.index === 0 ? 'venta' : 'compra')">
+          <p-tabPanel
+            [disabled]="countCantFactSaved('venta').disable"
+            tooltip="No tiene facturas de Venta guardadas"
+            headerStyleClass="{{ countCantFactSaved('venta').disable ? 'noTabView' : '' }}"
+            tooltipDisabled="true"
+            tooltipStyleClass="{{ countCantFactSaved('venta').disable ? 'd-block' : 'd-none' }} tabViewTootip"
+          >
+            <ng-template pTemplate="header">
+              Venta
+              <span *ngIf="!countCantFactSaved('venta').disable"> &nbsp;({{ countCantFactSaved('venta').cant }})</span>
+            </ng-template>
+          </p-tabPanel>
+
+          <p-tabPanel
+            [disabled]="countCantFactSaved('compra').disable"
+            tooltip="No tiene facturas de Compra guardadas"
+            headerStyleClass="{{ countCantFactSaved('compra').disable ? 'noTabView' : '' }}"
+            tooltipDisabled="true"
+            tooltipStyleClass="{{ countCantFactSaved('compra').disable ? 'd-block' : 'd-none' }} tabViewTootip"
+          >
+            <ng-template pTemplate="header">
+              Compra
+              <span *ngIf="!countCantFactSaved('compra').disable"> &nbsp;({{ countCantFactSaved('compra').cant }})</span>
+            </ng-template>
+          </p-tabPanel>
         </p-tabView>
 
         <div #divFact class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="pasarFacturaAfacturacion(fact)">
@@ -46,12 +69,7 @@
 
           <div class="info_fact h-100 {{ factGuardada?.factura_id === fact?.factura_id ? 'activa' : '' }}">
             <i class="fas fa-truck-moving {{ fact.is_viaje ? 'if_viaje' : 'd-none' }}"></i>
-            <i
-              class="btn_borrar_factura_gurdada far fa-trash-alt"
-              (click)="abrirModalFacturaGuardada(fact, $event)"
-              mdbTooltip="Quitar factura"
-              placement="left"
-            ></i>
+            <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" mdbTooltip="Quitar factura" placement="left"></i>
             <span
               class="negrita text-mayuscula text-separado-2 texto-borde-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}
             texto-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}"
