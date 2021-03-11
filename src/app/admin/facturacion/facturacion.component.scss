@@ -3,6 +3,7 @@
   background-color: #eaffe4;
   border-radius: 1rem 1rem 0rem 0rem !important;
   padding: 0.6rem;
+  height: 21%;
 }
 #inputTelefono {
   &:hover {
@@ -14,9 +15,21 @@
 #inputTelefono:focus,
 #inputTelefono.active {
   outline: 0px;
-  // -webkit-box-shadow: 0px solid rgb(177, 177, 177) !important;
   border-color: #d4d4d4 !important;
   box-shadow: 0px 0px #d4d4d4 !important;
+}
+
+.cuadroResumenTotal {
+  background-color: #b0c8bc;
+  display: flex;
+  position: relative;
+  color: black;
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  > .label {
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
 }
 
 .cuadroTotal {
@@ -45,11 +58,14 @@ div.pieFactura {
   position: absolute;
   width: 100%;
   bottom: 0;
+  height: 21%;
+  display: flex;
+  align-items: center;
 }
 div.cuerpoFactura.mb-2 {
   position: absolute;
   width: 100%;
-  height: calc(100% - 36vh);
+  height: 56%;
 }
 
 .fecha {
@@ -100,7 +116,12 @@ div.cuerpoFactura.mb-2 {
   border-top: 1px solid grey;
 }
 .mostrarNumeros {
-  margin-right: 7rem;
+  margin-right: 2rem;
+  display: flex;
+  justify-content: flex-end;
+  > .row {
+    width: 60%;
+  }
 }
 
 .tipo {
@@ -132,6 +153,7 @@ mdb-popover-container {
 .numerosCalculos {
   justify-content: flex-end;
 }
-.TOTALN {
+
+.text-end {
   text-align: end;
 }

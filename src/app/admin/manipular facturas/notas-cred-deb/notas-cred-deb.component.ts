@@ -269,17 +269,9 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     }
   }
 
-  formarFechaFactura(date) {
-    const hora = moment(date).hour();
-    const minutos = moment(date).minutes();
-    const fechaTemp = moment(date).format('YYYY-MM-DD');
-
-    return fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
-  }
-
   async getPrecioSaco(factura, callback = (arg) => {}) {
     try {
-      const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente);
+      const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente)['FechaFactura'];
       const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, fechaFactura, 'todos').toPromise();
 
       callback({ estado: true, precio_saco: res.data[0].precio_principal });

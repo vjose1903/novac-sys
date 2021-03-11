@@ -312,7 +312,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
 
   async calcularPrecio(detalle, factura) {
     if (detalle.calcular_saco) {
-      const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente);
+      const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente)['FechaFactura'];
       const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, fechaFactura, 'todos').toPromise();
 
       const precio_saco = res.data[0].precio_principal;
@@ -323,14 +323,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     }
 
     return detalle;
-  }
-
-  formarFechaFactura(date) {
-    const hora = moment(date).hour();
-    const minutos = moment(date).minutes();
-    const fechaTemp = moment(date).format('YYYY-MM-DD');
-
-    return fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
   }
 
   async pedirFactura(campo, valor, e) {
@@ -528,18 +520,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   formatoNumeroFactura(num) {
     return _.padStart(num, 8, '0');
   }
-  enfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    element.focus();
-  }
-  desEnfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    element.blur();
-  }
-  selectContenido(arg) {
-    const element = document.getElementById(arg) as any;
-    element.select();
-  }
+
   editarFactura() {
     this.router.navigateByUrl(`/admin/factura/venta/update/${this.facturaSelected.id}`);
   }

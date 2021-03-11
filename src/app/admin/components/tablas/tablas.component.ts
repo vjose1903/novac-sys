@@ -20,6 +20,10 @@ import { obj_paginate_default, TablasService } from './tablas.service';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { mixinClass } from '../../mixinClass';
+import { IpcService } from '../../../core/services/ipc.service';
+import { LayoutService } from '../../layout/layout.service';
+import { ModalService } from '../modal/modal.service';
 
 @Component({
   selector: 'app-tablas',
@@ -125,8 +129,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   @Input() alto = 200;
   @Input() pad = true;
-
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private tServ: TablasService) {}
+  mixinClass;
+  constructor(private cdRef: ChangeDetectorRef, private dbServ: DBservice, private tServ: TablasService) {}
 
   ngOnInit() {
     this.subTotalPag = this.tServ.TOTALPAGINAS.subscribe((res) => {
@@ -497,12 +501,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
   }
 
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-
-    this.element.focus();
-  }
-
   // ===================================================================================================
 
   formatoNumero(num) {
@@ -722,5 +720,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   ENTER(arg) {
     const element = document.getElementById(arg) as any;
     element.click();
+  }
+
+  enfocarInput(arg) {
+    const element = document.getElementById(arg) as HTMLElement;
+    element.focus();
   }
 }

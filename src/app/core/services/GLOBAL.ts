@@ -54,7 +54,7 @@ export class GLOBAL {
 
   static my_dateFormater(str) {
     const dateObj = new Date(str);
-    const month = dateObj.getMonth() + 1;
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const day = String(dateObj.getDate()).padStart(2, '0');
     const year = dateObj.getFullYear();
 
@@ -234,24 +234,7 @@ export class GLOBAL {
   //     return sTnum;
   //   }
   // }
-  // ===========================================================================
 
-  static enfocarInput(arg) {
-    const element = document.getElementById(arg) as any;
-    element.focus();
-  }
-  // ===========================================================================
-
-  static desEnfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    element.blur();
-  }
-
-  // ===========================================================================
-  static selectContenido(arg) {
-    const element = document.getElementById(arg) as any;
-    element.select();
-  }
 }
 
 export const showLoadin = new BehaviorSubject<boolean>(false);

@@ -8,13 +8,13 @@ import { ModalService } from './modal.service';
 import { VM } from './interfaces';
 
 export class modalClass extends LayoutClass {
-  public static a_quien_responder: string;
+  private static a_quien_responder: string;
+  private quien_me_llamo = '';
   pdfSrc: any;
   fileName: any;
   titulo_moda_reporte: any;
   seleccionModal;
   tipoModal: string;
-  quien_me_llamo = '';
   metodos = {};
 
   subDeci: Subscription;
@@ -65,7 +65,7 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('refreshFacturas')) {
-      this.subRefresh = this.layServ.REFRESHFACTURAS.subscribe((res) => this.run_subscribe('PRESSESC', res));
+      this.subRefresh = this.layServ.REFRESHFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
     }
 
     if (this._lista.includes('sacarFacturas')) {
@@ -168,12 +168,15 @@ export class modalClass extends LayoutClass {
     }
   }
 
+  public static set aquienResponder(quien_responde) {
+    modalClass.a_quien_responder = quien_responde;
+  }
+
   abrirModal(tipo, seleccion, tipo_modal?) {
     modalClass.a_quien_responder = this.quien_me_llamo;
 
     this.tipoModal = tipo_modal ? tipo_modal : tipo;
     this.seleccionModal = seleccion;
-
     this.mServ.modalTipo(tipo);
     this.mServ.ModalSeleccion(seleccion);
     this.mServ.mostrarModal(true);

@@ -15,6 +15,7 @@ import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
 import { FacturacionService } from './facturacion.service';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import { modalClass } from '../components/modal/modal';
 
 @Component({
   selector: 'app-facturacion',
@@ -55,8 +56,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  FechaFactura: string;
-  FechaFacturaMostrar: string;
+  FechaFactura;
+  FechaFacturaMostrar: any;
   action: any;
   factura_a_editar;
   form: FormGroup;
@@ -142,15 +143,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }, 1000);
   }
 
-  formarFechaFactura(date) {
-    const hora = moment(date).hour();
-    const minutos = moment(date).minutes();
-    const fechaTemp = moment(date).format('YYYY-MM-DD');
-
-    this.FechaFactura = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
-    this.FechaFacturaMostrar = GLOBAL.my_dateFormater(this.FechaFactura) + ' - ' + GLOBAL.my_houreFormater(this.FechaFactura);
-  }
-
   ngOnInit() {
     this.localeService.use('es');
     this.rellenarVariables();
@@ -158,7 +150,10 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   rellenarVariables() {
-    this.formarFechaFactura(new Date());
+    this.FechaFactura = {};
+    this.FechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
+    this.FechaFactura['back'] = this.FechaFactura['front'];
+    this.FechaFacturaMostrar = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
 
     this.action = undefined;
     this.factura_a_editar = undefined;
@@ -232,8 +227,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   rellenarFacturaGuardada(callback = (arg) => {}) {
     let factura_id;
     let obj;
-    let abrirModal = false;
-    let procesoRelleno = false;
     this.factura_para_comparar = GLOBAL.duplicarJson(this.facturaGuardada, false);
 
     if (this.checkIfFacturaIniciada()) {
@@ -263,9 +256,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   procesoRelleno() {
     try {
       this.rellenarCampos(null, 'fact_guardada', this.facturaGuardada);
+
       this.cuerpo.llenarFactura(this.facturaGuardada['detalle_facturas_attributes'], true, (res) => {
         setTimeout(() => {
           this.getCuerpoFactura(this.facturaGuardada['detalle_facturas_attributes'], true);
+          modalClass.aquienResponder = 'layout';
           this.layServ.nextRefresh(true);
         }, 250);
       });
@@ -284,8 +279,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     const factura_a_guardar = this.formarFacturaAGuardar() as any;
     delete factura_a_guardar.fecha_valida;
 
-    if (JSON.stringify(comparar) === JSON.stringify(factura_a_guardar)) {
-      this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
+    if (_.isEqual(comparar, factura_a_guardar)) {
+      this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO', true);
 
       callback(true);
     } else {
@@ -293,14 +288,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  // comparar          -->  {"condicion":"Contado","forma_pago":"Efectivo","fecha_viaje":null,"fecha_equivalente":null,"pagada":true,"balance":0,"devuelta":0,"tipo_factura_id":2,"numero_comprobante":"b0100000042","costoYgasto":"9","numero_factura":null,"total_factura":75000,"Bruto":75000,"itbis":0,"descuento":0,"estado":true,"is_adelantada":false,"is_viaje":false,"is_nota":false,"suplidor_id":1,"detalle_facturas_attributes":[{"id":null,"articulo_id":209,"cod":"00209","pre":"750.00","costo":750,"descuento_porciento":0,"descuento_valor":0,"cantidad_en_unidades":10000,"is_materia_prima":null,"calcular_saco":true,"cantidad":100,"total":75000,"itbis":0,"unidad":"Quintal","precio":750}],"FACTURA_DE":14,"tipo":"compra","user_id":1,"tiene_nota":false,"action":"new"}
-  // factura_a_guardar -->  {"condicion":"Contado","forma_pago":"Efectivo","fecha_viaje":null,"fecha_equivalente":null,"pagada":true,"balance":0,"devuelta":0,"tipo_factura_id":2,"numero_comprobante":"b0100000042","costoYgasto":"9","numero_factura":null,"total_factura":75000,"Bruto":75000,"itbis":0,"descuento":0,"estado":true,"is_adelantada":false,"is_viaje":false,"is_nota":false,"suplidor_id":1,"detalle_facturas_attributes":[{"id":null,"articulo_id":209,"cod":"00209","pre":"750.00","costo":750,"descuento_porciento":0,"descuento_valor":0,"cantidad_en_unidades":100,"is_materia_prima":false,"calcular_saco":true,"cantidad":100,"total":75000,"itbis":0,"unidad":"Quintal","precio":750}],"FACTURA_DE":14,"tipo":"compra","user_id":1,"tiene_nota":false,"action":"new"}
-
   initCambioMenu(arg) {
-    this.fun.logYellow('initCambioMenu FACTURACION COMPONENT arg --> ', arg);
-
     if (arg.bool) {
-      this.fun.logRed('this.checkIfFacturaIniciada() --> ', this.checkIfFacturaIniciada());
       if (this.checkIfFacturaIniciada()) {
         let obj;
         let abrirModal = false;
@@ -308,7 +297,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         this.layServ.nextDecisionCambioMenu({ bool: false, ruta: arg.ruta });
 
         this.factura_para_comparar = GLOBAL.duplicarJson(this.facturaGuardada);
-        this.fun.logBlue('this.factura_para_comparar --> ', this.factura_para_comparar);
 
         if (this.facturaGuardada) {
           factura_id = GLOBAL.duplicarJson(this.facturaGuardada.factura_id);
@@ -349,7 +337,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.luegoDecision(res);
     }
     if (res !== undefined && res.bool) {
-      this.formarFechaFactura(res.Date);
+      this.FechaFactura['front'] = this.formarFechaFactura(res.Date)['FechaFactura'];
+      this.FechaFactura['back'] = this.FechaFactura['front'];
+      this.FechaFacturaMostrar = this.formarFechaFactura(res.Date)['FechaFacturaMostrar'];
       this.FacturaAtrasada = true;
     }
   }
@@ -446,13 +436,25 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.propietario_factura['id'] = res.cliente_id;
     } else {
       res = fact;
-
       this.setPropietario(res);
 
       const tipo = _.find(this.lista_tipos_facturas, (fact) => fact.id === res['tipo_factura_id']);
       res['tipo_factura'] = tipo ? tipo['descripcion'] : '';
     }
     this.metodo = res.tipo;
+    this.FacturaAtrasada = fact.FacturaAtrasada;
+
+    const fecha_facturacion = fact.fecha_equivalente ? fact.fecha_equivalente : GLOBAL.duplicarJson(this.FechaFactura['back']);
+
+    this.FechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
+    this.FechaFactura['back'] = this.FechaFactura['front'];
+
+    this.FechaFacturaMostrar = this.formarFechaFactura(fecha_facturacion)['FechaFacturaMostrar'];
+
+    console.log(':::::::: ', fact);
+
+    // FechaFactura
+    // FechaFacturaMostrar
 
     this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
     await this.calcularPorcientoComprobante();
@@ -519,7 +521,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         }
 
         if (buscar) {
-          this.abrirModalFiltro();
+          this.abrirModalFiltro(510);
         }
       }, 250);
     }
@@ -656,7 +658,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   saltar(campo, valor?, salioDe?) {
     if (campo === 'buscarCliente') {
       this.desEnfocarInput(salioDe);
-      this.abrirModalFiltro();
+      this.abrirModalFiltro(647);
     }
 
     if (campo === 'condicion') {
@@ -697,7 +699,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
     if (campo === 'filtro') {
       if (this.validarRayaAbajo()) {
-        this.abrirModalFiltro();
+        this.abrirModalFiltro(688);
+
+        this.desEnfocarInput(salioDe);
       } else {
         this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso', true);
       }
@@ -766,21 +770,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     input.value = valor;
   }
 
-  enfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    element.focus();
-  }
-
-  desEnfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    element.blur();
-  }
-
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES & SUPLIDORES
   // =============================================
 
-  abrirModalFiltro() {
+  abrirModalFiltro(arg) {
     let tipo = 'buscarCliente';
     let obj = {};
     obj['data'] = [];
@@ -880,7 +874,10 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (arg) {
         this.agregarFacturaALocalStorage();
         setTimeout(() => {
+          modalClass.aquienResponder = 'layout';
+
           this.layServ.nextRefresh(true);
+
           this.resetVariables();
         }, 250);
       }
@@ -890,50 +887,40 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   formarFacturaAGuardar() {
     const factura_a_guardar = this.formarData();
     factura_a_guardar['action'] = this.action;
+    factura_a_guardar['FacturaAtrasada'] = this.FacturaAtrasada;
     return factura_a_guardar;
-  }
-
-  reemplazarFactura() {
-    const facturas_localStorage = this.fun.getFacturasguardadas();
-    const index = _.findIndex(facturas_localStorage, (facts: any) => facts.factura_id === this.facturaGuardada.factura_id);
-    const factura_sobreescrita = this.formarFacturaAGuardar();
-
-    if (index !== -1) {
-      factura_sobreescrita['factura_id'] = this.facturaGuardada.factura_id;
-      facturas_localStorage[index] = factura_sobreescrita;
-      this.fun.setFacturasGuardadas(facturas_localStorage);
-    } else {
-      this.pushFacturaToLocalStorage();
-    }
   }
 
   agregarFacturaALocalStorage() {
     if (!this.propietario_factura) {
       this.propietario_factura = this.form.value;
     }
-
-    if (this.facturaGuardada) {
-      this.reemplazarFactura();
-    } else {
-      this.pushFacturaToLocalStorage();
-    }
+    this.pushFacturaToLocalStorage();
   }
 
   pushFacturaToLocalStorage() {
     const facturas_localStorage = this.fun.getFacturasguardadas();
     const factura_a_guardar = this.formarFacturaAGuardar();
 
-    if (facturas_localStorage.length > 0) {
-      facturas_localStorage.sort((a, b) => {
-        return a.factura_id > b.factura_id ? 1 : -1;
-      });
-      factura_a_guardar['factura_id'] = (_.last(facturas_localStorage) as any).factura_id + 1;
-    } else {
-      factura_a_guardar['factura_id'] = 1;
-    }
+    const index = _.findIndex(facturas_localStorage, (facts: any) => facts?.factura_id === this.facturaGuardada?.factura_id);
 
-    facturas_localStorage.push(factura_a_guardar);
-    this.fun.setFacturasGuardadas(facturas_localStorage);
+    if (index !== undefined && index !== null && index !== -1) {
+      factura_a_guardar['factura_id'] = this.facturaGuardada.factura_id;
+      facturas_localStorage[index] = factura_a_guardar;
+      this.fun.setFacturasGuardadas(facturas_localStorage);
+    } else {
+      if (facturas_localStorage.length > 0) {
+        facturas_localStorage.sort((a, b) => {
+          return a.factura_id > b.factura_id ? 1 : -1;
+        });
+        factura_a_guardar['factura_id'] = (_.last(facturas_localStorage) as any).factura_id + 1;
+      } else {
+        factura_a_guardar['factura_id'] = 1;
+      }
+
+      facturas_localStorage.push(factura_a_guardar);
+      this.fun.setFacturasGuardadas(facturas_localStorage);
+    }
   }
 
   archivarFactura() {
@@ -1002,6 +989,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         return articulo;
       });
     }
+
+    this.fun.logYellow('this.CuerpoFactura --> ', this.CuerpoFactura);
   }
 
   resetVariables() {
@@ -1075,7 +1064,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
       let articulo;
       try {
-        articulo = await this.dbServ.getArticulosFiltrados(row.cod, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
+        articulo = await this.dbServ.getArticulosFiltrados(row.cod, 0, 0, true, false, this.FechaFactura['front'], 'todos').toPromise();
       } catch (error) {
         console.error(error);
       }
@@ -1097,9 +1086,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         medidaEs = 'principal';
       }
       contenido_articulo.forEach((content) => {
-        if (content.medida === row.unidad) {
-          medidaEs = content.condicion;
-        }
+        if (content.medida === row.unidad) medidaEs = content.condicion;
       });
 
       // if (contenido_articulo.length === 0 || medidaEs === 'principal' || row.unidad === 'Caja' || row.unidad === 'Quintal') {
@@ -1176,7 +1163,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         const row_unidad = element.unidad;
         let calculo = 0;
 
-        const articulo = await this.dbServ.getOneArticulo(element.articulo_id).toPromise();
+        const articulo = await this.dbServ.getOneArticulo(element.articulo_id, this.FechaFactura['front']).toPromise();
         if (row_unidad === articulo.medida) {
           calculo = articulo.precio_principal;
         } else {
@@ -1210,6 +1197,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
     let cuerpo_fact = GLOBAL.duplicarJson(this.CuerpoFactura);
+    this.fun.logRed('cuerpo_fact --> ', cuerpo_fact);
+
     if (this.metodo === 'venta') {
       // cuerpo_fact = await this.checkCuerpoForSendBackend(cuerpo_fact);
     }
@@ -1220,7 +1209,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     let fecha_equi;
     if (this.FacturaAtrasada) {
-      fecha_equi = this.FechaFactura;
+      fecha_equi = this.FechaFactura['front'];
     } else {
       fecha_equi = null;
     }

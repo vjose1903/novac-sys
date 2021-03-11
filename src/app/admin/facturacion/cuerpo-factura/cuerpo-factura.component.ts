@@ -92,7 +92,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   pressEscResponse(res) {
     if (res !== undefined && res !== null && res !== {}) {
-      setTimeout(() => GLOBAL.enfocarInput('cod-' + res), 250);
+      setTimeout(() => this.enfocarInput('cod-' + res), 250);
     }
   }
 
@@ -208,7 +208,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   readPrecio() {
     let res = true;
-    if (this.metodo === 'compra' && this.propietario !== null) {
+    if (this.metodo === 'compra' && this.propietario) {
       res = false;
     }
     return res;
@@ -216,7 +216,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   readDescuento() {
     let res = true;
-
     if (this.metodo === 'venta' && this.propietario) {
       res = false;
     }
@@ -342,9 +341,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     return res;
   }
 
-  enfocarInput(arg) {
-    GLOBAL.enfocarInput(arg);
-  }
   // =============================================
   //  RESETEAR FORMULARIO
   // =============================================
@@ -412,7 +408,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
           try {
             if (is_guardada) {
-              articulo = await this.dbServ.getOneArticulo(row.articulo_id, true).toPromise();
+              articulo = await this.dbServ.getOneArticulo(row.articulo_id, this.FechaFactura, true).toPromise();
             } else {
               articulo = await this.dbServ.getArticulosFiltrados(row.codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
             }
@@ -420,6 +416,11 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             const cant_en_unidades_actual = row.cantidad_en_unidades;
             const multiplo = row.cantidad_en_unidades / row.cantidad;
             const cant_actual = cant_en_unidades_actual / multiplo;
+
+            this.logGreen('row.cantidad --> ', row.cantidad);
+            this.logYellow('cant_en_unidades_actual --> ', cant_en_unidades_actual);
+            this.logRed('multiplo --> ', multiplo);
+            this.logBlue('cant_actual --> ', cant_actual);
 
             (this.control.controls[j] as any).controls['pre'].setValue(
               this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo),
@@ -458,6 +459,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
             (this.control.controls[j] as any).controls['uni'].setValue(uni);
 
+            this.llenarArrayUnidades(articulo, j);
+
             if (this.metodo === 'venta') {
               try {
                 this.calcularSacoEnRow(j, row, articulo, 'llenarFact', (res) => {
@@ -473,6 +476,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             this.aumentarSecuencia();
           } catch (error) {}
         }
+
         callback(true);
       } else {
         callback(false);
@@ -505,14 +509,14 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       if (cantidad !== '' && cantidad !== '0' && cantidad !== 0 && cantidad !== null && codigo !== '' && codigo !== null && codigo !== undefined) {
         this.checkCantidadExede(i, 'change', (res) => {
           if (res) {
-            GLOBAL.enfocarInput('can-' + index);
-            GLOBAL.selectContenido('can-' + index);
+            this.enfocarInput('can-' + index);
+            this.selectContenido('can-' + index);
             setTimeout(() => {
               (this.control.controls[index] as any).controls['uni'].setValue(null);
             }, 2);
           } else {
             this.setInputDrop(i);
-            GLOBAL.enfocarInput('uni-' + index);
+            this.enfocarInput('uni-' + index);
           }
         });
       }
@@ -527,22 +531,22 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
       this.checkCantidadExede(i, 'saltar', (res) => {
         if (res) {
-          GLOBAL.enfocarInput('can-' + i);
-          GLOBAL.selectContenido('can-' + i);
+          this.enfocarInput('can-' + i);
+          this.selectContenido('can-' + i);
           setTimeout(() => {
             (this.control.controls[i] as any).controls['uni'].setValue(null);
           }, 2);
         } else {
           if (unidad === '' || unidad === null) {
             setTimeout(() => {
-              GLOBAL.enfocarInput('uni-' + i);
+              this.enfocarInput('uni-' + i);
             }, 5);
           } else {
             this.aumentarSecuencia();
             if (this.metodo === 'venta') {
-              GLOBAL.enfocarInput('cod-' + index);
+              this.enfocarInput('cod-' + index);
             } else {
-              GLOBAL.enfocarInput('pre-' + i);
+              this.enfocarInput('pre-' + i);
             }
           }
         }
@@ -551,66 +555,17 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
     if (input === 'can-' && codigo !== '') {
       if (codigo === null) {
-        GLOBAL.enfocarInput('cod-' + i);
-        GLOBAL.selectContenido('cod-' + i);
+        this.enfocarInput('cod-' + i);
+        this.selectContenido('cod-' + i);
       } else {
         const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
 
-        GLOBAL.desEnfocarInput('cod-' + i);
+        this.desEnfocarInput('cod-' + i);
         this.abrirModal('buscarArticulo', obj);
 
         // }
       }
     }
-  }
-
-  articulo_detallable(art) {
-    const precioQuintal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
-    const costoQuintal = art.costo_principal;
-    this.drop = true;
-    this.UnidadesArticulo = [];
-
-    if (this.metodo === 'venta') {
-      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-        this.entrarSacosAUnidades(precioQuintal, costoQuintal);
-      }
-    } else {
-      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-        this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
-        this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
-      }
-    }
-
-    if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
-      this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
-      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
-    }
-
-    art.contenido_articulos.forEach((element) => {
-      this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
-    });
-  }
-
-  articulo_no_detallable(art) {
-    const precioQuintal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
-    const costoQuintal = art.costo_principal;
-    this.drop = true;
-    this.UnidadesArticulo = [];
-
-    if (art.descripcion === 'Veterinaria' || art.descripcion === 'Otros') {
-      this.UnidadesArticulo.push({ value: 'Medida', precio: 0 });
-      this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal });
-    }
-    art.contenido_articulos.forEach((element) => {
-      if (element.referencia === null) {
-        if (art.descripcion === 'Veterinaria') {
-          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo });
-        }
-      }
-      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-        this.entrarSacosAUnidades(precioQuintal, costoQuintal);
-      }
-    });
   }
 
   aumentarSecuencia() {
@@ -708,8 +663,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
     this.checkCantidadExede(i, 'change', (res) => {
       if (res) {
-        GLOBAL.enfocarInput('can-' + i);
-        GLOBAL.selectContenido('can-' + i);
+        this.enfocarInput('can-' + i);
+        this.selectContenido('can-' + i);
         setTimeout(() => {
           (this.control.controls[i] as any).controls['uni'].setValue(null);
         }, 250);
@@ -730,7 +685,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   verificarSecuencia(i, input?) {
     if (this.secuencia < i) {
-      GLOBAL.enfocarInput(this.inputSecuencia);
+      this.enfocarInput(this.inputSecuencia);
     }
 
     if (!input) {
@@ -765,7 +720,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     if (precio && cantidad) {
       const tot = precio * cantidad;
       (this.control.controls[i] as any).controls['tot'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(tot)));
-
+      this.fun.logRed('cantidad --> ', cantidad);
+      this.fun.logRed('cantidadMinima --> ', cantidadMinima);
       (this.control.controls[i] as any).controls['cantidad_en_unidades'].setValue(cantidad * cantidadMinima);
 
       this.calculosTotalesGenerales();
@@ -817,7 +773,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         this.checkLongMillares(tempdecimales)
       ) {
         this.dbServ.toastError('Precio introducido es invalido', 'ERROR', true);
-        GLOBAL.enfocarInput('pre-' + i);
+        this.enfocarInput('pre-' + i);
       } else {
         //
         if (splitPrecio.length === 2) {
@@ -926,6 +882,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         Total: GLOBAL.redondearAdos(this.TOTAL),
         ITBIS: '',
       };
+      this.fun.logRed('calculosTotalesGenerales --> ', obj);
+
       this.sendCalculos.emit(obj);
     }
   }
@@ -969,8 +927,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       }
 
       setTimeout(() => {
-        GLOBAL.enfocarInput('cod-' + i);
-        GLOBAL.selectContenido('cod-' + i);
+        this.enfocarInput('cod-' + i);
+        this.selectContenido('cod-' + i);
       }, 5);
     } else {
       const cantidades = ARTICULO.cantidades;
@@ -1019,9 +977,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       const cantidad = (this.control.controls[i] as any).controls['can'].value;
 
       // if (codigo && cantidad) {
-      //   GLOBAL.enfocarInput('uni-' + i);
+      //   this.enfocarInput('uni-' + i);
       // } else {
-      GLOBAL.enfocarInput('can-' + i);
+      this.enfocarInput('can-' + i);
       // }
     }
   }
@@ -1040,6 +998,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       const costoPrincipal = art.costo_principal;
       this.drop = true;
       this.UnidadesArticulo = [];
+
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
 
       if (this.metodo === 'venta' && (art.contenido_articulos.length === 0 || art.medida !== 'Quintal')) {
@@ -1064,6 +1023,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       if (detallable) {
         this.articuloDetallable(art);
       }
+      this.UnidadesArticulo = _.uniqWith(this.UnidadesArticulo, _.isEqual);
+      this.fun.logBlue('##########', _.uniqWith(this.UnidadesArticulo, _.isEqual));
     }
   }
 

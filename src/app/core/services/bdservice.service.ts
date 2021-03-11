@@ -307,10 +307,7 @@ export class DBservice {
   }
 
   getArticulosFiltrados(arg, page, per_page, paginado, compra = false, fecha, tipo = 'todos') {
-    return this.peticionSinLoad(
-      `articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}&fecha=${fecha}`,
-      'get',
-    );
+    return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}&fecha=${fecha}`, 'get');
   }
   // getArticulosFiltrados(arg, page, per_page, paginado, compra = false, tipo = 'todos') {
   //   return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}`, 'get');
@@ -340,7 +337,6 @@ export class DBservice {
     return this.peticion('articulos/custom/materias_primas', 'get');
   }
 
-
   getTipoArticuloById(id) {
     return this.peticionSinLoad(`tipo_articulos/${id}`, 'get');
   }
@@ -349,11 +345,11 @@ export class DBservice {
     return this.peticion('tipo_articulos', 'get');
   }
 
-  getOneArticulo(id: number | string, sinLoad?) {
+  getOneArticulo(id: number | string, fecha?, sinLoad?) {
     if (sinLoad) {
-      return this.peticionSinLoad(`articulos/${id}`, 'get');
+      return this.peticionSinLoad(`articulos/${id}?fecha="${fecha}`, 'get');
     } else {
-      return this.peticion(`articulos/${id}`, 'get');
+      return this.peticion(`articulos/${id}?fecha="${fecha}`, 'get');
     }
   }
 
@@ -427,10 +423,7 @@ export class DBservice {
   getFacturasByParams(campo, valor, tipo_factura_id, adelantada = false, page, per_page, paginado) {
     const valor_enc = btoa(valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
-    return this.peticion(
-      `cabecera_facturas/params/${campo}/${VALOR_ENC}/${tipo_factura_id}/${adelantada}?page=${page}&per_page=${per_page}&paginado=${paginado}`,
-      'get',
-    );
+    return this.peticion(`cabecera_facturas/params/${campo}/${VALOR_ENC}/${tipo_factura_id}/${adelantada}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   cancelarFactura(id) {

@@ -135,12 +135,12 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   async filtrarArticulo(e) {
-    await this.formarFechaFactura(new Date());
+    this.FechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
     await this.getArticulos(e);
   }
 
   async necesarioStart() {
-    await this.formarFechaFactura(new Date());
+    this.FechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
     await this.getArticulos(this.tServ.obj_paginate);
     this.getTipoArticulos();
   }
@@ -169,14 +169,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     this.dbServ.getTipoArticulos().subscribe((res) => {
       this.listaTipoArticulos = GLOBAL.duplicarJson(res);
     });
-  }
-
-  formarFechaFactura(date) {
-    const hora = moment(date).hour();
-    const minutos = moment(date).minutes();
-    const fechaTemp = moment(date).format('YYYY-MM-DD');
-
-    this.FechaFactura = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
   }
 
   async getArticulos(e) {
@@ -337,10 +329,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     }
   }
 
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.focus();
-  }
 
   borrar() {
     this.ProductoEditando = null;

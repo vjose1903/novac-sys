@@ -154,10 +154,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   atras() {
     this.router.navigateByUrl('/admin/dashboard');
   }
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.focus();
-  }
+
   borrar() {
     this.form.reset();
     this.enfocarInput('campoNombre');

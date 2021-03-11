@@ -462,15 +462,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     this.facturas_selected = [];
   }
 
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.focus();
-  }
-  selectContenido(arg) {
-    this.element = document.getElementById(arg);
-    this.element.select();
-  }
-
   getInfoChange(item) {
     if (item.cambio === 'pagoT' && item.value) {
       this.tablas.resetInput('balance', 'monto', item.index, true);

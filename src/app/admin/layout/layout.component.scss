@@ -190,6 +190,7 @@ span.btn_side_bar_facturas {
   min-height: 8rem;
   position: relative;
   .colorsito {
+    height: -webkit-fill-available;
     position: absolute;
     width: 0.4rem;
     border-radius: 5px 0px 0px 5px;
@@ -219,12 +220,17 @@ span.btn_side_bar_facturas {
         color: #750f0f;
       }
     }
-    > .if_viaje {
+
+    > .iconFacturaGuardada {
       position: absolute;
       right: -6px;
       bottom: 11px;
       color: #54b5544d;
       font-size: 1.5rem;
+
+      &.is_atrasada {
+        color: #f37d20a1 !important;
+      }
     }
     > .tipoFactura {
       font-size: 1.3rem;

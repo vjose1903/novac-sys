@@ -7,20 +7,25 @@ import * as moment from '../../../../../utils/javascript/moment';
 import { map } from 'rxjs/operators';
 import { DBservice } from '../../../../core/services/bdservice.service';
 import { ModalService } from '../../modal/modal.service';
+import { IpcService } from '../../../../core/services/ipc.service';
+import { LayoutService } from '../../../layout/layout.service';
+import { mixinClass } from '../../../mixinClass';
 
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss'],
 })
-export class ChangePasswordComponent implements OnInit, AfterViewInit {
+export class ChangePasswordComponent extends mixinClass implements OnInit, AfterViewInit {
   form: FormGroup;
   element: HTMLElement;
   @Input() user;
 
   @Output() cancel = new EventEmitter<any>();
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, public mServ: ModalService) {}
+  constructor(private fb: FormBuilder, private dbServ: DBservice, public mServ: ModalService, public _ipc: IpcService, public layServ: LayoutService) {
+    super(mServ, _ipc, layServ);
+  }
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -34,11 +39,6 @@ export class ChangePasswordComponent implements OnInit, AfterViewInit {
     }, 50);
   }
 
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-
-    this.element.focus();
-  }
   accion(arg) {
     this.cancel.emit(arg);
   }

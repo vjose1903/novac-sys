@@ -115,7 +115,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
         if (res.bool && res.verificar) {
           this.ready = false;
 
-          setTimeout(() => this.decisionCambioMenu_(res), 30);
+          setTimeout(() => this.decisionCambioMenu_(res), 10);
         } else {
           this.decisionCambioMenu_(res);
         }
@@ -212,25 +212,27 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   }
 
   abrirModalFacturaGuardada(fact, e) {
-    const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.' };
-    this.seleccionModal = fact;
+    const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.', factura_id: fact.factura_id };
     this.abrirModal('dinamico_texto', obj, 'quitar_factura');
     e.stopPropagation();
   }
 
   quitarFacturaGuardada(fact?) {
     let index;
+    const allFacturas = this.fun.getFacturasguardadas();
 
-    if (!fact) index = _.findIndex(this.facturas_localStorage, (o: any) => o.factura_id === this.seleccionModal.factura_id);
-    if (fact) index = _.findIndex(this.facturas_localStorage, (o: any) => o.factura_id === fact.factura_id);
+    if (!fact) index = _.findIndex(allFacturas, (o: any) => o.factura_id === this.seleccionModal?.factura_id);
+    if (fact) index = _.findIndex(allFacturas, (o: any) => o.factura_id === fact?.factura_id);
 
-    _.pullAt(this.facturas_localStorage, index);
+    _.pullAt(allFacturas, index);
 
-    this.fun.setFacturasGuardadas(this.facturas_localStorage);
+    this.fun.setFacturasGuardadas(allFacturas);
+    this.refreshResponse();
   }
 
   clickTabView(where) {
     const can = !this.countCantFactSaved(where).disable;
+
     if (can) {
       if (this.activeIndex === (where === 'venta' ? 0 : 1)) {
         this.checkWhereIs(where);
@@ -298,8 +300,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
       this.actualMenuItemBack = GLOBAL.duplicarJson(this.actualMenyItem);
 
       if (url === 'factura') {
-        this.getFacturasGuardadas();
         this.activeIndex = tipo === 'venta' ? 0 : 1;
+        this.getFacturasGuardadas();
       }
     }
   }
@@ -311,11 +313,12 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
   async getFacturasGuardadas() {
     this.facturas_localStorage = this.fun.getFacturasguardadas();
+
     this.facturas_localStorage = _.filter(this.facturas_localStorage, (o: any) => o.tipo === (this.activeIndex === 0 ? 'venta' : 'compra'));
 
     setTimeout(async () => {
       if (this.facturas_localStorage.length > 0) {
-        document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.facturas_localStorage.length);
+        document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.fun.getFacturasguardadas().length);
 
         for (let i = 0; i < this.facturas_localStorage.length; i++) {
           const fact = this.facturas_localStorage[i];

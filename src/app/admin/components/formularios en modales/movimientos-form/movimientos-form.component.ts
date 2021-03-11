@@ -7,13 +7,16 @@ import * as _ from 'lodash';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import { ModalService } from '../../modal/modal.service';
 import { FunctionService } from '../../../../core/services/functions.service';
+import { IpcService } from '../../../../core/services/ipc.service';
+import { LayoutService } from '../../../layout/layout.service';
+import { mixinClass } from '../../../mixinClass';
 
 @Component({
   selector: 'app-movimientos-form',
   templateUrl: './movimientos-form.component.html',
   styleUrls: ['./movimientos-form.component.scss'],
 })
-export class MovimientosFormComponent implements OnInit, AfterViewInit {
+export class MovimientosFormComponent extends mixinClass implements OnInit, AfterViewInit {
   form;
   tipo_movimiento;
   tipo_salida;
@@ -25,14 +28,9 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
   @Output() cancel = new EventEmitter<any>();
   medidas;
   plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
-  constructor(
-    private dbServ: DBservice,
-    private fun: FunctionService,
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    public mServ: ModalService,
-  ) {}
+  constructor(private dbServ: DBservice, private fun: FunctionService, public mServ: ModalService, public _ipc: IpcService, public layServ: LayoutService) {
+    super(mServ, _ipc, layServ);
+  }
 
   ngOnInit() {
     this.medidas = _.keys(this.data.cantidades);
@@ -40,9 +38,11 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.enfocarInput('tipo_movimiento');
   }
+
   accion(arg) {
     this.cancel.emit(arg);
   }
+
   formatoNumero(arg) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(arg));
   }
@@ -67,15 +67,6 @@ export class MovimientosFormComponent implements OnInit, AfterViewInit {
         return 'Proximo en inventario ' + this.formatoNumero(calculo) + ' ' + med;
       }
     }
-  }
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.focus();
-  }
-
-  selectContenido(arg) {
-    this.element = document.getElementById(arg);
-    this.element.select();
   }
 
   saltar(campo) {

@@ -54,7 +54,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
     this.titulo = 'Registro de camiones';
     this.boton = 'Registrar';
 
-    GLOBAL.enfocarInput('user_id');
+    this.enfocarInput('user_id');
     this.necesarioStart();
   }
 
@@ -140,10 +140,10 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
     }
 
     if (campo !== 'send') {
-      GLOBAL.enfocarInput(campo);
+      this.enfocarInput(campo);
     } else {
       if (this.form.valid) {
-        GLOBAL.enfocarInput('user_id');
+        this.enfocarInput('user_id');
         setTimeout(() => {
           this.submit(this.form);
         }, 250);
@@ -157,7 +157,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
     this.restartCampo('nombre_no_empleado');
     this.restartCampo('apellido_no_empleado');
     this.restartCampo('telefono_no_empleado');
-    GLOBAL.enfocarInput('user_id');
+    this.enfocarInput('user_id');
 
     this.titulo = 'Registro de camiones';
     this.boton = 'Registrar';

@@ -6,13 +6,16 @@ import { GLOBAL } from '../../../../core/services/GLOBAL';
 import { ModalService } from '../../../components/modal/modal.service';
 import * as _ from 'lodash';
 import { TablasService } from '../../../components/tablas/tablas.service';
+import { mixinClass } from '../../../mixinClass';
+import { IpcService } from '../../../../core/services/ipc.service';
+import { LayoutService } from '../../../layout/layout.service';
 
 @Component({
   selector: 'app-formulario-marca-modelo',
   templateUrl: './formulario-marca-modelo.component.html',
   styleUrls: ['./formulario-marca-modelo.component.scss'],
 })
-export class FormularioMarcaModeloComponent implements OnInit {
+export class FormularioMarcaModeloComponent extends mixinClass implements OnInit {
   @Input() tipo_formulario;
 
   componente;
@@ -46,7 +49,16 @@ export class FormularioMarcaModeloComponent implements OnInit {
   showModal: boolean;
   element;
   obj_p = this.tServ.obj_paginate;
-  constructor(private fb: FormBuilder, private dbServ: DBservice, public mServ: ModalService, private tServ: TablasService) {}
+  constructor(
+    private fb: FormBuilder,
+    private dbServ: DBservice,
+    public mServ: ModalService,
+    private tServ: TablasService,
+    public _ipc: IpcService,
+    public layServ: LayoutService,
+  ) {
+    super(mServ, _ipc, layServ);
+  }
 
   ngOnInit() {
     this.createForm();
@@ -55,21 +67,15 @@ export class FormularioMarcaModeloComponent implements OnInit {
       this.componente = 'reg_tipo_articulos';
       this.tituloTabla = 'Tipos de articulos';
       this.campo1 = 'Tipo articulo';
-
-      // this.enfocarInput('descripcion');
     } else if (this.tipo_formulario === 'marcas') {
       this.componente = 'reg_marcas';
       this.tituloTabla = 'Marcas';
       this.campo1 = 'Marca';
-
-      // this.enfocarInput('descripcion');
     } else if (this.tipo_formulario === 'modelos') {
       this.componente = 'reg_modelos';
       this.tituloTabla = 'Modelos';
       this.campo1 = 'Marca';
       this.getMarcas();
-
-      // this.enfocarInput('marca');
 
       this.info = [
         {
@@ -212,11 +218,6 @@ export class FormularioMarcaModeloComponent implements OnInit {
         );
       }
     }
-  }
-
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.focus();
   }
 
   borrar() {

@@ -154,10 +154,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       }
     }
   }
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.focus();
-  }
+
 
   disableOption(arg, boolean) {
     (this.element = document.getElementById(arg) as any).disabled = boolean;

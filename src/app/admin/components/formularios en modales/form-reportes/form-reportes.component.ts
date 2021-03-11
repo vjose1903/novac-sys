@@ -5,13 +5,16 @@ import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as moment from '../../../../../utils/javascript/moment';
 import { ModalService } from '../../modal/modal.service';
 import { DBservice } from '../../../../core/services/bdservice.service';
+import { mixinClass } from '../../../mixinClass';
+import { LayoutService } from '../../../layout/layout.service';
+import { IpcService } from '../../../../core/services/ipc.service';
 
 @Component({
   selector: 'app-form-reportes',
   templateUrl: './form-reportes.component.html',
   styleUrls: ['./form-reportes.component.scss'],
 })
-export class FormVentasComponent implements OnInit {
+export class FormVentasComponent extends mixinClass implements OnInit {
   @Input() tipo_reporte;
 
   @Output() seleccion = new EventEmitter<any>();
@@ -32,7 +35,15 @@ export class FormVentasComponent implements OnInit {
   formarFecha = ['suplidor_prod'];
   Fecha: string;
 
-  constructor(private fb: FormBuilder, public mServ: ModalService, private dbServ: DBservice, private localeService: BsLocaleService) {
+  constructor(
+    private fb: FormBuilder,
+    public _ipc: IpcService,
+    public mServ: ModalService,
+    public dbServ: DBservice,
+    public layServ: LayoutService,
+    private localeService: BsLocaleService,
+  ) {
+    super(mServ, _ipc, layServ);
     this.dpConfig = Object.assign(
       {},
       {
@@ -54,18 +65,8 @@ export class FormVentasComponent implements OnInit {
     await this.agregateValidators();
 
     if (this.formarFecha.includes(this.tipo_reporte)) {
-      this.formarFechaFactura(new Date());
+      this.Fecha = this.formarFechaFactura(new Date())['FechaFactura'];
     }
-  }
-
-  formarFechaFactura(date) {
-    const hora = moment(date).hour();
-    const minutos = moment(date).minutes();
-    const fechaTemp = moment(date).format('YYYY-MM-DD');
-
-    // this.FechaFacturaMostrar = moment(date).format('DD/MM/YYYY');
-
-    this.Fecha = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
   }
 
   async getArticulos(arg) {

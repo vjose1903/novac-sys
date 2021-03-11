@@ -141,10 +141,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   atras() {
     this.router.navigateByUrl('/admin/dashboard');
   }
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.focus();
-  }
 
   marcarCheck(arg) {
     const radio = document.getElementById('identificacion-' + arg) as HTMLElement;

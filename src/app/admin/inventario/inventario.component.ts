@@ -135,8 +135,8 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   async necesarioParaEmpezar() {
+    this.FechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
     await this.getCantidadInventario();
-    await this.formarFechaFactura(new Date());
     await this.getArticulos(this.tServ.obj_paginate);
     await this.calcularGananciasCostos();
   }
@@ -186,14 +186,6 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
     } catch (error) {
       this.dbServ.toastError('Error buscando la cantidad de articulos en inventario.', 'ERROR');
     }
-  }
-
-  formarFechaFactura(date) {
-    const hora = moment(date).hour();
-    const minutos = moment(date).minutes();
-    const fechaTemp = moment(date).format('YYYY-MM-DD');
-
-    this.FechaFactura = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
   }
 
   async getArticulos(e) {

@@ -5,13 +5,16 @@ import { DBservice } from '../../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import { ModalService } from '../../modal/modal.service';
+import { mixinClass } from '../../../mixinClass';
+import { IpcService } from '../../../../core/services/ipc.service';
+import { LayoutService } from '../../../layout/layout.service';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
   templateUrl: './form-cantidad-efectivo.component.html',
   styleUrls: ['./form-cantidad-efectivo.component.scss'],
 })
-export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
+export class FormCantidadEfectivoComponent extends mixinClass implements OnInit, AfterViewInit {
   @Input() tipo = 'devuelta';
   @Input() data;
   @Input() debe_cubrir = true;
@@ -24,7 +27,9 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
   @Output() cancel = new EventEmitter<any>();
   factura_de: any;
   cambiar_articulos = undefined;
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private router: Router, public mServ: ModalService) {}
+  constructor(private dbServ: DBservice, public mServ: ModalService, public _ipc: IpcService, public layServ: LayoutService) {
+    super(mServ, _ipc, layServ);
+  }
 
   ngOnInit() {
     this.efectivo = this.formatoNumero(this.data.devuelta);
@@ -101,7 +106,13 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
         tempdecimales = '00';
       }
       //
-      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
+      if (
+        splitPrecio.length > 2 ||
+        this.checkNumbers(enteros) ||
+        this.checkLongMillares(enteros) ||
+        this.checkNumbers(tempdecimales) ||
+        this.checkLongMillares(tempdecimales)
+      ) {
         this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
         this.enfocarInput(input);
       } else {
@@ -165,11 +176,6 @@ export class FormCantidadEfectivoComponent implements OnInit, AfterViewInit {
         this.getDevuelta.emit(obj);
       }
     }
-  }
-
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.focus();
   }
 
   cambiosEnArticulos(lugar) {

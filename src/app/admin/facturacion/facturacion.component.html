@@ -27,7 +27,7 @@
             <span class="titulos"><strong>Condición :</strong></span>
             <select
               id="condicion"
-              (keydown.enter)="saltar(metodo === 'compra' ? 'costo' : 'venta', $event.target.value, 'condicion')"
+              (keydown.enter)="saltar(metodo === 'compra' ? 'costo' : 'venta', $event.target.value, $event.target.id)"
               class="form-control inputE"
               [(ngModel)]="condicion_fact"
               (change)="cambiarTipoVenta($event.target.value)"
@@ -64,11 +64,7 @@
           <select
             id="venta"
             (keydown.enter)="
-              saltar(
-                modo_factura === 'normal' ? 'nom' : modo_factura === 'viaje' ? 'fecha_equivalente' : 'buscarCliente',
-                $event.target.value,
-                'venta'
-              )
+              saltar(modo_factura === 'normal' ? 'nom' : modo_factura === 'viaje' ? 'fecha_equivalente' : 'buscarCliente', $event.target.value, $event.target.id)
             "
             (change)="selectModoFactura($event.target.value)"
             class="form-control inputE"
@@ -88,7 +84,7 @@
           <span class="mt-1"><strong>Fecha viaje:</strong></span>
           <input
             type="text"
-            (keydown.enter)="saltar('buscarCliente', $event.target.value, 'fecha_equivalente')"
+            (keydown.enter)="saltar('buscarCliente', $event.target.value, $event.target.id)"
             [bsConfig]="dpConfig"
             placeholder="mm/dd/aaaa"
             class="form-control inputE"
@@ -111,7 +107,7 @@
             [textMask]="{ mask: ncfMask }"
             placeholder="b__________"
             class="form-control inputE UPPERCASE"
-            (keydown.enter)="saltar(condicion_fact === 'Crédito' ? 'fecha_vencimiento' : 'filtro', $event.target.value)"
+            (keydown.enter)="saltar(condicion_fact === 'Crédito' ? 'fecha_vencimiento' : 'filtro', $event.target.value, $event.target.id)"
             [(ngModel)]="NCFcompra"
             (focus)="trimEndNcf()"
             id="ncf"
@@ -251,17 +247,17 @@
       [factura]="factura_a_editar"
       [action]="action"
       [metodo]="metodo"
-      [FechaFactura]="FechaFactura"
+      [FechaFactura]="FechaFactura?.front"
       (getCuerpoFactura)="getCuerpoFactura($event)"
       (sendDescuento)="getDescuento($event)"
       (sendCalculos)="getCalculos($event)"
     ></app-cuerpo-factura>
   </div>
   <div class="pieFactura">
-    <div class="row mx-0">
+    <div class="row mx-0 w-100">
       <div class="col-7">
         <div class="row">
-          <div class="{{ metodo === 'venta' ? 'col-3' : 'col-4' }} ">
+          <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }} ">
             <app-btncircular
               [alto]="'100px'"
               [accion]="!factura_a_editar ? 'Imprimir Factura' : 'Reimprimir Factura'"
@@ -269,7 +265,7 @@
               (click)="imprimirFactura()"
             ></app-btncircular>
           </div>
-          <div class="{{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
+          <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
             <app-btncircular
               [alto]="'100px'"
               [accion]="!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'"
@@ -277,7 +273,7 @@
               (click)="cancelarFactura()"
             ></app-btncircular>
           </div>
-          <div class="{{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
+          <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
             <app-btncircular
               [alto]="'100px'"
               [accion]="facturaGuardada ? 'Factura ya está archivada' : 'Archivar Factura'"
@@ -286,7 +282,7 @@
               [disable]="facturaGuardada"
             ></app-btncircular>
           </div>
-          <div class="{{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">
+          <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">
             <app-btncircular
               *ngIf="!factura_a_editar"
               [alto]="'100px'"
@@ -298,31 +294,19 @@
         </div>
       </div>
       <div class="col-5 d-flex justify-content-end">
-        <div class="d-block mostrarNumeros">
+        <div class="mostrarNumeros w-100">
           <div class="row">
-            <div class="col-6">
-              <div class="d-flex justify-content-end">
-                <span>BRUTO:</span>
-              </div>
-              <div class="d-flex justify-content-end">
-                <span>DESCUENTO:</span>
-              </div>
-              <div class="d-flex justify-content-end">
-                <!-- class="borderTOP" -->
-                <span class="mt-2"> <strong>TOTAL:</strong> </span>
-              </div>
+            <div class="col-12 cuadroResumenTotal mb-2">
+              <span class="label text-poppins position-absolute left-0 top-0">BRUTO:</span>
+              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(BRUTO) }}</h5>
             </div>
-            <div class="col-6">
-              <div class="d-flex numerosCalculos">
-                <span>{{ formatoNumero(BRUTO) }}</span>
-              </div>
-              <div class="d-flex numerosCalculos">
-                <span>{{ formatoNumero(DESCUENTO) }}</span>
-              </div>
-              <div class="d-flex numerosCalculos">
-                <!--  -->
-                <h5 class="borderTOP w-100 TOTALN">{{ formatoNumero(TOTAL) }}</h5>
-              </div>
+            <div class="col-12 cuadroResumenTotal mb-2">
+              <span class="label text-poppins position-absolute left-0 top-0">DESCUENTO:</span>
+              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(DESCUENTO) }}</h5>
+            </div>
+            <div class="col-12 cuadroResumenTotal mb-2">
+              <span class="label text-poppins position-absolute left-0 top-0"> <strong>TOTAL:</strong> </span>
+              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(TOTAL) }}</h5>
             </div>
           </div>
         </div>

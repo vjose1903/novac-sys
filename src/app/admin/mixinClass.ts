@@ -3,12 +3,18 @@ import { IpcService } from '../core/services/ipc.service';
 import { modalClass } from './components/modal/modal';
 import { ModalService } from './components/modal/modal.service';
 import { LayoutService } from './layout/layout.service';
+import * as moment from '../../utils/javascript/moment';
 
 type lista_sub = 'printBase64Res' | 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'indexToFocus' | 'refreshFacturas' | 'sacarFacturas';
 
 interface mixinInit {
   component?: String;
   _lista_subs?: Array<lista_sub>;
+}
+
+interface fechaFactura {
+  FechaFactura?: string;
+  FechaFacturaMostrar?: string;
 }
 
 export class mixinClass extends modalClass {
@@ -39,6 +45,16 @@ export class mixinClass extends modalClass {
     }
   }
 
+  // =========================================================================================================
+  formarFechaFactura(date): fechaFactura {
+    const hora = moment(date).hour();
+    const minutos = moment(date).minutes();
+    const fechaTemp = moment(date).format('YYYY-MM-DD');
+    const obj = {};
+    obj['FechaFactura'] = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
+    obj['FechaFacturaMostrar'] = GLOBAL.my_dateFormater(obj['FechaFactura']) + ' - ' + GLOBAL.my_houreFormater(obj['FechaFactura']);
+    return obj;
+  }
   // =========================================================================================================
   my_timeDateFormater(str) {
     return `${this.my_dateFormater(str)} - ${this.my_houreFormater(str)}`;
@@ -74,6 +90,22 @@ export class mixinClass extends modalClass {
   }
 
   // =========================================================================================================
+  enfocarInput(arg) {
+    const element = document.getElementById(arg) as HTMLElement;
+    element.focus();
+  }
+  // =========================================================================================================
+  desEnfocarInput(arg) {
+    const element = document.getElementById(arg) as HTMLElement;
+    element.blur();
+  }
+
+  // =========================================================================================================
+  selectContenido(arg) {
+    const element = document.getElementById(arg) as any;
+    element.select();
+  }
+  // =========================================================================================================
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num)) + '  ';
   }
@@ -86,30 +118,18 @@ export class mixinClass extends modalClass {
 
   // =========================================================================================================
   logBlue(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #5580da');
-    if (body) {
-      console.log(GLOBAL.duplicarJson(body));
-    }
+    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? GLOBAL.duplicarJson(body) : '');
   }
 
   logYellow(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #dada55');
-    if (body) {
-      console.log(GLOBAL.duplicarJson(body));
-    }
+    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? GLOBAL.duplicarJson(body) : '');
   }
 
   logRed(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #da555f');
-    if (body) {
-      console.log(GLOBAL.duplicarJson(body));
-    }
+    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? GLOBAL.duplicarJson(body) : '');
   }
 
   logGreen(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #55da56');
-    if (body) {
-      console.log(GLOBAL.duplicarJson(body));
-    }
+    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? GLOBAL.duplicarJson(body) : '');
   }
 }

@@ -63,7 +63,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   facturaAdelantadaSelected;
   CuerpoConduce = [];
   rowsExcede = [];
-  FechaConduce: string;
+  FechaConduce: any;
 
   constructor(
     public mServ: ModalService,
@@ -75,14 +75,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     public pdfServ: PdfService,
   ) {
     super(mServ, _ipc, layServ);
-  }
-
-  formarFechaFactura(date) {
-    const hora = moment(date).hour();
-    const minutos = moment(date).minutes();
-    const fechaTemp = moment(date).format('YYYY-MM-DD');
-
-    this.FechaConduce = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
   }
 
   ngOnInit() {
@@ -145,13 +137,13 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         (document.getElementById('clienteI') as any).value = res.data.nombre;
         this.BuscarFacturasAdelantadas(res.data.id);
         setTimeout(() => {
-          GLOBAL.enfocarInput('cod-0');
+          this.enfocarInput('cod-0');
         }, 10);
         //
       } else if (res && res.tipo_modal === 'buscarArticulo') {
         this.LLenarRowDespuesDeFiltro(res);
         setTimeout(() => {
-          GLOBAL.enfocarInput('can-' + res.index);
+          this.enfocarInput('can-' + res.index);
         }, 10);
         //
       } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
@@ -168,14 +160,14 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     if (res && res.tipo_modal === 'buscarArticulo') {
       this.LLenarRowDespuesDeFiltro(res);
       setTimeout(() => {
-        GLOBAL.enfocarInput('can-' + res.index);
+        this.enfocarInput('can-' + res.index);
       }, 10);
     }
   }
 
   pressEscResponse(res) {
     if (res !== undefined && res !== null) {
-      GLOBAL.enfocarInput('cod-' + res);
+      this.enfocarInput('cod-' + res);
     }
   }
 
@@ -191,7 +183,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   noArticuloEncontrado(arg) {
     this.dbServ.toastError('Articulo no creado', 'ERROR', true);
-    GLOBAL.enfocarInput('cod-' + arg);
+    this.enfocarInput('cod-' + arg);
     setTimeout(() => {
       this.resetModalVaribales();
     }, 10);
@@ -202,8 +194,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   async necesarioStar() {
-    await this.formarFechaFactura(new Date());
-    GLOBAL.enfocarInput('clienteI');
+    this.FechaConduce = this.formarFechaFactura(new Date())['FechaFactura'];
+    this.enfocarInput('clienteI');
   }
   aumentarSecuencia() {
     this.secuencia++;
@@ -251,12 +243,12 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
     if (input === 'can-' && codigo !== '') {
       if (codigo === null) {
-        GLOBAL.enfocarInput('cod-' + i);
-        GLOBAL.selectContenido('cod-' + i);
+        this.enfocarInput('cod-' + i);
+        this.selectContenido('cod-' + i);
       } else {
         const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [], fecha_articulo: this.FechaConduce };
 
-        GLOBAL.desEnfocarInput('cod-' + i);
+        this.desEnfocarInput('cod-' + i);
         this.abrirModal('buscarArticulo', obj);
       }
     }
@@ -265,8 +257,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       if (cantidad !== '' && cantidad !== '0' && cantidad !== 0 && cantidad !== null && codigo !== '' && codigo !== null && codigo !== undefined) {
         this.checkCantidadExede(i, 'change', (res) => {
           if (res) {
-            GLOBAL.enfocarInput('can-' + index);
-            GLOBAL.selectContenido('can-' + index);
+            this.enfocarInput('can-' + index);
+            this.selectContenido('can-' + index);
             setTimeout(() => {
               (this.control.controls[index] as any).controls['uni'].setValue(null);
             }, 2);
@@ -275,12 +267,12 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
               const sig_detalle_factura_id = (this.control.controls[index + 1] as any).controls['detalle_factura_id'].value;
 
               if (sig_detalle_factura_id) {
-                GLOBAL.enfocarInput('can-' + (index + 1));
+                this.enfocarInput('can-' + (index + 1));
               } else {
-                GLOBAL.enfocarInput('cod-' + (index + 1));
+                this.enfocarInput('cod-' + (index + 1));
               }
             } else {
-              GLOBAL.enfocarInput('uni-' + index);
+              this.enfocarInput('uni-' + index);
             }
           }
         });
@@ -297,7 +289,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     //     if (!excede) {
 
     //     } else {
-    //       GLOBAL.enfocarInput('can-' + index);
+    //       this.enfocarInput('can-' + index);
     //       GLOBAL.selectContenido('can-' + index);
     //       if (!detalle_factura_id) {
     //         setTimeout(() => {
@@ -313,24 +305,24 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
       this.checkCantidadExede(i, 'saltar', (res) => {
         if (res) {
-          GLOBAL.enfocarInput('can-' + i);
-          GLOBAL.selectContenido('can-' + i);
+          this.enfocarInput('can-' + i);
+          this.selectContenido('can-' + i);
           setTimeout(() => {
             (this.control.controls[i] as any).controls['uni'].setValue(null);
           }, 2);
         } else {
           if (unidad === '' || unidad === null) {
             setTimeout(() => {
-              GLOBAL.enfocarInput('uni-' + i);
+              this.enfocarInput('uni-' + i);
             }, 5);
           } else {
             this.aumentarSecuencia();
             const sig_detalle_factura_id = (this.control.controls[index] as any).controls['detalle_factura_id'].value;
 
             if (sig_detalle_factura_id) {
-              GLOBAL.enfocarInput('can-' + index);
+              this.enfocarInput('can-' + index);
             } else {
-              GLOBAL.enfocarInput('cod-' + index);
+              this.enfocarInput('cod-' + index);
             }
           }
         }
@@ -342,7 +334,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     //   index++;
     //   this.checkCantidadExede(i, 'saltar', (res) => {
     //     if (res) {
-    //       GLOBAL.enfocarInput('can-' + i);
+    //       this.enfocarInput('can-' + i);
     //       GLOBAL.selectContenido('can-' + i);
     //       setTimeout(() => {
     //         (this.control.controls[i] as any).controls['uni'].setValue(null);
@@ -350,11 +342,11 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     //     } else {
     //       if (unidad === '' || unidad === null) {
     //         setTimeout(() => {
-    //           GLOBAL.enfocarInput('uni-' + i);
+    //           this.enfocarInput('uni-' + i);
     //         }, 5);
     //       } else {
     //         this.aumentarSecuencia();
-    //         GLOBAL.enfocarInput('cod-' + index);
+    //         this.enfocarInput('cod-' + index);
     //       }
     //     }
     //   });
@@ -374,8 +366,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       }
 
       setTimeout(() => {
-        GLOBAL.enfocarInput('cod-' + i);
-        GLOBAL.selectContenido('cod-' + i);
+        this.enfocarInput('cod-' + i);
+        this.selectContenido('cod-' + i);
       }, 5);
     } else {
       const cantidades = ARTICULO.cantidades;
@@ -417,9 +409,9 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
       // if (!detalle_factura_id) {
       //   if (codigo && cantidad) {
-      //     GLOBAL.enfocarInput('uni-' + i);
+      //     this.enfocarInput('uni-' + i);
       //   } else {
-      //     GLOBAL.enfocarInput('can-' + i);
+      //     this.enfocarInput('can-' + i);
       //   }
       // }
     }
@@ -568,7 +560,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   verificarSecuencia(i, check?) {
     if (this.secuencia < i) {
-      GLOBAL.enfocarInput(this.inputSecuencia);
+      this.enfocarInput(this.inputSecuencia);
     }
 
     if (!check) {
@@ -594,8 +586,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
     this.checkCantidadExede(i, 'change', (res) => {
       if (res) {
-        GLOBAL.enfocarInput('can-' + i);
-        GLOBAL.selectContenido('can-' + i);
+        this.enfocarInput('can-' + i);
+        this.selectContenido('can-' + i);
         setTimeout(() => {
           (this.control.controls[i] as any).controls['uni'].setValue(null);
         }, 250);
@@ -842,9 +834,9 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     const sig_detalle_factura_id = (this.control.controls[0] as any).controls['detalle_factura_id'].value;
 
     if (sig_detalle_factura_id) {
-      GLOBAL.enfocarInput('can-0');
+      this.enfocarInput('can-0');
     } else {
-      GLOBAL.enfocarInput('cod-0');
+      this.enfocarInput('cod-0');
     }
   }
 
@@ -911,7 +903,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR', true);
       }
       (this.control.controls[i] as any).controls['can'].setValue(max_can);
-      GLOBAL.enfocarInput('can-' + i);
+      this.enfocarInput('can-' + i);
     }
   }
 
@@ -1070,7 +1062,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       this.borrar();
       (document.getElementById('clienteI') as any).value = '';
       setTimeout(() => {
-        GLOBAL.enfocarInput('clienteI');
+        this.enfocarInput('clienteI');
       }, 10);
     }
   }

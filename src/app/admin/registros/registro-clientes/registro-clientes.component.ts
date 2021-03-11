@@ -415,10 +415,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
     }
   }
   atras() {}
-  enfocarInput(arg) {
-    this.element = document.getElementById(arg) as HTMLElement;
-    this.element.focus();
-  }
+
   borrar() {
     this.form.reset();
     this.enfocarInput('campoNombre');
