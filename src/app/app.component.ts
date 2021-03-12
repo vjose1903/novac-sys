@@ -46,9 +46,9 @@ export class AppComponent implements OnInit, AfterContentChecked {
 
         this.objPercent = res.body;
 
-        document.getElementById('imagenLogo').click();
-
-        if (document.getElementById('foco_angular')) {
+        try {
+          document.getElementById('imagenLogo').click();
+        } catch (error) {
           document.getElementById('foco_angular').click();
         }
       }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import * as fun_ from './utils/funciones';
 
 export function getContentWithTablaNormal(configuration, data) {
@@ -139,6 +140,8 @@ function formarCuerpo(data, configuration, detalle, j) {
     } else {
       if (info.formato_fecha) {
         text_ = fun_.my_dateFormater(detalle[info.key]);
+      } else if (info.formato_numero_tachado) {
+        text_ = fun_.numFormatTwoDecimals(detalle[info.key], true);
       } else if (info.formato_numero) {
         text_ = fun_.numFormatTwoDecimals(detalle[info.key]);
       } else {

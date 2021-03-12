@@ -90,6 +90,10 @@ export function formatearNumero(nStr) {
   }
 }
 // =========================================================================================================
-export function numFormatTwoDecimals(num) {
-  return formatearNumero(redondearAdos(num));
+export function numFormatTwoDecimals(num, tachado = false) {
+  if (tachado) {
+    return typeof num === 'string' ? num : num < 1 ? '-' : formatearNumero(redondearAdos(num));
+  } else {
+    return typeof num === 'string' ? num : formatearNumero(redondearAdos(num));
+  }
 }

@@ -53,7 +53,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   objDevueltoResponse(res) {
     if (res && res.tipo_modal === 'buscarCliente') {
       if (this.tipoModal === 'cuentas_cobrar_cliente') {
-        res.data.tipo_ = 2;
+        res.data.tipo_ = 1;
         this.makePdf(res.data);
       }
     } else if (res && res.tipo_modal !== 'buscarCliente') this.makePdf(res.data);
@@ -169,7 +169,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         this.abrirVisorPdf(obj);
       } else {
         this.loadServ.isLoading.next(false);
-        this.dbServ.toastError(res.msg + '   ERROR: ' + res.ERROR, 'ERROR', true);
+        this.dbServ.toastError(res.msg, 'ERROR', true);
       }
     });
   }
@@ -195,7 +195,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       this.titulo_moda_reporte = 'Reporte de CxC por antiguedad de saldos';
       this.tipoModal = 'cuentas_cobrar_ant_saldo';
       abrirModal = false;
-      this.makePdf({ tipo_: 1 });
+      this.makePdf({ tipo_: 2 });
       tipo_modal = undefined;
       return;
       //

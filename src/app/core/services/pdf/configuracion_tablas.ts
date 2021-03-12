@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // CONFIGURACION DE LAS TABLAS DE REPORTES
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -164,7 +165,7 @@ const t_c = {
         noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
-        key: 'balance',
+        key: 'total_pendiente',
         alignment_body: 'right',
         formato_numero: true,
       },
@@ -177,13 +178,14 @@ const t_c = {
   // --------------------------------------
   // CUENTAS POR COBRAR ANTIGUEDAD SALDO
   // --------------------------------------
+
   cxc_ant: {
     margin_general: [0, 0, 0, 0],
     isBreak: true,
     pageOrient: 'landscape',
     break: 26,
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
-    widths: [18, '*', 60, 70, 70, 70, 70, 'auto'],
+    widths: [18, '*', 60, 'auto', 'auto', 'auto', 'auto', 'auto'],
     mostrar_total: true,
     info: [
       {
@@ -217,38 +219,50 @@ const t_c = {
       {
         text: '0 - 30 Dias',
         style: 'letra10',
-        alignment_titulo: 'left',
+        alignment_titulo: 'right',
         noWrap: true,
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
         style_body: 'letra10',
         key: 'cero_to_treinta',
-        alignment_body: 'left',
+        alignment_body: 'right',
+        formato_numero_tachado: true,
       },
       {
         text: '31 - 60 Dias',
-        alignment_titulo: 'left',
+        alignment_titulo: 'right',
         noWrap: true,
         style: 'letra10',
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
         style_body: 'letra10',
         key: 'treinta_uno_to_sesenta',
-        alignment_body: 'left',
+        alignment_body: 'right',
+        formato_numero_tachado: true,
       },
       {
         text: '61 - 90 Dias',
-        alignment_titulo: 'left',
+        alignment_titulo: 'right',
         noWrap: true,
         style: 'letra10',
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
         style_body: 'letra10',
         key: 'sesenta_uno_to_noventa',
-        alignment_body: 'left',
+        alignment_body: 'right',
+        formato_numero_tachado: true,
       },
       {
         text: 'mas 91 Dias',
-        alignment_titulo: 'left',
+        alignment_titulo: 'right',
         noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
         key: 'noventa_uno_to_more',
-        alignment_body: 'left',
+        alignment_body: 'right',
+        formato_numero_tachado: true,
       },
 
       {
@@ -259,12 +273,13 @@ const t_c = {
         noWrap: true,
         style: 'letra10',
         style_body: 'letra10',
-        key: 'balance',
+        key: 'total_pendiente',
         alignment_body: 'right',
-        formato_numero: true,
+        formato_numero_tachado: true,
       },
     ],
   },
+
   // --------------------------------------
   // INVENTARIO
   // --------------------------------------

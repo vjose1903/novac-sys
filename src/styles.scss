@@ -7,6 +7,11 @@ $bodyfont: "Poppins";
 @import "./animateCss.scss";
 
 
+
+.text-end {
+  text-align: end;
+}
+
 .text-poppins {
   font-family: "Poppins" !important;
 }
@@ -202,10 +207,9 @@ body {
 
 .cardPrincipal {
   border-radius: 1rem !important;
-  height: calc(100% - 9vh);
+  // max-height: 88vh;
   background-color: white;
   box-shadow: 0px 4px 14px -6px black;
-  min-height: calc(100vh - 6.5rem);
   position: absolute;
   width: 96.5%;
 }

@@ -397,17 +397,16 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
       if (this.TOTAL === 0) {
         this.dbServ.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
       } else {
-        const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota };
-
-        this.abrirModal('cambio', obj);
+        const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota, tipo__: 'no_devuelta' };
+        this.abrirModal('imprimir', obj);
       }
     }
   }
 
   async decisionModal(res) {
     if (res) {
-      if (this.tipoModal === 'cambio') {
-        this.formarNota(res);
+      if (this.tipoModal === 'imprimir') {
+        this.formarNota();
       } else if (this.tipoModal === 'cancelar') {
         this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
       }
@@ -458,7 +457,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     return temp;
   }
 
-  async formarNota(res) {
+  async formarNota() {
     const empleado = this.fun.getUser();
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 

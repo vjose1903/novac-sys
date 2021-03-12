@@ -174,9 +174,13 @@ export class modalClass extends LayoutClass {
 
   abrirModal(tipo, seleccion, tipo_modal?) {
     modalClass.a_quien_responder = this.quien_me_llamo;
+    console.log('modalClass.a_quien_responder --> ', modalClass.a_quien_responder);
 
     this.tipoModal = tipo_modal ? tipo_modal : tipo;
     this.seleccionModal = seleccion;
+    console.log('tipo --> ', tipo);
+    console.log('seleccion --> ', seleccion);
+    console.log('tipo_modal --> ', this.tipoModal);
     this.mServ.modalTipo(tipo);
     this.mServ.ModalSeleccion(seleccion);
     this.mServ.mostrarModal(true);

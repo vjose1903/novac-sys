@@ -32,6 +32,11 @@ export class FormCantidadEfectivoComponent extends mixinClass implements OnInit,
   }
 
   ngOnInit() {
+    console.log('INIT CANTIDAD EFECTIVO');
+    console.log('tipo --> ', this.tipo);
+    console.log('data --> ', this.data);
+    console.log('debe_cubrir --> ', this.debe_cubrir);
+
     this.efectivo = this.formatoNumero(this.data.devuelta);
     this.factura_de = this.data.factura_de;
 

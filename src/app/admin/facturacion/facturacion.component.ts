@@ -416,6 +416,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
           telefono: '',
         };
       }
+
       this.propietario_factura = arg.cliente;
       this.form.patchValue(arg.cliente);
     } else {
@@ -442,19 +443,16 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       res['tipo_factura'] = tipo ? tipo['descripcion'] : '';
     }
     this.metodo = res.tipo;
-    this.FacturaAtrasada = fact.FacturaAtrasada;
+    this.FacturaAtrasada = fact ? fact?.FacturaAtrasada : false;
 
-    const fecha_facturacion = fact.fecha_equivalente ? fact.fecha_equivalente : GLOBAL.duplicarJson(this.FechaFactura['back']);
+    const fecha_facturacion = fact?.fecha_equivalente ? fact?.fecha_equivalente : GLOBAL.duplicarJson(this.FechaFactura['back']);
 
     this.FechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
     this.FechaFactura['back'] = this.FechaFactura['front'];
 
+    console.log('FechaFactura --> ', this.FechaFactura);
+
     this.FechaFacturaMostrar = this.formarFechaFactura(fecha_facturacion)['FechaFacturaMostrar'];
-
-    console.log(':::::::: ', fact);
-
-    // FechaFactura
-    // FechaFacturaMostrar
 
     this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
     await this.calcularPorcientoComprobante();
@@ -989,8 +987,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         return articulo;
       });
     }
-
-    this.fun.logYellow('this.CuerpoFactura --> ', this.CuerpoFactura);
   }
 
   resetVariables() {
@@ -1197,7 +1193,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
     let cuerpo_fact = GLOBAL.duplicarJson(this.CuerpoFactura);
-    this.fun.logRed('cuerpo_fact --> ', cuerpo_fact);
 
     if (this.metodo === 'venta') {
       // cuerpo_fact = await this.checkCuerpoForSendBackend(cuerpo_fact);

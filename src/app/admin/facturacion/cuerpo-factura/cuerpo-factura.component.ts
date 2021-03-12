@@ -417,11 +417,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             const multiplo = row.cantidad_en_unidades / row.cantidad;
             const cant_actual = cant_en_unidades_actual / multiplo;
 
-            this.logGreen('row.cantidad --> ', row.cantidad);
-            this.logYellow('cant_en_unidades_actual --> ', cant_en_unidades_actual);
-            this.logRed('multiplo --> ', multiplo);
-            this.logBlue('cant_actual --> ', cant_actual);
-
             (this.control.controls[j] as any).controls['pre'].setValue(
               this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo),
             );
@@ -720,8 +715,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     if (precio && cantidad) {
       const tot = precio * cantidad;
       (this.control.controls[i] as any).controls['tot'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(tot)));
-      this.fun.logRed('cantidad --> ', cantidad);
-      this.fun.logRed('cantidadMinima --> ', cantidadMinima);
       (this.control.controls[i] as any).controls['cantidad_en_unidades'].setValue(cantidad * cantidadMinima);
 
       this.calculosTotalesGenerales();
@@ -882,7 +875,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         Total: GLOBAL.redondearAdos(this.TOTAL),
         ITBIS: '',
       };
-      this.fun.logRed('calculosTotalesGenerales --> ', obj);
 
       this.sendCalculos.emit(obj);
     }
@@ -892,8 +884,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     const name = (this.control.controls[i] as any).controls['des'].value;
     const unidad = (this.control.controls[i] as any).controls['uni'].value;
     let obj = {};
-
-    if (unidad) obj['nombre']['name'] = `(${obj['nombre']['name']} (${unidad})`;
+    obj['nombre'] = unidad ? `${name} (${unidad})` : name;
 
     if (name) {
       this.indexRemove = i;
@@ -1024,7 +1015,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         this.articuloDetallable(art);
       }
       this.UnidadesArticulo = _.uniqWith(this.UnidadesArticulo, _.isEqual);
-      this.fun.logBlue('##########', _.uniqWith(this.UnidadesArticulo, _.isEqual));
     }
   }
 

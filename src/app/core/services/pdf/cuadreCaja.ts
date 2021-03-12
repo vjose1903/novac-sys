@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import * as fun_ from './utils/funciones';
 import { logoADM, styles_ } from './utils/files';
 import { AppConfig } from '../../../../environments/environment';

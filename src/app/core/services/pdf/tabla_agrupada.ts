@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import { getTablaNormal } from './tabla_normal';
 
 export function getContentWithTablaAgrupada(configuracion, data) {

@@ -1,4 +1,4 @@
-<div #cardTabla id="cardTabla" class="cardPrincipal sinPadding tamano">
+<div #cardTabla id="cardTabla" class="cardPrincipal sinPadding tamano" style="height: calc(100% - 9vh)">
   <div class="bordes info justify-content-between">
     <div class="text-center">
       <span style="font-size: 1.2rem"> Cantidad de productos en inventario </span>
@@ -30,7 +30,8 @@
     <div style="height: 100%">
       <app-tablas
         *ngIf="listaArticulos"
-        [padre]="cardTabla" [info]="info"
+        [padre]="cardTabla"
+        [info]="info"
         [data]="listaArticulos"
         [focusRow]="false"
         [search]="true"

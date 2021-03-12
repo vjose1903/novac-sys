@@ -9,7 +9,6 @@ import * as recibosIngresos from './recibosIngresos';
 import * as conduce from './conduce';
 import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
-import { FunctionService } from '../functions.service';
 import { DBservice } from '../bdservice.service';
 
 @Injectable({
@@ -26,6 +25,10 @@ export class PdfService {
     const reimprimir = oPdf.data.reimprimir ? true : false;
 
     data['reimprimir'] = reimprimir;
+
+    console.log('%c data --> ', 'color:red', data);
+    console.log('%c type --> ', 'color:red', type);
+    console.log('%c reimprimir --> ', 'color:red', reimprimir);
 
     try {
       switch (type) {

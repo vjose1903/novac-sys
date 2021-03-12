@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import { logoADM, styles_ } from './utils/files';
 import { getConfiguration } from './configuracion_tablas';
 import { getContentWithTablaNormal } from './tabla_normal';
@@ -11,6 +12,7 @@ import { AppConfig } from '../../../../environments/environment';
 export function makeReporte(data) {
   const configuration = getConfiguration(data.tipo_reporte);
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
+
   const dd = {
     // pageSize: { width: 990, height: 398 },
     pageMargins: [10, data.mostrar_sub_titulo ? 125 : 111.5, 10, 30],

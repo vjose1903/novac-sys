@@ -2,7 +2,7 @@
   <h3>
     {{ tituloPag }}<b>{{ factura_aplicada }}</b>
   </h3>
-  <div class="cardPrincipal sinPadding tamano">
+  <div class="cardPrincipal sinPadding tamano" style="height: calc(100% - 12vh)">
     <div class="cabezaFactura">
       <div class="row">
         <!-- ============ factura aplicada ============ -->
@@ -79,7 +79,8 @@
         [search]="false"
         [paginate]="false"
         [tablaHover]="false"
-        [padre]="cardTabla" [info]="info"
+        [padre]="cardTabla"
+        [info]="info"
         (getInfoChange)="getInfoChange($event)"
         [data]="detalleFacturas"
         [focusRow]="false"
@@ -108,29 +109,19 @@
         </div>
 
         <div class="col-6 d-flex justify-content-end">
-          <div class="d-block mostrarNumeros">
-            <div class="row">
-              <div class="col-6">
-                <!-- <div class="d-flex justify-content-end">
-                  <span>BRUTO:</span>
+          <div class="mostrarNumeros w-100">
+            <div class="row d-flex align-items-end">
+              <!-- <div class="col-12 cuadroResumenTotal mb-2">
+                  <span class="label text-poppins position-absolute left-0 top-0">BRUTO:</span>
+                  <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(BRUTO) }}</h5>
                 </div>
-                <div class="d-flex">
-                  <span>DESCUENTO:</span>
+                <div class="col-12 cuadroResumenTotal mb-2">
+                  <span class="label text-poppins position-absolute left-0 top-0">DESCUENTO:</span>
+                  <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(DESCUENTO) }}</h5>
                 </div> -->
-                <div class="d-flex">
-                  <span class="mt-2"> <strong>TOTAL:</strong> </span>
-                </div>
-              </div>
-              <div class="col-6">
-                <!-- <div class="d-flex numerosCalculos">
-                  <span>{{ formatoNumero(BRUTO) }}</span>
-                </div>
-                <div class="d-flex numerosCalculos">
-                  <span>{{ formatoNumero(DESCUENTO) }}</span>
-                </div> -->
-                <div class="d-flex numerosCalculos">
-                  <h5 class="borderTOP w-100 TOTALN">{{ formatoNumero(TOTAL) }}</h5>
-                </div>
+              <div class="col-12 cuadroResumenTotal mb-5" style="max-height: 3rem">
+                <span class="label text-poppins position-absolute left-0 top-0"> <strong>TOTAL:</strong> </span>
+                <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(TOTAL) }}</h5>
               </div>
             </div>
           </div>
