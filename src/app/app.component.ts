@@ -4,6 +4,8 @@ import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
 import { GLOBAL } from './core/services/GLOBAL';
 import { AppConfig } from '../environments/environment';
+import { FunctionService } from './core/services/functions.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -17,8 +19,17 @@ export class AppComponent implements OnInit, AfterContentChecked {
   imgLogo = AppConfig.imgLogo;
   tiempo_restante;
   objPercent;
+  pruebaModal = '';
+  counter = 0;
 
-  constructor(public _ipc: IpcService, private dbServ: DBservice, private loaderServ: LoaderService, private cdRef: ChangeDetectorRef) {}
+  constructor(
+    public _ipc: IpcService,
+    private dbServ: DBservice,
+    private loaderServ: LoaderService,
+    private cdRef: ChangeDetectorRef,
+    private fun: FunctionService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.loaderServ.isLoading.subscribe((v) => {
@@ -40,6 +51,12 @@ export class AppComponent implements OnInit, AfterContentChecked {
 
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
       if (res && res.body) {
+        if (this.counter == 1) {
+          this.fun.logout();
+          this.router.navigateByUrl('/auth/login');
+        }
+
+        this.counter++;
         this.tiempo_restante = this.timeConvert(res.body.total / res.body.bytesPerSecond);
 
         res.body.transferred = parseFloat(GLOBAL.redondearAdos(res.body.transferred / 1000000));
@@ -50,7 +67,6 @@ export class AppComponent implements OnInit, AfterContentChecked {
 
         try {
           if (document.getElementById('imagenLogo')) document.getElementById('imagenLogo').click();
-          if (document.getElementById('foco_angular')) document.getElementById('foco_angular').click();
         } catch (error) {
           console.error(error);
         }
@@ -64,6 +80,13 @@ export class AppComponent implements OnInit, AfterContentChecked {
     this._ipc.on('log', (event: Electron.IpcMessageEvent, res) => {});
 
     this.getPrintersName();
+  }
+
+  prepararActualizacion() {
+    const headerModalActualizar = document.getElementsByClassName('p-dialog-title')[0];
+    headerModalActualizar.id = 'modalProgress';
+
+    console.log('headerModalActualizar --> ', headerModalActualizar);
   }
 
   getPrintersName() {

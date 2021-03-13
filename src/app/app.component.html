@@ -9,8 +9,8 @@
   <p style="font-size: 3rem; color: white">{{ 'Por favor espere!...' | translate }}</p>
 </ngx-spinner> -->
 
+<mdb-card-img id="modalProgress" src="assets/img/transparente.png" alt="Logo ADM"></mdb-card-img>
 <p-dialog
-  id="modalProgress"
   [closable]="false"
   [closeOnEscape]="false"
   header="Porcentaje de descarga"
@@ -22,11 +22,12 @@
   [resizable]="false"
 >
   <div class="d-flex justify-content-between mb-2 position-relative">
-    <mdb-card-img id="foco_angular" class="btn_invisible" src="assets/img/transparente.png" alt="Logo ADM"></mdb-card-img>
     <span class="negrita">Descargando actualizacion...</span>
     <div class="mr-2">
       <span class="negrita">{{ objPercent?.transferred }} Mb / </span>
       <span class="negrita gris">{{ objPercent?.total }} Mb</span>
+
+      <span class="negrita gris">{{ pruebaModal }} Mb</span>
     </div>
   </div>
   <p-progressBar [value]="objPercent?.percent"></p-progressBar>

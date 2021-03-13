@@ -94,6 +94,11 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
   }
 }
 
+.btn_invisible_ {
+  border: 0px transparent;
+  background-color: transparent;
+}
+
 .btn_invisible {
   border: 0px transparent;
   background-color: transparent;
