@@ -10,7 +10,7 @@
 
     <!-- ----- TIPO -----  -->
     <!-- <div *ngIf="tipo_reporte === 'recibos'" class="col-12 mt-3"> -->
-    <div *ngIf="tipo_reporte === 'recibos' || tipo_reporte === 'ventas_productos'" class="col-12">
+    <div *ngIf="tipo_reporte === 'recibos' || tipo_reporte === 'ventas_productos' || tipo_reporte === 'cuentas_cobrar_ant_saldo'" class="col-12">
       <label class="control-label">Tipo: <span style="color: red">*</span> </label>
       <select formControlName="tipo" class="form-control" (change)="changeTipo()">
         <option *ngFor="let tipo of tipos" value="{{ tipo.id }}">{{ tipo.label }}</option>

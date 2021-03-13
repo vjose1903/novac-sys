@@ -176,10 +176,10 @@ const t_c = {
   //
   //
   // --------------------------------------
-  // CUENTAS POR COBRAR ANTIGUEDAD SALDO
+  // CUENTAS POR COBRAR ANTIGUEDAD SALDO DETALLADO
   // --------------------------------------
 
-  cxc_ant: {
+  cxc_ant_detallado: {
     margin_general: [0, 0, 0, 0],
     isBreak: true,
     pageOrient: 'landscape',
@@ -215,6 +215,101 @@ const t_c = {
         key: 'fecha_equivalente',
         alignment_body: 'left',
         formato_fecha: true,
+      },
+      {
+        text: '0 - 30 Dias',
+        style: 'letra10',
+        alignment_titulo: 'right',
+        noWrap: true,
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
+        style_body: 'letra10',
+        key: 'cero_to_treinta',
+        alignment_body: 'right',
+        formato_numero_tachado: true,
+      },
+      {
+        text: '31 - 60 Dias',
+        alignment_titulo: 'right',
+        noWrap: true,
+        style: 'letra10',
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
+        style_body: 'letra10',
+        key: 'treinta_uno_to_sesenta',
+        alignment_body: 'right',
+        formato_numero_tachado: true,
+      },
+      {
+        text: '61 - 90 Dias',
+        alignment_titulo: 'right',
+        noWrap: true,
+        style: 'letra10',
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
+        style_body: 'letra10',
+        key: 'sesenta_uno_to_noventa',
+        alignment_body: 'right',
+        formato_numero_tachado: true,
+      },
+      {
+        text: 'mas 91 Dias',
+        alignment_titulo: 'right',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
+        key: 'noventa_uno_to_more',
+        alignment_body: 'right',
+        formato_numero_tachado: true,
+      },
+
+      {
+        text: 'Pendiente',
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
+        alignment_titulo: 'right',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'total_pendiente',
+        alignment_body: 'right',
+        formato_numero_tachado: true,
+      },
+    ],
+  },
+
+  // --------------------------------------
+  // CUENTAS POR COBRAR ANTIGUEDAD SALDO AGRUPADO
+  // --------------------------------------
+
+  cxc_ant_agrupado: {
+    margin_general: [0, 0, 0, 0],
+    isBreak: true,
+    pageOrient: 'landscape',
+    break: 26,
+    // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
+    widths: [18, '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+    mostrar_total: true,
+    info: [
+      {
+        text: '#',
+        alignment_titulo: 'center',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'index',
+        alignment_body: 'center',
+      },
+      {
+        text: 'Cliente',
+        alignment_titulo: 'left',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'cliente_nombre',
+        alignment_body: 'left',
       },
       {
         text: '0 - 30 Dias',
@@ -347,7 +442,7 @@ const t_c = {
     margin_general: [0, 0, 0, 0],
     isBreak: true,
     break: 40,
-    widths: [24, 60, 70, '*', 50, 'auto'],
+    widths: [24, 60, 70, '*', 50, 50, 'auto'],
     mostrar_total: true,
     info: [
       {
@@ -386,6 +481,15 @@ const t_c = {
         style_body: 'letra10',
         key: 'cliente_nombre',
         alignment_body: 'left',
+      },
+      {
+        text: 'Met. pago',
+        style: 'letra10',
+        alignment_titulo: 'center',
+        noWrap: true,
+        style_body: 'letra10',
+        key: 'forma_pago',
+        alignment_body: 'center',
       },
       {
         text: 'Tipo',

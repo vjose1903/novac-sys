@@ -450,8 +450,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.FechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
     this.FechaFactura['back'] = this.FechaFactura['front'];
 
-    console.log('FechaFactura --> ', this.FechaFactura);
-
     this.FechaFacturaMostrar = this.formarFechaFactura(fecha_facturacion)['FechaFacturaMostrar'];
 
     this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];

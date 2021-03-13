@@ -26,10 +26,6 @@ export class PdfService {
 
     data['reimprimir'] = reimprimir;
 
-    console.log('%c data --> ', 'color:red', data);
-    console.log('%c type --> ', 'color:red', type);
-    console.log('%c reimprimir --> ', 'color:red', reimprimir);
-
     try {
       switch (type) {
         case 'recibo_ingreso':

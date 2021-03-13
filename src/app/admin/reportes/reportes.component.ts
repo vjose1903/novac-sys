@@ -102,7 +102,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         tipo = 'ventas';
         //
       } else if (this.tipoModal === 'cuentas_cobrar_cliente' || this.tipoModal === 'cuentas_cobrar_ant_saldo') {
-        params = `tipo=${data.tipo_}&cliente_id=${data.id ? data.id : 1}`;
+        params = `tipo=${data.tipo_ ? data.tipo_ : data.tipo}&cliente_id=${data.id ? data.id : 1}`;
         tipo = 'cuentas_cobrar';
         //
       } else if (this.tipoModal === 'recibos') {
@@ -181,7 +181,9 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     let abrirModal = true;
 
     if (tipo === 'cuadre') this.titulo_moda_reporte = 'Reporte de cuadre de caja';
+    //
     else if (tipo === 'ventas_diarias') this.titulo_moda_reporte = 'Reporte de ventas diarias';
+    //
     else if (tipo === 'ventas_rango') this.titulo_moda_reporte = 'Reporte de ventas por fechas';
     //
     else if (tipo === 'cuentas_cobrar_cliente') {
@@ -191,24 +193,15 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       obj['data'] = [];
       obj['filtrarCliente'] = null;
       //
-    } else if (tipo === 'cuentas_cobrar_ant_saldo') {
-      this.titulo_moda_reporte = 'Reporte de CxC por antiguedad de saldos';
-      this.tipoModal = 'cuentas_cobrar_ant_saldo';
-      abrirModal = false;
-      this.makePdf({ tipo_: 2 });
-      tipo_modal = undefined;
-      return;
-      //
-    } else if (tipo === 'recibos') {
-      this.titulo_moda_reporte = 'Reporte de recibos de ingreso';
-      //
-    } else if (tipo === 'ventas_productos') {
-      this.titulo_moda_reporte = 'Reporte de productos vendidos por dia';
-      //
-    } else if (tipo === 'suplidor_prod') {
-      this.titulo_moda_reporte = 'Reporte de suplidor por producto';
-      //
-    } else if (tipo === 'inventario') {
+    } else if (tipo === 'cuentas_cobrar_ant_saldo') this.titulo_moda_reporte = 'Reporte de CxC por antiguedad de saldos';
+    //
+    else if (tipo === 'recibos') this.titulo_moda_reporte = 'Reporte de recibos de ingreso';
+    //
+    else if (tipo === 'ventas_productos') this.titulo_moda_reporte = 'Reporte de productos vendidos por dia';
+    //
+    else if (tipo === 'suplidor_prod') this.titulo_moda_reporte = 'Reporte de suplidor por producto';
+    //
+    else if (tipo === 'inventario') {
       this.titulo_moda_reporte = 'Reporte de inventario';
       abrirModal = false;
       this.makePdf({ tipo_: 1 });

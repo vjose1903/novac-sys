@@ -111,6 +111,11 @@ export class FormVentasComponent extends mixinClass implements OnInit {
       this.setValidator('condicion');
       this.setValidator('desde');
       this.setValidator('hasta');
+    } else if (this.tipo_reporte === 'cuentas_cobrar_ant_saldo') {
+      this.tipos = [
+        { id: '2', label: 'Detallado' },
+        { id: '3', label: 'Agrupado' },
+      ];
     } else if (this.tipo_reporte === 'ventas_productos') {
       this.tipos = [
         { id: '1', label: 'Dia único' },
