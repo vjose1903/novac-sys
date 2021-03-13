@@ -33,9 +33,6 @@ export class HomeAdminComponent extends mixinClass implements OnInit, OnDestroy 
     this._destroy_mixin();
   }
 
-  p() {
-    // document.getElementById('imgd').classList.add('rubberBand');
-  }
   verificar() {
     GLOBAL.ValidaCedula(this.cedula);
   }
