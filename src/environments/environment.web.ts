@@ -6,4 +6,5 @@ export const AppConfig = {
   // url_server: 'http://192.168.0.134:3000',
   num_telefono: '809-573-0060',
   rnc: '131-99603-5',
+  imgLogo: 'assets/img/logoSinFondo.png',
 };

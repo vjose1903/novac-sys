@@ -3,6 +3,7 @@ import { DBservice } from './core/services/bdservice.service';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
 import { GLOBAL } from './core/services/GLOBAL';
+import { AppConfig } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,7 @@ export class AppComponent implements OnInit, AfterContentChecked {
   loading = false;
   objProgress;
   visible = false;
+  imgLogo = AppConfig.imgLogo;
   tiempo_restante;
   objPercent;
 
@@ -47,9 +49,10 @@ export class AppComponent implements OnInit, AfterContentChecked {
         this.objPercent = res.body;
 
         try {
-          document.getElementById('imagenLogo').click();
+          if (document.getElementById('imagenLogo')) document.getElementById('imagenLogo').click();
+          if (document.getElementById('foco_angular')) document.getElementById('foco_angular').click();
         } catch (error) {
-          document.getElementById('foco_angular').click();
+          console.error(error);
         }
       }
     });

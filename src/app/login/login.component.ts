@@ -19,6 +19,7 @@ import {
 import { FunctionService } from '../core/services/functions.service';
 import { ModalService } from '../admin/components/modal/modal.service';
 import { PdfService } from '../core/services/pdf/pdf.service';
+import { AppConfig } from '../../environments/environment';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -30,6 +31,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   errorU = '';
   versionApp = '';
   tipo_prueba = 'otro';
+  imgLogo = AppConfig.imgLogo;
 
   constructor(
     private dbServ: DBservice,

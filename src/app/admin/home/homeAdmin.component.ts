@@ -4,6 +4,7 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 import { ModalService } from '../components/modal/modal.service';
 import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
+import { AppConfig } from '../../../environments/environment';
 
 @Component({
   selector: 'app-homeAdmin',
@@ -15,6 +16,8 @@ export class HomeAdminComponent extends mixinClass implements OnInit, OnDestroy 
   constructor(public _ipc: IpcService, public mServ: ModalService, public layServ: LayoutService) {
     super(mServ, _ipc, layServ);
   }
+
+  imgLogo = AppConfig.imgLogo;
 
   initCambioMenu(arg) {
     if (arg.bool) {
