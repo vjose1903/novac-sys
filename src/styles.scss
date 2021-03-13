@@ -6,8 +6,6 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
-
-
 .text-end {
   text-align: end;
 }
@@ -15,7 +13,6 @@ $bodyfont: "Poppins";
 .text-poppins {
   font-family: "Poppins" !important;
 }
-
 
 .ng-dropdown-panel {
   z-index: 99999 !important;
