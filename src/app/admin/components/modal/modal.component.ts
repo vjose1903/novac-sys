@@ -323,10 +323,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   refrescarFiltro(arg) {
     this.dbServ.toastWarning(`No existe ${arg} con el nombre introducido`, 'AVISO', true);
-    setTimeout(() => {
-      this.canbiarValorFiltros(arg, '__refresh__');
-      setTimeout(() => this.canbiarValorFiltros(arg, null), 700);
-    }, 250);
+    // lo comente para que no se borre el input de la tabla que lo borre el usuario
+    // setTimeout(() => {
+    //   this.canbiarValorFiltros(arg, '__refresh__');
+    //   setTimeout(() => this.canbiarValorFiltros(arg, null), 700);
+    // }, 250);
   }
 
   async renovarDataFiltros(e, buscando?, fecha_articulo?) {
@@ -369,7 +370,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
         this.dataFiltro = undefined;
 
-
         res.data.map(async (cli) => {
           cli.nombre = GLOBAL.Capitalice(cli.nombre);
           cli.apellido = GLOBAL.Capitalice(cli.apellido);
@@ -393,7 +393,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
         this.dataFiltro = undefined;
-
 
         res.data.map(async (supli) => {
           supli.nombre = GLOBAL.Capitalice(supli.nombre);
