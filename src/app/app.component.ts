@@ -19,6 +19,7 @@ export class AppComponent implements OnInit, AfterContentChecked {
   imgLogo = AppConfig.imgLogo;
   tiempo_restante;
   objPercent;
+
   pruebaModal = '';
   counter = 0;
 

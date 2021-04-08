@@ -79,7 +79,8 @@ export class modalClass extends LayoutClass {
     if (_this) {
       switch (observable) {
         case 'printBase64Res':
-          _this.ipcBase64Resonse(res);
+          _this.ipcBase64Resonse(res)
+
           _this.reiniciarVariables([VM._7]);
           setTimeout(() => this.quitarFocodeElectron(), 25);
           break;
@@ -87,6 +88,7 @@ export class modalClass extends LayoutClass {
         case 'DECISIONMODAL':
           if (res !== undefined) {
             _this.decisionModal(res);
+
             _this.reiniciarVariables([VM._4, VM._5, VM._9, VM._7]);
           }
           break;

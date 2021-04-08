@@ -44,7 +44,8 @@ export class ChangePasswordComponent extends mixinClass implements OnInit, After
   }
 
   submit(form) {
-    const objTemp = JSON.parse(JSON.stringify(form));
+    const objTemp = form.value;
+    console.log('objTemp --> ', objTemp);
 
     if (objTemp.password === null) {
       this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR', true);

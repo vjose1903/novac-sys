@@ -26,6 +26,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { ReportesComponent } from '../reportes/reportes.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
+
 @NgModule({
   declarations: [
     LayoutComponent,

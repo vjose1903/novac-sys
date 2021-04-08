@@ -633,6 +633,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   timeout: any = null;
+  
   awaitTyping(event) {
     clearTimeout(this.timeout);
     var $this = this;
