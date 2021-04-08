@@ -62,6 +62,11 @@ export class GLOBAL {
   }
 
   // =========================================================================================================
+  static is_number(str) {
+    return !isNaN(str);
+  }
+
+  // =========================================================================================================
   static my_houreFormater(str) {
     const dateObj = new Date(str);
 
@@ -234,7 +239,6 @@ export class GLOBAL {
   //     return sTnum;
   //   }
   // }
-
 }
 
 export const showLoadin = new BehaviorSubject<boolean>(false);

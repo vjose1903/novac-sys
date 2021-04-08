@@ -92,7 +92,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() is_modal = false;
   @Input() metodo = null;
   @Input() paraFiltroArticulos = null;
-  @Input() paraFiltroClientes;
+  @Input() paraFiltroClientes = null;
   @Input() info;
   @Input() colorHead = true;
   @Input() tablaHover = true;
@@ -607,7 +607,17 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
   }
 
+  renovarFiltro() {
+    this.searchText = '';
+  }
+
   ngOnChanges(simpleChanges) {
+    if (simpleChanges.paraFiltroArticulos && simpleChanges.paraFiltroArticulos.currentValue == '__refresh__') this.renovarFiltro();
+
+    if (simpleChanges.paraFiltroClientes && simpleChanges.paraFiltroClientes.currentValue == '__refresh__') this.renovarFiltro();
+
+    if (simpleChanges.paraFiltroSuplidor && simpleChanges.paraFiltroSuplidor.currentValue == '__refresh__') this.renovarFiltro();
+
     if (simpleChanges.data && simpleChanges.data.currentValue) {
       // ================================================
       // CUSTOM STYLES
@@ -633,7 +643,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   timeout: any = null;
-  
+
   awaitTyping(event) {
     clearTimeout(this.timeout);
     var $this = this;

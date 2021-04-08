@@ -283,8 +283,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.ModalObj(obj);
   }
 
-  noArticulo() {
+  noArticulo(is_codigo) {
     this.reinicioModal();
+    let es = 'codigo';
+    if (!is_codigo) es = 'nombre';
+
+    this.dbServ.toastWarning(`No existe articulo con el ${es} introducido`, 'AVISO', true);
+
     this.mServ.ModalIndex(this.index);
   }
 
@@ -310,7 +315,22 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.reinicioModal();
   }
 
+  canbiarValorFiltros(arg, valor) {
+    if (arg === 'cliente') this.paraFiltroClientes = valor;
+    if (arg === 'suplidor') this.paraFiltroSuplidor = valor;
+    if (arg === 'articulo') this.paraFiltroArticulos = valor;
+  }
+
+  refrescarFiltro(arg) {
+    this.dbServ.toastWarning(`No existe ${arg} con el nombre introducido`, 'AVISO', true);
+    setTimeout(() => {
+      this.canbiarValorFiltros(arg, '__refresh__');
+      setTimeout(() => this.canbiarValorFiltros(arg, null), 700);
+    }, 250);
+  }
+
   async renovarDataFiltros(e, buscando?, fecha_articulo?) {
+    const copyData = GLOBAL.duplicarJson(this.dataFiltro);
     const page = e.page;
     const per_page = e.per_page;
     let palabra_a_buscar = ' ';
@@ -331,7 +351,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           this.dataFiltro = res.data;
 
           if (this.dataFiltro.length === 0) {
-            this.noArticulo();
+            const is_codigo = GLOBAL.is_number(palabra_a_buscar);
+            this.noArticulo(is_codigo);
             return;
           }
 
@@ -348,42 +369,44 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
         this.dataFiltro = undefined;
 
-        if (res.data.length === 0) {
-          this.dbServ.toastWarning('No existe cliente con el nombre introducido', 'AVISO', true);
-          setTimeout(() => {}, 250);
-        } else {
-          res.data.map(async (cli) => {
-            cli.nombre = GLOBAL.Capitalice(cli.nombre);
-            cli.apellido = GLOBAL.Capitalice(cli.apellido);
-            cli.documento_identidad = await cli.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
-            // cli.documento_identidad = cli.documento_de_identidad ? (cli.documento_de_identidad.documento ? cli.documento_de_identidad.documento : '---------') : '---------';
-            return cli;
-          });
 
-          this.dataFiltro = res.data;
-          this.mostrarModalLuegoDeBuscarData();
+        res.data.map(async (cli) => {
+          cli.nombre = GLOBAL.Capitalice(cli.nombre);
+          cli.apellido = GLOBAL.Capitalice(cli.apellido);
+          cli.documento_identidad = await cli.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
+          // cli.documento_identidad = cli.documento_de_identidad ? (cli.documento_de_identidad.documento ? cli.documento_de_identidad.documento : '---------') : '---------';
+          return cli;
+        });
 
-          const obj = {
-            total: res.total_registros,
-            tabla: 'filtroCliente',
-          };
-          this.tServ.Func_total_paginas(obj);
-        }
+        if (res.data.length > 0) this.dataFiltro = res.data;
+        if (res.data.length === 0) this.dataFiltro = copyData;
+
+        this.mostrarModalLuegoDeBuscarData();
+        if (res.data.length === 0) this.refrescarFiltro('cliente');
+
+        const obj = {
+          total: res.total_registros,
+          tabla: 'filtroCliente',
+        };
+        this.tServ.Func_total_paginas(obj);
       } else if (this.tipoModal === 'buscarSuplidor') {
         const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
 
         this.dataFiltro = undefined;
+
+
         res.data.map(async (supli) => {
           supli.nombre = GLOBAL.Capitalice(supli.nombre);
           supli.documento_identidad = await supli.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
           return supli;
         });
-        this.dataFiltro = res.data;
+
+        if (res.data.length > 0) this.dataFiltro = res.data;
+        if (res.data.length === 0) this.dataFiltro = copyData;
         this.mostrarModalLuegoDeBuscarData();
 
-        if (res.data.length === 0) {
-          this.dbServ.toastWarning('No existe suplidor con el nombre introducido', 'AVISO', true);
-        }
+        if (res.data.length === 0) this.refrescarFiltro('suplidor');
+
         const obj = {
           total: res.total_registros,
           tabla: 'filtroSuplidor',

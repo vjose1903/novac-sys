@@ -86,8 +86,6 @@ export class AppComponent implements OnInit, AfterContentChecked {
   prepararActualizacion() {
     const headerModalActualizar = document.getElementsByClassName('p-dialog-title')[0];
     headerModalActualizar.id = 'modalProgress';
-
-    console.log('headerModalActualizar --> ', headerModalActualizar);
   }
 
   getPrintersName() {
