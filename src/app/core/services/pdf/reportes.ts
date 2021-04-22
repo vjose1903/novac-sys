@@ -39,6 +39,7 @@ export function makeReporte(data) {
     doc: dd,
     file: 'reporte.pdf',
     type: 'base64',
+    scale: configuration['pageOrient'] ? (configuration['pageOrient'] === 'landscape' ? 'fit' : 'noscale') : 'noscale'
   };
 
   return obj;
@@ -124,10 +125,10 @@ function cabeceraReporte(data, configuration) {
       },
       data.mostrar_sub_titulo
         ? {
-            text: data.sub_titulo,
-            style: 'letra10',
-            margin: [15, 10, 0, 0],
-          }
+          text: data.sub_titulo,
+          style: 'letra10',
+          margin: [15, 10, 0, 0],
+        }
         : { text: '' },
 
       {

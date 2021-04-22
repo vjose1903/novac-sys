@@ -17,6 +17,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   pdfSrc: any;
   fileName: any;
   tipoModal: string;
+  scaleImpresion: any;
 
   constructor(
     public _ipc: IpcService,
@@ -142,6 +143,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   generarPdf(obj) {
     this.pdfServ.generatePdf(obj, (res) => {
+      this.scaleImpresion = res['scale'] ? res['scale'] : 'noscale'
       if (res.status === 'si') {
         let obj;
 
@@ -227,6 +229,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
           base64: this.pdfSrc,
           filename: this.fileName,
           type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte',
+          scale: this.scaleImpresion
         };
 
         this._ipc.send('printBase64', obj);

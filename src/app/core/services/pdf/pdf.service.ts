@@ -15,9 +15,9 @@ import { DBservice } from '../bdservice.service';
   providedIn: 'root',
 })
 export class PdfService {
-  constructor(private dbServ: DBservice) {}
+  constructor(private dbServ: DBservice) { }
 
-  generatePdf(oPdf, callback = (arg) => {}) {
+  generatePdf(oPdf, callback = (arg) => { }) {
     let obj;
     let todo_true = true;
     const data = oPdf.data;
@@ -59,6 +59,7 @@ export class PdfService {
         const type = obj.type;
 
         this.createPdfbase64(dd, file, reimprimir, (res) => {
+          res['scale'] = obj.scale
           callback(res);
         });
       } else {
@@ -73,7 +74,7 @@ export class PdfService {
     }
   }
 
-  createPdfbase64(docDefinition, file_, reimprimir_, callback = (arg) => {}) {
+  createPdfbase64(docDefinition, file_, reimprimir_, callback = (arg) => { }) {
     try {
       const pdfDocGenerator = pdfMake.createPdf(docDefinition);
       pdfDocGenerator.getBase64((data) => {

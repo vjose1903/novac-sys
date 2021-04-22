@@ -148,7 +148,7 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   // autoUpdater.quitAndInstall();
 });
 
-autoUpdater.on('update-not-available', (info) => {});
+autoUpdater.on('update-not-available', (info) => { });
 
 autoUpdater.on('error', (error) => {
   if (win) {
@@ -188,11 +188,12 @@ ipcMain.on('printBase64', async (event: any, oPdf) => {
   const base64 = oPdf.base64;
   const filename = oPdf.filename;
   const type = oPdf.type;
+  const scale = oPdf['scale'] ? oPdf['scale'] : 'noscale';
 
   // await puts(base64, 'base64');
   // await puts(filename, 'filename');
   // await puts(type, 'type');
-  generatePdfFileFormBase64(filename, base64, type);
+  generatePdfFileFormBase64(filename, base64, type, scale);
 });
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // BORRA EL ARCHIVO DE LOGS
@@ -276,7 +277,7 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
 // PARA BORRAR UN ELEMENTO QUE NO ESTE BIEN
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-async function borrado_de_archivos_malos(archivos, callback = (arg) => {}) {
+async function borrado_de_archivos_malos(archivos, callback = (arg) => { }) {
   const del = require('del');
 
   // delete directory recursively
@@ -510,7 +511,7 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function cmd(command, callback = (arg) => {}) {
+function cmd(command, callback = (arg) => { }) {
   puts(command, 'comando realizado en la funcion cmd');
   exec(command, (error, stdout, stderr) => {
     let obj;
@@ -539,7 +540,7 @@ function cmd(command, callback = (arg) => {}) {
 // FUNCION QUE SE ENCARGA DE DESCARGAR ARCHIVOS
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
+function downloadFile(archive_url, path, file_, callback = (arg) => { }) {
   // Save variable to know progress
 
   let received_bytes = 0;
@@ -624,7 +625,7 @@ async function escribirLogs(file, titulo, texto) {
       stream.end();
     });
   } else {
-    await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => {});
+    await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => { });
   }
 }
 
@@ -632,12 +633,12 @@ async function escribirLogs(file, titulo, texto) {
 // GENERAR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
+function generatePdfFileFormBase64(cFileName, base64, type = 'reporte', scale = 'noscale') {
   const FileName = pathAdd('/' + cFileName);
 
   try {
     fs.writeFile(FileName, base64, { encoding: 'base64' }, (err) => {
-      imprimir(cFileName, type);
+      imprimir(cFileName, type, scale);
     });
   } catch (err) {
     win.webContents.send('printBase64Res', { msg: 'Error generando reporte!!', status: false, error: err });
@@ -648,7 +649,7 @@ function generatePdfFileFormBase64(cFileName, base64, type = 'reporte') {
 // IMPRIMIR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function imprimir(cFileName, tipo) {
+function imprimir(cFileName, tipo, scale) {
   puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${pathAdd(`/${cFileName}`)}`);
   const sumatrapdf_path = pathAdd('/print/lp.exe');
   const file_path = pathAdd(`/${cFileName}`);
@@ -656,7 +657,7 @@ function imprimir(cFileName, tipo) {
   const orientation = tipo === 'reporte' ? 'Portrait' : 'landscape';
   const paper_size = tipo === 'reporte' ? 'carta' : 'VJPOS';
 
-  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},noscale,paper=${paper_size},simplex" -silent "${file_path}"`;
+  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},${scale},paper=${paper_size},simplex" -silent "${file_path}"`;
 
   cmd(comando, (res) => {
     let msg_ = 'PDF impreso correctamente!!';
