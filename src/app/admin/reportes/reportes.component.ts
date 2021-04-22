@@ -143,7 +143,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   generarPdf(obj) {
     this.pdfServ.generatePdf(obj, (res) => {
-      this.scaleImpresion = res['scale'] ? res['scale'] : 'noscale'
+      this.scaleImpresion = res['scale'] ? res['scale'] : 'noscale';
       if (res.status === 'si') {
         let obj;
 
@@ -229,8 +229,9 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
           base64: this.pdfSrc,
           filename: this.fileName,
           type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte',
-          scale: this.scaleImpresion
+          scale: this.scaleImpresion,
         };
+        console.log('obj --> ', obj);
 
         this._ipc.send('printBase64', obj);
       } else if (this.tipoModal === 'cuadre') {
