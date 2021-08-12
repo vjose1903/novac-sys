@@ -655,7 +655,7 @@ function imprimir(cFileName, tipo, scale) {
   const file_path = pathAdd(`/${cFileName}`);
 
   const orientation = tipo === 'reporte' ? 'Portrait' : 'landscape';
-  const paper_size = tipo === 'reporte' ? 'carta' : 'VJPOS';
+  const paper_size = tipo === 'reporte' ? 'letter' : 'VJPOS';
 
   const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},${scale},paper=${paper_size},simplex" -silent "${file_path}"`;
 
