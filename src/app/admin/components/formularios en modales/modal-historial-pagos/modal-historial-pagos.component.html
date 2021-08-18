@@ -1,9 +1,10 @@
-<div #cardTabla id="cardTabla" style="height: 100%">
+<div #cardTabla id="cardTabla cardListados" style="height: 100%">
   <app-tablas
     [search]="false"
     [paginate]="true"
     [id_tabla]="'historial_pago'"
     [padre]="cardTabla"
+    [pad]="false"
     [info]="info"
     [data]="pagos"
     [tablaHover]="false"

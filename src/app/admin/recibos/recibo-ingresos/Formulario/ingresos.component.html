@@ -17,7 +17,7 @@
           autocomplete="off"
           [disabled]="clienteAdepositar"
         />
-        <button class="btn btn-gris" routerLink="/admin/ingresos">Atras</button>
+        <button class="btn btn-gris" routerLink="/admin/recibos/ingresos">Atras</button>
       </div>
     </div>
   </div>
@@ -26,12 +26,8 @@
       <div class="text-center">
         <h1 class="negrita">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h1>
 
-        <span class="badge {{ clienteAdepositar.balance > 0 ? 'red' : 'green' }} text-white debe mb-3">
-          Debe: RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span
-        >
-        <span *ngIf="facturas_selected.length > 0" class="badge green debe text-white mb-3 ml-2">
-          Recibiendo: RD$ {{ formatoNumero(recibiendo) }}</span
-        >
+        <span class="badge {{ clienteAdepositar.balance > 0 ? 'red' : 'green' }} text-white debe mb-3"> Debe: RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span>
+        <span *ngIf="facturas_selected.length > 0" class="badge green debe text-white mb-3 ml-2"> Recibiendo: RD$ {{ formatoNumero(recibiendo) }}</span>
         <span *ngIf="facturas_selected.length > 0" class="badge yellow recibe mb-3 ml-2"> Faltando: RD$ {{ formatoNumero(restando) }}</span>
       </div>
       <div *ngIf="clienteAdepositar.balance > 0" class="d-flex justify-content-between">
@@ -53,7 +49,8 @@
           </div>
           <app-tablas
             *ngIf="Facturas"
-            [padre]="cardTabla" [info]="info"
+            [padre]="cardTabla"
+            [info]="info"
             [data]="Facturas"
             [quitarAScorll]="60"
             (getInfoChange)="getInfoChange($event)"

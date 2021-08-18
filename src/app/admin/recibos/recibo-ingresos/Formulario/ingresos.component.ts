@@ -21,15 +21,10 @@ import { PdfService } from '../../../../core/services/pdf/pdf.service';
   styleUrls: ['./ingresos.component.scss'],
 })
 export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
-  element: any;
-  listaClientes;
   clienteAdepositar: any;
   Facturas;
   tipo_recibo = 'Pago factura';
   facturas_selected = [];
-  articuloEnTurno = null;
-  articuloEnTurnoid = null;
-  medidaEnTurno = null;
 
   @ViewChild(TablasComponent) tablas: TablasComponent;
   // =============================================
@@ -43,12 +38,10 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       text_color: 'colorEstado',
       isIcon: true,
       color: true,
-      customClass: true,
       estilos: [{ width: '2rem' }, { color: '#8ef3a3' }],
     },
     {
       titulo: 'NCF',
-      customClass: true,
       estilos: [{ width: '7rem' }],
       key: 'numero_comprobante',
     },
@@ -76,7 +69,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       titulo: 'Seleccione',
       tipo: 'check',
       key: 'select',
-      customClass: true,
+      select_all: false,
       estilos: [{ width: '7rem' }],
       disable: {
         getDisabled: true,
@@ -88,7 +81,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       titulo: 'Pago Total',
       tipo: 'check',
       key: 'pagoT',
-      customClass: true,
+      select_all: false,
       estilos: [{ width: '6rem' }],
       disable: {
         getDisabled: true,
@@ -208,7 +201,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
         }
       } else {
         if (fact.is_viaje && !fact.select) {
-          this.Facturas[j].monto = GLOBAL.numFormatTwoDecimals(this.Facturas[j].total_factura);
           this.Facturas[j].select = true;
           this.facturas_selected.push(fact);
         }
@@ -321,12 +313,14 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
         for (let i = 0; i < pagos.length; i++) {
           const pago = pagos[i];
           pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
-          pago.recibo_created_at = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
+          pago.recibo_created_at = moment(pago.recibo_created_at).format('DD/MM/YYYY');
         }
+
         const obj = {
           total: pagos.length,
           tabla: 'historial_pago',
         };
+
         this.abrirModal('historial_pago', pagos);
         this.tServ.Func_total_paginas(obj);
       }
@@ -349,9 +343,8 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     (document.getElementById('clienteI') as any).value = null;
     this.AllSelected = false;
     this.resetVariables();
-    setTimeout(() => {
-      this.enfocarInput('clienteI');
-    }, 250);
+
+    setTimeout(() => this.enfocarInput('clienteI'), 250);
   }
 
   formarDetalleRecibos() {
@@ -477,6 +470,8 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       } else {
         this.facturas_selected.push(item.body[item.index]);
       }
+
+      if (_.every(this.Facturas, { select: this.Facturas[item.index].select })) this.AllSelected = this.Facturas[item.index].select;
     }
 
     if (item.cambio === 'monto') {
@@ -532,14 +527,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
         filtrarCliente: nombre,
       };
       this.abrirModal('buscarCliente', obj);
-    }
-  }
-
-  async saltar(campo, valor?) {
-    if (valor === 'Pago factura') {
-      this.enfocarInput(campo);
-    } else if (valor === 'Compra adelantada') {
-      this.medidaEnTurno = null;
     }
   }
 }

@@ -56,13 +56,11 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       text_color: 'colorEstado',
       isIcon: true,
       color: true,
-      customClass: true,
       estilos: [{ width: '2rem' }],
     },
     {
       titulo: 'Numero Fact',
       key: 'secuencia',
-      customClass: true,
       estilos: [{ width: '7rem' }],
     },
     {
@@ -72,13 +70,11 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     {
       titulo: 'Comprobante',
       key: 'numero_comprobante',
-      customClass: true,
       estilos: [{ width: '7rem' }],
     },
     {
       titulo: 'Condicion',
       key: 'condicion',
-      customClass: true,
       estilos: [{ width: '6rem' }],
     },
     {
@@ -107,18 +103,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       isIcon: true,
       color: true,
     },
-
-    // {
-    //   titulo: 'Seleccione',
-    //   tipo: 'check',
-    //   key: 'select',
-
-    //   disable: {
-    //     getDisabled: false,
-    //     campo: '',
-    //   },
-    //   title: '',
-    // },
   ];
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 

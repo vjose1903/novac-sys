@@ -29,7 +29,6 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
     {
       titulo: 'Cod.',
       key: 'codigo',
-      customClass: true,
       estilos: [{ width: '3.5rem' }],
     },
     {
@@ -54,7 +53,6 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
       text_color: 'colorUsado',
       isIcon: true,
       color: true,
-      customClass: true,
       estilos: [{ width: '3.5rem' }],
     },
     {
@@ -63,7 +61,6 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
       text_color: 'colorEstado',
       isIcon: true,
       color: true,
-      customClass: true,
       estilos: [{ width: '3.5rem' }],
     },
   ];

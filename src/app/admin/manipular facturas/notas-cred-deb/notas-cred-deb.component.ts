@@ -141,13 +141,11 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
           campo: '',
         },
         title: '',
-        customClass: true,
         estilos: [{ width: '3rem' }],
       },
       {
         titulo: 'Articulo',
         key: 'descripcion',
-        customClass: true,
         estilos: [{ 'text-align': 'left' }, { width: '20rem' }],
       },
       {
@@ -160,20 +158,17 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
           getDisabled: true,
           campo: 'select',
         },
-        customClass: true,
         estilos: [{ width: '6rem' }],
       },
       {
         titulo: 'Cantidad',
         key: 'cantidad',
         formatoNumero: true,
-        customClass: true,
         estilos: [{ width: '5rem' }],
       },
       {
         titulo: 'Unidad',
         key: 'unidad',
-        customClass: true,
         estilos: [{ width: '4.5rem' }],
       },
       {
@@ -198,7 +193,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
         disable: {
           getDisabled: true,
         },
-        customClass: true,
         estilos: [{ width: '8rem' }],
       },
     ];
@@ -317,6 +311,8 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
       }
     }
   }
+
+  async selectAll(info) {}
 
   async getInfoChange(info) {
     const entidad = info.body[info.index];

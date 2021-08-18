@@ -27,26 +27,22 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     {
       titulo: 'Cod.',
       key: 'codigo',
-      customClass: true,
       estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }],
     },
     {
       titulo: 'Articulo',
       key: 'nombre',
-      customClass: true,
       estilos: [{ width: '37%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }],
     },
     {
       titulo: 'Medida',
       key: 'medida',
-      customClass: true,
       estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }],
     },
     {
       titulo: 'Precio',
       key: 'precio_principal',
       formatoNumero: true,
-      customClass: true,
       estilos: [{ width: '20%' }],
     },
   ];

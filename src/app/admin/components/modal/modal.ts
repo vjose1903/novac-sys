@@ -79,7 +79,7 @@ export class modalClass extends LayoutClass {
     if (_this) {
       switch (observable) {
         case 'printBase64Res':
-          _this.ipcBase64Resonse(res)
+          _this.ipcBase64Resonse(res);
 
           _this.reiniciarVariables([VM._7]);
           setTimeout(() => this.quitarFocodeElectron(), 25);
@@ -174,7 +174,7 @@ export class modalClass extends LayoutClass {
     modalClass.a_quien_responder = quien_responde;
   }
 
-  abrirModal(tipo, seleccion, tipo_modal?) {
+  abrirModal(tipo, seleccion, tipo_modal?, callback = (arg) => {}) {
     modalClass.a_quien_responder = this.quien_me_llamo;
 
     this.tipoModal = tipo_modal ? tipo_modal : tipo;
@@ -182,5 +182,7 @@ export class modalClass extends LayoutClass {
     this.mServ.modalTipo(tipo);
     this.mServ.ModalSeleccion(seleccion);
     this.mServ.mostrarModal(true);
+
+    callback(true);
   }
 }

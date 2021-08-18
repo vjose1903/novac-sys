@@ -13,17 +13,12 @@ import {
   ElementRef,
 } from '@angular/core';
 import { MdbTableDirective } from 'angular-bootstrap-md';
-import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+
 import { Subscription } from 'rxjs';
 import { obj_paginate_default, TablasService } from './tablas.service';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
-import { mixinClass } from '../../mixinClass';
-import { IpcService } from '../../../core/services/ipc.service';
-import { LayoutService } from '../../layout/layout.service';
-import { ModalService } from '../modal/modal.service';
 
 @Component({
   selector: 'app-tablas',
@@ -129,6 +124,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   @Input() alto = 200;
   @Input() pad = true;
+  select_all_value = false;
   mixinClass;
   constructor(private cdRef: ChangeDetectorRef, private dbServ: DBservice, private tServ: TablasService) {}
 
@@ -179,19 +175,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const arrayTamanos = [filterHeight, paginationHeight, titulosHeigth, this.quitarAScorll];
 
     setTimeout(() => {
-      //   if (this.search && this.paginate) {
-      //     // si tiene paginacion y buscador
-      //     restoAHeigthDiv = filterHeight + paginationHeight + titulosHeigth;
-      //   } else if (this.search && !this.paginate) {
-      //     // si solo buscador
-      //     restoAHeigthDiv = filterHeight + titulosHeigth;
-      //   } else if (!this.search && this.paginate) {
-      //     // si solo paginacion
-      //     restoAHeigthDiv = paginationHeight + titulosHeigth;
-      //   } else if (!this.search && !this.paginate) {
-      //     // si no tiene ni paginacion ni buscador
-      //     restoAHeigthDiv = titulosHeigth;
-      //   }
       let restar = 0;
       for (let i = 0; i < arrayTamanos.length; i++) {
         const tamano = arrayTamanos[i];
@@ -326,7 +309,15 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
   }
 
-  changeValorCheck(key, i) {
+  changeValorSelectAll() {
+    this.select_all_value = !this.select_all_value;
+
+    this.data.forEach((data, index) => {
+      if ((this.select_all_value && !data.select) || (!this.select_all_value && data.select)) this.changeValorCheck('select', index, true);
+    });
+  }
+
+  changeValorCheck(key, i, auto = false) {
     this.data[i][key] = !this.data[i][key];
     const obj = {
       body: this.data,
@@ -334,6 +325,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       cambio: key,
       value: this.data[i][key],
     };
+
+    if (!auto && _.every(this.data, { select: this.data[i][key] })) this.select_all_value = this.data[i][key];
+
     this.getInfoChange.emit(obj);
   }
 
@@ -431,6 +425,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
     return res;
   }
+
   checkLongMillares(num) {
     let res = false;
     const splitNum = _.split(num, ',');
@@ -583,11 +578,18 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       }
     }
   }
+
   changeStylesTitles() {
     for (let i = 0; i < this.info.length; i++) {
       const info = this.info[i];
 
-      if (info.customClass) {
+      if (info.tipo === 'check') {
+        if (!_.has(info, 'select_all')) info.select_all = true;
+        if (!_.has(info, 'estilos')) info.estilos = [];
+        info.estilos.push({ padding: 0 });
+      }
+
+      if (info.estilos && info.estilos.length > 0) {
         let list_estilos_titulos = '';
         for (let j = 0; j < info.estilos.length; j++) {
           const estilos = info.estilos[j];
@@ -630,9 +632,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     if (simpleChanges.data && simpleChanges.info) {
       if (simpleChanges.data.currentValue && simpleChanges.info.currentValue) {
-        setTimeout(() => {
-          this.calcularAlto();
-        }, 250);
+        setTimeout(() => this.calcularAlto(), 250);
       }
     }
     if (simpleChanges.seleccionado) {

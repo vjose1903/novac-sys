@@ -25,13 +25,11 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
     {
       titulo: 'Cod.',
       key: 'codigo',
-      customClass: true,
       estilos: [{ width: '4rem' }],
     },
     {
       titulo: 'Articulo',
       key: 'nombre',
-      customClass: true,
       estilos: [{ width: '35rem' }, { 'text-align': 'left' }, { 'padding-left': '2rem' }],
     },
     {

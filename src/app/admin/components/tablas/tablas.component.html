@@ -7,9 +7,28 @@
   <!-- <div style="border-radius: 10px 10px 0px 0px;" class="tableBodyScroll"> -->
   <div style="border-radius: 10px 10px 0px 0px" class="tableBodyScroll" [ngStyle]="{ height: alto + 'px' }">
     <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" small="true" id="VICtablas">
-      <thead class="text-center" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
+      <thead class="text-center position-relative" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
+        <!-- [disabled]="disabledInput(column.disable, i)" -->
         <tr #titulosHeader>
-          <th id="{{ row.titulo }}" *ngFor="let row of info">{{ row.titulo }}</th>
+          <th id="{{ row.titulo }}" *ngFor="let row of info">
+            <span [ngSwitch]="row.tipo">
+              <span *ngSwitchCase="'check'">
+                <input
+                  *ngIf="row?.select_all"
+                  class="apple-switch"
+                  type="checkbox"
+                  [checked]="select_all_value"
+                  pTooltip="{{ select_all_value ? 'Deseleccionar todo' : 'Seleccionar todo' }}"
+                  tooltipPosition="top"
+                  (change)="changeValorSelectAll()"
+                />
+              </span>
+
+              <span *ngSwitchDefault>
+                {{ row.titulo }}
+              </span>
+            </span>
+          </th>
           <th *ngIf="botones.titulo">Acciones</th>
         </tr>
       </thead>

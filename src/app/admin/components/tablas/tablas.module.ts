@@ -6,10 +6,11 @@ import { FORMERR } from 'dns';
 import { FormsModule } from '@angular/forms';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
+import { PrimengModule } from '../../../modules/primeng.module';
 
 @NgModule({
   declarations: [BTNACCIONESComponent, TablasComponent],
-  imports: [CommonModule, FormsModule, MDBBootstrapModule, NgxBootstrapModule],
+  imports: [CommonModule, FormsModule, MDBBootstrapModule, NgxBootstrapModule, PrimengModule],
   exports: [BTNACCIONESComponent, TablasComponent],
 })
 export class TablasModule {}

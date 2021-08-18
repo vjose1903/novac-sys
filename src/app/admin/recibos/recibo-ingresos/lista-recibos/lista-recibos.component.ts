@@ -8,6 +8,8 @@ import { TablasService } from '../../../components/tablas/tablas.service';
 import { LayoutService } from '../../../../admin/layout/layout.service';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import { mixinClass } from '../../../mixinClass';
+import { PdfService } from '../../../../core/services/pdf/pdf.service';
+import { LoaderService } from '../../../../loader/loader.service';
 
 @Component({
   selector: 'app-lista-recibos',
@@ -19,45 +21,40 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
     {
       titulo: '1',
       key: 'tipo_recibo',
+      text_tooltip: 'tooltip_tipo',
       text_color: 'colorEstado',
       isIcon: true,
       color: true,
-      customClass: true,
       estilos: [{ width: '3%' }, { color: '#8ef3a3' }],
     },
     {
       titulo: 'No. recibo',
-      customClass: true,
       estilos: [{ width: '8%' }],
       key: 'numero_recibo',
     },
     {
       titulo: 'Cliente',
       key: 'cliente_',
-      customClass: true,
       estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }],
     },
     {
       titulo: 'No. factura',
       key: 'numero_factura',
-      customClass: true,
       estilos: [{ width: '12%' }],
     },
     {
       titulo: 'Total recibido',
       key: 'total',
       formatoNumero: true,
-      customClass: true,
       estilos: [{ width: '12%' }, { 'text-align': 'end' }],
     },
     {
       titulo: '2',
       key: 'ver',
       text_color: 'colorNegro',
-      text_tooltip: 'tooltip_print',
+      text_tooltip: 'tooltip_ver',
       isIcon: true,
       color: true,
-      customClass: true,
       estilos: [{ width: '0%' }, { color: '#8ef3a3' }],
     },
     {
@@ -67,7 +64,6 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
       text_tooltip: 'tooltip_anular',
       isIcon: true,
       color: true,
-      customClass: true,
       estilos: [{ width: '9%' }, { color: '#000' }],
     },
   ];
@@ -81,6 +77,8 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
     public mServ: ModalService,
     private tServ: TablasService,
     public layServ: LayoutService,
+    public pdfServ: PdfService,
+    public loadServ: LoaderService,
   ) {
     super(mServ, _ipc, layServ);
   }
@@ -100,26 +98,33 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
     this._destroy_mixin();
   }
 
+  async ipcBase64Resonse(res) {
+    if (res.status === 'si') {
+      this.dbServ.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO', true);
+    } else {
+      this.dbServ.toastError(res.msg, 'ERROR', true);
+    }
+
+    setTimeout(() => GLOBAL.quitarFocodeElectron(), 5);
+  }
+
   ipcPrintResponse(res) {
     if (res.status === 'si') {
-      this.fileName = res.file;
-      this.pdfSrc = res.body;
-
-      const obj = {
-        pdfSrc: this.pdfSrc,
-        titulo: 'Revisión de recibo de ingreso',
-        height: '25rem',
-        reimprimir: true,
-        fileName: this.fileName.split('.')[0],
-      };
-
-      this.abrirModal('visor_pdf', obj);
+      // this.fileName = res.file;
+      // this.pdfSrc = res.body;
+      // const obj = {
+      //   pdfSrc: this.pdfSrc,
+      //   titulo: 'Revisión de recibo de ingreso',
+      //   height: '25rem',
+      //   reimprimir: true,
+      //   fileName: this.fileName.split('.')[0],
+      // };
+      // this.loadServ.isLoading.next(true);
+      // this.abrirModal('visor_pdf', obj);
     } else {
       this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
     }
   }
-
-  ipcBase64Resonse(res) {}
 
   mapeoRecibos(res) {
     res.map((recibo) => {
@@ -129,7 +134,8 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
       recibo['numero_factura'] = recibo.detalle_recibos.length === 1 ? recibo.detalle_recibos[0].descripcion.split(' ')[1] : 'Varios...';
       recibo['ver'] = 'far fa-eye';
       recibo['anular'] = 'far fa-trash-alt';
-      recibo['tooltip_print'] = 'Ver';
+      recibo['tooltip_tipo'] = recibo.chofer ? 'Factura de Viaje' : 'Factura a crédito';
+      recibo['tooltip_ver'] = 'Ver';
       recibo['tooltip_anular'] = 'Anular';
 
       recibo['iconsMoveEvents'] = [
@@ -216,23 +222,29 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
 
   getReciboBase64(arg) {
     const recibo_selected = _.find(this.lista_recibos, (recibo) => recibo.id === arg.id);
-    // let ids = '';
 
-    // recibo_selected.detalle_recibos.map((detalle) => {
-    //   ids += detalle['cabecera_factura_id'];
+    const obj = { data: recibo_selected, type: 'recibo_ingreso', retunBase64: true };
 
-    //   detalle['total_factura'] = 0;
+    this.generarPdf(obj);
+  }
 
-    //   return detalle;
-    // });
+  generarPdf(obj) {
+    this.loadServ.isLoading.next(true);
+    this.pdfServ.generatePdf(obj, (res) => {
+      if (res.status === 'si') {
+        this.fileName = res.file;
+        this.pdfSrc = res.body;
+        obj = {
+          pdfSrc: res.body,
+          titulo: 'Revisión de recibo de ingreso',
+          height: '25rem',
+          reimprimir: true,
+          fileName: res.file.split('.')[0],
+        };
 
-    const obj = {
-      data: recibo_selected,
-      type: 'recibo_ingreso',
-      retunBase64: true,
-    };
-
-    this._ipc.send('print', obj);
+        this.abrirModal('visor_pdf', obj, undefined, (res) => this.loadServ.isLoading.next(false));
+      }
+    });
   }
 
   imprimir_base64() {

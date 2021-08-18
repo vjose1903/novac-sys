@@ -25,7 +25,6 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
       text_color: 'colorEstado',
       isIcon: true,
       color: true,
-      customClass: true,
       estilos: [{ width: '1.5rem' }, { color: '#8ef3a3' }],
     },
     {
