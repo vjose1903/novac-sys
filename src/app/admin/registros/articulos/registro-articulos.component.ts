@@ -325,7 +325,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     }
   }
 
-
   borrar() {
     this.ProductoEditando = null;
     this.form.reset();
@@ -780,6 +779,8 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   async editarItem(item) {
+    console.log('item --> ', item);
+
     const articulo = item.ARG;
 
     this.borrar();
@@ -791,7 +792,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     this.MEDIDACAJA = '';
     this.TIPOARTICULO = articulo.descripcion;
 
-    if (articulo.is_combo) {
+    if (articulo.is_combo || (_.has(articulo, 'formulas_productos_terminados') && articulo.formulas_productos_terminados.length)) {
       this.getMateriasP((res) => {
         this.numIngredientes = articulo.formulas_productos_terminados.length;
 
