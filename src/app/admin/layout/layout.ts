@@ -1,12 +1,9 @@
 import { Subscription } from 'rxjs';
 import { GLOBAL } from '../../core/services/GLOBAL';
-import { myElectron } from '../../core/services/electron';
 import { LayoutService } from './layout.service';
 
-export class LayoutClass extends myElectron {
-  constructor(public layServ?: LayoutService) {
-    super();
-  }
+export class LayoutClass {
+  constructor(public layServ?: LayoutService) {}
 
   public facturaGuardada: any = undefined;
   info_cambio = {};

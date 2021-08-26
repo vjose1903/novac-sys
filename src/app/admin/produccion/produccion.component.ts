@@ -6,7 +6,6 @@ import * as _ from 'lodash';
 import { ModalService } from '../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 
-import { FunctionService } from '../../core/services/functions.service';
 import { obj_paginate_default, TablasService } from '../components/tablas/tablas.service';
 
 import { LayoutService } from '../layout/layout.service';
@@ -49,7 +48,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
   constructor(
     private dbServ: DBservice,
-    private fun: FunctionService,
     public mServ: ModalService,
     private tServ: TablasService,
     public layServ: LayoutService,

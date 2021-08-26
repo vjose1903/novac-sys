@@ -70,11 +70,6 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnCh
 
       return arti;
     });
-
-    // this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => {
-    //   if (res) this.mandarArticulos();
-    //   else this.resetLista();
-    // });
   }
 
   ngOnChanges(simpleChanges) {

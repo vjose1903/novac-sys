@@ -7,7 +7,6 @@ import * as moment from '../../../../utils/javascript/moment';
 import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { FunctionService } from '../../../core/services/functions.service';
 import { LoaderService } from '../../../loader/loader.service';
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutService } from '../../layout/layout.service';
@@ -93,7 +92,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   constructor(
     private dbServ: DBservice,
     private cdRef: ChangeDetectorRef,
-    private fun: FunctionService,
     private fb: FormBuilder,
     private router: Router,
     public mServ: ModalService,

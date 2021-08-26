@@ -3,7 +3,6 @@
   <span class="text"> CARGANDO ... </span>
 </div>
 
-<mdb-card-img id="modalProgress" class="btn_invisible position-absolute" src="assets/img/transparente.png" alt="Logo ADM"></mdb-card-img>
 <router-outlet></router-outlet>
 
 <!-- <ngx-spinner size="large" bdOpacity="0.9" [fullScreen]="true" type="ball-atom" color="#95f0a7">
@@ -26,8 +25,6 @@
     <div class="mr-2">
       <span class="negrita">{{ objPercent?.transferred }} Mb / </span>
       <span class="negrita gris">{{ objPercent?.total }} Mb</span>
-
-      <span class="negrita gris">{{ pruebaModal }} Mb</span>
     </div>
   </div>
   <p-progressBar [value]="objPercent?.percent"></p-progressBar>

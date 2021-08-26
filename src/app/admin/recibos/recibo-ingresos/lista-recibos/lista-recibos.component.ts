@@ -104,8 +104,6 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
     } else {
       this.dbServ.toastError(res.msg, 'ERROR', true);
     }
-
-    setTimeout(() => GLOBAL.quitarFocodeElectron(), 5);
   }
 
   ipcPrintResponse(res) {

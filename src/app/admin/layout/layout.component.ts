@@ -8,7 +8,6 @@ import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationErr
 import { DBservice } from '../../core/services/bdservice.service';
 import { IpcService } from '../../core/services/ipc.service';
 
-import { FunctionService } from '../../core/services/functions.service';
 import { LayoutService } from './layout.service';
 import { mixinClass } from '../mixinClass';
 import { ModalService } from '../components/modal/modal.service';
@@ -42,7 +41,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   initNavigate = true;
 
   constructor(
-    public fun: FunctionService,
     private dbServ: DBservice,
     private breakpointObserver: BreakpointObserver,
     private router: Router,
@@ -124,6 +122,10 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
     this.searchVersion();
     this.getPrintersName();
+  }
+
+  probar() {
+    console.log('CLICK EN FOCO ANGULAR');
   }
 
   initVariables() {

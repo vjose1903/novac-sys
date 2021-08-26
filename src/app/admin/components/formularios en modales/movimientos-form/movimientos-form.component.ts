@@ -1,12 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { DBservice } from '../../../../core/services/bdservice.service';
-import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import { ModalService } from '../../modal/modal.service';
-import { FunctionService } from '../../../../core/services/functions.service';
 import { IpcService } from '../../../../core/services/ipc.service';
 import { LayoutService } from '../../../layout/layout.service';
 import { mixinClass } from '../../../mixinClass';
@@ -28,7 +25,7 @@ export class MovimientosFormComponent extends mixinClass implements OnInit, Afte
   @Output() cancel = new EventEmitter<any>();
   medidas;
   plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
-  constructor(private dbServ: DBservice, private fun: FunctionService, public mServ: ModalService, public _ipc: IpcService, public layServ: LayoutService) {
+  constructor(private dbServ: DBservice, public mServ: ModalService, public _ipc: IpcService, public layServ: LayoutService) {
     super(mServ, _ipc, layServ);
   }
 

@@ -4,7 +4,6 @@ import * as _ from 'lodash';
 import * as moment from '../../../../utils/javascript/moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { ModalService } from '../../components/modal/modal.service';
-import { FunctionService } from '../../../core/services/functions.service';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutService } from '../../layout/layout.service';
@@ -77,7 +76,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     public _ipc: IpcService,
     public mServ: ModalService,
     public layServ: LayoutService,
-    private fun: FunctionService,
+
     private tServ: TablasService,
     public pdfServ: PdfService,
   ) {

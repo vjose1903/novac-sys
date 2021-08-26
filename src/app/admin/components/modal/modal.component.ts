@@ -117,6 +117,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
+      console.log('SHOWMODAL en modalComponent ', res);
+
       if (res !== undefined && res !== null) {
         if (!this.paraFiltroArticulos && !this.paraFiltroClientes && !this.paraFiltroSuplidor) {
           this.showModal = res;
@@ -222,17 +224,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   accion(arg, tipo_?) {
-    let obj = {};
+    let obj = arg;
 
-    if (tipo_) {
-      obj = { tipo: tipo_, body: arg };
-    } else {
-      obj = arg;
-    }
+    if (tipo_) obj = { tipo: tipo_, body: arg };
 
     this.mServ.ModalDecision(obj);
 
-    setTimeout(() => this.reinicioModal(), 250);
+    // setTimeout(() => this.reinicioModal(), 250);
   }
 
   getDevuelta(arg) {
@@ -249,6 +247,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.cant_notas_credito = 0;
     this.cant_notas_debito = 0;
     this.filtrar = true;
+    console.log('REINICIANDO VARIABLES MODAL');
   }
 
   formReporteAccion(arg) {

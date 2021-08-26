@@ -11,6 +11,7 @@ import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { LoaderService } from '../../../loader/loader.service';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -44,6 +45,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     public _ipc: IpcService,
     public layServ: LayoutService,
     public pdfServ: PdfService,
+    public loadServ: LoaderService,
   ) {
     super(mServ, _ipc, layServ);
   }
@@ -120,11 +122,15 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     this.completarTituloPag();
   }
 
-  ipcBase64Resonse(res) {
-    if (res.status === 'si') {
-      this.dbServ.toastSuccess(res.msg, 'CORRECTO', true);
+  ipcBase64Resonse(res_ipc) {
+    // console.log('res_ipc: ', res_ipc);
+
+    this.loadServ.isLoading.next(false);
+
+    if (res_ipc.status === 'si') {
+      this.dbServ.toastSuccess(res_ipc.msg, 'CORRECTO', true);
     } else {
-      this.dbServ.toastError(res.msg, 'ERROR', true);
+      this.dbServ.toastError(res_ipc.msg, 'ERROR', true);
     }
   }
 
@@ -143,35 +149,45 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   }
 
   reimprimirFactura(obj) {
+    this.loadServ.isLoading.next(true);
     this.pdfServ.generatePdf(obj, (res) => {
       if (res.status === 'si') {
-        const objBase = {
-          base64: res.body,
-          filename: res.file,
-          type: 'conduce',
-        };
-        this._ipc.send('printBase64', objBase);
+        this.fileName = res.file;
+        this.pdfSrc = res.body;
+
+        const obj = { base64: this.pdfSrc, filename: this.fileName, type: 'facturacion' };
+
+        this._ipc.send('printBase64', obj);
       }
     });
   }
 
   decisionModal(res) {
+    // console.log('this.tipoModal ', this.tipoModal);
+    // console.log('this.BuscarPara ', this.BuscarPara);
+    // console.log('res ', res);
+
     if (res) {
       if (this.tipoModal === 'mostrarFactura') {
+        // console.log('this.BuscarPara ==> ', this.BuscarPara);
+
         if (this.BuscarPara === 'anular_factura') {
           this.facturaSelected['identificadorFact'] =
             this.campo === '2'
               ? ' con el comprobante fiscal ' + this.facturaSelected.numero_comprobante
               : ' con el numero de factura ' + this.formatoNumeroFactura(this.facturaSelected.numero_factura);
-          setTimeout(() => {
-            this.abrirModal('cancelar', this.facturaSelected);
-          }, 10);
+
+          setTimeout(() => this.abrirModal('cancelar', this.facturaSelected), 10);
         } else if (this.BuscarPara === 'solo_ver') {
           if (res.tipo === 'reimrimir') {
-            const obj = {
-              data: this.facturaSelected,
-              type: 'facturacion',
-            };
+            const obj = { data: this.facturaSelected, type: 'facturacion' };
+            console.log(' ');
+            console.log(' ');
+            console.log(' ========================================');
+            console.log('this.facturaSelected --> ', this.facturaSelected);
+            console.log(' ========================================');
+            console.log(' ');
+            console.log(' ');
 
             this.reimprimirFactura(obj);
           } else {
@@ -185,18 +201,12 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
         this.decisionesModal();
       }
     } else {
-      if (this.tipoModal === 'cancelar') {
-        setTimeout(() => {
-          this.abrirModal('mostrarFactura', this.facturas[0]);
-        }, 10);
-      }
+      if (this.tipoModal === 'cancelar') setTimeout(() => this.abrirModal('mostrarFactura', this.facturas[0]), 10);
     }
   }
 
   initCambioMenu(arg) {
-    if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
-    }
+    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
   }
 
   ngOnDestroy(): void {
@@ -246,6 +256,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       this.dbServ.toastError(error.error.msg, 'ERROR', true);
     }
   }
+
   completarTituloPag() {
     if (this.BuscarPara === 'anular_factura') {
       this.Para = ' Anular factura';
@@ -350,10 +361,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       //     detalle = await this.calcularPrecio(detalle, factura);
       //   }
       // }
-      const obj = {
-        total: busqueda.total_registros,
-        tabla: 'facturas_parms',
-      };
+      const obj = { total: busqueda.total_registros, tabla: 'facturas_parms' };
 
       this.tServ.Func_total_paginas(obj);
       this.facturas = GLOBAL.duplicarJson(busqueda['data']);
@@ -361,8 +369,12 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       if (this.facturas.length > 0) {
         if (this.campo === '2') {
           this.facturas[0]['mostrarFacturaPara'] = this.BuscarPara;
+
           this.facturaSelected = this.facturas[0];
-          this.abrirModal('mostrarFactura', this.facturas[0]);
+          this.parseFacturaSelected().then((res) => {
+            this.abrirModal('mostrarFactura', res);
+          });
+          // console.log('this.facturaSelected --> ', this.facturaSelected);
         }
       } else {
         if (this.campo === '1') {
@@ -428,17 +440,23 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     this.enfocarInput('campoI');
   }
 
-  selectFactura(item) {
-    if (item.column === 'select') {
-      this.facturaSelected = undefined;
+  parseFacturaSelected() {
+    return new Promise<string>((resolve) => {
       setTimeout(() => {
-        this.facturaSelected = this.facturas[item.index];
-        this.indexSelected = item.index;
-
         this.facturaSelected['FACTURA_DE'] = 'venta';
         this.facturaSelected['mostrarFacturaPara'] = this.BuscarPara;
-        this.abrirModal('mostrarFactura', this.facturaSelected);
+        resolve(this.facturaSelected);
       }, 5);
+    });
+  }
+
+  selectFactura(item) {
+    if (item.column === 'select') {
+      this.facturaSelected = this.facturas[item.index];
+      this.indexSelected = item.index;
+      this.parseFacturaSelected().then(() => {
+        this.abrirModal('mostrarFactura', this.facturaSelected);
+      });
     }
   }
 

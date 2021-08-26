@@ -9,7 +9,6 @@ import { TablasComponent } from '../../../components/tablas/tablas.component';
 import { ModalService } from '../../../components/modal/modal.service';
 import { TablasService } from '../../../components/tablas/tablas.service';
 import { IpcService } from '../../../../core/services/ipc.service';
-import { FunctionService } from '../../../../core/services/functions.service';
 
 import { LayoutService } from '../../../../admin/layout/layout.service';
 import { mixinClass } from '../../../mixinClass';
@@ -119,7 +118,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   constructor(
     private config: NgSelectConfig,
     public mServ: ModalService,
-    private fun: FunctionService,
     private dbServ: DBservice,
     public _ipc: IpcService,
     private tServ: TablasService,

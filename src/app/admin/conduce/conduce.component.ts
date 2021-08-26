@@ -7,7 +7,6 @@ import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from '../../../utils/javascript/moment';
 import { IpcService } from '../../core/services/ipc.service';
-import { FunctionService } from '../../core/services/functions.service';
 
 import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
@@ -68,7 +67,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   constructor(
     public mServ: ModalService,
     public _ipc: IpcService,
-    private fun: FunctionService,
     private dbServ: DBservice,
     private fb: FormBuilder,
     public layServ: LayoutService,

@@ -6,6 +6,7 @@ import { LayoutClass } from '../../layout/layout';
 import { LayoutService } from '../../layout/layout.service';
 import { ModalService } from './modal.service';
 import { VM } from './interfaces';
+import { SingletonService } from '../../../core/services/singleton.service';
 
 export class modalClass extends LayoutClass {
   private static a_quien_responder: string;
@@ -27,6 +28,9 @@ export class modalClass extends LayoutClass {
 
   _lista = [];
 
+  fun = SingletonService.fun;
+  zone = SingletonService.zone;
+
   constructor(public mServ: ModalService, public _ipc: IpcService, public layServ?: LayoutService) {
     super(layServ);
   }
@@ -35,6 +39,7 @@ export class modalClass extends LayoutClass {
     this.quien_me_llamo = arg.component;
 
     this.metodos[this.quien_me_llamo] = this;
+    // console.log('this.metodos --> ', this.metodos);
 
     this._lista = arg._lista_subs ? arg._lista_subs : [];
 
@@ -47,9 +52,7 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('objDevuelto')) {
-      this.subObj = this.mServ.OBJDEVUELTO.subscribe(async (res) => {
-        this.run_subscribe('OBJDEVUELTO', res);
-      });
+      this.subObj = this.mServ.OBJDEVUELTO.subscribe(async (res) => this.run_subscribe('OBJDEVUELTO', res));
     }
 
     if (this._lista.includes('articuloPorCodigo')) {
@@ -76,20 +79,26 @@ export class modalClass extends LayoutClass {
   run_subscribe(observable, res) {
     const _this = this.metodos[modalClass.a_quien_responder];
 
+    // console.log('  ');
+    // console.log(' ----------------------------------------------- ');
+    // console.log('observable --> ', observable);
+    // console.log('_this --> ', _this);
+
     if (_this) {
       switch (observable) {
         case 'printBase64Res':
-          _this.ipcBase64Resonse(res);
+          this.zone.run(() => {
+            _this.ipcBase64Resonse(res);
+            _this.reiniciarVariables([VM._7]);
+          });
 
-          _this.reiniciarVariables([VM._7]);
-          setTimeout(() => this.quitarFocodeElectron(), 25);
           break;
 
         case 'DECISIONMODAL':
           if (res !== undefined) {
             _this.decisionModal(res);
-
-            _this.reiniciarVariables([VM._4, VM._5, VM._9, VM._7]);
+            // _this.reiniciarVariables([VM._4, VM._5, VM._9, VM._7]);
+            _this.reiniciarVariables([VM._4, VM._5, VM._7]);
           }
           break;
 

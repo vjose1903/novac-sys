@@ -10,6 +10,7 @@ import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { LoaderService } from '../../../app/loader/loader.service';
+
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
@@ -94,10 +95,6 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
     } else {
       this.dbServ.toastError(res.msg, 'ERROR', true);
     }
-
-    setTimeout(() => {
-      GLOBAL.quitarFocodeElectron();
-    }, 5);
   }
 
   async decisionModal(arg) {

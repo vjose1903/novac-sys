@@ -148,7 +148,7 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   // autoUpdater.quitAndInstall();
 });
 
-autoUpdater.on('update-not-available', (info) => { });
+autoUpdater.on('update-not-available', (info) => {});
 
 autoUpdater.on('error', (error) => {
   if (win) {
@@ -277,7 +277,7 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
 // PARA BORRAR UN ELEMENTO QUE NO ESTE BIEN
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-async function borrado_de_archivos_malos(archivos, callback = (arg) => { }) {
+async function borrado_de_archivos_malos(archivos, callback = (arg) => {}) {
   const del = require('del');
 
   // delete directory recursively
@@ -511,7 +511,7 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function cmd(command, callback = (arg) => { }) {
+function cmd(command, callback = (arg) => {}) {
   puts(command, 'comando realizado en la funcion cmd');
   exec(command, (error, stdout, stderr) => {
     let obj;
@@ -540,7 +540,7 @@ function cmd(command, callback = (arg) => { }) {
 // FUNCION QUE SE ENCARGA DE DESCARGAR ARCHIVOS
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function downloadFile(archive_url, path, file_, callback = (arg) => { }) {
+function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
   // Save variable to know progress
 
   let received_bytes = 0;
@@ -625,7 +625,7 @@ async function escribirLogs(file, titulo, texto) {
       stream.end();
     });
   } else {
-    await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => { });
+    await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => {});
   }
 }
 

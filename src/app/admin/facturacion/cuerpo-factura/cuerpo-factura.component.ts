@@ -7,7 +7,6 @@ import { ModalService } from '../../components/modal/modal.service';
 import { mixinClass } from '../../mixinClass';
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutService } from '../../layout/layout.service';
-import { FunctionService } from '../../../core/services/functions.service';
 import * as moment from '../../../../utils/javascript/moment';
 @Component({
   selector: 'app-cuerpo-factura',
@@ -59,7 +58,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     private fb: FormBuilder,
     public _ipc: IpcService,
     public layServ: LayoutService,
-    public fun: FunctionService,
   ) {
     super(mServ, _ipc, layServ);
     // this.rowFactura = new FormArray([new FormControl()]);

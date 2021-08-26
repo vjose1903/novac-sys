@@ -10,7 +10,6 @@ import { GLOBAL, tipos_facturas } from '../../core/services/GLOBAL';
 
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { FunctionService } from '../../core/services/functions.service';
 import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
 import { FacturacionService } from './facturacion.service';
@@ -109,7 +108,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   constructor(
     public _ipc: IpcService,
     public mServ: ModalService,
-    private fun: FunctionService,
     private dbServ: DBservice,
     private fb: FormBuilder,
     private route: ActivatedRoute,

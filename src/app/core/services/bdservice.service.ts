@@ -519,11 +519,18 @@ export class DBservice {
   }
 
   toastError(msg?, titulo?, excepcion?) {
+    // console.log('toastError ');
+    // console.log('this.fun.canToast ', this.fun.canToast);
+
     if (this.fun.canToast) {
       const msg_ = msg;
+      // console.log('msg_ ', msg_);
+      // console.log('this.ultimoMensajeMostrado ', this.ultimoMensajeMostrado);
+      // console.log('excepcion ', excepcion);
 
       if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
         this.ultimoMensajeMostrado = msg_;
+
         this.toastr.error(msg || '', titulo || '');
       }
     }

@@ -8,7 +8,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IpcService } from '../../../core/services/ipc.service';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { ModalService } from '../../components/modal/modal.service';
-import { FunctionService } from '../../../core/services/functions.service';
 import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
@@ -45,7 +44,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     private activeRoute: ActivatedRoute,
     public mServ: ModalService,
     public _ipc: IpcService,
-    private fun: FunctionService,
+
     private router: Router,
     public layServ: LayoutService,
     public pdfServ: PdfService,
@@ -115,6 +114,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     if (id) {
       try {
         const cliente = await this.dbServ.getClienteById(id).toPromise();
+
         const documento = cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0];
         this.propietario_factura = {
           nombre: cliente.nombre + ' ' + cliente.apellido,

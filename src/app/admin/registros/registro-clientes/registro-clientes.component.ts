@@ -48,6 +48,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
   };
   indexSeleccionado: any;
   vendedores;
+  documentos_de_identidad: any;
 
   constructor(
     private dbServ: DBservice,
@@ -77,7 +78,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
       limite_credito: ['', Validators.required],
       maximo_credito: ['', Validators.required],
       vendedor_id: [''],
-      cuenta: [0],
       cedula: [null, ValidateRayaAbajo.verificarRayaAbajo],
     });
 
@@ -256,6 +256,8 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
 
   editarItem(item) {
     this.indexSeleccionado = item.INDEX;
+    this.documentos_de_identidad = item.ARG.documentos_de_identidad;
+    console.log('this.documentos_de_identidad ---> ', this.documentos_de_identidad);
 
     item.ARG.documentos_de_identidad.forEach((doc) => {
       if (doc.descripcion === 'rnc') {
@@ -314,6 +316,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
 
     const temp = JSON.parse(JSON.stringify(arg.value));
     const documentos_identidad = [];
+
     const temp_documentos_identidad = [
       { doc: temp.cedula, descripcion: 'cedula' },
       { doc: temp.rnc, descripcion: 'rnc' },
@@ -334,6 +337,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
       // haciendo la estructura para mandar los documentos a la base de datos
       let docSplit;
       if (element.doc !== null && element.doc !== ' ' && element.doc !== '') {
+        const doc_backend = _.find(this.documentos_de_identidad, (doc) => _.lowerCase(doc.descripcion) === _.lowerCase(element.descripcion));
         if (element.descripcion === 'cedula') {
           docSplit = _.split(element.doc, '-');
 
@@ -350,12 +354,14 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
         }
 
         documentos_identidad.push({
+          id: doc_backend ? doc_backend.id : null,
           descripcion: element.descripcion,
           documento: element.doc,
           principal: element.descripcion === this.doc_principal ? true : false,
         });
       }
     });
+
     // entra aqui si el formato de un documento de identidad esta mal
     if (devolver) {
       Fail.forEach((doc) => {
@@ -384,7 +390,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
           obj['balance'] = 0;
           obj.maximo_credito = GLOBAL.desformatear(obj.maximo_credito);
           if (obj.id === null) {
-            obj.cuenta = obj.cuenta;
             this.dbServ.createCliente(obj).subscribe(
               (res) => {
                 this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
@@ -398,7 +403,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
               },
             );
           } else {
-            obj.cuenta = 0;
             this.dbServ.editarCliente(obj).subscribe(
               (res) => {
                 this.getClientes(this.tServ.obj_paginate);
