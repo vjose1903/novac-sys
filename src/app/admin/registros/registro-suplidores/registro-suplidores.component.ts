@@ -51,6 +51,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   element: HTMLElement;
   documento_identidad = false;
   doc_principal = 'rnc';
+  documentos_de_identidad: any;
 
   constructor(
     private fb: FormBuilder,
@@ -86,9 +87,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   }
 
   initCambioMenu(arg) {
-    if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
-    }
+    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
   }
 
   ngOnDestroy(): void {
@@ -111,6 +110,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
       const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+      console.log('res ---> ', res);
 
       res.data.map((suplidor) => {
         suplidor.documentos_de_identidad.map((docu) => {
@@ -169,6 +169,8 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
     this.titulo = 'Editar suplidor: ' + item.ARG.nombre;
     this.boton = 'Editar';
     this.form.patchValue(item.ARG);
+    this.documentos_de_identidad = item.ARG.documentos_de_identidad;
+
     item.ARG.documentos_de_identidad.forEach((doc) => {
       if (doc.descripcion === 'rnc') {
         this.form.controls.rnc.setValue(doc.documento);
@@ -222,14 +224,16 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
       }
       // haciendo la estructura para mandar los documentos a la base de datos
       if (element.doc !== null && element.doc !== ' ' && element.doc !== '') {
+        const doc_backend = _.find(this.documentos_de_identidad, (doc) => _.lowerCase(doc.descripcion) === _.lowerCase(element.descripcion));
         documentos_identidad.push({
+          id: doc_backend ? doc_backend.id : null,
           descripcion: element.descripcion,
           documento: element.doc,
           principal: element.descripcion === this.doc_principal ? true : false,
         });
       }
     });
-    obj.documentos_de_identidad_attributes = documentos_identidad;
+    obj.documentos_de_identidad = documentos_identidad;
     obj.estado = true;
 
     // entra aqui si el formato de un documento de identidad esta mal
@@ -255,7 +259,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
             (err) => {
               console.error(err);
 
-              this.mostrarErrores(err.error);
+              this.mostrarErrores(err.error.msg);
             },
           );
         } else {
@@ -277,6 +281,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   }
 
   mostrarErrores(arg) {
+    console.log('::::::', arg);
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
         this.dbServ.toastError(error, 'ERROR', true);
@@ -297,11 +302,9 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   async decisionModal(arg) {
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      obj['estado'] = false;
-      obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
 
       try {
-        const res = await this.dbServ.editarSuplidor(obj).toPromise();
+        const res = await this.dbServ.borrarSuplidor(obj).toPromise();
         this.dbServ.toastSuccess('Empleado ' + obj.nombre + ' borrado.', 'CORRECTO');
         this.getSuplidores(this.tServ.obj_paginate);
       } catch (error) {

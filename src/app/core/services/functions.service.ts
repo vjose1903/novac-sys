@@ -36,6 +36,32 @@ export class FunctionService {
     }
   }
 
+  // __________________________________________________________________________________________________
+  // Nombre: hasValue
+  // Descripcion : Esta funcion valida que si una variable tiene valor
+  // __________________________________________________________________________________________________
+
+  hasValue(value) {
+    return !this.isEmpty(value);
+  }
+  // __________________________________________________________________________________________________
+  // Nombre: isEmpty
+  // Descripcion : Esta funcion valida que si una variable esta vacia
+  // __________________________________________________________________________________________________
+
+  isEmpty(value) {
+    return (
+      // es null o indefinido
+      value == null ||
+      // si tiene longitud 0
+      (value.hasOwnProperty('length') && value.length === 0) ||
+      // si es un string vacio o con lleno de espacios
+      (typeof value === 'string' && value.trim().length === 0) ||
+      // si es un objeto y no tiene propiedades
+      (value.constructor === Object && Object.keys(value).length === 0)
+    );
+  }
+
   getAuthToken() {
     return localStorage.getItem('access-token');
   }

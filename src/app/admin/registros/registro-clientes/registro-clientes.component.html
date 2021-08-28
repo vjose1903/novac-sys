@@ -194,7 +194,7 @@
             <div class="form-group">
               <label class="control-label">Vendedor: <span style="color: red">*</span></label>
               <select formControlName="vendedor_id" class="form-control">
-                <option *ngFor="let item of vendedores" value="{{ item.id }}">{{ item.nombre }}</option>
+                <option *ngFor="let item of vendedores" value="{{ item.id }}">{{ item.nombreCompleto }}</option>
               </select>
               <div
                 class="alerta text-danger ml-1"

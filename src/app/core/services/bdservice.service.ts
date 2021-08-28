@@ -43,7 +43,7 @@ export class DBservice {
           'Content-Type': 'application/json',
           Accept: 'Application/json',
         },
-        params: { spinner: 'no' },
+        params: { spinner: 'no_hide' },
       }).pipe(
         map((val) => {
           // set obs false
@@ -57,7 +57,7 @@ export class DBservice {
           'Content-Type': 'application/json',
           Accept: 'Application/json',
         },
-        params: { spinner: 'no' },
+        params: { spinner: 'no_hide' },
       }).pipe(
         map((val) => {
           // set obs false
@@ -174,7 +174,7 @@ export class DBservice {
   }
 
   getPaquetesNCFFiltrados(arg, page, per_page, paginado) {
-    return this.peticionSinLoad(`secuencia_comprobantes/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticion(`secuencia_comprobantes/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   // =====================================================================
@@ -199,12 +199,17 @@ export class DBservice {
   createCliente(arg) {
     return this.peticion('clientes', 'post', JSON.stringify(arg));
   }
+
   editarCliente(arg) {
     return this.peticion('clientes/' + arg.id, 'put', JSON.stringify(arg));
   }
 
+  deleteCliente(arg) {
+    return this.peticion('clientes/' + arg.id, 'delete');
+  }
+
   getClientesFiltrados(arg, page, per_page, paginado) {
-    return this.peticionSinLoad(`clientes/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticion(`clientes/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   // =====================================================================
@@ -218,10 +223,6 @@ export class DBservice {
     return this.peticion('suplidores', 'get');
   }
 
-  getNombresSuplidores() {
-    return this.peticion('nombreSuplidores', 'get');
-  }
-
   createSuplidor(arg) {
     return this.peticion('suplidores', 'post', JSON.stringify(arg));
   }
@@ -230,8 +231,12 @@ export class DBservice {
     return this.peticion('suplidores/' + arg.id, 'patch', JSON.stringify(arg));
   }
 
+  borrarSuplidor(arg) {
+    return this.peticion('suplidores/' + arg.id, 'delete');
+  }
+
   getSuplidoresFiltrados(arg, page, per_page, paginado) {
-    return this.peticionSinLoad(`suplidores/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticion(`suplidores/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   // =====================================================================
@@ -242,9 +247,16 @@ export class DBservice {
     return this.peticion('users/custom/names', 'get');
   }
 
-  getEmpleados() {
-    return this.peticion('users', 'get');
+  // getEmpleados() {
+  //   return this.peticion('users', 'get');
+  // }
+
+  getEmpleados(params = null) {
+    let url = 'users';
+    if (this.fun.hasValue(params)) url += params;
+    return this.peticion(url, 'get');
   }
+
   getUserByRole(role) {
     return this.peticion(`users/by_role/${role}`, 'get');
   }
@@ -261,7 +273,7 @@ export class DBservice {
   }
 
   getEmpleadosFiltrados(arg, page, per_page, paginado) {
-    return this.peticionSinLoad(`users/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticion(`users/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   // =====================================================================
@@ -307,7 +319,7 @@ export class DBservice {
   }
 
   getArticulosFiltrados(arg, page, per_page, paginado, compra = false, fecha, tipo = 'todos') {
-    return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}&fecha=${fecha}`, 'get');
+    return this.peticion(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}&fecha=${fecha}`, 'get');
   }
   // getArticulosFiltrados(arg, page, per_page, paginado, compra = false, tipo = 'todos') {
   //   return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}`, 'get');
@@ -365,7 +377,7 @@ export class DBservice {
   }
 
   getRecibosFiltrados(arg, page, per_page, paginado) {
-    return this.peticionSinLoad(`recibos_ingresos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticion(`recibos_ingresos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   getRecibosLimit(cant, loading) {
@@ -466,7 +478,7 @@ export class DBservice {
   }
 
   getModelosFiltrados(arg, page, per_page, paginado) {
-    return this.peticionSinLoad(`modelos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticion(`modelos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   getModelos(page, per_page, paginado) {
@@ -490,7 +502,7 @@ export class DBservice {
   }
 
   getVehiculosFiltrados(arg, page, per_page, paginado) {
-    return this.peticionSinLoad(`vehiculos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticion(`vehiculos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   eliminarVehiculo(arg) {

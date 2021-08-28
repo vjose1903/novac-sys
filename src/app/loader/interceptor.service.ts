@@ -12,18 +12,28 @@ import { Router } from '@angular/router';
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
   constructor(public loadServ: LoaderService, private fun: FunctionService, private dbServ: DBservice, private router: Router) {}
+  requestCount: number = 0;
+
+  private startRequest(): void {
+    if (this.requestCount == 0) this.loadServ.isLoading.next(true);
+    this.requestCount++;
+  }
+
+  private endRequest(args?): void {
+    this.requestCount--;
+
+    if (this.requestCount == 0 && args !== 'no_hide') this.loadServ.isLoading.next(false);
+  }
+
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     this.fun.nextCanToast(false);
     const token = this.fun.getAuthToken();
-    const spinner = request.params.get('spinner');
 
-    if (spinner && spinner === 'no') {
-      // remove parameter spinner y no ejecuta el loader
-      request.params.delete('spinner');
-    } else {
-      // Activa el loader
-      this.loadServ.isLoading.next(true);
-    }
+    let spinner = request.params.get('spinner');
+
+    if (spinner) request.params.delete('spinner'); // remove parameter spinner y no ejecuta el loader
+
+    if (!spinner || spinner == 'no_hide') this.startRequest(); // Activa el spinner
 
     if (token) {
       request = request.clone({
@@ -66,7 +76,7 @@ export class InterceptorService implements HttpInterceptor {
         return throwError(response);
       }),
       finalize(() => {
-        this.loadServ.isLoading.next(false);
+        this.endRequest(spinner);
       }),
     );
     // return next.handle(request).pipe(

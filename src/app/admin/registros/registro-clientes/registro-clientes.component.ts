@@ -82,18 +82,14 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
     });
 
     this.necesarioStart();
-    setTimeout(() => {
-      this.marcarCheck('cedula');
-    }, 200);
+    setTimeout(() => this.marcarCheck('cedula'), 200);
   }
 
   async decisionModal(arg) {
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      obj['estado'] = false;
-      obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
       try {
-        const res = await this.dbServ.editarCliente(obj).toPromise();
+        const res = await this.dbServ.deleteCliente(obj).toPromise();
         this.dbServ.toastSuccess('Cliente ' + obj.nombre + ' borrado.', 'CORRECTO');
         this.getClientes(this.tServ.obj_paginate);
       } catch (error) {
@@ -128,10 +124,14 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
   }
 
   getVendedores() {
-    this.dbServ.getUserByRole('V').subscribe((res) => {
-      this.vendedores = res;
-    });
+    this.dbServ.getEmpleados('?id=true&nombreCompleto=true&filter_key=role&filter_value=V').subscribe((res) => (this.vendedores = res['data']));
   }
+
+  // getVendedores() {
+  //   this.dbServ.getUserByRole('V').subscribe((res) => {
+  //     this.vendedores = res;
+  //   });
+  // }
   async getClientes(e) {
     try {
       const page = e.page;
@@ -378,7 +378,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
 
           // paso todas las validaciones
         } else {
-          temp.documentos_de_identidad_attributes = documentos_identidad;
+          temp.documentos_de_identidad = documentos_identidad;
 
           if (this.PhotoData !== undefined) {
             temp.imagen_attributes = null;
