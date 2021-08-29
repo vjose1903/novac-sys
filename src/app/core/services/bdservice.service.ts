@@ -196,12 +196,15 @@ export class DBservice {
   getClientes() {
     return this.peticion('clientes', 'get');
   }
-  createCliente(arg) {
-    return this.peticion('clientes', 'post', JSON.stringify(arg));
-  }
 
-  editarCliente(arg) {
-    return this.peticion('clientes/' + arg.id, 'put', JSON.stringify(arg));
+  createUpdateClientes(arg) {
+    let method = 'post';
+    let url = 'clientes';
+    if (_.has(arg.id) && this.fun.hasValue(arg.id)) {
+      method = 'put';
+      url += `/${arg.id}`;
+    }
+    return this.peticion(url, method, JSON.stringify(arg));
   }
 
   deleteCliente(arg) {
@@ -223,12 +226,14 @@ export class DBservice {
     return this.peticion('suplidores', 'get');
   }
 
-  createSuplidor(arg) {
-    return this.peticion('suplidores', 'post', JSON.stringify(arg));
-  }
-
-  editarSuplidor(arg) {
-    return this.peticion('suplidores/' + arg.id, 'patch', JSON.stringify(arg));
+  createUpdateSuplidores(arg) {
+    let method = 'post';
+    let url = 'suplidores';
+    if (_.has(arg.id) && this.fun.hasValue(arg.id)) {
+      method = 'put';
+      url += `/${arg.id}`;
+    }
+    return this.peticion(url, method, JSON.stringify(arg));
   }
 
   borrarSuplidor(arg) {
@@ -243,14 +248,6 @@ export class DBservice {
   // USUARIOS
   // =====================================================================
 
-  getEmpleadosNames() {
-    return this.peticion('users/custom/names', 'get');
-  }
-
-  // getEmpleados() {
-  //   return this.peticion('users', 'get');
-  // }
-
   getEmpleados(params = null) {
     let url = 'users';
     if (this.fun.hasValue(params)) url += params;
@@ -261,11 +258,18 @@ export class DBservice {
     return this.peticion(`users/by_role/${role}`, 'get');
   }
 
-  updateEmpleados(arg) {
-    return this.peticion('auth', 'patch', JSON.stringify(arg));
+  createUpdateEmpleados(arg) {
+    let method = 'post';
+    let url = 'users';
+    if (_.has(arg.id) && this.fun.hasValue(arg.id)) {
+      method = 'put';
+      url += `/${arg.id}`;
+    }
+    return this.peticion(url, method, JSON.stringify(arg));
   }
-  createEmpleados(arg) {
-    return this.peticion('auth', 'post', JSON.stringify(arg));
+
+  deleteEmpleados(arg) {
+    return this.peticion('users/' + arg.id, 'delete');
   }
 
   getEmpleado() {
@@ -461,7 +465,7 @@ export class DBservice {
   }
 
   getMarcasFiltradas(arg, page, per_page, paginado) {
-    return this.peticionSinLoad(`marcas/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticion(`marcas/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   // =====================================================================
@@ -482,11 +486,11 @@ export class DBservice {
   }
 
   getModelos(page, per_page, paginado) {
-    return this.peticionSinLoad(`modelos?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticion(`modelos?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   getModelosByMarca(marca) {
-    return this.peticionSinLoad(`modelos/por_marca/${marca}`, 'get');
+    return this.peticion(`modelos/por_marca/${marca}`, 'get');
   }
 
   // =====================================================================
@@ -520,7 +524,7 @@ export class DBservice {
   // =====================================================================
   // TOASTS
   // =====================================================================
-  toastSuccess(msg?, titulo?, excepcion = true) {
+  toastSuccess(msg?, titulo = 'CORRECTO', excepcion = true) {
     if (this.fun.canToast) {
       const msg_ = msg;
       if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
@@ -530,7 +534,7 @@ export class DBservice {
     }
   }
 
-  toastError(msg?, titulo?, excepcion?) {
+  toastError(msg?, titulo = 'ERROR', excepcion?) {
     // console.log('toastError ');
     // console.log('this.fun.canToast ', this.fun.canToast);
 
@@ -548,7 +552,7 @@ export class DBservice {
     }
   }
 
-  toastWarning(msg?, titulo?, excepcion?) {
+  toastWarning(msg?, titulo = 'AVISO', excepcion?) {
     if (this.fun.canToast) {
       const msg_ = msg;
       if (this.ultimoMensajeMostrado !== msg_ || excepcion) {

@@ -55,6 +55,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   editando = false;
   usuarioSelected: any;
   indexBorrar: any;
+  documentos_de_identidad: any;
 
   constructor(
     private fb: FormBuilder,
@@ -161,6 +162,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     this.titulo = 'Registro de empleados';
     this.boton = 'Registrar';
     this.editando = false;
+    this.documentos_de_identidad = undefined;
   }
 
   fecha(a: any) {
@@ -210,69 +212,18 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     if (!this.editando && objSend.password === null) {
       this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR', true);
     } else {
-      if (objSend.id) {
-        objSend['id'] = objSend.id;
-
-        this.dbServ.updateEmpleados(objSend).subscribe(
-          (res) => {
-            this.dbServ.toastSuccess('Usuario Editado', 'Correcto');
-
-            this.getEmpleados(this.tServ.obj_paginate);
-            this.borrar();
-          },
-          (err) => {
-            this.dbServ.toastError(err.error.msg, 'ERROR', true);
-          },
-        );
-      } else {
-        this.dbServ.createEmpleados(objSend).subscribe(
-          (res) => {
-            this.getEmpleados(this.tServ.obj_paginate);
-            this.dbServ.toastSuccess('Usuario Creado', 'Correcto');
-
-            this.borrar();
-            this.enfocarInput('campoNombre');
-          },
-          (err) => {
-            this.mostrarErrores(err.error.errors.full_messages);
-          },
-        );
-      }
+      this.dbServ.createUpdateEmpleados(objSend).subscribe((res) => {
+        this.getEmpleados(this.tServ.obj_paginate);
+        this.borrar();
+        this.enfocarInput('campoNombre');
+      });
     }
   }
 
   decisionModal(arg) {
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      obj['estado'] = false;
-      obj['documentos_de_identidad_attributes'] = obj.documentos_de_identidad;
-      this.dbServ.updateEmpleados(obj).subscribe(
-        (res) => {
-          this.dbServ.toastSuccess('Empleado ' + obj.nombre + ' borrado.', 'CORRECTO');
-          this.getEmpleados(this.tServ.obj_paginate);
-        },
-        (err) => {
-          this.mostrarErrores(err.error.errors);
-        },
-      );
-    }
-  }
-
-  mostrarErrores(arg) {
-    if (Array.isArray(arg)) {
-      arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR', true);
-      });
-    } else {
-      for (const key in arg) {
-        if (arg.hasOwnProperty(key)) {
-          const element = arg[key];
-
-          if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR', true);
-          }
-        }
-      }
+      this.dbServ.deleteEmpleados(obj).subscribe((res) => this.getEmpleados(this.tServ.obj_paginate));
     }
   }
 }

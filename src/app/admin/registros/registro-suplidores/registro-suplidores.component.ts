@@ -153,6 +153,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
     this.boton = 'Registrar';
     this.enfocarInput('campoNombre');
     this.documento_identidad = false;
+    this.documentos_de_identidad = undefined;
     this.doc_principal = 'rnc';
     this.marcarCheck('rnc');
   }
@@ -248,53 +249,10 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
 
         // paso todas las validaciones
       } else {
-        if (obj.id === null) {
-          this.dbServ.createSuplidor(obj).subscribe(
-            (res) => {
-              this.getSuplidores(this.tServ.obj_paginate);
-
-              this.dbServ.toastSuccess('Suplidor registrado con exito.', 'Correcto');
-              this.borrar();
-            },
-            (err) => {
-              console.error(err);
-
-              this.mostrarErrores(err.error.msg);
-            },
-          );
-        } else {
-          this.dbServ.editarSuplidor(obj).subscribe(
-            (res) => {
-              this.getSuplidores(this.tServ.obj_paginate);
-
-              this.dbServ.toastSuccess('Suplidor editado con exito.', 'Correcto');
-              this.borrar();
-            },
-            (err) => {
-              console.error(err);
-              this.mostrarErrores(err.error);
-            },
-          );
-        }
-      }
-    }
-  }
-
-  mostrarErrores(arg) {
-    console.log('::::::', arg);
-    if (Array.isArray(arg)) {
-      arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR', true);
-      });
-    } else {
-      for (const key in arg) {
-        if (arg.hasOwnProperty(key)) {
-          const element = arg[key];
-
-          if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR', true);
-          }
-        }
+        this.dbServ.createUpdateSuplidores(obj).subscribe((res) => {
+          this.getSuplidores(this.tServ.obj_paginate);
+          this.borrar();
+        });
       }
     }
   }
@@ -305,11 +263,8 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
 
       try {
         const res = await this.dbServ.borrarSuplidor(obj).toPromise();
-        this.dbServ.toastSuccess('Empleado ' + obj.nombre + ' borrado.', 'CORRECTO');
         this.getSuplidores(this.tServ.obj_paginate);
-      } catch (error) {
-        this.mostrarErrores(error.error);
-      }
+      } catch (error) {}
     }
   }
 }

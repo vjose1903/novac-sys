@@ -50,6 +50,24 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
   vendedores;
   documentos_de_identidad: any;
 
+  info = [
+    {
+      titulo: 'Nombre',
+      key: 'nombre',
+    },
+    {
+      titulo: 'Apellido',
+      key: 'apellido',
+    },
+    {
+      titulo: 'Telefono',
+      key: 'telefono',
+    },
+    {
+      titulo: 'Doc. identidad',
+      key: 'documento_identidad', // ojo
+    },
+  ];
   constructor(
     private dbServ: DBservice,
     private fb: FormBuilder,
@@ -90,11 +108,8 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
       try {
         const res = await this.dbServ.deleteCliente(obj).toPromise();
-        this.dbServ.toastSuccess('Cliente ' + obj.nombre + ' borrado.', 'CORRECTO');
         this.getClientes(this.tServ.obj_paginate);
-      } catch (error) {
-        this.mostrarErrores(error.error);
-      }
+      } catch (error) {}
     }
   }
 
@@ -389,31 +404,12 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
           const obj = _.omit(temp, ['cedula', 'rnc']);
           obj['balance'] = 0;
           obj.maximo_credito = GLOBAL.desformatear(obj.maximo_credito);
-          if (obj.id === null) {
-            this.dbServ.createCliente(obj).subscribe(
-              (res) => {
-                this.dbServ.toastSuccess('Cliente registrado con exito.', 'Correcto');
-                this.getClientes(this.tServ.obj_paginate);
-                this.borrar();
 
-                this.enfocarInput('campoNombre');
-              },
-              (err) => {
-                this.mostrarErrores(err.error);
-              },
-            );
-          } else {
-            this.dbServ.editarCliente(obj).subscribe(
-              (res) => {
-                this.getClientes(this.tServ.obj_paginate);
-                this.enfocarInput('campoNombre');
-                this.borrar();
-              },
-              (err) => {
-                this.mostrarErrores(err.error);
-              },
-            );
-          }
+          this.dbServ.createUpdateClientes(obj).subscribe((res) => {
+            this.getClientes(this.tServ.obj_paginate);
+            this.borrar();
+            this.enfocarInput('campoNombre');
+          });
         }
       }
     }
@@ -424,6 +420,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
     this.form.reset();
     this.enfocarInput('campoNombre');
     this.documento_identidad = true;
+    this.documentos_de_identidad = undefined;
     this.boton = 'Guardar';
     this.titulo = 'Registro de clientes';
     this.doc_principal = 'cedula';
@@ -436,45 +433,4 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
   setDocumentoPrincipal(doc) {
     this.doc_principal = doc;
   }
-
-  mostrarErrores(arg) {
-    if (Array.isArray(arg)) {
-      arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR', true);
-      });
-    } else {
-      for (const key in arg) {
-        if (arg.hasOwnProperty(key)) {
-          const element = arg[key];
-
-          if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR', true);
-          }
-        }
-      }
-    }
-  }
-
-  // =============================================
-  //  TABLAS
-  // =============================================
-
-  info = [
-    {
-      titulo: 'Nombre',
-      key: 'nombre',
-    },
-    {
-      titulo: 'Apellido',
-      key: 'apellido',
-    },
-    {
-      titulo: 'Telefono',
-      key: 'telefono',
-    },
-    {
-      titulo: 'Doc. identidad',
-      key: 'documento_identidad', // ojo
-    },
-  ];
 }

@@ -34,9 +34,7 @@ export class ChangePasswordComponent extends mixinClass implements OnInit, After
     });
   }
   ngAfterViewInit() {
-    setTimeout(() => {
-      this.enfocarInput('pass');
-    }, 50);
+    setTimeout(() => this.enfocarInput('pass'), 50);
   }
 
   accion(arg) {
@@ -54,14 +52,7 @@ export class ChangePasswordComponent extends mixinClass implements OnInit, After
       obj['password'] = objTemp.password;
       obj['documentos_de_identidad_attributes'] = this.user.documentos_de_identidad;
 
-      this.dbServ.updateEmpleados(obj).subscribe(
-        (res) => {
-          this.cancel.emit(false);
-        },
-        (err) => {
-          this.dbServ.toastError(_.upperFirst(Object.keys(err.error.contenido)[0]) + ' ya existe.', err.error.titulo, true);
-        },
-      );
+      this.dbServ.createUpdateEmpleados(obj).subscribe((res) => this.cancel.emit(false));
     }
   }
 }

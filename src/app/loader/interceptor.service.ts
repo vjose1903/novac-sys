@@ -7,6 +7,7 @@ import { LoaderService } from './loader.service';
 import { FunctionService } from '../core/services/functions.service';
 import { DBservice } from '../core/services/bdservice.service';
 import { Router } from '@angular/router';
+import * as _ from 'lodash';
 // Note: these are only the initial imports. Add more as needed.
 
 @Injectable()
@@ -50,6 +51,8 @@ export class InterceptorService implements HttpInterceptor {
     return next.handle(request).pipe(
       map((event) => {
         if (event instanceof HttpResponse) {
+          if (_.has(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
+
           ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {
             const headerValue = event.headers.get(header);
             if (headerValue !== null && localStorage.getItem(header) == null) {
@@ -63,14 +66,19 @@ export class InterceptorService implements HttpInterceptor {
       }),
 
       catchError((response: HttpErrorResponse) => {
+        console.log('::::::::::::::::::::::::::::::::::::::::::::::::::');
+        console.log(response);
+        console.log('::::::::::::::::::::::::::::::::::::::::::::::::::');
+
         if (response.error === null) {
           this.dbServ.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR', true);
-        }
-        if (response.error && response.error.msg === 'Para realizar esta accion debe de iniciar sesión.') {
+        } else if (response.error && response.error.msg === 'Para realizar esta accion debe de iniciar sesión.') {
           this.dbServ.toastError(response.error.msg, 'ERROR');
           this.fun.nextCanToast(false);
           this.fun.logout();
           this.router.navigateByUrl('/auth/login');
+        } else {
+          if (_.has(response, 'error.msg')) this.handler_msg(response.error.msg, 'error');
         }
 
         return throwError(response);
@@ -81,5 +89,18 @@ export class InterceptorService implements HttpInterceptor {
     );
     // return next.handle(request).pipe(
     // );
+  }
+
+  handler_msg(menssages, tipo_) {
+    console.warn('MENSAJE DESDE EL INTERCEPTOR');
+
+    if (menssages && Array.isArray(menssages)) {
+      for (let i = 0; i < menssages.length; i++) {
+        const menssage = menssages[i];
+
+        if (tipo_ === 'success') this.dbServ.toastSuccess(menssage, 'CORRECTO', true);
+        if (tipo_ === 'error') this.dbServ.toastError(menssage, 'ERROR', true);
+      }
+    }
   }
 }

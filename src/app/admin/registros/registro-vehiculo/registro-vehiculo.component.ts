@@ -76,15 +76,10 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   }
 
   async getPropietarios() {
-    const res = await this.dbServ.getEmpleadosNames().toPromise();
-    res.map((val) => {
-      val.nombreCompleto = val.nombre + ' ' + val.apellido;
-      return val;
+    this.dbServ.getEmpleados('?id=true&nombreCompleto=true').subscribe((res) => {
+      res['data'].unshift({ id: -1, nombreCompleto: 'No empleado' });
+      this.listaPropietarios = res['data'];
     });
-
-    res.push({ id: -1, nombreCompleto: 'No empleado' });
-
-    this.listaPropietarios = res;
   }
   async getVehiculos(e) {
     const page = e.page;
