@@ -124,8 +124,8 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async getChoferes() {
-    this.dbServ.getUserByRole('C').subscribe((res) => {
-      this.choferes = res;
+    this.dbServ.getEmpleados('?id=true&nombreCompleto=true&filter_key=role&filter_value=C').subscribe((res) => {
+      this.choferes = res['data'];
       this.is_choferes_register = this.choferes.length > 0 ? true : false;
     });
   }

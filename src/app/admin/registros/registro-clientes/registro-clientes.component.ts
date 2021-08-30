@@ -142,11 +142,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
     this.dbServ.getEmpleados('?id=true&nombreCompleto=true&filter_key=role&filter_value=V').subscribe((res) => (this.vendedores = res['data']));
   }
 
-  // getVendedores() {
-  //   this.dbServ.getUserByRole('V').subscribe((res) => {
-  //     this.vendedores = res;
-  //   });
-  // }
   async getClientes(e) {
     try {
       const page = e.page;
@@ -351,7 +346,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
       }
       // haciendo la estructura para mandar los documentos a la base de datos
       let docSplit;
-      if (element.doc !== null && element.doc !== ' ' && element.doc !== '') {
+      if (this.fun.hasValue(element.doc)) {
         const doc_backend = _.find(this.documentos_de_identidad, (doc) => _.lowerCase(doc.descripcion) === _.lowerCase(element.descripcion));
         if (element.descripcion === 'cedula') {
           docSplit = _.split(element.doc, '-');

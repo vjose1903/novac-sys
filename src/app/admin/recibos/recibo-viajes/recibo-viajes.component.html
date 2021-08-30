@@ -89,7 +89,7 @@
           <div class="form-group mt-4">
             <label class="control-label">Viaje realizado por: <span style="color: red">*</span></label>
             <select [(ngModel)]="chofer_id" class="form-control" (ngModelChange)="checkChofer()" (blur)="checkChofer()" (focus)="entroEnChofer()">
-              <option *ngFor="let item of choferes" value="{{ item.id }}">{{ item.nombre }}</option>
+              <option *ngFor="let item of choferes" value="{{ item.id }}">{{ item.nombreCompleto }}</option>
               <option *ngIf="!is_choferes_register" disable>No tiene Choferes registrados</option>
             </select>
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="is_choferes_register && !is_chofer_selected && salio_en_chofer">

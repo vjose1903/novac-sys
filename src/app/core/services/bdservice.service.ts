@@ -67,33 +67,6 @@ export class DBservice {
     }
   }
 
-  // peticion(ruta: string, metodo: string, json?: string): Observable<any> {
-  //   if (metodo === 'get' || metodo === 'delete') {
-  //     return this.http[metodo](`${this.url}/${ruta}`);
-  //   } else {
-
-  //     return this.http[metodo](`${this.url}/${ruta}`, json || '', {
-  //       headers: {
-  //         'Conten-Type': 'application/json',
-  //         Accept: 'Application/json',
-  //       },
-  //     });
-  //   }
-  // }
-
-  // peticionSinLoad(ruta: string, metodo: string, json?: string): Observable<any> {
-  //   // set obs true
-  //   if (metodo === 'get' || metodo === 'delete') {
-  //     return this.http[metodo](`${this.url}/${ruta}`, {
-  //       params: { spinner: 'no' },
-  //     });
-  //   } else {
-  //     return this.http[metodo](`${this.url}/${ruta}`, json || '', {
-  //       params: { spinner: 'no' },
-  //     });
-  //   }
-  // }
-
   async validateToken() {
     return await this.peticion('auth/validate_token', 'get').toPromise();
   }
@@ -138,7 +111,7 @@ export class DBservice {
   }
 
   getViajesByCompletada(arg, page, per_page, paginado, estado = false) {
-    return this.peticionSinLoad(`cabecera_facturas/custom/viajes/${estado}/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
+    return this.peticion(`cabecera_facturas/custom/viajes/${estado}/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
   getFacturas() {
@@ -252,10 +225,6 @@ export class DBservice {
     let url = 'users';
     if (this.fun.hasValue(params)) url += params;
     return this.peticion(url, 'get');
-  }
-
-  getUserByRole(role) {
-    return this.peticion(`users/by_role/${role}`, 'get');
   }
 
   createUpdateEmpleados(arg) {

@@ -172,11 +172,10 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   }
 
   editarItem(item) {
+    this.documentos_de_identidad = item.ARG.documentos_de_identidad;
     const doc = item.ARG.documentos_de_identidad.filter((doc) => doc.principal === true);
 
-    if (item.ARG.documentos_de_identidad.length > 0 && doc !== [] && doc !== null && doc !== undefined) {
-      this.form.controls.cedula.setValue(doc[0].documento);
-    }
+    if (item.ARG.documentos_de_identidad.length > 0 && this.fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
 
     item.ARG.fecha_nacimiento = this.fecha(item.ARG.fecha_nacimiento);
     this.form.patchValue(item.ARG);
@@ -189,23 +188,23 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   submit(form) {
     const objTemp = JSON.parse(JSON.stringify(form));
 
-    const documentos_identidad = [];
-    const temp_documentos_identidad = [
-      { doc: objTemp.cedula, descripcion: 'cedula' },
+    // const documentos_identidad = [];
+
+    const documentos_identidad = [
+      { documento: objTemp.cedula, descripcion: 'cedula' },
       // { doc: objTemp.rnc, descripcion: 'rnc' },
     ];
 
-    temp_documentos_identidad.forEach((element) => {
+    documentos_identidad.map((element) => {
       // haciendo la estructura para mandar los documentos a la base de datos
-      if (element.doc !== null && element.doc !== ' ' && element.doc !== '' && element.doc !== undefined) {
-        documentos_identidad.push({
-          descripcion: element.descripcion,
-          documento: element.doc,
-          principal: true,
-        });
-      }
+      const doc_backend = _.find(this.documentos_de_identidad, (doc) => _.lowerCase(doc.descripcion) === _.lowerCase(element.descripcion));
+
+      element['id'] = doc_backend ? doc_backend.id : null;
+      element['principal'] = true;
+      return element;
     });
-    objTemp.documentos_de_identidad_attributes = documentos_identidad;
+
+    objTemp.documentos_de_identidad = documentos_identidad;
     objTemp.estado = true;
     const objSend = _.omit(objTemp, ['cedula']);
 
