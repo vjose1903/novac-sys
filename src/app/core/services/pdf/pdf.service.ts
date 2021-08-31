@@ -15,66 +15,68 @@ import { DBservice } from '../bdservice.service';
   providedIn: 'root',
 })
 export class PdfService {
-  constructor(private dbServ: DBservice) { }
+  constructor(private dbServ: DBservice) {}
 
-  generatePdf(oPdf, callback = (arg) => { }) {
-    let obj;
-    let todo_true = true;
-    const data = oPdf.data;
-    const type = oPdf.type;
-    const reimprimir = oPdf.data.reimprimir ? true : false;
+  generatePdf(oPdf): any {
+    return new Promise((resolve, reject) => {
+      let obj;
+      let todo_true = true;
+      const data = oPdf.data;
+      const type = oPdf.type;
+      const reimprimir = oPdf.data.reimprimir ? true : false;
 
-    data['reimprimir'] = reimprimir;
+      data['reimprimir'] = reimprimir;
 
-    try {
-      switch (type) {
-        case 'recibo_ingreso':
-          obj = recibosIngresos.makeRecibo(data);
-          break;
+      try {
+        switch (type) {
+          case 'recibo_ingreso':
+            obj = recibosIngresos.makeRecibo(data);
+            break;
 
-        case 'conduce':
-          obj = conduce.makeConduce(data);
-          break;
+          case 'conduce':
+            obj = conduce.makeConduce(data);
+            break;
 
-        case 'facturacion':
-          obj = facturasCompraVenta.makeFacturaVenta(data);
-          break;
+          case 'facturacion':
+            obj = facturasCompraVenta.makeFacturaVenta(data);
+            break;
 
-        case 'cuadre_caja':
-          obj = cuadreCaja.makeCuadre(data);
-          break;
+          case 'cuadre_caja':
+            obj = cuadreCaja.makeCuadre(data);
+            break;
 
-        case 'reporte':
-          obj = reportes.makeReporte(data);
-          break;
+          case 'reporte':
+            obj = reportes.makeReporte(data);
+            break;
 
-        default:
-          todo_true = false;
-          break;
+          default:
+            todo_true = false;
+            break;
+        }
+
+        if (todo_true) {
+          const dd = obj.doc;
+          const file = obj.file;
+          const type = obj.type;
+
+          this.createPdfbase64(dd, file, reimprimir, (res) => {
+            res['scale'] = obj.scale;
+            resolve(res);
+          });
+        } else {
+          const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
+          this.dbServ.toastError('Error generando el pdf.', 'ERROR', true);
+          resolve(respuesta);
+        }
+      } catch (error) {
+        const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de pdf.', status: 'no', body: error });
+        this.dbServ.toastError('ERROR en el switch de tipos de pdf.', 'ERROR', true);
+        reject(respuesta);
       }
-
-      if (todo_true) {
-        const dd = obj.doc;
-        const file = obj.file;
-        const type = obj.type;
-
-        this.createPdfbase64(dd, file, reimprimir, (res) => {
-          res['scale'] = obj.scale
-          callback(res);
-        });
-      } else {
-        const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
-        this.dbServ.toastError('Error generando el pdf.', 'ERROR', true);
-        callback(respuesta);
-      }
-    } catch (error) {
-      const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de pdf.', status: 'no', body: error });
-      this.dbServ.toastError('ERROR en el switch de tipos de pdf.', 'ERROR', true);
-      callback(respuesta);
-    }
+    });
   }
 
-  createPdfbase64(docDefinition, file_, reimprimir_, callback = (arg) => { }) {
+  createPdfbase64(docDefinition, file_, reimprimir_, callback = (arg) => {}) {
     try {
       const pdfDocGenerator = pdfMake.createPdf(docDefinition);
       pdfDocGenerator.getBase64((data) => {

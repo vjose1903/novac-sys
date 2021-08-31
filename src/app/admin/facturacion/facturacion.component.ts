@@ -1297,7 +1297,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       };
 
       if (this.metodo === 'venta') {
-        this.pdfServ.generatePdf(obj, (res) => {
+        this.pdfServ.generatePdf(obj).then((res) => {
           if (res.status === 'si') {
             const objBase = {
               base64: res.body,

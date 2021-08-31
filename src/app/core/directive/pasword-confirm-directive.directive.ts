@@ -3,7 +3,6 @@ import { NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@an
 import { Subscription } from 'rxjs';
 
 @Directive({
-  // tslint:disable:directive-selector
   selector: '[compare]',
   providers: [
     {

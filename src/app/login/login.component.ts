@@ -166,7 +166,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   generar(obj) {
-    this.pdfServ.generatePdf(obj, (res) => {
+    this.pdfServ.generatePdf(obj).then((res) => {
       if (res.status === 'si') {
         const objBase = {
           base64: res.body,

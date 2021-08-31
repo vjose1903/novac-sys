@@ -16,16 +16,10 @@ import { UploadImgModule } from '../components/upload-img/upload-img.module';
 import { AngularModule } from '../../modules/angular.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
+import { DirectivesModule } from '../../core/directive/directives.module';
 
 @NgModule({
-  declarations: [
-    RegistroArticulosComponent,
-    RegistroClientesComponent,
-    RegistroEmpleadosComponent,
-    RegistroSuplidoresComponent,
-    RegistroVehiculoComponent,
-    NcfComponent,
-  ],
+  declarations: [RegistroArticulosComponent, RegistroClientesComponent, RegistroEmpleadosComponent, RegistroSuplidoresComponent, RegistroVehiculoComponent, NcfComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -38,6 +32,7 @@ import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
     AngularModule,
     MDBBootstrapModule,
     NgxBootstrapModule,
+    DirectivesModule,
   ],
 })
 export class RegistrosModule {}

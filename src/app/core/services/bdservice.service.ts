@@ -353,12 +353,8 @@ export class DBservice {
     return this.peticion(`recibos_ingresos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
-  getRecibosLimit(cant, loading) {
-    if (loading) {
-      return this.peticion(`recibos_ingresos/get/${cant}`, 'get');
-    } else {
-      return this.peticionSinLoad(`recibos_ingresos/get/${cant}`, 'get');
-    }
+  getRecibosLimit(cant) {
+    return this.peticion(`recibos_ingresos/get/${cant}`, 'get');
   }
 
   revertirLastReciboByFacturaId(id) {

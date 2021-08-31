@@ -10,8 +10,8 @@ import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 
-import { PaswordConfirmDirective } from '../../core/directive/pasword-confirm-directive.directive';
 import { FiltroParaNgforPipe } from '../../core/pipe/filtro-para-ngfor.pipe';
+import { DirectivesModule } from '../../core/directive/directives.module';
 import { ValidateRayaAbajo } from '../../directives/validaciones';
 import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
 import { BtncircularModule } from '../components/btncircular/btncircular.module';
@@ -26,13 +26,10 @@ import { TabViewModule } from 'primeng/tabview';
 import { ReportesComponent } from '../reportes/reportes.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
-
 @NgModule({
   declarations: [
     LayoutComponent,
-    PaswordConfirmDirective,
     HomeAdminComponent,
-
     FiltroParaNgforPipe,
     FacturacionComponent,
     InventarioComponent,
@@ -59,6 +56,7 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
     ModalModule,
     MDBBootstrapModule.forRoot(),
     NgbModule,
+    DirectivesModule,
   ],
 })
 export class LayoutModule {}

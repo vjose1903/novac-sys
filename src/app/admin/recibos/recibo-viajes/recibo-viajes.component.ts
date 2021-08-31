@@ -341,7 +341,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
         type: 'recibo_ingreso',
       };
 
-      this.pdfServ.generatePdf(obj_print, (res) => {
+      this.pdfServ.generatePdf(obj_print).then( (res) => {
         if (res.status === 'si') {
           const objBase = {
             base64: res.body,

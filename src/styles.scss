@@ -339,10 +339,10 @@ input[type="checkbox"]:disabled {
   filter: brightness(0.91) !important;
 }
 
-input[type="checkbox"]:disabled,
-input[type="text"]:disabled {
-  filter: grayscale(74%);
-}
+// input[type="checkbox"]:disabled,
+// input[type="text"]:disabled {
+//   filter: grayscale(74%);
+// }
 
 #btn-gris,
 .btn-gris {

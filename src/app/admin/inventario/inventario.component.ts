@@ -157,7 +157,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   generarPdf(obj) {
-    this.pdfServ.generatePdf(obj, (res) => {
+    this.pdfServ.generatePdf(obj).then((res) => {
       if (res.status === 'si') {
         obj = {
           pdfSrc: res.body,

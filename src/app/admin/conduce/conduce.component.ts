@@ -987,17 +987,15 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     cabecera_conduce['cliente_id'] = this.cliente.id;
     cabecera_conduce['numero_conduce'] = '';
     cabecera_conduce['detalle_conduces_attributes'] = this.CuerpoConduce;
+
     try {
       const res = await this.dbServ.createConduce(cabecera_conduce).toPromise();
       this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
 
-      const obj = {
-        data: res,
-        type: 'conduce',
-      };
+      const obj = { data: res, type: 'conduce' };
 
       this.cancelarConduce(2);
-      this.pdfServ.generatePdf(obj, (res) => {
+      this.pdfServ.generatePdf(obj).then((res) => {
         if (res.status === 'si') {
           const objBase = {
             base64: res.body,

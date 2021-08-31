@@ -157,12 +157,12 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
-    await this.getLast50Recibos(true);
+    await this.getLast50Recibos();
   }
 
-  async getLast50Recibos(load) {
+  async getLast50Recibos() {
     try {
-      let res = await this.dbServ.getRecibosLimit(50, load).toPromise();
+      let res = await this.dbServ.getRecibosLimit(50).toPromise();
       res = this.mapeoRecibos(res);
       this.lista_recibos = GLOBAL.duplicarJson(res);
 
@@ -211,7 +211,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
         obj['tabla'] = 'listaRecibos';
         this.tServ.Func_total_paginas(obj);
       } else {
-        this.getLast50Recibos(false);
+        this.getLast50Recibos();
       }
     } catch (error) {
       this.dbServ.toastError('Error buscando recibos registrados.', 'ERROR', true);
@@ -228,21 +228,20 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
 
   generarPdf(obj) {
     this.loadServ.isLoading.next(true);
-    this.pdfServ.generatePdf(obj, (res) => {
-      if (res.status === 'si') {
-        this.fileName = res.file;
-        this.pdfSrc = res.body;
-        obj = {
-          pdfSrc: res.body,
-          titulo: 'Revisión de recibo de ingreso',
-          height: '25rem',
-          reimprimir: true,
-          fileName: res.file.split('.')[0],
-        };
+    this.pdfServ
+      .generatePdf(obj)
+      .then((res) => {
+        if (res.status === 'si') {
+          this.fileName = res.file;
+          this.pdfSrc = res.body;
+          obj = { pdfSrc: res.body, titulo: 'Revisión de recibo de ingreso', height: '25rem', reimprimir: true, fileName: res.file.split('.')[0] };
 
-        this.abrirModal('visor_pdf', obj, undefined, (res) => this.loadServ.isLoading.next(false));
-      }
-    });
+          this.abrirModal('visor_pdf', obj, undefined, (res_visor) => this.loadServ.isLoading.next(false));
+        }
+      })
+      .catch((error) => {
+        this.loadServ.isLoading.next(false);
+      });
   }
 
   imprimir_base64() {
@@ -258,7 +257,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   async anularRecibo(id) {
     try {
       const res = await this.dbServ.revertirReciboById(id).toPromise();
-      this.getLast50Recibos(false);
+      this.getLast50Recibos();
       this.dbServ.toastSuccess(res.msg, 'CORRECTO');
     } catch (error) {
       if (error.error) {

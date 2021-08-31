@@ -142,7 +142,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   generarPdf(obj) {
-    this.pdfServ.generatePdf(obj, (res) => {
+    this.pdfServ.generatePdf(obj).then((res) => {
       this.scaleImpresion = res['scale'] ? res['scale'] : 'noscale';
       if (res.status === 'si') {
         let obj;

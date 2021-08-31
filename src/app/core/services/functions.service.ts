@@ -37,6 +37,22 @@ export class FunctionService {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: awaitTyping
+  // Descripcion : Esta funcion espera a que terminen de escribir para ejecutar una funcion
+  // _________________________________________________________________________________________________
+
+  timeout;
+  awaitTyping(event?) {
+    const promise = new Promise((resolve) => {
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        if (!event || event.keyCode != 13) resolve(true);
+      }, 150);
+    });
+    return promise;
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: hasValue
   // Descripcion : Esta funcion valida que si una variable tiene valor
   // __________________________________________________________________________________________________

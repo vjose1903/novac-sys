@@ -29,8 +29,8 @@ export class ChangePasswordComponent extends mixinClass implements OnInit, After
 
   ngOnInit() {
     this.form = this.fb.group({
-      password: [null, Validators.minLength(5)],
-      confirmPassword: [null, Validators.minLength(5)],
+      password: [null, Validators.minLength(6)],
+      confirmPassword: [null, Validators.minLength(6)],
     });
   }
   ngAfterViewInit() {

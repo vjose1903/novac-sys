@@ -150,7 +150,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
 
   reimprimirFactura(obj) {
     this.loadServ.isLoading.next(true);
-    this.pdfServ.generatePdf(obj, (res) => {
+    this.pdfServ.generatePdf(obj).then((res) => {
       if (res.status === 'si') {
         this.fileName = res.file;
         this.pdfSrc = res.body;

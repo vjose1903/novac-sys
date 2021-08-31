@@ -5,13 +5,14 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import * as moment from '../../../../utils/javascript/moment';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { Subscription } from 'rxjs';
 import { ModalService } from '../../components/modal/modal.service';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { LayoutService } from '../../layout/layout.service';
 import { IpcService } from '../../../core/services/ipc.service';
 import { mixinClass } from '../../mixinClass';
+import { customValidators } from '../../../core/typescript/custom-validators';
+import { pattern } from '../../../core/typescript/constantes';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -21,10 +22,10 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   form: FormGroup;
   titulo = '';
   boton = '';
-  phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+  pattern = pattern;
+
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
-  element: HTMLElement;
-  cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
+
   rolesF = { V: 'Vendedora', A: 'Administradora', U: 'Cajera', C: 'Chofer' };
   rolesM = { V: 'Vendedor', A: 'Administrador', U: 'Cajero', C: 'Chofer' };
 
@@ -46,16 +47,20 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
       key: 'role_', // ojo
     },
   ];
+
   botones = {
     titulo: true,
     borrar: true,
     editar: true,
   };
+
   listaEmpleados;
   editando = false;
   usuarioSelected: any;
   indexBorrar: any;
   documentos_de_identidad: any;
+
+  documento_valido = true;
 
   constructor(
     private fb: FormBuilder,
@@ -87,19 +92,27 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     this._init_mixin({ component: 'reg_empleados', _lista_subs: ['decisionModal'] });
 
     this.necesarioStart();
+
+    this.createForm();
+  }
+
+  createForm() {
+    const myValidators = new customValidators();
+
     this.form = this.fb.group({
-      id: [null],
-      nombre: [null, Validators.required],
-      apellido: [null, Validators.required],
-      usuario: [null, Validators.compose([Validators.required])],
-      sexo: ['', Validators.required],
-      cedula: [''],
-      telefono: [null, Validators.required],
-      email: [null, Validators.compose([Validators.pattern(/^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+$/)])],
-      fecha_nacimiento: [null, Validators.required],
-      password: [null],
+      id: [{ value: null, disabled: true }],
+      nombre: [{ value: null, disabled: true }, Validators.required],
+      apellido: [{ value: null, disabled: true }, Validators.required],
+      usuario: [{ value: null, disabled: true }, Validators.compose([Validators.required])],
+      sexo: [{ value: '', disabled: true }, Validators.required],
+      cedula: [{ value: '', disabled: false }, Validators.compose([myValidators.cedulaValidator(), Validators.required])],
+      telefono: [{ value: null, disabled: true }, Validators.required],
+      email: [{ value: null, disabled: true }, Validators.compose([Validators.pattern(/^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+$/), Validators.required])],
+      fecha_nacimiento: [{ value: null, disabled: true }, Validators.required],
+      password: [{ value: null, disabled: true }, Validators.compose([Validators.minLength(6), Validators.required])],
+      confirm_password: [{ value: null, disabled: true }, Validators.required],
       // estado: [true],
-      role: [null, Validators.required],
+      role: [{ value: null, disabled: true }, Validators.required],
     });
   }
 
@@ -152,13 +165,21 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     }
   }
 
+  checkDocumento(tipo) {
+    console.log('this.form.controls --> ', this.form.controls);
+
+    if (this.form.controls[tipo].valid) {
+      console.log('this.form.controls[tipo] --> ', this.form.controls[tipo].value);
+    }
+  }
+
   atras() {
     this.router.navigateByUrl('/admin/dashboard');
   }
 
   borrar() {
     this.form.reset();
-    this.enfocarInput('campoNombre');
+    this.enfocarInput('cedula');
     this.titulo = 'Registro de empleados';
     this.boton = 'Registrar';
     this.editando = false;
@@ -214,7 +235,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
       this.dbServ.createUpdateEmpleados(objSend).subscribe((res) => {
         this.getEmpleados(this.tServ.obj_paginate);
         this.borrar();
-        this.enfocarInput('campoNombre');
+        this.enfocarInput('cedula');
       });
     }
   }
