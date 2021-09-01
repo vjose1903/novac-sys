@@ -13,6 +13,7 @@ import { IpcService } from '../../../core/services/ipc.service';
 import { mixinClass } from '../../mixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
+import { EmpleadoC } from './empleado';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -117,9 +118,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   }
 
   initCambioMenu(arg) {
-    if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
-    }
+    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
   }
 
   ngOnDestroy(): void {
@@ -166,10 +165,15 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   }
 
   checkDocumento(tipo) {
-    console.log('this.form.controls --> ', this.form.controls);
-
     if (this.form.controls[tipo].valid) {
-      console.log('this.form.controls[tipo] --> ', this.form.controls[tipo].value);
+      this.fun
+        .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula', tabla_origen: 'user' })
+        .then((res) => {
+          console.log('res ', res);
+        })
+        .catch((err) => {
+          console.error('err ', err);
+        });
     }
   }
 

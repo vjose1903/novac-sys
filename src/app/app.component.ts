@@ -7,6 +7,7 @@ import { AppConfig } from '../environments/environment';
 import { FunctionService } from './core/services/functions.service';
 import { SingletonService } from './core/services/singleton.service';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -31,11 +32,13 @@ export class AppComponent implements OnInit, AfterContentChecked {
     public fun: FunctionService,
     private router: Router,
     public zone: NgZone,
+    public http: HttpClient,
   ) {}
 
   ngOnInit(): void {
     SingletonService.fun = this.fun;
     SingletonService.zone = this.zone;
+    SingletonService.http = this.http;
 
     this.loaderServ.isLoading.subscribe((v) => {
       console.log('mostar loading: ', v);

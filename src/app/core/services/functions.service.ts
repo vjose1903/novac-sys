@@ -1,4 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
+import { DocumentosC } from '../typescript/documentos_de_identidad';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +35,24 @@ export class FunctionService {
     if (btn_side) {
       btn_side.setAttribute('data-cant-facturas', facturas.length);
     }
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: getPersonaByDocIdentidad
+  // Descripcion : Esta funcion busca una persona sea empleado, cliente o suplidor por su documento de identidad
+  // _________________________________________________________________________________________________
+
+  getPersonaByDocIdentidad(params: { documento: any; tipo: 'cedula' | 'rnc'; tabla_origen: 'user' | 'cliente' | 'suplidor' }) {
+    return new Promise((resolve, reject) => {
+      let extra = { afterPath: 'persona', parameters: {} };
+
+      extra['parameters'] = { all: true, documentos_de_identidad: true, filter_key: 'cedula', filter_value: params.documento, tabla_origen: params.tabla_origen };
+
+      new DocumentosC()
+        .getAll(extra)
+        .then((res) => resolve(res))
+        .catch((err) => reject(err));
+    });
   }
 
   // __________________________________________________________________________________________________

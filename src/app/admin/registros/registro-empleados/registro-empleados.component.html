@@ -9,7 +9,7 @@
               <div class="row">
                 <div class="col-6">
                   <div class="form-group" [appMsgError]="'cedula'" [form]="form">
-                    <label class="control-label">Cedula <span style="color: red">*</span></label>
+                    <label class="control-label">Cedula: <span style="color: red">*</span></label>
                     <input
                       id="cedula"
                       type="text"
@@ -95,7 +95,7 @@
             </div>
 
             <div class="col-6" [appMsgError]="'fecha_nacimiento'" [form]="form">
-              <label class="control-label">Fecha nac...: <span style="color: red">*</span> </label>
+              <label class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
               <input
                 type="text"
                 [bsConfig]="dpConfig"
