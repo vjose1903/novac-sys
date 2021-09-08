@@ -45,7 +45,6 @@
           </p-tabPanel>
 
           <p-tabPanel
-
             [disabled]="countCantFactSaved('compra').disable"
             tooltip="No tiene facturas de Compra guardadas"
             headerStyleClass="{{ countCantFactSaved('compra').disable ? 'noTabView' : '' }}"
@@ -61,13 +60,18 @@
 
         <h6 *ngIf="facturas_localStorage?.length === 0" class="mt-3 no_fact">No tiene Facturas guardadas por el momento!!</h6>
         <div *ngIf="facturas_localStorage?.length > 0">
-          <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="pasarFacturaAfacturacion(fact)" >
+          <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="pasarFacturaAfacturacion(fact)">
             <div class="colorsito bg-raya-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}{{ fact?.action === 'update' ? '-orange' : '' }}"></div>
 
             <div class="info_fact h-100 {{ factGuardada?.factura_id === fact?.factura_id ? 'activa' : '' }}">
               <i class="fas fa-history {{ fact.FacturaAtrasada ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}"></i>
               <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}"></i>
-              <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar factura" tooltipPosition="left"></i>
+              <i
+                class="btn_borrar_factura_gurdada far fa-trash-alt"
+                (click)="abrirModalFacturaGuardada(fact, $event)"
+                pTooltip="Quitar factura"
+                tooltipPosition="left"
+              ></i>
               <span
                 class="negrita text-mayuscula text-separado-2 texto-borde-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}
             texto-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}"
@@ -174,10 +178,10 @@
         <h5 [ngClass]="actualMenyItem == 'registros' ? 'tituloMenuA' : 'tituloMenu'"><strong>Registros</strong></h5>
 
         <div [ngClass]="actualMenyItem == 'registros_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'clientes', true)">Clientes</h4>
           <h4 class="opcion" (click)="nextCambioMenu(false, 'empleados', true)">Empleados</h4>
-          <h4 class="opcion" (click)="nextCambioMenu(false, 'articulos', true)">Articulos</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'clientes', true)">Clientes</h4>
           <h4 class="opcion" (click)="nextCambioMenu(false, 'suplidores', true)">Suplidores</h4>
+          <h4 class="opcion" (click)="nextCambioMenu(false, 'articulos', true)">Articulos</h4>
           <h4 class="opcion" (click)="nextCambioMenu(false, 'camiones', true)">Camiones</h4>
           <h4 class="opcion" (click)="nextCambioMenu(false, 'ncf', true)">NCF</h4>
         </div>

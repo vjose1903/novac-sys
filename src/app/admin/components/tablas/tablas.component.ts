@@ -388,9 +388,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     this.paginateChange.emit(this.paginate_info);
     this.tServ.obj_paginate = this.paginate_info;
-    setTimeout(() => {
-      this.IDROW = temp;
-    }, 250);
+
+    setTimeout(() => (this.IDROW = temp), 250);
   }
 
   disabledInput(condicion, i) {

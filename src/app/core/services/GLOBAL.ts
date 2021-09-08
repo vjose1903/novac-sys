@@ -1,7 +1,6 @@
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import * as _ from 'lodash';
 
-
 export function applyMixins(target: any, mixinList: any[]) {
   mixinList.forEach((mixin) => {
     Object.getOwnPropertyNames(mixin.prototype).forEach((name) => {
@@ -141,26 +140,26 @@ export class GLOBAL {
       // si el verificador da igual a la resta esta correcta
 
       if ((verificador === 10 && digitoVerificador === '0') || verificador.toString() === digitoVerificador.toString()) {
-        console.log('cedula ', cedula.substring(0, 3) + '-' + cedula.substring(3, 10) + '-' + cedula.substring(10, 11));
+        // console.log('cedula ', cedula.substring(0, 3) + '-' + cedula.substring(3, 10) + '-' + cedula.substring(10, 11));
 
-        console.log('=====================');
-        console.log('|      correcto      |');
-        console.log('=====================');
+        // console.log('=====================');
+        // console.log('|      correcto      |');
+        // console.log('=====================');
 
         return true;
       }
     } catch {
-      console.log('cedula ', cedula.substring(0, 3) + '-' + cedula.substring(3, 10) + '-' + cedula.substring(10, 11));
-      console.log('=====================');
-      console.log('|     inorrecto     |');
-      console.log('=====================');
+      // console.log('cedula ', cedula.substring(0, 3) + '-' + cedula.substring(3, 10) + '-' + cedula.substring(10, 11));
+      // console.log('=====================');
+      // console.log('|     inorrecto     |');
+      // console.log('=====================');
       return false;
     }
 
-    console.log('cedula ', cedula.substring(0, 3) + '-' + cedula.substring(3, 10) + '-' + cedula.substring(10, 11));
-    console.log('=====================');
-    console.log('|     incorrecto     |');
-    console.log('=====================');
+    // console.log('cedula ', cedula.substring(0, 3) + '-' + cedula.substring(3, 10) + '-' + cedula.substring(10, 11));
+    // console.log('=====================');
+    // console.log('|     incorrecto     |');
+    // console.log('=====================');
     return false;
   }
   // =========================================================================================================

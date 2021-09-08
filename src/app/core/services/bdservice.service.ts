@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppConfig } from '../../../environments/environment';
 import * as _ from 'lodash';
 import { FunctionService } from './functions.service';
+import { SingletonService } from './singleton.service';
+import { ToastrService } from 'ngx-toastr';
 @Injectable({
   providedIn: 'root',
 })
@@ -173,7 +174,7 @@ export class DBservice {
   createUpdateClientes(arg) {
     let method = 'post';
     let url = 'clientes';
-    if (_.has(arg.id) && this.fun.hasValue(arg.id)) {
+    if (_.has(arg, 'id') && this.fun.hasValue(arg.id)) {
       method = 'put';
       url += `/${arg.id}`;
     }
@@ -202,7 +203,9 @@ export class DBservice {
   createUpdateSuplidores(arg) {
     let method = 'post';
     let url = 'suplidores';
-    if (_.has(arg.id) && this.fun.hasValue(arg.id)) {
+
+    if (_.has(arg, 'id') && this.fun.hasValue(arg.id)) {
+      this.fun.logGreen('EDITANDOOOO');
       method = 'put';
       url += `/${arg.id}`;
     }
@@ -230,7 +233,7 @@ export class DBservice {
   createUpdateEmpleados(arg) {
     let method = 'post';
     let url = 'users';
-    if (_.has(arg.id) && this.fun.hasValue(arg.id)) {
+    if (_.has(arg, 'id') && this.fun.hasValue(arg.id)) {
       method = 'put';
       url += `/${arg.id}`;
     }

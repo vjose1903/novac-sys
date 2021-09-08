@@ -18,9 +18,7 @@
                       formControlName="cedula"
                       placeholder="___-_______-_"
                       autocomplete="off"
-                      autofocus
-                      (blur)="checkDocumento('cedula')"
-                      (keyup)="checkDocumento('cedula')"
+                      (keyup)="checkDocumento('cedula', $event)"
                     />
                     <span id="msgContainer_cedula"></span>
                   </div>
@@ -150,12 +148,9 @@
 
           <div class="row mt-3">
             <div class="col-md-12">
-              <div class="form-group">
-                <!-- <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a> -->
-                <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-                <input [disabled]="!form.valid" type="submit" (click)="submit(form.value)" class="btn" value="{{ boton }}" id="btn-verde" />
-                <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="abrirModal('password', usuarioSelected)">Cambiar contraseña</a>
-              </div>
+              <input [disabled]="!nombreHasValue()" class="btn mr-2" value="Borrar" id="btn-blanco" (click)="borrar('boton html')" style="max-width: 6rem" />
+              <input [disabled]="!form.valid" (click)="submit(form.value)" class="btn" value="{{ boton }}" id="btn-verde" style="max-width: 8rem" />
+              <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="abrirModal('password', usuarioSelected)">Cambiar contraseña</a>
             </div>
           </div>
         </form>

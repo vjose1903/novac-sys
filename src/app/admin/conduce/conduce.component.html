@@ -95,7 +95,7 @@
                         </a>
                         <ul class="dropdown-menu" role="menu" id="dropConfigRow">
                           <!-- <li role="menuitem">
-                            <div class="from-group my-1 ml-2">
+                            <div class="form-group my-1 ml-2">
                               <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, $event)" />
                               <span class="ml-2 subirLabelCheck">Calcular saco</span>
                             </div>
@@ -115,7 +115,7 @@
                     </td> -->
                     <!--  ::::::::::::  CODIGO  ::::::::::::  -->
                     <td class="COD td0padding">
-                      <div class="from-group">
+                      <div class="form-group">
                         <input
                           type="text"
                           class="form-control entrada"
@@ -132,7 +132,7 @@
                     </td>
                     <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
                     <td class="CAN td0padding">
-                      <div class="from-group">
+                      <div class="form-group">
                         <input
                           type="number"
                           min="0"
@@ -152,7 +152,7 @@
 
                     <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
                     <td class="UNI td0padding">
-                      <div class="from-group">
+                      <div class="form-group">
                         <input
                           *ngIf="(drop && inputDrop !== secuenciaDelDrop(i)) || (!drop && inputDrop === secuenciaDelDrop(i)) || !drop"
                           type="text"
@@ -186,7 +186,7 @@
 
                     <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
                     <td class="DES td0padding">
-                      <div class="from-group">
+                      <div class="form-group">
                         <input type="text" class="form-control entrada inDES" id="des-{{ i }}" formControlName="des" readonly="true" tabindex="-1" />
                       </div>
                     </td>

@@ -67,7 +67,7 @@
 
       <div class="row">
         <div class="col-md-12 mt-3">
-          <div class="from-group">
+          <div class="form-group">
             <a class="btn mr-2" id="btn-gris" (click)="accion(false)">Salir</a>
             <a *ngIf="editando" class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
             <input [disabled]="!form.valid" (click)="submit()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />

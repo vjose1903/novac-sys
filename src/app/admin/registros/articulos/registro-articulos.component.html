@@ -8,26 +8,26 @@
           <div class="col-12">
             <div class="row">
               <div class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }}">
-                <div class="from-group mb-2">
+                <div class="form-group mb-2">
                   <input formControlName="is_detallable" class="apple-switch ml-2" type="checkbox" />
                   <span class="ml-2 subirLabelCheck">Detallable</span>
                 </div>
               </div>
 
               <div *ngIf="TIPOARTICULO && TIPOARTICULO !== 'Materia prima'" class="col-4">
-                <div class="from-group mb-2">
+                <div class="form-group mb-2">
                   <input formControlName="is_materia_prima" class="apple-switch" type="checkbox" />
                   <span class="ml-1 subirLabelCheck_2">Funciona como materia prima</span>
                 </div>
               </div>
               <div *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'" class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }}">
-                <div class="from-group mb-2 ml-2">
+                <div class="form-group mb-2 ml-2">
                   <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" />
                   <span class="ml-2 subirLabelCheck">Calcular saco</span>
                 </div>
               </div>
               <!-- <div class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }}">
-                <div class="from-group mb-2 ml-2">
+                <div class="form-group mb-2 ml-2">
                   <input formControlName="calcular_itbis" class="apple-switch ml-2" type="checkbox" />
                   <span class="ml-2 subirLabelCheck">Calcular Itbis</span>
                 </div>
@@ -82,7 +82,7 @@
           </div>
 
           <div *ngIf="form.controls['tipo_articulo_id'].value === '3'" class="col-md-6">
-            <div class="from-group">
+            <div class="form-group">
               <label class="control-label">Vendido en: <span style="color: red">*</span></label>
               <select formControlName="vendido_en" (keydown.enter)="saltar('costoP')" id="vendido" class="form-control" value="">
                 <option value="{{ null }}">Tipo</option>
@@ -117,7 +117,7 @@
         </div>
         <div *ngIf="TIPOARTICULO !== 'Producto terminado'" class="row">
           <div class="col-md-6">
-            <div class="from-group">
+            <div class="form-group">
               <label class="control-label">Comprado en: <span style="color: red">*</span></label>
               <select
                 formControlName="medida"
@@ -144,7 +144,7 @@
           </div>
           <!--  -->
           <div class="col-md-6">
-            <div class="from-group">
+            <div class="form-group">
               <label class="control-label">Vendido en: <span style="color: red">*</span></label>
               <select formControlName="vendido_en" (keydown.enter)="saltar('costoP')" id="vendido" class="form-control" value="">
                 <option value="{{ null }}">Tipo</option>
@@ -161,7 +161,7 @@
           </div>
           <!--  -->
           <div class="col-md-6 mt-3">
-            <div class="from-group">
+            <div class="form-group">
               <label class="control-label">Costo: <span style="color: red">*</span></label>
               <input
                 type="text"
@@ -185,7 +185,7 @@
             </div>
           </div>
           <div class="col-md-6 mt-3">
-            <div class="from-group">
+            <div class="form-group">
               <label class="control-label">Precio venta: <span style="color: red">*</span></label>
               <input
                 type="text"
@@ -209,7 +209,7 @@
             </div>
           </div>
           <div class="col-md-6 mt-3">
-            <div class="from-group">
+            <div class="form-group">
               <label class="control-label">Alertar existencia: <span style="color: red">*</span></label>
               <div class="row">
                 <div class="col-8">
@@ -281,7 +281,7 @@
                 <hr *ngIf="j > 0" style="margin: 0.5rem 0rem 0.5rem 0rem; border: 0.5px solid #979797" />
                 <div class="row">
                   <div class="col-5">
-                    <div class="from-group">
+                    <div class="form-group">
                       <div>
                         <ng-select
                           id="articulo_id-{{ j }}"
@@ -315,7 +315,7 @@
                     </div>
                   </div>
                   <div class="col-2 p-0">
-                    <div class="from-group">
+                    <div class="form-group">
                       <!-- (keydown.enter)="saltar('send')" -->
                       <input
                         (focus)="$event.target.select()"
@@ -332,7 +332,7 @@
                     </div>
                   </div>
                   <div class="col-3">
-                    <div class="from-group">
+                    <div class="form-group">
                       <!-- (keydown.enter)="saltar('send')" -->
                       <input
                         (focus)="$event.target.select()"
@@ -363,7 +363,7 @@
 
           <div class="row">
             <div class="col-md-4">
-              <div class="from-group">
+              <div class="form-group">
                 <label class="control-label">Otros Costos: <span style="color: red">*</span></label>
                 <input
                   type="text"
@@ -387,7 +387,7 @@
               </div>
             </div>
             <div class="col-md-4">
-              <div class="from-group">
+              <div class="form-group">
                 <label class="control-label">Costo: <span style="color: red">*</span></label>
                 <input
                   type="text"
@@ -412,7 +412,7 @@
             </div>
 
             <div class="col-md-4">
-              <div class="from-group">
+              <div class="form-group">
                 <label class="control-label">Precio venta: <span style="color: red">*</span></label>
                 <input
                   type="text"
@@ -436,7 +436,7 @@
               </div>
             </div>
             <div class="col-md-6 mt-3">
-              <div class="from-group">
+              <div class="form-group">
                 <label class="control-label">Alertar existencia: </label>
                 <div class="row">
                   <div class="col-8">
@@ -487,7 +487,7 @@
           <div class="col-md-3">
             <label class="control-label">Precio por libra </label>
 
-            <div class="from-group">
+            <div class="form-group">
               <input
                 (keydown.enter)="saltar('send')"
                 (focus)="$event.target.select()"
@@ -519,7 +519,7 @@
 
           <div class="col-md-3">
             <label class="control-label">Contiene: </label>
-            <div class="from-group">
+            <div class="form-group">
               <input
                 (keydown.enter)="saltar('medidaPadre')"
                 (focus)="$event.target.select()"
@@ -543,7 +543,7 @@
             </div>
           </div>
           <div class="col-md-5">
-            <div class="from-group">
+            <div class="form-group">
               <label class="control-label text-transparent">medida </label>
               <select
                 (keydown.enter)="saltar('precioPadre')"
@@ -570,7 +570,7 @@
             </div>
           </div>
           <div class="col-md-4">
-            <div class="from-group">
+            <div class="form-group">
               <label class="control-label">Precio </label> {{ ' ' }}
               <label class="control-label">{{ form.controls['medida_contenido_padre'].value }} </label>
               <input
@@ -603,7 +603,7 @@
           <span class="w-100 ml-3 text-green">Contenido Paquete</span>
           <div class="col-md-3">
             <label class="control-label">Contiene: </label>
-            <div class="from-group">
+            <div class="form-group">
               <input
                 type="Number"
                 (focus)="$event.target.select()"
@@ -626,7 +626,7 @@
             </div>
           </div>
           <div class="col-md-5">
-            <div class="from-group">
+            <div class="form-group">
               <label class="control-label text-transparent">medida </label>
               <select (keydown.enter)="saltar('precioHijo')" id="medidaHijo" formControlName="medida_contenido_hijo" class="form-control" value="">
                 <option value="{{ null }}">Seleccione</option>
@@ -644,7 +644,7 @@
             </div>
           </div>
           <div class="col-md-4">
-            <div class="from-group">
+            <div class="form-group">
               <label class="control-label">Precio </label> {{ ' ' }}
               <label class="control-label">{{ form.controls['medida_contenido_hijo'].value }} </label>
               <input
@@ -671,7 +671,7 @@
       </form>
       <div class="row">
         <div class="col-md-12 mt-3">
-          <div class="from-group">
+          <div class="form-group">
             <!-- <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a> -->
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
             <input [disabled]="abilitarBtnSend()" (click)="submit(form)" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />

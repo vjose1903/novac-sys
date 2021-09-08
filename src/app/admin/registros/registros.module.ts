@@ -17,6 +17,7 @@ import { AngularModule } from '../../modules/angular.module';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
 import { DirectivesModule } from '../../core/directive/directives.module';
+import { PipesModule } from '../../core/pipe/pipes.module';
 
 @NgModule({
   declarations: [RegistroArticulosComponent, RegistroClientesComponent, RegistroEmpleadosComponent, RegistroSuplidoresComponent, RegistroVehiculoComponent, NcfComponent],
@@ -33,6 +34,7 @@ import { DirectivesModule } from '../../core/directive/directives.module';
     MDBBootstrapModule,
     NgxBootstrapModule,
     DirectivesModule,
+    PipesModule,
   ],
 })
 export class RegistrosModule {}

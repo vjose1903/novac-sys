@@ -8,6 +8,7 @@ import { FunctionService } from './core/services/functions.service';
 import { SingletonService } from './core/services/singleton.service';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-root',
@@ -33,6 +34,7 @@ export class AppComponent implements OnInit, AfterContentChecked {
     private router: Router,
     public zone: NgZone,
     public http: HttpClient,
+
   ) {}
 
   ngOnInit(): void {

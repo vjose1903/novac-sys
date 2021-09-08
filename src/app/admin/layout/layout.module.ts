@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 
-import { FiltroParaNgforPipe } from '../../core/pipe/filtro-para-ngfor.pipe';
 import { DirectivesModule } from '../../core/directive/directives.module';
 import { ValidateRayaAbajo } from '../../directives/validaciones';
 import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
@@ -30,7 +29,6 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
   declarations: [
     LayoutComponent,
     HomeAdminComponent,
-    FiltroParaNgforPipe,
     FacturacionComponent,
     InventarioComponent,
     CuerpoFacturaComponent,

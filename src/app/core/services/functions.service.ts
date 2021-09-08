@@ -1,5 +1,8 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { DocumentosC } from '../typescript/documentos_de_identidad';
+import * as _ from 'lodash';
+import { GLOBAL } from './GLOBAL';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +12,7 @@ export class FunctionService {
 
   currentUser = null;
 
-  constructor() {}
+  constructor(private toastr: ToastrService) {}
 
   nextCanToast(nextValue) {
     this.canToast = nextValue;
@@ -38,15 +41,89 @@ export class FunctionService {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: checkNumbers
+  // Descripcion : Esta funcion retorna true si algun caracter de una cadena no es un numero
+  // _________________________________________________________________________________________________
+
+  checkNumbers(arg) {
+    let res = false;
+    for (let i = 0; i < arg.length; i++) {
+      const tempCaracter = arg.charAt(i);
+      if (tempCaracter !== ',') {
+        const caracter = _.parseInt(tempCaracter);
+        if (_.isNaN(caracter)) {
+          res = true;
+          break;
+        }
+      }
+    }
+    return res;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: checkLongMillares
+  // Descripcion : Esta funcion validad que los millares sean de 3 en 3
+  // _________________________________________________________________________________________________
+  checkLongMillares(num) {
+    let res = false;
+    const splitNum = _.split(num, ',');
+
+    splitNum.forEach((element, i) => {
+      if (i !== 0) {
+        if (element.length !== 3) res = true;
+      }
+    });
+
+    return res;
+  }
+
+  revisarPrecio(input, id) {
+    const precioTEMPO = input.value;
+    if (this.hasValue(precioTEMPO)) {
+      const splitPrecio = _.split(precioTEMPO, '.');
+      let precioTEMP;
+      let enteros = splitPrecio[0];
+      let tempdecimales = splitPrecio[1];
+
+      if (tempdecimales === undefined) tempdecimales = '00';
+
+      if (
+        splitPrecio.length > 2 ||
+        this.checkNumbers(enteros) ||
+        this.checkLongMillares(enteros) ||
+        this.checkNumbers(tempdecimales) ||
+        this.checkLongMillares(tempdecimales)
+      ) {
+        this.toastError('Valor introducido es invalido', 'ERROR', true);
+        document.getElementById(id).focus();
+      } else {
+        //
+        if (splitPrecio.length === 2) {
+          if (this.isEmpty(enteros)) enteros = '0';
+
+          let decimales;
+          if (tempdecimales.length > 2) decimales = tempdecimales.substring(0, 2);
+          else decimales = _.padEnd(tempdecimales, 2, '0');
+
+          precioTEMP = _.join([enteros, decimales], '.');
+        } else if (splitPrecio.length === 1) {
+          precioTEMP = _.join([enteros, '00'], '.');
+        }
+      }
+
+      input.setValue(GLOBAL.formatearNumero(precioTEMP));
+    }
+  }
+  // __________________________________________________________________________________________________
   // Nombre: getPersonaByDocIdentidad
   // Descripcion : Esta funcion busca una persona sea empleado, cliente o suplidor por su documento de identidad
   // _________________________________________________________________________________________________
 
-  getPersonaByDocIdentidad(params: { documento: any; tipo: 'cedula' | 'rnc'; tabla_origen: 'user' | 'cliente' | 'suplidor' }) {
+  getPersonaByDocIdentidad(params: { documento: any; tipo: 'cedula' | 'rnc' }) {
     return new Promise((resolve, reject) => {
       let extra = { afterPath: 'persona', parameters: {} };
 
-      extra['parameters'] = { all: true, documentos_de_identidad: true, filter_key: 'cedula', filter_value: params.documento, tabla_origen: params.tabla_origen };
+      extra['parameters'] = { all: true, documentos_de_identidad: true, filter_key: 'cedula', filter_value: params.documento };
 
       new DocumentosC()
         .getAll(extra)
@@ -132,5 +209,42 @@ export class FunctionService {
 
   logGreen(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? body : '');
+  }
+
+  // =====================================================================
+  // TOASTS
+  // =====================================================================
+
+  ultimoMensajeMostrado: any;
+  toastSuccess(msg?, titulo = 'CORRECTO', excepcion = true) {
+    if (this.canToast) {
+      const msg_ = msg;
+      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
+        this.ultimoMensajeMostrado = msg_;
+        this.toastr.success(msg || '', titulo || '');
+      }
+    }
+  }
+
+  toastError(msg?, titulo = 'ERROR', excepcion?) {
+    if (this.canToast) {
+      const msg_ = msg;
+      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
+        this.ultimoMensajeMostrado = msg_;
+        console.log('this.toastr --> ', this.toastr);
+
+        this.toastr.error(msg || '', titulo || '');
+      }
+    }
+  }
+
+  toastWarning(msg?, titulo = 'AVISO', excepcion?) {
+    if (this.canToast) {
+      const msg_ = msg;
+      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
+        this.ultimoMensajeMostrado = msg_;
+        this.toastr.warning(msg || '', titulo || '');
+      }
+    }
   }
 }
