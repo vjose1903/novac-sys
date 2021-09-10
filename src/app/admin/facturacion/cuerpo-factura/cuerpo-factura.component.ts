@@ -52,13 +52,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   tipoModal: string;
   registroSaco: any;
 
-  constructor(
-    private dbServ: DBservice,
-    public mServ: ModalService,
-    private fb: FormBuilder,
-    public _ipc: IpcService,
-    public layServ: LayoutService,
-  ) {
+  constructor(private dbServ: DBservice, public mServ: ModalService, private fb: FormBuilder, public _ipc: IpcService, public layServ: LayoutService) {
     super(mServ, _ipc, layServ);
     // this.rowFactura = new FormArray([new FormControl()]);
   }
@@ -590,25 +584,25 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     } catch (error) {}
 
     for (let index = 0; index < this.control.controls.length; index++) {
-      const cod = (this.control.controls[index] as any).controls['cod'].value;
-      if (cod === null || cod === undefined || cod === '' || cod === ' ') {
-        break;
-      }
+      const control_ = (this.control.controls[index] as any).controls;
+      const cod = control_['cod'].value;
+
+      if (this.fun.isEmpty(cod)) break;
+
       let cantidadF = 0;
       let unidadF = '';
 
-      cantidadF = (this.control.controls[index] as any).controls['can'].value;
-      unidadF = (this.control.controls[index] as any).controls['uni'].value;
+      cantidadF = control_['can'].value;
+
+      unidadF = control_['uni'].value;
 
       const splitUnidadF = _.split(unidadF, ' ');
       let unity = splitUnidadF[0];
-      const FindProd = (this.control.controls[index] as any).controls['des'].value;
+      const FindProd = control_['des'].value;
 
       if (FindProd === descripcion) {
         if (unity === 'Saco' || unity === 'Libra') {
-          if (splitUnidadF.length > 1) {
-            cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
-          }
+          if (splitUnidadF.length > 1) cantidadF = cantidadF * _.parseInt(splitUnidadF[2]);
         }
 
         if (unity === 'Saco' && articulo.medida !== 'Saco') {
@@ -617,13 +611,12 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         }
 
         cantidadF *= articulo.contenido[unity];
+
         cantidad += cantidadF;
       }
     }
 
-    if (lugar === 'saltar') {
-      i--;
-    }
+    if (lugar === 'saltar') i--;
 
     try {
       const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();

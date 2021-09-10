@@ -68,7 +68,7 @@
 
               <!--  ::::::::::::  CODIGO  ::::::::::::  -->
               <td class="COD td0padding">
-                <div class="form-group">
+                <div class="form-group m-0">
                   <input
                     [readOnly]="!propietario"
                     type="text"
@@ -85,7 +85,7 @@
 
               <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
               <td class="CAN td0padding">
-                <div class="form-group">
+                <div class="form-group m-0">
                   <input
                     [readOnly]="!propietario"
                     type="number"
@@ -104,7 +104,7 @@
 
               <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
               <td class="UNI td0padding">
-                <div class="form-group">
+                <div class="form-group m-0">
                   <input
                     [readOnly]="!propietario"
                     *ngIf="(drop && inputDrop !== secuenciaDelDrop(i)) || (!drop && inputDrop === secuenciaDelDrop(i)) || !drop"
@@ -139,7 +139,7 @@
 
               <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
               <td class="DES td0padding">
-                <div class="form-group">
+                <div class="form-group m-0">
                   <input type="text" class="form-control entrada inDES" id="des-{{ i }}" formControlName="des" readonly="true" tabindex="-1" />
                 </div>
               </td>
@@ -147,7 +147,7 @@
               <!--  ::::::::::::  DESCUENTO  ::::::::::::  -->
 
               <td class="DESC td0padding">
-                <div class="form-group">
+                <div class="form-group m-0">
                   <input
                     type="number"
                     class="form-control entrada campoNumeros"
@@ -164,7 +164,7 @@
               </td>
               <!--  ::::::::::::  PRECIO  ::::::::::::  -->
               <td class="PRE td0padding">
-                <div class="form-group">
+                <div class="form-group m-0">
                   <input
                     type="text"
                     (blur)="revisarPrecio(i)"
@@ -182,7 +182,7 @@
 
               <!--  ::::::::::::  PRECIO  ::::::::::::  -->
               <td class="TOT td0padding">
-                <div class="form-group">
+                <div class="form-group m-0">
                   <input type="text" class="form-control entrada inTOT campoNumeros" id="tot-{{ i }}" formControlName="tot" readonly="true" tabindex="-1" />
                   <input type="hidden" [value]="i" formControlName="secuencia" tabindex="-1" />
                 </div>

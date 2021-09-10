@@ -15,8 +15,8 @@ export class InterceptorService implements HttpInterceptor {
   constructor(public loadServ: LoaderService, private fun: FunctionService, private dbServ: DBservice, private router: Router) {}
   requestCount: number = 0;
 
-  private startRequest(): void {
-    if (this.requestCount == 0) this.loadServ.isLoading.next(true);
+  private startRequest(args?): void {
+    if (this.requestCount == 0 && args !== 'no_show') this.loadServ.isLoading.next(true);
     this.requestCount++;
   }
 
@@ -34,7 +34,7 @@ export class InterceptorService implements HttpInterceptor {
 
     if (spinner) request.params.delete('spinner'); // remove parameter spinner y no ejecuta el loader
 
-    if (!spinner || spinner == 'no_hide') this.startRequest(); // Activa el spinner
+    if (!spinner || spinner == 'no_hide') this.startRequest(spinner); // Activa el spinner
 
     if (token) {
       request = request.clone({
@@ -66,10 +66,6 @@ export class InterceptorService implements HttpInterceptor {
       }),
 
       catchError((response: HttpErrorResponse) => {
-        console.log('::::::::::::::::::::::::::::::::::::::::::::::::::');
-        console.log(response);
-        console.log('::::::::::::::::::::::::::::::::::::::::::::::::::');
-
         if (response.error === null) {
           this.dbServ.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR', true);
         } else if (response.error && response.error.msg === 'Para realizar esta accion debe de iniciar sesión.') {

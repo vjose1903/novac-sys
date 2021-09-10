@@ -59,8 +59,6 @@ export class CrudG<T> {
   }
 
   async createOne(data, arg = null, tipo = 'backend') {
-    console.log('createOne --> ');
-
     let url = this.makeUrl(tipo, arg);
     return (await this.request(url, 'post', data, tipo).toPromise()) as T;
   }

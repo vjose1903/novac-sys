@@ -83,8 +83,6 @@ export class MsgErrorDirective {
 
           const errors = this.form.controls[this.id].errors;
 
-          console.log('errors : ', errors);
-
           if (this.fun.hasValue(errors) && !this.form.controls[this.id].valid && (this.form.controls[this.id].dirty || this.form.controls[this.id].touched)) {
             response.render = true;
 

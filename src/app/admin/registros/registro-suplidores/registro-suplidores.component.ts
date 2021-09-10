@@ -116,7 +116,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
       const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
-      console.log('res ---> ', res);
 
       res.data.map((suplidor) => {
         suplidor.documentos_de_identidad.map((docu) => {
@@ -164,12 +163,9 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
 
     this.form.controls.cedula.updateValueAndValidity();
     this.form.controls.rnc.updateValueAndValidity();
-    console.log('this.form ', this.form.controls);
   }
 
-  p() {
-    console.log('this.form ', this.form.controls);
-  }
+  p() {}
 
   checkDocumento(tipo, e?) {
     const documento = this.form.controls[tipo].value;
@@ -186,8 +182,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
         .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
         .then((res) => {
           if (res['data'].length) {
-            console.log("res['data'] --> ", res['data']);
-
             const is_suplidor = _.find(res['data'], (item) => item.persona_is === 'Suplidor');
 
             if (this.fun.hasValue(is_suplidor) && is_suplidor.persona.estado) {
@@ -212,8 +206,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
             if (this.camposDisabled) enable_campos = true;
 
             this.documentos_de_identidad = persona.documentos_de_identidad;
-            console.log('this.form.value: ', this.form.value);
-            console.log('this.documentos_de_identidad: ', this.documentos_de_identidad);
           } else {
             enable_campos = true;
           }
@@ -238,7 +230,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   changeStateCampos(enable = false) {
     const actual_state = this.form.controls.nombre.status;
 
-    console.log('actual_state: ', actual_state);
     ['nombre', 'telefono', 'direccion', 'email'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
       if (!enable) this.form.controls[campo].reset();
@@ -249,7 +240,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
 
   setDocumentoPrincipal(doc) {
     this.doc_principal = doc;
-    console.log('this.doc_principal --> ', this.doc_principal);
   }
 
   editarItem(item) {
@@ -263,8 +253,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
 
   patchDocumentos(documentos) {
     documentos.forEach((doc) => {
-      console.log('doc: ', doc);
-
       if (doc.descripcion === 'rnc') this.form.controls.rnc.setValue(doc.documento);
       else this.form.controls.cedula.setValue(doc.documento);
     });
@@ -316,8 +304,6 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
 
       // paso todas las validaciones
     } else {
-      console.log('obj --> ', obj);
-
       this.dbServ.createUpdateSuplidores(obj).subscribe((res) => {
         this.getSuplidores(this.tServ.obj_paginate);
         this.borrar();

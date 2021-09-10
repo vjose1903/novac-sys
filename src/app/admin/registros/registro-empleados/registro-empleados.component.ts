@@ -212,8 +212,6 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
         .catch((err) => {
           console.error('err ', err);
         });
-
-      console.log('this.form ', this.form.getRawValue());
     } else {
       if (!_.endsWith(cedula, '_')) {
         this.documentos_de_identidad = undefined;
@@ -226,7 +224,6 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   changeStateCampos(enable = false) {
     const actual_state = this.form.controls.nombre.status;
 
-    console.log('actual_state: ', actual_state);
     ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'role'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
       if (!enable) this.form.controls[campo].reset();
@@ -240,9 +237,6 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   }
 
   borrar(e?) {
-    console.log('QUIEN BORRA: ', e);
-    console.log('{{{{{{{{{{{{{{ BORRANDO }}}}}}}}}}}}}}}');
-
     this.form.reset();
     this.enfocarInput('cedula');
     this.titulo = 'Registro de empleados';
@@ -270,8 +264,6 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     const doc = item.ARG.documentos_de_identidad.filter((doc) => doc.principal === true);
 
     if (item.ARG.documentos_de_identidad.length > 0 && this.fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
-
-    console.log('item.ARG.fecha_nacimiento --> ', item.ARG.fecha_nacimiento);
 
     this.form.patchValue(item.ARG);
 
@@ -307,8 +299,6 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     if (!objTemp.fecha_nacimiento.includes('/')) objTemp.fecha_nacimiento = this.fecha(objTemp.fecha_nacimiento);
 
     const objSend = _.omit(objTemp, ['cedula']);
-
-    console.log('objSend --> ', objSend);
 
     if (!this.editando && objSend.password === null) {
       this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR', true);

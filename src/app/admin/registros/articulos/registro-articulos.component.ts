@@ -777,7 +777,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   async editarItem(item) {
-    console.log('item --> ', item);
 
     const articulo = item.ARG;
 

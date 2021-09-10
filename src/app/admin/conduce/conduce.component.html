@@ -115,7 +115,7 @@
                     </td> -->
                     <!--  ::::::::::::  CODIGO  ::::::::::::  -->
                     <td class="COD td0padding">
-                      <div class="form-group">
+                      <div class="form-group m-0">
                         <input
                           type="text"
                           class="form-control entrada"
@@ -132,7 +132,7 @@
                     </td>
                     <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
                     <td class="CAN td0padding">
-                      <div class="form-group">
+                      <div class="form-group m-0">
                         <input
                           type="number"
                           min="0"
@@ -152,7 +152,7 @@
 
                     <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
                     <td class="UNI td0padding">
-                      <div class="form-group">
+                      <div class="form-group m-0">
                         <input
                           *ngIf="(drop && inputDrop !== secuenciaDelDrop(i)) || (!drop && inputDrop === secuenciaDelDrop(i)) || !drop"
                           type="text"
@@ -186,7 +186,7 @@
 
                     <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
                     <td class="DES td0padding">
-                      <div class="form-group">
+                      <div class="form-group m-0">
                         <input type="text" class="form-control entrada inDES" id="des-{{ i }}" formControlName="des" readonly="true" tabindex="-1" />
                       </div>
                     </td>

@@ -234,7 +234,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
   changeStateCampos(enable = false) {
     const actual_state = this.form.controls.nombre.status;
 
-    console.log('actual_state: ', actual_state);
     ['nombre', 'apellido', 'direccion', 'sexo', 'telefono', 'limite_credito', 'maximo_credito', 'vendedor_id'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
       if (!enable) this.form.controls[campo].reset();
@@ -259,9 +258,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
         .then((res) => {
           if (res['data'].length) {
             const is_cliente = _.find(res['data'], (item) => item.persona_is === 'Cliente');
-
-            console.log('is_cliente --> ', is_cliente);
-            console.log("res['data'] --> ", res['data']);
 
             if (this.fun.hasValue(is_cliente) && is_cliente.persona.estado) {
               this.fun.toastError(
@@ -288,7 +284,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
             if (this.camposDisabled) enable_campos = true;
 
             this.documentos_de_identidad = persona.documentos_de_identidad;
-            console.log('this.documentos_de_identidad: ', this.documentos_de_identidad);
           } else {
             enable_campos = true;
           }
@@ -301,11 +296,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
         .catch((err) => {
           console.error('err ', err);
         });
-
-      console.log('this.form ', this.form.getRawValue());
     } else {
-      console.log("_.endsWith(cedula, '_') --> ", _.endsWith(documento, '_'));
-
       if (!_.endsWith(documento, '_')) {
         this.documentos_de_identidad = undefined;
         // this.camposDisabled = true;

@@ -34,7 +34,6 @@ export class AppComponent implements OnInit, AfterContentChecked {
     private router: Router,
     public zone: NgZone,
     public http: HttpClient,
-
   ) {}
 
   ngOnInit(): void {
@@ -43,8 +42,6 @@ export class AppComponent implements OnInit, AfterContentChecked {
     SingletonService.http = this.http;
 
     this.loaderServ.isLoading.subscribe((v) => {
-      console.log('mostar loading: ', v);
-
       this.loading = v;
     });
 
@@ -71,7 +68,6 @@ export class AppComponent implements OnInit, AfterContentChecked {
             this.fun.logout();
             this.router.navigateByUrl('/auth/login');
           }
-          console.log(res.body);
 
           this.counter++;
           this.tiempo_restante = this.timeConvert(res.body.total / res.body.bytesPerSecond);

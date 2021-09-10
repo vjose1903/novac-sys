@@ -124,9 +124,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.getPrintersName();
   }
 
-  probar() {
-    console.log('CLICK EN FOCO ANGULAR');
-  }
+  probar() {}
 
   initVariables() {
     this.showLoading = true;

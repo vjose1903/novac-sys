@@ -6,10 +6,7 @@ import { FormGroup } from '@angular/forms';
 })
 export class MsgErrorPipe implements PipeTransform {
   transform(formControl: FormGroup): unknown {
-    console.log('formControl --> ', formControl);
-
     const errors = formControl.errors;
-    console.log('errors --> ', errors);
 
     let msg = '';
 
@@ -18,8 +15,6 @@ export class MsgErrorPipe implements PipeTransform {
     else if (errors.ip) msg = `Intoduzca una ip valida.`;
     else if (errors.compares) msg = `Las contraseñas no coinciden.`;
     else if (errors.invalidCedula) msg = `Ingrese una cedula válida.`;
-
-    console.log('msg --> ', msg);
 
     return msg;
   }

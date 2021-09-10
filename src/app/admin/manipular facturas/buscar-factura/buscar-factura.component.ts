@@ -123,8 +123,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   }
 
   ipcBase64Resonse(res_ipc) {
-    // console.log('res_ipc: ', res_ipc);
-
     this.loadServ.isLoading.next(false);
 
     if (res_ipc.status === 'si') {
@@ -138,14 +136,13 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     if (res && res.tipo_modal === 'buscarCliente') {
       this.clienteBuscado = res.data;
       (document.getElementById('valorI') as any).value = res.data.nombre;
+      this.valor = res.data.id;
       this.pedirFactura('1', res.data.id, this.tServ.obj_paginate);
     }
   }
 
   pressEscResponse(res) {
-    if (res !== undefined && res !== null) {
-      this.enfocarInput('valorI');
-    }
+    if (res !== undefined && res !== null) this.enfocarInput('valorI');
   }
 
   reimprimirFactura(obj) {
@@ -163,14 +160,8 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   }
 
   decisionModal(res) {
-    // console.log('this.tipoModal ', this.tipoModal);
-    // console.log('this.BuscarPara ', this.BuscarPara);
-    // console.log('res ', res);
-
     if (res) {
       if (this.tipoModal === 'mostrarFactura') {
-        // console.log('this.BuscarPara ==> ', this.BuscarPara);
-
         if (this.BuscarPara === 'anular_factura') {
           this.facturaSelected['identificadorFact'] =
             this.campo === '2'
@@ -181,13 +172,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
         } else if (this.BuscarPara === 'solo_ver') {
           if (res.tipo === 'reimrimir') {
             const obj = { data: this.facturaSelected, type: 'facturacion' };
-            console.log(' ');
-            console.log(' ');
-            console.log(' ========================================');
-            console.log('this.facturaSelected --> ', this.facturaSelected);
-            console.log(' ========================================');
-            console.log(' ');
-            console.log(' ');
 
             this.reimprimirFactura(obj);
           } else {
@@ -374,7 +358,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
           this.parseFacturaSelected().then((res) => {
             this.abrirModal('mostrarFactura', res);
           });
-          // console.log('this.facturaSelected --> ', this.facturaSelected);
         }
       } else {
         if (this.campo === '1') {
@@ -397,6 +380,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   changeSelect(valor) {
     this.tipo_factura_id = null;
     this.facturas = undefined;
+
     if (valor === '1') {
       this.campoSelected = 'Cliente';
       this.placeHolder = 'Nombre Cliente';

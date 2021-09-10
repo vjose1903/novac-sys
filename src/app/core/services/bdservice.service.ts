@@ -44,7 +44,7 @@ export class DBservice {
           'Content-Type': 'application/json',
           Accept: 'Application/json',
         },
-        params: { spinner: 'no_hide' },
+        params: { spinner: 'no_show' },
       }).pipe(
         map((val) => {
           // set obs false
@@ -58,7 +58,7 @@ export class DBservice {
           'Content-Type': 'application/json',
           Accept: 'Application/json',
         },
-        params: { spinner: 'no_hide' },
+        params: { spinner: 'no_show' },
       }).pipe(
         map((val) => {
           // set obs false
