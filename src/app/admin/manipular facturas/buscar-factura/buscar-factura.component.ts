@@ -80,7 +80,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       estilos: [{ width: '6rem' }],
     },
     {
-      titulo: 'Fecha Facturacion',
+      titulo: 'Fecha Facturación',
       key: 'fecha',
     },
     {

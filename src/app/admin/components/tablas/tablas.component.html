@@ -10,7 +10,7 @@
       <thead class="text-center position-relative" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
         <!-- [disabled]="disabledInput(column.disable, i)" -->
         <tr #titulosHeader>
-          <th id="{{ row.titulo }}" *ngFor="let row of info">
+          <th id="{{ row.titulo }}" *ngFor="let row of info" class="thHead">
             <span [ngSwitch]="row.tipo">
               <span *ngSwitchCase="'check'">
                 <input
@@ -29,7 +29,7 @@
               </span>
             </span>
           </th>
-          <th *ngIf="botones.titulo">Acciones</th>
+          <th *ngIf="botones.titulo" class="thHead">Acciones</th>
         </tr>
       </thead>
       <tbody [ngStyle]="{ height: alto + 'px' }">
@@ -112,7 +112,7 @@
                 [mdbTooltip]="column.text_tooltip ? tooltip : ''"
                 placement="{{ i != 0 ? 'top' : 'botton' }}"
               >
-                <div class="form-group">
+                <div class="form-group m-0">
                   <input
                     class="apple-switch"
                     [disabled]="disabledInput(column.disable, i)"

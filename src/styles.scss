@@ -560,8 +560,8 @@ bs-daterangepicker-container {
 Not supports in Firefox and IE */
 
 ::-webkit-scrollbar {
-  background-color: #fff;
-  width: 10px;
+  background-color: inherit;
+  width: 7px;
   &:hover {
     cursor: pointer !important;
   }
@@ -577,6 +577,8 @@ Not supports in Firefox and IE */
 ::-webkit-scrollbar-thumb {
   background-color: #c1c1c1;
   border-radius: 16px;
+  width: 7px;
+  height: 7px;
 
   &:hover {
     cursor: pointer !important;

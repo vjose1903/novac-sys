@@ -67,7 +67,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
     {
       titulo: 'Doc. identidad',
       key: 'documento_identidad',
-      estilos: [{ padding: '0.6rem 0rem' }],
     },
   ];
   camposDisabled: boolean = true;
