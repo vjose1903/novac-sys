@@ -1,17 +1,22 @@
 {{ checkFacturaGuardada() }}
 
-<span id="actualMenuItemBack" class="text-danger position-absolute" style="z-index: 9; transform: translate(9rem, 5px)"> ({{ actualMenuItemBack }}) </span>
 <div id="fondoC" *ngIf="noServer" class="h-100 w-100 position-absolute backnegro">
   <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
 </div>
 
-<!-- *ngIf="actualMenuItemBack == 'factura'" -->
+
+<span *ngIf="actualMenuItemBack == 'factura'" id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center"  (click)="_toggleSidebar()">
+  <i id="triangualo" class="fas fa-caret-left text-white"></i>
+</span>
+
 <p-sidebar
   #my_sidebar
+  *ngIf="actualMenuItemBack == 'factura'"
   styleClass="my_sidebar  {{ _opened ? 'side_open' : 'side_closed' }}"
   [position]="'right'"
   [visible]="_opened"
   [modal]="true"
+  appendTo="body"
   [showCloseIcon]="false"
   [baseZIndex]="1"
   [dismissible]="true"
@@ -22,7 +27,6 @@
   <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar()">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
-
   <div class="contendioSidebar w-100 h-100">
     <div class="head w-100">
       <span class="tituloSidebar negrita">Facturas guardadas</span>
