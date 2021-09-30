@@ -226,11 +226,12 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     if (decision) {
       if (this.tipoModal === 'visor_pdf') {
         const obj = {
-          base64: this.pdfSrc,
-          filename: this.fileName,
+          base64: this.seleccionModal.pdfSrc,
+          filename: `${this.seleccionModal.fileName}.pdf`,
           type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte',
           scale: this.scaleImpresion,
         };
+
 
         this._ipc.send('printBase64', obj);
       } else if (this.tipoModal === 'cuadre') {
