@@ -88,7 +88,7 @@ export class modalClass extends LayoutClass {
       switch (observable) {
         case 'printBase64Res':
           this.zone.run(() => {
-            _this.ipcBase64Resonse(res);
+            _this.printBase64Res(res);
             _this.reiniciarVariables([VM._7]);
           });
 
@@ -146,7 +146,7 @@ export class modalClass extends LayoutClass {
     if (list.includes(VM._10)) if (de_quien_soy && this.metodos[de_quien_soy]) delete this.metodos[de_quien_soy]; /* metodos */
   }
 
-  ipcBase64Resonse(res) {}
+  printBase64Res(res) {}
   decisionModal(res: any) {}
   articuloFiltroResponse(res) {}
   pressEscResponse(res) {}

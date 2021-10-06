@@ -43,6 +43,7 @@ export function makeRecibo(data) {
 function cabeceraRecibo(data) {
   const rncCliente = data.cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
   const numero_letra = numLetra.NumeroALetras(data.total);
+
   const header = [
     {
       columns: [
@@ -107,10 +108,7 @@ function cabeceraRecibo(data) {
     },
     {
       margin: [15, 5, 0, 0],
-      text: [
-        { text: 'Cliente: ', fontSize: 12, bold: true },
-        { text: `${fun_.my_capitalize(data.cliente.nombre)} ${fun_.my_capitalize(data.cliente.apellido)}` },
-      ],
+      text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: `${fun_.my_capitalize(data.cliente.nombre)} ${fun_.my_capitalize(data.cliente.apellido)}` }],
     },
 
     {
@@ -123,11 +121,7 @@ function cabeceraRecibo(data) {
     },
 
     {
-      text: [
-        { text: 'Recibido: ', fontSize: 12, bold: true },
-        { text: fun_.numFormatTwoDecimals(data.total) },
-        { text: ` - ${fun_.my_capitalize(numero_letra)}` },
-      ],
+      text: [{ text: 'Recibido: ', fontSize: 12, bold: true }, { text: fun_.numFormatTwoDecimals(data.total) }, { text: ` - ${fun_.my_capitalize(numero_letra)}` }],
       margin: [15, 3, 0, 0],
     },
     { canvas: [{ type: 'rect', x: 10, y: 5, w: 970, h: 2, color: '#000000' }] },
@@ -200,7 +194,7 @@ function cabeceraRecibo(data) {
 
 // ==========================================================================================================================================================
 // CONTENIDO
-// =========================================================~=================================================================================================
+// ==========================================================================================================================================================
 
 function contenidoRecibo(data) {
   const tempBody = [];

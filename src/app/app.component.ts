@@ -63,11 +63,7 @@ export class AppComponent implements OnInit, AfterContentChecked {
     this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
       this.zone.run(() => {
         if (res && res.body) {
-          if (this.counter == 1) {
-            this.visible = true;
-            this.fun.logout();
-            this.router.navigateByUrl('/auth/login');
-          }
+          if (this.counter == 1) this.visible = true;
 
           this.counter++;
           this.tiempo_restante = this.timeConvert(res.body.total / res.body.bytesPerSecond);

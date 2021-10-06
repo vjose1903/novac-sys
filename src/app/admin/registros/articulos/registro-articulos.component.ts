@@ -777,7 +777,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   async editarItem(item) {
-
     const articulo = item.ARG;
 
     this.borrar();
@@ -880,12 +879,11 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   formarContenido() {
     const x = GLOBAL.duplicarJson(this.form.value);
 
-    if (x.medida === 'Quintal' || x.medida === 'Saco') {
-      x.medida_contenido_padre = 'Libra';
-    }
+    if (x.medida === 'Quintal' || x.medida === 'Saco') x.medida_contenido_padre = 'Libra';
 
     const padre = {
       referencia: null,
+      articulo_id: x.id,
       id: x.id_contenido_padre,
       costo: _.isString(x.costo_padre) ? parseFloat(x.costo_padre) : x.costo_padre,
       precio: GLOBAL.desformatear(x.medida === 'Caja' || x.medida === 'Saco' ? x.precio_padre : x.precio_libra),
@@ -896,6 +894,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
     const hijo = {
       referencia: x.referencia_hijo,
+      articulo_id: x.id,
       id: x.id_contenido_hijo,
       costo: _.isString(x.costo_hijo) ? parseFloat(x.costo_hijo) : x.costo_hijo,
       precio: GLOBAL.desformatear(x.precio_hijo),
@@ -906,11 +905,8 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
     let contenido = [];
     if (x.medida_contenido_padre !== null) {
-      if (x.medida_contenido_hijo === null) {
-        contenido = [padre];
-      } else {
-        contenido = [padre, hijo];
-      }
+      contenido = [padre];
+      if (x.medida_contenido_hijo !== null) contenido = [padre, hijo];
     }
 
     return contenido;
@@ -974,10 +970,10 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
           this.necesarioStart();
           this.borrar();
 
-          this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto', true);
+          // this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto', true);
         },
         (err) => {
-          this.mostrarErrores(err.error);
+          // this.mostrarErrores(err.error);
           // this.dbServ.toastError(err.error, 'Error', true);
         },
       );
@@ -987,10 +983,10 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
         (res) => {
           this.necesarioStart();
           this.borrar();
-          this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto', true);
+          // this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto', true);
         },
         (err) => {
-          this.mostrarErrores(err.error);
+          // this.mostrarErrores(err.error);
           // this.dbServ.toastError(err.error, 'Error', true);
         },
       );

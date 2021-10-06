@@ -43,7 +43,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     }
   }
 
-  ipcBase64Resonse(res) {
+  printBase64Res(res) {
     if (res.status === 'si') {
       this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
     } else {

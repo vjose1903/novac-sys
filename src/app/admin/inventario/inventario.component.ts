@@ -32,7 +32,6 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
       titulo: 'Articulo',
       key: 'nombre',
       estilos: [{ width: '35rem' }, { 'text-align': 'left' }, { 'padding-left': '2rem' }],
-
     },
     {
       titulo: 'Cantidad',
@@ -79,9 +78,8 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   async ngOnInit() {
     this._init_mixin({ component: 'inventario', _lista_subs: ['decisionModal', 'printBase64Res'] });
     this.necesarioParaEmpezar();
-    this.dbServ.getTipoArticulos().subscribe((res) => {
-      this.tipo_articulos = res;
-    });
+
+    this.dbServ.getTipoArticulos().subscribe((res) => (this.tipo_articulos = res));
   }
 
   initCambioMenu(arg) {
@@ -90,7 +88,9 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
     }
   }
 
-  async ipcBase64Resonse(res) {
+  async printBase64Res(res) {
+    console.log('res: ', res);
+
     if (res.status === 'si') {
       this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
     } else {

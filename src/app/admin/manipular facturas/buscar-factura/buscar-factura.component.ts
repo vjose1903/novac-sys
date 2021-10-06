@@ -122,7 +122,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     this.completarTituloPag();
   }
 
-  ipcBase64Resonse(res_ipc) {
+  printBase64Res(res_ipc) {
     this.loadServ.isLoading.next(false);
 
     if (res_ipc.status === 'si') {

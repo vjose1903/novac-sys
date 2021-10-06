@@ -4,8 +4,12 @@
   <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
 </div>
 
-
-<span *ngIf="actualMenuItemBack == 'factura'" id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center"  (click)="_toggleSidebar()">
+<span
+  *ngIf="actualMenuItemBack == 'factura'"
+  id="btn_side_facturas"
+  class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center"
+  (click)="_toggleSidebar()"
+>
   <i id="triangualo" class="fas fa-caret-left text-white"></i>
 </span>
 
@@ -16,7 +20,6 @@
   [position]="'right'"
   [visible]="_opened"
   [modal]="true"
-  appendTo="body"
   [showCloseIcon]="false"
   [baseZIndex]="1"
   [dismissible]="true"
@@ -283,7 +286,6 @@
 
     <div class="" style="padding: 0.5rem 1rem 2rem 1rem; height: calc(100% - 60px); overflow-y: auto">
       <mdb-card-img id="foco_angular" class="btn_invisible" src="assets/img/transparente.png" alt="Logo ADM" (click)="probar()"></mdb-card-img>
-
       <router-outlet *ngIf="ready"></router-outlet>
       <!-- rutas -->
     </div>

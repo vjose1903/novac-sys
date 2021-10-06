@@ -388,9 +388,6 @@ export class DBservice {
     return this.peticion('tipo_facturas', 'get');
   }
 
-  getSecuenciaFacturas() {
-    return this.peticion('secuencia_facturas', 'get');
-  }
 
   getFacturasByClienteIdAndPagada(cliente_id, pagada, page, per_page, paginado) {
     return this.peticion(`cabecera_facturas/cliente/${cliente_id}/pagada/${pagada}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');

@@ -414,6 +414,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       const res = await this.dbServ.createRecibo(obj).toPromise();
 
       this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
+
       this.clienteAdepositar.balance = res.cliente.balance;
 
       this.pedirFacturasPorCliente(this.clienteAdepositar.id, this.tServ.obj_paginate);
@@ -426,11 +427,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
       this.pdfServ.generatePdf(obj_print).then((res) => {
         if (res.status === 'si') {
-          const objBase = {
-            base64: res.body,
-            filename: res.file,
-            type: 'recibo_ingreso',
-          };
+          const objBase = { base64: res.body, filename: res.file, type: 'recibo_ingreso' };
           this._ipc.send('printBase64', objBase);
         }
       });
@@ -439,11 +436,9 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     }
   }
 
-  ipcBase64Resonse(res) {
+  printBase64Res(res) {
     if (res.status === 'si') {
-    } else {
-      this.dbServ.toastError(res.msg, 'ERROR', true);
-    }
+    } else this.dbServ.toastError(res.msg, 'ERROR', true);
   }
 
   resetVariables() {
@@ -503,7 +498,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
     this.facturas_selected.forEach((factura) => {
       this.recibiendo += GLOBAL.desformatear(factura.monto);
-
       this.restando = this.clienteAdepositar.balance - this.recibiendo;
     });
   }
