@@ -233,27 +233,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
         detalle['total_nota'] = 0;
         detalle['cantidad'] = detalle.cantidad - devueto;
 
-        // if (detalle.calcular_saco && detalle.se_calcula_saco) {
-        //   this.getPrecioSaco(this.factura, (res) => {
-        //     if (res.estado) {
-        //       detalle['precio'] = detalle['precio'] + res.precio_saco;
-        //       detalle['total'] = detalle['cantidad'] * detalle['precio'];
-        //     }
-        //   });
-        // }
-
-        // let contenido = {};
-        // try {
-        //   contenido = await this.dbServ.getContenidosArticulos(detalle.articulo_id).toPromise();
-        //   detalle['contenidos'] = contenido;
-        // } catch (error) {
-        //   if (error.error) {
-        //     this.dbServ.toastError(error.error.msg, 'ERROR', true);
-        //   } else {
-        //     this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
-        //   }
-        // }
-
         temp.push(detalle);
       }
 

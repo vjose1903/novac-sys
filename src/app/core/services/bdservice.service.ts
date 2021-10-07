@@ -278,10 +278,6 @@ export class DBservice {
     return this.peticionSinLoad(`articulos/custom/costo/${tipo}/${id}`, 'get');
   }
 
-  getContenidosArticulos(id) {
-    return this.peticion(`articulos/get/contenidos/${id}`, 'get');
-  }
-
   getProductosTerminados(id) {
     return this.peticion(`articulos/custom/productos_terminados`, 'get');
   }
@@ -312,9 +308,7 @@ export class DBservice {
   }
 
   eliminarArticulo(arg) {
-    const id = arg.id;
-    const body = _.omit(arg, ['id']);
-    return this.peticion('articulos/delete/' + id, 'patch', JSON.stringify(null));
+    return this.peticion('articulos/' + arg.id, 'delete');
   }
 
   getArticulos() {
@@ -387,7 +381,6 @@ export class DBservice {
   getTiposFacturas() {
     return this.peticion('tipo_facturas', 'get');
   }
-
 
   getFacturasByClienteIdAndPagada(cliente_id, pagada, page, per_page, paginado) {
     return this.peticion(`cabecera_facturas/cliente/${cliente_id}/pagada/${pagada}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');

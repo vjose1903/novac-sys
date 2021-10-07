@@ -11,6 +11,7 @@ import { LoaderService } from '../../../loader/loader.service';
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
+import { ArticuloC } from './articulo';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -88,7 +89,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     { backend: 'Galon', front: 'Galón' },
   ];
   FechaFactura: string;
-
+  articuloClass = new ArticuloC();
   constructor(
     private dbServ: DBservice,
     private cdRef: ChangeDetectorRef,
@@ -170,6 +171,8 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       const page = e.page;
       const per_page = e.per_page;
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+      this.listaArticulos = [];
+
       const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.FechaFactura, 'todos').toPromise();
 
       res.data.map(async (arti) => {
@@ -189,9 +192,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       };
 
       this.tServ.Func_total_paginas(obj);
-    } catch (error) {
-      this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);
-    }
+    } catch (error) {}
   }
 
   ngOnChanges() {
@@ -410,18 +411,21 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
     try {
       (control.controls[i] as any).controls['costo_formula'].setValue(undefined);
-      const res = await this.dbServ.getCostoArticulo(control.value[i].articulo_id).toPromise();
+      let extra = { afterPath: '', parameters: {} };
 
-      (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(res.costo));
-      (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(res.precio));
+      extra['parameters'] = { costos: true };
+
+      this.articuloClass
+        .getOne(control.value[i].articulo_id, extra)
+        .then((res) => {
+          const costos = res.data.costos.Libra;
+          (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.costo));
+          (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.precio));
+        })
+        .catch((err) => {});
     } catch (error) {
       this.dbServ.toastError('Error buscando el precio de la materia prima.', 'ERROR');
     }
-
-    // const MateriaPrima = this.listaMateriasPrimas.filter((val) => val.id === _.parseInt(id))[0];
-
-    // const costo = MateriaPrima.costo;
-    // const precio = MateriaPrima.precio;
   }
 
   calculateCostoPT() {
@@ -860,13 +864,15 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
       this.dbServ.eliminarArticulo(obj).subscribe(
         (res) => {
-          const i = _.findIndex(this.listaArticulos, (art: any) => {
-            if (art.id === obj['id']) return true;
-          });
+          this.getArticulos(this.tServ.obj_paginate);
 
-          this.dbServ.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
-          _.pullAt(this.listaArticulos, i);
-          this.tipoModal = '';
+          // const i = _.findIndex(this.listaArticulos, (art: any) => {
+          //   if (art.id === obj['id']) return true;
+          // });
+
+          // this.dbServ.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
+          // _.pullAt(this.listaArticulos, i);
+          // this.tipoModal = '';
           this.borrar();
         },
         (err) => {
