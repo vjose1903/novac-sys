@@ -274,9 +274,6 @@ export class DBservice {
     return this.peticionSinLoad(`articulos/custom/cantidad_inventario`, 'get');
   }
 
-  getCostoArticulo(id, tipo = 'lbs') {
-    return this.peticionSinLoad(`articulos/custom/costo/${tipo}/${id}`, 'get');
-  }
 
   getProductosTerminados(id) {
     return this.peticion(`articulos/custom/productos_terminados`, 'get');
@@ -293,9 +290,6 @@ export class DBservice {
   getArticulosFiltrados(arg, page, per_page, paginado, compra = false, fecha, tipo = 'todos') {
     return this.peticion(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}&fecha=${fecha}`, 'get');
   }
-  // getArticulosFiltrados(arg, page, per_page, paginado, compra = false, tipo = 'todos') {
-  //   return this.peticionSinLoad(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}`, 'get');
-  // }
 
   createArticulo(arg) {
     return this.peticion('articulos', 'post', JSON.stringify(arg));

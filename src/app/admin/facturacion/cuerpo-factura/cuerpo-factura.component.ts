@@ -8,6 +8,7 @@ import { mixinClass } from '../../mixinClass';
 import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutService } from '../../layout/layout.service';
 import * as moment from '../../../../utils/javascript/moment';
+import { ArticuloC } from '../../registros/articulos/articulo';
 @Component({
   selector: 'app-cuerpo-factura',
   templateUrl: './cuerpo-factura.component.html',
@@ -52,6 +53,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   tipoModal: string;
   registroSaco: any;
 
+  articuloClass = new ArticuloC();
+
   constructor(private dbServ: DBservice, public mServ: ModalService, private fb: FormBuilder, public _ipc: IpcService, public layServ: LayoutService) {
     super(mServ, _ipc, layServ);
     // this.rowFactura = new FormArray([new FormControl()]);
@@ -63,6 +66,18 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     this._init_mixin({
       component: 'cuerpo_factura',
       _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'articuloPorCodigo', 'pressEsc', 'indexToFocus'],
+    });
+  }
+
+  getOneArticuloFiltrado(buscar) {
+    return new Promise<any>((resolve, reject) => {
+      let extra = { afterPath: `filtro/${buscar}`, parameters: {} };
+
+      extra['parameters'] = { page: 1, per_page: 20, paginado: true, is_compra: false, tipo: 'todos', fecha: this.FechaFactura };
+
+      this.articuloClass.getAll(extra).then((res) => {
+        resolve(_.first(res['data']));
+      });
     });
   }
 
@@ -493,7 +508,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
 
     if (input === 'uni-') {
-      if (cantidad !== '' && cantidad !== '0' && cantidad !== 0 && cantidad !== null && codigo !== '' && codigo !== null && codigo !== undefined) {
+      if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) {
         this.checkCantidadExede(i, 'change', (res) => {
           if (res) {
             this.enfocarInput('can-' + index);
@@ -580,7 +595,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     let articulo;
 
     try {
-      articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
+      await this.getOneArticuloFiltrado(codigo).then((res) => (articulo = res));
     } catch (error) {}
 
     for (let index = 0; index < this.control.controls.length; index++) {
@@ -619,21 +634,24 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     if (lugar === 'saltar') i--;
 
     try {
-      const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();
+      let excede = true;
+      console.log('cantidad --> ', cantidad);
 
-      if (this.metodo === 'venta' && res.excede) {
+      const extra = { afterPath: `check_excede/${articulo.id}`, parameters: { cantidad: cantidad } };
+      await this.articuloClass.getAll(extra).then((res) => {
+        console.log('res --> ', res);
+        excede = res['data'];
+      });
+
+      if (this.metodo === 'venta' && excede) {
         this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR', true);
         callback(true);
       } else {
         callback(false);
       }
     } catch (error) {
-      if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR', true);
-      }
-      // else {
-      //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
-      // }
+      if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR', true);
+
       callback(false);
     }
   }
@@ -970,11 +988,17 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     const codigo = (this.control.controls[i] as any).controls['cod'].value;
     if (codigo) {
       if (!art) {
-        if (codigo) art = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
+        console.log('ANTES');
+
+        await this.getOneArticuloFiltrado(codigo).then((res) => {
+          art = res;
+        });
+        console.log('DESPUES');
       }
+      console.log('art --> ', art);
 
       const detallable = art.is_detallable;
-      this.drop = true;
+      console.log('detallable --> ', detallable);
 
       const precioPrincipal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
       const costoPrincipal = art.costo_principal;
