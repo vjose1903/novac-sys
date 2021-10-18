@@ -254,7 +254,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   procesoRelleno() {
     try {
       this.rellenarCampos(null, 'fact_guardada', this.facturaGuardada);
-
+      // TODO: revisar cuando cambie el backend para las facturas
       this.cuerpo.llenarFactura(this.facturaGuardada['detalle_facturas_attributes'], true, (res) => {
         setTimeout(() => {
           this.getCuerpoFactura(this.facturaGuardada['detalle_facturas_attributes'], true);

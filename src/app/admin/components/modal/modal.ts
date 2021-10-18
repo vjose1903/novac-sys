@@ -64,7 +64,7 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('indexToFocus')) {
-      this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => this.run_subscribe('PRESSESC', res));
+      this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => this.run_subscribe('INDEXTOFOCUS', res));
     }
 
     if (this._lista.includes('refreshFacturas')) {

@@ -90,6 +90,12 @@ export class mixinClass extends modalClass {
   }
 
   // =========================================================================================================
+  clickInput(arg) {
+    const element = document.getElementById(arg) as HTMLElement;
+    element.click();
+    console.log('CLICK ', element);
+  }
+  // =========================================================================================================
   enfocarInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
     element.focus();

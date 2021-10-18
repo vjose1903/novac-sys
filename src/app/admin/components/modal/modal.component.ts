@@ -4,6 +4,7 @@ import { ModalService } from './modal.service';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { TablasService } from '../tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { FunctionService } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-modal',
@@ -107,7 +108,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       key: 'direccion',
     },
   ];
-  constructor(public mServ: ModalService, private dbServ: DBservice, private tServ: TablasService) {}
+  constructor(public mServ: ModalService, private dbServ: DBservice, private tServ: TablasService, public fun: FunctionService) {}
 
   element: HTMLElement;
   subShow: Subscription;
@@ -118,9 +119,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
       if (res !== undefined && res !== null) {
-        if (!this.paraFiltroArticulos && !this.paraFiltroClientes && !this.paraFiltroSuplidor) {
-          this.showModal = res;
-        }
+        if (!this.paraFiltroArticulos && !this.paraFiltroClientes && !this.paraFiltroSuplidor) this.showModal = res;
 
         if (res === false) {
           this.showModal = res;
@@ -150,6 +149,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.paraFiltroClientes = res.filtrarCliente;
         this.paraFiltroSuplidor = res.filtrarSuplidor;
         this.fecha_articulo = res.fecha_articulo;
+
         this.metodo = res.metodo;
         this.identificadorFact = res.identificadorFact;
         this.index = res.index;
@@ -301,7 +301,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   articuloFiltradoPorCodigo(articulo) {
     const obj = {
-      data: articulo,
+      data: articulo.data[0],
       index: this.index,
       tipo_modal: this.tipoModal,
     };
@@ -332,11 +332,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     const per_page = e.per_page;
     let palabra_a_buscar = ' ';
 
-    if (buscando) {
-      palabra_a_buscar = buscando === '' || buscando === null || buscando === undefined ? ' ' : buscando;
-    } else {
-      palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
-    }
+    if (buscando) palabra_a_buscar = this.fun.isEmpty(buscando) ? ' ' : buscando;
+    else palabra_a_buscar = this.fun.isEmpty(e.searchText) ? ' ' : e.searchText;
 
     try {
       if (this.tipoModal === 'buscarArticulo') {
@@ -344,11 +341,15 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, fecha_articulo, 'todos').toPromise();
 
-        if (res.data) {
+        console.log('res --> ', res);
+
+        if (res.data.length > 1) {
           this.dataFiltro = res.data;
 
           if (this.dataFiltro.length === 0) {
             const is_codigo = GLOBAL.is_number(palabra_a_buscar);
+            console.log('is_codigo --> ', is_codigo);
+
             this.noArticulo(is_codigo);
             return;
           }
@@ -360,7 +361,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           };
           this.tServ.Func_total_paginas(obj);
         } else {
-          this.articuloFiltradoPorCodigo(res);
+          if (GLOBAL.is_number(palabra_a_buscar)) this.articuloFiltradoPorCodigo(res);
         }
       } else if (this.tipoModal === 'buscarCliente') {
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
@@ -412,12 +413,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       this.filtrar = true;
     } catch (error) {
       console.error(error);
-      if (this.tipoModal === 'buscarArticulo') this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);
       if (this.tipoModal === 'buscarCliente') this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
       if (this.tipoModal === 'buscarSuplidor') this.dbServ.toastError('Error buscando suplidor registrados.', 'ERROR', true);
-      setTimeout(() => {
-        this.mServ.mostrarModal(false);
-      }, 250);
+      console.log('toy sasdfgulsd');
+
+      setTimeout(() => this.mServ.mostrarModal(false), 250);
     }
   }
 
