@@ -535,6 +535,7 @@
     <app-form-reportes
       *ngIf="seleccionModal?.tipo === 'reportes'"
       [tipo_reporte]="seleccionModal?.tipo_reporte"
+      [switches]="seleccionModal?.switches"
       (seleccion)="formReporteAccion($event)"
     ></app-form-reportes>
   </p-dialog>

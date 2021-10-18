@@ -8,6 +8,7 @@ import { DBservice } from '../../../../core/services/bdservice.service';
 import { mixinClass } from '../../../mixinClass';
 import { LayoutService } from '../../../layout/layout.service';
 import { IpcService } from '../../../../core/services/ipc.service';
+import { FunctionService } from '../../../../core/services/functions.service';
 
 @Component({
   selector: 'app-form-reportes',
@@ -16,6 +17,7 @@ import { IpcService } from '../../../../core/services/ipc.service';
 })
 export class FormVentasComponent extends mixinClass implements OnInit {
   @Input() tipo_reporte;
+  @Input() switches;
 
   @Output() seleccion = new EventEmitter<any>();
   form: FormGroup;
@@ -37,6 +39,7 @@ export class FormVentasComponent extends mixinClass implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    public fun: FunctionService,
     public _ipc: IpcService,
     public mServ: ModalService,
     public dbServ: DBservice,

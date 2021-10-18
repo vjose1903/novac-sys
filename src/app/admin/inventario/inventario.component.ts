@@ -106,8 +106,8 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
     if (arg.bool) {
       if (this.tipoModal === 'visor_pdf') {
         const obj = {
-          base64: this.pdfSrc,
-          filename: this.fileName,
+          base64: this.seleccionModal.pdfSrc,
+          filename: `${this.seleccionModal.fileName}.pdf`,
         };
 
         this._ipc.send('printBase64', obj);
@@ -160,7 +160,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   generarPdf(obj) {
     this.pdfServ.generatePdf(obj).then((res) => {
       if (res.status === 'si') {
-        obj = {
+        const obj_pdf = {
           pdfSrc: res.body,
           titulo: 'Reporte de inventario',
           height: '83vh',
@@ -170,7 +170,9 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
         this.loadServ.isLoading.next(false);
 
-        this.abrirModal('visor_pdf', obj);
+
+
+        this.abrirModal('visor_pdf', obj_pdf);
       }
     });
   }
