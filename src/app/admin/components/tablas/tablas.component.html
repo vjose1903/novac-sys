@@ -112,7 +112,7 @@
                 [mdbTooltip]="column.text_tooltip ? tooltip : ''"
                 placement="{{ i != 0 ? 'top' : 'botton' }}"
               >
-                <div class="form-group m-0">
+                <div class="form-group m-0 switchDiv">
                   <input
                     class="apple-switch"
                     [disabled]="disabledInput(column.disable, i)"
@@ -120,7 +120,7 @@
                     (change)="changeValorCheck(column.key, i)"
                     [checked]="dato[column.key]"
                   />
-                  <span class="ml-2 subirLabelCheck">{{ column.title }}</span>
+                  <span class="ml-2">{{ column.title }}</span>
                 </div>
               </span>
 

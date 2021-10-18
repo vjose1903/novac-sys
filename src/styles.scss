@@ -133,14 +133,9 @@ body {
   position: absolute;
 }
 
-.subirLabelCheck {
-  transform: translate(5px, 2px);
-  position: absolute;
-}
-
-.subirLabelCheck_2 {
-  transform: translate(5px, -0.5rem);
-  position: absolute;
+.switchDiv {
+  display: flex;
+  align-items: center;
 }
 
 .scroll-container {
@@ -468,6 +463,7 @@ input.apple-switch {
   appearance: none;
   outline: none;
   width: 40px;
+  min-width: 40px;
   height: 26px;
   background-color: #ffffff;
   border: 1px solid #d9dadc;

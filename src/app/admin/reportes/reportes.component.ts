@@ -7,6 +7,7 @@ import { ModalService } from '../components/modal/modal.service';
 import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-reportes',
@@ -91,15 +92,35 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   async makePdf(data) {
     let res = {} as any;
-
+    console.log('SELECCION MODAL ', this.seleccionModal);
     try {
       let tipo = '';
       let params = '';
+      let continuar = true;
+      let msg_error = '';
+
       if (this.tipoModal === 'cuadre') {
         this.makeCuadre(data);
         return;
       } else if (this.tipoModal === 'ventas_diarias' || this.tipoModal === 'ventas_rango') {
-        params = `tipo=${data.tipo}&condicion=${data.condicion}&desde=${this.my_dateFormater(data.desde, false)}&hasta=${this.my_dateFormater(data.hasta, false)}`;
+        let formas_pago = '(';
+
+        this.seleccionModal.switches.array.forEach((item) => {
+          if (item.value) formas_pago += `'${item.label}',`;
+        });
+
+        formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+
+        params = `tipo=${data.tipo}&condicion=${data.condicion}&formas_pago=${formas_pago}&desde=${this.my_dateFormater(data.desde, false)}&hasta=${this.my_dateFormater(
+          data.hasta,
+          false,
+        )}`;
+
+        if (_.every(this.seleccionModal.switches.array, (item) => item.value === false)) {
+          msg_error = 'Debe seleccionar almenos un metodo de pago.';
+          continuar = false;
+        }
+
         tipo = 'ventas';
         //
       } else if (this.tipoModal === 'cuentas_cobrar_cliente' || this.tipoModal === 'cuentas_cobrar_ant_saldo') {
@@ -127,15 +148,19 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         //
       }
 
-      res = await this.dbServ.makeReportes(tipo, params).toPromise();
-      // aqui poner el loader
-      this.loadServ.isLoading.next(true);
-      const obj = {
-        data: res,
-        type: 'reporte',
-      };
+      if (continuar) {
+        res = await this.dbServ.makeReportes(tipo, params).toPromise();
+        // aqui poner el loader
+        this.loadServ.isLoading.next(true);
+        const obj = {
+          data: res,
+          type: 'reporte',
+        };
 
-      this.generarPdf(obj);
+        this.generarPdf(obj);
+      } else {
+        this.fun.toastError(msg_error, 'ERROR', true);
+      }
     } catch (error) {
       this.dbServ.toastError('Error realizando reporte.', 'ERROR', true);
     }
@@ -214,6 +239,18 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     obj['titulo'] = this.titulo_moda_reporte;
     obj['tipo_reporte'] = tipo;
 
+    if (tipo === 'ventas_diarias' || tipo === 'ventas_rango') {
+      obj['switches'] = {
+        title: 'Seleccione los metodos de pago deseados',
+        array: [
+          { label: 'Efectivo', value: true },
+          { label: 'Tarjeta', value: true },
+          { label: 'Cheque', value: true },
+          { label: 'Transferencia', value: false },
+        ],
+      };
+    }
+
     if (abrirModal) this.abrirModal(tipo_modal, obj, tipo);
   }
 
@@ -231,7 +268,6 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
           type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte',
           scale: this.scaleImpresion,
         };
-
 
         this._ipc.send('printBase64', obj);
       } else if (this.tipoModal === 'cuadre') {

@@ -95,6 +95,19 @@
     </div>
   </div>
 </form>
+
+<div>
+  <br *ngIf="switches" />
+  <label *ngIf="switches && switches?.title && fun.hasValue(switches.title)" class="control-label">{{ switches.title }} </label>
+
+  <div>
+    <div class="form-group mb-2 switchDiv" *ngFor="let switch of switches.array">
+      <input [(ngModel)]="switch.value" class="apple-switch ml-2" type="checkbox" />
+      <span class="ml-2">{{ switch.label }}</span>
+    </div>
+  </div>
+</div>
+
 <div class="mt-4 d-flex justify-content-end">
   <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
   <button [disabled]="!form.valid" (click)="accion(true)" type="submit" class="btn btn-verde">Aceptar</button>

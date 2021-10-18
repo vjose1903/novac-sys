@@ -252,10 +252,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     const obj_ = arg.obj;
 
     let obj;
-    obj = {
-      data: obj_,
-      tipo_modal: this.tipoModal,
-    };
+    obj = { data: obj_, tipo_modal: this.tipoModal };
 
     if (!bool) {
       obj = undefined;
