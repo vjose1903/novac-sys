@@ -90,8 +90,8 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
     }
   }
 
-  async ipcBase64Resonse(res) {
-    
+  async printBase64Res(res) {
+
     if (res.status === 'si') {
       this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
     } else {
@@ -110,7 +110,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
           base64: this.seleccionModal.pdfSrc,
           filename: `${this.seleccionModal.fileName}.pdf`,
         };
-        
+
         this._ipc.send('printBase64', obj);
         this.resetVariables();
       } else {
@@ -171,7 +171,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
         this.loadServ.isLoading.next(false);
 
-        
+
 
         this.abrirModal('visor_pdf', obj_pdf);
       }

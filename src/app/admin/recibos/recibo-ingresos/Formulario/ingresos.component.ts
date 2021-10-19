@@ -439,7 +439,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     }
   }
 
-  ipcBase64Resonse(res) {
+  printBase64Res(res) {
     if (res.status === 'si') {
     } else {
       this.dbServ.toastError(res.msg, 'ERROR', true);

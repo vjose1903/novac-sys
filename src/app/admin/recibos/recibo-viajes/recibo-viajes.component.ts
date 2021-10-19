@@ -356,7 +356,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     }
   }
 
-  ipcBase64Resonse(res) {
+  printBase64Res(res) {
     if (res.status === 'si') {
     } else {
       this.dbServ.toastError(res.msg, 'ERROR', true);

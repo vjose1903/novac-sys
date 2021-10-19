@@ -44,7 +44,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
     }
   }
 
-  ipcBase64Resonse(res) {
+  printBase64Res(res) {
     if (res.status === 'si') {
       this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
     } else {
@@ -250,6 +250,8 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         ],
       };
     }
+
+    console.log('obj ', obj);
 
     if (abrirModal) this.abrirModal(tipo_modal, obj, tipo);
   }

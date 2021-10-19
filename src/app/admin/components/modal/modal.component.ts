@@ -153,6 +153,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.metodo = res.metodo;
         this.identificadorFact = res.identificadorFact;
         this.index = res.index;
+        console.log('this.seleccionModal ', this.seleccionModal);
 
         if (this.tipoModal === 'buscarArticulo') {
           this.renovarDataFiltros(this.tServ.obj_paginate, this.paraFiltroArticulos, this.fecha_articulo);

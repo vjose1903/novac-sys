@@ -96,8 +96,8 @@
   </div>
 </form>
 
-<div>
-  <br *ngIf="switches" />
+<div *ngIf="switches">
+  <br />
   <label *ngIf="switches && switches?.title && fun.hasValue(switches.title)" class="control-label">{{ switches.title }} </label>
 
   <div>

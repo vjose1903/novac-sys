@@ -98,7 +98,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
     this._destroy_mixin();
   }
 
-  async ipcBase64Resonse(res) {
+  async printBase64Res(res) {
     if (res.status === 'si') {
       this.dbServ.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO', true);
     } else {

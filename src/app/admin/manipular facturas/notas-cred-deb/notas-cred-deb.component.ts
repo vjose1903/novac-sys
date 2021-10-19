@@ -79,7 +79,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     }
   }
 
-  ipcBase64Resonse(res) {
+  printBase64Res(res) {
     if (res.status === 'si') {
       this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
     } else {

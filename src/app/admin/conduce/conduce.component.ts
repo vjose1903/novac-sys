@@ -1012,7 +1012,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     }
   }
 
-  ipcBase64Resonse(res) {
+  printBase64Res(res) {
     if (res.status === 'si') {
     } else {
       this.dbServ.toastError(res.msg, 'ERROR', true);

@@ -1319,7 +1319,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  async ipcBase64Resonse(res) {
+  async printBase64Res(res) {
     if (res.status === 'si') {
     } else {
       this.dbServ.toastError('Error imprimiendo la factura.', 'ERROR', true);
