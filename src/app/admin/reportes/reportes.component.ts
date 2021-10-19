@@ -251,6 +251,9 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       };
     }
 
+    console.log("obj ",obj);
+
+
     if (abrirModal) this.abrirModal(tipo_modal, obj, tipo);
   }
 

@@ -144,6 +144,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         } else {
           this.seleccionModal = res;
         }
+        console.log('this. seleccionModal ', this.seleccionModal.switches);
 
         this.paraFiltroArticulos = res.filtrarArticulo;
         this.paraFiltroClientes = res.filtrarCliente;

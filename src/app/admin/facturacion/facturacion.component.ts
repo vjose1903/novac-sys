@@ -179,9 +179,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.fecha_viaje = new Date();
     this.articulosAcambiar = [];
 
-    this.dbServ.getTiposFacturas().subscribe((res) => {
-      this.lista_tipos_facturas = res;
-    });
+    this.dbServ.getTiposFacturas().subscribe((res) => (this.lista_tipos_facturas = res));
 
     this.factServ.setTipos(this.metodo, (res) => {
       if (res) {
@@ -430,9 +428,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     if (tipo === 'editar') {
       res = await this.dbServ.getFacturaById(id).toPromise();
+
       this.factura_a_editar = res;
       this.propietario_factura = res.cliente;
       this.propietario_factura['id'] = res.cliente_id;
+
     } else {
       res = fact;
       this.setPropietario(res);
@@ -440,6 +440,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       const tipo = _.find(this.lista_tipos_facturas, (fact) => fact.id === res['tipo_factura_id']);
       res['tipo_factura'] = tipo ? tipo['descripcion'] : '';
     }
+
     this.metodo = res.tipo;
     this.FacturaAtrasada = fact ? fact?.FacturaAtrasada : false;
 

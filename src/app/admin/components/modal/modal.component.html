@@ -531,11 +531,11 @@
     [style]="{ width: '510px' }"
     (onHide)="accion(false)"
   >
-    <!-- VENTAS ------------------------------------------------------------------------------------------------------------------------------ -->
+
     <app-form-reportes
       *ngIf="seleccionModal?.tipo === 'reportes'"
       [tipo_reporte]="seleccionModal?.tipo_reporte"
-      [switches]="seleccionModal?.switches"
+      [switches]="seleccionModal.switches"
       (seleccion)="formReporteAccion($event)"
     ></app-form-reportes>
   </p-dialog>

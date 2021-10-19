@@ -52,7 +52,7 @@
                     <li *ngIf="metodo === 'venta'" role="menuitem">
                       <div class="form-group my-1 ml-2 switchDiv">
                         <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, 'select', $event)" />
-                        <span class="ml-2 ">Calcular saco</span>
+                        <span class="ml-2">Calcular saco</span>
                       </div>
                     </li>
 
@@ -74,10 +74,9 @@
                     type="text"
                     class="form-control entrada"
                     id="cod-{{ i }}"
-                    (click)="verificarSecuencia(i)"
+                    (focus)="verificarSecuencia(i)"
                     (keydown.enter)="saltar($event, 'can-', i)"
                     formControlName="cod"
-                    (blur)="verificarRow(i)"
                     tabindex="-1"
                   />
                 </div>
@@ -92,11 +91,11 @@
                     min="1"
                     class="form-control entrada"
                     id="can-{{ i }}"
-                    (click)="verificarSecuencia(i)"
+                    (focus)="verificarSecuencia(i)"
                     (keydown.enter)="saltar($event, 'uni-', i)"
                     formControlName="can"
                     (focus)="llenarArrayUnidades(undefined, i)"
-                    (blur)="calcularTotalRow(i) && verificarRow(i)"
+                    (blur)="calcularTotalRow(i); saliDeCantidad(i)"
                     tabindex="-1"
                   />
                 </div>
@@ -107,28 +106,27 @@
                 <div class="form-group m-0">
                   <input
                     [readOnly]="!propietario"
-                    *ngIf="(drop && inputDrop !== secuenciaDelDrop(i)) || (!drop && inputDrop === secuenciaDelDrop(i)) || !drop"
+                    *ngIf="inputDrop !== secuenciaDelDrop(i)"
                     type="text"
                     class="form-control entrada"
                     id="uni-{{ i }}"
-                    (click)="verificarSecuencia(i, 'unidad')"
+                    (focus)="verificarSecuencia(i, 'unidad')"
                     (keydown.enter)="saltar($event, metodo === 'venta' ? 'cod-' : 'pre-', i)"
                     formControlName="uni"
-                    (blur)="calcularTotalRow(i) && verificarRow(i)"
+                    (blur)="calcularTotalRow(i)"
                     tabindex="-1"
                   />
 
-                  <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
+                  <div *ngIf="inputDrop === secuenciaDelDrop(i)">
                     <select
                       value="Medida"
-                      (focus)="verificarRow(i)"
                       formControlName="uni"
                       (change)="selectMedidaChange($event.target.value, i)"
                       class="form-control entrada"
                       style="border-radius: 0"
                       id="uni-{{ i }}"
                       (keydown.enter)="saltar($event, metodo === 'venta' ? 'cod-' : 'pre-', i)"
-                      (blur)="calcularTotalRow(i) && verificarRow(i)"
+                      (blur)="calcularTotalRow(i); setInputDrop(undefined)"
                       tabindex="-1"
                     >
                       <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
@@ -152,7 +150,7 @@
                     type="number"
                     class="form-control entrada campoNumeros"
                     id="desc-{{ i }}"
-                    (click)="verificarSecuencia(i)"
+                    (focus)="verificarSecuencia(i)"
                     (keydown.enter)="enfocarInput('cod-' + (i + 1))"
                     formControlName="descuento_porciento"
                     (blur)="calcularDescuento(i)"
@@ -171,7 +169,6 @@
                     (focus)="$event.target.select()"
                     class="form-control entrada campoNumeros {{ metodo === 'venta' ? 'inPRE' : '' }}"
                     (keydown.enter)="enfocarInput('cod-' + (i + 1))"
-                    (click)="verificarRow(i)"
                     id="pre-{{ i }}"
                     formControlName="pre"
                     [readOnly]="readPrecio()"
