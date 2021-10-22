@@ -464,7 +464,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     } else {
       this.fecha_vencimiento = new Date();
     }
-
+    this.is_viaje = res.is_viaje;
     this.condicion_fact = res.condicion;
 
     this.NCFcompra = res.tipo === 'compra' ? res.numero_comprobante : undefined;
