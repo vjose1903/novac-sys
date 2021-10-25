@@ -52,7 +52,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   @Output() getFechaFactura = new EventEmitter<any>();
 
   tipoModal: string;
-  registroSaco: any;
+  saco_sistema: any;
 
   articuloClass = new ArticuloC();
 
@@ -179,7 +179,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   async getSaco() {
     try {
       const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, this.FechaFactura, 'todos').toPromise();
-      this.registroSaco = res.data[0];
+      this.saco_sistema = res.data[0];
     } catch (error) {
       console.error(error);
     }
@@ -229,43 +229,38 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       const operacion = row.calcular_saco;
       const se_calcula = row.se_calcula_saco;
       const row_unidad = (this.control[i] as any).controls['uni'].value;
+      const precio_saco = this.saco_sistema.precio_principal;
+
       let calculo = 0;
 
-      if (row_unidad === articulo.medida) {
+      if (row_unidad == articulo.medida) {
         calculo = articulo.precio_principal;
       } else {
         const splitUnidad = _.split(row_unidad, ' ');
         let unity = splitUnidad[0];
         let peso = 100 / Number(splitUnidad[2]);
 
-        if (unity === 'Saco') {
-          calculo = articulo.precio_principal / peso;
-        } else {
-          calculo = articulo.contenido_articulos[0].precio;
-        }
+        calculo = articulo.precio_principal / peso;
+
+        if (unity != 'Saco') calculo = articulo.contenido_articulos[0].precio;
       }
 
       const descripcion = (this.control[i] as any).controls['des'].value;
 
+      let precio = calculo;
       if (operacion) {
-        const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, this.FechaFactura, 'todos').toPromise();
-        const precio_saco = res.data[0].precio_principal;
-        let precio = calculo;
-
-        if (moment(this.FechaFactura).format('YYYY-MM-DD') > moment(res.data[0].created_at).format('YYYY-MM-DD')) {
+        if (moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.created_at).format('YYYY-MM-DD')) {
           precio = calculo + precio_saco;
         }
 
         (this.control[i] as any).controls['des'].setValue(`${articulo.nombre}`);
         (this.control[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
       } else {
-        const precio = calculo;
         (this.control[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
 
-        if (se_calcula || lugar === 'select') {
-          (this.control[i] as any).controls['des'].setValue(`${descripcion}*`);
-        }
+        if (se_calcula || lugar === 'select') (this.control[i] as any).controls['des'].setValue(`${descripcion}*`);
       }
+
       callback(true);
     } catch (error) {
       this.dbServ.toastError('Error calculando el precio del saco', 'ERROR');
@@ -274,25 +269,20 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   async CalculoSacos(i, lugar, e?) {
-    let articulo;
     try {
       const unidad = (this.control[i] as any).controls['uni'].value;
 
-      if (e) {
-        e.stopPropagation();
-      }
+      if (e) e.stopPropagation();
+
       if (this.metodo === 'venta') {
-        const codigo = (this.control[i] as any).controls['cod'].value;
-        articulo = await this.dbServ.getArticulosFiltrados(codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
+        const articulo = (this.control[i] as any).controls['articulo'].value;
 
         if (articulo.calcular_saco) {
           const row = (this.control[i] as any).value;
 
           if (unidad) {
             this.calcularSacoEnRow(i, row, articulo, lugar, (res) => {
-              if (res) {
-                this.calcularTotalRow(i);
-              }
+              if (res) this.calcularTotalRow(i);
             });
           } else {
             this.dbServ.toastWarning('Para calcular los sacos debe de seleccionar una unidad', 'AVISO', true);
@@ -300,9 +290,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             (this.control[i] as any).controls['calcular_saco'].setValue(true);
           }
         } else {
-          if (e) {
-            this.dbServ.toastError('A este articulo no se le calculan los sacos', 'ERROR', true);
-          }
+          if (e) this.dbServ.toastError('A este articulo no se le calculan los sacos', 'ERROR', true);
           (this.control[i] as any).controls['calcular_saco'].setValue(false);
         }
       }
@@ -413,47 +401,46 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             const cant_en_unidades_actual = row.cantidad_en_unidades;
             const multiplo = row.cantidad_en_unidades / row.cantidad;
             const cant_actual = cant_en_unidades_actual / multiplo;
+            const campos = (this.control[j] as any).controls;
 
-            (this.control[j] as any).controls['pre'].setValue(this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo));
+            campos['pre'].setValue(this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo));
 
-            (this.control[j] as any).controls['costo'].setValue(GLOBAL.numFormatTwoDecimals(row.costo));
+            campos['costo'].setValue(GLOBAL.numFormatTwoDecimals(row.costo));
 
-            (this.control[j] as any).controls['descuento_porciento'].setValue(row.descuento_porciento > 0 ? row.descuento_porciento : null);
-            (this.control[j] as any).controls['descuento_valor'].setValue(row.descuento_valor);
-            (this.control[j] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(row.total));
+            campos['descuento_porciento'].setValue(row.descuento_porciento || null);
+            campos['descuento_valor'].setValue(row.descuento_valor);
+            campos['tot'].setValue(GLOBAL.numFormatTwoDecimals(row.total));
 
-            (this.control[j] as any).controls['articulo_id'].setValue(row.articulo_id);
-            (this.control[j] as any).controls['cod'].setValue(articulo.codigo);
+            campos['articulo_id'].setValue(row.articulo_id);
+            campos['cod'].setValue(articulo.codigo);
 
-            (this.control[j] as any).controls['can'].setValue(cant_actual);
-            (this.control[j] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
+            campos['can'].setValue(cant_actual);
+            campos['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
 
-            (this.control[j] as any).controls['des'].setValue(_.capitalize(articulo.nombre));
+            campos['des'].setValue(_.capitalize(articulo.nombre));
 
-            (this.control[j] as any).controls['calcular_saco'].setValue(row.calcular_saco);
+            campos['calcular_saco'].setValue(row.calcular_saco);
 
-            (this.control[j] as any).controls['articulo'].setValue(articulo);
+            campos['articulo'].setValue(articulo);
 
             if (row.tipo === 'Materia prima') {
-              (this.control[j] as any).controls['descuento_porciento'].disable({ onlySelf: true });
-              (this.control[j] as any).controls['is_materia_prima'].setValue(true);
+              campos['descuento_porciento'].disable({ onlySelf: true });
+              campos['is_materia_prima'].setValue(true);
             } else {
-              (this.control[j] as any).controls['descuento_porciento'].enable();
-              (this.control[j] as any).controls['is_materia_prima'].setValue(false);
+              campos['descuento_porciento'].enable();
+              campos['is_materia_prima'].setValue(false);
             }
 
             let uni = row.peso_saco ? 'Saco de ' + row.peso_saco + ' libras' : row.unidad;
 
-            (this.control[j] as any).controls['uni'].setValue(uni);
+            campos['uni'].setValue(uni);
 
             this.llenarArrayUnidades(articulo, j);
 
             if (this.metodo === 'venta') {
               try {
                 this.calcularSacoEnRow(j, row, articulo, 'llenarFact', (res) => {
-                  if (res) {
-                    this.calcularTotalRow(j);
-                  }
+                  if (res) this.calcularTotalRow(j);
                 });
               } catch (error) {}
             } else {
@@ -652,7 +639,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         (this.control[i] as any).controls['pre'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
         (this.control[i] as any).controls['costo'].setValue(costoDetalle);
 
-        if (this.metodo === 'venta' && moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.registroSaco.created_at).format('YYYY-MM-DD')) {
+        if (this.metodo === 'venta' && moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.created_at).format('YYYY-MM-DD')) {
           this.CalculoSacos(i, 'select', undefined);
         }
 
@@ -682,16 +669,16 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     const precio = GLOBAL.desformatear(precioTEMP);
     const cantidad = (this.control[i] as any).controls['can'].value;
     const unidad = (this.control[i] as any).controls['uni'].value;
-    // const calcular_saco = (this.control[i] as any).controls['calcular_saco'].value;
+
     let cantidadMinima = 1;
 
     if (unidad && this.UnidadesArticulo.length > 0) {
-      cantidadMinima = this.UnidadesArticulo.filter((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad))[0].cantidad;
+      cantidadMinima = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad)).cantidad;
     }
 
     if (precio && cantidad) {
       const tot = precio * cantidad;
-      (this.control[i] as any).controls['tot'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(tot)));
+      (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(tot));
       (this.control[i] as any).controls['cantidad_en_unidades'].setValue(cantidad * cantidadMinima);
 
       this.calculosTotalesGenerales();

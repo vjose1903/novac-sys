@@ -329,14 +329,14 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   decisionModal(res) {
-    if (res !== undefined) {
-      this.luegoDecision(res);
-    }
-    if (res !== undefined && res.bool) {
+    if (this.fun.hasValue(res)) this.luegoDecision(res);
+
+    if (this.fun.hasValue(res) && res.bool) {
       this.FechaFactura['front'] = this.formarFechaFactura(res.Date)['FechaFactura'];
       this.FechaFactura['back'] = this.FechaFactura['front'];
       this.FechaFacturaMostrar = this.formarFechaFactura(res.Date)['FechaFacturaMostrar'];
       this.FacturaAtrasada = true;
+      this.cuerpo.getSaco();
     }
   }
 
@@ -432,7 +432,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.factura_a_editar = res;
       this.propietario_factura = res.cliente;
       this.propietario_factura['id'] = res.cliente_id;
-
     } else {
       res = fact;
       this.setPropietario(res);
@@ -852,27 +851,20 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
 
     if (this.tipoModal === 'salir_layout') {
-      if (arg) {
-        this.agregarFacturaALocalStorage();
-      }
+      if (arg) this.agregarFacturaALocalStorage();
 
       this.info_cambio['bool'] = true;
       this.layServ.nextDecisionCambioMenu(this.info_cambio);
     } else if (this.tipoModal === 'desplegar_factura') {
-      if (arg) {
-        this.agregarFacturaALocalStorage();
-      }
-      setTimeout(() => {
-        this.procesoRelleno();
-      }, 250);
+      if (arg) this.agregarFacturaALocalStorage();
+
+      setTimeout(() => this.procesoRelleno(), 250);
     } else if (this.tipoModal === 'archivar_factura') {
       if (arg) {
         this.agregarFacturaALocalStorage();
         setTimeout(() => {
           modalClass.aquienResponder = 'layout';
-
           this.layServ.nextRefresh(true);
-
           this.resetVariables();
         }, 250);
       }
