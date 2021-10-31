@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LoaderService } from '../../loader/loader.service';
 import { DBservice } from '../../core/services/bdservice.service';
+import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { IpcService } from '../../core/services/ipc.service';
 import { ModalService } from '../components/modal/modal.service';
 import { LayoutService } from '../layout/layout.service';
@@ -70,6 +71,16 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   async makeCuadre(data?) {
     try {
       const params = `fecha=${this.my_dateFormater(data.fecha, false)}`;
+
+      // new CuadreCajaC().createOne({})
+
+      // let extra = { afterPath: '', parameters: {} };
+
+      // extra['parameters'] = { documentos_de_identidad: true, roles: true, filter_key: 'es_empleado', filter_value: true };
+  
+      // person.getAll(extra).then((res) => {
+      //   this.empleados = res['data'];
+      // });
 
       const res = await this.dbServ.createCuadreCaja(params).toPromise();
 
