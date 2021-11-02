@@ -432,6 +432,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
             type: 'recibo_ingreso',
           };
           this._ipc.send('printBase64', objBase);
+          this.layServ.nextCheckCuadreToday(true);
         }
       });
     } catch (error) {

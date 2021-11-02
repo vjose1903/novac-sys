@@ -1003,6 +1003,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
             type: 'conduce',
           };
           this._ipc.send('printBase64', objBase);
+          this.layServ.nextCheckCuadreToday(true);
         }
       });
     } catch (error) {

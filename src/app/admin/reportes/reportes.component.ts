@@ -70,25 +70,15 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   async makeCuadre(data?) {
     try {
-      const params = `fecha=${this.my_dateFormater(data.fecha, false)}`;
+      let extra = { afterPath: 'custom', parameters: {} };
 
-      // new CuadreCajaC().createOne({})
+      extra['parameters'] = { fecha: this.my_dateFormater(data.fecha, false) };
 
-      // let extra = { afterPath: '', parameters: {} };
-
-      // extra['parameters'] = { documentos_de_identidad: true, roles: true, filter_key: 'es_empleado', filter_value: true };
-  
-      // person.getAll(extra).then((res) => {
-      //   this.empleados = res['data'];
-      // });
-
-      const res = await this.dbServ.createCuadreCaja(params).toPromise();
-
-      const obj = {
-        data: res.body,
-        type: 'cuadre_caja',
-      };
-      this.generarPdf(obj);
+      new CuadreCajaC().createOne({}, extra).then((res) => {
+        const obj = { data: res.data, type: 'cuadre_caja' };
+        this.generarPdf(obj);
+        this.layServ.nextCheckCuadreToday(true);
+      });
     } catch (error) {
       console.error(error);
       this.dbServ.toastError(error.error.msg, 'ERROR', true);

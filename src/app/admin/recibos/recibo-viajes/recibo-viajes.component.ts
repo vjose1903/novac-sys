@@ -349,6 +349,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
             type: 'recibo_ingreso',
           };
           this._ipc.send('printBase64', objBase);
+          this.layServ.nextCheckCuadreToday(true);
         }
       });
     } catch (error) {

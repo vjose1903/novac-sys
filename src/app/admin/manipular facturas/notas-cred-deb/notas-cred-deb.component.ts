@@ -531,6 +531,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
           type: 'facturacion',
         };
         this._ipc.send('printBase64', objBase);
+        this.layServ.nextCheckCuadreToday(true);
       }
     });
   }
