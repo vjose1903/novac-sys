@@ -192,7 +192,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     let extra = { afterPath: 'check_today_cuadre', parameters: {} };
 
     new CuadreCajaC().getAll(extra).then((res) => {
-      console.log('CHEQUIANDO SI HAY CUADRE: ', res);
       this.cuadre_hoy = res['data'].existe_cuadre_hoy;
     });
   }

@@ -153,7 +153,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.metodo = res.metodo;
         this.identificadorFact = res.identificadorFact;
         this.index = res.index;
-        console.log('this.seleccionModal ', this.seleccionModal);
 
         if (this.tipoModal === 'buscarArticulo') {
           this.renovarDataFiltros(this.tServ.obj_paginate, this.paraFiltroArticulos, this.fecha_articulo);
@@ -363,7 +362,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       } else if (this.tipoModal === 'buscarCliente') {
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
         this.dataFiltro = undefined;
-        console.log('res.data --> ', res.data);
 
         res.data.map(async (cli) => {
           cli.nombre = GLOBAL.Capitalice(cli.nombre);
