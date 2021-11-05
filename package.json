@@ -31,7 +31,7 @@
     "bundle-report": "webpack-bundle-analyzer dist/stats.json"
   },
   "dependencies": {
-    "@angular/animations": "^11.2.3",
+    "@angular/animations": "^12.2.13",
     "@angular/cdk": "^11.2.2",
     "@angular/material": "^11.2.2",
     "@babel/eslint-parser": "7.13.8",
@@ -60,24 +60,24 @@
     "sass-google-fonts": "^1.0.1"
   },
   "devDependencies": {
-    "@angular/localize": "^11.2.3",
+    "@angular/localize": "^12.2.13",
     "@angular-builders/custom-webpack": "11.0.0",
-    "@angular-devkit/build-angular": "0.1102.0",
+    "@angular-devkit/build-angular": "12.2.13",
     "@angular-eslint/builder": "1.2.0",
     "@angular-eslint/eslint-plugin": "1.2.0",
     "@angular-eslint/eslint-plugin-template": "1.2.0",
     "@angular-eslint/schematics": "1.2.0",
     "@angular-eslint/template-parser": "1.2.0",
-    "@angular/cli": "11.2.0",
-    "@angular/common": "11.2.0",
-    "@angular/compiler": "11.2.0",
-    "@angular/compiler-cli": "11.2.0",
-    "@angular/core": "11.2.0",
-    "@angular/forms": "11.2.0",
-    "@angular/language-service": "11.2.0",
-    "@angular/platform-browser": "11.2.0",
-    "@angular/platform-browser-dynamic": "11.2.0",
-    "@angular/router": "11.2.0",
+    "@angular/cli": "12.2.13",
+    "@angular/common": "12.2.13",
+    "@angular/compiler": "12.2.13",
+    "@angular/compiler-cli": "12.2.13",
+    "@angular/core": "12.2.13",
+    "@angular/forms": "12.2.13",
+    "@angular/language-service": "12.2.13",
+    "@angular/platform-browser": "12.2.13",
+    "@angular/platform-browser-dynamic": "12.2.13",
+    "@angular/router": "12.2.13",
     "@ngx-translate/core": "13.0.0",
     "@ngx-translate/http-loader": "6.0.0",
     "@types/jasmine": "3.6.3",
@@ -100,7 +100,7 @@
     "eslint-plugin-prefer-arrow": "1.2.3",
     "jasmine-core": "3.6.0",
     "jasmine-spec-reporter": "6.0.0",
-    "karma": "6.1.1",
+    "karma": "6.3.7",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "webpack-bundle-analyzer": "^4.4.0",
     "karma-electron": "6.3.3",
@@ -115,7 +115,7 @@
     "typescript": "^4.2.3",
     "wait-on": "5.0.1",
     "webdriver-manager": "12.1.8",
-    "zone.js": "0.10.3"
+    "zone.js": "~0.11.4"
   },
   "engines": {
     "node": ">=10.13.0"
