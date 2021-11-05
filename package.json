@@ -112,7 +112,7 @@
     "spectron": "13.0.0",
     "ts-node": "9.1.1",
     "tslib": "2.1.0",
-    "typescript": "4.0.5",
+    "typescript": "^4.2.3",
     "wait-on": "5.0.1",
     "webdriver-manager": "12.1.8",
     "zone.js": "0.10.3"
