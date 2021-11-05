@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { SingletonService } from '../services/singleton.service';
 
 import * as _ from 'lodash';
-import { AppConfig } from '../../../environments/environment.web';
+import { AppConfig } from '../../../environments/environment';
 
 export interface extraArgs {
   afterPath: any;
@@ -83,6 +83,8 @@ export class CrudG<T> {
   }
 
   makeUrl(tipo, args?, id = null) {
+    console.log('AppConfig --> ', AppConfig);
+
     let url = `${AppConfig.url_server}/${this.path}`;
 
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';

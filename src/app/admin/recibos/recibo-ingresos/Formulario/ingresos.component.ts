@@ -429,6 +429,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
         if (res.status === 'si') {
           const objBase = { base64: res.body, filename: res.file, type: 'recibo_ingreso' };
           this._ipc.send('printBase64', objBase);
+          this.layServ.nextCheckCuadreToday(true);
         }
       });
     } catch (error) {

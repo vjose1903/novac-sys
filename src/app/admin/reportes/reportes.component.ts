@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LoaderService } from '../../loader/loader.service';
 import { DBservice } from '../../core/services/bdservice.service';
+import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { IpcService } from '../../core/services/ipc.service';
 import { ModalService } from '../components/modal/modal.service';
 import { LayoutService } from '../layout/layout.service';
@@ -69,15 +70,15 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   async makeCuadre(data?) {
     try {
-      const params = `fecha=${this.my_dateFormater(data.fecha, false)}`;
+      let extra = { afterPath: 'custom', parameters: {} };
 
-      const res = await this.dbServ.createCuadreCaja(params).toPromise();
+      extra['parameters'] = { fecha: this.my_dateFormater(data.fecha, false) };
 
-      const obj = {
-        data: res.body,
-        type: 'cuadre_caja',
-      };
-      this.generarPdf(obj);
+      new CuadreCajaC().createOne({}, extra).then((res) => {
+        const obj = { data: res.data, type: 'cuadre_caja' };
+        this.generarPdf(obj);
+        this.layServ.nextCheckCuadreToday(true);
+      });
     } catch (error) {
       console.error(error);
       this.dbServ.toastError(error.error.msg, 'ERROR', true);
@@ -92,7 +93,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   async makePdf(data) {
     let res = {} as any;
-    console.log('SELECCION MODAL ', this.seleccionModal);
+
     try {
       let tipo = '';
       let params = '';

@@ -12,6 +12,7 @@ import { LayoutService } from './layout.service';
 import { mixinClass } from '../mixinClass';
 import { ModalService } from '../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
+import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 
 @Component({
   selector: 'app-layout',
@@ -30,6 +31,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   versionApp: any;
   noServer;
   subDeciMenu: Subscription;
+  subCheckCuadreToday: Subscription;
   modulo_select: any;
   ready;
   _opened;
@@ -39,6 +41,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   lRun;
   activeIndex;
   initNavigate = true;
+  cuadre_hoy;
 
   constructor(
     private dbServ: DBservice,
@@ -62,6 +65,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
         if (this.initNavigate) {
           setTimeout(() => this.checkRouteActiva(), 250);
+          const token = this.fun.getAuthToken();
+          if (token) this.checkCuadre();
 
           this.initNavigate = false;
         }
@@ -120,11 +125,16 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
       }
     });
 
+    this.subCheckCuadreToday = this.layServ.CHECKCUADRETODAY.subscribe((res) => {
+      if (res) {
+        this.checkCuadre();
+        this.layServ.nextCheckCuadreToday(false);
+      }
+    });
+
     this.searchVersion();
     this.getPrintersName();
   }
-
-  probar() {}
 
   initVariables() {
     this.showLoading = true;
@@ -136,11 +146,13 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
     this.activeIndex = 0;
     this.lRun = false;
+    this.cuadre_hoy = false;
   }
 
   ngOnDestroy() {
     this._destroy_mixin();
     if (this.subDeciMenu) this.subDeciMenu.unsubscribe();
+    if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
   }
 
   decisionModal(arg) {
@@ -174,6 +186,14 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
   getVersion() {
     return this.versionApp;
+  }
+
+  checkCuadre() {
+    let extra = { afterPath: 'check_today_cuadre', parameters: {} };
+
+    new CuadreCajaC().getAll(extra).then((res) => {
+      this.cuadre_hoy = res['data'].existe_cuadre_hoy;
+    });
   }
 
   setUser(user) {

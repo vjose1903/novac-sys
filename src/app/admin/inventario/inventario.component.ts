@@ -89,7 +89,6 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   async printBase64Res(res) {
-    console.log('res: ', res);
 
     if (res.status === 'si') {
       this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);

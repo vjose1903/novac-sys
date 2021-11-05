@@ -464,7 +464,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     } else {
       this.fecha_vencimiento = new Date();
     }
-
+    this.is_viaje = res.is_viaje;
     this.condicion_fact = res.condicion;
 
     this.NCFcompra = res.tipo === 'compra' ? res.numero_comprobante : undefined;
@@ -792,9 +792,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   //  MODAL enviarABaseDatos
   // =============================================
   async imprimirFactura() {
-    if (!this.usuario) {
-      this.usuario = this.fun.getUser();
-    }
+    if (!this.usuario) this.usuario = this.fun.getUser();
 
     if (!this.propietario_factura) {
       if (this.metodo === 'compra') {
@@ -1276,18 +1274,13 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO', true);
       }
 
-      if (this.facturaGuardada) {
-        this.revisarLocalStorage();
-      }
+      if (this.facturaGuardada) this.revisarLocalStorage();
 
       await this.resetVariables();
 
       res['FACTURA_DE'] = this.metodo;
 
-      const obj = {
-        data: res,
-        type: 'facturacion',
-      };
+      const obj = { data: res, type: 'facturacion', };
 
       if (this.metodo === 'venta') {
         this.pdfServ.generatePdf(obj).then((res) => {
@@ -1302,6 +1295,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
           }
         });
       }
+
+      this.layServ.nextCheckCuadreToday(true);
+
     } catch (error) {
       console.error(error);
       try {

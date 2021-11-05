@@ -1,7 +1,65 @@
 /* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
+@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
 
-$bodyfont: 'Poppins';
+.cuadre_hoy {
+  position: absolute;
+  bottom: -3rem;
+  border-radius: 3rem 3rem 3rem 3rem;
+  background-color: red;
+  height: 5rem;
+  width: 5rem;
+  box-shadow: 0 0 0 0 #ff0000;
+  transform: scale(1);
+  animation: pulse 1.5s infinite;
+  transition-duration: 0.5s;
+  transition-property: width, border-radius, bottom;
+  transition-delay: 0s, 0s, 0.2s;
+  padding: 0rem 0rem 0rem 2.5rem;
+  .content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: 600;
+    height: 100%;
+    width: 0%;
+    overflow: hidden;
+    white-space: nowrap;
+    transition-duration: 0.3s;
+    transition-property: width;
+    transition-delay: 0.2s;
+  }
+  &:hover {
+    bottom: 0.5rem;
+    cursor: help;
+    border-radius: 3rem 1rem 1rem 3rem;
+    width: 20rem;
+    transition-delay: 0.2s, 0.2s, 0s;
+    .content {
+      width: 100%;
+      transition-delay: 0.2s;
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 #ff000062;
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 15px #ff000031;
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 #ff000000;
+  }
+}
+
+$bodyfont: "Poppins";
 ::ng-deep .tabViewTootip {
   z-index: 9999999999 !important;
 }
