@@ -34,35 +34,39 @@
   <form [formGroup]="form" action="">
     <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWFACTURAS?.controls; let i = index">
       <div [formGroupName]="i">
+        <p-overlayPanel #dropRowConfig>
+          <ng-template pTemplate>
+            <ul class="dropdown-menu dropRowConfig" role="menu">
+              <li *ngIf="metodo === 'venta'" role="menuitem">
+                <div class="form-group my-1 ml-2 switchDiv">
+                  <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, 'select', $event)" />
+                  <span class="ml-2">Calcular saco</span>
+                </div>
+              </li>
+
+              <li role="menuitem">
+                <a class="dropdown-item" id="dropdown-item" (click)="modalRemover(i, $event)">
+                  <i class="far fa-trash-alt text-red btnBorrar"></i>
+                  Quitar Producto
+                </a>
+              </li>
+            </ul>
+          </ng-template>
+        </p-overlayPanel>
+
         <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
           <tbody>
             <tr>
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
               <td *ngIf="propietario" class="sombreado2" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
-                <div class="btn-group" dropdown #dropRowConfig>
-                  <a *ngIf="checkIfArticuloRow(i)" dropdownToggle style="padding: 3px" (click)="(false)">
+                <div class="btn-group">
+                  <a *ngIf="checkIfArticuloRow(i)" style="padding: 3px" (click)="dropRowConfig.toggle($event)">
                     <i class="fas fa-ellipsis-v btnConfig"></i>
                   </a>
 
                   <a *ngIf="!checkIfArticuloRow(i)" style="padding: 3px">
                     <i class="fas fa-ellipsis-v btnConfigDis"></i>
                   </a>
-
-                  <ul class="dropdown-menu" role="menu" id="dropRowConfig">
-                    <li *ngIf="metodo === 'venta'" role="menuitem">
-                      <div class="form-group my-1 ml-2 switchDiv">
-                        <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, 'select', $event)" />
-                        <span class="ml-2">Calcular saco</span>
-                      </div>
-                    </li>
-
-                    <li role="menuitem">
-                      <a class="dropdown-item" id="dropdown-item" (click)="modalRemover(i, $event)">
-                        <i class="far fa-trash-alt text-red btnBorrar"></i>
-                        Quitar Producto
-                      </a>
-                    </li>
-                  </ul>
                 </div>
               </td>
 
@@ -106,7 +110,7 @@
                 <div class="form-group m-0">
                   <input
                     [readOnly]="!propietario"
-                    *ngIf="inputDrop !== secuenciaDelDrop(i)"
+                    *ngIf="inputDrop !== 'uni-' + i"
                     type="text"
                     class="form-control entrada"
                     id="uni-{{ i }}"
@@ -117,7 +121,7 @@
                     tabindex="-1"
                   />
 
-                  <div *ngIf="inputDrop === secuenciaDelDrop(i)">
+                  <div *ngIf="inputDrop === 'uni-' + i">
                     <select
                       value="Medida"
                       formControlName="uni"

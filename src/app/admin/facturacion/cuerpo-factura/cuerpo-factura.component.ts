@@ -658,13 +658,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
   }
 
-  secuenciaDelDrop(arg) {
-    return 'uni-' + arg;
-  }
-
   calcularTotalRow(i) {
-    console.log('calcularTotalRow --> ', i);
-
     const precioTEMP = (this.control[i] as any).controls['pre'].value;
     const precio = GLOBAL.desformatear(precioTEMP);
     const cantidad = (this.control[i] as any).controls['can'].value;
@@ -672,13 +666,10 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
     let cantidadMinima = 1;
 
-    if (unidad && this.UnidadesArticulo.length > 0) {
-      cantidadMinima = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad)).cantidad;
-    }
+    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad)).cantidad;
 
     if (precio && cantidad) {
-      const tot = precio * cantidad;
-      (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(tot));
+      (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(precio * cantidad));
       (this.control[i] as any).controls['cantidad_en_unidades'].setValue(cantidad * cantidadMinima);
 
       this.calculosTotalesGenerales();

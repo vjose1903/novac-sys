@@ -24,6 +24,7 @@ import { ProduccionComponent } from '../produccion/produccion.component';
 import { TabViewModule } from 'primeng/tabview';
 import { ReportesComponent } from '../reportes/reportes.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
     CommonModule,
     TabViewModule,
     AngularModule,
+    OverlayPanelModule,
     BtncircularModule,
     NgxBootstrapModule,
     NgSelectModule,
