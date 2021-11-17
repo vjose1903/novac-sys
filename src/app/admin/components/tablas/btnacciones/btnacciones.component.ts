@@ -6,14 +6,17 @@ import * as _ from 'lodash';
   styleUrls: ['./btnacciones.component.scss'],
 })
 export class BTNACCIONESComponent implements OnInit {
-  @Input() botones = {
-    titulo: false,
-    borrar: false,
-    editar: false,
-    panico: false,
-    mostrar: false,
-    inventario: false,
-  };
+  // @Input() botones = {
+  //   titulo: false,
+  //   borrar: false,
+  //   editar: false,
+  //   panico: false,
+  //   mostrar: false,
+  //   inventario: false,
+  // };
+
+  @Input() botones;
+
   @Input() row: any;
   @Input() i: any;
   @Input() data: any;

@@ -1,4 +1,4 @@
-<div *ngIf="showModal" class="overlay" (keypress)="prueba($event)">
+<div *ngIf="showModal" class="overlay">
   <!-- ================================================================================================================================ -->
   <!-- REMOVER DE LA LISTA -->
   <!-- ================================================================================================================================ -->
@@ -12,7 +12,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <p>Desea remover {{ seleccionModal.nombre }} de la lista</p>
     <p-footer>
@@ -35,7 +35,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <p>Desea eliminar {{ seleccionModal.nombre }}</p>
     <p-footer>
@@ -58,7 +58,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <app-pendiente-form (cancel)="accion($event)" (getDate)="getDatePendiente($event)"></app-pendiente-form>
   </p-dialog>
@@ -75,7 +75,7 @@
     [baseZIndex]="10000"
     [minY]="80"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <app-formulario-marca-modelo [tipo_formulario]="seleccionModal" (accion_)="accion($event)"></app-formulario-marca-modelo>
     <!-- <p-footer>
@@ -97,7 +97,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <div class="p-2">
       <app-movimientos-form [data]="seleccionModal" (cancel)="accion($event)"></app-movimientos-form>
@@ -117,7 +117,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <app-change-password [user]="seleccionModal" (cancel)="accion($event)"></app-change-password>
   </p-dialog>
@@ -136,7 +136,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <app-form-cantidad-efectivo [tipo]="tipoDevuelta" [data]="seleccionModal" (cancel)="accion(false)" (getDevuelta)="getDevuelta($event)"></app-form-cantidad-efectivo>
   </p-dialog>
@@ -154,7 +154,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <p>Seguro que desea cancelar la produccion</p>
     <p-footer>
@@ -176,7 +176,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <p>Existen articulos con costos distintos desea que se actualicen los costos automaticamente?</p>
     <p-footer>
@@ -198,7 +198,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <p>Seguro que desea cancelar la busqueda de factura</p>
     <p-footer>
@@ -220,7 +220,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <p>
       Seguro que desea cancelar la factura <b *ngIf="identificadorFact">{{ identificadorFact }}</b>
@@ -244,7 +244,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <p>
       Seguro que desea remover el articulo <b class="negrita">{{ seleccionModal.nombre }}</b>
@@ -269,7 +269,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <p>Seguro que desea imprimir la factura</p>
     <p-footer>
@@ -291,7 +291,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <app-modal-historial-pagos [pagos]="seleccionModal"></app-modal-historial-pagos>
   </p-dialog>
@@ -310,7 +310,7 @@
     [minY]="70"
     [baseZIndex]="10000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
     contentStyleClass="seleccionar_articulos_adelantados"
   >
     <app-modal-seleccinar-articulo
@@ -321,7 +321,7 @@
 
     <p-footer>
       <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">NO</button>
-      <button (click)="selectArticulosAdelantados(true)" type="submit" class="btn" id="btn-verde">SI</button>
+      <button (click)="selectArticulosAdelantados()" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
 
@@ -341,8 +341,7 @@
     [minY]="70"
     (onHide)="reinicioModal()"
     id="tablaSearch"
-    (onShow)="prueba()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
@@ -378,8 +377,7 @@
     [style]="{ width: '900px', height: '500px' }"
     [minY]="70"
     (onHide)="reinicioModal()"
-    (onShow)="prueba()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
@@ -413,8 +411,7 @@
     [style]="{ width: '1200px', minWidth: '510px' }"
     [minY]="70"
     (onHide)="reinicioModal()"
-    (onShow)="prueba()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <div class="p-2">
       <app-formar-factura *ngIf="seleccionModal" [factura]="seleccionModal"></app-formar-factura>
@@ -506,7 +503,7 @@
       [showBookmarkButton]="false"
       [enablePrint]="false"
       [base64Src]="seleccionModal?.pdfSrc"
-      useBrowserLocale="true"
+      [useBrowserLocale]="true"
       [height]="seleccionModal?.height"
     ></ngx-extended-pdf-viewer>
     <p-footer>
@@ -531,7 +528,6 @@
     [style]="{ width: '510px' }"
     (onHide)="accion(false)"
   >
-
     <app-form-reportes
       *ngIf="seleccionModal?.tipo === 'reportes'"
       [tipo_reporte]="seleccionModal?.tipo_reporte"

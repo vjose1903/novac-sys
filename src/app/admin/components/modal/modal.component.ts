@@ -277,7 +277,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.ModalObj(obj);
   }
 
-  noArticulo(is_codigo) {
+  noArticulo(is_codigo?) {
     this.reinicioModal();
     let es = 'codigo';
     if (!is_codigo) es = 'nombre';
@@ -287,15 +287,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.ModalIndex(this.index);
   }
 
-  prueba() {
-    if (this.tipoModal === 'buscarArticulo') {
-      this.element = document.getElementById('tablaSearch');
-      setTimeout(() => {
-        this.element.focus();
-        this.element.click();
-      }, 5);
-    }
-  }
+
 
   articuloFiltradoPorCodigo(articulo) {
     const obj = {

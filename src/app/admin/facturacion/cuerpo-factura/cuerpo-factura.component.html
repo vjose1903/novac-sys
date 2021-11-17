@@ -1,4 +1,4 @@
-<table #tituloFactTable="mdbTable" mdbTable class="table m-auto" small="true">
+<table #tituloFactTable="mdbTable" mdbTable class="table m-auto" [small]="true">
   <thead>
     <tr class="text-center">
       <th class="tiCOD">Codigo</th>
@@ -34,18 +34,18 @@
   <form [formGroup]="form" action="">
     <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWFACTURAS?.controls; let i = index">
       <div [formGroupName]="i">
-        <p-overlayPanel #dropRowConfig>
+        <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
           <ng-template pTemplate>
-            <ul class="dropdown-menu dropRowConfig" role="menu">
+            <ul class="dropRowConfig" role="menu">
               <li *ngIf="metodo === 'venta'" role="menuitem">
-                <div class="form-group my-1 ml-2 switchDiv">
-                  <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" (click)="CalculoSacos(i, 'select', $event)" />
+                <div class="form-group my-1 switchDiv">
+                  <input formControlName="calcular_saco" class="apple-switch" type="checkbox" (change)="CalculoSacos(i, 'select', $event)" />
                   <span class="ml-2">Calcular saco</span>
                 </div>
               </li>
 
-              <li role="menuitem">
-                <a class="dropdown-item" id="dropdown-item" (click)="modalRemover(i, $event)">
+              <li role="menuitem" (click)="modalRemover(i, $event)" class="hoverlable">
+                <a class="" id="dropdown-item">
                   <i class="far fa-trash-alt text-red btnBorrar"></i>
                   Quitar Producto
                 </a>
@@ -54,19 +54,19 @@
           </ng-template>
         </p-overlayPanel>
 
-        <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
+        <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" [small]="true">
           <tbody>
             <tr>
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
               <td *ngIf="propietario" class="sombreado2" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
                 <div class="btn-group">
-                  <a *ngIf="checkIfArticuloRow(i)" style="padding: 3px" (click)="dropRowConfig.toggle($event)">
+                  <div *ngIf="checkIfArticuloRow(i)" style="padding: 3px" (click)="dropRowConfig.toggle($event); printRow(i)">
                     <i class="fas fa-ellipsis-v btnConfig"></i>
-                  </a>
+                  </div>
 
-                  <a *ngIf="!checkIfArticuloRow(i)" style="padding: 3px">
+                  <div *ngIf="!checkIfArticuloRow(i)" style="padding: 3px">
                     <i class="fas fa-ellipsis-v btnConfigDis"></i>
-                  </a>
+                  </div>
                 </div>
               </td>
 
@@ -93,7 +93,7 @@
                     [readOnly]="!propietario"
                     type="number"
                     min="1"
-                    class="form-control entrada"
+                    class="form-control entrada input_cantidad"
                     id="can-{{ i }}"
                     (focus)="verificarSecuencia(i)"
                     (keydown.enter)="saltar($event, 'uni-', i)"
@@ -114,6 +114,7 @@
                     type="text"
                     class="form-control entrada"
                     id="uni-{{ i }}"
+                    (mouseenter)="verificarSecuencia(i, 'unidad')"
                     (focus)="verificarSecuencia(i, 'unidad')"
                     (keydown.enter)="saltar($event, metodo === 'venta' ? 'cod-' : 'pre-', i)"
                     formControlName="uni"
@@ -129,6 +130,7 @@
                       class="form-control entrada"
                       style="border-radius: 0"
                       id="uni-{{ i }}"
+                      (mouseleave)="setInputDrop(undefined)"
                       (keydown.enter)="saltar($event, metodo === 'venta' ? 'cod-' : 'pre-', i)"
                       (blur)="calcularTotalRow(i); setInputDrop(undefined)"
                       tabindex="-1"

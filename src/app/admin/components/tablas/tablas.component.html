@@ -6,7 +6,7 @@
 
   <!-- <div style="border-radius: 10px 10px 0px 0px;" class="tableBodyScroll"> -->
   <div style="border-radius: 10px 10px 0px 0px" class="tableBodyScroll" [ngStyle]="{ height: alto + 'px' }">
-    <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" small="true" id="VICtablas">
+    <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" [small]="true" id="VICtablas">
       <thead class="text-center position-relative" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
         <!-- [disabled]="disabledInput(column.disable, i)" -->
         <tr #titulosHeader>
@@ -177,7 +177,7 @@
         nextLabel="Siguiente"
         previousLabel="Anterior"
         class="my-pagination mr-3"
-        maxSize="5"
+        [maxSize]="5"
         [id]="id_tabla"
         (pageChange)="pageChange($event)"
       ></pagination-controls>

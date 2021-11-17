@@ -53,7 +53,7 @@
   <!-- ================================================================================================================================================ -->
   <div *ngIf="cliente" class="col-12 mt-3">
     <div class="card sombra bordeRedondeado" style="height: 37rem">
-      <table #tituloFactTable="mdbTable" mdbTable class="table m-auto" small="true">
+      <table #tituloFactTable="mdbTable" mdbTable class="table m-auto" [small]="true">
         <thead>
           <tr class="text-center">
             <th class="tiCOD">Codigo</th>
@@ -80,7 +80,7 @@
         <form *ngIf="ARRAY_ROWARTICULOS" [formGroup]="form" action="">
           <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWARTICULOS.controls; let i = index">
             <div [formGroupName]="i">
-              <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" small="true">
+              <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" [small]="true">
                 <tbody>
                   <tr>
                     <!--  ::::::::::::  CONFIG  ::::::::::::  -->
@@ -95,7 +95,7 @@
                         </a>
                         <ul class="dropdown-menu" role="menu" id="dropConfigRow">
                           <li role="menuitem">
-                            <a class="dropdown-item" id="dropdown-item" (click)="modalRemover(i, $event)">
+                            <a class="dropdown-item" id="dropdown-item" (click)="modalRemover(i)">
                               <i class="far fa-trash-alt text-red btnBorrar"></i>
                               Quitar Producto
                             </a>

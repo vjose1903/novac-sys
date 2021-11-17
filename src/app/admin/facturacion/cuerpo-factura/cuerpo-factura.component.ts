@@ -222,50 +222,44 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
   }
 
-  async calcularSacoEnRow(i, row, articulo, lugar, callback = (arg) => {}) {
-    try {
-      console.log('row --> ', row);
+  async calcularSacoEnRow(i, row, articulo, lugar) {
+    return new Promise((resolve, reject) => {
+      try {
+        const operacion = row.calcular_saco;
+        const se_calcula = row.se_calcula_saco;
+        const row_unidad = (this.control[i] as any).controls['uni'].value;
+        const precio_saco = this.saco_sistema.precio_principal;
 
-      const operacion = row.calcular_saco;
-      const se_calcula = row.se_calcula_saco;
-      const row_unidad = (this.control[i] as any).controls['uni'].value;
-      const precio_saco = this.saco_sistema.precio_principal;
+        let calculo = 0;
 
-      let calculo = 0;
+        if (row_unidad == articulo.medida) {
+          calculo = articulo.precio_principal;
+        } else {
+          const splitUnidad = _.split(row_unidad, ' ');
+          let unity = splitUnidad[0];
+          let peso = 100 / Number(splitUnidad[2]);
 
-      if (row_unidad == articulo.medida) {
-        calculo = articulo.precio_principal;
-      } else {
-        const splitUnidad = _.split(row_unidad, ' ');
-        let unity = splitUnidad[0];
-        let peso = 100 / Number(splitUnidad[2]);
-
-        calculo = articulo.precio_principal / peso;
-
-        if (unity != 'Saco') calculo = articulo.contenido_articulos[0].precio;
-      }
-
-      const descripcion = (this.control[i] as any).controls['des'].value;
-
-      let precio = calculo;
-      if (operacion) {
-        if (moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.created_at).format('YYYY-MM-DD')) {
-          precio = calculo + precio_saco;
+          calculo = unity == 'Saco' ? articulo.precio_principal / peso : articulo.contenido_articulos[0].precio;
         }
 
-        (this.control[i] as any).controls['des'].setValue(`${articulo.nombre}`);
-        (this.control[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
-      } else {
-        (this.control[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
+        const descripcion = (this.control[i] as any).controls['des'].value;
 
-        if (se_calcula || lugar === 'select') (this.control[i] as any).controls['des'].setValue(`${descripcion}*`);
+        let precio = calculo;
+        if (operacion) {
+          if (moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.fecha_ingreso).format('YYYY-MM-DD')) precio = calculo + precio_saco;
+          (this.control[i] as any).controls['des'].setValue(`${articulo.nombre}`);
+          (this.control[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
+        } else {
+          (this.control[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
+          if (se_calcula || lugar === 'select') (this.control[i] as any).controls['des'].setValue(`${descripcion}*`);
+        }
+
+        resolve(true);
+      } catch (error) {
+        this.dbServ.toastError('Error calculando el precio del saco', 'ERROR');
+        resolve(false);
       }
-
-      callback(true);
-    } catch (error) {
-      this.dbServ.toastError('Error calculando el precio del saco', 'ERROR');
-      callback(false);
-    }
+    });
   }
 
   async CalculoSacos(i, lugar, e?) {
@@ -281,12 +275,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
           const row = (this.control[i] as any).value;
 
           if (unidad) {
-            this.calcularSacoEnRow(i, row, articulo, lugar, (res) => {
-              if (res) this.calcularTotalRow(i);
-            });
+            this.calcularSacoEnRow(i, row, articulo, lugar).then((res) => (res ? this.calcularTotalRow(i) : () => {}));
           } else {
             this.dbServ.toastWarning('Para calcular los sacos debe de seleccionar una unidad', 'AVISO', true);
-
             (this.control[i] as any).controls['calcular_saco'].setValue(true);
           }
         } else {
@@ -308,6 +299,12 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         }
       }
     });
+  }
+
+  printRow(i) {
+    const row = (this.control[i] as any).value;
+
+    console.log('row --> ', row);
   }
 
   checkIfArticuloRow(i) {
@@ -439,9 +436,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
             if (this.metodo === 'venta') {
               try {
-                this.calcularSacoEnRow(j, row, articulo, 'llenarFact', (res) => {
-                  if (res) this.calcularTotalRow(j);
-                });
+                this.calcularSacoEnRow(j, row, articulo, 'llenarFact').then((res) => (res ? this.calcularTotalRow(j) : () => {}));
               } catch (error) {}
             } else {
               this.calcularTotalRow(j);
@@ -639,7 +634,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         (this.control[i] as any).controls['pre'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
         (this.control[i] as any).controls['costo'].setValue(costoDetalle);
 
-        if (this.metodo === 'venta' && moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.created_at).format('YYYY-MM-DD')) {
+        if (this.metodo === 'venta' && moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.fecha_ingreso).format('YYYY-MM-DD')) {
           this.CalculoSacos(i, 'select', undefined);
         }
 

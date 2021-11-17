@@ -27,14 +27,30 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
   height: 96% !important;
 }
 
+.dropConfigs {
+  .p-overlaypanel-content {
+    padding: 5px !important;
+  }
+}
+
 .dropRowConfig {
   max-width: 250px;
   min-width: 250px;
-  // margin: -1rem 0px 0px calc(100% - 257px);
-  margin: -1rem calc(100% - 257px) 0px 0px;
-  background: #fff;
-  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.25);
-  padding: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    padding: 15px 25px;
+    border-radius: 2px;
+    &:hover {
+      cursor: default;
+      &.hoverlable {
+        cursor: pointer !important;
+      }
+      background: #95f0a7;
+    }
+  }
 }
 
 .btnConfigDis {
@@ -65,8 +81,8 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 
 .dropdown-item:hover {
   border-radius: 2px;
-  background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
-  color: #fff;
+  background: #95f0a7;
+  // background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
 }
 
 /* dropdown cuerpo */
@@ -160,6 +176,17 @@ body {
 .p-tooltip {
   z-index: 99999999 !important;
 }
+
+.input_cantidad {
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  -moz-appearance: textfield;
+}
+
 // ========================================================
 // Progress bar
 // ========================================================

@@ -81,7 +81,8 @@
     <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
         *ngIf="listado && info"
-        [padre]="cardTabla" [info]="info"
+        [padre]="cardTabla"
+        [info]="info"
         [data]="listado"
         [focusRow]="false"
         [botones]="botones"
@@ -103,12 +104,12 @@
     [style]="{ width: '350px', minWidth: '200px' }"
     [baseZIndex]="12000"
     (onHide)="reinicioModal()"
-    blockScroll="true"
+    [blockScroll]="true"
   >
     <p *ngIf="tipo_formulario !== 'modelos'">Desea remover {{ seleccionModal.descripcion }} de la lista</p>
     <p *ngIf="tipo_formulario == 'modelos'">Desea remover {{ seleccionModal.marca.descripcion }} {{ seleccionModal.descripcion }} de la lista</p>
     <p-footer>
-      <button type="button" mdbBtn (click)="reinicioModal(false)" class="btn-peque btn-light">No</button>
+      <button type="button" mdbBtn (click)="reinicioModal()" class="btn-peque btn-light">No</button>
       <button type="button" mdbBtn (click)="decisionBorrar(true)" class="btn-peque btn-success">Si</button>
     </p-footer>
   </p-dialog>

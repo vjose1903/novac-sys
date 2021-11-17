@@ -515,7 +515,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         }
 
         if (buscar) {
-          this.abrirModalFiltro(510);
+          this.abrirModalFiltro();
         }
       }, 250);
     }
@@ -652,7 +652,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   saltar(campo, valor?, salioDe?) {
     if (campo === 'buscarCliente') {
       this.desEnfocarInput(salioDe);
-      this.abrirModalFiltro(647);
+      this.abrirModalFiltro();
     }
 
     if (campo === 'condicion') {
@@ -693,7 +693,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
     if (campo === 'filtro') {
       if (this.validarRayaAbajo()) {
-        this.abrirModalFiltro(688);
+        this.abrirModalFiltro();
 
         this.desEnfocarInput(salioDe);
       } else {
@@ -768,7 +768,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   //  MODAL PARA FILTRAR CLIENTES & SUPLIDORES
   // =============================================
 
-  abrirModalFiltro(arg) {
+  abrirModalFiltro() {
     let tipo = 'buscarCliente';
     let obj = {};
     obj['data'] = [];
@@ -1280,7 +1280,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
       res['FACTURA_DE'] = this.metodo;
 
-      const obj = { data: res, type: 'facturacion', };
+      const obj = { data: res, type: 'facturacion' };
 
       if (this.metodo === 'venta') {
         this.pdfServ.generatePdf(obj).then((res) => {
@@ -1297,7 +1297,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       }
 
       this.layServ.nextCheckCuadreToday(true);
-
     } catch (error) {
       console.error(error);
       try {

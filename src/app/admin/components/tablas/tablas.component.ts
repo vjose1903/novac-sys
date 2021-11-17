@@ -94,12 +94,13 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() search = true;
   @Input() paginate = true;
   @Input() quitarAScorll = 20;
-  @Input() botones = {
-    titulo: false,
-    borrar: false,
-    editar: false,
-    mostrar: false,
-  };
+  // @Input() botones = {
+  //   titulo: false,
+  //   borrar: false,
+  //   editar: false,
+  //   mostrar: false,
+  // };
+  @Input() botones;
 
   @Input() id_tabla = 'tabla';
 

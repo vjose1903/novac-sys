@@ -21,7 +21,10 @@
                 </div>
               </div>
 
-              <div *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'" class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
+              <div
+                *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'"
+                class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center"
+              >
                 <div class="form-group mb-2 switchDiv ml-2">
                   <input formControlName="calcular_saco" class="apple-switch ml-2" type="checkbox" />
                   <span class="ml-2">Calcular saco</span>
@@ -350,7 +353,7 @@
                   </div>
                   <div class="col-2">
                     <div *ngIf="j === 0" class="d-flex aling justify-content-between">
-                      <i (click)="addItem(j)" mdbTooltip="Agregar Ingrediente" placement="left" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
+                      <i (click)="addItem()" mdbTooltip="Agregar Ingrediente" placement="left" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
                     </div>
                     <div *ngIf="j !== 0" class="d-flex aling justify-content-between">
                       <i (click)="removeItem(j)" mdbTooltip="Quitar Ingrediente" placement="left" class="fas btnArray fa-minus-square text-danger btnQuitar"></i>
