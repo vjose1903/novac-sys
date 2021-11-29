@@ -77,42 +77,48 @@ export class FunctionService {
     return res;
   }
 
-  revisarPrecio(input, id) {
-    const precioTEMPO = input.value;
-    if (this.hasValue(precioTEMPO)) {
-      const splitPrecio = _.split(precioTEMPO, '.');
-      let precioTEMP;
-      let enteros = splitPrecio[0];
-      let tempdecimales = splitPrecio[1];
+  revisarPrecio(input, id): any {
+    return new Promise((resolve) => {
+      const precioTEMPO = input.value;
+      const res = { number: null, error: true };
 
-      if (tempdecimales === undefined) tempdecimales = '00';
+      if (this.hasValue(precioTEMPO)) {
+        const splitPrecio = _.split(precioTEMPO, '.');
+        let precioTEMP;
+        let enteros = splitPrecio[0];
+        let tempdecimales = splitPrecio[1];
 
-      if (
-        splitPrecio.length > 2 ||
-        this.checkNumbers(enteros) ||
-        this.checkLongMillares(enteros) ||
-        this.checkNumbers(tempdecimales) ||
-        this.checkLongMillares(tempdecimales)
-      ) {
-        this.toastError('Valor introducido es invalido', 'ERROR', true);
-        document.getElementById(id).focus();
-      } else {
-        //
-        if (splitPrecio.length === 2) {
-          if (this.isEmpty(enteros)) enteros = '0';
+        if (tempdecimales === undefined) tempdecimales = '00';
 
-          let decimales;
-          if (tempdecimales.length > 2) decimales = tempdecimales.substring(0, 2);
-          else decimales = _.padEnd(tempdecimales, 2, '0');
+        if (
+          splitPrecio.length > 2 ||
+          this.checkNumbers(enteros) ||
+          this.checkLongMillares(enteros) ||
+          this.checkNumbers(tempdecimales) ||
+          this.checkLongMillares(tempdecimales)
+        ) {
+          this.toastError('Valor introducido es invalido', 'ERROR', true);
+          document.getElementById(id).focus();
+        } else {
+          //
+          if (splitPrecio.length === 2) {
+            if (this.isEmpty(enteros)) enteros = '0';
 
-          precioTEMP = _.join([enteros, decimales], '.');
-        } else if (splitPrecio.length === 1) {
-          precioTEMP = _.join([enteros, '00'], '.');
+            let decimales;
+            if (tempdecimales.length > 2) decimales = tempdecimales.substring(0, 2);
+            else decimales = _.padEnd(tempdecimales, 2, '0');
+
+            precioTEMP = _.join([enteros, decimales], '.');
+          } else if (splitPrecio.length === 1) {
+            precioTEMP = _.join([enteros, '00'], '.');
+          }
+          res.number = GLOBAL.formatearNumero(precioTEMP);
+          res.error = false;
         }
       }
 
-      input.setValue(GLOBAL.formatearNumero(precioTEMP));
-    }
+      resolve(res);
+    });
   }
   // __________________________________________________________________________________________________
   // Nombre: getPersonaByDocIdentidad

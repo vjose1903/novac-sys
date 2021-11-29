@@ -287,8 +287,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.ModalIndex(this.index);
   }
 
-
-
   articuloFiltradoPorCodigo(articulo) {
     const obj = {
       data: articulo.data[0],
@@ -343,6 +341,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
             this.noArticulo(is_codigo);
             return;
           }
+          console.log('this.dataFiltro ', this.dataFiltro);
+          console.log('this.tipoModal ', this.tipoModal);
+          console.log('this.filtrar ', this.filtrar);
+          console.log('this.infoArticulos ', this.infoArticulos);
+          console.log('this.seleccionModal ', this.seleccionModal);
 
           this.mostrarModalLuegoDeBuscarData();
           const obj = {
@@ -411,8 +414,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   mostrarModalLuegoDeBuscarData() {
-    setTimeout(() => {
-      this.showModal = true;
-    }, 250);
+    setTimeout(() => (this.showModal = true), 250);
   }
 }

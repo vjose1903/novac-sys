@@ -322,7 +322,9 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
 
   revisarPrecio(id) {
     const input = this.form.controls[id];
-    this.fun.revisarPrecio(input, id);
+    this.fun.revisarPrecio(input, id).then((res) => {
+      if (!res.error) input.setValue(res.number);
+    });
   }
 
   submit(arg) {

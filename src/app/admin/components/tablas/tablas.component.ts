@@ -141,6 +141,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         }
       }
     });
+
+    console.log('info ', this.info);
     // if (this.search) {
     //   setTimeout(() => {
     //     this.element = document.getElementById('search') as HTMLElement;
@@ -599,6 +601,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           // columna.style[key] = value;
           list_estilos_titulos += `${key}: ${value} !important; `;
         }
+        console.log('info --> ', info);
 
         const columna = document.getElementById(info.titulo) as any;
 

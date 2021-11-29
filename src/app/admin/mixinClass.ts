@@ -102,6 +102,7 @@ export class mixinClass extends modalClass {
   }
   // =========================================================================================================
   desEnfocarInput(arg) {
+
     const element = document.getElementById(arg) as HTMLElement;
     element.blur();
   }

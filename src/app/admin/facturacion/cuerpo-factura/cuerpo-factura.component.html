@@ -60,11 +60,11 @@
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
               <td *ngIf="propietario" class="sombreado2" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
                 <div class="btn-group">
-                  <div *ngIf="checkIfArticuloRow(i)" style="padding: 3px" (click)="dropRowConfig.toggle($event); printRow(i)">
+                  <div *ngIf="checkIfRowContainArticulo(i)" style="padding: 3px" (click)="dropRowConfig.toggle($event)">
                     <i class="fas fa-ellipsis-v btnConfig"></i>
                   </div>
 
-                  <div *ngIf="!checkIfArticuloRow(i)" style="padding: 3px">
+                  <div *ngIf="!checkIfRowContainArticulo(i)" style="padding: 3px">
                     <i class="fas fa-ellipsis-v btnConfigDis"></i>
                   </div>
                 </div>

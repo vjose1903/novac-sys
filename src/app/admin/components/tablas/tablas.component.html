@@ -10,8 +10,8 @@
       <thead class="text-center position-relative" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
         <!-- [disabled]="disabledInput(column.disable, i)" -->
         <tr #titulosHeader>
-          <th id="{{ row.titulo }}" *ngFor="let row of info" class="thHead">
-            <span [ngSwitch]="row.tipo">
+          <th id="{{ row?.titulo }}" *ngFor="let row of info" class="thHead">
+            <span [ngSwitch]="row?.tipo">
               <span *ngSwitchCase="'check'">
                 <input
                   *ngIf="row?.select_all"
@@ -25,11 +25,11 @@
               </span>
 
               <span *ngSwitchDefault>
-                {{ row.titulo }}
+                {{ row?.titulo }}
               </span>
             </span>
           </th>
-          <th *ngIf="botones.titulo" class="thHead">Acciones</th>
+          <th *ngIf="botones && botones?.titulo" class="thHead">Acciones</th>
         </tr>
       </thead>
       <tbody [ngStyle]="{ height: alto + 'px' }">
@@ -157,7 +157,7 @@
               </span>
             </td>
 
-            <td id="td-acciones-{{ i }}" class="btnAccion tableTD" *ngIf="botones.titulo">
+            <td id="td-acciones-{{ i }}" class="btnAccion tableTD" *ngIf="botones && botones?.titulo">
               <app-btnacciones
                 [row]="dato"
                 [i]="i"
