@@ -632,8 +632,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     });
   }
 
-  // TODO: seguir revisando de aqui para abajo
-
   calcularDescuento(i) {
     const codido = (this.control[i] as any).controls['cod'].value;
     const precioTEMP = (this.control[i] as any).controls['pre'].value;
@@ -643,23 +641,25 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     let descuento = (this.control[i] as any).controls['descuento_porciento'].value;
 
     const total = precio * cantidad;
-    let calculoDesc = 0;
-    let nuevoTotal = 0;
 
-    if (codido && (descuento === 0 || descuento === '0' || descuento === null || descuento === undefined)) {
+    if (this.fun.hasValue(codido) && (this.fun.isEmpty(descuento) || descuento == 0)) {
       (this.control[i] as any).controls['descuento_porciento'].reset();
-      const total = precio * cantidad;
-      (this.control[i] as any).controls['tot'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(total)));
+      (this.control[i] as any).controls['descuento_valor'].reset();
+      (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(total));
+
+      this.sacarDescuento(i);
     }
 
-    if (codido && precio && cantidad && descuento) {
+    let calculoDesc = 0;
+    let nuevoTotal = 0;
+    if (this.fun.hasValue(codido) && this.fun.hasValue(precio) && this.fun.hasValue(cantidad) && this.fun.hasValue(descuento)) {
       descuento = descuento / 100;
 
       calculoDesc = precio * descuento * cantidad;
       (this.control[i] as any).controls['descuento_valor'].setValue(calculoDesc);
       nuevoTotal = total - calculoDesc;
 
-      (this.control[i] as any).controls['tot'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(nuevoTotal)));
+      (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(nuevoTotal));
       this.calculosTotalesGenerales();
       this.calculosDescuentoGeneral(calculoDesc, i);
       this.aumentarSecuencia();
@@ -669,15 +669,20 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   sacarDescuento(i) {
     let acuDesc = 0;
 
-    const index = _.findIndex(this.listaDeDescuentos, (o: any) => o.fila === i);
+    const currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila == i);
 
-    if (index !== -1) {
-      _.pullAt(this.listaDeDescuentos, index);
+    console.log('currentDescuento -->< ', currentDescuento);
+
+    if (this.fun.hasValue(currentDescuento)) {
+      console.log('ENTRO A BORRAR EL DESCUENTO');
+      _.remove(this.listaDeDescuentos, currentDescuento);
       this.listaDeDescuentos.forEach((element) => (acuDesc = acuDesc + element.desc));
 
       this.sendDescuento.emit(acuDesc);
     }
   }
+
+  // TODO: SEGUIR REVISANDO DE AQUI ABAJO
 
   calculosDescuentoGeneral(descuento, i) {
     let acuDesc = 0;
@@ -784,6 +789,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
   }
 
+  // TODO: revisar por que explota cuando cierro el modal sin seleccionar nada
   async llenarArrayUnidades(art?, i?) {
     const codigo = (this.control[i] as any).controls['cod'].value;
     if (codigo) {
