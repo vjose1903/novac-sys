@@ -682,37 +682,24 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
   }
 
-  // TODO: SEGUIR REVISANDO DE AQUI ABAJO
-
   calculosDescuentoGeneral(descuento, i) {
     let acuDesc = 0;
-    const obj = { fila: i, desc: descuento };
-    const index = _.findIndex(this.listaDeDescuentos, (o: any) => {
-      return o.fila === obj.fila;
-    });
 
-    if (index !== -1) {
-      this.listaDeDescuentos[index] = obj;
-    } else {
-      this.listaDeDescuentos.push(obj);
-    }
-    this.listaDeDescuentos.forEach((element) => {
-      acuDesc = acuDesc + element.desc;
-    });
+    let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila === i);
+
+    if (this.fun.hasValue(currentDescuento)) currentDescuento.desc = descuento;
+    else this.listaDeDescuentos.push({ fila: i, desc: descuento });
+
+    this.listaDeDescuentos.forEach((element) => (acuDesc = acuDesc + element.desc));
 
     this.sendDescuento.emit(acuDesc);
   }
 
   calculosTotalesGenerales() {
-    let temp = 0;
+    let tempTotal = _.reduce(this.control, (acumulado, item) => acumulado + GLOBAL.desformatear(item.value.tot), 0);
 
-    for (let index = 0; index < this.control.length; index++) {
-      const acu = (this.control[index] as any).controls['tot'].value;
-      if (acu) temp += GLOBAL.desformatear(acu);
-    }
-
-    if (temp !== this.TOTAL) {
-      this.TOTAL = temp;
+    if (tempTotal !== this.TOTAL) {
+      this.TOTAL = tempTotal;
 
       const obj = { Total: GLOBAL.redondearAdos(this.TOTAL), ITBIS: '' };
 
@@ -732,11 +719,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
 
     if (e) e.stopPropagation();
-  }
-
-  reinicarVarModal() {
-    this.modalSearch = false;
-    this.showModal = false;
   }
 
   setInputDrop(arg) {
@@ -789,6 +771,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
   }
 
+  // TODO: SEGUIR REVISANDO DE AQUI ABAJO
   // TODO: revisar por que explota cuando cierro el modal sin seleccionar nada
   async llenarArrayUnidades(art?, i?) {
     const codigo = (this.control[i] as any).controls['cod'].value;
