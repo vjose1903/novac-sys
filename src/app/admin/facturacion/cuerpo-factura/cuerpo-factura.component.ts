@@ -70,18 +70,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     });
   }
 
-  // getOneArticuloFiltrado(buscar) {
-  //   return new Promise<any>((resolve, reject) => {
-  //     let extra = { afterPath: `filtro/${buscar}`, parameters: {} };
-
-  //     extra['parameters'] = { page: 1, per_page: 20, paginado: true, is_compra: false, tipo: 'todos', fecha: this.FechaFactura };
-
-  //     this.articuloClass.getAll(extra).then((res) => {
-  //       resolve(_.first(res['data']));
-  //     });
-  //   });
-  // }
-
   decisionModal(res) {
     if (this.tipoModal === 'removerArticulo' && res) this.procesoQuitarArticulo();
   }
@@ -370,8 +358,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
               articulo = await this.dbServ.getArticulosFiltrados(row.codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
             }
 
-            console.log('articulo --> ', articulo);
-
             const cant_en_unidades_actual = row.cantidad_en_unidades;
             const multiplo = row.cantidad_en_unidades / row.cantidad;
             const cant_actual = cant_en_unidades_actual / multiplo;
@@ -445,7 +431,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     const cantidad = (this.control[i] as any).controls['can'].value;
     const unidad = (this.control[i] as any).controls['uni'].value;
 
-    console.log('input --> ', input);
     if (i >= 10 && input === 'cod-') this.addItem(i);
 
     if (input === 'uni-') {
@@ -563,8 +548,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     if (this.secuencia < i) this.enfocarInput(this.inputSecuencia);
 
     const codigo = (this.control[i] as any).controls['cod'].value;
+    const art = (this.control[i] as any).controls['articulo'].value;
 
-    if (input === 'unidad' && this.fun.hasValue(codigo)) {
+    if (input === 'unidad' && this.fun.hasValue(codigo) && this.fun.hasValue(art)) {
       this.setInputDrop(i);
       this.llenarArrayUnidades(null, i);
     }
@@ -671,10 +657,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
     const currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila == i);
 
-    console.log('currentDescuento -->< ', currentDescuento);
-
     if (this.fun.hasValue(currentDescuento)) {
-      console.log('ENTRO A BORRAR EL DESCUENTO');
       _.remove(this.listaDeDescuentos, currentDescuento);
       this.listaDeDescuentos.forEach((element) => (acuDesc = acuDesc + element.desc));
 
@@ -771,29 +754,21 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
   }
 
-  // TODO: SEGUIR REVISANDO DE AQUI ABAJO
-  // TODO: revisar por que explota cuando cierro el modal sin seleccionar nada
   async llenarArrayUnidades(art?, i?) {
     const codigo = (this.control[i] as any).controls['cod'].value;
-    if (codigo) {
-      if (!art) art = (this.control[i] as any).controls['articulo'].value;
-
+    if (!art) art = (this.control[i] as any).controls['articulo'].value;
+    if (codigo && art) {
       const precioPrincipal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
       const costoPrincipal = art.costo_principal;
       this.UnidadesArticulo = [];
 
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
 
-      if (this.metodo === 'venta' && (art.contenido_articulos.length === 0 || art.medida !== 'Quintal')) {
-        this.UnidadesArticulo.push({
-          value: art.medida,
-          precio: art.precio_principal,
-          costo: art.costo_principal,
-          cantidad: art.contenido[art.medida],
-        });
-      }
-
       if (this.metodo === 'compra') this.medidasCuandoCompra(art);
+
+      if (this.metodo === 'venta' && (art.contenido_articulos.length === 0 || art.medida !== 'Quintal')) {
+        this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
+      }
 
       if (this.metodo === 'venta' && (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima')) {
         if (art.vendido_en === 'Saco' && art.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
