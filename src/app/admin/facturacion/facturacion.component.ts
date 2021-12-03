@@ -15,6 +15,7 @@ import { mixinClass } from '../mixinClass';
 import { FacturacionService } from './facturacion.service';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { modalClass } from '../components/modal/modal';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-facturacion',
@@ -39,19 +40,14 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     const key = event.keyCode;
 
     if (event.type === 'keydown') {
-      if (!this.secuenciaKeys.includes(key)) {
-        this.secuenciaKeys.push(key);
-      }
+      if (!this.secuenciaKeys.includes(key)) this.secuenciaKeys.push(key);
     } else if (event.type === 'keyup') {
       const combinacion = _.join(this.secuenciaKeys, '_');
       this.secuenciaKeys = [];
 
-      if (combinacion === '17_80') {
-        this.imprimirFactura();
-      }
-      if (combinacion === '17_71') {
-        this.archivarFactura();
-      }
+      if (combinacion === '17_80') this.imprimirFactura();
+
+      if (combinacion === '17_71') this.archivarFactura();
     }
   }
 
@@ -91,6 +87,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     Unidad: 'Unidades',
     Saco: 'Sacos',
   };
+  facturaGuardada;
   usuario: any;
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
@@ -104,6 +101,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   articulosAcambiar;
   newCuerpo: any[];
   paqueteComprobante: any;
+  subFactG: Subscription;
 
   constructor(
     public _ipc: IpcService,
@@ -126,25 +124,30 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       telefono: [],
     });
 
-    this.dpConfig = Object.assign(
-      {},
-      {
-        // locale:'en',
-        showWeekNumbers: false,
-        minDate: new Date(),
-        dateInputFormat: 'DD/MM/YYYY',
-      },
-    );
+    this.dpConfig = Object.assign({}, { showWeekNumbers: false, minDate: new Date(), dateInputFormat: 'DD/MM/YYYY' });
 
-    setInterval(() => {
-      this.fecha = this.my_timeDateFormater(new Date());
-    }, 1000);
+    setInterval(() => (this.fecha = this.my_timeDateFormater(new Date())), 1000);
   }
 
   ngOnInit() {
     this.localeService.use('es');
     this.rellenarVariables();
     this._init_mixin({ component: 'cabeza_factura', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
+
+    this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((fact) => {
+      if (fact) {
+        this.facturaGuardada = fact;
+        this.fun.logYellow('FACTURAGUARDADA --> ', fact);
+
+        this.rellenarFacturaGuardada().then((res) => {
+          if (res) {
+            this.facturaGuardada = fact;
+            this.layServ.factura_guardada = GLOBAL.duplicarJson(fact);
+          }
+        });
+        this.layServ.nextFacturaGuardada(undefined);
+      }
+    });
   }
 
   rellenarVariables() {
@@ -192,12 +195,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     });
 
     if (this.metodo === 'venta') {
-      this.form.patchValue({
-        id: null,
-        nombre: 'Cliente contado',
-        direccion: 'Autopista duarte KM 0 el Higuero',
-        telefono: null,
-      });
+      this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higuero', telefono: null });
     } else {
       this.form.reset();
     }
@@ -206,9 +204,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.factura_a_editar = {};
       this.rellenarCampos(id_factura, 'editar');
     } else {
-      setTimeout(() => {
-        this.enfocarInput('tipoFact');
-      }, 5);
+      setTimeout(() => this.enfocarInput('tipoFact'), 5);
     }
   }
 
@@ -220,39 +216,41 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.usuario = this.fun.getUser();
   }
 
-  rellenarFacturaGuardada(callback = (arg) => {}) {
-    let factura_id;
-    let obj;
-    this.factura_para_comparar = GLOBAL.duplicarJson(this.facturaGuardada, false);
+  rellenarFacturaGuardada() {
+    return new Promise((resolve) => {
+      let obj = { texto_modal: '' };
+      this.fun.logRed('this.facturaGuardada --> ', this.facturaGuardada);
 
-    if (this.checkIfFacturaIniciada()) {
-      if (this.facturaGuardada) {
-        factura_id = GLOBAL.duplicarJson(this.factura_para_comparar.factura_id);
+      this.factura_para_comparar = GLOBAL.duplicarJson(this.facturaGuardada, false);
 
-        this.facturasSonIguales((res) => {
-          if (!res) {
-            obj = { texto_modal: 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?' };
-            this.abrirModal('dinamico_texto', obj, 'desplegar_factura');
-          } else {
-            this.procesoRelleno();
-          }
-        });
-      } else {
-        obj = { texto_modal: '¿Desea archivar la factura que esta en proceso?' };
+      this.fun.logGreen('this.factura_para_comparar --> ', this.factura_para_comparar);
+
+      if (this.checkIfFacturaIniciada()) {
+        if (this.facturaGuardada) {
+          this.facturasSonIguales((res) => {
+            if (!res) obj.texto_modal = 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?';
+            else this.procesoRelleno();
+          });
+        } else obj.texto_modal = '¿Desea archivar la factura que esta en proceso?';
+
         this.abrirModal('dinamico_texto', obj, 'desplegar_factura');
+        resolve(true);
+      } else {
+        this.procesoRelleno();
+        resolve(true);
       }
-
-      callback(true);
-    } else {
-      callback(true);
-      this.procesoRelleno();
-    }
+    });
   }
 
+  // TODO: seguir revisando de aqui para abajo
+
   procesoRelleno() {
+    this.fun.logRed('---- procesoRelleno ----');
     try {
       this.rellenarCampos(null, 'fact_guardada', this.facturaGuardada);
       // TODO: revisar cuando cambie el backend para las facturas
+      console.log("this.facturaGuardada['detalle_facturas_attributes'] --> ",this.facturaGuardada['detalle_facturas_attributes']);
+
       this.cuerpo.llenarFactura(this.facturaGuardada['detalle_facturas_attributes'], true, (res) => {
         setTimeout(() => {
           this.getCuerpoFactura(this.facturaGuardada['detalle_facturas_attributes'], true);
@@ -402,6 +400,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   setPropietario(arg) {
+    console.log('arg --> ', arg);
+
     if (arg.tipo === 'venta') {
       if (arg.cliente) this.propietario_factura['id'] = arg.cliente_id;
       else {
@@ -423,6 +423,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   async rellenarCampos(id, tipo?, fact?) {
+    console.log('rellenarCampos --> ID: ', id, ' TIPO: ', tipo, ' FACT: ', fact);
+
     let res;
     this.propietario_factura = {};
 
@@ -854,6 +856,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.info_cambio['bool'] = true;
       this.layServ.nextDecisionCambioMenu(this.info_cambio);
     } else if (this.tipoModal === 'desplegar_factura') {
+      this.fun.logBlue('luegoDecision: ', arg);
       if (arg) this.agregarFacturaALocalStorage();
 
       setTimeout(() => this.procesoRelleno(), 250);

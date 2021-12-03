@@ -262,25 +262,24 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     } else this.activeIndex = where === 'compra' ? 0 : 1;
   }
 
-  checkWhereIs(arg?, callback = (arg) => {}) {
-    const temp_url = document.location.href.split('admin/');
-    const url = temp_url[1].split('/')[1];
+  checkWhereIs(arg?) {
+    return new Promise((resolve) => {
+      console.log('arg --> ', arg);
 
-    if (url !== arg) {
-      this.layServ.nextCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
-      callback(true);
-    } else {
-      callback(true);
-    }
+      const url = document.location.pathname.split('/')[3];
+
+      if (url !== arg) {
+        this.layServ.nextCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
+        resolve(true);
+      } else resolve(true);
+    });
   }
 
   pasarFacturaAfacturacion(fact) {
-    this.checkWhereIs(fact.tipo, (res) => {
-      if (res) {
-        // setTimeout(() => {
-        this.layServ.nextFacturaGuardada(fact);
-        //     }, 250);
-      }
+    this.checkWhereIs(fact.tipo).then((res) => {
+      this.fun.logGreen('pasarFacturaAfacturacion ', fact);
+
+      if (res) this.layServ.nextFacturaGuardada(fact);
     });
   }
 

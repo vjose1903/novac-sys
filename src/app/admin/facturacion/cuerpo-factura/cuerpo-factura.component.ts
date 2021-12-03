@@ -348,15 +348,10 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       if (res) {
         for (let j = 0; j < rows.length; j++) {
           const row = rows[j];
-          let articulo;
+          let articulo = row.articulo;
 
           try {
-            // TODO: hacer que cuando busque una factura por id traiga el codigo para poder hacer solo una peticion aqui
-            if (is_guardada) {
-              articulo = await this.dbServ.getOneArticulo(row.articulo_id, this.FechaFactura, true).toPromise();
-            } else {
-              articulo = await this.dbServ.getArticulosFiltrados(row.codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
-            }
+            if (!is_guardada) articulo = await this.dbServ.getArticulosFiltrados(row.codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
 
             const cant_en_unidades_actual = row.cantidad_en_unidades;
             const multiplo = row.cantidad_en_unidades / row.cantidad;
@@ -547,12 +542,14 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   verificarSecuencia(i, input?) {
     if (this.secuencia < i) this.enfocarInput(this.inputSecuencia);
 
-    const codigo = (this.control[i] as any).controls['cod'].value;
-    const art = (this.control[i] as any).controls['articulo'].value;
+    if (this.control) {
+      const codigo = (this.control[i] as any).controls['cod'].value;
+      const art = (this.control[i] as any).controls['articulo'].value;
 
-    if (input === 'unidad' && this.fun.hasValue(codigo) && this.fun.hasValue(art)) {
-      this.setInputDrop(i);
-      this.llenarArrayUnidades(null, i);
+      if (input === 'unidad' && this.fun.hasValue(codigo) && this.fun.hasValue(art)) {
+        this.setInputDrop(i);
+        this.llenarArrayUnidades(null, i);
+      }
     }
   }
 

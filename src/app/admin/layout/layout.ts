@@ -1,18 +1,18 @@
 import { Subscription } from 'rxjs';
+import { FunctionService } from '../../core/services/functions.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { LayoutService } from './layout.service';
 
 export class LayoutClass {
-  constructor(public layServ?: LayoutService) {}
+  constructor(public layServ?: LayoutService, public fun?: FunctionService) {}
 
-  public facturaGuardada: any = undefined;
   info_cambio = {};
   ruta_a_cambiar = '';
   url_actual = '';
 
   subInit: Subscription;
   subDeciMenu: Subscription;
-  subFactG: Subscription;
+
   subRefresh: Subscription;
 
   _init_layout() {
@@ -23,29 +23,8 @@ export class LayoutClass {
         this.initCambioMenu(res);
       }
     });
-
-    const temp_url = document.location.href.split('admin/');
-    if (temp_url[1]) {
-      this.url_actual = temp_url[1].split('/')[0];
-
-      if (this.url_actual === 'factura') {
-        this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((fact) => {
-          if (fact) {
-            this.rellenarFacturaGuardada((res) => {
-              if (res) {
-                this.facturaGuardada = fact;
-                this.layServ.factura_guardada = GLOBAL.duplicarJson(fact);
-              }
-            });
-
-            this.layServ.nextFacturaGuardada(undefined);
-          }
-        });
-      }
-    }
   }
 
-  rellenarFacturaGuardada(callback = (arg) => {}) {}
   initCambioMenu(arg) {}
 
   decisionCambioMenu() {}
@@ -53,8 +32,6 @@ export class LayoutClass {
   _destroy_layout() {
     if (this.subInit) {
       if (this.subInit) this.subInit.unsubscribe();
-
-      if (this.url_actual === 'factura' && this.subFactG) this.subFactG.unsubscribe();
     }
   }
 
