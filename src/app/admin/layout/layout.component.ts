@@ -249,6 +249,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     _.pullAt(allFacturas, index);
 
     this.fun.setFacturasGuardadas(allFacturas);
+    this.layServ.nextFacturaGuardada(undefined);
     this.refreshResponse();
   }
 
