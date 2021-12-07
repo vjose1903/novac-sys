@@ -71,7 +71,7 @@
           <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="pasarFacturaAfacturacion(fact)">
             <div class="colorsito bg-raya-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}{{ fact?.action === 'update' ? '-orange' : '' }}"></div>
 
-            <div class="info_fact h-100 {{ factGuardada?.factura_id === fact?.factura_id ? 'activa' : '' }}">
+            <div class="info_fact h-100 {{ factGuardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
               <i class="fas fa-history {{ fact.FacturaAtrasada ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}"></i>
               <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}"></i>
               <i
@@ -288,9 +288,7 @@
       <router-outlet *ngIf="ready"></router-outlet>
       <!-- rutas -->
       <div *ngIf="cuadre_hoy" class="cuadre_hoy">
-        <div class="content">
-          Hoy ya existe un cuadre
-        </div>
+        <div class="content">Hoy ya existe un cuadre</div>
       </div>
     </div>
     <div class="footerCustom">VjPOS {{ getVersion() }} - @2020 Desarrollador: Victor J. Vasquez</div>

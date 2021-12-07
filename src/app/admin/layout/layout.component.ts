@@ -368,9 +368,11 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
             } catch (error) {}
           }
         }
-        this.facturas_localStorage.sort((a, b) => {
-          return a.factura_id > b.factura_id ? 1 : -1;
-        });
+        _.orderBy(this.facturas_localStorage, ['archivo_id'], ['asc']);
+
+        // this.facturas_localStorage.sort((a, b) => {
+        //   return a.factura_id > b.factura_id ? 1 : -1;
+        // });
       }
     }, 20);
   }
