@@ -282,7 +282,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     let es = 'codigo';
     if (!is_codigo) es = 'nombre';
 
-    this.dbServ.toastWarning(`No existe articulo con el ${es} introducido`, 'AVISO', true);
+    this.dbServ.toastWarning(`No existe articulo con el ${es} introducido`, 'AVISO');
 
     this.mServ.ModalIndex(this.index);
   }
@@ -306,7 +306,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   refrescarFiltro(arg) {
-    this.dbServ.toastWarning(`No existe ${arg} con el nombre introducido`, 'AVISO', true);
+    this.dbServ.toastWarning(`No existe ${arg} con el nombre introducido`, 'AVISO');
     // lo comente para que no se borre el input de la tabla que lo borre el usuario
     // setTimeout(() => {
     //   this.canbiarValorFiltros(arg, '__refresh__');
@@ -405,8 +405,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       this.filtrar = true;
     } catch (error) {
       console.error(error);
-      if (this.tipoModal === 'buscarCliente') this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
-      if (this.tipoModal === 'buscarSuplidor') this.dbServ.toastError('Error buscando suplidor registrados.', 'ERROR', true);
+      if (this.tipoModal === 'buscarCliente') this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
+      if (this.tipoModal === 'buscarSuplidor') this.dbServ.toastError('Error buscando suplidor registrados.', 'ERROR');
       console.log('toy sasdfgulsd');
 
       setTimeout(() => this.mServ.mostrarModal(false), 250);

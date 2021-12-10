@@ -180,7 +180,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   noArticuloEncontrado(arg) {
-    this.dbServ.toastError('Articulo no creado', 'ERROR', true);
+    this.dbServ.toastError('Articulo no creado', 'ERROR');
     this.enfocarInput('cod-' + arg);
     setTimeout(() => {
       this.resetModalVaribales();
@@ -532,7 +532,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       const res = await this.dbServ.getIngredienteExcede(articulo.id, cantidad).toPromise();
 
       if (res.excede) {
-        this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR', true);
+        this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
         callback(true);
         // return true;
       } else {
@@ -541,7 +541,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       }
     } catch (error) {
       if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR', true);
+        this.dbServ.toastError(error.error.msg, 'ERROR');
       }
       callback(false);
     }
@@ -896,9 +896,9 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     const can = (this.control.controls[i] as any).controls['can'].value;
     if (detalle_factura_id && can > max_can) {
       if (can_original > max_can) {
-        this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad restante de la factura ', 'ERROR', true);
+        this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad restante de la factura ', 'ERROR');
       } else {
-        this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR', true);
+        this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR');
       }
       (this.control.controls[i] as any).controls['can'].setValue(max_can);
       this.enfocarInput('can-' + i);
@@ -1008,7 +1008,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       });
     } catch (error) {
       if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR', true);
+        this.dbServ.toastError(error.error.msg, 'ERROR');
       }
     }
   }
@@ -1016,7 +1016,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   printBase64Res(res) {
     if (res.status === 'si') {
     } else {
-      this.dbServ.toastError(res.msg, 'ERROR', true);
+      this.dbServ.toastError(res.msg, 'ERROR');
     }
   }
 

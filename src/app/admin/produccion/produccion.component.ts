@@ -86,7 +86,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       const res = await this.dbServ.getProductosTerminados(this.articulo_id).toPromise();
       this.listaProductos = res;
     } catch (error) {
-      if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR', true);
+      if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }
 
@@ -98,7 +98,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
         this.ingredientes = res;
       } catch (error) {
-        if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR', true);
+        if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
       }
     }
   }
@@ -205,13 +205,13 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
             this.cantidad_producir = null;
             this.ingredientesParaProduccion = [];
 
-            this.dbServ.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR', true);
+            this.dbServ.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR');
             this.enfocarInput('cantidad_producir');
           } else {
             this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj, articulo_id: ingre.articulo_id });
           }
         } catch (error) {
-          if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR', true);
+          if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
         }
       });
     }
@@ -349,7 +349,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     for (const error in arg) {
       if (arg.hasOwnProperty(error)) {
         const element = arg[error];
-        this.dbServ.toastError(element, 'Error', true);
+        this.dbServ.toastError(element, 'Error');
       }
     }
   }

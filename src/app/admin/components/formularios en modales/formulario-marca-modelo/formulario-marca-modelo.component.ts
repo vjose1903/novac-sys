@@ -137,7 +137,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
       } catch (error) {
         console.error(error);
 
-        this.dbServ.toastError('Error buscando modelos', 'ERROR', true);
+        this.dbServ.toastError('Error buscando modelos', 'ERROR');
       }
     } else if (this.componente === 'reg_marcas') {
       try {
@@ -148,7 +148,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
       } catch (error) {
         console.error(error);
 
-        this.dbServ.toastError('Error buscando marcas', 'ERROR', true);
+        this.dbServ.toastError('Error buscando marcas', 'ERROR');
       }
     }
   }
@@ -191,7 +191,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
           this.enfocarInput('descripcion');
         }
       } catch (error) {
-        this.dbServ.toastError('Error editando item ', 'ERROR', true);
+        this.dbServ.toastError('Error editando item ', 'ERROR');
       }
     } else {
       // ------------------------------------------- CREANDO -------------------------------------------
@@ -261,7 +261,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
         this.listado = temp;
         this.reinicioModal();
       } catch (error) {
-        this.dbServ.toastError('Error eliminando ' + tipo_e, 'ERROR', true);
+        this.dbServ.toastError(`Error eliminando ${tipo_e}`, 'ERROR');
       }
     }
   }

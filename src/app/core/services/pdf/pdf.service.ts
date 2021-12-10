@@ -70,12 +70,12 @@ export class PdfService {
           });
         } else {
           const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
-          this.dbServ.toastError('Error generando el pdf.', 'ERROR', true);
+          this.dbServ.toastError('Error generando el pdf.', 'ERROR');
           resolve(respuesta);
         }
       } catch (error) {
         const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de pdf.', status: 'no', body: error });
-        this.dbServ.toastError('ERROR en el switch de tipos de pdf.', 'ERROR', true);
+        this.dbServ.toastError('ERROR en el switch de tipos de pdf.', 'ERROR');
         reject(respuesta);
       }
     });

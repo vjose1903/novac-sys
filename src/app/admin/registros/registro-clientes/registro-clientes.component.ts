@@ -181,7 +181,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
       this.tServ.Func_total_paginas(obj);
       this.quitarContadoDeLista();
     } catch (error) {
-      this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR', true);
+      this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
     }
   }
 
@@ -262,7 +262,6 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
               this.fun.toastError(
                 `${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`,
                 'ERROR',
-                true,
               );
               this.changeStateCampos(false);
               // this.camposDisabled = false;
@@ -346,7 +345,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
     obj.documentos_de_identidad = _.filter(documentos_identidad, (doc) => this.fun.hasValue(doc.documento));
 
     if (!this.form.controls[this.doc_principal].value) {
-      this.dbServ.toastError('Debe de ingresar el documento marcado como principal', 'ERROR', true);
+      this.dbServ.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
 
       // paso todas las validaciones
     } else {

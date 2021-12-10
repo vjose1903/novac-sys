@@ -93,9 +93,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       })
       .catch((err) => {
         if (err.status === 0) {
-          this.dbServ.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR', true);
+          this.dbServ.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
         } else {
-          this.dbServ.toastError('Datos de acceso proporcionados estan incorrectos', 'ERROR', true);
+          this.dbServ.toastError('Datos de acceso proporcionados estan incorrectos', 'ERROR');
         }
       });
   }
@@ -105,7 +105,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       if (arg.hasOwnProperty(error)) {
         const element = arg[error];
 
-        this.dbServ.toastError(element, 'Error', true);
+        this.dbServ.toastError(element, 'Error');
       }
     }
   }

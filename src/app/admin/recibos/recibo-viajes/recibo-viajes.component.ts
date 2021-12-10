@@ -178,10 +178,10 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
       console.error(error);
 
       if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR', true);
+        this.dbServ.toastError(error.error.msg, 'ERROR');
       }
       //  else {
-      //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR', true);
+      //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
       // }
     }
   }
@@ -353,14 +353,14 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
         }
       });
     } catch (error) {
-      this.dbServ.toastError(error.error.msg, 'ERROR', true);
+      this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }
 
   printBase64Res(res) {
     if (res.status === 'si') {
     } else {
-      this.dbServ.toastError(res.msg, 'ERROR', true);
+      this.dbServ.toastError(res.msg, 'ERROR');
     }
   }
 

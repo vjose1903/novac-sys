@@ -1001,17 +1001,13 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
-      arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR', true);
-      });
+      arg.forEach((error) => this.dbServ.toastError(error, 'ERROR'));
     } else {
       for (const key in arg) {
         if (arg.hasOwnProperty(key)) {
           const element = arg[key];
 
-          if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR', true);
-          }
+          if (key !== 'status') this.dbServ.toastError(element, 'ERROR');
         }
       }
     }
@@ -1065,7 +1061,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
         this.checkNumbers(tempdecimales) ||
         this.checkLongMillares(tempdecimales)
       ) {
-        this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
+        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
         this.enfocarInput(id);
       } else {
         //

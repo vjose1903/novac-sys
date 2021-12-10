@@ -126,9 +126,9 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     this.loadServ.isLoading.next(false);
 
     if (res_ipc.status === 'si') {
-      this.dbServ.toastSuccess(res_ipc.msg, 'CORRECTO', true);
+      this.dbServ.toastSuccess(res_ipc.msg, 'CORRECTO');
     } else {
-      this.dbServ.toastError(res_ipc.msg, 'ERROR', true);
+      this.dbServ.toastError(res_ipc.msg, 'ERROR');
     }
   }
 
@@ -237,7 +237,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     } catch (error) {
       this.existenComprobantes = true;
       console.error(error);
-      this.dbServ.toastError(error.error.msg, 'ERROR', true);
+      this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }
 
@@ -362,14 +362,14 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       } else {
         if (this.campo === '1') {
           if (this.tipo_factura_id === '0') {
-            this.dbServ.toastError('Este cliente no tiene facturas a credito a su nombre', 'ERROR', true);
+            this.dbServ.toastError('Este cliente no tiene facturas a credito a su nombre', 'ERROR');
           } else {
-            this.dbServ.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR', true);
+            this.dbServ.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
           }
         } else if (this.campo === '3') {
-          this.dbServ.toastError('No existen facturas con este número.', 'ERROR', true);
+          this.dbServ.toastError('No existen facturas con este número.', 'ERROR');
         } else if (this.campo === '2') {
-          this.dbServ.toastError('La factura buscada no existe', 'ERROR', true);
+          this.dbServ.toastError('La factura buscada no existe', 'ERROR');
         }
       }
     } catch (error) {

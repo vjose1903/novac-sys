@@ -98,7 +98,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
         return a.id > b.id ? 1 : -1;
       });
     } catch (error) {
-      this.dbServ.toastError('Error buscando camiones', 'ERROR', true);
+      this.dbServ.toastError('Error buscando camiones', 'ERROR');
     }
   }
 
@@ -107,7 +107,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
       const res = await this.dbServ.getMarcas().toPromise();
       this.listaMarcas = res;
     } catch (error) {
-      this.dbServ.toastError('Error buscando articulos', 'ERROR', true);
+      this.dbServ.toastError('Error buscando articulos', 'ERROR');
     }
   }
 
@@ -184,7 +184,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
       }
     } catch (error) {
       callback(false);
-      this.dbServ.toastError('Error seleccionando marca.', 'ERROR', true);
+      this.dbServ.toastError('Error seleccionando marca.', 'ERROR');
     }
   }
 
@@ -280,7 +280,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
       this.borrar();
       this.getVehiculos(this.tServ.obj_paginate);
     } catch (error) {
-      this.dbServ.toastError(msg_error, 'ERROR', true);
+      this.dbServ.toastError(msg_error, 'ERROR');
     }
   }
 
@@ -295,7 +295,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
           const element = arg[key];
 
           if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR', true);
+            this.dbServ.toastError(element, 'ERROR');
           }
         }
       }

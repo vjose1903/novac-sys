@@ -123,7 +123,6 @@ export class MovimientosFormComponent extends mixinClass implements OnInit, Afte
       (err) => {
         console.error(err.error);
         this.mostrarErrores(err.error);
-        // this.dbServ.toastError(err.error, 'Error', true);
       },
     );
   }
@@ -131,7 +130,7 @@ export class MovimientosFormComponent extends mixinClass implements OnInit, Afte
     for (const error in arg) {
       if (arg.hasOwnProperty(error)) {
         const element = arg[error];
-        this.dbServ.toastError(element, 'Error', true);
+        this.dbServ.toastError(element, 'Error');
       }
     }
   }

@@ -255,11 +255,11 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
           if (unidad) {
             this.calcularSacoEnRow(i, row, articulo, lugar).then((res) => (res ? this.calcularTotalRow(i) : () => {}));
           } else {
-            this.dbServ.toastWarning('Para calcular los sacos debe de seleccionar una unidad', 'AVISO', true);
+            this.dbServ.toastWarning('Para calcular los sacos debe de seleccionar una unidad', 'AVISO');
             (this.control[i] as any).controls['calcular_saco'].setValue(true);
           }
         } else {
-          if (e) this.dbServ.toastError('A este articulo no se le calculan los sacos', 'ERROR', true);
+          if (e) this.dbServ.toastError('A este articulo no se le calculan los sacos', 'ERROR');
           (this.control[i] as any).controls['calcular_saco'].setValue(false);
         }
       }
@@ -495,7 +495,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         excede = res['data'];
 
         if (this.metodo === 'venta' && excede) {
-          this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR', true);
+          this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
 
           this.enfocarInput('can-' + i);
           this.selectContenido('can-' + i);
@@ -508,7 +508,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         }
       });
     } catch (error) {
-      if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR', true);
+      if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
       callback(false);
     }
   }
@@ -714,7 +714,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
       if (ARTICULO.descripcion === 'Producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
-      this.dbServ.toastError(msg, 'ERROR', true);
+      this.dbServ.toastError(msg, 'ERROR');
 
       setTimeout(() => {
         this.enfocarInput('cod-' + i);

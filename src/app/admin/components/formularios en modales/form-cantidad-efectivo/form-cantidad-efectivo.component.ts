@@ -54,7 +54,7 @@ export class FormCantidadEfectivoComponent extends mixinClass implements OnInit,
     }
     if (campo === 'send') {
       if (this.tipo !== 'no_devuelta' && this.efectivo < this.data.total_factura) {
-        this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR', true);
+        this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         this.enfocarInput('inputEfectivo');
       } else {
         this.enfocarInput('btnSend');
@@ -113,7 +113,7 @@ export class FormCantidadEfectivoComponent extends mixinClass implements OnInit,
         this.checkNumbers(tempdecimales) ||
         this.checkLongMillares(tempdecimales)
       ) {
-        this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
+        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
         this.enfocarInput(input);
       } else {
         //
@@ -164,7 +164,7 @@ export class FormCantidadEfectivoComponent extends mixinClass implements OnInit,
     };
 
     if (this.factura_de === 'venta' && this.tipo !== 'no_devuelta' && total > efectivo) {
-      this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR', true);
+      this.dbServ.toastError('Efectivo no cubre el total de la factura', 'ERROR');
     } else {
       if (this.factura_de === 'compra') {
         if (this.cambiar_articulos !== undefined) {

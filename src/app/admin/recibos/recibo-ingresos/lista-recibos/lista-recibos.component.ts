@@ -100,9 +100,9 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
 
   async printBase64Res(res) {
     if (res.status === 'si') {
-      this.dbServ.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO', true);
+      this.dbServ.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
     } else {
-      this.dbServ.toastError(res.msg, 'ERROR', true);
+      this.dbServ.toastError(res.msg, 'ERROR');
     }
   }
 
@@ -120,7 +120,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
       // this.loadServ.isLoading.next(true);
       // this.abrirModal('visor_pdf', obj);
     } else {
-      this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR', true);
+      this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
     }
   }
 
@@ -214,7 +214,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
         this.getLast50Recibos();
       }
     } catch (error) {
-      this.dbServ.toastError('Error buscando recibos registrados.', 'ERROR', true);
+      this.dbServ.toastError('Error buscando recibos registrados.', 'ERROR');
     }
   }
 

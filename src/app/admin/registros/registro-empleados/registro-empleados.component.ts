@@ -160,7 +160,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
       };
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
-      this.dbServ.toastError('Error buscando empleados registrados.', 'ERROR', true);
+      this.dbServ.toastError('Error buscando empleados registrados.', 'ERROR');
     }
   }
 
@@ -182,7 +182,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
             const is_user = _.find(res['data'], (item) => item.persona_is === 'User');
 
             if (this.fun.hasValue(is_user) && is_user.persona.estado) {
-              this.fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR', true);
+              this.fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR');
               this.changeStateCampos(false);
               // this.camposDisabled = false;
 
@@ -301,7 +301,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     const objSend = _.omit(objTemp, ['cedula']);
 
     if (!this.editando && objSend.password === null) {
-      this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR', true);
+      this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
       this.dbServ.createUpdateEmpleados(objSend).subscribe((res) => {
         this.getEmpleados(this.tServ.obj_paginate);

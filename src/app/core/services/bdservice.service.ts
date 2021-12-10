@@ -13,7 +13,6 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class DBservice {
   url = AppConfig.url_server;
-  ultimoMensajeMostrado: any;
 
   constructor(private http: HttpClient, private toastr: ToastrService, private router: Router, private fun: FunctionService) {}
 
@@ -274,7 +273,6 @@ export class DBservice {
     return this.peticionSinLoad(`articulos/custom/cantidad_inventario`, 'get');
   }
 
-
   getProductosTerminados(id) {
     return this.peticion(`articulos/custom/productos_terminados`, 'get');
   }
@@ -476,41 +474,15 @@ export class DBservice {
   // =====================================================================
   // TOASTS
   // =====================================================================
-  toastSuccess(msg?, titulo = 'CORRECTO', excepcion = true) {
-    if (this.fun.canToast) {
-      const msg_ = msg;
-      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
-        this.ultimoMensajeMostrado = msg_;
-        this.toastr.success(msg || '', titulo || '');
-      }
-    }
+  toastSuccess(msg?, titulo = 'CORRECTO') {
+    if (this.fun.canToast) this.toastr.success(msg || '', titulo || '');
   }
 
-  toastError(msg?, titulo = 'ERROR', excepcion?) {
-    // console.log('toastError ');
-    // console.log('this.fun.canToast ', this.fun.canToast);
-
-    if (this.fun.canToast) {
-      const msg_ = msg;
-      // console.log('msg_ ', msg_);
-      // console.log('this.ultimoMensajeMostrado ', this.ultimoMensajeMostrado);
-      // console.log('excepcion ', excepcion);
-
-      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
-        this.ultimoMensajeMostrado = msg_;
-
-        this.toastr.error(msg || '', titulo || '');
-      }
-    }
+  toastError(msg?, titulo = 'ERROR') {
+    if (this.fun.canToast) this.toastr.error(msg || '', titulo || '');
   }
 
-  toastWarning(msg?, titulo = 'AVISO', excepcion?) {
-    if (this.fun.canToast) {
-      const msg_ = msg;
-      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
-        this.ultimoMensajeMostrado = msg_;
-        this.toastr.warning(msg || '', titulo || '');
-      }
-    }
+  toastWarning(msg?, titulo = 'AVISO') {
+    if (this.fun.canToast) this.toastr.warning(msg || '', titulo || '');
   }
 }

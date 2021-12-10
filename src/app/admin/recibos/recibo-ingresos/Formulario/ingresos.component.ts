@@ -297,7 +297,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
       console.error(error);
-      this.dbServ.toastError(error, 'ERROR', true);
+      this.dbServ.toastError(error, 'ERROR');
     }
   }
   async necesarioStart() {
@@ -384,7 +384,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
-      this.dbServ.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR', true);
+      this.dbServ.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo__: 'devuelta' };
@@ -433,13 +433,13 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
         }
       });
     } catch (error) {
-      this.dbServ.toastError(error.error.msg, 'ERROR', true);
+      this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }
 
   printBase64Res(res) {
     if (res.status === 'si') {
-    } else this.dbServ.toastError(res.msg, 'ERROR', true);
+    } else this.dbServ.toastError(res.msg, 'ERROR');
   }
 
   resetVariables() {

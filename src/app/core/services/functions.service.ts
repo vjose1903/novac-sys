@@ -97,7 +97,7 @@ export class FunctionService {
           this.checkNumbers(tempdecimales) ||
           this.checkLongMillares(tempdecimales)
         ) {
-          this.toastError('Valor introducido es invalido', 'ERROR', true);
+          this.toastError('Valor introducido es invalido', 'ERROR');
           document.getElementById(id).focus();
         } else {
           //
@@ -221,36 +221,15 @@ export class FunctionService {
   // TOASTS
   // =====================================================================
 
-  ultimoMensajeMostrado: any;
-  toastSuccess(msg?, titulo = 'CORRECTO', excepcion = true) {
-    if (this.canToast) {
-      const msg_ = msg;
-      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
-        this.ultimoMensajeMostrado = msg_;
-        this.toastr.success(msg || '', titulo || '');
-      }
-    }
+  toastSuccess(msg?, titulo = 'CORRECTO') {
+    if (this.canToast) this.toastr.success(msg || '', titulo || '');
   }
 
-  toastError(msg?, titulo = 'ERROR', excepcion?) {
-    if (this.canToast) {
-      const msg_ = msg;
-      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
-        this.ultimoMensajeMostrado = msg_;
-        console.log('this.toastr --> ', this.toastr);
-
-        this.toastr.error(msg || '', titulo || '');
-      }
-    }
+  toastError(msg?, titulo = 'ERROR') {
+    if (this.canToast) this.toastr.error(msg || '', titulo || '');
   }
 
-  toastWarning(msg?, titulo = 'AVISO', excepcion?) {
-    if (this.canToast) {
-      const msg_ = msg;
-      if (this.ultimoMensajeMostrado !== msg_ || excepcion) {
-        this.ultimoMensajeMostrado = msg_;
-        this.toastr.warning(msg || '', titulo || '');
-      }
-    }
+  toastWarning(msg?, titulo = 'AVISO') {
+    if (this.canToast) this.toastr.warning(msg || '', titulo || '');
   }
 }

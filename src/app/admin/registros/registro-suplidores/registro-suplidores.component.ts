@@ -129,7 +129,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
 
       this.listaSuplidores = res.data;
     } catch (error) {
-      this.dbServ.toastError('Error buscando suplidores registrados.', 'ERROR', true);
+      this.dbServ.toastError('Error buscando suplidores registrados.', 'ERROR');
     }
   }
 
@@ -185,7 +185,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
             const is_suplidor = _.find(res['data'], (item) => item.persona_is === 'Suplidor');
 
             if (this.fun.hasValue(is_suplidor) && is_suplidor.persona.estado) {
-              this.fun.toastError(`Esta cedula pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR', true);
+              this.fun.toastError(`Esta cedula pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR');
               this.changeStateCampos(false);
               // this.camposDisabled = false;
 
@@ -300,7 +300,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
     obj.estado = true;
 
     if (!this.form.controls[this.doc_principal].value) {
-      this.dbServ.toastError('Debe de ingresar el documento marcado como principal', 'ERROR', true);
+      this.dbServ.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
 
       // paso todas las validaciones
     } else {

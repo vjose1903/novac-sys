@@ -50,7 +50,7 @@ export class AppComponent implements OnInit, AfterContentChecked {
     this._ipc.on('update-error', (event: Electron.IpcMessageEvent, res) => {
       this.zone.run(() => {
         if (res) {
-          this.dbServ.toastError(res.msg, 'ERRROR', true);
+          this.dbServ.toastError(res.msg, 'ERRROR');
           this.visible = false;
         }
       });

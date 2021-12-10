@@ -31,7 +31,7 @@ defineLocale('es', esLocale);
     FormsModule,
     HttpClientModule,
     CoreModule,
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot({ preventDuplicates: true }),
     AppRoutingModule,
     AngularModule,
     MDBBootstrapModule,

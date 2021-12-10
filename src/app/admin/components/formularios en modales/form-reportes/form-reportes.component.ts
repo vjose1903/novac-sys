@@ -81,13 +81,13 @@ export class FormVentasComponent extends mixinClass implements OnInit {
         const res = await this.dbServ.getArticulosFiltrados(arg.term, 0, 0, false, is_compra, this.Fecha, 'todos').toPromise();
 
         if (res.length === 0) {
-          this.dbServ.toastError('Articulo no creado', 'ERROR', true);
+          this.dbServ.toastError('Articulo no creado', 'ERROR');
         } else {
           this.listaArticulos = res;
         }
       } catch (error) {
         console.error(error);
-        this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);
+        this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
       }
     } else {
       this.listaArticulos = [];

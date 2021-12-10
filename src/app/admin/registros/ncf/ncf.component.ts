@@ -231,7 +231,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
     } catch (error) {
       console.error(error);
 
-      this.dbServ.toastError('Error buscando Paquetes de NCF registrados.', 'ERROR', true);
+      this.dbServ.toastError('Error buscando Paquetes de NCF registrados.', 'ERROR');
     }
   }
 
@@ -295,7 +295,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
       this.borrar();
     } catch (error) {
       console.error(error);
-      this.dbServ.toastError(error.error.msg, 'ERROR', true);
+      this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }
   abilitarBtnSend() {
@@ -375,7 +375,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR', true);
+        this.dbServ.toastError(error, 'ERROR');
       });
     } else {
       for (const key in arg) {
@@ -383,7 +383,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
           const element = arg[key];
 
           if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR', true);
+            this.dbServ.toastError(element, 'ERROR');
           }
         }
       }

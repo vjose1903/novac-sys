@@ -89,11 +89,10 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   async printBase64Res(res) {
-
     if (res.status === 'si') {
-      this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO', true);
+      this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
     } else {
-      this.dbServ.toastError(res.msg, 'ERROR', true);
+      this.dbServ.toastError(res.msg, 'ERROR');
     }
   }
 
@@ -152,7 +151,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
       this.generarPdf(obj);
       // this._ipc.send('print', obj);
     } catch (error) {
-      this.dbServ.toastError('Error realizando reporte.', 'ERROR', true);
+      this.dbServ.toastError('Error realizando reporte.', 'ERROR');
     }
   }
 
@@ -168,8 +167,6 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
         };
 
         this.loadServ.isLoading.next(false);
-
-
 
         this.abrirModal('visor_pdf', obj_pdf);
       }
@@ -237,7 +234,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
-      this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR', true);
+      this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
     }
   }
 

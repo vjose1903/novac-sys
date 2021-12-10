@@ -83,7 +83,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     if (res.status === 'si') {
       this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
     } else {
-      this.dbServ.toastError(res.msg, 'ERROR', true);
+      this.dbServ.toastError(res.msg, 'ERROR');
     }
   }
 
@@ -238,7 +238,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
       this.detalleFacturas = temp;
     } catch (error) {
-      this.dbServ.toastError('Error mostrando factura elegida', 'ERROR', true);
+      this.dbServ.toastError('Error mostrando factura elegida', 'ERROR');
     }
   }
 
@@ -300,7 +300,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     if (info.cambio === 'cant_nota') {
       if (this.tipoNota === 'credito') {
         if (entidad.cant_nota > entidad.cant) {
-          this.dbServ.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR', true);
+          this.dbServ.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
           this.tablas.enfocarInput('inputNu-' + info.index);
           setTimeout(() => {
             this.tablas.resetInput('cant', 'cant_nota', info.index, false);
@@ -497,7 +497,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
       this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
     } catch (error) {
-      this.dbServ.toastError(error.statusText, 'ERROR', true);
+      this.dbServ.toastError(error.statusText, 'ERROR');
     }
   }
 

@@ -316,7 +316,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.select_all_value = !this.select_all_value;
 
     this.data.forEach((data, index) => {
-      if ((this.select_all_value && !data.select) || (!this.select_all_value && data.select)) this.changeValorCheck('select', index, true);
+      if ((this.select_all_value && !data.select) || (!this.select_all_value && data.select)) this.changeValorCheck('select', index);
     });
   }
 
@@ -462,7 +462,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         this.checkNumbers(tempdecimales) ||
         this.checkLongMillares(tempdecimales)
       ) {
-        this.dbServ.toastError('Valor introducido es invalido', 'ERROR', true);
+        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
         this.enfocarInput(input);
       } else {
         //

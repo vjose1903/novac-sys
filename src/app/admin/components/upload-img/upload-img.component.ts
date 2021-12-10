@@ -39,9 +39,7 @@ export class UploadImgComponent implements OnInit {
           console.error(err);
         },
       );
-    } else {
-      this.dbServ.toastError('Debe de seleccionar una foto primero', 'ERROR', true);
-    }
+    } else this.dbServ.toastError('Debe de seleccionar una foto primero', 'ERROR');
   }
 
   onFileChange(ev) {
