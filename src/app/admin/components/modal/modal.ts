@@ -72,6 +72,8 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('sacarFacturas')) {
+      console.log('sacarFacturas --> ');
+
       this.subRefresh = this.layServ.SACARFACTURA.subscribe((res) => this.run_subscribe('SACARFACTURA', res));
     }
   }

@@ -13,6 +13,7 @@ import { mixinClass } from '../mixinClass';
 import { ModalService } from '../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
+import { modalClass } from '../components/modal/modal';
 
 @Component({
   selector: 'app-layout',
@@ -254,7 +255,10 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
     this.fun.setFacturasGuardadas(allFacturas);
     this.layServ.nextFacturaGuardada(undefined);
-    if (params && params.quien_llamo !== 'layout') this.layServ.nextSacar({ quien_llamo: 'layout', body: this.layServ.factura_guardada });
+    if (params && params.quien_llamo !== 'layout') {
+      modalClass.aquienResponder = 'cabeza_factura';
+      this.layServ.nextSacar({ quien_llamo: 'layout', body: this.layServ.factura_guardada });
+    }
 
     console.log('  ');
     this.refreshResponse();
@@ -298,6 +302,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   }
 
   sacarResponse(res) {
+    console.log('sacarResponse layout');
     this.quitarFacturaGuardada(res);
   }
 

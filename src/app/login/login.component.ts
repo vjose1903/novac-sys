@@ -44,16 +44,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.loginForm = this.fb.group({
-      usuario: null,
-      password: null,
-    });
+    this.loginForm = this.fb.group({ usuario: null, password: null });
 
     this._ipc.on('versionResponse', (event, arg) => {
       this.versionApp = arg;
-      setTimeout(() => {
-        this.quitarFocoElectron();
-      }, 25);
+      setTimeout(() => this.quitarFocoElectron(), 25);
     });
 
     this.searchVersion();

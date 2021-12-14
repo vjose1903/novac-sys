@@ -184,7 +184,14 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   sacarResponse(res) {
     if (res.quien_llamo === 'layout') {
-      console.log('revisar facturas');
+      this.formarObjArchivo().then(() => {
+        if (_.get(this.objArchivo, 'archivo_id_en_turno')) {
+          if (this.fun.isEmpty(_.find(this.objArchivo.facturas_localStorage, this.objArchivo.archivo_id_en_turno))) {
+            this.layServ.factura_guardada = undefined;
+            this.objArchivo.archivo_id_en_turno = undefined;
+          }
+        }
+      });
     }
   }
 
@@ -1224,10 +1231,13 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   revisarLocalStorage() {
-    const facturas_localStorage = this.fun.getFacturasguardadas();
-    const is_guardada = _.find(facturas_localStorage, (fact: any) => fact.archivo_id === this.layServ.factura_guardada.archivo_id);
+    const is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id === this.layServ.factura_guardada.archivo_id);
+    console.log('is_guardada --> ', is_guardada);
 
-    if (this.layServ.factura_guardada && this.fun.hasValue(is_guardada)) this.layServ.nextSacar({ quien_llamo: 'facturacion', body: this.layServ.factura_guardada });
+    if (this.fun.hasValue(is_guardada)) {
+      modalClass.aquienResponder = 'layout';
+      this.layServ.nextSacar({ quien_llamo: 'facturacion', body: this.layServ.factura_guardada });
+    }
   }
 
   formarData() {
