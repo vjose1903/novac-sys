@@ -35,9 +35,9 @@ export class FunctionService {
     localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
 
     const btn_side = document.getElementById('btn_side_facturas');
-    if (btn_side) {
-      btn_side.setAttribute('data-cant-facturas', facturas.length);
-    }
+    console.log('facturas.length ', facturas.length);
+
+    if (btn_side) btn_side.setAttribute('data-cant-facturas', facturas.length > 0 ? facturas.length : null);
   }
 
   // __________________________________________________________________________________________________

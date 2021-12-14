@@ -156,9 +156,9 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   }
 
   decisionModal(arg) {
-    if (this.tipoModal === 'quitar_factura' && arg) {
-      this.quitarFacturaGuardada();
-    }
+    console.log('this.seleccionModal --> ', this.seleccionModal);
+
+    if (this.tipoModal === 'quitar_factura' && arg) this.quitarFacturaGuardada({ body: { archivo_id: this.seleccionModal?.archivo_id } });
   }
 
   _toggleSidebar() {
@@ -234,22 +234,29 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   }
 
   abrirModalFacturaGuardada(fact, e) {
-    const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.', factura_id: fact.factura_id };
+    console.log('fact --> ', fact);
+
+    const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.', archivo_id: fact.archivo_id };
     this.abrirModal('dinamico_texto', obj, 'quitar_factura');
     e.stopPropagation();
   }
 
-  quitarFacturaGuardada(fact?) {
+  quitarFacturaGuardada(params?) {
+    const fact = params.body;
+    console.log('params --> ', GLOBAL.duplicarJson(params));
     let index;
     const allFacturas = this.fun.getFacturasguardadas();
 
-    if (!fact) index = _.findIndex(allFacturas, (o: any) => o.factura_id === this.seleccionModal?.factura_id);
-    if (fact) index = _.findIndex(allFacturas, (o: any) => o.factura_id === fact?.factura_id);
+    if (fact) index = _.findIndex(allFacturas, (o: any) => o.archivo_id === fact?.archivo_id);
+    console.log('index --> ', index);
 
     _.pullAt(allFacturas, index);
 
     this.fun.setFacturasGuardadas(allFacturas);
     this.layServ.nextFacturaGuardada(undefined);
+    if (params && params.quien_llamo !== 'layout') this.layServ.nextSacar({ quien_llamo: 'layout', body: this.layServ.factura_guardada });
+
+    console.log('  ');
     this.refreshResponse();
   }
 
@@ -277,11 +284,13 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   }
 
   pasarFacturaAfacturacion(fact) {
-    this.checkWhereIs(fact.tipo).then((res) => {
-      this.fun.logGreen('pasarFacturaAfacturacion ', fact);
+    if (this.fun.isEmpty(this.factGuardada) || fact.archivo_id != this.factGuardada.archivo_id) {
+      this.checkWhereIs(fact.tipo).then((res) => {
+        this.fun.logGreen('pasarFacturaAfacturacion ', fact);
 
-      if (res) this.layServ.nextFacturaGuardada(fact);
-    });
+        if (res) this.layServ.nextFacturaGuardada(fact);
+      });
+    }
   }
 
   refreshResponse() {
@@ -398,9 +407,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
       this.router.navigateByUrl(decision.ruta);
       this.layServ.nextDecisionCambioMenu(undefined);
       this.layServ.nextCambioMenu(undefined);
-      setTimeout(() => {
-        this.ready = true;
-      }, 20);
+      setTimeout(() => (this.ready = true), 20);
     } else {
       this.ready = true;
     }
