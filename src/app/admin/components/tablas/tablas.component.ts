@@ -612,24 +612,12 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
   }
 
-  renovarFiltro() {
-    this.searchText = '';
-  }
-
   ngOnChanges(simpleChanges) {
-    if (simpleChanges.paraFiltroArticulos && simpleChanges.paraFiltroArticulos.currentValue == '__refresh__') this.renovarFiltro();
-
-    if (simpleChanges.paraFiltroClientes && simpleChanges.paraFiltroClientes.currentValue == '__refresh__') this.renovarFiltro();
-
-    if (simpleChanges.paraFiltroSuplidor && simpleChanges.paraFiltroSuplidor.currentValue == '__refresh__') this.renovarFiltro();
-
     if (simpleChanges.data && simpleChanges.data.currentValue) {
       // ================================================
       // CUSTOM STYLES
       // ================================================
-      setTimeout(() => {
-        this.changeStylesTitles();
-      }, 1);
+      setTimeout(() => this.changeStylesTitles(), 1);
       // ================================================
     }
 

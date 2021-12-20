@@ -95,10 +95,9 @@
                     min="1"
                     class="form-control entrada input_cantidad"
                     id="can-{{ i }}"
-                    (focus)="verificarSecuencia(i)"
                     (keydown.enter)="saltar($event, 'uni-', i)"
                     formControlName="can"
-                    (focus)="llenarArrayUnidades(undefined, i)"
+                    (focus)="verificarSecuencia(i); llenarArrayUnidades(null, i)"
                     (blur)="calcularTotalRow(i); saliDeCantidad(i)"
                     tabindex="-1"
                   />

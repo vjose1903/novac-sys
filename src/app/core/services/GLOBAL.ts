@@ -95,12 +95,8 @@ export class GLOBAL {
   }
 
   // =========================================================================================================
-  static ModificarClass(item, clase, action) {
-    if (action === 'add') {
-      document.getElementById(item).classList.add(clase);
-    } else {
-      document.getElementById(item).classList.remove(clase);
-    }
+  static ModificarClass(item, clase, action: 'add' | 'remove') {
+    if (document.getElementById(item)) document.getElementById(item).classList[action](clase);
   }
   // =========================================================================================================
   static roundDecenaMayor(value) {

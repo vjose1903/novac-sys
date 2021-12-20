@@ -363,6 +363,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (arg.cliente) this.propietario_factura['id'] = arg.cliente_id;
       else arg['cliente'] = { id: null, direccion: arg['NoCliente_direccion'], nombre: arg['NoCliente_nombre'], telefono: '' };
       this.propietario_factura = arg.cliente;
+
       this.form.patchValue(arg.cliente);
     } else {
       this.propietario_factura['id'] = arg.suplidor_id;
@@ -1037,7 +1038,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   revisarLocalStorage() {
     const is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id === this.layServ.factura_guardada.archivo_id);
-    console.log('is_guardada --> ', is_guardada);
 
     if (this.fun.hasValue(is_guardada)) {
       modalClass.aquienResponder = 'layout';
@@ -1099,7 +1099,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     cabecera_fact['is_nota'] = false;
 
     if (this.metodo === 'venta') {
-      if (_.isEmpty(this.propietario_factura) || _.isEmpty(this.propietario_factura.id)) {
+      if (this.fun.isEmpty(this.propietario_factura) || this.fun.isEmpty(this.propietario_factura.id)) {
         cabecera_fact['cliente_id'] = null;
         cabecera_fact['NoCliente_nombre'] = this.form.controls.nombre.value;
         cabecera_fact['NoCliente_direccion'] = this.form.controls.direccion.value;

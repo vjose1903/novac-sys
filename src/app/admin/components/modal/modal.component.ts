@@ -118,7 +118,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
-      if (res !== undefined && res !== null) {
+      if (this.fun.hasValue(res)) {
         if (!this.paraFiltroArticulos && !this.paraFiltroClientes && !this.paraFiltroSuplidor) this.showModal = res;
 
         if (res === false) {
@@ -132,19 +132,18 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     });
 
     this.subTipo = this.mServ.TIPOMODAL.subscribe((res) => {
-      if (res !== undefined && res !== null) {
+      if (this.fun.hasValue(res)) {
         this.tipoModal = res;
       }
     });
 
     this.subSelec = this.mServ.SELECCIONMODAL.subscribe((res) => {
-      if (res !== undefined && res !== null) {
+      if (this.fun.hasValue(res)) {
         if (res.filtrarArticulo || res.filtrarCliente || res.filtrarSuplidor) {
           this.seleccionModal = res.data;
         } else {
           this.seleccionModal = res;
         }
-        console.log('this. seleccionModal ', this.seleccionModal.switches);
 
         this.paraFiltroArticulos = res.filtrarArticulo;
         this.paraFiltroClientes = res.filtrarCliente;
@@ -270,19 +269,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       tipo_modal: this.tipoModal,
     };
 
-    if (this.tipoModal === 'buscarArticulo') {
-      obj['index'] = this.index;
-    }
+    if (this.tipoModal === 'buscarArticulo') obj['index'] = this.index;
 
     this.mServ.ModalObj(obj);
   }
 
-  noArticulo(is_codigo?) {
+  noArticulo() {
     this.reinicioModal();
-    let es = 'codigo';
-    if (!is_codigo) es = 'nombre';
-
-    this.dbServ.toastWarning(`No existe articulo con el ${es} introducido`, 'AVISO');
 
     this.mServ.ModalIndex(this.index);
   }
@@ -299,19 +292,12 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.reinicioModal();
   }
 
-  canbiarValorFiltros(arg, valor) {
-    if (arg === 'cliente') this.paraFiltroClientes = valor;
-    if (arg === 'suplidor') this.paraFiltroSuplidor = valor;
-    if (arg === 'articulo') this.paraFiltroArticulos = valor;
-  }
-
-  refrescarFiltro(arg) {
-    this.dbServ.toastWarning(`No existe ${arg} con el nombre introducido`, 'AVISO');
+  refrescarFiltro() {
     // lo comente para que no se borre el input de la tabla que lo borre el usuario
-    // setTimeout(() => {
-    //   this.canbiarValorFiltros(arg, '__refresh__');
-    //   setTimeout(() => this.canbiarValorFiltros(arg, null), 700);
-    // }, 250);
+    setTimeout(() => {
+      const element = document.getElementById('search') as any;
+      if (element) element.select();
+    }, 100);
   }
 
   async renovarDataFiltros(e, buscando?, fecha_articulo?) {
@@ -329,29 +315,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, fecha_articulo, 'todos').toPromise();
 
-        console.log('res --> ', res);
-
         if (res.data.length > 1) {
           this.dataFiltro = res.data;
 
-          if (this.dataFiltro.length === 0) {
-            const is_codigo = GLOBAL.is_number(palabra_a_buscar);
-            console.log('is_codigo --> ', is_codigo);
-
-            this.noArticulo(is_codigo);
-            return;
-          }
-          console.log('this.dataFiltro ', this.dataFiltro);
-          console.log('this.tipoModal ', this.tipoModal);
-          console.log('this.filtrar ', this.filtrar);
-          console.log('this.infoArticulos ', this.infoArticulos);
-          console.log('this.seleccionModal ', this.seleccionModal);
-
           this.mostrarModalLuegoDeBuscarData();
-          const obj = {
-            total: res.total_registros,
-            tabla: 'filtroArticulos',
-          };
+          const obj = { total: res.total_registros, tabla: 'filtroArticulos' };
           this.tServ.Func_total_paginas(obj);
         } else {
           if (GLOBAL.is_number(palabra_a_buscar)) this.articuloFiltradoPorCodigo(res);
@@ -372,7 +340,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         if (res.data.length === 0) this.dataFiltro = copyData;
 
         this.mostrarModalLuegoDeBuscarData();
-        if (res.data.length === 0) this.refrescarFiltro('cliente');
 
         const obj = {
           total: res.total_registros,
@@ -394,8 +361,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         if (res.data.length === 0) this.dataFiltro = copyData;
         this.mostrarModalLuegoDeBuscarData();
 
-        if (res.data.length === 0) this.refrescarFiltro('suplidor');
-
         const obj = {
           total: res.total_registros,
           tabla: 'filtroSuplidor',
@@ -404,12 +369,14 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       }
       this.filtrar = true;
     } catch (error) {
+      if (this.tipoModal === 'buscarArticulo') {
+        this.noArticulo();
+        setTimeout(() => this.mServ.mostrarModal(false), 250);
+      }
+      this.refrescarFiltro();
       console.error(error);
-      if (this.tipoModal === 'buscarCliente') this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
-      if (this.tipoModal === 'buscarSuplidor') this.dbServ.toastError('Error buscando suplidor registrados.', 'ERROR');
-      console.log('toy sasdfgulsd');
-
-      setTimeout(() => this.mServ.mostrarModal(false), 250);
+      // if (this.tipoModal === 'buscarCliente') this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
+      // if (this.tipoModal === 'buscarSuplidor') this.dbServ.toastError('Error buscando suplidor registrados.', 'ERROR');
     }
   }
 

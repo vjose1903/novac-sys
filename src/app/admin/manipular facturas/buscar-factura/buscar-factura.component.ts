@@ -142,7 +142,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   }
 
   pressEscResponse(res) {
-    if (res !== undefined && res !== null) this.enfocarInput('valorI');
+    if (this.fun.hasValue(res)) this.enfocarInput('valorI');
   }
 
   reimprimirFactura(obj) {

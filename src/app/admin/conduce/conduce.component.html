@@ -58,7 +58,7 @@
           <tr class="text-center">
             <th class="tiCOD">Codigo</th>
             <th class="tiCAN">Cantidad</th>
-            <th class="tiUNI"><span class="ml-3">Unidad</span></th>
+            <th class="tiUNI">Unidad</th>
             <th class="tiDES">Descripcion</th>
           </tr>
         </thead>
@@ -79,30 +79,37 @@
         <!-- <div class="cuadro" #cuadro [ngClass]="{ sinFlow: secuencia <= 12, conFlow: secuencia >= 13 }"> -->
         <form *ngIf="ARRAY_ROWARTICULOS" [formGroup]="form" action="">
           <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWARTICULOS.controls; let i = index">
+            <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
+              <ng-template pTemplate>
+                <ul class="dropRowConfig" role="menu">
+                  <li role="menuitem" (click)="modalRemover(i, $event)" class="hoverlable">
+                    <a class="" id="dropdown-item">
+                      <i class="far fa-trash-alt text-red btnBorrar"></i>
+                      Quitar Producto
+                    </a>
+                  </li>
+                </ul>
+              </ng-template>
+            </p-overlayPanel>
+
             <div [formGroupName]="i">
               <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" [small]="true">
                 <tbody>
                   <tr>
                     <!--  ::::::::::::  CONFIG  ::::::::::::  -->
-                    <td class="sombreado2">
-                      <div class="btn-group" dropdown #dropConfigRow>
-                        <a *ngIf="checkIfArticuloRow(i)" dropdownToggle style="padding: 3px" (click)="(false)">
-                          <i class="fas fa-ellipsis-v btnConfig"></i>
-                        </a>
 
-                        <a *ngIf="!checkIfArticuloRow(i)" style="padding: 3px">
+                    <td class="sombreado2" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
+                      <div class="btn-group">
+                        <div *ngIf="checkIfRowContainArticulo(i)" style="padding: 3px" (click)="dropRowConfig.toggle($event)">
+                          <i class="fas fa-ellipsis-v btnConfig"></i>
+                        </div>
+
+                        <div *ngIf="!checkIfRowContainArticulo(i)" style="padding: 3px">
                           <i class="fas fa-ellipsis-v btnConfigDis"></i>
-                        </a>
-                        <ul class="dropdown-menu" role="menu" id="dropConfigRow">
-                          <li role="menuitem">
-                            <a class="dropdown-item" id="dropdown-item" (click)="modalRemover(i)">
-                              <i class="far fa-trash-alt text-red btnBorrar"></i>
-                              Quitar Producto
-                            </a>
-                          </li>
-                        </ul>
+                        </div>
                       </div>
                     </td>
+
                     <!-- <td class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
                       <i class="far fa-trash-alt text-red btnBorrar" (click)="modalRemover(i)"></i>
                     </td> -->
@@ -113,11 +120,10 @@
                           type="text"
                           class="form-control entrada"
                           id="cod-{{ i }}"
-                          (click)="verificarSecuencia(i)"
+                          (focus)="verificarSecuencia(i)"
                           (keydown.enter)="saltar('can-', i)"
                           formControlName="cod"
-                          (blur)="verificarRow(i)"
-                          (blur)="calculateCantidadEnUnidades(i)"
+                          (blur)="calculateCantidadEnUnidades({ index: i, clean: false })"
                           tabindex="-1"
                           [readOnly]="disableCamposFactAdelantadas(i)"
                         />
@@ -129,15 +135,13 @@
                         <input
                           type="number"
                           min="0"
-                          class="form-control entrada {{ verSiExcede(i) ? 'badAlert' : '' }}"
+                          class="form-control entrada input_cantidad {{ verSiExcede(i) ? 'badAlert' : '' }}"
                           id="can-{{ i }}"
-                          (click)="verificarSecuencia(i, true)"
+                          (focus)="llenarArrayUnidades(undefined, i); verificarSecuencia(i, true)"
                           (keydown.enter)="saltar('uni-', i)"
                           formControlName="can"
                           [max]="getMaxCan(i)"
-                          (blur)="verificarRow(i)"
-                          (blur)="calculateCantidadEnUnidades(i)"
-                          (blur)="excedeMaxCan(i)"
+                          (blur)="calculateCantidadEnUnidades({ index: i, clean: false }); saliDeCantidad(i); excedeMaxCan(i)"
                           tabindex="-1"
                         />
                       </div>
@@ -147,28 +151,28 @@
                     <td class="UNI td0padding">
                       <div class="form-group m-0">
                         <input
-                          *ngIf="(drop && inputDrop !== secuenciaDelDrop(i)) || (!drop && inputDrop === secuenciaDelDrop(i)) || !drop"
+                          *ngIf="inputDrop !== 'uni-' + i"
                           type="text"
                           class="form-control entrada"
                           id="uni-{{ i }}"
-                          (click)="verificarSecuencia(i, true)"
+                          (mouseenter)="verificarSecuencia(i, 'unidad')"
+                          (focus)="verificarSecuencia(i, 'unidad')"
                           (keydown.enter)="saltar('cod-', i)"
                           formControlName="uni"
-                          (blur)="verificarRow(i)"
-                          (blur)="calculateCantidadEnUnidades(i)"
+                          (blur)="calculateCantidadEnUnidades({ index: i, clean: false })"
                           tabindex="-1"
                         />
 
-                        <div *ngIf="drop && inputDrop === secuenciaDelDrop(i)">
+                        <div *ngIf="inputDrop === 'uni-' + i">
                           <select
                             value="Medida"
                             formControlName="uni"
                             (change)="selectMedidaChange($event.target.value, i)"
                             class="form-control entrada"
                             id="uni-{{ i }}"
+                            (mouseleave)="setInputDrop(undefined)"
                             (keydown.enter)="saltar('cod-', i)"
-                            (blur)="verificarRow(i)"
-                            (blur)="calculateCantidadEnUnidades(i)"
+                            (blur)="setInputDrop(undefined); calculateCantidadEnUnidades({ index: i, clean: false })"
                             tabindex="-1"
                           >
                             <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>

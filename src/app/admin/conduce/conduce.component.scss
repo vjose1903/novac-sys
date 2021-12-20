@@ -63,10 +63,10 @@
 // ====================================================
 
 .tiCOD {
-  max-width: 1.005rem;
+  width: 12rem;
 }
 .tiCAN {
-  max-width: 1rem;
+  width: 6rem;
 }
 .tiDES {
   max-width: 3.9rem;
@@ -77,40 +77,27 @@
 }
 
 .tiUNI {
-  max-width: 1.3rem;
-  text-align: left;
-}
-.tiPRE {
-  max-width: 1rem;
-}
-.tiTOT {
-  max-width: 1.4rem;
+  width: 11.3rem;
 }
 
 .inDES,
-.inUNI,
-.inPRE,
-.inTOT {
+.inUNI {
   &:hover {
     cursor: default;
   }
 }
+
 .inDES:active,
-.inPRE:active,
 .inUNI:active,
-.inTOT:active,
 .inDES:focus,
-.inPRE:focus,
 .inUNI:focus,
-.inTOT:focus,
 .inDES.active,
-.inPRE.active,
-.inUNI.active,
-.inTOT.active {
+.inUNI.active {
   outline: 0px;
   border-color: #d4d4d4 !important;
   box-shadow: 1px 1px #d4d4d4 !important;
 }
+
 .scrollContainer {
   display: flex;
   flex-direction: column;
