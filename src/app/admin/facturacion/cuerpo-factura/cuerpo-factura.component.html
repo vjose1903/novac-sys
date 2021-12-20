@@ -171,10 +171,10 @@
                 <div class="form-group m-0">
                   <input
                     type="text"
-                    (blur)="revisarPrecio(i)"
+                    (blur)="calcularTotalRow(i); revisarPrecio(i)"
                     (focus)="$event.target.select()"
                     class="form-control entrada campoNumeros {{ metodo === 'venta' ? 'inPRE' : '' }}"
-                    (keydown.enter)="enfocarInput('cod-' + (i + 1))"
+                    (keydown.enter)="calcularTotalRow(i); enfocarInput('cod-' + (i + 1))"
                     id="pre-{{ i }}"
                     formControlName="pre"
                     [readOnly]="readPrecio()"
@@ -197,5 +197,3 @@
     </div>
   </form>
 </div>
-
-

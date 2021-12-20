@@ -46,8 +46,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   @Input() propietario;
   @Input() metodo;
 
-  @Output() sendCalculos = new EventEmitter<any>();
-  @Output() sendDescuento = new EventEmitter<any>();
+  @Output() getCalculosDinero = new EventEmitter<any>();
   @Output() getCuerpoFactura = new EventEmitter<any>();
   @Output() getFechaFactura = new EventEmitter<any>();
 
@@ -620,32 +619,38 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     const precioTEMP = (this.control[i] as any).controls['pre'].value;
     const precio = GLOBAL.desformatear(precioTEMP);
     const cantidad = (this.control[i] as any).controls['can'].value;
-
     let descuento = (this.control[i] as any).controls['descuento_porciento'].value;
 
-    const total = precio * cantidad;
+    if (descuento >= 0 && descuento <= 100) {
+      const total = precio * cantidad;
 
-    if (this.fun.hasValue(codido) && (this.fun.isEmpty(descuento) || descuento == 0)) {
-      (this.control[i] as any).controls['descuento_porciento'].reset();
-      (this.control[i] as any).controls['descuento_valor'].reset();
-      (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(total));
+      if (this.fun.hasValue(codido) && (this.fun.isEmpty(descuento) || descuento == 0)) {
+        (this.control[i] as any).controls['descuento_porciento'].reset();
+        (this.control[i] as any).controls['descuento_valor'].reset();
+        (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(total));
 
-      this.sacarDescuento(i);
-    }
+        this.sacarDescuento(i);
+      }
 
-    let calculoDesc = 0;
-    let nuevoTotal = 0;
-    if (this.fun.hasValue(codido) && this.fun.hasValue(precio) && this.fun.hasValue(cantidad) && this.fun.hasValue(descuento)) {
-      descuento = descuento / 100;
+      let calculoDesc = 0;
+      let nuevoTotal = 0;
+      if (this.fun.hasValue(codido) && this.fun.hasValue(precio) && this.fun.hasValue(cantidad) && this.fun.hasValue(descuento)) {
+        descuento = descuento / 100;
 
-      calculoDesc = precio * descuento * cantidad;
-      (this.control[i] as any).controls['descuento_valor'].setValue(calculoDesc);
-      nuevoTotal = total - calculoDesc;
+        calculoDesc = precio * descuento * cantidad;
+        (this.control[i] as any).controls['descuento_valor'].setValue(calculoDesc);
+        nuevoTotal = total - calculoDesc;
 
-      (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(nuevoTotal));
-      this.calculosTotalesGenerales();
-      this.calculosDescuentoGeneral(calculoDesc, i);
-      this.aumentarSecuencia();
+        (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(nuevoTotal));
+        this.calculosTotalesGenerales();
+        this.calculosDescuentoGeneral(calculoDesc, i);
+        this.aumentarSecuencia();
+      }
+    } else {
+      if (descuento > 100) this.fun.toastWarning('El descuento es calculado en porciento, el valor del descuento no puede ser mayor a 100', 'AVISO');
+      if (descuento < 0) this.fun.toastWarning('El descuento es calculado en porciento, el valor del descuento no puede ser menor a 0', 'AVISO');
+      (this.control[i] as any).controls['descuento_porciento'].setValue(0);
+      this.enfocarInput(`desc-${i}`);
     }
   }
 
@@ -658,7 +663,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       _.remove(this.listaDeDescuentos, currentDescuento);
       this.listaDeDescuentos.forEach((element) => (acuDesc = acuDesc + element.desc));
 
-      this.sendDescuento.emit(acuDesc);
+      this.getCalculosDinero.emit({ tipo: 'descuento', monto: acuDesc });
     }
   }
 
@@ -672,7 +677,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
     this.listaDeDescuentos.forEach((element) => (acuDesc = acuDesc + element.desc));
 
-    this.sendDescuento.emit(acuDesc);
+    this.getCalculosDinero.emit({ tipo: 'descuento', monto: acuDesc });
   }
 
   calculosTotalesGenerales() {
@@ -681,9 +686,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     if (tempTotal !== this.TOTAL) {
       this.TOTAL = tempTotal;
 
-      const obj = { Total: GLOBAL.redondearAdos(this.TOTAL), ITBIS: '' };
+      const obj = { total: GLOBAL.redondearAdos(this.TOTAL), ITBIS: '' };
 
-      this.sendCalculos.emit(obj);
+      this.getCalculosDinero.emit({ tipo: 'bruto', monto: obj });
     }
   }
 

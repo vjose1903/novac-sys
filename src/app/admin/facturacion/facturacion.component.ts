@@ -284,47 +284,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  // rellenarFacturaGuardada(facturaGuardada) {
-  //   return new Promise((resolve) => {
-  //     let obj = { texto_modal: '' };
-
-  //     const factura_para_comparar = GLOBAL.duplicarJson(facturaGuardada, false);
-
-  //     if (this.checkIfFacturacionEnProceso()) {
-  //       if (this.archivo_id_desplegada) {
-  //         // revisar si la factura que esta en proceso es igual a la factura que se va a rellenar
-  //         this.facturasSonIguales(factura_para_comparar).then((res_fact_a_rellenar) => {
-
-  //           if (!res_fact_a_rellenar) {
-  //             // revisar si la factura que esta en proceso se ha modificado para sobreescribirla
-  //             this.facturasSonIguales().then((res_fact_en_curso) => {
-  //               if (res_fact_en_curso) {
-  //                 this.procesoRelleno(facturaGuardada);
-  //               } else {
-  //                 obj.texto_modal = 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?';
-  //                 this.abrirModal('dinamico_texto', obj, 'desplegar_facturad');
-  //               }
-  //             });
-  //           } else this.procesoRelleno(facturaGuardada);
-  //         });
-  //       } else {
-  //         obj.texto_modal = '¿Desea archivar la factura que esta en proceso?';
-
-  //         this.abrirModal('dinamico_texto', obj, 'desplegar_facturea');
-  //       }
-
-  //       resolve(true);
-  //     } else {
-  //       this.procesoRelleno(facturaGuardada).then(() => {
-
-  //         resolve(true);
-  //       });
-  //     }
-  //   });
-  // }
-
-  // TODO: seguir revisando de aqui para abajo
-
   procesoRelleno(factura) {
     return new Promise((resolve) => {
       try {
@@ -411,28 +370,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.form.patchValue(arg.suplidor);
     }
   }
-
-  // facturasSonIguales(factura_para_comparar?) {
-  //   return new Promise((resolve) => {
-  //     const factura_a_guardar = this.formarFacturaAGuardar() as any;
-  //     delete factura_a_guardar.fecha_valida;
-
-  //     if (this.fun.isEmpty(factura_para_comparar)) {
-  //       const facturas_localStorage = this.fun.getFacturasguardadas();
-  //       factura_para_comparar = _.find(facturas_localStorage, (item) => item.archivo_id == this.archivo_id_desplegada);
-  //     }
-
-  //     factura_para_comparar = _.omit(factura_para_comparar, ['archivo_id', 'factura_id', 'cliente', 'suplidor', 'tipo_factura', 'fecha_valida']);
-
-  //     if (_.isEqual(factura_para_comparar, factura_a_guardar)) {
-  //       this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
-
-  //       resolve(true);
-  //     } else {
-  //       resolve(false);
-  //     }
-  //   });
-  // }
 
   initCambioMenu(arg) {
     if (arg.bool) {
@@ -525,30 +462,13 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   checkIfFacturacionEnProceso() {
-    let res = false;
-
-    const form = this.form.controls as any;
-
-    // if (
-    //   ((this.metodo === 'venta' && this.tipoFactura === '02' && form.nombre.value === 'Cliente contado' && form.direccion.value === 'Autopista duarte KM 0 el Higuero') ||
-    //     (this.metodo === 'compra' && this.tipoFactura === '01' && this.NCFcompra === 'b01')) &&
-    //   this.condicion_fact === 'Contado' &&
-    //   this.CostoYgasto === '' &&
-    //   this.modo_factura === 'normal' &&
-    //   this.propietario_factura === undefined
-    // ) {
-    if (this.CuerpoFactura.length) res = true;
-
-    return res;
+    return this.CuerpoFactura.length;
   }
 
   setWidthPop(bool, e) {
     e.select();
-    if (bool) {
-      document.documentElement.style.setProperty('--popInfo', '17rem');
-    } else {
-      document.documentElement.style.setProperty('--popInfo', '25rem');
-    }
+    const size = bool ? '18rem' : '26rem';
+    document.documentElement.style.setProperty('--popInfo', size);
   }
 
   checkCambiosModoyCondicionFactura(arg) {
@@ -564,47 +484,29 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
 
         if (sali_de === 'venta' && condicion === 'Crédito' && nombre === 'Cliente contado') {
-          if (voy_a !== 'fecha_equivalente' && voy_a === 'nom') {
-            buscar = true;
-          }
+          if (voy_a !== 'fecha_equivalente' && voy_a === 'nom') buscar = true;
         }
-        if (sali_de === 'venta' && tipo_factura === '01' && voy_a !== 'fecha_equivalente' && nombre === 'Cliente contado') {
-          buscar = true;
-        }
-        if (sali_de === 'venta' && valor === 'adelantada' && nombre === 'Cliente contado') {
-          buscar = true;
-        }
-        if (sali_de === 'venta' && condicion === 'Contado' && valor === 'normal' && voy_a !== 'nom' && voy_a !== 'dir') {
-          this.iniciarFactura('cod-0');
-        }
+        if (sali_de === 'venta' && tipo_factura === '01' && voy_a !== 'fecha_equivalente' && nombre === 'Cliente contado') buscar = true;
 
-        if (sali_de === 'fecha_equivalente' && condicion === 'Crédito' && nombre === 'Cliente contado') {
-          buscar = true;
-        }
+        if (sali_de === 'venta' && valor === 'adelantada' && nombre === 'Cliente contado') buscar = true;
 
-        if (buscar) {
-          this.abrirModalFiltro();
-        }
+        if (sali_de === 'venta' && condicion === 'Contado' && valor === 'normal' && voy_a !== 'nom' && voy_a !== 'dir') this.iniciarFactura('cod-0');
+
+        if (sali_de === 'fecha_equivalente' && condicion === 'Crédito' && nombre === 'Cliente contado') buscar = true;
+
+        if (buscar) this.abrirModalFiltro();
       }, 250);
     }
   }
 
-  getCalculos(arg) {
-    this.TOTAL = parseFloat(arg.Total);
-    this.calcularBruto();
-  }
-  getDescuento(arg) {
-    this.DESCUENTO = parseFloat(arg);
-
+  getCalculosDinero(arg) {
+    if (arg.tipo == 'descuento') this.DESCUENTO = parseFloat(arg.monto);
+    else if (arg.tipo == 'bruto') this.TOTAL = parseFloat(arg.monto.total);
     this.calcularBruto();
   }
 
   calcularBruto() {
-    setTimeout(() => {
-      const calculo = this.TOTAL + this.DESCUENTO;
-
-      this.BRUTO = calculo;
-    }, 5);
+    setTimeout(() => (this.BRUTO = this.TOTAL + this.DESCUENTO), 5);
   }
 
   validarRayaAbajo() {
@@ -617,11 +519,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         num = index;
       }
 
-      if (num < 10 || char === '_') {
-        return false;
-      } else {
-        return true;
-      }
+      if (num < 10 || char === '_') return false;
+      else return true;
     }
   }
 
@@ -672,9 +571,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
                   ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
                   : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
 
-              if (secuencia >= limite) {
-                this.dbServ.toastWarning(msg, 'AVISO');
-              }
+              if (secuencia >= limite) this.dbServ.toastWarning(msg, 'AVISO');
             }
             resolve(true);
           } catch (error) {
@@ -701,15 +598,10 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.tipoFactura = valor;
       this.NCFcompra = 'b' + valor;
 
-      let continuar = true;
-
       if (check) {
         this.calcularPorcientoComprobante().then((continuar) => {
-          if (continuar) {
-            this.enfocarInput(campo);
-          } else {
-            this.enfocarInput('tipoFact');
-          }
+          if (continuar) this.enfocarInput(campo);
+          else this.enfocarInput('tipoFact');
         });
       } else {
         this.enfocarInput(campo);
@@ -725,18 +617,15 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.abrirModalFiltro();
     }
 
-    if (campo === 'condicion') {
-      this.checkTipoFactura(campo, valor, false);
-    }
+    if (campo === 'condicion') this.checkTipoFactura(campo, valor, false);
 
     if (campo === 'venta') {
       this.desEnfocarInput(salioDe);
       this.enfocarInput(campo);
     }
 
-    if (campo === 'costo' || campo === 'fecha_vencimiento' || campo === 'fecha_equivalente') {
-      this.enfocarInput(campo);
-    }
+    if (campo === 'costo' || campo === 'fecha_vencimiento' || campo === 'fecha_equivalente') this.enfocarInput(campo);
+
     if (campo === 'pago') {
       if (this.metodo === 'compra' && !this.tipos_costosYgastos.includes(valor)) {
         this.dbServ.toastError('El tipo de costo y gasto introducido es incorrecto.', 'ERROR');
@@ -754,30 +643,22 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         }
       }
     }
+
     if (campo === 'nom') {
-      if (this.metodo === 'venta') {
-        this.enfocarInput('nom');
-      } else {
-        this.enfocarInput('ncf');
-      }
+      if (this.metodo === 'venta') this.enfocarInput('nom');
+      else this.enfocarInput('ncf');
     }
+
     if (campo === 'filtro') {
       if (this.validarRayaAbajo()) {
         this.abrirModalFiltro();
-
         this.desEnfocarInput(salioDe);
-      } else {
-        this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso');
-      }
+      } else this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso');
     }
 
-    if (campo === 'dir' && valor !== null) {
-      this.enfocarInput(campo);
-    }
+    if (campo === 'dir' && valor !== null) this.enfocarInput(campo);
 
-    if (campo === 'cod-0' && valor !== null) {
-      this.iniciarFactura(campo);
-    }
+    if (campo === 'cod-0' && valor !== null) this.iniciarFactura(campo);
   }
 
   iniciarFactura(campo) {
@@ -821,9 +702,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     return res;
   }
-  pru() {
-    const input = document.getElementById('ncf') as any;
-  }
 
   trimEndNcf() {
     const input = document.getElementById('ncf') as any;
@@ -858,6 +736,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   cancelarFactura() {
     this.abrirModal('cancelar', null);
   }
+
   // =============================================
   //  MODAL enviarABaseDatos
   // =============================================
@@ -865,11 +744,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     if (!this.usuario) this.usuario = this.fun.getUser();
 
     if (!this.propietario_factura) {
-      if (this.metodo === 'compra') {
-        this.dbServ.toastWarning('Factura no tiene suplidor', 'Aviso');
-      } else {
-        this.dbServ.toastWarning('Factura no tiene cliente', 'Aviso');
-      }
+      if (this.metodo === 'compra') this.dbServ.toastWarning('Factura no tiene suplidor seleccionado', 'Aviso');
+      else this.dbServ.toastWarning('Factura no tiene cliente seleccionado', 'Aviso');
     } else {
       if (this.CuerpoFactura.length === 0) {
         this.dbServ.toastWarning('Factura incompleta!!!', 'Aviso');
@@ -887,9 +763,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
               this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
             }
 
-            if (this.articulosAcambiar.length > 0) {
-              articulos_a_cambiar = true;
-            }
+            if (this.articulosAcambiar.length > 0) articulos_a_cambiar = true;
 
             const obj = {
               total_factura: this.TOTAL,
@@ -912,9 +786,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         this.enviarABaseDatos();
       } else if (this.tipoModal === 'cancelar') {
         if (this.action !== 'update') this.resetVariables();
-        if (this.action === 'update') {
-          this.router.navigateByUrl(`/admin/factura/${this.metodo}/new/0`).then(() => this.resetVariables());
-        }
+        if (this.action === 'update') this.router.navigateByUrl(`/admin/factura/${this.metodo}/new/0`).then(() => this.resetVariables());
       }
     }
 
@@ -973,10 +845,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.fun.setFacturasGuardadas(facturas_localStorage);
   }
 
-  prueba() {}
-
   archivarFactura() {
-    // TODO:poner la funcion que arma el objArchivo
     this.formarObjArchivo().then(() => {
       if (this.checkIfFacturacionEnProceso()) {
         let is_guardada;
@@ -997,21 +866,12 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     });
   }
 
-  selectFecha(arg) {
-    setTimeout(() => {
-      this.enfocarInput(arg);
-    }, 250);
-  }
-
   selectModoFactura(arg) {
     this.is_viaje = false;
     this.is_adelantada = false;
 
-    if (arg === 'viaje') {
-      this.is_viaje = true;
-    } else if (arg === 'adelantada') {
-      this.is_adelantada = true;
-    }
+    if (arg === 'viaje') this.is_viaje = true;
+    else if (arg === 'adelantada') this.is_adelantada = true;
   }
 
   // =============================================
@@ -1022,11 +882,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.CuerpoFactura = [];
     let obj;
 
-    if (!recuperar) {
-      obj = JSON.parse(arg);
-    } else {
-      obj = arg;
-    }
+    if (!recuperar) obj = JSON.parse(arg);
+    else obj = arg;
 
     this.CuerpoFactura = obj;
 
@@ -1052,7 +909,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  calculoMedidaprincipal(costo_db, costoRow, articulo) {
+  calculoMedidaPrincipal(costo_db, costoRow, articulo) {
     const contenido_articulo = articulo.contenido_articulos;
 
     if (costo_db !== costoRow) {
@@ -1061,36 +918,35 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       const tempContenido = [];
 
       let precioRow = this.calculatePrice(costoRow);
-      if (contenido_articulo.length > 0) {
-        contenido_articulo.forEach((contenido) => {
-          let temporal = contenido;
-          if (contenido.condicion === 'padre') {
-            if (contenido.precio) {
-              cantPadre = contenido.cantidad;
-              const precio = this.calcularNuevosPrecios(cantPadre, precioRow);
-              const costo = this.calcularNuevosPrecios(cantPadre, costoRow);
-              temporal.precio = GLOBAL.desformatear(precio);
-              temporal.costo = GLOBAL.desformatear(costo);
-            }
+
+      contenido_articulo.forEach((contenido) => {
+        let temporal = contenido;
+        if (contenido.condicion === 'padre') {
+          if (contenido.precio) {
+            cantPadre = contenido.cantidad;
+            const precio = this.calcularNuevosPrecios(cantPadre, precioRow);
+            const costo = this.calcularNuevosPrecios(cantPadre, costoRow);
+            temporal.precio = GLOBAL.desformatear(precio);
+            temporal.costo = GLOBAL.desformatear(costo);
+          }
+        } else {
+          if (contenido.precio) {
+            cantHijo = contenido.cantidad;
+            const prePadre = this.calcularNuevosPrecios(cantPadre, precioRow);
+            const cosPadre = this.calcularNuevosPrecios(cantPadre, costoRow);
+            const precio = this.calcularNuevosPrecios(cantHijo, GLOBAL.redondearAdos(prePadre));
+            const costo = this.calcularNuevosPrecios(cantHijo, GLOBAL.redondearAdos(cosPadre));
+            temporal.precio = GLOBAL.desformatear(precio);
+            temporal.costo = GLOBAL.desformatear(costo);
           } else {
-            if (contenido.precio) {
-              cantHijo = contenido.cantidad;
-              const prePadre = this.calcularNuevosPrecios(cantPadre, precioRow);
-              const cosPadre = this.calcularNuevosPrecios(cantPadre, costoRow);
-              const precio = this.calcularNuevosPrecios(cantHijo, GLOBAL.redondearAdos(prePadre));
-              const costo = this.calcularNuevosPrecios(cantHijo, GLOBAL.redondearAdos(cosPadre));
-              temporal.precio = GLOBAL.desformatear(precio);
-              temporal.costo = GLOBAL.desformatear(costo);
-            } else {
-              temporal = null;
-            }
+            temporal = null;
           }
-          if (temporal !== null) {
-            const tempu = _.omit(temporal, ['created_at', 'updated_at']);
-            tempContenido.push(tempu);
-          }
-        });
-      }
+        }
+        if (temporal !== null) {
+          const tempu = _.omit(temporal, ['created_at', 'updated_at']);
+          tempContenido.push(tempu);
+        }
+      });
 
       articulo.costo_principal = costoRow;
       articulo.precio_principal = precioRow;
@@ -1109,12 +965,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     for (let i = 0; i < cuerpoFact.length; i++) {
       const row = cuerpoFact[i];
 
-      let articulo;
-      try {
-        articulo = await this.dbServ.getArticulosFiltrados(row.cod, 0, 0, true, false, this.FechaFactura['front'], 'todos').toPromise();
-      } catch (error) {
-        console.error(error);
-      }
+      let articulo = row.articulo;
 
       const contenido_articulo = articulo.contenido_articulos;
 
@@ -1129,16 +980,14 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       const contenidoHijo = contenido_articulo.filter((cont) => cont.condicion === 'hijo')[0];
 
       let medidaEs = '';
-      if (articulo.medida === row.unidad) {
-        medidaEs = 'principal';
-      }
+      if (articulo.medida === row.unidad) medidaEs = 'principal';
+
       contenido_articulo.forEach((content) => {
         if (content.medida === row.unidad) medidaEs = content.condicion;
       });
 
-      // if (contenido_articulo.length === 0 || medidaEs === 'principal' || row.unidad === 'Caja' || row.unidad === 'Quintal') {
       if (contenido_articulo.length === 0 || medidaEs === 'principal') {
-        this.calculoMedidaprincipal(costoPrincipal, costoRow, articulo);
+        this.calculoMedidaPrincipal(costoPrincipal, costoRow, articulo);
       } else {
         if (medidaEs === 'padre') {
           costoA = contenidoPadre.costo * contenidoPadre.cantidad;
@@ -1154,22 +1003,13 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
           }
           costoR = MaxContenido * costoRow;
         }
-        this.calculoMedidaprincipal(costoA, costoR, articulo);
+        this.calculoMedidaPrincipal(costoA, costoR, articulo);
       }
 
       temp = _.omit(row, ['costo', 'condicion', 'pre', 'cod']);
       tempCuerpo.push(temp);
     }
     return tempCuerpo;
-  }
-
-  mostrarErrores(arg) {
-    for (const error in arg) {
-      if (arg.hasOwnProperty(error)) {
-        const element = arg[error];
-        this.dbServ.toastError(element, 'Error');
-      }
-    }
   }
 
   ingresarFecha() {
@@ -1181,13 +1021,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     return GLOBAL.redondearAdos(pre);
   }
 
-  parsearDetalleComprarDetallesCompra(cuerpo) {
-    cuerpo.forEach((element) => {
-      delete element.pre;
-      element.precio = null;
-    });
-    return cuerpo;
-  }
   async cambiarCostos() {
     if (this.articulosAcambiar.length > 0) {
       for (let i = 0; i < this.articulosAcambiar.length; i++) {
@@ -1200,34 +1033,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         }
       }
     }
-  }
-
-  async checkCuerpoForSendBackend(cuerpo) {
-    for (let i = 0; i < cuerpo.length; i++) {
-      const element = cuerpo[i];
-
-      if (element.calcular_saco) {
-        const row_unidad = element.unidad;
-        let calculo = 0;
-
-        const articulo = await this.dbServ.getOneArticulo(element.articulo_id, this.FechaFactura['front']).toPromise();
-        if (row_unidad === articulo.medida) {
-          calculo = articulo.precio_principal;
-        } else {
-          const splitUnidad = _.split(row_unidad, ' ');
-          let unity = splitUnidad[0];
-          let peso = 100 / Number(splitUnidad[2]);
-
-          if (unity === 'Saco') {
-            calculo = articulo.precio_principal / peso;
-          }
-        }
-
-        element.precio = calculo;
-        element.total = calculo * element.cantidad;
-      }
-    }
-    return cuerpo;
   }
 
   revisarLocalStorage() {
@@ -1245,10 +1050,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
     let cuerpo_fact = GLOBAL.duplicarJson(this.CuerpoFactura);
-
-    if (this.metodo === 'venta') {
-      // cuerpo_fact = await this.checkCuerpoForSendBackend(cuerpo_fact);
-    }
 
     const cabecera_fact = {};
     cabecera_fact['condicion'] = this.condicion_fact;
