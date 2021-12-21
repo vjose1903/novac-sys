@@ -22,8 +22,8 @@ export class modalClass extends LayoutClass {
   subArticuloFiltro: Subscription;
   subObj: Subscription;
   subEsc: Subscription;
-  subInde: Subscription;
   subRefresh: Subscription;
+  subNoFiltro: Subscription;
   subSacar: Subscription;
 
   _lista = [];
@@ -63,12 +63,12 @@ export class modalClass extends LayoutClass {
       this.subEsc = this.mServ.PRESSESC.subscribe((res) => this.run_subscribe('PRESSESC', res));
     }
 
-    if (this._lista.includes('indexToFocus')) {
-      this.subInde = this.mServ.INDEXTOFOCUS.subscribe((res) => this.run_subscribe('INDEXTOFOCUS', res));
-    }
-
     if (this._lista.includes('refreshFacturas')) {
       this.subRefresh = this.layServ.REFRESHFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
+    }
+
+    if (this._lista.includes('noFiltro')) {
+      this.subNoFiltro = this.mServ.NOFILTRO.subscribe((res) => this.run_subscribe('NOFILTRO', res));
     }
 
     if (this._lista.includes('sacarFacturas')) {
@@ -118,9 +118,8 @@ export class modalClass extends LayoutClass {
           _this.pressEscResponse(res);
           break;
 
-        case 'INDEXTOFOCUS':
-          _this.indexToFocusResponse(res);
-          if (res !== undefined) _this.reiniciarVariables([VM._7]);
+        case 'NOFILTRO':
+          _this.noFiltroResponse(res);
           break;
 
         case 'REFRESHFACTURAS':
@@ -152,7 +151,7 @@ export class modalClass extends LayoutClass {
   decisionModal(res: any) {}
   articuloFiltroResponse(res) {}
   pressEscResponse(res) {}
-  indexToFocusResponse(res) {}
+  noFiltroResponse(res) {}
   objDevueltoResponse(res) {}
   refreshResponse(res) {}
   sacarResponse(res) {}
@@ -171,9 +170,9 @@ export class modalClass extends LayoutClass {
 
     if (this._lista.includes('pressEsc') && this.subEsc) this.subEsc.unsubscribe();
 
-    if (this._lista.includes('indexToFocus') && this.subInde) this.subInde.unsubscribe();
-
     if (this._lista.includes('refreshFacturas') && this.subRefresh) this.subRefresh.unsubscribe();
+
+    if (this._lista.includes('noFiltro') && this.subNoFiltro) this.subNoFiltro.unsubscribe();
 
     if (this._lista.includes('sacarFacturas') && this.subSacar) this.subSacar.unsubscribe();
 

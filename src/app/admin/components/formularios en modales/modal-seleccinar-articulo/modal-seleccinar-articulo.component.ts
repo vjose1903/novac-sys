@@ -21,27 +21,34 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnCh
     {
       titulo: 'Articulo',
       key: 'descripcion',
+      estilos: [{ width: '44%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }],
     },
     {
       titulo: 'Cantidad',
       key: 'cantidad',
+      estilos: [{ width: '12%' }],
     },
     {
       titulo: 'Unidad',
       key: 'unidad',
+      estilos: [{ width: '14%' }],
     },
     {
       titulo: 'Retirado',
       key: 'retirado_mostrar',
+      estilos: [{ width: '12%' }],
     },
     {
       titulo: 'Restante',
       key: 'restante_mostrar',
+      estilos: [{ width: '12%' }],
     },
     {
       titulo: 'Seleccione',
       tipo: 'check',
       key: 'select',
+      // estilos: [{ width: '10%' }, { display: 'flex' }, { 'justify-content': 'flex-end' }, { 'aling-items': 'center' }, { 'padding-right': '0.5rem' }],
+      estilos: [{ width: '10.8%' }],
 
       disable: {
         getDisabled: false,
@@ -56,6 +63,8 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnCh
   constructor(private dbServ: DBservice, public mServ: ModalService) {}
 
   ngOnInit() {
+    console.log('this.articulos --> ', this.articulos);
+
     this.articulos = GLOBAL.duplicarJson(this.articulos);
     this.articulos.map(async (arti) => {
       const medida = arti.retirado === 0 ? '' : arti.retirado < 100 ? 'LBS' : 'QTL';
@@ -67,6 +76,16 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnCh
       arti.retirado_mostrar = cantidad + ' ' + medida;
 
       arti.restante_mostrar = cant_restante + ' ' + medida;
+
+      arti.customStyles = {
+        'td-descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
+        // 'td-select': { width: '10%', display: 'flex', 'justify-content': 'flex-end', 'aling-items': 'center', 'padding-right': '0.5rem' },
+        'td-cantidad': { width: '9%' },
+        'td-unidad': { width: '15%' },
+        'td-retirado_mostrar': { width: '9%' },
+        'td-restante_mostrar': { width: '15%' },
+        'td-select': { width: '6.5%' },
+      };
 
       return arti;
     });

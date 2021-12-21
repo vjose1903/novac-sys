@@ -65,7 +65,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
     this._init_mixin({
       component: 'cuerpo_factura',
-      _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'articuloPorCodigo', 'pressEsc', 'indexToFocus'],
+      _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'articuloPorCodigo', 'pressEsc', 'noFiltro'],
     });
   }
 
@@ -77,10 +77,10 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     this.objDevueltoResponse(res);
   }
 
-  indexToFocusResponse(res) {
-    if (this.fun.hasValue(res)) {
-      this.enfocarInput(`cod-${res}`);
-      this.selectContenido(`cod-${res}`);
+  noFiltroResponse(res) {
+    if (res.tipo == 'buscarArticulo') {
+      this.enfocarInput(`cod-${res.index}`);
+      this.selectContenido(`cod-${res.index}`);
     }
   }
 

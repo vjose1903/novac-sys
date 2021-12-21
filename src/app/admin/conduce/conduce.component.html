@@ -1,58 +1,61 @@
-<div class="row">
-  <div class="col-5">
+<div class="row layoutConduce h-100">
+  <div class="col-12 p-0 arriba">
     <div class="row">
-      <div class="col-12 mb-3">
-        <h2 class="negrita">Conduce</h2>
+      <div class="col-5">
+        <div class="row gridSelecClient h-100">
+          <div class="col-12 p-0 mb-3 titulo">
+            <h2 class="negrita">Conduce</h2>
+          </div>
+          <div class="col-12 p-0 colCard">
+            <div class="card card-padding sombra h-100">
+              <div class="form-group">
+                <label class="control-label">Cliente: </label>
+                <input
+                  type="text"
+                  id="clienteI"
+                  (keydown.enter)="abrirModalFiltro($event.target.value)"
+                  (focus)="$event.target.select()"
+                  placeholder="Nombre Cliente"
+                  class="form-control mb-4 inputE"
+                  autocomplete="off"
+                  [disabled]="cliente"
+                  value=""
+                  tabindex="-1"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="col-12">
-        <div class="card card-padding sombra">
-          <div class="form-group">
-            <label class="control-label">Cliente: </label>
-            <!-- (change)="selectTipoArticulo($event.target.value)" -->
-            <input
-              type="text"
-              id="clienteI"
-              (keydown.enter)="abrirModalFiltro($event.target.value)"
-              (focus)="$event.target.select()"
-              placeholder="Nombre Cliente"
-              class="form-control mb-4 inputE"
-              autocomplete="off"
-              [disabled]="cliente"
-              value=""
-              tabindex="-1"
-            />
+      <div class="col-7">
+        <div *ngIf="facturas_adelantadas.length > 0" class="row">
+          <div class="col-12 mb-3">
+            <h3>Ventas adelantadas</h3>
+          </div>
+          <div class="col-12">
+            <div #cardTabla id="cardTabla" class="card sombra bordeRedondeado factAdelantadas overflowHidden">
+              <app-tablas
+                *ngIf="facturas_adelantadas && info"
+                [padre]="cardTabla"
+                [info]="info"
+                [ROW]="'row_adelantada'"
+                [search]="false"
+                [paginate]="false"
+                [data]="facturas_adelantadas"
+                [focusRow]="false"
+                (clickRow)="SeleccionarFactruaAdelantada($event)"
+                tabindex="-1"
+              ></app-tablas>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="col-7">
-    <div *ngIf="facturas_adelantadas.length > 0" class="row">
-      <div class="col-12 mb-3">
-        <h3>Ventas adelantadas</h3>
-      </div>
-      <div class="col-12">
-        <div #cardTabla id="cardTabla" class="card sombra bordeRedondeado factAdelantadas">
-          <app-tablas
-            *ngIf="facturas_adelantadas && info"
-            [padre]="cardTabla"
-            [info]="info"
-            [ROW]="'row_adelantada'"
-            [search]="false"
-            [paginate]="false"
-            [data]="facturas_adelantadas"
-            [focusRow]="false"
-            (clickRow)="SeleccionarFactruaAdelantada($event)"
-            tabindex="-1"
-          ></app-tablas>
-        </div>
-      </div>
-    </div>
-  </div>
   <!-- ================================================================================================================================================ -->
   <!-- ================================================================================================================================================ -->
-  <div *ngIf="cliente" class="col-12 mt-3">
-    <div class="card sombra bordeRedondeado" style="height: 37rem">
+  <div *ngIf="cliente" class="col-12 mt-3 abajo">
+    <div class="card sombra bordeRedondeado h-100">
       <table #tituloFactTable="mdbTable" mdbTable class="table m-auto" [small]="true">
         <thead>
           <tr class="text-center">

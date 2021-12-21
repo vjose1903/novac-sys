@@ -9,4 +9,5 @@ export enum VM {
   '_8' = 'ModalObj',
   '_9' = 'ModalDecision',
   '_10' = 'metodos',
+  '_11' = 'noFiltro',
 }

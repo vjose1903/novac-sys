@@ -19,6 +19,7 @@ import { obj_paginate_default, TablasService } from './tablas.service';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { FunctionService } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-tablas',
@@ -117,7 +118,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Output() DevolverInfo = new EventEmitter<any>();
   @Output() DELETE = new EventEmitter<any>();
   @Output() reinicioModal = new EventEmitter<any>();
-  @Output() noArticulo = new EventEmitter<any>();
   @Output() getInfoChange = new EventEmitter<any>();
   @Output() paginateChange = new EventEmitter<any>();
 
@@ -127,7 +127,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() pad = true;
   select_all_value = false;
   mixinClass;
-  constructor(private cdRef: ChangeDetectorRef, private dbServ: DBservice, private tServ: TablasService) {}
+  constructor(private cdRef: ChangeDetectorRef, private dbServ: DBservice, private tServ: TablasService, private fun: FunctionService) {}
 
   ngOnInit() {
     this.subTotalPag = this.tServ.TOTALPAGINAS.subscribe((res) => {
@@ -601,7 +601,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           // columna.style[key] = value;
           list_estilos_titulos += `${key}: ${value} !important; `;
         }
-        console.log('info --> ', info);
 
         const columna = document.getElementById(info.titulo) as any;
 
@@ -701,21 +700,22 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   // ========================================================================
 
   ARRIBA() {
-    if (this.NUM === 0) {
-      this.NUM = this.data.length;
-    }
+    if (this.NUM === 0) this.NUM = this.data.length;
+
     this.NUM = this.NUM - 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
+
+    this.fun.scrollTo(this.IDROW, 'center');
     this.enfocarInput(this.IDROW);
   }
 
   ABAJO() {
-    if (this.NUM === this.data.length - 1) {
-      this.NUM = -1;
-    }
+    if (this.NUM === this.data.length - 1) this.NUM = -1;
 
     this.NUM = this.NUM + 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
+
+    this.fun.scrollTo(this.IDROW, 'center');
     this.enfocarInput(this.IDROW);
   }
 

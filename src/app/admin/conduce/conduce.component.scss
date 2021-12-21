@@ -1,3 +1,32 @@
+.layoutConduce {
+  display: grid;
+  grid-template-areas:
+    "arriba"
+    "abajo";
+  grid-template-rows: min-content;
+  .arriba {
+    grid-area: arriba;
+  }
+  .abajo {
+    grid-area: abajo;
+  }
+}
+
+.gridSelecClient {
+  display: grid;
+  grid-template-areas:
+    "titulo"
+    "colCard";
+  grid-template-rows: min-content;
+
+  .titulo {
+    grid-area: titulo;
+  }
+  .colCard {
+    grid-area: colCard;
+  }
+}
+
 .entrada {
   border-radius: 0 !important;
   height: calc(1.5em + 0.3rem + 2px) !important;

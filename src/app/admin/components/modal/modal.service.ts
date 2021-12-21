@@ -5,14 +5,13 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class ModalService {
-
   private tipoModal = new BehaviorSubject<any>(undefined);
   private showModal = new BehaviorSubject<boolean>(false);
   private calcularHeight = new BehaviorSubject<boolean>(false);
   private seleccionModal = new BehaviorSubject<any>(undefined);
   private decisionModal = new BehaviorSubject<any>(undefined);
   private ObjDevuelto = new BehaviorSubject<any>(undefined);
-  private indexToFocus = new BehaviorSubject<any>(undefined);
+  private noFiltro = new BehaviorSubject<any>(undefined);
   private press_Esc = new BehaviorSubject<any>(undefined);
   private tabla_modal_change = new BehaviorSubject<any>(undefined);
   private articuloFiltradoPorCodigo = new BehaviorSubject<any>(undefined);
@@ -23,7 +22,7 @@ export class ModalService {
   SELECCIONMODAL = this.seleccionModal.asObservable();
   DECISIONMODAL = this.decisionModal.asObservable();
   OBJDEVUELTO = this.ObjDevuelto.asObservable();
-  INDEXTOFOCUS = this.indexToFocus.asObservable();
+  NOFILTRO = this.noFiltro.asObservable();
   PRESSESC = this.press_Esc.asObservable();
   TABLA_MODAL_CHANGE = this.tabla_modal_change.asObservable();
   ARTICULOFILTRADOPORCODIGO = this.articuloFiltradoPorCodigo.asObservable();
@@ -62,8 +61,8 @@ export class ModalService {
     this.ObjDevuelto.next(nextValue);
   }
 
-  ModalIndex(nextValue) {
-    this.indexToFocus.next(nextValue);
+  ModalNoFiltro(nextValue) {
+    this.noFiltro.next(nextValue);
   }
 
   pressEsc(nextValue) {

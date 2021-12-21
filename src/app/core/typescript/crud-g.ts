@@ -83,8 +83,6 @@ export class CrudG<T> {
   }
 
   makeUrl(tipo, args?, id = null) {
-    console.log('AppConfig --> ', AppConfig);
-
     let url = `${AppConfig.url_server}/${this.path}`;
 
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';

@@ -5,7 +5,15 @@ import { ModalService } from './components/modal/modal.service';
 import { LayoutService } from './layout/layout.service';
 import * as moment from '../../utils/javascript/moment';
 
-type lista_sub = 'printBase64Res' | 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'indexToFocus' | 'refreshFacturas' | 'sacarFacturas';
+type lista_sub =
+  | 'printBase64Res'
+  | 'decisionModal'
+  | 'objDevuelto'
+  | 'articuloPorCodigo'
+  | 'pressEsc'
+  | 'refreshFacturas'
+  | 'sacarFacturas'
+  | 'noFiltro';
 
 interface mixinInit {
   component?: String;
@@ -102,7 +110,6 @@ export class mixinClass extends modalClass {
   }
   // =========================================================================================================
   desEnfocarInput(arg) {
-
     const element = document.getElementById(arg) as HTMLElement;
     element.blur();
   }

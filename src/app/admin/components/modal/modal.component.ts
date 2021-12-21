@@ -274,10 +274,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.mServ.ModalObj(obj);
   }
 
-  noArticulo() {
+  noFiltro(tipo, palabra_a_buscar) {
     this.reinicioModal();
-
-    this.mServ.ModalIndex(this.index);
+    this.mServ.ModalNoFiltro({ tipo: tipo, index: this.index, palabra_a_buscar: palabra_a_buscar });
   }
 
   articuloFiltradoPorCodigo(articulo) {
@@ -369,14 +368,20 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       }
       this.filtrar = true;
     } catch (error) {
+      let tipo = '';
+
       if (this.tipoModal === 'buscarArticulo') {
-        this.noArticulo();
+        tipo = 'buscarArticulo';
         setTimeout(() => this.mServ.mostrarModal(false), 250);
       }
+
+      if (this.tipoModal === 'buscarCliente') tipo = 'buscarCliente';
+
+      if (this.tipoModal === 'buscarSuplidor') tipo = 'buscarSuplidor';
+
+      this.noFiltro(tipo, palabra_a_buscar);
+
       this.refrescarFiltro();
-      console.error(error);
-      // if (this.tipoModal === 'buscarCliente') this.dbServ.toastError('Error buscando clientes registrados.', 'ERROR');
-      // if (this.tipoModal === 'buscarSuplidor') this.dbServ.toastError('Error buscando suplidor registrados.', 'ERROR');
     }
   }
 

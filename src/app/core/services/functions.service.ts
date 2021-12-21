@@ -162,6 +162,15 @@ export class FunctionService {
   hasValue(value) {
     return !this.isEmpty(value);
   }
+
+  // __________________________________________________________________________________________________
+  // Nombre: scrollTo
+  // Descripcion : Esta funcion mueve el scroll hasta un elemento proporcionados
+  // __________________________________________________________________________________________________
+  scrollTo(id, block_: any = 'start', inline_: any = 'center') {
+    if (id && document.getElementById(`${id}`)) document.getElementById(`${id}`).scrollIntoView({ behavior: 'smooth', block: block_, inline: inline_ });
+  }
+
   // __________________________________________________________________________________________________
   // Nombre: isEmpty
   // Descripcion : Esta funcion valida que si una variable esta vacia

@@ -6,6 +6,16 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
+
+.overflowHidden{
+  overflow:hidden;
+}
+
+.row {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
 .text-end {
   text-align: end;
 }
