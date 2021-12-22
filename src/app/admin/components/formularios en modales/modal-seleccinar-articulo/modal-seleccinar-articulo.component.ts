@@ -50,10 +50,8 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnCh
       // estilos: [{ width: '10%' }, { display: 'flex' }, { 'justify-content': 'flex-end' }, { 'aling-items': 'center' }, { 'padding-right': '0.5rem' }],
       estilos: [{ width: '10.8%' }],
 
-      disable: {
-        getDisabled: false,
-        campo: '',
-      },
+      disable: [{ kind: 'campo', target: 'disable', value: [true] }],
+
       title: '',
     },
   ];

@@ -157,7 +157,9 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         // mirar aqui el res
         console.log('res -> ', res);
 
-        this.llenarConduce(res.data.body);
+        this.llenarConduce(res.data.body).then((res) => {
+          console.log('TERMINE DE LLENAR EL CONDUCE');
+        });
       }
       setTimeout(() => this.resetModalVaribales(), 1000);
     }
@@ -363,19 +365,21 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
     control['cantidad_en_unidades'].setValue(cant_unidades);
   }
-
+  prueba() {
+    console.log('this.filasDetalle --> ', this.filasDetalle);
+  }
   // =============================================
   async checkCantidadExede(i, lugar, callback = (arg) => {}) {
     let cantidad = 0;
     this.calcularCantidadEnUnidades({ index: i });
-    const descripcion = (this.filasDetalle[i] as any).controls['des'].value;
 
     const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
 
     const rowsIgual = _.map(
-      _.filter(this.filasDetalle, (item) => item.value.des === descripcion),
+      _.filter(this.filasDetalle, (item) => item.controls.articulo?.value?.id == articulo.id),
       'value',
     );
+
     cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + item.cantidad_en_unidades, 0);
 
     if (lugar === 'saltar') i--;
@@ -547,9 +551,10 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     if (factura) {
       factura.detalle_facturas.map((detalle) => {
         const formArray = this.form.get('rowFactura') as FormArray;
-        const existe = formArray.value.find((d) => d.id === detalle.id);
-        if (existe) detalle.select = true;
-        else detalle.select = false;
+        const existe = formArray.value.find((d) => d.detalle_factura_id === detalle.id);
+
+        detalle.select = !!existe;
+        detalle.disable = !!existe;
 
         return detalle;
       });
@@ -609,40 +614,51 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     }
     this.form.reset();
   }
+  // TODO: seguir de aqui para abajo
 
-  llenarConduce(detalles) {
-    console.log('detalles ', detalles);
+  llenarConduce(detalles, conteo = 0, firstResolve = null) {
+    return new Promise((resolve) => {
+      firstResolve ??= resolve;
+      this.llenarFila(detalles[conteo], this.secuencia).then((res) => {
+        conteo++;
+        if (conteo < detalles.length) this.llenarConduce(detalles, conteo, firstResolve);
+        else firstResolve(true);
+      });
+    });
 
-    for (let j = 0; j < detalles.length; j++) {
-      const detalle = detalles[j];
+    // this.llenarFila(detalles[conteo], this.secuencia).then((res) => {});
 
-      for (let i = 0; i < this.filasDetalle.length; i++) {
-        const filaDetalle = this.filasDetalle[i].value;
+    // for (let j = 0; j < detalles.length; j++) {
+    //   const detalle = detalles[j];
+    //   console.log('this.secuencia --> ', this.secuencia);
 
-        const existe = this.filasDetalle.find((d) => d.value.detalle_factura_id === detalle.id);
+    // for (let i = 0; i < this.filasDetalle.length; i++) {
+    //   const filaDetalle = this.filasDetalle[i].value;
 
-        if (filaDetalle.des && filaDetalle.cod) {
-          if (!filaDetalle.detalle_factura_id && filaDetalle.articulo.id === detalle.articulo_id) {
-            const splitUnidad = _.split(filaDetalle.uni, ' ');
+    //   const existe = this.filasDetalle.find((d) => d.value.detalle_factura_id === detalle.id);
 
-            if (detalle.peso_saco && detalle.peso_saco === splitUnidad[2]) {
-              this.llenarFila(detalle, i);
-            } else if (detalle.unidad === filaDetalle.uni) {
-              this.llenarFila(detalle, i);
-            }
-          }
-        } else {
-          if (!existe && detalle.destroy !== 1) this.llenarFila(detalle, i);
-        }
-      }
-    }
-    const sig_detalle_factura_id = (this.filasDetalle[0] as any).controls['detalle_factura_id'].value;
+    //   if (filaDetalle.des && filaDetalle.cod) {
+    //     if (!filaDetalle.detalle_factura_id && filaDetalle.articulo.id === detalle.articulo_id) {
+    //       const splitUnidad = _.split(filaDetalle.uni, ' ');
 
-    if (sig_detalle_factura_id) {
-      this.enfocarInput('can-0');
-    } else {
-      this.enfocarInput('cod-0');
-    }
+    //       if (detalle.peso_saco && detalle.peso_saco === splitUnidad[2]) {
+    //         this.llenarFila(detalle, i);
+    //       } else if (detalle.unidad === filaDetalle.uni) {
+    //         this.llenarFila(detalle, i);
+    //       }
+    //     }
+    //   } else {
+    //     if (!existe && detalle.destroy !== 1) this.llenarFila(detalle, i);
+    //   }
+    // }
+    // }
+    // const sig_detalle_factura_id = (this.filasDetalle[0] as any).controls['detalle_factura_id'].value;
+
+    // if (sig_detalle_factura_id) {
+    //   this.enfocarInput('can-0');
+    // } else {
+    //   this.enfocarInput('cod-0');
+    // }
   }
 
   verSiExcede(i) {
@@ -659,39 +675,43 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   async llenarFila(element, i) {
-    const cant_en_unidades_actual = element.cantidad_en_unidades - element.retirado;
-    const multiplo = element.cantidad_en_unidades / element.cantidad;
-    const cant_actual = cant_en_unidades_actual / multiplo;
-    this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.FechaConduce }).then((result) => {
-      const articulo = _.first(result);
-      // const cant_en_unidades_actual = cant_en_unidades_actual * multiplo;
+    return new Promise((resolve) => {
+      const cant_en_unidades_actual = element.cantidad_en_unidades - element.retirado;
+      const multiplo = element.cantidad_en_unidades / element.cantidad;
+      const cant_actual = cant_en_unidades_actual / multiplo;
+      this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.FechaConduce }).then((result) => {
+        const articulo = _.first(result);
+        // const cant_en_unidades_actual = cant_en_unidades_actual * multiplo;
 
-      (this.filasDetalle[i] as any).controls['detalle_factura_id'].setValue(element.id);
-      // (this.control[i] as any).controls['articulo_id'].setValue(element.articulo_id);
-      (this.filasDetalle[i] as any).controls['cod'].setValue(element.codigo);
+        (this.filasDetalle[i] as any).controls['detalle_factura_id'].setValue(element.id);
+        // (this.control[i] as any).controls['articulo_id'].setValue(element.articulo_id);
+        (this.filasDetalle[i] as any).controls['cod'].setValue(element.codigo);
 
-      (this.filasDetalle[i] as any).controls['can'].setValue(cant_actual);
-      (this.filasDetalle[i] as any).controls['can_ant'].setValue(cant_actual);
-      (this.filasDetalle[i] as any).controls['max_can'].setValue(cant_actual);
-      (this.filasDetalle[i] as any).controls['can_original'].setValue(element.cantidad);
-      (this.filasDetalle[i] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
-      (this.filasDetalle[i] as any).controls['articulo'].setValue(articulo);
+        (this.filasDetalle[i] as any).controls['can'].setValue(cant_actual);
+        (this.filasDetalle[i] as any).controls['can_ant'].setValue(cant_actual);
+        (this.filasDetalle[i] as any).controls['max_can'].setValue(cant_actual);
+        (this.filasDetalle[i] as any).controls['can_original'].setValue(element.cantidad);
+        (this.filasDetalle[i] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
+        (this.filasDetalle[i] as any).controls['articulo'].setValue(articulo);
 
-      (this.filasDetalle[i] as any).controls['des'].setValue(_.capitalize(element.descripcion));
-      let uni = '';
+        (this.filasDetalle[i] as any).controls['des'].setValue(articulo.nombre);
+        let uni = '';
 
-      if (element.peso_saco) uni = 'Saco de ' + element.peso_saco + ' libras';
-      else uni = element.unidad;
+        if (element.peso_saco) uni = 'Saco de ' + element.peso_saco + ' libras';
+        else uni = element.unidad;
 
-      (this.filasDetalle[i] as any).controls['uni'].setValue(uni);
-      (this.filasDetalle[i] as any).controls['uni'].disable();
+        (this.filasDetalle[i] as any).controls['uni'].setValue(uni);
+        (this.filasDetalle[i] as any).controls['uni'].disable();
 
-      setTimeout(async () => {
-        this.checkCantidadExede(i, 'change', (res) => {
-          if (res) this.rowsExcede.push(i);
-        });
-      }, 100);
-      this.aumentarSecuencia();
+        setTimeout(async () => {
+          this.checkCantidadExede(i, 'change', (res) => {
+            if (res) this.rowsExcede.push(i);
+          });
+
+          this.aumentarSecuencia();
+          resolve(true);
+        }, 100);
+      });
     });
   }
 

@@ -314,14 +314,14 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, fecha_articulo, 'todos').toPromise();
 
-        if (res.data.length > 1) {
+        if (GLOBAL.is_number(palabra_a_buscar) && res.data.length === 1) {
+          this.articuloFiltradoPorCodigo(res);
+        } else {
           this.dataFiltro = res.data;
 
           this.mostrarModalLuegoDeBuscarData();
           const obj = { total: res.total_registros, tabla: 'filtroArticulos' };
           this.tServ.Func_total_paginas(obj);
-        } else {
-          if (GLOBAL.is_number(palabra_a_buscar)) this.articuloFiltradoPorCodigo(res);
         }
       } else if (this.tipoModal === 'buscarCliente') {
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();

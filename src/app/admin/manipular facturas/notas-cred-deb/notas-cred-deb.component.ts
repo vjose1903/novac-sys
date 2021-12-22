@@ -136,10 +136,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
         titulo: ' ',
         tipo: 'check',
         key: 'select',
-        disable: {
-          getDisabled: false,
-          campo: '',
-        },
         title: '',
         estilos: [{ width: '3rem' }],
       },
@@ -154,10 +150,8 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
         formatoNumero: true,
         tipo: 'input',
         inputType: 'number',
-        disable: {
-          getDisabled: true,
-          campo: 'select',
-        },
+        disable: [{ kind: 'campo', target: 'select', value: [true] }],
+
         estilos: [{ width: '6rem' }],
       },
       {
@@ -190,9 +184,10 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
         titulo: 'Total nota',
         key: 'total_nota',
         tipo: 'input',
-        disable: {
-          getDisabled: true,
-        },
+
+        // disable: [{ kind: 'selected' }, { kind: 'campo', target: 'descripcion', value: ['hola'] }],
+        disable: [{ kind: 'always' }],
+
         estilos: [{ width: '8rem' }],
       },
     ];

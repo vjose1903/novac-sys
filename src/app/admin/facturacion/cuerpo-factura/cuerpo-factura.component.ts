@@ -32,7 +32,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   secuencia;
   inputSecuencia;
   inputDrop;
-  control;
+  filasDetalle;
   llevaDescuento;
   DESCUENTO;
   listaDeDescuentos;
@@ -141,7 +141,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       this.secuencia = 0;
       this.inputSecuencia = 'cod-0';
       this.inputDrop = undefined;
-      this.control = undefined;
+      this.filasDetalle = undefined;
       this.llevaDescuento = undefined;
       this.DESCUENTO = 0;
       this.listaDeDescuentos = [];
@@ -157,7 +157,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         await this.addItem(index);
       }
       setTimeout(() => {
-        this.control = (this.form.controls['rowFactura'] as FormArray).controls;
+        this.filasDetalle = (this.form.controls['rowFactura'] as FormArray).controls;
 
         this.escucharCambiosEnForm();
 
@@ -211,7 +211,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       try {
         const operacion = row.calcular_saco;
         const se_calcula = row.se_calcula_saco;
-        const row_unidad = (this.control[i] as any).controls['uni'].value;
+        const row_unidad = (this.filasDetalle[i] as any).controls['uni'].value;
         const precio_saco = this.saco_sistema.precio_principal;
 
         let calculo = 0;
@@ -226,16 +226,16 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
           calculo = unity == 'Saco' ? articulo.precio_principal / peso : articulo.contenido_articulos[0].precio;
         }
 
-        const descripcion = (this.control[i] as any).controls['des'].value;
+        const descripcion = (this.filasDetalle[i] as any).controls['des'].value;
 
         let precio = calculo;
         if (operacion) {
           if (moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.fecha_ingreso).format('YYYY-MM-DD')) precio = calculo + precio_saco;
-          (this.control[i] as any).controls['des'].setValue(`${articulo.nombre}`);
-          (this.control[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
+          (this.filasDetalle[i] as any).controls['des'].setValue(`${articulo.nombre}`);
+          (this.filasDetalle[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
         } else {
-          (this.control[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
-          if (se_calcula || lugar === 'select') (this.control[i] as any).controls['des'].setValue(`${descripcion}*`);
+          (this.filasDetalle[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
+          if (se_calcula || lugar === 'select') (this.filasDetalle[i] as any).controls['des'].setValue(`${descripcion}*`);
         }
 
         resolve(true);
@@ -248,25 +248,25 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   async CalculoSacos(i, lugar, e?) {
     try {
-      const unidad = (this.control[i] as any).controls['uni'].value;
+      const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
 
       if (e) e.stopPropagation();
 
       if (this.metodo === 'venta') {
-        const articulo = (this.control[i] as any).controls['articulo'].value;
+        const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
 
         if (articulo.calcular_saco) {
-          const row = (this.control[i] as any).value;
+          const row = (this.filasDetalle[i] as any).value;
 
           if (unidad) {
             this.calcularSacoEnRow(i, row, articulo, lugar).then((res) => (res ? this.calcularTotalRow(i) : () => {}));
           } else {
             this.dbServ.toastWarning('Para calcular los sacos debe de seleccionar una unidad', 'AVISO');
-            (this.control[i] as any).controls['calcular_saco'].setValue(true);
+            (this.filasDetalle[i] as any).controls['calcular_saco'].setValue(true);
           }
         } else {
           if (e) this.dbServ.toastError('A este articulo no se le calculan los sacos', 'ERROR');
-          (this.control[i] as any).controls['calcular_saco'].setValue(false);
+          (this.filasDetalle[i] as any).controls['calcular_saco'].setValue(false);
         }
       }
     } catch (error) {}
@@ -284,8 +284,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   checkIfRowContainArticulo(i) {
     let res = false;
-    if (this.control) {
-      const element = this.control[i] as any;
+    if (this.filasDetalle) {
+      const element = this.filasDetalle[i] as any;
       res = element.controls['des'].value || element.controls['cod'].value;
     }
     return res;
@@ -295,9 +295,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   //  RESETEAR FORMULARIO
   // =============================================
   RESETCUERPO() {
-    if (this.control) {
-      for (let i = 0; i < this.control.length; i++) {
-        (this.control[i] as any).controls['descuento_porciento'].enable();
+    if (this.filasDetalle) {
+      for (let i = 0; i < this.filasDetalle.length; i++) {
+        (this.filasDetalle[i] as any).controls['descuento_porciento'].enable();
       }
     }
 
@@ -362,7 +362,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             const cant_en_unidades_actual = row.cantidad_en_unidades;
             const multiplo = row.cantidad_en_unidades / row.cantidad;
             const cant_actual = cant_en_unidades_actual / multiplo;
-            const campos = (this.control[j] as any).controls;
+            const campos = (this.filasDetalle[j] as any).controls;
 
             campos['pre'].setValue(this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo));
 
@@ -426,10 +426,10 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   async saltar(e, input, i) {
     const index = i;
 
-    const articulo = (this.control[i] as any).controls['articulo'].value;
-    const codigo = (this.control[i] as any).controls['cod'].value;
-    const cantidad = (this.control[i] as any).controls['can'].value;
-    const unidad = (this.control[i] as any).controls['uni'].value;
+    const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
+    const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
+    const cantidad = (this.filasDetalle[i] as any).controls['can'].value;
+    const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
 
     if (i >= 10 && input === 'cod-') this.addItem(i);
 
@@ -470,26 +470,25 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   saliDeCantidad(i) {
-    const unidad = (this.control[i] as any).controls['uni'].value;
-    const cantidad = (this.control[i] as any).controls['can'].value;
-    const cantidad_anterior = (this.control[i] as any).controls['can_ant'].value;
+    const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
+    const cantidad = (this.filasDetalle[i] as any).controls['can'].value;
+    const cantidad_anterior = (this.filasDetalle[i] as any).controls['can_ant'].value;
 
     if (cantidad != cantidad_anterior) {
       if (this.fun.hasValue(unidad)) this.checkCantidadExede(i, 'change', () => {});
 
-      (this.control[i] as any).controls['can_ant'].setValue(cantidad);
+      (this.filasDetalle[i] as any).controls['can_ant'].setValue(cantidad);
     }
   }
 
   async checkCantidadExede(i, lugar, callback = (arg) => {}) {
     let cantidad = 0;
     this.calcularCantidadEnUnidades({ index: i });
-    const descripcion = (this.control[i] as any).controls['des'].value;
 
-    const articulo = (this.control[i] as any).controls['articulo'].value;
+    const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
 
     const rowsIgual = _.map(
-      _.filter(this.control, (item) => item.value.des === descripcion),
+      _.filter(this.filasDetalle, (item) => item.controls.articulo?.value?.id == articulo.id),
       'value',
     );
     cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + item.cantidad_en_unidades, 0);
@@ -510,8 +509,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             this.enfocarInput('can-' + i);
             this.selectContenido('can-' + i);
             this.calcularCantidadEnUnidades({ index: i, clean: true });
-            (this.control[i] as any).controls['uni'].setValue(null);
-            (this.control[i] as any).controls['can_ant'].setValue(null);
+            (this.filasDetalle[i] as any).controls['uni'].setValue(null);
+            (this.filasDetalle[i] as any).controls['can_ant'].setValue(null);
           }, 250);
 
           callback(true);
@@ -533,13 +532,15 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     const unidad = medidaSelected.value;
 
     if (unidad.toLowerCase() === 'medida') {
-      (this.control[i] as any).controls['uni'].setValue(null);
+      (this.filasDetalle[i] as any).controls['uni'].setValue(null);
     } else {
       this.checkCantidadExede(i, 'change', (res) => {
         if (!res) {
-          (this.control[i] as any).controls['uni'].setValue(unidad);
-          (this.control[i] as any).controls['pre'].setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)));
-          (this.control[i] as any).controls['costo'].setValue(costoDetalle);
+          (this.filasDetalle[i] as any).controls['uni'].setValue(unidad);
+          (this.filasDetalle[i] as any).controls['pre'].setValue(
+            GLOBAL.formatearNumero(GLOBAL.redondearAdos(this.metodo === 'venta' ? this.precioDetalle : costoDetalle)),
+          );
+          (this.filasDetalle[i] as any).controls['costo'].setValue(costoDetalle);
 
           if (this.metodo === 'venta' && moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.fecha_ingreso).format('YYYY-MM-DD')) {
             this.CalculoSacos(i, 'select', undefined);
@@ -554,9 +555,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   verificarSecuencia(i, input?) {
     if (this.secuencia < i) this.enfocarInput(this.inputSecuencia);
 
-    if (this.control) {
-      const codigo = (this.control[i] as any).controls['cod'].value;
-      const art = (this.control[i] as any).controls['articulo'].value;
+    if (this.filasDetalle) {
+      const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
+      const art = (this.filasDetalle[i] as any).controls['articulo'].value;
 
       if (input === 'unidad' && this.fun.hasValue(codigo) && this.fun.hasValue(art)) {
         this.setInputDrop(i);
@@ -566,8 +567,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
-    const control = this.control[params.index].controls;
-    const valores = this.control[params.index].value;
+    const control = this.filasDetalle[params.index].controls;
+    const valores = this.filasDetalle[params.index].value;
 
     const unidad = valores['uni'];
     const cantidad = valores['can'];
@@ -584,8 +585,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   calcularTotalRow(i) {
-    const control = this.control[i].controls;
-    const valores = this.control[i].value;
+    const control = this.filasDetalle[i].controls;
+    const valores = this.filasDetalle[i].value;
 
     const precio = GLOBAL.desformatear(valores.pre);
     const cantidad = valores['can'];
@@ -625,26 +626,26 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   revisarPrecio(i) {
-    let input = (this.control[i] as any).controls['pre'];
+    let input = (this.filasDetalle[i] as any).controls['pre'];
     this.fun.revisarPrecio(input, `pre-${i}`).then((res) => {
       if (!res.error) input.setValue(res.number);
     });
   }
 
   calcularDescuento(i) {
-    const codido = (this.control[i] as any).controls['cod'].value;
-    const precioTEMP = (this.control[i] as any).controls['pre'].value;
+    const codido = (this.filasDetalle[i] as any).controls['cod'].value;
+    const precioTEMP = (this.filasDetalle[i] as any).controls['pre'].value;
     const precio = GLOBAL.desformatear(precioTEMP);
-    const cantidad = (this.control[i] as any).controls['can'].value;
-    let descuento = (this.control[i] as any).controls['descuento_porciento'].value;
+    const cantidad = (this.filasDetalle[i] as any).controls['can'].value;
+    let descuento = (this.filasDetalle[i] as any).controls['descuento_porciento'].value;
 
     if (descuento >= 0 && descuento <= 100) {
       const total = precio * cantidad;
 
       if (this.fun.hasValue(codido) && (this.fun.isEmpty(descuento) || descuento == 0)) {
-        (this.control[i] as any).controls['descuento_porciento'].reset();
-        (this.control[i] as any).controls['descuento_valor'].reset();
-        (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(total));
+        (this.filasDetalle[i] as any).controls['descuento_porciento'].reset();
+        (this.filasDetalle[i] as any).controls['descuento_valor'].reset();
+        (this.filasDetalle[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(total));
 
         this.sacarDescuento(i);
       }
@@ -655,10 +656,10 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         descuento = descuento / 100;
 
         calculoDesc = precio * descuento * cantidad;
-        (this.control[i] as any).controls['descuento_valor'].setValue(calculoDesc);
+        (this.filasDetalle[i] as any).controls['descuento_valor'].setValue(calculoDesc);
         nuevoTotal = total - calculoDesc;
 
-        (this.control[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(nuevoTotal));
+        (this.filasDetalle[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(nuevoTotal));
         this.calculosTotalesGenerales();
         this.calculosDescuentoGeneral(calculoDesc, i);
         this.aumentarSecuencia();
@@ -666,7 +667,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     } else {
       if (descuento > 100) this.fun.toastWarning('El descuento es calculado en porciento, el valor del descuento no puede ser mayor a 100', 'AVISO');
       if (descuento < 0) this.fun.toastWarning('El descuento es calculado en porciento, el valor del descuento no puede ser menor a 0', 'AVISO');
-      (this.control[i] as any).controls['descuento_porciento'].setValue(0);
+      (this.filasDetalle[i] as any).controls['descuento_porciento'].setValue(0);
       this.enfocarInput(`desc-${i}`);
     }
   }
@@ -698,7 +699,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   calculosTotalesGenerales() {
-    let tempTotal = _.reduce(this.control, (acumulado, item) => acumulado + GLOBAL.desformatear(item.value.tot), 0);
+    let tempTotal = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + GLOBAL.desformatear(item.value.tot), 0);
 
     if (tempTotal !== this.TOTAL) {
       this.TOTAL = tempTotal;
@@ -710,8 +711,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   modalRemover(i, e?) {
-    const name = (this.control[i] as any).controls['des'].value;
-    const unidad = (this.control[i] as any).controls['uni'].value;
+    const name = (this.filasDetalle[i] as any).controls['des'].value;
+    const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
     let obj = {};
     obj['nombre'] = unidad ? `${name} (${unidad})` : name;
 
@@ -754,21 +755,21 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         this.dbServ.toastWarning(msg, 'AVISO');
       }
 
-      (this.control[i] as any).controls['articulo'].setValue(ARTICULO);
-      (this.control[i] as any).controls['cod'].setValue(ARTICULO.codigo);
-      (this.control[i] as any).controls['des'].setValue(ARTICULO.nombre);
-      (this.control[i] as any).controls['calcular_saco'].setValue(ARTICULO.calcular_saco);
-      (this.control[i] as any).controls['can'].setValue(null);
-      (this.control[i] as any).controls['can_ant'].setValue(null);
-      (this.control[i] as any).controls['uni'].setValue(null);
+      (this.filasDetalle[i] as any).controls['articulo'].setValue(ARTICULO);
+      (this.filasDetalle[i] as any).controls['cod'].setValue(ARTICULO.codigo);
+      (this.filasDetalle[i] as any).controls['des'].setValue(ARTICULO.nombre);
+      (this.filasDetalle[i] as any).controls['calcular_saco'].setValue(ARTICULO.calcular_saco);
+      (this.filasDetalle[i] as any).controls['can'].setValue(null);
+      (this.filasDetalle[i] as any).controls['can_ant'].setValue(null);
+      (this.filasDetalle[i] as any).controls['uni'].setValue(null);
 
       if (this.metodo === 'venta') {
         if (ARTICULO.descripcion === 'Materia prima') {
-          (this.control[i] as any).controls['descuento_porciento'].disable({ onlySelf: true });
-          (this.control[i] as any).controls['is_materia_prima'].setValue(true);
+          (this.filasDetalle[i] as any).controls['descuento_porciento'].disable({ onlySelf: true });
+          (this.filasDetalle[i] as any).controls['is_materia_prima'].setValue(true);
         } else {
-          (this.control[i] as any).controls['descuento_porciento'].enable();
-          (this.control[i] as any).controls['is_materia_prima'].setValue(false);
+          (this.filasDetalle[i] as any).controls['descuento_porciento'].enable();
+          (this.filasDetalle[i] as any).controls['is_materia_prima'].setValue(false);
         }
       }
       this.enfocarInput('can-' + i);
@@ -776,8 +777,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   async llenarArrayUnidades(art?, i?) {
-    const codigo = (this.control[i] as any).controls['cod'].value;
-    if (!art) art = (this.control[i] as any).controls['articulo'].value;
+    const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
+    if (!art) art = (this.filasDetalle[i] as any).controls['articulo'].value;
     if (codigo && art) {
       const precioPrincipal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
       const costoPrincipal = art.costo_principal;

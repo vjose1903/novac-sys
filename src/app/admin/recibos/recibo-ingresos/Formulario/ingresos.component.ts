@@ -70,10 +70,9 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       key: 'select',
       select_all: false,
       estilos: [{ width: '7rem' }],
-      disable: {
-        getDisabled: true,
-        campo: 'is_viaje',
-      },
+
+      disable: [{ kind: 'campo', target: 'is_viaje', value: [true] }],
+
       title: '',
     },
     {
@@ -82,10 +81,8 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       key: 'pagoT',
       select_all: false,
       estilos: [{ width: '6rem' }],
-      disable: {
-        getDisabled: true,
-        campo: 'select',
-      },
+      disable: [{ kind: 'campo', target: 'select', value: [true] }],
+
       title: '',
     },
     {
@@ -93,11 +90,12 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       tipo: 'input',
       key: 'monto',
       checkNumber: true,
-      disable: {
-        getDisabled: true,
-        campo: 'select',
-        campo2: 'pagoT',
-      },
+
+      disable: [
+        { kind: 'campo', target: 'select', value: [true] },
+        { kind: 'campo', target: 'pagoT', value: [true] },
+      ],
+
       title: '',
     },
   ];

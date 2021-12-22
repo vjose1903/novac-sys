@@ -8,7 +8,7 @@
   <div style="border-radius: 10px 10px 0px 0px" class="tableBodyScroll" [ngStyle]="{ height: alto + 'px' }">
     <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" [small]="true" id="VICtablas">
       <thead class="text-center position-relative" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
-        <!-- [disabled]="disabledInput(column.disable, i)" -->
+        <!-- [disabled]="disabledInput(dato, column)" -->
         <tr #titulosHeader>
           <th id="{{ row?.titulo }}" *ngFor="let row of info" class="thHead">
             <span [ngSwitch]="row?.tipo">
@@ -115,7 +115,7 @@
                 <div class="form-group m-0 switchDiv">
                   <input
                     class="apple-switch"
-                    [disabled]="disabledInput(column.disable, i)"
+                    [disabled]="disabledInput(dato, column)"
                     type="checkbox"
                     (change)="changeValorCheck(column.key, i)"
                     [checked]="dato[column.key]"
@@ -137,7 +137,7 @@
                     [max]="dato.max_ ? dato.max_ : null"
                     type="{{ column.inputType ? column.inputType : 'text' }}"
                     [value]="dato[column.key]"
-                    [disabled]="disabledInput(column.disable, i)"
+                    [disabled]="disabledInput(dato, column)"
                     (keyup)="changeValorInput(column.key, i, $event.target.value)"
                     (change)="changeValorInput(column.key, i, $event.target.value)"
                   />
@@ -149,7 +149,7 @@
                     id="input-{{ i }}"
                     [value]="dato[column.key]"
                     (blur)="revisarPrecio(i, $event.target.value, column.key, 'input-' + i)"
-                    [disabled]="disabledInput(column.disable, i)"
+                    [disabled]="disabledInput(dato, column)"
                     (keyup)="changeValorInput(column.key, i, $event.target.value)"
                     (change)="changeValorInput(column.key, i, $event.target.value)"
                   />
