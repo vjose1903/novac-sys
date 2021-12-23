@@ -321,17 +321,20 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   changeValorCheck(key, i, auto = false) {
-    this.data[i][key] = !this.data[i][key];
-    const obj = {
-      body: this.data,
-      index: i,
-      cambio: key,
-      value: this.data[i][key],
-    };
+    const info_colum = _.find(this.info, (item) => item.key == key);
+    if (!this.disabledInput(this.data[i], info_colum)) {
+      this.data[i][key] = !this.data[i][key];
+      const obj = {
+        body: this.data,
+        index: i,
+        cambio: key,
+        value: this.data[i][key],
+      };
 
-    if (!auto && _.every(this.data, { select: this.data[i][key] })) this.select_all_value = this.data[i][key];
+      if (!auto && _.every(this.data, { select: this.data[i][key] })) this.select_all_value = this.data[i][key];
 
-    this.getInfoChange.emit(obj);
+      this.getInfoChange.emit(obj);
+    }
   }
 
   changeValorInput(key, i, valor) {
