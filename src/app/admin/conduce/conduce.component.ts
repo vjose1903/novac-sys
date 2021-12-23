@@ -155,11 +155,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         //
       } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
         // mirar aqui el res
-        console.log('res -> ', res);
-
-        this.llenarConduce(res.data.body).then((res) => {
-          console.log('TERMINE DE LLENAR EL CONDUCE');
-        });
+        this.ajustarSecuencia();
+        this.llenarConduce(res.data.body).then((res) => {});
       }
       setTimeout(() => this.resetModalVaribales(), 1000);
     }
@@ -187,38 +184,41 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     this.filasDetalle = (this.form.controls['rowFactura'] as FormArray).controls;
   }
 
-  aumentarSecuencia() {
-    this.secuencia++;
-    this.inputSecuencia = 'cod-' + this.secuencia;
-  }
-
-  // aumentarSecuencia() {
-  //   this.secuencia++;
-  //   this.inputSecuencia = 'cod-' + this.secuencia;
-  //   this.inputDrop = 'uni-' + this.secuencia;
-  //   this.drop = false;
-  // }
-
   async procesoQuitarArticulo() {
     await this.removeItem(this.indexRemove);
-    await this.disminuirSecuencia();
-    // await this.chequearExcede();
+    await this.ajustarSecuencia();
+    await this.reajustarExcedentes();
   }
 
-  async chequearExcede() {
-    for (let i = 0; i < this.filasDetalle.value.length; i++) {
-      const element = this.filasDetalle.value[i];
+  async reajustarExcedentes(conteo = 0) {
+    const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
 
-      if (element.cod) {
-        const excede = await this.checkCantidadExede(i, 'change', element.des);
-      } else {
-        this.rowsExcede = _.difference(this.rowsExcede, [i]);
+    this.checkCantidadExede(conteo, 'proceso_quitar_articulo', (excede) => {
+      if (excede) this.rowsExcede.push(conteo);
+      else if (_.includes(this.rowsExcede, conteo) && !excede) _.pull(this.rowsExcede, conteo);
+
+      conteo++;
+      if (conteo < filas_ocupadas.length) this.reajustarExcedentes(conteo);
+      else {
+        const excedientes_mayores = _.filter(this.rowsExcede, (item) => item >= conteo);
+        excedientes_mayores.forEach((element) => _.pull(this.rowsExcede, element));
       }
-    }
+    });
+
+    // for (let i = 0; i < this.filasDetalle.length; i++) {
+    //   const element = this.filasDetalle[i].value;
+
+    //   if (element.articulo) {
+    //   } else {
+    //     this.rowsExcede = _.difference(this.rowsExcede, [i]);
+    //     break;
+    //   }
+    // }
   }
 
-  disminuirSecuencia() {
-    this.secuencia--;
+  ajustarSecuencia() {
+    const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
+    this.secuencia = filas_ocupadas.length;
     this.inputSecuencia = 'cod-' + this.secuencia;
   }
 
@@ -247,7 +247,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     }
 
     if (input === 'cod-' && this.fun.hasValue(unidad) && _.lowerCase(unidad) != _.lowerCase('medida')) {
-      this.aumentarSecuencia();
+      this.ajustarSecuencia();
       if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) this.enfocarInput('cod-' + (index + 1));
     }
   }
@@ -353,8 +353,9 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
+    this.llenarArrayUnidades(null, params.index);
     const control = this.filasDetalle[params.index].controls;
-    const valores = this.filasDetalle[params.index].value;
+    const valores = this.filasDetalle[params.index].getRawValue();
 
     const unidad = valores['uni'];
     const cantidad = valores['can'];
@@ -365,50 +366,57 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
     control['cantidad_en_unidades'].setValue(cant_unidades);
   }
-  prueba() {
-    console.log('this.filasDetalle --> ', this.filasDetalle);
-  }
+  prueba() {}
   // =============================================
   async checkCantidadExede(i, lugar, callback = (arg) => {}) {
     let cantidad = 0;
-    this.calcularCantidadEnUnidades({ index: i });
-
     const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
 
-    const rowsIgual = _.map(
-      _.filter(this.filasDetalle, (item) => item.controls.articulo?.value?.id == articulo.id),
-      'value',
-    );
+    if (this.fun.hasValue(articulo)) {
+      this.calcularCantidadEnUnidades({ index: i });
 
-    cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + item.cantidad_en_unidades, 0);
+      const rowsIgual = _.map(
+        _.filter(this.filasDetalle, (item) => item.controls.articulo?.value?.id == articulo.id),
+        'value',
+      );
 
-    if (lugar === 'saltar') i--;
+      cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + item.cantidad_en_unidades, 0);
 
-    try {
-      let excede = true;
+      if (lugar === 'saltar') i--;
 
-      const extra = { afterPath: `check_excede/${articulo.id}`, parameters: { cantidad: cantidad } };
-      await this.articuloClass.getAll(extra).then((res) => {
-        excede = res['data'];
+      try {
+        let excede = true;
 
-        if (excede) {
-          this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+        const extra = { afterPath: `check_excede/${articulo.id}`, parameters: { cantidad: cantidad } };
+        await this.articuloClass.getAll(extra).then((res) => {
+          excede = res['data'];
 
-          setTimeout(() => {
-            this.enfocarInput('can-' + i);
-            this.selectContenido('can-' + i);
-            this.calcularCantidadEnUnidades({ index: i, clean: true });
-            (this.filasDetalle[i] as any).controls['uni'].setValue(null);
-            (this.filasDetalle[i] as any).controls['can_ant'].setValue(null);
-          }, 250);
+          if (excede) {
+            this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
 
-          callback(true);
-        } else {
-          callback(false);
-        }
-      });
-    } catch (error) {
-      if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
+            // proceso_quitar_articulo
+
+            setTimeout(() => {
+              this.enfocarInput('can-' + i);
+              this.selectContenido('can-' + i);
+              if (!_.includes(this.rowsExcede, i)) {
+                this.calcularCantidadEnUnidades({ index: i, clean: true });
+                (this.filasDetalle[i] as any).controls['uni'].setValue(null);
+                (this.filasDetalle[i] as any).controls['can_ant'].setValue(null);
+              }
+            }, 250);
+
+            callback(true);
+          } else {
+            callback(false);
+          }
+        });
+      } catch (error) {
+        if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
+
+        callback(false);
+      }
+    } else {
       callback(false);
     }
   }
@@ -543,7 +551,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
           ),
         )
         .toPromise();
-      console.log(' facturas_adelantadas ==> ', this.facturas_adelantadas);
     } catch (error) {}
   }
 
@@ -630,7 +637,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
     // for (let j = 0; j < detalles.length; j++) {
     //   const detalle = detalles[j];
-    //   console.log('this.secuencia --> ', this.secuencia);
 
     // for (let i = 0; i < this.filasDetalle.length; i++) {
     //   const filaDetalle = this.filasDetalle[i].value;
@@ -701,14 +707,15 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         else uni = element.unidad;
 
         (this.filasDetalle[i] as any).controls['uni'].setValue(uni);
+
         (this.filasDetalle[i] as any).controls['uni'].disable();
 
         setTimeout(async () => {
-          this.checkCantidadExede(i, 'change', (res) => {
+          this.checkCantidadExede(i, 'llenarFila', (res) => {
             if (res) this.rowsExcede.push(i);
           });
 
-          this.aumentarSecuencia();
+          this.ajustarSecuencia();
           resolve(true);
         }, 100);
       });
@@ -778,9 +785,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
           unidad: unidad_,
         });
         this.checkCantidadExede(i, 'change', (res) => {
-          if (res) {
-            res = false;
-          }
+          if (res) res = false;
         });
       } else {
         break;
@@ -790,16 +795,20 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   async imprimirConduce() {
-    if (!this.cliente) {
-      this.dbServ.toastWarning('Conduce no tiene cliente', 'Aviso');
+    if (this.rowsExcede.length) {
+      this.dbServ.toastWarning('No puede hacer el conduce, existiendo artículos que exceden su cantidad en el inventario', 'Aviso');
     } else {
-      const cuerpoBien = await this.ParsearCuerpo();
+      if (!this.cliente) {
+        this.dbServ.toastWarning('Conduce no tiene cliente', 'Aviso');
+      } else {
+        const cuerpoBien = await this.ParsearCuerpo();
 
-      if (cuerpoBien) {
-        if (this.CuerpoConduce.length === 0) {
-          this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
-        } else {
-          this.abrirModalDinamicText('Seguro que desea imprimir el conduce', 2);
+        if (cuerpoBien) {
+          if (this.CuerpoConduce.length === 0) {
+            this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
+          } else {
+            this.abrirModalDinamicText('Seguro que desea imprimir el conduce', 2);
+          }
         }
       }
     }
