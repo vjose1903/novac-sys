@@ -97,7 +97,7 @@
                     id="can-{{ i }}"
                     (keydown.enter)="saltar($event, 'uni-', i)"
                     formControlName="can"
-                    (focus)="verificarSecuencia(i); llenarArrayUnidades(null, i)"
+                    (focus)="verificarSecuencia(i)"
                     (blur)="calcularTotalRow(i); saliDeCantidad(i)"
                     tabindex="-1"
                   />

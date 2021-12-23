@@ -189,7 +189,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     await this.sacarDescuento(this.indexRemove);
     await this.removeItem(this.indexRemove);
     await this.calculosTotalesGenerales();
-    await this.disminuirSecuencia();
+    await this.ajustarSecuencia();
   }
 
   readPrecio() {
@@ -403,7 +403,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
               this.calcularTotalRow(j);
             }
 
-            this.aumentarSecuencia();
+            this.ajustarSecuencia();
           } catch (error) {}
         }
 
@@ -442,7 +442,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
       if (input === 'cod-') index++;
 
-      this.aumentarSecuencia();
+      this.ajustarSecuencia();
       if (this.metodo === 'venta') this.enfocarInput('cod-' + index);
       else this.enfocarInput('pre-' + index);
     }
@@ -459,13 +459,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
   }
 
-  aumentarSecuencia() {
-    this.secuencia++;
-    this.inputSecuencia = 'cod-' + this.secuencia;
-  }
-
-  disminuirSecuencia() {
-    this.secuencia--;
+  ajustarSecuencia() {
+    const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
+    this.secuencia = filas_ocupadas.length;
     this.inputSecuencia = 'cod-' + this.secuencia;
   }
 
@@ -561,7 +557,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
       if (input === 'unidad' && this.fun.hasValue(codigo) && this.fun.hasValue(art)) {
         this.setInputDrop(i);
-        this.llenarArrayUnidades(null, i);
+        this.llenarArrayUnidades(i);
       }
     }
   }
@@ -662,7 +658,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         (this.filasDetalle[i] as any).controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(nuevoTotal));
         this.calculosTotalesGenerales();
         this.calculosDescuentoGeneral(calculoDesc, i);
-        this.aumentarSecuencia();
+        this.ajustarSecuencia();
       }
     } else {
       if (descuento > 100) this.fun.toastWarning('El descuento es calculado en porciento, el valor del descuento no puede ser mayor a 100', 'AVISO');
@@ -776,9 +772,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
   }
 
-  async llenarArrayUnidades(art?, i?) {
+  async llenarArrayUnidades(i) {
     const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
-    if (!art) art = (this.filasDetalle[i] as any).controls['articulo'].value;
+    const art = (this.filasDetalle[i] as any).controls['articulo'].value;
     if (codigo && art) {
       const precioPrincipal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
       const costoPrincipal = art.costo_principal;

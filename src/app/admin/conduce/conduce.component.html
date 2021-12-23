@@ -140,7 +140,7 @@
                           min="0"
                           class="form-control entrada input_cantidad {{ verSiExcede(i) ? 'badAlert' : '' }}"
                           id="can-{{ i }}"
-                          (focus)="llenarArrayUnidades(undefined, i); verificarSecuencia(i, true)"
+                          (focus)="verificarSecuencia(i)"
                           (keydown.enter)="saltar('uni-', i)"
                           formControlName="can"
                           [max]="getMaxCan(i)"
@@ -205,9 +205,7 @@
         <div class="col-2">
           <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (click)="cancelarConduce(1)"></app-btncircular>
         </div>
-        <div class="col-2">
-          <app-btncircular [alto]="'100px'" [accion]="'Prueba'" [nombreImg]="'cancelar'" (click)="prueba()"></app-btncircular>
-        </div>
+
       </div>
     </div>
   </div>

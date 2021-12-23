@@ -23,7 +23,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   cliente;
   facturas_adelantadas = [];
-  facturas_adelantadas_wait = [];
 
   form: FormGroup;
   ARRAY_ROWARTICULOS: any;
@@ -41,6 +40,12 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   TOTAL: number;
 
   info = [
+    {
+      titulo: '1',
+      key: 'detalles_selected',
+      isIcon: true,
+      estilos: [{ width: '2rem' }, { color: '#8ef3a3' }],
+    },
     {
       titulo: 'Numero Fact',
       key: 'secuencia',
@@ -117,12 +122,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
       if (this.tipoModal === 'cancelar_conduce') this.cancelarConduce(2);
 
-      if (this.tipoModal === 'conduce_lleno') {
-        await this.form.reset();
-        await this.SeleccionarFactruaAdelantada(this.facturas_adelantadas_wait);
-        this.facturas_adelantadas_wait = [];
-      }
-
       if (this.tipoModal === 'imprimir_conduce') await this.sendData();
 
       setTimeout(() => this.resetModalVaribales(), 1000);
@@ -146,7 +145,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       if (res.tipo_modal === 'buscarCliente') {
         this.cliente = res.data;
         (document.getElementById('clienteI') as any).value = res.data.nombre;
-        this.BuscarFacturasAdelantadas(res.data.id);
+        this.buscarFacturasAdelantadas(res.data.id);
         setTimeout(() => this.enfocarInput('cod-0'), 10);
         //
       } else if (res && res.tipo_modal === 'buscarArticulo') {
@@ -156,7 +155,9 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
         // mirar aqui el res
         this.ajustarSecuencia();
-        this.llenarConduce(res.data.body).then((res) => {});
+        this.llenarConduce(res.data.body).then((res) => {
+          this.checkFacturasAdelantadasSelection();
+        });
       }
       setTimeout(() => this.resetModalVaribales(), 1000);
     }
@@ -188,6 +189,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     await this.removeItem(this.indexRemove);
     await this.ajustarSecuencia();
     await this.reajustarExcedentes();
+    await this.checkFacturasAdelantadasSelection();
   }
 
   async reajustarExcedentes(conteo = 0) {
@@ -204,16 +206,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         excedientes_mayores.forEach((element) => _.pull(this.rowsExcede, element));
       }
     });
-
-    // for (let i = 0; i < this.filasDetalle.length; i++) {
-    //   const element = this.filasDetalle[i].value;
-
-    //   if (element.articulo) {
-    //   } else {
-    //     this.rowsExcede = _.difference(this.rowsExcede, [i]);
-    //     break;
-    //   }
-    // }
   }
 
   ajustarSecuencia() {
@@ -224,10 +216,14 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   async saltar(input, i) {
     let index = i;
-    const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
-    const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
-    const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
-    const cantidad = (this.filasDetalle[i] as any).controls['can'].value;
+    const fila_actual = this.filasDetalle[i].getRawValue();
+    const fila_siguiente = this.filasDetalle[i + 1].getRawValue();
+
+    const unidad = fila_actual['uni'];
+    const articulo = fila_actual['articulo'];
+    const codigo = fila_actual['cod'];
+    const cantidad = fila_actual['can'];
+    const detalle_factura_id = fila_actual['detalle_factura_id'];
 
     if (i >= 10 && input === 'cod-') this.addItem(i);
 
@@ -242,13 +238,15 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       }
     }
 
+    let campo_siguiente = this.fun.hasValue(fila_siguiente['detalle_factura_id']) ? `can-${index + 1}` : `cod-${index + 1}`;
     if (input === 'uni-') {
-      if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) this.enfocarInput('uni-' + index);
+      const campo = this.fun.hasValue(detalle_factura_id) ? campo_siguiente : `uni-${index}`;
+      if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) this.enfocarInput(campo);
     }
 
     if (input === 'cod-' && this.fun.hasValue(unidad) && _.lowerCase(unidad) != _.lowerCase('medida')) {
       this.ajustarSecuencia();
-      if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) this.enfocarInput('cod-' + (index + 1));
+      if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) this.enfocarInput(campo_siguiente);
     }
   }
 
@@ -290,9 +288,11 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     }
   }
 
-  async llenarArrayUnidades(art?, i?) {
-    const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
-    if (!art) art = (this.filasDetalle[i] as any).controls['articulo'].value;
+  async llenarArrayUnidades(i) {
+    const fila_actual = this.filasDetalle[i].getRawValue();
+    const codigo = fila_actual['cod'];
+    const art = fila_actual['articulo'];
+
     if (codigo && art) {
       const precioPrincipal = art.precio_principal;
       const costoPrincipal = art.costo_principal;
@@ -353,12 +353,12 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
-    this.llenarArrayUnidades(null, params.index);
+    this.llenarArrayUnidades(params.index);
     const control = this.filasDetalle[params.index].controls;
-    const valores = this.filasDetalle[params.index].getRawValue();
+    const fila_actual = this.filasDetalle[params.index].getRawValue();
 
-    const unidad = valores['uni'];
-    const cantidad = valores['can'];
+    const unidad = fila_actual['uni'];
+    const cantidad = fila_actual['can'];
 
     let cantidadMinima = 1;
     if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad)).cantidad;
@@ -366,11 +366,12 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
     control['cantidad_en_unidades'].setValue(cant_unidades);
   }
-  prueba() {}
+
   // =============================================
   async checkCantidadExede(i, lugar, callback = (arg) => {}) {
     let cantidad = 0;
-    const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
+    const fila_actual = this.filasDetalle[i].getRawValue();
+    const articulo = fila_actual['articulo'];
 
     if (this.fun.hasValue(articulo)) {
       this.calcularCantidadEnUnidades({ index: i });
@@ -431,23 +432,26 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   verificarSecuencia(i, input?) {
+    const fila_actual = this.filasDetalle[i].getRawValue();
+
     if (this.secuencia < i) this.enfocarInput(this.inputSecuencia);
 
     if (this.filasDetalle) {
-      const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
-      const art = (this.filasDetalle[i] as any).controls['articulo'].value;
+      const codigo = fila_actual['cod'];
+      const art = fila_actual['articulo'];
 
       if (input === 'unidad' && this.fun.hasValue(codigo) && this.fun.hasValue(art)) {
         this.setInputDrop(i);
-        this.llenarArrayUnidades(null, i);
+        this.llenarArrayUnidades(i);
       }
     }
   }
 
   saliDeCantidad(i) {
-    const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
-    const cantidad = (this.filasDetalle[i] as any).controls['can'].value;
-    const cantidad_anterior = (this.filasDetalle[i] as any).controls['can_ant'].value;
+    const fila_actual = this.filasDetalle[i].getRawValue();
+    const unidad = fila_actual['uni'];
+    const cantidad = fila_actual['can'];
+    const cantidad_anterior = fila_actual['can_ant'];
 
     if (cantidad != cantidad_anterior) {
       if (this.fun.hasValue(unidad)) this.checkCantidadExede(i, 'change', () => {});
@@ -471,13 +475,15 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   async calculateCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
-    const control = this.filasDetalle[params.index].controls;
-    const valores = this.filasDetalle[params.index].value;
+    this.llenarArrayUnidades(params.index);
 
-    const unidad = valores['uni'];
-    const cantidad = valores['can'];
+    const control = this.filasDetalle[params.index].controls;
+    const fila_actual = this.filasDetalle[params.index].value;
+    const unidad = fila_actual['uni'];
+    const cantidad = fila_actual['can'];
 
     let cantidadMinima = 1;
+
     if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad)).cantidad;
 
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
@@ -506,8 +512,9 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   modalRemover(i, e?) {
-    const name = (this.filasDetalle[i] as any).controls['des'].value;
-    const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
+    const fila_actual = this.filasDetalle[i].getRawValue();
+    const name = fila_actual['des'];
+    const unidad = fila_actual['uni'];
     let obj = {};
     obj['nombre'] = unidad ? `${name} (${unidad})` : name;
 
@@ -527,7 +534,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     });
   }
 
-  async BuscarFacturasAdelantadas(id) {
+  async buscarFacturasAdelantadas(id) {
     try {
       this.facturas_adelantadas = await this.dbServ
         .getFacturasByParams('1', id, 0, true, 0, 0, false)
@@ -536,10 +543,13 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
             (fact) =>
               (fact = fact.data.map((val) => {
                 val.secuencia = _.padStart(val.numero_factura, 8, '0');
+
                 val.fecha = moment(val.fecha_equivalente).format('DD-MM-YYYY');
                 val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : '';
                 val.estado_ = val.estado ? 'fas fa-check' : 'fas fa-times';
                 val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
+
+                val.customStyles = { 'td-detalles_selected': { width: '2rem' } };
 
                 for (let i = 0; i < val.detalle_facturas.length; i++) {
                   const detalle = val.detalle_facturas[i];
@@ -551,12 +561,13 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
           ),
         )
         .toPromise();
+      this.checkFacturasAdelantadasSelection();
     } catch (error) {}
   }
 
-  async SeleccionarFactruaAdelantada(factura) {
-    if (factura) {
-      factura.detalle_facturas.map((detalle) => {
+  checkFacturasAdelantadasSelection() {
+    this.facturas_adelantadas.map((item) => {
+      item.detalle_facturas.map((detalle) => {
         const formArray = this.form.get('rowFactura') as FormArray;
         const existe = formArray.value.find((d) => d.detalle_factura_id === detalle.id);
 
@@ -565,8 +576,19 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
         return detalle;
       });
+
+      const almenos_uno = _.some(item.detalle_facturas, (detalle) => detalle.select);
+      const todos = _.every(item.detalle_facturas, (detalle) => detalle.select);
+
+      item.detalles_selected = todos ? 'fas fa-check' : almenos_uno ? 'far fa-check-square' : 'far fa-square';
+      return item;
+    });
+  }
+
+  async SeleccionarFactruaAdelantada(factura) {
+    if (factura) {
+      this.checkFacturasAdelantadasSelection();
       this.abrirModal('seleccionar_articulos_adelantados', factura.detalle_facturas);
-      // }
     }
   }
 
@@ -632,39 +654,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         else firstResolve(true);
       });
     });
-
-    // this.llenarFila(detalles[conteo], this.secuencia).then((res) => {});
-
-    // for (let j = 0; j < detalles.length; j++) {
-    //   const detalle = detalles[j];
-
-    // for (let i = 0; i < this.filasDetalle.length; i++) {
-    //   const filaDetalle = this.filasDetalle[i].value;
-
-    //   const existe = this.filasDetalle.find((d) => d.value.detalle_factura_id === detalle.id);
-
-    //   if (filaDetalle.des && filaDetalle.cod) {
-    //     if (!filaDetalle.detalle_factura_id && filaDetalle.articulo.id === detalle.articulo_id) {
-    //       const splitUnidad = _.split(filaDetalle.uni, ' ');
-
-    //       if (detalle.peso_saco && detalle.peso_saco === splitUnidad[2]) {
-    //         this.llenarFila(detalle, i);
-    //       } else if (detalle.unidad === filaDetalle.uni) {
-    //         this.llenarFila(detalle, i);
-    //       }
-    //     }
-    //   } else {
-    //     if (!existe && detalle.destroy !== 1) this.llenarFila(detalle, i);
-    //   }
-    // }
-    // }
-    // const sig_detalle_factura_id = (this.filasDetalle[0] as any).controls['detalle_factura_id'].value;
-
-    // if (sig_detalle_factura_id) {
-    //   this.enfocarInput('can-0');
-    // } else {
-    //   this.enfocarInput('cod-0');
-    // }
   }
 
   verSiExcede(i) {
@@ -673,7 +662,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   disableCamposFactAdelantadas(i) {
     let res = false;
-    const detalle_factura_id = (this.filasDetalle[i] as any).controls['detalle_factura_id'].value;
+    const fila_actual = this.filasDetalle[i].getRawValue();
+    const detalle_factura_id = fila_actual['detalle_factura_id'];
     if (detalle_factura_id) {
       res = true;
     }
@@ -723,10 +713,12 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   excedeMaxCan(i) {
-    const detalle_factura_id = (this.filasDetalle[i] as any).controls['detalle_factura_id'].value;
-    const max_can = (this.filasDetalle[i] as any).controls['max_can'].value;
-    const can_original = (this.filasDetalle[i] as any).controls['can_original'].value;
-    const can = (this.filasDetalle[i] as any).controls['can'].value;
+    const fila_actual = this.filasDetalle[i].getRawValue();
+
+    const detalle_factura_id = fila_actual['detalle_factura_id'];
+    const max_can = fila_actual['max_can'];
+    const can_original = fila_actual['can_original'];
+    const can = fila_actual['can'];
     if (detalle_factura_id && can > max_can) {
       if (can_original > max_can) {
         this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad restante de la factura ', 'ERROR');
@@ -739,78 +731,39 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   getMaxCan(i) {
-    const detalle_factura_id = (this.filasDetalle[i] as any).controls['detalle_factura_id'].value;
-    const max_can = (this.filasDetalle[i] as any).controls['max_can'].value;
-    if (detalle_factura_id) {
-      return max_can;
-    } else {
-      return 9007199254740991;
-    }
-  }
+    const fila_actual = this.filasDetalle[i].getRawValue();
+    const detalle_factura_id = fila_actual['detalle_factura_id'];
+    const max_can = fila_actual['max_can'];
 
-  p() {
-    for (let i = 0; i < this.filasDetalle.value.length; i++) {
-      const element = this.filasDetalle.value[i];
-      if (element.des) {
-      } else {
-        break;
-      }
-    }
-  }
-  async ParsearCuerpo() {
-    this.CuerpoConduce = [];
-    let res = true;
-
-    // for (let i = 0; i < this.control.value.length; i++) {
-    //   const element = this.control.value[i];
-    for (let i = 0; i < this.filasDetalle.length; i++) {
-      const control = this.filasDetalle[i] as any;
-
-      const codigo_ = control['cod'].value;
-      const unidad_ = control['uni'].value;
-      const cantidad_ = control['can'].value;
-
-      if (codigo_ && unidad_ && cantidad_) {
-        try {
-          control['articulo'] = await this.dbServ.getArticulosFiltrados(codigo_, 0, 0, true, false, this.FechaConduce, 'todos').toPromise();
-        } catch (error) {}
-
-        // control['articulo'] = this.listaArticulos.filter((art) => art.codigo === control.cod)[0].id;
-
-        this.CuerpoConduce.push({
-          detalle_factura_id: control['detalle_factura_id'].value ? control['detalle_factura_id'].value : null,
-          articulo_id: control['articulo'].value.id,
-          cantidad: cantidad_,
-          cantidad_en_unidades: control['cantidad_en_unidades'].value,
-          unidad: unidad_,
-        });
-        this.checkCantidadExede(i, 'change', (res) => {
-          if (res) res = false;
-        });
-      } else {
-        break;
-      }
-    }
-    return res;
+    return detalle_factura_id ? max_can : 9007199254740991;
   }
 
   async imprimirConduce() {
+    const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
+    console.log('filas_ocupadas --> ', filas_ocupadas);
+
     if (this.rowsExcede.length) {
       this.dbServ.toastWarning('No puede hacer el conduce, existiendo artículos que exceden su cantidad en el inventario', 'Aviso');
+    } else if (!this.cliente) {
+      this.dbServ.toastWarning('Conduce no tiene cliente', 'Aviso');
+    } else if (filas_ocupadas.length === 0) {
+      this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
     } else {
-      if (!this.cliente) {
-        this.dbServ.toastWarning('Conduce no tiene cliente', 'Aviso');
-      } else {
-        const cuerpoBien = await this.ParsearCuerpo();
+      for (let i = 0; i < filas_ocupadas.length; i++) {
+        const fila = filas_ocupadas[i].getRawValue();
+        const detalle = _.pick(fila, ['detalle_factura_id', 'articulo.id', 'can', 'cantidad_en_unidades', 'uni', 'id']);
 
-        if (cuerpoBien) {
-          if (this.CuerpoConduce.length === 0) {
-            this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
-          } else {
-            this.abrirModalDinamicText('Seguro que desea imprimir el conduce', 2);
-          }
-        }
+        let detalle_parsed = this.fun.remplaceKeyFromJson(detalle, [
+          { old_key: 'can', new_key: 'cantidad' },
+          { old_key: 'uni', new_key: 'unidad' },
+        ]);
+        detalle_parsed['articulo_id'] = detalle_parsed.articulo.id;
+        delete detalle_parsed['articulo'];
+
+        this.CuerpoConduce.push(detalle_parsed);
       }
+
+      this.abrirModalDinamicText('Seguro que desea imprimir el conduce', 2);
     }
   }
 
@@ -832,19 +785,13 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       this.cancelarConduce(2);
       this.pdfServ.generatePdf(obj).then((res) => {
         if (res.status === 'si') {
-          const objBase = {
-            base64: res.body,
-            filename: res.file,
-            type: 'conduce',
-          };
+          const objBase = { base64: res.body, filename: res.file, type: 'conduce' };
           this._ipc.send('printBase64', objBase);
           this.layServ.nextCheckCuadreToday(true);
         }
       });
     } catch (error) {
-      if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
-      }
+      if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }
 
@@ -861,7 +808,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
       if (control.des && control.cod) {
         (this.filasDetalle[i] as any).controls['detalle_factura_id'].setValue(null);
-        // (this.control[i] as any).controls['articulo_id'].setValue(null);
         (this.filasDetalle[i] as any).controls['articulo'].setValue(null);
         (this.filasDetalle[i] as any).controls['cod'].setValue(null);
 
@@ -879,7 +825,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   borrar() {
     this.resetForm();
     this.cliente = undefined;
-    this.facturas_adelantadas_wait = [];
+    this.CuerpoConduce = [];
     this.facturas_adelantadas = [];
     this.secuencia = 0;
     this.inputSecuencia = 'cod-0';

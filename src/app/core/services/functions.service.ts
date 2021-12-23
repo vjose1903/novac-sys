@@ -172,6 +172,20 @@ export class FunctionService {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: remplaceKeyFromJson
+  // Descripcion : Esta funcion cambia los key especificados de un objeto json
+  // __________________________________________________________________________________________________
+  remplaceKeyFromJson(json, params) {
+    let jsonString = JSON.stringify(json);
+
+    for (let i = 0; i < params.length; i++) {
+      const element = params[i];
+      jsonString = _.replace(jsonString, `"${element.old_key}"`, `"${element.new_key}"`);
+    }
+
+    return JSON.parse(jsonString);
+  }
+  // __________________________________________________________________________________________________
   // Nombre: isEmpty
   // Descripcion : Esta funcion valida que si una variable esta vacia
   // __________________________________________________________________________________________________
