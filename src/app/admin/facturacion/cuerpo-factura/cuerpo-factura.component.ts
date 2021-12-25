@@ -3,10 +3,7 @@ import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
-import { ModalService } from '../../components/modal/modal.service';
 import { mixinClass } from '../../mixinClass';
-import { IpcService } from '../../../core/services/ipc.service';
-import { LayoutService } from '../../layout/layout.service';
 import * as moment from '../../../../utils/javascript/moment';
 import { ArticuloC } from '../../registros/articulos/articulo';
 
@@ -55,8 +52,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   articuloClass = new ArticuloC();
 
-  constructor(private dbServ: DBservice, public mServ: ModalService, private fb: FormBuilder, public _ipc: IpcService, public layServ: LayoutService) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private fb: FormBuilder) {
+    super();
     // this.rowFactura = new FormArray([new FormControl()]);
   }
 

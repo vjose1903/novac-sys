@@ -1,14 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-
 import * as _ from 'lodash';
-import * as moment from '../../../../../utils/javascript/moment';
-import { map } from 'rxjs/operators';
 import { DBservice } from '../../../../core/services/bdservice.service';
-import { ModalService } from '../../modal/modal.service';
-import { IpcService } from '../../../../core/services/ipc.service';
-import { LayoutService } from '../../../layout/layout.service';
 import { mixinClass } from '../../../mixinClass';
 
 @Component({
@@ -23,8 +16,8 @@ export class ChangePasswordComponent extends mixinClass implements OnInit, After
 
   @Output() cancel = new EventEmitter<any>();
 
-  constructor(private fb: FormBuilder, private dbServ: DBservice, public mServ: ModalService, public _ipc: IpcService, public layServ: LayoutService) {
-    super(mServ, _ipc, layServ);
+  constructor(private fb: FormBuilder, private dbServ: DBservice) {
+    super();
   }
 
   ngOnInit() {

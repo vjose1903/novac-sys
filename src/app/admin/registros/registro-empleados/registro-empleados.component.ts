@@ -1,18 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import * as moment from '../../../../utils/javascript/moment';
 import { DBservice } from '../../../core/services/bdservice.service';
-import { ModalService } from '../../components/modal/modal.service';
-import { TablasService } from '../../components/tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
-import { LayoutService } from '../../layout/layout.service';
-import { IpcService } from '../../../core/services/ipc.service';
 import { mixinClass } from '../../mixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
+import { TablasService } from '../../components/tablas/tablas.service';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -62,17 +58,8 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
 
   camposDisabled = true;
 
-  constructor(
-    private fb: FormBuilder,
-    public layServ: LayoutService,
-    public _ipc: IpcService,
-    private dbServ: DBservice,
-    private router: Router,
-    public mServ: ModalService,
-    private tServ: TablasService,
-    private localeService: BsLocaleService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private fb: FormBuilder, private dbServ: DBservice, private localeService: BsLocaleService, private tServ: TablasService) {
+    super();
     this.dpConfig = Object.assign(
       {},
       {

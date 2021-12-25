@@ -1,19 +1,8 @@
 import { GLOBAL } from '../core/services/GLOBAL';
-import { IpcService } from '../core/services/ipc.service';
 import { modalClass } from './components/modal/modal';
-import { ModalService } from './components/modal/modal.service';
-import { LayoutService } from './layout/layout.service';
 import * as moment from '../../utils/javascript/moment';
 
-type lista_sub =
-  | 'printBase64Res'
-  | 'decisionModal'
-  | 'objDevuelto'
-  | 'articuloPorCodigo'
-  | 'pressEsc'
-  | 'refreshFacturas'
-  | 'sacarFacturas'
-  | 'noFiltro';
+type lista_sub = 'printBase64Res' | 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'refreshFacturas' | 'sacarFacturas' | 'noFiltro';
 
 interface mixinInit {
   component?: String;
@@ -26,8 +15,8 @@ interface fechaFactura {
 }
 
 export class mixinClass extends modalClass {
-  constructor(public mServ: ModalService, public _ipc: IpcService, public layServ: LayoutService) {
-    super(mServ, _ipc, layServ);
+  constructor() {
+    super();
   }
 
   arg_mixin;

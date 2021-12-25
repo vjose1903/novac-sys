@@ -3,13 +3,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
-
-import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
-import { Subscription } from 'rxjs';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { LayoutService } from '../../layout/layout.service';
-import { IpcService } from '../../../core/services/ipc.service';
 import { mixinClass } from '../../mixinClass';
 
 @Component({
@@ -33,17 +28,8 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   listaModelos: any;
   vehiculoEditando: any;
 
-  constructor(
-    private dbServ: DBservice,
-    private cdRef: ChangeDetectorRef,
-    private fb: FormBuilder,
-    private router: Router,
-    public mServ: ModalService,
-    private tServ: TablasService,
-    public layServ: LayoutService,
-    public _ipc: IpcService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService) {
+    super();
   }
 
   ngOnInit() {

@@ -6,11 +6,7 @@ import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
 
 import { DBservice } from '../../core/services/bdservice.service';
-import { IpcService } from '../../core/services/ipc.service';
-
-import { LayoutService } from './layout.service';
 import { mixinClass } from '../mixinClass';
-import { ModalService } from '../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { modalClass } from '../components/modal/modal';
@@ -44,16 +40,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   initNavigate = true;
   cuadre_hoy;
 
-  constructor(
-    private dbServ: DBservice,
-    private breakpointObserver: BreakpointObserver,
-    private router: Router,
-    public _ipc: IpcService,
-    public layServ: LayoutService,
-    private cdRef: ChangeDetectorRef,
-    public mServ: ModalService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef) {
+    super();
 
     this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {

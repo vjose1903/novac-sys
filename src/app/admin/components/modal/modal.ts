@@ -1,10 +1,7 @@
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { IpcService } from '../../../core/services/ipc.service';
 import { LayoutClass } from '../../layout/layout';
-import { LayoutService } from '../../layout/layout.service';
-import { ModalService } from './modal.service';
+
 import { VM } from './interfaces';
 import { SingletonService } from '../../../core/services/singleton.service';
 
@@ -30,9 +27,12 @@ export class modalClass extends LayoutClass {
 
   fun = SingletonService.fun;
   zone = SingletonService.zone;
+  _ipc = SingletonService._ipc;
+  mServ = SingletonService.mServ;
+  pdfServ = SingletonService.pdfServ;
 
-  constructor(public mServ: ModalService, public _ipc: IpcService, public layServ?: LayoutService) {
-    super(layServ);
+  constructor() {
+    super();
   }
 
   _init_modal(arg) {

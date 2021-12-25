@@ -5,12 +5,8 @@ import * as moment from '../../../../utils/javascript/moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IpcService } from '../../../core/services/ipc.service';
 import { TablasComponent } from '../../components/tablas/tablas.component';
-import { ModalService } from '../../components/modal/modal.service';
-import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -39,17 +35,8 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   lista_tipos_facturas: any;
   propietario_factura: any;
   paqueteComprobante;
-  constructor(
-    private dbServ: DBservice,
-    private activeRoute: ActivatedRoute,
-    public mServ: ModalService,
-    public _ipc: IpcService,
-
-    private router: Router,
-    public layServ: LayoutService,
-    public pdfServ: PdfService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private activeRoute: ActivatedRoute, private router: Router) {
+    super();
   }
 
   ngOnInit() {

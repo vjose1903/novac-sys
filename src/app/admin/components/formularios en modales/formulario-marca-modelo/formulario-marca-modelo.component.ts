@@ -2,13 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { DBservice } from '../../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
-
-import { ModalService } from '../../../components/modal/modal.service';
 import * as _ from 'lodash';
 import { TablasService } from '../../../components/tablas/tablas.service';
 import { mixinClass } from '../../../mixinClass';
-import { IpcService } from '../../../../core/services/ipc.service';
-import { LayoutService } from '../../../layout/layout.service';
 
 @Component({
   selector: 'app-formulario-marca-modelo',
@@ -49,15 +45,8 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
   showModal: boolean;
   element;
   obj_p = this.tServ.obj_paginate;
-  constructor(
-    private fb: FormBuilder,
-    private dbServ: DBservice,
-    public mServ: ModalService,
-    private tServ: TablasService,
-    public _ipc: IpcService,
-    public layServ: LayoutService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private fb: FormBuilder, private dbServ: DBservice, private tServ: TablasService) {
+    super();
   }
 
   ngOnInit() {

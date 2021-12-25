@@ -4,12 +4,9 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as moment from '../../../../utils/javascript/moment';
-import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { LoaderService } from '../../../loader/loader.service';
-import { IpcService } from '../../../core/services/ipc.service';
-import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
 import { ArticuloC } from './articulo';
 
@@ -95,13 +92,10 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     private cdRef: ChangeDetectorRef,
     private fb: FormBuilder,
     private router: Router,
-    public mServ: ModalService,
     private tServ: TablasService,
     private loadServ: LoaderService,
-    public _ipc: IpcService,
-    public layServ: LayoutService,
   ) {
-    super(mServ, _ipc, layServ);
+    super();
   }
 
   ngOnInit() {

@@ -2,13 +2,8 @@ import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/co
 import { DBservice } from '../../core/services/bdservice.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
-import * as moment from '../../../utils/javascript/moment';
-import { ModalService } from '../components/modal/modal.service';
 import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
-import { IpcService } from '../../core/services/ipc.service';
-import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
-import { PdfService } from '../../core/services/pdf/pdf.service';
 import { LoaderService } from '../../../app/loader/loader.service';
 
 @Component({
@@ -63,16 +58,8 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   pdfSrc: any;
   fileName: any;
 
-  constructor(
-    private dbServ: DBservice,
-    private tServ: TablasService,
-    public mServ: ModalService,
-    public _ipc: IpcService,
-    public layServ: LayoutService,
-    public pdfServ: PdfService,
-    public loadServ: LoaderService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private tServ: TablasService, public loadServ: LoaderService) {
+    super();
   }
 
   async ngOnInit() {

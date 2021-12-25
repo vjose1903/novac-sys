@@ -9,6 +9,9 @@ import { SingletonService } from './core/services/singleton.service';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+import { ModalService } from './admin/components/modal/modal.service';
+import { LayoutService } from './admin/layout/layout.service';
+import { PdfService } from './core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-root',
@@ -31,15 +34,23 @@ export class AppComponent implements OnInit, AfterContentChecked {
     private loaderServ: LoaderService,
     private cdRef: ChangeDetectorRef,
     public fun: FunctionService,
-    private router: Router,
+
     public zone: NgZone,
     public http: HttpClient,
+    public mServ: ModalService,
+    public layServ: LayoutService,
+    public pdfServ: PdfService,
   ) {}
 
   ngOnInit(): void {
     SingletonService.fun = this.fun;
     SingletonService.zone = this.zone;
     SingletonService.http = this.http;
+
+    SingletonService.mServ = this.mServ;
+    SingletonService._ipc = this._ipc;
+    SingletonService.layServ = this.layServ;
+    SingletonService.pdfServ = this.pdfServ;
 
     this.loaderServ.isLoading.subscribe((v) => {
       this.loading = v;

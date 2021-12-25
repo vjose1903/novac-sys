@@ -1,13 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { LoaderService } from '../../loader/loader.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
-import { IpcService } from '../../core/services/ipc.service';
-import { ModalService } from '../components/modal/modal.service';
-import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
-import { PdfService } from '../../core/services/pdf/pdf.service';
 import * as _ from 'lodash';
 
 @Component({
@@ -21,15 +16,8 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   tipoModal: string;
   scaleImpresion: any;
 
-  constructor(
-    public _ipc: IpcService,
-    public mServ: ModalService,
-    private dbServ: DBservice,
-    public layServ: LayoutService,
-    public loadServ: LoaderService,
-    public pdfServ: PdfService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, public loadServ: LoaderService) {
+    super();
   }
 
   appDir;
@@ -252,8 +240,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       };
     }
 
-    console.log("obj ",obj);
-
+    console.log('obj ', obj);
 
     if (abrirModal) this.abrirModal(tipo_modal, obj, tipo);
   }

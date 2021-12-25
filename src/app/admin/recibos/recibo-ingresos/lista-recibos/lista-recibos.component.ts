@@ -2,13 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DBservice } from '../../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
-import { IpcService } from '../../../../core/services/ipc.service';
-import { ModalService } from '../../../components/modal/modal.service';
 import { TablasService } from '../../../components/tablas/tablas.service';
-import { LayoutService } from '../../../../admin/layout/layout.service';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import { mixinClass } from '../../../mixinClass';
-import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { LoaderService } from '../../../../loader/loader.service';
 
 @Component({
@@ -70,17 +66,8 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   lista_recibos;
   rowSelected: any;
 
-  constructor(
-    public dbServ: DBservice,
-    private router: Router,
-    public _ipc: IpcService,
-    public mServ: ModalService,
-    private tServ: TablasService,
-    public layServ: LayoutService,
-    public pdfServ: PdfService,
-    public loadServ: LoaderService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(public dbServ: DBservice, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+    super();
   }
 
   async ngOnInit() {

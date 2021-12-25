@@ -3,12 +3,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
-import { Subscription } from 'rxjs';
-import { ModalService } from '../../components/modal/modal.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { LayoutService } from '../../layout/layout.service';
-import { IpcService } from '../../../core/services/ipc.service';
 import { mixinClass } from '../../mixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
@@ -58,17 +54,8 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   camposDisabled: boolean = true;
   editando: boolean = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private dbServ: DBservice,
-    public mServ: ModalService,
-    private router: Router,
-    private tServ: TablasService,
-    public layServ: LayoutService,
-    public _ipc: IpcService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private dbServ: DBservice, private tServ: TablasService) {
+    super();
   }
 
   ngOnInit() {

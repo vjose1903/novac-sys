@@ -4,10 +4,7 @@ import * as _ from 'lodash';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as moment from '../../../../utils/javascript/moment';
-import { ModalService } from '../../components/modal/modal.service';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { IpcService } from '../../../core/services/ipc.service';
-import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
 
 @Component({
@@ -90,15 +87,8 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   desdeAlert = false;
   hastaAlert = false;
   listaNCFBack: any[];
-  constructor(
-    private dbServ: DBservice,
-    public _ipc: IpcService,
-    public layServ: LayoutService,
-    public mServ: ModalService,
-    private tServ: TablasService,
-    private localeService: BsLocaleService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private tServ: TablasService, private localeService: BsLocaleService) {
+    super();
     this.dpConfig = Object.assign(
       {},
       {

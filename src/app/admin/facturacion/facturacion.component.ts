@@ -4,16 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from '../../../utils/javascript/moment';
 import { DBservice } from '../../core/services/bdservice.service';
 import * as _ from 'lodash';
-import { IpcService } from '../../core/services/ipc.service';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { GLOBAL, tipos_facturas } from '../../core/services/GLOBAL';
-
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
 import { FacturacionService } from './facturacion.service';
-import { PdfService } from '../../core/services/pdf/pdf.service';
 import { modalClass } from '../components/modal/modal';
 import { Subscription } from 'rxjs';
 
@@ -112,18 +108,15 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   subFactG: Subscription;
 
   constructor(
-    public _ipc: IpcService,
     public mServ: ModalService,
     private dbServ: DBservice,
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    public layServ: LayoutService,
     private localeService: BsLocaleService,
-    private pdfServ: PdfService,
     public factServ: FacturacionService,
   ) {
-    super(mServ, _ipc, layServ);
+    super();
 
     this.form = this.fb.group({
       id: [],

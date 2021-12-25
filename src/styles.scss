@@ -6,9 +6,8 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
-
-.overflowHidden{
-  overflow:hidden;
+.overflowHidden {
+  overflow: hidden;
 }
 
 .row {
@@ -141,7 +140,7 @@ body {
 
 .backnegro {
   background-color: #000000b3;
-  z-index: 9;
+  z-index: 999999;
   display: flex;
   justify-content: center;
   align-items: center;

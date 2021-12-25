@@ -3,12 +3,8 @@ import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as moment from '../../../../../utils/javascript/moment';
-import { ModalService } from '../../modal/modal.service';
 import { DBservice } from '../../../../core/services/bdservice.service';
 import { mixinClass } from '../../../mixinClass';
-import { LayoutService } from '../../../layout/layout.service';
-import { IpcService } from '../../../../core/services/ipc.service';
-import { FunctionService } from '../../../../core/services/functions.service';
 
 @Component({
   selector: 'app-form-reportes',
@@ -37,16 +33,8 @@ export class FormVentasComponent extends mixinClass implements OnInit {
   formarFecha = ['suplidor_prod'];
   Fecha: string;
 
-  constructor(
-    private fb: FormBuilder,
-    public fun: FunctionService,
-    public _ipc: IpcService,
-    public mServ: ModalService,
-    public dbServ: DBservice,
-    public layServ: LayoutService,
-    private localeService: BsLocaleService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private fb: FormBuilder, public dbServ: DBservice, private localeService: BsLocaleService) {
+    super();
     this.dpConfig = Object.assign(
       {},
       {

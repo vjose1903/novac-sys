@@ -1,13 +1,8 @@
 import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { DBservice } from '../../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import * as _ from 'lodash';
-import { ModalService } from '../../modal/modal.service';
 import { mixinClass } from '../../../mixinClass';
-import { IpcService } from '../../../../core/services/ipc.service';
-import { LayoutService } from '../../../layout/layout.service';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
@@ -27,8 +22,8 @@ export class FormCantidadEfectivoComponent extends mixinClass implements OnInit,
   @Output() cancel = new EventEmitter<any>();
   factura_de: any;
   cambiar_articulos = undefined;
-  constructor(private dbServ: DBservice, public mServ: ModalService, public _ipc: IpcService, public layServ: LayoutService) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice) {
+    super();
   }
 
   ngOnInit() {

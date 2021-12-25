@@ -2,13 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
-
 import { GLOBAL } from '../../../core/services/GLOBAL';
-import { Subscription } from 'rxjs';
-import { ModalService } from '../../components/modal/modal.service';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { LayoutService } from '../../layout/layout.service';
-import { IpcService } from '../../../core/services/ipc.service';
 import { mixinClass } from '../../mixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 
@@ -73,16 +68,8 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
   editando: boolean = false;
   myValidators = new customValidators();
 
-  constructor(
-    private dbServ: DBservice,
-    private fb: FormBuilder,
-
-    public layServ: LayoutService,
-    public _ipc: IpcService,
-    public mServ: ModalService,
-    private tServ: TablasService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private fb: FormBuilder, private tServ: TablasService) {
+    super();
   }
 
   ngOnInit() {

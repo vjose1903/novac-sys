@@ -1,16 +1,11 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { ModalService } from '../components/modal/modal.service';
 import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from '../../../utils/javascript/moment';
-import { IpcService } from '../../core/services/ipc.service';
-
-import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
-import { PdfService } from '../../core/services/pdf/pdf.service';
 import { ArticuloC } from '../registros/articulos/articulo';
 
 @Component({
@@ -72,15 +67,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   articuloClass = new ArticuloC();
 
-  constructor(
-    public mServ: ModalService,
-    public _ipc: IpcService,
-    private dbServ: DBservice,
-    private fb: FormBuilder,
-    public layServ: LayoutService,
-    public pdfServ: PdfService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private fb: FormBuilder) {
+    super();
   }
 
   ngOnInit() {
@@ -749,6 +737,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     } else if (filas_ocupadas.length === 0) {
       this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
     } else {
+      this.CuerpoConduce = [];
       for (let i = 0; i < filas_ocupadas.length; i++) {
         const fila = filas_ocupadas[i].getRawValue();
         const detalle = _.pick(fila, ['detalle_factura_id', 'articulo.id', 'can', 'cantidad_en_unidades', 'uni', 'id']);
@@ -768,17 +757,13 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   async sendData() {
-    const empleado = this.fun.getUser();
-
     const cabecera_conduce = {};
-    cabecera_conduce['user_id'] = empleado.id;
     cabecera_conduce['cliente_id'] = this.cliente.id;
     cabecera_conduce['numero_conduce'] = '';
     cabecera_conduce['detalle_conduces_attributes'] = this.CuerpoConduce;
 
     try {
       const res = await this.dbServ.createConduce(cabecera_conduce).toPromise();
-      this.dbServ.toastSuccess('Conduce realizado.', 'CORRECTO');
 
       const obj = { data: res, type: 'conduce' };
 
@@ -791,7 +776,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         }
       });
     } catch (error) {
-      if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
+      // if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
     }
   }
 

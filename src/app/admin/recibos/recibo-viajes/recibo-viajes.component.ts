@@ -3,12 +3,8 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import * as moment from '../../../../utils/javascript/moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
-import { ModalService } from '../../components/modal/modal.service';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { IpcService } from '../../../core/services/ipc.service';
-import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -71,16 +67,8 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   have_incidencia = false;
   incidencia = '';
 
-  constructor(
-    private dbServ: DBservice,
-    public _ipc: IpcService,
-    public mServ: ModalService,
-    public layServ: LayoutService,
-
-    private tServ: TablasService,
-    public pdfServ: PdfService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private tServ: TablasService) {
+    super();
   }
 
   ngOnInit() {
@@ -341,7 +329,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
         type: 'recibo_ingreso',
       };
 
-      this.pdfServ.generatePdf(obj_print).then( (res) => {
+      this.pdfServ.generatePdf(obj_print).then((res) => {
         if (res.status === 'si') {
           const objBase = {
             base64: res.body,

@@ -1,17 +1,9 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-
 import { DBservice } from '../../core/services/bdservice.service';
-
 import * as _ from 'lodash';
-import { ModalService } from '../components/modal/modal.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
-
-import { obj_paginate_default, TablasService } from '../components/tablas/tablas.service';
-
-import { LayoutService } from '../layout/layout.service';
-
-import { IpcService } from '../../core/services/ipc.service';
 import { mixinClass } from '../mixinClass';
+import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
@@ -46,14 +38,8 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   listaProductos: any;
   articuloEditando: any;
 
-  constructor(
-    private dbServ: DBservice,
-    public mServ: ModalService,
-    private tServ: TablasService,
-    public layServ: LayoutService,
-    public _ipc: IpcService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private tServ: TablasService) {
+    super();
   }
 
   ngOnInit() {
@@ -152,7 +138,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       }
     }
   }
-
 
   disableOption(arg, boolean) {
     (this.element = document.getElementById(arg) as any).disabled = boolean;

@@ -5,12 +5,8 @@ import * as _ from 'lodash';
 import * as moment from '../../../../utils/javascript/moment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
-import { ModalService } from '../../components/modal/modal.service';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { IpcService } from '../../../core/services/ipc.service';
-import { LayoutService } from '../../layout/layout.service';
 import { mixinClass } from '../../mixinClass';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { LoaderService } from '../../../loader/loader.service';
 @Component({
   selector: 'app-buscar-factura',
@@ -36,18 +32,8 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   tipo_factura_id = null;
   valor: any;
 
-  constructor(
-    private dbServ: DBservice,
-    public mServ: ModalService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private tServ: TablasService,
-    public _ipc: IpcService,
-    public layServ: LayoutService,
-    public pdfServ: PdfService,
-    public loadServ: LoaderService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private dbServ: DBservice, private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+    super();
   }
   campo = null;
   placeHolder = '';

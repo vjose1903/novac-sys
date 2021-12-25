@@ -2,17 +2,16 @@ import { EventEmitter, OnChanges } from '@angular/core';
 import { Component, OnInit, OnDestroy, Input, Output, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
-import { DBservice } from '../../../../core/services/bdservice.service';
-
 import { GLOBAL } from '../../../../core/services/GLOBAL';
-import { ModalService } from '../../modal/modal.service';
+import { mixinClass } from '../../../mixinClass';
+import { ArticuloC } from '../../../registros/articulos/articulo';
 
 @Component({
   selector: 'app-modal-seleccinar-articulo',
   templateUrl: './modal-seleccinar-articulo.component.html',
   styleUrls: ['./modal-seleccinar-articulo.component.scss'],
 })
-export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnChanges {
+export class ModalSeleccinarArticuloComponent extends mixinClass implements OnInit, OnDestroy, OnChanges {
   @Input() articulos;
   @Input() returnArticulos;
   @Output() getArticulos = new EventEmitter<any>();
@@ -55,39 +54,61 @@ export class ModalSeleccinarArticuloComponent implements OnInit, OnDestroy, OnCh
       title: '',
     },
   ];
+
   articulos_selected = [];
 
   subDeci: Subscription;
-  constructor(private dbServ: DBservice, public mServ: ModalService) {}
+  articuloClass = new ArticuloC();
+  articulosParsed = false;
+  constructor() {
+    super();
+  }
 
   ngOnInit() {
+    const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
     console.log('this.articulos --> ', this.articulos);
 
     this.articulos = GLOBAL.duplicarJson(this.articulos);
+    // TODO: MOVER ESTE PARSO PARA ANTES DE ABRIR EL MODAL
+    let conteo = 0;
     this.articulos.map(async (arti) => {
-      const medida = arti.retirado === 0 ? '' : arti.retirado < 100 ? 'LBS' : 'QTL';
-      const cantidad = arti.retirado < 100 ? arti.retirado : arti.retirado / 100;
-      const multiplo = arti.cantidad_en_unidades / arti.cantidad;
-      const cant_en_unidades_actual = arti.cantidad_en_unidades - arti.retirado;
-      const cant_restante = cant_en_unidades_actual / multiplo;
+      this.articuloClass.getArticulosFiltrado({ buscar: arti.codigo, fecha: fechaActual, parameters: { contenido: true } }).then((res_articulo) => {
+        const articulo = _.first(res_articulo);
+        console.log('articulo --> ', articulo.contenido);
+        /*
+        para poner bien el sufijo de las cantidades en el modal tengo que ordenar las cantidades de mayor a menor
+        y luego empezar a comparar si la cantidad es mayor o igual a la medida en turno sino seguir con el menor
+        hasta consegir cual es la medida optima para presentar
+        */
+        const medida = arti.retirado === 0 ? '' : arti.retirado < 100 ? 'LBS' : 'QTL';
+        const cantidad = arti.retirado < 100 ? arti.retirado : arti.retirado / 100;
+        const multiplo = arti.cantidad_en_unidades / arti.cantidad;
+        const cant_en_unidades_actual = arti.cantidad_en_unidades - arti.retirado;
+        const cant_restante = cant_en_unidades_actual / multiplo;
 
-      arti.retirado_mostrar = cantidad + ' ' + medida;
+        arti.retirado_mostrar = cantidad + ' ' + medida;
 
-      arti.restante_mostrar = cant_restante + ' ' + medida;
+        arti.restante_mostrar = cant_restante + ' ' + medida;
 
-      arti.customStyles = {
-        'td-descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
-        // 'td-select': { width: '10%', display: 'flex', 'justify-content': 'flex-end', 'aling-items': 'center', 'padding-right': '0.5rem' },
-        'td-cantidad': { width: '9%' },
-        'td-unidad': { width: '15%' },
-        'td-retirado_mostrar': { width: '9%' },
-        'td-restante_mostrar': { width: '15%' },
-        'td-select': { width: '6.5%' },
-      };
+        arti.customStyles = {
+          'td-descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
+          // 'td-select': { width: '10%', display: 'flex', 'justify-content': 'flex-end', 'aling-items': 'center', 'padding-right': '0.5rem' },
+          'td-cantidad': { width: '9%' },
+          'td-unidad': { width: '15%' },
+          'td-retirado_mostrar': { width: '9%' },
+          'td-restante_mostrar': { width: '15%' },
+          'td-select': { width: '6.5%' },
+        };
 
-      return arti;
+        conteo++;
+        if (conteo >= this.articulos.length) setTimeout(() => (this.articulosParsed = true), 250);
+
+        return arti;
+      });
     });
   }
+
+  parseCantidades() {}
 
   ngOnChanges(simpleChanges) {
     if (simpleChanges && simpleChanges.returnArticulos && simpleChanges.returnArticulos.currentValue) {

@@ -1,10 +1,9 @@
 import { Subscription } from 'rxjs';
-import { FunctionService } from '../../core/services/functions.service';
-import { GLOBAL } from '../../core/services/GLOBAL';
-import { LayoutService } from './layout.service';
+import { SingletonService } from '../../core/services/singleton.service';
+
 
 export class LayoutClass {
-  constructor(public layServ?: LayoutService, public fun?: FunctionService) {}
+  constructor() {}
 
   info_cambio = {};
   ruta_a_cambiar = '';
@@ -15,7 +14,10 @@ export class LayoutClass {
 
   subRefresh: Subscription;
 
+  layServ;
   _init_layout() {
+    this.layServ = SingletonService.layServ;
+
     this.subInit = this.layServ.INITCAMBIOMENU.subscribe((res) => {
       if (res && res.bool) {
         this.info_cambio = res;

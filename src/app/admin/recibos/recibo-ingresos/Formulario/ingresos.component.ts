@@ -6,13 +6,8 @@ import { GLOBAL } from '../../../../core/services/GLOBAL';
 import * as moment from '../../../../../utils/javascript/moment';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../../../components/tablas/tablas.component';
-import { ModalService } from '../../../components/modal/modal.service';
 import { TablasService } from '../../../components/tablas/tablas.service';
-import { IpcService } from '../../../../core/services/ipc.service';
-
-import { LayoutService } from '../../../../admin/layout/layout.service';
 import { mixinClass } from '../../../mixinClass';
-import { PdfService } from '../../../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -113,16 +108,8 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   recibiendo = 0;
   restando = 0;
 
-  constructor(
-    private config: NgSelectConfig,
-    public mServ: ModalService,
-    private dbServ: DBservice,
-    public _ipc: IpcService,
-    private tServ: TablasService,
-    public layServ: LayoutService,
-    public pdfServ: PdfService,
-  ) {
-    super(mServ, _ipc, layServ);
+  constructor(private config: NgSelectConfig, private dbServ: DBservice, private tServ: TablasService) {
+    super();
     this.config.notFoundText = 'Articulo no existe';
   }
 

@@ -1,8 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { IpcService } from '../../core/services/ipc.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
-import { ModalService } from '../components/modal/modal.service';
-import { LayoutService } from '../layout/layout.service';
 import { mixinClass } from '../mixinClass';
 import { AppConfig } from '../../../environments/environment';
 
@@ -13,8 +10,8 @@ import { AppConfig } from '../../../environments/environment';
 })
 // export class HomeAdminComponent extends LayoutClass implements OnInit, OnDestroy {
 export class HomeAdminComponent extends mixinClass implements OnInit, OnDestroy {
-  constructor(public _ipc: IpcService, public mServ: ModalService, public layServ: LayoutService) {
-    super(mServ, _ipc, layServ);
+  constructor() {
+    super();
   }
 
   imgLogo = AppConfig.imgLogo;
