@@ -88,8 +88,8 @@ export class InterceptorService implements HttpInterceptor {
   }
 
   handler_msg(menssages, tipo_) {
-    console.warn('MENSAJE DESDE EL INTERCEPTOR');
-    console.warn('menssages ', menssages);
+    // console.warn('MENSAJE DESDE EL INTERCEPTOR');
+    // console.warn('menssages ', menssages);
 
     if (menssages && Array.isArray(menssages)) {
       for (let i = 0; i < menssages.length; i++) {

@@ -74,21 +74,32 @@ export class ModalSeleccinarArticuloComponent extends mixinClass implements OnIn
     this.articulos.map(async (arti) => {
       this.articuloClass.getArticulosFiltrado({ buscar: arti.codigo, fecha: fechaActual, parameters: { contenido: true } }).then((res_articulo) => {
         const articulo = _.first(res_articulo);
-        console.log('articulo --> ', articulo.contenido);
-        /*
-        para poner bien el sufijo de las cantidades en el modal tengo que ordenar las cantidades de mayor a menor
-        y luego empezar a comparar si la cantidad es mayor o igual a la medida en turno sino seguir con el menor
-        hasta consegir cual es la medida optima para presentar
-        */
-        const medida = arti.retirado === 0 ? '' : arti.retirado < 100 ? 'LBS' : 'QTL';
-        const cantidad = arti.retirado < 100 ? arti.retirado : arti.retirado / 100;
-        const multiplo = arti.cantidad_en_unidades / arti.cantidad;
-        const cant_en_unidades_actual = arti.cantidad_en_unidades - arti.retirado;
-        const cant_restante = cant_en_unidades_actual / multiplo;
+        const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.' };
+        const contenidos_format = this.formatContenidos(articulo.contenido);
 
-        arti.retirado_mostrar = cantidad + ' ' + medida;
+        const arrayMostrar = [
+          { num: arti.retirado, medida: '' },
+          { num: arti.cantidad_en_unidades - arti.retirado, medida: '' },
+        ];
 
-        arti.restante_mostrar = cant_restante + ' ' + medida;
+        for (let j = 0; j < arrayMostrar.length; j++) {
+          const element = arrayMostrar[j];
+
+          for (let i = 0; i < contenidos_format.length; i++) {
+            const contenido = contenidos_format[i];
+            console.log('  ');
+
+            console.log('element.num >= contenido[1] ', `${element.num} >= ${contenido[1]}`);
+            if (element.num >= contenido[1]) {
+              const cantidad = element.num / contenido[1];
+              element.medida = `${cantidad} ${abreviaturas[contenido[0]]}`;
+              break;
+            }
+          }
+        }
+
+        arti.retirado_mostrar = arrayMostrar[0].medida;
+        arti.restante_mostrar = arrayMostrar[1].medida;
 
         arti.customStyles = {
           'td-descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
@@ -106,6 +117,15 @@ export class ModalSeleccinarArticuloComponent extends mixinClass implements OnIn
         return arti;
       });
     });
+  }
+
+  formatContenidos(contenidos) {
+    const contenido = [];
+    for (var cont in contenidos) {
+      if (!_.includes(cont, 'Saco')) contenido.push([cont, contenidos[cont]]);
+    }
+
+    return contenido.sort((a, b) => a[1] + b[1]);
   }
 
   parseCantidades() {}
