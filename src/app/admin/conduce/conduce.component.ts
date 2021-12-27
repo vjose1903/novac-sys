@@ -63,7 +63,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   facturaAdelantadaSelected;
   CuerpoConduce = [];
   rowsExcede = [];
-  FechaConduce: any;
+  fechaConduce: any;
 
   articuloClass = new ArticuloC();
 
@@ -91,7 +91,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   async necesarioStar() {
-    this.FechaConduce = this.formarFechaFactura(new Date())['FechaFactura'];
+    this.fechaConduce = this.formarFechaFactura(new Date())['FechaFactura'];
     this.enfocarInput('clienteI');
   }
 
@@ -217,7 +217,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
     if (input === 'can-' && this.fun.hasValue(codigo)) {
       if (this.fun.isEmpty(articulo) || codigo !== articulo.codigo) {
-        const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [], fecha_articulo: this.FechaConduce };
+        const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
 
         this.desEnfocarInput('cod-' + i);
         this.abrirModal('buscarArticulo', obj);
@@ -531,12 +531,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
             (fact) =>
               (fact = fact.data.map((val) => {
                 val.secuencia = _.padStart(val.numero_factura, 8, '0');
-
                 val.fecha = moment(val.fecha_equivalente).format('DD-MM-YYYY');
-                val.fechaV = moment(val.fecha_vencimiento).isValid() ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : '';
-                val.estado_ = val.estado ? 'fas fa-check' : 'fas fa-times';
-                val.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(val.balance));
-
                 val.customStyles = { 'td-detalles_selected': { width: '2rem' } };
 
                 for (let i = 0; i < val.detalle_facturas.length; i++) {
@@ -576,8 +571,46 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   async SeleccionarFactruaAdelantada(factura) {
     if (factura) {
       this.checkFacturasAdelantadasSelection();
-      this.abrirModal('seleccionar_articulos_adelantados', factura.detalle_facturas);
+      let conteo = 0;
+      factura.detalle_facturas.map(async (arti) => {
+        this.articuloClass.getArticulosFiltrado({ buscar: arti.codigo, fecha: this.fechaConduce, parameters: { contenido: true } }).then((res_articulo) => {
+          const articulo = _.first(res_articulo);
+          const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.' };
+          const contenidos_format = this.formatContenidos(articulo.contenido);
+
+          const arrayMostrar = [
+            { num: arti.retirado, medida: '' },
+            { num: arti.cantidad_en_unidades - arti.retirado, medida: '' },
+          ];
+
+          for (let j = 0; j < arrayMostrar.length; j++) {
+            const element = arrayMostrar[j];
+
+            const cantidadMostrarSelected = _.find(contenidos_format, (cont) => element.num >= cont[1]);
+
+            const cantidad = element.num / cantidadMostrarSelected[1];
+            element.medida = `${cantidad} ${abreviaturas[cantidadMostrarSelected[0]]}`;
+          }
+
+          arti.retirado_mostrar = arrayMostrar[0].medida;
+          arti.restante_mostrar = arrayMostrar[1].medida;
+
+          conteo++;
+          if (conteo >= factura.detalle_facturas.length) setTimeout(() => this.abrirModal('seleccionar_articulos_adelantados', factura.detalle_facturas), 250);
+
+          return arti;
+        });
+      });
     }
+  }
+
+  formatContenidos(contenidos) {
+    const contenido = [];
+    for (var cont in contenidos) {
+      if (!_.includes(cont, 'Saco')) contenido.push([cont, contenidos[cont]]);
+    }
+
+    return contenido.sort((a, b) => a[1] + b[1]);
   }
 
   checkIfRowContainArticulo(i) {
@@ -663,7 +696,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       const cant_en_unidades_actual = element.cantidad_en_unidades - element.retirado;
       const multiplo = element.cantidad_en_unidades / element.cantidad;
       const cant_actual = cant_en_unidades_actual / multiplo;
-      this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.FechaConduce }).then((result) => {
+      this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.fechaConduce }).then((result) => {
         const articulo = _.first(result);
         // const cant_en_unidades_actual = cant_en_unidades_actual * multiplo;
 
@@ -728,7 +761,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   async imprimirConduce() {
     const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
-    console.log('filas_ocupadas --> ', filas_ocupadas);
 
     if (this.rowsExcede.length) {
       this.dbServ.toastWarning('No puede hacer el conduce, existiendo artículos que exceden su cantidad en el inventario', 'Aviso');

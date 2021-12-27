@@ -59,74 +59,30 @@ export class ModalSeleccinarArticuloComponent extends mixinClass implements OnIn
 
   subDeci: Subscription;
   articuloClass = new ArticuloC();
-  articulosParsed = false;
+
   constructor() {
     super();
   }
 
   ngOnInit() {
-    const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
-    console.log('this.articulos --> ', this.articulos);
-
     this.articulos = GLOBAL.duplicarJson(this.articulos);
-    // TODO: MOVER ESTE PARSO PARA ANTES DE ABRIR EL MODAL
-    let conteo = 0;
+
     this.articulos.map(async (arti) => {
-      this.articuloClass.getArticulosFiltrado({ buscar: arti.codigo, fecha: fechaActual, parameters: { contenido: true } }).then((res_articulo) => {
-        const articulo = _.first(res_articulo);
-        const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.' };
-        const contenidos_format = this.formatContenidos(articulo.contenido);
+      arti.customStyles = {
+        'td-descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
+        // 'td-select': { width: '10%', display: 'flex', 'justify-content': 'flex-end', 'aling-items': 'center', 'padding-right': '0.5rem' },
+        'td-cantidad': { width: '9%' },
+        'td-unidad': { width: '15%' },
+        'td-retirado_mostrar': { width: '9%' },
+        'td-restante_mostrar': { width: '15%' },
+        'td-select': { width: '6.5%' },
+      };
 
-        const arrayMostrar = [
-          { num: arti.retirado, medida: '' },
-          { num: arti.cantidad_en_unidades - arti.retirado, medida: '' },
-        ];
-
-        for (let j = 0; j < arrayMostrar.length; j++) {
-          const element = arrayMostrar[j];
-
-          for (let i = 0; i < contenidos_format.length; i++) {
-            const contenido = contenidos_format[i];
-            console.log('  ');
-
-            console.log('element.num >= contenido[1] ', `${element.num} >= ${contenido[1]}`);
-            if (element.num >= contenido[1]) {
-              const cantidad = element.num / contenido[1];
-              element.medida = `${cantidad} ${abreviaturas[contenido[0]]}`;
-              break;
-            }
-          }
-        }
-
-        arti.retirado_mostrar = arrayMostrar[0].medida;
-        arti.restante_mostrar = arrayMostrar[1].medida;
-
-        arti.customStyles = {
-          'td-descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
-          // 'td-select': { width: '10%', display: 'flex', 'justify-content': 'flex-end', 'aling-items': 'center', 'padding-right': '0.5rem' },
-          'td-cantidad': { width: '9%' },
-          'td-unidad': { width: '15%' },
-          'td-retirado_mostrar': { width: '9%' },
-          'td-restante_mostrar': { width: '15%' },
-          'td-select': { width: '6.5%' },
-        };
-
-        conteo++;
-        if (conteo >= this.articulos.length) setTimeout(() => (this.articulosParsed = true), 250);
-
-        return arti;
-      });
+      return arti;
     });
   }
 
-  formatContenidos(contenidos) {
-    const contenido = [];
-    for (var cont in contenidos) {
-      if (!_.includes(cont, 'Saco')) contenido.push([cont, contenidos[cont]]);
-    }
 
-    return contenido.sort((a, b) => a[1] + b[1]);
-  }
 
   parseCantidades() {}
 
