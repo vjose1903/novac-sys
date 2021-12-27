@@ -501,15 +501,15 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   modalRemover(i, e?) {
     const fila_actual = this.filasDetalle[i].getRawValue();
+    const codigo = fila_actual['cod'];
     const name = fila_actual['des'];
     const unidad = fila_actual['uni'];
     let obj = {};
-    obj['nombre'] = unidad ? `${name} (${unidad})` : name;
+    obj['nombre'] = unidad && name ? `${name} (${unidad})` : name ? name : codigo;
 
-    if (name) {
-      this.indexRemove = i;
-      this.abrirModal('removerArticulo', obj);
-    }
+    this.indexRemove = i;
+
+    this.abrirModal('removerArticulo', obj);
 
     if (e) e.stopPropagation();
   }
@@ -586,10 +586,10 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
           for (let j = 0; j < arrayMostrar.length; j++) {
             const element = arrayMostrar[j];
 
-            const cantidadMostrarSelected = _.find(contenidos_format, (cont) => element.num >= cont[1]);
+            const contenidoSelected = _.find(contenidos_format, (cont) => element.num >= cont[1]);
 
-            const cantidad = element.num / cantidadMostrarSelected[1];
-            element.medida = `${cantidad} ${abreviaturas[cantidadMostrarSelected[0]]}`;
+            const cantidad = contenidoSelected ? element.num / contenidoSelected[1] : null;
+            element.medida = contenidoSelected ? `${cantidad} ${abreviaturas[contenidoSelected[0]]}` : null;
           }
 
           arti.retirado_mostrar = arrayMostrar[0].medida;
@@ -633,37 +633,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     this.abrirModal('dinamico_texto', obj, tipo_modal);
   }
 
-  parsearDetalleModal(articulos) {
-    const articulos_parsed = [];
-
-    for (let i = 0; i < this.filasDetalle.length; i++) {
-      const row_conduce = this.filasDetalle[i].value;
-
-      if (row_conduce.id) {
-        for (let j = 0; j < articulos.length; j++) {
-          const articulo = articulos[j];
-
-          const i = _.findIndex(this.filasDetalle, (control: any) => {
-            return control.id === articulo.id;
-          });
-
-          if (i !== -1) {
-            articulo.cantidad = this.filasDetalle[i].value.can + articulo.retirado;
-            articulos_parsed.push(articulo);
-          } else {
-            if (row_conduce.cod && row_conduce.des) {
-              articulos_parsed.push(row_conduce);
-            }
-          }
-        }
-      } else {
-        if (row_conduce.cod && row_conduce.des) {
-          articulos_parsed.push(row_conduce);
-        }
-      }
-    }
-    this.form.reset();
-  }
   // TODO: seguir de aqui para abajo
 
   llenarConduce(detalles, conteo = 0, firstResolve = null) {

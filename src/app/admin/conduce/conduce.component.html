@@ -79,7 +79,6 @@
       </table>
 
       <div class="cuadro scrollContainer" #cuadro>
-        <!-- <div class="cuadro" #cuadro [ngClass]="{ sinFlow: secuencia <= 12, conFlow: secuencia >= 13 }"> -->
         <form *ngIf="ARRAY_ROWARTICULOS" [formGroup]="form" action="">
           <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWARTICULOS.controls; let i = index">
             <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
@@ -113,9 +112,6 @@
                       </div>
                     </td>
 
-                    <!-- <td class="{{ checkIfArticuloRow(i) ? 'btnQuitarRow' : 'sombreado' }}" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
-                      <i class="far fa-trash-alt text-red btnBorrar" (click)="modalRemover(i)"></i>
-                    </td> -->
                     <!--  ::::::::::::  CODIGO  ::::::::::::  -->
                     <td class="COD td0padding">
                       <div class="form-group m-0">
@@ -205,7 +201,6 @@
         <div class="col-2">
           <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (click)="cancelarConduce(1)"></app-btncircular>
         </div>
-
       </div>
     </div>
   </div>

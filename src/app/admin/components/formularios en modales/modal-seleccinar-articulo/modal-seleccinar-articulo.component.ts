@@ -70,7 +70,6 @@ export class ModalSeleccinarArticuloComponent extends mixinClass implements OnIn
     this.articulos.map(async (arti) => {
       arti.customStyles = {
         'td-descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
-        // 'td-select': { width: '10%', display: 'flex', 'justify-content': 'flex-end', 'aling-items': 'center', 'padding-right': '0.5rem' },
         'td-cantidad': { width: '9%' },
         'td-unidad': { width: '15%' },
         'td-retirado_mostrar': { width: '9%' },
@@ -81,8 +80,6 @@ export class ModalSeleccinarArticuloComponent extends mixinClass implements OnIn
       return arti;
     });
   }
-
-
 
   parseCantidades() {}
 
