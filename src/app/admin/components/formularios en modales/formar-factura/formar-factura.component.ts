@@ -16,6 +16,8 @@ export class FormarFacturaComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
+    console.log(' factura ', this.factura);
+
     // this.factura.detalle_facturas = [
     //   ...this.factura.detalle_facturas,
     //   ...this.factura.detalle_facturas,
@@ -29,13 +31,16 @@ export class FormarFacturaComponent implements OnInit {
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
   }
+
   formatoNumeroFactura(num) {
     return _.padStart(num, 8, '0');
   }
+
   formatoFecha(fecha) {
     moment.locale('es');
     return moment(fecha).format('DD/MM/YYYY');
   }
+
   formatoHora(fecha) {
     moment.locale('es');
     return moment(fecha).format('hh:mm a');

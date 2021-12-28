@@ -137,7 +137,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
         formatoNumero: true,
         tipo: 'input',
         inputType: 'number',
-        disable: [{ kind: 'campo', target: 'select', value: [true] }],
+        disable: [{ kind: 'campo', target: 'select', value: [false] }],
 
         estilos: [{ width: '6rem' }],
       },

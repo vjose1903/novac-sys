@@ -1,72 +1,72 @@
-<div class="row">
-  <div class="col-12 mb-3">
-    <h3 class="negrita">Realizar recibo de ingreso</h3>
+<div class="row IngresosRow">
+  <div class="col-12 titulo">
+    <h3 class="negrita mb-0">Realizar recibo de ingreso</h3>
   </div>
-  <div class="col-5">
-    <div class="card card-padding sombra">
-      <div class="form-group">
-        <label class="control-label">Cliente: </label>
-        <!-- (change)="selectTipoArticulo($event.target.value)" -->
-        <input
-          type="text"
-          id="clienteI"
-          (keydown.enter)="abrirModalFiltro($event.target.value)"
-          (focus)="$event.target.select()"
-          placeholder="Nombre Cliente"
-          class="form-control mb-4"
-          autocomplete="off"
-          [disabled]="clienteAdepositar"
-        />
-        <button class="btn btn-gris" routerLink="/admin/recibos/ingresos">Atras</button>
-      </div>
-    </div>
-  </div>
-  <div class="col-7">
-    <div *ngIf="clienteAdepositar">
-      <div class="text-center">
-        <h1 class="negrita">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h1>
-
-        <span class="badge {{ clienteAdepositar.balance > 0 ? 'red' : 'green' }} text-white debe mb-3"> Debe: RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span>
-        <span *ngIf="facturas_selected.length > 0" class="badge green debe text-white mb-3 ml-2"> Recibiendo: RD$ {{ formatoNumero(recibiendo) }}</span>
-        <span *ngIf="facturas_selected.length > 0" class="badge yellow recibe mb-3 ml-2"> Faltando: RD$ {{ formatoNumero(restando) }}</span>
-      </div>
-      <div *ngIf="clienteAdepositar.balance > 0" class="d-flex justify-content-between">
-        <span class="negrita">Porcentaje de pago</span>
-        <div>
-          <span class="negrita">RD${{ formatoNumero(totalPagado) }} / </span>
-          <span class="negrita gris">RD${{ formatoNumero(totalFacturado) }}</span>
-        </div>
-      </div>
-      <p-progressBar *ngIf="clienteAdepositar.balance > 0" [value]="totalPagadoPorciento"></p-progressBar>
-    </div>
-  </div>
-  <div class="col-12 mt-4">
-    <div *ngIf="Facturas" class="row">
-      <div class="col-12">
-        <div #cardTabla id="cardTabla" class="card card-padding sombra ingreCard" style="height: 34rem">
-          <div class="w-100 d-flex justify-content-end">
-            <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+  <div class="col-12 p-0 arriba">
+    <div class="row">
+      <div class="col-5">
+        <div class="card card-padding sombra">
+          <div class="form-group">
+            <label class="control-label">Cliente: </label>
+            <input
+              type="text"
+              id="clienteI"
+              (keydown.enter)="abrirModalFiltro($event.target.value)"
+              (focus)="$event.target.select()"
+              placeholder="Nombre Cliente"
+              class="form-control mb-4"
+              autocomplete="off"
+              [disabled]="clienteAdepositar"
+            />
+            <button class="btn btn-gris" routerLink="/admin/recibos/ingresos">Atras</button>
           </div>
-          <app-tablas
-            *ngIf="Facturas"
-            [padre]="cardTabla"
-            [info]="info"
-            [data]="Facturas"
-            [quitarAScorll]="60"
-            (getInfoChange)="getInfoChange($event)"
-            (clickIcon)="clickVerPagos($event)"
-            [tablaHover]="false"
-            [focusRow]="false"
-            [id_tabla]="'facturasPendientes'"
-          ></app-tablas>
         </div>
       </div>
-      <div class="col-12 mt-3">
-        <div class="d-flex justify-content-end">
-          <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-          <input [disabled]="abilitarBtnConfirmar()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      <div class="col-7 abajo">
+        <div *ngIf="clienteAdepositar">
+          <div class="text-center">
+            <h1 class="negrita">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h1>
+
+            <span class="badge {{ clienteAdepositar.balance > 0 ? 'red' : 'green' }} text-white debe mb-3">
+              Debe: RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span
+            >
+            <span *ngIf="isOneFacturaWithMonto()" class="badge green debe text-white mb-3 ml-2"> Recibiendo: RD$ {{ formatoNumero(recibiendo) }}</span>
+            <span *ngIf="isOneFacturaWithMonto()" class="badge yellow recibe mb-3 ml-2"> Faltando: RD$ {{ formatoNumero(restando) }}</span>
+          </div>
+          <div *ngIf="clienteAdepositar.balance > 0" class="d-flex justify-content-between">
+            <span class="negrita">Porcentaje de pago</span>
+            <div>
+              <span class="negrita">RD${{ formatoNumero(totalPagado) }} / </span>
+              <span class="negrita gris">RD${{ formatoNumero(totalFacturado) }}</span>
+            </div>
+          </div>
+          <p-progressBar *ngIf="clienteAdepositar.balance > 0" [value]="totalPagadoPorciento"></p-progressBar>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="col-12 medio">
+    <div *ngIf="facturas" #cardTabla id="cardTabla" class="card card-padding sombra ingreCard h-100">
+      <div class="w-100 d-flex justify-content-end">
+        <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+      </div>
+      <app-tablas
+        [padre]="cardTabla"
+        [info]="info"
+        [data]="facturas"
+        [quitarAScorll]="60"
+        (getInfoChange)="getInfoChange($event)"
+        (clickIcon)="clickVerPagos($event)"
+        [tablaHover]="false"
+        [focusRow]="false"
+        [id_tabla]="'facturasPendientes'"
+      ></app-tablas>
+    </div>
+  </div>
+  <div class="col-12 abajo">
+    <div *ngIf="facturas" class="d-flex justify-content-end">
+      <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+      <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
     </div>
   </div>
 </div>

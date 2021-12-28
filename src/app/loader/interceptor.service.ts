@@ -16,6 +16,8 @@ export class InterceptorService implements HttpInterceptor {
   requestCount: number = 0;
 
   private startRequest(args?): void {
+    console.log('args --> ', args);
+
     if (this.requestCount == 0 && args !== 'no_show') this.loadServ.isLoading.next(true);
     this.requestCount++;
   }
@@ -33,6 +35,7 @@ export class InterceptorService implements HttpInterceptor {
     let spinner = request.params.get('spinner');
 
     if (spinner) request.params.delete('spinner'); // remove parameter spinner y no ejecuta el loader
+    console.log('spinner --> ', spinner);
 
     if (!spinner || spinner == 'no_hide') this.startRequest(spinner); // Activa el spinner
 

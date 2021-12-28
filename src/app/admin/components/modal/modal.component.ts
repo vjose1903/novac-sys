@@ -168,14 +168,11 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           this.mostrar_para = res.mostrarFacturaPara;
 
           if (this.seleccionModal.tiene_nota && this.seleccionModal.notas.length > 0) {
+            // TODO: usar reduce aqui
             for (let i = 0; i < this.seleccionModal.notas.length; i++) {
               const nota = this.seleccionModal.notas[i];
-              if (nota.tipo_factura_id === 5) {
-                this.cant_notas_credito++;
-              }
-              if (nota.tipo_factura_id === 4) {
-                this.cant_notas_debito++;
-              }
+              if (nota.tipo_factura_id === 5) this.cant_notas_credito++;
+              if (nota.tipo_factura_id === 4) this.cant_notas_debito++;
             }
           }
         }

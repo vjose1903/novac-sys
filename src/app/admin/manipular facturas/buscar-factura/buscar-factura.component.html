@@ -1,10 +1,10 @@
-<div class="row">
-  <div class="col-12 mb-3">
-    <h3>
+<div class="row BuscarFacturaRow">
+  <div class="col-12 titulo">
+    <h3 class="mb-0">
       Buscar facturas :<b *ngIf="Para">{{ Para }}</b>
     </h3>
   </div>
-  <div class="col-5">
+  <div class="col-5 arriba">
     <div class="card card-padding sombra">
       <div class="form-group">
         <label class="control-label">Buscar factura por : </label>
@@ -87,22 +87,19 @@
     </div>
   </div>
 
-  <div class="col-12 mt-4">
-    <div *ngIf="mostrarListaFacturas()" class="row">
-      <div class="col-12">
-        <div #cardTabla id="cardTabla" class="card card-padding sombra ingreCard" style="height: 37.5rem">
-          <app-tablas
-            [padre]="cardTabla" [info]="info"
-            [quitarAScorll]="60"
-            [id_tabla]="'facturas_parms'"
-            (clickIcon)="selectFactura($event)"
-            [data]="facturas"
-            (getInfoChange)="selectFactura($event)"
-            (paginateChange)="changePaginate($event)"
-            [focusRow]="false"
-          ></app-tablas>
-        </div>
-      </div>
+  <div class="col-12 abajo">
+    <div *ngIf="mostrarListaFacturas()" #cardTabla id="cardTabla" class="card card-padding sombra ingreCard h-100">
+      <app-tablas
+        [padre]="cardTabla"
+        [info]="info"
+        [quitarAScorll]="60"
+        [id_tabla]="'facturas_parms'"
+        (clickIcon)="selectFactura($event)"
+        [data]="facturas"
+        (getInfoChange)="selectFactura($event)"
+        (paginateChange)="changePaginate($event)"
+        [focusRow]="false"
+      ></app-tablas>
     </div>
   </div>
 </div>

@@ -39,7 +39,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   @Input() factura;
   @Input() action;
-  @Input() FechaFactura;
+  @Input() fechaFactura;
   @Input() propietario;
   @Input() metodo;
 
@@ -58,12 +58,12 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   ngOnInit() {
-    this.rellenarVariables();
-
     this._init_mixin({
       component: 'cuerpo_factura',
       _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'articuloPorCodigo', 'pressEsc', 'noFiltro'],
     });
+
+    this.rellenarVariables();
   }
 
   decisionModal(res) {
@@ -150,9 +150,11 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       });
 
       this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
+
       for (let index = 1; index <= 22; index++) {
         await this.addItem(index);
       }
+
       setTimeout(() => {
         this.filasDetalle = (this.form.controls['rowFactura'] as FormArray).controls;
 
@@ -169,18 +171,14 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   async getSaco() {
     try {
-      const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, this.FechaFactura, 'todos').toPromise();
+      const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, this.fechaFactura, 'todos').toPromise();
       this.saco_sistema = res.data[0];
     } catch (error) {
       console.error(error);
     }
   }
 
-  ngOnChanges(simpleChanges) {
-    if (simpleChanges.factura && simpleChanges.factura.currentValue && this.action === 'update' && _.hasIn(this.factura, 'id')) {
-      this.llenarFactura(this.factura.detalle_facturas);
-    }
-  }
+  ngOnChanges(simpleChanges) {}
 
   async procesoQuitarArticulo() {
     await this.sacarDescuento(this.indexRemove);
@@ -227,7 +225,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
         let precio = calculo;
         if (operacion) {
-          if (moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.fecha_ingreso).format('YYYY-MM-DD')) precio = calculo + precio_saco;
+          if (moment(this.fechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.fecha_ingreso).format('YYYY-MM-DD')) precio = calculo + precio_saco;
           (this.filasDetalle[i] as any).controls['des'].setValue(`${articulo.nombre}`);
           (this.filasDetalle[i] as any).controls['pre'].setValue(GLOBAL.numFormatTwoDecimals(precio));
         } else {
@@ -347,6 +345,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   //  MODIFICAR FACTURA
   // =============================================
   async llenarFactura(rows, is_guardada?, callback = (arg) => {}) {
+    console.log('<-- llenarFactura --> ');
+
     this.rellenarVariables().then(async (res) => {
       if (res) {
         for (let j = 0; j < rows.length; j++) {
@@ -354,53 +354,13 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
           let articulo = row.articulo;
 
           try {
-            if (!is_guardada) articulo = await this.dbServ.getArticulosFiltrados(row.codigo, 0, 0, true, false, this.FechaFactura, 'todos').toPromise();
-
-            const cant_en_unidades_actual = row.cantidad_en_unidades;
-            const multiplo = row.cantidad_en_unidades / row.cantidad;
-            const cant_actual = cant_en_unidades_actual / multiplo;
-            const campos = (this.filasDetalle[j] as any).controls;
-
-            campos['pre'].setValue(this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo));
-
-            campos['costo'].setValue(GLOBAL.numFormatTwoDecimals(row.costo));
-
-            campos['descuento_porciento'].setValue(row.descuento_porciento || null);
-            campos['descuento_valor'].setValue(row.descuento_valor);
-            campos['tot'].setValue(GLOBAL.numFormatTwoDecimals(row.total));
-
-            campos['cod'].setValue(articulo.codigo);
-
-            campos['can'].setValue(cant_actual);
-            campos['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
-
-            campos['des'].setValue(_.capitalize(articulo.nombre));
-
-            campos['calcular_saco'].setValue(row.calcular_saco);
-
-            campos['articulo'].setValue(articulo);
-
-            if (row.tipo === 'Materia prima') {
-              campos['descuento_porciento'].disable({ onlySelf: true });
-              campos['is_materia_prima'].setValue(true);
+            if (!is_guardada) {
+              this.articuloClass
+                .getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura })
+                .then((res_articulo) => this.llenarFilas(row, _.first(res_articulo), j));
             } else {
-              campos['descuento_porciento'].enable();
-              campos['is_materia_prima'].setValue(false);
+              this.llenarFilas(row, articulo, j);
             }
-
-            let uni = row.peso_saco ? 'Saco de ' + row.peso_saco + ' libras' : row.unidad;
-
-            campos['uni'].setValue(uni);
-
-            if (this.metodo === 'venta') {
-              try {
-                this.calcularSacoEnRow(j, row, articulo, 'llenarFact').then((res) => (res ? this.calcularTotalRow(j) : () => {}));
-              } catch (error) {}
-            } else {
-              this.calcularTotalRow(j);
-            }
-
-            this.ajustarSecuencia();
           } catch (error) {}
         }
 
@@ -409,6 +369,54 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         callback(false);
       }
     });
+  }
+
+  llenarFilas(row, articulo, j) {
+    const cant_en_unidades_actual = row.cantidad_en_unidades;
+    const multiplo = row.cantidad_en_unidades / row.cantidad;
+    const cant_actual = cant_en_unidades_actual / multiplo;
+    const campos = (this.filasDetalle[j] as any).controls;
+
+    campos['pre'].setValue(this.metodo === 'venta' ? GLOBAL.numFormatTwoDecimals(row.precio) : GLOBAL.numFormatTwoDecimals(row.costo));
+
+    campos['costo'].setValue(GLOBAL.numFormatTwoDecimals(row.costo));
+
+    campos['descuento_porciento'].setValue(row.descuento_porciento || null);
+    campos['descuento_valor'].setValue(row.descuento_valor);
+    campos['tot'].setValue(GLOBAL.numFormatTwoDecimals(row.total));
+
+    campos['cod'].setValue(articulo.codigo);
+
+    campos['can'].setValue(cant_actual);
+    campos['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
+
+    campos['des'].setValue(_.capitalize(articulo.nombre));
+
+    campos['calcular_saco'].setValue(row.calcular_saco);
+
+    campos['articulo'].setValue(articulo);
+
+    if (row.tipo === 'Materia prima') {
+      campos['descuento_porciento'].disable({ onlySelf: true });
+      campos['is_materia_prima'].setValue(true);
+    } else {
+      campos['descuento_porciento'].enable();
+      campos['is_materia_prima'].setValue(false);
+    }
+
+    let uni = row.peso_saco ? 'Saco de ' + row.peso_saco + ' libras' : row.unidad;
+
+    campos['uni'].setValue(uni);
+
+    if (this.metodo === 'venta') {
+      try {
+        this.calcularSacoEnRow(j, row, articulo, 'llenarFact').then((res) => (res ? this.calcularTotalRow(j) : () => {}));
+      } catch (error) {}
+    } else {
+      this.calcularTotalRow(j);
+    }
+
+    this.ajustarSecuencia();
   }
 
   // =============================================
@@ -446,7 +454,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
     if (input === 'can-' && this.fun.hasValue(codigo)) {
       if (this.fun.isEmpty(articulo) || codigo !== articulo.codigo) {
-        const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.FechaFactura };
+        const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
 
         this.desEnfocarInput('cod-' + i);
         this.abrirModal('buscarArticulo', obj);
@@ -535,7 +543,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
           );
           (this.filasDetalle[i] as any).controls['costo'].setValue(costoDetalle);
 
-          if (this.metodo === 'venta' && moment(this.FechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.fecha_ingreso).format('YYYY-MM-DD')) {
+          if (this.metodo === 'venta' && moment(this.fechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.fecha_ingreso).format('YYYY-MM-DD')) {
             this.CalculoSacos(i, 'select', undefined);
           }
 

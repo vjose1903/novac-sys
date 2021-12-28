@@ -46,7 +46,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  FechaFactura;
+  fechaFactura;
   FechaFacturaMostrar: any;
   action: any;
   factura_a_editar;
@@ -131,9 +131,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   ngOnInit() {
+    this._init_mixin({ component: 'cabeza_factura', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'sacarFacturas'] });
     this.localeService.use('es');
     this.rellenarVariables();
-    this._init_mixin({ component: 'cabeza_factura', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'sacarFacturas'] });
 
     this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((facturaGuardada) => {
       if (facturaGuardada) {
@@ -218,9 +218,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   rellenarVariables() {
-    this.FechaFactura = {};
-    this.FechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
-    this.FechaFactura['back'] = this.FechaFactura['front'];
+    this.fechaFactura = {};
+    this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
+    this.fechaFactura['back'] = this.fechaFactura['front'];
     this.FechaFacturaMostrar = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
     this.action = undefined;
     this.factura_a_editar = undefined;
@@ -270,6 +270,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     if (this.action === 'update') {
       this.factura_a_editar = {};
       this.rellenarCampos(id_factura, 'editar').then(() => {
+        console.log(' luego de rellenarCampos');
+        this.cuerpo.llenarFactura(this.factura_a_editar.detalle_facturas);
         this.enfocarInput('cod-0');
       });
     } else {
@@ -307,6 +309,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
       if (tipo === 'editar') {
         res = await this.dbServ.getFacturaById(id).toPromise();
+        console.log('res editar --> ', res);
 
         this.factura_a_editar = res;
         this.propietario_factura = res.cliente;
@@ -322,16 +325,18 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.metodo = res.tipo;
       this.FacturaAtrasada = fact ? fact?.FacturaAtrasada : false;
 
-      const fecha_facturacion = fact?.fecha_equivalente ? fact?.fecha_equivalente : GLOBAL.duplicarJson(this.FechaFactura['back']);
+      const fecha_facturacion = fact?.fecha_equivalente ? fact?.fecha_equivalente : GLOBAL.duplicarJson(this.fechaFactura['back']);
 
-      this.FechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
-      this.FechaFactura['back'] = this.FechaFactura['front'];
+      this.fechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
+      this.fechaFactura['back'] = this.fechaFactura['front'];
 
       this.FechaFacturaMostrar = this.formarFechaFactura(fecha_facturacion)['FechaFacturaMostrar'];
 
       this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
 
       await this.calcularPorcientoComprobante().then((res_calculo) => {
+        console.log('luego de calcularPorcientoComprobante');
+
         if (res.is_viaje) this.fecha_viaje = new Date(res.fecha_viaje);
         else this.fecha_viaje = new Date();
 
@@ -407,8 +412,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     if (this.fun.hasValue(res)) this.luegoDecision(res);
 
     if (this.fun.hasValue(res) && res.bool) {
-      this.FechaFactura['front'] = this.formarFechaFactura(res.Date)['FechaFactura'];
-      this.FechaFactura['back'] = this.FechaFactura['front'];
+      this.fechaFactura['front'] = this.formarFechaFactura(res.Date)['FechaFactura'];
+      this.fechaFactura['back'] = this.fechaFactura['front'];
       this.FechaFacturaMostrar = this.formarFechaFactura(res.Date)['FechaFacturaMostrar'];
       this.FacturaAtrasada = true;
       this.cuerpo.getSaco();
@@ -1049,7 +1054,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     cabecera_fact['forma_pago'] = this.forma_pago;
 
     let fecha_equi;
-    if (this.FacturaAtrasada) fecha_equi = this.FechaFactura['front'];
+    if (this.FacturaAtrasada) fecha_equi = this.fechaFactura['front'];
     else fecha_equi = null;
 
     cabecera_fact['fecha_viaje'] = this.is_viaje ? this.fecha_viaje : null;

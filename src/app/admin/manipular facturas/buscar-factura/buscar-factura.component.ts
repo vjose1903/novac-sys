@@ -297,6 +297,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       const page = e.page;
       const per_page = e.per_page;
       const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id, false, page, per_page, true).toPromise();
+      this.fun.logRed('busqueda ', busqueda);
 
       busqueda['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
@@ -421,12 +422,14 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   }
 
   selectFactura(item) {
+    console.log('item --> ', item);
+
     if (item.column === 'select') {
-      this.facturaSelected = this.facturas[item.index];
+      this.facturaSelected = item.row;
+      console.log('this.facturaSelected --> ', this.facturaSelected);
       this.indexSelected = item.index;
-      this.parseFacturaSelected().then(() => {
-        this.abrirModal('mostrarFactura', this.facturaSelected);
-      });
+
+      this.parseFacturaSelected().then(() => this.abrirModal('mostrarFactura', this.facturaSelected));
     }
   }
 
