@@ -23,3 +23,21 @@ div.card-header {
 hr.rayaA.mt-2 {
   margin-top: 1rem !important;
 }
+
+.pagoPorcentaje {
+
+  display: grid;
+  grid-template-areas: "pagado divisor total";
+
+  grid-template-rows: min-content;
+
+  .pagado {
+    grid-area: pagado;
+  }
+  .divisor {
+    grid-area: divisor;
+  }
+  .total {
+    grid-area: total;
+  }
+}

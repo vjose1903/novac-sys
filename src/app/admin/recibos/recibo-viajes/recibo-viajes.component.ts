@@ -5,6 +5,9 @@ import * as moment from '../../../../utils/javascript/moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { mixinClass } from '../../mixinClass';
+import { EmpleadoC } from '../../registros/registro-empleados/empleado';
+import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
+import { ReciboC } from '../recibos';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -66,6 +69,10 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   monto_pendiente = 0;
   have_incidencia = false;
   incidencia = '';
+  devuelta: any;
+  userClass = new EmpleadoC();
+  vehiculoClass = new VehiculoC();
+  reciboClass = new ReciboC();
 
   constructor(private dbServ: DBservice, private tServ: TablasService) {
     super();
@@ -78,19 +85,16 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   }
 
   initCambioMenu(arg) {
-    if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
-    }
+    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
   }
 
   decisionModal(res: any) {
-    if (res !== undefined) {
-      this.reversarUltimaTransaccion(res);
-    }
+    if (this.fun.hasValue(res)) this.reversarUltimaTransaccion(res);
   }
 
   objDevueltoResponse(res) {
     if (res && res.tipo_modal === 'cambio') {
+      this.devuelta = res.data.devuelta > 0 ? res.data.devuelta : 0;
       this.forma_pago = res.data.forma_pago;
       this.total_recibido = res.data.dinero;
       this.IMPRIMIR();
@@ -112,14 +116,19 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async getChoferes() {
-    this.dbServ.getEmpleados('?id=true&nombreCompleto=true&filter_key=role&filter_value=C').subscribe((res) => {
+    const extra = { parameters: { id: true, nombreCompleto: true, filter_key: 'role', filter_value: 'C' } };
+    this.userClass.getAll(extra).then((res) => {
       this.choferes = res['data'];
       this.is_choferes_register = this.choferes.length > 0 ? true : false;
     });
   }
+
   async getCamiones() {
-    this.dbServ.getVehiculosFiltrados(' ', 0, 0, false).subscribe((res) => {
-      this.camiones = res;
+    const extra = { afterPath: `filtro/ `, parameters: { paginado: false } };
+
+    this.vehiculoClass.getAll(extra).then((res) => {
+      this.camiones = res['data'];
+
       this.is_camiones_register = this.camiones.length > 0 ? true : false;
     });
   }
@@ -151,40 +160,28 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
       this.viajes = res.data;
       this.viajes_cant = res.total_registros ? res.total_registros : 0;
 
-      this.viajes_completados_cant = this.viajes.filter((v) => v.fecha_completada !== null).length;
-      this.viajes_pendientes_cant = this.viajes.filter((v) => v.fecha_completada === null).length;
+      this.viajes_completados_cant = this.viajes.filter((v) => this.fun.hasValue(v.fecha_completada)).length;
+      this.viajes_pendientes_cant = this.viajes.filter((v) => this.fun.isEmpty(v.fecha_completada)).length;
 
       setTimeout(() => {
         this.viajes_cant_porciento = (this.viajes_completados_cant / this.viajes_cant) * 100;
         this.viajes_cant_porciento = GLOBAL.numFormatTwoDecimals(this.viajes_cant_porciento);
       }, 5);
 
-      this.viajes.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
-      });
+      this.viajes = _.orderBy(this.viajes, ['id'], ['desc']);
     } catch (error) {
       console.error(error);
 
-      if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
-      }
-      //  else {
-      //   this.dbServ.toastError('Error en el servidor, contactar con el desarrollador', 'ERROR');
-      // }
+      if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
     }
   }
 
   // ----------------------------------------
   checkChofer() {
     if (this.choferes.length > 0) {
-      if (this.chofer_id) {
-        this.is_chofer_selected = true;
-      } else {
-        this.is_chofer_selected = false;
-      }
-    } else {
-      this.is_chofer_selected = false;
-    }
+      this.is_chofer_selected = this.fun.hasValue(this.chofer_id);
+    } else this.is_chofer_selected = false;
+
     this.salio_en_chofer = true;
   }
 
@@ -194,14 +191,9 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   // ----------------------------------------
   checkCamion() {
     if (this.camiones.length > 0) {
-      if (this.camion_id) {
-        this.is_camion_selected = true;
-      } else {
-        this.is_camion_selected = false;
-      }
-    } else {
-      this.is_camion_selected = false;
-    }
+      this.is_camion_selected = this.fun.hasValue(this.camion_id);
+    } else this.is_camion_selected = false;
+
     this.salio_en_camion = true;
   }
 
@@ -212,11 +204,9 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
 
   abilitarRecibir() {
     let res = false;
-    if (this.is_chofer_selected && this.is_camion_selected) {
-      res = false;
-    } else {
-      res = true;
-    }
+    if (this.is_chofer_selected && this.is_camion_selected) res = false;
+    else res = true;
+
     return res;
   }
 
@@ -226,16 +216,14 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     this.totalPagadoPorciento = 0;
 
     this.viaje_selected = arg;
-    this.viaje_selected.pagos.forEach((abono) => {
-      this.totalPagado += abono.deposito;
-    });
+
+    this.totalPagado = _.reduce(this.viaje_selected.pagos, (acumulado, item) => acumulado + item.deposito, 0);
 
     this.monto_pendiente = this.viaje_selected.total_factura - this.totalPagado;
     this.totalPagadoPorciento = (this.totalPagado / this.viaje_selected.total_factura) * 100;
     this.totalPagadoPorciento = GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento);
 
-    const lengthpagos = this.viaje_selected.pagos.length;
-    this.ultimo_pago = this.viaje_selected.pagos[lengthpagos - 1];
+    this.ultimo_pago = _.maxBy(this.viaje_selected.pagos, 'id');
   }
 
   recalcularMonto(monto_original, notas) {
@@ -244,11 +232,8 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
       const element = notas[i];
       const totalABS = Math.abs(element.total_factura);
 
-      if (element.tipo_factura_id === 5) {
-        monto -= totalABS;
-      } else if (element.tipo_factura_id === 4) {
-        monto += totalABS;
-      }
+      if (element.tipo_factura_id === 5) monto -= totalABS;
+      else if (element.tipo_factura_id === 4) monto += totalABS;
     }
     return monto;
   }
@@ -274,10 +259,11 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   async reversarUltimaTransaccion(arg) {
     if (arg) {
       try {
-        const res = await this.dbServ.revertirLastReciboByFacturaId(this.viaje_selected.id).toPromise();
-
-        this.getViajes(this.tServ.obj_paginate);
-        this.resetVariables();
+        const extra = { afterPath: `revertir/by_factura/${this.viaje_selected.id}` };
+        this.reciboClass.getAll(extra).then((res) => {
+          this.getViajes(this.tServ.obj_paginate);
+          this.resetVariables();
+        });
       } catch (error) {
         console.error(error);
       }
@@ -293,8 +279,8 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
       pago_total: pagado_total,
       deposito: GLOBAL.desformatear(this.total_recibido),
       descripcion: pagado_total
-        ? 'Saldo ' + this.viaje_selected.numero_comprobante + ' ' + this.viaje_selected.fecha_equivalente
-        : 'Abono ' + this.viaje_selected.numero_comprobante + ' ' + this.viaje_selected.fecha_equivalente,
+        ? 'Saldo ' + this.viaje_selected.numero_comprobante + ' ' + moment(this.viaje_selected.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
+        : 'Abono ' + this.viaje_selected.numero_comprobante + ' ' + moment(this.viaje_selected.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss'),
       pago_a_tiempo: this.viaje_selected.pago_a_tiempo,
     });
 
@@ -302,54 +288,39 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async IMPRIMIR() {
-    const empleado = this.fun.getUser();
-
     const obj = {
       cliente_id: this.viaje_selected.cliente_id,
-      user_id: empleado.id,
       total: this.total_recibido,
       forma_pago: this.forma_pago,
       tipo_factura_id: 17,
-      devuelta: 0,
+      devuelta: this.devuelta,
       numero_recibo: null,
       chofer: Number(this.chofer_id),
       vehiculo_id: Number(this.camion_id),
+      estado: true,
     };
 
-    obj['detalle_recibos_attributes'] = this.formarDetalle();
-    try {
-      const res = await this.dbServ.createRecibo(obj).toPromise();
+    obj['detalle_recibos'] = this.formarDetalle();
 
-      this.dbServ.toastSuccess('Recibo de ingreso realizado.', 'CORRECTO');
+    this.reciboClass.createUpdateOne(obj).then((res) => {
       this.getViajes(this.tServ.obj_paginate);
       this.resetVariables();
 
-      const obj_print = {
-        data: res,
-        type: 'recibo_ingreso',
-      };
+      const obj_print = { data: res, type: 'recibo_ingreso' };
 
       this.pdfServ.generatePdf(obj_print).then((res) => {
         if (res.status === 'si') {
-          const objBase = {
-            base64: res.body,
-            filename: res.file,
-            type: 'recibo_ingreso',
-          };
+          const objBase = { base64: res.body, filename: res.file, type: 'recibo_ingreso' };
           this._ipc.send('printBase64', objBase);
           this.layServ.nextCheckCuadreToday(true);
         }
       });
-    } catch (error) {
-      this.dbServ.toastError(error.error.msg, 'ERROR');
-    }
+    });
   }
 
   printBase64Res(res) {
     if (res.status === 'si') {
-    } else {
-      this.dbServ.toastError(res.msg, 'ERROR');
-    }
+    } else this.fun.toastError(res.msg, 'ERROR');
   }
 
   resetVariables() {

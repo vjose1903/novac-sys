@@ -6,7 +6,8 @@
     <div #cardTabla id="cardTabla" class="card cardListados p-3">
       <app-tablas
         *ngIf="viajes && info"
-        [padre]="cardTabla" [info]="info"
+        [padre]="cardTabla"
+        [info]="info"
         [seleccionado]="viaje_selected"
         [search]="true"
         [data]="viajes"
@@ -23,25 +24,23 @@
 
   <div class="col-md-5">
     <div>
-      <span *ngIf="viajes_pendientes_cant > 0" class="badge red text-white debe mb-3"
-        >Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span
-      >
+      <span *ngIf="viajes_pendientes_cant > 0" class="badge red text-white debe mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
       <span *ngIf="viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge blue text-white debe mb-3"
         >Cantidad de viajes completados {{ viajes_completados_cant }}</span
       >
       <span *ngIf="viajes?.length === 0" class="badge green text-white debe mb-3">No tiene viajes pendientes</span>
 
-      <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant === 0" class="badge green text-white debe mb-3"
-        >Todos los viajes fueron completados</span
-      >
+      <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant === 0" class="badge green text-white debe mb-3">Todos los viajes fueron completados</span>
 
       <div *ngIf="viajes?.length > 0 && viajes_completados_cant > 0">
         <div class="d-flex justify-content-between">
           <span class="negrita">Porcentaje de viajes completos</span>
 
           <div>
-            <span class="negrita">{{ viajes_completados_cant }} / </span>
-            <span class="negrita gris">{{ viajes_cant }}</span>
+            <span style="flex-wrap: nowrap">
+              <span class="negrita">{{ viajes_completados_cant }} / </span>
+              <span class="negrita gris">{{ viajes_cant }}</span>
+            </span>
           </div>
         </div>
         <p-progressBar [value]="viajes_cant_porciento"></p-progressBar>
@@ -75,10 +74,11 @@
           <div *ngIf="viaje_selected?.pagos?.length > 0">
             <hr class="rayaA mt-2" />
             <div class="d-flex justify-content-between">
-              <span class="negrita">Porcentaje de pago</span>
-              <div>
-                <span class="negrita">RD${{ formatoNumero(totalPagado) }} / </span>
-                <span class="negrita gris">RD${{ formatoNumero(viaje_selected?.total_factura) }}</span>
+              <span class="negrita">Restante</span>
+              <div class="pagoPorcentaje">
+                <span class="pagado negrita">RD${{ formatoNumero(totalPagado) }} </span>
+                <span class="divisor negrita">/</span>
+                <span class="total negrita gris">RD${{ formatoNumero(viaje_selected?.total_factura) }}</span>
               </div>
             </div>
             <p-progressBar class="mb-2" [value]="totalPagadoPorciento"></p-progressBar>
@@ -120,9 +120,7 @@
             <!-- <button [disabled]="(!is_chofer_selected && !is_camion_selected) || viaje_selected.fecha_completada" (click)="accion(true, 'cambio')" class="btn btn-verde"> -->
 
             <button [disabled]="abilitarRecibir()" (click)="accion(true, 'cambio')" class="btn btn-verde">Recibir efectivo</button>
-            <button *ngIf="ultimo_pago?.is_ultimo" (click)="accion(true, 'dinamico_texto')" class="btn btn-amarillo ml-2">
-              Reversar ultima transacción
-            </button>
+            <button *ngIf="ultimo_pago?.is_ultimo" (click)="accion(true, 'dinamico_texto')" class="btn btn-amarillo ml-2">Reversar ultima transacción</button>
           </div>
         </div>
       </div>

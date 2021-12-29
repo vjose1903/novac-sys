@@ -835,7 +835,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       factura_a_guardar['archivo_id'] = this.objArchivo.archivo_id_en_turno;
       facturas_localStorage[index_fact_archivada] = factura_a_guardar;
     } else {
-      _.orderBy(facturas_localStorage, ['archivo_id'], ['asc']);
+      facturas_localStorage = _.orderBy(facturas_localStorage, ['archivo_id'], ['asc']);
       factura_a_guardar['archivo_id'] = facturas_localStorage.length > 0 ? _.last(facturas_localStorage).archivo_id + 1 : 1;
       facturas_localStorage.push(factura_a_guardar);
     }
