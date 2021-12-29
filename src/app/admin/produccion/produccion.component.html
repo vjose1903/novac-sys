@@ -1,125 +1,133 @@
-<div class="row">
-  <div class="col-5">
-    <div class="card card-padding-1 sombra heightPmin mb-3">
-      <h5>Seleccione el producto a elaborar:</h5>
-      <div class="row">
-        <div class="col-12">
-          <div class="form-group">
-            <label class="control-label mt-1 mb-0">Nombre producto:</label>
-            <div>
-              <select
-                [(ngModel)]="articulo_id"
-                (keydown.enter)="saltar('cantidad_producir')"
-                class="form-control inputE"
-                style="border-radius: 0"
-                (change)="getIngredients()"
-                id="articulo_id"
+<div class="row ProductionRow">
+  <div class="col-12 p-0 arriba">
+    <div class="row">
+      <div class="col-4">
+        <div #cardFormulario class="card card-padding-1 sombra h-100">
+          <h5>Seleccione el producto a elaborar:</h5>
+          <div class="row">
+            <div class="col-12 p-0">
+              <div class="form-group">
+                <label class="control-label mt-1 mb-0">Nombre producto: <span style="color: red">*</span></label>
+                <div>
+                  <select
+                    [(ngModel)]="articulo_id"
+                    (keydown.enter)="saltar('cantidad_producir')"
+                    class="form-control inputE"
+                    (change)="getIngredients()"
+                    id="articulo_id"
+                  >
+                    <option value="-1" selected>seleccione producto</option>
+                    <option *ngFor="let lista of listaProductos" id="prod-{{ lista.id }}" value="{{ lista.id }}">{{ lista.nombre }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 p-0 mt-2">
+              <div class="form-group">
+                <label class="control-label mb-0">Cantidad a producir: <span style="color: red">*</span></label>
+                <div class="row">
+                  <div class="col-4 p-0">
+                    <input
+                      type="Number"
+                      (keydown.enter)="saltar('medida_producir')"
+                      id="cantidad_producir"
+                      [(ngModel)]="cantidad_producir"
+                      (focus)="$event.target.select()"
+                      placeholder="Cantidad a producir"
+                      class="form-control inputE input_cantidad"
+                      autocomplete="off"
+                      (blur)="calcularCantidadAProduccir()"
+                    />
+                  </div>
+
+                  <div class="col-8 pr-0">
+                    <select
+                      (keydown.enter)="saltar('agregar')"
+                      class="form-control inputE"
+                      [(ngModel)]="medida_producir"
+                      id="medida_producir"
+                      (change)="calcularCantidadAProduccir()"
+                      (blur)="calcularCantidadAProduccir()"
+                    >
+                      <option value="{{ null }}"></option>
+                      <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 p-0 mt-2">
+              <a class="btn mr-2 btn-blanco" (click)="borrar()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
+              <input
+                [disabled]="abilitarBtnAgregar()"
+                (click)="agregarAlista()"
+                type="submit"
+                class="btn btn-verde"
+                value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-8 pl-0">
+        <div class="card card-padding-1 sombra cardIngredientes" [ngStyle]="{ 'max-height': cardFormulario.offsetHeight + 'px' }">
+          <h4 class="titulo">Ingredientes</h4>
+
+          <div class="row h-100 cuerpo">
+            <div class="col-6 p-0 fondoGris bordes">
+              <div class="text-center tituloIngre">Inventario</div>
+
+              <div id="inventario_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
+                <div *ngFor="let ingrediente of ingredientes; let i = index" class="ingredientesList d-flex">
+                  <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
+                  <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
+
+                  <div class="d-flex justify-content-end" style="width: 100%">
+                    <span
+                      *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'"
+                      [mdbTooltip]="cantiTool"
+                      placement="{{ i != 0 ? 'top' : 'botton' }}"
+                      class="cantidadInve"
+                    >
+                      {{ lookprincipal(ingrediente.existencia) }}
+                    </span>
+                    <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Libra'" class="cantidadInve">
+                      {{ lookprincipal(ingrediente.existencia) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 p-0 bordes fondoBlanco">
+              <div class="text-center tituloIngre">Producción</div>
+              <div
+                id="produccion_scroll"
+                *ngIf="ingredientesParaProduccion.length > 0"
+                class="scroll-container-prod"
+                appOnScroll
+                (scrolling)="ingredientesScroll($event)"
               >
-                <option value="-1" selected>seleccione producto</option>
-                <option *ngFor="let lista of listaProductos" id="prod-{{ lista.id }}" value="{{ lista.id }}">{{ lista.nombre }}</option>
-              </select>
-            </div>
-          </div>
-        </div>
+                <div *ngFor="let ingrediente of ingredientesParaProduccion; let i = index" class="ingredientesList d-flex">
+                  <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
 
-        <div class="col-12 mt-4">
-          <div class="form-group">
-            <label class="control-label">Cantidad a producir: <span style="color: red">*</span></label>
-            <div class="row">
-              <div class="col-4 pr-0">
-                <input
-                  type="Number"
-                  (keydown.enter)="saltar('medida_producir')"
-                  id="cantidad_producir"
-                  [(ngModel)]="cantidad_producir"
-                  (focus)="$event.target.select()"
-                  placeholder="Cantidad a producir"
-                  class="form-control mb-4 inputE"
-                  autocomplete="off"
-                  (blur)="calcularCantidadAProduccir()"
-                />
-              </div>
+                  <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
 
-              <div class="col-8">
-                <select
-                  (keydown.enter)="saltar('agregar')"
-                  class="form-control inputE"
-                  [(ngModel)]="medida_producir"
-                  id="medida_producir"
-                  (change)="calcularCantidadAProduccir()"
-                  (blur)="calcularCantidadAProduccir()"
-                >
-                  <!-- [ngClass]="{ badAlert: Ispaquete }" -->
-                  <option value="{{ null }}"></option>
-                  <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="pl-3">
-          <a class="btn mr-2 btn-blanco" (click)="borrar()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
-          <input
-            [disabled]="abilitarBtnAgregar()"
-            (click)="agregarAlista()"
-            type="submit"
-            class="btn"
-            value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}"
-            id="btn-verde"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-7">
-    <div class="card card-padding-1 sombra heightPmin mb-3">
-      <h4>Ingredientes</h4>
-
-      <div class="row h-100">
-        <div class="col-6 p-0 fondoGris bordes">
-          <div class="text-center tituloIngre">Inventario</div>
-
-          <div class="scroll-container-prod">
-            <div *ngFor="let ingrediente of ingredientes; let i = index" class="ingredientesList d-flex">
-              <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
-              <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
-
-              <div class="d-flex justify-content-end" style="width: 100%">
-                <span
-                  *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'"
-                  [mdbTooltip]="cantiTool"
-                  placement="{{ i != 0 ? 'top' : 'botton' }}"
-                  class="cantidadInve"
-                >
-                  {{ lookprincipal(ingrediente.existencia) }}
-                </span>
-                <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Libra'" class="cantidadInve">
-                  {{ lookprincipal(ingrediente.existencia) }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 p-0 bordes fondoBlanco">
-          <div class="text-center tituloIngre">Producción</div>
-          <div *ngIf="ingredientesParaProduccion.length > 0" class="scroll-container-prod">
-            <div *ngFor="let ingrediente of ingredientesParaProduccion; let i = index" class="ingredientesList d-flex">
-              <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
-
-              <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
-
-              <div class="d-flex justify-content-end" style="width: 100%">
-                <span
-                  *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'"
-                  [mdbTooltip]="cantiTool"
-                  placement="{{ i != 0 ? 'top' : 'botton' }}"
-                  class="cantidadInve"
-                >
-                  {{ lookprincipal(ingrediente.existencia) }}
-                </span>
-                <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Libra'" class="cantidadInve">
-                  {{ lookprincipal(ingrediente.existencia) }}
-                </span>
+                  <div class="d-flex justify-content-end" style="width: 100%">
+                    <span
+                      *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'"
+                      [mdbTooltip]="cantiTool"
+                      placement="{{ i != 0 ? 'top' : 'botton' }}"
+                      class="cantidadInve"
+                    >
+                      {{ lookprincipal(ingrediente.existencia) }}
+                    </span>
+                    <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Libra'" class="cantidadInve">
+                      {{ lookprincipal(ingrediente.existencia) }}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -127,8 +135,9 @@
       </div>
     </div>
   </div>
-  <div class="col-12">
-    <div #cardTabla id="cardTabla" class="card card-padding-1 sombra heightPmax">
+
+  <div class="col-12 medio">
+    <div #cardTabla id="cardTabla" class="card card-padding-1 sombra h-100">
       <div>
         <app-tablas
           *ngIf="lista_produccion"
@@ -145,7 +154,9 @@
         ></app-tablas>
       </div>
     </div>
-    <div class="d-flex justify-content-end mt-4">
+  </div>
+  <div class="col-12 abajo">
+    <div class="d-flex justify-content-end w-100">
       <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModal('cancelarP', null)" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
       <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar')" type="submit" class="btn" value="Confirmar" id="btn-verde" />
     </div>

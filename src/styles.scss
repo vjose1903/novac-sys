@@ -6,6 +6,10 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
+.h-inherit {
+  max-height: inherit;
+}
+
 .overflowHidden {
   overflow: hidden;
 }
@@ -411,6 +415,7 @@ input[type="checkbox"]:disabled {
 }
 
 .btn {
+  border-radius: 0.3rem !important;
   transition: all 0.2s;
 }
 

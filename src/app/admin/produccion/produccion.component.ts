@@ -82,7 +82,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
         const res = await this.dbServ.getIngredientesFormula(this.articulo_id).toPromise();
         this.articuloSelected = this.listaProductos.filter((prod) => prod.id === _.parseInt(this.articulo_id))[0];
 
-        this.ingredientes = res;
+        this.ingredientes = _.orderBy(res, ['articulo_id'], ['asc']);
       } catch (error) {
         if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
       }
@@ -110,6 +110,15 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
     return cantiTootip;
   }
+
+  ingredientesScroll(arg) {
+    const divs = ['inventario_scroll', 'produccion_scroll'];
+    let div_opuesto_id = _.find(divs, (item) => item != arg.element_id);
+    const div_opuesto = document.getElementById(div_opuesto_id);
+
+    if (this.fun.hasValue(div_opuesto)) div_opuesto.scrollTop = arg.element.scrollTop;
+  }
+
   isLibraOrQuintal(objeto) {
     let presentar = 'Quintal';
     if (objeto.Quintal && objeto.Libra > 100) presentar = 'Quintal';
@@ -194,6 +203,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
             this.enfocarInput('cantidad_producir');
           } else {
             this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj, articulo_id: ingre.articulo_id });
+            this.ingredientesParaProduccion = _.orderBy(this.ingredientesParaProduccion, ['articulo_id'], ['asc']);
           }
         } catch (error) {
           if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
