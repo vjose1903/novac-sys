@@ -126,7 +126,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
       } catch (error) {
         console.error(error);
 
-        this.dbServ.toastError('Error buscando modelos', 'ERROR');
+        this.fun.toastError('Error buscando modelos', 'ERROR');
       }
     } else if (this.componente === 'reg_marcas') {
       try {
@@ -137,7 +137,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
       } catch (error) {
         console.error(error);
 
-        this.dbServ.toastError('Error buscando marcas', 'ERROR');
+        this.fun.toastError('Error buscando marcas', 'ERROR');
       }
     }
   }
@@ -164,7 +164,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
         } else if (this.tipo_formulario === 'marcas') {
           res = await this.dbServ.updateMarca(obj).toPromise();
         }
-        this.dbServ.toastSuccess('Item editado correctamente.', 'CORRECTO');
+        this.fun.toastSuccess('Item editado correctamente.', 'CORRECTO');
 
         const temp = GLOBAL.duplicarJson(this.listado);
         const index = _.findIndex(temp, (o: any) => {
@@ -180,7 +180,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
           this.enfocarInput('descripcion');
         }
       } catch (error) {
-        this.dbServ.toastError('Error editando item ', 'ERROR');
+        this.fun.toastError('Error editando item ', 'ERROR');
       }
     } else {
       // ------------------------------------------- CREANDO -------------------------------------------
@@ -191,7 +191,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
             this.listado = [...this.listado, res];
             this.enfocarInput('marca_modal');
             this.borrar();
-            this.dbServ.toastSuccess('Modelo creado correctamente.', 'CORRECTO');
+            this.fun.toastSuccess('Modelo creado correctamente.', 'CORRECTO');
           },
           (err) => {},
         );
@@ -201,7 +201,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
             this.listado = [...this.listado, res];
             this.enfocarInput('descripcion');
             this.borrar();
-            this.dbServ.toastSuccess('Marca creada correctamente.', 'CORRECTO');
+            this.fun.toastSuccess('Marca creada correctamente.', 'CORRECTO');
           },
           (err) => {},
         );
@@ -250,7 +250,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
         this.listado = temp;
         this.reinicioModal();
       } catch (error) {
-        this.dbServ.toastError(`Error eliminando ${tipo_e}`, 'ERROR');
+        this.fun.toastError(`Error eliminando ${tipo_e}`, 'ERROR');
       }
     }
   }

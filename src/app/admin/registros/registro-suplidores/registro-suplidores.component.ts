@@ -116,7 +116,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
 
       this.listaSuplidores = res.data;
     } catch (error) {
-      this.dbServ.toastError('Error buscando suplidores registrados.', 'ERROR');
+      this.fun.toastError('Error buscando suplidores registrados.', 'ERROR');
     }
   }
 
@@ -287,7 +287,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
     obj.estado = true;
 
     if (!this.form.controls[this.doc_principal].value) {
-      this.dbServ.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
+      this.fun.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
 
       // paso todas las validaciones
     } else {

@@ -35,9 +35,9 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   printBase64Res(res) {
     if (res.status === 'si') {
-      this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+      this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
     } else {
-      this.dbServ.toastError(res.msg, 'ERROR');
+      this.fun.toastError(res.msg, 'ERROR');
     }
   }
 
@@ -69,7 +69,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       });
     } catch (error) {
       console.error(error);
-      this.dbServ.toastError(error.error.msg, 'ERROR');
+      this.fun.toastError(error.error.msg, 'ERROR');
     }
   }
 
@@ -151,7 +151,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         this.fun.toastError(msg_error, 'ERROR');
       }
     } catch (error) {
-      this.dbServ.toastError('Error realizando reporte.', 'ERROR');
+      this.fun.toastError('Error realizando reporte.', 'ERROR');
     }
   }
 
@@ -185,7 +185,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         this.abrirVisorPdf(obj);
       } else {
         this.loadServ.isLoading.next(false);
-        this.dbServ.toastError(res.msg, 'ERROR');
+        this.fun.toastError(res.msg, 'ERROR');
       }
     });
   }

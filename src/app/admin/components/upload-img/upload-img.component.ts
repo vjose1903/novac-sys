@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
+import { FunctionService } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-upload-img',
@@ -16,7 +17,7 @@ export class UploadImgComponent implements OnInit {
 
   @Output() getPhotoData = new EventEmitter<any>();
 
-  constructor(private dbServ: DBservice) {}
+  constructor(private dbServ: DBservice, private fun: FunctionService) {}
 
   ngOnInit() {}
 
@@ -39,7 +40,7 @@ export class UploadImgComponent implements OnInit {
           console.error(err);
         },
       );
-    } else this.dbServ.toastError('Debe de seleccionar una foto primero', 'ERROR');
+    } else this.fun.toastError('Debe de seleccionar una foto primero', 'ERROR');
   }
 
   onFileChange(ev) {

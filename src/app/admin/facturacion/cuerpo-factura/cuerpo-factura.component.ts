@@ -235,7 +235,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
         resolve(true);
       } catch (error) {
-        this.dbServ.toastError('Error calculando el precio del saco', 'ERROR');
+        this.fun.toastError('Error calculando el precio del saco', 'ERROR');
         resolve(false);
       }
     });
@@ -256,11 +256,11 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
           if (unidad) {
             this.calcularSacoEnRow(i, row, articulo, lugar).then((res) => (res ? this.calcularTotalRow(i) : () => {}));
           } else {
-            this.dbServ.toastWarning('Para calcular los sacos debe de seleccionar una unidad', 'AVISO');
+            this.fun.toastWarning('Para calcular los sacos debe de seleccionar una unidad', 'AVISO');
             (this.filasDetalle[i] as any).controls['calcular_saco'].setValue(true);
           }
         } else {
-          if (e) this.dbServ.toastError('A este articulo no se le calculan los sacos', 'ERROR');
+          if (e) this.fun.toastError('A este articulo no se le calculan los sacos', 'ERROR');
           (this.filasDetalle[i] as any).controls['calcular_saco'].setValue(false);
         }
       }
@@ -357,7 +357,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             if (!is_guardada) {
               this.articuloClass
                 .getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura })
-                .then((res_articulo) => this.llenarFilas(row, _.first(res_articulo), j));
+                .then((res_articulo) => this.llenarFilas(row, _.first(res_articulo['data']), j));
             } else {
               this.llenarFilas(row, articulo, j);
             }
@@ -504,7 +504,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         excede = res['data'];
 
         if (this.metodo === 'venta' && excede) {
-          this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+          this.fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
 
           setTimeout(() => {
             this.enfocarInput('can-' + i);
@@ -520,7 +520,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         }
       });
     } catch (error) {
-      if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
+      if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
       callback(false);
     }
   }
@@ -738,7 +738,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
       if (ARTICULO.descripcion === 'Producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
-      this.dbServ.toastError(msg, 'ERROR');
+      this.fun.toastError(msg, 'ERROR');
 
       setTimeout(() => {
         this.enfocarInput('cod-' + i);
@@ -753,7 +753,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         let msg = `Solo quedan ${cant_restante} ${ARTICULO.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
 
         if (ARTICULO.descripcion === 'Producto terminado') msg = `Solo quedan ${cant_restante} ${ARTICULO.medida_alerta} de este producto, debe de producir mas!!!`;
-        this.dbServ.toastWarning(msg, 'AVISO');
+        this.fun.toastWarning(msg, 'AVISO');
       }
 
       (this.filasDetalle[i] as any).controls['articulo'].setValue(ARTICULO);

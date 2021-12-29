@@ -259,7 +259,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
       console.error(error);
-      this.dbServ.toastError(error, 'ERROR');
+      this.fun.toastError(error, 'ERROR');
     }
   }
 
@@ -339,7 +339,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
-      this.dbServ.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
+      this.fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo__: 'devuelta' };
@@ -383,7 +383,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
   printBase64Res(res) {
     if (res.status === 'si') {
-    } else this.dbServ.toastError(res.msg, 'ERROR');
+    } else this.fun.toastError(res.msg, 'ERROR');
   }
 
   resetVariables() {
@@ -405,7 +405,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
     if (item.cambio === 'monto') {
       if (!item.value) {
-        this.dbServ.toastWarning('Debe de introducir un Monto', 'AVISO');
+        this.fun.toastWarning('Debe de introducir un Monto', 'AVISO');
         this.tablas.enfocarInput('input-' + item.index);
       }
       const total = item.body[item.index].balance;
@@ -415,7 +415,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
       if (monto > total) {
         this.ExisteMontoMayor = true;
-        this.dbServ.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+        this.fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
         this.facturas[item.index].monto = this.facturas[item.index].balance;
         this.tablas.enfocarInput('input-' + item.index);
       } else {

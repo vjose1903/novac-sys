@@ -84,7 +84,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
         return a.id > b.id ? 1 : -1;
       });
     } catch (error) {
-      this.dbServ.toastError('Error buscando camiones', 'ERROR');
+      this.fun.toastError('Error buscando camiones', 'ERROR');
     }
   }
 
@@ -93,7 +93,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
       const res = await this.dbServ.getMarcas().toPromise();
       this.listaMarcas = res;
     } catch (error) {
-      this.dbServ.toastError('Error buscando articulos', 'ERROR');
+      this.fun.toastError('Error buscando articulos', 'ERROR');
     }
   }
 
@@ -170,7 +170,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
       }
     } catch (error) {
       callback(false);
-      this.dbServ.toastError('Error seleccionando marca.', 'ERROR');
+      this.fun.toastError('Error seleccionando marca.', 'ERROR');
     }
   }
 
@@ -214,7 +214,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
       this.dbServ.eliminarVehiculo(obj).subscribe(
         (res) => {
-          this.dbServ.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
+          this.fun.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
           this.getVehiculos(this.tServ.obj_paginate);
           this.borrar();
         },
@@ -255,25 +255,25 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
         obj['id'] = x.id;
         const res = await this.dbServ.updateVehiculos(obj).toPromise();
 
-        this.dbServ.toastSuccess('Vehiculo editando con exito.', 'Correcto');
+        this.fun.toastSuccess('Vehiculo editando con exito.', 'Correcto');
       } else {
         msg_error = 'Error registrando vehiculo';
 
         const res = await this.dbServ.createVehiculos(obj).toPromise();
 
-        this.dbServ.toastSuccess('Vehiculo registrado con exito.', 'Correcto');
+        this.fun.toastSuccess('Vehiculo registrado con exito.', 'Correcto');
       }
       this.borrar();
       this.getVehiculos(this.tServ.obj_paginate);
     } catch (error) {
-      this.dbServ.toastError(msg_error, 'ERROR');
+      this.fun.toastError(msg_error, 'ERROR');
     }
   }
 
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR'), true;
+        this.fun.toastError(error, 'ERROR'), true;
       });
     } else {
       for (const key in arg) {
@@ -281,7 +281,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
           const element = arg[key];
 
           if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR');
+            this.fun.toastError(element, 'ERROR');
           }
         }
       }

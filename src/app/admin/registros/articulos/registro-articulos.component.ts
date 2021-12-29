@@ -419,7 +419,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
         })
         .catch((err) => {});
     } catch (error) {
-      this.dbServ.toastError('Error buscando el precio de la materia prima.', 'ERROR');
+      this.fun.toastError('Error buscando el precio de la materia prima.', 'ERROR');
     }
   }
 
@@ -865,7 +865,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
           //   if (art.id === obj['id']) return true;
           // });
 
-          // this.dbServ.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
+          // this.fun.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
           // _.pullAt(this.listaArticulos, i);
           // this.tipoModal = '';
           this.borrar();
@@ -971,11 +971,11 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
           this.necesarioStart();
           this.borrar();
 
-          // this.dbServ.toastSuccess('Producto editado con exito.', 'Correcto', true);
+          // this.fun.toastSuccess('Producto editado con exito.', 'Correcto', true);
         },
         (err) => {
           // this.mostrarErrores(err.error);
-          // this.dbServ.toastError(err.error, 'Error', true);
+          // this.fun.toastError(err.error, 'Error', true);
         },
       );
       //
@@ -984,11 +984,11 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
         (res) => {
           this.necesarioStart();
           this.borrar();
-          // this.dbServ.toastSuccess('Producto registrado con exito.', 'Correcto', true);
+          // this.fun.toastSuccess('Producto registrado con exito.', 'Correcto', true);
         },
         (err) => {
           // this.mostrarErrores(err.error);
-          // this.dbServ.toastError(err.error, 'Error', true);
+          // this.fun.toastError(err.error, 'Error', true);
         },
       );
     }
@@ -996,13 +996,13 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
-      arg.forEach((error) => this.dbServ.toastError(error, 'ERROR'));
+      arg.forEach((error) => this.fun.toastError(error, 'ERROR'));
     } else {
       for (const key in arg) {
         if (arg.hasOwnProperty(key)) {
           const element = arg[key];
 
-          if (key !== 'status') this.dbServ.toastError(element, 'ERROR');
+          if (key !== 'status') this.fun.toastError(element, 'ERROR');
         }
       }
     }
@@ -1056,7 +1056,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
         this.checkNumbers(tempdecimales) ||
         this.checkLongMillares(tempdecimales)
       ) {
-        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
+        this.fun.toastError('Valor introducido es invalido', 'ERROR');
         this.enfocarInput(id);
       } else {
         //

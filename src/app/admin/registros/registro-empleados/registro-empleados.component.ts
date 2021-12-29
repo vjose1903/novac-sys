@@ -147,7 +147,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
       };
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
-      this.dbServ.toastError('Error buscando empleados registrados.', 'ERROR');
+      this.fun.toastError('Error buscando empleados registrados.', 'ERROR');
     }
   }
 
@@ -288,7 +288,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     const objSend = _.omit(objTemp, ['cedula']);
 
     if (!this.editando && objSend.password === null) {
-      this.dbServ.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
+      this.fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
       this.dbServ.createUpdateEmpleados(objSend).subscribe((res) => {
         this.getEmpleados(this.tServ.obj_paginate);

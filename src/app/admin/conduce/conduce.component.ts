@@ -247,7 +247,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
       if (ARTICULO.descripcion === 'Producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
-      this.dbServ.toastError(msg, 'ERROR');
+      this.fun.toastError(msg, 'ERROR');
 
       setTimeout(() => {
         this.enfocarInput('cod-' + i);
@@ -262,7 +262,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         let msg = `Solo quedan ${cant_restante} ${ARTICULO.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
 
         if (ARTICULO.descripcion === 'Producto terminado') msg = `Solo quedan ${cant_restante} ${ARTICULO.medida_alerta} de este producto, debe de producir mas!!!`;
-        this.dbServ.toastWarning(msg, 'AVISO');
+        this.fun.toastWarning(msg, 'AVISO');
       }
 
       (this.filasDetalle[i] as any).controls['articulo'].setValue(ARTICULO);
@@ -381,7 +381,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
           excede = res['data'];
 
           if (excede) {
-            this.dbServ.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+            this.fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
 
             // proceso_quitar_articulo
 
@@ -401,7 +401,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
           }
         });
       } catch (error) {
-        if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
+        if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
 
         callback(false);
       }
@@ -574,7 +574,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       let conteo = 0;
       factura.detalle_facturas.map(async (arti) => {
         this.articuloClass.getArticulosFiltrado({ buscar: arti.codigo, fecha: this.fechaConduce, parameters: { contenido: true } }).then((res_articulo) => {
-          const articulo = _.first(res_articulo);
+          const articulo = _.first(res_articulo['data']);
           const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.' };
           const contenidos_format = this.formatContenidos(articulo.contenido);
 
@@ -666,7 +666,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       const multiplo = element.cantidad_en_unidades / element.cantidad;
       const cant_actual = cant_en_unidades_actual / multiplo;
       this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.fechaConduce }).then((result) => {
-        const articulo = _.first(result);
+        const articulo = _.first(result['data']);
         // const cant_en_unidades_actual = cant_en_unidades_actual * multiplo;
 
         (this.filasDetalle[i] as any).controls['detalle_factura_id'].setValue(element.id);
@@ -711,9 +711,9 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     const can = fila_actual['can'];
     if (detalle_factura_id && can > max_can) {
       if (can_original > max_can) {
-        this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad restante de la factura ', 'ERROR');
+        this.fun.toastError('No puede introducir una cantidad mayor a la cantidad restante de la factura ', 'ERROR');
       } else {
-        this.dbServ.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR');
+        this.fun.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR');
       }
       (this.filasDetalle[i] as any).controls['can'].setValue(max_can);
       this.enfocarInput('can-' + i);
@@ -732,11 +732,11 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
 
     if (this.rowsExcede.length) {
-      this.dbServ.toastWarning('No puede hacer el conduce, existiendo artículos que exceden su cantidad en el inventario', 'Aviso');
+      this.fun.toastWarning('No puede hacer el conduce, existiendo artículos que exceden su cantidad en el inventario', 'Aviso');
     } else if (!this.cliente) {
-      this.dbServ.toastWarning('Conduce no tiene cliente', 'Aviso');
+      this.fun.toastWarning('Conduce no tiene cliente', 'Aviso');
     } else if (filas_ocupadas.length === 0) {
-      this.dbServ.toastWarning('Conduce no tiene Articulos', 'Aviso');
+      this.fun.toastWarning('Conduce no tiene Articulos', 'Aviso');
     } else {
       this.CuerpoConduce = [];
       for (let i = 0; i < filas_ocupadas.length; i++) {
@@ -777,14 +777,14 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         }
       });
     } catch (error) {
-      // if (error.error) this.dbServ.toastError(error.error.msg, 'ERROR');
+      // if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
     }
   }
 
   printBase64Res(res) {
     if (res.status === 'si') {
     } else {
-      this.dbServ.toastError(res.msg, 'ERROR');
+      this.fun.toastError(res.msg, 'ERROR');
     }
   }
 

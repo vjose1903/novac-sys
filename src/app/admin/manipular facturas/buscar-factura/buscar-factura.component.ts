@@ -95,7 +95,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
   ngOnInit() {
-    this._init_mixin({ component: 'buscar_factura', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'pressEsc'] });
+    this._init_mixin({ component: 'buscar_factura', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'pressEsc', 'noFiltro'] });
     this.BuscarPara = this.route.snapshot.params['para'];
 
     if (this.BuscarPara === 'nota_credito') {
@@ -112,9 +112,9 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     this.loadServ.isLoading.next(false);
 
     if (res_ipc.status === 'si') {
-      this.dbServ.toastSuccess(res_ipc.msg, 'CORRECTO');
+      this.fun.toastSuccess(res_ipc.msg, 'CORRECTO');
     } else {
-      this.dbServ.toastError(res_ipc.msg, 'ERROR');
+      this.fun.toastError(res_ipc.msg, 'ERROR');
     }
   }
 
@@ -179,6 +179,13 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
     if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
   }
 
+  noFiltroResponse(res) {
+    if (res.tipo == 'buscarCliente') {
+      this.enfocarInput('valorI');
+      this.selectContenido('valorI');
+    }
+  }
+
   ngOnDestroy(): void {
     this._destroy_mixin();
     this.borrar('salir');
@@ -217,13 +224,13 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
             : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
 
         if (secuencia >= limite) {
-          this.dbServ.toastWarning(msg, 'AVISO');
+          this.fun.toastWarning(msg, 'AVISO');
         }
       }
     } catch (error) {
       this.existenComprobantes = true;
       console.error(error);
-      this.dbServ.toastError(error.error.msg, 'ERROR');
+      this.fun.toastError(error.error.msg, 'ERROR');
     }
   }
 
@@ -349,14 +356,14 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       } else {
         if (this.campo === '1') {
           if (this.tipo_factura_id === '0') {
-            this.dbServ.toastError('Este cliente no tiene facturas a credito a su nombre', 'ERROR');
+            this.fun.toastError('Este cliente no tiene facturas a credito a su nombre', 'ERROR');
           } else {
-            this.dbServ.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
+            this.fun.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
           }
         } else if (this.campo === '3') {
-          this.dbServ.toastError('No existen facturas con este número.', 'ERROR');
+          this.fun.toastError('No existen facturas con este número.', 'ERROR');
         } else if (this.campo === '2') {
-          this.dbServ.toastError('La factura buscada no existe', 'ERROR');
+          this.fun.toastError('La factura buscada no existe', 'ERROR');
         }
       }
     } catch (error) {
@@ -469,7 +476,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
           if (this.validarRayaAbajo()) {
             this.pedirFactura(this.campo, valor, this.tServ.obj_paginate);
           } else {
-            this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso');
+            this.fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
           }
         } else {
           if (this.tipo_factura_id === '0') {

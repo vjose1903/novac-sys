@@ -28,6 +28,7 @@ export interface ArticuloI {
   cantidades?: any;
   calcular_saco?: boolean;
   costos?: any;
+  stock?: any;
 }
 
 export class ArticuloC extends CrudG<ArticuloI> {
@@ -49,7 +50,13 @@ export class ArticuloC extends CrudG<ArticuloI> {
         ...arg.parameters,
       };
 
-      this.getAll(extra).then((res) => resolve(res['data']));
+      this.getAll(extra).then((res) => resolve(res));
     });
+  }
+}
+
+export class TipoArticuloC extends CrudG<any> {
+  constructor() {
+    super('tipo_articulos');
   }
 }

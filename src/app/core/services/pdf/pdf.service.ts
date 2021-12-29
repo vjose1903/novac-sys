@@ -9,13 +9,14 @@ import * as recibosIngresos from './recibosIngresos';
 import * as conduce from './conduce';
 import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
-import { DBservice } from '../bdservice.service';
+import { SingletonService } from '../singleton.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PdfService {
-  constructor(private dbServ: DBservice) {}
+  fun = SingletonService.fun;
+  constructor() {}
 
   generatePdf(oPdf): any {
     return new Promise((resolve, reject) => {
@@ -70,12 +71,12 @@ export class PdfService {
           });
         } else {
           const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
-          this.dbServ.toastError('Error generando el pdf.', 'ERROR');
+          this.fun.toastError('Error generando el pdf.', 'ERROR');
           resolve(respuesta);
         }
       } catch (error) {
         const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de pdf.', status: 'no', body: error });
-        this.dbServ.toastError('ERROR en el switch de tipos de pdf.', 'ERROR');
+        this.fun.toastError('ERROR en el switch de tipos de pdf.', 'ERROR');
         reject(respuesta);
       }
     });

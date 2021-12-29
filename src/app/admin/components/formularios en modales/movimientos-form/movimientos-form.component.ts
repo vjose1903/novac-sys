@@ -108,7 +108,7 @@ export class MovimientosFormComponent extends mixinClass implements OnInit, Afte
     };
     this.dbServ.createMovimientoI(obj).subscribe(
       (res) => {
-        this.dbServ.toastSuccess(_.capitalize(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
+        this.fun.toastSuccess(_.capitalize(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
         this.resetForm();
 
         const obj = {
@@ -127,7 +127,7 @@ export class MovimientosFormComponent extends mixinClass implements OnInit, Afte
     for (const error in arg) {
       if (arg.hasOwnProperty(error)) {
         const element = arg[error];
-        this.dbServ.toastError(element, 'Error');
+        this.fun.toastError(element, 'Error');
       }
     }
   }

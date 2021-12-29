@@ -146,7 +146,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
             // para saber si la factura que estaba en turno era una factura ya archivada
             if (this.objArchivo.archivo_id_en_turno) {
               if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
-                this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
+                this.fun.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
                 this.procesoRelleno(this.objArchivo.factura_para_rellenar);
                 abrir_modal = false;
               } else {
@@ -382,7 +382,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
           if (_.get(this.objArchivo, 'archivo_id_en_turno')) {
             if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
-              this.dbServ.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
+              this.fun.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
               abrirModal = false;
             } else {
               obj.texto_modal = 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?';
@@ -430,9 +430,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
 
       if (balance > maxCred - 1000 && balance < maxCred) {
-        this.dbServ.toastWarning(`Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
+        this.fun.toastWarning(`Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
       } else if (balance > maxCred) {
-        this.dbServ.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
+        this.fun.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
       }
       //
     } else if (res && res.tipo_modal === 'buscarSuplidor') {
@@ -570,14 +570,14 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
                   ? `Ultimo comprobante para ${TipoFact[0].descripcion}.`
                   : `Los comprobantes para ${TipoFact[0].descripcion} se estan agotando, solo quedan ${restante}`;
 
-              if (secuencia >= limite) this.dbServ.toastWarning(msg, 'AVISO');
+              if (secuencia >= limite) this.fun.toastWarning(msg, 'AVISO');
             }
             resolve(true);
           } catch (error) {
             if (error.error.msg) {
-              this.dbServ.toastError(error.error.msg, 'ERROR');
+              this.fun.toastError(error.error.msg, 'ERROR');
             } else {
-              this.dbServ.toastError('Error calculando la secuencia de comprobantes.', 'AVISO');
+              this.fun.toastError('Error calculando la secuencia de comprobantes.', 'AVISO');
             }
 
             this.enfocarInput('tipoFact');
@@ -606,7 +606,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         this.enfocarInput(campo);
       }
     } else {
-      this.dbServ.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
+      this.fun.toastError('El tipo de factura introducido es incorrecto.', 'ERROR');
     }
   }
 
@@ -627,7 +627,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     if (campo === 'pago') {
       if (this.metodo === 'compra' && !this.tipos_costosYgastos.includes(valor)) {
-        this.dbServ.toastError('El tipo de costo y gasto introducido es incorrecto.', 'ERROR');
+        this.fun.toastError('El tipo de costo y gasto introducido es incorrecto.', 'ERROR');
       } else {
         this.CostoYgasto = valor;
         if (this.condicion_fact === 'Contado') {
@@ -652,7 +652,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (this.validarRayaAbajo()) {
         this.abrirModalFiltro();
         this.desEnfocarInput(salioDe);
-      } else this.dbServ.toastWarning('Numero de comprobante incorrecto', 'Aviso');
+      } else this.fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
     }
 
     if (campo === 'dir' && valor !== null) this.enfocarInput(campo);
@@ -665,7 +665,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.enfocarInput(campo);
       this.propietario_factura = this.form.value;
     } else {
-      this.dbServ.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
+      this.fun.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
     }
   }
 
@@ -743,14 +743,14 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     if (!this.usuario) this.usuario = this.fun.getUser();
 
     if (!this.propietario_factura) {
-      if (this.metodo === 'compra') this.dbServ.toastWarning('Factura no tiene suplidor seleccionado', 'Aviso');
-      else this.dbServ.toastWarning('Factura no tiene cliente seleccionado', 'Aviso');
+      if (this.metodo === 'compra') this.fun.toastWarning('Factura no tiene suplidor seleccionado', 'Aviso');
+      else this.fun.toastWarning('Factura no tiene cliente seleccionado', 'Aviso');
     } else {
       if (this.CuerpoFactura.length === 0) {
-        this.dbServ.toastWarning('Factura incompleta!!!', 'Aviso');
+        this.fun.toastWarning('Factura incompleta!!!', 'Aviso');
       } else {
         if (this.TOTAL === 0) {
-          this.dbServ.toastWarning('Total de la factura no puede ser 0', 'Aviso');
+          this.fun.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
           if (this.condicion_fact === 'Crédito' || this.is_viaje) {
             this.abrirModal('imprimir', null);
@@ -860,7 +860,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
         this.abrirModal('dinamico_texto', obj, 'archivar_factura');
       } else {
-        this.dbServ.toastWarning('Debe de iniciar una factura para archivarla', 'AVISO');
+        this.fun.toastWarning('Debe de iniciar una factura para archivarla', 'AVISO');
       }
     });
   }
@@ -1028,7 +1028,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
           const res = await this.dbServ.editarArticulo(articulo).toPromise();
         } catch (error) {
           console.error(error);
-          this.dbServ.toastError('Error actualizando costos articulos.', 'ERROR');
+          this.fun.toastError('Error actualizando costos articulos.', 'ERROR');
         }
       }
     }
@@ -1129,10 +1129,10 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
       if (metodo === 'editar_factura') {
         res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();
-        this.dbServ.toastSuccess('Factura editada correctamente.', 'CORRECTO');
+        this.fun.toastSuccess('Factura editada correctamente.', 'CORRECTO');
       } else {
         res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
-        this.dbServ.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO');
+        this.fun.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO');
       }
 
       if (this.layServ.factura_guardada) this.revisarLocalStorage();
@@ -1161,7 +1161,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     } catch (error) {
       console.error(error);
       try {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
+        this.fun.toastError(error.error.msg, 'ERROR');
       } catch (error) {
         console.error('error--> ', error);
       }
@@ -1171,7 +1171,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   async printBase64Res(res) {
     if (res.status === 'si') {
     } else {
-      this.dbServ.toastError('Error imprimiendo la factura.', 'ERROR');
+      this.fun.toastError('Error imprimiendo la factura.', 'ERROR');
     }
   }
 }

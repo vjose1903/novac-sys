@@ -70,9 +70,9 @@ export class InterceptorService implements HttpInterceptor {
 
       catchError((response: HttpErrorResponse) => {
         if (response.error === null) {
-          this.dbServ.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
+          this.fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
         } else if (response.error && response.error.msg === 'Para realizar esta accion debe de iniciar sesión.') {
-          this.dbServ.toastError(response.error.msg, 'ERROR');
+          this.fun.toastError(response.error.msg, 'ERROR');
           this.fun.nextCanToast(false);
           this.fun.logout();
           this.router.navigateByUrl('/auth/login');
@@ -98,8 +98,8 @@ export class InterceptorService implements HttpInterceptor {
       for (let i = 0; i < menssages.length; i++) {
         const menssage = menssages[i];
 
-        if (tipo_ === 'success') this.dbServ.toastSuccess(menssage, 'CORRECTO');
-        if (tipo_ === 'error') this.dbServ.toastError(menssage, 'ERROR');
+        if (tipo_ === 'success') this.fun.toastSuccess(menssage, 'CORRECTO');
+        if (tipo_ === 'error') this.fun.toastError(menssage, 'ERROR');
       }
     }
   }

@@ -484,7 +484,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         this.checkNumbers(tempdecimales) ||
         this.checkLongMillares(tempdecimales)
       ) {
-        this.dbServ.toastError('Valor introducido es invalido', 'ERROR');
+        this.fun.toastError('Valor introducido es invalido', 'ERROR');
         this.enfocarInput(input);
       } else {
         //
@@ -699,9 +699,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     if (this.metodo === 'venta' && this.paraFiltroArticulos !== null && arg.existencia === 0) {
       if (arg.descripcion === 'Producto terminado') {
-        this.dbServ.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
+        this.fun.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
       } else {
-        this.dbServ.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+        this.fun.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
       }
     } else {
       this.clickRow.emit(arg);

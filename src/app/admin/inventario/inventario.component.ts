@@ -5,6 +5,8 @@ import * as _ from 'lodash';
 import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
 import { mixinClass } from '../mixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
+import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
+import { ReporteC } from '../reportes/reporte';
 
 @Component({
   selector: 'app-inventario',
@@ -39,14 +41,11 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
       formatoNumero: true,
     },
   ];
+
   cant_inventario = 0;
-  botones = {
-    titulo: true,
-    inventario: true,
-  };
+  botones = { titulo: true, inventario: true };
   listaArticulos;
-  costoTotal: number;
-  gananciaTotal: number;
+
   tipo_articulos;
   indexSelected: any;
   seleccionModal: any;
@@ -54,11 +53,15 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   filtro = 'todos';
 
   palabra_buscar;
-  FechaFactura: string;
+  fechaFactura: string;
   pdfSrc: any;
   fileName: any;
 
-  constructor(private dbServ: DBservice, private tServ: TablasService, public loadServ: LoaderService) {
+  articuloClass = new ArticuloC();
+  tipoArticuloClass = new TipoArticuloC();
+  reporteClass = new ReporteC();
+
+  constructor(private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
 
@@ -66,34 +69,24 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
     this._init_mixin({ component: 'inventario', _lista_subs: ['decisionModal', 'printBase64Res'] });
     this.necesarioParaEmpezar();
 
-    this.dbServ.getTipoArticulos().subscribe((res) => (this.tipo_articulos = res));
+    this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res));
   }
 
   initCambioMenu(arg) {
-    if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
-    }
+    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
   }
 
   async printBase64Res(res) {
-    if (res.status === 'si') {
-      this.dbServ.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-    } else {
-      this.dbServ.toastError(res.msg, 'ERROR');
-    }
+    if (res.status === 'si') this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+    else this.fun.toastError(res.msg, 'ERROR');
   }
 
   async decisionModal(arg) {
-    if (this.tipoModal === 'visor_pdf') {
-      arg = { bool: arg };
-    }
+    if (this.tipoModal === 'visor_pdf') arg = { bool: arg };
 
     if (arg.bool) {
       if (this.tipoModal === 'visor_pdf') {
-        const obj = {
-          base64: this.seleccionModal.pdfSrc,
-          filename: `${this.seleccionModal.fileName}.pdf`,
-        };
+        const obj = { base64: this.seleccionModal.pdfSrc, filename: `${this.seleccionModal.fileName}.pdf` };
 
         this._ipc.send('printBase64', obj);
         this.resetVariables();
@@ -106,7 +99,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   ngOnDestroy() {
     this._destroy_mixin();
 
-    this.FechaFactura = undefined;
+    this.fechaFactura = undefined;
     this.tServ.obj_paginate = obj_paginate_default;
     this.tServ.Func_total_paginas(1);
   }
@@ -116,134 +109,58 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   async necesarioParaEmpezar() {
-    this.FechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
-    await this.getCantidadInventario();
+    this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
     await this.getArticulos(this.tServ.obj_paginate);
-    await this.calcularGananciasCostos();
+    await this.getStock();
   }
 
   async makeReporte() {
-    let res = {} as any;
-
-    try {
-      const tipo = 'inventario';
-      let params = '';
-
-      res = await this.dbServ.makeReportes(tipo, params).toPromise();
-      const obj = {
-        data: res,
-        type: 'reporte',
-      };
+    const extra = { afterPath: `inventario` };
+    this.reporteClass.getAll(extra).then((res) => {
+      const obj = { data: res, type: 'reporte' };
       this.loadServ.isLoading.next(true);
       this.generarPdf(obj);
-      // this._ipc.send('print', obj);
-    } catch (error) {
-      this.dbServ.toastError('Error realizando reporte.', 'ERROR');
-    }
+    });
   }
 
   generarPdf(obj) {
     this.pdfServ.generatePdf(obj).then((res) => {
       if (res.status === 'si') {
-        const obj_pdf = {
-          pdfSrc: res.body,
-          titulo: 'Reporte de inventario',
-          height: '83vh',
-          reimprimir: res.reimprimir,
-          fileName: res.file.split('.')[0],
-        };
-
+        const obj_pdf = { pdfSrc: res.body, titulo: 'Reporte de inventario', height: '83vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
         this.loadServ.isLoading.next(false);
-
         this.abrirModal('visor_pdf', obj_pdf);
       }
     });
   }
 
-  async getCantidadInventario() {
-    try {
-      const res = await this.dbServ.getCantidadInventario().toPromise();
-      this.cant_inventario = res.count;
-    } catch (error) {
-      this.dbServ.toastError('Error buscando la cantidad de articulos en inventario.', 'ERROR');
-    }
+  async getStock() {
+    const extra = { afterPath: `custom/stock` };
+    this.articuloClass.getAll(extra).then((result) => (this.cant_inventario = result['data'].stock));
   }
 
   async getArticulos(e) {
-    try {
-      // this.listaArticulos = [];
-      const page = e.page;
-      const per_page = e.per_page;
-      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+    const page = e.page;
+    const per_page = e.per_page;
+    const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+    this.palabra_buscar = palabra_a_buscar;
 
-      const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.FechaFactura, this.filtro).toPromise();
-      this.palabra_buscar = palabra_a_buscar;
+    this.articuloClass
+      .getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: page, per_page: per_page, paginado: true, is_compra: false, tipo: this.filtro })
+      .then((res) => {
+        res.data.map((arti) => {
+          arti.customStyles = { 'td-codigo': { width: '4rem' }, 'td-nombre': { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
+        });
 
-      res.data.map(async (arti) => {
-        arti.customStyles = {
-          'td-codigo': {
-            width: '4rem',
-          },
-          'td-nombre': {
-            width: '35rem',
-            'text-align': 'left',
-            'padding-left': '2rem',
-          },
-        };
+        this.listaArticulos = GLOBAL.duplicarJson(res.data);
+
+        const obj = { total: res.total_registros, tabla: 'listaArticulos' };
+        this.tServ.Func_total_paginas(obj);
       });
-
-      this.listaArticulos = GLOBAL.duplicarJson(res.data);
-
-      // this.listaArticulos = [
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      //   ...this.listaArticulos,
-      // ];
-
-      const obj = {
-        total: res.total_registros,
-        tabla: 'listaArticulos',
-      };
-
-      // const obj = {
-      //   total: this.listaArticulos.length,
-      //   tabla: 'listaArticulos',
-      // };
-
-      this.tServ.Func_total_paginas(obj);
-    } catch (error) {
-      this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
-    }
   }
 
   filtrarArticulos() {
     this.tServ.obj_paginate['searchText'] = this.palabra_buscar;
-
     this.getArticulos(this.tServ.obj_paginate);
-    this.calcularGananciasCostos();
-  }
-
-  calcularGananciasCostos() {
-    this.costoTotal = 0;
-    this.gananciaTotal = 0;
-    for (let i = 0; i < this.listaArticulos.length; i++) {
-      const articulo = this.listaArticulos[i];
-      const costo = articulo.costo_principal;
-      const precio = articulo.precio_principal;
-      const cantidad = articulo.cantidades[articulo.medida];
-
-      this.costoTotal += costo * cantidad;
-      this.gananciaTotal += precio * cantidad;
-    }
   }
 
   movimientoInventario(arg) {

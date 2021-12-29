@@ -68,9 +68,9 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
   printBase64Res(res) {
     if (res.status === 'si') {
-      this.dbServ.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
+      this.fun.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
     } else {
-      this.dbServ.toastError(res.msg, 'ERROR');
+      this.fun.toastError(res.msg, 'ERROR');
     }
   }
 
@@ -220,7 +220,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
       this.detalleFacturas = temp;
     } catch (error) {
-      this.dbServ.toastError('Error mostrando factura elegida', 'ERROR');
+      this.fun.toastError('Error mostrando factura elegida', 'ERROR');
     }
   }
 
@@ -231,7 +231,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
       callback({ estado: true, precio_saco: res.data[0].precio_principal });
     } catch (error) {
-      this.dbServ.toastError('Error calculando el precio del saco', 'ERROR');
+      this.fun.toastError('Error calculando el precio del saco', 'ERROR');
       callback({ estado: false });
     }
   }
@@ -282,7 +282,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     if (info.cambio === 'cant_nota') {
       if (this.tipoNota === 'credito') {
         if (entidad.cant_nota > entidad.cant) {
-          this.dbServ.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
+          this.fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
           this.tablas.enfocarInput('inputNu-' + info.index);
           setTimeout(() => {
             this.tablas.resetInput('cant', 'cant_nota', info.index, false);
@@ -349,10 +349,10 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   // =============================================
   imprimirFactura() {
     if (this.detalleNota.length === 0) {
-      this.dbServ.toastWarning('Nota de ' + this.tipoNota + ' no puede estar vacía.', 'Aviso');
+      this.fun.toastWarning('Nota de ' + this.tipoNota + ' no puede estar vacía.', 'Aviso');
     } else {
       if (this.TOTAL === 0) {
-        this.dbServ.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
+        this.fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
       } else {
         const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota, tipo__: 'no_devuelta' };
         this.abrirModal('imprimir', obj);
@@ -479,7 +479,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
       this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
     } catch (error) {
-      this.dbServ.toastError(error.statusText, 'ERROR');
+      this.fun.toastError(error.statusText, 'ERROR');
     }
   }
 

@@ -221,7 +221,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
     } catch (error) {
       console.error(error);
 
-      this.dbServ.toastError('Error buscando Paquetes de NCF registrados.', 'ERROR');
+      this.fun.toastError('Error buscando Paquetes de NCF registrados.', 'ERROR');
     }
   }
 
@@ -278,14 +278,14 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
 
       this.getPaquetesNCF(this.tServ.obj_paginate);
       if (this.is_editando) {
-        this.dbServ.toastSuccess('Comprobante editado', 'CORRECTO');
+        this.fun.toastSuccess('Comprobante editado', 'CORRECTO');
       } else {
-        this.dbServ.toastSuccess('Comprobante ingresado', 'CORRECTO');
+        this.fun.toastSuccess('Comprobante ingresado', 'CORRECTO');
       }
       this.borrar();
     } catch (error) {
       console.error(error);
-      this.dbServ.toastError(error.error.msg, 'ERROR');
+      this.fun.toastError(error.error.msg, 'ERROR');
     }
   }
   abilitarBtnSend() {
@@ -351,7 +351,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
       if (arg && obj) {
         this.dbServ.deleteNCF(obj.id).subscribe(
           (res) => {
-            this.dbServ.toastSuccess('comprobante para ' + obj.tipoC_ + ' numero: ' + obj.codigo + ' borrado', 'CORRECTO');
+            this.fun.toastSuccess('comprobante para ' + obj.tipoC_ + ' numero: ' + obj.codigo + ' borrado', 'CORRECTO');
             this.getPaquetesNCF(this.tServ.obj_paginate);
           },
           (err) => {
@@ -365,7 +365,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
-        this.dbServ.toastError(error, 'ERROR');
+        this.fun.toastError(error, 'ERROR');
       });
     } else {
       for (const key in arg) {
@@ -373,7 +373,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
           const element = arg[key];
 
           if (key !== 'status') {
-            this.dbServ.toastError(element, 'ERROR');
+            this.fun.toastError(element, 'ERROR');
           }
         }
       }

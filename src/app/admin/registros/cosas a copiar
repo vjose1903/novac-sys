@@ -18,7 +18,7 @@ async getClientes(e) {
 
       this.listaClientes = res.data;
 
-this.dbServ.toastError('Error buscando articulos registrados.', 'ERROR');
+this.fun.toastError('Error buscando articulos registrados.', 'ERROR');
 
 
 
