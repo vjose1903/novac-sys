@@ -12,14 +12,15 @@
       </div> -->
       <app-tablas
         *ngIf="lista_recibos"
-        [padre]="cardTabla" [info]="info"
+        [padre]="cardTabla"
+        [info]="info"
         [data]="lista_recibos"
         [quitarAScorll]="50"
         [tablaHover]="true"
         (clickIcon)="clickIcon($event)"
-        (paginateChange)="filtrarRecibos($event)"
+        (paginateChange)="getRecibos($event)"
         [focusRow]="false"
-        [id_tabla]="'recibos_ingreso'"
+        [id_tabla]="'listaRecibos'"
       ></app-tablas>
     </div>
   </div>

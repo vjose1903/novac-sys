@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DBservice } from '../../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { TablasService } from '../../../components/tablas/tablas.service';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import { mixinClass } from '../../../mixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
+import { ReciboC } from '../../recibos';
 
 @Component({
   selector: 'app-lista-recibos',
@@ -65,8 +65,9 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   ];
   lista_recibos;
   rowSelected: any;
+  reciboClass = new ReciboC();
 
-  constructor(public dbServ: DBservice, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
 
@@ -86,14 +87,13 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async printBase64Res(res) {
-    if (res.status === 'si') {
-      this.dbServ.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
-    } else {
-      this.dbServ.toastError(res.msg, 'ERROR');
-    }
+    if (res.status === 'si') this.fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
+    else this.fun.toastError(res.msg, 'ERROR');
   }
 
   ipcPrintResponse(res) {
+    console.log('res --> ', res);
+
     if (res.status === 'si') {
       // this.fileName = res.file;
       // this.pdfSrc = res.body;
@@ -107,7 +107,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
       // this.loadServ.isLoading.next(true);
       // this.abrirModal('visor_pdf', obj);
     } else {
-      this.dbServ.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
+      this.fun.toastError(res.msg + '   ERROR: ' + res.err, 'ERROR');
     }
   }
 
@@ -144,22 +144,28 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
-    await this.getLast50Recibos();
+    await this.getRecibos(this.tServ.obj_paginate);
   }
 
-  async getLast50Recibos() {
+  async getRecibos(e) {
     try {
-      let res = await this.dbServ.getRecibosLimit(50).toPromise();
-      res = this.mapeoRecibos(res);
-      this.lista_recibos = GLOBAL.duplicarJson(res);
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
-      const obj = {};
-      obj['total'] = res.length;
-      obj['tabla'] = 'listaRecibos';
-      this.tServ.Func_total_paginas(obj);
-    } catch (error) {
-      console.error('Error buscando recibos --> ', error);
-    }
+      const extra = {
+        afterPath: `filtro/${palabra_a_buscar}`,
+        parameters: { page: page, per_page: per_page, paginado: true },
+      };
+
+      this.reciboClass.getAll(extra).then((res) => {
+        res['data'] = this.mapeoRecibos(res['data']);
+        this.lista_recibos = GLOBAL.duplicarJson(res['data']);
+
+        const obj = { total: res['total_registros'], tabla: 'listaRecibos' };
+        this.tServ.Func_total_paginas(obj);
+      });
+    } catch (error) {}
   }
 
   navegar() {
@@ -183,33 +189,9 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
     }
   }
 
-  async filtrarRecibos(e) {
-    const obj = {};
-    try {
-      if (e.searchText !== '' && e.searchText !== ' ') {
-        const page = e.page;
-        const per_page = e.per_page;
-        const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
-        const res = await this.dbServ.getRecibosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
-
-        this.lista_recibos = this.mapeoRecibos(res.data);
-
-        obj['total'] = res.total_registros;
-        obj['tabla'] = 'listaRecibos';
-        this.tServ.Func_total_paginas(obj);
-      } else {
-        this.getLast50Recibos();
-      }
-    } catch (error) {
-      this.dbServ.toastError('Error buscando recibos registrados.', 'ERROR');
-    }
-  }
-
   getReciboBase64(arg) {
     const recibo_selected = _.find(this.lista_recibos, (recibo) => recibo.id === arg.id);
-
     const obj = { data: recibo_selected, type: 'recibo_ingreso', retunBase64: true };
-
     this.generarPdf(obj);
   }
 
@@ -232,25 +214,15 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   }
 
   imprimir_base64() {
-    const obj = {
-      base64: this.pdfSrc,
-      filename: this.fileName,
-      type: 'recibo_ingreso',
-    };
-
+    const obj = { base64: this.pdfSrc, filename: this.fileName, type: 'recibo_ingreso' };
     this._ipc.send('printBase64', obj);
   }
 
   async anularRecibo(id) {
     try {
-      const res = await this.dbServ.revertirReciboById(id).toPromise();
-      this.getLast50Recibos();
-      this.dbServ.toastSuccess(res.msg, 'CORRECTO');
-    } catch (error) {
-      if (error.error) {
-        this.dbServ.toastError(error.error.msg, 'ERROR');
-      }
-    }
+      const extra = { afterPath: `revertir/by_id/${id}` };
+      this.reciboClass.getAll(extra).then((res) => this.getRecibos(this.tServ.obj_paginate));
+    } catch (error) {}
   }
 
   decisionModal(res) {

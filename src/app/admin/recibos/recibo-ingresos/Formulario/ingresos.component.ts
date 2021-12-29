@@ -355,6 +355,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     obj['detalle_recibos'] = this.detalleYtotal.detalle;
 
     try {
+
       const res = await this.dbServ.createRecibo(obj).toPromise();
 
       this.clienteAdepositar.balance = res.data.cliente.balance;

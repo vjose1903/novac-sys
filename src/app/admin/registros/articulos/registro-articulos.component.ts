@@ -43,6 +43,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       estilos: [{ width: '20%' }],
     },
   ];
+
   botones = {
     titulo: true,
     borrar: true,

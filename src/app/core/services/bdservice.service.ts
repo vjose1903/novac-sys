@@ -338,21 +338,10 @@ export class DBservice {
     return this.peticion('recibos_ingresos', 'post', JSON.stringify(arg));
   }
 
-  getRecibosFiltrados(arg, page, per_page, paginado) {
-    return this.peticion(`recibos_ingresos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
-  }
-
-  getRecibosLimit(cant) {
-    return this.peticion(`recibos_ingresos/get/${cant}`, 'get');
-  }
-
   revertirLastReciboByFacturaId(id) {
     return this.peticion(`recibos_ingresos/revertir/by_factura/${id}`, 'get');
   }
 
-  revertirReciboById(id) {
-    return this.peticion(`recibos_ingresos/revertir/by_id/${id}`, 'get');
-  }
 
   // =====================================================================
   // NOTAS
