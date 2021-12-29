@@ -13,6 +13,8 @@
           <th id="{{ row?.titulo }}" *ngFor="let row of info" class="thHead">
             <span [ngSwitch]="row?.tipo">
               <span *ngSwitchCase="'check'">
+                <ng-container *ngIf="!row?.select_all"> {{ row?.titulo }} </ng-container>
+
                 <input
                   *ngIf="row?.select_all"
                   class="apple-switch"
@@ -25,7 +27,7 @@
               </span>
 
               <span *ngSwitchDefault>
-                {{ row?.titulo }}
+                <span> {{ row?.titulo }} </span>
               </span>
             </span>
           </th>

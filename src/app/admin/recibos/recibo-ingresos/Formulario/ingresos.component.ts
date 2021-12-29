@@ -63,7 +63,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       tipo: 'check',
       key: 'select',
       select_all: false,
-      estilos: [{ width: '7rem' }],
+      estilos: [{ width: '7rem', padding: '0.6rem 0rem' }],
 
       disable: [{ kind: 'campo', target: 'is_viaje', value: [true] }],
     },
@@ -73,7 +73,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       tipo: 'check',
       key: 'pagoT',
       select_all: false,
-      estilos: [{ width: '6rem' }],
+      estilos: [{ width: '6rem', padding: '0.6rem 0rem' }],
       disable: [{ kind: 'campo', target: 'select', value: [false] }],
     },
     {
@@ -109,7 +109,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'ingresos', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
+    this._init_mixin({ component: 'ingresos', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'noFiltro'] });
 
     this.necesarioStart();
   }
@@ -138,6 +138,13 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       this.devuelta = res.data.devuelta;
       this.forma_pago = res.data.forma_pago;
       this.sendIngreso();
+    }
+  }
+
+  noFiltroResponse(res) {
+    if (res.tipo == 'buscarCliente') {
+      this.enfocarInput('clienteI');
+      this.selectContenido('clienteI');
     }
   }
 
@@ -355,7 +362,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     obj['detalle_recibos'] = this.detalleYtotal.detalle;
 
     try {
-
       const res = await this.dbServ.createRecibo(obj).toPromise();
 
       this.clienteAdepositar.balance = res.data.cliente.balance;

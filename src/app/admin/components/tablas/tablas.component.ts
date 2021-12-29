@@ -610,7 +610,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       if (info.tipo === 'check') {
         if (!_.has(info, 'select_all')) info.select_all = true;
         if (!_.has(info, 'estilos')) info.estilos = [];
-        info.estilos.push({ padding: 0 });
+        if (info.select_all) info.estilos.push({ padding: 0 });
       }
 
       if (info.estilos && info.estilos.length > 0) {

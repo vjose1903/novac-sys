@@ -46,11 +46,8 @@ export class ModalSeleccinarArticuloComponent extends mixinClass implements OnIn
       titulo: 'Seleccione',
       tipo: 'check',
       key: 'select',
-      // estilos: [{ width: '10%' }, { display: 'flex' }, { 'justify-content': 'flex-end' }, { 'aling-items': 'center' }, { 'padding-right': '0.5rem' }],
       estilos: [{ width: '10.8%' }],
-
       disable: [{ kind: 'campo', target: 'disable', value: [true] }],
-
       title: '',
     },
   ];
