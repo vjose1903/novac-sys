@@ -1,0 +1,450 @@
+/* You can add global styles to this file, and also import other style files */
+
+
+// =====================================================================================================================================================================
+// ICONO             ===================================================================================================================================================
+// =====================================================================================================================================================================
+.btnIcon {
+  border-radius: 0.4rem;
+  color: #adb7be;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    position: absolute;
+  }
+
+  &.sm {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &:hover {
+    background: #cfcfcf2e;
+    cursor: pointer;
+  }
+
+  &.bg-red {
+    background: #fc2c2ca8;
+    color: #3a0303e0 !important;
+
+    &:hover {
+      filter: brightness(0.6);
+      cursor: pointer;
+    }
+  }
+
+  &.disable {
+    background: #7a7a7a2e;
+    color: #b1b1b1a4;
+
+    pointer-events: none;
+  }
+}
+
+// =====================================================================================================================================================================
+// VERDE OSCURO      ===================================================================================================================================================
+// =====================================================================================================================================================================
+
+.btn-verde-claro {
+  color: #1d253b  !important;
+  background: #2cdfc2 !important;
+  border-color: #2cdfc2 !important;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+
+.btn-verde-claro:hover {
+  color: #1d253b  !important;
+  background: #2cdfc2 !important;
+  filter: brightness(0.9);
+}
+
+.btn-verde-claro:active,
+.btn-verde-claro.active {
+  color: #d4d4d4 !important;
+  background: #2cdfc2 !important;
+}
+
+.btn-verde-claro:focus,
+.btn-verde-claro.focus {
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014, 0 0 0 0 #48887b !important;
+  background: #2cdfc2 !important;
+}
+
+.btn-verde-claro.disabled,
+.btn-verde-claro:disabled {
+  color: #434c63b4 !important;
+  background: #2cdfc2 !important;
+}
+
+.btn-verde-claro:not(:disabled):not(.disabled):active,
+.btn-verde-claro:not(:disabled):not(.disabled).active,
+.show > .btn-verde-claro.dropdown-toggle {
+  color: #1d253b ;
+  background: #2cdfc2 !important;
+  border-color: #2cdfc2 !important;
+}
+
+.btn-verde-claro:not(:disabled):not(.disabled):active:focus,
+.btn-verde-claro:not(:disabled):not(.disabled).active:focus,
+.show > .btn-verde-claro.dropdown-toggle:focus {
+  box-shadow: none, 0 0 0 0 #2cdfc2 !important;
+}
+
+// =====================================================================================================================================================================
+// AZUL NAVY    ========================================================================================================================================================
+// =====================================================================================================================================================================
+
+.btn-azul-navy {
+  color: #ffffff !important;
+  background: #263148;
+  border-color: #263148 !important;
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014 !important;
+}
+
+.btn-azul-navy:hover {
+  color: #ffffff !important;
+  background: #263148;
+  border-color: #d6dae2 !important;
+}
+
+.btn-azul-navy:focus,
+.btn-azul-navy.focus {
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014, 0 0 0 0 #f4f5f780 !important;
+}
+
+.btn-azul-navy.disabled,
+.btn-azul-navy:disabled {
+  color: #ffffff !important;
+  background: #263148;
+  border-color: #263148 !important;
+}
+
+.btn-azul-navy:not(:disabled):not(.disabled):active,
+.btn-azul-navy:not(:disabled):not(.disabled).active,
+.show > .btn-azul-navy.dropdown-toggle {
+  color: #434c63b4 !important;
+  background: #263148;
+  border-color: #263148 !important;
+}
+
+.btn-azul-navy:not(:disabled):not(.disabled):active:focus,
+.btn-azul-navy:not(:disabled):not(.disabled).active:focus,
+.show > .btn-azul-navy.dropdown-toggle:focus {
+  box-shadow: none, 0 0 0 0 #f4f5f780 !important;
+}
+
+// =====================================================================================================================================================================
+// ROJO    ========================================================================================================================================================
+// =====================================================================================================================================================================
+
+@mixin rojo-gradient {
+  background: linear-gradient(27deg, #792222 6%, #ce4f4f 48%, #792222 89%) !important;
+}
+
+.btn-rojo {
+  color: #ffffff !important;
+  @include rojo-gradient;
+  border-color: #490000 !important;
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014 !important;
+}
+
+.btn-rojo:hover {
+  color: #ffffff !important;
+  @include rojo-gradient;
+  border-color: #490000 !important;
+}
+
+.btn-rojo:focus,
+.btn-rojo.focus {
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014, 0 0 0 0 #f4f5f780 !important;
+}
+
+.btn-rojo.disabled,
+.btn-rojo:disabled {
+  color: #ffffff !important;
+  @include rojo-gradient;
+  border-color: #490000 !important;
+}
+
+.btn-rojo:not(:disabled):not(.disabled):active,
+.btn-rojo:not(:disabled):not(.disabled).active,
+.show > .btn-rojo.dropdown-toggle {
+  color: #212529 !important;
+  @include rojo-gradient;
+  border-color: #490000 !important;
+}
+
+.btn-rojo:not(:disabled):not(.disabled):active:focus,
+.btn-rojo:not(:disabled):not(.disabled).active:focus,
+.show > .btn-rojo.dropdown-toggle:focus {
+  box-shadow: none, 0 0 0 0 #490000 !important;
+}
+
+// =====================================================================================================================================================================
+// AMARILLO    ========================================================================================================================================================
+// =====================================================================================================================================================================
+
+@mixin amarillo-gradient {
+  background: linear-gradient(27deg, #795e22 6%, #ceac4f 48%, #795e22 89%) !important;
+}
+
+.btn-amarillo {
+  color: #ffffff !important;
+  @include amarillo-gradient;
+  border-color: #795e22 !important;
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014 !important;
+}
+
+.btn-amarillo:hover {
+  color: #ffffff !important;
+  @include amarillo-gradient;
+  border-color: #795e22 !important;
+}
+
+.btn-amarillo:focus,
+.btn-amarillo.focus {
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014, 0 0 0 0 #f4f5f780 !important;
+}
+
+.btn-amarillo.disabled,
+.btn-amarillo:disabled {
+  color: #ffffff !important;
+  @include amarillo-gradient;
+  border-color: #795e22 !important;
+}
+
+.btn-amarillo:not(:disabled):not(.disabled):active,
+.btn-amarillo:not(:disabled):not(.disabled).active,
+.show > .btn-amarillo.dropdown-toggle {
+  color: #212529 !important;
+  @include amarillo-gradient;
+  border-color: #795e22 !important;
+}
+
+.btn-amarillo:not(:disabled):not(.disabled):active:focus,
+.btn-amarillo:not(:disabled):not(.disabled).active:focus,
+.show > .btn-amarillo.dropdown-toggle:focus {
+  box-shadow: none, 0 0 0 0 #795e22 !important;
+}
+
+// =====================================================================================================================================================================
+// AZUL OSCURO    ========================================================================================================================================================
+// =====================================================================================================================================================================
+
+@mixin azul-oscuro-gradient {
+  background: linear-gradient(27deg, #223279 6%, #3d54b8 48%, #223279 89%) !important;
+}
+
+.btn-azul-oscuro {
+  color: #ffffff !important;
+  @include azul-oscuro-gradient;
+  border-color: #001749 !important;
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014 !important;
+}
+
+.btn-azul-oscuro:hover {
+  color: #ffffff !important;
+  @include azul-oscuro-gradient;
+  border-color: #001749 !important;
+}
+
+.btn-azul-oscuro:focus,
+.btn-azul-oscuro.focus {
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014, 0 0 0 0 #f4f5f780 !important;
+}
+
+.btn-azul-oscuro.disabled,
+.btn-azul-oscuro:disabled {
+  color: #ffffff !important;
+  @include azul-oscuro-gradient;
+  border-color: #001749 !important;
+}
+
+.btn-azul-oscuro:not(:disabled):not(.disabled):active,
+.btn-azul-oscuro:not(:disabled):not(.disabled).active,
+.show > .btn-azul-oscuro.dropdown-toggle {
+  color: #212529 !important;
+  @include azul-oscuro-gradient;
+  border-color: #001749 !important;
+}
+
+.btn-azul-oscuro:not(:disabled):not(.disabled):active:focus,
+.btn-azul-oscuro:not(:disabled):not(.disabled).active:focus,
+.show > .btn-azul-oscuro.dropdown-toggle:focus {
+  box-shadow: none, 0 0 0 0 #001749 !important;
+}
+
+// =====================================================================================================================================================================
+// GREY    ========================================================================================================================================================
+// =====================================================================================================================================================================
+
+@mixin grey-gradient {
+  background: linear-gradient(27deg, #50535f 6%, #747783 48%, #50535f 89%) !important;
+}
+
+.btn-grey {
+  color: #ffffff !important;
+  @include grey-gradient;
+  border-color: #50535f !important;
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014 !important;
+}
+
+.btn-grey:hover {
+  color: #ffffff !important;
+  @include grey-gradient;
+  border-color: #50535f !important;
+}
+
+.btn-grey:focus,
+.btn-grey.focus {
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014, 0 0 0 0 #f4f5f780 !important;
+}
+
+.btn-grey.disabled,
+.btn-grey:disabled {
+  color: #ffffff !important;
+  @include grey-gradient;
+  border-color: #50535f !important;
+}
+
+.btn-grey:not(:disabled):not(.disabled):active,
+.btn-grey:not(:disabled):not(.disabled).active,
+.show > .btn-grey.dropdown-toggle {
+  color: #212529 !important;
+  @include grey-gradient;
+  border-color: #50535f !important;
+}
+
+.btn-grey:not(:disabled):not(.disabled):active:focus,
+.btn-grey:not(:disabled):not(.disabled).active:focus,
+.show > .btn-grey.dropdown-toggle:focus {
+  box-shadow: none, 0 0 0 0 #50535f !important;
+}
+
+// =====================================================================================================================================================================
+// VERDE    ========================================================================================================================================================
+// =====================================================================================================================================================================
+
+@mixin verde-gradient {
+  background: linear-gradient(27deg, #227929 6%, #51c75b 48%, #227929 89%) !important;
+}
+
+.btn-verde {
+  color: #ffffff !important;
+  @include verde-gradient;
+  border-color: #227929 !important;
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014 !important;
+}
+
+.btn-verde:hover {
+  color: #ffffff !important;
+  @include verde-gradient;
+  border-color: #227929 !important;
+}
+
+.btn-verde:focus,
+.btn-verde.focus {
+  box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014, 0 0 0 0 #f4f5f780 !important;
+}
+
+.btn-verde.disabled,
+.btn-verde:disabled {
+  color: #ffffff !important;
+  @include verde-gradient;
+  border-color: #227929 !important;
+}
+
+.btn-verde:not(:disabled):not(.disabled):active,
+.btn-verde:not(:disabled):not(.disabled).active,
+.show > .btn-verde.dropdown-toggle {
+  color: #212529 !important;
+  @include verde-gradient;
+  border-color: #227929 !important;
+}
+
+.btn-verde:not(:disabled):not(.disabled):active:focus,
+.btn-verde:not(:disabled):not(.disabled).active:focus,
+.show > .btn-verde.dropdown-toggle:focus {
+  box-shadow: none, 0 0 0 0 #227929 !important;
+}
+
+.btn {
+  border-radius: 5px;
+  &.btn_group {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin: 0;
+    padding: 0rem 0.7rem;
+  }
+
+  &.disable {
+    opacity: 0.5 !important;
+    &:hover {
+      transform: translate(0, 0) !important;
+      cursor: not-allowed;
+    }
+    &:active,
+    &.active,
+    &.focus {
+      color: white !important;
+    }
+  }
+}
+
+.btn-close {
+  width: 2rem;
+  height: 2rem;
+  color: #6c757d;
+  border-radius: 50%;
+  background: transparent;
+  border: 0 none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:hover {
+    color: #6c757d;
+    background: #e9ecef;
+    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+  .btn {
+    padding: 10px 40px;
+    &.btn-sm {
+      padding: 4px 14px;
+    }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+  .btn {
+    padding: 8px 30px;
+    &.btn-sm {
+      padding: 4px 14px;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+  .btn {
+    padding: 7px 28px;
+    border-radius: 5px;
+    &.btn-sm {
+      padding: 4px 14px;
+    }
+  }
+}

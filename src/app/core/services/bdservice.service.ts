@@ -273,9 +273,6 @@ export class DBservice {
     return this.peticionSinLoad(`articulos/custom/cantidad_inventario`, 'get');
   }
 
-  getProductosTerminados(id) {
-    return this.peticion(`articulos/custom/productos_terminados`, 'get');
-  }
 
   getIngredienteExcede(id, cantidad) {
     return this.peticionSinLoad(`articulos/check_excede/${id}?cantidad=${cantidad}`, 'get');

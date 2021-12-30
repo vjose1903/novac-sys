@@ -6,8 +6,22 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
+@import "./assets/my_styles/forms.scss";
+
 .h-inherit {
   max-height: inherit;
+}
+
+.inputE {
+  height: calc(1.5em + 0.3rem + 2px) !important;
+  padding: 0.2rem 0.7rem !important;
+  width: 100%;
+
+  &:focus {
+    background-color: #b9e2ad !important;
+    border-color: transparent !important;
+    box-shadow: 0px 0px 6px #2ba950 !important;
+  }
 }
 
 .overflowHidden {

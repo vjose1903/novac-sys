@@ -1,0 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap");
+
+.text-bold-500 {
+  font-weight: 500;
+}
+
+.text-bold-600 {
+  font-weight: 600;
+}
+
+.text-bold-700 {
+  font-weight: 700;
+}
+
+.text-bold-800 {
+  font-weight: 800;
+}
+
+.letras {
+  color: #1d253b ;
+}
+
+.datta-dark {
+  .letras {
+    color: #adb7be !important;
+  }
+}
+
+.text-dark {
+  color: #1d253b  !important;
+  &.hoverable {
+    > i:hover {
+      color: #022217 !important;
+    }
+  }
+}
+
+.text-more-dark {
+  color: #1d253b -2 !important;
+}
+
+.text-light {
+  color: #adb7be !important;
+}
+
+.text-light-2 {
+  color: #adb7be !important;
+}
+
+.degradado-rojo {
+  background: linear-gradient(#e4181ef0 29%, #690303 80%);
+  -webkit-background-clip: text;
+  color: transparent !important;
+}
+
+.degradado-verde {
+  background: linear-gradient(#2fdf3c 29%, #035008 80%);
+
+  -webkit-background-clip: text;
+  color: transparent !important;
+}
+
+.degradado-amarillo {
+  background: linear-gradient(#d9d92f 29%, #5e5e04 80%);
+
+  -webkit-background-clip: text;
+  color: transparent !important;
+}

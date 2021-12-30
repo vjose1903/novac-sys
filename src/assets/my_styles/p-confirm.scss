@@ -1,0 +1,119 @@
+
+@import "./btns.scss";
+
+.white-content {
+  .p-confirm-popup {
+    background: #c7c7c7 !important;
+    color: #1d253b  !important;
+    &::before,
+    &::after {
+      border-bottom-color: #c7c7c7 !important;
+    }
+  }
+}
+
+.p-confirm-popup {
+  z-index: 9999 !important;
+  background: #3c3e53 !important;
+  color: #ffffffcc !important;
+  &::before,
+  &::after {
+    border-bottom-color: #3c3e53 !important;
+  }
+}
+.p-confirm-popup {
+  .p-confirm-popup-footer {
+    .p-confirm-popup-reject {
+      border-radius: 30px;
+      span {
+        font-weight: 600;
+        color: #ffffff !important;
+      }
+      @include rojo-gradient;
+      border-color: #490000 !important;
+      box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014 !important;
+      &:hover {
+        transform: translateY(-1px);
+
+        @include rojo-gradient;
+        border-color: #490000 !important;
+      }
+
+      &:active {
+        transform: translateY(1px);
+        span {
+          color: #1d253b  !important;
+        }
+      }
+
+      &:focus,
+      &.focus {
+        box-shadow: 0 4px 6px #20203b, 0 1px 3px #20203b !important;
+      }
+
+      &.disabled,
+      &:disabled {
+        span {
+          color: #ffffff !important;
+        }
+        @include rojo-gradient;
+        border-color: #490000 !important;
+      }
+    }
+
+    .p-confirm-popup-accept {
+      border-radius: 30px;
+      span {
+        font-weight: 600;
+        color: #ffffff !important;
+      }
+      @include verde-gradient;
+      border-color: #227929 !important;
+      box-shadow: 0 4px 6px #32325d1c, 0 1px 3px #00000014 !important;
+
+      &:hover {
+        transform: translateY(-1px);
+        @include verde-gradient;
+        border-color: #227929 !important;
+      }
+
+      &:active {
+        transform: translateY(1px);
+        span {
+          color: #1d253b  !important;
+        }
+      }
+
+      &:focus,
+      &.focus {
+        box-shadow: 0 4px 6px #20203b, 0 1px 3px #20203b !important;
+      }
+      &.disabled,
+      &:disabled {
+        span {
+          color: #ffffff !important;
+        }
+        @include verde-gradient;
+        border-color: #227929 !important;
+      }
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}

@@ -1,0 +1,170 @@
+@mixin primengFocus {
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.p-checkbox-box {
+  &.p-highlight {
+    &[aria-checked="true"] {
+      border-color: #20b9d5 !important;
+      background: #20b9d5 !important;
+    }
+    &[aria-checked="false"] {
+      border-color: #bd4848 !important;
+      background: #bd4848 !important;
+    }
+  }
+
+  &.focus {
+    @include primengFocus;
+  }
+}
+
+.p-tag {
+  .p-tag-value {
+    color: #fff !important;
+    &.dark_font {
+      color: #1d253b !important;
+    }
+  }
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.p-inputgroup-addon {
+  padding: 0 !important;
+}
+
+.p-dropdown {
+  display: flex !important;
+  align-items: center !important;
+  &.p-focus,
+  &.p-dropdown-open {
+    @include primengFocus;
+    background-color: #b9e2ad !important;
+    border-color: transparent !important;
+    box-shadow: 0px 0px 6px #2ba950 !important;
+  }
+}
+
+.p-dropdown-panel {
+  z-index: 99999999999 !important;
+
+  .p-dropdown-header {
+    padding: 0.2rem !important;
+  }
+  .p-dropdown-items-wrapper {
+    .p-dropdown-items {
+      .p-dropdown-item {
+        &.p-highlight {
+          background-color: #27bb3582 !important;
+          color: black;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+@mixin campos {
+  background-color: #f3f3f3e8;
+  color: #1d253b;
+  border-color: #798196;
+  box-shadow: 1px 1px 4px 0px #1d253b3d;
+}
+
+textarea {
+  width: 100% !important;
+  border-radius: 0.25rem !important;
+  @include campos;
+  &:focus {
+    @include primengFocus;
+    border-color: #20b9d5 !important;
+  }
+}
+
+.p-inputtext,
+.form-control {
+  &.with_btn {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+  border-radius: 0.25rem !important;
+
+  &:disabled {
+    background-color: #9f9f9f79 !important;
+    color: #9f9f9f !important;
+  }
+}
+
+.white-content .form-control:focus,
+.form-control:focus {
+  border-color: #20b9d5 !important;
+  color: #1d253b;
+  background-color: #f3f3f3e8;
+  box-shadow: none;
+}
+
+.form-control {
+  @include campos;
+  &.min {
+    height: 2rem !important;
+    padding: 0.2rem !important;
+  }
+}
+
+.form-group {
+  > label {
+    color: #1d253b;
+  }
+
+  > input {
+    @include campos;
+  }
+}
+
+p-inputswitch {
+  display: flex !important;
+}
+
+.p-inputswitch {
+  &.p-focus {
+    .p-inputswitch-slider {
+      @include primengFocus;
+    }
+  }
+  &.p-inputswitch-checked {
+    .p-inputswitch-slider {
+      background: #20b9d5 !important;
+    }
+  }
+}
+
+.p-inputtext:enabled {
+  &:focus {
+    @include primengFocus;
+  }
+  &:hover {
+    border-color: #20b9d5;
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}

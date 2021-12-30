@@ -9,16 +9,21 @@
               <div class="form-group">
                 <label class="control-label mt-1 mb-0">Nombre producto: <span style="color: red">*</span></label>
                 <div>
-                  <select
-                    [(ngModel)]="articulo_id"
-                    (keydown.enter)="saltar('cantidad_producir')"
-                    class="form-control inputE"
-                    (change)="getIngredients()"
+                  <p-dropdown
+                    [placeholder]="'Seleccione producto'"
+                    [options]="listaProductos"
+                    [(ngModel)]="producto_terminado_en_turno"
+                    optionLabel="nombre"
+                    [filter]="true"
+                    optionDisabled="optionDisabled"
+                    filterBy="nombre"
+                    (onHide)="saltar('cantidad_producir')"
+                    (onChange)="getIngredients()"
+                    styleClass="form-control min"
+                    [virtualScroll]="true"
+                    [itemSize]="30"
                     id="articulo_id"
-                  >
-                    <option value="-1" selected>seleccione producto</option>
-                    <option *ngFor="let lista of listaProductos" id="prod-{{ lista.id }}" value="{{ lista.id }}">{{ lista.nombre }}</option>
-                  </select>
+                  ></p-dropdown>
                 </div>
               </div>
             </div>

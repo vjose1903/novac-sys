@@ -372,6 +372,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       id: [null],
       articulo_id: [null],
       cantidad_formula: [null],
+      medida_formula: [null],
       costo_formula: [null],
       precio_formula: [null],
       _destroy: [null],
@@ -405,7 +406,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     const control = this.form.controls['rowFormula'] as FormArray;
 
     try {
-      (control.controls[i] as any).controls['costo_formula'].setValue(undefined);
+      (control.controls[i] as any).controls['costo_formula'].setValue(null);
       let extra = { afterPath: '', parameters: {} };
 
       extra['parameters'] = { costos: true };
@@ -413,7 +414,13 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       this.articuloClass
         .getOne(control.value[i].articulo_id, extra)
         .then((res) => {
-          const costos = res.data.costos.Libra;
+          console.log('res --> ', res);
+
+          const costos = res.data.costos.Libra || res.data.costos.Unidad;
+          const medida = this.fun.hasValue(res.data.costos.Unidad) ? 'Und.' : 'Lbs.';
+
+          (control.controls[i] as any).controls['medida_formula'].setValue(medida);
+
           (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.costo));
           (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.precio));
         })
@@ -714,22 +721,25 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       this.Ispaquete = false;
     }
   }
-  checkCostoFormula(formula) {
+
+  checkCostoFormula(fila) {
     let res = false;
 
-    const x = GLOBAL.duplicarJson(formula.value);
+    const fila_formulario = GLOBAL.duplicarJson(fila.value);
 
-    const tempArticulo = this.listaMateriasPrimas.filter((val) => val.id === x.articulo_id);
-    const articulo = tempArticulo[0];
-    let costo;
-    if (articulo !== undefined) {
-      costo = articulo.costo;
+    const articulo = this.listaMateriasPrimas.find((val) => Number(val.id) === Number(fila_formulario.articulo_id));
 
-      if (x.costo_formula && costo !== GLOBAL.desformatear(x.costo_formula)) {
+    if (fila_formulario.costo_formula && this.fun.hasValue(articulo)) {
+      const costo = GLOBAL.numFormatTwoDecimals(articulo.costo);
+
+      console.log('articulo.costo ', articulo.costo);
+      console.log('GLOBAL.numFormatTwoDecimals(articulo.costo) ', GLOBAL.numFormatTwoDecimals(articulo.costo));
+      console.log('GLOBAL.desformatear(costo) ', GLOBAL.desformatear(costo));
+      console.log('GLOBAL.desformatear(fila_formulario.costo_formula) ', GLOBAL.desformatear(fila_formulario.costo_formula));
+
+      if (GLOBAL.desformatear(costo) !== GLOBAL.desformatear(fila_formulario.costo_formula)) {
         res = true;
-        setTimeout(() => {
-          this.Recalcular = true;
-        }, 10);
+        setTimeout(() => (this.Recalcular = true), 10);
       }
     }
 

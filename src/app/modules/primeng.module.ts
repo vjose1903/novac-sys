@@ -4,8 +4,9 @@ import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TooltipModule } from 'primeng/tooltip';
+import { DropdownModule } from 'primeng/dropdown';
 
-const modulos = [DialogModule, ProgressBarModule, SidebarModule, TooltipModule];
+const modulos = [DialogModule, ProgressBarModule, SidebarModule, TooltipModule, DropdownModule];
 @NgModule({
   declarations: [],
   imports: [CommonModule, ...modulos],

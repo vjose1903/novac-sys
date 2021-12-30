@@ -1,0 +1,37 @@
+.scrollbox {
+  overflow: auto;
+  position: relative;
+  transition: all 0.2s ease-out;
+
+  &.off-top {
+    box-shadow: 0 1.5rem 2rem -1rem #000000cc inset;
+  }
+
+  &.off-bottom {
+    box-shadow: 0 -1.5rem 2rem -1rem #000000cc inset;
+  }
+
+  &.off-bottom.off-top {
+    box-shadow: 0 -1.5rem 2rem -1rem #000000cc inset, 0 1.5rem 2rem -1rem #000000cc inset;
+  }
+}
+
+.white-content {
+  .scrollbox {
+    overflow: auto;
+    position: relative;
+    transition: all 0.2s ease-out;
+
+    &.off-top {
+      box-shadow: 0 1.5rem 2rem -1rem #00000066 inset;
+    }
+
+    &.off-bottom {
+      box-shadow: 0 -1.5rem 2rem -1rem #00000066 inset;
+    }
+
+    &.off-bottom.off-top {
+      box-shadow: 0 -1.5rem 2rem -1rem #00000066 inset, 0 1.5rem 2rem -1rem #00000066 inset;
+    }
+  }
+}

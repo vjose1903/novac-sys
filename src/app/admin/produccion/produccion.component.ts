@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { mixinClass } from '../mixinClass';
 import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
+import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
@@ -13,10 +14,9 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   @ViewChild('cardTabla') cardTabla: ElementRef;
 
   // listaArticulos: any;
-  articulo_id = '-1' as any;
+  producto_terminado_en_turno;
   cantidad_producir;
   medida_producir;
-  articuloSelected: any;
 
   lista_produccion = [];
   ingredientes = [];
@@ -35,8 +35,9 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   seleccionModal: any;
   tipoModal: string;
 
-  listaProductos: any;
+  listaProductos = [];
   articuloEditando: any;
+  articuloClass = new ArticuloC();
 
   constructor(private dbServ: DBservice, private tServ: TablasService) {
     super();
@@ -44,7 +45,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
   ngOnInit() {
     this._init_mixin({ component: 'produccion', _lista_subs: ['decisionModal'] });
-    this.enfocarInput('articulo_id');
+
     this.getProductosTerminados();
   }
 
@@ -60,33 +61,26 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   decisionModal(res) {
-    if (res !== null && res !== undefined && (this.tipoModal === 'remover' || this.tipoModal === 'cancelarP')) {
+    if (this.fun.hasValue(res) && (this.tipoModal === 'remover' || this.tipoModal === 'cancelarP')) {
       this.decisionModalP(res);
-    } else if (res && this.tipoModal === 'confirmar_produccion') {
+    } else if (this.fun.hasValue(res) && this.tipoModal === 'confirmar_produccion') {
       this.confirmarProduccion();
     }
   }
 
   async getProductosTerminados() {
-    try {
-      const res = await this.dbServ.getProductosTerminados(this.articulo_id).toPromise();
-      this.listaProductos = res;
-    } catch (error) {
-      if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
-    }
+    const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
+    this.listaProductos.length = 0;
+    this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.Producto_terminado }).then((res) => {
+      res['data'].map((producto_terminado) => {
+        producto_terminado.optionDisabled = false;
+        this.listaProductos.push(producto_terminado);
+      });
+    });
   }
 
   async getIngredients() {
-    if (this.articulo_id !== '-1') {
-      try {
-        const res = await this.dbServ.getIngredientesFormula(this.articulo_id).toPromise();
-        this.articuloSelected = this.listaProductos.filter((prod) => prod.id === _.parseInt(this.articulo_id))[0];
-
-        this.ingredientes = _.orderBy(res, ['articulo_id'], ['asc']);
-      } catch (error) {
-        if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
-      }
-    }
+    this.ingredientes = _.orderBy(this.producto_terminado_en_turno.formulas_productos_terminados, ['articulo_id'], ['asc']);
   }
 
   lookOters(objeto) {
@@ -129,32 +123,30 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
   lookprincipal(objeto) {
     const presentar = this.isLibraOrQuintal(objeto);
-    let cantidad = 0;
-    cantidad = objeto[presentar];
+    const cantidad = objeto[presentar];
     const fin = cantidad === 1 ? presentar : this.medidas[presentar];
 
-    return GLOBAL.numFormatTwoDecimals(cantidad) + '  ' + fin;
+    return `${GLOBAL.numFormatTwoDecimals(cantidad)} ${fin}`;
   }
 
   saltar(campo) {
     if (campo !== 'agregar') {
       this.enfocarInput(campo);
     } else {
-      if (this.articulo_id) {
-        const continu = this.abilitarBtnAgregar();
-
-        if (!continu) setTimeout(() => this.agregarAlista(), 250);
+      if (this.producto_terminado_en_turno) {
+        const is_invalid = this.abilitarBtnAgregar();
+        if (!is_invalid) setTimeout(() => this.agregarAlista(), 250);
       }
     }
   }
-
+  // TODO: cambiar la forma de desabilitar
   disableOption(arg, boolean) {
     (this.element = document.getElementById(arg) as any).disabled = boolean;
   }
 
   abilitarBtnAgregar() {
     let res = true;
-    if (this.articulo_id && this.cantidad_producir && this.medida_producir) res = false;
+    if (this.producto_terminado_en_turno && this.cantidad_producir && this.medida_producir) res = false;
     return res;
   }
 
@@ -166,6 +158,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
   calcularCantidadAProduccir() {
     this.ingredientesParaProduccion = [];
+
     if (this.cantidad_producir && this.medida_producir) {
       this.ingredientes.forEach(async (ingre) => {
         let cantidadFormula = ingre.cantidad;
@@ -174,10 +167,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
         let cantidad_calculada = cantidadFormula * this.cantidad_producir;
 
-        const obj = {
-          Quintal: cantidad_calculada / 100,
-          Libra: cantidad_calculada,
-        };
+        const obj = { Quintal: cantidad_calculada / 100, Libra: cantidad_calculada };
 
         if (this.lista_produccion.length > 0) {
           for (let i = 0; i < this.lista_produccion.length; i++) {
@@ -199,7 +189,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
             this.cantidad_producir = null;
             this.ingredientesParaProduccion = [];
 
-            this.fun.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.articuloSelected.nombre, 'ERROR');
+            this.fun.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.producto_terminado_en_turno.nombre, 'ERROR');
             this.enfocarInput('cantidad_producir');
           } else {
             this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj, articulo_id: ingre.articulo_id });
@@ -213,16 +203,14 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   borrar() {
-    if (this.articuloEditando) {
-      this.agregarAlista();
-    }
+    if (this.articuloEditando) this.agregarAlista();
+
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
-    this.articulo_id = null;
+    this.producto_terminado_en_turno = null;
     this.medida_producir = null;
     this.cantidad_producir = null;
     this.articuloEditando = undefined;
-    this.enfocarInput('articulo_id');
   }
 
   paginateChange(arg) {}
@@ -237,11 +225,11 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     });
 
     const obj = {
-      nombre: this.articuloSelected.nombre,
+      nombre: this.producto_terminado_en_turno.nombre,
       cantidad: this.cantidad_producir,
       cantidad_en_unidades: this.medida_producir === 'Quintal' ? this.cantidad_producir * 100 : this.cantidad_producir,
       medida: this.medida_producir,
-      articulo_id: _.parseInt(this.articulo_id),
+      articulo_id: _.parseInt(this.producto_terminado_en_turno),
       ingredientes: this.ingredientesParaProduccion,
     };
 
@@ -249,7 +237,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
     this.tServ.Func_total_paginas(this.lista_produccion.length);
 
-    this.disableOption('prod-' + this.articulo_id, true);
+    this.disableOption('prod-' + this.producto_terminado_en_turno, true);
     this.articuloEditando = undefined;
     this.borrar();
   }
@@ -259,7 +247,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
-    this.articulo_id = item.ARG.articulo_id;
+    this.producto_terminado_en_turno = item.ARG.articulo_id;
     this.cantidad_producir = item.ARG.cantidad;
     this.medida_producir = item.ARG.medida;
 
