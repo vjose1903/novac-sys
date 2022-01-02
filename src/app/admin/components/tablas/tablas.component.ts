@@ -663,7 +663,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       if (event.keyCode != 13) {
         $this.searchItems();
       }
-    }, 250);
+    }, 500);
   }
 
   async searchItems() {

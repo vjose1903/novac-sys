@@ -1,9 +1,8 @@
 <div class="row" style="height: calc(100% - 60px)">
   <div class="col-md-6 contenedorRegistro">
-    <!-- <div class=""> -->
     <h4 class="negrita">{{ titulo }}</h4>
     <div class="card card-padding sombra">
-      <form [formGroup]="form" (submit)="submit(form)">
+      <form [formGroup]="form">
         <div class="row">
           <div class="col-12 p-0">
             <div class="row mb-2">
@@ -26,17 +25,10 @@
                 class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center"
               >
                 <div class="form-group switchDiv">
-                  <input formControlName="calcular_saco" class="apple-switch" type="checkbox" />
+                  <input formControlName="calcular_saco" class="apple-switch" type="checkbox" (change)="cambiarCalcularSaco()" />
                   <span class="ml-2">Calcular saco</span>
                 </div>
               </div>
-
-              <!-- <div class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }}">
-                <div class="form-group switchDiv ml-2">
-                  <input formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
-                  <span class="ml-2 ">Calcular Itbis</span>
-                </div>
-              </div> -->
             </div>
           </div>
           <div class="col-md-12 p-0">
@@ -66,7 +58,7 @@
             <div class="form-group">
               <label class="control-label">Tipo: <span style="color: red">*</span></label>
               <select
-                (keydown.enter)="saltar(TIPOARTICULO !== 'Producto terminado' ? 'comprado' : 'articulo_id-0')"
+                (keydown.enter)="saltar(TIPOARTICULO !== 'Producto terminado' ? 'comprado' : 'vendido')"
                 id="tipo"
                 formControlName="tipo_articulo_id"
                 (change)="selectTipoArticulo($event.target.value)"
@@ -86,10 +78,10 @@
             </div>
           </div>
 
-          <div *ngIf="form.controls['tipo_articulo_id'].value === '3'" class="col-md-6 pr-0">
+          <div *ngIf="form.controls['tipo_articulo_id'].value == 3" class="col-md-6 pr-0">
             <div class="form-group">
               <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-              <select formControlName="vendido_en" (keydown.enter)="saltar('costoP')" id="vendido" class="form-control" value="">
+              <select formControlName="vendido_en" (keydown.enter)="saltar('cantidad_formula', -1)" id="vendido" class="form-control" value="">
                 <option value="{{ null }}">Tipo</option>
                 <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
               </select>
@@ -102,39 +94,17 @@
               </div>
             </div>
           </div>
-
-          <!-- <div *ngIf="TIPOARTICULO !== 'Producto terminado'" class="col-md-6">
-            <div class="form-group">
-              <label class="control-label">Suplidor: <span style="color: red">*</span></label>
-              <select (keydown.enter)="saltar('comprado')" id="suplidor" formControlName="suplidor_id" class="form-control " value="">
-                <option value="" disabled selected>Seleccione suplidor</option>
-                <option *ngFor="let tipo of listaSuplidores" value="{{ tipo.id }}">{{ tipo.nombre }}</option>
-              </select>
-              <div
-                class="alerta text-danger ml-1"
-                style="font-size: 12px"
-                *ngIf="!form.controls['suplidor_id'].valid && (form.controls['suplidor_id'].dirty || form.controls['suplidor_id'].touched)"
-              >
-                Seleccione un suplidor
-              </div>
-            </div>
-          </div> -->
         </div>
 
         <div *ngIf="TIPOARTICULO !== 'Producto terminado'" class="row">
           <div class="col-md-6 p-0">
             <div class="form-group">
               <label class="control-label">Comprado en: <span style="color: red">*</span></label>
-              <select
-                formControlName="medida"
-                (keydown.enter)="saltar(TIPOARTICULO === 'Materia prima' ? 'vendido' : 'costoP')"
-                id="comprado"
-                class="form-control"
-                value=""
-                (change)="resetCompradoEn($event.target.value)"
-              >
+              <!-- (keydown.enter)="saltar(TIPOARTICULO === 'Materia prima' ? 'vendido' : 'costo_principal')" -->
+              <select formControlName="medida" (keydown.enter)="saltar('vendido')" id="comprado" class="form-control" (change)="resetCompradoEn($event.target.value)">
                 <option value="{{ null }}">Tipo</option>
                 <option value="Quintal">Quintal</option>
+                <option value="Libra">Libra</option>
                 <option value="Saco">Saco</option>
                 <option value="Caja">Caja</option>
                 <option value="Unidad">Unidad</option>
@@ -152,7 +122,7 @@
           <div class="col-md-6 pr-0">
             <div class="form-group">
               <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-              <select formControlName="vendido_en" (keydown.enter)="saltar('costoP')" id="vendido" class="form-control" value="">
+              <select formControlName="vendido_en" (keydown.enter)="saltar('costo_principal')" id="vendido" class="form-control" value="">
                 <option value="{{ null }}">Tipo</option>
                 <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
               </select>
@@ -166,20 +136,20 @@
             </div>
           </div>
           <!--  -->
-          <div class="col-md-6 mt-3 p-0">
+          <div class="col-md-6 p-0">
             <div class="form-group">
               <label class="control-label">Costo: <span style="color: red">*</span></label>
               <input
                 type="text"
-                (keydown.enter)="saltar('precioP')"
-                id="costoP"
+                (keydown.enter)="saltar('precio_principal')"
+                id="costo_principal"
                 formControlName="costo_principal"
                 (blur)="calculatePrice()"
                 placeholder="Introduzca costo"
                 class="form-control"
                 (focus)="$event.target.select()"
                 autocomplete="off"
-                (blur)="revisarPrecio('costo_principal', 'costoP')"
+                (blur)="revisarPrecio('costo_principal')"
               />
               <div
                 class="alerta text-danger ml-1"
@@ -190,20 +160,20 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6 mt-3 pr-0">
+          <div class="col-md-6 pr-0">
             <div class="form-group">
               <label class="control-label">Precio venta: <span style="color: red">*</span></label>
               <input
                 type="text"
                 (keydown.enter)="saltar('existencia')"
-                id="precioP"
+                id="precio_principal"
                 formControlName="precio_principal"
                 placeholder="Introduzca precio"
                 class="form-control"
                 (focus)="$event.target.select()"
                 autocomplete="off"
                 (blur)="calculatePriceLibra()"
-                (blur)="revisarPrecio('precio_principal', 'precioP')"
+                (blur)="revisarPrecio('precio_principal')"
               />
               <div
                 class="alerta text-danger ml-1"
@@ -214,7 +184,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6 mt-3 p-0">
+          <div class="col-md-6 p-0">
             <div class="form-group">
               <label class="control-label">Alertar existencia: <span style="color: red">*</span></label>
               <div class="row">
@@ -236,7 +206,7 @@
                     (keydown.enter)="
                       saltar(
                         form.controls['medida'].value === 'Quintal'
-                          ? 'precioLibra'
+                          ? 'precio_libra'
                           : form.controls['medida'].value === 'Unidad' || form.controls['medida'].value === 'Libra'
                           ? 'send'
                           : 'contenidoPadre'
@@ -246,7 +216,7 @@
                     formControlName="medida_alerta"
                     id="medida_alerta"
                     (change)="seleccionarContenidoCaja()"
-                    [ngClass]="{ badAlert: Ispaquete }"
+                    [ngClass]="{ badAlert: articulo_no_paquete }"
                   >
                     <option value="{{ null }}"></option>
                     <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
@@ -260,7 +230,7 @@
               >
                 Este Campo es obligatorio
               </div>
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="Ispaquete">Este Articulo no se contiene Paquetes</div>
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="articulo_no_paquete">Este Articulo no contiene Paquetes</div>
             </div>
           </div>
         </div>
@@ -288,23 +258,25 @@
                   <div class="col-5 p-0">
                     <div class="form-group mb-0">
                       <div>
-                        <ng-select
-                          id="articulo_id-{{ j }}"
+                        <p-dropdown
+                          [placeholder]="'Seleccione ingrediente'"
+                          [options]="listaMateriasPrimas"
                           formControlName="articulo_id"
-                          (change)="getCosto(j)"
-                          [items]="listaMateriasPrimas"
-                          bindLabel="nombre"
-                          bindValue="id"
-                          class="custom"
+                          optionLabel="nombre"
+                          optionValue="id"
+                          [filter]="true"
+                          optionDisabled="optionDisabled"
+                          filterBy="nombre"
+                          (onHide)="saltar('ingrediente_producir', j)"
+                          (keydown.enter)="saltar('ingrediente_producir', j)"
+                          (onChange)="getCosto(j)"
+                          styleClass="form-control min"
+                          panelStyleClass="ingredienteDrop"
+                          [virtualScroll]="true"
                           appendTo="body"
-                          [clearable]="false"
-                        >
-                          <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-                            <div>
-                              <span>{{ item.nombre }} </span>
-                            </div>
-                          </ng-template>
-                        </ng-select>
+                          [itemSize]="30"
+                          id="articulo_id-{{ j }}"
+                        ></p-dropdown>
                       </div>
                     </div>
                   </div>
@@ -314,11 +286,9 @@
                       <input
                         (focus)="$event.target.select()"
                         type="text"
-                        (keydown.enter)="
-                          saltar(j !== ARRAY_FORMULA.controls.length - 1 ? 'articulo_id-' : 'OtrosG', j !== ARRAY_FORMULA.controls.length - 1 ? true : false, j + 1)
-                        "
+                        (keydown.enter)="saltar('cantidad_formula', j)"
                         (blur)="calculateCostoPT()"
-                        id="cantidad_formula-{{ j }}"
+                        [id]="'cantidad_formula-' + j"
                         formControlName="cantidad_formula"
                         class="form-control"
                         style="border-radius: 0.25rem 0rem 0rem 0.25rem !important"
@@ -332,6 +302,7 @@
                       readonly
                       type="text"
                       id="medida_formula-{{ j }}"
+                      tabindex="-1"
                       formControlName="medida_formula"
                       style="border-radius: 0rem 0.25rem 0.25rem 0rem !important; padding: 0.2rem"
                       class="form-control"
@@ -345,6 +316,7 @@
                         readonly
                         type="text"
                         id="costo_formula-{{ j }}"
+                        tabindex="-1"
                         formControlName="costo_formula"
                         [ngClass]="{ badAlert: checkCostoFormula(formula) }"
                         class="form-control"
@@ -365,7 +337,7 @@
             </div>
           </div>
 
-          <hr *ngIf="TIPOARTICULO === 'Producto terminado'" class="raya mt-2" />
+          <hr *ngIf="TIPOARTICULO === 'Producto terminado'" class="raya mt-1" />
 
           <div class="row">
             <div class="col-md-4 pl-0">
@@ -373,15 +345,14 @@
                 <label class="control-label">Otros Costos: <span style="color: red">*</span></label>
                 <input
                   type="text"
-                  (keydown.enter)="saltar('costoP')"
-                  id="OtrosG"
+                  (keydown.enter)="saltar('costo_principal')"
+                  id="otros_costos"
                   formControlName="otros_costos"
                   placeholder="Otros Gastos"
                   class="form-control"
-                  (blur)="calculateCostoPT()"
+                  (blur)="calculateCostoPT(); revisarPrecio('otros_costos')"
                   (focus)="$event.target.select()"
                   autocomplete="off"
-                  (blur)="revisarPrecio('otros_costos', 'OtrosG')"
                 />
                 <div
                   class="alerta text-danger ml-1"
@@ -397,15 +368,15 @@
                 <label class="control-label">Costo: <span style="color: red">*</span></label>
                 <input
                   type="text"
-                  (keydown.enter)="saltar('precioP')"
-                  id="costoP"
+                  (keydown.enter)="saltar('precio_principal')"
+                  id="costo_principal"
                   formControlName="costo_principal"
                   (blur)="calculatePrice()"
                   placeholder="Introduzca costo"
                   class="form-control"
                   (focus)="$event.target.select()"
                   autocomplete="off"
-                  (blur)="revisarPrecio('costo_principal', 'costoP')"
+                  (blur)="revisarPrecio('costo_principal')"
                 />
                 <div
                   class="alerta text-danger ml-1"
@@ -423,13 +394,13 @@
                 <input
                   type="text"
                   (keydown.enter)="saltar('existencia')"
-                  id="precioP"
+                  id="precio_principal"
                   formControlName="precio_principal"
                   placeholder="Introduzca precio"
                   class="form-control"
                   (focus)="$event.target.select()"
                   autocomplete="off"
-                  (blur)="calculatePriceLibra(); revisarPrecio('precio_principal', 'precioP')"
+                  (blur)="calculatePriceLibra(); revisarPrecio('precio_principal')"
                 />
                 <div
                   class="alerta text-danger ml-1"
@@ -440,7 +411,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-6 mt-3 p-0">
+            <div class="col-md-6 mt-1 p-0">
               <div class="form-group">
                 <label class="control-label">Alertar existencia: </label>
                 <div class="row">
@@ -464,7 +435,7 @@
                       formControlName="medida_alerta"
                       id="medida_alerta"
                       (change)="seleccionarContenidoCaja()"
-                      [ngClass]="{ badAlert: Ispaquete }"
+                      [ngClass]="{ badAlert: articulo_no_paquete }"
                     >
                       <option value="{{ null }}"></option>
                       <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
@@ -478,7 +449,7 @@
                 >
                   Este Campo es obligatorio
                 </div>
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="Ispaquete">Este Articulo no se contiene Paquetes</div>
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="articulo_no_paquete">Este Articulo no se contiene Paquetes</div>
               </div>
             </div>
           </div>
@@ -497,10 +468,10 @@
                 (keydown.enter)="saltar('send')"
                 (focus)="$event.target.select()"
                 type="text"
-                id="precioLibra"
+                id="precio_libra"
                 formControlName="precio_libra"
                 class="form-control"
-                (blur)="revisarPrecio('precio_libra', 'precioLibra')"
+                (blur)="revisarPrecio('precio_libra')"
                 autocomplete="off"
               />
               <div
@@ -520,7 +491,7 @@
         <!--  CONTENIDO DE LA CAJA O SACO -->
         <!-- ======================================================================================================================= -->
         <div class="row" *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Saco'">
-          <span class="w-100 ml-3 text-green">Contenido {{ form.controls['medida'].value }}</span>
+          <span class="w-100 text-green">Contenido {{ form.controls['medida'].value }}</span>
 
           <div class="col-md-3 p-0">
             <label class="control-label">Contiene: </label>
@@ -547,11 +518,11 @@
               </div>
             </div>
           </div>
-          <div class="col-md-5 p-0">
+          <div class="col-md-5">
             <div class="form-group">
               <label class="control-label text-transparent">medida </label>
               <select
-                (keydown.enter)="saltar('precioPadre')"
+                (keydown.enter)="saltar('precio_padre')"
                 id="medidaPadre"
                 formControlName="medida_contenido_padre"
                 (change)="seleccionarContenidoCaja()"
@@ -581,12 +552,12 @@
               <input
                 (keydown.enter)="saltar(form.controls['medida_contenido_padre'].value === 'Paquete' ? 'contenidoHijo' : 'send')"
                 type="text"
-                id="precioPadre"
+                id="precio_padre"
                 (focus)="$event.target.select()"
                 formControlName="precio_padre"
                 placeholder="Introduzca precio"
                 class="form-control"
-                (blur)="revisarPrecio('precio_padre', 'precioPadre')"
+                (blur)="revisarPrecio('precio_padre')"
                 (blur)="calculatePriceHijo()"
                 autocomplete="off"
               />
@@ -605,8 +576,8 @@
         <!--  CONTENIDO DEL PAQUETE -->
         <!-- ======================================================================================================================= -->
         <div class="row" *ngIf="form.controls['medida_contenido_padre'].value === 'Paquete'">
-          <span class="w-100 ml-3 text-green">Contenido Paquete</span>
-          <div class="col-md-3 pl-0">
+          <span class="w-100 text-green">Contenido Paquete</span>
+          <div class="col-md-3 p-0">
             <label class="control-label">Contiene: </label>
             <div class="form-group">
               <input
@@ -630,14 +601,12 @@
               </div>
             </div>
           </div>
-          <div class="col-md-5 p-0">
+          <div class="col-md-5">
             <div class="form-group">
               <label class="control-label text-transparent">medida </label>
-              <select (keydown.enter)="saltar('precioHijo')" id="medidaHijo" formControlName="medida_contenido_hijo" class="form-control" value="">
+              <select (keydown.enter)="saltar('precio_hijo')" id="medidaHijo" formControlName="medida_contenido_hijo" class="form-control" value="">
                 <option value="{{ null }}">Seleccione</option>
                 <option value="Unidad">Unidad</option>
-                <!-- <option value="Sobre">Sobre</option>
-                <option value="Frasco">Frasco</option> -->
               </select>
               <div
                 class="alerta text-danger ml-1"
@@ -648,19 +617,19 @@
               </div>
             </div>
           </div>
-          <div class="col-md-4 pr-0">
+          <div class="col-md-4 p-0">
             <div class="form-group">
               <label class="control-label">Precio </label> {{ ' ' }}
               <label class="control-label">{{ form.controls['medida_contenido_hijo'].value }} </label>
               <input
-                id="precioHijo"
+                id="precio_hijo"
                 (keydown.enter)="saltar('send')"
                 type="text"
                 formControlName="precio_hijo"
                 placeholder="Introduzca precio"
                 class="form-control"
                 (focus)="$event.target.select()"
-                (blur)="revisarPrecio('precio_hijo', 'precioHijo')"
+                (blur)="revisarPrecio('precio_hijo')"
                 autocomplete="off"
               />
               <div
@@ -677,18 +646,18 @@
       <div class="row">
         <div class="col-md-12 mt-3 p-0">
           <div class="form-group">
-            <!-- <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a> -->
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-            <input [disabled]="abilitarBtnSend()" (click)="submit(form)" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+            <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
 
-            <ng-container *ngIf="clickBtnRe === false && TIPOARTICULO === 'Producto terminado' && Recalcular === true">
-              <a class="btn ml-2" id="btn-blanco" (click)="recalcular()">Recarcular</a>
+            <input (click)="prue()" type="submit" class="btn ml-2" value="prueba" id="btn-verde" />
+
+            <ng-container *ngIf="clickBtnRe === false && TIPOARTICULO === 'Producto terminado' && recalcular === true">
+              <a class="btn ml-2" id="btn-blanco" (click)="recalcularFunc()">Recarcular</a>
             </ng-container>
           </div>
         </div>
       </div>
     </div>
-    <!-- </div> -->
   </div>
 
   <div class="col-md-6 pl-0">

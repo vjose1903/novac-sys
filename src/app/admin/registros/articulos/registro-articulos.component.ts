@@ -8,7 +8,8 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { LoaderService } from '../../../loader/loader.service';
 import { mixinClass } from '../../mixinClass';
-import { ArticuloC } from './articulo';
+import { ArticuloC, tipos_articulos } from './articulo';
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -67,16 +68,15 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   optionsAlerta: any[];
   alertaMedida: any;
 
-  Ispaquete = false;
+  articulo_no_paquete = false;
   TIPOARTICULO: any;
 
   ARRAY_FORMULA: FormArray;
   COMPRADOEN: any;
   MEDIDACAJA: any;
   is_combo = false;
-  numIngredientes: any;
-  Recalcular = false;
-  ProductoEditando: any;
+  recalcular = false;
+  productoEditando: any;
   clickBtnRe = false;
 
   vendido_en: any;
@@ -86,7 +86,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     { backend: 'Saco', front: 'Saco' },
     { backend: 'Galon', front: 'Galón' },
   ];
-  FechaFactura: string;
+  fechaFactura: string;
   articuloClass = new ArticuloC();
   constructor(
     private dbServ: DBservice,
@@ -100,19 +100,17 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   ngOnInit() {
+    this._init_mixin({ component: 'reg_articulo', _lista_subs: ['decisionModal'] });
     this.createForm();
     this.FORM = this.form.controls;
 
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
     this.necesarioStart();
-    this._init_mixin({ component: 'reg_articulo', _lista_subs: ['decisionModal'] });
   }
 
   initCambioMenu(arg) {
-    if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
-    }
+    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
   }
 
   ngOnDestroy() {
@@ -125,33 +123,27 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   async filtrarArticulo(e) {
-    this.FechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
+    this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
     await this.getArticulos(e);
   }
 
   async necesarioStart() {
-    this.FechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
+    this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
     await this.getArticulos(this.tServ.obj_paginate);
     this.getTipoArticulos();
+    this.enfocarInput('nombre');
   }
 
-  getMateriasP(callback = (arg) => {}) {
-    this.loadServ.isLoading.next(true);
-    this.dbServ.getMateriasPrimas().subscribe(
-      (res) => {
-        this.loadServ.isLoading.next(false);
-        this.listaMateriasPrimas = GLOBAL.duplicarJson(res);
-        callback({
-          status: true,
-        });
-      },
-      (err) => {
-        callback({
-          status: false,
-        });
-        this.loadServ.isLoading.next(false);
-      },
-    );
+  getMateriasP() {
+    return new Promise(async (resolve) => {
+      const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
+
+      this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.Materia_prima }).then((res) => {
+        console.log("res['data'] --> ", res['data']);
+        this.listaMateriasPrimas = GLOBAL.duplicarJson(res['data']);
+        resolve(true);
+      });
+    });
   }
 
   getTipoArticulos() {
@@ -162,13 +154,12 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   async getArticulos(e) {
-    try {
-      const page = e.page;
-      const per_page = e.per_page;
-      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
-      this.listaArticulos = [];
+    const page = e.page;
+    const per_page = e.per_page;
+    const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
-      const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, false, this.FechaFactura, 'todos').toPromise();
+    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: page, per_page: per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
+      console.log("res['data'] --> ", res['data']);
 
       res.data.map(async (arti) => {
         arti.customStyles = {
@@ -180,42 +171,53 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       });
 
       this.listaArticulos = res.data;
-      // this.listaArticulos = [...this.listaArticulos, ...this.listaArticulos, ...this.listaArticulos];
-      const obj = {
-        total: res.total_registros,
-        tabla: 'listaArticulos',
-      };
+
+      const obj = { total: res.total_registros, tabla: 'listaArticulos' };
 
       this.tServ.Func_total_paginas(obj);
-    } catch (error) {}
+    });
   }
 
   ngOnChanges() {
     this.cdRef.detectChanges();
   }
 
+  revisarPrecio(id) {
+    const input = this.form.controls[id];
+
+    this.fun.revisarPrecio(input, id).then((res) => {
+      if (!res.error) input.setValue(res.number);
+    });
+  }
+
+  cambiarCalcularSaco() {
+    const formulario = this.form.getRawValue();
+    if (this.fun.hasValue(formulario.medida) && formulario.medida !== 'Quintal' && formulario.medida !== 'Libra') {
+      this.fun.toastWarning('Solo se le puede calcular el saco a los productos comprados en Quintal o Libra', 'AVISO');
+      this.form.controls.calcular_saco.setValue(false);
+    }
+  }
+
   async selectTipoArticulo(tipo) {
-    const Tipo = this.listaTipoArticulos.filter((val) => val.id === _.parseInt(tipo));
-    this.TIPOARTICULO = Tipo[0].descripcion;
+    this.TIPOARTICULO = this.listaTipoArticulos.find((val) => val.id === _.parseInt(tipo)).descripcion;
     const tipo_check = _.lowerCase(this.TIPOARTICULO);
 
     if (tipo_check === 'materia prima') {
       this.form.controls.is_materia_prima.setValue(true);
     } else {
-      this.form.controls.is_materia_prima.setValue(this.ProductoEditando ? this.ProductoEditando.is_materia_prima : false);
+      this.form.controls.is_materia_prima.setValue(this.productoEditando ? this.productoEditando.is_materia_prima : false);
     }
 
-    if (tipo_check !== 'producto terminado' && tipo_check !== 'materia prima') {
-      this.form.controls.calcular_saco.setValue(false);
-    }
+    if (tipo_check !== 'producto terminado' && tipo_check !== 'materia prima') this.form.controls.calcular_saco.setValue(false);
 
     if (tipo_check === 'producto terminado') {
-      await this.getMateriasP((res) => {
+      await this.getMateriasP().then((res) => {
         this.addItem();
-        this.COMPRADOEN = undefined;
-        this.form.controls.medida.setValue('Quintal');
+        this.resetCompradoEn('Quintal');
         this.fillDropAlerta('Quintal');
         this.is_combo = true;
+        this.form.controls.medida.setValue('Quintal');
+        this.form.controls.calcular_saco.setValue(true);
         this.form.controls.costo_principal.reset(null);
         this.form.controls.precio_principal.reset(null);
       });
@@ -224,10 +226,12 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       this.is_combo = false;
     }
   }
+
   capitalice(control, arg) {
     const campo = this.form.get(control);
     campo.setValue(GLOBAL.Capitalice(arg));
   }
+
   createForm() {
     this.form = this.fb.group({
       nombre: [null, Validators.required],
@@ -264,63 +268,43 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       rowFormula: this.fb.array([]),
       otros_costos: [null],
     });
-    // this.form = this.fb.group({
-    //   nombre: ['Maiz'],
-    //   tipo_articulo_id: [2],
-    //   medida: [null],
-    //   costo_principal: [null],
-    //   precio_principal: [null],
-    //   is_detallable: [false],
-    //   fecha_ingreso: [new Date()],
-    //   aviso_existencia: [2],
-    //   calcular_itbis: [false],
-    //   existencia: [0],
-    //   medida_alerta: ['Quintal'],
-    //   cantidad_contenido_padre: [null],
-    //   medida_contenido_padre: [null],
-    //   precio_padre: [null],
-    //   precio_libra: [null],
-    //   precio_unidad: [null],
-    //   costo_padre: [null],
-    //   costo_hijo: [null],
-    //   id: [null],
-    //   id_contenido_padre: [null],
-    //   id_contenido_hijo: [null],
-    //   vendido_en: [null],
 
-    //   referencia_padre: [null],
-    //   referencia_hijo: [null],
-
-    //   medida_contenido_hijo: [null],
-    //   cantidad_contenido_hijo: [null],
-    //   precio_hijo: [null],
-    //   rowFormula: this.fb.array([]),
-    //   otros_costos: [null],
-    // });
     this.ARRAY_FORMULA = this.form.controls['rowFormula'] as FormArray;
   }
 
-  saltar(campo, array?, i?) {
-    if (array) {
-      campo = campo + i;
-    }
-
-    if (campo !== 'send') {
+  saltar(campo, i?) {
+    if (campo != 'send' && campo != 'cantidad_formula' && campo != 'ingrediente_producir') {
       this.enfocarInput(campo);
-    } else {
-      const continu = this.abilitarBtnSend();
+    } else if (campo == 'ingrediente_producir') {
+      console.log('>>>>>>>>>> ', `cantidad_formula-${i}`);
 
-      if (!continu) {
+      this.enfocarInput(`cantidad_formula-${i}`);
+    } else if (campo == 'cantidad_formula') {
+      const actual_campo = i >= 0 ? `#cantidad_formula-${i}` : '#vendido';
+      console.log('>>>>>>>>>> ', actual_campo);
+      var field = $(actual_campo)[0];
+
+      console.log('field ', field);
+      var fields = $(actual_campo).parents('form:eq(0),body').find(':input').not('[tabindex]');
+      console.log('fields ', fields);
+
+      // var index = fields.index(actual_campo);
+      var index = _.findIndex(fields, field);
+      console.log('index ', index);
+
+      if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
+    } else {
+      const is_invalid = this.formIsInvalid();
+
+      if (!is_invalid) {
         this.enfocarInput('nombre');
-        setTimeout(() => {
-          this.submit(this.form);
-        }, 250);
+        setTimeout(() => this.submit(), 250);
       }
     }
   }
 
   borrar() {
-    this.ProductoEditando = null;
+    this.productoEditando = null;
     this.form.reset();
     this.enfocarInput('nombre');
     this.form.controls.is_detallable.setValue(false);
@@ -329,19 +313,17 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     this.boton = 'Registrar';
     this.TIPOARTICULO = '';
     this.clickBtnRe = false;
+    this.recalcular = false;
 
-    if (this.is_combo) {
-      this.resetArray();
-    }
+    if (this.is_combo) this.resetArray();
+
     this.is_combo = false;
     this.form.controls['rowFormula'].reset();
-
-    if (this.Recalcular === true) {
-      this.Recalcular = false;
-    }
   }
 
   resetCompradoEn(value) {
+    const formulario = this.form.getRawValue();
+
     this.form.controls.medida_contenido_padre.reset(null);
     this.form.controls.medida_contenido_hijo.reset(null);
     this.form.controls.cantidad_contenido_padre.setValue(null);
@@ -360,6 +342,11 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       this.calculatePrice();
       this.form.controls.medida_contenido_padre.setValue('Libra');
     }
+
+    if (formulario.calcular_saco && value !== 'Quintal' && value !== 'Libra') {
+      this.fun.toastWarning('Solo se le puede calcular el saco a los productos comprados en Quintal o Libra');
+      this.form.controls.calcular_saco.setValue(false);
+    }
     this.fillDropAlerta(value);
   }
 
@@ -376,16 +363,13 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       costo_formula: [null],
       precio_formula: [null],
       _destroy: [null],
-      // costo: [null],
     });
   }
 
   resetArray() {
     this.ARRAY_FORMULA = this.form.get('rowFormula') as FormArray;
-    // this.ARRAY_FORMULA.controls.forEach((element, i) => {
-    this.ARRAY_FORMULA.value.forEach((element, i) => {
-      this.removeItem(0);
-    });
+
+    this.ARRAY_FORMULA.value.forEach((element) => this.removeItem(0));
   }
 
   addItem(): void {
@@ -395,82 +379,47 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
   removeItem(i: number) {
     const control = this.form.controls['rowFormula'] as FormArray;
-    // if (control.value[i].id) {
-    //   (control.controls[i] as any).controls['_destroy'].setValue('1');
-    // } else {
     control.removeAt(i);
-    // }
   }
 
   async getCosto(i) {
+    console.log(i);
+
     const control = this.form.controls['rowFormula'] as FormArray;
+    console.log('control ', control);
 
-    try {
-      (control.controls[i] as any).controls['costo_formula'].setValue(null);
-      let extra = { afterPath: '', parameters: {} };
+    (control.controls[i] as any).controls['costo_formula'].setValue(null);
 
-      extra['parameters'] = { costos: true };
+    let extra = { afterPath: '', parameters: { costos: true } };
 
-      this.articuloClass
-        .getOne(control.value[i].articulo_id, extra)
-        .then((res) => {
-          console.log('res --> ', res);
+    this.articuloClass.getOne(control.value[i].articulo_id, extra).then((res) => {
+      const costos = res.data.costos.Libra || res.data.costos.Unidad;
+      const medida = this.fun.hasValue(res.data.costos.Unidad) ? 'Und.' : 'Lbs.';
 
-          const costos = res.data.costos.Libra || res.data.costos.Unidad;
-          const medida = this.fun.hasValue(res.data.costos.Unidad) ? 'Und.' : 'Lbs.';
+      (control.controls[i] as any).controls['medida_formula'].setValue(medida);
 
-          (control.controls[i] as any).controls['medida_formula'].setValue(medida);
+      (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.costo));
+      (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.precio));
 
-          (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.costo));
-          (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.precio));
-        })
-        .catch((err) => {});
-    } catch (error) {
-      this.fun.toastError('Error buscando el precio de la materia prima.', 'ERROR');
-    }
+      setTimeout(() => this.calculateCostoPT(), 1);
+    });
   }
 
   calculateCostoPT() {
-    let sumatoriaMult = 0;
+    const array = this.ARRAY_FORMULA.value;
 
-    if (this.ARRAY_FORMULA.value.length > 0 && this.ARRAY_FORMULA.value !== undefined) {
-      this.ARRAY_FORMULA.value.forEach((ingrediente: any) => {
-        sumatoriaMult += GLOBAL.desformatear(ingrediente.cantidad_formula) * GLOBAL.desformatear(ingrediente.costo_formula);
-      });
+    if (array.length > 0 && array !== undefined) {
+      let sumatoriaMult = _.reduce(array, (sum, item) => GLOBAL.desformatear(item.cantidad_formula) * GLOBAL.desformatear(item.costo_formula) + sum, 0);
 
-      const formulario = this.form.controls;
-      if (
-        formulario.otros_costos.value !== null &&
-        formulario.otros_costos.value !== undefined &&
-        formulario.otros_costos.value !== '' &&
-        formulario.otros_costos.value !== ' '
-      ) {
-        sumatoriaMult += GLOBAL.desformatear(formulario.otros_costos.value);
-        this.form.controls.costo_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(sumatoriaMult)));
+      const formulario = this.form.getRawValue();
+
+      if (this.fun.hasValue(formulario.otros_costos) && !isNaN(formulario.otros_costos)) {
+        sumatoriaMult += GLOBAL.desformatear(formulario.otros_costos);
+        this.form.controls.costo_principal.setValue(GLOBAL.numFormatTwoDecimals(sumatoriaMult));
         this.calculatePrice();
         this.calculatePriceLibra();
       }
     }
-  }
-
-  checkRecalcular() {
-    let res = false;
-    if (this.Recalcular) {
-      res = true;
-    }
-    return res;
-  }
-
-  // =============================================
-  //  VALIDACIONES DE ARRAY
-  // =============================================
-  getvalidateControlArray(i, campo) {
-    const control = this.form.controls['rowFormula'] as FormArray;
-    if ((control.controls[i] as any).controls[campo].status === 'INVALID' && (control.controls[i] as any).controls[campo].touched) {
-      return true;
-    }
-
-    return false;
   }
 
   // =============================================
@@ -486,37 +435,38 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   isDetallableClick() {
     this.isDetallable = !this.isDetallable;
   }
+
   // =============================================
   //  Calculate price
   // =============================================
   calculatePrice() {
-    const costoTemp = this.form.value.costo_principal;
-    const costo = GLOBAL.desformatear(costoTemp);
+    const formulario = this.form.getRawValue();
 
-    if (costo > 0 || costo != null || costo) {
+    const costo = GLOBAL.desformatear(formulario.costo_principal);
+
+    if (costo > 0 && this.fun.hasValue(costo)) {
       const precio = costo / 0.9;
       const precioLibra = precio / 100;
-      this.form.controls.precio_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precio)));
-      this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioLibra)));
+      this.form.controls.precio_principal.setValue(GLOBAL.numFormatTwoDecimals(precio));
+      this.form.controls.precio_libra.setValue(GLOBAL.numFormatTwoDecimals(precioLibra));
 
       this.calculatePriceLibra();
     }
   }
 
   calculatePriceLibra() {
-    const medida = this.form.value.medida;
+    const formulario = this.form.getRawValue();
+    const medida = formulario.medida;
 
-    const precioTemp = this.form.value.precio_principal;
-    const precio = GLOBAL.desformatear(precioTemp);
+    const precio = GLOBAL.desformatear(formulario.precio_principal);
 
-    const costoTemp = this.form.value.costo_principal;
-    const costo = GLOBAL.desformatear(costoTemp);
+    const costo = GLOBAL.desformatear(formulario.costo_principal);
 
-    if (precio > 0 || precio != null || precio) {
+    if (precio > 0 && this.fun.hasValue(precio)) {
       const precioLibra = precio / 100;
       const costoLibra = costo / 100;
       if (medida === 'Quintal') {
-        this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioLibra)));
+        this.form.controls.precio_libra.setValue(GLOBAL.numFormatTwoDecimals(precioLibra));
         this.form.controls.costo_padre.setValue(GLOBAL.redondearAdos(costoLibra));
         this.form.controls.precio_padre.setValue(GLOBAL.redondearAdos(precioLibra));
         this.form.controls.cantidad_contenido_padre.setValue(100);
@@ -528,197 +478,97 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   calculatePricePadre() {
-    const PrecioTemp = this.form.value.precio_principal;
-    const Precio = GLOBAL.desformatear(PrecioTemp);
-    const PrecioPadreTemp = this.form.value.precio_padre;
+    const formulario = this.form.getRawValue();
 
-    const costoTemp = this.form.value.costo_principal;
-    const costo = GLOBAL.desformatear(costoTemp);
-    const cantidadPadre = this.form.value.cantidad_contenido_padre;
+    const precio = GLOBAL.desformatear(formulario.precio_principal);
+    const precioPadreTemp = formulario.precio_padre;
 
-    if (
-      Precio > 0 &&
-      Precio != null &&
-      Precio !== undefined &&
-      !isNaN(Precio) &&
-      cantidadPadre > 0 &&
-      cantidadPadre != null &&
-      cantidadPadre !== undefined &&
-      !isNaN(cantidadPadre)
-    ) {
-      const PrecioPadre = Precio / cantidadPadre;
+    const costo = GLOBAL.desformatear(formulario.costo_principal);
+    const cantidadPadre = formulario.cantidad_contenido_padre;
+
+    if (this.fun.hasValue(precio) && precio > 0 && !isNaN(precio) && this.fun.hasValue(cantidadPadre) && cantidadPadre > 0 && !isNaN(cantidadPadre)) {
+      const precioPadre = precio / cantidadPadre;
       const costoPadre = costo / cantidadPadre;
 
-      this.form.controls.precio_padre.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(PrecioPadre)));
+      this.form.controls.precio_padre.setValue(GLOBAL.numFormatTwoDecimals(precioPadre));
       this.form.controls.costo_padre.setValue(GLOBAL.redondearAdos(costoPadre));
     }
-    if (PrecioPadreTemp) {
-      this.calculatePriceHijo();
-    }
-  }
-  calculatePriceHijo() {
-    const PrecioPadreTemp = this.form.value.precio_padre;
-    const PrecioP = GLOBAL.desformatear(PrecioPadreTemp);
 
-    const costoPadreTemp = this.form.value.costo_padre;
-    const costoP = GLOBAL.desformatear(costoPadreTemp);
-    const cantidadHijo = this.form.value.cantidad_contenido_hijo;
-    if (
-      PrecioP > 0 &&
-      PrecioP != null &&
-      PrecioP !== undefined &&
-      !isNaN(PrecioP) &&
-      cantidadHijo > 0 &&
-      cantidadHijo != null &&
-      cantidadHijo !== undefined &&
-      !isNaN(cantidadHijo)
-    ) {
-      const PrecioHijo = PrecioP / cantidadHijo;
+    if (precioPadreTemp) this.calculatePriceHijo();
+  }
+
+  calculatePriceHijo() {
+    const formulario = this.form.getRawValue();
+
+    const precioP = GLOBAL.desformatear(formulario.precio_padre);
+
+    const costoP = GLOBAL.desformatear(formulario.costo_padre);
+    const cantidadHijo = formulario.cantidad_contenido_hijo;
+
+    if (this.fun.hasValue(precioP) && precioP > 0 && !isNaN(precioP) && this.fun.hasValue(cantidadHijo) && cantidadHijo > 0 && !isNaN(cantidadHijo)) {
+      const PrecioHijo = precioP / cantidadHijo;
       const costoHijo = costoP / cantidadHijo;
-      this.form.controls.precio_hijo.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(PrecioHijo)));
+      this.form.controls.precio_hijo.setValue(GLOBAL.numFormatTwoDecimals(PrecioHijo));
       this.form.controls.costo_hijo.setValue(GLOBAL.redondearAdos(costoHijo));
     }
   }
 
-  abilitarBtnSend() {
+  formIsInvalid() {
     let res = true;
-    const FORM = this.form.controls;
+    const formulario = this.form.getRawValue();
 
-    if (this.form.valid) {
-      if (this.form.controls['tipo_articulo_id'].value === '3') {
-        res = true;
+    if (this.form.valid && !this.articulo_no_paquete) {
+      if (formulario.tipo_articulo_id == 3) {
+        res = _.some(formulario.rowFormula, (fila) => this.fun.isEmpty(fila.articulo_id) || this.fun.isEmpty(fila.cantidad_formula));
 
-        this.ARRAY_FORMULA.controls.forEach((row, i) => {
-          if ((row as any).controls['articulo_id'].value && (row as any).controls['cantidad_formula'].value) {
-            res = false;
-          } else {
-            res = true;
-          }
-        });
+        if (res) return res;
+        else {
+          res = this.fun.isEmpty(formulario.otros_costos) || this.fun.isEmpty(formulario.costo_principal) || this.fun.isEmpty(formulario.precio_principal);
+          if (res) return res;
+        }
       } else {
         res = false;
       }
 
+      const contenido_padre_valid = !!formulario.cantidad_contenido_padre && !!formulario.precio_padre && !!formulario.costo_padre && !!formulario.medida_contenido_padre;
+
       if (this.COMPRADOEN === 'Quintal' || this.COMPRADOEN === 'Saco') {
-        if (FORM.cantidad_contenido_padre.value && FORM.precio_padre.value && FORM.costo_padre.value && FORM.medida_contenido_padre.value) {
-          res = false;
-        } else {
-          res = true;
-        }
+        if (contenido_padre_valid) res = false;
+        else res = true;
+        if (res) return res;
       }
 
       if (this.COMPRADOEN === 'Caja') {
         if (this.MEDIDACAJA === 'Unidad') {
-          if (FORM.cantidad_contenido_padre.value && FORM.precio_padre.value && FORM.costo_padre.value && FORM.medida_contenido_padre.value) {
-            res = false;
-          } else {
-            res = true;
-          }
+          if (contenido_padre_valid) res = false;
+          else res = true;
         } else {
-          if (
-            FORM.cantidad_contenido_padre.value &&
-            FORM.precio_padre.value &&
-            FORM.costo_padre.value &&
-            FORM.medida_contenido_padre.value &&
-            FORM.cantidad_contenido_hijo.value &&
-            FORM.precio_hijo.value &&
-            FORM.costo_hijo.value &&
-            FORM.medida_contenido_hijo.value
-          ) {
+          if (contenido_padre_valid && formulario.cantidad_contenido_hijo && formulario.precio_hijo && formulario.costo_hijo && formulario.medida_contenido_hijo)
             res = false;
-          } else {
-            res = true;
-          }
+          else res = true;
         }
       }
-    } else {
-      res = true;
-    }
+    } else res = true;
 
-    // if (this.ARRAY_FORMULA.length === 0) {
-    //     if (this.COMPRADOEN === 'Unidad') {
-    //       res = false;
-    //     }
-
-    //     if (this.COMPRADOEN === 'Quintal') {
-    //       if (FORM.cantidad_contenido_padre.value !== null && (FORM.precio_padre.value !== null) !== null && FORM.costo_padre.value !== null) {
-    //         res = false;
-    //       } else {
-    //         res = true;
-    //       }
-    //     }
-
-    //     if (FORM.tipo_articulo_id.value === '2') {
-    //       if (FORM.vendido_en.value) {
-    //         res = false;
-    //       } else {
-    //         res = true;
-    //       }
-    //     }
-
-    //     if (this.COMPRADOEN === 'Caja') {
-    //       if (this.MEDIDACAJA === 'Unidad') {
-    //         if (FORM.medida_contenido_padre.value !== null && FORM.cantidad_contenido_padre !== null && (FORM.precio_padre !== null) !== null && FORM.costo_padre !== null) {
-    //           res = false;
-    //         } else {
-    //           res = true;
-    //         }
-    //       } else {
-    //         if (
-    //           FORM.medida_contenido_hijo.value !== null &&
-    //           FORM.medida_contenido_padre.value !== null &&
-    //           FORM.cantidad_contenido_padre.value !== null &&
-    //           (FORM.precio_padre.value !== null) !== null &&
-    //           FORM.costo_padre.value !== null &&
-    //           FORM.cantidad_contenido_hijo.value !== null &&
-    //           (FORM.precio_hijo.value !== null) !== null &&
-    //           FORM.costo_hijo.value !== null
-    //         ) {
-    //           res = false;
-    //         } else {
-    //           res = true;
-    //         }
-    //       }
-    //     }
-    //   }
-    //   if (this.Ispaquete) {
-    //     res = true;
-    //   }
-    // } else {
-    //   if (this.form.valid) {
-    //     if (this.ARRAY_FORMULA.controls.length > 0) {
-    //       this.ARRAY_FORMULA.controls.forEach((row, i) => {
-    //         if ((row as any).controls['articulo_id'].value && (row as any).controls['cantidad_formula'].value) {
-    //           res = false;
-    //         } else {
-    //           res = true;
-    //         }
-    //       });
-    //     }
-    //   }
-    // }
     return res;
   }
 
   fillDropAlerta(medida) {
-    if (medida === 'Quintal') {
-      this.optionsAlerta = ['Quintal', 'Libra'];
-    } else if (medida === 'Saco') {
-      this.optionsAlerta = ['Saco', 'Libra'];
-    } else if (medida === 'Caja') {
-      this.optionsAlerta = ['Caja', 'Paquete', 'Unidad'];
-    } else if (medida === 'Unidad') {
-      this.optionsAlerta = ['Unidad'];
-    }
+    if (medida == 'Quintal') this.optionsAlerta = ['Quintal', 'Libra'];
+    else if (medida == 'Libra') this.optionsAlerta = ['Libra'];
+    else if (medida == 'Saco') this.optionsAlerta = ['Saco', 'Libra'];
+    else if (medida == 'Caja') this.optionsAlerta = ['Caja', 'Paquete', 'Unidad'];
+    else if (medida == 'Unidad') this.optionsAlerta = ['Unidad'];
   }
 
   seleccionarContenidoCaja() {
-    const x = this.form.controls;
-    this.MEDIDACAJA = x.medida_contenido_padre.value;
-    if (x.medida_alerta.value === 'Paquete' && x.medida_contenido_padre.value === 'Unidad') {
-      this.Ispaquete = true;
+    const formulario = this.form.getRawValue();
+    this.MEDIDACAJA = formulario.medida_contenido_padre;
+
+    if (formulario.medida_alerta === 'Paquete' && formulario.medida_contenido_padre === 'Unidad') {
+      this.articulo_no_paquete = true;
     } else {
-      this.Ispaquete = false;
+      this.articulo_no_paquete = false;
     }
   }
 
@@ -730,59 +580,73 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     const articulo = this.listaMateriasPrimas.find((val) => Number(val.id) === Number(fila_formulario.articulo_id));
 
     if (fila_formulario.costo_formula && this.fun.hasValue(articulo)) {
-      const costo = GLOBAL.numFormatTwoDecimals(articulo.costo);
-
-      console.log('articulo.costo ', articulo.costo);
-      console.log('GLOBAL.numFormatTwoDecimals(articulo.costo) ', GLOBAL.numFormatTwoDecimals(articulo.costo));
-      console.log('GLOBAL.desformatear(costo) ', GLOBAL.desformatear(costo));
-      console.log('GLOBAL.desformatear(fila_formulario.costo_formula) ', GLOBAL.desformatear(fila_formulario.costo_formula));
+      const costo_temp = this.fun.hasValue(articulo.costos.Unidad) ? articulo.costos.Unidad.costo : articulo.costos.Libra.costo;
+      const costo = GLOBAL.numFormatTwoDecimals(costo_temp);
 
       if (GLOBAL.desformatear(costo) !== GLOBAL.desformatear(fila_formulario.costo_formula)) {
         res = true;
-        setTimeout(() => (this.Recalcular = true), 10);
+        setTimeout(() => (this.recalcular = true), 10);
       }
     }
 
     return res;
   }
 
-  async recalcular() {
+  async recalcularFunc() {
     this.clickBtnRe = true;
     const temp = GLOBAL.duplicarJson(this.TIPOARTICULO);
     this.TIPOARTICULO = null;
     this.resetArray();
+    console.log('this.productoEditando.formulas_productos_terminados --> ', this.productoEditando.formulas_productos_terminados);
 
-    for (let i = 0; i < this.ProductoEditando.formulas_productos_terminados.length; i++) {
-      const ingredient = this.ProductoEditando.formulas_productos_terminados[i];
+    for (let i = 0; i < this.productoEditando.formulas_productos_terminados.length; i++) {
+      const ingredient = this.productoEditando.formulas_productos_terminados[i];
       this.addItem();
       this.fillFormula(ingredient, i, true);
     }
 
     await this.calculateCostoPT();
-    this.Recalcular = null;
+    this.recalcular = null;
     this.TIPOARTICULO = temp;
   }
 
-  fillFormula(ingredient, i, recalcular?) {
+  fillFormula(ingredient, i, recalcular = false) {
     const control = this.form.controls['rowFormula'] as FormArray;
 
-    const TempMateriaPrima = this.listaMateriasPrimas.filter((val) => val.id === _.parseInt(ingredient.articulo_combo));
+    const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(ingredient.articulo_combo));
+    console.log('  ');
+    console.log(' ------------------------------------ ');
+    console.log('materiaPrima ', materiaPrima);
+    console.log('ingredient ', ingredient);
 
-    const MateriaPrima = TempMateriaPrima[0];
+    try {
+      const costo = materiaPrima?.costos?.Libra?.costo || materiaPrima?.costos?.Unidad?.costo;
+      const precio = materiaPrima?.costos?.Libra?.precio || materiaPrima?.costos?.Unidad?.precio;
 
-    const costo = MateriaPrima.costo;
-    const precio = MateriaPrima.precio;
+      console.log('costo ', costo);
+      console.log('precio ', precio);
 
-    if (recalcular) {
-      (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costo));
-      (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(precio));
-    } else {
-      (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(ingredient.costo));
-      (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(ingredient.precio));
+      const medida = this.fun.hasValue(materiaPrima.costos.Unidad) ? 'Und.' : 'Lbs.';
+      const control_en_turno = (control.controls[i] as any).controls;
+      console.log('medida ', medida);
+      console.log('control_en_turno ', control_en_turno);
+
+      if (recalcular) {
+        control_en_turno['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costo));
+        control_en_turno['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(precio));
+      } else {
+        control_en_turno['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(ingredient.costo));
+        control_en_turno['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(ingredient.precio));
+      }
+
+      control_en_turno['medida_formula'].setValue(medida);
+      control_en_turno['articulo_id'].setValue(ingredient.articulo_combo);
+      control_en_turno['id'].setValue(ingredient.id || null);
+
+      control_en_turno['cantidad_formula'].setValue(GLOBAL.numFormatTwoDecimals(ingredient.cantidad));
+    } catch (error) {
+      this.fun.toastError(recalcular ? 'Error recalculando los costos de la formula.' : 'Error rellenando los campos del formulario', 'ERROR');
     }
-    (control.controls[i] as any).controls['articulo_id'].setValue(ingredient.articulo_combo);
-    (control.controls[i] as any).controls['cantidad_formula'].setValue(GLOBAL.numFormatTwoDecimals(ingredient.cantidad));
-    (control.controls[i] as any).controls['id'].setValue(ingredient.id ? ingredient.id : null);
   }
 
   async editarItem(item) {
@@ -790,20 +654,19 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
     this.borrar();
     this.form.patchValue(articulo);
-    this.ProductoEditando = item.ARG;
+    this.productoEditando = item.ARG;
     this.titulo = 'Editar producto: ' + articulo.nombre;
     this.boton = 'Editar';
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
     this.TIPOARTICULO = articulo.descripcion;
+    console.log('item ', item);
+    this.is_combo = articulo.is_combo;
 
     if (articulo.is_combo || (_.has(articulo, 'formulas_productos_terminados') && articulo.formulas_productos_terminados.length)) {
-      this.getMateriasP((res) => {
-        this.numIngredientes = articulo.formulas_productos_terminados.length;
-
-        this.is_combo = true;
-        // articulo.formulas_productos_terminados.forEach((ingredient, i) => {
-        // });
+      this.COMPRADOEN = 'Quintal';
+      this.form.controls.otros_costos.setValue(GLOBAL.numFormatTwoDecimals(articulo.otros_costos));
+      this.getMateriasP().then((res) => {
         this.form.controls.medida.setValue('Quintal');
         this.fillDropAlerta('Quintal');
 
@@ -813,14 +676,9 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
           this.fillFormula(ingredient, i);
         }
       });
-    } else {
-      this.is_combo = false;
-      this.numIngredientes = null;
-      this.COMPRADOEN = articulo.medida;
-    }
-    if (articulo.contenido_articulos.length > 0) {
-      this.MEDIDACAJA = articulo.contenido_articulos[0].medida;
-    }
+    } else this.COMPRADOEN = articulo.medida;
+
+    if (articulo.contenido_articulos.length > 0) this.MEDIDACAJA = articulo.contenido_articulos[0].medida;
 
     this.fillDropAlerta(articulo.medida);
     setTimeout(() => {
@@ -828,11 +686,11 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
         const contenido = articulo.contenido_articulos[j];
         if (articulo.contenido_articulos.length === 1) {
           if (articulo.contenido_articulos[0].medida === 'Libra') {
-            this.form.controls.precio_libra.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
+            this.form.controls.precio_libra.setValue(GLOBAL.numFormatTwoDecimals(contenido.precio));
             this.form.controls.costo_padre.setValue(contenido.costo);
             this.form.controls.id_contenido_padre.setValue(contenido.id);
           } else {
-            this.form.controls.precio_unidad.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
+            this.form.controls.precio_unidad.setValue(GLOBAL.numFormatTwoDecimals(contenido.precio));
             this.form.controls.costo_padre.setValue(contenido.costo);
             this.form.controls.id_contenido_padre.setValue(contenido.id);
           }
@@ -840,7 +698,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
         if (contenido.condicion === 'hijo') {
           this.form.controls.cantidad_contenido_hijo.setValue(contenido.cantidad);
           this.form.controls.medida_contenido_hijo.setValue(contenido.medida);
-          this.form.controls.precio_hijo.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
+          this.form.controls.precio_hijo.setValue(GLOBAL.numFormatTwoDecimals(contenido.precio));
           this.form.controls.costo_hijo.setValue(contenido.costo);
           this.form.controls.id_contenido_hijo.setValue(contenido.id);
           this.form.controls.referencia_hijo.setValue(contenido.referencia);
@@ -848,95 +706,99 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
           this.form.controls.cantidad_contenido_padre.setValue(contenido.cantidad);
           this.form.controls.medida_contenido_padre.setValue(contenido.medida);
 
-          this.form.controls.precio_padre.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(contenido.precio)));
+          this.form.controls.precio_padre.setValue(GLOBAL.numFormatTwoDecimals(contenido.precio));
           this.form.controls.costo_padre.setValue(contenido.costo);
           this.form.controls.id_contenido_padre.setValue(contenido.id);
         }
       }
     }, 2);
 
-    articulo['tipo_articulo_id'] = articulo['tipo_articulo_id'] + '';
-
-    if (articulo.is_combo) {
-      this.form.controls.otros_costos.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.otros_costos)));
-    }
-    this.form.controls.costo_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.costo_principal)));
-    this.form.controls.precio_principal.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(articulo.precio_principal)));
+    this.form.controls.tipo_articulo_id.setValue(articulo['tipo_articulo_id']);
+    this.form.controls.costo_principal.setValue(GLOBAL.numFormatTwoDecimals(articulo.costo_principal));
+    this.form.controls.precio_principal.setValue(GLOBAL.numFormatTwoDecimals(articulo.precio_principal));
   }
 
   decisionModal(arg) {
     if (arg) {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
-      this.dbServ.eliminarArticulo(obj).subscribe(
-        (res) => {
-          this.getArticulos(this.tServ.obj_paginate);
-
-          // const i = _.findIndex(this.listaArticulos, (art: any) => {
-          //   if (art.id === obj['id']) return true;
-          // });
-
-          // this.fun.toastSuccess('Articulo ' + obj.nombre + ' borrado.', 'CORRECTO');
-          // _.pullAt(this.listaArticulos, i);
-          // this.tipoModal = '';
-          this.borrar();
-        },
-        (err) => {
-          this.mostrarErrores(err.error);
-        },
-      );
+      this.articuloClass.deleteOne(obj.id).then((res) => {
+        this.getArticulos(this.tServ.obj_paginate);
+        this.borrar();
+      });
     }
   }
 
   formarContenido() {
-    const x = GLOBAL.duplicarJson(this.form.value);
+    const formulario = this.form.getRawValue();
 
-    if (x.medida === 'Quintal' || x.medida === 'Saco') x.medida_contenido_padre = 'Libra';
+    if (formulario.medida === 'Quintal' || formulario.medida === 'Saco') formulario.medida_contenido_padre = 'Libra';
 
     const padre = {
       referencia: null,
-      articulo_id: x.id,
-      id: x.id_contenido_padre,
-      costo: _.isString(x.costo_padre) ? parseFloat(x.costo_padre) : x.costo_padre,
-      precio: GLOBAL.desformatear(x.medida === 'Caja' || x.medida === 'Saco' ? x.precio_padre : x.precio_libra),
-      cantidad: x.medida === 'Caja' || x.medida === 'Saco' ? x.cantidad_contenido_padre : 100,
-      medida: x.medida_contenido_padre,
+      articulo_id: formulario.id,
+      id: formulario.id_contenido_padre,
+      costo: _.isString(formulario.costo_padre) ? parseFloat(formulario.costo_padre) : formulario.costo_padre,
+      precio: GLOBAL.desformatear(formulario.medida === 'Caja' || formulario.medida === 'Saco' ? formulario.precio_padre : formulario.precio_libra),
+      cantidad: formulario.medida === 'Caja' || formulario.medida === 'Saco' ? formulario.cantidad_contenido_padre : 100,
+      medida: formulario.medida_contenido_padre,
       condicion: 'padre',
     };
 
     const hijo = {
-      referencia: x.referencia_hijo,
-      articulo_id: x.id,
-      id: x.id_contenido_hijo,
-      costo: _.isString(x.costo_hijo) ? parseFloat(x.costo_hijo) : x.costo_hijo,
-      precio: GLOBAL.desformatear(x.precio_hijo),
-      cantidad: x.cantidad_contenido_hijo,
-      medida: x.medida_contenido_hijo,
+      referencia: formulario.referencia_hijo,
+      articulo_id: formulario.id,
+      id: formulario.id_contenido_hijo,
+      costo: _.isString(formulario.costo_hijo) ? parseFloat(formulario.costo_hijo) : formulario.costo_hijo,
+      precio: GLOBAL.desformatear(formulario.precio_hijo),
+      cantidad: formulario.cantidad_contenido_hijo,
+      medida: formulario.medida_contenido_hijo,
       condicion: 'hijo',
     };
 
     let contenido = [];
-    if (x.medida_contenido_padre !== null) {
+    if (this.fun.hasValue(formulario.medida_contenido_padre)) {
       contenido = [padre];
-      if (x.medida_contenido_hijo !== null) contenido = [padre, hijo];
+      if (this.fun.hasValue(formulario.medida_contenido_hijo)) contenido = [padre, hijo];
     }
 
     return contenido;
   }
 
+  prue() {
+    // var keypressEvent = $.Event('keydown', { which: 9, keyCode: 9 });
+    // $(`#nombre`).siblings();
+
+    ($(`#articulo_id-0`)[0].firstChild as any).focus();
+    console.log('$(`#articulo_id-0`) ', $(`#articulo_id-0`));
+    // var fields = $(`#cantidad_formula-0`).parents('form:eq(0),body').find(':input').not('[tabindex]');
+    // console.log('fields ', fields);
+    // var index = fields.index($(`#cantidad_formula-0`));
+    // console.log('index ', index);
+    // if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
+    // if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
+
+    // $(`#nombre`).trigger(keypressEvent);
+    // console.log('>>>>>>>  ', $(`#nombre`).on);
+  }
+
   formarFormula() {
-    const x = GLOBAL.duplicarJson(this.ARRAY_FORMULA.value);
+    const array = this.ARRAY_FORMULA.value;
     const formulas = [];
-    x.forEach((element) => {
+    console.log('array --> ', array);
+
+    array.forEach((element) => {
       const obj = {
         id: _.parseInt(element.id ? element.id : null),
         articulo_combo: _.parseInt(element.articulo_id),
         cantidad: GLOBAL.desformatear(element.cantidad_formula),
         costo: GLOBAL.desformatear(element.costo_formula),
         precio: GLOBAL.desformatear(element.precio_formula),
-        _destroy: element._destroy ? element._destroy : null,
+        medida: element.medida_formula == 'Und.' ? 'Unidad' : 'Libra',
+        // _destroy: element._destroy ? element._destroy : null,
       };
       formulas.push(obj);
     });
+    console.log('formulas --> ', formulas);
     return formulas;
   }
   // =============================================
@@ -944,152 +806,39 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   // =============================================
 
   element: HTMLElement;
-  submit(form) {
-    const x = GLOBAL.duplicarJson(form.value);
+  submit() {
+    const formulario = this.form.getRawValue();
 
     const obj = {
-      user_id: this.fun.getUser().id,
-      tipo_articulo_id: _.parseInt(x.tipo_articulo_id),
-      nombre: x.nombre,
-      costo_principal: GLOBAL.desformatear(x.costo_principal),
-      precio_principal: GLOBAL.desformatear(x.precio_principal),
-      aviso_existencia: x.aviso_existencia,
-      medida_alerta: x.medida_alerta,
-      fecha_ingreso: x.id ? x.fecha_ingreso : moment().format('DD/MM/YYYY'),
-      medida: x.medida,
-      is_detallable: x.is_detallable,
-      contenido_articulos_attributes: this.formarContenido(),
-      existencia: x.existencia,
-      calcular_itbis: x.calcular_itbis !== null ? x.calcular_itbis : false,
+      id: _.parseInt(formulario.id),
+      tipo_articulo_id: _.parseInt(formulario.tipo_articulo_id),
+      nombre: formulario.nombre,
+      costo_principal: GLOBAL.desformatear(formulario.costo_principal),
+      precio_principal: GLOBAL.desformatear(formulario.precio_principal),
+      aviso_existencia: formulario.aviso_existencia,
+      medida_alerta: formulario.medida_alerta,
+      fecha_ingreso: formulario.id ? formulario.fecha_ingreso : moment().format('DD/MM/YYYY'),
+      medida: formulario.medida,
+      is_detallable: formulario.is_detallable,
+      contenido_articulos: this.formarContenido(),
+      existencia: formulario.existencia,
+      calcular_itbis: formulario.calcular_itbis !== null ? formulario.calcular_itbis : false,
       estado: true,
       is_combo: this.is_combo,
-      vendido_en: x.vendido_en,
-      is_materia_prima: x.is_materia_prima,
-      calcular_saco: x.calcular_saco,
+      vendido_en: formulario.vendido_en,
+      is_materia_prima: formulario.is_materia_prima,
+      calcular_saco: formulario.calcular_saco,
     };
     if (obj.is_combo) {
       obj['vendido_en'] = 'Saco';
-      obj['otros_costos'] = x.otros_costos;
-      obj['formulas_productos_terminados_attributes'] = this.formarFormula();
+      obj['otros_costos'] = formulario.otros_costos;
+      obj['formulas_productos_terminados'] = this.formarFormula();
     }
+    this.fun.logBlue('obj ', obj);
 
-    if (x.id) {
-      obj['id'] = x.id;
-
-      this.dbServ.editarArticulo(obj).subscribe(
-        (res) => {
-          this.necesarioStart();
-          this.borrar();
-
-          // this.fun.toastSuccess('Producto editado con exito.', 'Correcto', true);
-        },
-        (err) => {
-          // this.mostrarErrores(err.error);
-          // this.fun.toastError(err.error, 'Error', true);
-        },
-      );
-      //
-    } else {
-      this.dbServ.createArticulo(obj).subscribe(
-        (res) => {
-          this.necesarioStart();
-          this.borrar();
-          // this.fun.toastSuccess('Producto registrado con exito.', 'Correcto', true);
-        },
-        (err) => {
-          // this.mostrarErrores(err.error);
-          // this.fun.toastError(err.error, 'Error', true);
-        },
-      );
-    }
-  }
-
-  mostrarErrores(arg) {
-    if (Array.isArray(arg)) {
-      arg.forEach((error) => this.fun.toastError(error, 'ERROR'));
-    } else {
-      for (const key in arg) {
-        if (arg.hasOwnProperty(key)) {
-          const element = arg[key];
-
-          if (key !== 'status') this.fun.toastError(element, 'ERROR');
-        }
-      }
-    }
-  }
-
-  checkNumbers(arg) {
-    let res = false;
-    for (let i = 0; i < arg.length; i++) {
-      const tempCaracter = arg.charAt(i);
-      if (tempCaracter !== ',') {
-        const caracter = _.parseInt(tempCaracter);
-        if (_.isNaN(caracter)) {
-          res = true;
-        }
-      }
-    }
-    return res;
-  }
-  checkLongMillares(num) {
-    let res = false;
-    const splitNum = _.split(num, ',');
-    splitNum.forEach((element, i) => {
-      if (i !== 0) {
-        if (element.length !== 3) {
-          res = true;
-        }
-      }
+    this.articuloClass.createUpdateOne(obj).then((res) => {
+      this.necesarioStart();
+      this.borrar();
     });
-    return res;
-  }
-
-  revisarPrecio(input, id) {
-    const Input = this.form.controls[input];
-    const precioTEMPO = Input.value;
-
-    if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
-      const splitPrecio = _.split(precioTEMPO, '.');
-
-      let precioTEMP;
-
-      let enteros = splitPrecio[0];
-      let tempdecimales = splitPrecio[1];
-      if (tempdecimales === undefined) {
-        tempdecimales = '00';
-      }
-      //
-      if (
-        splitPrecio.length > 2 ||
-        this.checkNumbers(enteros) ||
-        this.checkLongMillares(enteros) ||
-        this.checkNumbers(tempdecimales) ||
-        this.checkLongMillares(tempdecimales)
-      ) {
-        this.fun.toastError('Valor introducido es invalido', 'ERROR');
-        this.enfocarInput(id);
-      } else {
-        //
-        if (splitPrecio.length === 2) {
-          if (enteros === '' || enteros === ' ') {
-            enteros = '0';
-          }
-          let decimales;
-          if (tempdecimales.length > 2) {
-            decimales = tempdecimales.substring(0, 2);
-          } else {
-            decimales = _.padEnd(tempdecimales, 2, '0');
-          }
-          const temp = [enteros, decimales];
-          precioTEMP = _.join(temp, '.');
-        } else if (splitPrecio.length === 1) {
-          const decimales = '00';
-          const temp = [enteros, decimales];
-          precioTEMP = _.join(temp, '.');
-        }
-
-        Input.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioTEMP)));
-      }
-    }
   }
 }

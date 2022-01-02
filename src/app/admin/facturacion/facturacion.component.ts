@@ -34,6 +34,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     event.stopPropagation();
     const key = event.keyCode;
 
+    console.log('event ', event);
+
     if (event.type === 'keydown') {
       if (!this.secuenciaKeys.includes(key)) this.secuenciaKeys.push(key);
     } else if (event.type === 'keyup') {

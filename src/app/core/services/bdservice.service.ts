@@ -273,13 +273,8 @@ export class DBservice {
     return this.peticionSinLoad(`articulos/custom/cantidad_inventario`, 'get');
   }
 
-
   getIngredienteExcede(id, cantidad) {
     return this.peticionSinLoad(`articulos/check_excede/${id}?cantidad=${cantidad}`, 'get');
-  }
-
-  getIngredientesFormula(id) {
-    return this.peticion(`articulos/ingredientes/${id}`, 'get');
   }
 
   getArticulosFiltrados(arg, page, per_page, paginado, compra = false, fecha, tipo = 'todos') {
@@ -294,10 +289,6 @@ export class DBservice {
     const id = arg.id;
     const body = _.omit(arg, ['id']);
     return this.peticion('articulos/' + id, 'patch', JSON.stringify(body));
-  }
-
-  eliminarArticulo(arg) {
-    return this.peticion('articulos/' + arg.id, 'delete');
   }
 
   getArticulos() {
@@ -338,7 +329,6 @@ export class DBservice {
   revertirLastReciboByFacturaId(id) {
     return this.peticion(`recibos_ingresos/revertir/by_factura/${id}`, 'get');
   }
-
 
   // =====================================================================
   // NOTAS

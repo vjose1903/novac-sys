@@ -71,8 +71,12 @@
 @mixin campos {
   background-color: #f3f3f3e8;
   color: #1d253b;
-  border-color: #798196;
   box-shadow: 1px 1px 4px 0px #1d253b3d;
+  &:focus {
+    background-color: #b9e2ad !important;
+    border-color: transparent !important;
+    box-shadow: 0px 0px 6px #2ba950 !important;
+  }
 }
 
 textarea {
@@ -81,7 +85,6 @@ textarea {
   @include campos;
   &:focus {
     @include primengFocus;
-    border-color: #20b9d5 !important;
   }
 }
 
@@ -92,18 +95,9 @@ textarea {
     border-bottom-right-radius: 0 !important;
   }
   border-radius: 0.25rem !important;
-
-  &:disabled {
-    background-color: #9f9f9f79 !important;
-    color: #9f9f9f !important;
-  }
 }
 
-.white-content .form-control:focus,
 .form-control:focus {
-  border-color: #20b9d5 !important;
-  color: #1d253b;
-  background-color: #f3f3f3e8;
   box-shadow: none;
 }
 

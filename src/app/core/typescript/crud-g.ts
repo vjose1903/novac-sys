@@ -21,12 +21,12 @@ export class CrudG<T> {
     return (await this.request(url, 'get', null, tipo).toPromise()) as T[];
   }
 
-  async getOne(id: any = '', arg = null, tipo = 'backend') {
+  async getOne(id: number, arg = null, tipo = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
     return (await this.request(url, 'get', null, tipo).toPromise()) as T;
   }
 
-  async deleteOne(id: any = '', arg = null, tipo = 'backend') {
+  async deleteOne(id: number, arg = null, tipo = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
     return (await this.request(url, 'delete', null, tipo).toPromise()) as T;
   }
