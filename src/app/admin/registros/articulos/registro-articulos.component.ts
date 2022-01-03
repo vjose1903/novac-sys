@@ -2,13 +2,11 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@ang
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { DBservice } from '../../../core/services/bdservice.service';
 import * as moment from '../../../../utils/javascript/moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { LoaderService } from '../../../loader/loader.service';
 import { mixinClass } from '../../mixinClass';
-import { ArticuloC, tipos_articulos } from './articulo';
+import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 import * as $ from 'jquery';
 
 @Component({
@@ -77,7 +75,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   is_combo = false;
   recalcular = false;
   productoEditando: any;
-  clickBtnRe = false;
 
   vendido_en: any;
   listaMateriasPrimas = [];
@@ -88,14 +85,8 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   ];
   fechaFactura: string;
   articuloClass = new ArticuloC();
-  constructor(
-    private dbServ: DBservice,
-    private cdRef: ChangeDetectorRef,
-    private fb: FormBuilder,
-    private router: Router,
-    private tServ: TablasService,
-    private loadServ: LoaderService,
-  ) {
+  tipoArticuloClass = new TipoArticuloC();
+  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService) {
     super();
   }
 
@@ -148,9 +139,10 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
   getTipoArticulos() {
     this.listaTipoArticulos = [];
-    this.dbServ.getTipoArticulos().subscribe((res) => {
+    this.tipoArticuloClass.getAll().then((res) => {
       this.listaTipoArticulos = GLOBAL.duplicarJson(res);
     });
+
   }
 
   async getArticulos(e) {
@@ -312,7 +304,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
     this.TIPOARTICULO = '';
-    this.clickBtnRe = false;
     this.recalcular = false;
 
     if (this.is_combo) this.resetArray();
@@ -324,8 +315,8 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   resetCompradoEn(value) {
     const formulario = this.form.getRawValue();
 
-    this.form.controls.medida_contenido_padre.reset(null);
-    this.form.controls.medida_contenido_hijo.reset(null);
+    this.form.controls.medida_contenido_padre.setValue(null);
+    this.form.controls.medida_contenido_hijo.setValue(null);
     this.form.controls.cantidad_contenido_padre.setValue(null);
     this.form.controls.cantidad_contenido_hijo.setValue(null);
 
@@ -348,6 +339,8 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       this.form.controls.calcular_saco.setValue(false);
     }
     this.fillDropAlerta(value);
+    console.log("formulario ", formulario);
+
   }
 
   // =============================================
@@ -593,7 +586,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   async recalcularFunc() {
-    this.clickBtnRe = true;
     const temp = GLOBAL.duplicarJson(this.TIPOARTICULO);
     this.TIPOARTICULO = null;
     this.resetArray();

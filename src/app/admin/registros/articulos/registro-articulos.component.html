@@ -5,7 +5,7 @@
       <form [formGroup]="form">
         <div class="row">
           <div class="col-12 p-0">
-            <div class="row mb-2">
+            <div class="row">
               <div class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
                 <div class="form-group switchDiv">
                   <input formControlName="is_detallable" class="apple-switch" type="checkbox" />
@@ -65,7 +65,7 @@
                 class="form-control"
                 value=""
               >
-                <option value="{{ null }}">Tipo de articulo</option>
+                <option value="{{ null }}" disabled>Tipo de articulo</option>
                 <option *ngFor="let tipo of listaTipoArticulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
               </select>
               <div
@@ -82,7 +82,7 @@
             <div class="form-group">
               <label class="control-label">Vendido en: <span style="color: red">*</span></label>
               <select formControlName="vendido_en" (keydown.enter)="saltar('cantidad_formula', -1)" id="vendido" class="form-control" value="">
-                <option value="{{ null }}">Tipo</option>
+                <option value="{{ null }}" disabled>Tipo</option>
                 <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
               </select>
               <div
@@ -102,7 +102,7 @@
               <label class="control-label">Comprado en: <span style="color: red">*</span></label>
               <!-- (keydown.enter)="saltar(TIPOARTICULO === 'Materia prima' ? 'vendido' : 'costo_principal')" -->
               <select formControlName="medida" (keydown.enter)="saltar('vendido')" id="comprado" class="form-control" (change)="resetCompradoEn($event.target.value)">
-                <option value="{{ null }}">Tipo</option>
+                <option value="{{ null }}" disabled>Tipo</option>
                 <option value="Quintal">Quintal</option>
                 <option value="Libra">Libra</option>
                 <option value="Saco">Saco</option>
@@ -123,7 +123,7 @@
             <div class="form-group">
               <label class="control-label">Vendido en: <span style="color: red">*</span></label>
               <select formControlName="vendido_en" (keydown.enter)="saltar('costo_principal')" id="vendido" class="form-control" value="">
-                <option value="{{ null }}">Tipo</option>
+                <option value="{{ null }}" disabled>Tipo</option>
                 <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
               </select>
               <div
@@ -196,6 +196,7 @@
                     formControlName="aviso_existencia"
                     (focus)="$event.target.select()"
                     placeholder="Cantidad para alertar"
+                    min="0"
                     class="form-control input_cantidad"
                     autocomplete="off"
                   />
@@ -218,7 +219,7 @@
                     (change)="seleccionarContenidoCaja()"
                     [ngClass]="{ badAlert: articulo_no_paquete }"
                   >
-                    <option value="{{ null }}"></option>
+                    <option value="{{ null }}" disabled></option>
                     <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                   </select>
                 </div>
@@ -424,6 +425,7 @@
                       (focus)="$event.target.select()"
                       placeholder="Cantidad para alertar"
                       class="form-control input_cantidad"
+                      min="0"
                       autocomplete="off"
                     />
                   </div>
@@ -437,7 +439,7 @@
                       (change)="seleccionarContenidoCaja()"
                       [ngClass]="{ badAlert: articulo_no_paquete }"
                     >
-                      <option value="{{ null }}"></option>
+                      <option value="{{ null }}" disabled></option>
                       <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                     </select>
                   </div>
@@ -503,7 +505,8 @@
                 id="contenidoPadre"
                 formControlName="cantidad_contenido_padre"
                 (blur)="calculatePricePadre()"
-                class="form-control"
+                class="form-control input_cantidad"
+                min="0"
                 autocomplete="off"
               />
               <div
@@ -529,7 +532,7 @@
                 class="form-control"
                 value=""
               >
-                <option value="{{ null }}">Seleccione</option>
+                <option *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Saco'" value="{{ null }}" disabled>Seleccione</option>
                 <option *ngIf="form.controls['medida'].value === 'Saco'" value="Libra">Libra</option>
                 <option *ngIf="form.controls['medida'].value === 'Caja'" value="Paquete">Paquete</option>
                 <option *ngIf="form.controls['medida'].value === 'Caja'" value="Unidad">Unidad</option>
@@ -586,8 +589,9 @@
                 (keydown.enter)="saltar('medidaHijo')"
                 id="contenidoHijo"
                 formControlName="cantidad_contenido_hijo"
+                min="0"
                 (blur)="calculatePriceHijo()"
-                class="form-control"
+                class="form-control input_cantidad"
                 autocomplete="off"
               />
               <div
@@ -605,7 +609,7 @@
             <div class="form-group">
               <label class="control-label text-transparent">medida </label>
               <select (keydown.enter)="saltar('precio_hijo')" id="medidaHijo" formControlName="medida_contenido_hijo" class="form-control" value="">
-                <option value="{{ null }}">Seleccione</option>
+                <option value="{{ null }}" disabled>Seleccione</option>
                 <option value="Unidad">Unidad</option>
               </select>
               <div
@@ -649,9 +653,9 @@
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
             <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
 
-            <input (click)="prue()" type="submit" class="btn ml-2" value="prueba" id="btn-verde" />
+            <!-- <input (click)="prue()" type="submit" class="btn ml-2" value="prueba" id="btn-verde" /> -->
 
-            <ng-container *ngIf="clickBtnRe === false && TIPOARTICULO === 'Producto terminado' && recalcular === true">
+            <ng-container *ngIf="TIPOARTICULO === 'Producto terminado' && recalcular === true">
               <a class="btn ml-2" id="btn-blanco" (click)="recalcularFunc()">Recarcular</a>
             </ng-container>
           </div>
