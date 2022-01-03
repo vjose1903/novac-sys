@@ -18,6 +18,7 @@
                     optionDisabled="optionDisabled"
                     filterBy="nombre"
                     (onHide)="saltar('cantidad_producir')"
+                    (keydown.enter)="saltar('cantidad_producir')"
                     (onChange)="getIngredients()"
                     styleClass="form-control min"
                     [virtualScroll]="true"
@@ -55,8 +56,8 @@
                       (change)="calcularCantidadAProduccir()"
                       (blur)="calcularCantidadAProduccir()"
                     >
-                      <option value="{{ null }}"></option>
-                      <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
+                      <option value="{{ null }}" disabled></option>
+                      <option *ngFor="let item of optionsMedidas" value="{{ item }}">{{ item }}</option>
                     </select>
                   </div>
                 </div>
@@ -66,7 +67,7 @@
             <div class="col-12 p-0 mt-2">
               <a class="btn mr-2 btn-blanco" (click)="borrar()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
               <input
-                [disabled]="abilitarBtnAgregar()"
+                [disabled]="formIsInvalid()"
                 (click)="agregarAlista()"
                 type="submit"
                 class="btn btn-verde"
@@ -90,16 +91,11 @@
                   <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
 
                   <div class="d-flex justify-content-end" style="width: 100%">
-                    <span
-                      *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'"
-                      [mdbTooltip]="cantiTool"
-                      placement="{{ i != 0 ? 'top' : 'botton' }}"
-                      class="cantidadInve"
-                    >
-                      {{ lookprincipal(ingrediente.existencia) }}
+                    <span *ngIf="existenciaConTooltip(ingrediente)" [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
+                      {{ lookprincipal(ingrediente) }}
                     </span>
-                    <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Libra'" class="cantidadInve">
-                      {{ lookprincipal(ingrediente.existencia) }}
+                    <span *ngIf="!existenciaConTooltip(ingrediente)" class="cantidadInve">
+                      {{ lookprincipal(ingrediente) }}
                     </span>
                   </div>
                 </div>
@@ -120,16 +116,11 @@
                   <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
 
                   <div class="d-flex justify-content-end" style="width: 100%">
-                    <span
-                      *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Quintal'"
-                      [mdbTooltip]="cantiTool"
-                      placement="{{ i != 0 ? 'top' : 'botton' }}"
-                      class="cantidadInve"
-                    >
-                      {{ lookprincipal(ingrediente.existencia) }}
+                    <span *ngIf="existenciaConTooltip(ingrediente)" [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
+                      {{ lookprincipal(ingrediente) }}
                     </span>
-                    <span *ngIf="isLibraOrQuintal(ingrediente.existencia) === 'Libra'" class="cantidadInve">
-                      {{ lookprincipal(ingrediente.existencia) }}
+                    <span *ngIf="!existenciaConTooltip(ingrediente)" class="cantidadInve">
+                      {{ lookprincipal(ingrediente) }}
                     </span>
                   </div>
                 </div>
@@ -150,8 +141,8 @@
           [info]="info"
           [data]="lista_produccion"
           [search]="false"
+          [colores]="false"
           [quitarAScorll]="50"
-          [focusRow]="false"
           [botones]="botones"
           (DevolverInfo)="editarItem($event)"
           (DELETE)="abrirModal('remover', $event.ARG)"

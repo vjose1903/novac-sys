@@ -237,9 +237,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   async necesarioStart() {
-    if (this.focusRow) {
-      this.IDROW = this.ROW + _.toString(this.NUM);
-    }
+    if (this.focusRow) this.IDROW = this.ROW + _.toString(this.NUM);
 
     await this.setDATATABLE();
 
@@ -693,9 +691,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   clickROW(arg) {
-    if (this.focusRow && arg.id) {
-      this.seleccionado = arg.id;
-    }
+    if (this.focusRow && arg.id) this.seleccionado = arg.id;
 
     if (this.metodo === 'venta' && this.paraFiltroArticulos !== null && arg.existencia === 0) {
       if (arg.descripcion === 'Producto terminado') {

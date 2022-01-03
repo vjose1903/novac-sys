@@ -130,7 +130,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
 
       this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.Materia_prima }).then((res) => {
-        console.log("res['data'] --> ", res['data']);
         this.listaMateriasPrimas = GLOBAL.duplicarJson(res['data']);
         resolve(true);
       });
@@ -142,7 +141,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     this.tipoArticuloClass.getAll().then((res) => {
       this.listaTipoArticulos = GLOBAL.duplicarJson(res);
     });
-
   }
 
   async getArticulos(e) {
@@ -151,8 +149,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: page, per_page: per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
-      console.log("res['data'] --> ", res['data']);
-
       res.data.map(async (arti) => {
         arti.customStyles = {
           'td-codigo': { width: '11%' },
@@ -268,21 +264,15 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     if (campo != 'send' && campo != 'cantidad_formula' && campo != 'ingrediente_producir') {
       this.enfocarInput(campo);
     } else if (campo == 'ingrediente_producir') {
-      console.log('>>>>>>>>>> ', `cantidad_formula-${i}`);
-
       this.enfocarInput(`cantidad_formula-${i}`);
     } else if (campo == 'cantidad_formula') {
       const actual_campo = i >= 0 ? `#cantidad_formula-${i}` : '#vendido';
-      console.log('>>>>>>>>>> ', actual_campo);
       var field = $(actual_campo)[0];
 
-      console.log('field ', field);
       var fields = $(actual_campo).parents('form:eq(0),body').find(':input').not('[tabindex]');
-      console.log('fields ', fields);
 
       // var index = fields.index(actual_campo);
       var index = _.findIndex(fields, field);
-      console.log('index ', index);
 
       if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
     } else {
@@ -339,8 +329,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       this.form.controls.calcular_saco.setValue(false);
     }
     this.fillDropAlerta(value);
-    console.log("formulario ", formulario);
-
   }
 
   // =============================================
@@ -376,10 +364,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   }
 
   async getCosto(i) {
-    console.log(i);
-
     const control = this.form.controls['rowFormula'] as FormArray;
-    console.log('control ', control);
 
     (control.controls[i] as any).controls['costo_formula'].setValue(null);
 
@@ -589,7 +574,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     const temp = GLOBAL.duplicarJson(this.TIPOARTICULO);
     this.TIPOARTICULO = null;
     this.resetArray();
-    console.log('this.productoEditando.formulas_productos_terminados --> ', this.productoEditando.formulas_productos_terminados);
 
     for (let i = 0; i < this.productoEditando.formulas_productos_terminados.length; i++) {
       const ingredient = this.productoEditando.formulas_productos_terminados[i];
@@ -606,22 +590,13 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     const control = this.form.controls['rowFormula'] as FormArray;
 
     const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(ingredient.articulo_combo));
-    console.log('  ');
-    console.log(' ------------------------------------ ');
-    console.log('materiaPrima ', materiaPrima);
-    console.log('ingredient ', ingredient);
 
     try {
       const costo = materiaPrima?.costos?.Libra?.costo || materiaPrima?.costos?.Unidad?.costo;
       const precio = materiaPrima?.costos?.Libra?.precio || materiaPrima?.costos?.Unidad?.precio;
 
-      console.log('costo ', costo);
-      console.log('precio ', precio);
-
       const medida = this.fun.hasValue(materiaPrima.costos.Unidad) ? 'Und.' : 'Lbs.';
       const control_en_turno = (control.controls[i] as any).controls;
-      console.log('medida ', medida);
-      console.log('control_en_turno ', control_en_turno);
 
       if (recalcular) {
         control_en_turno['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costo));
@@ -652,7 +627,6 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
     this.TIPOARTICULO = articulo.descripcion;
-    console.log('item ', item);
     this.is_combo = articulo.is_combo;
 
     if (articulo.is_combo || (_.has(articulo, 'formulas_productos_terminados') && articulo.formulas_productos_terminados.length)) {
@@ -761,22 +735,17 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     // $(`#nombre`).siblings();
 
     ($(`#articulo_id-0`)[0].firstChild as any).focus();
-    console.log('$(`#articulo_id-0`) ', $(`#articulo_id-0`));
     // var fields = $(`#cantidad_formula-0`).parents('form:eq(0),body').find(':input').not('[tabindex]');
-    // console.log('fields ', fields);
     // var index = fields.index($(`#cantidad_formula-0`));
-    // console.log('index ', index);
     // if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
     // if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
 
     // $(`#nombre`).trigger(keypressEvent);
-    // console.log('>>>>>>>  ', $(`#nombre`).on);
   }
 
   formarFormula() {
     const array = this.ARRAY_FORMULA.value;
     const formulas = [];
-    console.log('array --> ', array);
 
     array.forEach((element) => {
       const obj = {
@@ -790,14 +759,12 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       };
       formulas.push(obj);
     });
-    console.log('formulas --> ', formulas);
     return formulas;
   }
   // =============================================
   //  Crear articulo
   // =============================================
 
-  element: HTMLElement;
   submit() {
     const formulario = this.form.getRawValue();
 
@@ -821,12 +788,12 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       is_materia_prima: formulario.is_materia_prima,
       calcular_saco: formulario.calcular_saco,
     };
+
     if (obj.is_combo) {
       obj['vendido_en'] = 'Saco';
       obj['otros_costos'] = formulario.otros_costos;
       obj['formulas_productos_terminados'] = this.formarFormula();
     }
-    this.fun.logBlue('obj ', obj);
 
     this.articuloClass.createUpdateOne(obj).then((res) => {
       this.necesarioStart();

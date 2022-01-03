@@ -1,19 +1,17 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { DBservice } from '../../core/services/bdservice.service';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { mixinClass } from '../mixinClass';
 import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
 import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
+import { ProduccionC } from './produccion';
+import * as $ from 'jquery';
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
   styleUrls: ['./produccion.component.scss'],
 })
-export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy {
-  @ViewChild('cardTabla') cardTabla: ElementRef;
-
-  // listaArticulos: any;
+export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
   producto_terminado_en_turno;
   cantidad_producir;
   medida_producir;
@@ -22,25 +20,31 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   ingredientes = [];
   ingredientesParaProduccion = [];
 
-  medidas = {
-    Libra: 'Libras',
-    Quintal: 'Quintales',
-    Caja: 'Cajas',
-    Paquete: 'Paquetes',
-    Unidad: 'Unidades',
-  };
+  medidas = { Libra: 'Libras', Quintal: 'Quintales', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades' };
 
   element: any;
-  optionsAlerta = ['Quintal', 'Libra'];
+  optionsMedidas = ['Quintal', 'Libra'];
   seleccionModal: any;
   tipoModal: string;
+
+  info = [
+    { titulo: 'Producto', key: 'nombre' },
+    { titulo: 'Cantidad', key: 'cantidad', formatoNumero: true },
+    { titulo: 'Medida', key: 'medida' },
+  ];
+
+  botones = { titulo: true, borrar: true, editar: true };
 
   listaProductos = [];
   articuloEditando: any;
   articuloClass = new ArticuloC();
+  produccionClass = new ProduccionC();
 
-  constructor(private dbServ: DBservice, private tServ: TablasService) {
+  constructor(private tServ: TablasService) {
     super();
+  }
+  ngAfterViewInit(): void {
+    this.enfocarSelect();
   }
 
   ngOnInit() {
@@ -68,6 +72,11 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     }
   }
 
+  enfocarSelect() {
+    var fields = $('#cantidad_producir').parents('form:eq(0),body').find(':input').not('[tabindex]');
+    fields.eq(0).focus();
+  }
+
   async getProductosTerminados() {
     const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
     this.listaProductos.length = 0;
@@ -80,7 +89,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   async getIngredients() {
-    this.ingredientes = _.orderBy(this.producto_terminado_en_turno.formulas_productos_terminados, ['articulo_id'], ['asc']);
+    this.ingredientes = _.orderBy(this.producto_terminado_en_turno.formulas_productos_terminados, ['articulo_combo'], ['asc']);
   }
 
   lookOters(objeto) {
@@ -113,20 +122,34 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     if (this.fun.hasValue(div_opuesto)) div_opuesto.scrollTop = arg.element.scrollTop;
   }
 
-  isLibraOrQuintal(objeto) {
-    let presentar = 'Quintal';
-    if (objeto.Quintal && objeto.Libra > 100) presentar = 'Quintal';
-    else presentar = 'Libra';
+  existenciaConTooltip(objeto) {
+    let llevaTooltip = true;
 
-    return presentar;
+    if (_.has(objeto.existencia, 'Caja')) llevaTooltip = objeto.existencia.Unidad > objeto.contenido.Caja && objeto.existencia.Caja > 0;
+    else if (_.has(objeto.existencia, 'Saco')) llevaTooltip = objeto.existencia.Libra > objeto.contenido.Saco && objeto.existencia.Saco > 0;
+    else llevaTooltip = objeto.existencia.Libra > 100;
+
+    return llevaTooltip;
   }
 
   lookprincipal(objeto) {
-    const presentar = this.isLibraOrQuintal(objeto);
-    const cantidad = objeto[presentar];
-    const fin = cantidad === 1 ? presentar : this.medidas[presentar];
+    let mostrar;
 
-    return `${GLOBAL.numFormatTwoDecimals(cantidad)} ${fin}`;
+    if (_.has(objeto.existencia, 'Caja')) {
+      if (objeto.existencia.Unidad > objeto.contenido.Caja && objeto.existencia.Caja > 0) {
+        mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Caja)} ${objeto.existencia.Caja === 1 ? 'Caja' : 'Cajas'}`;
+      } else mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Unidad)} ${objeto.existencia.Unidad === 1 ? 'Unidad' : 'Unidades'}`;
+    } else if (_.has(objeto.existencia, 'Saco')) {
+      if (objeto.existencia.Libra > objeto.contenido.Saco && objeto.existencia.Saco > 0) {
+        mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Saco)} ${objeto.existencia.Saco === 1 ? 'Saco' : 'sacos'}`;
+      } else mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
+    } else {
+      if (objeto.existencia.Libra > 100)
+        mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Quintal)} ${objeto.existencia.Quintal === 1 ? 'Quintal' : 'Quintales'}`;
+      else mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
+    }
+
+    return mostrar;
   }
 
   saltar(campo) {
@@ -134,17 +157,17 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       this.enfocarInput(campo);
     } else {
       if (this.producto_terminado_en_turno) {
-        const is_invalid = this.abilitarBtnAgregar();
+        const is_invalid = this.formIsInvalid();
         if (!is_invalid) setTimeout(() => this.agregarAlista(), 250);
       }
     }
   }
-  // TODO: cambiar la forma de desabilitar
-  disableOption(arg, boolean) {
-    (this.element = document.getElementById(arg) as any).disabled = boolean;
+  disableOption(id, boolean) {
+    let optionSelected = _.find(this.listaProductos, (item) => item.id == id);
+    optionSelected.optionDisabled = boolean;
   }
 
-  abilitarBtnAgregar() {
+  formIsInvalid() {
     let res = true;
     if (this.producto_terminado_en_turno && this.cantidad_producir && this.medida_producir) res = false;
     return res;
@@ -163,41 +186,41 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       this.ingredientes.forEach(async (ingre) => {
         let cantidadFormula = ingre.cantidad;
 
-        if (this.medida_producir === 'Libra') cantidadFormula = cantidadFormula / 100;
+        if (this.medida_producir === 'Libra' && ingre.medida === 'Libra') cantidadFormula = cantidadFormula / 100;
 
         let cantidad_calculada = cantidadFormula * this.cantidad_producir;
 
-        const obj = { Quintal: cantidad_calculada / 100, Libra: cantidad_calculada };
+        let obj: any = { Quintal: cantidad_calculada / 100, Libra: cantidad_calculada };
+
+        if (ingre.medida == 'Unidad') obj = { Caja: cantidad_calculada / ingre.contenido.Caja, Unidad: cantidad_calculada };
 
         if (this.lista_produccion.length > 0) {
-          for (let i = 0; i < this.lista_produccion.length; i++) {
-            const element = this.lista_produccion[i];
-
-            if (element.ingredientes.length > 0) {
-              for (let j = 0; j < element.ingredientes.length; j++) {
-                const ingrediente = element.ingredientes[j];
-                if (ingrediente.nombre === ingre.nombre) cantidad_calculada += ingrediente.cantidad;
-              }
-            }
-          }
+          const ingredientesIguales = _.filter(this.lista_produccion, (item) => item.articulo_combo == ingre.articulo_combo);
+          cantidad_calculada = _.reduce(ingredientesIguales, (acumulado, item) => acumulado + item.cantidad, cantidad_calculada);
         }
 
-        try {
-          const res = await this.dbServ.getIngredienteExcede(ingre.articulo_id, cantidad_calculada).toPromise();
-
-          if (res.excede) {
+        const extra = { afterPath: `check_excede/${ingre.articulo_combo}`, parameters: { cantidad: cantidad_calculada } };
+        await this.articuloClass.getAll(extra).then((res) => {
+          const excede = res['data'];
+          if (excede) {
             this.cantidad_producir = null;
             this.ingredientesParaProduccion = [];
 
             this.fun.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.producto_terminado_en_turno.nombre, 'ERROR');
             this.enfocarInput('cantidad_producir');
           } else {
-            this.ingredientesParaProduccion.push({ nombre: ingre.nombre, existencia: obj, articulo_id: ingre.articulo_id });
-            this.ingredientesParaProduccion = _.orderBy(this.ingredientesParaProduccion, ['articulo_id'], ['asc']);
+            this.ingredientesParaProduccion.push({
+              nombre: ingre.nombre,
+              existencia: obj,
+              articulo_id: ingre.articulo_id,
+              contenido: ingre.contenido,
+              articulo_combo: ingre.articulo_combo,
+              cantidad_en_unidades: ingre.medida == 'Unidad' ? ingre.existencia.Unidad : ingre.existencia.Libra,
+            });
+
+            this.ingredientesParaProduccion = _.orderBy(this.ingredientesParaProduccion, ['articulo_combo'], ['asc']);
           }
-        } catch (error) {
-          if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
-        }
+        });
       });
     }
   }
@@ -216,30 +239,25 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   paginateChange(arg) {}
 
   agregarAlista() {
-    this.ingredientesParaProduccion.forEach((ingre) => {
-      ingre.cantidad = this.medida_producir === 'Quintal' ? ingre.existencia.Quintal : ingre.existencia.Quintal;
-      ingre.cantidad_en_unidades = ingre.existencia.Libra;
-      ingre.articulo_id = ingre.articulo_id;
-
-      delete ingre.existencia;
-    });
-
     const obj = {
       nombre: this.producto_terminado_en_turno.nombre,
       cantidad: this.cantidad_producir,
       cantidad_en_unidades: this.medida_producir === 'Quintal' ? this.cantidad_producir * 100 : this.cantidad_producir,
       medida: this.medida_producir,
-      articulo_id: _.parseInt(this.producto_terminado_en_turno),
+      articulo_id: _.parseInt(this.producto_terminado_en_turno.id),
+      id: _.parseInt(this.producto_terminado_en_turno.id),
       ingredientes: this.ingredientesParaProduccion,
+      formulas_productos_terminados: this.producto_terminado_en_turno.formulas_productos_terminados,
     };
 
     this.lista_produccion.push(obj);
 
     this.tServ.Func_total_paginas(this.lista_produccion.length);
 
-    this.disableOption('prod-' + this.producto_terminado_en_turno, true);
+    this.disableOption(this.producto_terminado_en_turno.id, true);
     this.articuloEditando = undefined;
     this.borrar();
+    this.enfocarSelect();
   }
 
   editarItem(item) {
@@ -247,11 +265,12 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
-    this.producto_terminado_en_turno = item.ARG.articulo_id;
+    this.producto_terminado_en_turno = item.ARG;
     this.cantidad_producir = item.ARG.cantidad;
     this.medida_producir = item.ARG.medida;
 
     this.articuloEditando = item.ARG;
+
     setTimeout(() => {
       this.getIngredients();
       this.calcularCantidadAProduccir();
@@ -273,16 +292,11 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     if (bool) {
       if (this.tipoModal === 'remover') {
         this.lista_produccion = [];
-        this.disableOption('prod-' + this.seleccionModal.articulo_id, false);
-
-        this.lista_produccion = _.remove(listaTemp, (n) => {
-          return n.articulo_id !== this.seleccionModal.articulo_id;
-        });
-        this.tServ.Func_total_paginas(this.lista_produccion.length);
+        this.disableOption(this.seleccionModal.articulo_id, false);
+        this.lista_produccion = _.remove(listaTemp, (item) => item.articulo_id !== this.seleccionModal.articulo_id);
       } else {
-        this.lista_produccion.forEach((element) => {
-          this.disableOption('prod-' + element.articulo_id, false);
-        });
+        this.lista_produccion.forEach((element) => this.disableOption(element.articulo_id, false));
+
         this.lista_produccion = [];
         this.borrar();
       }
@@ -293,8 +307,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
   async confirmarProduccion() {
     const obj = JSON.parse(JSON.stringify(this.lista_produccion));
     const produccion_send = {};
-
-    const empleado = this.fun.getUser();
 
     const detalle = [];
 
@@ -307,57 +319,12 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
       });
     });
 
-    produccion_send['user_id'] = empleado.id;
     produccion_send['numero'] = null;
     produccion_send['fecha_equivalente'] = null;
-    produccion_send['detalles_produccion_attributes'] = detalle;
+    produccion_send['detalles_produccion'] = detalle;
 
-    try {
-      const res = await this.dbServ.createProduccion(produccion_send).toPromise();
-      this.succes();
-    } catch (error) {
-      console.error(error);
-      if (error.error) this.fun.toastError(error.error.msg, 'Error');
-    }
+    console.log('produccion_send --> ', produccion_send);
+
+    // this.produccionClass.createUpdateOne(produccion_send).then((res) => this.decisionModalP('cancelarP'));
   }
-
-  succes() {
-    this.fun.toastSuccess('Producción registrada.', 'Correcto');
-    this.tipoModal;
-    this.decisionModalP('cancelarP');
-    this.borrar();
-  }
-
-  mostrarErrores(arg) {
-    for (const error in arg) {
-      if (arg.hasOwnProperty(error)) {
-        const element = arg[error];
-        this.fun.toastError(element, 'Error');
-      }
-    }
-  }
-  // =============================================
-  //  TABLAS
-  // =============================================
-
-  info = [
-    {
-      titulo: 'Producto',
-      key: 'nombre',
-    },
-    {
-      titulo: 'Cantidad',
-      key: 'cantidad',
-      formatoNumero: true,
-    },
-    {
-      titulo: 'Medida',
-      key: 'medida',
-    },
-  ];
-  botones = {
-    titulo: true,
-    borrar: true,
-    editar: true,
-  };
 }

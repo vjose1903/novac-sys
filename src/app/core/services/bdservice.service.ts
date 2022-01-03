@@ -150,15 +150,6 @@ export class DBservice {
     return this.peticion(`secuencia_comprobantes/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
-  // =====================================================================
-  // HISTORICO PRODUCCIONES
-  // =====================================================================
-  getProducciones() {
-    return this.peticion('producciones', 'get');
-  }
-  createProduccion(arg) {
-    return this.peticion('producciones', 'post', JSON.stringify(arg));
-  }
 
   // =====================================================================
   // CLIENTES
