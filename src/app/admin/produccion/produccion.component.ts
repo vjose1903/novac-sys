@@ -215,7 +215,8 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
               articulo_id: ingre.articulo_id,
               contenido: ingre.contenido,
               articulo_combo: ingre.articulo_combo,
-              cantidad_en_unidades: ingre.medida == 'Unidad' ? ingre.existencia.Unidad : ingre.existencia.Libra,
+              cantidad_en_unidades: ingre.medida == 'Unidad' ? obj.Unidad : obj.Libra,
+              medida: ingre.medida,
             });
 
             this.ingredientesParaProduccion = _.orderBy(this.ingredientesParaProduccion, ['articulo_combo'], ['asc']);
@@ -304,6 +305,23 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     this.tServ.Func_total_paginas(this.lista_produccion.length);
   }
 
+  formarIngredientes(ingredientes) {
+    const ingredientes_format = [];
+
+    for (let i = 0; i < ingredientes.length; i++) {
+      const ingrediente = ingredientes[i];
+      console.log(' ');
+      console.log('ingrediente --> ', ingrediente);
+
+      const obj = {
+        articulo_combo: ingrediente.articulo_combo,
+        cantidad_en_unidades: ingrediente.cantidad_en_unidades,
+      };
+      ingredientes_format.push(obj);
+    }
+    return ingredientes_format;
+  }
+
   async confirmarProduccion() {
     const obj = JSON.parse(JSON.stringify(this.lista_produccion));
     const produccion_send = {};
@@ -316,6 +334,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
         cantidad: produccion.cantidad,
         cantidad_en_unidades: produccion.cantidad_en_unidades,
         medida: produccion.medida,
+        ingredientes: this.formarIngredientes(produccion.ingredientes),
       });
     });
 
@@ -323,8 +342,9 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
     produccion_send['fecha_equivalente'] = null;
     produccion_send['detalles_produccion'] = detalle;
 
-    console.log('produccion_send --> ', produccion_send);
-
-    // this.produccionClass.createUpdateOne(produccion_send).then((res) => this.decisionModalP('cancelarP'));
+    this.produccionClass.createUpdateOne(produccion_send).then((res) => {
+      this.decisionModalP('cancelarP');
+      this.getProductosTerminados();
+    });
   }
 }

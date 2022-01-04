@@ -84,11 +84,7 @@ export class DBservice {
   }
 
   makeReportes(tipo, params) {
-    return this.peticion(`reporte/${tipo}?${params}`, 'get');
-  }
-
-  reporteVentas(tipo, condicion, desde = ' ', hasta = ' ') {
-    return this.peticion(`reporte/ventas/${tipo}/${condicion}/${desde}/${hasta}`, 'get');
+    return this.peticion(`reportes/custom/${tipo}${params ? `?${params}` : ''}`, 'get');
   }
 
   // =====================================================================
@@ -143,13 +139,12 @@ export class DBservice {
     return this.peticion(`secuencia_comprobantes/${id}`, 'delete');
   }
   getPaquetesNCF(tipo_factura_id, estado = true) {
-    return this.peticionSinLoad(`paqueteNCF/${tipo_factura_id}/${estado}`, 'get');
+    return this.peticionSinLoad(`secuencia_comprobantes/custom/${tipo_factura_id}/${estado}`, 'get');
   }
 
   getPaquetesNCFFiltrados(arg, page, per_page, paginado) {
     return this.peticion(`secuencia_comprobantes/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
-
 
   // =====================================================================
   // CLIENTES

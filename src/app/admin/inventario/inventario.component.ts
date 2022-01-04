@@ -115,7 +115,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
   }
 
   async makeReporte() {
-    const extra = { afterPath: `inventario` };
+    const extra = { afterPath: `custom/inventario` };
     this.reporteClass.getAll(extra).then((res) => {
       const obj = { data: res, type: 'reporte' };
       this.loadServ.isLoading.next(true);
