@@ -5,6 +5,7 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import { TablasService } from '../tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { FunctionService } from '../../../core/services/functions.service';
+import { ArticuloC } from '../../registros/articulos/articulo';
 
 @Component({
   selector: 'app-modal',
@@ -30,6 +31,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   returnArticulosSeleccionado = false;
   filtrar = false;
   dataFiltro;
+  articuloClass = new ArticuloC();
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       this.showModal = false;
@@ -309,17 +311,19 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       if (this.tipoModal === 'buscarArticulo') {
         const is_compra = this.metodo === 'compra' ? true : false;
 
-        const res = await this.dbServ.getArticulosFiltrados(palabra_a_buscar, page, per_page, true, is_compra, fecha_articulo, 'todos').toPromise();
+        this.articuloClass
+          .getArticulosFiltrado({ buscar: palabra_a_buscar, page: page, per_page: per_page, paginado: true, fecha: fecha_articulo, is_compra: is_compra })
+          .then((res) => {
+            if (GLOBAL.is_number(palabra_a_buscar) && res.data.length === 1) {
+              this.articuloFiltradoPorCodigo(res);
+            } else {
+              this.dataFiltro = res.data;
 
-        if (GLOBAL.is_number(palabra_a_buscar) && res.data.length === 1) {
-          this.articuloFiltradoPorCodigo(res);
-        } else {
-          this.dataFiltro = res.data;
-
-          this.mostrarModalLuegoDeBuscarData();
-          const obj = { total: res.total_registros, tabla: 'filtroArticulos' };
-          this.tServ.Func_total_paginas(obj);
-        }
+              this.mostrarModalLuegoDeBuscarData();
+              const obj = { total: res.total_registros, tabla: 'filtroArticulos' };
+              this.tServ.Func_total_paginas(obj);
+            }
+          });
       } else if (this.tipoModal === 'buscarCliente') {
         const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
         this.dataFiltro = undefined;

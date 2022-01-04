@@ -8,6 +8,7 @@ import { TablasComponent } from '../../components/tablas/tablas.component';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { mixinClass } from '../../mixinClass';
 import { LoaderService } from '../../../loader/loader.service';
+import { ArticuloC } from '../../registros/articulos/articulo';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -31,7 +32,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   paqueteComprobante: any;
   tipo_factura_id = null;
   valor: any;
-
+  articuloClass = new ArticuloC();
   constructor(private dbServ: DBservice, private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
@@ -285,11 +286,12 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   async calcularPrecio(detalle, factura) {
     if (detalle.calcular_saco) {
       const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente)['FechaFactura'];
-      const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, fechaFactura, 'todos').toPromise();
 
-      const precio_saco = res.data[0].precio_principal;
-      detalle.precio = detalle.precio + precio_saco;
-      detalle.total = detalle.precio * detalle.cantidad;
+      this.articuloClass.getArticulosFiltrado({ buscar: 'Saco sistema', fecha: fechaFactura, paginado: false }).then((res) => {
+        const precio_saco = res.data[0].precio_principal;
+        detalle.precio = detalle.precio + precio_saco;
+        detalle.total = detalle.precio * detalle.cantidad;
+      });
     } else {
       detalle.precio = detalle.precio;
     }
@@ -304,7 +306,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       const page = e.page;
       const per_page = e.per_page;
       const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id, false, page, per_page, true).toPromise();
-      this.fun.logRed('busqueda ', busqueda);
 
       busqueda['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');

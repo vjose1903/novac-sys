@@ -91,6 +91,7 @@ export class MsgErrorDirective {
             else if (errors.ip) response.msg = `Intoduzca una ip valida.`;
             else if (errors.compares) response.msg = `Las contraseñas no coinciden.`;
             else if (errors.invalidCedula) response.msg = `Ingrese una cédula válida.`;
+            else if (errors.email) response.msg = `Ingrese una email válido.`;
             else if (errors.sinRayas) response.msg = `Complete el campo: ${this.id}`;
           }
 

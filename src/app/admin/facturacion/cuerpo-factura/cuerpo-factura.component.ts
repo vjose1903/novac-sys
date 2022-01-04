@@ -1,7 +1,6 @@
 import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, OnDestroy, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
-import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { mixinClass } from '../../mixinClass';
 import * as moment from '../../../../utils/javascript/moment';
@@ -52,7 +51,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   articuloClass = new ArticuloC();
 
-  constructor(private dbServ: DBservice, private fb: FormBuilder) {
+  constructor(private fb: FormBuilder) {
     super();
     // this.rowFactura = new FormArray([new FormControl()]);
   }
@@ -170,12 +169,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   async getSaco() {
-    try {
-      const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, this.fechaFactura, 'todos').toPromise();
-      this.saco_sistema = res.data[0];
-    } catch (error) {
-      console.error(error);
-    }
+    this.articuloClass.getArticulosFiltrado({ buscar: 'Saco sistema', fecha: this.fechaFactura, paginado: false }).then((res) => {
+      this.saco_sistema = res['data'][0];
+    });
   }
 
   ngOnChanges(simpleChanges) {}

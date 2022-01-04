@@ -17,45 +17,17 @@ export class ModalSeleccinarArticuloComponent extends mixinClass implements OnIn
   @Output() getArticulos = new EventEmitter<any>();
 
   info = [
-    {
-      titulo: 'Articulo',
-      key: 'descripcion',
-      estilos: [{ width: '44%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }],
-    },
-    {
-      titulo: 'Cantidad',
-      key: 'cantidad',
-      estilos: [{ width: '12%' }],
-    },
-    {
-      titulo: 'Unidad',
-      key: 'unidad',
-      estilos: [{ width: '14%' }],
-    },
-    {
-      titulo: 'Retirado',
-      key: 'retirado_mostrar',
-      estilos: [{ width: '12%' }],
-    },
-    {
-      titulo: 'Restante',
-      key: 'restante_mostrar',
-      estilos: [{ width: '12%' }],
-    },
-    {
-      titulo: 'Seleccione',
-      tipo: 'check',
-      key: 'select',
-      estilos: [{ width: '10.8%' }],
-      disable: [{ kind: 'campo', target: 'disable', value: [true] }],
-      title: '',
-    },
+    { titulo: 'Articulo', key: 'descripcion', estilos: [{ width: '44%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
+    { titulo: 'Cantidad', key: 'cantidad', estilos: [{ width: '12%' }] },
+    { titulo: 'Unidad', key: 'unidad', estilos: [{ width: '14%' }] },
+    { titulo: 'Retirado', key: 'retirado_mostrar', estilos: [{ width: '12%' }] },
+    { titulo: 'Restante', key: 'restante_mostrar', estilos: [{ width: '12%' }] },
+    { titulo: 'Seleccione', tipo: 'check', key: 'select', estilos: [{ width: '10.8%' }], disable: [{ kind: 'campo', target: 'disable', value: [true] }], title: '' },
   ];
 
   articulos_selected = [];
 
   subDeci: Subscription;
-  articuloClass = new ArticuloC();
 
   constructor() {
     super();
@@ -110,8 +82,6 @@ export class ModalSeleccinarArticuloComponent extends mixinClass implements OnIn
           articulo.destroy = 1;
           this.articulos_selected.push(articulo);
         }
-
-        // _.pullAt(this.articulos_selected, i);
       } else {
         if (_x_ !== -1) {
           this.articulos_selected[_x_].destroy = 0;

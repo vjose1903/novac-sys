@@ -20,34 +20,13 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
   // =============================================
 
   info = [
-    {
-      titulo: 'Cod.',
-      key: 'codigo',
-      estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }],
-    },
-    {
-      titulo: 'Articulo',
-      key: 'nombre',
-      estilos: [{ width: '37%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }],
-    },
-    {
-      titulo: 'Medida',
-      key: 'medida',
-      estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }],
-    },
-    {
-      titulo: 'Precio',
-      key: 'precio_principal',
-      formatoNumero: true,
-      estilos: [{ width: '20%' }],
-    },
+    { titulo: 'Cod.', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }] },
+    { titulo: 'Articulo', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
+    { titulo: 'Medida', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
+    { titulo: 'Precio', key: 'precio_principal', formatoNumero: true, estilos: [{ width: '20%' }] },
   ];
 
-  botones = {
-    titulo: true,
-    borrar: true,
-    editar: true,
-  };
+  botones = { titulo: true, borrar: true, editar: true };
 
   titulo = '';
   boton = '';
@@ -78,11 +57,13 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
   vendido_en: any;
   listaMateriasPrimas = [];
+
   vendidoEn = [
     { backend: 'Unidad', front: 'Unidad' },
     { backend: 'Saco', front: 'Saco' },
     { backend: 'Galon', front: 'Galón' },
   ];
+
   fechaFactura: string;
   articuloClass = new ArticuloC();
   tipoArticuloClass = new TipoArticuloC();

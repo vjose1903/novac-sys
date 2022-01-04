@@ -190,7 +190,6 @@ export class DBservice {
     let url = 'suplidores';
 
     if (_.has(arg, 'id') && this.fun.hasValue(arg.id)) {
-      this.fun.logGreen('EDITANDOOOO');
       method = 'put';
       url += `/${arg.id}`;
     }
@@ -250,55 +249,6 @@ export class DBservice {
 
   createMovimientoI(arg) {
     return this.peticion('movimientos_inventarios', 'post', JSON.stringify(arg));
-  }
-  // =====================================================================
-  // ARTICULOS
-  // =====================================================================
-
-  getCantidadInventario() {
-    return this.peticionSinLoad(`articulos/custom/cantidad_inventario`, 'get');
-  }
-
-  getIngredienteExcede(id, cantidad) {
-    return this.peticionSinLoad(`articulos/check_excede/${id}?cantidad=${cantidad}`, 'get');
-  }
-
-  getArticulosFiltrados(arg, page, per_page, paginado, compra = false, fecha, tipo = 'todos') {
-    return this.peticion(`articulos/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}&is_compra=${compra}&tipo=${tipo}&fecha=${fecha}`, 'get');
-  }
-
-  createArticulo(arg) {
-    return this.peticion('articulos', 'post', JSON.stringify(arg));
-  }
-
-  editarArticulo(arg) {
-    const id = arg.id;
-    const body = _.omit(arg, ['id']);
-    return this.peticion('articulos/' + id, 'patch', JSON.stringify(body));
-  }
-
-  getArticulos() {
-    return this.peticion('articulos', 'get');
-  }
-
-  getMateriasPrimas() {
-    return this.peticion('articulos/custom/materias_primas', 'get');
-  }
-
-  getTipoArticuloById(id) {
-    return this.peticionSinLoad(`tipo_articulos/${id}`, 'get');
-  }
-
-  getTipoArticulos() {
-    return this.peticion('tipo_articulos', 'get');
-  }
-
-  getOneArticulo(id: number | string, fecha?, sinLoad?) {
-    if (sinLoad) {
-      return this.peticionSinLoad(`articulos/${id}?fecha="${fecha}`, 'get');
-    } else {
-      return this.peticion(`articulos/${id}?fecha="${fecha}`, 'get');
-    }
   }
 
   // =====================================================================

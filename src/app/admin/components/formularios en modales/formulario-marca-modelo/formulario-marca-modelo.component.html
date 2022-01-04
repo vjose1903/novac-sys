@@ -3,11 +3,11 @@
   <div class="col-12" style="max-height: 2rem">
     <h4>{{ tituloTabla }}</h4>
   </div>
-  <div class="col-md-6 contenedorRegistro">
+  <div class="col-6 contenedorRegistro">
     <div class="card card-padding sombra">
       <form [formGroup]="form">
         <div class="row">
-          <div *ngIf="tipo_formulario !== 'modelos'" class="col-md-12">
+          <div *ngIf="tipo_formulario !== 'modelos'" class="col-12">
             <div class="form-group">
               <label class="control-label">{{ campo1 }}: <span style="color: red">*</span></label>
               <input
@@ -29,7 +29,7 @@
             </div>
           </div>
 
-          <div *ngIf="tipo_formulario === 'modelos'" class="col-md-12">
+          <div *ngIf="tipo_formulario === 'modelos'" class="col-12">
             <div class="form-group">
               <label class="control-label">Marca: <span style="color: red">*</span></label>
               <ng-select id="marca_modal" formControlName="marca_id" [items]="listaMarcas" bindLabel="descripcion" bindValue="id" [clearable]="false">
@@ -41,7 +41,7 @@
               </ng-select>
             </div>
           </div>
-          <div *ngIf="tipo_formulario === 'modelos'" class="col-md-12">
+          <div *ngIf="tipo_formulario === 'modelos'" class="col-12">
             <div class="form-group">
               <label class="control-label">Modelo: <span style="color: red">*</span></label>
               <input
@@ -66,7 +66,7 @@
       </form>
 
       <div class="row">
-        <div class="col-md-12 mt-3">
+        <div class="col-12 mt-3">
           <div class="form-group">
             <a class="btn mr-2" id="btn-gris" (click)="accion(false)">Salir</a>
             <a *ngIf="editando" class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
@@ -77,7 +77,7 @@
     </div>
   </div>
 
-  <div class="col-md-6" style="height: calc(100% - 2.5rem)">
+  <div class="col-6" style="height: calc(100% - 2.5rem)">
     <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
         *ngIf="listado && info"

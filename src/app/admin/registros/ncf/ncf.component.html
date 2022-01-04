@@ -1,10 +1,9 @@
 <div class="row" style="height: calc(100% - 60px)">
-  <div class="col-md-5 contenedorRegistro">
-    <!-- <div class=""> -->
+  <div class="col-5 contenedorRegistro">
     <h4 class="negrita">{{ titulo }}</h4>
     <div class="card card-padding sombra">
       <div class="row">
-        <div class="col-12">
+        <div class="col-12 p-0">
           <div class="form-group">
             <label class="control-label">Tipo comprobante: <span style="color: red">*</span></label>
             <select
@@ -23,22 +22,22 @@
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="aletarTipoArticulo">Debe de seleccionar tipo de comprobante</div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="form-group mt-4">
+        <div class="col-6 p-0 pr-2">
+          <div class="form-group mt-2">
             <label class="control-label">Desde: <span style="color: red">*</span></label>
-            <input type="number" class="form-control" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')" />
+            <input type="number" class="form-control input_cantidad" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')" />
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="desdeAlert">Campo obligatorio.</div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="form-group mt-4">
+        <div class="col-6 p-0 pl-2">
+          <div class="form-group mt-2">
             <label class="control-label">Hasta: <span style="color: red">*</span></label>
-            <input type="number" class="form-control" [(ngModel)]="Hasta" (keyup)="checkInputs('hasta')" (blur)="checkInputs('hasta')" />
+            <input type="number" class="form-control input_cantidad" [(ngModel)]="Hasta" (keyup)="checkInputs('hasta')" (blur)="checkInputs('hasta')" />
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="hastaAlert">Campo obligatorio.</div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="form-group mt-4">
+        <div class="col-6 p-0 pr-2">
+          <div class="form-group mt-2">
             <label class="control-label">Fecha compra: <span style="color: red">*</span></label>
             <input
               type="text"
@@ -54,8 +53,8 @@
             />
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="form-group mt-4">
+        <div class="col-6 p-0 pl-2">
+          <div class="form-group mt-2">
             <label class="control-label">Fecha validez: </label>
             <input
               type="text"
@@ -75,37 +74,29 @@
             <div class="col-6">
               <div class="d-flex">
                 <h5>Usado:</h5>
-                <i
-                  class="ml-3 mt-1 {{ ncfSelected.usado ? 'fas fa-check' : 'fas fa-times' }} {{ ncfSelected.usado ? 'text-green' : 'text-red' }}"
-                ></i>
+                <i class="ml-3 mt-1 {{ ncfSelected.usado ? 'fas fa-check' : 'fas fa-times' }} {{ ncfSelected.usado ? 'text-green' : 'text-red' }}"></i>
               </div>
             </div>
             <div class="col-6">
               <div class="d-flex">
                 <h5>Activo:</h5>
-                <i
-                  class="ml-3 mt-1 {{ ncfSelected.estado ? 'fas fa-check' : 'fas fa-times' }}  {{ ncfSelected.estado ? 'text-green' : 'text-red' }}"
-                ></i>
+                <i class="ml-3 mt-1 {{ ncfSelected.estado ? 'fas fa-check' : 'fas fa-times' }}  {{ ncfSelected.estado ? 'text-green' : 'text-red' }}"></i>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="row">
-        <div class="col-md-12 mt-3">
+        <div class="col-12 p-0 mt-3">
           <div class="form-group">
-            <!-- <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a> -->
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-            <input [disabled]="abilitarBtnSend()" (click)="submit()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+            <input [disabled]="abilitarBtnSend()" (click)="submit()" type="submit" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
           </div>
         </div>
       </div>
     </div>
-    <!-- </div> -->
   </div>
 
-  <div class="col-md-7">
+  <div class="col-7">
     <h4>Listado articulos</h4>
     <div #cardTabla id="cardTabla" class="card cardListados">
       <div>

@@ -3,9 +3,9 @@
     <h4 class="negrita">{{ titulo }}</h4>
     <div class="contenedorRegistro">
       <div class="card card-padding sombra">
-        <form [formGroup]="form" (ngSubmit)="submit(form)">
+        <form [formGroup]="form">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-6 p-0 pr-2">
               <div>
                 <label class="mr-2">
                   <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label
@@ -20,9 +20,11 @@
                 <div class="input-group">
                   <input
                     type="text"
+                    id="campoCedula"
                     [textMask]="{ mask: pattern.cedula }"
                     class="form-control"
                     formControlName="cedula"
+                    (keydown.enter)="saltar('campoTelefono')"
                     placeholder="___-_______-_"
                     autocomplete="off"
                     (keyup)="checkDocumento('cedula', $event)"
@@ -45,8 +47,10 @@
                   <input
                     type="text"
                     class="form-control"
+                    id="campoRnc"
                     [textMask]="{ mask: pattern.rnc }"
                     formControlName="rnc"
+                    (keydown.enter)="saltar('campoTelefono')"
                     placeholder="___-_____-_"
                     autocomplete="off"
                     (keyup)="checkDocumento('rnc', $event)"
@@ -65,15 +69,24 @@
               </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-6 p-0 pl-2">
               <div class="form-group mb-2" [appMsgError]="'telefono'" [form]="form">
                 <label class="control-label">Telefono: <span style="color: red">*</span></label>
-                <input type="text" class="form-control" [textMask]="{ mask: pattern.phone }" formControlName="telefono" placeholder="(___) ___-____" autocomplete="off" />
+                <input
+                  (keydown.enter)="saltar('campoNombre')"
+                  type="text"
+                  id="campoTelefono"
+                  class="form-control"
+                  [textMask]="{ mask: pattern.phone }"
+                  formControlName="telefono"
+                  placeholder="(___) ___-____"
+                  autocomplete="off"
+                />
                 <span id="msgContainer_telefono"></span>
               </div>
             </div>
 
-            <div class="col-md-12">
+            <div class="col-12 p-0">
               <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                 <label class="control-label">Nombre: <span style="color: red">*</span></label>
                 <input
@@ -82,6 +95,7 @@
                   (keyup)="capitalice('nombre', $event.target.value)"
                   placeholder="Introduzca nombre"
                   class="form-control"
+                  (keydown.enter)="saltar('campoEmail')"
                   id="campoNombre"
                   autocomplete="off"
                   autofocus
@@ -90,34 +104,44 @@
               </div>
             </div>
 
-            <div class="col-md-12">
+            <div class="col-12 p-0">
               <div class="form-group" [appMsgError]="'email'" [form]="form">
                 <label class="control-label">Email:</label>
-                <input type="text" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
+                <input
+                  type="text"
+                  id="campoEmail"
+                  (keydown.enter)="saltar('campoDir')"
+                  formControlName="email"
+                  placeholder="Introduzca email"
+                  class="form-control"
+                  autocomplete="off"
+                />
 
                 <span id="msgContainer_email"></span>
               </div>
             </div>
 
-            <div class="col-md-12">
+            <div class="col-12 p-0">
               <div class="form-group" [appMsgError]="'direccion'" [form]="form">
                 <label class="control-label">Direccion: <span style="color: red">*</span></label>
                 <textarea
+                  id="campoDir"
                   formControlName="direccion"
                   (keyup)="capitalice('direccion', $event.target.value)"
                   placeholder="Ingrese la direccion"
                   cols="100"
-                  rows="2"
+                  rows="3"
                   class="form-control"
                 ></textarea>
                 <span id="msgContainer_direccion"></span>
               </div>
             </div>
-          </div>
-          <div class="col-md-12 p-0">
-            <div class="form-group">
-              <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-              <input [disabled]="abilitarSend()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+
+            <div class="col-12 p-0 mt-3">
+              <div class="form-group">
+                <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                <input [disabled]="formIsInvalid()" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" style="max-width: 6rem" />
+              </div>
             </div>
           </div>
         </form>
@@ -136,6 +160,7 @@
         (DELETE)="abrirModal('borrar', $event.ARG)"
         [quitarAScorll]="-20"
         [data]="listaSuplidores"
+        [id_tabla]="'listaSuplidores'"
         (paginateChange)="getSuplidores($event)"
         [focusRow]="false"
       ></app-tablas>

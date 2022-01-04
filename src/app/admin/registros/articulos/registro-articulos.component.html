@@ -1,5 +1,5 @@
 <div class="row" style="height: calc(100% - 60px)">
-  <div class="col-md-6 contenedorRegistro">
+  <div class="col-6 contenedorRegistro">
     <h4 class="negrita">{{ titulo }}</h4>
     <div class="card card-padding sombra">
       <form [formGroup]="form">
@@ -31,7 +31,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-12 p-0">
+          <div class="col-12 p-0">
             <div class="form-group">
               <label class="control-label">Nombre: <span style="color: red">*</span></label>
               <input
@@ -54,7 +54,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6 p-0">
+          <div class="col-6 p-0">
             <div class="form-group">
               <label class="control-label">Tipo: <span style="color: red">*</span></label>
               <select
@@ -78,7 +78,7 @@
             </div>
           </div>
 
-          <div *ngIf="form.controls['tipo_articulo_id'].value == 3" class="col-md-6 pr-0">
+          <div *ngIf="form.controls['tipo_articulo_id'].value == 3" class="col-6 pr-0">
             <div class="form-group">
               <label class="control-label">Vendido en: <span style="color: red">*</span></label>
               <select formControlName="vendido_en" (keydown.enter)="saltar('cantidad_formula', -1)" id="vendido" class="form-control" value="">
@@ -97,7 +97,7 @@
         </div>
 
         <div *ngIf="TIPOARTICULO !== 'Producto terminado'" class="row">
-          <div class="col-md-6 p-0">
+          <div class="col-6 p-0">
             <div class="form-group">
               <label class="control-label">Comprado en: <span style="color: red">*</span></label>
               <!-- (keydown.enter)="saltar(TIPOARTICULO === 'Materia prima' ? 'vendido' : 'costo_principal')" -->
@@ -119,7 +119,7 @@
             </div>
           </div>
           <!--  -->
-          <div class="col-md-6 pr-0">
+          <div class="col-6 pr-0">
             <div class="form-group">
               <label class="control-label">Vendido en: <span style="color: red">*</span></label>
               <select formControlName="vendido_en" (keydown.enter)="saltar('costo_principal')" id="vendido" class="form-control" value="">
@@ -136,7 +136,7 @@
             </div>
           </div>
           <!--  -->
-          <div class="col-md-6 p-0">
+          <div class="col-6 p-0">
             <div class="form-group">
               <label class="control-label">Costo: <span style="color: red">*</span></label>
               <input
@@ -160,7 +160,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6 pr-0">
+          <div class="col-6 pr-0">
             <div class="form-group">
               <label class="control-label">Precio venta: <span style="color: red">*</span></label>
               <input
@@ -184,7 +184,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6 p-0">
+          <div class="col-6 p-0">
             <div class="form-group">
               <label class="control-label">Alertar existencia: <span style="color: red">*</span></label>
               <div class="row">
@@ -341,7 +341,7 @@
           <hr *ngIf="TIPOARTICULO === 'Producto terminado'" class="raya mt-1" />
 
           <div class="row">
-            <div class="col-md-4 pl-0">
+            <div class="col-4 pl-0">
               <div class="form-group">
                 <label class="control-label">Otros Costos: <span style="color: red">*</span></label>
                 <input
@@ -364,7 +364,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-4 pl-0">
+            <div class="col-4 pl-0">
               <div class="form-group">
                 <label class="control-label">Costo: <span style="color: red">*</span></label>
                 <input
@@ -389,7 +389,7 @@
               </div>
             </div>
 
-            <div class="col-md-4 p-0">
+            <div class="col-4 p-0">
               <div class="form-group">
                 <label class="control-label">Precio venta: <span style="color: red">*</span></label>
                 <input
@@ -412,7 +412,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-6 mt-1 p-0">
+            <div class="col-6 mt-1 p-0">
               <div class="form-group">
                 <label class="control-label">Alertar existencia: </label>
                 <div class="row">
@@ -462,7 +462,7 @@
         <!-- ======================================================================================================================= -->
 
         <div class="row" *ngIf="form.controls['medida'].value === 'Quintal' && TIPOARTICULO !== 'Producto terminado'">
-          <div class="col-md-3 p-0">
+          <div class="col-3 p-0">
             <label class="control-label">Precio por libra </label>
 
             <div class="form-group">
@@ -495,7 +495,7 @@
         <div class="row" *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Saco'">
           <span class="w-100 text-green">Contenido {{ form.controls['medida'].value }}</span>
 
-          <div class="col-md-3 p-0">
+          <div class="col-3 p-0">
             <label class="control-label">Contiene: </label>
             <div class="form-group">
               <input
@@ -521,7 +521,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-5">
+          <div class="col-5">
             <div class="form-group">
               <label class="control-label text-transparent">medida </label>
               <select
@@ -548,7 +548,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-4 p-0">
+          <div class="col-4 p-0">
             <div class="form-group">
               <label class="control-label">Precio </label> {{ ' ' }}
               <label class="control-label">{{ form.controls['medida_contenido_padre'].value }} </label>
@@ -580,7 +580,7 @@
         <!-- ======================================================================================================================= -->
         <div class="row" *ngIf="form.controls['medida_contenido_padre'].value === 'Paquete'">
           <span class="w-100 text-green">Contenido Paquete</span>
-          <div class="col-md-3 p-0">
+          <div class="col-3 p-0">
             <label class="control-label">Contiene: </label>
             <div class="form-group">
               <input
@@ -605,7 +605,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-5">
+          <div class="col-5">
             <div class="form-group">
               <label class="control-label text-transparent">medida </label>
               <select (keydown.enter)="saltar('precio_hijo')" id="medidaHijo" formControlName="medida_contenido_hijo" class="form-control" value="">
@@ -621,7 +621,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-4 p-0">
+          <div class="col-4 p-0">
             <div class="form-group">
               <label class="control-label">Precio </label> {{ ' ' }}
               <label class="control-label">{{ form.controls['medida_contenido_hijo'].value }} </label>
@@ -648,7 +648,7 @@
         </div>
       </form>
       <div class="row">
-        <div class="col-md-12 mt-3 p-0">
+        <div class="col-12 mt-3 p-0">
           <div class="form-group">
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
             <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
@@ -664,7 +664,7 @@
     </div>
   </div>
 
-  <div class="col-md-6 pl-0">
+  <div class="col-6 pl-0">
     <h4>Listado articulos</h4>
     <div #cardTabla id="cardTabla" class="card cardListados">
       <app-tablas

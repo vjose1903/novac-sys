@@ -1,13 +1,13 @@
 <h4 class="negrita">Reportes</h4>
 <div class="row">
-  <div class="col-6">
+  <div class="col-6 p-0">
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 p-0 pr-2">
         <div class="card card-padding sombra">
           <span class="bntLetra" (click)="formarObjModal('cuadre')"><i class="fas fa-cash-register"></i> Cuadre de caja </span>
         </div>
       </div>
-      <div class="col-12 mt-3">
+      <div class="col-12 p-0 pr-2 mt-3">
         <div class="card card-padding sombra">
           <h5 class="negrita subrayado">Ventas</h5>
 
@@ -16,11 +16,18 @@
           <span class="bntLetra" (click)="formarObjModal('ventas_productos')"> <i class="fas fa-shopping-basket"></i> Relación de productos vendidos </span>
         </div>
       </div>
+      <div class="col-12 p-0 pr-2 mt-3">
+        <div class="card card-padding sombra">
+          <h5 class="negrita subrayado">Productos</h5>
+          <span class="bntLetra" (click)="formarObjModal('inventario')"> <i class="fas fa-boxes"></i> Inventario </span>
+          <span class="bntLetra" (click)="formarObjModal('suplidor_prod')"> <i class="fas fa-user-tag"></i> Suplidor por producto </span>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="col-6">
+  <div class="col-6 p-0 pl-2">
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 p-0">
         <div class="card card-padding sombra">
           <h5 class="negrita subrayado">Cuentas</h5>
           <span class="bntLetra" (click)="formarObjModal('cuentas_cobrar_cliente')">
@@ -32,20 +39,9 @@
           </span>
         </div>
       </div>
-      <div class="col-12 mt-3">
+      <div class="col-12 p-0 pl-2 mt-3">
         <div class="card card-padding sombra">
           <span class="bntLetra" (click)="formarObjModal('recibos')"> <i class="fas fa-hand-holding-usd"></i> Recibos ingreso </span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-6">
-    <div class="row">
-      <div class="col-12 mt-3">
-        <div class="card card-padding sombra">
-          <h5 class="negrita subrayado">Productos</h5>
-          <span class="bntLetra" (click)="formarObjModal('inventario')"> <i class="fas fa-boxes"></i> Inventario </span>
-          <span class="bntLetra" (click)="formarObjModal('suplidor_prod')"> <i class="fas fa-user-tag"></i> Suplidor por producto </span>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { mixinClass } from '../../mixinClass';
+import { ArticuloC } from '../../registros/articulos/articulo';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -35,6 +36,8 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   lista_tipos_facturas: any;
   propietario_factura: any;
   paqueteComprobante;
+
+  articuloClass = new ArticuloC();
   constructor(private dbServ: DBservice, private activeRoute: ActivatedRoute, private router: Router) {
     super();
   }
@@ -225,15 +228,11 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async getPrecioSaco(factura, callback = (arg) => {}) {
-    try {
-      const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente)['FechaFactura'];
-      const res = await this.dbServ.getArticulosFiltrados('Saco sistema', 1, 1, true, false, fechaFactura, 'todos').toPromise();
+    const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente)['FechaFactura'];
 
+    this.articuloClass.getArticulosFiltrado({ buscar: 'Saco sistema', fecha: fechaFactura, paginado: false }).then((res) => {
       callback({ estado: true, precio_saco: res.data[0].precio_principal });
-    } catch (error) {
-      this.fun.toastError('Error calculando el precio del saco', 'ERROR');
-      callback({ estado: false });
-    }
+    });
   }
 
   getIndexNota(id_) {

@@ -1,16 +1,15 @@
 <div class="row" style="height: calc(100% - 60px)">
   <div class="col-5 contenedorRegistro pr-0">
-    <!-- <div class=""> -->
     <h4 class="negrita">{{ titulo }}</h4>
     <div class="card card-padding">
-      <form [formGroup]="form" (ngSubmit)="submit(form)">
+      <form [formGroup]="form">
         <div class="row">
-          <div class="col-6">
+          <div class="col-6 p-0">
             <app-upload-img (getPhotoData)="getPhotoData($event)"></app-upload-img>
           </div>
           <div class="col-6 p-0">
-            <div class="row m-0">
-              <div class="pl-0 col-12">
+            <div class="row">
+              <div class="pr-0 col-12">
                 <div>
                   <label class="mr-2">
                     <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label
@@ -31,6 +30,7 @@
                       formControlName="cedula"
                       placeholder="___-_______-_"
                       (keyup)="checkDocumento('cedula', $event)"
+                      (keydown.enter)="saltar('campoNombre')"
                       autocomplete="off"
                     />
 
@@ -56,6 +56,7 @@
                       placeholder="___-_____-_"
                       autocomplete="off"
                       (keyup)="checkDocumento('rnc', $event)"
+                      (keydown.enter)="saltar('campoNombre')"
                     />
 
                     <div
@@ -70,12 +71,13 @@
                   <span id="msgContainer_rnc"></span>
                 </div>
               </div>
-              <div class="pl-0 col-12">
+              <div class="pr-0 col-12">
                 <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                   <label class="control-label">Nombre: <span style="color: red">*</span></label>
                   <input
                     id="campoNombre"
                     (keyup)="capitalice('nombre', $event.target.value)"
+                    (keydown.enter)="saltar('campoApellido')"
                     type="text"
                     formControlName="nombre"
                     placeholder="Introduzca nombre"
@@ -86,12 +88,13 @@
                   <span id="msgContainer_nombre"></span>
                 </div>
               </div>
-              <div class="pl-0 col-12 mb-3">
+              <div class="pr-0 col-12 mb-3">
                 <div class="form-group" [appMsgError]="'apellido'" [form]="form">
                   <label class="control-label">Apellido: <span style="color: red">*</span></label>
                   <input
                     id="campoApellido"
                     (keyup)="capitalice('apellido', $event.target.value)"
+                    (keydown.enter)="saltar('campoTelefono')"
                     type="text"
                     formControlName="apellido"
                     placeholder="Introduzca apellido"
@@ -104,30 +107,39 @@
             </div>
           </div>
 
-          <div class="col-6 mt-4">
+          <div class="col-6 p-0 pr-2 mt-4">
             <div class="form-group" [appMsgError]="'telefono'" [form]="form">
               <label class="control-label">Telefono: <span style="color: red">*</span></label>
-              <input type="text" class="form-control" [textMask]="{ mask: phoneMask }" formControlName="telefono" placeholder="(___) ___-____" autocomplete="off" />
+              <input
+                id="campoTelefono"
+                type="text"
+                class="form-control"
+                (keydown.enter)="saltar('campoSexo')"
+                [textMask]="{ mask: phoneMask }"
+                formControlName="telefono"
+                placeholder="(___) ___-____"
+                autocomplete="off"
+              />
               <span id="msgContainer_telefono"></span>
             </div>
           </div>
 
-          <div class="col-6 pl-0 mt-4">
+          <div class="col-6 p-0 pl-2 mt-4">
             <div class="form-group" [appMsgError]="'sexo'" [form]="form">
               <label class="control-label">Sexo: <span style="color: red">*</span></label>
-              <select formControlName="sexo" class="form-control">
-                <option value="" disabled selected hidden>Sexo</option>
+              <select id="campoSexo" formControlName="sexo" class="form-control" (keydown.enter)="saltar('campoDias')">
+                <option value="{{ null }}" disabled>Sexo</option>
                 <option value="M">Masculino</option>
                 <option value="F">Femenino</option>
               </select>
               <span id="msgContainer_sexo"></span>
             </div>
           </div>
-          <div class="col-6">
+          <div class="col-6 p-0 pr-2">
             <div class="form-group" [appMsgError]="'limite_credito'" [form]="form">
               <label class="control-label">Dias credito: <span style="color: red">*</span></label>
-              <select formControlName="limite_credito" class="form-control">
-                <option value="" disabled selected hidden>Limite</option>
+              <select id="campoDias" formControlName="limite_credito" class="form-control" (keydown.enter)="saltar('maximo_credito')">
+                <option value="{{ null }}" disabled>Seleccione</option>
                 <option value="15">15 dias</option>
                 <option value="30">30 dias</option>
               </select>
@@ -135,7 +147,7 @@
             </div>
           </div>
 
-          <div class="col-6 pl-0">
+          <div class="col-6 p-0 pl-2">
             <div class="form-group" [appMsgError]="'maximo_credito'" [form]="form">
               <label class="control-label">Limite de credito: <span style="color: red">*</span></label>
 
@@ -145,6 +157,7 @@
                 (blur)="revisarPrecio('maximo_credito')"
                 formControlName="maximo_credito"
                 id="maximo_credito"
+                (keydown.enter)="saltar('campoVendedor')"
                 placeholder="cantidad maxima"
                 autocomplete="off"
               />
@@ -152,17 +165,18 @@
             </div>
           </div>
 
-          <div class="col-6">
+          <div class="col-6 p-0 pr-2">
             <div class="form-group" [appMsgError]="'vendedor_id'" [form]="form">
               <label class="control-label">Vendedor: <span style="color: red">*</span></label>
-              <select formControlName="vendedor_id" class="form-control">
+              <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('campoDir')">
+                <option value="{{ null }}" disabled>Seleccione</option>
                 <option *ngFor="let item of vendedores" value="{{ item.id }}">{{ item.nombreCompleto }}</option>
               </select>
               <span id="msgContainer_vendedor_id"></span>
             </div>
           </div>
 
-          <div class="col-12">
+          <div class="col-12 p-0">
             <div class="form-group" [appMsgError]="'direccion'" [form]="form">
               <label class="control-label">Direccion <span style="color: red">*</span></label>
               <textarea
@@ -176,18 +190,15 @@
               <span id="msgContainer_direccion"></span>
             </div>
           </div>
-        </div>
 
-        <div class="mt-3">
           <div class="form-group">
-            <!-- <a class="btn mr-2" id="btn-gris" (click)="atras()">Atras</a> -->
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-            <input [disabled]="abilitarSend()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
+
+            <input [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
           </div>
         </div>
       </form>
     </div>
-    <!-- </div> -->
   </div>
   <div class="col-7">
     <h4>Listado clientes</h4>

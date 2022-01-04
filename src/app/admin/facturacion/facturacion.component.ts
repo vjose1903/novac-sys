@@ -12,6 +12,7 @@ import { mixinClass } from '../mixinClass';
 import { FacturacionService } from './facturacion.service';
 import { modalClass } from '../components/modal/modal';
 import { Subscription } from 'rxjs';
+import { ArticuloC } from '../registros/articulos/articulo';
 
 @Component({
   selector: 'app-facturacion',
@@ -33,8 +34,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     // alt 18
     event.stopPropagation();
     const key = event.keyCode;
-
-    console.log('event ', event);
 
     if (event.type === 'keydown') {
       if (!this.secuenciaKeys.includes(key)) this.secuenciaKeys.push(key);
@@ -108,6 +107,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   newCuerpo: any[];
   paqueteComprobante: any;
   subFactG: Subscription;
+  articuloClass = new ArticuloC();
 
   constructor(
     public mServ: ModalService,
@@ -1026,12 +1026,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     if (this.articulosAcambiar.length > 0) {
       for (let i = 0; i < this.articulosAcambiar.length; i++) {
         const articulo = this.articulosAcambiar[i];
-        try {
-          const res = await this.dbServ.editarArticulo(articulo).toPromise();
-        } catch (error) {
-          console.error(error);
-          this.fun.toastError('Error actualizando costos articulos.', 'ERROR');
-        }
+
+        this.articuloClass.createUpdateOne(articulo).then((res) => {});
       }
     }
   }
