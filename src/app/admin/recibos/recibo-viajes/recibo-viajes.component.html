@@ -24,13 +24,13 @@
 
   <div class="col-5">
     <div>
-      <span *ngIf="viajes_pendientes_cant > 0" class="badge red text-white debe mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
-      <span *ngIf="viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge blue text-white debe mb-3"
+      <span *ngIf="viajes_pendientes_cant > 0" class="badge text-shadow red text-white  mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
+      <span *ngIf="viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge text-shadow blue text-white  mb-3"
         >Cantidad de viajes completados {{ viajes_completados_cant }}</span
       >
-      <span *ngIf="viajes?.length === 0" class="badge green text-white debe mb-3">No tiene viajes pendientes</span>
+      <span *ngIf="viajes?.length === 0" class="badge text-shadow green text-white  mb-3">No tiene viajes pendientes</span>
 
-      <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant === 0" class="badge green text-white debe mb-3">Todos los viajes fueron completados</span>
+      <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant === 0" class="badge text-shadow green text-white  mb-3">Todos los viajes fueron completados</span>
 
       <div *ngIf="viajes?.length > 0 && viajes_completados_cant > 0">
         <div class="d-flex justify-content-between">

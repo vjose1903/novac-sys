@@ -283,7 +283,7 @@
 
   <p-dialog
     *ngIf="tipoModal === 'historial_pago'"
-    header="historial de abonos a facturas"
+    header="historial de moviemientos a balance de factura"
     [draggable]="false"
     [(visible)]="showModal"
     [modal]="false"
@@ -293,7 +293,7 @@
     (onHide)="reinicioModal()"
     [blockScroll]="true"
   >
-    <app-modal-historial-pagos [pagos]="seleccionModal"></app-modal-historial-pagos>
+    <app-modal-historial-pagos [detalles]="seleccionModal"></app-modal-historial-pagos>
   </p-dialog>
 
   <!-- ================================================================================================================================ -->
@@ -441,7 +441,7 @@
           <div class="p-1" *ngIf="mostrar_para === 'solo_ver'">
             <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
             <button (click)="accion(true, 'reimrimir')" type="submit" class="btn btn-amarillo mr-2">Reimprimir</button>
-            <button (click)="accion(true)" type="submit" class="btn btn-verde mr-2">Editar</button>
+            <button *ngIf="seleccionModal?.estado" (click)="accion(true)" type="submit" class="btn btn-verde mr-2">Editar</button>
           </div>
 
           <div *ngIf="mostrar_para === 'nota_credito' || mostrar_para === 'nota_debito'">

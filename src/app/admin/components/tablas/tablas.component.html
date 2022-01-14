@@ -1,7 +1,9 @@
 <div #dinamicTable>
   <div #searchDiv *ngIf="search" class="searchDiv">
     <label class="search-label" for="search">Busqueda </label>
-    <input [(ngModel)]="searchText" id="search" class="search-input" (ngModelChange)="awaitTyping($event)" />
+    <div style="max-width: 12rem">
+      <input [(ngModel)]="searchText" id="search" class="search-input form-control" (ngModelChange)="awaitTyping($event)" />
+    </div>
   </div>
 
   <!-- <div style="border-radius: 10px 10px 0px 0px;" class="tableBodyScroll"> -->
@@ -133,7 +135,7 @@
               >
                 <div *ngIf="!column.checkNumber">
                   <input
-                    class="form-control m-0 inputTabla"
+                    class="form-control m-0 inputTabla {{ column.inputType ? (column.inputType == 'number' ? 'input_cantidad' : '') : '' }}"
                     id="inputNu-{{ i }}"
                     [min]="dato.min_ ? dato.min_ : 0"
                     [max]="dato.max_ ? dato.max_ : null"

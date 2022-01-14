@@ -457,10 +457,74 @@ input[type="checkbox"]:disabled {
   }
 }
 /* ====================================================== */
+/* BADGE */
+/* ====================================================== */
+.badge {
+  font-size: 1rem;
+  padding: 0.5rem;
+  box-shadow: 1px 1px 1px black;
+  letter-spacing: 1px;
+
+  &.text-shadow {
+    text-shadow: 1px 1px 1px #000000cf;
+  }
+}
+
+.bg-secondary {
+  background-color: #6c757d !important;
+}
+.bg-green {
+  background: #459845;
+}
+
+/* ====================================================== */
+/* TAB VIEW */
+/* ====================================================== */
+.my_tabView {
+  & .p-tabview-panels {
+    border: 0px solid transparent !important;
+  }
+
+  & .p-tabview-nav li {
+    margin-right: 0 !important;
+    & .p-tabview-nav-link {
+      border: 1px solid #c8c8c8 !important;
+      border-color: #c8c8c866 !important;
+      background: transparent !important;
+      color: #333333;
+      padding: 0.5rem 2rem !important;
+      border-bottom: 2px solid #b6b6b6 !important;
+      &:focus {
+        box-shadow: 0 0 0 0rem transparent !important;
+      }
+    }
+
+    &.p-highlight .p-tabview-nav-link {
+      background: #007ad900 !important;
+      border-color: #c8c8c866 !important;
+      color: #42c05b !important;
+      border-bottom: 2px solid #42c05b !important;
+    }
+  }
+}
+
+.noTabView {
+  a {
+    pointer-events: all !important;
+    cursor: not-allowed !important;
+    color: #a0a0a088 !important;
+  }
+}
+
+.tabViewTootip {
+  z-index: 9999999999 !important;
+}
+/* ====================================================== */
 /* INPUT BUSCAR */
 /* ====================================================== */
 
 .searchDiv {
+  display: flex;
   .search-input {
     margin: 0rem 0rem 0.8rem 0.5rem;
     height: calc(1em + 0.8rem + 2px);
@@ -468,12 +532,6 @@ input[type="checkbox"]:disabled {
     font-size: 0.8rem;
     font-weight: 600;
     line-height: 2;
-    color: #495057;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   }
 }
 

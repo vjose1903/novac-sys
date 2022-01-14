@@ -64,17 +64,16 @@ export class FormVentasComponent extends mixinClass implements OnInit {
 
   async getArticulos(arg) {
     if (arg.term && arg.term !== '') {
-      try {
-
-        this.articuloClass.getArticulosFiltrado({ buscar: arg.term, fecha: this.Fecha, paginado: false, is_compra: true }).then((res) => {
-          console.log('res ', res);
-
-          this.listaArticulos = res;
-        });
-      } catch (error) {
-        console.error(error);
-        this.fun.toastError('Error buscando articulos registrados.', 'ERROR');
-      }
+      this.fun.awaitTyping().then((res) => {
+        try {
+          this.articuloClass
+            .getArticulosFiltrado({ buscar: arg.term, fecha: this.Fecha, paginado: false, is_compra: true })
+            .then((res) => (this.listaArticulos = res['data']));
+        } catch (error) {
+          console.error(error);
+          this.fun.toastError('Error buscando articulos registrados.', 'ERROR');
+        }
+      });
     } else {
       this.listaArticulos = [];
     }

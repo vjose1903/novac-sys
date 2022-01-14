@@ -47,10 +47,10 @@ span.canceladaContent {
   align-items: center;
   > span.canceladaContent {
     font-size: 6rem;
-    color: red;
+    color: #ff000078;
     z-index: 1000;
     font-weight: 510;
-    transform: rotate(15deg);
+    transform: rotate(10deg);
     text-shadow: 2px 2px 12px #585858eb;
   }
 }

@@ -10,18 +10,9 @@
   color: #779882c4;
 }
 
-.recibe {
-  font-size: 0.9rem;
-  padding: 0.5rem;
-  letter-spacing: 1px;
-  box-shadow: 1px 1px 1px black;
-}
-.debe {
-  font-size: 0.9rem;
-  padding: 0.5rem;
-  text-shadow: 1px 1px 1px #000000cf;
-  letter-spacing: 1px;
-  box-shadow: 1px 1px 1px black;
+.detalleBalance {
+  display: flex;
+  justify-content: space-between;
 }
 
 .IngresosRow {
@@ -46,5 +37,44 @@
   }
   .abajo {
     grid-area: abajo;
+  }
+}
+
+.clienteAdepositar {
+  display: grid;
+  height: 100%;
+  grid-template-areas:
+    "nombre_cliente"
+    "cuerpo"
+    "porcentaje";
+  grid-template-rows: min-content auto min-content;
+
+  .nombre_cliente {
+    grid-area: nombre_cliente;
+    // background-color: red;
+  }
+  .cuerpo {
+    grid-area: cuerpo;
+    // background-color: green;
+
+    .cajas {
+      display: grid;
+      height: 100%;
+      grid-template-areas: "izquierda derecha";
+      grid-template-columns: auto auto;
+      grid-template-rows: auto;
+      .izquierda {
+        grid-area: izquierda;
+        // background-color: yellow;
+      }
+      .derecha {
+        grid-area: derecha;
+        // background-color: plum;
+      }
+    }
+  }
+  .porcentaje {
+    grid-area: porcentaje;
+    // background-color: blue;
   }
 }

@@ -25,51 +25,22 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   // =============================================
 
   info = [
-    {
-      titulo: '1',
-      key: 'historyPagos',
-      text_color: 'colorEstado',
-      isIcon: true,
-      color: true,
-      estilos: [{ width: '2rem' }, { color: '#8ef3a3' }],
-    },
-    {
-      titulo: 'NCF',
-      estilos: [{ width: '7rem' }],
-      key: 'numero_comprobante',
-    },
-    {
-      titulo: 'Fecha Facturacion',
-      key: 'fecha',
-    },
-    {
-      titulo: 'Fecha Vencimiento',
-      text_color: 'colorFecha',
-      key: 'fechaV',
-      color: true,
-    },
-    {
-      titulo: 'Total facturado',
-      key: 'total_factura',
-      formatoNumero: true,
-    },
-    {
-      titulo: 'Balance factura',
-      key: 'balance',
-      formatoNumero: true,
-    },
+    { titulo: '1', key: 'historyPagos', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }, { color: '#8ef3a3' }] },
+    { titulo: 'NCF', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
+    { titulo: 'Fecha Facturacion', key: 'fecha' },
+    { titulo: 'Fecha Vencimiento', text_color: 'colorFecha', key: 'fechaV', color: true },
+    { titulo: 'Total facturado', key: 'total_factura', formatoNumero: true },
+    { titulo: 'Balance factura', key: 'balance', formatoNumero: true },
     {
       titulo: 'Seleccione',
       tipo: 'check',
       key: 'select',
       select_all: false,
       estilos: [{ width: '7rem', padding: '0.6rem 0rem' }],
-
       disable: [{ kind: 'campo', target: 'is_viaje', value: [true] }],
     },
     {
       titulo: 'Pago Total',
-
       tipo: 'check',
       key: 'pagoT',
       select_all: false,
@@ -81,12 +52,10 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       tipo: 'input',
       key: 'monto',
       checkNumber: true,
-
       disable: [
         { kind: 'campo', target: 'select', value: [false] },
         { kind: 'campo', target: 'pagoT', value: [true] },
       ],
-
       title: '',
     },
   ];
@@ -99,6 +68,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
   totalFacturado: number;
   totalPagado: number;
+  totalNotas: number;
   totalPagadoPorciento: number;
   recibiendo = 0;
   restando = 0;
@@ -182,85 +152,66 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     this.sumarTotalRecibo();
   }
 
-  recalcularMonto(monto_original, notas) {
-    let monto = monto_original;
-    for (let i = 0; i < notas.length; i++) {
-      const element = notas[i];
-      const totalABS = Math.abs(element.total_factura);
-
-      if (element.tipo_factura_id === 5) monto -= totalABS;
-      else if (element.tipo_factura_id === 4) monto += totalABS;
-    }
-    return monto;
-  }
-
   async pedirFacturasPorCliente(cliente_id, e) {
     this.facturas = undefined;
     this.totalFacturado = 0;
     this.totalPagado = 0;
+    this.totalNotas = 0;
     this.totalPagadoPorciento = 0;
 
     const page = e.page;
     const per_page = e.per_page;
 
-    try {
-      const fechaA = moment().format('YYYY-MM-DD');
-      this.facturas = await this.dbServ
-        .getFacturasByClienteIdAndPagada(cliente_id, false, page, per_page, true)
-        .pipe(
-          map(
-            (fact) =>
-              (fact = fact.map((val) => {
-                val.secuencia = _.padStart(val.numero_factura, 8, '0');
-                val.fecha = moment(val.fecha_equivalente).format('DD-MM-YYYY');
-                val.fechaV = val.condicion === 'Crédito' ? moment(val.fecha_vencimiento).format('DD-MM-YYYY') : null;
-                val.select = false;
-                val.pagoT = false;
-                val.pago_a_tiempo = val.fecha_vencimiento > fechaA ? true : false;
-                val.colorFecha = moment(val.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
+    const fechaA = moment().format('YYYY-MM-DD');
+    this.facturas = await this.dbServ
+      .getFacturasByClienteIdAndPagada(cliente_id, false, page, per_page, true)
+      .pipe(
+        map(
+          (val) =>
+            (val = val['data'].map((factura) => {
+              factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
+              factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
+              factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD-MM-YYYY') : null;
+              factura.select = false;
+              factura.pagoT = false;
+              factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
+              factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
+              factura.monto = 0;
 
-                val.balance = this.recalcularMonto(val.balance, val.notas);
-                val.total_factura = this.recalcularMonto(val.total_factura, val.notas);
-                val.monto = 0;
+              factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : factura.pagos.length > 0 ? 'fas fa-comment-dollar' : 'far fa-comment';
+              factura.colorEstado = factura.is_viaje ? 'green' : factura.pagos.length > 0 ? 'black' : 'gris-claro';
+              factura.iconHover = factura.is_viaje ? false : factura.pagos.length > 0 || factura.notas.length > 0 ? true : false;
 
-                val.historyPagos = val.is_viaje ? 'fas fa-truck-moving' : val.pagos.length > 0 ? 'fas fa-comment-dollar' : 'far fa-comment';
-                val.colorEstado = val.is_viaje ? 'green' : val.pagos.length > 0 ? 'black' : 'gris-claro';
-                val.iconHover = val.is_viaje ? false : val.pagos.length > 0 ? true : false;
+              factura.customStyles = {
+                'td-historyPagos': { width: '2rem', 'font-size': '1.2rem' },
+                'td-select': { width: '6rem' },
+                'td-pagoT': { width: '6rem' },
+                'td-numero_comprobante': { width: '7rem' },
+              };
 
-                val.customStyles = {
-                  'td-historyPagos': { width: '2rem', 'font-size': '1.2rem' },
-                  'td-select': { width: '6rem' },
-                  'td-pagoT': { width: '6rem' },
-                  'td-numero_comprobante': { width: '7rem' },
-                };
+              console.log('factura ', factura);
 
-                val.pagos.forEach((abono) => {
-                  this.totalPagado += abono.deposito;
-                });
+              this.totalPagado = _.reduce(factura.pagos, (acumulado, item) => acumulado + item.deposito, this.totalPagado);
+              this.totalNotas = _.reduce(factura.notas, (acumulado, item) => acumulado + Math.abs(item.total_factura), this.totalNotas);
 
-                val.subrayar = val.is_viaje;
-                // val.is_viaje = !val.is_viaje;
+              factura.subrayar = factura.is_viaje;
 
-                this.totalFacturado += val.total_factura;
-                this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
-                this.totalPagadoPorciento = parseFloat(GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento));
-                return val;
-              })),
-          ),
-        )
-        .toPromise();
+              this.totalFacturado += factura.total_factura;
+              this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
+              this.totalPagadoPorciento = parseFloat(GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento));
+              return factura;
+            })),
+        ),
+      )
+      .toPromise();
 
-      this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
+    this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
+    this.restando = this.clienteAdepositar.balance - this.recibiendo;
 
-      console.log('this.facturas ', this.facturas);
 
-      const obj = { total: this.facturas.lenght, tabla: 'facturasPendientes' };
+    const obj = { total: this.facturas.lenght, tabla: 'facturasPendientes' };
 
-      this.tServ.Func_total_paginas(obj);
-    } catch (error) {
-      console.error(error);
-      this.fun.toastError(error, 'ERROR');
-    }
+    this.tServ.Func_total_paginas(obj);
   }
 
   async necesarioStart() {
@@ -270,17 +221,21 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   clickVerPagos(arg) {
     if (arg.column === 'historyPagos') {
       const pagos = this.facturas[arg.index].pagos;
-      if (pagos.length > 0) {
+      const notas = this.facturas[arg.index].notas;
+
+      if (pagos.length > 0 || notas.length > 0) {
         for (let i = 0; i < pagos.length; i++) {
           const pago = pagos[i];
           pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
-          pago.recibo_created_at = moment(pago.recibo_created_at).format('DD/MM/YYYY');
+          pago.fecha_equivalente = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
         }
 
-        const obj = { total: pagos.length, tabla: 'historial_pago' };
-
-        this.abrirModal('historial_pago', pagos);
-        this.tServ.Func_total_paginas(obj);
+        for (let i = 0; i < notas.length; i++) {
+          const nota = notas[i];
+          nota.total_factura = Math.abs(nota.total_factura);
+          nota.fecha_equivalente = moment(nota.fecha_equivalente).format('DD/MM/YYYY');
+        }
+        this.abrirModal('historial_pago', { abonos: pagos, notas: notas });
       }
     }
   }

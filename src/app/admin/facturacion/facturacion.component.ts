@@ -13,6 +13,7 @@ import { FacturacionService } from './facturacion.service';
 import { modalClass } from '../components/modal/modal';
 import { Subscription } from 'rxjs';
 import { ArticuloC } from '../registros/articulos/articulo';
+import { FacturaC } from './factura';
 
 @Component({
   selector: 'app-facturacion',
@@ -107,7 +108,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   newCuerpo: any[];
   paqueteComprobante: any;
   subFactG: Subscription;
+
   articuloClass = new ArticuloC();
+  facturaClass = new FacturaC();
 
   constructor(
     public mServ: ModalService,
@@ -289,9 +292,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
           // TODO: revisar cuando cambie el backend para las facturas
 
-          this.cuerpo.llenarFactura(factura['detalle_facturas_attributes'], true, (res) => {
+          this.cuerpo.llenarFactura(factura['detalle_facturas'], true, (res) => {
             setTimeout(() => {
-              this.getCuerpoFactura(factura['detalle_facturas_attributes'], true);
+              this.getCuerpoFactura(factura['detalle_facturas'], true);
               modalClass.aquienResponder = 'layout';
               this.layServ.nextRefresh(true);
               resolve(true);
@@ -310,7 +313,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.propietario_factura = {};
 
       if (tipo === 'editar') {
-        res = await this.dbServ.getFacturaById(id).toPromise();
+        res = await this.facturaClass.getFacturaById(id);
+        res = res['data'];
         console.log('res editar --> ', res);
 
         this.factura_a_editar = res;
@@ -898,6 +902,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
+  prueba(){
+    console.log("this.CuerpoFactura --> ", this.CuerpoFactura);
+
+  }
+
   resetVariables() {
     this.cuerpo.RESETCUERPO();
     this.rellenarVariables();
@@ -951,7 +960,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
       articulo.costo_principal = costoRow;
       articulo.precio_principal = precioRow;
-      articulo.contenido_articulos_attributes = tempContenido;
+      articulo.contenido_articulos = tempContenido;
       articulo.user_id = this.usuario.id;
 
       const tempEnviar = _.omit(articulo, ['created_at', 'updated_at', 'contenido_articulos']);
@@ -1060,11 +1069,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     if (this.condicion_fact === 'Crédito') {
       let fecha_venci;
-      if (this.metodo === 'venta') {
-        fecha_venci = moment(new Date()).add(this.propietario_factura.limite_credito, 'days').format('DD/MM/YYYY');
-      } else {
-        fecha_venci = moment(this.fecha_vencimiento).format('DD/MM/YYYY');
-      }
+      if (this.metodo === 'venta') fecha_venci = moment(new Date()).add(this.propietario_factura.limite_credito, 'days').format('DD/MM/YYYY');
+      else fecha_venci = moment(this.fecha_vencimiento).format('DD/MM/YYYY');
+
       cabecera_fact['fecha_vencimiento'] = fecha_venci;
       cabecera_fact['pagada'] = false;
       cabecera_fact['balance'] = GLOBAL.parseFloatTwoDecimals(this.TOTAL);
@@ -1106,15 +1113,18 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       cabecera_fact['suplidor_id'] = this.propietario_factura.id;
     }
 
-    cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
+    cabecera_fact['detalle_facturas'] = cuerpo_fact;
     cabecera_fact['FACTURA_DE'] = this.metodo === 'venta' ? 13 : 14;
     cabecera_fact['tipo'] = this.metodo;
     cabecera_fact['user_id'] = empleado.id;
-    cabecera_fact['tiene_nota'] = false;
+    console.log(' ');
+    console.log(':::::::::::::::: ', this.factura_a_editar);
+    console.log(' ');
 
-    if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) {
-      cabecera_fact['vendedor_id'] = Number(this.propietario_factura.vendedor_id);
-    }
+    cabecera_fact['tiene_nota'] = this.factura_a_editar ? this.factura_a_editar.tiene_nota : false;
+
+    if (this.metodo === 'venta' && this.propietario_factura.vendedor_id) cabecera_fact['vendedor_id'] = Number(this.propietario_factura.vendedor_id);
+
     return cabecera_fact;
   }
 
@@ -1125,13 +1135,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       let res;
       const metodo = this.action === 'update' ? 'editar_factura' : '';
 
-      if (metodo === 'editar_factura') {
-        res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();
-        this.fun.toastSuccess('Factura editada correctamente.', 'CORRECTO');
-      } else {
-        res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
-        this.fun.toastSuccess('Factura de ' + this.metodo + ' realizada correctamente.', 'CORRECTO');
-      }
+      if (metodo === 'editar_factura') res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();
+      else res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
 
       if (this.layServ.factura_guardada) this.revisarLocalStorage();
 

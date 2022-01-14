@@ -1,14 +1,16 @@
 import { Component, OnInit, Input } from '@angular/core';
-
+import * as _ from 'lodash';
+import { TablasService } from '../../tablas/tablas.service';
 @Component({
   selector: 'app-modal-historial-pagos',
   templateUrl: './modal-historial-pagos.component.html',
   styleUrls: ['./modal-historial-pagos.component.scss'],
 })
 export class ModalHistorialPagosComponent implements OnInit {
-  @Input() pagos;
+  @Input() detalles;
+  activeIndex = 0;
 
-  info = [
+  info_pagos = [
     {
       titulo: 'NO. recibo',
       key: 'numero_recibo',
@@ -20,11 +22,51 @@ export class ModalHistorialPagosComponent implements OnInit {
     },
     {
       titulo: 'Fecha abono',
-      key: 'recibo_created_at',
+      key: 'fecha_equivalente',
     },
   ];
 
-  constructor() {}
+  info_notas = [
+    {
+      titulo: 'NO. comprobante',
+      key: 'numero_comprobante',
+    },
+    {
+      titulo: 'Crédito',
+      key: 'total_factura',
+      formatoNumero: true,
+    },
+    {
+      titulo: 'Fecha nota',
+      key: 'fecha_equivalente',
+    },
+  ];
+
+  constructor(private tServ: TablasService) {}
+
+  clickTabView(index) {
+    const tipo = index == 0 ? 'abonos' : 'notas';
+    const cantidad = this.arrayHasData(tipo).cant;
+
+    if (index == 0) {
+      if (cantidad > 0) {
+        this.activeIndex = index;
+        const obj = { total: cantidad, tabla: 'historial_movimientos' };
+        this.tServ.Func_total_paginas(obj);
+      } else this.activeIndex = 1;
+    } else {
+      if (cantidad > 0) {
+        this.activeIndex = index;
+        const obj = { total: cantidad, tabla: 'historial_movimientos' };
+        this.tServ.Func_total_paginas(obj);
+      } else this.activeIndex = 0;
+    }
+
+  }
+
+  arrayHasData(tipo) {
+    return { disable: this.detalles[tipo].length === 0, cant: this.detalles[tipo].length };
+  }
 
   ngOnInit() {}
 }

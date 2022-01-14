@@ -610,10 +610,12 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     this.TIPOARTICULO = articulo.descripcion;
     this.is_combo = articulo.is_combo;
 
-    if (articulo.is_combo || (_.has(articulo, 'formulas_productos_terminados') && articulo.formulas_productos_terminados.length)) {
+    if (articulo.is_combo) {
       this.COMPRADOEN = 'Quintal';
       this.form.controls.otros_costos.setValue(GLOBAL.numFormatTwoDecimals(articulo.otros_costos));
-      this.getMateriasP().then((res) => {
+      const res = await this.getMateriasP();
+
+      if (articulo.formulas_productos_terminados.length) {
         this.form.controls.medida.setValue('Quintal');
         this.fillDropAlerta('Quintal');
 
@@ -622,7 +624,9 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
           this.addItem();
           this.fillFormula(ingredient, i);
         }
-      });
+      } else {
+        this.addItem();
+      }
     } else this.COMPRADOEN = articulo.medida;
 
     if (articulo.contenido_articulos.length > 0) this.MEDIDACAJA = articulo.contenido_articulos[0].medida;

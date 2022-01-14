@@ -366,11 +366,9 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
             } catch (error) {}
           }
         }
-        this.facturas_localStorage =_.orderBy(this.facturas_localStorage, ['archivo_id'], ['asc']);
-
-        // this.facturas_localStorage.sort((a, b) => {
-        //   return a.factura_id > b.factura_id ? 1 : -1;
-        // });
+        this.facturas_localStorage = _.orderBy(this.facturas_localStorage, ['archivo_id'], ['asc']);
+      } else {
+        document.getElementById('btn_side_facturas').removeAttribute('data-cant-facturas');
       }
     }, 20);
   }

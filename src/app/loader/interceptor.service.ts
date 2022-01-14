@@ -77,6 +77,9 @@ export class InterceptorService implements HttpInterceptor {
           this.fun.logout();
           this.router.navigateByUrl('/auth/login');
         } else {
+          console.log('response --> ', response);
+          if (_.has(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
+
           if (_.has(response, 'error.msg')) this.handler_msg(response.error.msg, 'error');
         }
 
@@ -99,6 +102,7 @@ export class InterceptorService implements HttpInterceptor {
         const menssage = menssages[i];
 
         if (tipo_ === 'success') this.fun.toastSuccess(menssage, 'CORRECTO');
+        if (tipo_ === 'warning') this.fun.toastWarning(menssage, 'AVISO');
         if (tipo_ === 'error') this.fun.toastError(menssage, 'ERROR');
       }
     }

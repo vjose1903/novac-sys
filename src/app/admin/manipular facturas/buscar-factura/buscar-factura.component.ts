@@ -9,6 +9,7 @@ import { TablasService } from '../../components/tablas/tablas.service';
 import { mixinClass } from '../../mixinClass';
 import { LoaderService } from '../../../loader/loader.service';
 import { ArticuloC } from '../../registros/articulos/articulo';
+import { FacturaC } from '../../facturacion/factura';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -33,66 +34,25 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   tipo_factura_id = null;
   valor: any;
   articuloClass = new ArticuloC();
+  facturaClass = new FacturaC();
   constructor(private dbServ: DBservice, private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
   campo = null;
   placeHolder = '';
   info = [
-    {
-      titulo: ' ',
-      key: 'estatus',
-      text_color: 'colorEstado',
-      isIcon: true,
-      color: true,
-      estilos: [{ width: '2rem' }],
-    },
-    {
-      titulo: 'Numero Fact',
-      key: 'secuencia',
-      estilos: [{ width: '7rem' }],
-    },
-    {
-      titulo: 'Tipo',
-      key: 'tipo_factura',
-    },
-    {
-      titulo: 'Comprobante',
-      key: 'numero_comprobante',
-      estilos: [{ width: '7rem' }],
-    },
-    {
-      titulo: 'Condicion',
-      key: 'condicion',
-      estilos: [{ width: '6rem' }],
-    },
-    {
-      titulo: 'Fecha Facturación',
-      key: 'fecha',
-    },
-    {
-      titulo: 'Fecha Vencimiento',
-      key: 'fechaV',
-    },
-    {
-      titulo: 'Total facturado',
-      key: 'total_factura',
-      formatoNumero: true,
-    },
-    {
-      titulo: 'Balance tactura',
-      key: 'balance',
-      formatoNumero: true,
-    },
-
-    {
-      titulo: 'Seleccione',
-      key: 'select',
-      text_color: 'selectColor',
-      isIcon: true,
-      color: true,
-    },
+    { titulo: ' ', key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }] },
+    { titulo: 'Numero Fact', key: 'secuencia', estilos: [{ width: '7rem' }] },
+    { titulo: 'Tipo', key: 'tipo_factura' },
+    { titulo: 'Comprobante', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+    { titulo: 'Condicion', key: 'condicion', estilos: [{ width: '6rem' }] },
+    { titulo: 'Fecha Facturación', key: 'fecha' },
+    { titulo: 'Fecha Vencimiento', key: 'fechaV' },
+    { titulo: 'Total facturado', key: 'total_factura', formatoNumero: true },
+    { titulo: 'Balance tactura', key: 'balance', formatoNumero: true },
+    { titulo: 'Seleccione', key: 'select', text_color: 'selectColor', isIcon: true, color: true },
   ];
+
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
   ngOnInit() {
@@ -156,14 +116,17 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
               : ' con el numero de factura ' + this.formatoNumeroFactura(this.facturaSelected.numero_factura);
 
           setTimeout(() => this.abrirModal('cancelar', this.facturaSelected), 10);
+          //
         } else if (this.BuscarPara === 'solo_ver') {
           if (res.tipo === 'reimrimir') {
             const obj = { data: this.facturaSelected, type: 'facturacion' };
-
             this.reimprimirFactura(obj);
           } else {
-            this.editarFactura();
+            this.facturaClass.getAll({ afterPath: `custom/canUpdate/${this.facturaSelected.id}` }).then((res) => {
+              setTimeout(() => this.editarFactura(), 10);
+            });
           }
+          //
         } else {
           const url = `/admin/manipular/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
           this.router.navigateByUrl(url);
@@ -195,8 +158,9 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   async getPaqueteComprobante() {
     try {
       const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipo_factu_nota);
-      const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
-      this.paqueteComprobante = paquete.body;
+      const res = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
+
+      this.paqueteComprobante = res['data'] as any;
 
       if (this.paqueteComprobante.fecha_valida !== null) {
         const desde = this.paqueteComprobante.desde;
@@ -259,9 +223,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   async necesarioStart() {
     await this.getTipoFacturas();
 
-    if (this.BuscarPara === 'nota_credito' || this.BuscarPara === 'nota_debito') {
-      await this.getPaqueteComprobante();
-    }
+    if (this.BuscarPara === 'nota_credito' || this.BuscarPara === 'nota_debito') await this.getPaqueteComprobante();
 
     this.enfocarInput('campoI');
   }

@@ -131,6 +131,7 @@ export class MovimientosFormComponent extends mixinClass implements OnInit, Afte
       }
     }
   }
+
   resetForm() {
     this.tipo_movimiento = undefined;
     this.medida = undefined;

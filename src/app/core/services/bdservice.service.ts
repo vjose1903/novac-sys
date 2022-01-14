@@ -290,10 +290,6 @@ export class DBservice {
     return this.peticion(`cabecera_facturas/cliente/${cliente_id}/pagada/${pagada}?page=${page}&per_page=${per_page}&paginado=${paginado}`, 'get');
   }
 
-  getInfoFacturasByArray(ids, campos) {
-    return this.peticion(`custom/getinfo?campos=${campos}&ids=${ids}`, 'get');
-  }
-
   getFacturasById(id) {
     return this.peticion(`cabecera_facturas/${id}`, 'get');
   }

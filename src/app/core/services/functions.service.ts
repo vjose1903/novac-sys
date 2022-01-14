@@ -35,9 +35,11 @@ export class FunctionService {
     localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
 
     const btn_side = document.getElementById('btn_side_facturas');
-    console.log('facturas.length ', facturas.length);
 
-    if (btn_side) btn_side.setAttribute('data-cant-facturas', facturas.length > 0 ? facturas.length : null);
+    if (btn_side) {
+      if (facturas.length.length > 0) btn_side.setAttribute('data-cant-facturas', facturas.length);
+      else btn_side.removeAttribute('data-cant-facturas');
+    }
   }
 
   // __________________________________________________________________________________________________
@@ -149,7 +151,7 @@ export class FunctionService {
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
         if (!event || event.keyCode != 13) resolve(true);
-      }, 150);
+      }, 500);
     });
     return promise;
   }

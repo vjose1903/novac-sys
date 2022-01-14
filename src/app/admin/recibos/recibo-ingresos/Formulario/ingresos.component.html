@@ -4,7 +4,7 @@
   </div>
   <div class="col-12 p-0 arriba">
     <div class="row">
-      <div class="col-5">
+      <div class="col-4">
         <div class="card card-padding sombra">
           <div class="form-group">
             <label class="control-label">Cliente: </label>
@@ -22,25 +22,45 @@
           </div>
         </div>
       </div>
-      <div class="col-7 abajo">
-        <div *ngIf="clienteAdepositar">
-          <div class="text-center">
-            <h1 class="negrita">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h1>
-
-            <span class="badge {{ clienteAdepositar.balance > 0 ? 'red' : 'green' }} text-white debe mb-3">
-              Debe: RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span
-            >
-            <span *ngIf="isOneFacturaWithMonto()" class="badge green debe text-white mb-3 ml-2"> Recibiendo: RD$ {{ formatoNumero(recibiendo) }}</span>
-            <span *ngIf="isOneFacturaWithMonto()" class="badge yellow recibe mb-3 ml-2"> Faltando: RD$ {{ formatoNumero(restando) }}</span>
+      <div class="col-8 pl-0">
+        <div *ngIf="clienteAdepositar" class="clienteAdepositar">
+          <div class="nombre_cliente">
+            <h3 class="negrita mb-0">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h3>
           </div>
-          <div *ngIf="clienteAdepositar.balance > 0" class="d-flex justify-content-between">
-            <span class="negrita">Porcentaje de pago</span>
-            <div>
-              <span class="negrita">RD${{ formatoNumero(totalPagado) }} / </span>
-              <span class="negrita gris">RD${{ formatoNumero(totalFacturado) }}</span>
+          <div class="cuerpo">
+            <div class="cajas">
+              <div class="izquierda pr-2">
+                <span class="w-100 detalleBalance badge bg-info mb-2">
+                  <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span></span
+                >
+                <span class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
+                  <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo) }}</span>
+                </span>
+
+                <span class="w-100 detalleBalance badge bg-warning mb-2">
+                  <span>Faltando:</span> <span>RD$ {{ formatoNumero(restando) }}</span>
+                </span>
+              </div>
+
+              <div class="derecha pl-2">
+                <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white mb-2">
+                  <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
+                </span>
+                <span class="w-100 detalleBalance badge text-shadow bg-primary text-white mb-2">
+                  <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotas) }}</span>
+                </span>
+                <span class="w-100 detalleBalance badge text-shadow bg-danger text-white mb-2">
+                  <span> Debiendo:</span> <span>RD$ {{ formatoNumero(clienteAdepositar.balance) }}</span>
+                </span>
+              </div>
             </div>
           </div>
-          <p-progressBar *ngIf="clienteAdepositar.balance > 0" [value]="totalPagadoPorciento"></p-progressBar>
+          <div class="porcentaje">
+            <div *ngIf="clienteAdepositar.balance > 0" class="d-flex justify-content-between">
+              <span class="negrita">Porcentaje de pago</span>
+            </div>
+            <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>
+          </div>
         </div>
       </div>
     </div>

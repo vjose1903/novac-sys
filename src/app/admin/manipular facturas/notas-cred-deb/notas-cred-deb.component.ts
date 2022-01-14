@@ -8,6 +8,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { mixinClass } from '../../mixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
+import { FacturaC } from '../../facturacion/factura';
+import { NcfC } from '../../registros/ncf/ncf';
+import { ClienteC } from '../../registros/registro-clientes/cliente';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -38,6 +41,9 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   paqueteComprobante;
 
   articuloClass = new ArticuloC();
+  facturaClass = new FacturaC();
+  clientesClass = new ClienteC();
+  ncfClass = new NcfC();
   constructor(private dbServ: DBservice, private activeRoute: ActivatedRoute, private router: Router) {
     super();
   }
@@ -88,29 +94,48 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
-    await this.getFactura();
-    await this.formarTitulosTabla();
-    await this.getPropietario(this.factura.cliente_id);
-    await this.getPaqueteComprobante();
-    this.factura_aplicada = this.factura.numero_comprobante;
+    console.log('----- necesarioStart ------');
+
+    this.getFactura().then(async (res_factura) => {
+      console.log('luego de getFactura');
+      await this.formarTitulosTabla();
+      console.log('luego de formarTitulosTabla');
+      await this.getPropietario(this.factura.cliente_id);
+      console.log('luego de getPropietario');
+      await this.getPaqueteComprobante();
+      console.log('luego de getPaqueteComprobante');
+      this.factura_aplicada = this.factura.numero_comprobante;
+      console.log('this.factura_aplicada  ', this.factura_aplicada);
+    });
   }
 
   async getPaqueteComprobante() {
-    const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
-    const paquete = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
-    this.paqueteComprobante = paquete.body;
+    console.log('---- getPaqueteComprobante ----');
+
+    const TipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === this.tipoFactura);
+    console.log('TipoFact ', TipoFact);
+
+    this.ncfClass.getAll({ afterPath: `custom/${TipoFact.id}/true` }).then((res) => {
+      console.log('##### ', res);
+
+      this.paqueteComprobante = res['data'];
+    });
   }
   async getPropietario(id) {
     if (id) {
       try {
-        const cliente = await this.dbServ.getClienteById(id).toPromise();
+        this.clientesClass.getOne(id).then((res) => {
+          const cliente = res['data'];
 
-        const documento = cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0];
-        this.propietario_factura = {
-          nombre: cliente.nombre + ' ' + cliente.apellido,
-          direccion: cliente.direccion,
-          rnc: documento.documento,
-        };
+          const documento = cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0];
+
+          this.propietario_factura = {
+            nombre: cliente.nombre + ' ' + cliente.apellido,
+            direccion: cliente.direccion,
+            rnc: documento.documento,
+          };
+          this.fun.logGreen('this.propietario_factura ', this.propietario_factura);
+        });
       } catch (error) {}
     } else {
       this.propietario_factura = {
@@ -122,18 +147,8 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
   formarTitulosTabla() {
     this.info = [
-      {
-        titulo: ' ',
-        tipo: 'check',
-        key: 'select',
-        title: '',
-        estilos: [{ width: '3rem' }],
-      },
-      {
-        titulo: 'Articulo',
-        key: 'descripcion',
-        estilos: [{ 'text-align': 'left' }, { width: '20rem' }],
-      },
+      { titulo: ' ', tipo: 'check', key: 'select', title: '', estilos: [{ width: '3rem' }] },
+      { titulo: 'Articulo', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }] },
       {
         titulo: this.tipoNota === 'credito' ? 'Devolver' : 'Aumentar',
         key: 'cant_nota',
@@ -141,90 +156,65 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
         tipo: 'input',
         inputType: 'number',
         disable: [{ kind: 'campo', target: 'select', value: [false] }],
-
         estilos: [{ width: '6rem' }],
       },
-      {
-        titulo: 'Cantidad',
-        key: 'cantidad',
-        formatoNumero: true,
-        estilos: [{ width: '5rem' }],
-      },
-      {
-        titulo: 'Unidad',
-        key: 'unidad',
-        estilos: [{ width: '4.5rem' }],
-      },
-      {
-        titulo: 'Precio',
-        key: 'precio',
-        formatoNumero: true,
-      },
-      {
-        titulo: 'Descuento',
-        key: 'descuento_valor',
-        formatoNumero: true,
-      },
-      {
-        titulo: 'Total Facturado',
-        key: 'total',
-        formatoNumero: true,
-      },
-      {
-        titulo: 'Total nota',
-        key: 'total_nota',
-        tipo: 'input',
-
-        // disable: [{ kind: 'selected' }, { kind: 'campo', target: 'descripcion', value: ['hola'] }],
-        disable: [{ kind: 'always' }],
-
-        estilos: [{ width: '8rem' }],
-      },
+      { titulo: 'Cantidad', key: 'cantidad', formatoNumero: true, estilos: [{ width: '5rem' }] },
+      { titulo: 'Unidad', key: 'unidad', estilos: [{ width: '4.5rem' }] },
+      { titulo: 'Precio', key: 'precio', formatoNumero: true },
+      { titulo: 'Descuento', key: 'descuento_valor', formatoNumero: true },
+      { titulo: 'Total Facturado', key: 'total', formatoNumero: true },
+      { titulo: 'Total nota', key: 'total_nota', tipo: 'input', disable: [{ kind: 'always' }], estilos: [{ width: '8rem' }] },
     ];
   }
 
   async getFactura() {
-    try {
-      this.factura = await this.dbServ.getFacturaById(this.idFactura, '?get_contenidos=true').toPromise();
-      const devueltos = await this.dbServ.getCantidadDevuelto(this.factura.numero_comprobante).toPromise();
+    return new Promise(async (resolve) => {
+      this.facturaClass.getOne(this.idFactura).then((res_factura) => {
+        this.factura = res_factura['data'];
+        this.fun.logRed('this.factura --> ', this.factura);
 
-      const temp = [];
-      for (let i = 0; i < this.factura.detalle_facturas.length; i++) {
-        const detalle = this.factura.detalle_facturas[i];
+        this.facturaClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.factura.numero_comprobante}` }).then((res) => {
+          const devueltos = res['data'];
+          console.log('devueltos --> ', devueltos);
+          const temp = [];
+          for (let i = 0; i < this.factura.detalle_facturas.length; i++) {
+            const detalle = this.factura.detalle_facturas[i];
 
-        const devueto = devueltos[detalle.id] !== undefined ? devueltos[detalle.id] : 0;
+            const devueto = devueltos[detalle.id] !== undefined ? devueltos[detalle.id] : 0;
 
-        detalle['select'] = false;
-        detalle['cant'] = detalle.cantidad - devueto;
-        detalle['cant_nota'] = 0;
+            detalle['select'] = false;
+            detalle['cant'] = detalle.cantidad - devueto;
+            detalle['cant_nota'] = 0;
 
-        detalle['customStyles'] = {
-          'td-select': { width: '3rem' },
-          'td-cantidad': { width: '5rem' },
-          'td-total_nota': { width: '7.3rem' },
-          'td-cant_nota': { width: '6rem' },
-          'td-unidad': { width: '4.5rem' },
-          'td-descripcion': { 'text-align': 'left', width: '20rem' },
-        };
+            detalle['customStyles'] = {
+              'td-select': { width: '3rem' },
+              'td-cantidad': { width: '5rem' },
+              'td-total_nota': { width: '7.3rem' },
+              'td-cant_nota': { width: '6rem' },
+              'td-unidad': { width: '4.5rem' },
+              'td-descripcion': { 'text-align': 'left', width: '20rem' },
+            };
 
-        if (this.tipoNota === 'credito') {
-          detalle['min_'] = 0;
-          detalle['max_'] = detalle.cantidad - devueto;
-        } else {
-          detalle['min_'] = 0;
-          detalle['max_'] = null;
-        }
+            if (this.tipoNota === 'credito') {
+              detalle['min_'] = 0;
+              detalle['max_'] = detalle.cantidad - devueto;
+            } else {
+              detalle['min_'] = 0;
+              detalle['max_'] = null;
+            }
 
-        detalle['total_nota'] = 0;
-        detalle['cantidad'] = detalle.cantidad - devueto;
+            detalle['total_nota'] = 0;
+            detalle['cantidad'] = detalle.cantidad - devueto;
 
-        temp.push(detalle);
-      }
+            temp.push(detalle);
+          }
 
-      this.detalleFacturas = temp;
-    } catch (error) {
-      this.fun.toastError('Error mostrando factura elegida', 'ERROR');
-    }
+          this.detalleFacturas = temp;
+
+          resolve(true);
+        });
+      });
+    });
   }
 
   async getPrecioSaco(factura, callback = (arg) => {}) {
@@ -389,9 +379,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
       let unidad_ = element.unidad;
       if (element.select) {
-        if (unidad_ === 'Saco') {
-          unidad_ = this.obtenerSaco(element.descripcion, 'descripcion');
-        }
+        if (unidad_ === 'Saco') unidad_ = this.obtenerSaco(element.descripcion, 'descripcion');
 
         const fila = {
           detalle_factura_nota: element.id,
@@ -454,16 +442,14 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
       cabecera_fact['cliente_id'] = this.factura.cliente_id;
     }
 
-    cabecera_fact['detalle_facturas_attributes'] = cuerpo_fact;
+    cabecera_fact['detalle_facturas'] = cuerpo_fact;
     cabecera_fact['FACTURA_DE'] = null;
     cabecera_fact['tipo'] = 'nota_' + this.tipoNota;
     cabecera_fact['user_id'] = empleado.id;
     cabecera_fact['aplicada_a'] = this.factura_aplicada;
     cabecera_fact['factura_id'] = this.factura.id;
 
-    if (this.propietario_factura.vendedor_id) {
-      cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id;
-    }
+    if (this.propietario_factura.vendedor_id) cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id || null;
 
     try {
       const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();

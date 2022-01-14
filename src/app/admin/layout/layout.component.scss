@@ -60,45 +60,9 @@
 }
 
 $bodyfont: "Poppins";
-::ng-deep .tabViewTootip {
-  z-index: 9999999999 !important;
-}
 
-::ng-deep .my_tabView {
-  & .p-tabview-panels {
-    border: 0px solid transparent !important;
-  }
 
-  & .p-tabview-nav li {
-    margin-right: 0 !important;
-    & .p-tabview-nav-link {
-      border: 1px solid #c8c8c8 !important;
-      border-color: #c8c8c866 !important;
-      background: transparent !important;
-      color: #333333;
-      padding: 0.5rem 2rem !important;
-      border-bottom: 2px solid #b6b6b6 !important;
-      &:focus {
-        box-shadow: 0 0 0 0rem transparent !important;
-      }
-    }
 
-    &.p-highlight .p-tabview-nav-link {
-      background: #007ad900 !important;
-      border-color: #c8c8c866 !important;
-      color: #42c05b !important;
-      border-bottom: 2px solid #42c05b !important;
-    }
-  }
-}
-
-::ng-deep .noTabView {
-  a {
-    pointer-events: all !important;
-    cursor: not-allowed !important;
-    color: #a0a0a088 !important;
-  }
-}
 
 /* ============================================== */
 /*        FOOTER                                  */

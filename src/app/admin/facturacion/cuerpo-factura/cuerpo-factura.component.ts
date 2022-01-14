@@ -112,7 +112,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         fila.precio = GLOBAL.desformatear(fila.pre);
         fila.costo = GLOBAL.desformatear(fila.costo);
 
-        let omitir = ['cod', 'can', 'can_ant', 'des', 'uni', 'pre', 'tot', 'costo', 'secuencia', 'verificado'];
+        let omitir = ['cod', 'can', 'can_ant', 'des', 'uni', 'pre', 'tot', 'secuencia', 'verificado'];
 
         if (this.metodo === 'compra') omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'secuencia', 'verificado'];
 
@@ -341,8 +341,6 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   //  MODIFICAR FACTURA
   // =============================================
   async llenarFactura(rows, is_guardada?, callback = (arg) => {}) {
-    console.log('<-- llenarFactura --> ');
-
     this.rellenarVariables().then(async (res) => {
       if (res) {
         for (let j = 0; j < rows.length; j++) {
@@ -383,8 +381,10 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
     campos['cod'].setValue(articulo.codigo);
 
-    campos['can'].setValue(cant_actual);
-    campos['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
+    // campos['can'].setValue(cant_actual);
+    // campos['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
+    campos['can'].setValue(row.cantidad);
+    campos['cantidad_en_unidades'].setValue(row.cantidad_en_unidades);
 
     campos['des'].setValue(_.capitalize(articulo.nombre));
 
@@ -480,6 +480,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   async checkCantidadExede(i, lugar, callback = (arg) => {}) {
     let cantidad = 0;
+    this.llenarArrayUnidades(i);
     this.calcularCantidadEnUnidades({ index: i });
 
     const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
@@ -591,6 +592,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     if (precio && cantidad) {
       control['tot'].setValue(GLOBAL.numFormatTwoDecimals(precio * cantidad));
 
+      this.llenarArrayUnidades(i);
       this.calcularCantidadEnUnidades({ index: i });
       this.calculosTotalesGenerales();
     }
@@ -776,6 +778,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   async llenarArrayUnidades(i) {
     const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
     const art = (this.filasDetalle[i] as any).controls['articulo'].value;
+
     if (codigo && art) {
       const precioPrincipal = this.metodo === 'venta' ? art.precio_principal : art.costo_principal;
       const costoPrincipal = art.costo_principal;

@@ -7,7 +7,7 @@
           <div class="form-group">
             <label class="control-label">Tipo comprobante: <span style="color: red">*</span></label>
             <select
-              (keydown.enter)="saltar('Producto terminado')"
+              (keydown.enter)="saltar('campoDesde')"
               id="tipo"
               [(ngModel)]="tipo_articulo_id"
               (change)="selectTipoFactura($event.target.value)"
@@ -25,14 +25,14 @@
         <div class="col-6 p-0 pr-2">
           <div class="form-group mt-2">
             <label class="control-label">Desde: <span style="color: red">*</span></label>
-            <input type="number" class="form-control input_cantidad" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')" />
+            <input id="campoDesde" (keydown.enter)="saltar('campoHasta')" type="number" class="form-control input_cantidad" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')" />
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="desdeAlert">Campo obligatorio.</div>
           </div>
         </div>
         <div class="col-6 p-0 pl-2">
           <div class="form-group mt-2">
             <label class="control-label">Hasta: <span style="color: red">*</span></label>
-            <input type="number" class="form-control input_cantidad" [(ngModel)]="Hasta" (keyup)="checkInputs('hasta')" (blur)="checkInputs('hasta')" />
+            <input id="campoHasta" (keydown.enter)="saltar('campoFechaCompra')" type="number" class="form-control input_cantidad" [(ngModel)]="Hasta" (keyup)="checkInputs('hasta')" (blur)="checkInputs('hasta')" />
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="hastaAlert">Campo obligatorio.</div>
           </div>
         </div>
@@ -41,6 +41,8 @@
             <label class="control-label">Fecha compra: <span style="color: red">*</span></label>
             <input
               type="text"
+              id="campoFechaCompra"
+              (keydown.enter)="saltar('campoFechaValida')"
               [bsConfig]="dpConfig"
               placeholder="dd/mm/aaaa"
               class="form-control"
@@ -58,6 +60,8 @@
             <label class="control-label">Fecha validez: </label>
             <input
               type="text"
+              id="campoFechaValida"
+              (keydown.enter)="saltar('send')"
               [bsConfig]="dpConfigValidez"
               placeholder="dd/mm/aaaa"
               [value]="fechaValidez"
@@ -89,7 +93,7 @@
         <div class="col-12 p-0 mt-3">
           <div class="form-group">
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-            <input [disabled]="abilitarBtnSend()" (click)="submit()" type="submit" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+            <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
           </div>
         </div>
       </div>

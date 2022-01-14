@@ -1,12 +1,54 @@
 <div #cardTabla id="cardTabla cardListados" style="height: 100%">
+  <p-tabView [(activeIndex)]="activeIndex" styleClass="my_tabView" (onChange)="clickTabView($event.index)">
+    <p-tabPanel
+      [disabled]="arrayHasData('abonos').disable"
+      tooltip="Factura no tiene abonos"
+      headerStyleClass="{{ arrayHasData('abonos').disable ? 'noTabView' : '' }}"
+      tooltipDisabled="true"
+      tooltipStyleClass="{{ arrayHasData('abonos').disable ? 'd-block' : 'd-none' }} tabViewTootip"
+    >
+      <ng-template pTemplate="header">
+        Abonos
+        <span *ngIf="!arrayHasData('abonos').disable"> &nbsp;({{ arrayHasData('abonos').cant }})</span>
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel
+      [disabled]="arrayHasData('notas').disable"
+      tooltip="Factura no tiene notas de crédito"
+      headerStyleClass="{{ arrayHasData('notas').disable ? 'noTabView' : '' }}"
+      tooltipDisabled="true"
+      tooltipStyleClass="{{ arrayHasData('notas').disable ? 'd-block' : 'd-none' }} tabViewTootip"
+    >
+      <ng-template pTemplate="header">
+        Notas de crédito
+        <span *ngIf="!arrayHasData('notas').disable"> &nbsp;({{ arrayHasData('notas').cant }})</span>
+      </ng-template>
+    </p-tabPanel>
+  </p-tabView>
+
   <app-tablas
+    *ngIf="activeIndex == 0"
     [search]="false"
     [paginate]="true"
-    [id_tabla]="'historial_pago'"
+    [id_tabla]="'historial_movimientos'"
     [padre]="cardTabla"
     [pad]="false"
-    [info]="info"
-    [data]="pagos"
+    [info]="info_pagos"
+    [data]="detalles['abonos']"
+    [tablaHover]="false"
+    [focusRow]="false"
+  ></app-tablas>
+
+  <app-tablas
+    *ngIf="activeIndex == 1"
+    [search]="false"
+    [paginate]="true"
+    [id_tabla]="'historial_movimientos'"
+    [padre]="cardTabla"
+    [pad]="false"
+    [info]="info_notas"
+    [data]="detalles['notas']"
     [tablaHover]="false"
     [focusRow]="false"
   ></app-tablas>

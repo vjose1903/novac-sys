@@ -4,6 +4,7 @@ import { DBservice } from '../../core/services/bdservice.service';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { mixinClass } from '../mixinClass';
 import * as _ from 'lodash';
+import { ReporteC } from './reporte';
 
 @Component({
   selector: 'app-reportes',
@@ -15,6 +16,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   fileName: any;
   tipoModal: string;
   scaleImpresion: any;
+  reporteClass = new ReporteC();
 
   constructor(private dbServ: DBservice, public loadServ: LoaderService) {
     super();
@@ -80,78 +82,74 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   }
 
   async makePdf(data) {
-    let res = {} as any;
+    let tipo = '';
+    let params = '';
+    let continuar = true;
+    let msg_error = '';
 
-    try {
-      let tipo = '';
-      let params = '';
-      let continuar = true;
-      let msg_error = '';
+    const extra = { afterPath: 'custom', parameters: null };
 
-      if (this.tipoModal === 'cuadre') {
-        this.makeCuadre(data);
-        return;
-      } else if (this.tipoModal === 'ventas_diarias' || this.tipoModal === 'ventas_rango') {
-        let formas_pago = '(';
+    if (this.tipoModal === 'cuadre') {
+      this.makeCuadre(data);
+      return;
+    } else if (this.tipoModal === 'ventas_diarias' || this.tipoModal === 'ventas_rango') {
+      let formas_pago = '(';
 
-        this.seleccionModal.switches.array.forEach((item) => {
-          if (item.value) formas_pago += `'${item.label}',`;
-        });
+      this.seleccionModal.switches.array.forEach((item) => {
+        if (item.value) formas_pago += `'${item.label}',`;
+      });
 
-        formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+      formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+      extra.parameters = {
+        tipo: data.tipo,
+        condicion: data.condicion,
+        formas_pago: formas_pago,
+        desde: this.my_dateFormater(data.desde, false),
+        hasta: this.my_dateFormater(data.hasta, false),
+      };
 
-        params = `tipo=${data.tipo}&condicion=${data.condicion}&formas_pago=${formas_pago}&desde=${this.my_dateFormater(data.desde, false)}&hasta=${this.my_dateFormater(
-          data.hasta,
-          false,
-        )}`;
-
-        if (_.every(this.seleccionModal.switches.array, (item) => item.value === false)) {
-          msg_error = 'Debe seleccionar almenos un metodo de pago.';
-          continuar = false;
-        }
-
-        tipo = 'ventas';
-        //
-      } else if (this.tipoModal === 'cuentas_cobrar_cliente' || this.tipoModal === 'cuentas_cobrar_ant_saldo') {
-        params = `tipo=${data.tipo_ ? data.tipo_ : data.tipo}&cliente_id=${data.id ? data.id : 1}`;
-        tipo = 'cuentas_cobrar';
-        //
-      } else if (this.tipoModal === 'recibos') {
-        params = `desde=${this.my_dateFormater(data.desde, false)}&hasta=${this.my_dateFormater(data.hasta, false)}&tipo_recibo=${data.tipo}&order=ASC`;
-        tipo = 'recibos';
-        //
-      } else if (this.tipoModal === 'ventas_productos') {
-        params =
-          data.tipo === '1'
-            ? `desde=${this.my_dateFormater(data.fecha, false)}`
-            : (params = `desde=${this.my_dateFormater(data.desde, false)}&hasta=${this.my_dateFormater(data.hasta, false)}`);
-        tipo = 'ventas_productos';
-        //
-      } else if (this.tipoModal === 'suplidor_prod') {
-        params = `articulo_id=${data.articulo_id}&desde=${this.my_dateFormater(data.desde, false)}&hasta=${this.my_dateFormater(data.hasta, false)}`;
-        tipo = 'suplidor_prod';
-        //
-      } else if (this.tipoModal === 'inventario') {
-        params = ``;
-        tipo = 'inventario';
-        //
+      if (_.every(this.seleccionModal.switches.array, (item) => item.value === false)) {
+        msg_error = 'Debe seleccionar almenos un metodo de pago.';
+        continuar = false;
       }
+      tipo = 'ventas';
+      //
+    } else if (this.tipoModal === 'cuentas_cobrar_cliente' || this.tipoModal === 'cuentas_cobrar_ant_saldo') {
+      extra.parameters = { tipo: data.tipo_ ? data.tipo_ : data.tipo, cliente_id: data.id ? data.id : 1 };
+      tipo = 'cuentas_cobrar';
+      //
+    } else if (this.tipoModal === 'recibos') {
+      extra.parameters = { desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false), tipo_recibo: data.tipo, order: 'ASC' };
+      tipo = 'recibos';
+      //
+    } else if (this.tipoModal === 'ventas_productos') {
+      if (data.tipo === '1') extra.parameters = { desde: this.my_dateFormater(data.fecha, false) };
+      else extra.parameters = { desde: this.my_dateFormater(data.fecha, false), hasta: this.my_dateFormater(data.hasta, false) };
 
-      if (continuar) {
-        res = await this.dbServ.makeReportes(tipo, params).toPromise();
-        // aqui poner el loader
+      tipo = 'ventas_productos';
+      //
+    } else if (this.tipoModal === 'suplidor_prod') {
+      extra.parameters = { articulo_id: data.articulo_id, desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false) };
+      tipo = 'suplidor_prod';
+      //
+    } else if (this.tipoModal === 'inventario') {
+      params = ``;
+      tipo = 'inventario';
+      //
+    }
+
+    extra.afterPath += `/${tipo}`;
+
+    if (continuar) {
+      this.reporteClass.getAll(extra).then((res) => {
         this.loadServ.isLoading.next(true);
-        const obj = {
-          data: res,
-          type: 'reporte',
-        };
+        const obj = { data: res, type: 'reporte' };
 
         this.generarPdf(obj);
-      } else {
-        this.fun.toastError(msg_error, 'ERROR');
-      }
-    } catch (error) {
-      this.fun.toastError('Error realizando reporte.', 'ERROR');
+      });
+      // res = await this.dbServ.makeReportes(tipo, params).toPromise();
+    } else {
+      this.fun.toastError(msg_error, 'ERROR');
     }
   }
 

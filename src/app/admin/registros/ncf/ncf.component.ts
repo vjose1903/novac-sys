@@ -23,51 +23,17 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   usado = false;
 
   info = [
-    {
-      titulo: 'Cod.',
-      key: 'codigo',
-      estilos: [{ width: '3.5rem' }],
-    },
-    {
-      titulo: 'Tipo',
-      key: 'tipoC',
-    },
-    {
-      titulo: 'Secuencia',
-      key: 'secuencia_',
-    },
-    {
-      titulo: 'Desde',
-      key: 'desde',
-    },
-    {
-      titulo: 'Hasta',
-      key: 'hasta',
-    },
-    {
-      titulo: 'Usado',
-      key: 'usado_',
-      text_color: 'colorUsado',
-      isIcon: true,
-      color: true,
-      estilos: [{ width: '3.5rem' }],
-    },
-    {
-      titulo: 'Activo',
-      key: 'estado_',
-      text_color: 'colorEstado',
-      isIcon: true,
-      color: true,
-      estilos: [{ width: '3.5rem' }],
-    },
+    { titulo: 'Cod.', key: 'codigo', estilos: [{ width: '3.5rem' }] },
+    { titulo: 'Tipo', key: 'tipoC' },
+    { titulo: 'Secuencia', key: 'secuencia_' },
+    { titulo: 'Desde', key: 'desde' },
+    { titulo: 'Hasta', key: 'hasta' },
+    { titulo: 'Usado', key: 'usado_', text_color: 'colorUsado', isIcon: true, color: true, estilos: [{ width: '3.5rem' }] },
+    { titulo: 'Activo', key: 'estado_', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '3.5rem' }] },
   ];
 
   filtro: any = 0;
-  botones = {
-    titulo: true,
-    borrar: true,
-    editar: true,
-  };
+  botones = { titulo: true, borrar: true, editar: true };
 
   lista_tipos_facturas: any;
 
@@ -257,7 +223,12 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
     this.aletarTipoArticulo = false;
   }
 
-  saltar(input) {}
+  saltar(campo) {
+    if (campo != 'send') this.enfocarInput(campo);
+    else {
+      if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
+    }
+  }
 
   async submit() {
     const obj = {
@@ -288,13 +259,11 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
       this.fun.toastError(error.error.msg, 'ERROR');
     }
   }
-  abilitarBtnSend() {
+
+  formIsInvalid() {
     let res = true;
-    if (this.tipo_articulo_id !== -1 && this.Desde && this.Hasta && this.fechaCompra && this.fechaValidez) {
-      res = false;
-    } else {
-      res = true;
-    }
+    if (this.tipo_articulo_id !== -1 && this.Desde && this.Hasta && this.fechaCompra && this.fechaValidez) res = false;
+    else res = true;
     return res;
   }
 
