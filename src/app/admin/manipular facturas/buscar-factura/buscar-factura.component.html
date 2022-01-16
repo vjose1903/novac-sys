@@ -16,7 +16,7 @@
           (keydown.enter)="saltar('campoTipoFact', $event.target.value)"
           (change)="changeSelect($event.target.value)"
           value=""
-          [disabled]="existenComprobantes"
+          [ngClass]="{ disabled: existenComprobantes }"
         >
           <option [value]="null" selected disabled>Escoger tipo</option>
           <option value="1">Por cliente</option>

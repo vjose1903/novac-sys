@@ -39,7 +39,7 @@ export class modalClass extends LayoutClass {
     this.quien_me_llamo = arg.component;
 
     this.metodos[this.quien_me_llamo] = this;
-    // console.log('this.metodos --> ', this.metodos);
+
 
     this._lista = arg._lista_subs ? arg._lista_subs : [];
 
@@ -72,7 +72,7 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('sacarFacturas')) {
-      console.log('sacarFacturas --> ');
+
 
       this.subRefresh = this.layServ.SACARFACTURA.subscribe((res) => this.run_subscribe('SACARFACTURA', res));
     }
@@ -81,10 +81,10 @@ export class modalClass extends LayoutClass {
   run_subscribe(observable, res) {
     const _this = this.metodos[modalClass.a_quien_responder];
 
-    // console.log('  ');
-    // console.log(' ----------------------------------------------- ');
-    // console.log('observable --> ', observable);
-    // console.log('_this --> ', _this);
+
+
+
+
 
     if (_this) {
       switch (observable) {

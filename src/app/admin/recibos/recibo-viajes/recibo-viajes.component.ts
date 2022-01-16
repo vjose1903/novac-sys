@@ -8,6 +8,7 @@ import { mixinClass } from '../../mixinClass';
 import { EmpleadoC } from '../../registros/registro-empleados/empleado';
 import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
 import { ReciboC } from '../recibos';
+import { RecibosService } from '../recibos.service';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -17,31 +18,11 @@ import { ReciboC } from '../recibos';
 export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;
   info = [
-    {
-      titulo: '1',
-      key: 'estatus',
-      text_color: 'colorEstado',
-      isIcon: true,
-      color: true,
-      estilos: [{ width: '1.5rem' }, { color: '#8ef3a3' }],
-    },
-    {
-      titulo: 'Fecha Fact.',
-      key: 'fecha',
-    },
-    {
-      titulo: 'Cliente',
-      key: 'cliente_mostrar',
-    },
-    {
-      titulo: 'NCF',
-      key: 'numero_comprobante',
-    },
-    {
-      titulo: 'Total facturado',
-      key: 'total_factura',
-      formatoNumero: true,
-    },
+    { titulo: '1', key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '1.5rem' }, { color: '#8ef3a3' }] },
+    { titulo: 'Fecha Fact.', key: 'fecha' },
+    { titulo: 'Cliente', key: 'cliente_mostrar' },
+    { titulo: 'NCF', key: 'numero_comprobante' },
+    { titulo: 'Total facturado', key: 'total_factura', formatoNumero: true },
   ];
   viajes;
   viaje_selected = { id: -1 } as any;
@@ -74,7 +55,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   vehiculoClass = new VehiculoC();
   reciboClass = new ReciboC();
 
-  constructor(private dbServ: DBservice, private tServ: TablasService) {
+  constructor(private dbServ: DBservice, private tServ: TablasService, private reciboServ: RecibosService) {
     super();
   }
 
@@ -149,8 +130,6 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
         fact.customStyles = { 'td-estatus': { width: '1.5rem' } };
         fact.cliente_mostrar = fact.cliente.nombre;
         fact.fecha = moment(fact.fecha_equivalente).format('DD-MM-YYYY');
-        fact.total_factura = this.recalcularMonto(fact.total_factura, fact.notas);
-        fact.balance = this.recalcularMonto(fact.balance, fact.notas);
         fact['pago_a_tiempo'] = pago_a_tiempo;
 
         return fact;
@@ -209,6 +188,12 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     return res;
   }
 
+  abrir_historial() {
+    const pagos = this.viaje_selected.pagos;
+    const notas = this.viaje_selected.notas;
+
+    if (pagos.length || notas.length) this.reciboServ.abrirModalHistorial(pagos, notas);
+  }
   verViaje(arg) {
     this.monto_pendiente = 0;
     this.totalPagado = 0;
@@ -218,23 +203,11 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
 
     this.totalPagado = _.reduce(this.viaje_selected.pagos, (acumulado, item) => acumulado + item.deposito, 0);
 
-    this.monto_pendiente = this.viaje_selected.total_factura - this.totalPagado;
+    this.monto_pendiente = this.viaje_selected.balance;
     this.totalPagadoPorciento = (this.totalPagado / this.viaje_selected.total_factura) * 100;
     this.totalPagadoPorciento = GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento);
 
     this.ultimo_pago = _.maxBy(this.viaje_selected.pagos, 'id');
-  }
-
-  recalcularMonto(monto_original, notas) {
-    let monto = monto_original;
-    for (let i = 0; i < notas.length; i++) {
-      const element = notas[i];
-      const totalABS = Math.abs(element.total_factura);
-
-      if (element.tipo_factura_id === 5) monto -= totalABS;
-      else if (element.tipo_factura_id === 4) monto += totalABS;
-    }
-    return monto;
   }
 
   accion(bool, tipo) {

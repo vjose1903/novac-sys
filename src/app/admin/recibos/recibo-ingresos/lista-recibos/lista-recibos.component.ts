@@ -92,7 +92,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   }
 
   ipcPrintResponse(res) {
-    console.log('res --> ', res);
+    
 
     if (res.status === 'si') {
       // this.fileName = res.file;

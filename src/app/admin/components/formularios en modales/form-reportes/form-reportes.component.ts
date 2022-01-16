@@ -50,7 +50,6 @@ export class FormVentasComponent extends mixinClass implements OnInit {
   ngOnInit() {
     this.localeService.use('es');
     this.necesarioStart();
-    console.log('switches ', this.switches);
   }
 
   async necesarioStart() {

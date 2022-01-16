@@ -12,18 +12,6 @@ $bodyfont: "Poppins";
   max-height: inherit;
 }
 
-.inputE {
-  height: calc(1.5em + 0.3rem + 2px) !important;
-  padding: 0.2rem 0.7rem !important;
-  width: 100%;
-
-  &:focus {
-    background-color: #b9e2ad !important;
-    border-color: transparent !important;
-    box-shadow: 0px 0px 6px #2ba950 !important;
-  }
-}
-
 .overflowHidden {
   overflow: hidden;
 }
@@ -384,14 +372,34 @@ input[type="text"] {
     cursor: pointer;
   }
 }
-input[type="checkbox"]:disabled {
-  filter: brightness(0.91) !important;
-}
 
 // input[type="checkbox"]:disabled,
 // input[type="text"]:disabled {
 //   filter: grayscale(74%);
 // }
+
+.btn-icon {
+  font-size: 1.3rem;
+  cursor: pointer;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.3rem;
+  &:hover {
+    background: #00000052;
+  }
+  &:active {
+    background: #0000007e;
+  }
+  &.disabled {
+    touch-action: none;
+    pointer-events: none;
+    background: #8585857e;
+    color: grey;
+  }
+}
 
 #btn-gris,
 .btn-gris {
@@ -581,9 +589,13 @@ input.apple-switch {
   background-color: #ffffff;
   border: 1px solid #d9dadc;
   border-radius: 50px;
-  box-shadow: inset -20px 0 0 0 #ffffff;
+  box-shadow: inset -15px 0 0 0 #e6e5e5;
   transition-duration: 500ms;
+  &.disabled {
+    filter: brightness(0.9) !important;
+  }
 }
+
 input.apple-switch:after {
   content: "";
   position: absolute;

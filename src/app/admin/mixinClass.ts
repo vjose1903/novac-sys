@@ -64,11 +64,10 @@ export class mixinClass extends modalClass {
     let month = String(dateObj.getMonth() + 1).padStart(2, '0');
     let day = String(dateObj.getDate()).padStart(2, '0');
     let year = dateObj.getFullYear();
-    if (front) {
-      str = `${day}/${month}/${year}`;
-    } else {
-      str = `${year}-${month}-${day}`;
-    }
+
+    if (front) str = `${day}/${month}/${year}`;
+    else str = `${year}-${month}-${day}`;
+
     return str;
   }
 
@@ -90,7 +89,6 @@ export class mixinClass extends modalClass {
   clickInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
     element.click();
-    console.log('CLICK ', element);
   }
   // =========================================================================================================
   enfocarInput(arg) {

@@ -74,7 +74,7 @@
               <td class="COD td0padding">
                 <div class="form-group m-0">
                   <input
-                    [readOnly]="!propietario"
+                    [ngClass]="{ disabled: !propietario }"
                     type="text"
                     class="form-control entrada"
                     id="cod-{{ i }}"
@@ -90,7 +90,7 @@
               <td class="CAN td0padding">
                 <div class="form-group m-0">
                   <input
-                    [readOnly]="!propietario"
+                    [ngClass]="{ disabled: !propietario }"
                     type="number"
                     min="0"
                     class="form-control entrada input_cantidad"
@@ -108,7 +108,7 @@
               <td class="UNI td0padding">
                 <div class="form-group m-0">
                   <input
-                    [readOnly]="!propietario"
+                    [ngClass]="{ disabled: !propietario }"
                     *ngIf="inputDrop !== 'uni-' + i"
                     type="text"
                     class="form-control entrada"
@@ -143,7 +143,7 @@
               <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
               <td class="DES td0padding">
                 <div class="form-group m-0">
-                  <input type="text" class="form-control entrada inDES" id="des-{{ i }}" formControlName="des" readonly="true" tabindex="-1" />
+                  <input type="text" class="form-control entrada inDES disabled" id="des-{{ i }}" formControlName="des" tabindex="-1" />
                 </div>
               </td>
 
@@ -160,7 +160,7 @@
                     formControlName="descuento_porciento"
                     (blur)="calcularDescuento(i)"
                     (emptied)="calcularDescuento(i)"
-                    [readOnly]="readDescuento()"
+                    [ngClass]="{ disabled: readDescuento() }"
                     tabindex="-1"
                   />
                 </div>
@@ -176,16 +176,16 @@
                     (keydown.enter)="calcularTotalRow(i); enfocarInput('cod-' + (i + 1))"
                     id="pre-{{ i }}"
                     formControlName="pre"
-                    [readOnly]="readPrecio()"
+                    [ngClass]="{ disabled: readPrecio() }"
                     tabindex="-1"
                   />
                 </div>
               </td>
 
-              <!--  ::::::::::::  PRECIO  ::::::::::::  -->
+              <!--  ::::::::::::  TOTAL  ::::::::::::  -->
               <td class="TOT td0padding">
                 <div class="form-group m-0">
-                  <input type="text" class="form-control entrada inTOT campoNumeros" id="tot-{{ i }}" formControlName="tot" readonly="true" tabindex="-1" />
+                  <input type="text" class="form-control entrada inTOT campoNumeros disabled" id="tot-{{ i }}" formControlName="tot" tabindex="-1" />
                   <input type="hidden" [value]="i" formControlName="secuencia" tabindex="-1" />
                 </div>
               </td>

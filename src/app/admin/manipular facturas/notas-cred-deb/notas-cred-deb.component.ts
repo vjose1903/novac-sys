@@ -94,29 +94,20 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
-    console.log('----- necesarioStart ------');
 
     this.getFactura().then(async (res_factura) => {
-      console.log('luego de getFactura');
       await this.formarTitulosTabla();
-      console.log('luego de formarTitulosTabla');
       await this.getPropietario(this.factura.cliente_id);
-      console.log('luego de getPropietario');
       await this.getPaqueteComprobante();
-      console.log('luego de getPaqueteComprobante');
       this.factura_aplicada = this.factura.numero_comprobante;
-      console.log('this.factura_aplicada  ', this.factura_aplicada);
     });
   }
 
   async getPaqueteComprobante() {
-    console.log('---- getPaqueteComprobante ----');
 
     const TipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === this.tipoFactura);
-    console.log('TipoFact ', TipoFact);
 
     this.ncfClass.getAll({ afterPath: `custom/${TipoFact.id}/true` }).then((res) => {
-      console.log('##### ', res);
 
       this.paqueteComprobante = res['data'];
     });
@@ -175,7 +166,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
         this.facturaClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.factura.numero_comprobante}` }).then((res) => {
           const devueltos = res['data'];
-          console.log('devueltos --> ', devueltos);
           const temp = [];
           for (let i = 0; i < this.factura.detalle_facturas.length; i++) {
             const detalle = this.factura.detalle_facturas[i];
@@ -246,19 +236,22 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async checkCantidadEnUnidades() {
+    this.fun.logBlue(' ----- checkCantidadEnUnidades ----- ');
     for (let i = 0; i < this.detalleNota.length; i++) {
       const detalle = this.detalleNota[i];
 
-      if (!detalle.cantidad_en_unidades_nota) {
-        detalle.cantidad_en_unidades_nota = 0;
-      }
+      if (!detalle.cantidad_en_unidades_nota) detalle.cantidad_en_unidades_nota = 0;
 
       if (detalle.unidad === 'Saco' && detalle.se_calcula_saco) {
         const peso = this.obtenerSaco(detalle.descripcion, 'peso');
+
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * peso;
       } else {
+
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * detalle.contenidos[detalle.unidad];
       }
+      this.fun.logRed('detalle ', GLOBAL.duplicarJson(detalle));
+
     }
   }
 

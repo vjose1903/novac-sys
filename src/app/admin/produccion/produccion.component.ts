@@ -310,8 +310,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
     for (let i = 0; i < ingredientes.length; i++) {
       const ingrediente = ingredientes[i];
-      console.log(' ');
-      console.log('ingrediente --> ', ingrediente);
 
       const obj = {
         articulo_combo: ingrediente.articulo_combo,

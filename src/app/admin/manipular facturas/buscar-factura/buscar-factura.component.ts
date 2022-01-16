@@ -392,11 +392,9 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   }
 
   selectFactura(item) {
-    console.log('item --> ', item);
 
     if (item.column === 'select') {
       this.facturaSelected = item.row;
-      console.log('this.facturaSelected --> ', this.facturaSelected);
       this.indexSelected = item.index;
 
       this.parseFacturaSelected().then(() => this.abrirModal('mostrarFactura', this.facturaSelected));

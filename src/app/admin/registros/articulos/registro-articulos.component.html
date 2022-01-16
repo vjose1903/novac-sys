@@ -300,13 +300,12 @@
                   <!--  -->
                   <div class="col-1 p-0">
                     <input
-                      readonly
                       type="text"
                       id="medida_formula-{{ j }}"
                       tabindex="-1"
                       formControlName="medida_formula"
                       style="border-radius: 0rem 0.25rem 0.25rem 0rem !important; padding: 0.2rem"
-                      class="form-control"
+                      class="form-control disabled"
                       autocomplete="off"
                     />
                   </div>
@@ -314,13 +313,13 @@
                   <div class="col-3 pr-0">
                     <div class="form-group mb-0">
                       <input
-                        readonly
+
                         type="text"
                         id="costo_formula-{{ j }}"
                         tabindex="-1"
                         formControlName="costo_formula"
                         [ngClass]="{ badAlert: checkCostoFormula(formula) }"
-                        class="form-control"
+                        class="form-control disabled"
                         autocomplete="off"
                       />
                     </div>

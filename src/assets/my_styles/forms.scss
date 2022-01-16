@@ -69,9 +69,9 @@
 }
 
 @mixin campos {
-  background-color: #ffffffe8;
-  color: #1d253b;
-  box-shadow: 1px 1px 4px 0px #1d253b3d;
+  background-color: #ffffffe8 !important;
+  color: #1d253b !important;
+  box-shadow: 1px 1px 4px 0px #1d253b3d !important;
   &:focus {
     background-color: #b9e2ad !important;
     border-color: transparent !important;
@@ -97,15 +97,34 @@ textarea {
   border-radius: 0.25rem !important;
 }
 
-.form-control:focus {
-  box-shadow: none;
+.inputE {
+  height: calc(1.5em + 0.3rem + 2px) !important;
+  padding: 0.2rem 0.7rem !important;
+  width: 100%;
+  @include campos;
+
+  // &:focus {
+  //   background-color: #b9e2ad !important;
+  //   border-color: transparent !important;
+  //   box-shadow: 0px 0px 6px #2ba950 !important;
+  // }
 }
 
 .form-control {
+  &:focus {
+    box-shadow: none;
+  }
   @include campos;
   &.min {
     height: 2rem !important;
     padding: 0.2rem !important;
+  }
+
+  &.disabled,
+  &:disabled {
+    background-color: #e9ecef !important;
+    touch-action: none;
+    pointer-events: none;
   }
 }
 
@@ -114,9 +133,9 @@ textarea {
     color: #1d253b;
   }
 
-  > input {
-    @include campos;
-  }
+  // > input:not(.apple-switch) {
+  //   @include campos;
+  // }
 }
 
 p-inputswitch {

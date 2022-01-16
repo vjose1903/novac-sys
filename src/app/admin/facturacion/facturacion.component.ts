@@ -108,6 +108,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   newCuerpo: any[];
   paqueteComprobante: any;
   subFactG: Subscription;
+  condiciones = [{ nombre: 'Contado' }, { nombre: 'Crédito' }];
 
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
@@ -275,7 +276,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     if (this.action === 'update') {
       this.factura_a_editar = {};
       this.rellenarCampos(id_factura, 'editar').then(() => {
-        console.log(' luego de rellenarCampos');
         this.cuerpo.llenarFactura(this.factura_a_editar.detalle_facturas);
         this.enfocarInput('cod-0');
       });
@@ -315,7 +315,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (tipo === 'editar') {
         res = await this.facturaClass.getFacturaById(id);
         res = res['data'];
-        console.log('res editar --> ', res);
 
         this.factura_a_editar = res;
         this.propietario_factura = res.cliente;
@@ -341,7 +340,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
 
       await this.calcularPorcientoComprobante().then((res_calculo) => {
-        console.log('luego de calcularPorcientoComprobante');
 
         if (res.is_viaje) this.fecha_viaje = new Date(res.fecha_viaje);
         else this.fecha_viaje = new Date();
@@ -902,9 +900,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  prueba(){
-    console.log("this.CuerpoFactura --> ", this.CuerpoFactura);
-
+  prueba() {
   }
 
   resetVariables() {
@@ -1117,9 +1113,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     cabecera_fact['FACTURA_DE'] = this.metodo === 'venta' ? 13 : 14;
     cabecera_fact['tipo'] = this.metodo;
     cabecera_fact['user_id'] = empleado.id;
-    console.log(' ');
-    console.log(':::::::::::::::: ', this.factura_a_editar);
-    console.log(' ');
 
     cabecera_fact['tiene_nota'] = this.factura_a_editar ? this.factura_a_editar.tiene_nota : false;
 

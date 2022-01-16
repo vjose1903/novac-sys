@@ -119,7 +119,7 @@
                 <div class="form-group m-0 switchDiv">
                   <input
                     class="apple-switch"
-                    [disabled]="disabledInput(dato, column)"
+                    [ngClass]="{ disabled: disabledInput(dato, column) }"
                     type="checkbox"
                     (change)="changeValorCheck(column.key, i)"
                     [checked]="dato[column.key]"
@@ -141,7 +141,7 @@
                     [max]="dato.max_ ? dato.max_ : null"
                     type="{{ column.inputType ? column.inputType : 'text' }}"
                     [value]="dato[column.key]"
-                    [disabled]="disabledInput(dato, column)"
+                    [ngClass]="{ disabled: disabledInput(dato, column) }"
                     (keyup)="changeValorInput(column.key, i, $event.target.value)"
                     (change)="changeValorInput(column.key, i, $event.target.value)"
                   />
@@ -153,7 +153,7 @@
                     id="input-{{ i }}"
                     [value]="dato[column.key]"
                     (blur)="revisarPrecio(i, $event.target.value, column.key, 'input-' + i)"
-                    [disabled]="disabledInput(dato, column)"
+                    [ngClass]="{ disabled: disabledInput(dato, column) }"
                     (keyup)="changeValorInput(column.key, i, $event.target.value)"
                     (change)="changeValorInput(column.key, i, $event.target.value)"
                   />

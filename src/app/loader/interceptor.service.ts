@@ -16,14 +16,13 @@ export class InterceptorService implements HttpInterceptor {
   requestCount: number = 0;
 
   private startRequest(args?): void {
-    console.log('args --> ', args);
 
-    if (this.requestCount == 0 && args !== 'no_show') this.loadServ.isLoading.next(true);
+    if (this.requestCount <= 0 && args !== 'no_show') this.loadServ.isLoading.next(true);
     this.requestCount++;
   }
 
   private endRequest(args?): void {
-    this.requestCount--;
+    if (this.requestCount > 0) this.requestCount--;
 
     if (this.requestCount == 0 && args !== 'no_hide') this.loadServ.isLoading.next(false);
   }
@@ -35,7 +34,6 @@ export class InterceptorService implements HttpInterceptor {
     let spinner = request.params.get('spinner');
 
     if (spinner) request.params.delete('spinner'); // remove parameter spinner y no ejecuta el loader
-    console.log('spinner --> ', spinner);
 
     if (!spinner || spinner == 'no_hide') this.startRequest(spinner); // Activa el spinner
 
@@ -74,10 +72,8 @@ export class InterceptorService implements HttpInterceptor {
         } else if (response.error && response.error.msg === 'Para realizar esta accion debe de iniciar sesión.') {
           this.fun.toastError(response.error.msg, 'ERROR');
           this.fun.nextCanToast(false);
-          this.fun.logout();
           this.router.navigateByUrl('/auth/login');
         } else {
-          console.log('response --> ', response);
           if (_.has(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
 
           if (_.has(response, 'error.msg')) this.handler_msg(response.error.msg, 'error');

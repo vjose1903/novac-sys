@@ -83,11 +83,11 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
   async makePdf(data) {
     let tipo = '';
-    let params = '';
     let continuar = true;
     let msg_error = '';
 
     const extra = { afterPath: 'custom', parameters: null };
+    console.log('this.tipoModal--> ', this.tipoModal);
 
     if (this.tipoModal === 'cuadre') {
       this.makeCuadre(data);
@@ -123,17 +123,18 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       tipo = 'recibos';
       //
     } else if (this.tipoModal === 'ventas_productos') {
-      if (data.tipo === '1') extra.parameters = { desde: this.my_dateFormater(data.fecha, false) };
-      else extra.parameters = { desde: this.my_dateFormater(data.fecha, false), hasta: this.my_dateFormater(data.hasta, false) };
+      console.log('data ', data);
+      if (data.tipo == '1') extra.parameters = { desde: this.my_dateFormater(data.fecha, false) };
+      else extra.parameters = { desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false) };
 
       tipo = 'ventas_productos';
       //
     } else if (this.tipoModal === 'suplidor_prod') {
+
       extra.parameters = { articulo_id: data.articulo_id, desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false) };
       tipo = 'suplidor_prod';
       //
     } else if (this.tipoModal === 'inventario') {
-      params = ``;
       tipo = 'inventario';
       //
     }
@@ -237,8 +238,6 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         ],
       };
     }
-
-    console.log('obj ', obj);
 
     if (abrirModal) this.abrirModal(tipo_modal, obj, tipo);
   }

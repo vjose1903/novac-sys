@@ -145,8 +145,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   }
 
   decisionModal(arg) {
-    console.log('this.seleccionModal --> ', this.seleccionModal);
-
     if (this.tipoModal === 'quitar_factura' && arg) this.quitarFacturaGuardada({ body: { archivo_id: this.seleccionModal?.archivo_id } });
   }
 
@@ -219,8 +217,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   }
 
   abrirModalFacturaGuardada(fact, e) {
-    console.log('fact --> ', fact);
-
     const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.', archivo_id: fact.archivo_id };
     this.abrirModal('dinamico_texto', obj, 'quitar_factura');
     e.stopPropagation();
@@ -228,12 +224,10 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
   quitarFacturaGuardada(params?) {
     const fact = params.body;
-    console.log('params --> ', GLOBAL.duplicarJson(params));
     let index;
     const allFacturas = this.fun.getFacturasguardadas();
 
     if (fact) index = _.findIndex(allFacturas, (o: any) => o.archivo_id === fact?.archivo_id);
-    console.log('index --> ', index);
 
     _.pullAt(allFacturas, index);
 
@@ -244,7 +238,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
       this.layServ.nextSacar({ quien_llamo: 'layout', body: this.layServ.factura_guardada });
     }
 
-    console.log('  ');
     this.refreshResponse();
   }
 
@@ -260,8 +253,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
   checkWhereIs(arg?) {
     return new Promise((resolve) => {
-      console.log('arg --> ', arg);
-
       const url = document.location.pathname.split('/')[3];
 
       if (url !== arg) {
@@ -286,7 +277,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   }
 
   sacarResponse(res) {
-    console.log('sacarResponse layout');
     this.quitarFacturaGuardada(res);
   }
 

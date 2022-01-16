@@ -464,9 +464,10 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   async calculateCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
     this.llenarArrayUnidades(params.index);
+    this.fun.logRed('----- calculateCantidadEnUnidades ------');
 
     const control = this.filasDetalle[params.index].controls;
-    const fila_actual = this.filasDetalle[params.index].value;
+    const fila_actual = this.filasDetalle[params.index].getRawValue();
     const unidad = fila_actual['uni'];
     const cantidad = fila_actual['can'];
 
@@ -475,6 +476,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad)).cantidad;
 
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
+
     control['cantidad_en_unidades'].setValue(cant_unidades);
   }
 
@@ -633,8 +635,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     this.abrirModal('dinamico_texto', obj, tipo_modal);
   }
 
-  // TODO: seguir de aqui para abajo
-
   llenarConduce(detalles, conteo = 0, firstResolve = null) {
     return new Promise((resolve) => {
       firstResolve ??= resolve;
@@ -654,9 +654,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     let res = false;
     const fila_actual = this.filasDetalle[i].getRawValue();
     const detalle_factura_id = fila_actual['detalle_factura_id'];
-    if (detalle_factura_id) {
-      res = true;
-    }
+    if (detalle_factura_id) res = true;
+
     return res;
   }
 

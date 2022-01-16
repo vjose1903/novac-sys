@@ -11,38 +11,22 @@ export class ModalHistorialPagosComponent implements OnInit {
   activeIndex = 0;
 
   info_pagos = [
-    {
-      titulo: 'NO. recibo',
-      key: 'numero_recibo',
-    },
-    {
-      titulo: 'Abonado',
-      key: 'deposito',
-      formatoNumero: true,
-    },
-    {
-      titulo: 'Fecha abono',
-      key: 'fecha_equivalente',
-    },
+    { titulo: 'NO. recibo', key: 'numero_recibo' },
+    { titulo: 'Abonado', key: 'deposito', formatoNumero: true },
+    { titulo: 'Fecha abono', key: 'fecha_equivalente' },
   ];
 
   info_notas = [
-    {
-      titulo: 'NO. comprobante',
-      key: 'numero_comprobante',
-    },
-    {
-      titulo: 'Crédito',
-      key: 'total_factura',
-      formatoNumero: true,
-    },
-    {
-      titulo: 'Fecha nota',
-      key: 'fecha_equivalente',
-    },
+    { titulo: 'NO. comprobante', key: 'numero_comprobante' },
+    { titulo: 'Crédito', key: 'total_factura', formatoNumero: true },
+    { titulo: 'Fecha nota', key: 'fecha_equivalente' },
   ];
 
   constructor(private tServ: TablasService) {}
+
+  ngOnInit() {
+    this.activeIndex = this.arrayHasData('abonos').cant > 0 ? 0 : 1;
+  }
 
   clickTabView(index) {
     const tipo = index == 0 ? 'abonos' : 'notas';
@@ -61,12 +45,9 @@ export class ModalHistorialPagosComponent implements OnInit {
         this.tServ.Func_total_paginas(obj);
       } else this.activeIndex = 0;
     }
-
   }
 
   arrayHasData(tipo) {
     return { disable: this.detalles[tipo].length === 0, cant: this.detalles[tipo].length };
   }
-
-  ngOnInit() {}
 }

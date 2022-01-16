@@ -26,17 +26,14 @@ export class PdfService {
       const type = oPdf.type;
       const reimprimir = oPdf.data.reimprimir ? true : false;
 
-      console.log('oPdf --> ', oPdf);
 
       data['reimprimir'] = reimprimir;
 
       try {
         switch (type) {
           case 'recibo_ingreso':
-            console.log('ENTROOO');
 
             obj = recibosIngresos.makeRecibo(data);
-            console.log('obj: ', obj);
             break;
 
           case 'conduce':

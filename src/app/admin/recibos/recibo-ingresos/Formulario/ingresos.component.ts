@@ -8,6 +8,8 @@ import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../../../components/tablas/tablas.component';
 import { TablasService } from '../../../components/tablas/tablas.service';
 import { mixinClass } from '../../../mixinClass';
+import { ReciboC } from '../../recibos';
+import { RecibosService } from '../../recibos.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -72,8 +74,9 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   totalPagadoPorciento: number;
   recibiendo = 0;
   restando = 0;
+  reciboClass = new ReciboC();
 
-  constructor(private config: NgSelectConfig, private dbServ: DBservice, private tServ: TablasService) {
+  constructor(private config: NgSelectConfig, private dbServ: DBservice, private tServ: TablasService, private reciboServ: RecibosService) {
     super();
     this.config.notFoundText = 'Articulo no existe';
   }
@@ -177,10 +180,10 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
               factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
               factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
               factura.monto = 0;
-
-              factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : factura.pagos.length > 0 ? 'fas fa-comment-dollar' : 'far fa-comment';
-              factura.colorEstado = factura.is_viaje ? 'green' : factura.pagos.length > 0 ? 'black' : 'gris-claro';
-              factura.iconHover = factura.is_viaje ? false : factura.pagos.length > 0 || factura.notas.length > 0 ? true : false;
+              const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
+              factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
+              factura.colorEstado = factura.is_viaje ? 'green' : modalMoviemientos ? 'black' : 'gris-claro';
+              factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
 
               factura.customStyles = {
                 'td-historyPagos': { width: '2rem', 'font-size': '1.2rem' },
@@ -188,8 +191,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
                 'td-pagoT': { width: '6rem' },
                 'td-numero_comprobante': { width: '7rem' },
               };
-
-              console.log('factura ', factura);
 
               this.totalPagado = _.reduce(factura.pagos, (acumulado, item) => acumulado + item.deposito, this.totalPagado);
               this.totalNotas = _.reduce(factura.notas, (acumulado, item) => acumulado + Math.abs(item.total_factura), this.totalNotas);
@@ -208,7 +209,6 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
     this.restando = this.clienteAdepositar.balance - this.recibiendo;
 
-
     const obj = { total: this.facturas.lenght, tabla: 'facturasPendientes' };
 
     this.tServ.Func_total_paginas(obj);
@@ -222,21 +222,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     if (arg.column === 'historyPagos') {
       const pagos = this.facturas[arg.index].pagos;
       const notas = this.facturas[arg.index].notas;
-
-      if (pagos.length > 0 || notas.length > 0) {
-        for (let i = 0; i < pagos.length; i++) {
-          const pago = pagos[i];
-          pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
-          pago.fecha_equivalente = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
-        }
-
-        for (let i = 0; i < notas.length; i++) {
-          const nota = notas[i];
-          nota.total_factura = Math.abs(nota.total_factura);
-          nota.fecha_equivalente = moment(nota.fecha_equivalente).format('DD/MM/YYYY');
-        }
-        this.abrirModal('historial_pago', { abonos: pagos, notas: notas });
-      }
+      if (pagos.length || notas.length) this.reciboServ.abrirModalHistorial(pagos, notas);
     }
   }
 
@@ -316,24 +302,24 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     obj.total = this.detalleYtotal.total_recibo;
     obj['detalle_recibos'] = this.detalleYtotal.detalle;
 
-    try {
-      const res = await this.dbServ.createRecibo(obj).toPromise();
+    this.reciboClass.createUpdateOne(obj).then((res) => {
+      const recibo = res['data'].recibo;
 
-      this.clienteAdepositar.balance = res.data.cliente.balance;
+      this.clienteAdepositar.balance = recibo.cliente.balance;
 
       this.pedirFacturasPorCliente(this.clienteAdepositar.id, this.tServ.obj_paginate);
       this.resetVariables();
 
-      const obj_print = { data: res, type: 'recibo_ingreso' };
+      const obj_print = { data: recibo, type: 'recibo_ingreso' };
 
-      this.pdfServ.generatePdf(obj_print).then((res) => {
-        if (res.status === 'si') {
-          const objBase = { base64: res.body, filename: res.file, type: 'recibo_ingreso' };
+      this.pdfServ.generatePdf(obj_print).then((res_pdf) => {
+        if (res_pdf.status === 'si') {
+          const objBase = { base64: res_pdf.body, filename: res_pdf.file, type: 'recibo_ingreso' };
           this._ipc.send('printBase64', objBase);
           this.layServ.nextCheckCuadreToday(true);
         }
       });
-    } catch (error) {}
+    });
   }
 
   printBase64Res(res) {

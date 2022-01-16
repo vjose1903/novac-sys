@@ -610,7 +610,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     this.TIPOARTICULO = articulo.descripcion;
     this.is_combo = articulo.is_combo;
 
-    if (articulo.is_combo) {
+    if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
       this.COMPRADOEN = 'Quintal';
       this.form.controls.otros_costos.setValue(GLOBAL.numFormatTwoDecimals(articulo.otros_costos));
       const res = await this.getMateriasP();
@@ -774,7 +774,10 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
       calcular_saco: formulario.calcular_saco,
     };
 
-    if (obj.is_combo) {
+    const array = this.ARRAY_FORMULA.value;
+
+    if (obj.is_combo || (array && array.length)) {
+      obj['is_combo'] = true;
       obj['vendido_en'] = 'Saco';
       obj['otros_costos'] = formulario.otros_costos;
       obj['formulas_productos_terminados'] = this.formarFormula();
