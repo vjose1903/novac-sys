@@ -112,6 +112,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
         msg_error = 'Debe seleccionar almenos un metodo de pago.';
         continuar = false;
       }
+
       tipo = 'ventas';
       //
     } else if (this.tipoModal === 'cuentas_cobrar_cliente' || this.tipoModal === 'cuentas_cobrar_ant_saldo') {
@@ -130,7 +131,6 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
       tipo = 'ventas_productos';
       //
     } else if (this.tipoModal === 'suplidor_prod') {
-
       extra.parameters = { articulo_id: data.articulo_id, desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false) };
       tipo = 'suplidor_prod';
       //
