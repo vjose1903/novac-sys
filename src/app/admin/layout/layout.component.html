@@ -1,5 +1,6 @@
 {{ checkFacturaGuardada() }}
 
+
 <div id="fondoC" *ngIf="noServer" class="h-100 w-100 position-absolute backnegro">
   <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
 </div>
@@ -8,7 +9,7 @@
   *ngIf="actualMenuItemBack == 'factura'"
   id="btn_side_facturas"
   class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center"
-  (click)="_toggleSidebar()"
+  (click)="_toggleSidebar('btn afuera')"
 >
   <i id="triangualo" class="fas fa-caret-left text-white"></i>
 </span>
@@ -24,10 +25,10 @@
   [baseZIndex]="1"
   [dismissible]="true"
   [closeOnEscape]="true"
-  (visibleChange)="_toggleSidebar()"
   [blockScroll]="true"
->
-  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar()">
+  (visibleChange)="_toggleSidebar('visibleChange')"
+  >
+  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro')">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
   <div class="contendioSidebar w-100 h-100">
@@ -63,6 +64,7 @@
               Compra
               <span *ngIf="!countCantFactSaved('compra').disable"> &nbsp;({{ countCantFactSaved('compra').cant }})</span>
             </ng-template>
+
           </p-tabPanel>
         </p-tabView>
 

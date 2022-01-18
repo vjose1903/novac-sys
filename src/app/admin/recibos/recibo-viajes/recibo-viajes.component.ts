@@ -275,14 +275,16 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
     obj['detalle_recibos'] = this.formarDetalle();
 
     this.reciboClass.createUpdateOne(obj).then((res) => {
+      console.log('res --> ', res['data']);
+
       this.getViajes(this.tServ.obj_paginate);
       this.resetVariables();
 
-      const obj_print = { data: res, type: 'recibo_ingreso' };
+      const obj_print = { data: res['data'].recibo, type: 'recibo_ingreso' };
 
-      this.pdfServ.generatePdf(obj_print).then((res) => {
-        if (res.status === 'si') {
-          const objBase = { base64: res.body, filename: res.file, type: 'recibo_ingreso' };
+      this.pdfServ.generatePdf(obj_print).then((res_pdf) => {
+        if (res_pdf.status === 'si') {
+          const objBase = { base64: res_pdf.body, filename: res_pdf.file, type: 'recibo_ingreso' };
           this._ipc.send('printBase64', objBase);
           this.layServ.nextCheckCuadreToday(true);
         }

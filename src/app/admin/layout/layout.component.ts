@@ -39,7 +39,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   activeIndex;
   initNavigate = true;
   cuadre_hoy;
-
+  ant_event_change_visibility;
   constructor(private dbServ: DBservice, private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef) {
     super();
 
@@ -148,8 +148,16 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     if (this.tipoModal === 'quitar_factura' && arg) this.quitarFacturaGuardada({ body: { archivo_id: this.seleccionModal?.archivo_id } });
   }
 
-  _toggleSidebar() {
-    this._opened = !this._opened;
+  _toggleSidebar(where?) {
+    if (where == 'visibleChange') {
+      if (this.ant_event_change_visibility == 'visibleChange') {
+        this._opened = false;
+        this.ant_event_change_visibility = undefined;
+      } else this.ant_event_change_visibility = where;
+    } else {
+      this.ant_event_change_visibility = where;
+      this._opened = !this._opened;
+    }
   }
 
   async getPrintersName() {
