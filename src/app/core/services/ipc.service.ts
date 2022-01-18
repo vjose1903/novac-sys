@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ipcRenderer, remote, webFrame } from 'electron';
+import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import { BehaviorSubject } from 'rxjs';
 import * as fs from 'fs';
@@ -10,7 +10,7 @@ import * as fs from 'fs';
 export class IpcService {
   private _ipc: typeof ipcRenderer;
   webFrame: typeof webFrame;
-  remote: typeof remote;
+
   childProcess: typeof childProcess;
   fs: typeof fs;
 
@@ -34,8 +34,6 @@ export class IpcService {
       try {
         this._ipc = window.require('electron').ipcRenderer;
         this.webFrame = window.require('electron').webFrame;
-        // If you wan to use remote object, pleanse set enableRemoteModule to true in main.ts
-        // this.remote = window.require('electron').remote;
 
         this.childProcess = window.require('child_process');
         this.fs = window.require('fs');
