@@ -226,6 +226,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   rellenarVariables() {
+    this.dbServ.getTiposFacturas().subscribe((res) => {
+      this.fun.logRed(' -----getTiposFacturas-----');
+      this.lista_tipos_facturas = res;
+    });
+
     this.fechaFactura = {};
     this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
     this.fechaFactura['back'] = this.fechaFactura['front'];
@@ -257,7 +262,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.fecha_viaje = new Date();
     this.articulosAcambiar = [];
 
-    this.dbServ.getTiposFacturas().subscribe((res) => (this.lista_tipos_facturas = res));
 
     this.factServ.setTipos(this.metodo, (res) => {
       if (res) {
@@ -378,7 +382,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   initCambioMenu(arg) {
     if (arg.bool) {
       this.formarObjArchivo().then(() => {
-        console.log("this.checkIfFacturacionEnProceso() --> ", this.checkIfFacturacionEnProceso());
+        console.log('this.checkIfFacturacionEnProceso() --> ', this.checkIfFacturacionEnProceso());
 
         if (this.checkIfFacturacionEnProceso()) {
           let obj;
@@ -403,7 +407,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
           this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta, verificar: true });
           this.layServ.nextFacturaGuardada(undefined);
         }
-
       });
     }
   }
