@@ -340,7 +340,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
 
       await this.calcularPorcientoComprobante().then((res_calculo) => {
-
         if (res.is_viaje) this.fecha_viaje = new Date(res.fecha_viaje);
         else this.fecha_viaje = new Date();
 
@@ -900,8 +899,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
   }
 
-  prueba() {
-  }
+  prueba() {}
 
   resetVariables() {
     this.cuerpo.RESETCUERPO();
@@ -1131,23 +1129,20 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (metodo === 'editar_factura') res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();
       else res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
 
+      let res_factura = res['data'];
+
       if (this.layServ.factura_guardada) this.revisarLocalStorage();
 
       await this.resetVariables();
 
-      res['FACTURA_DE'] = this.metodo;
+      res_factura['FACTURA_DE'] = this.metodo;
 
-      const obj = { data: res, type: 'facturacion' };
+      const obj = { data: res_factura, type: 'facturacion' };
 
       if (this.metodo === 'venta') {
-        this.pdfServ.generatePdf(obj).then((res) => {
-          if (res.status === 'si') {
-            const objBase = {
-              base64: res.body,
-              filename: res.file,
-              type: 'facturacion',
-            };
-
+        this.pdfServ.generatePdf(obj).then((res_pdf) => {
+          if (res_pdf.status === 'si') {
+            const objBase = { base64: res_pdf.body, filename: res_pdf.file, type: 'facturacion' };
             this._ipc.send('printBase64', objBase);
           }
         });
