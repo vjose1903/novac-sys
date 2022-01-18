@@ -142,6 +142,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.rellenarVariables();
 
     this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((facturaGuardada) => {
+      console.log('facturaGuardada --> ', facturaGuardada);
+
       if (facturaGuardada) {
         let obj = { texto_modal: '' };
 
@@ -376,6 +378,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   initCambioMenu(arg) {
     if (arg.bool) {
       this.formarObjArchivo().then(() => {
+        console.log("this.checkIfFacturacionEnProceso() --> ", this.checkIfFacturacionEnProceso());
+
         if (this.checkIfFacturacionEnProceso()) {
           let obj;
           let abrirModal = true;
@@ -387,6 +391,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
             if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
               this.fun.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
               abrirModal = false;
+              this.layServ.nextFacturaGuardada(undefined);
             } else {
               obj.texto_modal = 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?';
             }
@@ -394,8 +399,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
           this.procesoCambio(abrirModal, archivo_id, obj);
         } else {
+          this.fun.logYellow('NO HAY NADA EMPEZADO');
           this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta, verificar: true });
+          this.layServ.nextFacturaGuardada(undefined);
         }
+
       });
     }
   }
@@ -798,6 +806,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.info_cambio['bool'] = true;
 
       this.layServ.nextDecisionCambioMenu(this.info_cambio);
+      this.fun.logRed('salir_layout --> ');
+
       this.layServ.nextFacturaGuardada(undefined);
     } else if (this.tipoModal === 'desplegar_factura') {
       if (arg) this.agregarFacturaALocalStorage();
