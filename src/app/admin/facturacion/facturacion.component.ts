@@ -233,8 +233,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     this.fechaFactura = {};
     this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
-    this.fechaFactura['back'] = this.fechaFactura['front'];
-    this.FechaFacturaMostrar = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
+    this.fechaFactura['back']  = this.fechaFactura['front'];
+    this.FechaFacturaMostrar   = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
     this.action = undefined;
     this.factura_a_editar = undefined;
     this.modo_factura = 'normal';
@@ -549,6 +549,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   async calcularPorcientoComprobante() {
     return new Promise(async (resolve) => {
+      console.log("<-- calcularPorcientoComprobante --> ");
+
       const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
       if (this.metodo === 'venta') {
@@ -1059,6 +1061,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   formarData() {
     const empleado = this.fun.getUser();
+    console.log("<-- formarData --> ");
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
     let cuerpo_fact = GLOBAL.duplicarJson(this.CuerpoFactura);
