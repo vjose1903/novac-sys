@@ -144,7 +144,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((facturaGuardada) => {
       console.log('facturaGuardada --> ', facturaGuardada);
 
-      if (facturaGuardada) {
+      if (this.fun.hasValue(facturaGuardada)) {
         let obj = { texto_modal: '' };
 
         this.formarObjArchivo(facturaGuardada).then(() => {
@@ -164,6 +164,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
             if (abrir_modal) this.abrirModal('dinamico_texto', obj, 'desplegar_factura');
           } else {
+
+            console.log("No hay facturas en curso");
             this.procesoRelleno(facturaGuardada);
           }
           // si el modal no se abrira asignando el archivo_id de la factura que se va a rellenar como el que estara en turno
@@ -225,11 +227,16 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     });
   }
 
-  rellenarVariables() {
+  getTiposFacturas(){
+
     this.dbServ.getTiposFacturas().subscribe((res) => {
       this.fun.logRed(' -----getTiposFacturas-----');
       this.lista_tipos_facturas = res;
     });
+  }
+
+  rellenarVariables() {
+    this.getTiposFacturas();
 
     this.fechaFactura = {};
     this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
@@ -315,6 +322,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   rellenarCampos(id, tipo?, fact?) {
     return new Promise(async (resolve) => {
+      this.getTiposFacturas();
       let res;
       this.propietario_factura = {};
 
@@ -328,8 +336,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       } else {
         res = fact;
         this.setPropietario(res);
-
-        const tipo = _.find(this.lista_tipos_facturas, (fact) => fact.id === res['tipo_factura_id']);
+        console.log("this.lista_tipos_facturas ", this.lista_tipos_facturas);
+        const tipo = _.find(this.lista_tipos_facturas, (fact) => fact.id == res['tipo_factura_id']);
+        console.log("tipo ", tipo);
         res['tipo_factura'] = tipo ? tipo['descripcion'] : '';
       }
 
@@ -342,10 +351,12 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       this.fechaFactura['back'] = this.fechaFactura['front'];
 
       this.FechaFacturaMostrar = this.formarFechaFactura(fecha_facturacion)['FechaFacturaMostrar'];
-
+      console.log("tipos_facturas ", tipos_facturas);
+      console.log("res.tipo_factura ", res.tipo_factura);
       this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
 
       await this.calcularPorcientoComprobante().then((res_calculo) => {
+        console.log("res_calculo -> ",res_calculo);
         if (res.is_viaje) this.fecha_viaje = new Date(res.fecha_viaje);
         else this.fecha_viaje = new Date();
 
@@ -549,8 +560,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   async calcularPorcientoComprobante() {
     return new Promise(async (resolve) => {
-      console.log("<-- calcularPorcientoComprobante --> ");
 
+      console.log("<-- calcularPorcientoComprobante --> ");
+      console.log("lista_tipos_facturas --> ", this.lista_tipos_facturas);
       const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
       if (this.metodo === 'venta') {
