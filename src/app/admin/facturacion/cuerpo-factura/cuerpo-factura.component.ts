@@ -456,7 +456,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
         setTimeout(() => {
           if (this.metodo === 'venta') this.enfocarInput('cod-' + index);
           else this.enfocarInput('pre-' + index);
-        }, 150);
+        }, 200);
       });
     }
 
@@ -564,7 +564,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
               setTimeout(() => {
                 if (this.metodo === 'venta') this.enfocarInput(`cod-${i + 1}`);
                 else this.enfocarInput(`pre-${i + 1}`);
-              }, 150);
+              }, 200);
             });
           });
         }

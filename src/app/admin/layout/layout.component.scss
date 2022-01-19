@@ -279,6 +279,7 @@ $bodyfont: "Poppins";
   .p-sidebar-content {
     overflow: initial !important;
     padding: 0 !important;
+    width: calc(100% - 0.5rem );
   }
 
   &.side_open {

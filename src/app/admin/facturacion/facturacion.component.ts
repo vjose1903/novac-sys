@@ -228,73 +228,77 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   getTiposFacturas(){
+    return new Promise((resolve)=>{
 
-    this.dbServ.getTiposFacturas().subscribe((res) => {
-      this.fun.logRed(' -----getTiposFacturas-----');
-      this.lista_tipos_facturas = res;
+      this.dbServ.getTiposFacturas().subscribe((res) => {
+        this.fun.logRed(' -----getTiposFacturas-----');
+        this.lista_tipos_facturas = res;
+        resolve(true);
+      });
     });
   }
 
   rellenarVariables() {
-    this.getTiposFacturas();
+    this.getTiposFacturas().then((resultado)=>{
 
-    this.fechaFactura = {};
-    this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
-    this.fechaFactura['back']  = this.fechaFactura['front'];
-    this.FechaFacturaMostrar   = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
-    this.action = undefined;
-    this.factura_a_editar = undefined;
-    this.modo_factura = 'normal';
-    this.is_adelantada = false;
-    this.is_viaje = false;
-    this.condicion_fact = 'Contado';
-    this.forma_pago = 'Efectivo';
-    this.propietario_factura = undefined;
-    this.objArchivo = undefined;
-    this.CuerpoFactura = [];
-    this.DESCUENTO = 0.0;
-    this.BRUTO = 0.0;
-    this.TOTAL = 0.0;
-    this.ITBIS = 0;
-    this.NCFcompra = undefined;
-    this.CostoYgasto = '';
-    // this.facturaGuardada = undefined;
-    this.layServ.factura_guardada = undefined;
-    this.metodo = this.route.snapshot.params['tipo'];
-    this.action = this.route.snapshot.params['action'];
-    const id_factura = this.route.snapshot.params['id'];
-    this.FacturaAtrasada = false;
-    this.fecha_vencimiento = new Date();
-    this.fecha_equivalente = new Date();
-    this.fecha_viaje = new Date();
-    this.articulosAcambiar = [];
+      this.fechaFactura = {};
+      this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
+      this.fechaFactura['back']  = this.fechaFactura['front'];
+      this.FechaFacturaMostrar   = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
+      this.action = undefined;
+      this.factura_a_editar = undefined;
+      this.modo_factura = 'normal';
+      this.is_adelantada = false;
+      this.is_viaje = false;
+      this.condicion_fact = 'Contado';
+      this.forma_pago = 'Efectivo';
+      this.propietario_factura = undefined;
+      this.objArchivo = undefined;
+      this.CuerpoFactura = [];
+      this.DESCUENTO = 0.0;
+      this.BRUTO = 0.0;
+      this.TOTAL = 0.0;
+      this.ITBIS = 0;
+      this.NCFcompra = undefined;
+      this.CostoYgasto = '';
+      // this.facturaGuardada = undefined;
+      this.layServ.factura_guardada = undefined;
+      this.metodo = this.route.snapshot.params['tipo'];
+      this.action = this.route.snapshot.params['action'];
+      const id_factura = this.route.snapshot.params['id'];
+      this.FacturaAtrasada = false;
+      this.fecha_vencimiento = new Date();
+      this.fecha_equivalente = new Date();
+      this.fecha_viaje = new Date();
+      this.articulosAcambiar = [];
 
 
-    this.factServ.setTipos(this.metodo, (res) => {
-      if (res) {
-        this.tipoFactura = this.factServ.tipoFactura;
-        this.TiposFacturas = this.factServ.TiposFacturas;
-        this.tipos_facturas = this.factServ.tipos_facturas;
-        this.TiposCostosGastos = this.factServ.TiposCostosGastos;
-        this.tipos_costosYgastos = this.factServ.tipos_costosYgastos;
+      this.factServ.setTipos(this.metodo, (res) => {
+        if (res) {
+          this.tipoFactura = this.factServ.tipoFactura;
+          this.TiposFacturas = this.factServ.TiposFacturas;
+          this.tipos_facturas = this.factServ.tipos_facturas;
+          this.TiposCostosGastos = this.factServ.TiposCostosGastos;
+          this.tipos_costosYgastos = this.factServ.tipos_costosYgastos;
+        }
+      });
+
+      if (this.metodo === 'venta') {
+        this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higuero', telefono: null });
+      } else {
+        this.form.reset();
+      }
+
+      if (this.action === 'update') {
+        this.factura_a_editar = {};
+        this.rellenarCampos(id_factura, 'editar').then(() => {
+          this.cuerpo.llenarFactura(this.factura_a_editar.detalle_facturas);
+          this.enfocarInput('cod-0');
+        });
+      } else {
+        setTimeout(() => this.enfocarInput('tipoFact'), 5);
       }
     });
-
-    if (this.metodo === 'venta') {
-      this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higuero', telefono: null });
-    } else {
-      this.form.reset();
-    }
-
-    if (this.action === 'update') {
-      this.factura_a_editar = {};
-      this.rellenarCampos(id_factura, 'editar').then(() => {
-        this.cuerpo.llenarFactura(this.factura_a_editar.detalle_facturas);
-        this.enfocarInput('cod-0');
-      });
-    } else {
-      setTimeout(() => this.enfocarInput('tipoFact'), 5);
-    }
   }
 
   procesoRelleno(factura) {
@@ -321,57 +325,60 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
   }
 
   rellenarCampos(id, tipo?, fact?) {
-    return new Promise(async (resolve) => {
-      this.getTiposFacturas();
-      let res;
-      this.propietario_factura = {};
+    return new Promise( (resolve) => {
+      this.getTiposFacturas().then(async (resultado)=>{
 
-      if (tipo === 'editar') {
-        res = await this.facturaClass.getFacturaById(id);
-        res = res['data'];
+        let res;
+        this.propietario_factura = {};
 
-        this.factura_a_editar = res;
-        this.propietario_factura = res.cliente;
-        this.propietario_factura['id'] = res.cliente_id;
-      } else {
-        res = fact;
-        this.setPropietario(res);
-        console.log("this.lista_tipos_facturas ", this.lista_tipos_facturas);
-        const tipo = _.find(this.lista_tipos_facturas, (fact) => fact.id == res['tipo_factura_id']);
-        console.log("tipo ", tipo);
-        res['tipo_factura'] = tipo ? tipo['descripcion'] : '';
-      }
+        if (tipo === 'editar') {
+          res = await this.facturaClass.getFacturaById(id);
+          res = res['data'];
 
-      this.metodo = res.tipo;
-      this.FacturaAtrasada = fact ? fact?.FacturaAtrasada : false;
+          this.factura_a_editar = res;
+          this.propietario_factura = res.cliente;
+          this.propietario_factura['id'] = res.cliente_id;
+        } else {
+          res = fact;
+          this.setPropietario(res);
+          console.log("this.lista_tipos_facturas ", this.lista_tipos_facturas);
+          const tipo = _.find(this.lista_tipos_facturas, (fact) => fact.id == res['tipo_factura_id']);
+          console.log("tipo ", tipo);
+          res['tipo_factura'] = tipo ? tipo['descripcion'] : '';
+        }
 
-      const fecha_facturacion = fact?.fecha_equivalente ? fact?.fecha_equivalente : GLOBAL.duplicarJson(this.fechaFactura['back']);
+        this.metodo = res.tipo;
+        this.FacturaAtrasada = fact ? fact?.FacturaAtrasada : false;
 
-      this.fechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
-      this.fechaFactura['back'] = this.fechaFactura['front'];
+        const fecha_facturacion = fact?.fecha_equivalente ? fact?.fecha_equivalente : GLOBAL.duplicarJson(this.fechaFactura['back']);
 
-      this.FechaFacturaMostrar = this.formarFechaFactura(fecha_facturacion)['FechaFacturaMostrar'];
-      console.log("tipos_facturas ", tipos_facturas);
-      console.log("res.tipo_factura ", res.tipo_factura);
-      this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
+        this.fechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
+        this.fechaFactura['back'] = this.fechaFactura['front'];
 
-      await this.calcularPorcientoComprobante().then((res_calculo) => {
-        console.log("res_calculo -> ",res_calculo);
-        if (res.is_viaje) this.fecha_viaje = new Date(res.fecha_viaje);
-        else this.fecha_viaje = new Date();
+        this.FechaFacturaMostrar = this.formarFechaFactura(fecha_facturacion)['FechaFacturaMostrar'];
+        console.log("tipos_facturas ", tipos_facturas);
+        console.log("res.tipo_factura ", res.tipo_factura);
+        this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
 
-        if (res.tipo === 'compra') this.fecha_vencimiento = new Date(res.fecha_vencimiento);
-        else this.fecha_vencimiento = new Date();
+        await this.calcularPorcientoComprobante().then((res_calculo) => {
+          console.log("res_calculo -> ",res_calculo);
+          if (res.is_viaje) this.fecha_viaje = new Date(res.fecha_viaje);
+          else this.fecha_viaje = new Date();
 
-        this.is_viaje = res.is_viaje;
-        this.condicion_fact = res.condicion;
+          if (res.tipo === 'compra') this.fecha_vencimiento = new Date(res.fecha_vencimiento);
+          else this.fecha_vencimiento = new Date();
 
-        this.NCFcompra = res.tipo === 'compra' ? res.numero_comprobante : undefined;
-        this.CostoYgasto = res.tipo === 'compra' ? res.costoYgasto : '';
+          this.is_viaje = res.is_viaje;
+          this.condicion_fact = res.condicion;
 
-        this.modo_factura = res.is_viaje ? 'viaje' : res.is_adelantada ? 'adelantada' : 'normal';
+          this.NCFcompra = res.tipo === 'compra' ? res.numero_comprobante : undefined;
+          this.CostoYgasto = res.tipo === 'compra' ? res.costoYgasto : '';
 
-        resolve(true);
+          this.modo_factura = res.is_viaje ? 'viaje' : res.is_adelantada ? 'adelantada' : 'normal';
+
+          resolve(true);
+        });
+
       });
     });
   }

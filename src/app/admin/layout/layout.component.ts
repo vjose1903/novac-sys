@@ -54,6 +54,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
         if (this.initNavigate) {
           setTimeout(() => this.checkRouteActiva(), 250);
+
           const token = this.fun.getAuthToken();
           if (token) this.checkCuadre();
 
@@ -261,21 +262,29 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
 
   checkWhereIs(arg?) {
     return new Promise((resolve) => {
+      const pathname = document.location.pathname;
       const url = document.location.pathname.split('/')[3];
+      console.log('pathname ', pathname);
+      console.log('arg ', arg);
 
-      if (url !== arg) {
+      console.log('url ', url);
+      if (this.fun.hasValue(arg) && !pathname.includes(arg)) {
         this.layServ.nextCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
-        resolve(true);
-      } else resolve(true);
+        setTimeout(() => resolve(true) ,100);
+      } else setTimeout(() => resolve(true) ,100);
     });
   }
 
   pasarFacturaAfacturacion(fact) {
     if (this.fun.isEmpty(this.factGuardada) || fact.archivo_id != this.factGuardada.archivo_id) {
       this.checkWhereIs(fact.tipo).then((res) => {
+        console.log('res ', res);
         this.fun.logGreen('pasarFacturaAfacturacion ', fact);
 
-        if (res) this.layServ.nextFacturaGuardada(fact);
+        setTimeout(() => {
+          if (res) this.layServ.nextFacturaGuardada(fact);
+        }, 150);
+
       });
     }
   }
