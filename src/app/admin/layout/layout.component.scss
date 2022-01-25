@@ -428,7 +428,7 @@ $bodyfont: "Poppins";
 }
 
 mat-nav-list {
-  background-color: #95f0a7;
+  background-color: var(--primary01);
   overflow: hidden auto;
   height: calc(100% - 32px);
 }

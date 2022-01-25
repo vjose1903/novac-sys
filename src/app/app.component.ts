@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit } from '@angular/core';
 import { DBservice } from './core/services/bdservice.service';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
@@ -12,13 +12,14 @@ import { ToastrService } from 'ngx-toastr';
 import { ModalService } from './admin/components/modal/modal.service';
 import { LayoutService } from './admin/layout/layout.service';
 import { PdfService } from './core/services/pdf/pdf.service';
+import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit, AfterContentChecked {
+export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit {
   loading = false;
   objProgress;
   visible = false;
@@ -40,6 +41,7 @@ export class AppComponent implements OnInit, AfterContentChecked {
     public mServ: ModalService,
     public layServ: LayoutService,
     public pdfServ: PdfService,
+    private themeService: ThemeService,
   ) {}
 
   ngOnInit(): void {
@@ -99,6 +101,10 @@ export class AppComponent implements OnInit, AfterContentChecked {
     });
 
     this.getPrintersName();
+  }
+
+  ngAfterViewInit(): void {
+    this.themeService.setTheme('green');
   }
 
   getPrintersName() {

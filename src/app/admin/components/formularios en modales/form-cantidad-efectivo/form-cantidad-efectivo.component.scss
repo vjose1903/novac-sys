@@ -1,5 +1,3 @@
-.label {
-}
 .total {
   font-size: 3rem;
 }
@@ -11,8 +9,8 @@
 }
 
 .cambioDePrecios {
-  background-color: #95f0a7;
-  border: 1.5px solid #7add8d;
+  background-color: var(--primary01);
+  border: 1.5px solid var(--primary02);
   border-radius: 1rem;
   padding: 0.5rem;
 }
@@ -23,10 +21,10 @@ span.spanTituloCambio {
   font-size: 1.15rem;
   > span {
     font-weight: 520;
-    color: #1e6f15;
+    color: var(--primary07);
   }
   > i.fas.fa-exclamation-circle {
-    color: #22ad41;
+    color: var(--primary05);
     font-size: 1.5rem;
   }
 }

@@ -63,7 +63,7 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
       &.hoverlable {
         cursor: pointer !important;
       }
-      background: #95f0a7;
+      background: var(--primary01);
     }
   }
 }
@@ -82,7 +82,7 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 /* boton cuenta */
 #button-basic:hover {
   text-decoration-line: none;
-  color: #36c080;
+  color: var(--primary03);
 }
 
 /* botones de opciones */
@@ -96,7 +96,7 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 
 .dropdown-item:hover {
   border-radius: 2px;
-  background: #95f0a7;
+  background: var(--primary01);
   // background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
 }
 
@@ -111,7 +111,7 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 }
 
 .dropdown-header {
-  background-color: #a2f6cf59;
+  background-color: var(--transparente02)
 }
 .dropdown-header h2 {
   color: black;
@@ -207,7 +207,7 @@ body {
 // ========================================================
 
 .p-progressbar-value {
-  background-color: #45e465d1 !important;
+  background-color: var(--primary04) !important;
   &:hover {
     background-color: #3bc65785 !important;
   }
@@ -269,12 +269,6 @@ body {
 
 .sombra {
   box-shadow: 0px 4px 14px -6px black;
-}
-.contenedorRegistro {
-  // display: flex;
-  // flex-direction: column;
-  // justify-content: center;
-  // height: calc(100% - 50px);
 }
 
 .sinPadding {
