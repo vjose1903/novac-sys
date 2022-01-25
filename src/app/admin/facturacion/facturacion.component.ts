@@ -1153,32 +1153,32 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     res_factura['FACTURA_DE'] = this.metodo;
 
     const obj = { data: res_factura, type: 'facturacion' };
+    console.log('res_factura ', res_factura);
 
     if (this.metodo === 'venta') {
       this.pdfServ.generatePdf(obj).then((res_pdf) => {
         this.fun.logRed('res_pdf ', res_pdf);
         try {
           if (res_pdf.status === 'si') {
-            const objBase = { base64: res_pdf.body, filename: res_pdf.file, type: 'facturacion' };
-            this._ipc.send('printBase64', objBase);
+            const obj = { base64: res_pdf.body, filename: res_pdf.file, type: 'facturacion' };
+            this._ipc.send('printBase64', obj);
           }
         } catch (error) {
-          console.log("error --> ", error);
-
+          console.log('error --> ', error);
         }
       });
     }
 
     this.layServ.nextCheckCuadreToday(true);
 
-    if (metodo === 'editar_factura') this.router.navigateByUrl('manipular/buscarFactura/solo_ver');
-    else await this.resetVariables();
+    // if (metodo === 'editar_factura') this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
+    // else await this.resetVariables();
   }
 
-  printBase64Res(res) {
-    if (res.status === 'si') {
+  printBase64Res(res_ipc) {
+    if (res_ipc.status === 'si') {
     } else {
-      this.fun.toastError('Error imprimiendo la factura.', 'ERROR');
+      this.fun.toastError('Error imprimiendo la factura', 'ERROR');
     }
   }
 }

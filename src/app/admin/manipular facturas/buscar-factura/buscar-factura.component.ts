@@ -98,9 +98,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
       if (res.status === 'si') {
         this.fileName = res.file;
         this.pdfSrc = res.body;
-
         const obj = { base64: this.pdfSrc, filename: this.fileName, type: 'facturacion' };
-
         this._ipc.send('printBase64', obj);
       }
     });
