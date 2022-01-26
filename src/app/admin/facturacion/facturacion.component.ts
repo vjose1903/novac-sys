@@ -1171,8 +1171,8 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     this.layServ.nextCheckCuadreToday(true);
 
-    // if (metodo === 'editar_factura') this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
-    // else await this.resetVariables();
+    if (metodo === 'editar_factura') this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
+    else await this.resetVariables();
   }
 
   printBase64Res(res_ipc) {
