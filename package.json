@@ -48,6 +48,7 @@
     "electron-dl": "^3.0.2",
     "electron-log": "^4.2.4",
     "electron-updater": "4.6.1",
+    "express": "4.17.2",
     "hammerjs": "~2.0.8",
     "jquery": "3.6.0",
     "ngx-bootstrap": "^6.2.0",
