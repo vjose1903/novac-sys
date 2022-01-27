@@ -1177,8 +1177,6 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   printBase64Res(res_ipc) {
     if (res_ipc.status === 'si') {
-    } else {
-      this.fun.toastError('Error imprimiendo la factura', 'ERROR');
-    }
+    } else this.fun.toastError('Error imprimiendo la factura', 'ERROR');
   }
 }
