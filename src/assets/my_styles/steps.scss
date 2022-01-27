@@ -17,12 +17,12 @@
     &.p-highlight {
       .p-menuitem-link {
         .p-steps-number {
-          background: #64b5a5 !important;
-          border-color: #64b5a5 !important;
+          background: var(--primary04) !important;
+          border-color: var(--primary04) !important;
         }
         .p-steps-title {
           font-weight: 700 !important;
-          color: #64b5a5 !important;
+          color: var(--primary04) !important;
         }
       }
     }

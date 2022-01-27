@@ -18,7 +18,7 @@ import { RecibosService } from '../recibos.service';
 export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;
   info = [
-    { titulo: '1', key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '1.5rem' }, { color: '#8ef3a3' }] },
+    { titulo: '1', key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '1.5rem' }, { color: 'var(--transparente00)' }] },
     { titulo: 'Fecha Fact.', key: 'fecha' },
     { titulo: 'Cliente', key: 'cliente_mostrar' },
     { titulo: 'NCF', key: 'numero_comprobante' },

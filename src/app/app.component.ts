@@ -105,6 +105,8 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
   ngAfterViewInit(): void {
     this.themeService.setTheme('green');
+    // this.themeService.setTheme('blue');
+    // this.themeService.setTheme('red');
   }
 
   getPrintersName() {

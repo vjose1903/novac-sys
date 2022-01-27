@@ -63,7 +63,7 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
       &.hoverlable {
         cursor: pointer !important;
       }
-      background: var(--primary01);
+      background: var(--primary02);
     }
   }
 }
@@ -82,7 +82,7 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 /* boton cuenta */
 #button-basic:hover {
   text-decoration-line: none;
-  color: var(--primary03);
+  color: var(--primary04);
 }
 
 /* botones de opciones */
@@ -96,7 +96,7 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 
 .dropdown-item:hover {
   border-radius: 2px;
-  background: var(--primary01);
+  background: var(--primary02);
   // background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
 }
 
@@ -111,7 +111,7 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 }
 
 .dropdown-header {
-  background-color: var(--transparente02)
+  background-color: var(--transparente02);
 }
 .dropdown-header h2 {
   color: black;
@@ -207,9 +207,9 @@ body {
 // ========================================================
 
 .p-progressbar-value {
-  background-color: var(--primary04) !important;
+  background-color: var(--primary06) !important;
   &:hover {
-    background-color: #3bc65785 !important;
+    background-color: var(--transparente03) !important;
   }
 }
 .p-progressbar {
@@ -418,6 +418,7 @@ input[type="text"] {
     color: white;
   }
 }
+
 .btn-verde,
 #btn-verde {
   box-shadow: 0px 2px 3px 0px #a0a0a0;
@@ -426,6 +427,17 @@ input[type="text"] {
   &:hover {
     cursor: pointer;
     background-color: rgb(25, 135, 43);
+    color: white;
+  }
+}
+
+.btn-tema {
+  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  background-color: var(--primary07);
+  color: white;
+  &:hover {
+    cursor: pointer;
+    filter: brightness(0.6);
     color: white;
   }
 }
@@ -454,7 +466,7 @@ input[type="text"] {
     cursor: pointer;
     &:hover {
       cursor: pointer;
-      color: #4fa05d;
+      color: var(--primary05);
     }
   }
 }
@@ -504,8 +516,8 @@ input[type="text"] {
     &.p-highlight .p-tabview-nav-link {
       background: #007ad900 !important;
       border-color: #c8c8c866 !important;
-      color: #42c05b !important;
-      border-bottom: 2px solid #42c05b !important;
+      color: var(--primary07) !important;
+      border-bottom: 2px solid var(--primary06) !important;
     }
   }
 }
@@ -542,7 +554,7 @@ input[type="text"] {
 /* ====================================================== */
 
 body .p-dialog .p-dialog-header {
-  background-color: #94e6aa !important;
+  background-color: var(--primary02) !important;
   padding: 0.5rem 1rem !important;
   z-index: 100001 !important;
   text-transform: uppercase;
@@ -604,8 +616,8 @@ input.apple-switch:after {
 }
 
 input.apple-switch:checked {
-  border-color: #55d069;
-  box-shadow: inset 15px 0px 0 0 #55d069;
+  border-color: var(--primary07);
+  box-shadow: inset 15px 0px 0 0 var(--primary07);
 }
 input.apple-switch:checked:after {
   left: 16px;
@@ -629,7 +641,7 @@ input.apple-switch:checked:after {
     border-radius: 0 !important;
 
     button[disabled] {
-      background: #00890b4d;
+      background: var(--transparente04);
     }
   }
 }
@@ -642,7 +654,7 @@ bs-daterangepicker-container {
 .btn.btn-link {
   margin: 0 !important;
   padding: 0.3rem !important;
-  color: #158515 !important;
+  color: var(--primary09) !important;
 }
 
 #timepiker_______ {
@@ -650,12 +662,12 @@ bs-daterangepicker-container {
     > div {
       > div.ngb-tp-meridian {
         button {
-          border: 2px solid #16a016 !important;
+          border: 2px solid var(--primary07) !important;
           background-color: transparent !important;
-          color: #158515 !important;
+          color: var(--primary09) !important;
           &:hover {
-            border: 2px solid #126b12 !important;
-            color: #0b580b !important;
+            border: 2px solid var(--primary09) !important;
+            color: var(--primary10) !important;
           }
         }
       }
@@ -716,15 +728,15 @@ Not supports in Firefox and IE */
   margin: 0;
   padding: 0;
   & .current {
-    background: #4ee488 !important;
+    background: var(--primary04) !important;
   }
 
   & .my-pagination .current:hover {
-    background: hsl(139, 55%, 42%) !important;
+    background: var(--primary08);
     cursor: pointer;
   }
   & .pagination-next > a:hover {
-    color: #30a756 !important;
+    color: var(--primary05) !important;
     cursor: pointer;
   }
 
@@ -735,7 +747,7 @@ Not supports in Firefox and IE */
 
 .my-pagination .pagination-next > a:hover,
 .my-pagination .pagination-previous > a:hover {
-  color: #30a756 !important;
+  color: var(--primary07) !important;
   cursor: pointer;
 }
 

@@ -6,16 +6,16 @@
   border-radius: 50%;
   transition: all 0.5s;
   &:hover {
-    background-color: #d9e8d4;
+    background-color: var(--primary01);
     cursor: pointer;
   }
 }
 .bordes {
-  border: 2px solid rgb(23, 122, 20);
+  border: 2px solid var(--primary09);
 }
 
 .info {
-  background-color: #0080002e;
+  background-color: var(--transparente04);
   border-radius: 10px;
   box-shadow: 1px 1px 4px grey;
 }

@@ -17,7 +17,7 @@
 // }
 
 .areaDetalle {
-  background-color: var(--primary04);
+  background-color: var(--primary06);
   padding: 1.5rem 0.1rem 2rem 1rem;
   border-radius: 12px;
 }
@@ -26,7 +26,7 @@
   transform: translate(30px, 0px);
   &:hover {
     cursor: pointer;
-    text-shadow: 1px 1px 4px #3f403dd6;
+    text-shadow: 1px 1px 4px var(--secondary05);
   }
 }
 #btnMasInput {
@@ -36,10 +36,10 @@
   padding: 0;
   &:hover {
     cursor: pointer;
-    text-shadow: 1px 1px 4px #3f403dd6;
+    text-shadow: 1px 1px 4px var(--secondary05);
   }
   &:disabled {
-    color: rgba(236, 143, 143, 0.764);
+    color: #ec8f8fc3;
     :hover {
       cursor: no-drop !important;
     }
@@ -104,7 +104,7 @@
     margin-left: 16px;
   }
   input:checked + label:before {
-    background: #55d069;
+    background: var(--primary07);
   }
 }
 
@@ -169,6 +169,6 @@ mdb-checkbox .form-check {
 }
 mdb-checkbox .form-check {
   &input[type="checkbox"].ios8-switch:checked + label:before {
-    background: #55d069;
+    background: var(--primary07);
   }
 }

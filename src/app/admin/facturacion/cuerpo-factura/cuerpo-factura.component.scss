@@ -3,7 +3,7 @@
   height: calc(1.5em + 0.3rem + 2px) !important;
   padding: 0rem 0.3rem 0rem 0.5rem !important;
   &:focus {
-    background-color: #eaffe4;
+    background-color: var(--primary01);
     border-color: #d4d4d4 !important;
     box-shadow: 1px 1px #d4d4d4 !important;
   }

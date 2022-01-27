@@ -15,8 +15,8 @@
     li {
       &.p-highlight {
         a {
-          border-color: #64b5a5 !important;
-          color: #64b5a5 !important;
+          border-color: var(--primary04) !important;
+          color: var(--primary04) !important;
         }
       }
       a {
@@ -42,8 +42,8 @@
       li {
         &.p-highlight {
           a {
-            border-color: #64b5a5 !important;
-            color: #64b5a5 !important;
+            border-color: var(--primary04) !important;
+            color: var(--primary04) !important;
           }
         }
         a {

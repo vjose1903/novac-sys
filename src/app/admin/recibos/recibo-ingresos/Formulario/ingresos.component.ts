@@ -27,7 +27,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   // =============================================
 
   info = [
-    { titulo: '1', key: 'historyPagos', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }, { color: '#8ef3a3' }] },
+    { titulo: '1', key: 'historyPagos', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }] },
     { titulo: 'NCF', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
     { titulo: 'Fecha Facturacion', key: 'fecha' },
     { titulo: 'Fecha Vencimiento', text_color: 'colorFecha', key: 'fechaV', color: true },

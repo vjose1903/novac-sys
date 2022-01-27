@@ -27,7 +27,7 @@
     }
     &.p-menuitem-active {
       > .p-menuitem-link {
-        background: #4a897c4f !important;
+        background: var(--transparente02) !important;
         &:focus {
           @include primengFocus;
         }

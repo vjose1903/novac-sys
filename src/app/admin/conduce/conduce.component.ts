@@ -39,7 +39,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       titulo: '1',
       key: 'detalles_selected',
       isIcon: true,
-      estilos: [{ width: '2rem' }, { color: '#8ef3a3' }],
+      estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }],
     },
     {
       titulo: 'Numero Fact',

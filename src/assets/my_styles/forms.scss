@@ -43,9 +43,9 @@
   &.p-focus,
   &.p-dropdown-open {
     @include primengFocus;
-    background-color: #b9e2ad !important;
+    background-color: var(--primary02) !important;
     border-color: transparent !important;
-    box-shadow: 0px 0px 6px #2ba950 !important;
+    box-shadow: 0px 0px 6px var(--primary08) !important;
   }
 }
 
@@ -59,7 +59,7 @@
     .p-dropdown-items {
       .p-dropdown-item {
         &.p-highlight {
-          background-color: #27bb3582 !important;
+          background-color: var(--primary08) !important;
           color: black;
           font-weight: 600;
         }
@@ -73,9 +73,9 @@
   color: #1d253b !important;
   box-shadow: 1px 1px 4px 0px #1d253b3d !important;
   &:focus {
-    background-color: #b9e2ad !important;
+    background-color: var(--primary02) !important;
     border-color: transparent !important;
-    box-shadow: 0px 0px 6px #2ba950 !important;
+    box-shadow: 0px 0px 6px var(--primary08) !important;
   }
 }
 
@@ -104,9 +104,9 @@ textarea {
   @include campos;
 
   // &:focus {
-  //   background-color: #b9e2ad !important;
+  //   background-color: var(--primary01) !important;
   //   border-color: transparent !important;
-  //   box-shadow: 0px 0px 6px #2ba950 !important;
+  //   box-shadow: 0px 0px 6px var(--primary08) !important;
   // }
 }
 

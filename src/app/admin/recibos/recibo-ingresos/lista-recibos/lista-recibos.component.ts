@@ -21,7 +21,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
       text_color: 'colorEstado',
       isIcon: true,
       color: true,
-      estilos: [{ width: '3%' }, { color: '#8ef3a3' }],
+      estilos: [{ width: '3%' }, { color: 'var(--transparente00)' }],
     },
     {
       titulo: 'No. recibo',
@@ -45,13 +45,13 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
       estilos: [{ width: '12%' }, { 'text-align': 'end' }],
     },
     {
-      titulo: '2',
+      titulo: '7',
       key: 'ver',
       text_color: 'colorNegro',
       text_tooltip: 'tooltip_ver',
       isIcon: true,
       color: true,
-      estilos: [{ width: '0%' }, { color: '#8ef3a3' }],
+      estilos: [{ width: '0%' }, { color: 'var(--transparente00)' }],
     },
     {
       titulo: 'Acciones',
@@ -92,7 +92,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   }
 
   ipcPrintResponse(res) {
-    
+
 
     if (res.status === 'si') {
       // this.fileName = res.file;

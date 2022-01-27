@@ -1,13 +1,13 @@
-.bntLetra {
+.btnLetra {
   font-size: 1.3rem;
   font-weight: 450;
   transition: all 0.1s;
   &::active {
-    color: rgb(76, 167, 11);
+    color: var(--primary07);
   }
   &:hover {
     cursor: pointer;
     font-size: 1.33rem;
-    color: green;
+    color: var(--primary07);
   }
 }
