@@ -75,6 +75,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   recibiendo = 0;
   restando = 0;
   reciboClass = new ReciboC();
+  debiendo;
 
   constructor(private config: NgSelectConfig, private dbServ: DBservice, private tServ: TablasService, private reciboServ: RecibosService) {
     super();
@@ -102,7 +103,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   objDevueltoResponse(res) {
     if (res && res.tipo_modal === 'buscarCliente') {
       this.clienteAdepositar = res.data;
-      this.clienteAdepositar.balance = this.clienteAdepositar.balance ? this.clienteAdepositar.balance : 0;
+      console.log('res.data --> ', res.data);
 
       (document.getElementById('clienteI') as any).value = `${res.data.nombre} ${res.data.apellido}`;
 
@@ -207,13 +208,16 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       .toPromise();
 
     this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
-    this.restando = this.clienteAdepositar.balance - this.recibiendo;
+    this.debiendo = this.totalFacturado - this.totalPagado - this.totalNotas;
+    console.log(' debiendo ', this.debiendo);
 
+    this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
     const obj = { total: this.facturas.lenght, tabla: 'facturasPendientes' };
 
     this.tServ.Func_total_paginas(obj);
   }
 
+  // 134215.75+27725+106099.56+139550.75+2970+159379.56+110629.31+92004.56+32554.89
   async necesarioStart() {
     this.enfocarInput('clienteI');
   }
@@ -368,7 +372,7 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
 
   sumarTotalRecibo() {
     this.recibiendo = _.reduce(this.facturas, (sum, item) => GLOBAL.desformatear(item.monto) + sum, 0);
-    this.restando = this.clienteAdepositar.balance - this.recibiendo;
+    this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
   }
 
   async abrirModalFiltro(nombre) {
