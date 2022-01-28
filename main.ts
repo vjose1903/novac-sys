@@ -61,8 +61,8 @@ function createWindow(): BrowserWindow {
     win.loadURL('http://localhost:5220');
   } else {
     // Path when running electron executable
-    let pathIndex = pathAdd('/index.html');
-    let baseDirectory = pathAdd('/');
+    let pathIndex = pathAdd('/dist/index.html');
+    let baseDirectory = pathAdd('/dist/');
 
     // if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
     //   // Path when running electron in local folder
