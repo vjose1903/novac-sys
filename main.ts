@@ -61,41 +61,44 @@ function createWindow(): BrowserWindow {
     win.loadURL('http://localhost:5220');
   } else {
     // Path when running electron executable
-    let pathIndex = './index.html';
-    let baseDirectory = '../app';
+    let pathIndex = pathAdd('/index.html');
+    let baseDirectory = pathAdd('/');
 
-    if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-      // Path when running electron in local folder
-      pathIndex = '../dist/index.html';
-      baseDirectory = '../dist';
-    }
+    // if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
+    //   // Path when running electron in local folder
+    //   pathIndex = '../dist/index.html';
+    //   baseDirectory = '../dist';
+    // }
     var httpPort = 5220;
     const app = express();
 
-    if (fs.existsSync('resources/app/index.html')) {
-      // Path when running electron in local folder
-      pathIndex = 'resources/app/index.html';
-      baseDirectory = 'resources/app';
-      app.use(express.static(path.resolve(baseDirectory)));
+    app.use(express.static(path.resolve(baseDirectory)));
 
-      app.get('/', (req, res) => {
-        res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
-      });
+    app.get('/', (req, res) => {
+      res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
+    });
 
-      app.get('*', (req, res) => {
-        res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
-      });
-    } else {
-      app.use(express.static(path.join(__dirname, baseDirectory)));
+    app.get('*', (req, res) => {
+      res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
+    });
 
-      app.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
-      });
 
-      app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
-      });
-    }
+
+    // if (fs.existsSync('resources/app/index.html')) {
+    //   // Path when running electron in local folder
+    //   pathIndex = 'resources/app/index.html';
+    //   baseDirectory = 'resources/app';
+    // } else {
+    //   app.use(express.static(path.join(__dirname, baseDirectory)));
+
+    //   app.get('/', (req, res) => {
+    //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
+    //   });
+
+    //   app.get('*', (req, res) => {
+    //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
+    //   });
+    // }
 
     app.listen(httpPort, () => win.loadURL('http://localhost:5220'));
 
