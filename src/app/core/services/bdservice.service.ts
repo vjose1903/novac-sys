@@ -120,16 +120,19 @@ export class DBservice {
       url = `secuencia_comprobantes/${arg.id}`;
       metodo = 'put';
     } else {
-      url = 'secuencia_comprobantes';
+
     }
     return this.peticion(url, metodo, JSON.stringify(arg));
   }
+
   getNCFregistrados() {
     return this.peticion(`secuencia_comprobantes`, 'get');
   }
+
   deleteNCF(id) {
     return this.peticion(`secuencia_comprobantes/${id}`, 'delete');
   }
+
   getPaquetesNCF(tipo_factura_id, estado = true) {
     return this.peticionSinLoad(`secuencia_comprobantes/custom/${tipo_factura_id}/${estado}`, 'get');
   }

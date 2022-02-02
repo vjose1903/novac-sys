@@ -14,6 +14,7 @@ import { EmpleadoC } from './empleado';
   templateUrl: './registro-empleados.component.html',
   styleUrls: ['./registro-empleados.component.scss'],
 })
+
 export class RegistroEmpleadosComponent extends mixinClass implements OnInit, OnDestroy {
   form: FormGroup;
   titulo = '';
@@ -260,6 +261,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     }
 
     this.form.patchValue(item.ARG);
+    console.log("item.ARG --> ", item.ARG);
 
     this.usuarioSelected = item.ARG;
     this.editando = true;

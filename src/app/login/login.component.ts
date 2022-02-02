@@ -108,17 +108,23 @@ export class LoginComponent implements OnInit, OnDestroy {
   async printTest() {
     // const data_ = compra_credito_valor_fiscal;
     // const data_ = compra_contado_valor_fiscal;
-    // const data_ = venta_credito_consumo;
-    const data_ = venta_contado_consumo;
+    const data_ = venta_credito_consumo;
+    // const data_ = venta_contado_consumo;
     // const data_ = nota_credito;
 
-    const obj = {
-      data: data_,
-      type: 'facturacion',
-    };
+    const obj = { data: data_, type: 'facturacion', };
 
     this.tipo_prueba = obj.type;
-    this._ipc.send('print', obj);
+    this.pdfServ.generatePdf(obj).then((res_pdf) => {
+      try {
+        if (res_pdf.status === 'si') {
+          const obj = { base64: res_pdf.body, filename: res_pdf.file, type: 'facturacion' };
+          this._ipc.send('printBase64', obj);
+        }
+      } catch (error) {
+        console.log('error --> ', error);
+      }
+    });
   }
 
   async pruebaRecibo() {

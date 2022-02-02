@@ -280,7 +280,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       });
 
       if (this.metodo === 'venta') {
-        this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higuero', telefono: null });
+        this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higüero', telefono: null });
       } else {
         this.form.reset();
       }
@@ -1131,7 +1131,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     }
 
     cabecera_fact['detalle_facturas'] = cuerpo_fact;
-    cabecera_fact['FACTURA_DE'] = this.metodo === 'venta' ? 13 : 14;
+    cabecera_fact['FACTURA_DE'] = this.metodo === 'venta' ? (this.condicion_fact == 'Contado' ? 13 : 18) : 14;
     cabecera_fact['tipo'] = this.metodo;
     cabecera_fact['user_id'] = empleado.id;
 
@@ -1158,13 +1158,14 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
     if (this.layServ.factura_guardada) this.revisarLocalStorage();
 
     res_factura['FACTURA_DE'] = this.metodo;
+    console.log(JSON.stringify(res_factura));
 
     const obj = { data: res_factura, type: 'facturacion' };
-    console.log('res_factura ', res_factura);
 
     if (this.metodo === 'venta') {
       this.pdfServ.generatePdf(obj).then((res_pdf) => {
         this.fun.logRed('res_pdf ', res_pdf);
+
         try {
           if (res_pdf.status === 'si') {
             const obj = { base64: res_pdf.body, filename: res_pdf.file, type: 'facturacion' };

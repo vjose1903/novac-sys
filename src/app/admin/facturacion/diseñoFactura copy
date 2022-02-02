@@ -7,7 +7,7 @@ var dd = {
       margin: [0, -62, 0, 0],
       stack: [
         { text: 'ADM Agroindustrial S.R.L', alignment: 'center', bold: true, fontSize: 17 },
-        { text: 'Autopista Duarte Km0 El Higuero, La Vega', alignment: 'center' },
+        { text: 'Autopista Duarte Km0 El Higüero, La Vega', alignment: 'center' },
         {
           text: [
             { text: 'Telefono: ', fontSize: 9, bold: true },

@@ -65,7 +65,7 @@ function cabeceraConduce(data) {
           style: 'letra17',
         },
         {
-          text: 'Autopista Duarte Km0 El Higuero, La Vega',
+          text: 'Autopista Duarte Km0 El Higüero, La Vega',
           alignment: 'center',
         },
         {

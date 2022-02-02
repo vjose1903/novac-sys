@@ -283,19 +283,27 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     const codigo = fila_actual['cod'];
     const art = fila_actual['articulo'];
 
+    console.log("codigo ", codigo);
+    console.log("art ", art);
+
+
     if (codigo && art) {
       const precioPrincipal = art.precio_principal;
       const costoPrincipal = art.costo_principal;
       this.UnidadesArticulo = [];
 
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
+      console.log("art.contenido_articulos.length ", art.contenido_articulos.length);
+      console.log("art.medida ", art.medida);
 
       if (art.contenido_articulos.length === 0 || art.medida !== 'Quintal') {
         this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
       }
+      console.log("this.UnidadesArticulo ", this.UnidadesArticulo);
 
+      console.log("art.descripcion ", art.descripcion);
       if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-        if (art.vendido_en === 'Saco' && art.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+        if (_.lowerCase(art.vendido_en) === _.lowerCase('Saco') && art.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
       }
 
       const detallable = art.is_detallable;
@@ -305,6 +313,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
       const estoy_en = document.activeElement.id;
       if (_.includes(estoy_en, 'uni')) setTimeout(() => this.enfocarInput(estoy_en), 150);
+      console.log("  ");
     }
   }
 
