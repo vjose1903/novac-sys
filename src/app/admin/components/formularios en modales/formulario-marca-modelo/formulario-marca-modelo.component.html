@@ -87,7 +87,7 @@
         [focusRow]="false"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
-        (ESTADO)="abrirModal($event)"
+        (DELETE)="abrirModal($event)"
         [id_tabla]="'tabla_frm_marca_modelo'"
         (paginateChange)="pedirNuevaData($event)"
       ></app-tablas>
@@ -102,15 +102,14 @@
     [(visible)]="showModal"
     [responsive]="true"
     [style]="{ width: '350px', minWidth: '200px' }"
-    [baseZIndex]="12000"
     (onHide)="reinicioModal()"
     [blockScroll]="true"
   >
     <p *ngIf="tipo_formulario !== 'modelos'">Desea remover {{ seleccionModal.descripcion }} de la lista</p>
     <p *ngIf="tipo_formulario == 'modelos'">Desea remover {{ seleccionModal.marca.descripcion }} {{ seleccionModal.descripcion }} de la lista</p>
     <p-footer>
-      <button type="button" mdbBtn (click)="reinicioModal()" class="btn-peque btn-light">No</button>
-      <button type="button" mdbBtn (click)="decisionBorrar(true)" class="btn-peque btn-success">Si</button>
+      <button (click)="reinicioModal()" type="submit" class="btn btn-blanco mr-2">NO</button>
+      <button (click)="decisionBorrar(true)" type="submit" class="btn" id="btn-verde">SI</button>
     </p-footer>
   </p-dialog>
 </div>

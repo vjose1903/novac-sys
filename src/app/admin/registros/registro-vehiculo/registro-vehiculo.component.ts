@@ -4,8 +4,11 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
+import { MarcaC, ModeloC } from '../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { mixinClass } from '../../mixinClass';
+import { EmpleadoC } from '../registro-empleados/empleado';
+import { VehiculoC } from './vehiculo';
 
 @Component({
   selector: 'app-registro-vehiculo',
@@ -28,7 +31,12 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   listaModelos: any;
   vehiculoEditando: any;
 
-  constructor(private dbServ: DBservice, private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService) {
+  vehiculosClass = new VehiculoC();
+  marcasClass = new MarcaC();
+  empleadosClass = new EmpleadoC();
+  modeloClass = new ModeloC();
+
+  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService) {
     super();
   }
 
@@ -55,42 +63,49 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
     this.borrar();
   }
 
-  async necesarioStart() {
-    await this.getVehiculos(this.tServ.obj_paginate);
-    await this.getPropietarios();
-    await this.getMarcas();
+  necesarioStart() {
+    this.getVehiculos(this.tServ.obj_paginate);
+    this.getPropietarios();
+    this.getMarcas();
   }
 
   async getPropietarios() {
-    this.dbServ.getEmpleados('?id=true&nombreCompleto=true').subscribe((res) => {
-      res['data'].unshift({ id: -1, nombreCompleto: 'No empleado' });
-      this.listaPropietarios = res['data'];
-    });
+    console.log('getPropietarios()');
+
+    this.empleadosClass.getAll({ parameters: { id: true, nombreCompleto: true } }).then(
+      (res) => {
+        console.log('EMPLEADOS RES: ', res);
+
+        res['data'].unshift({ id: -1, nombreCompleto: 'No empleado' });
+        this.listaPropietarios = res['data'];
+      },
+      (err: any) => {
+        console.log('EMPLEADOS err: ', err);
+      },
+    );
   }
   async getVehiculos(e) {
     const page = e.page;
     const per_page = e.per_page;
     const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
-    try {
-      const res = await this.dbServ.getVehiculosFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
-      res.data.map((val) => {
-        val.nombreCompleto = `${val.propietario.nombre} ${val.propietario.apellido}`;
-        return val;
-      });
-      this.listaVehiculos = res.data;
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
+    const res = await this.vehiculosClass.getAll(extra);
 
-      this.listaVehiculos.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
-      });
-    } catch (error) {
-      this.fun.toastError('Error buscando camiones', 'ERROR');
-    }
+    res.data.map((val) => {
+      val.nombreCompleto = `${val.propietario.nombre} ${val.propietario.apellido}`;
+      return val;
+    });
+    this.listaVehiculos = res.data;
+
+    this.listaVehiculos.sort((a, b) => {
+      return a.id > b.id ? 1 : -1;
+    });
   }
 
   async getMarcas() {
     try {
-      const res = await this.dbServ.getMarcas().toPromise();
+      const res = await this.marcasClass.getAll();
       this.listaMarcas = res;
     } catch (error) {
       this.fun.toastError('Error buscando articulos', 'ERROR');
@@ -161,16 +176,12 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   }
 
   async selectMarca(callback = (arg) => {}) {
-    try {
-      const marca_selected_id = this.form.controls.marca.value;
-      if (marca_selected_id) {
-        const res = await this.dbServ.getModelosByMarca(marca_selected_id).toPromise();
-        this.listaModelos = res;
-        callback(true);
-      }
-    } catch (error) {
-      callback(false);
-      this.fun.toastError('Error seleccionando marca.', 'ERROR');
+    const marca_selected_id = this.form.controls.marca.value;
+    if (marca_selected_id) {
+      const res = await this.modeloClass.getAll({ afterPath: `por_marca/${marca_selected_id}` });
+
+      this.listaModelos = res;
+      callback(true);
     }
   }
 
@@ -212,8 +223,10 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   decisionModal(arg) {
     if (arg) {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
-      this.dbServ.eliminarVehiculo(obj).subscribe(
+
+      this.vehiculosClass.deleteOne(obj.id).then(
         (res) => {
+          this.listaVehiculos = null;
           this.fun.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
           this.getVehiculos(this.tServ.obj_paginate);
           this.borrar();
@@ -253,13 +266,14 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
       if (x.id) {
         msg_error = 'Error editando vehiculo';
         obj['id'] = x.id;
-        const res = await this.dbServ.updateVehiculos(obj).toPromise();
+
+        const res = await this.vehiculosClass.updateOne(obj);
 
         this.fun.toastSuccess('Vehiculo editando con exito.', 'Correcto');
       } else {
         msg_error = 'Error registrando vehiculo';
 
-        const res = await this.dbServ.createVehiculos(obj).toPromise();
+        const res = await this.vehiculosClass.createOne(obj);
 
         this.fun.toastSuccess('Vehiculo registrado con exito.', 'Correcto');
       }

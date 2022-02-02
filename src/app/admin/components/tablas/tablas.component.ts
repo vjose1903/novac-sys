@@ -128,7 +128,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() pad = true;
   select_all_value = false;
   mixinClass;
-  constructor(private cdRef: ChangeDetectorRef, private dbServ: DBservice, private tServ: TablasService, private fun: FunctionService) {}
+  constructor(private cdRef: ChangeDetectorRef, private tServ: TablasService, private fun: FunctionService) {}
 
   ngOnInit() {
     this.subTotalPag = this.tServ.TOTALPAGINAS.subscribe((res) => {

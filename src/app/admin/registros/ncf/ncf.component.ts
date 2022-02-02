@@ -6,6 +6,8 @@ import { GLOBAL } from '../../../core/services/GLOBAL';
 import * as moment from '../../../../utils/javascript/moment';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { mixinClass } from '../../mixinClass';
+import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
+import { NcfC } from './ncf';
 
 @Component({
   selector: 'app-ncf',
@@ -53,7 +55,11 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
   desdeAlert = false;
   hastaAlert = false;
   listaNCFBack: any[];
-  constructor(private dbServ: DBservice, private tServ: TablasService, private localeService: BsLocaleService) {
+
+  facturaClass = new FacturaC();
+  tiposFacturasClass = new TiposFacturaC();
+  ncfClass = new NcfC();
+  constructor(private tServ: TablasService, private localeService: BsLocaleService) {
     super();
     this.dpConfig = Object.assign(
       {},
@@ -124,7 +130,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
 
   async getTiposFacturas() {
     try {
-      this.lista_tipos_facturas = await this.dbServ.getTiposFacturas().toPromise();
+      this.lista_tipos_facturas = await this.tiposFacturasClass.getAll();
       const temp = GLOBAL.duplicarJson(this.lista_tipos_facturas);
       for (let i = 0; i < temp.length; i++) {
         const element = temp[i];
@@ -149,8 +155,9 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
       const page = e.page;
       const per_page = e.per_page;
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+      // `secuencia_comprobantes/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`
 
-      const res = await this.dbServ.getPaquetesNCFFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+      const res = await this.ncfClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
 
       const tempNCF = [];
       res.data.forEach((ncf) => {
@@ -245,7 +252,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
     };
 
     try {
-      const res = await this.dbServ.PaqueteNCF(obj).toPromise();
+      const res = await this.ncfClass.createUpdateOne(obj);
 
       this.getPaquetesNCF(this.tServ.obj_paginate);
       if (this.is_editando) {
@@ -318,8 +325,8 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
     if (arg !== null && arg !== undefined) {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
       if (arg && obj) {
-        this.dbServ.deleteNCF(obj.id).subscribe(
-          (res) => {
+        this.ncfClass.deleteOne(obj.id).then(
+          () => {
             this.fun.toastSuccess('comprobante para ' + obj.tipoC_ + ' numero: ' + obj.codigo + ' borrado', 'CORRECTO');
             this.getPaquetesNCF(this.tServ.obj_paginate);
           },

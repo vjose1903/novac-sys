@@ -12,11 +12,10 @@ import * as _ from 'lodash';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
-  constructor(public loadServ: LoaderService, private fun: FunctionService, private dbServ: DBservice, private router: Router) {}
+  constructor(public loadServ: LoaderService, private fun: FunctionService, private router: Router) {}
   requestCount: number = 0;
 
   private startRequest(args?): void {
-
     if (this.requestCount <= 0 && args !== 'no_show') this.loadServ.isLoading.next(true);
     this.requestCount++;
   }

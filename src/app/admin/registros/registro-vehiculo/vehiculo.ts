@@ -5,3 +5,6 @@ export class VehiculoC extends CrudG<any> {
     super('vehiculos');
   }
 }
+
+
+

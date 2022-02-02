@@ -10,6 +10,7 @@ import { TablasService } from '../../../components/tablas/tablas.service';
 import { mixinClass } from '../../../mixinClass';
 import { ReciboC } from '../../recibos';
 import { RecibosService } from '../../recibos.service';
+import { FacturaC } from '../../../facturacion/factura';
 
 @Component({
   selector: 'app-ingresos',
@@ -75,9 +76,10 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
   recibiendo = 0;
   restando = 0;
   reciboClass = new ReciboC();
+  facturaClass = new FacturaC();
   debiendo;
 
-  constructor(private config: NgSelectConfig, private dbServ: DBservice, private tServ: TablasService, private reciboServ: RecibosService) {
+  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService) {
     super();
     this.config.notFoundText = 'Articulo no existe';
   }
@@ -167,45 +169,42 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
     const per_page = e.per_page;
 
     const fechaA = moment().format('YYYY-MM-DD');
-    this.facturas = await this.dbServ
-      .getFacturasByClienteIdAndPagada(cliente_id, false, page, per_page, true)
-      .pipe(
-        map(
-          (val) =>
-            (val = val['data'].map((factura) => {
-              factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
-              factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
-              factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD-MM-YYYY') : null;
-              factura.select = false;
-              factura.pagoT = false;
-              factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
-              factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
-              factura.monto = 0;
-              const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
-              factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
-              factura.colorEstado = factura.is_viaje ? 'green' : modalMoviemientos ? 'black' : 'gris-claro';
-              factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
 
-              factura.customStyles = {
-                'td-historyPagos': { width: '2rem', 'font-size': '1.2rem' },
-                'td-select': { width: '6rem' },
-                'td-pagoT': { width: '6rem' },
-                'td-numero_comprobante': { width: '7rem' },
-              };
+    const factTemp = await this.facturaClass.getAll({ afterPath: `cliente/${cliente_id}/pagada/false`, parameters: { page, per_page, paginado: false } });
+    console.log('this.facturas===> ', this.facturas);
+    this.facturas = factTemp.data;
 
-              this.totalPagado = _.reduce(factura.pagos, (acumulado, item) => acumulado + item.deposito, this.totalPagado);
-              this.totalNotas = _.reduce(factura.notas, (acumulado, item) => acumulado + Math.abs(item.total_factura), this.totalNotas);
+    this.facturas.map((factura) => {
+      factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
+      factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
+      factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD-MM-YYYY') : null;
+      factura.select = false;
+      factura.pagoT = false;
+      factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
+      factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
+      factura.monto = 0;
+      const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
+      factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
+      factura.colorEstado = factura.is_viaje ? 'green' : modalMoviemientos ? 'black' : 'gris-claro';
+      factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
 
-              factura.subrayar = factura.is_viaje;
+      factura.customStyles = {
+        'td-historyPagos': { width: '2rem', 'font-size': '1.2rem' },
+        'td-select': { width: '6rem' },
+        'td-pagoT': { width: '6rem' },
+        'td-numero_comprobante': { width: '7rem' },
+      };
 
-              this.totalFacturado += factura.total_factura;
-              this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
-              this.totalPagadoPorciento = parseFloat(GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento));
-              return factura;
-            })),
-        ),
-      )
-      .toPromise();
+      this.totalPagado = _.reduce(factura.pagos, (acumulado, item) => acumulado + item.deposito, this.totalPagado);
+      this.totalNotas = _.reduce(factura.notas, (acumulado, item) => acumulado + Math.abs(item.total_factura), this.totalNotas);
+
+      factura.subrayar = factura.is_viaje;
+
+      this.totalFacturado += factura.total_factura;
+      this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
+      this.totalPagadoPorciento = parseFloat(GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento));
+      return factura;
+    });
 
     this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
     this.debiendo = this.totalFacturado - this.totalPagado - this.totalNotas;

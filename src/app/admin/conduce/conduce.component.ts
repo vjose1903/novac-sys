@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { DBservice } from '../../core/services/bdservice.service';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
-import { map } from 'rxjs/operators';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from '../../../utils/javascript/moment';
 import { mixinClass } from '../mixinClass';
 import { ArticuloC } from '../registros/articulos/articulo';
+import { ConduceC } from '../conduce/coduce';
+import { FacturaC } from '../facturacion/factura';
 
 @Component({
   selector: 'app-conduce',
@@ -66,8 +66,10 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   fechaConduce: any;
 
   articuloClass = new ArticuloC();
+  conduceClass = new ConduceC();
+  facturaClass = new FacturaC();
 
-  constructor(private dbServ: DBservice, private fb: FormBuilder) {
+  constructor(private fb: FormBuilder) {
     super();
   }
 
@@ -526,27 +528,21 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   async buscarFacturasAdelantadas(id) {
     try {
-      this.facturas_adelantadas = await this.dbServ
-        .getFacturasByParams('1', id, 0, true, 0, 0, false)
-        .pipe(
-          map(
-            (fact) =>
-              (fact = fact.data.map((val) => {
-                val.secuencia = _.padStart(val.numero_factura, 8, '0');
-                val.fecha = moment(val.fecha_equivalente).format('DD-MM-YYYY');
-                val.customStyles = { 'td-detalles_selected': { width: '2rem' } };
+      this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false }).then((res) => {
+        this.facturas_adelantadas = res['data'];
+        this.facturas_adelantadas.map((factura) => {
+          factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
+          factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
+          factura.customStyles = { 'td-detalles_selected': { width: '2rem' } };
 
-                for (let i = 0; i < val.detalle_facturas.length; i++) {
-                  const detalle = val.detalle_facturas[i];
-                  detalle.select = false;
-                }
-
-                return val;
-              })),
-          ),
-        )
-        .toPromise();
-      this.checkFacturasAdelantadasSelection();
+          for (let i = 0; i < factura.detalle_facturas.length; i++) {
+            const detalle = factura.detalle_facturas[i];
+            detalle.select = false;
+          }
+          return factura;
+        });
+        this.checkFacturasAdelantadasSelection();
+      });
     } catch (error) {}
   }
 
@@ -762,9 +758,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     cabecera_conduce['numero_conduce'] = '';
     cabecera_conduce['detalle_conduces'] = this.CuerpoConduce;
 
-    try {
-      const res = await this.dbServ.createConduce(cabecera_conduce).toPromise();
-
+    this.conduceClass.createUpdateOne(cabecera_conduce).then((res) => {
       const obj = { data: res['data'], type: 'conduce' };
 
       this.cancelarConduce(2);
@@ -775,9 +769,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
           this.layServ.nextCheckCuadreToday(true);
         }
       });
-    } catch (error) {
-      // if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
-    }
+    });
   }
 
   printBase64Res(res) {

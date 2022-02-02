@@ -6,6 +6,8 @@ import { TablasService } from '../tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { FunctionService } from '../../../core/services/functions.service';
 import { ArticuloC } from '../../registros/articulos/articulo';
+import { SuplidorC } from '../../registros/registro-suplidores/suplidores';
+import { ClienteC } from '../../registros/registro-clientes/cliente';
 
 @Component({
   selector: 'app-modal',
@@ -32,6 +34,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   filtrar = false;
   dataFiltro;
   articuloClass = new ArticuloC();
+  suplidorClass = new SuplidorC();
+  clienteClass = new ClienteC();
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       this.showModal = false;
@@ -76,7 +80,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     { titulo: 'Doc. identidad', key: 'documento_identidad' },
     { titulo: 'Direccion', key: 'direccion' },
   ];
-  constructor(public mServ: ModalService, private dbServ: DBservice, private tServ: TablasService, public fun: FunctionService) {}
+  constructor(public mServ: ModalService, private tServ: TablasService, public fun: FunctionService) {}
 
   element: HTMLElement;
   subShow: Subscription;
@@ -291,7 +295,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
             }
           });
       } else if (this.tipoModal === 'buscarCliente') {
-        const res = await this.dbServ.getClientesFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+        const res = await this.clienteClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
+
         this.dataFiltro = undefined;
 
         res.data.map(async (cli) => {
@@ -313,7 +318,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         };
         this.tServ.Func_total_paginas(obj);
       } else if (this.tipoModal === 'buscarSuplidor') {
-        const res = await this.dbServ.getSuplidoresFiltrados(palabra_a_buscar, page, per_page, true).toPromise();
+        const res = await this.suplidorClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
 
         this.dataFiltro = undefined;
 

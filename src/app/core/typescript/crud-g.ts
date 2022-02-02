@@ -7,31 +7,38 @@ import * as _ from 'lodash';
 import { AppConfig } from '../../../environments/environment';
 
 export interface extraArgs {
-  afterPath: any;
-  parameters: any;
+  afterPath?: any;
+  parameters?: any;
 }
+
+export interface responseModel<T> {
+  data: T[] | T;
+  msg: any[];
+  total_paginas?: number;
+  total_registros?: number;
+} // TODO: <================================================================ PARA DESPUES`
 
 export class CrudG<T> {
   http = SingletonService.http;
 
   constructor(public path: string) {}
 
-  async getAll(arg?, tipo = 'backend') {
+  async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
-    return (await this.request(url, 'get', null, tipo).toPromise()) as T[];
+    return (await this.request(url, 'get', null, tipo).toPromise()) as T;
   }
 
-  async getOne(id: number, arg = null, tipo = 'backend') {
+  async getOne(id: number, arg = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
     return (await this.request(url, 'get', null, tipo).toPromise()) as T;
   }
 
-  async deleteOne(id: number, arg = null, tipo = 'backend') {
+  async deleteOne(id: number, arg = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
     return (await this.request(url, 'delete', null, tipo).toPromise()) as T;
   }
 
-  createUpdateOne(data, arg = null, tipo = 'backend') {
+  createUpdateOne(data, arg = null, tipo: 'backend' | 'externo' = 'backend') {
     const promise = new Promise((resolve, reject) => {
       if (Number(data.id) === 0 || !data.id) delete data.id;
 
@@ -58,12 +65,12 @@ export class CrudG<T> {
     return promise;
   }
 
-  async createOne(data, arg = null, tipo = 'backend') {
+  async createOne(data, arg = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
     return (await this.request(url, 'post', data, tipo).toPromise()) as T;
   }
 
-  async updateOne(data, arg = null, tipo = 'backend') {
+  async updateOne(data, arg = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, data.id);
     return (await this.request(url, 'patch', data, tipo).toPromise()) as T;
   }

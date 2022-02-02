@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
-import { DBservice } from '../../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import { mixinClass } from '../../../mixinClass';
@@ -22,7 +21,7 @@ export class FormCantidadEfectivoComponent extends mixinClass implements OnInit,
   @Output() cancel = new EventEmitter<any>();
   factura_de: any;
   cambiar_articulos = undefined;
-  constructor(private dbServ: DBservice) {
+  constructor() {
     super();
   }
 

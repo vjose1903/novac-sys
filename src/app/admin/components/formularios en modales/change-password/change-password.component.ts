@@ -1,8 +1,8 @@
 import { Component, OnInit, Output, EventEmitter, Input, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import { DBservice } from '../../../../core/services/bdservice.service';
 import { mixinClass } from '../../../mixinClass';
+import { EmpleadoC } from '../../../registros/registro-empleados/empleado';
 
 @Component({
   selector: 'app-change-password',
@@ -13,10 +13,11 @@ export class ChangePasswordComponent extends mixinClass implements OnInit, After
   form: FormGroup;
   element: HTMLElement;
   @Input() user;
+  empleadoClass = new EmpleadoC();
 
   @Output() cancel = new EventEmitter<any>();
 
-  constructor(private fb: FormBuilder, private dbServ: DBservice) {
+  constructor(private fb: FormBuilder) {
     super();
   }
 
@@ -45,7 +46,7 @@ export class ChangePasswordComponent extends mixinClass implements OnInit, After
       obj['password'] = objTemp.password;
       obj['documentos_de_identidad_attributes'] = this.user.documentos_de_identidad;
 
-      this.dbServ.createUpdateEmpleados(obj).subscribe((res) => this.cancel.emit(false));
+      this.empleadoClass.createUpdateOne(obj).then(() => this.cancel.emit(false));
     }
   }
 }

@@ -13,7 +13,8 @@ import { FacturacionService } from './facturacion.service';
 import { modalClass } from '../components/modal/modal';
 import { Subscription } from 'rxjs';
 import { ArticuloC } from '../registros/articulos/articulo';
-import { FacturaC } from './factura';
+import { FacturaC, TiposFacturaC } from './factura';
+import { NcfC } from '../registros/ncf/ncf';
 
 @Component({
   selector: 'app-facturacion',
@@ -112,10 +113,12 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
+  tipoFacturaClass = new TiposFacturaC();
+  ncfClass = new NcfC();
 
   constructor(
     public mServ: ModalService,
-    private dbServ: DBservice,
+    
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
@@ -225,9 +228,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   getTiposFacturas() {
     return new Promise((resolve) => {
-      this.dbServ.getTiposFacturas().subscribe((res) => {
+      this.tipoFacturaClass.getAll().then((tiposFacturas) => {
         this.fun.logRed(' -----getTiposFacturas-----');
-        this.lista_tipos_facturas = res;
+        this.lista_tipos_facturas = tiposFacturas;
         resolve(true);
       });
     });
@@ -350,7 +353,9 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
         this.tipoFactura = tipos_facturas[_.lowerCase(res.tipo_factura)];
 
         const TipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === this.tipoFactura);
-        const paquete = await this.dbServ.getPaquetesNCF(TipoFact.id).toPromise();
+
+        const paquete = await this.ncfClass.getAll({ afterPath: `custom/${TipoFact.id}/true` });
+
         this.paqueteComprobante = paquete.data;
 
         if (res.is_viaje) this.fecha_viaje = new Date(res.fecha_viaje);
@@ -560,7 +565,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
       if (this.metodo === 'venta') {
         if (this.tipoFactura !== '00' && this.tipoFactura !== '0' && this.tipoFactura !== '02' && this.tipoFactura !== '2') {
           try {
-            const paquete = await this.dbServ.getPaquetesNCF(TipoFact.id).toPromise();
+            const paquete = await this.ncfClass.getAll({ afterPath: `custom/${TipoFact.id}/true` });
 
             this.paqueteComprobante = paquete.data;
 
@@ -1142,9 +1147,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     let res;
     const metodo = this.action === 'update' ? 'editar_factura' : '';
+    
 
-    if (metodo === 'editar_factura') res = await this.dbServ.editarFactura(this.factura_a_editar.id, cabecera_fact).toPromise();
-    else res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
+    if (metodo === 'editar_factura') res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_editar.id}` });
+    else res = await this.facturaClass.createOne(cabecera_fact);
+    
 
     let res_factura = res['data'];
 

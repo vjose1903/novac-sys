@@ -10,6 +10,8 @@ import { mixinClass } from '../mixinClass';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { modalClass } from '../components/modal/modal';
+import { ClienteC } from '../registros/registro-clientes/cliente';
+import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 
 @Component({
   selector: 'app-layout',
@@ -40,6 +42,10 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   initNavigate = true;
   cuadre_hoy;
   ant_event_change_visibility;
+
+  clienteClass= new ClienteC;
+  suplidorClass= new SuplidorC;
+
   constructor(private dbServ: DBservice, private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef) {
     super();
 
@@ -350,7 +356,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
         for (let i = 0; i < this.facturas_localStorage.length; i++) {
           const fact = this.facturas_localStorage[i];
           if (fact.suplidor_id) {
-            const suplidor = await this.dbServ.getSuplidorById(fact.suplidor_id).toPromise();
+            const suplidor = await this.suplidorClass.getOne(fact.suplidor_id);
+            
             fact['suplidor'] = {
               nombre: `${suplidor.nombre} ${suplidor.apellido ? suplidor.apellido : ''}`,
               direccion: `${suplidor.direccion}`,
@@ -361,7 +368,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
           }
           if (fact.cliente_id) {
             try {
-              const cliente = await this.dbServ.getClienteById(fact.cliente_id).toPromise();
+              const cliente = await this.clienteClass.getOne(fact.cliente_id);
+              // const cliente = await this.dbServ.getClienteById(fact.cliente_id).toPromise();
               fact['cliente'] = {
                 nombre: `${cliente.nombre} ${cliente.apellido ? cliente.apellido : ''}`,
                 direccion: `${cliente.direccion}`,

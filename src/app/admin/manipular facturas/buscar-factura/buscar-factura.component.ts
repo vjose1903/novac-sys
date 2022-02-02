@@ -9,7 +9,8 @@ import { TablasService } from '../../components/tablas/tablas.service';
 import { mixinClass } from '../../mixinClass';
 import { LoaderService } from '../../../loader/loader.service';
 import { ArticuloC } from '../../registros/articulos/articulo';
-import { FacturaC } from '../../facturacion/factura';
+import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
+import { NcfC } from '../../registros/ncf/ncf';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -35,7 +36,10 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   valor: any;
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
-  constructor(private dbServ: DBservice, private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  tiposFacturasClass = new FacturaC();
+  ncfClass = new NcfC();
+
+  constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
   campo = null;
@@ -156,7 +160,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   async getPaqueteComprobante() {
     try {
       const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipo_factu_nota);
-      const res = await this.dbServ.getPaquetesNCF(TipoFact[0].id).toPromise();
+      const res = await this.ncfClass.getAll({ afterPath: `custom/${TipoFact[0].id}/true` });
 
       this.paqueteComprobante = res['data'] as any;
 
@@ -211,7 +215,8 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
 
   async getTipoFacturas() {
     try {
-      const res = await this.dbServ.getTiposFacturas().toPromise();
+      const res = await this.tiposFacturasClass.getAll();
+
       this.lista_tipos_facturas = res;
     } catch (error) {
       console.error(error);
@@ -262,10 +267,9 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   async pedirFactura(campo, valor, e) {
     try {
       const fechaA = moment().format('YYYY-MM-DD');
-      // this.facturas = undefined;
-      const page = e.page;
-      const per_page = e.per_page;
-      const busqueda = await this.dbServ.getFacturasByParams(campo, valor, this.tipo_factura_id, false, page, per_page, true).toPromise();
+
+      const args = { campo, valor, tipo_factura_id: this.tipo_factura_id, adelantada: false, page: e.page, per_page: e.per_page, paginado: true };
+      const busqueda = await this.facturaClass.getFacturasByParams(args);
 
       busqueda['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
@@ -390,7 +394,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   }
 
   selectFactura(item) {
-
     if (item.column === 'select') {
       this.facturaSelected = item.row;
       this.indexSelected = item.index;
@@ -475,7 +478,8 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   }
   async CancelarFactura() {
     try {
-      const res = await this.dbServ.cancelarFactura(this.facturaSelected.id).toPromise();
+      const res = await this.facturaClass.createOne(null, { afterPath: `anular_factura/${this.facturaSelected.id}` });
+
       const temp = GLOBAL.duplicarJson(this.facturas);
 
       this.facturas = [];

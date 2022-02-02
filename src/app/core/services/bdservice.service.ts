@@ -79,14 +79,6 @@ export class DBservice {
   // Reportes
   // =====================================================================
 
-  createCuadreCaja(params) {
-    return this.peticion(`cuadre_cajas/custom?${params}`, 'post', JSON.stringify({}));
-  }
-
-  makeReportes(tipo, params) {
-    return this.peticion(`reportes/custom/${tipo}${params ? `?${params}` : ''}`, 'get');
-  }
-
   // =====================================================================
   // Conduce
   // =====================================================================

@@ -18,7 +18,7 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
   scaleImpresion: any;
   reporteClass = new ReporteC();
 
-  constructor(private dbServ: DBservice, public loadServ: LoaderService) {
+  constructor(public loadServ: LoaderService) {
     super();
   }
 
@@ -148,7 +148,6 @@ export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
 
         this.generarPdf(obj);
       });
-      // res = await this.dbServ.makeReportes(tipo, params).toPromise();
     } else {
       this.fun.toastError(msg_error, 'ERROR');
     }

@@ -42,9 +42,10 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
+  tiposFacturasClass = new FacturaC();
   clientesClass = new ClienteC();
   ncfClass = new NcfC();
-  constructor(private dbServ: DBservice, private activeRoute: ActivatedRoute, private router: Router) {
+  constructor(private activeRoute: ActivatedRoute, private router: Router) {
     super();
   }
 
@@ -54,7 +55,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
     this.fecha = moment().format('DD/MM/YYYY');
-    this.dbServ.getTiposFacturas().subscribe((res) => {
+    this.tiposFacturasClass.getAll().then((res) => {
       this.lista_tipos_facturas = res;
     });
 
@@ -94,7 +95,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
-
     this.getFactura().then(async (res_factura) => {
       await this.formarTitulosTabla();
       await this.getPropietario(this.factura.cliente_id);
@@ -104,11 +104,9 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async getPaqueteComprobante() {
-
     const TipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === this.tipoFactura);
 
     this.ncfClass.getAll({ afterPath: `custom/${TipoFact.id}/true` }).then((res) => {
-
       this.paqueteComprobante = res['data'];
     });
   }
@@ -247,11 +245,9 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * peso;
       } else {
-
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * detalle.contenidos[detalle.unidad];
       }
       this.fun.logRed('detalle ', GLOBAL.duplicarJson(detalle));
-
     }
   }
 
@@ -445,7 +441,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     if (this.propietario_factura.vendedor_id) cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id || null;
 
     try {
-      const res = await this.dbServ.createFacturas(cabecera_fact).toPromise();
+      const res = await this.facturaClass.createOne(cabecera_fact);
 
       res['FACTURA_DE'] = 'nota';
       const obj = {

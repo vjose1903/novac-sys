@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import { mixinClass } from '../../../mixinClass';
+import { MovimientosC } from './movimiento-model';
 
 @Component({
   selector: 'app-movimientos-form',
@@ -21,8 +22,10 @@ export class MovimientosFormComponent extends mixinClass implements OnInit, Afte
   @Input() data;
   @Output() cancel = new EventEmitter<any>();
   medidas;
+
+  movimientosC = new MovimientosC;
   plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
-  constructor(private dbServ: DBservice) {
+  constructor() {
     super();
   }
 
@@ -106,7 +109,8 @@ export class MovimientosFormComponent extends mixinClass implements OnInit, Afte
       medida: this.medida,
       tipo_salida: this.tipo_salida,
     };
-    this.dbServ.createMovimientoI(obj).subscribe(
+
+    this.movimientosC.createOne(obj).then(
       (res) => {
         this.fun.toastSuccess(_.capitalize(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
         this.resetForm();
@@ -122,6 +126,7 @@ export class MovimientosFormComponent extends mixinClass implements OnInit, Afte
         this.mostrarErrores(err.error);
       },
     );
+     
   }
   mostrarErrores(arg) {
     for (const error in arg) {

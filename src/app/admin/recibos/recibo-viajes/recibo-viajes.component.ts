@@ -9,6 +9,7 @@ import { EmpleadoC } from '../../registros/registro-empleados/empleado';
 import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
 import { ReciboC } from '../recibos';
 import { RecibosService } from '../recibos.service';
+import { FacturaC } from '../../facturacion/factura';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -54,8 +55,9 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   userClass = new EmpleadoC();
   vehiculoClass = new VehiculoC();
   reciboClass = new ReciboC();
+  facturaClass = new FacturaC();
 
-  constructor(private dbServ: DBservice, private tServ: TablasService, private reciboServ: RecibosService) {
+  constructor(private tServ: TablasService, private reciboServ: RecibosService) {
     super();
   }
 
@@ -119,7 +121,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
       const per_page = e.per_page;
       const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
-      const res = await this.dbServ.getViajesByCompletada(palabra_a_buscar, page, per_page, true).toPromise();
+      const res = await this.facturaClass.getAll({ afterPath: `custom/viajes/true/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
 
       const fechaA = moment().format('YYYY-MM-DD');
       res.data.map((fact) => {

@@ -1,14 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit } from '@angular/core';
-import { DBservice } from './core/services/bdservice.service';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
 import { GLOBAL } from './core/services/GLOBAL';
 import { AppConfig } from '../environments/environment';
 import { FunctionService } from './core/services/functions.service';
 import { SingletonService } from './core/services/singleton.service';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { ToastrService } from 'ngx-toastr';
 import { ModalService } from './admin/components/modal/modal.service';
 import { LayoutService } from './admin/layout/layout.service';
 import { PdfService } from './core/services/pdf/pdf.service';
@@ -31,7 +28,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
   constructor(
     public _ipc: IpcService,
-    private dbServ: DBservice,
     private loaderServ: LoaderService,
     private cdRef: ChangeDetectorRef,
     public fun: FunctionService,

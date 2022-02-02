@@ -73,8 +73,8 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
       nombre: [{ value: null, disabled: true }, Validators.required],
       apellido: [{ value: null, disabled: true }, Validators.required],
       usuario: [{ value: null, disabled: true }, Validators.compose([Validators.required])],
-      sexo: [{ value: '', disabled: true }, Validators.required],
-      cedula: [{ value: '', disabled: false }, Validators.compose([myValidators.cedulaValidator(), Validators.required])],
+      sexo: [{ value: null, disabled: true }, Validators.required],
+      cedula: [{ value: null, disabled: false }, Validators.compose([myValidators.cedulaValidator(), Validators.required])],
       telefono: [{ value: null, disabled: true }, Validators.required],
       email: [{ value: null, disabled: true }, Validators.compose([Validators.email, Validators.required])],
       fecha_nacimiento: [{ value: null, disabled: true }, Validators.required],
@@ -244,8 +244,10 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   }
 
   fecha(a: any) {
-    moment.locale('es');
+    // moment.locale('es');
     const fechaFormato = moment(a).format('DD/MM/YYYY');
+    console.log('FORMATO ANTES DE ENVIAR: ', fechaFormato);
+
     return fechaFormato;
   }
 
@@ -286,8 +288,6 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
 
     formulario.documentos_de_identidad = documentos_identidad;
     formulario.estado = true;
-
-    if (!formulario.fecha_nacimiento.includes('/')) formulario.fecha_nacimiento = this.fecha(formulario.fecha_nacimiento);
 
     const objSend = _.omit(formulario, ['cedula']);
 

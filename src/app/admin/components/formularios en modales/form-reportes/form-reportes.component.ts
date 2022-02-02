@@ -3,7 +3,7 @@ import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as moment from '../../../../../utils/javascript/moment';
-import { DBservice } from '../../../../core/services/bdservice.service';
+
 import { mixinClass } from '../../../mixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 
@@ -34,7 +34,7 @@ export class FormVentasComponent extends mixinClass implements OnInit {
   formarFecha = ['suplidor_prod'];
   Fecha: string;
   articuloClass = new ArticuloC();
-  constructor(private fb: FormBuilder, public dbServ: DBservice, private localeService: BsLocaleService) {
+  constructor(private fb: FormBuilder, private localeService: BsLocaleService) {
     super();
     this.dpConfig = Object.assign(
       {},
