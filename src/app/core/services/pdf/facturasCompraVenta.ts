@@ -254,7 +254,7 @@ function calcularPrecio(cant, precio, tipo) {
 
 function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
   const tempBody = [];
-  const _break = is_contado ? 6 : 25;
+  const _break = is_contado ? 6 : 26;
   data.detalle_facturas.forEach((detalle, i) => {
     const row = [];
     const br_ = i !== 0 && i % _break === 0;
@@ -315,6 +315,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
       stack: [
         {
           columns: [
+            is_venta && !is_contado ? {text: ''} :
             {
               stack: [
                 {
@@ -420,15 +421,16 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
                       {
                         stack: [
                           {
-                            svg: `<svg viewBox="0 0 700 270">
-                      <rect height="270" width="70" fill="#ffffff" rx="5" ry="5" x="0" y="0" stroke="black" />
-                      <text transform="translate(24, 228) rotate(-90)" font-weight="bold" style="font-size: 15px" > ADM AGROINDUSTRIAL SRL </text>
-                      <text transform="translate(40, 250) rotate(-90)" style="font-size: 12px"> Autopista Duarte Km0 El Higüero, La Vega </text>
-                      <text transform="translate(56, 250) rotate(-90)" font-weight="bold" style="font-size: 11px" > Telefono: </text>
-                      <text transform="translate(56, 200) rotate(-90)" style="font-size: 11px"> 809-573-0060 </text>
-                      <text transform="translate(56, 108) rotate(-90)" font-weight="bold" style="font-size: 11px" > Rnc: </text>
-                      <text transform="translate(56, 85) rotate(-90)" style="font-size: 11px"> 131-99603-5 </text>
-                  </svg>`,
+                            svg:    `<svg viewBox="0 0 700 180">
+                            <rect height="180" width="55" fill="#ffffff" rx="5" ry="5" x="0" y="0" stroke="black" />
+
+                            <text transform="translate(18, 165) rotate(-90)" font-weight="bold" style="font-size: 12px" > ADM AGROINDUSTRIAL SRL </text>
+                            <text transform="translate(30, 175) rotate(-90)" style="font-size: 9px"> Autopista Duarte Km0 El Higuero, La Vega </text>
+                            <text transform="translate(45, 175) rotate(-90)" font-weight="bold" style="font-size: 9px" > Telefono: </text>
+                            <text transform="translate(45, 136) rotate(-90)" style="font-size: 9px"> 809-573-0060 - </text>
+                            <text transform="translate(45, 75) rotate(-90)" font-weight="bold" style="font-size: 9px" > Rnc: </text>
+                            <text transform="translate(45, 57) rotate(-90)" style="font-size: 9px"> 131-99603-5 </text>
+                        </svg>`,
                           },
                         ],
                         margin: [20, 5, 0, 0],
@@ -436,56 +438,57 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
                       {
                         stack: [
                           {
-                            svg: `<svg viewBox="0 0 900 270">
-                      <rect height="270" width="860" fill="#ffffff" rx="5" ry="5" x="0" y="0" stroke="black" />
+                            svg: `<svg viewBox="0 0 950 180">
+                        <rect height="180" width="890" fill="#ffffff" rx="5" ry="5" x="0" y="0" stroke="black" />
 
-                      <text transform="translate(10, 15)" style="font-size: 10px" >DESPUÉS DE LA FECHA DE VENCIMIENTO </text>
-                      <text transform="translate(10, 30)" style="font-size: 10px" >DE ESTA FACTURA QUE SON 30 DÍAS,</text>
-                      <text transform="translate(10, 45)" style="font-size: 10px" > SE GENERARÁ UN 2% DE RECARGO  </text>
+                        <text transform="translate(10, 15)" style="font-size: 8px" >DESPUÉS DE LA FECHA DE VENCIMIENTO DE ESTA FACTURA </text>
+                      <text transform="translate(10, 25)" style="font-size: 8px" > QUE SON 30 DÍAS, SE GENERARÁ UN 2% DE RECARGO</text>
 
-                      <text transform="translate(350, 30)" style="font-size: 20px" font-weight="bold">Única de Cambio </text>
+                        <text transform="translate(350, 20)" style="font-size: 15px" font-weight="bold">Unica de Cambio </text>
 
-                      <text transform="translate(700, 20)" font-weight="bold" style="font-size: 14px" > Fecha: </text>
-                      <text transform="translate(750, 20)" style="font-size: 14px"> ${fun_.my_dateFormater(data.fecha_equivalente)} </text>
-
-
-                      <text transform="translate(10, 75)" style="font-size: 15px"> Debo y pagaré a  </text>
-                      <text transform="translate(125, 76)" style="font-size: 15px" font-weight="bold"> ADM AGROINDUSTRIAL SRL </text>
-                      <text transform="translate(325, 75)" style="font-size: 15px"> la cantidad de :  </text>
-                      <text transform="translate(10, 95)" style="font-size: 13px" font-weight="bold"> *** ${numero_letra} *** </text>
-
-                      <text transform="translate(10, 115)" style="font-size: 15px"> Valor recibido a mi (nuestra) entera satisfacción según la</text>
-                      <text transform="translate(395, 115)" style="font-size: 15px" font-weight="bold"> Factura No. ${fun_.my_padStart( data.numero_factura, 8, '0' )}</text>
-                      <text transform="translate(550, 115)" style="font-size: 15px"> para el fiel cumplimiento del pago</text>
-                      <text transform="translate(10, 135)" style="font-size: 15px"> quedan afectados mis (nuestros) bienes habidos y por haber, con renuncia de fuero de domicilio y de cualquier otra</text>
-                      <text transform="translate(10, 155)" style="font-size: 15px"> que pudiera favorecerme (nos).</text>
-
-                      <text transform="translate(10, 180)" style="font-size: 15px" font-weight="bold"> A: </text>
-                      <line x1="30" y1="184" x2="830" y2="184" style="stroke:#000000;stroke-width:1" />
-                      <text transform="translate(35, 180)" style="font-size: 20px" font-weight="bold"> ${data.cliente.nombre} </text>
-                      <text transform="translate(10, 210)" style="font-size: 15px" font-weight="bold"> RD$ </text>
-                      <rect height="30" width="300" fill="#ffffff" rx="0" ry="5" x="45" y="190" stroke="black" />
-                      <text transform="translate(50, 210)" style="font-size: 15px" font-weight="bold"> ${fun_.numFormatTwoDecimals(data.total_factura)} </text>
-
-                      <line x1="30" y1="255" x2="220" y2="255" style="stroke:#000000;stroke-width:1" />
-                      <text transform="translate(100, 265)" style="font-size: 11px" >Nombre</text>
-
-                      <line x1="250" y1="255" x2="470" y2="255" style="stroke:#000000;stroke-width:1" />
-                      <text transform="translate(340, 265)" style="font-size: 11px" >Cédula</text>
-
-                      <line x1="500" y1="255" x2="720" y2="255" style="stroke:#000000;stroke-width:1" />
-                      <text transform="translate(548, 265)" style="font-size: 11px" >Firma Autorizada / Sello</text>
+                        <text transform="translate(730, 20)" font-weight="bold" style="font-size: 13px" > Fecha: </text>
+                        <text transform="translate(775, 20)" style="font-size: 13px"> ${fun_.my_dateFormater(data.fecha_equivalente)} </text>
 
 
-                  </svg>`,
+                        <text transform="translate(10, 45)" style="font-size: 11px"> Debo y pagaré a  </text>
+                        <text transform="translate(95, 45)" style="font-size: 11px" font-weight="bold"> ADM AGROINDUSTRIAL SRL </text>
+                        <text transform="translate(240, 45)" style="font-size: 11px"> la cantidad de :  </text>
+
+                        <text transform="translate(10, 63)" style="font-size: 12px" font-weight="bold"> *** ${numero_letra}  *** </text>
+
+                        <text transform="translate(10, 77)" style="font-size: 11px"> Valor recibido a mi (nuestra) entera satisfacción segun la</text>
+                        <text transform="translate(292, 77)" style="font-size: 11px" font-weight="bold"> Factura No. ${fun_.my_padStart( data.numero_factura, 8, '0' )}</text>
+                        <text transform="translate(405, 77)" style="font-size: 11px"> para el fiel cumplimiento del pago</text>
+                        <text transform="translate(572, 77)" style="font-size: 11px"> quedan afectados mis (nuestros) bienes habidos y por haber,</text>
+                        <text transform="translate(10, 90)" style="font-size: 11px"> con renuncia de fuero de domicilio y de cualquier otra que puediera favorecerme (nos).</text>
+
+
+                        <text transform="translate(10, 106)" style="font-size: 11px" font-weight="bold"> A: </text>
+                        <text transform="translate(25, 106)" style="font-size: 15px" font-weight="bold"> ${data.cliente.nombre} </text>
+                        <line x1="20" y1="110" x2="870" y2="110" style="stroke:#000000;stroke-width:1" />
+
+                        <text transform="translate(10, 128)" style="font-size: 11px" font-weight="bold"> RD$ </text>
+                        <rect height="20" width="300" fill="#ffffff" rx="0" ry="5" x="40" y="115" stroke="black" />
+                        <text transform="translate(50, 128)" style="font-size: 12px" font-weight="bold"> ${fun_.numFormatTwoDecimals(data.total_factura)} </text>
+
+                        <line x1="30" y1="163" x2="220" y2="163" style="stroke:#000000;stroke-width:1" />
+                        <text transform="translate(100, 174)" style="font-size: 11px" >Nombre</text>
+
+                        <line x1="250" y1="163" x2="470" y2="163" style="stroke:#000000;stroke-width:1" />
+                        <text transform="translate(340, 174)" style="font-size: 11px" >Cedula</text>
+
+                        <line x1="500" y1="163" x2="720" y2="163" style="stroke:#000000;stroke-width:1" />
+                        <text transform="translate(548, 174)" style="font-size: 11px" >Firma Autorizada / Sello</text>
+
+                    </svg>`,
                           },
                         ],
-                        margin: [-620, 5, 0, 0],
+                        margin: [-640, 5, 0, 0],
                       },
                     ],
                   },
                 ],
-                margin: [0, 5, 0, 0],
+                margin: [0, 10, 0, 0],
               }
             : { text: '' }
           : { text: '' },
