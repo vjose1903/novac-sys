@@ -194,7 +194,7 @@
           <div class="form-group">
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
 
-            <input [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+            <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
           </div>
         </div>
       </form>
