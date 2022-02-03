@@ -139,6 +139,14 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
 
           setTimeout(() => this.abrirModal('cancelar', this.facturaSelected), 10);
           //
+        } else if (this.BuscarPara === 'nota_credito' || this.BuscarPara === 'nota_debito') {
+          if (res.tipo === 'reimrimir') {
+            const obj = { data: this.notaSelected, type: 'facturacion' };
+            this.reimprimirFactura(obj);
+          } else {
+            const url = `/admin/manipular/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
+            this.router.navigateByUrl(url);
+          }
         } else if (this.BuscarPara === 'solo_ver') {
           if (res.tipo === 'reimrimir') {
             const obj = { data: this.facturaSelected, type: 'facturacion' };
@@ -149,9 +157,6 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
             });
           }
           //
-        } else {
-          const url = `/admin/manipular/nota/${this.BuscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
-          this.router.navigateByUrl(url);
         }
       } else if (this.tipoModal === 'cancelarBusqueda') {
         this.decisionesModal();
@@ -518,14 +523,13 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   editarFactura() {
     this.router.navigateByUrl(`/admin/factura/venta/update/${this.facturaSelected.id}`);
   }
+
   decisionesModal() {
-    if (this.BuscarPara === 'anular_factura') {
-      this.CancelarFactura();
-    }
-    if (this.tipoModal === 'cancelarBusqueda') {
-      this.borrar();
-    }
+    if (this.BuscarPara === 'anular_factura') this.CancelarFactura();
+
+    if (this.tipoModal === 'cancelarBusqueda') this.borrar();
   }
+
   async CancelarFactura() {
     try {
       const res = await this.facturaClass.createOne(null, { afterPath: `anular_factura/${this.facturaSelected.id}` });

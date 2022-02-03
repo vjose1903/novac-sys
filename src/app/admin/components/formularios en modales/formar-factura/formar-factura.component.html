@@ -13,14 +13,18 @@
         <small class="L3"> <b>Telefono:</b> {{ num_telefono }} &nbsp; <b>Rnc:</b>{{ rnc }}</small>
       </div>
       <div class="col-4 d-flex justify-content-end">
-        <span *ngIf="factura.FACTURA_DE != 'nota'" class="TipoFact">FACTURA A {{ factura.condicion | uppercase }}</span>
+        <div>
+          <b class="L1 text-right">{{ factura.tipo_factura }}</b>
+          <b *ngIf="factura.FACTURA_DE != 'nota'" class="L2 text-right">FACTURA A {{ factura.condicion | uppercase }}</b>
+          <b *ngIf="factura.FACTURA_DE == 'nota'" class="L2 text-right"> Aplicada a: {{ factura.aplicada_a }}</b>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="col-12 p-0">
     <div class="row">
-      <div class="col-4 mt-2">
+      <div class="col-8 mt-2">
         <div class="infoPropFact">
           <span class="d-block">
             <b class="negrita">{{ factura.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
@@ -38,9 +42,7 @@
           </span>
         </div>
       </div>
-      <div class="col-4 d-flex justify-content-center align-items-center">
-        <b class="L1">{{ factura.tipo_factura }}</b>
-      </div>
+
       <div class="col-4 d-flex justify-content-center">
         <div class="infoFactura">
           <span class="d-block">
@@ -54,7 +56,7 @@
             <b class="negrita">NCF :</b>&nbsp; <span>{{ factura.numero_comprobante }}</span>
           </span>
           <span class="d-block">
-            <b class="negrita">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(factura.numero_factura) }}</span>
+            <b class="negrita">Doc No :</b>&nbsp; <span>{{ formatoNumeroFactura(factura.numero_factura) }}</span>
           </span>
           <span class="d-block">
             <b class="negrita">Valida hasta :</b> &nbsp;
@@ -64,7 +66,7 @@
       </div>
     </div>
   </div>
-  <div class="col-12 p-0">
+  <div class="col-12 p-0 my-2" style="border-top: 1px solid #8e8e8e; border-bottom: 1px solid #8e8e8e">
     <div class="factBodyScroll" [ngStyle]="{ 'max-height': '25rem' }">
       <table class="table" mdbTable [small]="true">
         <thead class="">
@@ -97,17 +99,17 @@
   </div>
   <div class="col-12 p-0">
     <div class="row">
-      <div class="col-7">
-        <div *ngIf="factura.tipo === 'venta'">
+      <div class="col-8">
+        <div *ngIf="factura.tipo != 'compra'">
           <span>
             <b class="negrita">Realizada por :</b>&nbsp; <span>{{ factura.usuario }}</span>
           </span>
-          <span>
+          <span *ngIf="factura.vendedor">
             &nbsp;&nbsp; <b class="negrita">Vendedor :</b>&nbsp; <span>{{ factura.vendedor }}</span>
           </span>
         </div>
       </div>
-      <div class="col-1"></div>
+
       <div class="col-4 d-flex justify-content-end">
         <div class="infoCantidades pr-2">
           <span class="d-block">
