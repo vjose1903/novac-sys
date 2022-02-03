@@ -11,9 +11,7 @@
             <div class="row">
               <div class="pr-0 col-12">
                 <div>
-                  <label class="mr-2">
-                    <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label
-                  >
+                  <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
                   <label>
                     <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="mr-1" (click)="changeIdent(false)" />Rnc
                     <span style="color: red">*</span>
@@ -59,12 +57,7 @@
                       (keydown.enter)="saltar('campoNombre')"
                     />
 
-                    <div
-                      (click)="setDocumentoPrincipal('rnc')"
-                      class="input-group-append"
-                      mdbTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}"
-                      placement="right"
-                    >
+                    <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" mdbTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" placement="right">
                       <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                     </div>
                   </div>
@@ -179,14 +172,7 @@
           <div class="col-12 p-0">
             <div class="form-group" [appMsgError]="'direccion'" [form]="form">
               <label class="control-label">Direccion <span style="color: red">*</span></label>
-              <textarea
-                id="campoDir"
-                (keyup)="capitalice('direccion', $event.target.value)"
-                formControlName="direccion"
-                class="form-control"
-                cols="30"
-                rows="3"
-              ></textarea>
+              <textarea id="campoDir" (keyup)="capitalice('direccion', $event.target.value)" formControlName="direccion" class="form-control" cols="30" rows="3"></textarea>
               <span id="msgContainer_direccion"></span>
             </div>
           </div>
@@ -194,7 +180,7 @@
           <div class="form-group">
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
 
-            <input [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+            <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
           </div>
         </div>
       </form>

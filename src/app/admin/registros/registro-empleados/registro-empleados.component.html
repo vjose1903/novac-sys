@@ -43,6 +43,7 @@
                 <span id="msgContainer_nombre"></span>
               </div>
             </div>
+
             <div class="col-6 p-0 pl-2">
               <div class="form-group" [appMsgError]="'apellido'" [form]="form">
                 <label class="control-label">Apellido: <span style="color: red">*</span></label>
@@ -63,15 +64,7 @@
             <div class="col-6 p-0 pr-2">
               <div class="form-group" [appMsgError]="'usuario'" [form]="form">
                 <label class="control-label">Usuario: <span style="color: red">*</span></label>
-                <input
-                  (keydown.enter)="saltar('campoTelefono')"
-                  type="text"
-                  id="campoUsuario"
-                  formControlName="usuario"
-                  placeholder="Introduzca usuario"
-                  class="form-control"
-                  autocomplete="off"
-                />
+                <input (keydown.enter)="saltar('campoTelefono')" type="text" id="campoUsuario" formControlName="usuario" placeholder="Introduzca usuario" class="form-control" autocomplete="off" />
                 <span id="msgContainer_usuario"></span>
               </div>
             </div>
@@ -96,15 +89,7 @@
             <div class="col-8 p-0 pr-2">
               <div class="form-group" [appMsgError]="'email'" [form]="form">
                 <label class="control-label">Email: <span style="color: red">*</span> </label>
-                <input
-                  id="campoEmail"
-                  (keydown.enter)="saltar('campoSexo')"
-                  type="text"
-                  formControlName="email"
-                  placeholder="Introduzca email"
-                  class="form-control"
-                  autocomplete="off"
-                />
+                <input id="campoEmail" (keydown.enter)="saltar('campoSexo')" type="text" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
                 <span id="msgContainer_email"></span>
               </div>
             </div>
@@ -185,17 +170,16 @@
                 <span id="msgContainer_confirm_password"></span>
               </div>
             </div>
-
-            <div class="col-12 p-0 mt-3">
-              <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar('boton html')" style="width: 6.5rem">
-                {{ 'Borrar' }}
-              </button>
-              <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde" style="width: 6.5rem">{{ boton }}</button>
-              <!-- [value]="boton"  -->
-              <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="abrirModal('password', usuarioSelected)">Cambiar contraseña</a>
-            </div>
           </div>
         </form>
+        <div class="col-12 p-0 mt-3">
+          <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar('boton html', $event)" style="width: 6.5rem">
+            {{ 'Borrar' }}
+          </button>
+          <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde" style="width: 6.5rem">{{ boton }}</button>
+          <!-- [value]="boton"  -->
+          <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="abrirModal('password', usuarioSelected)">Cambiar contraseña</a>
+        </div>
       </div>
     </div>
   </div>

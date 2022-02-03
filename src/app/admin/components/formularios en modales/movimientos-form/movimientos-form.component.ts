@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
-import { DBservice } from '../../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 
 import { GLOBAL } from '../../../../core/services/GLOBAL';
@@ -126,7 +125,7 @@ export class MovimientosFormComponent extends mixinClass implements OnInit, Afte
         this.mostrarErrores(err.error);
       },
     );
-     
+
   }
   mostrarErrores(arg) {
     for (const error in arg) {

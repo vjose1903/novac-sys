@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';

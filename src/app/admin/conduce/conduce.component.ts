@@ -119,7 +119,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   noFiltroResponse(res) {
-    console.log("res --> ", res);
+    console.log('res --> ', res);
 
     if (res.tipo == 'buscarCliente') {
       this.enfocarInput('clienteI');
@@ -285,9 +285,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     const codigo = fila_actual['cod'];
     const art = fila_actual['articulo'];
 
-    console.log("codigo ", codigo);
-    console.log("art ", art);
-
+    console.log('codigo ', codigo);
+    console.log('art ', art);
 
     if (codigo && art) {
       const precioPrincipal = art.precio_principal;
@@ -295,15 +294,15 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
       this.UnidadesArticulo = [];
 
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
-      console.log("art.contenido_articulos.length ", art.contenido_articulos.length);
-      console.log("art.medida ", art.medida);
+      console.log('art.contenido_articulos.length ', art.contenido_articulos.length);
+      console.log('art.medida ', art.medida);
 
       if (art.contenido_articulos.length === 0 || art.medida !== 'Quintal') {
         this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
       }
-      console.log("this.UnidadesArticulo ", this.UnidadesArticulo);
+      console.log('this.UnidadesArticulo ', this.UnidadesArticulo);
 
-      console.log("art.descripcion ", art.descripcion);
+      console.log('art.descripcion ', art.descripcion);
       if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
         if (_.lowerCase(art.vendido_en) === _.lowerCase('Saco') && art.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
       }
@@ -315,7 +314,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
       const estoy_en = document.activeElement.id;
       if (_.includes(estoy_en, 'uni')) setTimeout(() => this.enfocarInput(estoy_en), 150);
-      console.log("  ");
+      console.log('  ');
     }
   }
 
@@ -539,7 +538,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   async buscarFacturasAdelantadas(id) {
     try {
-      this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false }).then((res) => {
+      this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, fact_de: 'venta' }).then((res) => {
         this.facturas_adelantadas = res['data'];
         this.facturas_adelantadas.map((factura) => {
           factura.secuencia = _.padStart(factura.numero_factura, 8, '0');

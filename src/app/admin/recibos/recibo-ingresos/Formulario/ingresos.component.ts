@@ -1,6 +1,4 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { DBservice } from '../../../../core/services/bdservice.service';
-import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import * as moment from '../../../../../utils/javascript/moment';

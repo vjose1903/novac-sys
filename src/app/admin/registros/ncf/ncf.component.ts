@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { DBservice } from '../../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { GLOBAL } from '../../../core/services/GLOBAL';

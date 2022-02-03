@@ -3,7 +3,6 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../../utils/javascript/moment';
 import { GLOBAL } from '../../../core/services/GLOBAL';
-import { DBservice } from '../../../core/services/bdservice.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { mixinClass } from '../../mixinClass';
@@ -443,12 +442,10 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
     try {
       const res = await this.facturaClass.createOne(cabecera_fact);
+      console.log('res --> ', res);
 
-      res['FACTURA_DE'] = 'nota';
-      const obj = {
-        data: res,
-        type: 'facturacion',
-      };
+      res['data']['FACTURA_DE'] = 'nota';
+      const obj = { data: res['data'], type: 'facturacion' };
 
       this.imprimirNota(obj);
 
@@ -461,11 +458,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   imprimirNota(obj) {
     this.pdfServ.generatePdf(obj).then((res) => {
       if (res.status === 'si') {
-        const objBase = {
-          base64: res.body,
-          filename: res.file,
-          type: 'facturacion',
-        };
+        const objBase = { base64: res.body, filename: res.file, type: 'facturacion' };
         this._ipc.send('printBase64', objBase);
         this.layServ.nextCheckCuadreToday(true);
       }

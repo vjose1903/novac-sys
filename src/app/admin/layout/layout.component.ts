@@ -4,8 +4,6 @@ import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
-
-import { DBservice } from '../../core/services/bdservice.service';
 import { mixinClass } from '../mixinClass';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';

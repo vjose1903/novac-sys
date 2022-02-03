@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-
-import { DBservice } from '../core/services/bdservice.service';
 import { IpcService } from '../core/services/ipc.service';
 
 import {
@@ -36,14 +34,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   requestClass = new RequestC();
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private fun: FunctionService,
-    public _ipc: IpcService,
-    public mServ: ModalService,
-    public pdfServ: PdfService,
-  ) {}
+  constructor(private fb: FormBuilder, private router: Router, private fun: FunctionService, public _ipc: IpcService, public mServ: ModalService, public pdfServ: PdfService) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({ usuario: null, password: null });

@@ -13,7 +13,7 @@
         <small class="L3"> <b>Telefono:</b> {{ num_telefono }} &nbsp; <b>Rnc:</b>{{ rnc }}</small>
       </div>
       <div class="col-4 d-flex justify-content-end">
-        <span class="TipoFact">FACTURA A {{ factura.condicion | uppercase }}</span>
+        <span *ngIf="factura.FACTURA_DE != 'nota'" class="TipoFact">FACTURA A {{ factura.condicion | uppercase }}</span>
       </div>
     </div>
   </div>
@@ -58,9 +58,7 @@
           </span>
           <span class="d-block">
             <b class="negrita">Valida hasta :</b> &nbsp;
-            <span *ngIf="factura.numero_factura">{{
-              factura.tipo_factura_id === 3 ? 'No aplica' : factura.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(factura.fecha_valida)
-            }}</span>
+            <span *ngIf="factura.numero_factura">{{ factura.tipo_factura_id === 3 ? 'No aplica' : factura.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(factura.fecha_valida) }}</span>
           </span>
         </div>
       </div>

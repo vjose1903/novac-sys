@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, OnChanges, OnDestroy, HostListener, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
-import { DBservice } from '../../../core/services/bdservice.service';
 import { TablasService } from '../tablas/tablas.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { FunctionService } from '../../../core/services/functions.service';

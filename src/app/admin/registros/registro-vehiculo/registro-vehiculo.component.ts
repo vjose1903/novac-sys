@@ -2,7 +2,6 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { MarcaC, ModeloC } from '../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { TablasService } from '../../components/tablas/tablas.service';

@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import { mixinClass } from '../mixinClass';
-import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
+import { TablasService } from '../components/tablas/tablas.service';
 import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
 import { ProduccionC } from './produccion';
 import * as $ from 'jquery';
@@ -59,9 +59,6 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
   ngOnDestroy() {
     this._destroy_mixin();
-
-    this.tServ.obj_paginate = obj_paginate_default;
-    this.tServ.Func_total_paginas(1);
   }
 
   decisionModal(res) {
@@ -144,8 +141,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
         mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Saco)} ${objeto.existencia.Saco === 1 ? 'Saco' : 'sacos'}`;
       } else mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
     } else {
-      if (objeto.existencia.Libra > 100)
-        mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Quintal)} ${objeto.existencia.Quintal === 1 ? 'Quintal' : 'Quintales'}`;
+      if (objeto.existencia.Libra > 100) mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Quintal)} ${objeto.existencia.Quintal === 1 ? 'Quintal' : 'Quintales'}`;
       else mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
     }
 

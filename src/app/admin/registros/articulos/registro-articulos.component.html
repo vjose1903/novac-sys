@@ -20,10 +20,7 @@
                 </div>
               </div>
 
-              <div
-                *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'"
-                class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center"
-              >
+              <div *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'" class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
                 <div class="form-group switchDiv">
                   <input formControlName="calcular_saco" class="apple-switch" type="checkbox" (change)="cambiarCalcularSaco()" />
                   <span class="ml-2">Calcular saco</span>
@@ -45,11 +42,7 @@
                 autocomplete="off"
                 id="nombre"
               />
-              <div
-                class="alerta text-danger ml-1"
-                style="font-size: 12px"
-                *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)"
-              >
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
                 Este Campo es obligatorio
               </div>
             </div>
@@ -85,11 +78,7 @@
                 <option value="{{ null }}" disabled>Tipo</option>
                 <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
               </select>
-              <div
-                class="alerta text-danger ml-1"
-                style="font-size: 12px"
-                *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)"
-              >
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">
                 Seleccione una opcion
               </div>
             </div>
@@ -109,11 +98,7 @@
                 <option value="Caja">Caja</option>
                 <option value="Unidad">Unidad</option>
               </select>
-              <div
-                class="alerta text-danger ml-1"
-                style="font-size: 12px"
-                *ngIf="!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)"
-              >
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)">
                 Seleccione una opcion
               </div>
             </div>
@@ -126,11 +111,7 @@
                 <option value="{{ null }}" disabled>Tipo</option>
                 <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
               </select>
-              <div
-                class="alerta text-danger ml-1"
-                style="font-size: 12px"
-                *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)"
-              >
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">
                 Seleccione una opcion
               </div>
             </div>
@@ -248,11 +229,7 @@
             <div class="col-1"></div>
           </div>
           <div class="SCROLLFORMULA">
-            <div
-              [ngClass]="{ 'd-none': formula['controls']['_destroy'].value === '1' }"
-              formArrayName="rowFormula"
-              *ngFor="let formula of ARRAY_FORMULA.controls; let j = index"
-            >
+            <div [ngClass]="{ 'd-none': formula['controls']['_destroy'].value === '1' }" formArrayName="rowFormula" *ngFor="let formula of ARRAY_FORMULA.controls; let j = index">
               <div [formGroupName]="j">
                 <hr *ngIf="j > 0" style="margin: 0.5rem 0rem 0.5rem 0rem; border: 0.5px solid #979797" />
                 <div class="row mb-2">
@@ -313,7 +290,6 @@
                   <div class="col-3 pr-0">
                     <div class="form-group mb-0">
                       <input
-
                         type="text"
                         id="costo_formula-{{ j }}"
                         tabindex="-1"
@@ -511,10 +487,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['cantidad_contenido_padre'].valid &&
-                  (form.controls['cantidad_contenido_padre'].dirty || form.controls['cantidad_contenido_padre'].touched)
-                "
+                *ngIf="!form.controls['cantidad_contenido_padre'].valid && (form.controls['cantidad_contenido_padre'].dirty || form.controls['cantidad_contenido_padre'].touched)"
               >
                 Cantidad de la caja
               </div>
@@ -523,14 +496,7 @@
           <div class="col-5">
             <div class="form-group">
               <label class="control-label text-transparent">medida </label>
-              <select
-                (keydown.enter)="saltar('precio_padre')"
-                id="medidaPadre"
-                formControlName="medida_contenido_padre"
-                (change)="seleccionarContenidoCaja()"
-                class="form-control"
-                value=""
-              >
+              <select (keydown.enter)="saltar('precio_padre')" id="medidaPadre" formControlName="medida_contenido_padre" (change)="seleccionarContenidoCaja()" class="form-control" value="">
                 <option *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Saco'" value="{{ null }}" disabled>Seleccione</option>
                 <option *ngIf="form.controls['medida'].value === 'Saco'" value="Libra">Libra</option>
                 <option *ngIf="form.controls['medida'].value === 'Caja'" value="Paquete">Paquete</option>
@@ -539,9 +505,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['medida_contenido_padre'].valid && (form.controls['medida_contenido_padre'].dirty || form.controls['medida_contenido_padre'].touched)
-                "
+                *ngIf="!form.controls['medida_contenido_padre'].valid && (form.controls['medida_contenido_padre'].dirty || form.controls['medida_contenido_padre'].touched)"
               >
                 Este Campo es obligatorio
               </div>
@@ -596,9 +560,7 @@
               <div
                 class="alerta text-danger ml-1"
                 style="font-size: 12px"
-                *ngIf="
-                  !form.controls['cantidad_contenido_hijo'].valid && (form.controls['cantidad_contenido_hijo'].dirty || form.controls['cantidad_contenido_hijo'].touched)
-                "
+                *ngIf="!form.controls['cantidad_contenido_hijo'].valid && (form.controls['cantidad_contenido_hijo'].dirty || form.controls['cantidad_contenido_hijo'].touched)"
               >
                 Cantidad del paquete
               </div>
@@ -635,11 +597,7 @@
                 (blur)="revisarPrecio('precio_hijo')"
                 autocomplete="off"
               />
-              <div
-                class="alerta text-danger ml-1"
-                style="font-size: 12px"
-                *ngIf="!form.controls['precio_hijo'].valid && (form.controls['precio_hijo'].dirty || form.controls['precio_hijo'].touched)"
-              >
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['precio_hijo'].valid && (form.controls['precio_hijo'].dirty || form.controls['precio_hijo'].touched)">
                 Este Campo es obligatorio
               </div>
             </div>
@@ -651,8 +609,6 @@
           <div class="form-group">
             <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
             <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
-
-            <!-- <input (click)="prue()" type="submit" class="btn ml-2" value="prueba" id="btn-verde" /> -->
 
             <ng-container *ngIf="TIPOARTICULO === 'Producto terminado' && recalcular === true">
               <a class="btn ml-2" id="btn-blanco" (click)="recalcularFunc()">Recarcular</a>

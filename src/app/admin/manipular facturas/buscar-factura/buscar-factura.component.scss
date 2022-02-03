@@ -1,4 +1,3 @@
-
 .BuscarFacturaRow {
   display: grid;
   grid-row-gap: 1rem;
@@ -17,5 +16,13 @@
   }
   .abajo {
     grid-area: abajo;
+  }
+}
+
+::ng-deep .sideFact {
+  z-index: 9999 !important;
+
+  .p-sidebar-content {
+    height: 100%;
   }
 }

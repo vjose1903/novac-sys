@@ -1,23 +1,9 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  AfterViewInit,
-  HostListener,
-  ChangeDetectorRef,
-  Input,
-  Output,
-  EventEmitter,
-  OnDestroy,
-  OnChanges,
-  ElementRef,
-} from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter, OnDestroy, OnChanges, ElementRef } from '@angular/core';
 import { MdbTableDirective } from 'angular-bootstrap-md';
 
 import { Subscription } from 'rxjs';
-import { obj_paginate_default, TablasService } from './tablas.service';
+import { TablasService } from './tablas.service';
 import * as _ from 'lodash';
-import { DBservice } from '../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../core/services/GLOBAL';
 import { FunctionService } from '../../../core/services/functions.service';
 
@@ -80,7 +66,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     Unidad: 'Unidades',
     Saco: 'Sacos',
   };
-  paginate_info = this.tServ.obj_paginate;
 
   // inputs
 
@@ -128,15 +113,19 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() pad = true;
   select_all_value = false;
   mixinClass;
+
+  pagActual = 1;
+  mostrar;
+  listaMostrar = [5, 20, 40, 60];
+  total_registros;
+
   constructor(private cdRef: ChangeDetectorRef, private tServ: TablasService, private fun: FunctionService) {}
 
   ngOnInit() {
     this.subTotalPag = this.tServ.TOTALPAGINAS.subscribe((res) => {
       if (res) {
         if (this.id_tabla !== 'tabla') {
-          if (res.tabla === this.id_tabla) {
-            this.total_registros = res.total;
-          }
+          if (res.tabla === this.id_tabla) this.total_registros = res.total;
         } else {
           this.total_registros = res.total;
         }
@@ -149,6 +138,14 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     //     this.element.focus();
     //   }, 5);
     // }
+    this.checkPagination();
+  }
+
+  checkPagination() {
+    // this.tServ.initPagination(this.id_tabla, this.config.obj_paginate || this.tServ.obj_paginate.default);
+    this.tServ.initPagination(this.id_tabla, this.tServ.obj_paginate.default);
+    const actualPagination = this.tServ.getPaginationById(this.id_tabla);
+    this.mostrar = actualPagination['per_page'];
   }
 
   searchCardTabla(tablaContent, restar) {
@@ -203,6 +200,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         { title: 'MDBTABLE', body: this.mdbTable },
         { title: 'INFO', body: this.info },
       ];
+
       necesarios.forEach((element) => {
         if (!element.body) console.error(`LA TABLA NO FUNCIONA SI NO TIENE: ${element.title}`);
       });
@@ -239,19 +237,13 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     await this.setDATATABLE();
 
-    if (this.paraFiltroArticulos) {
-      this.searchText = await this.paraFiltroArticulos;
-    }
+    if (this.paraFiltroArticulos) this.searchText = await this.paraFiltroArticulos;
 
-    if (this.paraFiltroClientes) {
-      this.searchText = await this.paraFiltroClientes;
-    }
+    if (this.paraFiltroClientes) this.searchText = await this.paraFiltroClientes;
 
     // this.changeStylesTitles();
 
-    setTimeout(() => {
-      this.ready = true;
-    }, 250);
+    setTimeout(() => (this.ready = true), 250);
   }
 
   // ===================================================
@@ -292,8 +284,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.alto = undefined;
     this.searchText = '';
     this.reinicioModal.emit();
-    this.tServ.obj_paginate = obj_paginate_default;
-    this.tServ.Func_total_paginas(1);
+    this.tServ.deletePaginationById(this.id_tabla);
   }
 
   resetInput(referencia, destino, i, formatear, especifico?) {
@@ -350,28 +341,17 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.clickIcon.emit(obj);
   }
 
-  pagActual = 1;
-  mostrar = this.paginate_info.per_page;
-  listaMostrar = [5, 20, 40, 60];
-  total_registros;
-
   cambiaMostrar(num: number) {
     const temp = GLOBAL.duplicarJson(this.ROW + '0');
     this.IDROW = null;
-
     this.mostrar = num;
 
-    this.paginate_info = {
-      page: this.pagActual,
-      per_page: this.mostrar,
-      searchText: this.searchText === '' ? ' ' : this.searchText,
-    };
+    this.tServ.modifyPaginationById(this.id_tabla, [{ per_page: this.mostrar }, { searchText: this.searchText === '' ? ' ' : this.searchText }]).then(() => {
+      const paginationChanged = this.tServ.getPaginationById(this.id_tabla);
+      this.paginateChange.emit(paginationChanged);
+    });
 
-    this.paginateChange.emit(this.paginate_info);
-    this.tServ.obj_paginate = this.paginate_info;
-    setTimeout(() => {
-      this.IDROW = temp;
-    }, 250);
+    setTimeout(() => (this.IDROW = temp), 150);
   }
 
   pageChange(arg, tipo = '') {
@@ -379,16 +359,14 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.IDROW = null;
     this.pagActual = tipo === 'filtro' ? 1 : arg;
 
-    this.paginate_info = {
-      page: tipo === 'filtro' ? 1 : arg,
-      per_page: this.mostrar,
-      searchText: this.searchText === '' ? ' ' : this.searchText,
-    };
+    this.tServ.modifyPaginationById(this.id_tabla, [{ page: tipo === 'filtro' ? 1 : arg }, { searchText: this.searchText === '' ? ' ' : this.searchText }]).then(() => {
 
-    this.paginateChange.emit(this.paginate_info);
-    this.tServ.obj_paginate = this.paginate_info;
 
-    setTimeout(() => (this.IDROW = temp), 250);
+      const paginationChanged = this.tServ.getPaginationById(this.id_tabla);
+      this.paginateChange.emit(paginationChanged);
+    });
+
+    setTimeout(() => (this.IDROW = temp), 150);
   }
 
   disabledInput(dato, column) {
@@ -460,13 +438,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         tempdecimales = '00';
       }
       //
-      if (
-        splitPrecio.length > 2 ||
-        this.checkNumbers(enteros) ||
-        this.checkLongMillares(enteros) ||
-        this.checkNumbers(tempdecimales) ||
-        this.checkLongMillares(tempdecimales)
-      ) {
+      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
         this.fun.toastError('Valor introducido es invalido', 'ERROR');
         this.enfocarInput(input);
       } else {

@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, O
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from '../../../utils/javascript/moment';
-import { DBservice } from '../../core/services/bdservice.service';
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { GLOBAL, tipos_facturas } from '../../core/services/GLOBAL';
@@ -118,7 +117,7 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
   constructor(
     public mServ: ModalService,
-    
+
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
@@ -1147,11 +1146,11 @@ export class FacturacionComponent extends mixinClass implements OnInit, OnDestro
 
     let res;
     const metodo = this.action === 'update' ? 'editar_factura' : '';
-    
+
 
     if (metodo === 'editar_factura') res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_editar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
-    
+
 
     let res_factura = res['data'];
 

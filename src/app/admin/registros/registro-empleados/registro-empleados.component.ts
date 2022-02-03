@@ -14,7 +14,6 @@ import { EmpleadoC } from './empleado';
   templateUrl: './registro-empleados.component.html',
   styleUrls: ['./registro-empleados.component.scss'],
 })
-
 export class RegistroEmpleadosComponent extends mixinClass implements OnInit, OnDestroy {
   form: FormGroup;
   titulo = '';
@@ -226,7 +225,10 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     return !this.camposDisabled || this.fun.hasValue(this.form.controls.nombre.value);
   }
 
-  borrar(e?) {
+  borrar(e, a?) {
+    console.log('SE LLAMA BORRAR: ', e);
+    console.log('SE LLAMA BORRAR event: ', a);
+
     this.form.reset();
 
     this.enfocarInput('cedula');
@@ -261,7 +263,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
     }
 
     this.form.patchValue(item.ARG);
-    console.log("item.ARG --> ", item.ARG);
+    console.log('item.ARG --> ', item.ARG);
 
     this.usuarioSelected = item.ARG;
     this.editando = true;
@@ -275,6 +277,8 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   }
 
   submit() {
+    console.log('SE LLAMA submit()');
+
     const formulario = this.form.getRawValue();
 
     const documentos_identidad = [{ documento: formulario.cedula, descripcion: 'cedula' }];

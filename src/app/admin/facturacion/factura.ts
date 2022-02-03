@@ -11,7 +11,7 @@ export class FacturaC extends CrudG<any> {
     });
   }
 
-  getFacturasByParams(args: { campo: string; valor: 'string'; tipo_factura_id: number; adelantada: boolean; page: number; per_page: number; paginado: boolean }) {
+  getFacturasByParams(args: { campo: string; valor: 'string'; tipo_factura_id: number; adelantada: boolean; page: number; per_page: number; paginado: boolean; fact_de: string }) {
     // `params/${campo}/${VALOR_ENC}/${tipo_factura_id}/${adelantada}?page=${page}&per_page=${per_page}&paginado=${paginado}`
 
     const valor_enc = btoa(args.valor);

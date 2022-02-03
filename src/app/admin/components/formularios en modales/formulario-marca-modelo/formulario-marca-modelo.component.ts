@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { DBservice } from '../../../../core/services/bdservice.service';
 import { GLOBAL } from '../../../../core/services/GLOBAL';
 import * as _ from 'lodash';
 import { TablasService } from '../../../components/tablas/tablas.service';

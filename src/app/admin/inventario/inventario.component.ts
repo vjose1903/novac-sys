@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
-import { DBservice } from '../../core/services/bdservice.service';
 import { GLOBAL } from '../../core/services/GLOBAL';
 import * as _ from 'lodash';
-import { TablasService, obj_paginate_default } from '../components/tablas/tablas.service';
+import { TablasService } from '../components/tablas/tablas.service';
 import { mixinClass } from '../mixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
 import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
@@ -98,10 +97,6 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
   ngOnDestroy() {
     this._destroy_mixin();
-
-    this.fechaFactura = undefined;
-    this.tServ.obj_paginate = obj_paginate_default;
-    this.tServ.Func_total_paginas(1);
   }
 
   formatoNumero(num) {
@@ -144,18 +139,16 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
     const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
     this.palabra_buscar = palabra_a_buscar;
 
-    this.articuloClass
-      .getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: page, per_page: per_page, paginado: true, is_compra: false, tipo: this.filtro })
-      .then((res) => {
-        res.data.map((arti) => {
-          arti.customStyles = { 'td-codigo': { width: '4rem' }, 'td-nombre': { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
-        });
-
-        this.listaArticulos = GLOBAL.duplicarJson(res.data);
-
-        const obj = { total: res.total_registros, tabla: 'listaArticulos' };
-        this.tServ.Func_total_paginas(obj);
+    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: page, per_page: per_page, paginado: true, is_compra: false, tipo: this.filtro }).then((res) => {
+      res.data.map((arti) => {
+        arti.customStyles = { 'td-codigo': { width: '4rem' }, 'td-nombre': { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
       });
+
+      this.listaArticulos = GLOBAL.duplicarJson(res.data);
+
+      const obj = { total: res.total_registros, tabla: 'listaArticulos' };
+      this.tServ.Func_total_paginas(obj);
+    });
   }
 
   filtrarArticulos() {

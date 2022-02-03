@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LoaderService } from '../../loader/loader.service';
-import { DBservice } from '../../core/services/bdservice.service';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { mixinClass } from '../mixinClass';
 import * as _ from 'lodash';

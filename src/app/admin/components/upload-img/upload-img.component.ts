@@ -1,5 +1,4 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { DBservice } from '../../../core/services/bdservice.service';
 import { FunctionService } from '../../../core/services/functions.service';
 import { RequestC } from '../../../core/typescript/requests';
 
