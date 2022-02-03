@@ -20,7 +20,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   facturas: any;
   campoSelected: string;
   clienteBuscado: any;
-  listaClientes: unknown;
+  listaClientes;
   facturaSelected: any;
   @ViewChild(TablasComponent) tablas: TablasComponent;
   BuscarPara: any;
@@ -36,7 +36,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   valor: any;
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
-  tiposFacturasClass = new FacturaC();
+  tiposFacturasClass = new TiposFacturaC();
   ncfClass = new NcfC();
 
   constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {

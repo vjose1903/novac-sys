@@ -119,6 +119,8 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   noFiltroResponse(res) {
+    console.log("res --> ", res);
+
     if (res.tipo == 'buscarCliente') {
       this.enfocarInput('clienteI');
       this.selectContenido('clienteI');

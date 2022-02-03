@@ -12,6 +12,7 @@ import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { modalClass } from '../components/modal/modal';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
+import { RequestC } from '../../core/typescript/requests';
 
 @Component({
   selector: 'app-layout',
@@ -43,10 +44,11 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
   cuadre_hoy;
   ant_event_change_visibility;
 
-  clienteClass= new ClienteC;
-  suplidorClass= new SuplidorC;
+  clienteClass = new ClienteC();
+  suplidorClass = new SuplidorC();
+  requestClass = new RequestC();
 
-  constructor(private dbServ: DBservice, private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef) {
+  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef) {
     super();
 
     this.router.events.subscribe((routerEvent: Event) => {
@@ -75,33 +77,26 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
     this._init_mixin({ component: 'layout', _lista_subs: ['decisionModal', 'refreshFacturas', 'sacarFacturas'] });
 
     this._ipc.PRINTERS.subscribe((res) => {
-      if (res !== undefined) {
-        this.PrintersInstall = res;
-      }
+      if (res !== undefined) this.PrintersInstall = res;
     });
 
     const token = this.fun.getAuthToken();
 
     if (token) {
-      this.dbServ
-        .validateToken()
+      this.requestClass
+        .getAll({ afterPath: 'auth/validate_token' })
         .then((res) => {
           this.setUser(res.data);
-          if (res.data.sexo === 'm') {
-            this.imgUser = 'assets/img/userH.png';
-          } else {
-            this.imgUser = 'assets/img/userM.png';
-          }
+          if (res.data.sexo === 'm') this.imgUser = 'assets/img/userH.png';
+          else this.imgUser = 'assets/img/userM.png';
+
           this.lRun = true;
         })
         .catch((err) => {
-          if (err.status === 0) {
-            this.noServer = true;
-          } else {
+          if (err.status === 0) this.noServer = true;
+          else {
             this.fun.logout();
-
             this.router.navigateByUrl('/auth/login');
-
             this.noServer = false;
           }
         });
@@ -276,8 +271,8 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
       console.log('url ', url);
       if (this.fun.hasValue(arg) && !pathname.includes(arg)) {
         this.layServ.nextCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
-        setTimeout(() => resolve(true) ,100);
-      } else setTimeout(() => resolve(true) ,100);
+        setTimeout(() => resolve(true), 100);
+      } else setTimeout(() => resolve(true), 100);
     });
   }
 
@@ -290,7 +285,6 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
         setTimeout(() => {
           if (res) this.layServ.nextFacturaGuardada(fact);
         }, 150);
-
       });
     }
   }
@@ -357,7 +351,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
           const fact = this.facturas_localStorage[i];
           if (fact.suplidor_id) {
             const suplidor = await this.suplidorClass.getOne(fact.suplidor_id);
-            
+
             fact['suplidor'] = {
               nombre: `${suplidor.nombre} ${suplidor.apellido ? suplidor.apellido : ''}`,
               direccion: `${suplidor.direccion}`,
@@ -369,7 +363,7 @@ export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, Af
           if (fact.cliente_id) {
             try {
               const cliente = await this.clienteClass.getOne(fact.cliente_id);
-              // const cliente = await this.dbServ.getClienteById(fact.cliente_id).toPromise();
+
               fact['cliente'] = {
                 nombre: `${cliente.nombre} ${cliente.apellido ? cliente.apellido : ''}`,
                 direccion: `${cliente.direccion}`,

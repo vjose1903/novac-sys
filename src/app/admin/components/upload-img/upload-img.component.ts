@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { DBservice } from '../../../core/services/bdservice.service';
 import { FunctionService } from '../../../core/services/functions.service';
+import { RequestC } from '../../../core/typescript/requests';
 
 @Component({
   selector: 'app-upload-img',
@@ -14,10 +15,11 @@ export class UploadImgComponent implements OnInit {
   imageSrc: any;
   BASE_64;
   FILE_NAME;
+  requestClass = new RequestC();
 
   @Output() getPhotoData = new EventEmitter<any>();
 
-  constructor(private dbServ: DBservice, private fun: FunctionService) {}
+  constructor(private fun: FunctionService) {}
 
   ngOnInit() {}
 
@@ -33,13 +35,9 @@ export class UploadImgComponent implements OnInit {
         base_64: this.BASE_64,
         file_name: this.FILE_NAME,
       };
-
-      this.dbServ.subirFoto(obj).subscribe(
-        (res) => {},
-        (err) => {
-          console.error(err);
-        },
-      );
+      this.requestClass.createOne(obj, { afterPath: 'imagenes' }).then((res) => {
+        console.log('res ', res);
+      });
     } else this.fun.toastError('Debe de seleccionar una foto primero', 'ERROR');
   }
 

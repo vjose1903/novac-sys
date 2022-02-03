@@ -449,8 +449,11 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
     if ((input === 'cod-' || input === 'pre-') && this.fun.hasValue(codigo) && this.fun.hasValue(cantidad) && this.fun.hasValue(unidad)) {
       let index = i;
+      console.log('input --> ', input);
+      console.log('index 00 --> ', index);
 
       if (input === 'cod-') index++;
+      console.log('index 11 --> ', index);
 
       this.ajustarSecuencia().then((res) => {
         setTimeout(() => {
@@ -563,7 +566,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
             this.ajustarSecuencia().then((res_ajustar) => {
               setTimeout(() => {
                 if (this.metodo === 'venta') this.enfocarInput(`cod-${i + 1}`);
-                else this.enfocarInput(`pre-${i + 1}`);
+                else this.enfocarInput(`pre-${i}`);
               }, 200);
             });
           });
@@ -573,7 +576,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   verificarSecuencia(i, input?) {
-    if (this.secuencia < i) this.enfocarInput(this.inputSecuencia);
+    if (this.secuencia < i && input != 'unidad') this.enfocarInput(this.inputSecuencia);
 
     if (this.filasDetalle) {
       const codigo = (this.filasDetalle[i] as any).controls['cod'].value;

@@ -19,6 +19,7 @@ import {
 import { FunctionService } from '../core/services/functions.service';
 import { ModalService } from '../admin/components/modal/modal.service';
 import { PdfService } from '../core/services/pdf/pdf.service';
+import { RequestC } from '../core/typescript/requests';
 import { AppConfig } from '../../environments/environment';
 @Component({
   selector: 'app-login',
@@ -33,8 +34,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   tipo_prueba = 'otro';
   imgLogo = AppConfig.imgLogo;
 
+  requestClass = new RequestC();
+
   constructor(
-    private dbServ: DBservice,
     private fb: FormBuilder,
     private router: Router,
     private fun: FunctionService,
@@ -80,14 +82,16 @@ export class LoginComponent implements OnInit, OnDestroy {
   // LOGIN
   // =================================================================
   login(form: any) {
-    this.dbServ
-      .login(form.value)
+    this.requestClass
+      .createOne(form.value, { afterPath: 'auth/sign_in' })
       .then((res) => {
         this.fun.setUser(res.data);
         this.router.navigateByUrl('/admin/dashboard');
       })
-      .catch((err) => {
-        if (err.status === 0) {
+      .catch((error) => {
+        console.log('error ', error);
+
+        if (error.status === 0) {
           this.fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
         } else {
           this.fun.toastError('Datos de acceso proporcionados estan incorrectos', 'ERROR');
@@ -112,7 +116,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     // const data_ = venta_contado_consumo;
     // const data_ = nota_credito;
 
-    const obj = { data: data_, type: 'facturacion', };
+    const obj = { data: data_, type: 'facturacion' };
 
     this.tipo_prueba = obj.type;
     this.pdfServ.generatePdf(obj).then((res_pdf) => {

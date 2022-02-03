@@ -8,7 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { mixinClass } from '../../mixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
-import { FacturaC } from '../../facturacion/factura';
+import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
 
@@ -42,7 +42,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
 
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
-  tiposFacturasClass = new FacturaC();
+  tiposFacturasClass = new TiposFacturaC();
   clientesClass = new ClienteC();
   ncfClass = new NcfC();
   constructor(private activeRoute: ActivatedRoute, private router: Router) {
@@ -55,9 +55,6 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
     this.fecha = moment().format('DD/MM/YYYY');
-    this.tiposFacturasClass.getAll().then((res) => {
-      this.lista_tipos_facturas = res;
-    });
 
     if (this.tipoNota === 'credito') {
       this.tituloPag = 'Nota de crédito aplicada a factura ';
@@ -95,6 +92,9 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
+    this.lista_tipos_facturas = await this.tiposFacturasClass.getAll();
+    console.log('this.lista_tipos_facturas --> ', this.lista_tipos_facturas);
+
     this.getFactura().then(async (res_factura) => {
       await this.formarTitulosTabla();
       await this.getPropietario(this.factura.cliente_id);
@@ -110,6 +110,7 @@ export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestr
       this.paqueteComprobante = res['data'];
     });
   }
+
   async getPropietario(id) {
     if (id) {
       try {

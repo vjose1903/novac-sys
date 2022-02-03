@@ -20,6 +20,7 @@ export interface responseModel<T> {
 
 export class CrudG<T> {
   http = SingletonService.http;
+  fun = SingletonService.fun;
 
   constructor(public path: string) {}
 
@@ -90,7 +91,7 @@ export class CrudG<T> {
   }
 
   makeUrl(tipo, args?, id = null) {
-    let url = `${AppConfig.url_server}/${this.path}`;
+    let url = `${AppConfig.url_server}${this.fun.hasValue(this.path) ? `/${this.path}` : ''}`;
 
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';
 

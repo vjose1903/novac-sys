@@ -88,28 +88,29 @@ export class mixinClass extends modalClass {
   // =========================================================================================================
   clickInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
-    element.click();
+    if (element) element.click();
   }
   // =========================================================================================================
   enfocarInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
-    element.focus();
+    if (element) element.focus();
   }
   // =========================================================================================================
   desEnfocarInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
-    element.blur();
+    if (element) element.blur();
   }
 
   // =========================================================================================================
   selectContenido(arg) {
     const element = document.getElementById(arg) as any;
-    element.select();
+    if (element) element.select();
   }
   // =========================================================================================================
   formatoNumero(num) {
     return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num)) + '  ';
   }
+  // 301,755.67
 
   // =========================================================================================================
   my_capitalize(str) {
