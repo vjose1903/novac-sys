@@ -357,9 +357,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
           try {
             if (!is_guardada) {
-              this.articuloClass
-                .getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura })
-                .then((res_articulo) => this.llenarFilas(row, _.first(res_articulo['data']), j));
+              this.articuloClass.getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura }).then((res_articulo) => this.llenarFilas(row, _.first(res_articulo['data']), j));
             } else {
               this.llenarFilas(row, articulo, j);
             }
@@ -433,53 +431,53 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   element: any;
 
   async saltar(input, i) {
-    const index = i;
+    setTimeout(() => {
+      const index = i;
 
-    const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
-    const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
-    const cantidad = (this.filasDetalle[i] as any).controls['can'].value;
-    const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
+      const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
+      const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
+      const cantidad = (this.filasDetalle[i] as any).controls['can'].value;
+      const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
 
-    if (i >= 10 && input === 'cod-') this.addItem(i);
+      if (i >= 10 && input === 'cod-') this.addItem(i);
 
-    if (input == 'uni-') {
-      if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) this.enfocarInput('uni-' + index);
-      return;
-    }
-
-    if ((input === 'cod-' || input === 'pre-') && this.fun.hasValue(codigo) && this.fun.hasValue(cantidad) && this.fun.hasValue(unidad)) {
-      let index = i;
-      console.log('input --> ', input);
-      console.log('index 00 --> ', index);
-
-      if (input === 'cod-') index++;
-      console.log('index 11 --> ', index);
-
-      this.ajustarSecuencia().then((res) => {
-        setTimeout(() => {
-          if (this.metodo === 'venta') this.enfocarInput('cod-' + index);
-          else this.enfocarInput('pre-' + index);
-        }, 200);
-      });
-    }
-
-    if (input === 'can-' && this.fun.hasValue(codigo)) {
-      if (this.fun.isEmpty(articulo) || codigo !== articulo.codigo) {
-        const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
-
-        this.desEnfocarInput('cod-' + i);
-        this.abrirModal('buscarArticulo', obj);
-      } else {
-        this.enfocarInput(`can-${i}`);
+      if (input == 'uni-') {
+        if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) this.enfocarInput('uni-' + index);
+        return;
       }
-    }
+
+      if ((input === 'cod-' || input === 'pre-') && this.fun.hasValue(codigo) && this.fun.hasValue(cantidad) && this.fun.hasValue(unidad)) {
+        let index = i;
+
+        if (input === 'cod-') index++;
+
+        this.ajustarSecuencia().then((res) => {
+          setTimeout(() => {
+            if (this.metodo === 'venta') this.enfocarInput('cod-' + index);
+            else this.enfocarInput('pre-' + index);
+          }, 200);
+        });
+      }
+
+      if (input === 'can-' && this.fun.hasValue(codigo)) {
+        console.log('this.fun.isEmpty(articulo) ', this.fun.isEmpty(articulo));
+
+        if (this.fun.isEmpty(articulo) || codigo !== articulo.codigo) {
+          const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
+
+          // this.desEnfocarInput('cod-' + i);
+          this.abrirModal('buscarArticulo', obj);
+        } else {
+          this.enfocarInput(`can-${i}`);
+        }
+      }
+    }, 0);
   }
 
   ajustarSecuencia() {
     return new Promise((resolve) => {
       const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
       this.secuencia = filas_ocupadas.length;
-      this.fun.logRed('filas_ocupadas --> ', filas_ocupadas.length);
 
       this.inputSecuencia = 'cod-' + this.secuencia;
       resolve(true);
@@ -575,8 +573,8 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
   }
 
-  verificarSecuencia(i, input?) {
-    if (this.secuencia < i && input != 'unidad') this.enfocarInput(this.inputSecuencia);
+  verificarSecuencia(i, input?, mover = true) {
+    if (this.secuencia < i && mover) this.enfocarInput(this.inputSecuencia);
 
     if (this.filasDetalle) {
       const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
