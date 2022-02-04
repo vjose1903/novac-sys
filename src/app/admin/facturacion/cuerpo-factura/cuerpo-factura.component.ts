@@ -82,7 +82,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   objDevueltoResponse(res) {
-    if (res && res.tipo_modal === 'buscarArticulo') this.LLenarRowDespuesDeFiltro(res);
+    if (res && res.tipo_modal === 'buscarArticulo') this.llenarRowDespuesDeFiltro(res);
   }
 
   pressEscResponse(res) {
@@ -430,45 +430,28 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
 
   element: any;
 
-  async saltar(input, i) {
+  async saltar(input, index, p = '') {
+    console.log('saltar ', p);
+
     setTimeout(() => {
-      const index = i;
+      const { articulo, cod, can, uni } = this.filasDetalle[index].getRawValue();
 
-      const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
-      const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
-      const cantidad = (this.filasDetalle[i] as any).controls['can'].value;
-      const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
+      if (index >= 10 && input === 'cod-') this.addItem(index);
 
-      if (i >= 10 && input === 'cod-') this.addItem(i);
+      if (input == 'uni-' && this.fun.hasValue(can) && can != 0 && this.fun.hasValue(cod)) this.enfocarInput('uni-' + index);
 
-      if (input == 'uni-') {
-        if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) this.enfocarInput('uni-' + index);
-        return;
-      }
-
-      if ((input === 'cod-' || input === 'pre-') && this.fun.hasValue(codigo) && this.fun.hasValue(cantidad) && this.fun.hasValue(unidad)) {
-        let index = i;
-
+      if ((input === 'cod-' || input === 'pre-') && this.fun.hasValue(cod) && this.fun.hasValue(can) && can != 0 && this.fun.hasValue(uni)) {
         if (input === 'cod-') index++;
 
-        this.ajustarSecuencia().then((res) => {
-          setTimeout(() => {
-            if (this.metodo === 'venta') this.enfocarInput('cod-' + index);
-            else this.enfocarInput('pre-' + index);
-          }, 200);
-        });
+        this.ajustarSecuencia().then((res) => this.enfocarInput(`${input}${index}`));
       }
 
-      if (input === 'can-' && this.fun.hasValue(codigo)) {
-        console.log('this.fun.isEmpty(articulo) ', this.fun.isEmpty(articulo));
-
-        if (this.fun.isEmpty(articulo) || codigo !== articulo.codigo) {
-          const obj = { filtrarArticulo: codigo, index: i, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
-
-          // this.desEnfocarInput('cod-' + i);
+      if (input === 'can-' && this.fun.hasValue(cod)) {
+        if (this.fun.isEmpty(articulo) || cod !== articulo.codigo) {
+          const obj = { filtrarArticulo: cod, index, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
           this.abrirModal('buscarArticulo', obj);
         } else {
-          this.enfocarInput(`can-${i}`);
+          this.enfocarInput(`can-${index}`);
         }
       }
     }, 0);
@@ -573,7 +556,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     }
   }
 
-  verificarSecuencia(i, input?, mover = true) {
+  verificarSecuencia(i, input?, mover = true, p = '') {
+    console.log('verificarSecuencia ', p);
+
     if (this.secuencia < i && mover) this.enfocarInput(this.inputSecuencia);
 
     if (this.filasDetalle) {
@@ -605,7 +590,9 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     control['cantidad_en_unidades'].setValue(cant_unidades);
   }
 
-  calcularTotalRow(i) {
+  calcularTotalRow(i, p = '') {
+    console.log('calcularTotalRow ', p);
+
     return new Promise((resolve) => {
       const control = this.filasDetalle[i].controls;
       const valores = this.filasDetalle[i].value;
@@ -750,11 +737,13 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
     if (e) e.stopPropagation();
   }
 
-  setInputDrop(arg) {
+  setInputDrop(arg, p = '') {
+    console.log('setInputDrop ', p);
+
     this.inputDrop = 'uni-' + arg;
   }
 
-  LLenarRowDespuesDeFiltro(obj) {
+  llenarRowDespuesDeFiltro(obj) {
     const ARTICULO = obj.data;
 
     const i = obj.index;
@@ -790,19 +779,22 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
       (this.filasDetalle[i] as any).controls['uni'].setValue(null);
 
       if (this.metodo === 'venta') {
-        if (ARTICULO.descripcion === 'Materia prima') {
-          (this.filasDetalle[i] as any).controls['descuento_porciento'].disable({ onlySelf: true });
-          (this.filasDetalle[i] as any).controls['is_materia_prima'].setValue(true);
-        } else {
-          (this.filasDetalle[i] as any).controls['descuento_porciento'].enable();
-          (this.filasDetalle[i] as any).controls['is_materia_prima'].setValue(false);
-        }
+        const objConditions = { si: { value: true, func: 'disable' }, no: { value: false, func: 'disable' } };
+        console.log('ARTICULO --> ', ARTICULO);
+
+        const condition = ARTICULO.descripcion === 'Materia prima' ? 'si' : 'no';
+        console.log('condition --> ', condition);
+        console.log('objConditions[condition] --> ', objConditions[condition]);
+
+        (this.filasDetalle[i] as any).controls['descuento_porciento'][objConditions[condition].func]();
+        (this.filasDetalle[i] as any).controls['is_materia_prima'].setValue([objConditions[condition].value]);
       }
 
-      setTimeout(() => this.enfocarInput('can-' + i), 150);
+      setTimeout(() => this.enfocarInput('can-' + i), 0);
     }
   }
 
+  // setInputDrop
   async llenarArrayUnidades(i) {
     const codigo = (this.filasDetalle[i] as any).controls['cod'].value;
     const art = (this.filasDetalle[i] as any).controls['articulo'].value;

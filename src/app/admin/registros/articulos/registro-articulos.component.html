@@ -177,7 +177,7 @@
                     formControlName="aviso_existencia"
                     (focus)="$event.target.select()"
                     placeholder="Cantidad para alertar"
-                    min="0"
+                    min="1"
                     class="form-control input_cantidad"
                     autocomplete="off"
                   />
@@ -400,7 +400,7 @@
                       (focus)="$event.target.select()"
                       placeholder="Cantidad para alertar"
                       class="form-control input_cantidad"
-                      min="0"
+                      min="1"
                       autocomplete="off"
                     />
                   </div>
@@ -481,7 +481,7 @@
                 formControlName="cantidad_contenido_padre"
                 (blur)="calculatePricePadre()"
                 class="form-control input_cantidad"
-                min="0"
+                min="1"
                 autocomplete="off"
               />
               <div
@@ -552,7 +552,7 @@
                 (keydown.enter)="saltar('medidaHijo')"
                 id="contenidoHijo"
                 formControlName="cantidad_contenido_hijo"
-                min="0"
+                min="1"
                 (blur)="calculatePriceHijo()"
                 class="form-control input_cantidad"
                 autocomplete="off"
