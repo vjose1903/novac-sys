@@ -25,14 +25,30 @@
         <div class="col-6 p-0 pr-2">
           <div class="form-group mt-2">
             <label class="control-label">Desde: <span style="color: red">*</span></label>
-            <input id="campoDesde" (keydown.enter)="saltar('campoHasta')" type="number" class="form-control input_cantidad" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')" />
+            <input
+              id="campoDesde"
+              (keydown.enter)="saltar('campoHasta')"
+              type="number"
+              class="form-control input_cantidad"
+              [(ngModel)]="Desde"
+              (keyup)="checkInputs('desde')"
+              (blur)="checkInputs('desde')"
+            />
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="desdeAlert">Campo obligatorio.</div>
           </div>
         </div>
         <div class="col-6 p-0 pl-2">
           <div class="form-group mt-2">
             <label class="control-label">Hasta: <span style="color: red">*</span></label>
-            <input id="campoHasta" (keydown.enter)="saltar('campoFechaCompra')" type="number" class="form-control input_cantidad" [(ngModel)]="Hasta" (keyup)="checkInputs('hasta')" (blur)="checkInputs('hasta')" />
+            <input
+              id="campoHasta"
+              (keydown.enter)="saltar('campoFechaCompra')"
+              type="number"
+              class="form-control input_cantidad"
+              [(ngModel)]="Hasta"
+              (keyup)="checkInputs('hasta')"
+              (blur)="checkInputs('hasta')"
+            />
             <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="hastaAlert">Campo obligatorio.</div>
           </div>
         </div>
@@ -116,6 +132,7 @@
         [info]="info"
         [data]="listaNCF"
         [focusRow]="false"
+        [id_tabla]="'lista_ncf'"
         [quitarAScorll]="-20"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"

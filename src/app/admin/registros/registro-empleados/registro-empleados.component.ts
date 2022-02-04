@@ -94,7 +94,7 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
 
   async necesarioStart() {
     await this.createForm();
-    await this.getEmpleados(this.tServ.obj_paginate);
+    await this.getEmpleados(this.tServ.obj_paginate.default);
     this.enfocarInput('cedula');
   }
 
@@ -301,7 +301,8 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
       this.fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
       this.empleadosClass.createUpdateOne(objSend).then((res) => {
-        this.getEmpleados(this.tServ.obj_paginate);
+        const actualPagination = this.tServ.getPaginationById('listaEmpleados');
+        this.getEmpleados(actualPagination);
         this.borrar('submit');
         this.enfocarInput('cedula');
       });
@@ -311,7 +312,8 @@ export class RegistroEmpleadosComponent extends mixinClass implements OnInit, On
   decisionModal(arg) {
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      this.empleadosClass.deleteOne(obj.id).then((res) => this.getEmpleados(this.tServ.obj_paginate));
+      const actualPagination = this.tServ.getPaginationById('listaEmpleados');
+      this.empleadosClass.deleteOne(obj.id).then((res) => this.getEmpleados(actualPagination));
     }
   }
 }

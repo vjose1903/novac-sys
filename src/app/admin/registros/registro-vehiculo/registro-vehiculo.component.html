@@ -8,15 +8,7 @@
           <div class="col-12 p-0">
             <div class="form-group">
               <label class="control-label">Propietario: <span style="color: red">*</span></label>
-              <ng-select
-                id="user_id"
-                formControlName="user_id"
-                (change)="selectPropietario()"
-                [items]="listaPropietarios"
-                bindLabel="nombreCompleto"
-                bindValue="id"
-                [clearable]="false"
-              >
+              <ng-select id="user_id" formControlName="user_id" (change)="selectPropietario()" [items]="listaPropietarios" bindLabel="nombreCompleto" bindValue="id" [clearable]="false">
                 <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                   <div>
                     <span>{{ item.nombreCompleto }} </span>
@@ -76,14 +68,7 @@
           <div class="col-6 p-0 pr-2" *ngIf="form.controls['user_id'].value === -1">
             <div class="form-group">
               <label class="control-label">Telefono: <span style="color: red">*</span></label>
-              <input
-                type="text"
-                class="form-control"
-                [textMask]="{ mask: phoneMask }"
-                formControlName="telefono_no_empleado"
-                placeholder="(___) ___-____"
-                autocomplete="off"
-              />
+              <input type="text" class="form-control" [textMask]="{ mask: phoneMask }" formControlName="telefono_no_empleado" placeholder="(___) ___-____" autocomplete="off" />
 
               <div
                 class="alerta text-danger ml-1"
@@ -130,22 +115,9 @@
           <div class="col-6 p-0 pr-2">
             <div class="form-group">
               <label class="control-label">Año: <span style="color: red">*</span></label>
-              <input
-                (focus)="$event.target.select()"
-                type="text"
-                formControlName="anio"
-                placeholder="Introduzca año"
-                class="form-control"
-                autocomplete="off"
-                id="anio"
-                maxlength="4"
-              />
+              <input (focus)="$event.target.select()" type="text" formControlName="anio" placeholder="Introduzca año" class="form-control" autocomplete="off" id="anio" maxlength="4" />
 
-              <div
-                class="alerta text-danger ml-1"
-                style="font-size: 12px"
-                *ngIf="!form.controls['anio'].valid && (form.controls['anio'].dirty || form.controls['anio'].touched)"
-              >
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['anio'].valid && (form.controls['anio'].dirty || form.controls['anio'].touched)">
                 <span *ngIf="form.controls['anio'].errors.minlength">Año incompleto</span>
                 <span *ngIf="form.controls['anio'].errors.required">Introduzca el año</span>
               </div>
@@ -177,6 +149,7 @@
         [info]="info"
         [data]="listaVehiculos"
         [focusRow]="false"
+        [id_tabla]="'lista_vehiculos'"
         [quitarAScorll]="-20"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"

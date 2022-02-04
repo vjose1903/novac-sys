@@ -28,7 +28,7 @@
   </p-tabView>
 
   <app-tablas
-    *ngIf="activeIndex == 0"
+    *ngIf="detalles['abonos'] && activeIndex == 0"
     [search]="false"
     [paginate]="true"
     [id_tabla]="'historial_movimientos'"
@@ -41,7 +41,7 @@
   ></app-tablas>
 
   <app-tablas
-    *ngIf="activeIndex == 1"
+    *ngIf="detalles['notas'] && activeIndex == 1"
     [search]="false"
     [paginate]="true"
     [id_tabla]="'historial_movimientos'"

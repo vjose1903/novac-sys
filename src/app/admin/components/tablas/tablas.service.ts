@@ -24,7 +24,8 @@ export class TablasService {
     return this.data;
   }
 
-  Func_total_paginas(nextValue) {
+  Func_total_paginas(nextValue: { total: number; tabla: string }) {
+    if (this.obj_paginate[nextValue.tabla] == undefined) this.initPagination(nextValue.tabla, this.obj_paginate.default);
     this.total_paginas.next(nextValue);
   }
 
@@ -37,6 +38,15 @@ export class TablasService {
       is_local: false,
     },
   };
+
+  getPaginationByModal() {
+    let modalPagination = undefined;
+    for (const key in this.obj_paginate) {
+      const element = this.obj_paginate[key];
+      if (key != 'default') modalPagination = element;
+    }
+    return modalPagination;
+  }
 
   initPagination(id, params) {
     this.obj_paginate[id] = GLOBAL.duplicarJson(params);

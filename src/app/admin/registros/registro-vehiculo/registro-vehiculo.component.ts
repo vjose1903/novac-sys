@@ -63,7 +63,7 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   }
 
   necesarioStart() {
-    this.getVehiculos(this.tServ.obj_paginate);
+    this.getVehiculos(this.tServ.obj_paginate.default);
     this.getPropietarios();
     this.getMarcas();
   }
@@ -227,7 +227,8 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
         (res) => {
           this.listaVehiculos = null;
           this.fun.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
-          this.getVehiculos(this.tServ.obj_paginate);
+          const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
+          this.getVehiculos(actualPagination);
           this.borrar();
         },
         (err) => {
@@ -243,28 +244,29 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
   }
 
   // =============================================
-  //  Crear articulo
+  //  Crear vehiculo
   // =============================================
 
   async submit(form) {
-    const x = GLOBAL.duplicarJson(form.value);
+    const formulario = this.form.getRawValue();
+
     const obj = {
-      user_id: x.user_id !== -1 ? x.user_id : null,
+      user_id: formulario.user_id !== -1 ? formulario.user_id : null,
 
-      marca: this.listaMarcas.find((marca) => marca.id === x.marca).descripcion,
-      modelo: this.listaModelos.find((modelo) => modelo.id === x.modelo).descripcion,
-      anio: x.anio,
-      estado: x.estado,
+      marca: this.listaMarcas.find((marca) => marca.id === formulario.marca).descripcion,
+      modelo: this.listaModelos.find((modelo) => modelo.id === formulario.modelo).descripcion,
+      anio: formulario.anio,
+      estado: formulario.estado,
 
-      nombre_no_empleado: x.nombre_no_empleado,
-      apellido_no_empleado: x.apellido_no_empleado,
-      telefono_no_empleado: x.telefono_no_empleado,
+      nombre_no_empleado: formulario.nombre_no_empleado,
+      apellido_no_empleado: formulario.apellido_no_empleado,
+      telefono_no_empleado: formulario.telefono_no_empleado,
     };
     let msg_error = '';
     try {
-      if (x.id) {
+      if (formulario.id) {
         msg_error = 'Error editando vehiculo';
-        obj['id'] = x.id;
+        obj['id'] = formulario.id;
 
         const res = await this.vehiculosClass.updateOne(obj);
 
@@ -277,7 +279,8 @@ export class RegistroVehiculoComponent extends mixinClass implements OnInit {
         this.fun.toastSuccess('Vehiculo registrado con exito.', 'Correcto');
       }
       this.borrar();
-      this.getVehiculos(this.tServ.obj_paginate);
+      const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
+      this.getVehiculos(actualPagination);
     } catch (error) {
       this.fun.toastError(msg_error, 'ERROR');
     }

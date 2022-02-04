@@ -1,5 +1,6 @@
 <div #cardTabla id="cardTabla" style="height: 100%; position: relative">
   <app-tablas
+    *ngIf="articulos && info"
     [padre]="cardTabla"
     [info]="info"
     [search]="false"

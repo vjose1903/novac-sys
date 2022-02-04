@@ -106,8 +106,8 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       console.log('res.data --> ', res.data);
 
       (document.getElementById('clienteI') as any).value = `${res.data.nombre} ${res.data.apellido}`;
-
-      this.pedirFacturasPorCliente(res.data.id, this.tServ.obj_paginate);
+      const actualPagination = this.tServ.getPaginationById('facturasPendientes');
+      this.pedirFacturasPorCliente(res.data.id, actualPagination);
     } else if (res && res.tipo_modal === 'cambio') {
       this.devuelta = res.data.devuelta;
       this.forma_pago = res.data.forma_pago;
@@ -307,8 +307,8 @@ export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
       const recibo = res['data'].recibo;
 
       this.clienteAdepositar.balance = recibo.cliente.balance;
-
-      this.pedirFacturasPorCliente(this.clienteAdepositar.id, this.tServ.obj_paginate);
+      const actualPagination = this.tServ.getPaginationById('facturasPendientes');
+      this.pedirFacturasPorCliente(this.clienteAdepositar.id, actualPagination);
       this.resetVariables();
 
       const obj_print = { data: recibo, type: 'recibo_ingreso' };

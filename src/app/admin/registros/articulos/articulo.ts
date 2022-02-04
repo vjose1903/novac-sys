@@ -50,7 +50,9 @@ export class ArticuloC extends CrudG<ArticuloI> {
         ...arg.parameters,
       };
 
-      this.getAll(extra).then((res) => resolve(res));
+      this.getAll(extra)
+        .then((res) => resolve(res))
+        .catch((err) => reject(err));
     });
   }
 }
@@ -61,6 +63,7 @@ export enum tipos_articulos {
   Producto_terminado = 3,
   Otros = 4,
 }
+
 export class TipoArticuloC extends CrudG<any> {
   constructor() {
     super('tipo_articulos');

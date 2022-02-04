@@ -125,7 +125,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.subTotalPag = this.tServ.TOTALPAGINAS.subscribe((res) => {
       if (res) {
         if (this.id_tabla !== 'tabla') {
+          console.log();
+
           if (res.tabla === this.id_tabla) this.total_registros = res.total;
+          console.log('res ==> ', res);
         } else {
           this.total_registros = res.total;
         }
@@ -360,8 +363,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.pagActual = tipo === 'filtro' ? 1 : arg;
 
     this.tServ.modifyPaginationById(this.id_tabla, [{ page: tipo === 'filtro' ? 1 : arg }, { searchText: this.searchText === '' ? ' ' : this.searchText }]).then(() => {
-
-
       const paginationChanged = this.tServ.getPaginationById(this.id_tabla);
       this.paginateChange.emit(paginationChanged);
     });
@@ -598,7 +599,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
 
     if (simpleChanges.data && simpleChanges.info) {
-      if (simpleChanges.data.currentValue && simpleChanges.info.currentValue) {
+      if (simpleChanges.data.currentValue && simpleChanges.data.currentValue.length && simpleChanges.info.currentValue) {
         setTimeout(() => this.calcularAlto(), 250);
       }
     }

@@ -249,7 +249,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
 
     this.lista_produccion.push(obj);
 
-    this.tServ.Func_total_paginas(this.lista_produccion.length);
+    this.tServ.Func_total_paginas({ total: this.lista_produccion.length, tabla: 'lista_produccion' });
 
     this.disableOption(this.producto_terminado_en_turno.id, true);
     this.articuloEditando = undefined;
@@ -298,7 +298,7 @@ export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy
         this.borrar();
       }
     }
-    this.tServ.Func_total_paginas(this.lista_produccion.length);
+    this.tServ.Func_total_paginas({ total: this.lista_produccion.length, tabla: 'lista_produccion' });
   }
 
   formarIngredientes(ingredientes) {

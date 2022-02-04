@@ -71,6 +71,7 @@
         <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
       </div>
       <app-tablas
+        *ngIf="facturas"
         [padre]="cardTabla"
         [info]="info"
         [data]="facturas"

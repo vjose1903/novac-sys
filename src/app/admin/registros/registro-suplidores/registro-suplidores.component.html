@@ -7,9 +7,7 @@
           <div class="row">
             <div class="col-6 p-0 pr-2">
               <div>
-                <label class="mr-2">
-                  <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label
-                >
+                <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
                 <label>
                   <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="mr-1" (click)="changeIdent(false)" />Rnc
                   <span style="color: red">*</span>
@@ -56,12 +54,7 @@
                     (keyup)="checkDocumento('rnc', $event)"
                   />
 
-                  <div
-                    (click)="setDocumentoPrincipal('rnc')"
-                    class="input-group-append"
-                    mdbTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}"
-                    placement="right"
-                  >
+                  <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" mdbTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" placement="right">
                     <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                   </div>
                 </div>
@@ -107,15 +100,7 @@
             <div class="col-12 p-0">
               <div class="form-group" [appMsgError]="'email'" [form]="form">
                 <label class="control-label">Email:</label>
-                <input
-                  type="text"
-                  id="campoEmail"
-                  (keydown.enter)="saltar('campoDir')"
-                  formControlName="email"
-                  placeholder="Introduzca email"
-                  class="form-control"
-                  autocomplete="off"
-                />
+                <input type="text" id="campoEmail" (keydown.enter)="saltar('campoDir')" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
 
                 <span id="msgContainer_email"></span>
               </div>

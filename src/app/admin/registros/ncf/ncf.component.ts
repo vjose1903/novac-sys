@@ -124,7 +124,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
 
   async necesarioStart() {
     await this.getTiposFacturas();
-    await this.getPaquetesNCF(this.tServ.obj_paginate);
+    await this.getPaquetesNCF(this.tServ.obj_paginate.default);
   }
 
   async getTiposFacturas() {
@@ -184,10 +184,7 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
       this.listaNCF = tempNCF;
       this.listaNCFBack = GLOBAL.duplicarJson(tempNCF);
 
-      const obj = {
-        total: res.total_registros,
-        tabla: 'listaNCF',
-      };
+      const obj = { total: res.total_registros, tabla: 'lista_ncf' };
 
       this.tServ.Func_total_paginas(obj);
     } catch (error) {
@@ -252,8 +249,8 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
 
     try {
       const res = await this.ncfClass.createUpdateOne(obj);
-
-      this.getPaquetesNCF(this.tServ.obj_paginate);
+      const actualPagination = this.tServ.getPaginationById('lista_ncf');
+      this.getPaquetesNCF(actualPagination);
       if (this.is_editando) {
         this.fun.toastSuccess('Comprobante editado', 'CORRECTO');
       } else {
@@ -327,7 +324,8 @@ export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
         this.ncfClass.deleteOne(obj.id).then(
           () => {
             this.fun.toastSuccess('comprobante para ' + obj.tipoC_ + ' numero: ' + obj.codigo + ' borrado', 'CORRECTO');
-            this.getPaquetesNCF(this.tServ.obj_paginate);
+            const actualPagination = this.tServ.getPaginationById('lista_ncf');
+            this.getPaquetesNCF(actualPagination);
           },
           (err) => {
             this.mostrarErrores(err.error);

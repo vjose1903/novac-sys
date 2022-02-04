@@ -93,7 +93,8 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
   async decisionModal(arg) {
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      this.clientesClass.deleteOne(obj.id).then((res) => this.getClientes(this.tServ.obj_paginate));
+      const actualPagination = this.tServ.getPaginationById('lista_clientes');
+      this.clientesClass.deleteOne(obj.id).then((res) => this.getClientes(actualPagination));
     }
   }
 
@@ -108,7 +109,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
   }
 
   necesarioStart() {
-    this.getClientes(this.tServ.obj_paginate);
+    this.getClientes(this.tServ.obj_paginate.default);
     this.getVendedores();
   }
 
@@ -144,7 +145,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
 
       this.listaClientes = res['data'];
 
-      const obj = { total: res['total_registros'], tabla: 'listaClientes' };
+      const obj = { total: res['total_registros'], tabla: 'lista_clientes' };
       this.tServ.Func_total_paginas(obj);
     });
   }
@@ -213,10 +214,7 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
               const is_cliente = _.find(res['data'], (item) => item.persona_is === 'Cliente');
 
               if (this.fun.hasValue(is_cliente) && is_cliente.persona.estado) {
-                this.fun.toastError(
-                  `${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`,
-                  'ERROR',
-                );
+                this.fun.toastError(`${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
                 this.changeStateCampos(false);
                 // this.camposDisabled = false;
                 return;
@@ -329,7 +327,8 @@ export class RegistroClientesComponent extends mixinClass implements OnInit, OnD
       formulario.maximo_credito = GLOBAL.desformatear(formulario.maximo_credito);
 
       this.clientesClass.createUpdateOne(formulario).then((res) => {
-        this.getClientes(this.tServ.obj_paginate);
+        const actualPagination = this.tServ.getPaginationById('lista_clientes');
+        this.getClientes(actualPagination);
         this.borrar();
         this.enfocarInput('cedula');
       });

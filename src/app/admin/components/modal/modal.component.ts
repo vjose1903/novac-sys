@@ -38,10 +38,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if (this.showModal) {
       this.showModal = false;
-      const obj = {
-        total: 0,
-        tabla: 'tabla',
-      };
+      const obj = { total: 0, tabla: 'tabla' };
 
       this.tServ.Func_total_paginas(obj);
       this.mServ.func_tabla_modal_change(undefined);
@@ -126,13 +123,15 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.index = res.index;
 
         if (this.tipoModal === 'buscarArticulo') {
-          this.renovarDataFiltros(this.tServ.obj_paginate, this.paraFiltroArticulos, this.fecha_articulo);
+          this.renovarDataFiltros(this.tServ.getPaginationByModal(), this.paraFiltroArticulos, this.fecha_articulo);
         } else if (this.tipoModal === 'buscarCliente') {
           this.tituloModal = 'Buscar cliente';
-          this.renovarDataFiltros(this.tServ.obj_paginate, this.paraFiltroClientes, this.fecha_articulo);
+          console.log('this.tServ.getPaginationByModal() --> ', this.tServ.getPaginationByModal());
+
+          this.renovarDataFiltros(this.tServ.getPaginationByModal(), this.paraFiltroClientes, this.fecha_articulo);
         } else {
           this.tituloModal = 'Buscar suplidor';
-          this.renovarDataFiltros(this.tServ.obj_paginate, this.paraFiltroSuplidor, this.fecha_articulo);
+          this.renovarDataFiltros(this.tServ.getPaginationByModal(), this.paraFiltroSuplidor, this.fecha_articulo);
         }
 
         if (this.tipoModal === 'mostrarFactura' && res) {
@@ -269,6 +268,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   async renovarDataFiltros(e, buscando?, fecha_articulo?) {
     const copyData = GLOBAL.duplicarJson(this.dataFiltro);
+    if (this.fun.isEmpty(e)) e = this.tServ.obj_paginate.default;
+
     const page = e.page;
     const per_page = e.per_page;
     let palabra_a_buscar = ' ';
@@ -280,7 +281,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       if (this.tipoModal === 'buscarArticulo') {
         const is_compra = this.metodo === 'compra' ? true : false;
 
+        console.log('---- buscando ----');
         const res = await this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: page, per_page: per_page, paginado: true, fecha: fecha_articulo, is_compra: is_compra });
+        console.log('LUEGO');
 
         if (GLOBAL.is_number(palabra_a_buscar) && res.data.length === 1) {
           this.articuloFiltradoPorCodigo(res);
@@ -292,15 +295,19 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         }
         //
       } else if (this.tipoModal === 'buscarCliente') {
+        console.log('---- buscando ----');
+
         const res = await this.clienteClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
+        console.log('LUEGO');
 
         this.dataFiltro = undefined;
 
         res.data.map(async (cli) => {
           cli.nombre = GLOBAL.Capitalice(cli.nombre);
           cli.apellido = GLOBAL.Capitalice(cli.apellido);
-          cli.documento_identidad = await cli.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
-          // cli.documento_identidad = cli.documento_de_identidad ? (cli.documento_de_identidad.documento ? cli.documento_de_identidad.documento : '---------') : '---------';
+
+          const documento = await cli.documentos_de_identidad.find((doc) => doc.principal === true);
+          cli.documento_identidad = documento ? documento.documento : '----------';
           return cli;
         });
 
@@ -309,10 +316,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         this.mostrarModalLuegoDeBuscarData();
 
-        const obj = {
-          total: res.total_registros,
-          tabla: 'filtroCliente',
-        };
+        const obj = { total: res.total_registros, tabla: 'filtroCliente' };
         this.tServ.Func_total_paginas(obj);
       } else if (this.tipoModal === 'buscarSuplidor') {
         const res = await this.suplidorClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
@@ -321,7 +325,9 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         res.data.map(async (supli) => {
           supli.nombre = GLOBAL.Capitalice(supli.nombre);
-          supli.documento_identidad = await supli.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
+          const documento = await supli.documentos_de_identidad.find((doc) => doc.principal === true);
+          supli.documento_identidad = documento ? documento.documento : '----------';
+
           return supli;
         });
 
@@ -329,10 +335,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         if (res.data.length === 0) this.dataFiltro = copyData;
         this.mostrarModalLuegoDeBuscarData();
 
-        const obj = {
-          total: res.total_registros,
-          tabla: 'filtroSuplidor',
-        };
+        const obj = { total: res.total_registros, tabla: 'filtroSuplidor' };
         this.tServ.Func_total_paginas(obj);
       }
       this.filtrar = true;

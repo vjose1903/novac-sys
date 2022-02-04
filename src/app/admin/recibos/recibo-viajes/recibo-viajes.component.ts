@@ -87,7 +87,7 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
   }
 
   necesarioStart() {
-    this.getViajes(this.tServ.obj_paginate);
+    this.getViajes(this.tServ.obj_paginate.default);
     this.getChoferes();
     this.getCamiones();
   }
@@ -234,7 +234,8 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
       try {
         const extra = { afterPath: `revertir/by_factura/${this.viaje_selected.id}` };
         this.reciboClass.getAll(extra).then((res) => {
-          this.getViajes(this.tServ.obj_paginate);
+          const actualPagination = this.tServ.getPaginationById('lista_viajes');
+          this.getViajes(actualPagination);
           this.resetVariables();
         });
       } catch (error) {
@@ -277,8 +278,8 @@ export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestr
 
     this.reciboClass.createUpdateOne(obj).then((res) => {
       console.log('res --> ', res['data']);
-
-      this.getViajes(this.tServ.obj_paginate);
+      const actualPagination = this.tServ.getPaginationById('lista_viajes');
+      this.getViajes(actualPagination);
       this.resetVariables();
 
       const obj_print = { data: res['data'].recibo, type: 'recibo_ingreso' };

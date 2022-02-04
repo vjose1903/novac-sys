@@ -249,6 +249,7 @@ export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDest
   }
 
   async openSide() {
+
     this.tServ.initPagination('notas', this.tServ.obj_paginate.default);
 
     this.getNotas(this.tServ.getPaginationById('notas'));

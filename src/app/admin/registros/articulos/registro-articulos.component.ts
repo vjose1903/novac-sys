@@ -101,7 +101,7 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
 
   async necesarioStart() {
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
-    await this.getArticulos(this.tServ.obj_paginate);
+    await this.getArticulos(this.tServ.obj_paginate.default);
     this.getTipoArticulos();
     this.enfocarInput('nombre');
   }
@@ -673,7 +673,8 @@ export class RegistroArticulosComponent extends mixinClass implements OnInit, On
     if (arg) {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
       this.articuloClass.deleteOne(obj.id).then((res) => {
-        this.getArticulos(this.tServ.obj_paginate);
+        const actualPagination = this.tServ.getPaginationById('listaArticulos');
+        this.getArticulos(actualPagination);
         this.borrar();
       });
     }

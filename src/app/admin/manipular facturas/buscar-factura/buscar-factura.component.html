@@ -97,6 +97,7 @@
   <div class="col-12 abajo">
     <div *ngIf="mostrarListaFacturas()" #cardTabla id="cardTabla" class="card card-padding sombra ingreCard h-100">
       <app-tablas
+        *ngIf="facturas"
         [padre]="cardTabla"
         [info]="info"
         [quitarAScorll]="60"

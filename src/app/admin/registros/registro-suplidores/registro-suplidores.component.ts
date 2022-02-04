@@ -75,7 +75,7 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   }
 
   async nesesarioStart() {
-    await this.getSuplidores(this.tServ.obj_paginate);
+    await this.getSuplidores(this.tServ.obj_paginate.default);
     this.enfocarInput('campoRnc');
     this.marcarCheck('rnc');
   }
@@ -299,7 +299,8 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
       // paso todas las validaciones
     } else {
       this.suplidorClass.createUpdateOne(formulario).then((res) => {
-        this.getSuplidores(this.tServ.obj_paginate);
+        const actualPagination = this.tServ.getPaginationById('listaSuplidores');
+        this.getSuplidores(actualPagination);
         this.borrar();
       });
     }
@@ -308,9 +309,9 @@ export class RegistroSuplidoresComponent extends mixinClass implements OnInit, O
   async decisionModal(arg) {
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-
       this.suplidorClass.deleteOne(obj.id).then((res) => {
-        this.getSuplidores(this.tServ.obj_paginate);
+        const actualPagination = this.tServ.getPaginationById('listaSuplidores');
+        this.getSuplidores(actualPagination);
       });
     }
   }

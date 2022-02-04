@@ -90,7 +90,8 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
         this._ipc.send('printBase64', obj);
         this.resetVariables();
       } else {
-        this.getArticulos(this.tServ.obj_paginate);
+        const actualPagination = this.tServ.getPaginationById('inventario');
+        this.getArticulos(actualPagination);
       }
     }
   }
@@ -105,7 +106,7 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
   async necesarioParaEmpezar() {
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
-    await this.getArticulos(this.tServ.obj_paginate);
+    await this.getArticulos(this.tServ.obj_paginate.default);
     await this.getStock();
   }
 
@@ -146,14 +147,15 @@ export class InventarioComponent extends mixinClass implements OnInit, OnDestroy
 
       this.listaArticulos = GLOBAL.duplicarJson(res.data);
 
-      const obj = { total: res.total_registros, tabla: 'listaArticulos' };
+      const obj = { total: res.total_registros, tabla: 'inventario' };
       this.tServ.Func_total_paginas(obj);
     });
   }
 
   filtrarArticulos() {
-    this.tServ.obj_paginate['searchText'] = this.palabra_buscar;
-    this.getArticulos(this.tServ.obj_paginate);
+    const actualPagination = this.tServ.getPaginationById('inventario');
+    actualPagination['searchText'] = this.palabra_buscar;
+    this.getArticulos(actualPagination);
   }
 
   movimientoInventario(arg) {

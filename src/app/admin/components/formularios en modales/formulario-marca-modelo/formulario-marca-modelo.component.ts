@@ -47,7 +47,7 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
 
   marcasClass = new MarcaC();
   modeloClass = new ModeloC();
-  obj_p = this.tServ.obj_paginate;
+  obj_p = this.tServ.obj_paginate.default;
   constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();
   }
@@ -92,19 +92,12 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
   }
 
   getMarcas(palabra_a_buscar = ' ', paginado = false, page = 1, per_page = 1) {
-    console.log('palabra_a_buscar ', palabra_a_buscar);
-    console.log('paginado ', paginado);
-    console.log('page ', page);
-    console.log('per_page ', per_page);
-
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado, page, per_page } };
     this.marcasClass.getAll(extra).then((res) => {
       if (!paginado) this.listaMarcas = GLOBAL.duplicarJson(res);
       if (paginado) {
-        console.log('res.data ', res.data);
-
         this.listado = res.data;
-        this.tServ.Func_total_paginas(res.total_registros);
+        this.tServ.Func_total_paginas({ total: res.total_registros, tabla: 'tabla_frm_marca_modelo' });
       }
     });
   }
@@ -135,12 +128,9 @@ export class FormularioMarcaModeloComponent extends mixinClass implements OnInit
         });
 
         this.listado = modeloRes.data;
-        this.tServ.Func_total_paginas(modeloRes.total_registros);
+        this.tServ.Func_total_paginas({ total: modeloRes.total_registros, tabla: 'tabla_frm_marca_modelo' });
       });
     } else if (this.componente === 'reg_marcas') {
-      console.log('==  arg.page ', arg.page);
-      console.log('==  arg.per_page ', arg.per_page);
-
       this.getMarcas(palabra_a_buscar, true, arg.page, arg.per_page);
     }
   }

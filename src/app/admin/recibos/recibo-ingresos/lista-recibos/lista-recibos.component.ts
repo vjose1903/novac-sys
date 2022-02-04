@@ -92,8 +92,6 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   }
 
   ipcPrintResponse(res) {
-
-
     if (res.status === 'si') {
       // this.fileName = res.file;
       // this.pdfSrc = res.body;
@@ -144,7 +142,7 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
-    await this.getRecibos(this.tServ.obj_paginate);
+    await this.getRecibos(this.tServ.obj_paginate.default);
   }
 
   async getRecibos(e) {
@@ -221,7 +219,8 @@ export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestr
   async anularRecibo(id) {
     try {
       const extra = { afterPath: `revertir/by_id/${id}` };
-      this.reciboClass.getAll(extra).then((res) => this.getRecibos(this.tServ.obj_paginate));
+      const actualPagination = this.tServ.getPaginationById('listaRecibos');
+      this.reciboClass.getAll(extra).then((res) => this.getRecibos(actualPagination));
     } catch (error) {}
   }
 
