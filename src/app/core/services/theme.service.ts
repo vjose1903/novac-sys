@@ -30,8 +30,6 @@ export class ThemeService {
     documentElement.setProperty('--transparente03', '#c6393985');
     documentElement.setProperty('--transparente04', '#8a00004d');
 
-
-
     documentElement.setProperty('--primary01', '#fcabab');
     documentElement.setProperty('--primary02', '#f18484');
     documentElement.setProperty('--primary03', '#e17070');
@@ -58,8 +56,6 @@ export class ThemeService {
     documentElement.setProperty('--transparente02', '#a2dbf659');
     documentElement.setProperty('--transparente03', '#397bc685');
     documentElement.setProperty('--transparente04', '#00258a4d');
-
-
 
     documentElement.setProperty('--primary01', '#cee7fd');
     documentElement.setProperty('--primary02', '#94d0f0');
@@ -88,9 +84,7 @@ export class ThemeService {
     documentElement.setProperty('--transparente03', '#3bc65785');
     documentElement.setProperty('--transparente04', '#00890b4d');
 
-
-
-    documentElement.setProperty('--primary01', '#eaffe4');
+    documentElement.setProperty('--primary01', '#dcfed2');
     documentElement.setProperty('--primary02', '#95f0a7');
     documentElement.setProperty('--primary03', '#7add8d');
     documentElement.setProperty('--primary04', '#36c080');

@@ -115,11 +115,11 @@
                     type="text"
                     class="form-control entrada"
                     id="uni-{{ i }}"
-                    (mouseenter)="verificarSecuencia(i, 'unidad', false)"
-                    (focus)="verificarSecuencia(i, 'unidad', 'uni-input')"
-                    (keyup.enter)="saltar(metodo === 'venta' ? 'cod-' : 'pre-', i, 'uni-input')"
+                    (mouseenter)="setInputDrop(i); llenarArrayUnidades(i); verificarSecuencia(i, false)"
+                    (focus)="setInputDrop(i); llenarArrayUnidades(i); verificarSecuencia(i)"
+                    (keyup.enter)="saltar(metodo === 'venta' ? 'cod-' : 'pre-', i)"
+                    (blur)="calcularTotalRow(i)"
                     formControlName="uni"
-                    (blur)="calcularTotalRow(i, 'uni-input')"
                     tabindex="-1"
                   />
 
@@ -131,9 +131,9 @@
                       class="form-control entrada"
                       style="border-radius: 0"
                       id="uni-{{ i }}"
-                      (mouseleave)="setInputDrop(undefined, 'uni-drop')"
-                      (keyup.enter)="saltar(metodo === 'venta' ? 'cod-' : 'pre-', i, 'uni-drop')"
-                      (blur)="calcularTotalRow(i, 'uni-drop'); setInputDrop(undefined, 'uni-drop')"
+                      (keyup.enter)="saltar(metodo === 'venta' ? 'cod-' : 'pre-', i)"
+                      (mouseleave)="setInputDrop(undefined); calcularTotalRow(i)"
+                      (blur)="setInputDrop(undefined); calcularTotalRow(i)"
                       tabindex="-1"
                     >
                       <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>

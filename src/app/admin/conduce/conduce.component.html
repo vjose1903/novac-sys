@@ -154,11 +154,11 @@
                           type="text"
                           class="form-control entrada"
                           id="uni-{{ i }}"
-                          (mouseenter)="verificarSecuencia(i, 'unidad')"
-                          (focus)="verificarSecuencia(i, 'unidad')"
+                          (mouseenter)="setInputDrop(i); llenarArrayUnidades(i); verificarSecuencia(i, false)"
+                          (focus)="setInputDrop(i); llenarArrayUnidades(i); verificarSecuencia(i)"
                           (keydown.enter)="saltar('cod-', i)"
-                          formControlName="uni"
                           (blur)="calculateCantidadEnUnidades({ index: i, clean: false })"
+                          formControlName="uni"
                           tabindex="-1"
                         />
 
@@ -169,8 +169,8 @@
                             (change)="selectMedidaChange($event.target.value, i)"
                             class="form-control entrada"
                             id="uni-{{ i }}"
-                            (mouseleave)="setInputDrop(undefined)"
                             (keydown.enter)="saltar('cod-', i)"
+                            (mouseleave)="setInputDrop(undefined); calculateCantidadEnUnidades({ index: i, clean: false })"
                             (blur)="setInputDrop(undefined); calculateCantidadEnUnidades({ index: i, clean: false })"
                             tabindex="-1"
                           >

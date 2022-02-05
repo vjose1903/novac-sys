@@ -119,8 +119,6 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   noFiltroResponse(res) {
-    console.log('res --> ', res);
-
     if (res.tipo == 'buscarCliente') {
       this.enfocarInput('clienteI');
       this.selectContenido('clienteI');
@@ -141,7 +139,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         setTimeout(() => this.enfocarInput('cod-0'), 10);
         //
       } else if (res && res.tipo_modal === 'buscarArticulo') {
-        this.LLenarRowDespuesDeFiltro(res);
+        this.llenarRowDespuesDeFiltro(res);
         setTimeout(() => this.enfocarInput('can-' + res.index), 10);
         //
       } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
@@ -157,7 +155,7 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
 
   articuloFiltroResponse(res) {
     if (res && res.tipo_modal === 'buscarArticulo') {
-      this.LLenarRowDespuesDeFiltro(res);
+      this.llenarRowDespuesDeFiltro(res);
       setTimeout(() => this.enfocarInput('can-' + res.index), 10);
     }
   }
@@ -201,62 +199,59 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
   }
 
   ajustarSecuencia() {
-    const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
-    this.secuencia = filas_ocupadas.length;
-    this.inputSecuencia = 'cod-' + this.secuencia;
+    return new Promise((resolve) => {
+      const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
+      this.secuencia = filas_ocupadas.length;
+
+      this.inputSecuencia = 'cod-' + this.secuencia;
+      resolve(true);
+    });
   }
 
-  async saltar(input, i) {
-    let index = i;
-    const fila_actual = this.filasDetalle[i].getRawValue();
-    const fila_siguiente = this.filasDetalle[i + 1].getRawValue();
+  async saltar(input, index) {
+    const fila_actual = this.filasDetalle[index].getRawValue();
+    const fila_siguiente = this.filasDetalle[index + 1].getRawValue();
 
-    const unidad = fila_actual['uni'];
-    const articulo = fila_actual['articulo'];
-    const codigo = fila_actual['cod'];
-    const cantidad = fila_actual['can'];
-    const detalle_factura_id = fila_actual['detalle_factura_id'];
+    const { articulo, cod, can, uni, detalle_factura_id } = fila_actual;
 
-    if (i >= 10 && input === 'cod-') this.addItem(i);
+    if (index >= 10 && input == 'cod-') this.addItem(index);
 
-    if (input === 'can-' && this.fun.hasValue(codigo)) {
-      if (this.fun.isEmpty(articulo) || codigo !== articulo.codigo) {
-        const obj = { filtrarArticulo: codigo, index: i, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
-
-        this.desEnfocarInput('cod-' + i);
+    if (input == 'can-' && this.fun.hasValue(cod)) {
+      if (this.fun.isEmpty(articulo) || cod !== articulo.codigo) {
+        const obj = { filtrarArticulo: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
         this.abrirModal('buscarArticulo', obj);
       } else {
-        this.enfocarInput(`can-${i}`);
+        this.enfocarInput(`can-${index}`);
       }
     }
 
-    let campo_siguiente = this.fun.hasValue(fila_siguiente['detalle_factura_id']) ? `can-${index + 1}` : `cod-${index + 1}`;
-    if (input === 'uni-') {
+    let campo_siguiente = this.fun.hasValue(fila_siguiente['detalle_factura_id']) ? `can-${index + 1}` : this.inputSecuencia;
+
+    if (input == 'uni-' && this.fun.hasValue(can) && can != 0 && this.fun.hasValue(cod)) {
       const campo = this.fun.hasValue(detalle_factura_id) ? campo_siguiente : `uni-${index}`;
-      if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) this.enfocarInput(campo);
+      this.enfocarInput(campo);
     }
 
-    if (input === 'cod-' && this.fun.hasValue(unidad) && _.lowerCase(unidad) != _.lowerCase('medida')) {
-      this.ajustarSecuencia();
-      if (this.fun.hasValue(cantidad) && cantidad != 0 && this.fun.hasValue(codigo)) this.enfocarInput(campo_siguiente);
+    if (input == 'cod-' && this.fun.hasValue(uni) && _.lowerCase(uni) != _.lowerCase('medida')) {
+      if (this.fun.hasValue(can) && can != 0 && this.fun.hasValue(cod)) this.ajustarSecuencia().then(() => this.enfocarInput(campo_siguiente));
     }
   }
 
-  LLenarRowDespuesDeFiltro(obj) {
+  llenarRowDespuesDeFiltro(obj) {
     const ARTICULO = obj.data;
 
-    const i = obj.index;
+    const index = obj.index;
 
-    if (ARTICULO.existencia === 0) {
+    if (ARTICULO.existencia == 0) {
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
       if (ARTICULO.descripcion === 'Producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
       this.fun.toastError(msg, 'ERROR');
 
       setTimeout(() => {
-        this.enfocarInput('cod-' + i);
-        this.selectContenido('cod-' + i);
-      }, 5);
+        this.enfocarInput('cod-' + index);
+        this.selectContenido('cod-' + index);
+      }, 0);
     } else {
       const cantidades = ARTICULO.cantidades;
 
@@ -269,59 +264,43 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
         this.fun.toastWarning(msg, 'AVISO');
       }
 
-      (this.filasDetalle[i] as any).controls['articulo'].setValue(ARTICULO);
-      (this.filasDetalle[i] as any).controls['cod'].setValue(ARTICULO.codigo);
-      (this.filasDetalle[i] as any).controls['des'].setValue(ARTICULO.nombre);
-      (this.filasDetalle[i] as any).controls['can'].setValue(null);
-      (this.filasDetalle[i] as any).controls['can_ant'].setValue(null);
-      (this.filasDetalle[i] as any).controls['uni'].setValue(null);
+      (this.filasDetalle[index] as any).controls['articulo'].setValue(ARTICULO);
+      (this.filasDetalle[index] as any).controls['cod'].setValue(ARTICULO.codigo);
+      (this.filasDetalle[index] as any).controls['des'].setValue(ARTICULO.nombre);
+      (this.filasDetalle[index] as any).controls['can'].setValue(null);
+      (this.filasDetalle[index] as any).controls['can_ant'].setValue(null);
+      (this.filasDetalle[index] as any).controls['uni'].setValue(null);
 
-      this.enfocarInput('can-' + i);
+      setTimeout(() => this.enfocarInput('can-' + index), 0);
     }
   }
 
-  async llenarArrayUnidades(i) {
-    const fila_actual = this.filasDetalle[i].getRawValue();
-    const codigo = fila_actual['cod'];
-    const art = fila_actual['articulo'];
+  async llenarArrayUnidades(index) {
+    const { articulo, cod } = this.filasDetalle[index].getRawValue();
 
-    console.log('codigo ', codigo);
-    console.log('art ', art);
-
-    if (codigo && art) {
-      const precioPrincipal = art.precio_principal;
-      const costoPrincipal = art.costo_principal;
+    if (cod && articulo) {
+      const precioPrincipal = articulo.precio_principal;
+      const costoPrincipal = articulo.costo_principal;
       this.UnidadesArticulo = [];
 
-      this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: art.contenido[art.medida] });
-      console.log('art.contenido_articulos.length ', art.contenido_articulos.length);
-      console.log('art.medida ', art.medida);
+      this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: articulo.contenido[articulo.medida] });
 
-      if (art.contenido_articulos.length === 0 || art.medida !== 'Quintal') {
-        this.UnidadesArticulo.push({ value: art.medida, precio: art.precio_principal, costo: art.costo_principal, cantidad: art.contenido[art.medida] });
-      }
-      console.log('this.UnidadesArticulo ', this.UnidadesArticulo);
-
-      console.log('art.descripcion ', art.descripcion);
-      if (art.descripcion === 'Producto terminado' || art.descripcion === 'Materia prima') {
-        if (_.lowerCase(art.vendido_en) === _.lowerCase('Saco') && art.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+      if (articulo.medida !== 'Quintal') {
+        this.UnidadesArticulo.push({ value: articulo.medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[articulo.medida] });
       }
 
-      const detallable = art.is_detallable;
-      if (detallable) this.articuloDetallable(art);
+      if (_.lowerCase(articulo.vendido_en) == 'saco' && articulo.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+
+      if (articulo.is_detallable) {
+        articulo.contenido_articulos.forEach((element) => {
+          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: articulo.contenido[element.medida] });
+        });
+      }
 
       this.UnidadesArticulo = _.uniqWith(this.UnidadesArticulo, _.isEqual);
 
-      const estoy_en = document.activeElement.id;
-      if (_.includes(estoy_en, 'uni')) setTimeout(() => this.enfocarInput(estoy_en), 150);
-      console.log('  ');
+      if (this.inputDrop) setTimeout(() => this.enfocarInput(this.inputDrop), 0);
     }
-  }
-
-  articuloDetallable(art) {
-    art.contenido_articulos.forEach((element) => {
-      this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: art.contenido[element.medida] });
-    });
   }
 
   entrarSacosAUnidades(precioQuintal, costoQuintal) {
@@ -431,32 +410,16 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     (this.form.get('rowFactura') as FormArray).removeAt(i);
   }
 
-  verificarSecuencia(i, input?) {
-    const fila_actual = this.filasDetalle[i].getRawValue();
-
-    if (this.secuencia < i) this.enfocarInput(this.inputSecuencia);
-
-    if (this.filasDetalle) {
-      const codigo = fila_actual['cod'];
-      const art = fila_actual['articulo'];
-
-      if (input === 'unidad' && this.fun.hasValue(codigo) && this.fun.hasValue(art)) {
-        this.setInputDrop(i);
-        this.llenarArrayUnidades(i);
-      }
-    }
+  verificarSecuencia(index, mover = true) {
+    if (this.secuencia < index && mover) this.enfocarInput(this.inputSecuencia);
   }
 
   saliDeCantidad(i) {
-    const fila_actual = this.filasDetalle[i].getRawValue();
-    const unidad = fila_actual['uni'];
-    const cantidad = fila_actual['can'];
-    const cantidad_anterior = fila_actual['can_ant'];
+    const { uni, can, can_ant } = this.filasDetalle[i].getRawValue();
 
-    if (cantidad != cantidad_anterior) {
-      if (this.fun.hasValue(unidad)) this.checkCantidadExede(i, 'change', () => {});
-
-      (this.filasDetalle[i] as any).controls['can_ant'].setValue(cantidad);
+    if (can != can_ant) {
+      if (this.fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
+      (this.filasDetalle[i] as any).controls['can_ant'].setValue(can);
     }
   }
 
@@ -470,13 +433,13 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     } else {
       this.checkCantidadExede(i, 'change', (excede) => {
         if (!excede) (this.filasDetalle[i] as any).controls['uni'].setValue(unidad);
+        this.ajustarSecuencia().then(() => this.enfocarInput(this.inputSecuencia));
       });
     }
   }
 
   async calculateCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
     this.llenarArrayUnidades(params.index);
-    this.fun.logRed('----- calculateCantidadEnUnidades ------');
 
     const control = this.filasDetalle[params.index].controls;
     const fila_actual = this.filasDetalle[params.index].getRawValue();
@@ -492,8 +455,13 @@ export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, A
     control['cantidad_en_unidades'].setValue(cant_unidades);
   }
 
-  setInputDrop(arg) {
-    this.inputDrop = 'uni-' + arg;
+  setInputDrop(index) {
+    if (this.fun.hasValue(index)) {
+      const { articulo } = this.filasDetalle[index].getRawValue();
+      if (this.fun.hasValue(articulo)) this.inputDrop = `uni-${index}`;
+    } else {
+      this.inputDrop = undefined;
+    }
   }
 
   createItem(i): FormGroup {
