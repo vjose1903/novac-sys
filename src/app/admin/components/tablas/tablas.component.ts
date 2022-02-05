@@ -125,10 +125,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.subTotalPag = this.tServ.TOTALPAGINAS.subscribe((res) => {
       if (res) {
         if (this.id_tabla !== 'tabla') {
-          console.log();
-
           if (res.tabla === this.id_tabla) this.total_registros = res.total;
-          console.log('res ==> ', res);
         } else {
           this.total_registros = res.total;
         }

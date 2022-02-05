@@ -551,41 +551,36 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
-    const control = this.filasDetalle[params.index].controls;
-    const valores = this.filasDetalle[params.index].value;
-
-    const unidad = valores['uni'];
-    const cantidad = valores['can'];
-
+    const { controls, value } = this.filasDetalle[params.index];
+    const { uni, can } = value;
     let cantidadMinima = 1;
 
-    if (unidad && this.UnidadesArticulo.length > 0) {
-      const unidad_find = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) == _.lowerCase(unidad));
+    if (uni && this.UnidadesArticulo.length > 0) {
+      const unidad_find = this.UnidadesArticulo.find((_uni) => _.lowerCase(_uni.value) == _.lowerCase(uni));
       if (unidad_find) cantidadMinima = unidad_find.cantidad;
     }
 
-    const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
-    control['cantidad_en_unidades'].setValue(cant_unidades);
+    const cant_unidades = params.clean ? 0 : can * cantidadMinima;
+    controls['cantidad_en_unidades'].setValue(cant_unidades);
 
     if (cant_unidades == 0) {
-      control['pre'].setValue(null);
-      control['tot'].setValue(null);
+      controls['pre'].setValue(null);
+      controls['tot'].setValue(null);
     }
   }
 
-  calcularTotalRow(i) {
+  calcularTotalRow(index) {
     return new Promise((resolve) => {
-      const control = this.filasDetalle[i].controls;
-      const valores = this.filasDetalle[i].value;
+      const { controls, value } = this.filasDetalle[index];
 
-      const precio = GLOBAL.desformatear(valores.pre);
-      const cantidad = valores['can'];
+      const precio = GLOBAL.desformatear(value.pre);
+      const cantidad = value['can'];
 
       if (precio && cantidad) {
-        control['tot'].setValue(GLOBAL.numFormatTwoDecimals(precio * cantidad));
+        controls['tot'].setValue(GLOBAL.numFormatTwoDecimals(precio * cantidad));
 
-        this.llenarArrayUnidades(i);
-        this.calcularCantidadEnUnidades({ index: i });
+        this.llenarArrayUnidades(index);
+        this.calcularCantidadEnUnidades({ index: index });
         this.calculosTotalesGenerales();
       }
 
@@ -667,7 +662,7 @@ export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChan
   }
 
   calculosTotalesGenerales() {
-    let tempTotal = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + GLOBAL.desformatear(item.value.tot), 0);
+    const tempTotal = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + GLOBAL.desformatear(item.value.tot), 0);
 
     if (tempTotal !== this.TOTAL) {
       this.TOTAL = tempTotal;
