@@ -1,10 +1,10 @@
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import * as _ from 'lodash';
 
-export function applyMixins(target: any, mixinList: any[]) {
-  mixinList.forEach((mixin) => {
-    Object.getOwnPropertyNames(mixin.prototype).forEach((name) => {
-      Object.defineProperty(target.prototype, name, Object.getOwnPropertyDescriptor(mixin.prototype, name));
+export function applyMixins(derivedCtor: any, constructors: any[]) {
+  constructors.forEach((baseCtor) => {
+    Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
+      Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name) || Object.create(null));
     });
   });
 }

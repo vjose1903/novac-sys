@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import * as moment from '../../../../../utils/javascript/moment';
+import * as moment from '../../../../core/javascript/moment';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 

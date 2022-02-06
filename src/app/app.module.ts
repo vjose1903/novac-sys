@@ -17,6 +17,7 @@ import { AppRoutingModule } from './app.routing';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { NewModalModule } from './admin/components/new_modal/modal.module';
 
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
@@ -37,6 +38,7 @@ defineLocale('es', esLocale);
     MDBBootstrapModule,
     BrowserAnimationsModule,
     NgxBootstrapModule,
+    NewModalModule,
   ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }],
   bootstrap: [AppComponent],

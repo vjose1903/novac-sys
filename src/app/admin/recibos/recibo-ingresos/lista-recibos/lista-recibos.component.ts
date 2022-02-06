@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { TablasService } from '../../../components/tablas/tablas.service';
-import { GLOBAL } from '../../../../core/services/GLOBAL';
-import { mixinClass } from '../../../mixinClass';
+import { GLOBAL } from '../../../../core/typescript/GLOBAL';
+import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
 
@@ -12,7 +12,7 @@ import { ReciboC } from '../../recibos';
   templateUrl: './lista-recibos.component.html',
   styleUrls: ['./lista-recibos.component.scss'],
 })
-export class ListaRecibosComponent extends mixinClass implements OnInit, OnDestroy {
+export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestroy {
   info = [
     {
       titulo: '1',

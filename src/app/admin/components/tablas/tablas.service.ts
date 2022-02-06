@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 export const DATATABLE = new BehaviorSubject<any>({});
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
 
 @Injectable({
   providedIn: 'root',

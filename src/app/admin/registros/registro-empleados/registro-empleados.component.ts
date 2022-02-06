@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as _ from 'lodash';
-import * as moment from '../../../../utils/javascript/moment';
-import { GLOBAL } from '../../../core/services/GLOBAL';
-import { mixinClass } from '../../mixinClass';
+import * as moment from '../../../core/javascript/moment';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
 import { TablasService } from '../../components/tablas/tablas.service';
@@ -14,7 +14,7 @@ import { EmpleadoC } from './empleado';
   templateUrl: './registro-empleados.component.html',
   styleUrls: ['./registro-empleados.component.scss'],
 })
-export class RegistroEmpleadosComponent extends mixinClass implements OnInit, OnDestroy {
+export class RegistroEmpleadosComponent extends MixinClass implements OnInit, OnDestroy {
   form: FormGroup;
   titulo = '';
   boton = '';

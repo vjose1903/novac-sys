@@ -1,9 +1,9 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from '../../../../utils/javascript/moment';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import * as moment from '../../../core/javascript/moment';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { mixinClass } from '../../mixinClass';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../registros/registro-empleados/empleado';
 import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
 import { ReciboC } from '../recibos';
@@ -15,7 +15,7 @@ import { FacturaC } from '../../facturacion/factura';
   templateUrl: './recibo-viajes.component.html',
   styleUrls: ['./recibo-viajes.component.scss'],
 })
-export class ReciboViajesComponent extends mixinClass implements OnInit, OnDestroy {
+export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;
   info = [
     { titulo: '1', key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '1.5rem' }, { color: 'var(--transparente00)' }] },

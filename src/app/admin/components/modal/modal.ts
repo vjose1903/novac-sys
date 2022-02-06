@@ -5,7 +5,7 @@ import { LayoutClass } from '../../layout/layout';
 import { VM } from './interfaces';
 import { SingletonService } from '../../../core/services/singleton.service';
 
-export class modalClass extends LayoutClass {
+export class modalClass {
   private static a_quien_responder: string;
   private quien_me_llamo = '';
   pdfSrc: any;
@@ -31,15 +31,12 @@ export class modalClass extends LayoutClass {
   mServ = SingletonService.mServ;
   pdfServ = SingletonService.pdfServ;
 
-  constructor() {
-    super();
-  }
+  constructor() {}
 
-  _init_modal(arg) {
+  _init_modal(arg, layServ) {
     this.quien_me_llamo = arg.component;
 
     this.metodos[this.quien_me_llamo] = this;
-
 
     this._lista = arg._lista_subs ? arg._lista_subs : [];
 
@@ -64,7 +61,7 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('refreshFacturas')) {
-      this.subRefresh = this.layServ.REFRESHFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
+      this.subRefresh = layServ.REFRESHFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
     }
 
     if (this._lista.includes('noFiltro')) {
@@ -72,19 +69,12 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('sacarFacturas')) {
-
-
-      this.subRefresh = this.layServ.SACARFACTURA.subscribe((res) => this.run_subscribe('SACARFACTURA', res));
+      this.subRefresh = layServ.SACARFACTURA.subscribe((res) => this.run_subscribe('SACARFACTURA', res));
     }
   }
 
   run_subscribe(observable, res) {
     const _this = this.metodos[modalClass.a_quien_responder];
-
-
-
-
-
 
     if (_this) {
       switch (observable) {

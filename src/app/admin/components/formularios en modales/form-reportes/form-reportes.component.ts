@@ -2,9 +2,9 @@ import { EventEmitter } from '@angular/core';
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import * as moment from '../../../../../utils/javascript/moment';
+import * as moment from '../../../../core/javascript/moment';
 
-import { mixinClass } from '../../../mixinClass';
+import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 
 @Component({
@@ -12,7 +12,9 @@ import { ArticuloC } from '../../../registros/articulos/articulo';
   templateUrl: './form-reportes.component.html',
   styleUrls: ['./form-reportes.component.scss'],
 })
-export class FormVentasComponent extends mixinClass implements OnInit {
+
+export class FormVentasComponent extends MixinClass implements OnInit {
+
   @Input() tipo_reporte;
   @Input() switches;
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
-import { GLOBAL } from './core/services/GLOBAL';
+import { GLOBAL } from './core/typescript/GLOBAL';
 import { AppConfig } from '../environments/environment';
 import { FunctionService } from './core/services/functions.service';
 import { SingletonService } from './core/services/singleton.service';

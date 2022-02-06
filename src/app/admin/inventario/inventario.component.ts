@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
-import { GLOBAL } from '../../core/services/GLOBAL';
+import { GLOBAL } from '../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { TablasService } from '../components/tablas/tablas.service';
-import { mixinClass } from '../mixinClass';
+import { MixinClass } from '../../core/typescript/MixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
 import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
 import { ReporteC } from '../reportes/reporte';
@@ -12,7 +12,7 @@ import { ReporteC } from '../reportes/reporte';
   templateUrl: './inventario.component.html',
   styleUrls: ['./inventario.component.scss'],
 })
-export class InventarioComponent extends mixinClass implements OnInit, OnDestroy {
+export class InventarioComponent extends MixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;
   // =============================================
   //  TABLAS

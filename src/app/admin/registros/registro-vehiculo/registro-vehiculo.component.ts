@@ -2,10 +2,10 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { MarcaC, ModeloC } from '../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { mixinClass } from '../../mixinClass';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../registro-empleados/empleado';
 import { VehiculoC } from './vehiculo';
 
@@ -14,7 +14,7 @@ import { VehiculoC } from './vehiculo';
   templateUrl: './registro-vehiculo.component.html',
   styleUrls: ['./registro-vehiculo.component.scss'],
 })
-export class RegistroVehiculoComponent extends mixinClass implements OnInit {
+export class RegistroVehiculoComponent extends MixinClass implements OnInit {
   titulo = '';
   boton = '';
   form: FormGroup;

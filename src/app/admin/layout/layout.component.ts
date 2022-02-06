@@ -4,8 +4,8 @@ import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
-import { mixinClass } from '../mixinClass';
-import { GLOBAL } from '../../core/services/GLOBAL';
+import { MixinClass } from '../../core/typescript/MixinClass';
+import { GLOBAL } from '../../core/typescript/GLOBAL';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { modalClass } from '../components/modal/modal';
 import { ClienteC } from '../registros/registro-clientes/cliente';
@@ -17,7 +17,7 @@ import { RequestC } from '../../core/typescript/requests';
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
 })
-export class LayoutComponent extends mixinClass implements OnInit, OnDestroy, AfterContentChecked, AfterViewInit {
+export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterContentChecked, AfterViewInit {
   actualMenuItemBack;
   actualMenyItem;
   showLoading;

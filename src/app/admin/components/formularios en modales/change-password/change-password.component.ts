@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import { mixinClass } from '../../../mixinClass';
+import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../../registros/registro-empleados/empleado';
 
 @Component({
@@ -9,7 +9,7 @@ import { EmpleadoC } from '../../../registros/registro-empleados/empleado';
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss'],
 })
-export class ChangePasswordComponent extends mixinClass implements OnInit, AfterViewInit {
+export class ChangePasswordComponent extends MixinClass implements OnInit, AfterViewInit {
   form: FormGroup;
   element: HTMLElement;
   @Input() user;

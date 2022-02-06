@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { mixinClass } from '../mixinClass';
+import { MixinClass } from '../../core/typescript/MixinClass';
 
 @Injectable({
   providedIn: 'root',
 })
-export class RecibosService extends mixinClass {
+export class RecibosService extends MixinClass {
   constructor() {
     super();
   }

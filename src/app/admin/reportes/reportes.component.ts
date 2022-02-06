@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LoaderService } from '../../loader/loader.service';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
-import { mixinClass } from '../mixinClass';
+import { MixinClass } from '../../core/typescript/MixinClass';
 import * as _ from 'lodash';
 import { ReporteC } from './reporte';
 
@@ -10,7 +10,7 @@ import { ReporteC } from './reporte';
   templateUrl: './reportes.component.html',
   styleUrls: ['./reportes.component.scss'],
 })
-export class ReportesComponent extends mixinClass implements OnInit, OnDestroy {
+export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   pdfSrc: any;
   fileName: any;
   tipoModal: string;

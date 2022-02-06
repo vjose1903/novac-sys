@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { GLOBAL } from '../../../core/services/GLOBAL';
-import * as moment from '../../../../utils/javascript/moment';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
+import * as moment from '../../../core/javascript/moment';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { mixinClass } from '../../mixinClass';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from './ncf';
 
@@ -13,7 +13,7 @@ import { NcfC } from './ncf';
   templateUrl: './ncf.component.html',
   styleUrls: ['./ncf.component.scss'],
 })
-export class NcfComponent extends mixinClass implements OnInit, OnDestroy {
+export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   titulo;
   form;
   boton = 'Ingresar';

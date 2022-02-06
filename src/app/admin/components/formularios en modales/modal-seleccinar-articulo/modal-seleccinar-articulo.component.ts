@@ -2,8 +2,8 @@ import { EventEmitter, OnChanges } from '@angular/core';
 import { Component, OnInit, OnDestroy, Input, Output, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
-import { GLOBAL } from '../../../../core/services/GLOBAL';
-import { mixinClass } from '../../../mixinClass';
+import { GLOBAL } from '../../../../core/typescript/GLOBAL';
+import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 
 @Component({
@@ -11,7 +11,7 @@ import { ArticuloC } from '../../../registros/articulos/articulo';
   templateUrl: './modal-seleccinar-articulo.component.html',
   styleUrls: ['./modal-seleccinar-articulo.component.scss'],
 })
-export class ModalSeleccinarArticuloComponent extends mixinClass implements OnInit, OnDestroy, OnChanges {
+export class ModalSeleccinarArticuloComponent extends MixinClass implements OnInit, OnDestroy, OnChanges {
   @Input() articulos;
   @Input() returnArticulos;
   @Output() getArticulos = new EventEmitter<any>();

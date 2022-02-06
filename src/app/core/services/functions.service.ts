@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
-import { GLOBAL } from './GLOBAL';
+import { AppConfig } from '../../../environments/environment';
+import { GLOBAL } from '../typescript/GLOBAL';
 
 @Injectable({
   providedIn: 'root',
@@ -92,13 +93,7 @@ export class FunctionService {
 
         if (tempdecimales === undefined) tempdecimales = '00';
 
-        if (
-          splitPrecio.length > 2 ||
-          this.checkNumbers(enteros) ||
-          this.checkLongMillares(enteros) ||
-          this.checkNumbers(tempdecimales) ||
-          this.checkLongMillares(tempdecimales)
-        ) {
+        if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
           this.toastError('Valor introducido es invalido', 'ERROR');
           document.getElementById(id).focus();
         } else {
@@ -224,6 +219,15 @@ export class FunctionService {
     }
 
     // this.router.navigateByUrl('/auth/login');
+  }
+
+  decryptConfigPassword(str) {
+    console.log('str ', str);
+
+    const str_remplace = btoa(str);
+    console.log('str_remplace ', str_remplace);
+    console.log('_.replace(AppConfig.config_password, VMj$pt30r=, =) ', _.replace(AppConfig.config_password, 'VMj$pt30r=', '='));
+    return str_remplace == _.replace(AppConfig.config_password, 'VMj$pt30r=', '=');
   }
 
   logBlue(text: any, body?) {

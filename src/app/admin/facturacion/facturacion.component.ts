@@ -1,13 +1,13 @@
 import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as moment from '../../../utils/javascript/moment';
+import * as moment from '../../core/javascript/moment';
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
-import { GLOBAL, tipos_facturas } from '../../core/services/GLOBAL';
+import { GLOBAL, tipos_facturas } from '../../core/typescript/GLOBAL';
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { mixinClass } from '../mixinClass';
+import { MixinClass } from '../../core/typescript/MixinClass';
 import { FacturacionService } from './facturacion.service';
 import { modalClass } from '../components/modal/modal';
 import { Subscription } from 'rxjs';
@@ -20,7 +20,7 @@ import { NcfC } from '../registros/ncf/ncf';
   templateUrl: './facturacion.component.html',
   styleUrls: ['./facturacion.component.scss'],
 })
-export class FacturacionComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
+export class FacturacionComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
 
   secuenciaKeys = [];

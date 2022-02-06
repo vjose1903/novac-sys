@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { GLOBAL } from '../../core/services/GLOBAL';
-import { mixinClass } from '../mixinClass';
+import { GLOBAL } from '../../core/typescript/GLOBAL';
+import { MixinClass } from '../../core/typescript/MixinClass';
 import { AppConfig } from '../../../environments/environment';
 
 @Component({
@@ -9,7 +9,7 @@ import { AppConfig } from '../../../environments/environment';
   styleUrls: ['./homeAdmin.component.scss'],
 })
 // export class HomeAdminComponent extends LayoutClass implements OnInit, OnDestroy {
-export class HomeAdminComponent extends mixinClass implements OnInit, OnDestroy {
+export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy {
   constructor() {
     super();
   }

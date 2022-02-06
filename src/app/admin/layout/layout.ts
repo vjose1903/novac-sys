@@ -1,7 +1,6 @@
 import { Subscription } from 'rxjs';
 import { SingletonService } from '../../core/services/singleton.service';
 
-
 export class LayoutClass {
   constructor() {}
 

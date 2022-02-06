@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
-import { GLOBAL } from '../../core/services/GLOBAL';
+import { GLOBAL } from '../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
-import * as moment from '../../../utils/javascript/moment';
-import { mixinClass } from '../mixinClass';
+import * as moment from '../../core/javascript/moment';
+import { MixinClass } from '../../core/typescript/MixinClass';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { ConduceC } from '../conduce/coduce';
 import { FacturaC } from '../facturacion/factura';
@@ -13,7 +13,7 @@ import { FacturaC } from '../facturacion/factura';
   templateUrl: './conduce.component.html',
   styleUrls: ['./conduce.component.scss'],
 })
-export class ConduceComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
+export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   listaClientes;
 
   cliente;

@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { mixinClass } from '../../mixinClass';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { ClienteC } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado';
@@ -13,7 +13,7 @@ import { EmpleadoC } from '../registro-empleados/empleado';
   templateUrl: './registro-clientes.component.html',
   styleUrls: ['./registro-clientes.component.scss'],
 })
-export class RegistroClientesComponent extends mixinClass implements OnInit, OnDestroy {
+export class RegistroClientesComponent extends MixinClass implements OnInit, OnDestroy {
   titulo = '';
   boton = '';
   form: FormGroup;

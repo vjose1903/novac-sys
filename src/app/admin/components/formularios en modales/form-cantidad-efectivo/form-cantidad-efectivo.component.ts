@@ -1,14 +1,14 @@
 import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
-import { GLOBAL } from '../../../../core/services/GLOBAL';
+import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
-import { mixinClass } from '../../../mixinClass';
+import { MixinClass } from '../../../../core/typescript/MixinClass';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
   templateUrl: './form-cantidad-efectivo.component.html',
   styleUrls: ['./form-cantidad-efectivo.component.scss'],
 })
-export class FormCantidadEfectivoComponent extends mixinClass implements OnInit, AfterViewInit {
+export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit {
   @Input() tipo = 'devuelta';
   @Input() data;
   @Input() debe_cubrir = true;

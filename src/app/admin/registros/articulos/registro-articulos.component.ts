@@ -2,10 +2,10 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@ang
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import * as moment from '../../../../utils/javascript/moment';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import * as moment from '../../../core/javascript/moment';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { mixinClass } from '../../mixinClass';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 import * as $ from 'jquery';
 
@@ -14,7 +14,7 @@ import * as $ from 'jquery';
   templateUrl: './registro-articulos.component.html',
   styleUrls: ['./registro-articulos.component.scss'],
 })
-export class RegistroArticulosComponent extends mixinClass implements OnInit, OnDestroy, OnChanges {
+export class RegistroArticulosComponent extends MixinClass implements OnInit, OnDestroy, OnChanges {
   // =============================================
   //  TABLAS
   // =============================================

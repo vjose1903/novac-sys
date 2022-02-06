@@ -1,9 +1,9 @@
 import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, OnDestroy, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/services/GLOBAL';
-import { mixinClass } from '../../mixinClass';
-import * as moment from '../../../../utils/javascript/moment';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
+import { MixinClass } from '../../../core/typescript/MixinClass';
+import * as moment from '../../../core/javascript/moment';
 import { ArticuloC } from '../../registros/articulos/articulo';
 
 @Component({
@@ -11,7 +11,7 @@ import { ArticuloC } from '../../registros/articulos/articulo';
   templateUrl: './cuerpo-factura.component.html',
   styleUrls: ['./cuerpo-factura.component.scss'],
 })
-export class CuerpoFacturaComponent extends mixinClass implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   form: FormGroup;
   ARRAY_ROWFACTURAS;
 

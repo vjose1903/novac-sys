@@ -2,7 +2,7 @@ import { Component, OnInit, Input, OnChanges, OnDestroy, HostListener, ViewChild
 import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
 import { TablasService } from '../tablas/tablas.service';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { FunctionService } from '../../../core/services/functions.service';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { SuplidorC } from '../../registros/registro-suplidores/suplidores';

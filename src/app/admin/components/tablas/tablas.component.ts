@@ -4,7 +4,7 @@ import { MdbTableDirective } from 'angular-bootstrap-md';
 import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { FunctionService } from '../../../core/services/functions.service';
 
 @Component({
@@ -112,7 +112,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() alto = 200;
   @Input() pad = true;
   select_all_value = false;
-  mixinClass;
 
   pagActual = 1;
   mostrar;

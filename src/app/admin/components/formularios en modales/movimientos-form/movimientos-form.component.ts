@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
 
-import { GLOBAL } from '../../../../core/services/GLOBAL';
-import { mixinClass } from '../../../mixinClass';
+import { GLOBAL } from '../../../../core/typescript/GLOBAL';
+import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { MovimientosC } from './movimiento-model';
 
 @Component({
@@ -10,7 +10,7 @@ import { MovimientosC } from './movimiento-model';
   templateUrl: './movimientos-form.component.html',
   styleUrls: ['./movimientos-form.component.scss'],
 })
-export class MovimientosFormComponent extends mixinClass implements OnInit, AfterViewInit {
+export class MovimientosFormComponent extends MixinClass implements OnInit, AfterViewInit {
   form;
   tipo_movimiento;
   tipo_salida;

@@ -1,6 +1,10 @@
-import { GLOBAL } from '../core/services/GLOBAL';
-import { modalClass } from './components/modal/modal';
-import * as moment from '../../utils/javascript/moment';
+import { GLOBAL } from './GLOBAL';
+import { modalClass } from '../../admin/components/modal/modal';
+import * as moment from '../javascript/moment';
+import { ModalClass } from '../../admin/components/new_modal/modal-class';
+import { applyMixins } from './GLOBAL';
+import { SingletonService } from '../services/singleton.service';
+import { LayoutClass } from '../../admin/layout/layout';
 
 type lista_sub = 'printBase64Res' | 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'refreshFacturas' | 'sacarFacturas' | 'noFiltro';
 
@@ -14,11 +18,10 @@ interface fechaFactura {
   FechaFacturaMostrar?: string;
 }
 
-export class mixinClass extends modalClass {
-  constructor() {
-    super();
-  }
-
+export class MixinClass {
+  constructor() {}
+  fun = SingletonService.fun;
+  layServ = SingletonService.layServ;
   arg_mixin;
 
   _init_mixin(arg?: mixinInit) {
@@ -28,7 +31,7 @@ export class mixinClass extends modalClass {
     this._init_layout();
 
     if (lista_sub) {
-      this._init_modal(arg);
+      this._init_modal(arg, this.layServ);
     }
   }
 
@@ -135,3 +138,7 @@ export class mixinClass extends modalClass {
     console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? GLOBAL.duplicarJson(body) : '');
   }
 }
+
+export interface MixinClass extends ModalClass, modalClass, LayoutClass {}
+
+applyMixins(MixinClass, [ModalClass, modalClass, LayoutClass]);

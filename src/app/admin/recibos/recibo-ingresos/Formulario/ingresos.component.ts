@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../../core/services/GLOBAL';
-import * as moment from '../../../../../utils/javascript/moment';
+import { GLOBAL } from '../../../../core/typescript/GLOBAL';
+import * as moment from '../../../../core/javascript/moment';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../../../components/tablas/tablas.component';
 import { TablasService } from '../../../components/tablas/tablas.service';
-import { mixinClass } from '../../../mixinClass';
+import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ReciboC } from '../../recibos';
 import { RecibosService } from '../../recibos.service';
 import { FacturaC } from '../../../facturacion/factura';
@@ -15,7 +15,7 @@ import { FacturaC } from '../../../facturacion/factura';
   templateUrl: './ingresos.component.html',
   styleUrls: ['./ingresos.component.scss'],
 })
-export class IngresosComponent extends mixinClass implements OnInit, OnDestroy {
+export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   clienteAdepositar: any;
   facturas;
   tipo_recibo = 'Pago factura';

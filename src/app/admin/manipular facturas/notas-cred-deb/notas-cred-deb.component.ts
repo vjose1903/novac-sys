@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 
 import * as _ from 'lodash';
-import * as moment from '../../../../utils/javascript/moment';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import * as moment from '../../../core/javascript/moment';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
-import { mixinClass } from '../../mixinClass';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
@@ -16,7 +16,7 @@ import { ClienteC } from '../../registros/registro-clientes/cliente';
   templateUrl: './notas-cred-deb.component.html',
   styleUrls: ['./notas-cred-deb.component.scss'],
 })
-export class NotasCredDebComponent extends mixinClass implements OnInit, OnDestroy {
+export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
   factura;
   idFactura: any;
   tipoNota: any;

@@ -1,4 +1,4 @@
-<div class="home" style="background-color: var(--primary02);">
+<div class="home" style="background-color: var(--primary02)">
   <div class="col-4">
     <mdb-card [cascade]="true" [narrower]="true">
       <div class="view view-cascade waves-light" mdbWavesEffect>
@@ -9,16 +9,16 @@
       </div>
 
       <mdb-card-body [cascade]="true" class="px-5">
-        <form [formGroup]="loginForm" (ngSubmit)="login(loginForm)" class="" method="post">
+        <form [formGroup]="loginForm" class="" method="post">
           <div class="form-group" id="usuario-group">
             <label for="" class="formulario__label d-block">Usuario:</label>
-            <input type="text" class="form-control" formControlName="usuario" id="Iusuario" autofocus />
+            <input type="text" class="form-control" formControlName="usuario" id="Iusuario" autofocus (keyup.enter)="saltar('Ipassword')" />
             <span class="error text-danger mt-0">{{ errorU }}</span>
           </div>
 
           <div class="form-group" id="password-group">
             <label for="" class="formulario__label d-block">Contraseña:</label>
-            <input type="password" class="form-control" formControlName="password" id="Ipassword" />
+            <input type="password" class="form-control" formControlName="password" id="Ipassword" (keyup.enter)="saltar('send')" />
             <span class="error text-danger mt-0">{{ errorC }}</span>
           </div>
 

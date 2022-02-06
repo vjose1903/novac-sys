@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../core/services/GLOBAL';
-import { mixinClass } from '../mixinClass';
+import { GLOBAL } from '../../core/typescript/GLOBAL';
+import { MixinClass } from '../../core/typescript/MixinClass';
 import { TablasService } from '../components/tablas/tablas.service';
 import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
 import { ProduccionC } from './produccion';
@@ -11,7 +11,7 @@ import * as $ from 'jquery';
   templateUrl: './produccion.component.html',
   styleUrls: ['./produccion.component.scss'],
 })
-export class ProduccionComponent extends mixinClass implements OnInit, OnDestroy, AfterViewInit {
+export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   producto_terminado_en_turno;
   cantidad_producir;
   medida_producir;

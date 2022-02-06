@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
-import * as moment from '../../../../utils/javascript/moment';
+import * as moment from '../../../core/javascript/moment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { mixinClass } from '../../mixinClass';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../loader/loader.service';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
@@ -15,7 +15,7 @@ import { NcfC } from '../../registros/ncf/ncf';
   templateUrl: './buscar-factura.component.html',
   styleUrls: ['./buscar-factura.component.scss'],
 })
-export class BuscarFacturaComponent extends mixinClass implements OnInit, OnDestroy {
+export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDestroy {
   facturas: any;
   campoSelected: string;
   clienteBuscado: any;

@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/services/GLOBAL';
+import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
-import { mixinClass } from '../../mixinClass';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
 import { SuplidorC } from './suplidores';
@@ -14,7 +14,7 @@ import { SuplidorC } from './suplidores';
   templateUrl: './registro-suplidores.component.html',
   styleUrls: ['./registro-suplidores.component.scss'],
 })
-export class RegistroSuplidoresComponent extends mixinClass implements OnInit, OnDestroy {
+export class RegistroSuplidoresComponent extends MixinClass implements OnInit, OnDestroy {
   form: FormGroup;
   titulo = '';
   boton = '';

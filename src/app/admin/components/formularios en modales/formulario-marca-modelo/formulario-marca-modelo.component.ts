@@ -1,9 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { GLOBAL } from '../../../../core/services/GLOBAL';
+import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { TablasService } from '../../../components/tablas/tablas.service';
-import { mixinClass } from '../../../mixinClass';
+import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '../../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
 
 @Component({
@@ -11,7 +11,7 @@ import { MarcaC, ModeloC } from '../../../components/formularios en modales/form
   templateUrl: './formulario-marca-modelo.component.html',
   styleUrls: ['./formulario-marca-modelo.component.scss'],
 })
-export class FormularioMarcaModeloComponent extends mixinClass implements OnInit {
+export class FormularioMarcaModeloComponent extends MixinClass implements OnInit {
   @Input() tipo_formulario;
 
   componente;
