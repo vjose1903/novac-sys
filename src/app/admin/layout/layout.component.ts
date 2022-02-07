@@ -389,6 +389,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     if (!subMenu) ruta_a_cambiar = this.modulo_select ? `/admin/${this.modulo_select}/${url}` : `/admin/${url}`;
 
     this.actualMenyItem = subMenu ? `${this.modulo_select}_select` : `${this.modulo_select}`;
+    console.log('this.actualMenyItem --> ', this.actualMenyItem);
 
     if (!subMenu) {
       this.ready = false;

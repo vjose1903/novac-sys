@@ -5,7 +5,7 @@ import { LayoutClass } from '../../layout/layout';
 import { VM } from './interfaces';
 import { SingletonService } from '../../../core/services/singleton.service';
 
-export class modalClass {
+export class modalClass extends LayoutClass {
   private static a_quien_responder: string;
   private quien_me_llamo = '';
   pdfSrc: any;
@@ -31,7 +31,9 @@ export class modalClass {
   mServ = SingletonService.mServ;
   pdfServ = SingletonService.pdfServ;
 
-  constructor() {}
+  constructor() {
+    super();
+  }
 
   _init_modal(arg, layServ) {
     this.quien_me_llamo = arg.component;
@@ -61,6 +63,8 @@ export class modalClass {
     }
 
     if (this._lista.includes('refreshFacturas')) {
+      console.log('----');
+
       this.subRefresh = layServ.REFRESHFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
     }
 

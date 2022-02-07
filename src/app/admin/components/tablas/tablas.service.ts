@@ -3,13 +3,14 @@ import { Observable, BehaviorSubject } from 'rxjs';
 export const DATATABLE = new BehaviorSubject<any>({});
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../core/typescript/GLOBAL';
+import { SingletonService } from '../../../core/services/singleton.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TablasService {
   data;
-
+  fun = SingletonService.fun;
   private total_paginas = new BehaviorSubject<any>({ tabla: 'tabla', total: 0 });
 
   TOTALPAGINAS = this.total_paginas.asObservable();
@@ -49,10 +50,12 @@ export class TablasService {
   }
 
   initPagination(id, params) {
-    this.obj_paginate[id] = GLOBAL.duplicarJson(params);
+    if (this.fun.isEmpty(this.obj_paginate[id])) this.obj_paginate[id] = GLOBAL.duplicarJson(params);
   }
 
   getPaginationById(id) {
+    if (this.fun.isEmpty(this.obj_paginate[id])) this.obj_paginate[id] = GLOBAL.duplicarJson(this.obj_paginate.default);
+
     return this.obj_paginate[id];
   }
 

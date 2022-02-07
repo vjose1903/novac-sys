@@ -1,9 +1,12 @@
 import * as _ from 'lodash';
 import { SingletonService } from '../../../core/services/singleton.service';
+import { modalClass } from '../modal/modal';
 import { MODALCONFIG } from './modal.service';
 
-export class ModalClass {
-  constructor() {}
+export class ModalClass extends modalClass {
+  constructor() {
+    super();
+  }
 
   modalServ = SingletonService.mServ;
 

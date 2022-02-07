@@ -18,8 +18,10 @@ interface fechaFactura {
   FechaFacturaMostrar?: string;
 }
 
-export class MixinClass {
-  constructor() {}
+export class MixinClass extends ModalClass {
+  constructor() {
+    super();
+  }
   fun = SingletonService.fun;
   layServ = SingletonService.layServ;
   arg_mixin;
@@ -139,6 +141,6 @@ export class MixinClass {
   }
 }
 
-export interface MixinClass extends ModalClass, modalClass, LayoutClass {}
+// export interface MixinClass extends ModalClass, modalClass, LayoutClass {}
 
-applyMixins(MixinClass, [ModalClass, modalClass, LayoutClass]);
+// applyMixins(MixinClass, [ModalClass, modalClass, LayoutClass]);

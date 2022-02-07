@@ -103,10 +103,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   objDevueltoResponse(res) {
     if (res && res.tipo_modal === 'buscarCliente') {
       this.clienteAdepositar = res.data;
-      console.log('res.data --> ', res.data);
 
       (document.getElementById('clienteI') as any).value = `${res.data.nombre} ${res.data.apellido}`;
       const actualPagination = this.tServ.getPaginationById('facturasPendientes');
+
       this.pedirFacturasPorCliente(res.data.id, actualPagination);
     } else if (res && res.tipo_modal === 'cambio') {
       this.devuelta = res.data.devuelta;
@@ -169,7 +169,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const fechaA = moment().format('YYYY-MM-DD');
 
     const factTemp = await this.facturaClass.getAll({ afterPath: `cliente/${cliente_id}/pagada/false`, parameters: { page, per_page, paginado: false } });
-    console.log('this.facturas===> ', this.facturas);
     this.facturas = factTemp.data;
 
     this.facturas.map((factura) => {
@@ -206,7 +205,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
     this.debiendo = this.totalFacturado - this.totalPagado - this.totalNotas;
-    console.log(' debiendo ', this.debiendo);
 
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
     const obj = { total: this.facturas.lenght, tabla: 'facturasPendientes' };
