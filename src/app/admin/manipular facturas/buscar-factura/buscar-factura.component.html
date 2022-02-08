@@ -125,6 +125,7 @@
       [id_tabla]="'notas'"
       (clickIcon)="selectNota($event)"
       [data]="notas"
+      [(TablasComponent)]="TablasComponent"
       (paginateChange)="getNotas($event)"
       [focusRow]="false"
     ></app-tablas>
