@@ -183,6 +183,18 @@ export class FunctionService {
     return JSON.parse(jsonString);
   }
   // __________________________________________________________________________________________________
+  // Nombre: IsJsonString
+  // Descripcion : Esta funcion valida que un string sea un json valido
+  // __________________________________________________________________________________________________
+  IsJsonString(str) {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+  // __________________________________________________________________________________________________
   // Nombre: isEmpty
   // Descripcion : Esta funcion valida que si una variable esta vacia
   // __________________________________________________________________________________________________

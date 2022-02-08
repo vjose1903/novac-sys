@@ -9,10 +9,13 @@ const autoUpdater = require('electron-updater').autoUpdater;
 const express = require('express');
 
 import { AppConfig } from './src/environments/environment.js';
+import { KEYWORD_ELECTRON_EVENT_DECRYPT, KEYWORD_ELECTRON_EVENT_ENCRYPT, KEYWORD_ELECTRON_RESPONSE, KEYWORD_ELECTRON_SENDER, MessageTaskInterface } from './shared-electron-angular.js';
+import Functions from './functions.js';
 
 let win: BrowserWindow = null;
-const args = process.argv.slice(1),
-  serve = args.some((val) => val === '--serve');
+
+const args = process.argv.slice(1);
+const serve = args.some((val) => val === '--serve');
 
 function createWindow(): BrowserWindow {
   const electronScreen = screen;
@@ -81,8 +84,6 @@ function createWindow(): BrowserWindow {
   //   app.get('*', (req, res) => {
   //     res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
   //   });
-
-
 
   //   // if (fs.existsSync('resources/app/index.html')) {
   //   //   // Path when running electron in local folder
@@ -224,6 +225,11 @@ autoUpdater.on('error', (error) => {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER LOS NOMBRES DE LAS IMPRESORAS DEL SISTEMA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+ipcMain.on(KEYWORD_ELECTRON_SENDER, handleEvent);
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER LOS NOMBRES DE LAS IMPRESORAS DEL SISTEMA
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ipcMain.on('printerNames', (event: any, arg) => {
   // name of function
@@ -255,6 +261,34 @@ ipcMain.on('printBase64', async (event: any, oPdf) => {
   // await puts(type, 'type');
   generatePdfFileFormBase64(filename, base64, type, scale);
 });
+
+async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
+  try {
+    var arg = JSON.parse(obj) as MessageTaskInterface;
+
+    console.log('arg --> ', arg);
+
+    // console.log("handleEvent::nodejs:", arg);
+
+    switch (arg.eventName) {
+      case KEYWORD_ELECTRON_EVENT_DECRYPT:
+        var res = Functions.desEncriptar(arg.data);
+        arg.response = res;
+        event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+        break;
+      case KEYWORD_ELECTRON_EVENT_ENCRYPT:
+        var res = Functions.encriptar(arg.data);
+        arg.response = res;
+        event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+        break;
+      default:
+        event.reply(KEYWORD_ELECTRON_RESPONSE);
+        break;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // BORRA EL ARCHIVO DE LOGS
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -303,9 +337,7 @@ function esperandoDescargaParaDescomprimirElemento(path_local_content, path_loca
   // const interval = setInterval(() => {
 
   const command =
-    process.platform === 'darwin'
-      ? `unzip "${pathAdd(path_local_extension)}" -d "${pathAdd()}"`
-      : `powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`;
+    process.platform === 'darwin' ? `unzip "${pathAdd(path_local_extension)}" -d "${pathAdd()}"` : `powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`;
 
   cmd(command, (res) => {
     if (res.status) {
@@ -361,17 +393,7 @@ async function borrado_de_archivos_malos(archivos, callback = (arg) => {}) {
 // PARA VERIFICAR SI LOS ELEMENTOS NECESARIOS FUNCIONAN
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-async function verificarElemento(
-  aFiles_malos,
-  paht_server,
-  path_local_content,
-  path_local_extension,
-  path_local_no_extension,
-  descomprimir,
-  is_carpeta,
-  nombre_err,
-  counter,
-) {
+async function verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_no_extension, descomprimir, is_carpeta, nombre_err, counter) {
   let descargar_archivo = false;
 
   let md5_servidor;
@@ -380,18 +402,7 @@ async function verificarElemento(
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
 
       if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_no_extension}` : `${path_local_extension}`}`))) {
-        procesoDescarga(
-          aFiles_malos,
-          path_local_extension,
-          path_local_content,
-          paht_server,
-          md5_servidor,
-          descomprimir,
-          path_local_no_extension,
-          nombre_err,
-          counter,
-          is_carpeta,
-        );
+        procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta);
         descargar_archivo = true;
       } else {
         if (descomprimir) {
@@ -404,36 +415,14 @@ async function verificarElemento(
             if (!res_compresion.status) {
               retornarMensajeErrorVeiricandoElementos(nombre_err);
             } else {
-              compararMD5(
-                aFiles_malos,
-                path_local_content,
-                path_local_extension,
-                md5_servidor,
-                path_local_no_extension,
-                is_carpeta,
-                nombre_err,
-                paht_server,
-                descomprimir,
-                counter,
-              );
+              compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
             }
           });
         }
       }
 
       if (!descargar_archivo && !descomprimir) {
-        compararMD5(
-          aFiles_malos,
-          path_local_content,
-          path_local_extension,
-          md5_servidor,
-          path_local_no_extension,
-          is_carpeta,
-          nombre_err,
-          paht_server,
-          descomprimir,
-          counter,
-        );
+        compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
       }
     } else {
     }
@@ -444,22 +433,9 @@ async function verificarElemento(
 // PARA COMPARA MD5 DE ELEMENTOS A VER SI FUNCIONAN
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function compararMD5(
-  aFiles_malos,
-  path_local_content,
-  path_local_extension,
-  md5_servidor,
-  path_local_no_extension,
-  is_carpeta,
-  nombre_err,
-  paht_server,
-  descomprimir,
-  counter,
-) {
+function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
   const command =
-    process.platform === 'darwin'
-      ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
-      : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+    process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
   cmd(command, (res_local) => {
     if (res_local.status) {
@@ -467,18 +443,7 @@ function compararMD5(
       if (md5_local !== md5_servidor) {
         borrado_de_archivos_malos(aFiles_malos, (res_del) => {
           if (res_del.status) {
-            procesoDescarga(
-              aFiles_malos,
-              path_local_extension,
-              path_local_content,
-              paht_server,
-              md5_servidor,
-              descomprimir,
-              path_local_no_extension,
-              nombre_err,
-              counter,
-              is_carpeta,
-            );
+            procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta);
           } else {
             retornarMensajeErrorVeiricandoElementos(nombre_err);
           }
@@ -494,26 +459,13 @@ function compararMD5(
 // PROCESO DE DESCARGA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-async function procesoDescarga(
-  aFiles_malos,
-  path_local_extension,
-  path_local_content,
-  paht_server,
-  md5_servidor,
-  descomprimir,
-  path_local_no_extension,
-  nombre_err,
-  counter,
-  is_carpeta,
-) {
+async function procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta) {
   let descarga_exito = true;
 
   await downloadFile(`${AppConfig.url_descargas}${paht_server}`, path_local_content, path_local_extension, (res) => {
     if (res.status) {
       const command =
-        process.platform === 'darwin'
-          ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"`
-          : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+        process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
       cmd(command, (res_local_before_descarga) => {
         if (res_local_before_descarga.status) {

@@ -10,6 +10,8 @@ import { ModalService } from './admin/components/modal/modal.service';
 import { LayoutService } from './admin/layout/layout.service';
 import { PdfService } from './core/services/pdf/pdf.service';
 import { ThemeService } from './core/services/theme.service';
+import { MessageTask } from './core/models/message-task';
+import { KEYWORD_ELECTRON_EVENT_DECRYPT, KEYWORD_ELECTRON_EVENT_ENCRYPT } from '../../shared-electron-angular';
 
 @Component({
   selector: 'app-root',
@@ -84,6 +86,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
           // try {
           //   if (document.getElementById('imagenLogo')) document.getElementById('imagenLogo').click();
           // } catch (error) {
+
           //   console.error(error);
           // }
         }
@@ -95,6 +98,37 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     });
 
     this.getPrintersName();
+    this.probandoEncriptar();
+  }
+
+  async probandoEncriptar() {
+    console.log('----- probandoEncriptar -----');
+
+    const task = new MessageTask(KEYWORD_ELECTRON_EVENT_ENCRYPT, { hola: 'mundo' });
+
+    this._ipc.sendTask(task).then(
+      (res: string) => {
+        this.probandoDesEncriptar(res);
+      },
+      (err) => {
+        console.log('err:: ', err);
+      },
+    );
+  }
+
+  async probandoDesEncriptar(strEncripted: string) {
+    console.log('----- probandoDesEncriptar -----');
+
+    const task = new MessageTask(KEYWORD_ELECTRON_EVENT_DECRYPT, strEncripted);
+
+    this._ipc.sendTask(task).then(
+      (res) => {
+        console.log('res decript:: ', res);
+      },
+      (err) => {
+        console.log('err:: ', err);
+      },
+    );
   }
 
   ngAfterViewInit(): void {
