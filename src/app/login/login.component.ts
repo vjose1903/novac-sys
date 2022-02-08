@@ -77,9 +77,8 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   saltar(input) {
-    if (input == 'send') {
-      this.login();
-    } else this.enfocarInput(input);
+    if (input == 'send') this.login();
+     else this.enfocarInput(input);
   }
 
   // =================================================================
