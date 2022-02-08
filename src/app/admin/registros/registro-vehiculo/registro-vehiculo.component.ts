@@ -69,18 +69,12 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
   }
 
   async getPropietarios() {
-    console.log('getPropietarios()');
-
     this.empleadosClass.getAll({ parameters: { id: true, nombreCompleto: true } }).then(
       (res) => {
-        console.log('EMPLEADOS RES: ', res);
-
         res['data'].unshift({ id: -1, nombreCompleto: 'No empleado' });
         this.listaPropietarios = res['data'];
       },
-      (err: any) => {
-        console.log('EMPLEADOS err: ', err);
-      },
+      (err: any) => {},
     );
   }
   async getVehiculos(e) {

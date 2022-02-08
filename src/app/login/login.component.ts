@@ -87,7 +87,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   // =================================================================
   login() {
     const formulario = this.loginForm.getRawValue();
-    console.log('formulario --> ', formulario);
 
     if (formulario.usuario == '1973' && formulario.password == '3791') {
       this.openConfigsModal();
@@ -99,8 +98,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
           this.router.navigateByUrl('/admin/dashboard');
         })
         .catch((error) => {
-          console.log('error ', error);
-
           if (error.status === 0) {
             this.fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
           } else {
@@ -145,9 +142,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
           const obj = { base64: res_pdf.body, filename: res_pdf.file, type: 'facturacion' };
           this._ipc.send('printBase64', obj);
         }
-      } catch (error) {
-        console.log('error --> ', error);
-      }
+      } catch (error) {}
     });
   }
 

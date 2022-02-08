@@ -263,10 +263,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     return new Promise((resolve) => {
       const pathname = document.location.pathname;
       const url = document.location.pathname.split('/')[3];
-      console.log('pathname ', pathname);
-      console.log('arg ', arg);
 
-      console.log('url ', url);
       if (this.fun.hasValue(arg) && !pathname.includes(arg)) {
         this.layServ.nextCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
         setTimeout(() => resolve(true), 100);
@@ -277,7 +274,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   pasarFacturaAfacturacion(fact) {
     if (this.fun.isEmpty(this.factGuardada) || fact.archivo_id != this.factGuardada.archivo_id) {
       this.checkWhereIs(fact.tipo).then((res) => {
-        console.log('res ', res);
         this.fun.logGreen('pasarFacturaAfacturacion ', fact);
 
         setTimeout(() => {
@@ -389,7 +385,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     if (!subMenu) ruta_a_cambiar = this.modulo_select ? `/admin/${this.modulo_select}/${url}` : `/admin/${url}`;
 
     this.actualMenyItem = subMenu ? `${this.modulo_select}_select` : `${this.modulo_select}`;
-    console.log('this.actualMenyItem --> ', this.actualMenyItem);
 
     if (!subMenu) {
       this.ready = false;

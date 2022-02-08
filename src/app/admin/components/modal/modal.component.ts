@@ -126,7 +126,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
           this.renovarDataFiltros(this.tServ.getPaginationByModal(), this.paraFiltroArticulos, this.fecha_articulo);
         } else if (this.tipoModal === 'buscarCliente') {
           this.tituloModal = 'Buscar cliente';
-          console.log('this.tServ.getPaginationByModal() --> ', this.tServ.getPaginationByModal());
 
           this.renovarDataFiltros(this.tServ.getPaginationByModal(), this.paraFiltroClientes, this.fecha_articulo);
         } else {
@@ -281,9 +280,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       if (this.tipoModal === 'buscarArticulo') {
         const is_compra = this.metodo === 'compra' ? true : false;
 
-        console.log('---- buscando ----');
         const res = await this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: page, per_page: per_page, paginado: true, fecha: fecha_articulo, is_compra: is_compra });
-        console.log('LUEGO');
 
         if (GLOBAL.is_number(palabra_a_buscar) && res.data.length === 1) {
           this.articuloFiltradoPorCodigo(res);
@@ -295,10 +292,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         }
         //
       } else if (this.tipoModal === 'buscarCliente') {
-        console.log('---- buscando ----');
-
         const res = await this.clienteClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
-        console.log('LUEGO');
 
         this.dataFiltro = undefined;
 
@@ -340,8 +334,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       }
       this.filtrar = true;
     } catch (error) {
-      console.log('error --> ', error);
-
       let tipo = '';
 
       if (this.tipoModal === 'buscarArticulo') {
@@ -352,8 +344,6 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       if (this.tipoModal === 'buscarCliente') tipo = 'buscarCliente';
 
       if (this.tipoModal === 'buscarSuplidor') tipo = 'buscarSuplidor';
-
-      console.log('---------- noFiltro ----------');
 
       this.noFiltro(tipo, palabra_a_buscar);
 

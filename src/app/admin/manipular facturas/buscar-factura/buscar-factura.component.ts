@@ -10,6 +10,7 @@ import { LoaderService } from '../../../loader/loader.service';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
+import { PdfService } from '../../../core/services/pdf/pdf.service';
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -41,7 +42,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   notas: any = [];
   notaSelected: string;
 
-  constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
     super();
   }
   campo = null;
@@ -249,7 +250,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async openSide() {
-
     this.tServ.initPagination('notas', this.tServ.obj_paginate.default);
 
     this.getNotas(this.tServ.getPaginationById('notas'));
@@ -397,7 +397,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     } else if (valor === '4') {
       this.tipo_factura_id = '0';
       this.valor = '0';
-      console.log("this.tServ.getPaginationById('facturas_params') ", this.tServ.getPaginationById('facturas_params'));
 
       this.pedirFactura(this.campo, '0', this.tServ.getPaginationById('facturas_params'));
     }

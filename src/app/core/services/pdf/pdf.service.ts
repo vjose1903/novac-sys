@@ -26,13 +26,11 @@ export class PdfService {
       const type = oPdf.type;
       const reimprimir = oPdf.data.reimprimir ? true : false;
 
-
       data['reimprimir'] = reimprimir;
 
       try {
         switch (type) {
           case 'recibo_ingreso':
-
             obj = recibosIngresos.makeRecibo(data);
             break;
 
@@ -73,6 +71,7 @@ export class PdfService {
         }
       } catch (error) {
         const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de pdf.', status: 'no', body: error });
+
         this.fun.toastError('ERROR en el switch de tipos de pdf.', 'ERROR');
         reject(respuesta);
       }

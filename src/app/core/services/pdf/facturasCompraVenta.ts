@@ -36,8 +36,6 @@ export function makeFacturaVenta(data) {
     styles: styles_,
   };
 
-  console.log();
-
   const obj = {
     doc: dd,
     file: 'factura.pdf',
@@ -145,10 +143,7 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
       margin: [15, 5, 0, 0],
       text: [
         {
-          text: [
-            { text: 'Dirección : ', style: 'letra12' },
-            is_venta || is_nota ? { text: data.cliente.direccion, style: 'letra12' } : { text: data.suplidor.direccion, style: 'letra12' },
-          ],
+          text: [{ text: 'Dirección : ', style: 'letra12' }, is_venta || is_nota ? { text: data.cliente.direccion, style: 'letra12' } : { text: data.suplidor.direccion, style: 'letra12' }],
         },
       ],
     },
@@ -190,11 +185,7 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
         {
           text: [
             { text: 'Valida hasta : ', style: 'letra11' },
-            data.tipo_factura_id === 3
-              ? { text: 'No aplica.', style: 'letra11' }
-              : data.FACTURA_DE === 'compra'
-              ? { text: ' ' }
-              : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra11' },
+            data.tipo_factura_id === 3 ? { text: 'No aplica.', style: 'letra11' } : data.FACTURA_DE === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra11' },
           ],
           margin: [85, 3, 0, 0],
         },
@@ -226,9 +217,7 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
             { text: 'Articulo', bold: true, margin: [-5, 0, 0, 0] },
             { text: 'Cantidad', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
             { text: 'Unidad', bold: true, alignment: 'center', margin: [0, 0, 15, 0] },
-            is_venta || is_nota
-              ? { text: 'Precio', bold: true, alignment: 'right', margin: [0, 0, 17, 0] }
-              : { text: 'Costo', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
+            is_venta || is_nota ? { text: 'Precio', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
             { text: 'Itbis', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
             { text: 'Total', bold: true, alignment: 'right', margin: [0, 0, 18, 0] }, // margin: [12, 0, 0, 0]
           ],
@@ -315,35 +304,36 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
       stack: [
         {
           columns: [
-            is_venta && !is_contado ? {text: ''} :
-            {
-              stack: [
-                {
-                  canvas: [
-                    { type: 'rect', x: 10, y: 0, w: 160, h: 1, color: '#000000' },
-                    { type: 'rect', x: 250, y: 0, w: 160, h: 1, color: '#000000' },
+            is_venta && !is_contado
+              ? { text: '' }
+              : {
+                  stack: [
+                    {
+                      canvas: [
+                        { type: 'rect', x: 10, y: 0, w: 160, h: 1, color: '#000000' },
+                        { type: 'rect', x: 250, y: 0, w: 160, h: 1, color: '#000000' },
+                      ],
+                      margin: [0, 80, 0, 0],
+                    },
+                    {
+                      columns: [
+                        [
+                          {
+                            text: [{ text: 'Revisada Por', style: 'letra12', bold: true }],
+                            margin: [50, 5, 0, 0],
+                          },
+                        ],
+                        [
+                          {
+                            text: [{ text: 'Cliente', style: 'letra12', bold: true }],
+                            margin: [65, 5, 0, 0],
+                          },
+                        ],
+                      ],
+                    },
                   ],
-                  margin: [0, 80, 0, 0],
+                  margin: [0, -40, 0, 0],
                 },
-                {
-                  columns: [
-                    [
-                      {
-                        text: [{ text: 'Revisada Por', style: 'letra12', bold: true }],
-                        margin: [50, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: [{ text: 'Cliente', style: 'letra12', bold: true }],
-                        margin: [65, 5, 0, 0],
-                      },
-                    ],
-                  ],
-                },
-              ],
-              margin: [0, -40, 0, 0],
-            },
 
             {
               margin: [0, -12, 0, 0],
@@ -421,7 +411,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
                       {
                         stack: [
                           {
-                            svg:    `<svg viewBox="0 0 700 180">
+                            svg: `<svg viewBox="0 0 700 180">
                             <rect height="180" width="55" fill="#ffffff" rx="5" ry="5" x="0" y="0" stroke="black" />
 
                             <text transform="translate(18, 165) rotate(-90)" font-weight="bold" style="font-size: 12px" > ADM AGROINDUSTRIAL SRL </text>
@@ -457,7 +447,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
                         <text transform="translate(10, 63)" style="font-size: 12px" font-weight="bold"> *** ${numero_letra}  *** </text>
 
                         <text transform="translate(10, 77)" style="font-size: 11px"> Valor recibido a mi (nuestra) entera satisfacción segun la</text>
-                        <text transform="translate(292, 77)" style="font-size: 11px" font-weight="bold"> Factura No. ${fun_.my_padStart( data.numero_factura, 8, '0' )}</text>
+                        <text transform="translate(292, 77)" style="font-size: 11px" font-weight="bold"> Factura No. ${fun_.my_padStart(data.numero_factura, 8, '0')}</text>
                         <text transform="translate(405, 77)" style="font-size: 11px"> para el fiel cumplimiento del pago</text>
                         <text transform="translate(572, 77)" style="font-size: 11px"> quedan afectados mis (nuestros) bienes habidos y por haber,</text>
                         <text transform="translate(10, 90)" style="font-size: 11px"> con renuncia de fuero de domicilio y de cualquier otra que puediera favorecerme (nos).</text>

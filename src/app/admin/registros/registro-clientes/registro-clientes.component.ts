@@ -52,7 +52,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   editando: boolean = false;
   myValidators = new customValidators();
 
-  clientesClass = new ClienteC();
+  clienteClass = new ClienteC();
   empleadosClass = new EmpleadoC();
 
   constructor(private fb: FormBuilder, private tServ: TablasService) {
@@ -94,7 +94,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     if (arg) {
       const obj = JSON.parse(JSON.stringify(this.seleccionModal));
       const actualPagination = this.tServ.getPaginationById('lista_clientes');
-      this.clientesClass.deleteOne(obj.id).then((res) => this.getClientes(actualPagination));
+      this.clienteClass.deleteOne(obj.id).then((res) => this.getClientes(actualPagination));
     }
   }
 
@@ -135,7 +135,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
 
-    this.clientesClass.getAll(extra).then((res) => {
+    this.clienteClass.getAll(extra).then((res) => {
       res['data'].map((cliente) => {
         cliente.documentos_de_identidad.map((docu) => {
           if (docu.principal) cliente.documento_identidad = docu.documento;
@@ -326,7 +326,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       formulario['balance'] = 0;
       formulario.maximo_credito = GLOBAL.desformatear(formulario.maximo_credito);
 
-      this.clientesClass.createUpdateOne(formulario).then((res) => {
+      this.clienteClass.createUpdateOne(formulario).then((res) => {
         const actualPagination = this.tServ.getPaginationById('lista_clientes');
         this.getClientes(actualPagination);
         this.borrar();

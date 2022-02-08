@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from './factura';
 import { NcfC } from '../registros/ncf/ncf';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -123,6 +124,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     private router: Router,
     private localeService: BsLocaleService,
     public factServ: FacturacionService,
+    private pdfServ: PdfService,
   ) {
     super();
 
@@ -875,13 +877,10 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
       if (this.checkIfFacturacionEnProceso()) {
         let is_guardada;
 
-        if (this.objArchivo.archivo_id_en_turno)
-          is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id == this.objArchivo.archivo_id_en_turno);
+        if (this.objArchivo.archivo_id_en_turno) is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id == this.objArchivo.archivo_id_en_turno);
 
         const obj = {
-          texto_modal: this.fun.hasValue(is_guardada)
-            ? 'Esta factura ya esta archivada ¿desea sobreescribirla?'
-            : '¿Seguro que desea archivar esta factura para continuarla luego?',
+          texto_modal: this.fun.hasValue(is_guardada) ? 'Esta factura ya esta archivada ¿desea sobreescribirla?' : '¿Seguro que desea archivar esta factura para continuarla luego?',
         };
 
         this.abrirModal('dinamico_texto', obj, 'archivar_factura');
@@ -1098,11 +1097,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
       cabecera_fact['devuelta'] = this.is_viaje ? 0 : this.Devuelta;
     }
 
-    cabecera_fact['fecha_valida'] = this.paqueteComprobante
-      ? this.paqueteComprobante.fecha_valida !== null
-        ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY')
-        : null
-      : null;
+    cabecera_fact['fecha_valida'] = this.paqueteComprobante ? (this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null) : null;
 
     cabecera_fact['tipo_factura_id'] = TipoFact[0].id;
     cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
@@ -1147,17 +1142,14 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     let res;
     const metodo = this.action === 'update' ? 'editar_factura' : '';
 
-
     if (metodo === 'editar_factura') res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_editar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
-
 
     let res_factura = res['data'];
 
     if (this.layServ.factura_guardada) this.revisarLocalStorage();
 
     res_factura['FACTURA_DE'] = this.metodo;
-    console.log(JSON.stringify(res_factura));
 
     const obj = { data: res_factura, type: 'facturacion' };
 
@@ -1170,9 +1162,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
             const obj = { base64: res_pdf.body, filename: res_pdf.file, type: 'facturacion' };
             this._ipc.send('printBase64', obj);
           }
-        } catch (error) {
-          console.log('error --> ', error);
-        }
+        } catch (error) {}
       });
     }
 

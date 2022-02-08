@@ -99,8 +99,8 @@ export class CrudG<T> {
     // if (tipo === 'externo') return `${this.path}`;
 
     if (id) url += `/${id}`;
-    if (_.has(args, 'afterPath')) url += `/${args.afterPath}`;
-    if (_.has(args, 'parameters')) url += this.parseParams(args.parameters);
+    if (_.has(args, 'afterPath') && this.fun.hasValue(args.afterPath)) url += `/${args.afterPath}`;
+    if (_.has(args, 'parameters') && this.fun.hasValue(args.parameters)) url += this.parseParams(args.parameters);
 
     return url;
   }

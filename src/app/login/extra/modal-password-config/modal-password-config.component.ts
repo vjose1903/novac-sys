@@ -38,7 +38,6 @@ export class ModalPasswordConfigComponent extends MixinClass implements OnInit {
       const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
       modal.closeModal(this.modal.component_id);
       modal.getDataModal({ error: false });
-      console.log('CORRECTO');
     } else {
       this.fun.toastError('Contraseña Incorrecta', 'ERROR');
     }

@@ -15,10 +15,7 @@ export function getContentWithTablaAgrupada(configuracion, data) {
     if (i > 0) cont_ = [getRaya(configuracion), ...cont_];
 
     if (data.contenido_reporte[i].titulo_grupo === 'TOTAL GENERAL') {
-      content.push({
-        stack: cont_,
-        unbreakable: true,
-      });
+      content.push({ stack: cont_, unbreakable: true, });
     } else {
       content.push(cont_);
     }

@@ -226,9 +226,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   borrar(e, a?) {
-    console.log('SE LLAMA BORRAR: ', e);
-    console.log('SE LLAMA BORRAR event: ', a);
-
     this.form.reset();
 
     this.enfocarInput('cedula');
@@ -249,7 +246,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   fecha(a: any) {
     // moment.locale('es');
     const fechaFormato = moment(a).format('DD/MM/YYYY');
-    console.log('FORMATO ANTES DE ENVIAR: ', fechaFormato);
 
     return fechaFormato;
   }
@@ -263,7 +259,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     }
 
     this.form.patchValue(item.ARG);
-    console.log('item.ARG --> ', item.ARG);
 
     this.usuarioSelected = item.ARG;
     this.editando = true;
@@ -277,8 +272,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   submit() {
-    console.log('SE LLAMA submit()');
-
     const formulario = this.form.getRawValue();
 
     const documentos_identidad = [{ documento: formulario.cedula, descripcion: 'cedula' }];

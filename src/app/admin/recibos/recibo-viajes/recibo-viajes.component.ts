@@ -9,6 +9,7 @@ import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
 import { ReciboC } from '../recibos';
 import { RecibosService } from '../recibos.service';
 import { FacturaC } from '../../facturacion/factura';
+import { PdfService } from '../../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -56,7 +57,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
-  constructor(private tServ: TablasService, private reciboServ: RecibosService) {
+  constructor(private tServ: TablasService, private reciboServ: RecibosService, private pdfServ: PdfService) {
     super();
   }
 
@@ -277,7 +278,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     obj['detalle_recibos'] = this.formarDetalle();
 
     this.reciboClass.createUpdateOne(obj).then((res) => {
-      console.log('res --> ', res['data']);
       const actualPagination = this.tServ.getPaginationById('lista_viajes');
       this.getViajes(actualPagination);
       this.resetVariables();

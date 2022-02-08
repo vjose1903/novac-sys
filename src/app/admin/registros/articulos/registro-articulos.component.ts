@@ -344,23 +344,24 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     control.removeAt(i);
   }
 
-  async getCosto(i) {
+  async getCosto(index, dropdown) {
     const control = this.form.controls['rowFormula'] as FormArray;
 
-    (control.controls[i] as any).controls['costo_formula'].setValue(null);
+    (control.controls[index] as any).controls['costo_formula'].setValue(null);
 
     let extra = { afterPath: '', parameters: { costos: true } };
 
-    this.articuloClass.getOne(control.value[i].articulo_id, extra).then((res) => {
+    this.articuloClass.getOne(control.value[index].articulo_id, extra).then((res) => {
       const costos = res.data.costos.Libra || res.data.costos.Unidad;
       const medida = this.fun.hasValue(res.data.costos.Unidad) ? 'Und.' : 'Lbs.';
 
-      (control.controls[i] as any).controls['medida_formula'].setValue(medida);
+      (control.controls[index] as any).controls['medida_formula'].setValue(medida);
 
-      (control.controls[i] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.costo));
-      (control.controls[i] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.precio));
+      (control.controls[index] as any).controls['costo_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.costo));
+      (control.controls[index] as any).controls['precio_formula'].setValue(GLOBAL.numFormatTwoDecimals(costos.precio));
 
-      setTimeout(() => this.calculateCostoPT(), 1);
+      this.calculateCostoPT();
+      dropdown.hide();
     });
   }
 
@@ -502,8 +503,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
           if (contenido_padre_valid) res = false;
           else res = true;
         } else {
-          if (contenido_padre_valid && formulario.cantidad_contenido_hijo && formulario.precio_hijo && formulario.costo_hijo && formulario.medida_contenido_hijo)
-            res = false;
+          if (contenido_padre_valid && formulario.cantidad_contenido_hijo && formulario.precio_hijo && formulario.costo_hijo && formulario.medida_contenido_hijo) res = false;
           else res = true;
         }
       }

@@ -10,6 +10,7 @@ import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
+import { PdfService } from '../../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -42,9 +43,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();
-  clientesClass = new ClienteC();
+  clienteClass = new ClienteC();
   ncfClass = new NcfC();
-  constructor(private activeRoute: ActivatedRoute, private router: Router) {
+  constructor(private activeRoute: ActivatedRoute, private router: Router, private pdfServ: PdfService) {
     super();
   }
 
@@ -92,7 +93,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async necesarioStart() {
     this.lista_tipos_facturas = await this.tiposFacturasClass.getAll();
-    console.log('this.lista_tipos_facturas --> ', this.lista_tipos_facturas);
 
     this.getFactura().then(async (res_factura) => {
       await this.formarTitulosTabla();
@@ -113,7 +113,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   async getPropietario(id) {
     if (id) {
       try {
-        this.clientesClass.getOne(id).then((res) => {
+        this.clienteClass.getOne(id).then((res) => {
           const cliente = res['data'];
 
           const documento = cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0];
@@ -442,7 +442,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     try {
       const res = await this.facturaClass.createOne(cabecera_fact);
-      console.log('res --> ', res);
 
       res['data']['FACTURA_DE'] = 'nota';
       const obj = { data: res['data'], type: 'facturacion' };

@@ -29,7 +29,6 @@ export class modalClass extends LayoutClass {
   zone = SingletonService.zone;
   _ipc = SingletonService._ipc;
   mServ = SingletonService.mServ;
-  pdfServ = SingletonService.pdfServ;
 
   constructor() {
     super();
@@ -63,8 +62,6 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('refreshFacturas')) {
-      console.log('----');
-
       this.subRefresh = layServ.REFRESHFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
     }
 

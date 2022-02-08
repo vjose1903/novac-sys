@@ -18,7 +18,6 @@ export class SingletonService {
   public static mServ: ModalService;
   public static _ipc: IpcService;
   public static layServ: LayoutService;
-  public static pdfServ: PdfService;
 
   constructor() {}
 }

@@ -6,15 +6,14 @@ import * as moment from '../../../../core/javascript/moment';
 
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
+import { ClienteC } from '../../../registros/registro-clientes/cliente';
 
 @Component({
   selector: 'app-form-reportes',
   templateUrl: './form-reportes.component.html',
   styleUrls: ['./form-reportes.component.scss'],
 })
-
 export class FormVentasComponent extends MixinClass implements OnInit {
-
   @Input() tipo_reporte;
   @Input() switches;
 
@@ -32,10 +31,13 @@ export class FormVentasComponent extends MixinClass implements OnInit {
 
   filtro_articulo;
   listaArticulos = [];
+  listaClientes = [];
 
   formarFecha = ['suplidor_prod'];
   Fecha: string;
   articuloClass = new ArticuloC();
+  clienteClass = new ClienteC();
+
   constructor(private fb: FormBuilder, private localeService: BsLocaleService) {
     super();
     this.dpConfig = Object.assign(
@@ -67,9 +69,7 @@ export class FormVentasComponent extends MixinClass implements OnInit {
     if (arg.term && arg.term !== '') {
       this.fun.awaitTyping().then((res) => {
         try {
-          this.articuloClass
-            .getArticulosFiltrado({ buscar: arg.term, fecha: this.Fecha, paginado: false, is_compra: true })
-            .then((res) => (this.listaArticulos = res['data']));
+          this.articuloClass.getArticulosFiltrado({ buscar: arg.term, fecha: this.Fecha, paginado: false, is_compra: true }).then((res) => (this.listaArticulos = res['data']));
         } catch (error) {
           console.error(error);
           this.fun.toastError('Error buscando articulos registrados.', 'ERROR');
@@ -77,6 +77,32 @@ export class FormVentasComponent extends MixinClass implements OnInit {
       });
     } else {
       this.listaArticulos = [];
+    }
+  }
+
+  async getClientes(arg) {
+
+    if (arg.term && arg.term !== '') {
+      this.fun.awaitTyping().then((res) => {
+        const extra = { afterPath: `filtro/${arg.term}`, parameters: { paginado: false } };
+
+        this.clienteClass.getAll(extra).then((res) => {
+
+          res['data'].map((cliente) => {
+            cliente.documentos_de_identidad.map((docu) => {
+              if (docu.principal) cliente.documento_identidad = docu.documento;
+            });
+            return cliente;
+          });
+
+          this.listaClientes = res['data'];
+
+          // const obj = { total: res['total_registros'], tabla: 'lista_clientes' };
+          // this.tServ.Func_total_paginas(obj);
+        });
+      });
+    } else {
+      this.listaClientes = [];
     }
   }
 
@@ -111,13 +137,23 @@ export class FormVentasComponent extends MixinClass implements OnInit {
         { id: '1', label: 'Dia único' },
         { id: '2', label: 'Rango fechas' },
       ];
+    } else if (this.tipo_reporte === 'cuentas_con_pagos') {
+      this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
+      this.form.controls.hasta.setValue(new Date());
+      this.setValidator('cliente_id');
+      this.setValidator('desde');
+      this.setValidator('hasta');
     } else if (this.tipo_reporte === 'suplidor_prod') {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
+      this.setValidator('desde');
+      this.setValidator('hasta');
     } else if (this.tipo_reporte === 'recibos') {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
       this.form.controls.tipo.setValue('todos');
+      this.setValidator('desde');
+      this.setValidator('hasta');
       this.tipos = [
         { id: 'viajes', label: 'Viajes' },
         { id: 'normal', label: 'Normal' },
@@ -145,6 +181,7 @@ export class FormVentasComponent extends MixinClass implements OnInit {
 
   createForm() {
     this.form = this.fb.group({
+      cliente_id: [null],
       articulo_id: [null],
       tipo: [null],
       condicion: [null],

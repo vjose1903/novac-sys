@@ -222,11 +222,8 @@ export class FunctionService {
   }
 
   decryptConfigPassword(str) {
-    console.log('str ', str);
-
     const str_remplace = btoa(str);
-    console.log('str_remplace ', str_remplace);
-    console.log('_.replace(AppConfig.config_password, VMj$pt30r=, =) ', _.replace(AppConfig.config_password, 'VMj$pt30r=', '='));
+
     return str_remplace == _.replace(AppConfig.config_password, 'VMj$pt30r=', '=');
   }
 
@@ -255,6 +252,9 @@ export class FunctionService {
   }
 
   toastError(msg?, titulo = 'ERROR') {
+    console.log('toy aq1uiiiiiii');
+    console.log('this.canToast ', this.canToast);
+
     if (this.canToast) this.toastr.error(msg || '', titulo || '');
   }
 

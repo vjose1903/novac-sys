@@ -237,6 +237,7 @@
                     <div class="form-group mb-0">
                       <div>
                         <p-dropdown
+                          #dropdown
                           [placeholder]="'Seleccione ingrediente'"
                           [options]="listaMateriasPrimas"
                           formControlName="articulo_id"
@@ -247,7 +248,7 @@
                           filterBy="nombre"
                           (onHide)="saltar('ingrediente_producir', j)"
                           (keydown.enter)="saltar('ingrediente_producir', j)"
-                          (onChange)="getCosto(j)"
+                          (onChange)="getCosto(j, dropdown)"
                           styleClass="form-control min"
                           panelStyleClass="ingredienteDrop"
                           [virtualScroll]="true"

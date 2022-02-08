@@ -9,6 +9,7 @@ import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ReciboC } from '../../recibos';
 import { RecibosService } from '../../recibos.service';
 import { FacturaC } from '../../../facturacion/factura';
+import { PdfService } from '../../../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -77,7 +78,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   facturaClass = new FacturaC();
   debiendo;
 
-  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService) {
+  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService, private pdfServ: PdfService) {
     super();
     this.config.notFoundText = 'Articulo no existe';
   }

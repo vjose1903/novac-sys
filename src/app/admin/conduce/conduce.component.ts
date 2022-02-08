@@ -7,6 +7,7 @@ import { MixinClass } from '../../core/typescript/MixinClass';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { ConduceC } from '../conduce/coduce';
 import { FacturaC } from '../facturacion/factura';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-conduce',
@@ -69,7 +70,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   conduceClass = new ConduceC();
   facturaClass = new FacturaC();
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private pdfServ: PdfService) {
     super();
   }
 

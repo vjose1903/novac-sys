@@ -4,6 +4,7 @@ import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import * as _ from 'lodash';
 import { ReporteC } from './reporte';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-reportes',
@@ -17,7 +18,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   scaleImpresion: any;
   reporteClass = new ReporteC();
 
-  constructor(public loadServ: LoaderService) {
+  constructor(public loadServ: LoaderService, private pdfServ: PdfService) {
     super();
   }
 
@@ -86,7 +87,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     let msg_error = '';
 
     const extra = { afterPath: 'custom', parameters: null };
-    console.log('this.tipoModal--> ', this.tipoModal);
 
     if (this.tipoModal === 'cuadre') {
       this.makeCuadre(data);
@@ -118,12 +118,15 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       extra.parameters = { tipo: data.tipo_ ? data.tipo_ : data.tipo, cliente_id: data.id ? data.id : 1 };
       tipo = 'cuentas_cobrar';
       //
+    } else if (this.tipoModal === 'cuentas_con_pagos') {
+      extra.parameters = { desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false), cliente_id: data.cliente_id };
+      tipo = 'cuentas_con_pagos';
+      //
     } else if (this.tipoModal === 'recibos') {
       extra.parameters = { desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false), tipo_recibo: data.tipo, order: 'ASC' };
       tipo = 'recibos';
       //
     } else if (this.tipoModal === 'ventas_productos') {
-      console.log('data ', data);
       if (data.tipo == '1') extra.parameters = { desde: this.my_dateFormater(data.fecha, false) };
       else extra.parameters = { desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false) };
 
@@ -143,6 +146,8 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     if (continuar) {
       this.reporteClass.getAll(extra).then((res) => {
         this.loadServ.isLoading.next(true);
+        console.log('res -->  ', res);
+
         const obj = { data: res, type: 'reporte' };
 
         this.generarPdf(obj);
@@ -153,38 +158,43 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   generarPdf(obj) {
-    this.pdfServ.generatePdf(obj).then((res) => {
-      this.scaleImpresion = res['scale'] ? res['scale'] : 'noscale';
-      if (res.status === 'si') {
-        let obj;
+    this.pdfServ
+      .generatePdf(obj)
+      .then((res) => {
+        this.scaleImpresion = res['scale'] ? res['scale'] : 'noscale';
+        if (res.status === 'si') {
+          let obj;
 
-        this.pdfSrc = res.body;
-        this.fileName = res.file;
+          this.pdfSrc = res.body;
+          this.fileName = res.file;
 
-        if (res.file === 'cuadre.pdf') {
-          obj = {
-            pdfSrc: res.body,
-            titulo: 'Cuadre de caja',
-            height: '25rem',
-            reimprimir: res.reimprimir,
-            fileName: res.file.split('.')[0],
-          };
-        } else if (res.file === 'reporte.pdf') {
-          obj = {
-            pdfSrc: res.body,
-            titulo: this.titulo_moda_reporte,
-            height: '83vh',
-            reimprimir: res.reimprimir,
-            fileName: res.file.split('.')[0],
-          };
+          if (res.file === 'cuadre.pdf') {
+            obj = {
+              pdfSrc: res.body,
+              titulo: 'Cuadre de caja',
+              height: '25rem',
+              reimprimir: res.reimprimir,
+              fileName: res.file.split('.')[0],
+            };
+          } else if (res.file === 'reporte.pdf') {
+            obj = {
+              pdfSrc: res.body,
+              titulo: this.titulo_moda_reporte,
+              height: '83vh',
+              reimprimir: res.reimprimir,
+              fileName: res.file.split('.')[0],
+            };
+          }
+
+          this.abrirVisorPdf(obj);
+        } else {
+          this.loadServ.isLoading.next(false);
+          this.fun.toastError(res.msg, 'ERROR');
         }
-
-        this.abrirVisorPdf(obj);
-      } else {
+      })
+      .catch((error) => {
         this.loadServ.isLoading.next(false);
-        this.fun.toastError(res.msg, 'ERROR');
-      }
-    });
+      });
   }
 
   formarObjModal(tipo) {
@@ -198,6 +208,8 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     else if (tipo === 'ventas_diarias') this.titulo_moda_reporte = 'Reporte de ventas diarias';
     //
     else if (tipo === 'ventas_rango') this.titulo_moda_reporte = 'Reporte de ventas por fechas';
+    //
+    else if (tipo === 'cuentas_con_pagos') this.titulo_moda_reporte = 'Reporte de facturas a crédito con sus pagos';
     //
     else if (tipo === 'cuentas_cobrar_cliente') {
       this.titulo_moda_reporte = 'Reporte de CxC por cliente';

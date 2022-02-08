@@ -30,14 +30,13 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     public _ipc: IpcService,
     private loaderServ: LoaderService,
     private cdRef: ChangeDetectorRef,
-    public fun: FunctionService,
 
     public zone: NgZone,
     public http: HttpClient,
     public mServ: ModalService,
     public layServ: LayoutService,
-    public pdfServ: PdfService,
     private themeService: ThemeService,
+    public fun: FunctionService,
   ) {}
 
   ngOnInit(): void {
@@ -48,7 +47,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     SingletonService.mServ = this.mServ;
     SingletonService._ipc = this._ipc;
     SingletonService.layServ = this.layServ;
-    SingletonService.pdfServ = this.pdfServ;
 
     this.loaderServ.isLoading.subscribe((v) => {
       this.loading = v;

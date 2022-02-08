@@ -6,6 +6,7 @@ import { MixinClass } from '../../core/typescript/MixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
 import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
 import { ReporteC } from '../reportes/reporte';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-inventario',
@@ -60,7 +61,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   tipoArticuloClass = new TipoArticuloC();
   reporteClass = new ReporteC();
 
-  constructor(private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
     super();
   }
 

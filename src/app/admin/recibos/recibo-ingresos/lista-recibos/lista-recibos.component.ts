@@ -6,6 +6,7 @@ import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
+import { PdfService } from '../../../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-lista-recibos',
@@ -67,7 +68,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   rowSelected: any;
   reciboClass = new ReciboC();
 
-  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
     super();
   }
 

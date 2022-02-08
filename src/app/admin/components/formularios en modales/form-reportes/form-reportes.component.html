@@ -17,7 +17,7 @@
       </select>
     </div>
 
-    <div *ngIf="tipo_reporte === 'suplidor_prod'" class="col-12 {{ tipo_reporte === 'suplidor_prod' ? 'mb-3' : '' }}">
+    <div *ngIf="tipo_reporte === 'suplidor_prod'" class="col-12 mb-3">
       <label class="control-label">Seleccione articulo: <span style="color: red">*</span> </label>
 
       <ng-select
@@ -39,16 +39,35 @@
       </ng-select>
     </div>
 
+    <div *ngIf="tipo_reporte === 'cuentas_con_pagos'" class="col-12">
+      <label class="control-label">Seleccione cliente: <span style="color: red">*</span> </label>
+
+      <ng-select
+        formControlName="cliente_id"
+        [items]="listaClientes"
+        bindLabel="nombre_completo"
+        bindValue="id"
+        [clearable]="true"
+        [appendTo]="'body'"
+        (search)="getClientes($event)"
+        notFoundText="Cliente no encontrado"
+        [disabled]="listaClientes.length === 0"
+      >
+        <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
+          <div>
+            <span class="d-block" style="font-size: 1.2rem"> <strong>Nombre: </strong> {{ item.nombre_completo }} </span>
+            <span class="d-block" style="font-size: 0.93rem; color: #909090"> <strong>documento de identidad</strong> {{ item.documento_identidad }} </span>
+          </div>
+        </ng-template>
+      </ng-select>
+    </div>
+
     <!-- ----- FECHA -----  -->
 
     <div *ngIf="(tipo_reporte === 'ventas_productos' && form.controls.tipo.value === '1') || tipo_reporte === 'cuadre'" class="col-12 mt-3">
       <label class="control-label">Fecha: <span style="color: red">*</span> </label>
       <input type="text" [bsConfig]="dpConfig" placeholder="dd/mm/aaaa" class="form-control" formControlName="fecha" #dp="bsDatepicker" placement="bottom" bsDatepicker />
-      <div
-        class="alerta text-danger ml-1"
-        style="font-size: 12px"
-        *ngIf="!form.controls['fecha'].valid && (form.controls['fecha'].dirty || form.controls['fecha'].touched)"
-      >
+      <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['fecha'].valid && (form.controls['fecha'].dirty || form.controls['fecha'].touched)">
         Este campo es obligatorio
       </div>
     </div>
@@ -59,17 +78,14 @@
         tipo_reporte === 'ventas_rango' ||
         tipo_reporte === 'suplidor_prod' ||
         tipo_reporte === 'recibos' ||
+        tipo_reporte === 'cuentas_con_pagos' ||
         (tipo_reporte === 'ventas_productos' && form.controls.tipo.value === '2')
       "
       class="col-6 mt-3"
     >
       <label class="control-label">Desde: <span style="color: red">*</span> </label>
       <input type="text" [bsConfig]="dpConfig" placeholder="dd/mm/aaaa" class="form-control" formControlName="desde" #dp="bsDatepicker" placement="bottom" bsDatepicker />
-      <div
-        class="alerta text-danger ml-1"
-        style="font-size: 12px"
-        *ngIf="!form.controls['desde'].valid && (form.controls['desde'].dirty || form.controls['desde'].touched)"
-      >
+      <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['desde'].valid && (form.controls['desde'].dirty || form.controls['desde'].touched)">
         Este campo es obligatorio
       </div>
     </div>
@@ -79,17 +95,14 @@
         tipo_reporte === 'ventas_rango' ||
         tipo_reporte === 'suplidor_prod' ||
         tipo_reporte === 'recibos' ||
+        tipo_reporte === 'cuentas_con_pagos' ||
         (tipo_reporte === 'ventas_productos' && form.controls.tipo.value === '2')
       "
       class="col-6 mt-3"
     >
       <label class="control-label">Hasta: <span style="color: red">*</span> </label>
       <input type="text" [bsConfig]="dpConfig" placeholder="dd/mm/aaaa" class="form-control" formControlName="hasta" #dp="bsDatepicker" placement="bottom" bsDatepicker />
-      <div
-        class="alerta text-danger ml-1"
-        style="font-size: 12px"
-        *ngIf="!form.controls['hasta'].valid && (form.controls['hasta'].dirty || form.controls['hasta'].touched)"
-      >
+      <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['hasta'].valid && (form.controls['hasta'].dirty || form.controls['hasta'].touched)">
         Este campo es obligatorio
       </div>
     </div>
