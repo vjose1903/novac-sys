@@ -11,7 +11,8 @@ export function getTablaNormal(configuration, data, index_data?, index_info?) {
 
 export function makeTablaNormal(configuration, data, index_data?, index_info?) {
   const data_ = data.tipo_tabla === 'normal' ? data : data.contenido_reporte[index_data];
-  const contendio_ = data.tipo_tabla === 'normal' ? data.contenido_reporte : data.contenido_reporte[index_data].contenido_grupo;
+
+  const contendio_ = data.tipo_tabla === 'normal' ? data_.contenido_reporte : index_info == 0 ? data_.contenido_titulo : data_.contenido_grupo;
 
   const titulos = [];
   const body = [];
@@ -19,7 +20,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
   configuration.info.forEach((titulo_config, i) => {
     try {
       const obj_titulo = {
-        text: configuration.only_titulo ? data_[titulo_config.key] : titulo_config.text,
+        text: configuration.only_titulo ? contendio_ : titulo_config.text,
         alignment: titulo_config.alignment_titulo,
         style: titulo_config.style,
         bold: true,
@@ -34,19 +35,24 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
     }
   });
 
-  if (contendio_.length > 0 || configuration.only_titulo) {
-    body.push(titulos as TablaRowPdfMake);
-  }
-
-  if (contendio_.length > 0 && !configuration.only_titulo) {
+  // if (contendio_.length > 0 || configuration.only_titulo) body.push(titulos as TablaRowPdfMake);
+  body.push(titulos as TablaRowPdfMake);
+  let longitud_cuerpo = 0;
+  if (!configuration.only_titulo) {
     contendio_.forEach((detalle, j) => {
+      longitud_cuerpo += 1;
       const row = formarCuerpo(data, configuration, detalle, j);
       body.push(row as TablaRowPdfMake);
     });
   }
 
+  if (configuration.only_titulo || (Array.isArray(contendio_) && contendio_.length > 0)) {
+    console.log('===== CONTENIDO NO VACIO =====');
+  } else {
+    console.log('===== MENSAJE CONTENIDO VACIO =====');
+  }
   var content = [
-    contendio_.length > 0 || configuration.only_titulo
+    configuration.only_titulo || (Array.isArray(contendio_) && contendio_.length > 0)
       ? ({
           table: {
             headerRows: 1,
@@ -77,9 +83,9 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
             },
           },
         } as TablaPdfMake)
-      : { text: '' },
+      : { text: configuration.mensaje_contenido_vacio, margin: [0, 2, 0, 5] },
 
-    configuration.mostrar_total && data.total > 0.99999
+    configuration.mostrar_total && data.total >= 1
       ? {
           stack: [
             {
@@ -120,7 +126,6 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
         }
       : { text: '' },
   ];
-
   return content;
 }
 

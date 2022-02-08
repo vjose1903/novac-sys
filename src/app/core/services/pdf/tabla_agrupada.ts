@@ -7,15 +7,15 @@ export function getContentWithTablaAgrupada(configuracion, data) {
   for (let i = 0; i < data.contenido_reporte.length; i++) {
     // const detalle = data.contenido_reporte[i];
     let cont_ = [];
-
     for (let j = 0; j < configuracion.info.length; j++) {
       const config = configuracion.info[j];
-      cont_.push(getTablaNormal(config, data, i, j));
+      const tabla = getTablaNormal(config, data, i, j);
+      cont_.push(tabla);
     }
     if (i > 0) cont_ = [getRaya(configuracion), ...cont_];
 
-    if (data.contenido_reporte[i].titulo_grupo === 'TOTAL GENERAL') {
-      content.push({ stack: cont_, unbreakable: true, });
+    if (data.contenido_reporte[i].contenido_titulo === 'TOTAL GENERAL') {
+      content.push({ stack: cont_, unbreakable: true });
     } else {
       content.push(cont_);
     }
@@ -27,14 +27,18 @@ export function getContentWithTablaAgrupada(configuracion, data) {
 function getRaya(configuracion) {
   const pageO = configuracion['pageOrient'] ? configuracion['pageOrient'] : 'portrait';
   return {
-    canvas: [
+    stack: [
       {
-        type: 'rect',
-        x: 0,
-        y: 0,
-        w: pageO === 'portrait' ? 575 : 823,
-        h: 1.5,
-        color: '#000000',
+        canvas: [
+          {
+            type: 'rect',
+            x: 0,
+            y: 0,
+            w: pageO === 'portrait' ? 575 : 823,
+            h: 2,
+            color: '#000000',
+          },
+        ],
       },
     ],
   };

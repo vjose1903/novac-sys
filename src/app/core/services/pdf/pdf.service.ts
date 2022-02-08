@@ -47,13 +47,16 @@ export class PdfService {
             break;
 
           case 'reporte':
+            this.fun.logRed('<-- ENTRE --> ');
             obj = reportes.makeReporte(data);
+            this.fun.logRed('<-- SALI --> ');
             break;
 
           default:
             todo_true = false;
             break;
         }
+        this.fun.logGreen('todo_true --> ', todo_true);
 
         if (todo_true) {
           const dd = obj.doc;

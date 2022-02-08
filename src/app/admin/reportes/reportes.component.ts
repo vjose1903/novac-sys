@@ -146,7 +146,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     if (continuar) {
       this.reporteClass.getAll(extra).then((res) => {
         this.loadServ.isLoading.next(true);
-        console.log('res -->  ', res);
 
         const obj = { data: res, type: 'reporte' };
 
