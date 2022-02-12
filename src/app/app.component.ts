@@ -106,14 +106,14 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
     const task = new MessageTask(KEYWORD_ELECTRON_EVENT_ENCRYPT, { hola: 'mundo' });
 
-    this._ipc.sendTask(task).then(
-      (res: string) => {
+    this._ipc
+      .sendTask(task)
+      .then((res: string) => {
         this.probandoDesEncriptar(res);
-      },
-      (err) => {
-        console.log('err:: ', err);
-      },
-    );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   async probandoDesEncriptar(strEncripted: string) {
@@ -121,14 +121,14 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
     const task = new MessageTask(KEYWORD_ELECTRON_EVENT_DECRYPT, strEncripted);
 
-    this._ipc.sendTask(task).then(
-      (res) => {
+    this._ipc
+      .sendTask(task)
+      .then((res) => {
         console.log('res decript:: ', res);
-      },
-      (err) => {
+      })
+      .catch((err) => {
         console.log('err:: ', err);
-      },
-    );
+      });
   }
 
   ngAfterViewInit(): void {

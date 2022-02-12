@@ -97,6 +97,7 @@ export class IpcService {
 
         try {
           const resultado = await lastValueFrom(task.fn.pipe(skip(1), take(1)));
+
           resolve(resultado);
         } catch (error) {
           reject(error);
