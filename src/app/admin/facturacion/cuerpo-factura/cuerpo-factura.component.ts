@@ -732,7 +732,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
       (this.filasDetalle[index] as any).controls['uni'].setValue(null);
 
       if (this.metodo === 'venta') {
-        const objConditions = { si: { value: true, func: 'disable' }, no: { value: false, func: 'disable' } };
+        const objConditions = { si: { value: true, func: 'disable' }, no: { value: false, func: 'enable' } };
 
         const condition = ARTICULO.descripcion === 'Materia prima' ? 'si' : 'no';
 
