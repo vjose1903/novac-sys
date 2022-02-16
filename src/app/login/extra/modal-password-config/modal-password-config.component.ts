@@ -30,6 +30,7 @@ export class ModalPasswordConfigComponent extends MixinClass implements OnInit {
   }
 
   btn_aceptar() {
+    this.fun.nextCanToast(true);
     let data = this.form.getRawValue();
 
     const is_correct = this.fun.decryptConfigPassword(data.password);
@@ -38,8 +39,10 @@ export class ModalPasswordConfigComponent extends MixinClass implements OnInit {
       const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
       modal.closeModal(this.modal.component_id);
       modal.getDataModal({ error: false });
+      setTimeout(() => this.fun.nextCanToast(false), 2000);
     } else {
       this.fun.toastError('Contraseña Incorrecta', 'ERROR');
+      setTimeout(() => this.fun.nextCanToast(false), 2000);
     }
   }
 }

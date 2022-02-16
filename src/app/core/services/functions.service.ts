@@ -4,7 +4,6 @@ import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 import { GLOBAL } from '../typescript/GLOBAL';
 import { ConfigurationService } from './configuration.service';
-import { SingletonService } from './singleton.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,8 +12,8 @@ export class FunctionService {
   canToast = false;
 
   currentUser = null;
-  configServ = SingletonService.configServ;
-  constructor(private toastr: ToastrService) {}
+  // configServ: ConfigurationService;
+  constructor(private toastr: ToastrService, public configServ: ConfigurationService) {}
 
   nextCanToast(nextValue) {
     this.canToast = nextValue;
@@ -237,11 +236,6 @@ export class FunctionService {
   decryptConfigPassword(str) {
     const str_remplace = btoa(str);
     const config = this.configServ.getConfig({ isPromise: false });
-    console.log('str_remplace --> ', str_remplace);
-    console.log('config ', config.config_password);
-
-    console.log("_.replace(config.config_password, 'VMj$pt30r=', '=') ", _.replace(config.config_password, 'VMj$pt30r=', '='));
-
     return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
   }
 
@@ -270,9 +264,6 @@ export class FunctionService {
   }
 
   toastError(msg?, titulo = 'ERROR') {
-    console.log('toy aq1uiiiiiii');
-    console.log('this.canToast ', this.canToast);
-
     if (this.canToast) this.toastr.error(msg || '', titulo || '');
   }
 

@@ -32,13 +32,13 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     private loaderServ: LoaderService,
     private cdRef: ChangeDetectorRef,
 
+    public fun: FunctionService,
     public zone: NgZone,
     public http: HttpClient,
     public mServ: ModalService,
     public layServ: LayoutService,
     public configServ: ConfigurationService,
     private themeService: ThemeService,
-    public fun: FunctionService,
   ) {}
 
   ngOnInit(): void {
