@@ -1,9 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../../core/javascript/moment';
-import { AppConfig } from '../../../../../environments/environment';
 
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
+import { SingletonService } from '../../../../core/services/singleton.service';
 @Component({
   selector: 'app-formar-factura',
   templateUrl: './formar-factura.component.html',
@@ -11,8 +11,9 @@ import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 })
 export class FormarFacturaComponent implements OnInit {
   @Input() factura;
-  num_telefono = AppConfig.num_telefono;
-  rnc = AppConfig.rnc;
+  num_telefono;
+  rnc;
+  configServ = SingletonService.configServ;
   constructor() {}
 
   ngOnInit() {
@@ -24,6 +25,10 @@ export class FormarFacturaComponent implements OnInit {
     //   ...this.factura.detalle_facturas,
     //   ...this.factura.detalle_facturas,
     // ];
+    this.configServ.getConfig().then((config) => {
+      this.num_telefono = config.telefono_empresa;
+      this.rnc = config.rnc_empresa;
+    });
   }
 
   formatoNumero(num) {

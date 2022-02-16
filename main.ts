@@ -8,9 +8,17 @@ const { exec } = require('child_process');
 const autoUpdater = require('electron-updater').autoUpdater;
 const express = require('express');
 
-import { AppConfig } from './src/environments/environment.js';
-import { KEYWORD_ELECTRON_EVENT_DECRYPT, KEYWORD_ELECTRON_EVENT_ENCRYPT, KEYWORD_ELECTRON_RESPONSE, KEYWORD_ELECTRON_SENDER, MessageTaskInterface } from './shared-electron-angular.js';
+import {
+  KEYWORD_ELECTRON_EVENT_DECRYPT,
+  KEYWORD_ELECTRON_EVENT_ENCRYPT,
+  KEYWORD_ELECTRON_GET_APP_CONFIG,
+  KEYWORD_ELECTRON_RESPONSE,
+  KEYWORD_ELECTRON_SENDER,
+  KEYWORD_ELECTRON_SET_APP_CONFIG,
+  MessageTaskInterface,
+} from './shared-electron-angular.js';
 import Functions from './functions.js';
+import HandlerConfigFile from './handler-config-file';
 
 let win: BrowserWindow = null;
 
@@ -114,6 +122,8 @@ function createWindow(): BrowserWindow {
 
   verificarSumastra();
   borrarLogs();
+
+  HandlerConfigFile.checkConfigFile();
 
   win.setMenuBarVisibility(false);
 
@@ -221,7 +231,7 @@ autoUpdater.on('error', (error) => {
 // ==========================================================================================================================================================
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// OBTENER LOS NOMBRES DE LAS IMPRESORAS DEL SISTEMA
+// Handle angular events
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ipcMain.on(KEYWORD_ELECTRON_SENDER, handleEvent);
 
@@ -274,11 +284,27 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
         arg.response = res;
         event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
         break;
+      //
       case KEYWORD_ELECTRON_EVENT_ENCRYPT:
         var res = Functions.encriptar(arg.data);
         arg.response = res;
         event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
         break;
+      //
+      case KEYWORD_ELECTRON_GET_APP_CONFIG:
+        Functions.getConfigFile().then((config: any) => {
+          arg.response = JSON.parse(config);
+          event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+        });
+        break;
+      //
+      case KEYWORD_ELECTRON_SET_APP_CONFIG:
+        Functions.setConfigFile(arg.data).then(() => {
+          arg.response = 'LISTO';
+          event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+        });
+        break;
+      //
       default:
         event.reply(KEYWORD_ELECTRON_RESPONSE);
         break;
@@ -393,8 +419,8 @@ async function borrado_de_archivos_malos(archivos, callback = (arg) => {}) {
 
 async function verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_no_extension, descomprimir, is_carpeta, nombre_err, counter) {
   let descargar_archivo = false;
-
   let md5_servidor;
+
   cmd(`ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public${paht_server}"`, async (res_servidor) => {
     if (res_servidor.status) {
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
@@ -459,49 +485,53 @@ function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5
 
 async function procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta) {
   let descarga_exito = true;
+  const confTemp = (await Functions.getConfigFile()) as any;
+  const conf = JSON.parse(confTemp);
 
-  await downloadFile(`${AppConfig.url_descargas}${paht_server}`, path_local_content, path_local_extension, (res) => {
-    if (res.status) {
-      const command =
-        process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+  if (conf.url_servidor_descargas) {
+    await downloadFile(`${conf.url_servidor_descargas}${paht_server}`, path_local_content, path_local_extension, (res) => {
+      if (res.status) {
+        const command =
+          process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
-      cmd(command, (res_local_before_descarga) => {
-        if (res_local_before_descarga.status) {
-          const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
-          if (md5_servidor === md5_local) {
-            if (descomprimir) {
-              esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, (res) => {
-                if (res.status) {
-                } else {
-                  win.webContents.send('err_descarga', {
-                    msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
-                    status: 'no',
-                  });
-                  return;
-                }
-              });
+        cmd(command, (res_local_before_descarga) => {
+          if (res_local_before_descarga.status) {
+            const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
+            if (md5_servidor === md5_local) {
+              if (descomprimir) {
+                esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, (res) => {
+                  if (res.status) {
+                  } else {
+                    win.webContents.send('err_descarga', {
+                      msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
+                      status: 'no',
+                    });
+                    return;
+                  }
+                });
+              }
+            } else {
+              descarga_exito = false;
             }
           } else {
-            descarga_exito = false;
+            retornarMensajeErrorVeiricandoElementos(nombre_err);
           }
-        } else {
-          retornarMensajeErrorVeiricandoElementos(nombre_err);
-        }
-      });
-    } else {
-      descarga_exito = false;
-    }
-  });
+        });
+      } else {
+        descarga_exito = false;
+      }
+    });
 
-  if (!descarga_exito) {
-    counter++;
-    if (counter <= 3) {
-      verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_no_extension, descomprimir, is_carpeta, nombre_err, counter);
-    } else {
-      win.webContents.send('err_descarga', {
-        msg: `Error descargando archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Victor Jose Vasquez Santos.`,
-        status: 'no',
-      });
+    if (!descarga_exito) {
+      counter++;
+      if (counter <= 3) {
+        verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_no_extension, descomprimir, is_carpeta, nombre_err, counter);
+      } else {
+        win.webContents.send('err_descarga', {
+          msg: `Error descargando archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Victor Jose Vasquez Santos.`,
+          status: 'no',
+        });
+      }
     }
   }
 }

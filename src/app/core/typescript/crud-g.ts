@@ -91,7 +91,8 @@ export class CrudG<T> {
   }
 
   makeUrl(tipo, args?, id = null) {
-    let url = `${AppConfig.url_server}${this.fun.hasValue(this.path) ? `/${this.path}` : ''}`;
+    const configApp = SingletonService.configServ.getConfig({ isPromise: false });
+    let url = `${AppConfig.production ? configApp.url_servidor : AppConfig.url_server}${this.fun.hasValue(this.path) ? `/${this.path}` : ''}`;
 
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';
 
@@ -130,3 +131,4 @@ export class CrudG<T> {
     return headers;
   }
 }
+0;

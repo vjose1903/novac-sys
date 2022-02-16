@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from './utils/funciones';
-import { logoADM, styles_ } from './utils/files';
-import { AppConfig } from '../../../../environments/environment';
+import { styles_ } from './utils/files';
 import * as numLetra from './utils/numero_letras';
+import { SingletonService } from '../singleton.service';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
@@ -23,15 +23,17 @@ export function makeFacturaVenta(data) {
   const is_contado = data.condicion === 'Contado' ? true : false;
   const is_nota = data.FACTURA_DE === 'nota' ? true : false;
 
+  const configApp = SingletonService.configServ.getConfig({ isPromise: false });
+
   const dd = {
     pageSize: is_contado ? { width: 990, height: 398 } : { width: 990, height: 796 },
     pageMargins: getPageMargin(is_contado),
     header: (currentPage, pageCount, pageSize) => {
-      return cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, pageCount);
+      return cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, pageCount, configApp);
     },
     content: contenidoFacturaVenta(data, is_nota, is_contado, is_venta),
     images: {
-      logo: logoADM,
+      logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
   };
@@ -48,7 +50,7 @@ export function makeFacturaVenta(data) {
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, pageCount) {
+function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, pageCount, configApp) {
   const header = [
     {
       columns: [
@@ -110,9 +112,9 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
         {
           text: [
             { text: 'Telefono: ', style: 'letra11  ' },
-            { text: AppConfig.num_telefono + ' ', style: 'letra11' },
+            { text: configApp.telefono_empresa + ' ', style: 'letra11' },
             { text: ' RNC: ', bold: true, style: 'letra11' },
-            { text: AppConfig.rnc, style: 'letra11' },
+            { text: configApp.rnc_empresa, style: 'letra11' },
           ],
           alignment: 'center',
         },

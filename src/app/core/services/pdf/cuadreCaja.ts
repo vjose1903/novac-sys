@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from './utils/funciones';
-import { logoADM, styles_ } from './utils/files';
-import { AppConfig } from '../../../../environments/environment';
+import { styles_ } from './utils/files';
+import { SingletonService } from '../singleton.service';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 
 export function makeCuadre(data) {
+  const configApp = SingletonService.configServ.getConfig({ isPromise: false });
   try {
     const dd = {
       pageSize: { width: 990, height: 398 },
       pageMargins: [0, 159.5, 0, 30],
-      header: cabeceraReporte(data),
+      header: cabeceraReporte(data, configApp),
       content: contenidoReporte(data),
       footer: (currentPage, pageCount) => {
         return [
@@ -24,7 +25,7 @@ export function makeCuadre(data) {
         ];
       },
       images: {
-        logo: logoADM,
+        logo: `data:image/png;base64,${configApp.logo_impresion}`,
       },
       styles: styles_,
     };
@@ -43,7 +44,7 @@ export function makeCuadre(data) {
 // ====================================================================================================================================================
 // CABECERA
 // ====================================================================================================================================================
-function cabeceraReporte(data) {
+function cabeceraReporte(data, configApp) {
   try {
     const header = [
       {
@@ -74,9 +75,9 @@ function cabeceraReporte(data) {
                 {
                   text: [
                     { text: 'Telefono: ', style: 'letra11', bold: true },
-                    { text: AppConfig.num_telefono + ' ', style: 'letra11' },
+                    { text: configApp.telefono_empresa + ' ', style: 'letra11' },
                     { text: ' RNC: ', style: 'letra11', bold: true },
-                    { text: AppConfig.rnc, style: 'letra11' },
+                    { text: configApp.rnc_empresa, style: 'letra11' },
                   ],
                   alignment: 'center',
                 },

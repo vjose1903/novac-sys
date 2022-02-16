@@ -742,6 +742,8 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
       this.cancelarConduce(2);
       this.pdfServ.generatePdf(obj).then((res) => {
+        console.log('res', res);
+
         if (res.status === 'si') {
           const objBase = { base64: res.body, filename: res.file, type: 'conduce' };
           this._ipc.send('printBase64', objBase);

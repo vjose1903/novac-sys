@@ -1,7 +1,7 @@
 {
   "productName": "adm-agroindustrial",
   "directories": {
-    "output": "release/"
+    "output": "actualizacion/"
   },
   "files": [
     "**/*",

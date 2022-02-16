@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/indent */
-import { logoADM, styles_ } from './utils/files';
+import { styles_ } from './utils/files';
 import { getConfiguration } from './configuracion_tablas';
 import { getContentWithTablaNormal } from './tabla_normal';
 import { getContentWithTablaAgrupada } from './tabla_agrupada';
-import { AppConfig } from '../../../../environments/environment';
+import { SingletonService } from '../singleton.service';
 
 // ==========================================================================================================================================================
 // UNIR REPORTE
@@ -12,12 +12,13 @@ import { AppConfig } from '../../../../environments/environment';
 export function makeReporte(data) {
   const configuration = getConfiguration(data.tipo_reporte);
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
+  const configApp = SingletonService.configServ.getConfig({ isPromise: false });
 
   const dd = {
     // pageSize: { width: 990, height: 398 },
     pageMargins: [10, data.mostrar_sub_titulo ? 125 : 111.5, 10, 30],
     pageOrientation: pageO,
-    header: cabeceraReporte(data, configuration),
+    header: cabeceraReporte(data, configuration, configApp),
     content: contenidoReporte(data, configuration),
     footer: (currentPage, pageCount) => {
       return [
@@ -30,7 +31,7 @@ export function makeReporte(data) {
       ];
     },
     images: {
-      logo: logoADM,
+      logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
   };
@@ -39,7 +40,7 @@ export function makeReporte(data) {
     doc: dd,
     file: 'reporte.pdf',
     type: 'base64',
-    scale: configuration['pageOrient'] ? (configuration['pageOrient'] === 'landscape' ? 'fit' : 'noscale') : 'noscale'
+    scale: configuration['pageOrient'] ? (configuration['pageOrient'] === 'landscape' ? 'fit' : 'noscale') : 'noscale',
   };
 
   return obj;
@@ -48,7 +49,7 @@ export function makeReporte(data) {
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraReporte(data, configuration) {
+function cabeceraReporte(data, configuration, configApp) {
   const header = (currentPage, pageCount) => {
     const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
     const pag = currentPage.toString() + ' de ' + pageCount;
@@ -75,9 +76,9 @@ function cabeceraReporte(data, configuration) {
                 {
                   text: [
                     { text: 'Telefono: ', style: 'letra9', bold: true },
-                    { text: AppConfig.num_telefono, style: 'letra9' },
+                    { text: configApp.telefono_empresa, style: 'letra9' },
                     { text: ' RNC: ', style: 'letra9', bold: true },
-                    { text: AppConfig.rnc, style: 'letra9' },
+                    { text: configApp.rnc_empresa, style: 'letra9' },
                   ],
                   alignment: 'center',
                 },
@@ -125,10 +126,10 @@ function cabeceraReporte(data, configuration) {
       },
       data.mostrar_sub_titulo
         ? {
-          text: data.sub_titulo,
-          style: 'letra10',
-          margin: [15, 10, 0, 0],
-        }
+            text: data.sub_titulo,
+            style: 'letra10',
+            margin: [15, 10, 0, 0],
+          }
         : { text: '' },
 
       {

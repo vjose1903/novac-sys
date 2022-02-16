@@ -17,12 +17,11 @@ import {
   venta_credito_consumo,
 } from '../../assets/facturas';
 
-import { FunctionService } from '../core/services/functions.service';
 import { ModalService } from '../admin/components/modal/modal.service';
 import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
-import { AppConfig } from '../../environments/environment';
+import { SingletonService } from '../core/services/singleton.service';
 
 @Component({
   selector: 'app-login',
@@ -35,9 +34,10 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   errorU = '';
   versionApp = '';
   tipo_prueba = 'otro';
-  imgLogo = AppConfig.imgLogo;
+  imgLogo;
 
   requestClass = new RequestC();
+  configServ = SingletonService.configServ;
 
   constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public mServ: ModalService, public pdfServ: PdfService) {
     super();
@@ -52,6 +52,9 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
     });
 
     this.searchVersion();
+    this.configServ.getConfig().then((config) => {
+      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+    });
   }
 
   abrirModalReporte(obj) {

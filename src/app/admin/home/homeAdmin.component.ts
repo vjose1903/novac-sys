@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GLOBAL } from '../../core/typescript/GLOBAL';
 import { MixinClass } from '../../core/typescript/MixinClass';
-import { AppConfig } from '../../../environments/environment';
+import { SingletonService } from '../../core/services/singleton.service';
 
 @Component({
   selector: 'app-homeAdmin',
@@ -14,7 +14,8 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
     super();
   }
 
-  imgLogo = AppConfig.imgLogo;
+  imgLogo;
+  configServ = SingletonService.configServ;
 
   initCambioMenu(arg) {
     if (arg.bool) {
@@ -25,7 +26,12 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   cedula = null;
   ngOnInit() {
     this._init_mixin({ component: 'home' });
+
+    this.configServ.getConfig().then((config) => {
+      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+    });
   }
+
   ngOnDestroy() {
     this._destroy_mixin();
   }

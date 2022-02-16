@@ -2,16 +2,15 @@ import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, Afte
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
 import { GLOBAL } from './core/typescript/GLOBAL';
-import { AppConfig } from '../environments/environment';
 import { FunctionService } from './core/services/functions.service';
 import { SingletonService } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { ModalService } from './admin/components/modal/modal.service';
 import { LayoutService } from './admin/layout/layout.service';
-import { PdfService } from './core/services/pdf/pdf.service';
+import { ConfigurationI, ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
 import { MessageTask } from './core/models/message-task';
-import { KEYWORD_ELECTRON_EVENT_DECRYPT, KEYWORD_ELECTRON_EVENT_ENCRYPT } from '../../shared-electron-angular';
+import { KEYWORD_ELECTRON_EVENT_DECRYPT, KEYWORD_ELECTRON_EVENT_ENCRYPT, KEYWORD_ELECTRON_GET_APP_CONFIG } from '../../shared-electron-angular';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +21,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   loading = false;
   objProgress;
   visible = false;
-  imgLogo = AppConfig.imgLogo;
+  imgLogo;
   tiempo_restante;
   objPercent;
 
@@ -37,6 +36,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     public http: HttpClient,
     public mServ: ModalService,
     public layServ: LayoutService,
+    public configServ: ConfigurationService,
     private themeService: ThemeService,
     public fun: FunctionService,
   ) {}
@@ -45,6 +45,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     SingletonService.fun = this.fun;
     SingletonService.zone = this.zone;
     SingletonService.http = this.http;
+    SingletonService.configServ = this.configServ;
 
     SingletonService.mServ = this.mServ;
     SingletonService._ipc = this._ipc;
@@ -97,10 +98,26 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
       this.zone.run(() => (this.visible = false));
     });
 
-    this.getPrintersName();
-    this.probandoEncriptar();
+    // this.getPrintersName();
+    // this.probandoEncriptar();
+    this.getAppConfig();
   }
 
+  async getAppConfig() {
+    const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
+    this._ipc
+      .sendTask(task)
+      .then((config: ConfigurationI) => {
+        console.log('config ', config);
+        this.themeService.setTheme(config.color_app);
+        this.configServ.setConfig = config;
+
+        this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
   async probandoEncriptar() {
     console.log('----- probandoEncriptar -----');
 
@@ -132,7 +149,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   }
 
   ngAfterViewInit(): void {
-    this.themeService.setTheme('green');
     // this.themeService.setTheme('blue');
     // this.themeService.setTheme('red');
   }

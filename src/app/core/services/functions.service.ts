@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
-import { AppConfig } from '../../../environments/environment';
 import { GLOBAL } from '../typescript/GLOBAL';
+import { ConfigurationService } from './configuration.service';
+import { SingletonService } from './singleton.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,7 @@ export class FunctionService {
   canToast = false;
 
   currentUser = null;
-
+  configServ = SingletonService.configServ;
   constructor(private toastr: ToastrService) {}
 
   nextCanToast(nextValue) {
@@ -235,8 +236,13 @@ export class FunctionService {
 
   decryptConfigPassword(str) {
     const str_remplace = btoa(str);
+    const config = this.configServ.getConfig({ isPromise: false });
+    console.log('str_remplace --> ', str_remplace);
+    console.log('config ', config.config_password);
 
-    return str_remplace == _.replace(AppConfig.config_password, 'VMj$pt30r=', '=');
+    console.log("_.replace(config.config_password, 'VMj$pt30r=', '=') ", _.replace(config.config_password, 'VMj$pt30r=', '='));
+
+    return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
   }
 
   logBlue(text: any, body?) {

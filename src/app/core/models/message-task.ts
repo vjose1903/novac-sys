@@ -10,10 +10,12 @@ export class MessageTask {
   fun = SingletonService.fun;
   fn = new BehaviorSubject<any>({});
 
-  constructor(eventName: string, data: string | object) {
+  constructor(eventName: string, data: string | object = '') {
+    console.log('eventName --> ', eventName);
+
     this.id = this.generateKey();
     this.eventName = eventName;
-    this.data = JSON.stringify(data);
+    this.data = typeof data === 'string' ? data : JSON.stringify(data);
   }
 
   generateDataKey(arrRes: any, hash?: any): any {

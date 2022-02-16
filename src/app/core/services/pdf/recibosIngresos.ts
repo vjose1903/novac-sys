@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as numLetra from './utils/numero_letras';
 import * as fun_ from './utils/funciones';
-import { logoADM, styles_ } from './utils/files';
-import { AppConfig } from '../../../../environments/environment';
+import { styles_ } from './utils/files';
+import { SingletonService } from '../singleton.service';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 
 export function makeRecibo(data) {
+  const configApp = SingletonService.configServ.getConfig({ isPromise: false });
   const dd = {
     pageSize: { width: 990, height: 398 },
     pageMargins: [0, 164, 0, 30],
-    header: cabeceraRecibo(data),
+    header: cabeceraRecibo(data, configApp),
     content: contenidoRecibo(data),
     footer: (currentPage, pageCount) => {
       return [
@@ -24,7 +25,7 @@ export function makeRecibo(data) {
       ];
     },
     images: {
-      logo: logoADM,
+      logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
   };
@@ -40,7 +41,7 @@ export function makeRecibo(data) {
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraRecibo(data) {
+function cabeceraRecibo(data, configApp) {
   const rncCliente = data.cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
   const numero_letra = numLetra.NumeroALetras(data.total);
 
@@ -98,9 +99,9 @@ function cabeceraRecibo(data) {
         {
           text: [
             { text: 'Telefono: ', style: 'letra11', bold: true },
-            { text: AppConfig.num_telefono + ' ', style: 'letra11' },
+            { text: configApp.telefono_empresa + ' ', style: 'letra11' },
             { text: ' RNC: ', bold: true, style: 'letra11' },
-            { text: AppConfig.rnc, style: 'letra11' },
+            { text: configApp.rnc_empresa, style: 'letra11' },
           ],
           alignment: 'center',
         },

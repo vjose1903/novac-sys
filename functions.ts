@@ -14,30 +14,32 @@ export default class Functions {
     return deflated;
   }
 
-  static getConfigFile(): string {
-    let pathConfig = pathAdd(`/app_config.config`);
-    console.log(' dirconfig ::::: ', pathConfig);
+  static getConfigFile() {
+    return new Promise((resolve, reject) => {
+      let pathConfig = pathAdd(`/app_config.config`);
 
-    if (fs.existsSync(pathConfig)) {
-      var res = fs.readFileSync(pathConfig, 'utf-8');
-      var decript = this.desEncriptar(res);
-      return decript;
-    } else {
-      return '{}';
-    }
+      if (fs.existsSync(pathConfig)) {
+        var res = fs.readFileSync(pathConfig, 'utf-8');
+        var decript = this.desEncriptar(res);
+        resolve(decript);
+      } else {
+        resolve('{}');
+      }
+    });
   }
 
-  static setConfigFile(data: string): boolean {
-    try {
-      let pathConfig = pathAdd(`/app_config.config`);
-      console.log(' dirconfig ::::: ', pathConfig);
+  static setConfigFile(data: string) {
+    return new Promise((resolve, reject) => {
+      try {
+        let pathConfig = pathAdd(`/app_config.config`);
 
-      var encripted = this.encriptar(data);
-      fs.writeFileSync(pathConfig, encripted, { encoding: 'utf-8' });
-      return true;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
+        var encripted = this.encriptar(data);
+        fs.writeFileSync(pathConfig, encripted, { encoding: 'utf-8' });
+        resolve(true);
+      } catch (error) {
+        console.error(error);
+        reject(false);
+      }
+    });
   }
 }

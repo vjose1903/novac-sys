@@ -17,31 +17,34 @@ var Functions = /** @class */ (function () {
         return deflated;
     };
     Functions.getConfigFile = function () {
-        var pathConfig = (0, main_1.pathAdd)("/app_config.config");
-        console.log(' dirconfig ::::: ', pathConfig);
-        if (fs.existsSync(pathConfig)) {
-            var res = fs.readFileSync(pathConfig, 'utf-8');
-            var decript = this.desEncriptar(res);
-            return decript;
-        }
-        else {
-            return '{}';
-        }
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var pathConfig = (0, main_1.pathAdd)("/app_config.config");
+            if (fs.existsSync(pathConfig)) {
+                var res = fs.readFileSync(pathConfig, 'utf-8');
+                var decript = _this.desEncriptar(res);
+                resolve(decript);
+            }
+            else {
+                resolve('{}');
+            }
+        });
     };
     Functions.setConfigFile = function (data) {
-        try {
-            var pathConfig = (0, main_1.pathAdd)("/app_config.config");
-            console.log(' dirconfig ::::: ', pathConfig);
-            var encripted = this.encriptar(data);
-            fs.writeFileSync(pathConfig, encripted, { encoding: 'utf-8' });
-            return true;
-        }
-        catch (error) {
-            console.log(error);
-            return false;
-        }
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            try {
+                var pathConfig = (0, main_1.pathAdd)("/app_config.config");
+                var encripted = _this.encriptar(data);
+                fs.writeFileSync(pathConfig, encripted, { encoding: 'utf-8' });
+                resolve(true);
+            }
+            catch (error) {
+                console.error(error);
+                reject(false);
+            }
+        });
     };
     return Functions;
 }());
 exports.default = Functions;
-//# sourceMappingURL=functions.js.map
