@@ -7,7 +7,7 @@ import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
-import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../../shared-electron-angular';
+import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../../electron/shared-electron-angular';
 
 @Component({
   selector: 'app-lista-recibos',

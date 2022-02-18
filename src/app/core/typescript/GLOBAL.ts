@@ -1,6 +1,8 @@
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import * as _ from 'lodash';
 
+export const ELECTRON_EVENTS_OBSERVER = new BehaviorSubject<any>(null);
+
 export function applyMixins(derivedCtor: any, constructors: any[]) {
   constructors.forEach((baseCtor) => {
     Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {

@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 
-import { pathAdd } from './main';
+import { pathAdd } from '../main';
 import Functions from './functions.js';
-const logos = require('./logos.json');
+const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
   static default_config = {

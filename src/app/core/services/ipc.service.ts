@@ -3,8 +3,9 @@ import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import { BehaviorSubject, lastValueFrom, skip, take } from 'rxjs';
 import * as fs from 'fs';
-import { KEYWORD_ELECTRON_RESPONSE, KEYWORD_ELECTRON_SENDER, MessageTaskInterface } from '../../../../shared-electron-angular';
+import { KEYWORD_ELECTRON_RESPONSE, KEYWORD_ELECTRON_SENDER, MessageTaskInterface } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
+import { ELECTRON_EVENTS_OBSERVER } from '../typescript/GLOBAL';
 
 @Injectable({
   providedIn: 'root',
@@ -56,12 +57,13 @@ export class IpcService {
 
   public on(channel: string, listener: any): void {
     if (!this._ipc) return;
-
     this._ipc.on(channel, listener);
   }
 
   listenEvents() {
     this._ipc.on(KEYWORD_ELECTRON_RESPONSE, (event, obj) => {
+      console.error('obj ', obj);
+
       const arg = typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface);
       const tareas = this.colaDeMensajes.value;
 
@@ -71,6 +73,9 @@ export class IpcService {
         tareas[arg.id] = undefined;
         // console.log(":listenEvents:::DESPUES DE EJECUTAR ACCION:::", JSON.stringify(tareas));
         this.updateColaMensaje(tareas);
+      } else {
+        ELECTRON_EVENTS_OBSERVER.next(obj);
+        console.log('entra aqui');
       }
     });
   }

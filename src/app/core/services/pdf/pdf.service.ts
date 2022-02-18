@@ -11,7 +11,7 @@ import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
 import { SingletonService } from '../singleton.service';
 import { MessageTask } from '../../models/message-task';
-import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../shared-electron-angular';
+import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
 
 @Injectable({
   providedIn: 'root',

@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
-import { GLOBAL } from './core/typescript/GLOBAL';
+import { ELECTRON_EVENTS_OBSERVER, GLOBAL } from './core/typescript/GLOBAL';
 import { FunctionService } from './core/services/functions.service';
 import { SingletonService } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
@@ -10,7 +10,18 @@ import { LayoutService } from './admin/layout/layout.service';
 import { ConfigurationI, ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
 import { MessageTask } from './core/models/message-task';
-import { KEYWORD_ELECTRON_EVENT_DECRYPT, KEYWORD_ELECTRON_EVENT_ENCRYPT, KEYWORD_ELECTRON_GET_APP_CONFIG } from '../../shared-electron-angular';
+import {
+  ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
+  ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS,
+  ELECTRON_EVENT_UPDATE_ERROR,
+  ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
+  ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
+  ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
+  KEYWORD_ELECTRON_EVENT_DECRYPT,
+  KEYWORD_ELECTRON_EVENT_ENCRYPT,
+  KEYWORD_ELECTRON_GET_APP_CONFIG,
+} from '../../electron/shared-electron-angular';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +37,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   objPercent;
 
   counter = 0;
+  sub: Subscription;
 
   constructor(
     public _ipc: IpcService,
@@ -51,55 +63,59 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     SingletonService._ipc = this._ipc;
     SingletonService.layServ = this.layServ;
 
-    this.loaderServ.isLoading.subscribe((v) => {
-      this.loading = v;
-    });
+    this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
 
-    this._ipc.on('checking-for-update', (event: Electron.IpcMessageEvent, res) => {});
+    this.sub = ELECTRON_EVENTS_OBSERVER.subscribe((res) => {
+      console.log('===== res ', res);
+      const info = res.info;
+      switch (res.event_name) {
+        case ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE:
+          this.fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
 
-    this._ipc.on('update-error', (event: Electron.IpcMessageEvent, res) => {
-      this.zone.run(() => {
-        if (res) {
-          this.fun.toastError(res.msg, 'ERRROR');
+          break;
+        //
+        case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
+          this.visible = true;
+          break;
+        //
+        case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
+          this.downloadProgression(info.body);
+          break;
+        //
+        case ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED:
           this.visible = false;
-        }
-      });
-    });
+          break;
+        //
+        case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
+          this.fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
 
-    this._ipc.on('update-available', (event: Electron.IpcMessageEvent, res) => {
-      this.zone.run(() => (this.visible = true));
-    });
-
-    this._ipc.on('download-progress', (event: Electron.IpcMessageEvent, res) => {
-      this.zone.run(() => {
-        if (res && res.body) {
-          if (this.counter == 1) this.visible = true;
-
-          this.counter++;
-          this.tiempo_restante = this.timeConvert(res.body.total / res.body.bytesPerSecond);
-
-          res.body.transferred = parseFloat(GLOBAL.redondearAdos(res.body.transferred / 1000000));
-          res.body.total = parseFloat(GLOBAL.redondearAdos(res.body.total / 1000000));
-          res.body.percent = parseFloat(GLOBAL.redondearAdos(res.body.percent));
-
-          this.objPercent = res.body;
-
-          // try {
-          //   if (document.getElementById('imagenLogo')) document.getElementById('imagenLogo').click();
-          // } catch (error) {
-
-          //   console.error(error);
-          // }
-        }
-      });
-    });
-
-    this._ipc.on('update-downloaded', (event: Electron.IpcMessageEvent, res) => {
-      this.zone.run(() => (this.visible = false));
+          break;
+        //
+        case ELECTRON_EVENT_UPDATE_ERROR:
+          this.fun.toastError(info.msg, 'ERRROR');
+          this.visible = false;
+          break;
+        //
+        default:
+          break;
+      }
     });
 
     // this.probandoEncriptar();
     this.getAppConfig();
+  }
+
+  downloadProgression(object) {
+    if (this.counter == 1) this.visible = true;
+
+    this.counter++;
+    this.tiempo_restante = this.timeConvert(object.total / object.bytesPerSecond);
+
+    object.transferred = parseFloat(GLOBAL.redondearAdos(object.transferred / 1000000));
+    object.total = parseFloat(GLOBAL.redondearAdos(object.total / 1000000));
+    object.percent = parseFloat(GLOBAL.redondearAdos(object.percent));
+
+    this.objPercent = object;
   }
 
   async getAppConfig() {
@@ -107,6 +123,8 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     this._ipc
       .sendTask(task)
       .then((config: ConfigurationI) => {
+        console.log('config ', config);
+
         this.themeService.setTheme(config.color_app);
         this.configServ.setConfig = config;
         this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;

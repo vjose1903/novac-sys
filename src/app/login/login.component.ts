@@ -22,7 +22,8 @@ import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
 import { SingletonService } from '../core/services/singleton.service';
-import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../shared-electron-angular';
+import { KEYWORD_ELECTRON_PRINT_BASE64, KEYWORD_ELECTRON_TEST } from '../../../electron/shared-electron-angular';
+import { MessageTask } from '../core/models/message-task';
 
 @Component({
   selector: 'app-login',
@@ -60,6 +61,17 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {}
+
+  test() {
+    console.log('----- probandoEncriptar -----');
+
+    const task = new MessageTask(KEYWORD_ELECTRON_TEST);
+
+    this._ipc
+      .sendTask(task)
+      .then((res: string) => console.log('res ', res))
+      .catch((err) => console.log(err));
+  }
 
   quitarFocoElectron() {
     if (document.getElementById('imagenLogo')) document.getElementById('imagenLogo').click();

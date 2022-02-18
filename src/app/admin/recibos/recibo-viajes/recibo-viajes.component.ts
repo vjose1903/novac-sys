@@ -10,7 +10,7 @@ import { ReciboC } from '../recibos';
 import { RecibosService } from '../recibos.service';
 import { FacturaC } from '../../facturacion/factura';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
-import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../shared-electron-angular';
+import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
 
 @Component({
   selector: 'app-recibo-viajes',

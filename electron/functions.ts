@@ -1,6 +1,6 @@
 import * as zlib from 'zlib';
 import * as fs from 'fs';
-import { pathAdd } from './main';
+import { pathAdd } from '../main';
 
 export default class Functions {
   static encriptar(arg: string): string {

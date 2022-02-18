@@ -5,8 +5,12 @@ import * as url from 'url';
 
 const request = require('request');
 const { exec } = require('child_process');
-const autoUpdater = require('electron-updater').autoUpdater;
+// const autoUpdater = require('electron-updater').autoUpdater;
+
 const express = require('express');
+
+import Functions from './electron/functions.js';
+import HandlerConfigFile from './electron/handler-config-file';
 
 import {
   KEYWORD_ELECTRON_EVENT_DECRYPT,
@@ -16,127 +20,117 @@ import {
   KEYWORD_ELECTRON_RESPONSE,
   KEYWORD_ELECTRON_SENDER,
   KEYWORD_ELECTRON_SET_APP_CONFIG,
+  KEYWORD_ELECTRON_TEST,
   MessageTaskInterface,
-} from './shared-electron-angular.js';
-import Functions from './functions.js';
-import HandlerConfigFile from './handler-config-file';
+} from './electron/shared-electron-angular.js';
+import AppUpdater from './electron/auto-update.js';
 
 let win: BrowserWindow = null;
+let auto_updater: AppUpdater = null;
 
 const args = process.argv.slice(1);
 const serve = args.some((val) => val === '--serve');
 
-function createWindow(): BrowserWindow {
-  const electronScreen = screen;
-  const size = electronScreen.getPrimaryDisplay().workAreaSize;
+function createWindow() {
+  return new Promise<BrowserWindow>((resolve, reject) => {
+    const electronScreen = screen;
+    const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
-  // Create the browser window.
-  win = new BrowserWindow({
-    x: 0,
-    y: 0,
-    width: size.width,
-    minWidth: size.width,
-    height: size.height,
-    minHeight: size.height,
-    // icon: process.platform === 'darwin' ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
-    webPreferences: {
-      nodeIntegration: true,
-      allowRunningInsecureContent: serve ? true : false,
-      contextIsolation: false, // false if you want to run 2e2 test with Spectron
-    },
-  });
-
-  if (serve) {
-    win.webContents.openDevTools();
-
-    require('electron-reload')(__dirname, {
-      electron: require(`${__dirname}/node_modules/electron`),
+    // Create the browser window.
+    win = new BrowserWindow({
+      x: 0,
+      y: 0,
+      width: size.width,
+      minWidth: size.width,
+      height: size.height,
+      minHeight: size.height,
+      // icon: process.platform === 'darwin' ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
+      webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
     });
-    win.loadURL('http://localhost:5220');
-  } else {
-    win.loadURL(
-      url.format({
-        pathname: path.join(__dirname, 'dist/index.html'),
-        protocol: 'file:',
-        slashes: true,
-      }),
-    );
-  }
 
-  // if (serve) {
-  //   win.webContents.openDevTools();
+    if (serve) {
+      win.webContents.openDevTools();
 
-  //   require('electron-reload')(__dirname, {
-  //     electron: require(path.join(__dirname, '/node_modules/electron')),
-  //   });
+      require('electron-reload')(__dirname, {
+        electron: require(`${__dirname}/node_modules/electron`),
+      });
+      win.loadURL('http://localhost:5220');
+    } else {
+      win.loadURL(
+        url.format({
+          pathname: path.join(__dirname, 'dist/index.html'),
+          protocol: 'file:',
+          slashes: true,
+        }),
+      );
+    }
 
-  //   win.loadURL('http://localhost:5220');
-  // } else {
-  //   // Path when running electron executable
-  //   let pathIndex = pathAdd('/dist/index.html');
-  //   let baseDirectory = pathAdd('/dist/');
+    // if (serve) {
+    //   win.webContents.openDevTools();
 
-  //   // if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-  //   //   // Path when running electron in local folder
-  //   //   pathIndex = '../dist/index.html';
-  //   //   baseDirectory = '../dist';
-  //   // }
-  //   var httpPort = 5220;
-  //   const app = express();
+    //   require('electron-reload')(__dirname, {
+    //     electron: require(path.join(__dirname, '/node_modules/electron')),
+    //   });
 
-  //   app.use(express.static(path.resolve(baseDirectory)));
+    //   win.loadURL('http://localhost:5220');
+    // } else {
+    //   // Path when running electron executable
+    //   let pathIndex = pathAdd('/dist/index.html');
+    //   let baseDirectory = pathAdd('/dist/');
 
-  //   app.get('/', (req, res) => {
-  //     res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
-  //   });
+    //   // if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
+    //   //   // Path when running electron in local folder
+    //   //   pathIndex = '../dist/index.html';
+    //   //   baseDirectory = '../dist';
+    //   // }
+    //   var httpPort = 5220;
+    //   const app = express();
 
-  //   app.get('*', (req, res) => {
-  //     res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
-  //   });
+    //   app.use(express.static(path.resolve(baseDirectory)));
 
-  //   // if (fs.existsSync('resources/app/index.html')) {
-  //   //   // Path when running electron in local folder
-  //   //   pathIndex = 'resources/app/index.html';
-  //   //   baseDirectory = 'resources/app';
-  //   // } else {
-  //   //   app.use(express.static(path.join(__dirname, baseDirectory)));
+    //   app.get('/', (req, res) => {
+    //     res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
+    //   });
 
-  //   //   app.get('/', (req, res) => {
-  //   //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
-  //   //   });
+    //   app.get('*', (req, res) => {
+    //     res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
+    //   });
 
-  //   //   app.get('*', (req, res) => {
-  //   //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
-  //   //   });
-  //   // }
+    //   // if (fs.existsSync('resources/app/index.html')) {
+    //   //   // Path when running electron in local folder
+    //   //   pathIndex = 'resources/app/index.html';
+    //   //   baseDirectory = 'resources/app';
+    //   // } else {
+    //   //   app.use(express.static(path.join(__dirname, baseDirectory)));
 
-  //   app.listen(httpPort, () => win.loadURL('http://localhost:5220'));
+    //   //   app.get('/', (req, res) => {
+    //   //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
+    //   //   });
 
-  //   // win.loadURL(url.format({
-  //   //   pathname: path.join(__dirname, pathIndex),
-  //   //   protocol: 'file:',
-  //   //   slashes: true
-  //   // }));
-  // }
+    //   //   app.get('*', (req, res) => {
+    //   //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
+    //   //   });
+    //   // }
 
-  verificarSumastra();
-  borrarLogs();
+    //   app.listen(httpPort, () => win.loadURL('http://localhost:5220'));
 
-  HandlerConfigFile.checkConfigFile();
+    //   // win.loadURL(url.format({
+    //   //   pathname: path.join(__dirname, pathIndex),
+    //   //   protocol: 'file:',
+    //   //   slashes: true
+    //   // }));
+    // }
 
-  win.setMenuBarVisibility(false);
+    // Emitted when the window is closed.
+    win.on('closed', () => {
+      // Dereference the window object, usually you would store window
+      // in an array if your app supports multi windows, this is the time
+      // when you should delete the corresponding element.
+      win = null;
+    });
 
-  autoUpdater.checkForUpdatesAndNotify();
-
-  // Emitted when the window is closed.
-  win.on('closed', () => {
-    // Dereference the window object, usually you would store window
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    win = null;
+    resolve(win);
   });
-
-  return win;
 }
 
 try {
@@ -144,86 +138,51 @@ try {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => setTimeout(createWindow, 400));
+  app.on('ready', () => {
+    console.log(' ');
+    console.log('=-=-=-=- READY -=-=-=-=');
+    console.log(' ');
+
+    createWindow()
+      .then((res) => beforeCreateWindow(res))
+      .catch(() => app.quit());
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
     // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-      app.quit();
-    }
+    // to stay active until the user quits explicitly with Cmd +
+    if (process.platform !== 'darwin') app.quit();
   });
 
   app.on('activate', () => {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (win === null) createWindow();
+    if (win === null)
+      createWindow()
+        .then((res) => beforeCreateWindow(res))
+        .catch(() => app.quit());
   });
 } catch (e) {
   // Catch Error
   // throw e;
 }
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// AUTO UPDATE
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+async function beforeCreateWindow(win_) {
+  win = win_;
 
-autoUpdater.logger = require('electron-log');
+  verificarSumastra();
+  borrarLogs();
 
-autoUpdater.logger.transports.file.level = 'info';
+  HandlerConfigFile.checkConfigFile();
 
-autoUpdater.on('checking-for-update', () => {
-  if (win) {
-    win.webContents.send('checking-for-update', { msg: 'verificando actualizacion...' });
-  }
-});
+  // ----- Manejar las actualizaciones -----
+  auto_updater = new AppUpdater();
+  auto_updater.handleUpdateEvents(win);
+  // ---------------------------------------
 
-autoUpdater.on('update-available', (info: any) => {
-  if (win) {
-    win.webContents.send('update-available', { msg: 'ACTUALIZACION DISPONIBLE!!!', body: info });
-  }
-  const dialogOpts = {
-    type: 'info',
-    buttons: ['ok'],
-    title: 'Actualización disponible',
-    message: 'VjPOS presenta una nueva actualizacion se empezará a descargar ahora.',
-    detail: `Version a descargar: ${info.version}`,
-  };
-});
-
-autoUpdater.on('download-progress', (progress) => {
-  if (win) {
-    win.webContents.send('download-progress', { msg: 'descarga porciento...', body: progress });
-  }
-});
-
-autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-  const dialogOpts = {
-    type: 'info',
-    buttons: ['Reiniciar'],
-    title: 'Actualizacion descargada',
-    message: process.platform === 'win32' ? releaseNotes : releaseName,
-    detail: 'Para que las actualizaciones sean efectivas debe de reiniciar la aplicacion.',
-  };
-
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) autoUpdater.quitAndInstall();
-    if (win) {
-      win.webContents.send('update-downloaded', { msg: 'descarga finalizada...', body: returnValue });
-    }
-  });
-  // autoUpdater.quitAndInstall();
-});
-
-autoUpdater.on('update-not-available', (info) => {});
-
-autoUpdater.on('error', (error) => {
-  if (win) {
-    win.webContents.send('update-error', { msg: 'Error descargando actualizacion...', body: error });
-  }
-  console.error('error', error);
-});
+  win.setMenuBarVisibility(false);
+}
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Handle angular events
@@ -237,6 +196,26 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
     let res;
 
     switch (arg.eventName) {
+      case KEYWORD_ELECTRON_TEST:
+        console.log('AQUIIIII');
+
+        const FileName = pathAdd('/factura.pdf');
+
+        const options = { silent: true, deviceName: 'HP_Color_LaserJet_Prro_M479' };
+        win.webContents.print(options, (success, errorType) => {
+          console.log('success ', success);
+          console.log('errorType ', errorType);
+          if (success) {
+            arg.response = success;
+            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+          } else {
+            arg.response = errorType;
+            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+          }
+        });
+
+        break;
+      //
       case KEYWORD_ELECTRON_EVENT_DECRYPT:
         res = Functions.desEncriptar(arg.data);
         arg.response = res;
@@ -541,21 +520,11 @@ function cmd(command, callback = (arg) => {}) {
   exec(command, (error, stdout, stderr) => {
     let obj;
     if (error) {
-      obj = {
-        status: false,
-        STDOUT: stdout,
-        STDERR: stderr,
-        msg: error,
-      };
+      obj = { status: false, STDOUT: stdout, STDERR: stderr, msg: error };
 
       callback(obj);
     } else {
-      obj = {
-        status: true,
-        msg: 'Comando realizado correctamente',
-        STDOUT: stdout,
-        STDERR: stderr,
-      };
+      obj = { status: true, msg: 'Comando realizado correctamente', STDOUT: stdout, STDERR: stderr };
       callback(obj);
     }
   });
@@ -571,10 +540,7 @@ function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
   let received_bytes = 0;
   let total_bytes = 0;
 
-  const req = request({
-    method: 'GET',
-    uri: archive_url,
-  });
+  const req = request({ method: 'GET', uri: archive_url });
 
   const out = fs.createWriteStream(pathAdd(`${path}${file_}`));
   req.pipe(out);
