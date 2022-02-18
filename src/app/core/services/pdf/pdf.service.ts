@@ -10,26 +10,29 @@ import * as conduce from './conduce';
 import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
 import { SingletonService } from '../singleton.service';
+import { MessageTask } from '../../models/message-task';
+import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../shared-electron-angular';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PdfService {
   fun = SingletonService.fun;
+  _ipc = SingletonService._ipc;
   constructor() {}
 
-  generatePdf(oPdf): any {
+  generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
     return new Promise((resolve, reject) => {
       let obj;
       let todo_true = true;
-      const data = oPdf.data;
-      const type = oPdf.type;
-      const reimprimir = oPdf.data.reimprimir ? true : false;
+      const data = params.oPdf.data;
+      const type_oPdf = params.oPdf.type;
+      const reimprimir = params.oPdf.data.reimprimir ? true : false;
 
       data['reimprimir'] = reimprimir;
 
       try {
-        switch (type) {
+        switch (type_oPdf) {
           case 'recibo_ingreso':
             obj = recibosIngresos.makeRecibo(data);
             break;
@@ -47,15 +50,14 @@ export class PdfService {
             break;
 
           case 'reporte':
-            this.fun.logRed('<-- ENTRE --> ');
             obj = reportes.makeReporte(data);
-            this.fun.logRed('<-- SALI --> ');
             break;
 
           default:
             todo_true = false;
             break;
         }
+
         this.fun.logGreen('todo_true --> ', todo_true);
 
         if (todo_true) {
@@ -65,7 +67,14 @@ export class PdfService {
 
           this.createPdfbase64(dd, file, reimprimir, (res) => {
             res['scale'] = obj.scale;
-            resolve(res);
+
+            if (params.imprimir) {
+              this.imprimirBase64({ base64: res.body, filename: res.file, type: type_oPdf })
+                .then((res_impresion) => resolve(res_impresion))
+                .catch((err_impresion) => reject(err_impresion));
+            } else {
+              resolve(res);
+            }
           });
         } else {
           const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
@@ -104,6 +113,20 @@ export class PdfService {
       const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no', body: error });
       callback(respuesta);
     }
+  }
+
+  imprimirBase64(oBase: { base64: string; filename: string; type: string }) {
+    return new Promise<any>((resolve, reject) => {
+      const task = new MessageTask(KEYWORD_ELECTRON_PRINT_BASE64, oBase);
+
+      this._ipc
+        .sendTask(task)
+        .then((res) => {
+          if (res['status'] == 'no') reject(res);
+          else resolve(res);
+        })
+        .catch((err) => reject(err));
+    });
   }
 
   makeStatusObj(oStatus) {

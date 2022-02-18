@@ -84,7 +84,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'ingresos', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res', 'noFiltro'] });
+    this._init_mixin({ component: 'ingresos', _lista_subs: ['decisionModal', 'objDevuelto', 'noFiltro'] });
 
     this.necesarioStart();
   }
@@ -312,19 +312,16 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
       const obj_print = { data: recibo, type: 'recibo_ingreso' };
 
-      this.pdfServ.generatePdf(obj_print).then((res_pdf) => {
-        if (res_pdf.status === 'si') {
-          const objBase = { base64: res_pdf.body, filename: res_pdf.file, type: 'recibo_ingreso' };
-          this._ipc.send('printBase64', objBase);
-          this.layServ.nextCheckCuadreToday(true);
-        }
-      });
-    });
-  }
+      this.pdfServ
+        .generatePdf({ oPdf: obj_print, imprimir: true })
+        .then(async (res) => {
+          if (res.status === 'si') {
+          } else this.fun.toastError(res.msg, 'ERROR');
 
-  printBase64Res(res) {
-    if (res.status === 'si') {
-    } else this.fun.toastError(res.msg, 'ERROR');
+          this.layServ.nextCheckCuadreToday(true);
+        })
+        .catch((err) => this.fun.toastError(err.msg, 'ERROR'));
+    });
   }
 
   resetVariables() {

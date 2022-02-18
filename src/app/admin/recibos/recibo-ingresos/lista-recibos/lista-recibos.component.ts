@@ -7,6 +7,7 @@ import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
+import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../../shared-electron-angular';
 
 @Component({
   selector: 'app-lista-recibos',
@@ -73,7 +74,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async ngOnInit() {
-    this._init_mixin({ component: 'lista_recibos', _lista_subs: ['decisionModal', 'printBase64Res'] });
+    this._init_mixin({ component: 'lista_recibos', _lista_subs: ['decisionModal'] });
     this.necesarioStart();
   }
 
@@ -85,11 +86,6 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   ngOnDestroy() {
     this._destroy_mixin();
-  }
-
-  async printBase64Res(res) {
-    if (res.status === 'si') this.fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
-    else this.fun.toastError(res.msg, 'ERROR');
   }
 
   ipcPrintResponse(res) {
@@ -196,25 +192,33 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   generarPdf(obj) {
     this.loadServ.isLoading.next(true);
+
     this.pdfServ
-      .generatePdf(obj)
-      .then((res) => {
+      .generatePdf({ oPdf: obj, imprimir: false })
+      .then(async (res) => {
         if (res.status === 'si') {
           this.fileName = res.file;
           this.pdfSrc = res.body;
-          obj = { pdfSrc: res.body, titulo: 'Revisión de recibo de ingreso', height: '25rem', reimprimir: true, fileName: res.file.split('.')[0] };
+          const obj_pdf = { pdfSrc: res.body, titulo: 'Revisión de recibo de ingreso', height: '25rem', reimprimir: true, fileName: res.file.split('.')[0] };
 
-          this.abrirModal('visor_pdf', obj, undefined, (res_visor) => this.loadServ.isLoading.next(false));
+          this.loadServ.isLoading.next(false);
+          this.abrirModal('visor_pdf', obj_pdf);
         }
+
+        console.log('res ', res);
       })
-      .catch((error) => {
-        this.loadServ.isLoading.next(false);
-      });
+      .catch(() => this.loadServ.isLoading.next(false));
   }
 
   imprimir_base64() {
     const obj = { base64: this.pdfSrc, filename: this.fileName, type: 'recibo_ingreso' };
-    this._ipc.send('printBase64', obj);
+    this.pdfServ
+      .imprimirBase64(obj)
+      .then(async (res) => {
+        if (res['status'] === 'si') this.fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
+        else this.fun.toastError(res['msg'], 'ERROR');
+      })
+      .catch((err) => this.fun.toastError(err['msg'], 'ERROR'));
   }
 
   async anularRecibo(id) {

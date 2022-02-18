@@ -1,16 +1,10 @@
 {{ checkFacturaGuardada() }}
 
-
 <div id="fondoC" *ngIf="noServer" class="h-100 w-100 position-absolute backnegro">
   <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
 </div>
 
-<span
-  *ngIf="actualMenuItemBack == 'factura'"
-  id="btn_side_facturas"
-  class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center"
-  (click)="_toggleSidebar('btn afuera')"
->
+<span *ngIf="actualMenuItemBack == 'factura'" id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera')">
   <i id="triangualo" class="fas fa-caret-left text-white"></i>
 </span>
 
@@ -27,7 +21,7 @@
   [closeOnEscape]="true"
   [blockScroll]="true"
   (visibleChange)="_toggleSidebar('visibleChange')"
-  >
+>
   <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro')">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
@@ -64,7 +58,6 @@
               Compra
               <span *ngIf="!countCantFactSaved('compra').disable"> &nbsp;({{ countCantFactSaved('compra').cant }})</span>
             </ng-template>
-
           </p-tabPanel>
         </p-tabView>
 
@@ -76,12 +69,7 @@
             <div class="info_fact h-100 {{ factGuardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
               <i class="fas fa-history {{ fact.FacturaAtrasada ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}"></i>
               <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}"></i>
-              <i
-                class="btn_borrar_factura_gurdada far fa-trash-alt"
-                (click)="abrirModalFacturaGuardada(fact, $event)"
-                pTooltip="Quitar factura"
-                tooltipPosition="left"
-              ></i>
+              <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar factura" tooltipPosition="left"></i>
               <span
                 class="negrita text-mayuscula text-separado-2 texto-borde-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}
             texto-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}"
@@ -122,12 +110,7 @@
     </mat-toolbar>
     <mat-nav-list class="text-center">
       <div class="menuList1 mt-5">
-        <img
-          [ngClass]="actualMenyItem == 'factura' ? 'iconosMenuA' : 'iconosMenu'"
-          src="assets/img/factura.png"
-          alt="Facturacion"
-          (click)="nextCambioMenu(true, 'factura')"
-        />
+        <img [ngClass]="actualMenyItem == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/factura.png" alt="Facturacion" (click)="nextCambioMenu(true, 'factura')" />
         <h5 [ngClass]="actualMenyItem == 'factura' ? 'tituloMenuA1' : 'tituloMenu1'"><strong>Facturación</strong></h5>
 
         <div [ngClass]="actualMenyItem == 'factura_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
@@ -136,12 +119,7 @@
         </div>
       </div>
       <div class="menuList2">
-        <img
-          [ngClass]="actualMenyItem == 'manipular' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'"
-          src="assets/img/notaM.png"
-          alt="Notas"
-          (click)="nextCambioMenu(true, 'manipular')"
-        />
+        <img [ngClass]="actualMenyItem == 'manipular' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'" src="assets/img/notaM.png" alt="Notas" (click)="nextCambioMenu(true, 'manipular')" />
         <h5 [ngClass]="actualMenyItem == 'manipular' ? 'tituloMenuA2' : 'tituloMenu2'"><strong>Manipular facturas</strong></h5>
         <!-- ultimo -->
 
@@ -155,12 +133,7 @@
       </div>
 
       <div class="menuList">
-        <img
-          [ngClass]="actualMenyItem == 'recibos' ? 'iconosMenuA' : 'iconosMenu'"
-          src="assets/img/reciboIngreso.png"
-          alt="Facturacion"
-          (click)="nextCambioMenu(true, 'recibos')"
-        />
+        <img [ngClass]="actualMenyItem == 'recibos' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="nextCambioMenu(true, 'recibos')" />
         <h5 [ngClass]="actualMenyItem == 'recibos' ? 'tituloMenuA' : 'tituloMenu'"><strong>Ingresos</strong></h5>
         <div [ngClass]="actualMenyItem == 'recibos_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
           <h4 class="opcion" (click)="nextCambioMenu(false, 'ingresos', true)">Recibo ingresos</h4>
@@ -169,22 +142,12 @@
       </div>
 
       <div class="menuList">
-        <img
-          [ngClass]="actualMenyItem == 'conduce' ? 'iconosMenuA' : 'iconosMenu'"
-          src="assets/img/conduce.png"
-          alt="Facturacion"
-          (click)="nextCambioMenu(false, 'conduce')"
-        />
+        <img [ngClass]="actualMenyItem == 'conduce' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/conduce.png" alt="Facturacion" (click)="nextCambioMenu(false, 'conduce')" />
         <h5 [ngClass]="actualMenyItem == 'conduce' ? 'tituloMenuA' : 'tituloMenu'"><strong>Conduce</strong></h5>
       </div>
 
       <div class="menuList">
-        <img
-          [ngClass]="actualMenyItem == 'registros' ? 'iconosMenuA' : 'iconosMenu'"
-          src="assets/img/registro.png"
-          alt="Registros"
-          (click)="nextCambioMenu(true, 'registros')"
-        />
+        <img [ngClass]="actualMenyItem == 'registros' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/registro.png" alt="Registros" (click)="nextCambioMenu(true, 'registros')" />
         <h5 [ngClass]="actualMenyItem == 'registros' ? 'tituloMenuA' : 'tituloMenu'"><strong>Registros</strong></h5>
 
         <div [ngClass]="actualMenyItem == 'registros_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
@@ -197,30 +160,15 @@
         </div>
       </div>
       <div class="menuList">
-        <img
-          [ngClass]="actualMenyItem == 'produccion' ? 'iconosMenuA' : 'iconosMenu'"
-          src="assets/img/produccion.png"
-          alt="Producción"
-          (click)="nextCambioMenu(false, 'produccion')"
-        />
+        <img [ngClass]="actualMenyItem == 'produccion' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/produccion.png" alt="Producción" (click)="nextCambioMenu(false, 'produccion')" />
         <h5 [ngClass]="actualMenyItem == 'produccion' ? 'tituloMenuA' : 'tituloMenu'"><strong>Producción</strong></h5>
       </div>
       <div class="menuList">
-        <img
-          [ngClass]="actualMenyItem == 'inventario' ? 'iconosMenuA' : 'iconosMenu'"
-          src="assets/img/inventario.png"
-          alt="Inventario"
-          (click)="nextCambioMenu(false, 'inventario')"
-        />
+        <img [ngClass]="actualMenyItem == 'inventario' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/inventario.png" alt="Inventario" (click)="nextCambioMenu(false, 'inventario')" />
         <h5 [ngClass]="actualMenyItem == 'inventario' ? 'tituloMenuA' : 'tituloMenu'"><strong>Inventario</strong></h5>
       </div>
       <div class="menuList">
-        <img
-          [ngClass]="actualMenyItem == 'reportes' ? 'iconosMenuA' : 'iconosMenu'"
-          src="assets/img/reporte.png"
-          alt="Reportes"
-          (click)="nextCambioMenu(false, 'reportes')"
-        />
+        <img [ngClass]="actualMenyItem == 'reportes' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png" alt="Reportes" (click)="nextCambioMenu(false, 'reportes')" />
         <h5 [ngClass]="actualMenyItem == 'reportes' ? 'tituloMenuA' : 'tituloMenu'"><strong>Reportes</strong></h5>
       </div>
       <!--
@@ -293,7 +241,7 @@
         <div class="content">Hoy ya existe un cuadre</div>
       </div>
     </div>
-    <div class="footerCustom">VjPOS {{ getVersion() }} - @2020 Desarrollador: Victor J. Vasquez</div>
+    <div class="footerCustom">VjPOS {{ versionApp }} - @2020 Desarrollador: Victor J. Vasquez</div>
   </mat-sidenav-content>
 </mat-sidenav-container>
 

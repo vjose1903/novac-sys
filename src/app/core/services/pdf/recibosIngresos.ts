@@ -30,11 +30,7 @@ export function makeRecibo(data) {
     styles: styles_,
   };
 
-  const obj = {
-    doc: dd,
-    file: 'reciboI.pdf',
-    type: 'file',
-  };
+  const obj = { doc: dd, file: 'reciboI.pdf', type: 'file' };
   return obj;
 }
 

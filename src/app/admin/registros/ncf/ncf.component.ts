@@ -63,6 +63,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.dpConfig = Object.assign(
       {},
       {
+
         showWeekNumbers: false,
         dateInputFormat: 'DD/MM/YYYY',
         // maxDate: new Date(),

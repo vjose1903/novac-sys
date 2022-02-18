@@ -22,6 +22,7 @@ import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
 import { SingletonService } from '../core/services/singleton.service';
+import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../shared-electron-angular';
 
 @Component({
   selector: 'app-login',
@@ -46,14 +47,9 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   ngOnInit() {
     this.loginForm = this.fb.group({ usuario: null, password: null });
 
-    this._ipc.on('versionResponse', (event, arg) => {
-      this.versionApp = arg;
-      setTimeout(() => this.quitarFocoElectron(), 25);
-    });
-
-    this.searchVersion();
     this.configServ.getConfig().then((config) => {
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+      this.versionApp = config.app_version;
     });
   }
 
@@ -63,20 +59,10 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
     this.mServ.mostrarModal(true);
   }
 
-  ngOnDestroy() {
-    this._ipc.removeListener('printRes');
-  }
-
-  async searchVersion() {
-    this._ipc.send('getVersion');
-  }
+  ngOnDestroy() {}
 
   quitarFocoElectron() {
     if (document.getElementById('imagenLogo')) document.getElementById('imagenLogo').click();
-  }
-
-  getVersion() {
-    return this.versionApp;
   }
 
   formularioIsInvalid() {
@@ -147,49 +133,34 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
     const obj = { data: data_, type: 'facturacion' };
 
     this.tipo_prueba = obj.type;
-    this.pdfServ.generatePdf(obj).then((res_pdf) => {
-      try {
-        if (res_pdf.status === 'si') {
-          const obj = { base64: res_pdf.body, filename: res_pdf.file, type: 'facturacion' };
-          this._ipc.send('printBase64', obj);
-        }
-      } catch (error) {}
-    });
+
+    this.generar(obj);
   }
 
   async pruebaRecibo() {
     const data_ = recibo_de_ingreso;
 
     // const DD = await this.pdfServ.makeFacturaVenta(data);
-    const obj = {
-      data: data_,
-      type: 'recibo_ingreso',
-    };
+    const obj = { data: data_, type: 'recibo_ingreso' };
 
     this.tipo_prueba = obj.type;
 
-    this._ipc.send('print', obj);
+    this.generar(obj);
   }
 
   async reporteTest() {
     const data_ = ventas_productos_rango;
 
-    const obj = {
-      data: data_,
-      type: 'reporte',
-    };
+    const obj = { data: data_, type: 'reporte' };
 
     this.tipo_prueba = obj.type;
-    this._ipc.send('print', obj);
+    this.generar(obj);
   }
 
   async pruebaConduce() {
     const data_ = conduce;
 
-    const obj = {
-      data: data_,
-      type: 'conduce',
-    };
+    const obj = { data: data_, type: 'conduce' };
 
     this.tipo_prueba = obj.type;
 
@@ -197,21 +168,12 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   generar(obj) {
-    this.pdfServ.generatePdf(obj).then((res) => {
+    this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
+      console.log('res ', res);
       if (res.status === 'si') {
-        const objBase = {
-          base64: res.body,
-          filename: res.file,
-          type: this.tipo_prueba,
-        };
+        const objBase = { base64: res.body, filename: res.file, type: this.tipo_prueba };
 
-        const obj = {
-          pdfSrc: res.body,
-          titulo: 'PRUEBA REPORTE',
-          height: '83vh',
-          reimprimir: res.reimprimir,
-          fileName: res.file.split('.')[0],
-        };
+        const obj = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '83vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
         this.abrirModalReporte(obj);
       }
     });

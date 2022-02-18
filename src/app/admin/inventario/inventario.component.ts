@@ -20,26 +20,10 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   // =============================================
 
   info = [
-    {
-      titulo: 'Cod.',
-      key: 'codigo',
-      estilos: [{ width: '4rem' }],
-    },
-    {
-      titulo: 'Articulo',
-      key: 'nombre',
-      estilos: [{ width: '35rem' }, { 'text-align': 'left' }, { 'padding-left': '2rem' }],
-    },
-    {
-      titulo: 'Cantidad',
-      key: 'cantidades',
-      cantidades: true,
-    },
-    {
-      titulo: 'Precio',
-      key: 'precio_principal',
-      formatoNumero: true,
-    },
+    { titulo: 'Cod.', key: 'codigo', estilos: [{ width: '4rem' }] },
+    { titulo: 'Articulo', key: 'nombre', estilos: [{ width: '35rem' }, { 'text-align': 'left' }, { 'padding-left': '2rem' }] },
+    { titulo: 'Cantidad', key: 'cantidades', cantidades: true },
+    { titulo: 'Precio', key: 'precio_principal', formatoNumero: true },
   ];
 
   cant_inventario = 0;
@@ -66,7 +50,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async ngOnInit() {
-    this._init_mixin({ component: 'inventario', _lista_subs: ['decisionModal', 'printBase64Res'] });
+    this._init_mixin({ component: 'inventario', _lista_subs: ['decisionModal'] });
     this.necesarioParaEmpezar();
 
     this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res));
@@ -76,19 +60,12 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
   }
 
-  async printBase64Res(res) {
-    if (res.status === 'si') this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-    else this.fun.toastError(res.msg, 'ERROR');
-  }
-
   async decisionModal(arg) {
     if (this.tipoModal === 'visor_pdf') arg = { bool: arg };
 
     if (arg.bool) {
       if (this.tipoModal === 'visor_pdf') {
-        const obj = { base64: this.seleccionModal.pdfSrc, filename: `${this.seleccionModal.fileName}.pdf` };
-
-        this._ipc.send('printBase64', obj);
+        this.imprimirReporteInventario();
         this.resetVariables();
       } else {
         const actualPagination = this.tServ.getPaginationById('inventario');
@@ -99,6 +76,21 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   ngOnDestroy() {
     this._destroy_mixin();
+  }
+
+  imprimirReporteInventario() {
+    const obj = { base64: this.seleccionModal.pdfSrc, filename: `${this.seleccionModal.fileName}.pdf`, type: 'reporte' };
+    this.pdfServ
+      .imprimirBase64(obj)
+      .then((res) => {
+        console.log('res ', res);
+
+        if (res['status'] === 'si') this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+        else this.fun.toastError(res['msg'], 'ERROR');
+      })
+      .catch((err) => {
+        this.fun.toastError(err['msg'], 'ERROR');
+      });
   }
 
   formatoNumero(num) {
@@ -116,17 +108,14 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this.reporteClass.getAll(extra).then((res) => {
       const obj = { data: res, type: 'reporte' };
       this.loadServ.isLoading.next(true);
-      this.generarPdf(obj);
-    });
-  }
 
-  generarPdf(obj) {
-    this.pdfServ.generatePdf(obj).then((res) => {
-      if (res.status === 'si') {
-        const obj_pdf = { pdfSrc: res.body, titulo: 'Reporte de inventario', height: '83vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
-        this.loadServ.isLoading.next(false);
-        this.abrirModal('visor_pdf', obj_pdf);
-      }
+      this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
+        if (res.status === 'si') {
+          const obj_pdf = { pdfSrc: res.body, titulo: 'Reporte de inventario', height: '83vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+          this.loadServ.isLoading.next(false);
+          this.abrirModal('visor_pdf', obj_pdf);
+        }
+      });
     });
   }
 

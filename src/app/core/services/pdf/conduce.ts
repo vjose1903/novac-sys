@@ -10,7 +10,6 @@ import { SingletonService } from '../singleton.service';
 export function makeConduce(data) {
   const configApp = SingletonService.configServ.getConfig({ isPromise: false });
 
-
   const dd = {
     pageSize: { width: 990, height: 398 },
     pageMargins: [10, 140, 10, 30],
@@ -31,11 +30,7 @@ export function makeConduce(data) {
     styles: styles_,
   };
 
-  const obj = {
-    doc: dd,
-    file: 'conduce.pdf',
-    type: 'file',
-  };
+  const obj = { doc: dd, file: 'conduce.pdf', type: 'file' };
   return obj;
 }
 

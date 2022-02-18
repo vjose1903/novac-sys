@@ -85,10 +85,10 @@
       </div>
       <div class="col-7">
         <i
-          *ngIf="BuscarPara.includes('nota')"
+          *ngIf="buscarPara.includes('nota')"
           class="fas fa-history btn-circle-icon"
           (click)="openSide()"
-          [pTooltip]="BuscarPara === 'nota_credito' ? 'Ver notas de crédito anteriores' : 'Ver notas de debito anteriores'"
+          [pTooltip]="buscarPara === 'nota_credito' ? 'Ver notas de crédito anteriores' : 'Ver notas de debito anteriores'"
           tooltipPosition="top"
         ></i>
       </div>

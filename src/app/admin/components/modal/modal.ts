@@ -41,10 +41,6 @@ export class modalClass extends LayoutClass {
 
     this._lista = arg._lista_subs ? arg._lista_subs : [];
 
-    if (this._lista.includes('printBase64Res')) {
-      this._ipc.on('printBase64Res', async (event: any, res) => this.run_subscribe('printBase64Res', res));
-    }
-
     if (this._lista.includes('decisionModal')) {
       this.subDeci = this.mServ.DECISIONMODAL.subscribe((res) => this.run_subscribe('DECISIONMODAL', res));
     }
@@ -79,14 +75,6 @@ export class modalClass extends LayoutClass {
 
     if (_this) {
       switch (observable) {
-        case 'printBase64Res':
-          this.zone.run(() => {
-            _this.printBase64Res(res);
-            _this.reiniciarVariables([VM._7]);
-          });
-
-          break;
-
         case 'DECISIONMODAL':
           if (res !== undefined) {
             _this.decisionModal(res);
@@ -138,7 +126,6 @@ export class modalClass extends LayoutClass {
     if (list.includes(VM._10)) if (de_quien_soy && this.metodos[de_quien_soy]) delete this.metodos[de_quien_soy]; /* metodos */
   }
 
-  printBase64Res(res) {}
   decisionModal(res: any) {}
   articuloFiltroResponse(res) {}
   pressEscResponse(res) {}
@@ -150,8 +137,6 @@ export class modalClass extends LayoutClass {
 
   _destroy_modal() {
     if (this.quien_me_llamo) this.metodos[this.quien_me_llamo].reiniciarVariables([VM._10]);
-
-    if (this._lista.includes('printBase64Res') && this._ipc) this._ipc.removeListener('printBase64Res');
 
     if (this._lista.includes('decisionModal') && this.subDeci) this.subDeci.unsubscribe();
 

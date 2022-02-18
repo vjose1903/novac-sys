@@ -77,7 +77,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   ngOnInit() {
     this._init_mixin({
       component: 'conduce',
-      _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'printBase64Res', 'noFiltro'],
+      _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'],
     });
 
     this.form = this.fb.group({
@@ -741,23 +741,11 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       const obj = { data: res['data'], type: 'conduce' };
 
       this.cancelarConduce(2);
-      this.pdfServ.generatePdf(obj).then((res) => {
-        console.log('res', res);
-
-        if (res.status === 'si') {
-          const objBase = { base64: res.body, filename: res.file, type: 'conduce' };
-          this._ipc.send('printBase64', objBase);
-          this.layServ.nextCheckCuadreToday(true);
-        }
-      });
+      this.pdfServ
+        .generatePdf({ oPdf: obj, imprimir: true })
+        .then(async (res) => console.log('res ', res))
+        .catch((err) => this.fun.toastError(err['msg'], 'ERROR'));
     });
-  }
-
-  printBase64Res(res) {
-    if (res.status === 'si') {
-    } else {
-      this.fun.toastError(res.msg, 'ERROR');
-    }
   }
 
   resetForm() {

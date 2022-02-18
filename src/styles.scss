@@ -6,6 +6,7 @@ $bodyfont: "Poppins";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
+@import "./assets/my_styles/modal.scss";
 @import "./assets/my_styles/forms.scss";
 @import "./assets/my_styles/btns.scss";
 
@@ -31,7 +32,7 @@ $bodyfont: "Poppins";
 }
 
 .ng-dropdown-panel {
-  z-index: 99999 !important;
+  z-index: 9999999 !important;
 }
 
 html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
@@ -432,39 +433,6 @@ body {
 }
 
 /* ====================================================== */
-/* MODAL */
-/* ====================================================== */
-
-body .p-dialog .p-dialog-header {
-  background-color: var(--primary02) !important;
-  padding: 0.5rem 1rem !important;
-  z-index: 100001 !important;
-  text-transform: uppercase;
-  font-size: 1rem;
-}
-
-.overlay {
-  z-index: 999999999 !important;
-  background-color: rgba(0, 0, 0, 0.4);
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-// body .p-widget-overlay {
-//   z-index: 0 !important;
-//   background-color: rgba(0, 0, 0, 0.4);
-// }
-
-body .p-dialog .p-dialog-content {
-  // height: -webkit-fill-available !important;
-  height: inherit !important;
-  overflow: hidden;
-}
-
-/* ====================================================== */
 /* CHECK APPLE */
 /* ====================================================== */
 
@@ -531,7 +499,7 @@ input.apple-switch:checked:after {
 
 bs-datepicker-container,
 bs-daterangepicker-container {
-  z-index: 10016 !important;
+  z-index: 9999999 !important;
 }
 
 .btn.btn-link {

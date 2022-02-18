@@ -11,6 +11,7 @@ import { modalClass } from '../components/modal/modal';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
+import { SingletonService } from '../../core/services/singleton.service';
 
 @Component({
   selector: 'app-layout',
@@ -23,7 +24,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   showLoading;
 
   usuario;
-  PrintersInstall: any;
+  printersList: any;
   OpenPrinterMenu;
   imgUser;
   versionApp: any;
@@ -42,6 +43,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   cuadre_hoy;
   ant_event_change_visibility;
 
+  configServ = SingletonService.configServ;
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
@@ -74,10 +76,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   ngOnInit() {
     this.initVariables();
     this._init_mixin({ component: 'layout', _lista_subs: ['decisionModal', 'refreshFacturas', 'sacarFacturas'] });
-
-    this._ipc.PRINTERS.subscribe((res) => {
-      if (res !== undefined) this.PrintersInstall = res;
-    });
 
     const token = this.fun.getAuthToken();
 
@@ -122,8 +120,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       }
     });
 
-    this.searchVersion();
-    this.getPrintersName();
+    this.configServ.getConfig().then((config) => {
+      this.versionApp = config.app_version;
+      this.printersList = config.printersList;
+    });
   }
 
   initVariables() {
@@ -161,27 +161,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     }
   }
 
-  async getPrintersName() {
-    this._ipc.send('printerNames');
-
-    await this._ipc.on('printersNameRes', (event: Electron.IpcMessageEvent, res) => {
-      this._ipc.PRINTERS_NEW(res);
-    });
-  }
-
-  async searchVersion() {
-    this._ipc.send('getVersion');
-    await this._ipc.on('versionResponse', (event, arg) => {
-      this.versionApp = arg;
-    });
-  }
-
   checkFacturaGuardada() {
     this.factGuardada = this.layServ.factura_guardada;
-  }
-
-  getVersion() {
-    return this.versionApp;
   }
 
   checkCuadre() {
@@ -217,6 +198,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   selectPrinter(name) {
     this.OpenPrinterMenu = false;
   }
+
   closePrinterMenu() {
     this.OpenPrinterMenu = false;
   }

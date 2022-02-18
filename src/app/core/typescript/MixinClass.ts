@@ -1,12 +1,9 @@
 import { GLOBAL } from './GLOBAL';
-import { modalClass } from '../../admin/components/modal/modal';
 import * as moment from '../javascript/moment';
 import { ModalClass } from '../../admin/components/new_modal/modal-class';
-import { applyMixins } from './GLOBAL';
 import { SingletonService } from '../services/singleton.service';
-import { LayoutClass } from '../../admin/layout/layout';
 
-type lista_sub = 'printBase64Res' | 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'refreshFacturas' | 'sacarFacturas' | 'noFiltro';
+type lista_sub = 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'refreshFacturas' | 'sacarFacturas' | 'noFiltro';
 
 interface mixinInit {
   component?: String;

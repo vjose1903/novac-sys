@@ -11,8 +11,6 @@ export class MessageTask {
   fn = new BehaviorSubject<any>({});
 
   constructor(eventName: string, data: string | object = '') {
-    console.log('eventName --> ', eventName);
-
     this.id = this.generateKey();
     this.eventName = eventName;
     this.data = typeof data === 'string' ? data : JSON.stringify(data);

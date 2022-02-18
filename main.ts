@@ -12,6 +12,7 @@ import {
   KEYWORD_ELECTRON_EVENT_DECRYPT,
   KEYWORD_ELECTRON_EVENT_ENCRYPT,
   KEYWORD_ELECTRON_GET_APP_CONFIG,
+  KEYWORD_ELECTRON_PRINT_BASE64,
   KEYWORD_ELECTRON_RESPONSE,
   KEYWORD_ELECTRON_SENDER,
   KEYWORD_ELECTRON_SET_APP_CONFIG,
@@ -110,8 +111,6 @@ function createWindow(): BrowserWindow {
   //   // }
 
   //   app.listen(httpPort, () => win.loadURL('http://localhost:5220'));
-
-  //   console.log('path a buscar:::', path.join(__dirname, pathIndex));
 
   //   // win.loadURL(url.format({
   //   //   pathname: path.join(__dirname, pathIndex),
@@ -226,78 +225,62 @@ autoUpdater.on('error', (error) => {
   console.error('error', error);
 });
 
-// ==========================================================================================================================================================
-//  MIS PROCESOS
-// ==========================================================================================================================================================
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Handle angular events
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ipcMain.on(KEYWORD_ELECTRON_SENDER, handleEvent);
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// OBTENER LOS NOMBRES DE LAS IMPRESORAS DEL SISTEMA
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-ipcMain.on('printerNames', (event: any, arg) => {
-  // name of function
-  const printersName = win.webContents.getPrinters();
-
-  event.reply('printersNameRes', printersName);
-});
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// PARA OBTENER LA VERSION DEL PACKAGE.JSON
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-ipcMain.on('getVersion', (event: any, arg) => {
-  // name of function
-  const pjson = require('./package.json');
-  event.reply('versionResponse', pjson.version);
-});
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// PARA IMPRIMIR UN BASE64
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-ipcMain.on('printBase64', async (event: any, oPdf) => {
-  const base64 = oPdf.base64;
-  const filename = oPdf.filename;
-  const type = oPdf.type;
-  const scale = oPdf['scale'] ? oPdf['scale'] : 'noscale';
-
-  // await puts(base64, 'base64');
-  // await puts(filename, 'filename');
-  // await puts(type, 'type');
-  generatePdfFileFormBase64(filename, base64, type, scale);
-});
-
 async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
   try {
     var arg = JSON.parse(obj) as MessageTaskInterface;
 
-    console.log('arg --> ', arg);
-
-    // console.log("handleEvent::nodejs:", arg);
+    let res;
 
     switch (arg.eventName) {
       case KEYWORD_ELECTRON_EVENT_DECRYPT:
-        var res = Functions.desEncriptar(arg.data);
+        res = Functions.desEncriptar(arg.data);
         arg.response = res;
         event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
         break;
       //
       case KEYWORD_ELECTRON_EVENT_ENCRYPT:
-        var res = Functions.encriptar(arg.data);
+        res = Functions.encriptar(arg.data);
         arg.response = res;
         event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+        break;
+      //
+      case KEYWORD_ELECTRON_PRINT_BASE64:
+        const oPdf = JSON.parse(arg.data);
+
+        const base64 = oPdf.base64;
+        const fileName = oPdf.filename;
+        const type = oPdf['type'] ? oPdf['type'] : 'reporte';
+        const scale = oPdf['scale'] ? oPdf['scale'] : 'noscale';
+
+        generatePdfFileFormBase64({ fileName, base64, type, scale })
+          .then((res) => {
+            arg.response = res;
+            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+          })
+          .catch((err) => {
+            arg.response = err;
+            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+          });
+
         break;
       //
       case KEYWORD_ELECTRON_GET_APP_CONFIG:
         const args_ = process.argv.slice(1);
         const serve_ = args_.some((val) => val === '--serve');
+        const pjson = require('./package.json');
 
         Functions.getConfigFile().then((config: any) => {
           arg.response = JSON.parse(config);
+
           arg.response['is_development'] = serve_;
+          arg.response['printersList'] = win.webContents.getPrinters();
+          arg.response['app_version'] = pjson.version;
+
           event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
         });
         break;
@@ -313,9 +296,7 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
         event.reply(KEYWORD_ELECTRON_RESPONSE);
         break;
     }
-  } catch (error) {
-    console.log(error);
-  }
+  } catch (error) {}
 }
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // BORRA EL ARCHIVO DE LOGS
@@ -677,42 +658,46 @@ async function escribirLogs(file, titulo, texto) {
 // GENERAR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function generatePdfFileFormBase64(cFileName, base64, type = 'reporte', scale = 'noscale') {
-  const FileName = pathAdd('/' + cFileName);
+function generatePdfFileFormBase64(params: { fileName: string; base64: string; type: string; scale: string }) {
+  return new Promise((resolve, reject) => {
+    const FileName = pathAdd('/' + params.fileName);
 
-  try {
-    fs.writeFile(FileName, base64, { encoding: 'base64' }, (err) => {
-      imprimir(cFileName, type, scale);
-    });
-  } catch (err) {
-    win.webContents.send('printBase64Res', { msg: 'Error generando reporte!!', status: false, error: err });
-  }
+    try {
+      fs.writeFile(FileName, params.base64, { encoding: 'base64' }, (err) => {
+        imprimir({ fileName: params.fileName, tipo: params.type, scale: params.scale })
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    } catch (err) {
+      reject({ msg: 'Error generando reporte!!', status: false, error: err });
+    }
+  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // IMPRIMIR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function imprimir(cFileName, tipo, scale) {
-  puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${pathAdd(`/${cFileName}`)}`);
-  const sumatrapdf_path = pathAdd('/print/lp.exe');
-  const file_path = pathAdd(`/${cFileName}`);
+function imprimir(params: { fileName: string; tipo: string; scale: string }) {
+  return new Promise((resolve, reject) => {
+    puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${pathAdd(`/${params.fileName}`)}`);
 
-  const orientation = tipo === 'reporte' ? 'Portrait' : 'landscape';
-  const paper_size = tipo === 'reporte' ? 'letter' : 'VJPOS';
+    const sumatrapdf_path = pathAdd('/print/lp.exe');
+    const file_path = pathAdd(`/${params.fileName}`);
 
-  const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},${scale},paper=${paper_size},simplex" -silent "${file_path}"`;
+    const orientation = params.tipo === 'reporte' ? 'Portrait' : 'landscape';
+    const paper_size = params.tipo === 'reporte' ? 'letter' : 'VJPOS';
 
-  cmd(comando, (res) => {
-    let msg_ = 'PDF impreso correctamente!!';
-    let tipo_ = 'printBase64Res';
-    if (res.status) {
-      win.webContents.send(tipo_, { msg: msg_, status: 'si', STDOUT: res });
-    } else {
-      msg_ = 'Error imprimiento PDF!!';
-      win.webContents.send(tipo_, { msg: msg_, status: 'no', err: res });
-      return;
-    }
+    const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
+
+    cmd(comando, (res) => {
+      if (res.status) resolve({ msg: 'PDF impreso correctamente!!', status: 'si', STDOUT: res });
+      else reject({ msg: 'Error imprimiento PDF!!', status: 'no', err: res });
+    });
   });
 }
 

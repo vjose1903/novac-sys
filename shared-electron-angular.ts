@@ -4,6 +4,7 @@ export const KEYWORD_ELECTRON_EVENT_DECRYPT = 'electron-desencriptar';
 export const KEYWORD_ELECTRON_EVENT_ENCRYPT = 'electron-encriptar';
 export const KEYWORD_ELECTRON_GET_APP_CONFIG = 'electron-get-app-config';
 export const KEYWORD_ELECTRON_SET_APP_CONFIG = 'electron-set-app-config';
+export const KEYWORD_ELECTRON_PRINT_BASE64 = 'electron-print-base64';
 
 export type MetodoHttp = 'get' | 'post' | 'put' | 'delete';
 export interface PeticionElectron {

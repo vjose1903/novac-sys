@@ -98,7 +98,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
       this.zone.run(() => (this.visible = false));
     });
 
-    // this.getPrintersName();
     // this.probandoEncriptar();
     this.getAppConfig();
   }
@@ -108,10 +107,8 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     this._ipc
       .sendTask(task)
       .then((config: ConfigurationI) => {
-        console.log('config ', config);
         this.themeService.setTheme(config.color_app);
         this.configServ.setConfig = config;
-
         this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       })
       .catch((err) => {
@@ -151,14 +148,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   ngAfterViewInit(): void {
     // this.themeService.setTheme('blue');
     // this.themeService.setTheme('red');
-  }
-
-  getPrintersName() {
-    this._ipc.on('printersNameRes', (event: Electron.IpcMessageEvent, res) => {
-      this._ipc.PRINTERS_NEW(res);
-    });
-
-    this._ipc.send('printerNames');
   }
 
   timeConvert(d) {

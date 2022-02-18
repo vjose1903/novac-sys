@@ -38,11 +38,7 @@ export function makeFacturaVenta(data) {
     styles: styles_,
   };
 
-  const obj = {
-    doc: dd,
-    file: 'factura.pdf',
-    type: 'file',
-  };
+  const obj = { doc: dd, file: 'factura.pdf', type: 'file', };
 
   return obj;
 }

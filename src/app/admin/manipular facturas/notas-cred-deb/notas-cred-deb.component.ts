@@ -50,7 +50,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'notas', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
+    this._init_mixin({ component: 'notas', _lista_subs: ['decisionModal', 'objDevuelto'] });
     this.idFactura = this.activeRoute.snapshot.params['id'];
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
@@ -70,14 +70,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   objDevueltoResponse(res) {
     if (res && res.tipo_modal === 'cambio') {
       this.decisionModal(res.data);
-    }
-  }
-
-  printBase64Res(res) {
-    if (res.status === 'si') {
-      this.fun.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
-    } else {
-      this.fun.toastError(res.msg, 'ERROR');
     }
   }
 
@@ -455,12 +447,14 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   imprimirNota(obj) {
-    this.pdfServ.generatePdf(obj).then((res) => {
-      if (res.status === 'si') {
-        const objBase = { base64: res.body, filename: res.file, type: 'facturacion' };
-        this._ipc.send('printBase64', objBase);
+    this.pdfServ
+      .generatePdf({ oPdf: obj, imprimir: true })
+      .then(async (res) => {
+        if (res.status === 'si') this.fun.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
+        else this.fun.toastError(res.msg, 'ERROR');
+
         this.layServ.nextCheckCuadreToday(true);
-      }
-    });
+      })
+      .catch((err) => this.fun.toastError(err.msg, 'ERROR'));
   }
 }

@@ -414,7 +414,19 @@
       <app-formar-factura *ngIf="seleccionModal" [factura]="seleccionModal"></app-formar-factura>
     </div>
 
+    <!-- TODO: HACER AQUI COMO HICE EN XCREEN PARA PONER LAS PROPIEDADES
+              HACER UN ARREGLO CON CUALES SI PERMITE X BOTON Y PREGUNTAR SI EL TIPO ACTUAL LO PERMITE
+              ASI SOLO TENER UN BOTON DE CADA UNO AQUI EN HTML -->
     <p-footer>
+      <ng-container class="p-1" *ngIf="mostrar_para === 'revisar'">
+        <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
+      </ng-container>
+
+      <ng-container class="p-1" *ngIf="mostrar_para === 'reimprimir'">
+        <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
+        <button (click)="accion(true, 'reimrimir')" type="submit" class="btn btn-amarillo mr-2">Reimprimir</button>
+      </ng-container>
+
       <ng-container class="p-1" *ngIf="mostrar_para === 'anular_factura'">
         <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
         <button (click)="accion(true)" type="submit" class="btn" id="btn-verde">Anular factura</button>
@@ -444,7 +456,7 @@
 
           <div *ngIf="mostrar_para === 'nota_credito' || mostrar_para === 'nota_debito'">
             <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
-            <button (click)="accion(true, 'reimrimir')" type="submit" class="btn btn-amarillo mr-2">Reimprimir</button>
+            <button (click)="accion(true)" type="submit" class="btn btn-verde mr-2">Continuar</button>
           </div>
         </div>
       </ng-container>

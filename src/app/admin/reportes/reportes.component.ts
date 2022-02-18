@@ -5,6 +5,7 @@ import { MixinClass } from '../../core/typescript/MixinClass';
 import * as _ from 'lodash';
 import { ReporteC } from './reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../shared-electron-angular';
 
 @Component({
   selector: 'app-reportes',
@@ -26,20 +27,12 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   titulo_moda_reporte;
 
   ngOnInit() {
-    this._init_mixin({ component: 'reportes', _lista_subs: ['decisionModal', 'objDevuelto', 'printBase64Res'] });
+    this._init_mixin({ component: 'reportes', _lista_subs: ['decisionModal', 'objDevuelto'] });
   }
 
   initCambioMenu(arg) {
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
-    }
-  }
-
-  printBase64Res(res) {
-    if (res.status === 'si') {
-      this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-    } else {
-      this.fun.toastError(res.msg, 'ERROR');
     }
   }
 
@@ -66,8 +59,11 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
 
       new CuadreCajaC().createOne({}, extra).then((res) => {
         const obj = { data: res.data, type: 'cuadre_caja' };
-        this.generarPdf(obj);
-        this.layServ.nextCheckCuadreToday(true);
+
+        this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
+          this.parseDataToVisorPdf(res);
+          this.layServ.nextCheckCuadreToday(true);
+        });
       });
     } catch (error) {
       console.error(error);
@@ -146,54 +142,46 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     if (continuar) {
       this.reporteClass.getAll(extra).then((res) => {
         this.loadServ.isLoading.next(true);
-
         const obj = { data: res, type: 'reporte' };
 
-        this.generarPdf(obj);
+        this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => this.parseDataToVisorPdf(res));
       });
     } else {
       this.fun.toastError(msg_error, 'ERROR');
     }
   }
 
-  generarPdf(obj) {
-    this.pdfServ
-      .generatePdf(obj)
-      .then((res) => {
-        this.scaleImpresion = res['scale'] ? res['scale'] : 'noscale';
-        if (res.status === 'si') {
-          let obj;
+  parseDataToVisorPdf(arg) {
+    this.scaleImpresion = arg['scale'] ? arg['scale'] : 'noscale';
+    if (arg.status === 'si') {
+      let obj;
 
-          this.pdfSrc = res.body;
-          this.fileName = res.file;
+      this.pdfSrc = arg.body;
+      this.fileName = arg.file;
 
-          if (res.file === 'cuadre.pdf') {
-            obj = {
-              pdfSrc: res.body,
-              titulo: 'Cuadre de caja',
-              height: '25rem',
-              reimprimir: res.reimprimir,
-              fileName: res.file.split('.')[0],
-            };
-          } else if (res.file === 'reporte.pdf') {
-            obj = {
-              pdfSrc: res.body,
-              titulo: this.titulo_moda_reporte,
-              height: '83vh',
-              reimprimir: res.reimprimir,
-              fileName: res.file.split('.')[0],
-            };
-          }
+      if (arg.file === 'cuadre.pdf') {
+        obj = {
+          pdfSrc: arg.body,
+          titulo: 'Cuadre de caja',
+          height: '25rem',
+          reimprimir: arg.reimprimir,
+          fileName: arg.file.split('.')[0],
+        };
+      } else if (arg.file === 'reporte.pdf') {
+        obj = {
+          pdfSrc: arg.body,
+          titulo: this.titulo_moda_reporte,
+          height: '83vh',
+          reimprimir: arg.reimprimir,
+          fileName: arg.file.split('.')[0],
+        };
+      }
 
-          this.abrirVisorPdf(obj);
-        } else {
-          this.loadServ.isLoading.next(false);
-          this.fun.toastError(res.msg, 'ERROR');
-        }
-      })
-      .catch((error) => {
-        this.loadServ.isLoading.next(false);
-      });
+      this.abrirVisorPdf(obj);
+    } else {
+      this.loadServ.isLoading.next(false);
+      this.fun.toastError(arg.msg, 'ERROR');
+    }
   }
 
   formarObjModal(tipo) {
@@ -259,14 +247,16 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   decisionModal(decision) {
     if (decision) {
       if (this.tipoModal === 'visor_pdf') {
-        const obj = {
-          base64: this.seleccionModal.pdfSrc,
-          filename: `${this.seleccionModal.fileName}.pdf`,
-          type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte',
-          scale: this.scaleImpresion,
-        };
+        const obj = { base64: this.seleccionModal.pdfSrc, filename: `${this.seleccionModal.fileName}.pdf`, type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte', scale: this.scaleImpresion };
 
-        this._ipc.send('printBase64', obj);
+        this.pdfServ
+          .imprimirBase64(obj)
+          .then((res) => {
+            if (res.status === 'si') this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+            else this.fun.toastError(res.msg, 'ERROR');
+          })
+          .catch((err) => this.fun.toastError(err.msg, 'ERROR'));
+        //
       } else if (this.tipoModal === 'cuadre') {
         this.makeCuadre();
       }

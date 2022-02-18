@@ -16,9 +16,6 @@ export class IpcService {
   childProcess: typeof childProcess;
   fs: typeof fs;
 
-  private printers = new BehaviorSubject<any>(undefined);
-  PRINTERS = this.printers.asObservable();
-
   objPercent = {
     transferred: 0,
     total: 0,
@@ -52,13 +49,8 @@ export class IpcService {
     return window['require'](module).ipcRenderer;
   }
 
-  PRINTERS_NEW(nextValue) {
-    this.printers.next(nextValue);
-  }
-
   public removeListener(channel: string): void {
     if (!this._ipc) return;
-
     this._ipc.removeAllListeners(channel);
   }
 
@@ -68,16 +60,8 @@ export class IpcService {
     this._ipc.on(channel, listener);
   }
 
-  public send(channel: string, ...args): void {
-    if (!this._ipc) return;
-
-    this._ipc.send(channel, ...args);
-  }
-
   listenEvents() {
     this._ipc.on(KEYWORD_ELECTRON_RESPONSE, (event, obj) => {
-      console.log('obj ==> ', obj);
-
       const arg = typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface);
       const tareas = this.colaDeMensajes.value;
 
@@ -99,7 +83,6 @@ export class IpcService {
 
         try {
           const resultado = await lastValueFrom(task.fn.pipe(skip(1), take(1)));
-
           resolve(resultado);
         } catch (error) {
           reject(error);

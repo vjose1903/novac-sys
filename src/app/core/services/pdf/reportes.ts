@@ -21,14 +21,7 @@ export function makeReporte(data) {
     header: cabeceraReporte(data, configuration, configApp),
     content: contenidoReporte(data, configuration),
     footer: (currentPage, pageCount) => {
-      return [
-        {
-          text: ' ',
-          alignment: 'right',
-          style: 'letra10',
-          margin: [0, 0, 20, 0],
-        },
-      ];
+      return [{ text: ' ', alignment: 'right', style: 'letra10', margin: [0, 0, 20, 0] }];
     },
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
@@ -36,12 +29,7 @@ export function makeReporte(data) {
     styles: styles_,
   };
 
-  const obj = {
-    doc: dd,
-    file: 'reporte.pdf',
-    type: 'base64',
-    scale: configuration['pageOrient'] ? (configuration['pageOrient'] === 'landscape' ? 'fit' : 'noscale') : 'noscale',
-  };
+  const obj = { doc: dd, file: 'reporte.pdf', type: 'base64', scale: configuration['pageOrient'] ? (configuration['pageOrient'] === 'landscape' ? 'fit' : 'noscale') : 'noscale' };
 
   return obj;
 }
