@@ -96,7 +96,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() filtroSelect: any;
   @Input() data;
   @Input() colores = false;
-
+  @Input() TablasComponent;
+  @Output() TablasComponentChange = new EventEmitter<any>();
   // output
   @Output() pageChanges = new EventEmitter<any>();
   @Output() clickIcon = new EventEmitter<any>();
@@ -131,12 +132,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       }
     });
 
-    // if (this.search) {
-    //   setTimeout(() => {
-    //     this.element = document.getElementById('search') as HTMLElement;
-    //     this.element.focus();
-    //   }, 5);
-    // }
+    this.TablasComponent = this;
+    this.TablasComponentChange.emit(this.TablasComponent);
+
     this.checkPagination();
   }
 

@@ -45,6 +45,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
+  chequiando_cuadre: boolean;
 
   constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef) {
     super();
@@ -184,9 +185,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   checkCuadre() {
-    let extra = { afterPath: 'check_today_cuadre', parameters: {} };
-
-    new CuadreCajaC().getAll(extra).then((res) => (this.cuadre_hoy = res['data'].existe_cuadre_hoy));
+    if (!this.chequiando_cuadre) {
+      let extra = { afterPath: 'check_today_cuadre', parameters: {} };
+      this.chequiando_cuadre = true;
+      new CuadreCajaC().getAll(extra).then((res) => {
+        this.cuadre_hoy = res['data'].existe_cuadre_hoy;
+        this.chequiando_cuadre = false;
+      });
+    }
   }
 
   setUser(user) {

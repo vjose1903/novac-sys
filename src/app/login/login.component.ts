@@ -79,10 +79,18 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
     return this.versionApp;
   }
 
+  formularioIsInvalid() {
+    const formulario = this.loginForm.getRawValue();
+    return this.fun.isEmpty(formulario.usuario) || this.fun.isEmpty(formulario.password);
+  }
+
   saltar(input) {
+    const formulario = this.loginForm.getRawValue();
     if (input == 'send') {
-      this.login();
-    } else this.enfocarInput(input);
+      if (this.fun.hasValue(formulario.password)) this.login();
+    } else {
+      if (this.fun.hasValue(formulario.usuario)) this.enfocarInput(input);
+    }
   }
 
   // =================================================================

@@ -38,9 +38,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();
   ncfClass = new NcfC();
-  showSide: boolean = false;
   notas: any = [];
   notaSelected: string;
+  showSide: boolean = false;
+  TablasComponent;
 
   constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
     super();
@@ -254,6 +255,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
     this.getNotas(this.tServ.getPaginationById('notas'));
     this.showSide = true;
+    setTimeout(() => this.TablasComponent.calcularAlto(), 100);
   }
 
   getNotas(e) {

@@ -173,10 +173,10 @@
           </div>
         </form>
         <div class="col-12 p-0 mt-3">
-          <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar('boton html', $event)" style="width: 6.5rem">
+          <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar('boton html', $event)" >
             {{ 'Borrar' }}
           </button>
-          <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde" style="width: 6.5rem">{{ boton }}</button>
+          <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde" >{{ boton }}</button>
           <!-- [value]="boton"  -->
           <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="abrirModal('password', usuarioSelected)">Cambiar contraseña</a>
         </div>
