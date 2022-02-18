@@ -292,8 +292,12 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
         break;
       //
       case KEYWORD_ELECTRON_GET_APP_CONFIG:
+        const args_ = process.argv.slice(1);
+        const serve_ = args_.some((val) => val === '--serve');
+
         Functions.getConfigFile().then((config: any) => {
           arg.response = JSON.parse(config);
+          arg.response['is_development'] = serve_;
           event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
         });
         break;

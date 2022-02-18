@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { FunctionService } from '../../../core/services/functions.service';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 
