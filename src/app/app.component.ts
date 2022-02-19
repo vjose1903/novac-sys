@@ -108,16 +108,19 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   }
 
   downloadProgression(object) {
-    if (this.counter == 1) this.visible = true;
+    this.zone.run(() => {
+      if (this.counter == 1) this.visible = true;
 
-    this.counter++;
-    this.tiempo_restante = this.timeConvert(object.total / object.bytesPerSecond);
+      this.counter++;
+      this.tiempo_restante = this.timeConvert(object.total / object.bytesPerSecond);
 
-    object.transferred = parseFloat(GLOBAL.redondearAdos(object.transferred / 1000000));
-    object.total = parseFloat(GLOBAL.redondearAdos(object.total / 1000000));
-    object.percent = parseFloat(GLOBAL.redondearAdos(object.percent));
+      object.transferred = parseFloat(GLOBAL.redondearAdos(object.transferred / 1000000));
+      object.total = parseFloat(GLOBAL.redondearAdos(object.total / 1000000));
+      object.percent = parseFloat(GLOBAL.redondearAdos(object.percent));
 
-    this.objPercent = object;
+      this.objPercent = object;
+      this.cdRef.detectChanges();
+    });
   }
 
   async getAppConfig() {
