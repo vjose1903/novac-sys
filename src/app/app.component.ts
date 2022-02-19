@@ -67,37 +67,39 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
     this.sub = ELECTRON_EVENTS_OBSERVER.subscribe((res) => {
       console.log('===== res ', res);
-      const info = res.info;
-      switch (res.event_name) {
-        case ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE:
-          this.fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
+      if (this.fun.hasValue(res)) {
+        const info = res.info;
+        switch (res.event_name) {
+          case ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE:
+            this.fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
 
-          break;
-        //
-        case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
-          this.visible = true;
-          break;
-        //
-        case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
-          this.downloadProgression(info.body);
-          break;
-        //
-        case ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED:
-          this.visible = false;
-          break;
-        //
-        case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
-          this.fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
+            break;
+          //
+          case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
+            this.visible = true;
+            break;
+          //
+          case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
+            this.downloadProgression(info.body);
+            break;
+          //
+          case ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED:
+            this.visible = false;
+            break;
+          //
+          case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
+            this.fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
 
-          break;
-        //
-        case ELECTRON_EVENT_UPDATE_ERROR:
-          this.fun.toastError(info.msg, 'ERRROR');
-          this.visible = false;
-          break;
-        //
-        default:
-          break;
+            break;
+          //
+          case ELECTRON_EVENT_UPDATE_ERROR:
+            this.fun.toastError(info.msg, 'ERRROR');
+            this.visible = false;
+            break;
+          //
+          default:
+            break;
+        }
       }
     });
 
