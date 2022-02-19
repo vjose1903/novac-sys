@@ -59,6 +59,7 @@
     "postcss": "8.4.5",
     "primeicons": "^4.1.0",
     "primeng": "13.0.4",
+    "replace-in-file": "6.3.2",
     "request": "^2.88.2",
     "sass-google-fonts": "^1.0.1",
     "zlib": "1.0.5"
