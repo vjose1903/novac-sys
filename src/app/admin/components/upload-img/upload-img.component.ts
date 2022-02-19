@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FunctionService } from '../../../core/services/functions.service';
 import { RequestC } from '../../../core/typescript/requests';
 
@@ -11,11 +11,12 @@ export class UploadImgComponent implements OnInit {
   nameFile = '';
   fotoActual: string;
   uploadedFile;
-  imageSrc: any;
   BASE_64;
   FILE_NAME;
   requestClass = new RequestC();
 
+  @Input() src_img;
+  @Input() id;
   @Output() getPhotoData = new EventEmitter<any>();
 
   constructor(private fun: FunctionService) {}
@@ -23,17 +24,18 @@ export class UploadImgComponent implements OnInit {
   ngOnInit() {}
 
   borrar() {
-    this.imageSrc = null;
+    this.src_img = null;
     this.BASE_64 = null;
     this.FILE_NAME = null;
-    this.getPhotoData.emit(null);
+
+    const data = { fileName: this.FILE_NAME, base_64: this.BASE_64, src_img: this.src_img, id: this.id };
+    this.getPhotoData.emit(data);
   }
+
   subirIMG() {
     if (this.BASE_64 && this.FILE_NAME) {
-      const obj = {
-        base_64: this.BASE_64,
-        file_name: this.FILE_NAME,
-      };
+      const obj = { base_64: this.BASE_64, file_name: this.FILE_NAME };
+
       this.requestClass.createOne(obj, { afterPath: 'imagenes' }).then((res) => {
         console.log('res ', res);
       });
@@ -52,13 +54,12 @@ export class UploadImgComponent implements OnInit {
         const bas64 = reader.result.toString().split(',')[1];
         this.FILE_NAME = files[0].name;
         this.BASE_64 = bas64;
-        this.imageSrc = reader.result;
+        this.src_img = `data:image/png;base64,${bas64}`;
       };
     }
-    const img = {
-      fileName: this.FILE_NAME,
-      base_64: this.BASE_64,
-    };
-    this.getPhotoData.emit(img);
+
+    const data = { fileName: this.FILE_NAME, base_64: this.BASE_64, id: this.id };
+
+    this.getPhotoData.emit(data);
   }
 }

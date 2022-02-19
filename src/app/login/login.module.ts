@@ -9,9 +9,11 @@ import { AngularModule } from '../modules/angular.module';
 import { ModalModule } from '../admin/components/modal/modal.module';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
 import { ConfiguracionesComponent } from './extra/configuraciones/configuraciones.component';
-
+import { InputMaskModule } from 'primeng/inputmask';
+import { UploadImgModule } from '../admin/components/upload-img/upload-img.module';
+import { DropdownModule } from 'primeng/dropdown';
 @NgModule({
   declarations: [LoginComponent, ModalPasswordConfigComponent, ConfiguracionesComponent],
-  imports: [CommonModule, LoginRoutingModule, MDBBootstrapModule, NgxBootstrapModule, AngularModule, ModalModule],
+  imports: [CommonModule, LoginRoutingModule, MDBBootstrapModule, NgxBootstrapModule, AngularModule, ModalModule, InputMaskModule, UploadImgModule, DropdownModule],
 })
 export class LoginModule {}

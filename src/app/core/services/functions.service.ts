@@ -44,6 +44,15 @@ export class FunctionService {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: duplicarJson
+  // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
+  // _________________________________________________________________________________________________
+
+  duplicarJson(json: Object | Array<any>) {
+    return _.cloneDeep(json);
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: checkNumbers
   // Descripcion : Esta funcion retorna true si algun caracter de una cadena no es un numero
   // _________________________________________________________________________________________________

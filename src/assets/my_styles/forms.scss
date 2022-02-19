@@ -91,6 +91,7 @@ textarea {
   }
 }
 
+.p-inputmask,
 .p-inputtext,
 .form-control {
   &.with_btn {
@@ -105,18 +106,20 @@ textarea {
   padding: 0.2rem 0.7rem !important;
   width: 100%;
   @include campos;
-
-  // &:focus {
-  //   background-color: var(--primary01) !important;
-  //   border-color: transparent !important;
-  //   box-shadow: 0px 0px 6px var(--primary08) !important;
-  // }
 }
 
+.p-inputmask,
 .form-control {
+  width: 100%;
+
+  &:hover {
+    border-color: #ced4da !important;
+  }
+
   &:focus {
     box-shadow: none;
   }
+
   @include campos;
   &.min {
     height: 2rem !important;

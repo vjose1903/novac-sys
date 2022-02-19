@@ -12,7 +12,7 @@ export default class HandlerConfigFile {
     telefono_empresa: '809-573-0060',
     logo_empresa: logos.normal,
     logo_impresion: logos.impresion,
-    color_app: 'blue',
+    color_app: 'green',
     url_servidor: 'http://admservidor.ddns.net:9090',
     url_servidor_respaldo: 'http://10.0.0.9:9090',
     url_servidor_descargas: 'http://admservidor.ddns.net:9090',

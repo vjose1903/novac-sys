@@ -18,9 +18,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   configServ = SingletonService.configServ;
 
   initCambioMenu(arg) {
-    if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
-    }
+    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
   }
 
   cedula = null;
