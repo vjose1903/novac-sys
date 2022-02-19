@@ -231,15 +231,15 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
             telefono_empresa: '809-573-0060',
             logo_empresa: logos.normal,
             logo_impresion: logos.impresion,
-            color_app: 'blue',
+            color_app: 'red',
             url_servidor: 'http://admservidor.ddns.net:9090',
             url_servidor_respaldo: 'http://10.0.0.9:9090',
             url_servidor_descargas: 'http://admservidor.ddns.net:9090',
             config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
             is_development: null,
           },
-          array_targets: ["color_app: 'red'"],
-          array_replacement: ["color_app: 'blue'"],
+          array_targets: ["color_app: 'blue'"],
+          array_replacement: ["color_app: 'red'"],
         };
 
         replace_in_file
