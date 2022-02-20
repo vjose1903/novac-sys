@@ -1,6 +1,7 @@
 import * as zlib from 'zlib';
 import * as fs from 'fs';
 import { pathAdd } from '../main';
+import { BrowserWindow } from 'electron';
 
 export default class Functions {
   static encriptar(arg: string): string {
@@ -41,5 +42,53 @@ export default class Functions {
         reject(false);
       }
     });
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: isEmpty
+  // Descripcion : Esta funcion valida que si una variable esta vacia
+  // __________________________________________________________________________________________________
+
+  static isEmpty(value) {
+    return (
+      // es null o indefinido
+      value == null ||
+      // si tiene longitud 0
+      (value.hasOwnProperty('length') && value.length === 0) ||
+      // si es un string vacio o con lleno de espacios
+      (typeof value === 'string' && value.trim().length === 0) ||
+      // si es un objeto y no tiene propiedades
+      (value.constructor === Object && Object.keys(value).length === 0)
+    );
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: hasValue
+  // Descripcion : Esta funcion valida que si una variable tiene valor
+  // __________________________________________________________________________________________________
+
+  static hasValue(value) {
+    return !this.isEmpty(value);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: multiAssing
+  // Descripcion : Esta funcion hace un multiAsignamiento en onjetos a partir de otro objeto
+  // __________________________________________________________________________________________________
+  static multiAssing(obj: Object, sources: Array<{ key: string; value: any }>) {
+    for (let index = 0; index < sources.length; index++) {
+      const element = sources[index];
+      obj[element.key] = element.value;
+    }
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: getDefaultPrinter
+  // Descripcion : Esta funcion hace un multiAsignamiento en onjetos a partir de otro objeto
+  // __________________________________________________________________________________________________
+  static getDefaultPrinter(win: BrowserWindow) {
+    const printers = win.webContents.getPrinters();
+    const defaultPrinter = printers.find((printer) => printer.isDefault);
+    return defaultPrinter;
   }
 }

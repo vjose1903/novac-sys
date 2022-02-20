@@ -52,6 +52,8 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       this.versionApp = config.app_version;
     });
+
+
   }
 
   abrirModalReporte(obj) {

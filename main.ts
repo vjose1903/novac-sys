@@ -178,7 +178,7 @@ async function beforeCreateWindow(win_) {
   verificarSumastra();
   borrarLogs();
 
-  HandlerConfigFile.checkConfigFile();
+  HandlerConfigFile.checkConfigFile(win);
 
   // ----- Manejar las actualizaciones -----
   auto_updater = new AppUpdater();
@@ -205,41 +205,11 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
 
     switch (arg.eventName) {
       case KEYWORD_ELECTRON_TEST:
-        // const FileName = pathAdd('/factura.pdf');
-
-        // const options = { silent: true, deviceName: 'HP_Color_LaserJet_Prro_M479' };
-        // win.webContents.print(options, (success, errorType) => {
-        //   console.log('success ', success);
-        //   console.log('errorType ', errorType);
-        //   if (success) {
-        //     arg.response = success;
-        //     event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-        //   } else {
-        //     arg.response = errorType;
-        //     event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-        //   }
-        // });
-
+        // test function
         break;
       //
       case KEYWORD_ELECTRON_CHANGE_CONFIG_FILE:
-        const obj = {
-          new_config: {
-            nombre_empresa: 'ADM Agroindustrial S.R.L',
-            rnc_empresa: '131-99603-5',
-            direccion_empresa: 'Autopista Duarte Km0 El Higüero, La Vega',
-            telefono_empresa: '809-573-0060',
-            logo_empresa: logos.normal,
-            logo_impresion: logos.impresion,
-            color_app: 'green',
-            url_servidor: 'http://admservidor.ddns.net:9090',
-            url_servidor_respaldo: 'http://10.0.0.9:9090',
-            url_servidor_descargas: 'http://admservidor.ddns.net:9090',
-            config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
-          },
-          array_targets: ["color_app: 'red'"],
-          array_replacement: ["color_app: 'green'"],
-        };
+        const obj = JSON.parse(arg.data);
 
         replace_in_file
           .replaceFunction(obj)

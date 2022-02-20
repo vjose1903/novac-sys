@@ -51,15 +51,14 @@ export class UploadImgComponent implements OnInit {
       reader.readAsDataURL(file);
 
       reader.onload = (e) => {
-        const bas64 = reader.result.toString().split(',')[1];
+        const base64 = reader.result.toString().split(',')[1];
         this.FILE_NAME = files[0].name;
-        this.BASE_64 = bas64;
-        this.src_img = `data:image/png;base64,${bas64}`;
+        this.BASE_64 = base64;
+        this.src_img = `data:image/png;base64,${base64}`;
+
+        const data = { fileName: this.FILE_NAME, base_64: this.BASE_64, src_img: this.src_img, id: this.id };
+        this.getPhotoData.emit(data);
       };
     }
-
-    const data = { fileName: this.FILE_NAME, base_64: this.BASE_64, id: this.id };
-
-    this.getPhotoData.emit(data);
   }
 }
