@@ -95,13 +95,13 @@
                 <label class="control-label">Impresora facturación seleccionada: </label>
                 <p-dropdown [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
                   <ng-template pTemplate="selectedItem">
-                    <div class="country-item country-item-value d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value.description">
-                      <div>{{ form.controls['printer_caja_selected'].value.description }}</div>
+                    <div class="country-item country-item-value d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value.displayName">
+                      <div>{{ form.controls['printer_caja_selected'].value.displayName }}</div>
                     </div>
                   </ng-template>
                   <ng-template let-printerItem pTemplate="item">
                     <div class="printerItem-item d-flex align-items-center">
-                      <div>{{ printerItem.description }}</div>
+                      <div>{{ printerItem.displayName }}</div>
                     </div>
                   </ng-template>
                 </p-dropdown>
@@ -114,13 +114,13 @@
                 <label class="control-label">Impresora reportes seleccionada: </label>
                 <p-dropdown [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
                   <ng-template pTemplate="selectedItem">
-                    <div class="country-item country-item-value d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value.description">
-                      <div>{{ form.controls['printer_reportes_selected'].value.description }}</div>
+                    <div class="country-item country-item-value d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value.displayName">
+                      <div>{{ form.controls['printer_reportes_selected'].value.displayName }}</div>
                     </div>
                   </ng-template>
                   <ng-template let-printerItem pTemplate="item">
                     <div class="printerItem-item d-flex align-items-center">
-                      <div>{{ printerItem.description }}</div>
+                      <div>{{ printerItem.displayName }}</div>
                     </div>
                   </ng-template>
                 </p-dropdown>

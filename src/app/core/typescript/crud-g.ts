@@ -90,10 +90,16 @@ export class CrudG<T> {
     return params;
   }
 
-  makeUrl(tipo, args?, id = null) {
+  getUrlInUse() {
     const configApp = SingletonService.configServ.getConfig({ isPromise: false });
+    if (!configApp.usa_url_principal) this.fun.logYellow('::::: USANDO LA URL DE RESPALDO :::::');
 
-    let url = `${configApp.is_development ? AppConfig.url_server : configApp.url_servidor}${this.fun.hasValue(this.path) ? `/${this.path}` : ''}`;
+    const url = configApp.is_development ? AppConfig.url_server : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
+    return url;
+  }
+
+  makeUrl(tipo, args?, id = null) {
+    let url = `${this.getUrlInUse()}${this.fun.hasValue(this.path) ? `/${this.path}` : ''}`;
 
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';
 
