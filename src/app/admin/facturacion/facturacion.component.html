@@ -66,9 +66,7 @@
           <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
           <select
             id="venta"
-            (keydown.enter)="
-              saltar(modo_factura === 'normal' ? 'nom' : modo_factura === 'viaje' ? 'fecha_equivalente' : 'buscarCliente', $event.target.value, $event.target.id)
-            "
+            (keydown.enter)="saltar(modo_factura === 'normal' ? 'nom' : modo_factura === 'viaje' ? 'fecha_equivalente' : 'buscarCliente', $event.target.value, $event.target.id)"
             (change)="selectModoFactura($event.target.value)"
             class="form-control inputE"
             [(ngModel)]="modo_factura"
@@ -105,17 +103,16 @@
 
         <div *ngIf="metodo === 'compra'">
           <span class="mt-2"><strong>Número comprobante:</strong></span>
-          <input
-            type="text"
-            [textMask]="{ mask: ncfMask }"
-            placeholder="b__________"
-            class="form-control inputE UPPERCASE"
+
+          <p-inputMask
             (keydown.enter)="saltar(condicion_fact === 'Crédito' ? 'fecha_vencimiento' : 'filtro', $event.target.value, $event.target.id)"
             [(ngModel)]="NCFcompra"
-            (focus)="trimEndNcf()"
-            id="ncf"
+            mask="B9999999999"
             tabindex="-1"
-          />
+            styleClass="form-control inputE UPPERCASE"
+            inputId="ncf"
+            placeholder="B__________"
+          ></p-inputMask>
 
           <div *ngIf="condicion_fact === 'Crédito'">
             <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
@@ -168,11 +165,7 @@
                 [ngClass]="{ disabled: activarNombreDireccion() }"
               />
               <input id="id" type="hidden" formControlName="id" />
-              <div
-                class="alerta text-danger ml-1"
-                style="font-size: 12px"
-                *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)"
-              >
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
                 Este Campo es obligatorio
               </div>
             </div>
@@ -180,21 +173,8 @@
             <div class="col-5 pr-0">
               <div class="form-group">
                 <span class="control-label titulos">Telefono:</span>
-                <input
-                  type="text"
-                  class="form-control inputE disabled"
-                  formControlName="telefono"
-                  placeholder="(___)___-____"
-                  autocomplete="off"
-                  id="inputTelefono"
-                  [readOnly]="true"
-                  tabindex="-1"
-                />
-                <div
-                  class="alerta text-danger ml-1"
-                  style="font-size: 12px"
-                  *ngIf="!form.controls['telefono'].valid && (form.controls['telefono'].dirty || form.controls['telefono'].touched)"
-                >
+                <input type="text" class="form-control inputE disabled" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" [readOnly]="true" tabindex="-1" />
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['telefono'].valid && (form.controls['telefono'].dirty || form.controls['telefono'].touched)">
                   Introduzca el numero de telefono
                 </div>
               </div>
@@ -215,11 +195,7 @@
                   [ngClass]="{ disabled: activarNombreDireccion() }"
                   tabindex="-1"
                 />
-                <div
-                  class="alerta text-danger ml-1"
-                  style="font-size: 12px"
-                  *ngIf="!form.controls['direccion'].valid && (form.controls['direccion'].dirty || form.controls['direccion'].touched)"
-                >
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['direccion'].valid && (form.controls['direccion'].dirty || form.controls['direccion'].touched)">
                   Este Campo es obligatorio
                 </div>
               </div>
@@ -260,20 +236,10 @@
       <div class="col-7">
         <div class="row">
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }} ">
-            <app-btncircular
-              [alto]="'100px'"
-              [accion]="!!!factura_a_editar ? 'Imprimir Factura' : 'Editar Factura'"
-              [nombreImg]="'printer'"
-              (click)="imprimirFactura()"
-            ></app-btncircular>
+            <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Imprimir Factura' : 'Editar Factura'" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
           </div>
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
-            <app-btncircular
-              [alto]="'100px'"
-              [accion]="!!!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'"
-              [nombreImg]="'cancelar'"
-              (click)="cancelarFactura()"
-            ></app-btncircular>
+            <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
           </div>
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
             <app-btncircular
@@ -285,13 +251,7 @@
           </div>
 
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">
-            <app-btncircular
-              *ngIf="!!!factura_a_editar"
-              [alto]="'100px'"
-              [accion]="'Ingresar Factura pendientes'"
-              [nombreImg]="'calendar'"
-              (click)="ingresarFecha()"
-            ></app-btncircular>
+            <app-btncircular *ngIf="!!!factura_a_editar" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (click)="ingresarFecha()"></app-btncircular>
           </div>
 
           <!-- <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">

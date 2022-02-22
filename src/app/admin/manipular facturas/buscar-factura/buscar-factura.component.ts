@@ -471,8 +471,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   saltar(campo, valor) {
+    console.log('valor ', valor);
+    console.log('this.campo ', this.campo);
     const actualPagination = this.tServ.getPaginationById('facturas_params');
+
     if (valor && this.campo) {
+      console.log('campo ', campo);
       this.valor = valor;
       if (campo === 'cliente') {
         if (valor || valor === ' ') {
@@ -485,11 +489,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         if (this.campo === '2') {
           valor = valor.toUpperCase();
           this.NCF = valor;
-          if (this.validarRayaAbajo()) {
-            this.pedirFactura(this.campo, valor, actualPagination);
-          } else {
-            this.fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
-          }
+
+          this.pedirFactura(this.campo, valor, actualPagination);
         } else {
           if (this.tipo_factura_id === '0') {
             this.pedirFactura(this.campo, valor, actualPagination);
@@ -499,6 +500,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         }
       } else {
         this.enfocarInput(campo);
+      }
+    } else {
+      if (campo === 'buscarFactura') {
+        this.fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
       }
     }
   }

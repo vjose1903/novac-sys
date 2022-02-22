@@ -189,7 +189,13 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
               if (this.fun.hasValue(is_suplidor) && is_suplidor.persona.estado) {
                 this.fun.toastError(`${_.capitalize(tipo)} pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR');
-                this.changeStateCampos(false);
+
+                const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
+                this.doc_is_cedula = documento_original.descripcion == 'cedula' ? true : false;
+                const otro_doc = documento_original.descripcion == 'cedula' ? 'rnc' : 'cedula';
+                this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
+                this.form.controls[otro_doc].setValue(null);
+                if (!this.editando) enable_campos = false;
                 return;
               }
 

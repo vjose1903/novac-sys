@@ -68,7 +68,8 @@
           <div class="col-6 p-0 pr-2" *ngIf="form.controls['user_id'].value === -1">
             <div class="form-group">
               <label class="control-label">Telefono: <span style="color: red">*</span></label>
-              <input type="text" class="form-control" [textMask]="{ mask: phoneMask }" formControlName="telefono_no_empleado" placeholder="(___) ___-____" autocomplete="off" />
+
+              <p-inputMask mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono_no_empleado"></p-inputMask>
 
               <div
                 class="alerta text-danger ml-1"

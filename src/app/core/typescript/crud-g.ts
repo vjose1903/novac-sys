@@ -45,21 +45,13 @@ export class CrudG<T> {
 
       if (_.has(data, 'id') && data.id !== 0) {
         this.updateOne(data, arg, tipo).then(
-          (res) => {
-            resolve(res);
-          },
-          (err) => {
-            reject(err);
-          },
+          (res) => resolve(res),
+          (err) => reject(err),
         );
       } else {
         this.createOne(data, arg, tipo).then(
-          (res) => {
-            resolve(res);
-          },
-          (err) => {
-            reject(err);
-          },
+          (res) => resolve(res),
+          (err) => reject(err),
         );
       }
     });

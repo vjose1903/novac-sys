@@ -200,6 +200,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       const documento = this.form.controls[tipo].value;
 
       let enable_campos = false;
+      console.log('documento ', documento);
+      console.log('this.form.controls[tipo].valid ', this.form.controls[tipo].valid);
 
       if (this.form.controls[tipo].valid) {
         if (this.editando && _.some(this.documentos_de_identidad, (doc) => doc.documento === documento)) {
@@ -215,8 +217,12 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
               if (this.fun.hasValue(is_cliente) && is_cliente.persona.estado) {
                 this.fun.toastError(`${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
-                this.changeStateCampos(false);
-                // this.camposDisabled = false;
+                const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
+                this.doc_is_cedula = documento_original.descripcion == 'cedula' ? true : false;
+                const otro_doc = documento_original.descripcion == 'cedula' ? 'rnc' : 'cedula';
+                this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
+                this.form.controls[otro_doc].setValue(null);
+                if (!this.editando) enable_campos = false;
                 return;
               }
 
@@ -238,16 +244,13 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
               enable_campos = true;
             }
 
-            if (enable_campos) {
-              this.changeStateCampos(true);
-              // this.camposDisabled = false;
-            }
+            if (enable_campos) this.changeStateCampos(true);
           })
           .catch((err) => {
             console.error('err ', err);
           });
       } else {
-        if (!_.endsWith(documento, '_')) {
+        if (!this.editando && _.endsWith(documento, '_')) {
           this.documentos_de_identidad = undefined;
           // this.camposDisabled = true;
           this.changeStateCampos(false);

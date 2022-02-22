@@ -91,16 +91,6 @@ textarea {
   }
 }
 
-.p-inputmask,
-.p-inputtext,
-.form-control {
-  &.with_btn {
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-  }
-  border-radius: 0.25rem !important;
-}
-
 .inputE {
   height: calc(1.5em + 0.3rem + 2px) !important;
   padding: 0.2rem 0.7rem !important;
@@ -111,6 +101,7 @@ textarea {
 .p-inputmask,
 .form-control {
   width: 100%;
+  border-radius: 0.25rem !important;
 
   &:hover {
     border-color: #ced4da !important;
@@ -129,8 +120,14 @@ textarea {
   &.disabled,
   &:disabled {
     background-color: #e9ecef !important;
+
     touch-action: none;
     pointer-events: none;
+  }
+
+  &.with-right-btn {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
   }
 }
 

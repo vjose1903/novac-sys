@@ -676,6 +676,8 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
     if (campo === 'filtro') {
       if (this.validarRayaAbajo()) {
+        console.log('ENTOOO');
+
         this.abrirModalFiltro();
         this.desEnfocarInput(salioDe);
       } else this.fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
@@ -695,22 +697,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     }
   }
 
-  setCaretPosition(ctrl, pos) {
-    // Modern browsers
-    if (ctrl.setSelectionRange) {
-      ctrl.focus();
-      ctrl.setSelectionRange(pos, pos);
-
-      // IE8 and below
-    } else if (ctrl.createTextRange) {
-      const range = ctrl.createTextRange();
-      range.collapse(true);
-      range.moveEnd('character', pos);
-      range.moveStart('character', pos);
-      range.select();
-    }
-  }
-
   activarNombreDireccion() {
     let res = false;
     if (this.metodo === 'compra' || this.factura_a_editar) {
@@ -726,15 +712,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     }
 
     return res;
-  }
-
-  trimEndNcf() {
-    const input = document.getElementById('ncf') as any;
-    const valor = input.value;
-
-    this.setCaretPosition(input, input.value.length - 8);
-    valor.substring(0, 3);
-    input.value = valor;
   }
 
   // =============================================
