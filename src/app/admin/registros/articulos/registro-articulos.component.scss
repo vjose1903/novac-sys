@@ -7,30 +7,6 @@
   padding: 1.5rem 0.1rem 2rem 1rem;
   border-radius: 12px;
 }
-#btnMenusInput {
-  color: white;
-  transform: translate(30px, 0px);
-  &:hover {
-    cursor: pointer;
-    text-shadow: 1px 1px 4px var(--secondary05);
-  }
-}
-#btnMasInput {
-  color: white;
-  border: none;
-  background-color: transparent;
-  padding: 0;
-  &:hover {
-    cursor: pointer;
-    text-shadow: 1px 1px 4px var(--secondary05);
-  }
-  &:disabled {
-    color: #ec8f8fc3;
-    :hover {
-      cursor: no-drop !important;
-    }
-  }
-}
 
 .SCROLLFORMULA {
   max-height: 14rem !important;
