@@ -15,6 +15,7 @@ const t_c = {
     margin_general: [0, 0, 0, 0],
     isBreak: true,
     break: 40,
+    only_titulo: false,
     widths: [24, 60, 73, 53, '*', 'auto'],
     mostrar_total: true,
     info: [
@@ -96,6 +97,7 @@ const t_c = {
     margin_general: [0, 0, 0, 0],
     isBreak: true,
     break: 40,
+    only_titulo: false,
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
     widths: [24, 60, 73, 53, '*', 'auto'],
     mostrar_total: true,
@@ -183,6 +185,7 @@ const t_c = {
     margin_general: [0, 0, 0, 0],
     isBreak: true,
     pageOrient: 'landscape',
+    only_titulo: false,
     break: 26,
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
     widths: [18, '*', 60, 'auto', 'auto', 'auto', 'auto', 'auto'],
@@ -289,6 +292,7 @@ const t_c = {
     isBreak: true,
     pageOrient: 'landscape',
     break: 26,
+    only_titulo: false,
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
     widths: [18, '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
     mostrar_total: true,
@@ -381,6 +385,7 @@ const t_c = {
   inventario: {
     margin_general: [0, 0, 0, 0],
     isBreak: true,
+    only_titulo: false,
     break: 40,
     widths: [24, 35, '*', 'auto', 'auto'],
     info: [
@@ -441,6 +446,7 @@ const t_c = {
   recibos: {
     margin_general: [0, 0, 0, 0],
     isBreak: true,
+    only_titulo: false,
     break: 40,
     widths: [24, 60, 70, '*', 50, 50, 'auto'],
     mostrar_total: true,
@@ -546,8 +552,9 @@ const t_c = {
         margin_general: [0, 0, 0, 0],
         isBreak: false,
         break: 40,
+        only_titulo: false,
         widths: [24, '*', 'auto', 'auto'],
-        mensaje_contenido_vacio:'No se vendió de este tipo de producto en la fecha indicada',
+        mensaje_contenido_vacio: 'No se vendió de este tipo de producto en la fecha indicada',
         mostrar_total: true,
         info: [
           {
@@ -660,10 +667,12 @@ const t_c = {
       },
       {
         margin_general: [0, 0, 0, 0],
+        isLineLight: true,
         isBreak: false,
+        only_titulo: false,
         break: 40,
         widths: [24, 70, 'auto', 'auto', '*'],
-        mensaje_contenido_vacio:'Esta Factura no ha recibido ningun movimiento.',
+        mensaje_contenido_vacio: 'Esta Factura no ha recibido ningun movimiento.',
         mostrar_total: false,
         info: [
           {
@@ -724,6 +733,7 @@ const t_c = {
   suplidor_prod: {
     margin_general: [0, 0, 0, 0],
     isBreak: true,
+    only_titulo: false,
     break: 40,
     widths: [24, 60, '*'],
     info: [

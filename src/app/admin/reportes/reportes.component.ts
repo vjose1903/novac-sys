@@ -144,7 +144,12 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
         this.loadServ.isLoading.next(true);
         const obj = { data: res, type: 'reporte' };
 
-        this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => this.parseDataToVisorPdf(res));
+        this.pdfServ
+          .generatePdf({ oPdf: obj, imprimir: false })
+          .then(async (res) => this.parseDataToVisorPdf(res))
+          .catch(async (err) => {
+            this.loadServ.isLoading.next(false);
+          });
       });
     } else {
       this.fun.toastError(msg_error, 'ERROR');
