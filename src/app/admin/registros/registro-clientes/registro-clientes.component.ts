@@ -41,10 +41,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   documentos_de_identidad: any;
 
   info = [
-    { titulo: 'Nombre', key: 'nombre' },
-    { titulo: 'Apellido', key: 'apellido' },
-    { titulo: 'Telefono', key: 'telefono' },
-    { titulo: 'Doc. identidad', key: 'documento_identidad' },
+    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
+    { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
+    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+    { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
   ];
   botones = { titulo: true, borrar: true, editar: true };
 

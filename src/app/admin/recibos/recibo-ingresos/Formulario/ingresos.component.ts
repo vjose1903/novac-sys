@@ -27,12 +27,12 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   // =============================================
 
   info = [
-    { titulo: '1', key: 'historyPagos', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }] },
-    { titulo: 'NCF', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
-    { titulo: 'Fecha Facturacion', key: 'fecha' },
-    { titulo: 'Fecha Vencimiento', text_color: 'colorFecha', key: 'fechaV', color: true },
-    { titulo: 'Total facturado', key: 'total_factura', formatoNumero: true },
-    { titulo: 'Balance factura', key: 'balance', formatoNumero: true },
+    { titulo: '1', tipo: 'icon', key: 'historyPagos', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }] },
+    { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
+    { titulo: 'Fecha Facturacion', tipo: 'text', key: 'fecha' },
+    { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFecha', key: 'fechaV', color: true },
+    { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', formatoNumero: true },
+    { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance', formatoNumero: true },
     {
       titulo: 'Seleccione',
       tipo: 'check',
@@ -61,6 +61,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       title: '',
     },
   ];
+
   tipoFacturas;
   precioEnTurno: any;
   ExisteMontoMayor: boolean;

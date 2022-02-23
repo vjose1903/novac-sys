@@ -20,10 +20,10 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   // =============================================
 
   info = [
-    { titulo: 'Cod.', key: 'codigo', estilos: [{ width: '4rem' }] },
-    { titulo: 'Articulo', key: 'nombre', estilos: [{ width: '35rem' }, { 'text-align': 'left' }, { 'padding-left': '2rem' }] },
-    { titulo: 'Cantidad', key: 'cantidades', cantidades: true },
-    { titulo: 'Precio', key: 'precio_principal', formatoNumero: true },
+    { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '4rem' }] },
+    { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '35rem' }, { 'text-align': 'left' }, { 'padding-left': '2rem' }] },
+    { titulo: 'Cantidad', tipo: 'cantidades', key: 'cantidades', cantidades: true },
+    { titulo: 'Precio', tipo: 'text', key: 'precio_principal', formatoNumero: true },
   ];
 
   cant_inventario = 0;

@@ -8,30 +8,13 @@ import { RegistroSuplidoresComponent } from './registro-suplidores/registro-supl
 import { RegistroVehiculoComponent } from './registro-vehiculo/registro-vehiculo.component';
 
 const routes: Routes = [
-  {
-    path: 'clientes',
-    component: RegistroClientesComponent,
-  },
-  {
-    path: 'suplidores',
-    component: RegistroSuplidoresComponent,
-  },
-  {
-    path: 'ncf',
-    component: NcfComponent,
-  },
-  {
-    path: 'articulos',
-    component: RegistroArticulosComponent,
-  },
-  {
-    path: 'empleados',
-    component: RegistroEmpleadosComponent,
-  },
-  {
-    path: 'camiones',
-    component: RegistroVehiculoComponent,
-  },
+  { path: 'clientes', component: RegistroClientesComponent },
+  { path: 'suplidores', component: RegistroSuplidoresComponent },
+  { path: 'ncf', component: NcfComponent },
+  { path: 'articulos', component: RegistroArticulosComponent },
+  { path: 'empleados', component: RegistroEmpleadosComponent },
+  { path: 'camiones', component: RegistroVehiculoComponent },
+  { path: 'roles', loadChildren: () => import('./roles/roles.module').then((m) => m.RolesModule) },
 ];
 
 @NgModule({

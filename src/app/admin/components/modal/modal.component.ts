@@ -56,25 +56,25 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   texto: any;
 
   infoArticulos = [
-    { titulo: 'Descripción', key: 'nombre' },
-    { titulo: 'Existencia', key: 'cantidades', cantidades: true },
+    { titulo: 'Descripción', tipo: 'text', key: 'nombre' },
+    { titulo: 'Existencia', tipo: 'cantidades', key: 'cantidades', cantidades: true },
   ];
 
   paraFiltroArticulos;
   metodo;
   infoCliente = [
-    { titulo: 'Nombre', key: 'nombre' },
-    { titulo: 'Apellido', key: 'apellido' },
-    { titulo: 'Telefono', key: 'telefono' },
-    { titulo: 'Doc. identidad', key: 'documento_identidad' },
-    { titulo: 'Direccion', key: 'direccion' },
+    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
+    { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
+    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+    { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
+    { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
 
   infoSuplidor = [
-    { titulo: 'Nombre', key: 'nombre' },
-    { titulo: 'Telefono', key: 'telefono' },
-    { titulo: 'Doc. identidad', key: 'documento_identidad' },
-    { titulo: 'Direccion', key: 'direccion' },
+    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
+    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+    { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
+    { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
   constructor(public mServ: ModalService, private tServ: TablasService, public fun: FunctionService) {}
 

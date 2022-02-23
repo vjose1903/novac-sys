@@ -129,7 +129,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   formarTitulosTabla() {
     this.info = [
       { titulo: ' ', tipo: 'check', key: 'select', title: '', estilos: [{ width: '3rem' }] },
-      { titulo: 'Articulo', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }] },
+      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }] },
       {
         titulo: this.tipoNota === 'credito' ? 'Devolver' : 'Aumentar',
         key: 'cant_nota',
@@ -139,11 +139,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         disable: [{ kind: 'campo', target: 'select', value: [false] }],
         estilos: [{ width: '6rem' }],
       },
-      { titulo: 'Cantidad', key: 'cantidad', formatoNumero: true, estilos: [{ width: '5rem' }] },
-      { titulo: 'Unidad', key: 'unidad', estilos: [{ width: '4.5rem' }] },
-      { titulo: 'Precio', key: 'precio', formatoNumero: true },
-      { titulo: 'Descuento', key: 'descuento_valor', formatoNumero: true },
-      { titulo: 'Total Facturado', key: 'total', formatoNumero: true },
+      { titulo: 'Cantidad', key: 'cantidad', tipo: 'formatoNumero', formatoNumero: true, estilos: [{ width: '5rem' }] },
+      { titulo: 'Unidad', key: 'unidad', tipo: 'text', estilos: [{ width: '4.5rem' }] },
+      { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero', formatoNumero: true },
+      { titulo: 'Descuento', key: 'descuento_valor', tipo: 'formatoNumero', formatoNumero: true },
+      { titulo: 'Total Facturado', key: 'total', tipo: 'formatoNumero', formatoNumero: true },
       { titulo: 'Total nota', key: 'total_nota', tipo: 'input', disable: [{ kind: 'always' }], estilos: [{ width: '8rem' }] },
     ];
   }

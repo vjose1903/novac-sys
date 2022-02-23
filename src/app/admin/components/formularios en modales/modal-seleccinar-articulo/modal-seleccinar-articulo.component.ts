@@ -17,11 +17,11 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
   @Output() getArticulos = new EventEmitter<any>();
 
   info = [
-    { titulo: 'Articulo', key: 'descripcion', estilos: [{ width: '44%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
-    { titulo: 'Cantidad', key: 'cantidad', estilos: [{ width: '12%' }] },
-    { titulo: 'Unidad', key: 'unidad', estilos: [{ width: '14%' }] },
-    { titulo: 'Retirado', key: 'retirado_mostrar', estilos: [{ width: '12%' }] },
-    { titulo: 'Restante', key: 'restante_mostrar', estilos: [{ width: '12%' }] },
+    { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ width: '44%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
+    { titulo: 'Cantidad', tipo: 'text', key: 'cantidad', estilos: [{ width: '12%' }] },
+    { titulo: 'Unidad', tipo: 'text', key: 'unidad', estilos: [{ width: '14%' }] },
+    { titulo: 'Retirado', tipo: 'text', key: 'retirado_mostrar', estilos: [{ width: '12%' }] },
+    { titulo: 'Restante', tipo: 'text', key: 'restante_mostrar', estilos: [{ width: '12%' }] },
     { titulo: 'Seleccione', tipo: 'check', key: 'select', estilos: [{ width: '10.8%' }], disable: [{ kind: 'campo', target: 'disable', value: [true] }], title: '' },
   ];
 

@@ -27,9 +27,9 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   // =============================================
 
   info = [
-    { titulo: 'Cod.', key: 'codigo' },
-    { titulo: 'Nombre', key: 'nombre' },
-    { titulo: 'Rnc', key: 'documento' },
+    { titulo: 'Cod.', tipo: 'text', key: 'codigo' },
+    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
+    { titulo: 'Rnc', tipo: 'text', key: 'documento' },
   ];
   botones = { titulo: true, borrar: true, editar: true };
 

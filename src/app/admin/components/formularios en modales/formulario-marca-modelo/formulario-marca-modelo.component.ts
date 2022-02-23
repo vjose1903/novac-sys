@@ -18,12 +18,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   tituloTabla;
   @Output() accion_ = new EventEmitter<any>();
   form: FormGroup;
-  info = [
-    {
-      titulo: 'Descripcion',
-      key: 'descripcion',
-    },
-  ];
+  info = [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }];
 
   botones = {
     titulo: true,
@@ -69,14 +64,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       this.getMarcas();
 
       this.info = [
-        {
-          titulo: 'Marca',
-          key: 'marca_nombre',
-        },
-        {
-          titulo: 'Modelo',
-          key: 'descripcion',
-        },
+        { titulo: 'Marca', key: 'marca_nombre', tipo: 'text' },
+        { titulo: 'Modelo', key: 'descripcion', tipo: 'text' },
       ];
     }
 

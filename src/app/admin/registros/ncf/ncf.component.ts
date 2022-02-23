@@ -24,13 +24,13 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   usado = false;
 
   info = [
-    { titulo: 'Cod.', key: 'codigo', estilos: [{ width: '3.5rem' }] },
-    { titulo: 'Tipo', key: 'tipoC' },
-    { titulo: 'Secuencia', key: 'secuencia_' },
-    { titulo: 'Desde', key: 'desde' },
-    { titulo: 'Hasta', key: 'hasta' },
-    { titulo: 'Usado', key: 'usado_', text_color: 'colorUsado', isIcon: true, color: true, estilos: [{ width: '3.5rem' }] },
-    { titulo: 'Activo', key: 'estado_', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '3.5rem' }] },
+    { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '3.5rem' }] },
+    { titulo: 'Tipo', tipo: 'text', key: 'tipoC' },
+    { titulo: 'Secuencia', tipo: 'text', key: 'secuencia_' },
+    { titulo: 'Desde', tipo: 'text', key: 'desde' },
+    { titulo: 'Hasta', tipo: 'text', key: 'hasta' },
+    { titulo: 'Usado', tipo: 'icon', key: 'usado_', text_color: 'colorUsado', isIcon: true, color: true, estilos: [{ width: '3.5rem' }] },
+    { titulo: 'Activo', tipo: 'icon', key: 'estado_', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '3.5rem' }] },
   ];
 
   filtro: any = 0;
@@ -63,7 +63,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.dpConfig = Object.assign(
       {},
       {
-
         showWeekNumbers: false,
         dateInputFormat: 'DD/MM/YYYY',
         // maxDate: new Date(),

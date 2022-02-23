@@ -28,9 +28,9 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   tipoModal: string;
 
   info = [
-    { titulo: 'Producto', key: 'nombre' },
-    { titulo: 'Cantidad', key: 'cantidad', formatoNumero: true },
-    { titulo: 'Medida', key: 'medida' },
+    { titulo: 'Producto', tipo: 'text', key: 'nombre' },
+    { titulo: 'Cantidad', tipo: 'text', key: 'cantidad', formatoNumero: true },
+    { titulo: 'Medida', tipo: 'text', key: 'medida' },
   ];
 
   botones = { titulo: true, borrar: true, editar: true };

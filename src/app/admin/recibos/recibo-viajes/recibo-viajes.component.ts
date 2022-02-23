@@ -20,11 +20,11 @@ import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-el
 export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;
   info = [
-    { titulo: '1', key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '1.5rem' }, { color: 'var(--transparente00)' }] },
-    { titulo: 'Fecha Fact.', key: 'fecha' },
-    { titulo: 'Cliente', key: 'cliente_mostrar' },
-    { titulo: 'NCF', key: 'numero_comprobante' },
-    { titulo: 'Total facturado', key: 'total_factura', formatoNumero: true },
+    { titulo: '1', tipo: 'icon', key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '1.5rem' }, { color: 'var(--transparente00)' }] },
+    { titulo: 'Fecha Fact.', tipo: 'text', key: 'fecha' },
+    { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar' },
+    { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante' },
+    { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', formatoNumero: true },
   ];
   viajes;
   viaje_selected = { id: -1 } as any;

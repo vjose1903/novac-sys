@@ -11,15 +11,15 @@ export class ModalHistorialPagosComponent implements OnInit {
   activeIndex = 0;
 
   info_pagos = [
-    { titulo: 'NO. recibo', key: 'numero_recibo' },
-    { titulo: 'Abonado', key: 'deposito', formatoNumero: true },
-    { titulo: 'Fecha abono', key: 'fecha_equivalente' },
+    { titulo: 'NO. recibo', tipo: 'text', key: 'numero_recibo' },
+    { titulo: 'Abonado', tipo: 'formatoNumero', key: 'deposito', formatoNumero: true },
+    { titulo: 'Fecha abono', tipo: 'text', key: 'fecha_equivalente' },
   ];
 
   info_notas = [
-    { titulo: 'NO. comprobante', key: 'numero_comprobante' },
-    { titulo: 'Crédito', key: 'total_factura', formatoNumero: true },
-    { titulo: 'Fecha nota', key: 'fecha_equivalente' },
+    { titulo: 'NO. comprobante', tipo: 'text', key: 'numero_comprobante' },
+    { titulo: 'Crédito', tipo: 'formatoNumero', key: 'total_factura', formatoNumero: true },
+    { titulo: 'Fecha nota', tipo: 'text', key: 'fecha_equivalente' },
   ];
 
   constructor(private tServ: TablasService) {}

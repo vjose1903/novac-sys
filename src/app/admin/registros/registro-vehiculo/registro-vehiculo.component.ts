@@ -30,6 +30,14 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
   listaModelos: any;
   vehiculoEditando: any;
 
+  info = [
+    { titulo: 'Propietario', key: 'nombreCompleto', tipo: 'text' },
+    { titulo: 'Marca', key: 'marca', tipo: 'text' },
+    { titulo: 'Modelo', key: 'modelo', tipo: 'text' },
+    { titulo: 'Cant. viajes', key: 'cantidad_viajes', tipo: 'text' },
+  ];
+  botones = { titulo: true, borrar: true, editar: true };
+
   vehiculosClass = new VehiculoC();
   marcasClass = new MarcaC();
   empleadosClass = new EmpleadoC();
@@ -217,18 +225,13 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
     if (arg) {
       const obj = GLOBAL.duplicarJson(this.seleccionModal);
 
-      this.vehiculosClass.deleteOne(obj.id).then(
-        (res) => {
-          this.listaVehiculos = null;
-          this.fun.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
-          const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
-          this.getVehiculos(actualPagination);
-          this.borrar();
-        },
-        (err) => {
-          this.mostrarErrores(err.error);
-        },
-      );
+      this.vehiculosClass.deleteOne(obj.id).then((res) => {
+        this.listaVehiculos = null;
+        this.fun.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
+        const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
+        this.getVehiculos(actualPagination);
+        this.borrar();
+      });
     }
   }
 
@@ -256,6 +259,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
       apellido_no_empleado: formulario.apellido_no_empleado,
       telefono_no_empleado: formulario.telefono_no_empleado,
     };
+
     let msg_error = '';
     try {
       if (formulario.id) {
@@ -279,50 +283,4 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
       this.fun.toastError(msg_error, 'ERROR');
     }
   }
-
-  mostrarErrores(arg) {
-    if (Array.isArray(arg)) {
-      arg.forEach((error) => {
-        this.fun.toastError(error, 'ERROR'), true;
-      });
-    } else {
-      for (const key in arg) {
-        if (arg.hasOwnProperty(key)) {
-          const element = arg[key];
-
-          if (key !== 'status') {
-            this.fun.toastError(element, 'ERROR');
-          }
-        }
-      }
-    }
-  }
-
-  // =============================================
-  //  TABLAS
-  // =============================================
-
-  info = [
-    {
-      titulo: 'Propietario',
-      key: 'nombreCompleto',
-    },
-    {
-      titulo: 'Marca',
-      key: 'marca',
-    },
-    {
-      titulo: 'Modelo',
-      key: 'modelo',
-    },
-    {
-      titulo: 'Cant. viajes',
-      key: 'cantidad_viajes',
-    },
-  ];
-  botones = {
-    titulo: true,
-    borrar: true,
-    editar: true,
-  };
 }

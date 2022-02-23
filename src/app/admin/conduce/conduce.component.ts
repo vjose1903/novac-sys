@@ -36,29 +36,11 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   TOTAL: number;
 
   info = [
-    {
-      titulo: '1',
-      key: 'detalles_selected',
-      isIcon: true,
-      estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }],
-    },
-    {
-      titulo: 'Numero Fact',
-      key: 'secuencia',
-    },
-    {
-      titulo: 'NCF',
-      key: 'numero_comprobante',
-    },
-    {
-      titulo: 'Fecha Facturacion',
-      key: 'fecha',
-    },
-    {
-      titulo: 'Total Facturado',
-      key: 'total_factura',
-      formatoNumero: true,
-    },
+    { titulo: '1', key: 'detalles_selected', tipo: 'icon', isIcon: true, estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }] },
+    { titulo: 'Numero Fact', key: 'secuencia', tipo: 'text' },
+    { titulo: 'NCF', key: 'numero_comprobante', tipo: 'text' },
+    { titulo: 'Fecha Facturacion', key: 'fecha', tipo: 'text' },
+    { titulo: 'Total Facturado', key: 'total_factura', tipo: 'formatoNumero', formatoNumero: true },
   ];
 
   facturaAdelantadaSelected;

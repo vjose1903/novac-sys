@@ -20,10 +20,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   // =============================================
 
   info = [
-    { titulo: 'Cod.', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }] },
-    { titulo: 'Articulo', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
-    { titulo: 'Medida', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
-    { titulo: 'Precio', key: 'precio_principal', formatoNumero: true, estilos: [{ width: '20%' }] },
+    { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }] },
+    { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
+    { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
+    { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', formatoNumero: true, estilos: [{ width: '20%' }] },
   ];
 
   botones = { titulo: true, borrar: true, editar: true };

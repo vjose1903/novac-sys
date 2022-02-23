@@ -49,23 +49,23 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   campo = null;
   placeHolder = '';
   info = [
-    { titulo: ' ', key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }] },
-    { titulo: 'Numero Fact', key: 'secuencia', estilos: [{ width: '7rem' }] },
-    { titulo: 'Tipo', key: 'tipo_factura' },
-    { titulo: 'Comprobante', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
-    { titulo: 'Condicion', key: 'condicion', estilos: [{ width: '6rem' }] },
-    { titulo: 'Fecha Facturación', key: 'fecha' },
-    { titulo: 'Fecha Vencimiento', key: 'fechaV' },
-    { titulo: 'Total facturado', key: 'total_factura', formatoNumero: true },
-    { titulo: 'Balance tactura', key: 'balance', formatoNumero: true },
-    { titulo: 'Seleccione', key: 'select', text_color: 'selectColor', isIcon: true, color: true },
+    { titulo: ' ', tipo: 'icon' , key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }] },
+    { titulo: 'Numero Fact', tipo: 'text' , key: 'secuencia', estilos: [{ width: '7rem' }] },
+    { titulo: 'Tipo', tipo: 'text' , key: 'tipo_factura' },
+    { titulo: 'Comprobante', tipo: 'text' , key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+    { titulo: 'Condicion', tipo: 'text' , key: 'condicion', estilos: [{ width: '6rem' }] },
+    { titulo: 'Fecha Facturación', tipo: 'text' , key: 'fecha' },
+    { titulo: 'Fecha Vencimiento', tipo: 'text' , key: 'fechaV' },
+    { titulo: 'Total facturado', tipo: 'formatoNumero' , key: 'total_factura', formatoNumero: true },
+    { titulo: 'Balance tactura', tipo: 'formatoNumero' , key: 'balance', formatoNumero: true },
+    { titulo: 'Seleccione', tipo: 'icon' , key: 'select', text_color: 'selectColor', isIcon: true, color: true },
   ];
 
   infoNota = [
-    { titulo: 'Fecha', key: 'fecha' },
-    { titulo: 'Comprobante', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
-    { titulo: 'Total nota', key: 'total_factura', formatoNumero: true },
-    { titulo: 'Seleccione', key: 'select', text_color: 'selectColor', isIcon: true, color: true },
+    { titulo: 'Fecha', tipo: 'text' , key: 'fecha' },
+    { titulo: 'Comprobante', tipo: 'text' , key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+    { titulo: 'Total nota', tipo: 'formatoNumero' , key: 'total_factura', formatoNumero: true },
+    { titulo: 'Seleccione', tipo: 'icon' , key: 'select', text_color: 'selectColor', isIcon: true, color: true },
   ];
 
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
