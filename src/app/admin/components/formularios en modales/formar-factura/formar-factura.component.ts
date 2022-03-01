@@ -4,6 +4,7 @@ import * as moment from '../../../../core/javascript/moment';
 
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { SingletonService } from '../../../../core/services/singleton.service';
+import { ConfigI } from '../../../../core/typescript/config-interface';
 @Component({
   selector: 'app-formar-factura',
   templateUrl: './formar-factura.component.html',
@@ -11,9 +12,9 @@ import { SingletonService } from '../../../../core/services/singleton.service';
 })
 export class FormarFacturaComponent implements OnInit {
   @Input() factura;
-  num_telefono;
-  rnc;
+
   configServ = SingletonService.configServ;
+  config: ConfigI;
   constructor() {}
 
   ngOnInit() {
@@ -25,9 +26,8 @@ export class FormarFacturaComponent implements OnInit {
     //   ...this.factura.detalle_facturas,
     //   ...this.factura.detalle_facturas,
     // ];
-    this.configServ.getConfig().then((config) => {
-      this.num_telefono = config.telefono_empresa;
-      this.rnc = config.rnc_empresa;
+    this.configServ.getConfig().then((config: ConfigI) => {
+      this.config = config;
     });
   }
 

@@ -1,3 +1,12 @@
+var JsBarcode = require('jsbarcode');
+
+// =========================================================================================================
+export function my_barcode(code) {
+  var canvas = document.createElement('canvas');
+  JsBarcode(canvas, code, { displayValue: false });
+
+  return canvas.toDataURL('image/png');
+}
 // =========================================================================================================
 export function my_capitalize(str) {
   const ultimoCaracte = str.length + 1;

@@ -5,6 +5,7 @@ import { GLOBAL, MODIFIED_CONFIG_FILE } from '../core/typescript/GLOBAL';
 import { IpcService } from '../core/services/ipc.service';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
 import * as _ from 'lodash';
+var JsBarcode = require('jsbarcode');
 
 import {
   compra_contado_valor_fiscal,
@@ -24,6 +25,7 @@ import { MixinClass } from '../core/typescript/MixinClass';
 import { SingletonService } from '../core/services/singleton.service';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, KEYWORD_ELECTRON_PRINT_BASE64, KEYWORD_ELECTRON_TEST } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
+import { ConfigI } from '../core/typescript/config-interface';
 
 @Component({
   selector: 'app-login',
@@ -48,12 +50,21 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   ngOnInit() {
     this.loginForm = this.fb.group({ usuario: null, password: null });
 
-    this.configServ.getConfig().then((config) => {
+    this.configServ.getConfig().then((config: ConfigI) => {
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       this.versionApp = config.app_version;
     });
 
+    // TESTEANDO EL CODIGO DE BARRAS
+    // const prueba = this.textToBase64Barcode('eJwdy00KwyAQQOGrhFmborbB1G2v0Kxl0AkdGAw1Yzcld+/P8n3w3pCFqSol\nLhBrFzHQd2r/nA3opihpxay94Veu4eQnAyvlByZ6dn6h/HaI4K13ow2jt4Ob\n4znEyzQs9xsYyFiVC5aETTl32XaI7vgAzSYnUg==\n');
+    // console.log('prueba ', prueba);
+  }
 
+  textToBase64Barcode(text) {
+    var canvas = document.createElement('canvas');
+    JsBarcode(canvas, text, { format: 'CODE128' });
+
+    return canvas.toDataURL('image/png');
   }
 
   abrirModalReporte(obj) {

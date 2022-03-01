@@ -4,6 +4,7 @@ import { getConfiguration } from './configuracion_tablas';
 import { getContentWithTablaNormal } from './tabla_normal';
 import { getContentWithTablaAgrupada } from './tabla_agrupada';
 import { SingletonService } from '../singleton.service';
+import { ConfigI } from '../../typescript/config-interface';
 
 // ==========================================================================================================================================================
 // UNIR REPORTE
@@ -12,7 +13,7 @@ import { SingletonService } from '../singleton.service';
 export function makeReporte(data) {
   const configuration = getConfiguration(data.tipo_reporte);
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
-  const configApp = SingletonService.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
 
   const dd = {
     // pageSize: { width: 990, height: 398 },
@@ -37,7 +38,7 @@ export function makeReporte(data) {
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraReporte(data, configuration, configApp) {
+function cabeceraReporte(data, configuration, configApp: ConfigI) {
   const header = (currentPage, pageCount) => {
     const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
     const pag = currentPage.toString() + ' de ' + pageCount;
@@ -51,13 +52,13 @@ function cabeceraReporte(data, configuration, configApp) {
               margin: [0, 17, 0, 0],
               stack: [
                 {
-                  text: 'ADM Agroindustrial S.R.L',
+                  text: configApp.nombre_empresa,
                   alignment: 'center',
                   bold: true,
-                  style: 'letra11_5',
+                  style: 'letra11',
                 },
                 {
-                  text: 'Autopista Duarte Km0 El Higüero, La Vega',
+                  text: configApp.direccion_empresa,
                   alignment: 'center',
                   style: 'letra10',
                 },

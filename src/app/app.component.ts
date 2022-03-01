@@ -7,7 +7,7 @@ import { SingletonService } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { ModalService } from './admin/components/modal/modal.service';
 import { LayoutService } from './admin/layout/layout.service';
-import { ConfigurationI, ConfigurationService } from './core/services/configuration.service';
+import { ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
 import { MessageTask } from './core/models/message-task';
 
@@ -24,6 +24,7 @@ import {
   KEYWORD_ELECTRON_GET_APP_CONFIG,
 } from '../../electron/shared-electron-angular';
 import { Subscription } from 'rxjs';
+import { ConfigI } from './core/typescript/config-interface';
 
 @Component({
   selector: 'app-root',
@@ -136,7 +137,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
     this._ipc
       .sendTask(task)
-      .then((config: ConfigurationI) => {
+      .then((config: ConfigI) => {
         if (_.has(config, 'err')) {
           console.error(config);
         } else {

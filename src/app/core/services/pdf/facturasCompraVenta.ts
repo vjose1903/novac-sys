@@ -3,6 +3,7 @@ import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
 import * as numLetra from './utils/numero_letras';
 import { SingletonService } from '../singleton.service';
+import { ConfigI } from '../../typescript/config-interface';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
@@ -23,7 +24,7 @@ export function makeFacturaVenta(data) {
   const is_contado = data.condicion === 'Contado' ? true : false;
   const is_nota = data.FACTURA_DE === 'nota' ? true : false;
 
-  const configApp = SingletonService.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
 
   const dd = {
     pageSize: is_contado ? { width: 990, height: 398 } : { width: 990, height: 796 },
@@ -46,7 +47,7 @@ export function makeFacturaVenta(data) {
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, pageCount, configApp) {
+function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, pageCount, configApp: ConfigI) {
   const header = [
     {
       columns: [
@@ -96,13 +97,13 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
       margin: [0, -40, 0, 0],
       stack: [
         {
-          text: 'ADM Agroindustrial S.R.L',
+          text: configApp.nombre_empresa,
           alignment: 'center',
           bold: true,
           style: 'letra17',
         },
         {
-          text: 'Autopista Duarte Km0 El Higüero, La Vega',
+          text: configApp.direccion_empresa,
           alignment: 'center',
         },
         {
@@ -339,37 +340,37 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
                 widths: ['*', 'auto'],
                 body: [
                   [
-                    { text: 'Bruto RD$: ', style: 'letra11_5', bold: true, alignment: 'right' },
+                    { text: 'Bruto RD$: ', style: 'letra11', bold: true, alignment: 'right' },
                     {
                       text: fun_.numFormatTwoDecimals(data.Bruto),
-                      style: 'letra11_5',
+                      style: 'letra11',
                       alignment: 'right',
                       margin: [0, 0, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
                     },
                   ],
                   [
-                    { text: 'Itbis RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                    { text: 'Itbis RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
                     {
                       text: fun_.numFormatTwoDecimals(data.itbis),
-                      style: 'letra11_5',
+                      style: 'letra11',
                       alignment: 'right',
                       margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
                     },
                   ],
                   [
-                    { text: 'Descuento RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                    { text: 'Descuento RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
                     {
                       text: fun_.numFormatTwoDecimals(data.descuento),
-                      style: 'letra11_5',
+                      style: 'letra11',
                       alignment: 'right',
                       margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
                     },
                   ],
                   [
-                    { text: 'TOTAL RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                    { text: 'TOTAL RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
                     {
                       text: fun_.numFormatTwoDecimals(data.total_factura),
-                      style: 'letra11_5',
+                      style: 'letra11',
                       alignment: 'right',
                       margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
                     },
@@ -377,10 +378,10 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
                   data.FACTURA_DE === 'compra' || is_nota
                     ? [{ text: '' }, { text: '' }]
                     : [
-                        { text: 'Devuelta RD$: ', style: 'letra11_5', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                        { text: 'Devuelta RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
                         {
                           text: fun_.numFormatTwoDecimals(data.devuelta),
-                          style: 'letra11_5',
+                          style: 'letra11',
                           alignment: 'right',
                           margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
                         },

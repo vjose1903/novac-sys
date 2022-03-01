@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GLOBAL } from '../../core/typescript/GLOBAL';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { SingletonService } from '../../core/services/singleton.service';
+import { ConfigI } from '../../core/typescript/config-interface';
 
 @Component({
   selector: 'app-homeAdmin',
@@ -25,7 +26,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   ngOnInit() {
     this._init_mixin({ component: 'home' });
 
-    this.configServ.getConfig().then((config) => {
+    this.configServ.getConfig().then((config: ConfigI) => {
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
     });
   }

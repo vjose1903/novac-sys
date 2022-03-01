@@ -21,6 +21,13 @@ export default class HandlerConfigFile {
     usa_url_principal: true,
     printer_caja_selected: null,
     printer_reportes_selected: null,
+    pages_sizes: {
+      recibo_ingreso: '8.5x5.5',
+      conduce: '8.5x5.5',
+      facturacion: '80mm_roll',
+      cuadre_caja: '8.5x5.5',
+      reporte: '8.5x11',
+    },
   };
 
   static checkConfigFile(win: BrowserWindow) {

@@ -1,26 +1,13 @@
 import { Injectable } from '@angular/core';
-
-export interface ConfigurationI {
-  nombre_empresa: string;
-  rnc_empresa: string;
-  direccion_empresa: string;
-  telefono_empresa: string;
-  logo_empresa: string;
-  logo_empresa_impresion: string;
-  color_app: string;
-  url_servidor: string;
-  url_servidor_respaldo: string;
-  url_servidor_descargas: string;
-}
+import { ConfigI } from '../typescript/config-interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ConfigurationService {
-
   constructor() {}
 
-  private config: ConfigurationI;
+  private config: ConfigI;
 
   set setConfig(configuration) {
     this.config = configuration;
@@ -29,10 +16,10 @@ export class ConfigurationService {
   getConfig(params: { isPromise: boolean } = { isPromise: true }): any {
     if (params.isPromise) {
       return new Promise((resolve) => {
-        resolve(this.config);
+        resolve(this.config as ConfigI);
       });
     } else {
-      return this.config as ConfigurationI;
+      return this.config as ConfigI;
     }
   }
 }

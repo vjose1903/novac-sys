@@ -2,13 +2,14 @@
 import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
 import { SingletonService } from '../singleton.service';
+import { ConfigI } from '../../typescript/config-interface';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 
 export function makeCuadre(data) {
-  const configApp = SingletonService.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
   try {
     const dd = {
       pageSize: { width: 990, height: 398 },
@@ -30,7 +31,7 @@ export function makeCuadre(data) {
       styles: styles_,
     };
 
-    const obj = { doc: dd, file: 'cuadre.pdf', type: 'base64', };
+    const obj = { doc: dd, file: 'cuadre.pdf', type: 'base64' };
     return obj;
   } catch (error) {
     return error;
@@ -40,7 +41,7 @@ export function makeCuadre(data) {
 // ====================================================================================================================================================
 // CABECERA
 // ====================================================================================================================================================
-function cabeceraReporte(data, configApp) {
+function cabeceraReporte(data, configApp: ConfigI) {
   try {
     const header = [
       {
@@ -58,13 +59,13 @@ function cabeceraReporte(data, configApp) {
               margin: [0, 23, 0, 0],
               stack: [
                 {
-                  text: 'ADM Agroindustrial S.R.L',
+                  text: configApp.nombre_empresa,
                   alignment: 'center',
                   bold: true,
                   style: 'letra17',
                 },
                 {
-                  text: 'Autopista Duarte Km0 El Higüero, La Vega',
+                  text: configApp.direccion_empresa,
                   alignment: 'center',
                   fontSize: 11,
                 },

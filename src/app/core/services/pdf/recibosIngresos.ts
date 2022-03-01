@@ -3,13 +3,14 @@ import * as numLetra from './utils/numero_letras';
 import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
 import { SingletonService } from '../singleton.service';
+import { ConfigI } from '../../typescript/config-interface';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 
 export function makeRecibo(data) {
-  const configApp = SingletonService.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
   const dd = {
     pageSize: { width: 990, height: 398 },
     pageMargins: [0, 164, 0, 30],
@@ -37,7 +38,7 @@ export function makeRecibo(data) {
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraRecibo(data, configApp) {
+function cabeceraRecibo(data, configApp: ConfigI) {
   const rncCliente = data.cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
   const numero_letra = numLetra.NumeroALetras(data.total);
 
@@ -83,13 +84,13 @@ function cabeceraRecibo(data, configApp) {
       margin: [0, -60, 0, 0],
       stack: [
         {
-          text: 'ADM Agroindustrial S.R.L',
+          text: configApp.nombre_empresa,
           alignment: 'center',
           bold: true,
           fontSize: 17,
         },
         {
-          text: 'Autopista Duarte Km0 El Higüero, La Vega',
+          text: configApp.direccion_empresa,
           alignment: 'center',
         },
         {

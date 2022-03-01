@@ -4,6 +4,7 @@ const pdfMake = require('pdfmake/build/pdfmake.js');
 const pdfFonts = require('pdfmake/build/vfs_fonts.js');
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
+import * as roll80mm from './80mm_roll/facturasCompraVenta';
 import * as facturasCompraVenta from './facturasCompraVenta';
 import * as recibosIngresos from './recibosIngresos';
 import * as conduce from './conduce';
@@ -12,6 +13,8 @@ import * as reportes from './reportes';
 import { SingletonService } from '../singleton.service';
 import { MessageTask } from '../../models/message-task';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
+import { ConfigurationService } from '../configuration.service';
+import { ConfigI } from '../../typescript/config-interface';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +22,8 @@ import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-el
 export class PdfService {
   fun = SingletonService.fun;
   _ipc = SingletonService._ipc;
-  constructor() {}
+
+  constructor(public configServ: ConfigurationService) {}
 
   generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
     return new Promise((resolve, reject) => {
@@ -28,6 +32,7 @@ export class PdfService {
       const data = params.oPdf.data;
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
+      const config: ConfigI = this.configServ.getConfig({ isPromise: false });
 
       data['reimprimir'] = reimprimir;
 
@@ -42,7 +47,8 @@ export class PdfService {
             break;
 
           case 'facturacion':
-            obj = facturasCompraVenta.makeFacturaVenta(data);
+            const options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
+            obj = options[config.pages_sizes.facturacion].makeFacturaVenta(data);
             break;
 
           case 'cuadre_caja':

@@ -2,13 +2,14 @@
 import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
 import { SingletonService } from '../singleton.service';
+import { ConfigI } from '../../typescript/config-interface';
 
 // ==========================================================================================================================================================
 // UNIR CONDUCE
 // ==========================================================================================================================================================
 
 export function makeConduce(data) {
-  const configApp = SingletonService.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
 
   const dd = {
     pageSize: { width: 990, height: 398 },
@@ -37,7 +38,7 @@ export function makeConduce(data) {
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraConduce(data, configApp) {
+function cabeceraConduce(data, configApp: ConfigI) {
   const rncCliente = data.cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
   console.log('configApp.num_telefono ', configApp.rnc_empresa);
 
@@ -58,13 +59,13 @@ function cabeceraConduce(data, configApp) {
       margin: [0, -40, 0, 0],
       stack: [
         {
-          text: 'ADM Agroindustrial S.R.L',
+          text: configApp.nombre_empresa,
           alignment: 'center',
           bold: true,
           style: 'letra17',
         },
         {
-          text: 'Autopista Duarte Km0 El Higüero, La Vega',
+          text: configApp.direccion_empresa,
           alignment: 'center',
         },
         {

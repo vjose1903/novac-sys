@@ -12,6 +12,7 @@ import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
 import { SingletonService } from '../../core/services/singleton.service';
+import { ConfigI } from '../../core/typescript/config-interface';
 
 @Component({
   selector: 'app-layout',
@@ -120,7 +121,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       }
     });
 
-    this.configServ.getConfig().then((config) => {
+    this.configServ.getConfig().then((config: ConfigI) => {
       this.versionApp = config.app_version;
       this.printersList = config.printersList;
     });

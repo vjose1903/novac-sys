@@ -1,0 +1,217 @@
+/* eslint-disable @typescript-eslint/indent */
+import * as fun_ from '../utils/funciones';
+import { styles_ } from '../utils/files';
+import { SingletonService } from '../../singleton.service';
+import { ConfigI } from '../../../typescript/config-interface';
+import { getContentWithTablaNormal } from '../tabla_normal';
+import { getConfiguration } from '../configuracion_tablas';
+
+export function makeFacturaVenta(data) {
+  const is_venta = data.FACTURA_DE === 'venta' ? true : false;
+  const is_contado = data.condicion === 'Contado' ? true : false;
+  const is_nota = data.FACTURA_DE === 'nota' ? true : false;
+
+  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
+  console.log('data ', data);
+  console.log('data.identificador ', data.identificador);
+
+  const dd = {
+    pageSize: { width: 302, height: 'auto' },
+    pageOrientation: 'portrait',
+    pageMargins: [20, 40, 20, 20],
+    content: contenidoPDF(data, is_nota, is_contado, is_venta, configApp),
+    images: {
+      logo: `data:image/png;base64,${configApp.logo_impresion}`,
+      barcode: fun_.my_barcode(data.identificador),
+    },
+    styles: styles_,
+  };
+
+  const obj = { doc: dd, file: 'factura.pdf', type: 'file' };
+
+  return obj;
+}
+
+// ==========================================================================================================================================================
+// CONTENIDO
+// =========================================================~=================================================================================================
+
+function contenidoPDF(data, is_nota, is_contado, is_venta, configApp: ConfigI) {
+  const configuration = getConfiguration('ventas');
+  data.tipo_tabla = 'normal';
+  data.contenido_reporte = data.detalle_facturas;
+
+  const tabla_detalles = getContentWithTablaNormal(configuration, data);
+  console.log('tabla_detalles ', tabla_detalles);
+
+  const prueba = [{ num: 1 }, { num: 2 }, ...tabla_detalles, { num: 3 }];
+
+  console.log('prueba ', prueba);
+
+  const content = [
+    {
+      alignment: 'center',
+      stack: [
+        {
+          image: 'logo',
+          fit: [220, 220],
+          // "width": 220,
+        },
+        {
+          text: configApp.nombre_empresa,
+          bold: true,
+          style: 'letra17',
+          margin: [0, 10, 0, 0],
+        },
+        {
+          text: configApp.direccion_empresa,
+          bold: false,
+          style: 'letra11',
+          margin: [0, 5, 0, 0],
+        },
+        {
+          alignment: 'center',
+          margin: [0, 3, 0, 0],
+          text: [
+            { text: 'Telefono: ', bold: true, style: 'letra11' },
+            { text: configApp.telefono_empresa, style: 'letra11' },
+            { text: ' RNC: ', bold: true, style: 'letra11' },
+            { text: configApp.rnc_empresa, style: 'letra11' },
+          ],
+        },
+        // ---------- DATOS DE LA FACTURA ----------
+        {
+          margin: [-10, 20, 0, 0],
+          stack: [
+            {
+              alignment: 'left',
+              margin: [0, 0, 0, 0],
+              text: [
+                { text: 'NCF                     : ', bold: true, style: 'letra10' },
+                { text: data.numero_comprobante, style: 'letra10' },
+              ],
+            },
+            {
+              alignment: 'left',
+              margin: [0, 3, 0, 0],
+              text: [
+                { text: 'No. Documento : ', bold: true, style: 'letra10' },
+                { text: fun_.my_padStart(data.numero_factura, 8, '0'), style: 'letra10' },
+              ],
+            },
+
+            {
+              margin: [0, 3, 0, 0],
+              alignment: 'left',
+              text: [
+                { text: 'Fecha                  : ', style: 'letra10' },
+                { text: `${fun_.my_dateFormater(data.fecha_equivalente)} - ${fun_.my_houreFormater(data.fecha_equivalente)}`, style: 'letra10' },
+              ],
+            },
+            {
+              alignment: 'left',
+              margin: [0, 3, 0, 0],
+              text: [
+                { text: 'Condición           : ', bold: true, style: 'letra10' },
+                { text: fun_.my_capitalize(data.condicion), style: 'letra10' },
+              ],
+            },
+          ],
+        },
+        // ---------- DATOS DEL CLIENTE ----------
+        {
+          margin: [-10, 20, 0, 0],
+          stack: [
+            {
+              alignment: 'left',
+              margin: [0, 0, 0, 0],
+              text: [
+                is_venta || is_nota ? { text: 'Cliente                : ', bold: true, style: 'letra10' } : { text: 'Suplidor               : ', bold: true, style: 'letra10' },
+                is_venta || is_nota ? { text: data.cliente.nombre, style: 'letra10' } : { text: data.suplidor.nombre, style: 'letra10' },
+              ],
+            },
+            {
+              alignment: 'left',
+              margin: [0, 3, 0, 0],
+              text: [{ text: 'Doc. identidad   : ', bold: true, style: 'letra10' }, is_venta || is_nota ? { text: data.cliente.rnc, style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
+            },
+            {
+              alignment: 'left',
+              margin: [0, 3, 0, 0],
+              text: [
+                { text: 'Telefono             : ', bold: true, style: 'letra10' },
+                is_venta || is_nota ? { text: data.cliente.telefono, style: 'letra10' } : { text: data.suplidor.telefono, style: 'letra10' },
+              ],
+            },
+          ],
+        },
+        {
+          margin: [0, 20, 0, 0],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 300, h: 1, color: '#000000' }],
+        },
+        {
+          alignment: 'center',
+          margin: [0, 5, 0, 5],
+          text: data.tipo_factura.toUpperCase(),
+          style: 'letra12',
+          bold: true,
+        },
+        {
+          margin: [0, 0, 0, 0],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 300, h: 1, color: '#000000' }],
+        },
+        {
+          margin: [0, 5, 0, 0],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 300, h: 2, color: '#000000' }],
+        },
+        // ---------- TABLA ----------
+        ...tabla_detalles,
+        {
+          margin: [-19, 0, -19, 0],
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: ['*', 'auto'],
+            body: [
+              [
+                { text: 'BRUTO:', bold: true, alignment: 'left', style: 'letra10', margin: [10, 0, 0, 0] },
+                { text: fun_.numFormatTwoDecimals(data.Bruto), alignment: 'right', style: 'letra10', bold: true, margin: [0, 0, 10, 0] },
+              ],
+              [
+                { text: 'DESCUENTO:', bold: true, alignment: 'left', style: 'letra10', margin: [10, 0, 0, 0] },
+                { text: fun_.numFormatTwoDecimals(data.descuento), alignment: 'right', style: 'letra10', bold: true, margin: [0, 0, 10, 0] },
+              ],
+              [
+                { text: 'TOTAL A PAGAR:', bold: true, fillColor: '#d8d8d8', alignment: 'left', style: 'letra10', margin: [10, 0, 0, 0] },
+                { text: fun_.numFormatTwoDecimals(data.total_factura), alignment: 'right', fillColor: '#d8d8d8', style: 'letra10', bold: true, margin: [0, 0, 10, 0] },
+              ],
+              [
+                { text: 'EFECTIVO', bold: true, alignment: 'left', style: 'letra10', margin: [10, 0, -5, 0] },
+                { text: fun_.numFormatTwoDecimals(data.total_factura + data.devuelta), bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+              ],
+              [
+                { text: 'CAMBIO', alignment: 'left', style: 'letra10', margin: [10, 0, -5, 0] },
+                { text: fun_.numFormatTwoDecimals(data.devuelta), alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+              ],
+            ],
+          },
+        },
+        {
+          alignment: 'left',
+          margin: [-10, 30, 0, 0],
+          text: [
+            { text: 'Le atendió: ', bold: true, style: 'letra11' },
+            { text: data.usuario, style: 'letra11' },
+          ],
+        },
+        {
+          margin: [0, 20, 0, 0],
+          image: 'barcode',
+          width: 250,
+          height: 80,
+        },
+      ],
+    },
+  ];
+  return content;
+}

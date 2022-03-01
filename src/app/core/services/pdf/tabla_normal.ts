@@ -10,6 +10,8 @@ export function getTablaNormal(configuration, data, index_data?, index_info?) {
 }
 
 export function makeTablaNormal(configuration, data, index_data?, index_info?) {
+  console.log('data ', data);
+
   const data_ = data.tipo_tabla === 'normal' ? data : data.contenido_reporte[index_data];
 
   const contendio_ = data.tipo_tabla === 'normal' ? data_.contenido_reporte : index_info == 0 ? data_.contenido_titulo : data_.contenido_grupo;
@@ -28,6 +30,8 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
         margin: titulo_config.margin_titulo ? titulo_config.margin_titulo : [0, 0, 0, 0],
       };
       if (titulo_config.fillColor) obj_titulo['fillColor'] = titulo_config.fillColor;
+      console.log('obj_titulo ', obj_titulo);
+      console.log(' ');
 
       titulos.push(obj_titulo as TablaRowPdfMake);
     } catch (error) {
@@ -35,8 +39,12 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
     }
   });
 
+  console.log('titulos ', titulos);
   // if (contendio_.length > 0 || configuration.only_titulo) body.push(titulos as TablaRowPdfMake);
   body.push(titulos as TablaRowPdfMake);
+  console.log('body ', body);
+  console.log(' ');
+  console.log(' ');
   let longitud_cuerpo = 0;
   if (!configuration.only_titulo && Array.isArray(contendio_)) {
     contendio_.forEach((detalle, j) => {
@@ -45,6 +53,13 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
       body.push(row as TablaRowPdfMake);
     });
   }
+  console.log(':::::::configuration.only_titulo ', configuration.only_titulo);
+  console.log(' ');
+  console.log(':::::::Array.isArray(contendio_) ', Array.isArray(contendio_));
+  console.log(' ');
+  console.log(':::::::contendio_ ', contendio_);
+  console.log(' ');
+  console.log(':::::::contendio_.length ', contendio_.length);
 
   var content = [
     configuration.only_titulo || (Array.isArray(contendio_) && contendio_.length > 0)

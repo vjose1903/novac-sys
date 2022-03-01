@@ -193,6 +193,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
           resolve(true);
         });
+
       });
     });
   }

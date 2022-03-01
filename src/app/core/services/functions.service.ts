@@ -4,6 +4,7 @@ import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 import { GLOBAL } from '../typescript/GLOBAL';
 import { ConfigurationService } from './configuration.service';
+import { ConfigI } from '../typescript/config-interface';
 
 @Injectable({
   providedIn: 'root',
@@ -256,7 +257,7 @@ export class FunctionService {
 
   decryptConfigPassword(str) {
     const str_remplace = btoa(str);
-    const config = this.configServ.getConfig({ isPromise: false });
+    const config: ConfigI = this.configServ.getConfig({ isPromise: false });
     return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
   }
 

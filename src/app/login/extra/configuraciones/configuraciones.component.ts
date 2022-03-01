@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { ConfigurationI } from '../../../core/services/configuration.service';
 import { SingletonService } from '../../../core/services/singleton.service';
 import { GLOBAL, MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { FunctionService } from '../../../core/services/functions.service';
 import { MessageTask } from '../../../core/models/message-task';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
+import { ConfigI } from '../../../core/typescript/config-interface';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
@@ -26,12 +26,19 @@ export class ConfiguracionesComponent implements OnInit {
     { label: 'Azul', descripcion: 'blue', color: '#0042bd' },
     { label: 'Verde', descripcion: 'green', color: '#19bd00' },
   ];
+
+  paper_sizes = [
+    { label: '8.5 x 11', descripcion: '8.5x11' },
+    { label: '8.5 x 5.5', descripcion: '8.5x5.5' },
+    { label: 'Rollo 80mm', descripcion: '80mm_roll' },
+  ];
+
   configCopy;
 
   constructor(private fb: FormBuilder, private fun: FunctionService) {}
 
   ngOnInit(): void {
-    this.configServ.getConfig().then((config: ConfigurationI) => {
+    this.configServ.getConfig().then((config: ConfigI) => {
       this.config = config;
       this.configCopy = this.fun.duplicarJson(config);
       this.createForm(config);
@@ -40,25 +47,41 @@ export class ConfiguracionesComponent implements OnInit {
 
   createForm(data) {
     const color_format = _.find(this.colores, (item) => item.descripcion == data.color_app);
+
     this.form = this.fb.group({
-      nombre_empresa: [{ value: data.nombre_empresa, disabled: false }, Validators.required],
-      rnc_empresa: [{ value: data.rnc_empresa, disabled: false }, Validators.required],
-      direccion_empresa: [{ value: data.direccion_empresa, disabled: false }, Validators.required],
-      telefono_empresa: [{ value: data.telefono_empresa, disabled: false }, Validators.required],
-      logo_empresa: [{ value: data.logo_empresa, disabled: false }, Validators.required],
-      logo_impresion: [{ value: data.logo_impresion, disabled: false }, Validators.required],
+      nombre_empresa: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
+      rnc_empresa: [{ value: this.getValue(data, 'rnc_empresa'), disabled: false }, Validators.required],
+      direccion_empresa: [{ value: this.getValue(data, 'direccion_empresa'), disabled: false }, Validators.required],
+      telefono_empresa: [{ value: this.getValue(data, 'telefono_empresa'), disabled: false }, Validators.required],
+      logo_empresa: [{ value: this.getValue(data, 'logo_empresa'), disabled: false }, Validators.required],
+      logo_impresion: [{ value: this.getValue(data, 'logo_impresion'), disabled: false }, Validators.required],
       color_app: [{ value: color_format, disabled: false }, Validators.required],
-      url_servidor: [{ value: data.url_servidor, disabled: false }, Validators.required],
-      url_servidor_respaldo: [{ value: data.url_servidor_respaldo, disabled: false }, Validators.required],
-      url_servidor_descargas: [{ value: data.url_servidor_descargas, disabled: false }, Validators.required],
-      config_password: [{ value: data.config_password, disabled: false }, Validators.required],
-      usa_url_principal: [{ value: data.usa_url_principal, disabled: false }, Validators.required],
-      printer_caja_selected: [{ value: data.printer_caja_selected, disabled: false }, Validators.required],
-      printer_reportes_selected: [{ value: data.printer_reportes_selected, disabled: false }, Validators.required],
+      url_servidor: [{ value: this.getValue(data, 'url_servidor'), disabled: false }, Validators.required],
+      url_servidor_respaldo: [{ value: this.getValue(data, 'url_servidor_respaldo'), disabled: false }, Validators.required],
+      url_servidor_descargas: [{ value: this.getValue(data, 'url_servidor_descargas'), disabled: false }, Validators.required],
+      config_password: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
+      usa_url_principal: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
+      printer_caja_selected: [{ value: this.getValue(data, 'printer_caja_selected'), disabled: false }, Validators.required],
+      printer_reportes_selected: [{ value: this.getValue(data, 'printer_reportes_selected'), disabled: false }, Validators.required],
+      page_size_recibo_ingreso: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
+      page_size_conduce: [{ value: this.getValuePageSize(data, 'pages_sizes.conduce'), disabled: false }, Validators.required],
+      page_size_facturacion: [{ value: this.getValuePageSize(data, 'pages_sizes.facturacion'), disabled: false }, Validators.required],
+      page_size_cuadre_caja: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
+      page_size_reporte: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
     });
 
     this.logo_empresa = `data:image/png;base64,${data.logo_empresa}`;
     this.logo_impresion = `data:image/png;base64,${data.logo_impresion}`;
+  }
+
+  getValuePageSize(data, key) {
+    const size = _.get(data, key);
+    const page_size = _.find(this.paper_sizes, (item) => item.descripcion == size);
+    return page_size;
+  }
+
+  getValue(data, key) {
+    return _.get(data, key);
   }
 
   capitalice(control, arg) {
@@ -69,14 +92,9 @@ export class ConfiguracionesComponent implements OnInit {
   saltar(input) {}
 
   getPhotoData(data_img) {
-    console.log('data_img ', data_img);
-
     if (data_img.src_img) {
-      console.log('CONFIG ANTES ', this.fun.duplicarJson(this.form.getRawValue()));
-
       this[data_img.id] = data_img.src_img;
       this.form.controls[data_img.id].setValue(data_img.base_64);
-      console.log('CONFIG DESPUES ', this.fun.duplicarJson(this.form.getRawValue()));
     }
   }
 
@@ -85,8 +103,19 @@ export class ConfiguracionesComponent implements OnInit {
   }
 
   getFormularioToSend() {
-    const formulario = this.form.getRawValue();
+    let formulario = this.form.getRawValue();
     formulario.color_app = formulario.color_app.descripcion;
+
+    const pages_sizes = {
+      recibo_ingreso: formulario.page_size_recibo_ingreso.descripcion,
+      conduce: formulario.page_size_conduce.descripcion,
+      facturacion: formulario.page_size_facturacion.descripcion,
+      cuadre_caja: formulario.page_size_cuadre_caja.descripcion,
+      reporte: formulario.page_size_reporte.descripcion,
+    };
+
+    formulario = _.omit(formulario, ['page_size_recibo_ingreso', 'page_size_conduce', 'page_size_facturacion', 'page_size_cuadre_caja', 'page_size_reporte']);
+    formulario['pages_sizes'] = pages_sizes;
     return formulario;
   }
 
@@ -94,7 +123,8 @@ export class ConfiguracionesComponent implements OnInit {
     let res = true;
     if (this.form) {
       if (this.form.valid) {
-        const formulario = this.getFormularioToSend();
+        let formulario = this.getFormularioToSend();
+
         let keysConfig = Object.keys(formulario);
         const cambios = [];
 
@@ -115,25 +145,33 @@ export class ConfiguracionesComponent implements OnInit {
   submit() {
     const formulario = this.getFormularioToSend();
 
-    const logosKeys = ['logo_empresa', 'logo_impresion'];
     const array_targets = [];
     const array_replacement = [];
     const logos_changes = {};
 
-    let keysConfig = Object.keys(formulario);
+    this.changesParser(array_targets, array_replacement, logos_changes, formulario, this.configCopy);
+    // let keysConfig = Object.keys(formulario);
+    // const logosKeys = ['logo_empresa', 'logo_impresion'];
 
-    for (let i = 0; i < keysConfig.length; i++) {
-      const keyC = keysConfig[i];
+    // for (let i = 0; i < keysConfig.length; i++) {
+    //   const keyC = keysConfig[i];
 
-      if (this.configCopy[keyC] != formulario[keyC]) {
-        if (logosKeys.includes(keyC)) {
-          logos_changes[keyC] = formulario[keyC];
-        } else {
-          array_targets.push(`${keyC}: '${this.configCopy[keyC]}'`);
-          array_replacement.push(`${keyC}: '${formulario[keyC]}'`);
-        }
-      }
-    }
+    //   if (typeof this.configCopy[keyC] == 'string') {
+    //     if (this.configCopy[keyC] != formulario[keyC]) {
+    //       if (logosKeys.includes(keyC)) {
+    //         logos_changes[keyC] = formulario[keyC];
+    //       } else {
+    //         array_targets.push(`${keyC}: '${this.configCopy[keyC]}'`);
+    //         array_replacement.push(`${keyC}: '${formulario[keyC]}'`);
+    //       }
+    //     }
+    //   } else {
+    //     if (!_.isEqual(this.configCopy[keyC], formulario[keyC])) {
+    //       array_targets.push(`${keyC}: '${JSON.stringify(this.configCopy[keyC])}'`);
+    //       array_replacement.push(`${keyC}: '${JSON.stringify(formulario[keyC])}'`);
+    //     }
+    //   }
+    // }
 
     const objChange = {
       new_config: formulario,
@@ -144,7 +182,6 @@ export class ConfiguracionesComponent implements OnInit {
     if (this.fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
 
     console.log('objChange ', objChange);
-
     const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, objChange);
 
     this._ipc
@@ -155,9 +192,31 @@ export class ConfiguracionesComponent implements OnInit {
         setTimeout(() => {
           MODIFIED_CONFIG_FILE.next(res);
           this.fun.nextCanToast(false);
-          this.salir();
+          // this.salir();
         }, 250);
       })
       .catch((err) => console.error(err));
+  }
+
+  changesParser(array_targets, array_replacement, logos_changes, obj, copyObjLevel) {
+    let keysConfig = Object.keys(obj);
+    const logosKeys = ['logo_empresa', 'logo_impresion'];
+
+    for (let i = 0; i < keysConfig.length; i++) {
+      const key = keysConfig[i];
+
+      if (typeof copyObjLevel[key] == 'string') {
+        if (copyObjLevel[key] != obj[key]) {
+          if (logosKeys.includes(key)) {
+            logos_changes[key] = obj[key];
+          } else {
+            array_targets.push(`${key}: '${copyObjLevel[key]}'`);
+            array_replacement.push(`${key}: '${obj[key]}'`);
+          }
+        }
+      } else {
+        this.changesParser(array_targets, array_replacement, logos_changes, obj[key], copyObjLevel[key]);
+      }
+    }
   }
 }

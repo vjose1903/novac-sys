@@ -15,8 +15,8 @@ export const styles_ = {
   letra10: {
     fontSize: 10,
   },
-  letra11_5: {
-    fontSize: 11.5,
+  letra11: {
+    fontSize: 11,
   },
   letra12: {
     fontSize: 12,
