@@ -198,7 +198,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
       if (res.status === 'si') {
         const objBase = { base64: res.body, filename: res.file, type: this.tipo_prueba };
 
-        const obj = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '83vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+        const obj = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
         this.abrirModalReporte(obj);
       }
     });

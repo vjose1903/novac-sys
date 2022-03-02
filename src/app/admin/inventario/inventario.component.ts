@@ -111,7 +111,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
       this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
         if (res.status === 'si') {
-          const obj_pdf = { pdfSrc: res.body, titulo: 'Reporte de inventario', height: '83vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+          const obj_pdf = { pdfSrc: res.body, titulo: 'Reporte de inventario', height: '76vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
           this.loadServ.isLoading.next(false);
           this.abrirModal('visor_pdf', obj_pdf);
         }

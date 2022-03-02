@@ -5,8 +5,9 @@ import { SingletonService } from '../../singleton.service';
 import { ConfigI } from '../../../typescript/config-interface';
 import { getContentWithTablaNormal } from '../tabla_normal';
 import { getConfiguration } from '../configuracion_tablas';
+import { infoPropietarioPartes, infoFacturaPartes, resumenPdf } from './infoFacturas';
 
-export function makeFacturaVenta(data) {
+export function makeFacturaVenta(data, tipo_pdf?) {
   const is_venta = data.FACTURA_DE === 'venta' ? true : false;
   const is_contado = data.condicion === 'Contado' ? true : false;
   const is_nota = data.FACTURA_DE === 'nota' ? true : false;
@@ -19,7 +20,7 @@ export function makeFacturaVenta(data) {
     pageSize: { width: 302, height: 'auto' },
     pageOrientation: 'portrait',
     pageMargins: [20, 40, 20, 20],
-    content: contenidoPDF(data, is_nota, is_contado, is_venta, configApp),
+    content: contenidoPDF(data, is_nota, is_contado, is_venta, configApp, tipo_pdf),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
       barcode: fun_.my_barcode(data.identificador),
@@ -36,8 +37,8 @@ export function makeFacturaVenta(data) {
 // CONTENIDO
 // =========================================================~=================================================================================================
 
-function contenidoPDF(data, is_nota, is_contado, is_venta, configApp: ConfigI) {
-  const configuration = getConfiguration('ventas');
+function contenidoPDF(data, is_nota, is_contado, is_venta, configApp: ConfigI, tipo_pdf) {
+  const configuration = getConfiguration(tipo_pdf);
   data.tipo_tabla = 'normal';
   data.contenido_reporte = data.detalle_facturas;
 
@@ -82,68 +83,13 @@ function contenidoPDF(data, is_nota, is_contado, is_venta, configApp: ConfigI) {
         // ---------- DATOS DE LA FACTURA ----------
         {
           margin: [-10, 20, 0, 0],
-          stack: [
-            {
-              alignment: 'left',
-              margin: [0, 0, 0, 0],
-              text: [
-                { text: 'NCF                     : ', bold: true, style: 'letra10' },
-                { text: data.numero_comprobante, style: 'letra10' },
-              ],
-            },
-            {
-              alignment: 'left',
-              margin: [0, 3, 0, 0],
-              text: [
-                { text: 'No. Documento : ', bold: true, style: 'letra10' },
-                { text: fun_.my_padStart(data.numero_factura, 8, '0'), style: 'letra10' },
-              ],
-            },
-
-            {
-              margin: [0, 3, 0, 0],
-              alignment: 'left',
-              text: [
-                { text: 'Fecha                  : ', style: 'letra10' },
-                { text: `${fun_.my_dateFormater(data.fecha_equivalente)} - ${fun_.my_houreFormater(data.fecha_equivalente)}`, style: 'letra10' },
-              ],
-            },
-            {
-              alignment: 'left',
-              margin: [0, 3, 0, 0],
-              text: [
-                { text: 'Condición           : ', bold: true, style: 'letra10' },
-                { text: fun_.my_capitalize(data.condicion), style: 'letra10' },
-              ],
-            },
-          ],
+          stack: [...parseInfoFactura(data, tipo_pdf)],
         },
-        // ---------- DATOS DEL CLIENTE ----------
+        // ---------- DATOS DEL PROPIETARIO ----------
         {
           margin: [-10, 20, 0, 0],
-          stack: [
-            {
-              alignment: 'left',
-              margin: [0, 0, 0, 0],
-              text: [
-                is_venta || is_nota ? { text: 'Cliente                : ', bold: true, style: 'letra10' } : { text: 'Suplidor               : ', bold: true, style: 'letra10' },
-                is_venta || is_nota ? { text: data.cliente.nombre, style: 'letra10' } : { text: data.suplidor.nombre, style: 'letra10' },
-              ],
-            },
-            {
-              alignment: 'left',
-              margin: [0, 3, 0, 0],
-              text: [{ text: 'Doc. identidad   : ', bold: true, style: 'letra10' }, is_venta || is_nota ? { text: data.cliente.rnc, style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
-            },
-            {
-              alignment: 'left',
-              margin: [0, 3, 0, 0],
-              text: [
-                { text: 'Telefono             : ', bold: true, style: 'letra10' },
-                is_venta || is_nota ? { text: data.cliente.telefono, style: 'letra10' } : { text: data.suplidor.telefono, style: 'letra10' },
-              ],
-            },
-          ],
+
+          stack: [...parseInfoPropietario(data, tipo_pdf, is_nota, is_venta)],
         },
         {
           margin: [0, 20, 0, 0],
@@ -196,22 +142,126 @@ function contenidoPDF(data, is_nota, is_contado, is_venta, configApp: ConfigI) {
             ],
           },
         },
-        {
-          alignment: 'left',
-          margin: [-10, 30, 0, 0],
-          text: [
-            { text: 'Le atendió: ', bold: true, style: 'letra11' },
-            { text: data.usuario, style: 'letra11' },
-          ],
-        },
-        {
-          margin: [0, 20, 0, 0],
-          image: 'barcode',
-          width: 250,
-          height: 80,
-        },
       ],
     },
   ];
+
+  // -------- PDF CREADO POR --------
+  if (resumenPdf['usuario'].includes(tipo_pdf)) {
+    content[0].stack.push({
+      alignment: 'left',
+      margin: [-10, 30, 0, 0],
+      text: [
+        { text: 'Le atendió: ', bold: true, style: 'letra11' },
+        { text: data.usuario, style: 'letra11' },
+      ],
+    } as any);
+  }
+
+  // -------- BARCODE --------
+  if (resumenPdf['barcode'].includes(tipo_pdf)) content[0].stack.push({ margin: [0, 20, 0, 0], image: 'barcode', width: 295 } as any);
+
   return content;
+}
+
+function parseInfoFactura(data, tipo_pdf) {
+  const contenido = [];
+
+  const partes = [
+    {
+      key: 'ncf',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'NCF                     : ', bold: true, style: 'letra10' },
+          { text: data.numero_comprobante, style: 'letra10' },
+        ],
+      },
+    },
+    {
+      key: 'no_documento',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'No. Documento : ', bold: true, style: 'letra10' },
+          { text: fun_.my_padStart(data.numero_documento, 8, '0'), style: 'letra10' },
+        ],
+      },
+    },
+
+    {
+      key: 'fecha',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'Fecha                  : ', style: 'letra10' },
+          { text: `${fun_.my_dateFormater(data.fecha)} - ${fun_.my_houreFormater(data.fecha)}`, style: 'letra10' },
+        ],
+      },
+    },
+    {
+      key: 'condición',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'Condición           : ', bold: true, style: 'letra10' },
+          { text: fun_.my_capitalize(data.condicion), style: 'letra10' },
+        ],
+      },
+    },
+  ];
+
+  for (let index = 0; index < partes.length; index++) {
+    const parte = partes[index];
+
+    if (infoFacturaPartes[tipo_pdf].includes(parte.key)) {
+      parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];
+      contenido.push(parte.item);
+    }
+  }
+  return contenido;
+}
+
+function parseInfoPropietario(data, tipo_pdf, is_nota, is_venta) {
+  const contenido = [];
+
+  const partes = [
+    {
+      key: 'nombre',
+      item: {
+        alignment: 'left',
+        text: [
+          is_venta || is_nota ? { text: 'Cliente                : ', bold: true, style: 'letra10' } : { text: 'Suplidor               : ', bold: true, style: 'letra10' },
+          is_venta || is_nota ? { text: data.cliente.nombre, style: 'letra10' } : { text: data.suplidor.nombre, style: 'letra10' },
+        ],
+      },
+    },
+    {
+      key: 'doc_identidad',
+      item: {
+        alignment: 'left',
+        text: [{ text: 'Doc. identidad   : ', bold: true, style: 'letra10' }, is_venta || is_nota ? { text: data.cliente.rnc, style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
+      },
+    },
+    {
+      key: 'telefono',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'Telefono             : ', bold: true, style: 'letra10' },
+          is_venta || is_nota ? { text: data.cliente.telefono, style: 'letra10' } : { text: data.suplidor.telefono, style: 'letra10' },
+        ],
+      },
+    },
+  ];
+
+  for (let index = 0; index < partes.length; index++) {
+    const parte = partes[index];
+
+    if (infoPropietarioPartes[tipo_pdf].includes(parte.key)) {
+      parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];
+      contenido.push(parte.item);
+    }
+  }
+  return contenido;
 }

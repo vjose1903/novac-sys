@@ -176,7 +176,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
         obj = {
           pdfSrc: arg.body,
           titulo: this.titulo_moda_reporte,
-          height: '83vh',
+          height: '76vh',
           reimprimir: arg.reimprimir,
           fileName: arg.file.split('.')[0],
         };

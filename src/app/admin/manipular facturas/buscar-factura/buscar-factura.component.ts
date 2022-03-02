@@ -49,23 +49,23 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   campo = null;
   placeHolder = '';
   info = [
-    { titulo: ' ', tipo: 'icon' , key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }] },
-    { titulo: 'Numero Fact', tipo: 'text' , key: 'secuencia', estilos: [{ width: '7rem' }] },
-    { titulo: 'Tipo', tipo: 'text' , key: 'tipo_factura' },
-    { titulo: 'Comprobante', tipo: 'text' , key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
-    { titulo: 'Condicion', tipo: 'text' , key: 'condicion', estilos: [{ width: '6rem' }] },
-    { titulo: 'Fecha Facturación', tipo: 'text' , key: 'fecha' },
-    { titulo: 'Fecha Vencimiento', tipo: 'text' , key: 'fechaV' },
-    { titulo: 'Total facturado', tipo: 'formatoNumero' , key: 'total_factura', formatoNumero: true },
-    { titulo: 'Balance tactura', tipo: 'formatoNumero' , key: 'balance', formatoNumero: true },
-    { titulo: 'Seleccione', tipo: 'icon' , key: 'select', text_color: 'selectColor', isIcon: true, color: true },
+    { titulo: ' ', tipo: 'icon', key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }] },
+    { titulo: 'Numero Fact', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
+    { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
+    { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+    { titulo: 'Condicion', tipo: 'text', key: 'condicion', estilos: [{ width: '6rem' }] },
+    { titulo: 'Fecha Facturación', tipo: 'text', key: 'fecha' },
+    { titulo: 'Fecha Vencimiento', tipo: 'text', key: 'fechaV' },
+    { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', formatoNumero: true },
+    { titulo: 'Balance tactura', tipo: 'formatoNumero', key: 'balance', formatoNumero: true },
+    { titulo: 'Seleccione', tipo: 'icon', key: 'select', text_color: 'selectColor', isIcon: true, color: true },
   ];
 
   infoNota = [
-    { titulo: 'Fecha', tipo: 'text' , key: 'fecha' },
-    { titulo: 'Comprobante', tipo: 'text' , key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
-    { titulo: 'Total nota', tipo: 'formatoNumero' , key: 'total_factura', formatoNumero: true },
-    { titulo: 'Seleccione', tipo: 'icon' , key: 'select', text_color: 'selectColor', isIcon: true, color: true },
+    { titulo: 'Fecha', tipo: 'text', key: 'fecha' },
+    { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+    { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total_factura', formatoNumero: true },
+    { titulo: 'Seleccione', tipo: 'icon', key: 'select', text_color: 'selectColor', isIcon: true, color: true },
   ];
 
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
@@ -471,12 +471,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   saltar(campo, valor) {
-    console.log('valor ', valor);
-    console.log('this.campo ', this.campo);
     const actualPagination = this.tServ.getPaginationById('facturas_params');
 
     if (valor && this.campo) {
-      console.log('campo ', campo);
       this.valor = valor;
       if (campo === 'cliente') {
         if (valor || valor === ' ') {

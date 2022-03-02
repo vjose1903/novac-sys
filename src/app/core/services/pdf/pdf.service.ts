@@ -35,7 +35,7 @@ export class PdfService {
       const config: ConfigI = this.configServ.getConfig({ isPromise: false });
 
       data['reimprimir'] = reimprimir;
-
+      // TODO: parsear los distintos campos de numero de documento para que coincidan con numero_documento
       try {
         switch (type_oPdf) {
           case 'recibo_ingreso':
@@ -48,7 +48,9 @@ export class PdfService {
 
           case 'facturacion':
             const options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
-            obj = options[config.pages_sizes.facturacion].makeFacturaVenta(data);
+            data.fecha = data.fecha_equivalente;
+            data.numero_documento = data.numero_factura;
+            obj = options[config.pages_sizes.facturacion].makeFacturaVenta(data, 'ventas');
             break;
 
           case 'cuadre_caja':

@@ -204,18 +204,20 @@ export class ConfiguracionesComponent implements OnInit {
 
     for (let i = 0; i < keysConfig.length; i++) {
       const key = keysConfig[i];
-
-      if (typeof copyObjLevel[key] == 'string') {
-        if (copyObjLevel[key] != obj[key]) {
-          if (logosKeys.includes(key)) {
-            logos_changes[key] = obj[key];
-          } else {
-            array_targets.push(`${key}: '${copyObjLevel[key]}'`);
-            array_replacement.push(`${key}: '${obj[key]}'`);
+      console.log('copyObjLevel[key] ', copyObjLevel[key]);
+      if (this.fun.hasValue(copyObjLevel[key])) {
+        if (typeof copyObjLevel[key] == 'string') {
+          if (copyObjLevel[key] != obj[key]) {
+            if (logosKeys.includes(key)) {
+              logos_changes[key] = obj[key];
+            } else {
+              array_targets.push(`${key}: '${copyObjLevel[key]}'`);
+              array_replacement.push(`${key}: '${obj[key]}'`);
+            }
           }
+        } else {
+          this.changesParser(array_targets, array_replacement, logos_changes, obj[key], copyObjLevel[key]);
         }
-      } else {
-        this.changesParser(array_targets, array_replacement, logos_changes, obj[key], copyObjLevel[key]);
       }
     }
   }

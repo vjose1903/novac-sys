@@ -2,6 +2,7 @@ import { app, BrowserWindow, screen, ipcMain, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
+import { ConfigI } from './src/app/core/typescript/config-interface';
 const logos = require('./logos.json');
 
 const request = require('request');
@@ -475,7 +476,7 @@ function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5
 async function procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta) {
   let descarga_exito = true;
   const confTemp = (await Functions.getConfigFile()) as any;
-  const conf = JSON.parse(confTemp);
+  const conf: ConfigI = JSON.parse(confTemp);
 
   if (conf.url_servidor_descargas) {
     await downloadFile(`${conf.url_servidor_descargas}${paht_server}`, path_local_content, path_local_extension, (res) => {
@@ -674,7 +675,7 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function imprimir(params: { fileName: string; tipo: string; scale: string }) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${pathAdd(`/${params.fileName}`)}`);
 
     const sumatrapdf_path = pathAdd('/print/lp.exe');
@@ -683,7 +684,15 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
     const orientation = params.tipo === 'reporte' ? 'Portrait' : 'landscape';
     const paper_size = params.tipo === 'reporte' ? 'letter' : 'VJPOS';
 
-    const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
+    const confTemp = (await Functions.getConfigFile()) as any;
+    const conf: ConfigI = JSON.parse(confTemp);
+
+    console.log('obj_printer_selected ', conf);
+
+    const selected_printer = params.tipo === 'reporte' ? conf.printer_reportes_selected : conf.printer_caja_selected;
+
+    // const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
+    const comando = `"${sumatrapdf_path}" -print-to ${selected_printer.name} -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
 
     cmd(comando, (res) => {
       if (res.status) resolve({ msg: 'PDF impreso correctamente!!', status: 'si', STDOUT: res });
