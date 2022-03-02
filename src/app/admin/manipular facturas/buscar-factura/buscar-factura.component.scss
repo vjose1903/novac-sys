@@ -3,10 +3,11 @@
   grid-row-gap: 1rem;
   height: 100%;
   grid-template-areas:
-    "titulo"
-    "arriba"
-    "abajo";
-  grid-template-rows: min-content min-content;
+    'titulo'
+    'arriba'
+    'abajo'
+    'footer';
+  grid-template-rows: min-content min-content auto min-content;
 
   .titulo {
     grid-area: titulo;
@@ -16,6 +17,12 @@
   }
   .abajo {
     grid-area: abajo;
+  }
+  .footer {
+    grid-area: footer;
+    width: min-content;
+    justify-self: end;
+    margin-right: 15px !important;
   }
 }
 

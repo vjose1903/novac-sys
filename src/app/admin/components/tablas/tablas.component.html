@@ -12,7 +12,7 @@
       <thead class="text-center position-relative" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
         <!-- [disabled]="disabledInput(dato, column)" -->
         <tr #titulosHeader>
-          <th id="{{ row?.titulo }}" *ngFor="let row of info" class="thHead">
+          <th id="{{ row?.titulo }}-{{id_tabla}}" *ngFor="let row of info" class="thHead">
             <span [ngSwitch]="row?.tipo">
               <span *ngSwitchCase="'check'">
                 <ng-container *ngIf="!row?.select_all"> {{ row?.titulo }} </ng-container>
@@ -54,7 +54,7 @@
             #RowElement
             (click)="clickROW(dato)"
           >
-            <td *ngFor="let column of info; let j = index" class="tableTD" id="td-{{ column.key }}-{{ i }}" [ngStyle]="getStyle(column.key, i)">
+            <td *ngFor="let column of info; let j = index" class="tableTD" id="td-{{ column.key.key ? column.key.key : column.key }}-{{ i }}" [ngStyle]="getStyle(column.key, i)">
               <!-- <ng-template *ngIf="column.text_tooltip" #tooltip>{{ dato[column.text_tooltip] }} </ng-template> -->
               <ng-template #tooltip>{{ dato[column.text_tooltip] }} </ng-template>
               <span
@@ -93,7 +93,7 @@
                 <i
                   id="{{ column.key }}-{{ i }}"
                   (click)="iconBtn(column.key, i, dato)"
-                  class="{{ dato[column.key] }} {{ dato.iconHover ? 'c-pointer' : '' }}   text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
+                  class="{{ getIconClass(column, dato) }} {{ dato.iconHover ? 'c-pointer' : '' }}   text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
                   (mouseenter)="mouseMoveEvent('hover', dato, column.key, $event.target.id)"
                   (mouseleave)="mouseMoveEvent('leave', dato, column.key, $event.target.id)"
                 ></i>
@@ -164,7 +164,6 @@
           </li>
         </ul>
       </div>
-
     </div>
   </div>
 </div>

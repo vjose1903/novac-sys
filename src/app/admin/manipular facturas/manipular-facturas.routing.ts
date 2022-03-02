@@ -9,7 +9,7 @@ const routes: Routes = [
     component: BuscarFacturaComponent,
   },
   {
-    path: 'nota/:tipo/:id',
+    path: 'nota/:tipo/:ids',
     component: NotasCredDebComponent,
   },
 ];

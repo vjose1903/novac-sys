@@ -9,9 +9,10 @@ import { TablasModule } from '../components/tablas/tablas.module';
 import { BtncircularModule } from '../components/btncircular/btncircular.module';
 import { TooltipModule } from 'primeng/tooltip';
 import { SidebarModule } from 'primeng/sidebar';
+import { TabViewModule } from 'primeng/tabview';
 
 @NgModule({
   declarations: [NotasCredDebComponent, BuscarFacturaComponent],
-  imports: [CommonModule, ManipularFacturasRoutingModule, AngularModule, TablasModule, BtncircularModule, TooltipModule, SidebarModule],
+  imports: [CommonModule, ManipularFacturasRoutingModule, AngularModule, TablasModule, BtncircularModule, TooltipModule, SidebarModule, TabViewModule],
 })
 export class ManipularFacturasModule {}

@@ -1,117 +1,110 @@
-<div *ngIf="factura">
-  <h3>
-    {{ tituloPag }}<b>{{ factura_aplicada }}</b>
-  </h3>
-  <div class="cardPrincipal sinPadding tamano" style="height: calc(100% - 12vh)">
-    <div class="cabezaFactura">
-      <div class="row">
-        <!-- ============ factura aplicada ============ -->
-        <div class="col-8 divRigth p-0">
+<div *ngIf="facturasConDetalles">
+  <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView anularPadding">
+    <p-tabPanel *ngFor="let iteraFact of facturasConDetalles" header="{{ iteraFact.numero_comprobante }}">
+      <div class="cardPrincipal sinPadding tamano" style="height: calc(100% - 12vh); width: 98% !important">
+        <h3 style="margin: 0.4rem">
+          {{ tituloPag }}<b>{{ iteraFact.numero_comprobante }}</b>
+        </h3>
+        <div class="cabezaFactura">
           <div class="row">
-            <div class="col-12 text-center mb-2">
-              <span class="infoFactuApli"> Informacion factura aplicada</span>
-            </div>
-            <div class="col-7 mt-2">
+            <!-- ============ factura aplicada ============ -->
+            <div class="col-8 divRigth p-0">
               <div class="row">
-                <div class="col-12 p-0">
-                  <span class="d-block">
-                    <b class="negrita">{{ factura.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
-                    >&nbsp;
-                    <span>{{ propietario_factura?.nombre }}</span>
-                  </span>
+                <div class="col-12 text-center mb-2">
+                  <span class="infoFactuApli"> Informacion factura aplicada</span>
+                </div>
+                <div class="col-7 mt-2">
+                  <div class="row">
+                    <div class="col-12 p-0">
+                      <span class="d-block">
+                        <b class="negrita">{{ iteraFact.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
+                        >&nbsp;
+                        <span>{{ iteraFact.cliente?.nombre }}</span>
+                      </span>
 
-                  <span class="d-block">
-                    <b class="negrita">{{ factura.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
-                    >&nbsp;
-                    <span>{{ propietario_factura?.rnc }}</span>
-                  </span>
-                  <span class="d-block">
-                    <b class="negrita">Direccion :</b>&nbsp; <span>{{ propietario_factura?.direccion }}</span>
-                  </span>
-                  <span class="d-block negrita"> Total facturado : &nbsp; {{ formatoNumero(factura?.total_factura) }} </span>
+                      <span class="d-block">
+                        <b class="negrita">{{ iteraFact.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
+                        >&nbsp;
+                        <span>{{ iteraFact.cliente?.rnc }}</span>
+                      </span>
+                      <span class="d-block">
+                        <b class="negrita">Direccion :</b>&nbsp; <span>{{ iteraFact.cliente?.direccion }}</span>
+                      </span>
+                      <span class="d-block negrita"> Total facturado : &nbsp; {{ formatoNumero(iteraFact?.total_factura) }} </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-5 d-flex justify-content-center">
+                  <div class="infoFactura">
+                    <span class="d-block">
+                      <b class="negrita">Fecha facturación:</b>&nbsp; <span>{{ formatoFecha(iteraFact.fecha_equivalente) }}</span>
+                    </span>
+                    <span *ngIf="iteraFact.condicion === 'Crédito'" class="d-block">
+                      <b class="negrita">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(iteraFact.fecha_vencimiento) }}</span>
+                    </span>
+                    <span class="d-block">
+                      <b class="negrita">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(iteraFact.numero_factura) }}</span>
+                    </span>
+                    <span class="d-block">
+                      <b class="negrita">Valida hasta :</b> &nbsp;
+                      <span *ngIf="iteraFact.numero_factura">{{
+                        iteraFact.tipo_factura_id === 3 ? 'No aplica' : iteraFact.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(iteraFact.fecha_valida)
+                      }}</span>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="col-5 d-flex justify-content-center">
-              <div class="infoFactura">
-                <span class="d-block">
-                  <b class="negrita">Fecha facturación:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_equivalente) }}</span>
-                </span>
-                <span *ngIf="factura.condicion === 'Crédito'" class="d-block">
-                  <b class="negrita">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(factura.fecha_vencimiento) }}</span>
-                </span>
-                <span class="d-block">
-                  <b class="negrita">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(factura.numero_factura) }}</span>
-                </span>
-                <span class="d-block">
-                  <b class="negrita">Valida hasta :</b> &nbsp;
-                  <span *ngIf="factura.numero_factura">{{
-                    factura.tipo_factura_id === 3 ? 'No aplica' : factura.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(factura.fecha_valida)
-                  }}</span>
-                </span>
+            <!-- ============ nota ============ -->
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12 text-center mb-2">
+                  <span class="infoFactuApli"> Informacion nota {{ tipos[tipoNota] }}</span>
+                </div>
+                <div class="col-12">
+                  <div class="encabezadoRigth fecha">
+                    <span class="titulos w-100">
+                      Fecha : <strong> {{ fecha }}</strong>
+                    </span>
+                  </div>
+                  <div class="cuadroTotal">RD$ {{ formatoNumero(TOTAL) }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <!-- ============ nota ============ -->
-        <div class="col-4">
-          <div class="row">
-            <div class="col-12 text-center mb-2">
-              <span class="infoFactuApli"> Informacion nota {{ tipos[tipoNota] }}</span>
-            </div>
-            <div class="col-12">
-              <div class="encabezadoRigth fecha">
-                <span class="titulos w-100">
-                  Fecha : <strong> {{ fecha }}</strong>
-                </span>
-              </div>
-              <div class="cuadroTotal">RD$ {{ formatoNumero(TOTAL) }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- ======================================================================================================== -->
-    <div #cardTabla id="cardTabla" class="cuerpoFactura mb-2">
-      <app-tablas
-        *ngIf="detalleFacturas"
-        [search]="false"
-        [paginate]="false"
-        [tablaHover]="false"
-        [padre]="cardTabla"
-        [info]="info"
-        (getInfoChange)="getInfoChange($event)"
-        [data]="detalleFacturas"
-        [focusRow]="false"
-        [pad]="false"
-        [colorHead]="false"
-      ></app-tablas>
-      <!-- [quitarAScorll]="340" -->
-    </div>
-    <div class="pieFactura">
-      <div class="row">
-        <div class="col-3">
-          <app-btncircular
-            [alto]="'100px'"
-            [accion]="'Imprimir nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')"
-            [nombreImg]="'printer'"
-            (click)="imprimirFactura()"
-          ></app-btncircular>
+        <!-- ======================================================================================================== -->
+        <div #cardTabla id="cardTabla" class="cuerpoFactura mb-2">
+          <app-tablas
+            *ngIf="iteraFact.detalle_facturas"
+            [search]="false"
+            [paginate]="false"
+            [id_tabla]="iteraFact.id"
+            [tablaHover]="false"
+            [padre]="cardTabla"
+            [info]="info"
+            (getInfoChange)="getInfoChange($event, iteraFact)"
+            [data]="iteraFact.detalle_facturas"
+            [focusRow]="false"
+            [pad]="false"
+            [colorHead]="false"
+          ></app-tablas>
+          <!-- [quitarAScorll]="340" -->
         </div>
-        <div class="col-3">
-          <app-btncircular
-            [alto]="'100px'"
-            [accion]="'Cancelar nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')"
-            [nombreImg]="'cancelar'"
-            (click)="cancelarFactura()"
-          ></app-btncircular>
-        </div>
+        <div class="pieFactura">
+          <div class="row" style="border-top: 2px solid #c7c9ca">
+            <div class="col-3">
+              <app-btncircular [alto]="'100px'" [accion]="'Imprimir nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
+            </div>
+            <div class="col-3">
+              <app-btncircular [alto]="'100px'" [accion]="'Cancelar nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
+            </div>
 
-        <div class="col-6 d-flex justify-content-end">
-          <div class="mostrarNumeros w-100">
-            <div class="row d-flex align-items-end">
-              <!-- <div class="col-12 cuadroResumenTotal mb-2">
+            <div class="col-6 d-flex justify-content-end">
+              <div class="mostrarNumeros w-100">
+                <div class="row d-flex align-items-end">
+                  <!-- <div class="col-12 cuadroResumenTotal mb-2">
                   <span class="label text-poppins position-absolute left-0 top-0">BRUTO:</span>
                   <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(BRUTO) }}</h5>
                 </div>
@@ -119,14 +112,18 @@
                   <span class="label text-poppins position-absolute left-0 top-0">DESCUENTO:</span>
                   <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(DESCUENTO) }}</h5>
                 </div> -->
-              <div class="col-12 cuadroResumenTotal mb-5" style="max-height: 3rem">
-                <span class="label text-poppins position-absolute left-0 top-0"> <strong>TOTAL:</strong> </span>
-                <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(TOTAL) }}</h5>
+                  <div class="col-12 cuadroResumenTotal mb-5" style="max-height: 3rem">
+                    <span class="label text-poppins position-absolute left-0 top-0"> <strong>TOTAL:</strong> </span>
+                    <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(TOTAL) }}</h5>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </p-tabPanel>
+  </p-tabView>
 </div>
+
+<!-- <ng-container *ngTemplateOutlet="txtMonto; context: { txtData: { title: 'Apuesta', color: '#565656' } }"></ng-container> -->

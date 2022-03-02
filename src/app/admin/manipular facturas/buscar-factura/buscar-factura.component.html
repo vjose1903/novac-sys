@@ -102,7 +102,7 @@
         [info]="info"
         [quitarAScorll]="60"
         [id_tabla]="'facturas_params'"
-        (clickIcon)="selectFactura($event)"
+        (clickIcon)="clickIconHandler($event)"
         [data]="facturas"
         (getInfoChange)="selectFactura($event)"
         (paginateChange)="changePaginate($event)"
@@ -110,6 +110,9 @@
       ></app-tablas>
     </div>
   </div>
+  <button *ngIf="mostrarListaFacturas()" [disabled]="!(idsFacturasSeleccionadas.length > 0)" [disabled]="" class="btn btn-verde mr-2 footer" value="" (click)="continuarAManipularFactura()">
+    {{ 'Continuar' }}
+  </button>
 </div>
 
 <!-- ============================================================================================================================================ -->
