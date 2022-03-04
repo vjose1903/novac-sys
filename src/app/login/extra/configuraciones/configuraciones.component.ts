@@ -192,7 +192,7 @@ export class ConfiguracionesComponent implements OnInit {
         setTimeout(() => {
           MODIFIED_CONFIG_FILE.next(res);
           this.fun.nextCanToast(false);
-          // this.salir();
+          this.salir();
         }, 250);
       })
       .catch((err) => console.error(err));

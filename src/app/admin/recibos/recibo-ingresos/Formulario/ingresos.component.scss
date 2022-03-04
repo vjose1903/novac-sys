@@ -7,7 +7,7 @@
 }
 
 .gris {
-  color: var(--transparente01)
+  color: var(--transparente01);
 }
 
 .detalleBalance {
@@ -51,13 +51,9 @@
 
   .nombre_cliente {
     grid-area: nombre_cliente;
-    color: #d8d8d8;
-    color: #424efa
-    // background-color: red;
   }
   .cuerpo {
     grid-area: cuerpo;
-    // background-color: green;
 
     .cajas {
       display: grid;
@@ -67,16 +63,13 @@
       grid-template-rows: auto;
       .izquierda {
         grid-area: izquierda;
-        // background-color: yellow;
       }
       .derecha {
         grid-area: derecha;
-        // background-color: plum;
       }
     }
   }
   .porcentaje {
     grid-area: porcentaje;
-    // background-color: blue;
   }
 }

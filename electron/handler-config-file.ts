@@ -22,8 +22,8 @@ export default class HandlerConfigFile {
     printer_caja_selected: null,
     printer_reportes_selected: null,
     pages_sizes: {
-      recibo_ingreso: '8.5x5.5',
-      conduce: '8.5x5.5',
+      recibo_ingreso: '80mm_roll',
+      conduce: '80mm_roll',
       facturacion: '80mm_roll',
       cuadre_caja: '8.5x5.5',
       reporte: '8.5x11',

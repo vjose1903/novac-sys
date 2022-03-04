@@ -8,8 +8,8 @@
         <img class="img-fluid logo" src="assets/img/adm_logo.jpg" alt="" />
       </div>
       <div class="col-4 text-center">
-        <b class="L1">{{config?.nombre_empresa}}</b>
-        <small class="L2"> {{config?.direccion_empresa}}</small>
+        <b class="L1">{{ config?.nombre_empresa }}</b>
+        <small class="L2"> {{ config?.direccion_empresa }}</small>
         <small class="L3"> <b>Telefono:</b> {{ config?.telefono_empresa }} &nbsp; <b>Rnc:</b>{{ config?.rnc_empresa }}</small>
       </div>
       <div class="col-4 d-flex justify-content-end">
@@ -72,9 +72,8 @@
         <thead class="">
           <tr>
             <th style="width: 3rem">#</th>
-            <th style="width: 27rem">Articulo</th>
+            <th style="width: 32rem">Articulo</th>
             <th class="text-right">Cantidad</th>
-            <th style="width: 5rem" class="text-right">Unidad</th>
             <th class="text-right">{{ factura.tipo === 'compra' ? 'Costo' : 'Precio' }}</th>
             <th class="text-right">Itbis</th>
             <th class="text-right">Total</th>
@@ -83,12 +82,11 @@
         <tbody [ngStyle]="{ 'max-height': '22rem' }">
           <tr *ngFor="let row of factura.detalle_facturas; let i = index">
             <td style="width: 3rem">{{ i + 1 }}</td>
-            <td style="width: 27rem">
+            <td style="width: 32rem">
               {{ row.descripcion }}
               <!-- <span *ngIf="row.se_calcula_saco && !row.calcular_saco"> * </span> -->
             </td>
-            <td class="text-right">{{ formatoNumero(row.cantidad) }}</td>
-            <td style="width: 5rem" class="text-right">{{ row.unidad }}</td>
+            <td class="text-right">{{ formatoNumero(row.cantidad) }}&nbsp;{{ row.unidad }}</td>
             <td class="text-right">{{ factura.tipo === 'compra' ? formatoNumero(row.costo) : formatoNumero(row.precio) }}</td>
             <td class="text-right">{{ formatoNumero(row.itbis) }}</td>
             <td class="text-right">{{ formatoNumero(row.total) }}</td>

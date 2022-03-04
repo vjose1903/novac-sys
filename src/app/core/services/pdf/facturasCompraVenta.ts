@@ -19,7 +19,7 @@ function getPageMargin(is_contado) {
   return margins;
 }
 
-export function makeFacturaVenta(data) {
+export function makePDF(data, file_name, tipo_pdf?) {
   const is_venta = data.FACTURA_DE === 'venta' ? true : false;
   const is_contado = data.condicion === 'Contado' ? true : false;
   const is_nota = data.FACTURA_DE === 'nota' ? true : false;
@@ -39,7 +39,7 @@ export function makeFacturaVenta(data) {
     styles: styles_,
   };
 
-  const obj = { doc: dd, file: 'factura.pdf', type: 'file' };
+  const obj = { doc: dd, file: file_name, type: 'file' };
 
   return obj;
 }
@@ -209,19 +209,18 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
       style: 'tableExample',
       table: {
         headerRows: 1,
-        widths: [30, 245, '*', '*', '*', '*', '*'],
+        widths: [30, 350, '*', '*', '*', '*'],
         body: [
           [
             { text: ' #', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
             { text: 'Articulo', bold: true, margin: [-5, 0, 0, 0] },
             { text: 'Cantidad', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
-            { text: 'Unidad', bold: true, alignment: 'center', margin: [0, 0, 15, 0] },
             is_venta || is_nota ? { text: 'Precio', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
             { text: 'Itbis', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
             { text: 'Total', bold: true, alignment: 'right', margin: [0, 0, 18, 0] }, // margin: [12, 0, 0, 0]
           ],
 
-          [1, 'Sample value 1', 'value 2', 'value 3', 'value 4', 'value 5', 'value 6'],
+          [1, 'Sample value 1', 'value 2', 'value 4', 'value 5', 'value 6'],
         ],
       },
       margin: [10, 0, 10, 0],
@@ -250,8 +249,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
     row.push(
       { text: i + 1, alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
       { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none' },
-      { text: fun_.numFormatTwoDecimals(detalle.cantidad), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
-      { text: detalle.unidad, alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
+      { text: detalle.cantidad, alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       {
         text: fun_.numFormatTwoDecimals(is_venta || is_nota ? detalle.precio : detalle.costo),
         alignment: 'right',
@@ -270,7 +268,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
     {
       style: 'tableExample',
       table: {
-        widths: [30, 245, '*', '*', '*', '*', '*'],
+        widths: [30, 350, '*', '*', '*', '*'],
         body: tempBody,
       },
       margin: is_contado ? [10, -2, 10, 0] : [10, -2, 10, 0],

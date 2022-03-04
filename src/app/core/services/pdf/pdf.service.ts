@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-
+import * as _ from 'lodash';
 const pdfMake = require('pdfmake/build/pdfmake.js');
 const pdfFonts = require('pdfmake/build/vfs_fonts.js');
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import * as roll80mm from './80mm_roll/facturasCompraVenta';
+import * as roll80mm from './80mm_roll/makePDF';
 import * as facturasCompraVenta from './facturasCompraVenta';
 import * as recibosIngresos from './recibosIngresos';
 import * as conduce from './conduce';
@@ -15,6 +15,7 @@ import { MessageTask } from '../../models/message-task';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
 import { ConfigurationService } from '../configuration.service';
 import { ConfigI } from '../../typescript/config-interface';
+import { GLOBAL } from '../../typescript/GLOBAL';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +25,11 @@ export class PdfService {
   _ipc = SingletonService._ipc;
 
   constructor(public configServ: ConfigurationService) {}
-
+  // conduce
+  // cuadre_caja
+  // facturacion
+  // recibo_ingreso
+  // reporte
   generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
     return new Promise((resolve, reject) => {
       let obj;
@@ -34,12 +39,31 @@ export class PdfService {
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
       const config: ConfigI = this.configServ.getConfig({ isPromise: false });
 
+      let options;
       data['reimprimir'] = reimprimir;
       // TODO: parsear los distintos campos de numero de documento para que coincidan con numero_documento
       try {
         switch (type_oPdf) {
           case 'recibo_ingreso':
-            obj = recibosIngresos.makeRecibo(data);
+            options = { '80mm_roll': roll80mm, '8.5x5.5': recibosIngresos, '8.5x11': recibosIngresos };
+
+            data.detalle_recibos.map((detalle) => {
+              detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
+              detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
+              detalle['fecha'] = _.split(detalle.descripcion, ' ')[2];
+            });
+
+            data.identificador = data.numero_recibo;
+            data.fecha = data.fecha_equivalente;
+            data.numero_documento = data.numero_recibo;
+            data.tipo_pdf = 'RECIBO DE INGRESOS';
+            data.contenido_reporte = data.detalle_recibos;
+            data.usuario = data.user.nombre_completo;
+
+            const documento = _.find(data.cliente.documentos_de_identidad, (item) => item.principal);
+            data.cliente.rnc = documento ? documento.documento : '----------';
+
+            obj = options[config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
             break;
 
           case 'conduce':
@@ -47,10 +71,19 @@ export class PdfService {
             break;
 
           case 'facturacion':
-            const options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
+            options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
+
+            data.detalle_facturas.map((detalle) => {
+              detalle['cantidad'] = `${GLOBAL.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+            });
+
             data.fecha = data.fecha_equivalente;
+            data.total = data.total_factura;
             data.numero_documento = data.numero_factura;
-            obj = options[config.pages_sizes.facturacion].makeFacturaVenta(data, 'ventas');
+            data.contenido_reporte = data.detalle_facturas;
+            data.tipo_pdf = data.tipo_factura.toUpperCase();
+
+            obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', 'ventas');
             break;
 
           case 'cuadre_caja':
@@ -90,7 +123,7 @@ export class PdfService {
           resolve(respuesta);
         }
       } catch (error) {
-        console.log('error ', error);
+        console.error('error ', error);
 
         const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de pdf.', status: 'no', body: error });
 

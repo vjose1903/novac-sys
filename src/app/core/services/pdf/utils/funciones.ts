@@ -12,6 +12,7 @@ export function my_capitalize(str) {
   const ultimoCaracte = str.length + 1;
   return str.substr(0, 1).toUpperCase() + str.substr(1, ultimoCaracte).toLowerCase();
 }
+
 // =========================================================================================================
 
 export function my_padStart(str, cant, relleno) {

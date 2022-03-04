@@ -9,7 +9,7 @@ import { ConfigI } from '../../typescript/config-interface';
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 
-export function makeRecibo(data) {
+export function makePDF(data, file_name, tipo_pdf?) {
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
   const dd = {
     pageSize: { width: 990, height: 398 },
@@ -31,7 +31,7 @@ export function makeRecibo(data) {
     styles: styles_,
   };
 
-  const obj = { doc: dd, file: 'reciboI.pdf', type: 'file' };
+  const obj = { doc: dd, file: file_name, type: 'file' };
   return obj;
 }
 
@@ -45,22 +45,9 @@ function cabeceraRecibo(data, configApp: ConfigI) {
   const header = [
     {
       columns: [
+        [{ image: 'logo', width: 72, height: 45, margin: [90, 15, 0, 0] }],
         [
-          {
-            image: 'logo',
-            width: 72,
-            height: 45,
-            margin: [90, 15, 0, 0],
-          },
-        ],
-        [
-          {
-            text: 'Recibo de ingresos',
-            fontSize: 14,
-            bold: true,
-            margin: [0, 20, 65, 0],
-            alignment: 'right',
-          },
+          { text: 'Recibo de ingresos', fontSize: 14, bold: true, margin: [0, 20, 65, 0], alignment: 'right' },
           {
             text: [
               { text: 'Fecha: ', fontSize: 12, bold: true },
