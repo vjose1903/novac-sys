@@ -39,6 +39,8 @@ export class ConfiguracionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
+      console.log('config ', config);
+
       this.config = config;
       this.configCopy = this.fun.duplicarJson(config);
       this.createForm(config);
@@ -69,6 +71,8 @@ export class ConfiguracionesComponent implements OnInit {
       page_size_cuadre_caja: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
       page_size_reporte: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
     });
+
+    console.log('this.form ', this.form);
 
     this.logo_empresa = `data:image/png;base64,${data.logo_empresa}`;
     this.logo_impresion = `data:image/png;base64,${data.logo_impresion}`;
@@ -150,28 +154,6 @@ export class ConfiguracionesComponent implements OnInit {
     const logos_changes = {};
 
     this.changesParser(array_targets, array_replacement, logos_changes, formulario, this.configCopy);
-    // let keysConfig = Object.keys(formulario);
-    // const logosKeys = ['logo_empresa', 'logo_impresion'];
-
-    // for (let i = 0; i < keysConfig.length; i++) {
-    //   const keyC = keysConfig[i];
-
-    //   if (typeof this.configCopy[keyC] == 'string') {
-    //     if (this.configCopy[keyC] != formulario[keyC]) {
-    //       if (logosKeys.includes(keyC)) {
-    //         logos_changes[keyC] = formulario[keyC];
-    //       } else {
-    //         array_targets.push(`${keyC}: '${this.configCopy[keyC]}'`);
-    //         array_replacement.push(`${keyC}: '${formulario[keyC]}'`);
-    //       }
-    //     }
-    //   } else {
-    //     if (!_.isEqual(this.configCopy[keyC], formulario[keyC])) {
-    //       array_targets.push(`${keyC}: '${JSON.stringify(this.configCopy[keyC])}'`);
-    //       array_replacement.push(`${keyC}: '${JSON.stringify(formulario[keyC])}'`);
-    //     }
-    //   }
-    // }
 
     const objChange = {
       new_config: formulario,
@@ -181,7 +163,6 @@ export class ConfiguracionesComponent implements OnInit {
 
     if (this.fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
 
-    console.log('objChange ', objChange);
     const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, objChange);
 
     this._ipc
@@ -204,7 +185,6 @@ export class ConfiguracionesComponent implements OnInit {
 
     for (let i = 0; i < keysConfig.length; i++) {
       const key = keysConfig[i];
-      console.log('copyObjLevel[key] ', copyObjLevel[key]);
       if (this.fun.hasValue(copyObjLevel[key])) {
         if (typeof copyObjLevel[key] == 'string') {
           if (copyObjLevel[key] != obj[key]) {

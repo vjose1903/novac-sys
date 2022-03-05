@@ -242,6 +242,7 @@ function calcularPrecio(cant, precio, tipo) {
 function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
   const tempBody = [];
   const _break = is_contado ? 6 : 26;
+
   data.detalle_facturas.forEach((detalle, i) => {
     const row = [];
     const br_ = i !== 0 && i % _break === 0;

@@ -25,12 +25,7 @@ export class PdfService {
   _ipc = SingletonService._ipc;
 
   constructor(public configServ: ConfigurationService) {}
-  // facturacion
-  // recibo_ingreso
-  // conduce
 
-  // cuadre_caja
-  // reporte
   generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
     return new Promise((resolve, reject) => {
       let obj;
@@ -39,8 +34,6 @@ export class PdfService {
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
       const config: ConfigI = this.configServ.getConfig({ isPromise: false });
-      console.log('config.pages_sizes ', config.pages_sizes);
-      console.log('data ', data);
 
       let options, documento;
       data['reimprimir'] = reimprimir;
@@ -48,7 +41,7 @@ export class PdfService {
       data.fecha = data.fecha_equivalente;
       try {
         switch (type_oPdf) {
-          case 'recibo_ingreso':
+          case 'recibo_ingreso': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': recibosIngresos, '8.5x11': recibosIngresos };
 
             data.identificador = data.numero_recibo;
@@ -69,7 +62,7 @@ export class PdfService {
             obj = options[config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
             break;
 
-          case 'conduce':
+          case 'conduce': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': conduce, '8.5x11': conduce };
             data.contenido_reporte = data.detalle_conduces;
 
@@ -88,7 +81,7 @@ export class PdfService {
             obj = options[config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
             break;
 
-          case 'facturacion':
+          case 'facturacion': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
 
             data.total = data.total_factura;
@@ -103,8 +96,14 @@ export class PdfService {
             obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', 'ventas');
             break;
 
-          case 'cuadre_caja':
-            obj = cuadreCaja.makeCuadre(data);
+          case 'cuadre_caja': // SI SI
+            options = { '80mm_roll': roll80mm, '8.5x5.5': cuadreCaja, '8.5x11': cuadreCaja };
+
+            data.tipo_pdf = 'CUADRE DE CAJA';
+            data.numero_documento = data.numero_reporte;
+            data.identificador = data.numero_documento;
+
+            obj = options[config.pages_sizes.cuadre_caja].makePDF(data, 'cuadre.pdf', 'cuadre_caja');
             break;
 
           case 'reporte':
@@ -115,8 +114,6 @@ export class PdfService {
             todo_true = false;
             break;
         }
-
-        this.fun.logGreen('todo_true --> ', todo_true);
 
         if (todo_true) {
           const dd = obj.doc;

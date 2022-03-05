@@ -8,7 +8,7 @@ import { ConfigI } from '../../typescript/config-interface';
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 
-export function makeCuadre(data) {
+export function makePDF(data) {
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
   try {
     const dd = {
@@ -58,17 +58,8 @@ function cabeceraReporte(data, configApp: ConfigI) {
             {
               margin: [0, 23, 0, 0],
               stack: [
-                {
-                  text: configApp.nombre_empresa,
-                  alignment: 'center',
-                  bold: true,
-                  style: 'letra17',
-                },
-                {
-                  text: configApp.direccion_empresa,
-                  alignment: 'center',
-                  fontSize: 11,
-                },
+                { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra17' },
+                { text: configApp.direccion_empresa, alignment: 'center', fontSize: 11 },
                 {
                   text: [
                     { text: 'Telefono: ', style: 'letra11', bold: true },
@@ -151,6 +142,14 @@ function cabeceraReporte(data, configApp: ConfigI) {
 // =========================================================~======================================================================================
 
 function contenidoReporte(data) {
+  const body = [];
+
+  data.contenido_reporte.forEach((detalle, i) => {
+    const row = [];
+    row.push({ text: detalle.titulo, alignment: 'left', bold: true, style: 'letra15' }, { text: fun_.numFormatTwoDecimals(detalle.valor), alignment: 'right', margin: [0, 0, 15, 0] });
+    body.push(row);
+  });
+
   const content = [
     {
       margin: [10, 0, 10, 0],
@@ -162,71 +161,25 @@ function contenidoReporte(data) {
               widths: ['auto', '*'],
               body: [
                 [
-                  {
-                    text: 'Descripción',
-                    alignment: 'left',
-                    bold: true,
-                    style: 'letra17',
-                  },
-                  {
-                    text: 'Monto',
-                    alignment: 'right',
-                    bold: true,
-                    style: 'letra17',
-                    margin: [0, 0, 20, 0],
-                  },
+                  { text: 'Descripción', alignment: 'left', bold: true, style: 'letra17' },
+                  { text: 'Monto', alignment: 'right', bold: true, style: 'letra17', margin: [0, 0, 20, 0] },
                 ],
-                [
-                  {
-                    text: 'Total facturado a contado:',
-                    alignment: 'left',
-                    bold: true,
-                    style: 'letra15',
-                  },
-                  { text: fun_.numFormatTwoDecimals(data.total_venta_contado), fontSize: 13, alignment: 'right', margin: [0, 3, 20, 0] },
-                ],
-                [
-                  {
-                    text: 'Total recibo de ingreso:',
-                    alignment: 'left',
-                    bold: true,
-                    style: 'letra15',
-                  },
-                  { text: fun_.numFormatTwoDecimals(data.total_recibo_ingreso), fontSize: 13, alignment: 'right', margin: [0, 3, 20, 0] },
-                ],
-                [
-                  {
-                    text: 'Total en caja:',
-                    alignment: 'left',
-                    bold: true,
-                    style: 'letra15',
-                  },
-                  { text: fun_.numFormatTwoDecimals(data.total_general), fontSize: 13, alignment: 'right', margin: [0, 3, 20, 0] },
-                ],
-                [
-                  {
-                    margin: [0, 17, 0, 0],
-                    text: 'Total facturado a crédito:',
-                    alignment: 'left',
-                    fontSize: 16,
-                  },
-                  { text: fun_.numFormatTwoDecimals(data.total_venta_credito), fontSize: 13, alignment: 'right', margin: [0, 19, 20, 0] },
-                ],
+                ...body,
               ],
             },
 
             layout: {
               fillColor: (rowIndex, node, columnIndex) => {
-                return rowIndex === 3 ? '#dcdcdc' : null;
+                return rowIndex === 4 ? '#dcdcdc' : null;
               },
               hLineWidth: (i, node) => {
-                return i === 0 || i === 1 || i === 3 || i === 4 || i === 5 ? 2 : 1;
+                return i === 0 || i === 1 || i === 4 || i === 5 || i === 6 ? 2 : 1;
               },
               vLineWidth: (i, node) => {
                 return 0;
               },
               hLineColor: (i, node) => {
-                return i === 0 || i === 1 || i === 3 || i === 4 || i === 5 ? 'black' : 'gray';
+                return i === 0 || i === 1 || i === 4 || i === 5 || i === 6 ? 'black' : 'gray';
               },
               vLineColor: (i, node) => {
                 return 'blacl';

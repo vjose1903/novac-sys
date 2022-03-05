@@ -57,7 +57,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
 
     // TESTEANDO EL CODIGO DE BARRAS
     // const prueba = this.textToBase64Barcode('eJwdy00KwyAQQOGrhFmborbB1G2v0Kxl0AkdGAw1Yzcld+/P8n3w3pCFqSol\nLhBrFzHQd2r/nA3opihpxay94Veu4eQnAyvlByZ6dn6h/HaI4K13ow2jt4Ob\n4znEyzQs9xsYyFiVC5aETTl32XaI7vgAzSYnUg==\n');
-    // console.log('prueba ', prueba);
   }
 
   textToBase64Barcode(text) {
@@ -76,8 +75,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   ngOnDestroy() {}
 
   test() {
-    console.log('----- test -----');
-
     const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE);
 
     this._ipc
@@ -194,7 +191,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
 
   generar(obj) {
     this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
-      console.log('res ', res);
       if (res.status === 'si') {
         const objBase = { base64: res.body, filename: res.file, type: this.tipo_prueba };
 

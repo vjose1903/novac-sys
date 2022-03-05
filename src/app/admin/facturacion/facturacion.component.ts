@@ -676,8 +676,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
     if (campo === 'filtro') {
       if (this.validarRayaAbajo()) {
-        console.log('ENTOOO');
-
         this.abrirModalFiltro();
         this.desEnfocarInput(salioDe);
       } else this.fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
@@ -1133,7 +1131,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     if (this.metodo === 'venta') {
       this.pdfServ
         .generatePdf({ oPdf: obj, imprimir: true })
-        .then(async (res) => console.log('res ', res))
+        .then((res) => console.log('res ', res))
         .catch((err) => this.fun.toastError('Error imprimiendo la factura', 'ERROR'));
     }
 

@@ -190,8 +190,6 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
           this.loadServ.isLoading.next(false);
           this.abrirModal('visor_pdf', obj_pdf);
         }
-
-        console.log('res ', res);
       })
       .catch(() => this.loadServ.isLoading.next(false));
   }

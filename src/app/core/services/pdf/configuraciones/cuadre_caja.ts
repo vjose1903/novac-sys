@@ -1,0 +1,32 @@
+export const config_cuadre_caja = {
+  margin_general: [-19, 1, -19, 0],
+  isBreak: false,
+  only_titulo: false,
+  widths: ['*', 'auto'],
+  mostrar_total: false,
+  info: [
+    {
+      text: 'Descripción',
+      alignment_titulo: 'left',
+      noWrap: true,
+      style: 'letra10',
+      style_body: 'letra10',
+      key: 'titulo',
+      fillColorCondition: [{ object: 'data', key: 'descripcion', value: 'total_general', color: '#dcdcdc' }],
+      alignment_body: 'left',
+    },
+    {
+      text: 'Monto',
+      alignment_titulo: 'right',
+      noWrap: true,
+      style: 'letra10',
+      style_body: 'letra10',
+      key: 'valor',
+      formato_numero: true,
+      alignment_body: 'right',
+      fillColorCondition: [{ object: 'data', key: 'descripcion', value: 'total_general', color: '#dcdcdc' }],
+      margin_titulo: [0, 0, 10, 0],
+      margin_body: [0, 0, 10, 0],
+    },
+  ],
+};

@@ -62,27 +62,22 @@ export class IpcService {
 
   listenEvents() {
     this._ipc.on(KEYWORD_ELECTRON_RESPONSE, (event, obj) => {
-      console.error('obj ', obj);
+      console.warn('obj ', obj);
 
       const arg = typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface);
       const tareas = this.colaDeMensajes.value;
 
       if (tareas.hasOwnProperty(arg.id)) {
-        // console.log(":listenEvents:::ANTES DE EJECUTAR ACCION:::", JSON.stringify(tareas));
         (tareas[arg.id] as MessageTask).fn.next(arg.response);
         tareas[arg.id] = undefined;
-        // console.log(":listenEvents:::DESPUES DE EJECUTAR ACCION:::", JSON.stringify(tareas));
         this.updateColaMensaje(tareas);
       } else {
         ELECTRON_EVENTS_OBSERVER.next(obj);
-        console.log('entra aqui');
       }
     });
   }
 
   sendTask(task: MessageTask) {
-    console.log('Enviando tarea:::: o ');
-
     return new Promise(async (resolve, reject) => {
       if (this.isElectron) {
         this.addColaMensaje(task);

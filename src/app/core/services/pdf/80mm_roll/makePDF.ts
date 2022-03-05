@@ -8,11 +8,13 @@ import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes 
 import { config_ventas } from '../configuraciones/ventas';
 import { config_recibo_ingreso } from '../configuraciones/recibo_ingreso';
 import { config_conduce } from '../configuraciones/conduce';
+import { config_cuadre_caja } from '../configuraciones/cuadre_caja';
 
 const configuraciones = {
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
   conduce: config_conduce,
+  cuadre_caja: config_cuadre_caja,
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
@@ -21,8 +23,6 @@ export function makePDF(data, file_name, tipo_pdf?) {
   const is_suplidor = is_compra;
 
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
-  console.log('data ', data);
-  console.log('data.identificador ', data.identificador);
 
   const dd = {
     pageSize: { width: 302, height: 'auto' },
@@ -51,11 +51,6 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
   data.tipo_tabla = 'normal';
 
   const tabla_detalles = getContentWithTablaNormal(configuration, data);
-  console.log('tabla_detalles ', tabla_detalles);
-
-  const prueba = [{ num: 1 }, { num: 2 }, ...tabla_detalles, { num: 3 }];
-
-  console.log('prueba ', prueba);
 
   const content = [
     {
@@ -122,17 +117,15 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
         // ---------- TABLA ----------
         ...tabla_detalles,
 
-        infoResumenPartes[tipo_pdf].length
-          ? {
-              margin: [-19, 0, -19, 0],
-              layout: 'noBorders',
-              table: {
-                headerRows: 0,
-                widths: ['*', 'auto'],
-                body: [...parseResumen(data, tipo_pdf)],
-              },
-            }
-          : { text: '' },
+        {
+          margin: [-19, 0, -19, 0],
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: ['*', 'auto'],
+            body: [...parseResumen(data, tipo_pdf)],
+          },
+        },
       ],
     },
   ];
@@ -143,7 +136,7 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
       alignment: 'left',
       margin: [-10, 30, 0, 0],
       text: [
-        { text: 'Le atendió: ', bold: true, style: 'letra11' },
+        { text: 'Realizado por: ', bold: true, style: 'letra11' },
         { text: data.usuario, style: 'letra11' },
       ],
     } as any);
@@ -157,6 +150,8 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
 
 function parseResumen(data, tipo_pdf) {
   const resumen = [];
+  if (!infoResumenPartes[tipo_pdf].length) return [{ text: '' }];
+
   const partes = [
     {
       key: 'bruto',
@@ -205,6 +200,7 @@ function parseResumen(data, tipo_pdf) {
 
 function parseInfoFactura(data, tipo_pdf) {
   const contenido = [];
+  if (!infoFacturaPartes[tipo_pdf].length) return [{ text: '' }];
 
   const partes = [
     {
@@ -263,6 +259,8 @@ function parseInfoFactura(data, tipo_pdf) {
 
 function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   const contenido = [];
+
+  if (!infoPropietarioPartes[tipo_pdf].length) return [{ text: '' }];
 
   const partes = [
     {

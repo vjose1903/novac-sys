@@ -40,7 +40,6 @@ export function makePDF(data) {
 // ==========================================================================================================================================================
 function cabeceraConduce(data, configApp: ConfigI) {
   const rncCliente = data.cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
-  console.log('configApp.num_telefono ', configApp.rnc_empresa);
 
   const header = [
     {
@@ -147,7 +146,7 @@ function contenidoConduce(data) {
     {
       text: '#',
       style: 'tableHeader',
-      alignment: 'center',
+      alignment: 'left',
       bold: true,
       margin: [6, 0, 0, 0],
     },
@@ -156,21 +155,14 @@ function contenidoConduce(data) {
       style: 'tableHeader',
       bold: true,
       margin: [0, 0, 0, 0],
-      alignment: 'right',
-    },
-    {
-      text: 'Unidad',
-      style: 'tableHeader',
-      bold: true,
       alignment: 'center',
-      margin: [0, 0, 0, 0],
     },
     {
       text: 'Descripción',
       style: 'tableHeader',
       bold: true,
       alignment: 'left',
-      margin: [0, 0, 0, 0],
+      margin: [80, 0, 0, 0],
     },
   ]);
 
@@ -180,10 +172,9 @@ function contenidoConduce(data) {
     const br_ = (i + 1) % 7 === 0;
 
     row.push(
-      { text: i + 1, pageBreak: br_ ? 'before' : 'none', alignment: 'center' },
-      { text: fun_.numFormatTwoDecimals(detalle.cantidad), alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 10, 0] },
-      { text: detalle.unidad, pageBreak: br_ ? 'before' : 'none', alignment: 'center', margin: [0, 0, 0, 0] },
-      { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none', alignment: 'left' },
+      { text: i + 1, pageBreak: br_ ? 'before' : 'none', alignment: 'left', margin: [6, 0, 0, 0] },
+      { text: detalle.cantidad, alignment: 'right', pageBreak: br_ ? 'before' : 'none', margin: [0, 0, 0, 0] },
+      { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none', alignment: 'left', margin: [80, 0, 0, 0] },
     );
     tempBody.push(row);
   }
@@ -193,7 +184,7 @@ function contenidoConduce(data) {
       margin: [0, -2, 0, 0],
       table: {
         headerRows: 1,
-        widths: [23, 60, 120, '*'],
+        widths: [50, 'auto', '*'],
         body: tempBody,
       },
 

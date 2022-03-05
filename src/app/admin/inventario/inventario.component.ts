@@ -83,8 +83,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this.pdfServ
       .imprimirBase64(obj)
       .then((res) => {
-        console.log('res ', res);
-
         if (res['status'] === 'si') this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
         else this.fun.toastError(res['msg'], 'ERROR');
       })

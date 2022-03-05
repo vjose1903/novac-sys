@@ -74,7 +74,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     });
 
     this.sub = ELECTRON_EVENTS_OBSERVER.subscribe((res) => {
-      console.log('===== res ', res);
       if (this.fun.hasValue(res)) {
         const info = res.info;
         switch (res.event_name) {
@@ -132,17 +131,13 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   }
 
   async getAppConfig() {
-    console.log('==== getAppConfig ====');
-
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
     this._ipc
       .sendTask(task)
       .then((config: ConfigI) => {
+        console.log('config ', config);
         if (_.has(config, 'err')) {
-          console.error(config);
         } else {
-          console.log('config ', config);
-
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
@@ -153,8 +148,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
       });
   }
   async probandoEncriptar() {
-    console.log('----- probandoEncriptar -----');
-
     const task = new MessageTask(KEYWORD_ELECTRON_EVENT_ENCRYPT, { hola: 'mundo' });
 
     this._ipc
@@ -163,23 +156,17 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
         this.probandoDesEncriptar(res);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   }
 
   async probandoDesEncriptar(strEncripted: string) {
-    console.log('----- probandoDesEncriptar -----');
-
     const task = new MessageTask(KEYWORD_ELECTRON_EVENT_DECRYPT, strEncripted);
 
     this._ipc
       .sendTask(task)
-      .then((res) => {
-        console.log('res decript:: ', res);
-      })
-      .catch((err) => {
-        console.log('err:: ', err);
-      });
+      .then((res) => {})
+      .catch((err) => {});
   }
 
   ngAfterViewInit(): void {

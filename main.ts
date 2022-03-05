@@ -144,10 +144,6 @@ try {
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
   app.on('ready', () => {
-    console.log(' ');
-    console.log('=-=-=-=- READY -=-=-=-=');
-    console.log(' ');
-
     createWindow()
       .then((res) => beforeCreateWindow(res))
       .catch(() => app.quit());
@@ -687,12 +683,10 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
     const confTemp = (await Functions.getConfigFile()) as any;
     const conf: ConfigI = JSON.parse(confTemp);
 
-    console.log('obj_printer_selected ', conf);
-
     const selected_printer = params.tipo === 'reporte' ? conf.printer_reportes_selected : conf.printer_caja_selected;
 
-    // const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
-    const comando = `"${sumatrapdf_path}" -print-to ${selected_printer.name} -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
+    const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
+    // const comando = `"${sumatrapdf_path}" -print-to ${selected_printer.name} -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
 
     cmd(comando, (res) => {
       if (res.status) resolve({ msg: 'PDF impreso correctamente!!', status: 'si', STDOUT: res });
