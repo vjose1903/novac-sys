@@ -7,18 +7,18 @@ import { getContentWithTablaNormal } from '../tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoFacturas';
 import { config_ventas } from '../configuraciones/ventas';
 import { config_recibo_ingreso } from '../configuraciones/recibo_ingreso';
+import { config_conduce } from '../configuraciones/conduce';
 
 const configuraciones = {
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
+  conduce: config_conduce,
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
-  const is_venta = data.FACTURA_DE === 'venta' ? true : false;
-  const is_contado = data.condicion === 'Contado' ? true : false;
-  const is_nota = data.FACTURA_DE === 'nota' ? true : false;
+  const is_compra = data.FACTURA_DE === 'compra' ? true : false;
 
-  const is_cliente = is_nota || is_venta || tipo_pdf == 'recibo_ingreso';
+  const is_suplidor = is_compra;
 
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
   console.log('data ', data);
@@ -28,7 +28,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
     pageSize: { width: 302, height: 'auto' },
     pageOrientation: 'portrait',
     pageMargins: [20, 40, 20, 20],
-    content: contenidoPDF(data, is_contado, is_cliente, configApp, tipo_pdf),
+    content: contenidoPDF(data, is_suplidor, configApp, tipo_pdf),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
       barcode: fun_.my_barcode(data.identificador),
@@ -45,7 +45,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
 // CONTENIDO
 // ==========================================================================================================================================================
 
-function contenidoPDF(data, is_contado, is_cliente, configApp: ConfigI, tipo_pdf) {
+function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
   const configuration = configuraciones[tipo_pdf];
 
   data.tipo_tabla = 'normal';
@@ -97,7 +97,7 @@ function contenidoPDF(data, is_contado, is_cliente, configApp: ConfigI, tipo_pdf
         {
           margin: [-10, 20, 0, 0],
 
-          stack: [...parseInfoPropietario(data, tipo_pdf, is_cliente)],
+          stack: [...parseInfoPropietario(data, tipo_pdf, is_suplidor)],
         },
         {
           margin: [0, 20, 0, 0],
@@ -121,15 +121,18 @@ function contenidoPDF(data, is_contado, is_cliente, configApp: ConfigI, tipo_pdf
         },
         // ---------- TABLA ----------
         ...tabla_detalles,
-        {
-          margin: [-19, 0, -19, 0],
-          layout: 'noBorders',
-          table: {
-            headerRows: 0,
-            widths: ['*', 'auto'],
-            body: [...parseResumen(data, tipo_pdf)],
-          },
-        },
+
+        infoResumenPartes[tipo_pdf].length
+          ? {
+              margin: [-19, 0, -19, 0],
+              layout: 'noBorders',
+              table: {
+                headerRows: 0,
+                widths: ['*', 'auto'],
+                body: [...parseResumen(data, tipo_pdf)],
+              },
+            }
+          : { text: '' },
       ],
     },
   ];
@@ -258,7 +261,7 @@ function parseInfoFactura(data, tipo_pdf) {
   return contenido;
 }
 
-function parseInfoPropietario(data, tipo_pdf, is_cliente) {
+function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   const contenido = [];
 
   const partes = [
@@ -267,8 +270,8 @@ function parseInfoPropietario(data, tipo_pdf, is_cliente) {
       item: {
         alignment: 'left',
         text: [
-          is_cliente ? { text: 'Cliente                : ', bold: true, style: 'letra10' } : { text: 'Suplidor               : ', bold: true, style: 'letra10' },
-          is_cliente ? { text: data.cliente.nombre || '', style: 'letra10' } : { text: data.suplidor.nombre || '', style: 'letra10' },
+          is_suplidor ? { text: 'Suplidor               : ', bold: true, style: 'letra10' } : { text: 'Cliente                : ', bold: true, style: 'letra10' },
+          is_suplidor ? { text: data.suplidor.nombre || '', style: 'letra10' } : { text: `${data.cliente.nombre || ''} ${data.cliente.apellido || ''}`, style: 'letra10' },
         ],
       },
     },
@@ -276,7 +279,7 @@ function parseInfoPropietario(data, tipo_pdf, is_cliente) {
       key: 'doc_identidad',
       item: {
         alignment: 'left',
-        text: [{ text: 'Doc. identidad   : ', bold: true, style: 'letra10' }, is_cliente ? { text: data.cliente.rnc || '', style: 'letra10' } : { text: data.suplidor.rnc || '', style: 'letra10' }],
+        text: [{ text: 'Doc. identidad   : ', bold: true, style: 'letra10' }, is_suplidor ? { text: data.suplidor.rnc || '', style: 'letra10' } : { text: data.cliente.rnc || '', style: 'letra10' }],
       },
     },
     {
@@ -285,7 +288,7 @@ function parseInfoPropietario(data, tipo_pdf, is_cliente) {
         alignment: 'left',
         text: [
           { text: 'Telefono             : ', bold: true, style: 'letra10' },
-          is_cliente ? { text: data.cliente.telefono || '', style: 'letra10' } : { text: data.suplidor.telefono || '', style: 'letra10' },
+          is_suplidor ? { text: data.suplidor.telefono || '', style: 'letra10' } : { text: data.cliente.telefono || '', style: 'letra10' },
         ],
       },
     },

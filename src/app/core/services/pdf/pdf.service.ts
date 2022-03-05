@@ -25,10 +25,11 @@ export class PdfService {
   _ipc = SingletonService._ipc;
 
   constructor(public configServ: ConfigurationService) {}
-  // conduce
-  // cuadre_caja
   // facturacion
   // recibo_ingreso
+  // conduce
+
+  // cuadre_caja
   // reporte
   generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
     return new Promise((resolve, reject) => {
@@ -38,50 +39,66 @@ export class PdfService {
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
       const config: ConfigI = this.configServ.getConfig({ isPromise: false });
+      console.log('config.pages_sizes ', config.pages_sizes);
+      console.log('data ', data);
 
-      let options;
+      let options, documento;
       data['reimprimir'] = reimprimir;
-      // TODO: parsear los distintos campos de numero de documento para que coincidan con numero_documento
+
+      data.fecha = data.fecha_equivalente;
       try {
         switch (type_oPdf) {
           case 'recibo_ingreso':
             options = { '80mm_roll': roll80mm, '8.5x5.5': recibosIngresos, '8.5x11': recibosIngresos };
 
-            data.detalle_recibos.map((detalle) => {
-              detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
-              detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
-              detalle['fecha'] = _.split(detalle.descripcion, ' ')[2];
-            });
-
             data.identificador = data.numero_recibo;
-            data.fecha = data.fecha_equivalente;
             data.numero_documento = data.numero_recibo;
             data.tipo_pdf = 'RECIBO DE INGRESOS';
             data.contenido_reporte = data.detalle_recibos;
             data.usuario = data.user.nombre_completo;
 
-            const documento = _.find(data.cliente.documentos_de_identidad, (item) => item.principal);
+            documento = _.find(data.cliente.documentos_de_identidad, (item) => item.principal);
             data.cliente.rnc = documento ? documento.documento : '----------';
+
+            data.contenido_reporte.map((detalle) => {
+              detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
+              detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
+              detalle['fecha'] = _.split(detalle.descripcion, ' ')[2];
+            });
 
             obj = options[config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
             break;
 
           case 'conduce':
-            obj = conduce.makeConduce(data);
+            options = { '80mm_roll': roll80mm, '8.5x5.5': conduce, '8.5x11': conduce };
+            data.contenido_reporte = data.detalle_conduces;
+
+            documento = _.find(data.cliente.documentos_de_identidad, (item) => item.principal);
+            data.cliente.rnc = documento ? documento.documento : '----------';
+
+            data.tipo_pdf = 'CONDUCE DE MERCANCIA';
+            data.numero_documento = data.numero_conduce;
+            data.usuario = data.user.nombre_completo;
+            data.identificador = data.numero_documento;
+
+            data.contenido_reporte.map((detalle) => {
+              detalle['cantidad'] = `${GLOBAL.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+            });
+
+            obj = options[config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
             break;
 
           case 'facturacion':
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
 
-            data.detalle_facturas.map((detalle) => {
-              detalle['cantidad'] = `${GLOBAL.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
-            });
-
-            data.fecha = data.fecha_equivalente;
             data.total = data.total_factura;
             data.numero_documento = data.numero_factura;
             data.contenido_reporte = data.detalle_facturas;
             data.tipo_pdf = data.tipo_factura.toUpperCase();
+
+            data.contenido_reporte.map((detalle) => {
+              detalle['cantidad'] = `${GLOBAL.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+            });
 
             obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', 'ventas');
             break;

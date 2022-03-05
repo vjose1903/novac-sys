@@ -8,7 +8,7 @@ import { ConfigI } from '../../typescript/config-interface';
 // UNIR CONDUCE
 // ==========================================================================================================================================================
 
-export function makeConduce(data) {
+export function makePDF(data) {
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
 
   const dd = {
