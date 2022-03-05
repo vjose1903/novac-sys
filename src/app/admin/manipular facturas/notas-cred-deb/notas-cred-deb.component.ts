@@ -128,7 +128,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
   formarTitulosTabla() {
     this.info = [
-      { titulo: ' ', tipo: 'check', key: 'select', title: '', estilos: [{ width: '3rem' }] },
+      { titulo: ' ', tipo: 'inputSwitch', key: 'select', title: '', estilos: [{ width: '3rem' }] },
       { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }] },
       {
         titulo: this.tipoNota === 'credito' ? 'Devolver' : 'Aumentar',
@@ -240,7 +240,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       } else {
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * detalle.contenidos[detalle.unidad];
       }
-      this.fun.logRed('detalle ', GLOBAL.duplicarJson(detalle));
+      this.fun.logRed('detalle ', this.fun.duplicarJson(detalle));
     }
   }
 
@@ -300,7 +300,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   formatoNumero(num) {
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
+    return this.fun.formatearNumero(this.fun.redondearAdos(num));
   }
   formatoNumeroFactura(num) {
     return _.padStart(num, 8, '0');
@@ -368,12 +368,12 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           articulo_id: element.articulo_id,
           cantidad: element.cant_nota,
           cantidad_en_unidades: element.cantidad_en_unidades_nota,
-          total: GLOBAL.desformatear(element.total_nota),
+          total: this.fun.desformatear(element.total_nota),
           descuento_valor: element.descuento_valor ? (element.descuento_valor !== null ? element.descuento_valor : 0) : 0,
           descuento_porciento: element.descuento_porciento ? (element.descuento_porciento !== null ? element.descuento_porciento : 0) : 0,
           itbis: 0,
           unidad: unidad_,
-          precio: GLOBAL.desformatear(element.precio),
+          precio: this.fun.desformatear(element.precio),
           calcular_saco: element.calcular_saco,
         };
 
@@ -407,7 +407,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     cabecera_fact['numero_comprobante'] = null;
     cabecera_fact['costoYgasto'] = null;
     cabecera_fact['numero_factura'] = null;
-    cabecera_fact['total_factura'] = GLOBAL.redondearAdos(this.TOTAL);
+    cabecera_fact['total_factura'] = this.fun.redondearAdos(this.TOTAL);
     cabecera_fact['Bruto'] = 0;
     cabecera_fact['itbis'] = 0;
     cabecera_fact['descuento'] = 0;

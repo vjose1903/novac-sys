@@ -83,7 +83,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   getMarcas(palabra_a_buscar = ' ', paginado = false, page = 1, per_page = 1) {
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado, page, per_page } };
     this.marcasClass.getAll(extra).then((res) => {
-      if (!paginado) this.listaMarcas = GLOBAL.duplicarJson(res);
+      if (!paginado) this.listaMarcas = this.fun.duplicarJson(res);
       if (paginado) {
         this.listado = res.data;
         this.tServ.Func_total_paginas({ total: res.total_registros, tabla: 'tabla_frm_marca_modelo' });
@@ -93,7 +93,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(GLOBAL.Capitalice(arg));
+    campo.setValue(this.fun.Capitalice(arg));
   }
 
   createForm() {
@@ -128,7 +128,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.accion_.emit(arg);
   }
   async submit() {
-    const obj = GLOBAL.duplicarJson(this.form.value);
+    const obj = this.fun.duplicarJson(this.form.value);
 
     if (this.tipo_formulario !== 'modelos') delete obj['marca_id'];
 

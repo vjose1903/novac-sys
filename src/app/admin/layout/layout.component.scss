@@ -153,12 +153,12 @@ $bodyfont: "Poppins";
 .btn_side_bar_facturas {
   position: absolute;
   transform: translate(-1.6rem, 49vh);
-  background-color: var(--transparente03);
+  background-color: var(--transparente05);
   height: 2.5rem;
   width: 1rem;
   border-radius: 4.5rem 0rem 0rem 4.5rem;
   &:hover {
-    background-color: var(--transparente04);
+    background-color: var(--transparente05);
     cursor: pointer;
   }
   > i#triangualo {
@@ -250,7 +250,7 @@ $bodyfont: "Poppins";
       position: absolute;
       right: -6px;
       bottom: 11px;
-      color: var(--transparente03);
+      color: var(--transparente05);
       font-size: 1.5rem;
 
       &.is_atrasada {
@@ -293,7 +293,7 @@ $bodyfont: "Poppins";
     overflow: hidden;
     > .head {
       width: 100%;
-      border-bottom: 1px solid var(--transparente04) !important;
+      border-bottom: 1px solid var(--transparente05) !important;
       margin-bottom: 1rem;
       > .tituloSidebar {
         font-size: 1.5rem;

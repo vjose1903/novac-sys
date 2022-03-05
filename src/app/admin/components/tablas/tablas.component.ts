@@ -214,14 +214,14 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           if (event === 'hover') {
             for (let i = 0; i < moveEvent.hover.length; i++) {
               const overEvent = moveEvent.hover[i];
-              GLOBAL.ModificarClass(id, moveEvent.leave[i], 'remove');
-              GLOBAL.ModificarClass(id, overEvent, 'add');
+              this.fun.ModificarClass(id, moveEvent.leave[i], 'remove');
+              this.fun.ModificarClass(id, overEvent, 'add');
             }
           } else {
             for (let i = 0; i < moveEvent.leave.length; i++) {
               const overEvent = moveEvent.leave[i];
-              GLOBAL.ModificarClass(id, moveEvent.hover[i], 'remove');
-              GLOBAL.ModificarClass(id, overEvent, 'add');
+              this.fun.ModificarClass(id, moveEvent.hover[i], 'remove');
+              this.fun.ModificarClass(id, overEvent, 'add');
             }
           }
         }
@@ -288,10 +288,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     if (referencia === 'especificar') {
       this.data[i][destino] = especifico;
     } else {
-      const copia = GLOBAL.duplicarJson(this.data[i][referencia]);
+      const copia = this.fun.duplicarJson(this.data[i][referencia]);
 
       if (formatear) {
-        this.data[i][destino] = GLOBAL.formatearNumero(GLOBAL.redondearAdos(copia));
+        this.data[i][destino] = this.fun.formatearNumero(this.fun.redondearAdos(copia));
       } else {
         this.data[i][destino] = copia;
       }
@@ -339,7 +339,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   cambiaMostrar(num: number) {
-    const temp = GLOBAL.duplicarJson(this.ROW + '0');
+    const temp = this.fun.duplicarJson(this.ROW + '0');
     this.IDROW = null;
     this.mostrar = num;
 
@@ -352,7 +352,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   pageChange(arg, tipo = '') {
-    const temp = GLOBAL.duplicarJson(this.ROW + '0');
+    const temp = this.fun.duplicarJson(this.ROW + '0');
     this.IDROW = null;
     this.pagActual = tipo === 'filtro' ? 1 : arg;
 
@@ -456,7 +456,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           precioTEMP = _.join(temp, '.');
         }
 
-        const numeroFormateado = GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioTEMP));
+        const numeroFormateado = this.fun.formatearNumero(this.fun.redondearAdos(precioTEMP));
 
         this.data[i][key] = numeroFormateado;
         const obj = {
@@ -473,7 +473,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   // ===================================================================================================
 
   formatoNumero(num) {
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
+    return this.fun.formatearNumero(this.fun.redondearAdos(num));
   }
 
   lookOters(objeto) {
@@ -484,10 +484,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const fin1 = values[1] > 1 ? this.medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? this.medidas[keys[2]] : keys[2];
 
-    const principal = GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[0])) + '  ' + fin;
+    const principal = this.fun.formatearNumero(this.fun.redondearAdos(values[0])) + '  ' + fin;
 
-    const padre = GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[1])) + '  ' + fin1;
-    const hijo = GLOBAL.formatearNumero(values[2]) + '  ' + fin2;
+    const padre = this.fun.formatearNumero(this.fun.redondearAdos(values[1])) + '  ' + fin1;
+    const hijo = this.fun.formatearNumero(values[2]) + '  ' + fin2;
 
     let cantiTootip = { Padre: undefined, Hijo: undefined };
     if (keys.length > 1) {
@@ -508,7 +508,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const values = _.values(objeto);
     const fin = values[0] > 1 ? this.medidas[keys[0]] : keys[0];
 
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[0])) + '  ' + fin;
+    return this.fun.formatearNumero(this.fun.redondearAdos(values[0])) + '  ' + fin;
   }
 
   getStyle(column, i) {
@@ -617,7 +617,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   async searchItems() {
-    const temp = GLOBAL.duplicarJson(this.ROW + '0');
+    const temp = this.fun.duplicarJson(this.ROW + '0');
     this.IDROW = null;
     // ------------------------------------------------------------------------------
 

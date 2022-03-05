@@ -50,11 +50,11 @@ export class TablasService {
   }
 
   initPagination(id, params) {
-    if (this.fun.isEmpty(this.obj_paginate[id])) this.obj_paginate[id] = GLOBAL.duplicarJson(params);
+    if (this.fun.isEmpty(this.obj_paginate[id])) this.obj_paginate[id] = this.fun.duplicarJson(params);
   }
 
   getPaginationById(id) {
-    if (this.fun.isEmpty(this.obj_paginate[id])) this.obj_paginate[id] = GLOBAL.duplicarJson(this.obj_paginate.default);
+    if (this.fun.isEmpty(this.obj_paginate[id])) this.obj_paginate[id] = this.fun.duplicarJson(this.obj_paginate.default);
 
     return this.obj_paginate[id];
   }

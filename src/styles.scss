@@ -113,7 +113,7 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 }
 
 .dropdown-header {
-  background-color: var(--transparente02);
+  background-color: var(--transparente05);
 }
 .dropdown-header h2 {
   color: black;
@@ -212,7 +212,7 @@ body {
 .p-progressbar-value {
   background-color: var(--primary06) !important;
   &:hover {
-    background-color: var(--transparente03) !important;
+    background-color: var(--transparente05) !important;
   }
 }
 .p-progressbar {
@@ -493,7 +493,7 @@ input.apple-switch:checked:after {
     border-radius: 0 !important;
 
     button[disabled] {
-      background: var(--transparente04);
+      background: var(--transparente05);
     }
   }
 }

@@ -307,7 +307,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       const tipo = temp_url[1].split('/')[1];
       this.actualMenyItem = url;
 
-      this.actualMenuItemBack = GLOBAL.duplicarJson(this.actualMenyItem);
+      this.actualMenuItemBack = this.fun.duplicarJson(this.actualMenyItem);
 
       if (url === 'factura') {
         this.activeIndex = tipo === 'venta' ? 0 : 1;

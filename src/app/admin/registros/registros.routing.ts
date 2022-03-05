@@ -14,11 +14,12 @@ const routes: Routes = [
   { path: 'articulos', component: RegistroArticulosComponent },
   { path: 'empleados', component: RegistroEmpleadosComponent },
   { path: 'camiones', component: RegistroVehiculoComponent },
-  // { path: 'roles', loadChildren: () => import('./roles/roles.module').then((m) => m.RolesModule) },
+  { path: 'roles', loadChildren: () => import('./roles/roles.module').then((m) => m.RolesModule) },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
+
 export class RegistrosRoutingModule {}

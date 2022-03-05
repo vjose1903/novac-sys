@@ -170,7 +170,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
           }
           // si el modal no se abrira asignando el archivo_id de la factura que se va a rellenar como el que estara en turno
           if (!abrir_modal || !is_factura_en_proceso) this.objArchivo.archivo_id_en_turno = facturaGuardada.archivo_id;
-          this.layServ.factura_guardada = GLOBAL.duplicarJson(facturaGuardada);
+          this.layServ.factura_guardada = this.fun.duplicarJson(facturaGuardada);
         });
       }
     });
@@ -345,7 +345,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
         this.metodo = res.tipo;
         this.FacturaAtrasada = fact ? fact?.FacturaAtrasada : false;
 
-        const fecha_facturacion = fact?.fecha_equivalente ? fact?.fecha_equivalente : GLOBAL.duplicarJson(this.fechaFactura['back']);
+        const fecha_facturacion = fact?.fecha_equivalente ? fact?.fecha_equivalente : this.fun.duplicarJson(this.fechaFactura['back']);
 
         this.fechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
         this.fechaFactura['back'] = this.fechaFactura['front'];
@@ -829,8 +829,8 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
   agregarFacturaALocalStorage() {
     if (!this.propietario_factura) this.propietario_factura = this.form.value;
 
-    let facturas_localStorage = GLOBAL.duplicarJson(this.objArchivo.facturas_localStorage);
-    const factura_a_guardar = GLOBAL.duplicarJson(this.objArchivo.factura_en_turno);
+    let facturas_localStorage = this.fun.duplicarJson(this.objArchivo.facturas_localStorage);
+    const factura_a_guardar = this.fun.duplicarJson(this.objArchivo.factura_en_turno);
 
     let index_fact_archivada = _.findIndex(facturas_localStorage, (facts: any) => facts?.archivo_id === this.objArchivo.archivo_id_en_turno);
 
@@ -906,7 +906,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
   calculatePrice(costo): number {
     if (costo > 0 || costo != null || costo) {
       const precio = costo / 0.9;
-      return GLOBAL.desformatear(GLOBAL.redondearAdos(precio));
+      return this.fun.desformatear(this.fun.redondearAdos(precio));
     }
   }
 
@@ -927,18 +927,18 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
             cantPadre = contenido.cantidad;
             const precio = this.calcularNuevosPrecios(cantPadre, precioRow);
             const costo = this.calcularNuevosPrecios(cantPadre, costoRow);
-            temporal.precio = GLOBAL.desformatear(precio);
-            temporal.costo = GLOBAL.desformatear(costo);
+            temporal.precio = this.fun.desformatear(precio);
+            temporal.costo = this.fun.desformatear(costo);
           }
         } else {
           if (contenido.precio) {
             cantHijo = contenido.cantidad;
             const prePadre = this.calcularNuevosPrecios(cantPadre, precioRow);
             const cosPadre = this.calcularNuevosPrecios(cantPadre, costoRow);
-            const precio = this.calcularNuevosPrecios(cantHijo, GLOBAL.redondearAdos(prePadre));
-            const costo = this.calcularNuevosPrecios(cantHijo, GLOBAL.redondearAdos(cosPadre));
-            temporal.precio = GLOBAL.desformatear(precio);
-            temporal.costo = GLOBAL.desformatear(costo);
+            const precio = this.calcularNuevosPrecios(cantHijo, this.fun.redondearAdos(prePadre));
+            const costo = this.calcularNuevosPrecios(cantHijo, this.fun.redondearAdos(cosPadre));
+            temporal.precio = this.fun.desformatear(precio);
+            temporal.costo = this.fun.desformatear(costo);
           } else {
             temporal = null;
           }
@@ -970,7 +970,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
       const contenido_articulo = articulo.contenido_articulos;
 
-      const costoRow = GLOBAL.desformatear(row.pre);
+      const costoRow = this.fun.desformatear(row.pre);
 
       const costoPrincipal = articulo.costo_principal;
 
@@ -1019,7 +1019,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
   calcularNuevosPrecios(cant, precio) {
     const pre = precio / cant;
-    return GLOBAL.redondearAdos(pre);
+    return this.fun.redondearAdos(pre);
   }
 
   async cambiarCostos() {
@@ -1044,7 +1044,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     const empleado = this.fun.getUser();
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
-    let cuerpo_fact = GLOBAL.duplicarJson(this.CuerpoFactura);
+    let cuerpo_fact = this.fun.duplicarJson(this.CuerpoFactura);
 
     const cabecera_fact = {};
     cabecera_fact['condicion'] = this.condicion_fact;
@@ -1064,11 +1064,11 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
       cabecera_fact['fecha_vencimiento'] = fecha_venci;
       cabecera_fact['pagada'] = false;
-      cabecera_fact['balance'] = GLOBAL.parseFloatTwoDecimals(this.TOTAL);
+      cabecera_fact['balance'] = this.fun.parseFloatTwoDecimals(this.TOTAL);
       cabecera_fact['devuelta'] = 0;
     } else {
       cabecera_fact['pagada'] = this.is_viaje ? false : true;
-      cabecera_fact['balance'] = this.is_viaje ? GLOBAL.parseFloatTwoDecimals(this.TOTAL) : 0;
+      cabecera_fact['balance'] = this.is_viaje ? this.fun.parseFloatTwoDecimals(this.TOTAL) : 0;
       cabecera_fact['devuelta'] = this.is_viaje ? 0 : this.Devuelta;
     }
 
@@ -1078,10 +1078,10 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     cabecera_fact['numero_comprobante'] = this.metodo === 'venta' ? null : this.NCFcompra;
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' ? null : this.CostoYgasto;
     cabecera_fact['numero_factura'] = null;
-    cabecera_fact['total_factura'] = GLOBAL.parseFloatTwoDecimals(this.TOTAL);
+    cabecera_fact['total_factura'] = this.fun.parseFloatTwoDecimals(this.TOTAL);
     cabecera_fact['Bruto'] = this.BRUTO;
-    cabecera_fact['itbis'] = GLOBAL.parseFloatTwoDecimals(this.ITBIS);
-    cabecera_fact['descuento'] = GLOBAL.parseFloatTwoDecimals(this.DESCUENTO);
+    cabecera_fact['itbis'] = this.fun.parseFloatTwoDecimals(this.ITBIS);
+    cabecera_fact['descuento'] = this.fun.parseFloatTwoDecimals(this.DESCUENTO);
     cabecera_fact['estado'] = true;
     cabecera_fact['is_adelantada'] = this.is_adelantada;
     cabecera_fact['is_viaje'] = this.is_viaje;

@@ -121,9 +121,9 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
       this.counter++;
       this.tiempo_restante = this.timeConvert(object.total / object.bytesPerSecond);
 
-      object.transferred = parseFloat(GLOBAL.redondearAdos(object.transferred / 1000000));
-      object.total = parseFloat(GLOBAL.redondearAdos(object.total / 1000000));
-      object.percent = parseFloat(GLOBAL.redondearAdos(object.percent));
+      object.transferred = parseFloat(this.fun.redondearAdos(object.transferred / 1000000));
+      object.total = parseFloat(this.fun.redondearAdos(object.total / 1000000));
+      object.percent = parseFloat(this.fun.redondearAdos(object.percent));
 
       this.objPercent = object;
       this.cdRef.detectChanges();

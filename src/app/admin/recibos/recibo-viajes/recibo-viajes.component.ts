@@ -95,7 +95,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   formatoNumero(num) {
-    return GLOBAL.numFormatTwoDecimals(num);
+    return this.fun.numFormatTwoDecimals(num);
   }
 
   async getChoferes() {
@@ -146,7 +146,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
       setTimeout(() => {
         this.viajes_cant_porciento = (this.viajes_completados_cant / this.viajes_cant) * 100;
-        this.viajes_cant_porciento = GLOBAL.numFormatTwoDecimals(this.viajes_cant_porciento);
+        this.viajes_cant_porciento = this.fun.numFormatTwoDecimals(this.viajes_cant_porciento);
       }, 5);
 
       this.viajes = _.orderBy(this.viajes, ['id'], ['desc']);
@@ -208,7 +208,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
     this.monto_pendiente = this.viaje_selected.balance;
     this.totalPagadoPorciento = (this.totalPagado / this.viaje_selected.total_factura) * 100;
-    this.totalPagadoPorciento = GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento);
+    this.totalPagadoPorciento = this.fun.numFormatTwoDecimals(this.totalPagadoPorciento);
 
     this.ultimo_pago = _.maxBy(this.viaje_selected.pagos, 'id');
   }
@@ -253,7 +253,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     temp.push({
       cabecera_factura_id: this.viaje_selected.id,
       pago_total: pagado_total,
-      deposito: GLOBAL.desformatear(this.total_recibido),
+      deposito: this.fun.desformatear(this.total_recibido),
       descripcion: pagado_total
         ? 'Saldo ' + this.viaje_selected.numero_comprobante + ' ' + moment(this.viaje_selected.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
         : 'Abono ' + this.viaje_selected.numero_comprobante + ' ' + moment(this.viaje_selected.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss'),

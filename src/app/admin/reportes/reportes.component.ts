@@ -55,7 +55,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     try {
       let extra = { afterPath: 'custom', parameters: {} };
 
-      extra['parameters'] = { fecha: this.my_dateFormater(data.fecha, false) };
+      extra['parameters'] = { fecha: this.fun.my_dateFormater(data.fecha, false) };
 
       new CuadreCajaC().createOne({}, extra).then((res) => {
         const obj = { data: res.data, type: 'cuadre_caja' };
@@ -99,8 +99,8 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
         tipo: data.tipo,
         condicion: data.condicion,
         formas_pago: formas_pago,
-        desde: this.my_dateFormater(data.desde, false),
-        hasta: this.my_dateFormater(data.hasta, false),
+        desde: this.fun.my_dateFormater(data.desde, false),
+        hasta: this.fun.my_dateFormater(data.hasta, false),
       };
 
       if (_.every(this.seleccionModal.switches.array, (item) => item.value === false)) {
@@ -115,21 +115,21 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       tipo = 'cuentas_cobrar';
       //
     } else if (this.tipoModal === 'cuentas_con_pagos') {
-      extra.parameters = { desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false), cliente_id: data.cliente_id };
+      extra.parameters = { desde: this.fun.my_dateFormater(data.desde, false), hasta: this.fun.my_dateFormater(data.hasta, false), cliente_id: data.cliente_id };
       tipo = 'cuentas_con_pagos';
       //
     } else if (this.tipoModal === 'recibos') {
-      extra.parameters = { desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false), tipo_recibo: data.tipo, order: 'ASC' };
+      extra.parameters = { desde: this.fun.my_dateFormater(data.desde, false), hasta: this.fun.my_dateFormater(data.hasta, false), tipo_recibo: data.tipo, order: 'ASC' };
       tipo = 'recibos';
       //
     } else if (this.tipoModal === 'ventas_productos') {
-      if (data.tipo == '1') extra.parameters = { desde: this.my_dateFormater(data.fecha, false) };
-      else extra.parameters = { desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false) };
+      if (data.tipo == '1') extra.parameters = { desde: this.fun.my_dateFormater(data.fecha, false) };
+      else extra.parameters = { desde: this.fun.my_dateFormater(data.desde, false), hasta: this.fun.my_dateFormater(data.hasta, false) };
 
       tipo = 'ventas_productos';
       //
     } else if (this.tipoModal === 'suplidor_prod') {
-      extra.parameters = { articulo_id: data.articulo_id, desde: this.my_dateFormater(data.desde, false), hasta: this.my_dateFormater(data.hasta, false) };
+      extra.parameters = { articulo_id: data.articulo_id, desde: this.fun.my_dateFormater(data.desde, false), hasta: this.fun.my_dateFormater(data.hasta, false) };
       tipo = 'suplidor_prod';
       //
     } else if (this.tipoModal === 'inventario') {

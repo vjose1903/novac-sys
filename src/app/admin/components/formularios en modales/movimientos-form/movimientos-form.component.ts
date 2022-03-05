@@ -40,7 +40,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   }
 
   formatoNumero(arg) {
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(arg));
+    return this.fun.formatearNumero(this.fun.redondearAdos(arg));
   }
 
   mostrarExistencia(arg) {

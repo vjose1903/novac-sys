@@ -22,6 +22,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   pattern = pattern;
 
   listaSuplidores;
+
   // =============================================
   //  TABLAS
   // =============================================
@@ -82,7 +83,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(GLOBAL.Capitalice(arg));
+    campo.setValue(this.fun.Capitalice(arg));
   }
 
   async getSuplidores(e) {
@@ -140,7 +141,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         if (!_.endsWith(formulario[this.doc_principal], '_')) {
           const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
           if (this.doc_principal == 'cedula') {
-            if (GLOBAL.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
+            if (this.fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
           } else this.enfocarInput(campo);
         }
       } else this.enfocarInput(campo);

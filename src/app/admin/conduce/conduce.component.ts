@@ -239,7 +239,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       const cantidades = ARTICULO.cantidades;
 
       if (ARTICULO.existencia > 0 && ARTICULO.aviso_existencia > cantidades[ARTICULO.medida_alerta]) {
-        let cant_restante = GLOBAL.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]);
+        let cant_restante = this.fun.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]);
 
         let msg = `Solo quedan ${cant_restante} ${ARTICULO.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
 
@@ -300,7 +300,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   calcularPrecioSaco(cant, precio) {
     const res = (cant / 100) * precio;
-    return GLOBAL.redondearAdos(res);
+    return this.fun.redondearAdos(res);
   }
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES
@@ -483,7 +483,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     const lista = [`cod-${i}`, `can-${i}`, `uni-${i}`, `des-${i}`];
 
     lista.forEach((row) => {
-      if (this.checkIfRowContainArticulo(i)) GLOBAL.ModificarClass(row, 'inputOscuro', bool ? 'add' : 'remove');
+      if (this.checkIfRowContainArticulo(i)) this.fun.ModificarClass(row, 'inputOscuro', bool ? 'add' : 'remove');
     });
   }
 

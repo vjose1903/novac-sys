@@ -141,7 +141,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
       this.reciboClass.getAll(extra).then((res) => {
         res['data'] = this.mapeoRecibos(res['data']);
-        this.lista_recibos = GLOBAL.duplicarJson(res['data']);
+        this.lista_recibos = this.fun.duplicarJson(res['data']);
 
         const obj = { total: res['total_registros'], tabla: 'listaRecibos' };
         this.tServ.Func_total_paginas(obj);

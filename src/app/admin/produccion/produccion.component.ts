@@ -97,10 +97,10 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     const fin1 = values[1] > 1 ? this.medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? this.medidas[keys[2]] : keys[2];
 
-    const principal = GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[0])) + '  ' + fin;
+    const principal = this.fun.formatearNumero(this.fun.redondearAdos(values[0])) + '  ' + fin;
 
-    const padre = GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[1])) + '  ' + fin1;
-    const hijo = GLOBAL.formatearNumero(GLOBAL.redondearAdos(values[2])) + '  ' + fin2;
+    const padre = this.fun.formatearNumero(this.fun.redondearAdos(values[1])) + '  ' + fin1;
+    const hijo = this.fun.formatearNumero(this.fun.redondearAdos(values[2])) + '  ' + fin2;
 
     let cantiTootip = ``;
     if (keys.length > 1) {
@@ -134,15 +134,15 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
     if (_.has(objeto.existencia, 'Caja')) {
       if (objeto.existencia.Unidad > objeto.contenido.Caja && objeto.existencia.Caja > 0) {
-        mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Caja)} ${objeto.existencia.Caja === 1 ? 'Caja' : 'Cajas'}`;
-      } else mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Unidad)} ${objeto.existencia.Unidad === 1 ? 'Unidad' : 'Unidades'}`;
+        mostrar = `${this.fun.numFormatTwoDecimals(objeto.existencia.Caja)} ${objeto.existencia.Caja === 1 ? 'Caja' : 'Cajas'}`;
+      } else mostrar = `${this.fun.numFormatTwoDecimals(objeto.existencia.Unidad)} ${objeto.existencia.Unidad === 1 ? 'Unidad' : 'Unidades'}`;
     } else if (_.has(objeto.existencia, 'Saco')) {
       if (objeto.existencia.Libra > objeto.contenido.Saco && objeto.existencia.Saco > 0) {
-        mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Saco)} ${objeto.existencia.Saco === 1 ? 'Saco' : 'sacos'}`;
-      } else mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
+        mostrar = `${this.fun.numFormatTwoDecimals(objeto.existencia.Saco)} ${objeto.existencia.Saco === 1 ? 'Saco' : 'sacos'}`;
+      } else mostrar = `${this.fun.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
     } else {
-      if (objeto.existencia.Libra > 100) mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Quintal)} ${objeto.existencia.Quintal === 1 ? 'Quintal' : 'Quintales'}`;
-      else mostrar = `${GLOBAL.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
+      if (objeto.existencia.Libra > 100) mostrar = `${this.fun.numFormatTwoDecimals(objeto.existencia.Quintal)} ${objeto.existencia.Quintal === 1 ? 'Quintal' : 'Quintales'}`;
+      else mostrar = `${this.fun.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
     }
 
     return mostrar;

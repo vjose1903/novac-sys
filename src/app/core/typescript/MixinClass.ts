@@ -51,26 +51,12 @@ export class MixinClass extends ModalClass {
     const fechaTemp = moment(date).format('YYYY-MM-DD');
     const obj = {};
     obj['FechaFactura'] = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
-    obj['FechaFacturaMostrar'] = GLOBAL.my_dateFormater(obj['FechaFactura']) + ' - ' + GLOBAL.my_houreFormater(obj['FechaFactura']);
+    obj['FechaFacturaMostrar'] = this.fun.my_dateFormater(obj['FechaFactura']) + ' - ' + this.fun.my_houreFormater(obj['FechaFactura']);
     return obj;
   }
   // =========================================================================================================
   my_timeDateFormater(str) {
-    return `${this.my_dateFormater(str)} - ${this.my_houreFormater(str)}`;
-  }
-  // =========================================================================================================
-  my_dateFormater(str, front = true) {
-    str = str + '';
-    let dateObj = new Date(str);
-
-    let month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    let day = String(dateObj.getDate()).padStart(2, '0');
-    let year = dateObj.getFullYear();
-
-    if (front) str = `${day}/${month}/${year}`;
-    else str = `${year}-${month}-${day}`;
-
-    return str;
+    return `${this.fun.my_dateFormater(str)} - ${this.my_houreFormater(str)}`;
   }
 
   // =========================================================================================================
@@ -110,7 +96,7 @@ export class MixinClass extends ModalClass {
   }
   // =========================================================================================================
   formatoNumero(num) {
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num)) + '  ';
+    return this.fun.formatearNumero(this.fun.redondearAdos(num)) + '  ';
   }
   // 301,755.67
 
@@ -122,19 +108,19 @@ export class MixinClass extends ModalClass {
 
   // =========================================================================================================
   logBlue(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? GLOBAL.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? this.fun.duplicarJson(body) : '');
   }
 
   logYellow(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? GLOBAL.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? this.fun.duplicarJson(body) : '');
   }
 
   logRed(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? GLOBAL.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? this.fun.duplicarJson(body) : '');
   }
 
   logGreen(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? GLOBAL.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? this.fun.duplicarJson(body) : '');
   }
 }
 

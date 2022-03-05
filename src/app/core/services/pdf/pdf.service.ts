@@ -75,7 +75,7 @@ export class PdfService {
             data.identificador = data.numero_documento;
 
             data.contenido_reporte.map((detalle) => {
-              detalle['cantidad'] = `${GLOBAL.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+              detalle['cantidad'] = `${this.fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
             });
 
             obj = options[config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
@@ -90,7 +90,7 @@ export class PdfService {
             data.tipo_pdf = data.tipo_factura.toUpperCase();
 
             data.contenido_reporte.map((detalle) => {
-              detalle['cantidad'] = `${GLOBAL.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+              detalle['cantidad'] = `${this.fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
             });
 
             obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', 'ventas');

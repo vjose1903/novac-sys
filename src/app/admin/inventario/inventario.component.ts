@@ -92,7 +92,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   formatoNumero(num) {
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
+    return this.fun.formatearNumero(this.fun.redondearAdos(num));
   }
 
   async necesarioParaEmpezar() {
@@ -133,7 +133,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
         arti.customStyles = { 'td-codigo': { width: '4rem' }, 'td-nombre': { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
       });
 
-      this.listaArticulos = GLOBAL.duplicarJson(res.data);
+      this.listaArticulos = this.fun.duplicarJson(res.data);
 
       const obj = { total: res.total_registros, tabla: 'inventario' };
       this.tServ.Func_total_paginas(obj);

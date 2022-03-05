@@ -266,7 +266,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   async renovarDataFiltros(e, buscando?, fecha_articulo?) {
-    const copyData = GLOBAL.duplicarJson(this.dataFiltro);
+    const copyData = this.fun.duplicarJson(this.dataFiltro);
     if (this.fun.isEmpty(e)) e = this.tServ.obj_paginate.default;
 
     const page = e.page;
@@ -282,7 +282,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         const res = await this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: page, per_page: per_page, paginado: true, fecha: fecha_articulo, is_compra: is_compra });
 
-        if (GLOBAL.is_number(palabra_a_buscar) && res.data.length === 1) {
+        if (this.fun.is_number(palabra_a_buscar) && res.data.length === 1) {
           this.articuloFiltradoPorCodigo(res);
         } else {
           this.dataFiltro = res.data;
@@ -297,8 +297,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.dataFiltro = undefined;
 
         res.data.map(async (cli) => {
-          cli.nombre = GLOBAL.Capitalice(cli.nombre);
-          cli.apellido = GLOBAL.Capitalice(cli.apellido);
+          cli.nombre = this.fun.Capitalice(cli.nombre);
+          cli.apellido = this.fun.Capitalice(cli.apellido);
 
           const documento = await cli.documentos_de_identidad.find((doc) => doc.principal === true);
           cli.documento_identidad = documento ? documento.documento : '----------';
@@ -318,7 +318,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.dataFiltro = undefined;
 
         res.data.map(async (supli) => {
-          supli.nombre = GLOBAL.Capitalice(supli.nombre);
+          supli.nombre = this.fun.Capitalice(supli.nombre);
           const documento = await supli.documentos_de_identidad.find((doc) => doc.principal === true);
           supli.documento_identidad = documento ? documento.documento : '----------';
 

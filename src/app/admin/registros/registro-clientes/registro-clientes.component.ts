@@ -115,7 +115,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(GLOBAL.Capitalice(arg));
+    campo.setValue(this.fun.Capitalice(arg));
   }
 
   marcarCheck(arg) {
@@ -162,7 +162,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     this.patchDocumentos(item.ARG.documentos_de_identidad);
 
-    this.form.controls.maximo_credito.setValue(GLOBAL.formatearNumero(GLOBAL.redondearAdos(item.ARG.maximo_credito)));
+    this.form.controls.maximo_credito.setValue(this.fun.formatearNumero(this.fun.redondearAdos(item.ARG.maximo_credito)));
 
     this.titulo = 'Editar cliente: ' + item.ARG.nombre;
     this.boton = 'Editar';
@@ -265,7 +265,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         if (!_.endsWith(formulario[this.doc_principal], '_')) {
           const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
           if (this.doc_principal == 'cedula') {
-            if (GLOBAL.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
+            if (this.fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
           } else this.enfocarInput(campo);
         }
       } else this.enfocarInput(campo);
@@ -325,7 +325,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       formulario.estado = true;
 
       formulario['balance'] = 0;
-      formulario.maximo_credito = GLOBAL.desformatear(formulario.maximo_credito);
+      formulario.maximo_credito = this.fun.desformatear(formulario.maximo_credito);
 
       this.clienteClass.createUpdateOne(formulario).then((res) => {
         const actualPagination = this.tServ.getPaginationById('lista_clientes');

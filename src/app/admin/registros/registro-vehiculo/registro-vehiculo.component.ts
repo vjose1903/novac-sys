@@ -43,9 +43,11 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
   empleadosClass = new EmpleadoC();
   modeloClass = new ModeloC();
 
+
   constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService) {
     super();
   }
+
 
   ngOnInit() {
     this._init_mixin({ component: 'reg_vehiculos', _lista_subs: ['decisionModal'] });
@@ -223,7 +225,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
 
   decisionModal(arg) {
     if (arg) {
-      const obj = GLOBAL.duplicarJson(this.seleccionModal);
+      const obj = this.fun.duplicarJson(this.seleccionModal);
 
       this.vehiculosClass.deleteOne(obj.id).then((res) => {
         this.listaVehiculos = null;
@@ -237,7 +239,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(GLOBAL.Capitalice(arg));
+    campo.setValue(this.fun.Capitalice(arg));
   }
 
   // =============================================

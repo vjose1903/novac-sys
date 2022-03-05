@@ -1,139 +1,99 @@
 <div class="row" style="height: calc(100% - 60px)">
-  <div class="col-5 contenedorRegistro pr-0">
+  <div class="col-5 contenedorRegistro p-0">
     <h4 class="negrita">{{ titulo }}</h4>
-    <!-- <div class="card card-padding">
+    <div class="card sombra card-padding">
       <form [formGroup]="form">
         <div class="row">
-          <div class="col-6 p-0">
-            <div class="row">
-              <div class="pr-0 col-12"></div>
-              <div class="pr-0 col-12">
-                <div class="form-group" [appMsgError]="'nombre'" [form]="form">
-                  <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                  <input
-                    id="campoNombre"
-                    (keyup)="capitalice('nombre', $event.target.value)"
-                    (keydown.enter)="saltar('campoApellido')"
-                    type="text"
-                    formControlName="nombre"
-                    placeholder="Introduzca nombre"
-                    class="form-control"
-                    autocomplete="off"
-                    autofocus
-                  />
-                  <span id="msgContainer_nombre"></span>
-                </div>
-              </div>
-              <div class="pr-0 col-12 mb-3">
-                <div class="form-group" [appMsgError]="'apellido'" [form]="form">
-                  <label class="control-label">Apellido: <span style="color: red">*</span></label>
-                  <input
-                    id="campoApellido"
-                    (keyup)="capitalice('apellido', $event.target.value)"
-                    (keydown.enter)="saltar('campoTelefono')"
-                    type="text"
-                    formControlName="apellido"
-                    placeholder="Introduzca apellido"
-                    class="form-control"
-                    autocomplete="off"
-                  />
-                  <span id="msgContainer_apellido"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-6 p-0 pr-2 mt-4">
-            <div class="form-group" [appMsgError]="'telefono'" [form]="form">
-              <label class="control-label">Telefono: <span style="color: red">*</span></label>
-
-              <p-inputMask
-                (keydown.enter)="saltar('campoSexo')"
-                mask="(999) 999-9999"
-                tabindex="-1"
-                styleClass="form-control"
-                inputId="campoTelefono"
-                placeholder="(___) ___-____"
-                formControlName="telefono"
-              ></p-inputMask>
-
-              <span id="msgContainer_telefono"></span>
-            </div>
-          </div>
-
-          <div class="col-6 p-0 pl-2 mt-4">
-            <div class="form-group" [appMsgError]="'sexo'" [form]="form">
-              <label class="control-label">Sexo: <span style="color: red">*</span></label>
-              <select id="campoSexo" formControlName="sexo" class="form-control" (keydown.enter)="saltar('campoDias')">
-                <option value="{{ null }}" disabled>Sexo</option>
-                <option value="M">Masculino</option>
-                <option value="F">Femenino</option>
-              </select>
-              <span id="msgContainer_sexo"></span>
-            </div>
-          </div>
-          <div class="col-6 p-0 pr-2">
-            <div class="form-group" [appMsgError]="'limite_credito'" [form]="form">
-              <label class="control-label">Dias credito: <span style="color: red">*</span></label>
-              <select id="campoDias" formControlName="limite_credito" class="form-control" (keydown.enter)="saltar('maximo_credito')">
-                <option value="{{ null }}" disabled>Seleccione</option>
-                <option value="15">15 dias</option>
-                <option value="30">30 dias</option>
-              </select>
-              <span id="msgContainer_limite_credito"></span>
-            </div>
-          </div>
-
-          <div class="col-6 p-0 pl-2">
-            <div class="form-group" [appMsgError]="'maximo_credito'" [form]="form">
-              <label class="control-label">Limite de credito: <span style="color: red">*</span></label>
-
-              <input
-                type="text"
-                class="form-control"
-                (blur)="revisarPrecio('maximo_credito')"
-                formControlName="maximo_credito"
-                id="maximo_credito"
-                (keydown.enter)="saltar('campoVendedor')"
-                placeholder="cantidad maxima"
-                autocomplete="off"
-              />
-              <span id="msgContainer_maximo_credito"></span>
-            </div>
-          </div>
-
-          <div class="col-6 p-0 pr-2">
-            <div class="form-group" [appMsgError]="'vendedor_id'" [form]="form">
-              <label class="control-label">Vendedor: <span style="color: red">*</span></label>
-              <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('campoDir')">
-                <option value="{{ null }}" disabled>Seleccione</option>
-                <option *ngFor="let item of vendedores" value="{{ item.id }}">{{ item.nombreCompleto }}</option>
-              </select>
-              <span id="msgContainer_vendedor_id"></span>
+          <div class="col-12 p-0">
+            <div class="form-group switchDiv">
+              <input formControlName="activo" class="apple-switch" type="checkbox" />
+              <span class="ml-2">Activo</span>
             </div>
           </div>
 
           <div class="col-12 p-0">
-            <div class="form-group" [appMsgError]="'direccion'" [form]="form">
-              <label class="control-label">Direccion <span style="color: red">*</span></label>
-              <textarea id="campoDir" (keyup)="capitalice('direccion', $event.target.value)" formControlName="direccion" class="form-control" cols="30" rows="3"></textarea>
-              <span id="msgContainer_direccion"></span>
+            <div class="form-group" [appMsgError]="'nombre'" [form]="form">
+              <label class="control-label">Nombre: <span style="color: red">*</span></label>
+              <input type="text" class="form-control" formControlName="nombre" id="campo_nombre" (keydown.enter)="saltar('campoVendedor')" placeholder="Introduzca nombre" autocomplete="off" />
+              <span id="msgContainer_nombre"></span>
             </div>
           </div>
 
-          <div class="form-group">
-            <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-
-            <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+          <div class="col-12 p-0">
+            <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
+              <label class="control-label">Descripción: <span style="color: red">*</span></label>
+              <textarea id="motivo" formControlName="descripcion" class="form-control" rows="3"></textarea>
+              <span id="msgContainer_descripcion"></span>
+            </div>
           </div>
         </div>
       </form>
-    </div> -->
+
+      <div class="card cardPermisos">
+        <div class="card-header position-relative d-flex align-items-center p-2">
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <h5 class="title margin negrita mb-0">Permisos</h5>
+          </div>
+        </div>
+
+        <div class="card-body p-1">
+          <div id="tabla_roles" class="h-100">
+            <div class="row">
+              <div class="col-4 pl-0 pr-2">
+                <!-- OPCIONES -->
+                <div class="overflow-auto" style="height: 24rem">
+                  <ul class="ulPermisos h-100">
+                    <li *ngFor="let permiso of listaPermisos" [ngClass]="{ 'bg-selected': permiso_selected?.id === permiso.id }" (click)="selectPermiso(permiso)">
+                      <i pTooltip="{{ iconCantSelected(permiso).tooltip }}" tooltipPosition="top" (click)="selectOrDeselectAll(permiso)" [class]="iconCantSelected(permiso).icon"></i>
+                      <span class="ml-2 descripcion"> {{ permiso.nombre }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="col-8 p-md-0">
+                <!-- DESCRIPCION PERMISO SELECCIONADO-->
+
+                <div id="tabla_acciones" style="height: 24rem">
+                  <app-tablas
+                    *ngIf="permiso_selected?.acciones && infoPermisos"
+                    [padre]="cardTabla"
+                    [info]="info"
+                    [data]="permiso_selected?.acciones"
+                    [botones]="botones"
+                    [id_tabla]="'lista_clientes'"
+                    [quitarAScorll]="-20"
+                    (DevolverInfo)="editarItem($event)"
+                    (DELETE)="abrirModal('borrar', $event.ARG)"
+                    [focusRow]="false"
+                    (paginateChange)="getRoles($event)"
+                  ></app-tablas>
+
+                  <!-- <dinamic-table
+                  *ngIf="permiso_selected"
+                  [(data)]="permiso_selected.acciones"
+                  [(TablasComponent)]="TablasComponent"
+                  [config]="table_config"
+                  (table_events)="handle_table_events($event)"
+                ></dinamic-table> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group mt-4">
+        <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+        <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+      </div>
+    </div>
   </div>
+
   <div class="col-7">
     <h4>Listado roles</h4>
     <div #cardTabla id="cardTabla" class="card cardListados">
-      <!-- <app-tablas
+      <app-tablas
         *ngIf="listaRoles && info"
         [padre]="cardTabla"
         [info]="info"
@@ -144,8 +104,8 @@
         (DevolverInfo)="editarItem($event)"
         (DELETE)="abrirModal('borrar', $event.ARG)"
         [focusRow]="false"
-        (paginateChange)="getClientes($event)"
-      ></app-tablas> -->
+        (paginateChange)="getRoles($event)"
+      ></app-tablas>
     </div>
   </div>
 </div>

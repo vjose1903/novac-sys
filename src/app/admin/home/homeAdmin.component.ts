@@ -36,7 +36,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   }
 
   verificar() {
-    GLOBAL.ValidaCedula(this.cedula);
+    this.fun.ValidaCedula(this.cedula);
   }
   mostrar() {
     const obj = {

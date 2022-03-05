@@ -22,7 +22,7 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
     { titulo: 'Unidad', tipo: 'text', key: 'unidad', estilos: [{ width: '14%' }] },
     { titulo: 'Retirado', tipo: 'text', key: 'retirado_mostrar', estilos: [{ width: '12%' }] },
     { titulo: 'Restante', tipo: 'text', key: 'restante_mostrar', estilos: [{ width: '12%' }] },
-    { titulo: 'Seleccione', tipo: 'check', key: 'select', estilos: [{ width: '10.8%' }], disable: [{ kind: 'campo', target: 'disable', value: [true] }], title: '' },
+    { titulo: 'Seleccione', tipo: 'inputSwitch', key: 'select', estilos: [{ width: '10.8%' }], disable: [{ kind: 'campo', target: 'disable', value: [true] }], title: '' },
   ];
 
   articulos_selected = [];
@@ -34,7 +34,7 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
   }
 
   ngOnInit() {
-    this.articulos = GLOBAL.duplicarJson(this.articulos);
+    this.articulos = this.fun.duplicarJson(this.articulos);
 
     this.articulos.map(async (arti) => {
       arti.customStyles = {

@@ -57,7 +57,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   formatoNumero(num) {
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
+    return this.fun.formatearNumero(this.fun.redondearAdos(num));
   }
 
   checkNumbers(arg) {
@@ -129,7 +129,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
           precioTEMP = _.join(temp, '.');
         }
 
-        const numeroFormateado = GLOBAL.formatearNumero(GLOBAL.redondearAdos(precioTEMP));
+        const numeroFormateado = this.fun.formatearNumero(this.fun.redondearAdos(precioTEMP));
 
         this.data.devuelta = numeroFormateado;
         this.efectivo = numeroFormateado;
@@ -138,7 +138,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
   calcularDevueta() {
     const total = this.data.total_factura;
-    const efectivo = GLOBAL.desformatear(this.efectivo);
+    const efectivo = this.fun.desformatear(this.efectivo);
     const dev = efectivo - total;
     this.devuelta = this.formatoNumero(dev);
   }
@@ -148,8 +148,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
   confirmar() {
     const total = this.data.total_factura;
-    const devuelta_ = GLOBAL.desformatear(this.devuelta);
-    const efectivo = GLOBAL.desformatear(this.efectivo);
+    const devuelta_ = this.fun.desformatear(this.devuelta);
+    const efectivo = this.fun.desformatear(this.efectivo);
     const obj = {
       dinero: efectivo,
       devuelta: this.devuelta ? devuelta_ : 0,

@@ -35,7 +35,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance', formatoNumero: true },
     {
       titulo: 'Seleccione',
-      tipo: 'check',
+      tipo: 'inputSwitch',
       key: 'select',
       select_all: false,
       estilos: [{ width: '7rem', padding: '0.6rem 0rem' }],
@@ -43,7 +43,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     },
     {
       titulo: 'Pago Total',
-      tipo: 'check',
+      tipo: 'inputSwitch',
       key: 'pagoT',
       select_all: false,
       estilos: [{ width: '6rem', padding: '0.6rem 0rem' }],
@@ -125,7 +125,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   formatoNumero(num) {
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
+    return this.fun.formatearNumero(this.fun.redondearAdos(num));
   }
 
   areAllSelected() {
@@ -201,7 +201,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
       this.totalFacturado += factura.total_factura;
       this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
-      this.totalPagadoPorciento = parseFloat(GLOBAL.numFormatTwoDecimals(this.totalPagadoPorciento));
+      this.totalPagadoPorciento = parseFloat(this.fun.numFormatTwoDecimals(this.totalPagadoPorciento));
       return factura;
     });
 
@@ -228,7 +228,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   isOneFacturaWithMonto() {
-    const valid = _.some(this.facturas, (factura) => factura.select && GLOBAL.desformatear(factura.monto) > 0);
+    const valid = _.some(this.facturas, (factura) => factura.select && this.fun.desformatear(factura.monto) > 0);
     return valid;
   }
 
@@ -254,7 +254,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       temp.push({
         cabecera_factura_id: fact.id,
         pago_total: fact.pagoT,
-        deposito: GLOBAL.desformatear(fact.monto),
+        deposito: this.fun.desformatear(fact.monto),
         descripcion:
           this.tipo_recibo === 'Pago factura'
             ? fact.pagoT
@@ -264,7 +264,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         pago_a_tiempo: fact.pago_a_tiempo,
       });
 
-      total += GLOBAL.desformatear(fact.monto);
+      total += this.fun.desformatear(fact.monto);
     }
 
     const obj = { total_recibo: total, detalle: temp };
@@ -348,7 +348,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         this.tablas.enfocarInput('input-' + item.index);
       }
       const total = item.body[item.index].balance;
-      const monto = GLOBAL.desformatear(item.value);
+      const monto = this.fun.desformatear(item.value);
 
       if (monto === total) this.facturas[item.index].pagoT = true;
 
@@ -365,7 +365,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   sumarTotalRecibo() {
-    this.recibiendo = _.reduce(this.facturas, (sum, item) => GLOBAL.desformatear(item.monto) + sum, 0);
+    this.recibiendo = _.reduce(this.facturas, (sum, item) => this.fun.desformatear(item.monto) + sum, 0);
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
   }
 

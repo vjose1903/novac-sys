@@ -100,7 +100,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(GLOBAL.Capitalice(arg));
+    campo.setValue(this.fun.Capitalice(arg));
   }
 
   async getEmpleados(e) {
@@ -192,7 +192,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       if (campo == 'campoNombre') {
         if (!_.endsWith(formulario['cedula'], '_')) {
           const docSinGuiones = _.join(_.split(formulario['cedula'], '-'), '');
-          if (GLOBAL.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
+          if (this.fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
         }
       } else this.enfocarInput(campo);
     } else {

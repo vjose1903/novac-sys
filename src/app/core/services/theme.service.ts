@@ -27,8 +27,9 @@ export class ThemeService {
     documentElement.setProperty('--transparente00', '#98767612');
     documentElement.setProperty('--transparente01', '#a16363c4');
     documentElement.setProperty('--transparente02', '#f6a2a259');
-    documentElement.setProperty('--transparente03', '#c6393985');
-    documentElement.setProperty('--transparente04', '#8a00004d');
+    documentElement.setProperty('--transparente03', '#f3868659');
+    documentElement.setProperty('--transparente04', '#c6393985');
+    documentElement.setProperty('--transparente05', '#8a00004d');
 
     documentElement.setProperty('--primary01', '#fb8989');
     documentElement.setProperty('--primary02', '#e96161');
@@ -54,8 +55,9 @@ export class ThemeService {
     documentElement.setProperty('--transparente00', '#76889812');
     documentElement.setProperty('--transparente01', '#768898c4');
     documentElement.setProperty('--transparente02', '#a2dbf659');
-    documentElement.setProperty('--transparente03', '#397bc685');
-    documentElement.setProperty('--transparente04', '#00258a4d');
+    documentElement.setProperty('--transparente03', '#8faabda3');
+    documentElement.setProperty('--transparente04', '#397bc685');
+    documentElement.setProperty('--transparente05', '#00258a4d');
 
     documentElement.setProperty('--primary01', '#79befb');
     documentElement.setProperty('--primary02', '#94d0f0');
@@ -80,9 +82,10 @@ export class ThemeService {
 
     documentElement.setProperty('--transparente00', '#76987b0f');
     documentElement.setProperty('--transparente01', '#779882c4');
-    documentElement.setProperty('--transparente02', '#a2f6cf59');
-    documentElement.setProperty('--transparente03', '#3bc65785');
-    documentElement.setProperty('--transparente04', '#00890b4d');
+    documentElement.setProperty('--transparente02', '#90be98a3');
+    documentElement.setProperty('--transparente03', '#a2f6cf59');
+    documentElement.setProperty('--transparente04', '#3bc65785');
+    documentElement.setProperty('--transparente05', '#00890b4d');
 
     documentElement.setProperty('--primary01', '#dcfed2');
     documentElement.setProperty('--primary02', '#95f0a7');

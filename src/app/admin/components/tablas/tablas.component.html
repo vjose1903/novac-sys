@@ -77,8 +77,30 @@
               </ng-template>
 
               <span *ngSwitchCase="'cantidades'" id="{{ column.key }}-{{ i }}" [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" style="width: 100%">
-                <!-- *ngIf="column.tipo !== 'check' && column.tipo !== 'input' && column.cantidades && !column.formatoNumero" -->
                 {{ lookprincipal(dato[column.key]) }}
+              </span>
+
+              <span
+                *ngSwitchCase="'tag'"
+                id="{{ column.key }}-{{ i }}"
+                [pTooltip]="column.text_tooltip ? dato[column.text_tooltip] : ''"
+                tooltipPosition="{{ i != 0 ? 'top' : 'bottom' }}"
+                style="width: 100%"
+              >
+                <p-tag
+                  [value]="dato[column.key]"
+                  [rounded]="true"
+                  [severity]="dato[column.tag_severity]"
+                  [ngClass]="{ tag_clickable: !!column.click }"
+                  [style]="{
+                    background: dato[column.tag_color],
+                    'white-space': 'nowrap',
+                    width: column.tag_apretada ? 'auto' : '-webkit-fill-available',
+                    overflow: 'hidden',
+                    'text-overflow': 'ellipsis',
+                    display: 'inline-block'
+                  }"
+                ></p-tag>
               </span>
 
               <span *ngSwitchCase="'icon'">
@@ -97,7 +119,7 @@
                 {{ formatoNumero(dato[column.key]) }}
               </span>
 
-              <span *ngSwitchCase="'check'" [mdbTooltip]="column.text_tooltip ? tooltip : ''" placement="{{ i != 0 ? 'top' : 'botton' }}">
+              <span *ngSwitchCase="'inputSwitch'" [mdbTooltip]="column.text_tooltip ? tooltip : ''" placement="{{ i != 0 ? 'top' : 'botton' }}">
                 <div class="form-group m-0 switchDiv">
                   <input class="apple-switch" [ngClass]="{ disabled: disabledInput(dato, column) }" type="checkbox" (change)="changeValorCheck(column.key, i)" [checked]="dato[column.key]" />
                   <span class="ml-2">{{ column.title }}</span>

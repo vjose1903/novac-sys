@@ -130,7 +130,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   async getTiposFacturas() {
     try {
       this.lista_tipos_facturas = await this.tiposFacturasClass.getAll();
-      const temp = GLOBAL.duplicarJson(this.lista_tipos_facturas);
+      const temp = this.fun.duplicarJson(this.lista_tipos_facturas);
       for (let i = 0; i < temp.length; i++) {
         const element = temp[i];
         if (!element.referencia || element.referencia === '02' || element.referencia === '00') {
@@ -143,7 +143,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   filtrarNCF() {
     if (this.filtro === 'todos') {
-      this.listaNCF = GLOBAL.duplicarJson(this.listaNCFBack);
+      this.listaNCF = this.fun.duplicarJson(this.listaNCFBack);
     } else {
       this.listaNCF = this.listaNCFBack.filter((pack) => Number(pack.tipo_factura_id) === Number(this.filtro));
     }
@@ -182,7 +182,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       });
 
       this.listaNCF = tempNCF;
-      this.listaNCFBack = GLOBAL.duplicarJson(tempNCF);
+      this.listaNCFBack = this.fun.duplicarJson(tempNCF);
 
       const obj = { total: res.total_registros, tabla: 'lista_ncf' };
 
@@ -294,7 +294,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.Desde = item.desde;
     this.Hasta = item.hasta;
 
-    this.ncfSelected = GLOBAL.duplicarJson(item);
+    this.ncfSelected = this.fun.duplicarJson(item);
   }
 
   editarItem(item) {
@@ -319,7 +319,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   decisionModal(arg) {
     if (arg !== null && arg !== undefined) {
-      const obj = GLOBAL.duplicarJson(this.seleccionModal);
+      const obj = this.fun.duplicarJson(this.seleccionModal);
       if (arg && obj) {
         this.ncfClass.deleteOne(obj.id).then(
           () => {

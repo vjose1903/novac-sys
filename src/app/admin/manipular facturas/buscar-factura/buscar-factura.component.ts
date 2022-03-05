@@ -259,7 +259,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       busqueda['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
         fact.fecha = moment(fact.fecha_equivalente).format('DD/MM/YYYY');
-        fact.total_factura = GLOBAL.formatearNumero(GLOBAL.redondearAdos(Math.abs(fact.total_factura)));
+        fact.total_factura = this.fun.formatearNumero(this.fun.redondearAdos(Math.abs(fact.total_factura)));
         fact.selectColor = 'gris-claro';
         fact.select = 'far fa-eye-slash';
 
@@ -324,7 +324,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.fechaV = moment(fact.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
         fact.pagoT = true;
         fact.estatus = fact.estado ? 'fas fa-check' : 'fas fa-times';
-        fact.monto = GLOBAL.formatearNumero(GLOBAL.redondearAdos(fact.balance));
+        fact.monto = this.fun.formatearNumero(this.fun.redondearAdos(fact.balance));
         fact.pago_a_tiempo = fact.fecha_vencimiento > fechaA ? true : false;
         fact.colorEstado = fact.estado ? 'green' : 'red';
         fact.selectColor = 'gris-claro';
@@ -346,7 +346,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       const obj = { total: busqueda.total_registros, tabla: 'facturas_params' };
 
       this.tServ.Func_total_paginas(obj);
-      this.facturas = GLOBAL.duplicarJson(busqueda['data']);
+      this.facturas = this.fun.duplicarJson(busqueda['data']);
 
       if (this.facturas.length > 0) {
         if (this.campo === '2') {

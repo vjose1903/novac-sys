@@ -5,6 +5,7 @@ import * as moment from '../../../../core/javascript/moment';
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { SingletonService } from '../../../../core/services/singleton.service';
 import { ConfigI } from '../../../../core/typescript/config-interface';
+import { FunctionService } from '../../../../core/services/functions.service';
 @Component({
   selector: 'app-formar-factura',
   templateUrl: './formar-factura.component.html',
@@ -15,7 +16,7 @@ export class FormarFacturaComponent implements OnInit {
 
   configServ = SingletonService.configServ;
   config: ConfigI;
-  constructor() {}
+  constructor(private fun: FunctionService) {}
 
   ngOnInit() {
     // this.factura.detalle_facturas = [
@@ -32,7 +33,7 @@ export class FormarFacturaComponent implements OnInit {
   }
 
   formatoNumero(num) {
-    return GLOBAL.formatearNumero(GLOBAL.redondearAdos(num));
+    return this.fun.formatearNumero(this.fun.redondearAdos(num));
   }
 
   formatoNumeroFactura(num) {
