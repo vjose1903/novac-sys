@@ -2,8 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import { RolesC } from './roles';
+import { AccionesC, PermisosC, RolesC } from './roles';
 import * as _ from 'lodash';
+import { TablasService } from '../../components/tablas/tablas.service';
 
 @Component({
   selector: 'app-roles',
@@ -16,40 +17,76 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   listaRoles = [];
   listaPermisos = [];
   info = [
-    { titulo: '#', key: 'i', tipo: 'index', estilos: [{ width: '5%' }] },
-    { titulo: 'Nombre', key: 'name', tipo: 'text', estilos: [{ width: '20%' }] },
-    { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', estilos: [{ width: '45%' }] },
+    { titulo: 'Nombre', key: 'nombre', tipo: 'text', estilos: [{ width: '20%' }] },
+    { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', estilos: [{ width: '50%' }] },
     { titulo: 'Activo', key: 'activo_', tag_severity: 'activo_tag', tag_apretada: true, tipo: 'tag', estilos: [{ width: '10%' }] },
   ];
 
   infoPermisos = [
-    { titulo: 'Descripcion', key: 'nombre', tipo: 'text' },
-    { titulo: 'Seleccionado', key: 'selected', tipo: 'inputSwitch' },
+    { titulo: 'Descripcion', key: 'nombre', tipo: 'text', estilos: [{ 'text-align': 'left' }, { 'padding-left': '0.5rem' }, { width: '75%' }] },
+    { titulo: 'Activo', key: 'selected', tipo: 'inputSwitch', estilos: [{ width: '25%' }] },
   ];
 
   botones = { titulo: true, borrar: true, editar: true };
   boton: string;
-  metodo: any;
 
   rolesClass = new RolesC();
+  permisosClass = new PermisosC();
+  accionesClass = new AccionesC();
+
   roleSelected: any;
   permiso_selected: any;
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute) {
+  isCreando: boolean = false;
+
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
     super();
   }
 
   ngOnInit(): void {
     this._init_mixin({ component: 'reg_roles', _lista_subs: ['decisionModal'] });
+    this.necesarioStart();
     this.createForm();
 
     this.titulo = 'Registro de roles';
     this.boton = 'Registrar';
-    this.metodo = this.route.snapshot.params['metodo'];
   }
 
   ngOnDestroy() {
     this._destroy_mixin();
+  }
+
+  async necesarioStart() {
+    this.getRoles(this.tServ.obj_paginate.default);
+    this.getPermisos();
+    this.listaRoles = [{ nombre: 'Administrador', descripcion: 'Administrador del sistema', activo: true, activo_: 'SI', activo_tag: 'success' }];
+  }
+  getRoles(event) {}
+
+  getPermisos() {
+    this.listaPermisos.length = 0;
+
+    this.permisosClass.getAll({ parameters: { acciones: true } }).then((res) => {
+      this.listaPermisos = res.data.map((permiso) => {
+        permiso.acciones = permiso.acciones.map((accion) => {
+          // accion.selected = _.some(this.inputs.data.acciones, (item) => item.id == accion.id);
+          accion.selected = false;
+          accion.nombre = this.my_capitalize(accion.nombre);
+
+          accion['customStyles'] = {
+            'td-nombre': { 'text-align': 'left', 'padding-left': '0.5rem', width: '75%' },
+            'td-selected': { 'justify-content': 'center', 'align-items': 'center', display: 'flex', width: 'auto' },
+          };
+          return accion;
+        });
+        delete permiso.permisoAccions;
+
+        // _.omit(permiso, )
+
+        return permiso;
+      });
+      this.permiso_selected = _.first(this.listaPermisos);
+    });
   }
 
   initCambioMenu(arg) {
@@ -75,7 +112,9 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  getRoles(event) {}
+  nuevoRegistro() {
+    this.isCreando = true;
+  }
 
   iconCantSelected(permiso) {
     const almenos_uno = _.some(permiso.acciones, (item) => item.selected);
@@ -85,6 +124,14 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     if (todos) res = { tooltip: 'Todos seleccionados', icon: 'fas fa-check' };
 
     return res;
+  }
+
+  getContenidoStyle() {
+    const style: any = {};
+    style['grid-template-columns'] = this.roleSelected || this.isCreando ? 'auto auto' : '0% auto';
+    style['column-gap'] = this.roleSelected || this.isCreando ? '0.5rem' : '0rem';
+
+    return style;
   }
 
   selectPermiso(data) {

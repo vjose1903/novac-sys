@@ -33,7 +33,7 @@ import { ConfigI } from '../core/typescript/config-interface';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
-  loginForm: FormGroup;
+  form: FormGroup;
   errorC = '';
   errorU = '';
   versionApp = '';
@@ -48,11 +48,11 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loginForm = this.fb.group({ usuario: null, password: null });
-
     this.configServ.getConfig().then((config: ConfigI) => {
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       this.versionApp = config.app_version;
+
+      this.form = this.fb.group({ usuario: config.is_development ? 'ADM' : null, password: config.is_development ? '1234567' : null });
     });
 
     // TESTEANDO EL CODIGO DE BARRAS
@@ -88,12 +88,14 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   formularioIsInvalid() {
-    const formulario = this.loginForm.getRawValue();
-    return this.fun.isEmpty(formulario.usuario) || this.fun.isEmpty(formulario.password);
+    if (this.form) {
+      const formulario = this.form.getRawValue();
+      return this.fun.isEmpty(formulario.usuario) || this.fun.isEmpty(formulario.password);
+    }
   }
 
   saltar(input) {
-    const formulario = this.loginForm.getRawValue();
+    const formulario = this.form.getRawValue();
     if (input == 'send') {
       if (this.fun.hasValue(formulario.password)) this.login();
     } else {
@@ -105,7 +107,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   // LOGIN
   // =================================================================
   login() {
-    const formulario = this.loginForm.getRawValue();
+    const formulario = this.form.getRawValue();
 
     if (formulario.usuario == '1973' && formulario.password == '3791') {
       this.openConfigsModal();
@@ -127,7 +129,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   openConfigsModal() {
-    this.loginForm.reset();
+    this.form.reset();
     this.enfocarInput('Iusuario');
 
     this.handleModalForm({

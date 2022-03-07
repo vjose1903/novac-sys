@@ -5,3 +5,13 @@ export class RolesC extends CrudG<any> {
     super('roles');
   }
 }
+export class PermisosC extends CrudG<any> {
+  constructor() {
+    super('permisos');
+  }
+}
+export class AccionesC extends CrudG<any> {
+  constructor() {
+    super('acciones');
+  }
+}

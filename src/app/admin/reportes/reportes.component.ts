@@ -43,6 +43,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
         this.makePdf(res.data);
       }
     } else if (res && res.tipo_modal !== 'buscarCliente') this.makePdf(res.data);
+
   }
 
   ngOnDestroy() {

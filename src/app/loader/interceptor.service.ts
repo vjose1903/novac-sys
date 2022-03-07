@@ -66,11 +66,15 @@ export class InterceptorService implements HttpInterceptor {
 
       catchError((response: HttpErrorResponse) => {
         if (response.error === null) {
+
           this.fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
-        } else if (response.error && response.error.msg === 'Para realizar esta accion debe de iniciar sesión.') {
+
+        } else if ((response.error && _.has(response.error, 'action'), response.error.action === 'close_ssesion')) {
+
           this.fun.toastError(response.error.msg, 'ERROR');
           this.fun.nextCanToast(false);
           this.router.navigateByUrl('/auth/login');
+
         } else {
           if (_.has(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
 

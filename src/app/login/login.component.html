@@ -9,7 +9,7 @@
       </div>
 
       <mdb-card-body [cascade]="true" class="px-5">
-        <form [formGroup]="loginForm" class="" method="post">
+        <form *ngIf="form" [formGroup]="form" class="" method="post">
           <div class="form-group" id="usuario-group">
             <label for="" class="formulario__label d-block">Usuario:</label>
             <input type="text" class="form-control" formControlName="usuario" id="Iusuario" autofocus (keyup.enter)="saltar('Ipassword')" />

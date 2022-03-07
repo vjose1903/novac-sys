@@ -64,9 +64,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
         if (this.initNavigate) {
           setTimeout(() => this.checkRouteActiva(), 250);
-
-          const token = this.fun.getAuthToken();
-          if (token) this.checkCuadre();
+          setTimeout(() => {
+            const token = this.fun.getAuthToken();
+            if (token) this.checkCuadre();
+          }, 500);
 
           this.initNavigate = false;
         }

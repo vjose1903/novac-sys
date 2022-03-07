@@ -1,31 +1,93 @@
+@mixin registro {
+  display: grid;
+  grid-template-areas:
+    "titulo_card"
+    "cardContent";
+  grid-template-rows: min-content auto;
+  .titulo_card {
+    grid-area: titulo_card;
+  }
+  .cardContent {
+    grid-area: cardContent;
+  }
+}
+
+.form {
+  transition: all 0.3s;
+  &.showForm {
+    width: 45%;
+    margin-right: 0.5rem;
+  }
+
+  &.hideForm {
+    width: 0%;
+    overflow: hidden;
+  }
+  @include registro;
+}
+
+.list {
+  transition: all 0.3s;
+  &.FormList {
+    width: 55%;
+  }
+
+  &.onlyList {
+    width: 100%;
+  }
+  @include registro;
+}
+
+.rowResgitro {
+  display: grid;
+  grid-template-areas:
+    "colTitulo"
+    "colFormularioListado";
+  grid-template-rows: min-content auto;
+  .colTitulo {
+    grid-area: colTitulo;
+  }
+  .colFormularioListado {
+    grid-area: colFormularioListado;
+  }
+}
+
 div.card-header {
   background-color: var(--primary06);
 }
 
 .cardPermisos {
-  background: #e7e7e7;
+  background: #f7f7f7;
   border-radius: 0.5rem;
 }
 
-.ulPermisos {
-  margin: 0;
-  padding: 0.3rem;
-  list-style: none;
-  border-radius: 0.3rem;
+.divPermisos {
   background-color: var(--transparente05);
+  border-radius: 0.3rem;
+  .ulPermisos {
+    margin: 0;
+    padding: 0.3rem;
+    list-style: none;
 
-  & li {
-    border-radius: 0.2rem;
-    padding: 0.5rem;
-    .descripcion {
-      color: #fff !important;
-    }
-    &.bg-selected {
-      background-color: #27283d52;
-    }
-    &:hover {
-      background-color: #34354b36;
-      cursor: pointer;
+    & li {
+      border-radius: 0.2rem;
+      padding: 0.5rem;
+      .descripcion {
+        color: black !important;
+        font-weight: 500;
+      }
+
+      &:hover {
+        background-color: #0000002a;
+        cursor: pointer;
+      }
+
+      &.bg-selected {
+        background-color: #00000046;
+        &:hover {
+          background-color: #0000005e !important;
+        }
+      }
     }
   }
 }
