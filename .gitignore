@@ -1,6 +1,7 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
+/dist/*
 /dist
 /tmp
 /out-tsc
@@ -8,6 +9,7 @@
 /release
 /resources/*
 /print/*
+/log/*
 main.js
 app_config.config
 !src/karma.conf.js
@@ -17,6 +19,9 @@ app_config.config
 *.js
 
 # dependencies
+/resources
+/print
+/log
 /node_modules
 /actualizacion
 actualizacion.zip

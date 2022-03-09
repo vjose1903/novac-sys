@@ -55,7 +55,8 @@
             "scripts": [],
             "customWebpackConfig": {
               "path": "./angular.webpack.js"
-            }
+            },
+            "allowedCommonJsDependencies": ["rxjs", "rxjs/operators"]
           },
           "configurations": {
             "dev": {

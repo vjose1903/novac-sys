@@ -145,9 +145,9 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
   }
 
-  decisionModal(arg) {
-    if (this.tipoModal === 'quitar_factura' && arg) this.quitarFacturaGuardada({ body: { archivo_id: this.seleccionModal?.archivo_id } });
-  }
+  // decisionModal(arg) {
+  //   if (this.tipoModal === 'quitar_factura' && arg) this.quitarFacturaGuardada({ body: { archivo_id: this.seleccionModal?.archivo_id } });
+  // }
 
   _toggleSidebar(where?) {
     if (where == 'visibleChange') {
@@ -214,7 +214,17 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   abrirModalFacturaGuardada(fact, e) {
     const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.', archivo_id: fact.archivo_id };
-    this.abrirModal('dinamico_texto', obj, 'quitar_factura');
+    const confirmationObj = {
+      id: 'quitar_factura',
+      texto: obj.texto_modal,
+      header: 'Confirmación',
+      siFunction: (instance) => {
+        this.quitarFacturaGuardada({ body: { archivo_id: obj.archivo_id } });
+      },
+      width: '30rem',
+    };
+    this.confirmationModal(confirmationObj);
+
     e.stopPropagation();
   }
 
@@ -391,5 +401,32 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     }
 
     this.modulo_select = undefined;
+  }
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.handleModalForm({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+      ${obj.texto}
+    </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+
+  closeModal(modalInstance) {
+    modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 }

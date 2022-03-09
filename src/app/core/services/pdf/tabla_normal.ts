@@ -38,7 +38,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
   // if (contendio_.length > 0 || configuration.only_titulo) body.push(titulos as TablaRowPdfMake);
   body.push(titulos as TablaRowPdfMake);
   let longitud_cuerpo = 0;
-  if (!configuration.only_titulo) {
+  if (!configuration.only_titulo && Array.isArray(contendio_)) {
     contendio_.forEach((detalle, j) => {
       longitud_cuerpo += 1;
       const row = formarCuerpo(data, configuration, detalle, j);
@@ -46,11 +46,6 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
     });
   }
 
-  if (configuration.only_titulo || (Array.isArray(contendio_) && contendio_.length > 0)) {
-    console.log('===== CONTENIDO NO VACIO =====');
-  } else {
-    console.log('===== MENSAJE CONTENIDO VACIO =====');
-  }
   var content = [
     configuration.only_titulo || (Array.isArray(contendio_) && contendio_.length > 0)
       ? ({
@@ -67,7 +62,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
               // const brk = configuration.break;
 
               if (configuration.isBreak) {
-                return i % brk === 0 && node.table.body.length !== brk ? 0 : i === node.table.body.length || i === 1 ? 1.5 : 1;
+                return i % brk === 0 && node.table.body.length !== brk ? 0 : i === node.table.body.length || i === 1 ? 2 : 0.5;
               } else {
                 return i == 0 ? 0 : 1 === 1 ? 1.5 : 1;
               }
@@ -76,14 +71,18 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
               return 0;
             },
             hLineColor: function (i, node) {
-              return i === node.table.body.length || i === 1 ? 'black' : 'gray';
+              if (configuration.isLineLight) {
+                return i === node.table.body.length ? 'black' : i === 1 ? '#b5b5b5' : '#ebebeb';
+              } else {
+                return i === node.table.body.length || i === 1 ? 'black' : 'grey';
+              }
             },
             vLineColor: function (i, node) {
               return 'black';
             },
           },
         } as TablaPdfMake)
-      : { text: configuration.mensaje_contenido_vacio, margin: [0, 2, 0, 5] },
+      : { text: Array.isArray(contendio_) ? configuration.mensaje_contenido_vacio : '', margin: [0, 2, 0, 5] },
 
     configuration.mostrar_total && data.total >= 1
       ? {

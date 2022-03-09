@@ -5,6 +5,7 @@ import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import * as moment from '../../../core/javascript/moment';
 import { ArticuloC } from '../../registros/articulos/articulo';
+import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -445,7 +446,18 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
       if (input === 'can-' && this.fun.hasValue(cod)) {
         if (this.fun.isEmpty(articulo) || cod !== articulo.codigo) {
           const obj = { filtrarArticulo: cod, index, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
-          this.abrirModal('buscarArticulo', obj);
+          this.handleModalForm({
+            component: BuscarArticuloComponent,
+            inputs: obj,
+            id: 'buscarArticulo',
+            header: 'BUSCAR ARTICULO',
+            width: '56.25rem',
+            height: '31.25rem',
+            botones: {
+              aceptar: { show: false, disable: false },
+              cancelar: { show: false, disable: false },
+            },
+          });
         } else {
           this.enfocarInput(`can-${index}`);
         }
@@ -681,7 +693,18 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
 
     if (name) {
       this.indexRemove = i;
-      this.abrirModal('removerArticulo', obj);
+
+      const confirmationObj = {
+        id: 'removerArticulo',
+        texto: 'Seguro que desea remover el articulo',
+        header: 'Confirmación',
+        siFunction: (instance) => {
+          this.closeModal(instance);
+          this.procesoQuitarArticulo();
+        },
+        width: '30rem',
+      };
+      this.confirmationModal(confirmationObj);
     }
 
     if (e) e.stopPropagation();
@@ -787,5 +810,39 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   calcularPrecioSaco(cant, precio) {
     const res = (cant / 100) * precio;
     return GLOBAL.redondearAdos(res);
+  }
+
+  async getDataFromModal(arg, search) {
+    this.llenarRowDespuesDeFiltro(arg);
+  }
+
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.handleModalForm({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+      ${obj.texto}
+    </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+
+  closeModal(modalInstance) {
+    console.warn('modalInstance: ', modalInstance);
+
+    modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 }

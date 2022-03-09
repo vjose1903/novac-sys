@@ -68,7 +68,7 @@
   <div class="col-12 medio">
     <div *ngIf="facturas" #cardTabla id="cardTabla" class="card card-padding sombra ingreCard h-100">
       <div class="w-100 d-flex justify-content-end">
-        <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+        <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
       </div>
       <app-tablas
         *ngIf="facturas"

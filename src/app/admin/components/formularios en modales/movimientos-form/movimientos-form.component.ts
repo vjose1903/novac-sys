@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
+import { ModalI } from '../../new_modal/modal-class';
 import { MovimientosC } from './movimiento-model';
 
 @Component({
@@ -10,7 +11,7 @@ import { MovimientosC } from './movimiento-model';
   templateUrl: './movimientos-form.component.html',
   styleUrls: ['./movimientos-form.component.scss'],
 })
-export class MovimientosFormComponent extends MixinClass implements OnInit, AfterViewInit {
+export class MovimientosFormComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
   form;
   tipo_movimiento;
   tipo_salida;
@@ -18,18 +19,22 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   element: any;
   cantidad = 0;
   motivo;
-  @Input() data;
+  // @Input() data;
   @Output() cancel = new EventEmitter<any>();
   medidas;
 
-  movimientosC = new MovimientosC;
+  movimientosC = new MovimientosC();
   plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
   constructor() {
     super();
   }
+  modal: any = {};
+  inputs: any;
 
   ngOnInit() {
-    this.medidas = _.keys(this.data.cantidades);
+    console.log('VIENDO LA  VAINA: ', this.inputs);
+
+    this.medidas = _.keys(this.inputs.cantidades);
   }
   ngAfterViewInit() {
     this.enfocarInput('tipo_movimiento');
@@ -53,7 +58,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
           return 'Disminuirá ' + this.cantidad + ' ' + med;
         }
       } else {
-        const existenciaPorMedida = this.data.cantidades[this.medida];
+        const existenciaPorMedida = this.inputs.cantidades[this.medida];
         let calculo = 0;
         if (this.tipo_movimiento === 'entrada') {
           calculo = existenciaPorMedida + this.cantidad;
@@ -69,7 +74,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
     if (campo !== 'send') {
       this.enfocarInput(campo);
     } else {
-      this.submit();
+      this.btn_aceptar();
     }
   }
 
@@ -96,12 +101,12 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
       this.tipo_salida = undefined;
     }
   }
-  submit() {
+  btn_aceptar() {
     const empleado = this.fun.getUser();
 
     const obj = {
       user_id: empleado.id,
-      articulo_id: this.data.id,
+      articulo_id: this.inputs.id,
       cantidad: this.cantidad,
       accion: this.tipo_movimiento,
       motivo: this.motivo,
@@ -118,6 +123,10 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
           bool: true,
           body: res.articulo,
         };
+
+        const modal_ = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+        modal_.closeModal('inventario', 'cancelar');
+
         this.accion(obj);
       },
       (err) => {
@@ -125,7 +134,6 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
         this.mostrarErrores(err.error);
       },
     );
-
   }
   mostrarErrores(arg) {
     for (const error in arg) {

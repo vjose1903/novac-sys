@@ -10,6 +10,8 @@ import { ReciboC } from '../../recibos';
 import { RecibosService } from '../../recibos.service';
 import { FacturaC } from '../../../facturacion/factura';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
+import { FormCantidadEfectivoComponent } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
+import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 
 @Component({
   selector: 'app-ingresos',
@@ -272,20 +274,91 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   abrirModalDinamicText(tipo) {
-    const obj = {};
-    if (tipo === 'cancelar') obj['texto_modal'] = 'Seguro de que desea cancelar la operacion.';
-
-    this.abrirModal('dinamico_texto', obj, 'cancelar_ingreso');
+    const obj = {
+      id: 'cancelar_ingreso',
+      header: 'Confirmación',
+      texto: 'Seguro de que desea cancelar la operacion.',
+      siFunction: this.cancelarIgreso,
+    };
+    this.confirmationModal(obj);
   }
 
+  async getDataFromModal(arg, search) {
+    if (arg.modal_id === 'cambioEfectivo_IngresosComponent') {
+      this.devuelta = arg.obj.devuelta;
+      this.forma_pago = arg.obj.forma_pago;
+      this.sendIngreso();
+    }
+
+    if (arg.modal_id === 'buscarCliente') {
+      this.clienteAdepositar = arg.data;
+
+      (document.getElementById('clienteI') as any).value = `${arg.data.nombre} ${arg.data.apellido}`;
+      const actualPagination = this.tServ.getPaginationById('facturasPendientes');
+
+      this.pedirFacturasPorCliente(arg.data.id, actualPagination);
+    }
+  }
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
       this.fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo__: 'devuelta' };
-      this.abrirModal('cambio', obj);
+
+      this.handleModalForm({
+        component: FormCantidadEfectivoComponent,
+        inputs: obj,
+        id: 'cambioEfectivo_IngresosComponent',
+        header: 'Cantidad de efectivo',
+        width: '34.375rem',
+        botones: {
+          aceptar: { show: false, disable: false },
+          cancelar: { show: false, disable: false },
+          dinamico: [
+            {
+              clase: 'btn btn-blanco mr-2',
+              function: (instance) => {
+                this.closeModal(instance);
+              },
+              label: 'Cancelar',
+              disable: false,
+            },
+            { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+          ],
+        },
+      });
     }
+  }
+
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.handleModalForm({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+      ${obj.texto}
+    </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+
+  closeModal(modalInstance) {
+    console.warn('modalInstance: ', modalInstance);
+
+    modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 
   async sendIngreso() {
@@ -370,8 +443,24 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   async abrirModalFiltro(nombre) {
     if (this.fun.hasValue(nombre)) {
-      const obj = { data: [], filtrarCliente: nombre };
-      this.abrirModal('buscarCliente', obj);
+      const obj = {
+        data: [],
+        palabra_a_buscar: nombre,
+        metodo: 'venta',
+      };
+
+      this.handleModalForm({
+        component: BuscarClienteSuplidorComponent,
+        inputs: obj,
+        id: 'buscarCliente',
+        header: 'Buscar cliente',
+        width: '900px',
+        height: '500px',
+        botones: {
+          aceptar: { show: false, disable: false },
+          cancelar: { show: false, disable: false },
+        },
+      });
       this.desEnfocarInput('clienteI');
     }
   }

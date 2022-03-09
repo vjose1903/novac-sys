@@ -395,6 +395,8 @@ $bodyfont: "Poppins";
   transform: translate(0px, 1rem) !important;
 }
 .iconosMenu {
+  border: 3px solid #4141417a;
+  border-radius: 50%;
   position: relative;
   display: block;
   margin: 0rem auto 0px auto;
@@ -404,6 +406,9 @@ $bodyfont: "Poppins";
 }
 
 .iconosMenuA {
+  background: var(--primary10);
+  border: 3px solid #4141417a;
+  border-radius: 50%;
   position: relative;
   display: block;
   margin: auto;

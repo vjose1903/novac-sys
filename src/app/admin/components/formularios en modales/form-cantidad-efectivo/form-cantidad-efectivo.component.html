@@ -15,9 +15,10 @@
       (keyup)="calcularDevueta()"
       (keydown.enter)="saltar('formaPago')"
       [(ngModel)]="efectivo"
+
+      (ngModelChange)="validarForm('input')"
       (blur)="revisarPrecio($event.target.value, 'devuelta')"
       id="inputEfectivo"
-
     />
     <h3 class="label w-100 mt-3">FORMA DE PAGO</h3>
     <select [(ngModel)]="formaPago" id="formaPago" (keydown.enter)="saltar('send')" class="form-control inputEfectivo">
@@ -35,12 +36,12 @@
     </div>
   </div>
 
-  <div class="col-12 {{ tipo !== 'devuelta' ? 'mt-4' : '' }}">
+  <!-- <div class="col-12 {{ tipo !== 'devuelta' ? 'mt-4' : '' }}">
     <div class="form-group">
       <input (click)="cancelar()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
       <input (click)="confirmar()" type="submit" class="btn btn-verde" value="Confirmar" id="btnSend" />
     </div>
-  </div>
+  </div> -->
 </div>
 <!-- ======================================================= -->
 

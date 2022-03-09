@@ -1,0 +1,79 @@
+import { Component, OnInit } from '@angular/core';
+import { FunctionService } from '../../../../core/services/functions.service';
+import { GLOBAL } from '../../../../core/typescript/GLOBAL';
+import { ClienteC } from '../../../registros/registro-clientes/cliente';
+import { ModalI } from '../../new_modal/modal-class';
+import { TablasService } from '../../tablas/tablas.service';
+import * as _ from 'lodash';
+import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
+@Component({
+  selector: 'app-buscar-cliente-suplidor',
+  templateUrl: './buscar-cliente-suplidor.component.html',
+  styleUrls: ['./buscar-cliente-suplidor.component.scss'],
+})
+export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
+  clienteClass = new ClienteC();
+  suplidorClass = new SuplidorC();
+  dataFiltro;
+  constructor(private tServ: TablasService, private fun: FunctionService) {}
+  modal: any = {};
+  inputs: any;
+  paraFiltroClientes;
+
+  ventaInfo = [
+    { titulo: 'Nombre', key: 'nombre' },
+    { titulo: 'Apellido', key: 'apellido' },
+    { titulo: 'Telefono', key: 'telefono' },
+    { titulo: 'Doc. identidad', key: 'documento_identidad' },
+    { titulo: 'Direccion', key: 'direccion' },
+  ];
+
+  compraInfo = [
+    { titulo: 'Nombre', key: 'nombre' },
+    { titulo: 'Telefono', key: 'telefono' },
+    { titulo: 'Doc. identidad', key: 'documento_identidad' },
+    { titulo: 'Direccion', key: 'direccion' },
+  ];
+
+  btn_aceptar() {}
+
+  ngOnInit(): void {
+    this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default);
+  }
+
+  async buscarClientesOrSuplidor(event) {
+    const copyData = GLOBAL.duplicarJson(this.dataFiltro);
+    const page = event.page;
+    const per_page = event.per_page;
+    let palabra_a_buscar = ' ';
+
+    if (this.inputs.palabra_a_buscar) palabra_a_buscar = this.fun.isEmpty(this.inputs.palabra_a_buscar) ? ' ' : this.inputs.palabra_a_buscar;
+    else palabra_a_buscar = this.fun.isEmpty(event.searchText) ? ' ' : event.searchText;
+
+    const classDinamic = this.inputs.metodo === 'venta' ? 'clienteClass' : 'suplidorClass';
+
+    const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
+
+    this.dataFiltro = undefined;
+
+    res.data.map(async (cli) => {
+      cli.nombre = GLOBAL.Capitalice(cli.nombre);
+      cli.apellido = GLOBAL.Capitalice(cli.apellido);
+
+      const documento = await cli.documentos_de_identidad.find((doc) => doc.principal === true);
+      cli.documento_identidad = documento ? documento.documento : '----------';
+      return cli;
+    });
+
+    if (res.data.length > 0) this.dataFiltro = res.data;
+    if (res.data.length === 0) this.dataFiltro = copyData;
+
+    const obj = { total: res.total_registros, tabla: 'filtroCliente' };
+    this.tServ.Func_total_paginas(obj);
+  }
+  devolverCLick(dataARetornar) {
+    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    modal.closeModal(this.modal.component_id);
+    modal.getDataModal({ data: dataARetornar, modal_id: this.modal.component_id });
+  }
+}

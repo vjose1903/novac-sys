@@ -5,14 +5,15 @@ import { Subscription } from 'rxjs';
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
+import { ModalI } from '../../new_modal/modal-class';
 
 @Component({
   selector: 'app-modal-seleccinar-articulo',
   templateUrl: './modal-seleccinar-articulo.component.html',
   styleUrls: ['./modal-seleccinar-articulo.component.scss'],
 })
-export class ModalSeleccinarArticuloComponent extends MixinClass implements OnInit, OnDestroy, OnChanges {
-  @Input() articulos;
+export class ModalSeleccinarArticuloComponent extends MixinClass implements OnInit, OnDestroy, OnChanges, ModalI {
+  // @Input() articulos;
   @Input() returnArticulos;
   @Output() getArticulos = new EventEmitter<any>();
 
@@ -32,11 +33,19 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
   constructor() {
     super();
   }
+  modal: any = {};
+  inputs: any;
+  btn_aceptar() {
+    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    modal.closeModal(this.modal.component_id);
+    modal.getDataModal({ data: this.articulos_selected, modal_id: this.modal.component_id });
+  }
 
   ngOnInit() {
-    this.articulos = GLOBAL.duplicarJson(this.articulos);
+    this.inputs = GLOBAL.duplicarJson(this.inputs);
+    console.log('INPUTS DATA: ', this.inputs);
 
-    this.articulos.map(async (arti) => {
+    this.inputs.map(async (arti) => {
       arti.customStyles = {
         'td-descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
         'td-cantidad': { width: '9%' },

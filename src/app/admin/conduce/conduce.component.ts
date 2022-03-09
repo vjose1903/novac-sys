@@ -8,6 +8,9 @@ import { ArticuloC } from '../registros/articulos/articulo';
 import { ConduceC } from '../conduce/coduce';
 import { FacturaC } from '../facturacion/factura';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import { BuscarArticuloComponent } from '../components/formularios en modales/buscar-articulo/buscar-articulo.component';
+import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { ModalSeleccinarArticuloComponent } from '../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 
 @Component({
   selector: 'app-conduce',
@@ -145,6 +148,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
         //
       } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
         // mirar aqui el res
+        console.log('Viendo los datos: ', res);
         this.ajustarSecuencia();
         this.llenarConduce(res.data.body).then((res) => {
           this.checkFacturasAdelantadasSelection();
@@ -209,6 +213,30 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     });
   }
 
+  async getDataFromModal(arg, search) {
+    if (arg.modal_id === 'buscarArticulo') {
+      console.log('llenarRowDespuesDeFiltro', arg);
+      this.llenarRowDespuesDeFiltro(arg);
+      setTimeout(() => this.enfocarInput('can-' + arg.index), 10);
+    }
+    if (arg.modal_id === 'buscarCliente') {
+      console.log('DESPUES DE BUSCAR CLIENTE: ', arg);
+
+      this.cliente = arg.data;
+      console.log('CLIENTE DATA: ', this.cliente);
+      (document.getElementById('clienteI') as any).value = arg.data.nombre;
+      setTimeout(() => this.enfocarInput('cod-0'), 10);
+      this.buscarFacturasAdelantadas(arg.data.id);
+    }
+    if (arg.modal_id === 'seleccionar_articulos_adelantados') {
+      console.log('seleccionar_articulos_adelantados===> ', arg);
+      this.ajustarSecuencia();
+      this.llenarConduce(arg.data).then((res) => {
+        this.checkFacturasAdelantadasSelection();
+      });
+    }
+  }
+
   async saltar(input, index) {
     const fila_actual = this.filasDetalle[index].getRawValue();
     const fila_siguiente = this.filasDetalle[index + 1].getRawValue();
@@ -220,7 +248,19 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     if (input == 'can-' && this.fun.hasValue(cod)) {
       if (this.fun.isEmpty(articulo) || cod !== articulo.codigo) {
         const obj = { filtrarArticulo: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
-        this.abrirModal('buscarArticulo', obj);
+
+        this.handleModalForm({
+          component: BuscarArticuloComponent,
+          inputs: obj,
+          id: 'buscarArticulo',
+          header: 'BUSCAR ARTICULO',
+          width: '56.25rem',
+          height: '31.25rem',
+          botones: {
+            aceptar: { show: false, disable: false },
+            cancelar: { show: false, disable: false },
+          },
+        });
       } else {
         this.enfocarInput(`can-${index}`);
       }
@@ -326,9 +366,22 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   async abrirModalFiltro(nombre) {
     if (this.fun.hasValue(nombre)) {
-      const obj = { data: [], filtrarCliente: nombre };
+      const obj = { data: [], palabra_a_buscar: nombre, metodo: 'venta' };
+
+      this.handleModalForm({
+        component: BuscarClienteSuplidorComponent,
+        inputs: obj,
+        id: 'buscarCliente',
+        header: 'Buscar cliente',
+        width: '900px',
+        height: '500px',
+        botones: {
+          aceptar: { show: false, disable: false },
+          cancelar: { show: false, disable: false },
+        },
+      });
+
       this.desEnfocarInput('clienteI');
-      this.abrirModal('buscarCliente', obj);
     }
   }
 
@@ -492,7 +545,15 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
     this.indexRemove = i;
 
-    this.abrirModal('removerArticulo', obj);
+    this.confirmationModal({
+      id: 'removerArticulo',
+      header: 'Confirmar',
+      texto: `Seguro que desea remover el articulo <b class="negrita">${name}</b>`,
+      siFunction: (instance) => {
+        this.procesoQuitarArticulo();
+        instance.closeModal(instance.id, 'removerArticulo');
+      },
+    });
 
     if (e) e.stopPropagation();
   }
@@ -507,22 +568,30 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   async buscarFacturasAdelantadas(id) {
     try {
-      this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, fact_de: 'venta' }).then((res) => {
-        this.facturas_adelantadas = res['data'];
-        this.facturas_adelantadas.map((factura) => {
-          factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
-          factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
-          factura.customStyles = { 'td-detalles_selected': { width: '2rem' } };
+      this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, fact_de: 'venta' }).then(
+        (res) => {
+          console.log('RESPUESTA facturaClass: ', res);
+          this.facturas_adelantadas = res['data'];
+          this.facturas_adelantadas.map((factura) => {
+            factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
+            factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
+            factura.customStyles = { 'td-detalles_selected': { width: '2rem' } };
 
-          for (let i = 0; i < factura.detalle_facturas.length; i++) {
-            const detalle = factura.detalle_facturas[i];
-            detalle.select = false;
-          }
-          return factura;
-        });
-        this.checkFacturasAdelantadasSelection();
-      });
-    } catch (error) {}
+            for (let i = 0; i < factura.detalle_facturas.length; i++) {
+              const detalle = factura.detalle_facturas[i];
+              detalle.select = false;
+            }
+            return factura;
+          });
+          this.checkFacturasAdelantadasSelection();
+        },
+        (error) => {
+          console.log('ERROR BUSCANDO FACTURAS ADELANTADAS: ', error);
+        },
+      );
+    } catch (error) {
+      console.log('ERROR BUSCANDO FACTURAS ADELANTADAS: ', error);
+    }
   }
 
   checkFacturasAdelantadasSelection() {
@@ -573,7 +642,26 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           arti.restante_mostrar = arrayMostrar[1].medida;
 
           conteo++;
-          if (conteo >= factura.detalle_facturas.length) setTimeout(() => this.abrirModal('seleccionar_articulos_adelantados', factura.detalle_facturas), 250);
+          if (conteo >= factura.detalle_facturas.length)
+            setTimeout(() => {
+              // TODO:
+              this.handleModalForm({
+                component: ModalSeleccinarArticuloComponent,
+                inputs: factura.detalle_facturas,
+                id: 'seleccionar_articulos_adelantados',
+                header: 'Confirmar',
+                width: '900px',
+                height: '400px',
+                botones: {
+                  aceptar: { show: false, disable: false },
+                  cancelar: { show: false, disable: false },
+                  dinamico: [
+                    { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
+                    { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: false },
+                  ],
+                },
+              });
+            }, 250);
 
           return arti;
         });
@@ -599,15 +687,29 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     return res;
   }
 
-  abrirModalDinamicText(texto, type) {
-    const obj = { texto_modal: texto };
+  async abrirModalDinamicText(texto, type) {
     let tipo_modal;
+    console.log('CLIENTE 1 ====> ', this.cliente);
+    const idModal = type === 2 ? 'imprimir_conduce' : 'cancelar_conduce';
 
-    if (type === 1) tipo_modal = 'conduce_lleno';
-    else if (type === 2) tipo_modal = 'imprimir_conduce';
-    else tipo_modal = 'cancelar_conduce';
+    const confirmationObj = {
+      id: idModal,
+      texto,
+      header: 'Confirmación',
+      siFunction: async (instance) => {
+        if (type === 2) {
+          this.sendData();
+        } else {
+          this.cancelarConduce(2);
+        }
 
-    this.abrirModal('dinamico_texto', obj, tipo_modal);
+        instance.closeModal(idModal, 'cancelar');
+      },
+      width: '30rem',
+    };
+
+    console.log('CLIENTE 3 ====> ', this.cliente);
+    this.confirmationModal(confirmationObj);
   }
 
   llenarConduce(detalles, conteo = 0, firstResolve = null) {
@@ -694,6 +796,30 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     }
   }
 
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.handleModalForm({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+        ${obj.texto}
+      </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+
   getMaxCan(i) {
     const fila_actual = this.filasDetalle[i].getRawValue();
     const detalle_factura_id = fila_actual['detalle_factura_id'];
@@ -733,6 +859,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   async sendData() {
     const cabecera_conduce = {};
+    console.log('Datos de cliente===> ', this.cliente);
     cabecera_conduce['cliente_id'] = this.cliente.id;
     cabecera_conduce['numero_conduce'] = '';
     cabecera_conduce['detalle_conduces'] = this.CuerpoConduce;
@@ -769,6 +896,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   borrar() {
+    console.log('BORRRRRRRAAAAAANNNNNNDOOOOO ====> ');
     this.resetForm();
     this.cliente = undefined;
     this.CuerpoConduce = [];

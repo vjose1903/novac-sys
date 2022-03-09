@@ -77,7 +77,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
       (err: any) => {},
     );
   }
-  async getVehiculos(e) {
+  async getVehiculos(e) { 
     const page = e.page;
     const per_page = e.per_page;
     const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;

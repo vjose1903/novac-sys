@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter, OnDestroy, OnChanges, ElementRef } from '@angular/core';
-import { MdbTableDirective } from 'angular-bootstrap-md';
 
 import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
@@ -13,8 +12,6 @@ import { FunctionService } from '../../../core/services/functions.service';
   styleUrls: ['./tablas.component.scss'],
 })
 export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  @ViewChild(MdbTableDirective) mdbTable: MdbTableDirective;
-  @ViewChild('dinamicTable') dinamicTable: ElementRef;
   cantiTootip: string;
   ready = false;
 
@@ -189,12 +186,11 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   async ngAfterViewInit() {
-    if (this.data && this.mdbTable && this.info) {
+    if (this.data && this.info) {
       this.necesarioStart();
     } else {
       const necesarios = [
         { title: 'DATA', body: this.data },
-        { title: 'MDBTABLE', body: this.mdbTable },
         { title: 'INFO', body: this.info },
       ];
 
@@ -230,16 +226,15 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   getIconClass(column, dato) {
-    let res = ''; 
+    let res = '';
     if (typeof column.key == 'string') res = dato[column.key];
 
     if (typeof column.key == 'object') {
-      
       const source = column.key.source;
       const clase_in_turn = _.find(column.key.clases, (item) => item.value == dato[source]);
       // console.log("clase_in_turn ", clase_in_turn);
       // console.log("  ");
-      
+
       res = clase_in_turn.clase;
     }
     return res;
@@ -248,8 +243,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   async necesarioStart() {
     if (this.focusRow) this.IDROW = this.ROW + _.toString(this.NUM);
 
-    await this.setDATATABLE();
-
     if (this.paraFiltroArticulos) this.searchText = await this.paraFiltroArticulos;
 
     if (this.paraFiltroClientes) this.searchText = await this.paraFiltroClientes;
@@ -257,37 +250,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     // this.changeStylesTitles();
 
     setTimeout(() => (this.ready = true), 250);
-  }
-
-  // ===================================================
-  //  Setear data en las tablas para busqueda
-  // ===================================================
-  llenarArreglos() {
-    for (let i = 0; i < this.data.length; i++) {
-      const element = this.data[i];
-      this.elements.push(element);
-      this.previous.push(element);
-    }
-  }
-
-  setearDataEnLaTabla() {
-    if (this.elements) {
-      this.mdbTable.setDataSource(this.elements);
-    }
-  }
-
-  actualizarArreglos() {
-    this.elements = this.mdbTable.getDataSource();
-    this.previous = this.mdbTable.getDataSource();
-  }
-
-  async setDATATABLE() {
-    this.elements = [];
-    this.previous = [];
-
-    await this.llenarArreglos();
-    await this.setearDataEnLaTabla();
-    await this.actualizarArreglos();
   }
 
   ngOnDestroy() {
@@ -644,20 +606,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
 
     // ------------------------------------------------------------------------------
-    const prev = await this.mdbTable.getDataSource();
 
-    if (!this.searchText) {
-      this.mdbTable.setDataSource(this.previous);
-      this.data = this.mdbTable.getDataSource();
-    }
-
-    if (this.searchText) {
-      this.data = this.mdbTable.searchLocalDataBy(this.searchText);
-      this.mdbTable.setDataSource(prev);
-    }
-    setTimeout(() => {
-      this.IDROW = temp;
-    }, 300);
+    setTimeout(() => (this.IDROW = temp), 300);
   }
 
   clickROW(arg) {

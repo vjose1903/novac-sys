@@ -15,6 +15,9 @@ import { ArticuloC } from '../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from './factura';
 import { NcfC } from '../registros/ncf/ncf';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import { PendienteFormComponent } from '../components/formularios en modales/pendiente-form/pendiente-form.component';
+import { FormCantidadEfectivoComponent } from '../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
+import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 
 @Component({
   selector: 'app-facturacion',
@@ -152,6 +155,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
         this.formarObjArchivo(facturaGuardada).then(() => {
           let abrir_modal = true;
           const is_factura_en_proceso = this.checkIfFacturacionEnProceso();
+
           if (is_factura_en_proceso) {
             // para saber si la factura que estaba en turno era una factura ya archivada
             if (this.objArchivo.archivo_id_en_turno) {
@@ -164,7 +168,16 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
               }
             } else obj.texto_modal = '¿Desea archivar la factura que esta en proceso?';
 
-            if (abrir_modal) this.abrirModal('dinamico_texto', obj, 'desplegar_factura');
+            if (abrir_modal) {
+              const confirmationObj = {
+                id: 'archivar_factura',
+                texto: obj.texto_modal,
+                header: 'Confirmación',
+                siFunction: (instance) => this.archivarFact(instance),
+                width: '30rem',
+              };
+              this.confirmationModal(confirmationObj);
+            }
           } else {
             this.procesoRelleno(facturaGuardada);
           }
@@ -396,7 +409,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     if (arg.bool) {
       this.formarObjArchivo().then(() => {
         if (this.checkIfFacturacionEnProceso()) {
-          let obj;
+          let obj = { texto_modal: '' };
           let abrirModal = true;
           let archivo_id;
 
@@ -425,7 +438,44 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
   procesoCambio(abrirModal, archivo_id, obj) {
     if (abrirModal) {
       if (this.layServ.factura_guardada) this.layServ.factura_guardada['archivo_id'] = archivo_id;
-      this.abrirModal('dinamico_texto', obj, 'salir_layout');
+
+      let salirFunction = (instance) => {
+        this.agregarFacturaALocalStorage();
+        this.info_cambio['bool'] = true;
+
+        this.layServ.nextDecisionCambioMenu(this.info_cambio);
+        this.fun.logRed('salir_layout --> ');
+        this.closeModal(instance);
+
+        this.layServ.nextFacturaGuardada(undefined);
+      };
+
+      const confirmationObj = {
+        id: 'salir_layout',
+        texto: obj.texto_modal,
+        header: 'Confirmación',
+        siFunction: (instance) => salirFunction(instance),
+        width: '30rem',
+      };
+
+      this.confirmationModal(confirmationObj);
+
+      // this.handleModalForm({
+      //   id: 'desplegar_factura',
+      //   header: 'Confirmación',
+      //   width: '30rem',
+      //   html: `<p>
+      //   ${obj.texto_modal}
+      // </p>`,
+      //   botones: {
+      //     aceptar: { show: false, disable: false },
+      //     cancelar: { show: false, disable: false },
+      //     dinamico: [
+      //       { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+      //       { clase: 'btn btn-verde', function: (instance) => this.archivarFact(instance), label: 'SI', disable: false },
+      //     ],
+      //   },
+      // });
     } else {
       this.info_cambio['bool'] = true;
       this.info_cambio['verificar'] = true;
@@ -433,34 +483,20 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     }
   }
 
-  decisionModal(res) {
-    if (this.fun.hasValue(res)) this.luegoDecision(res);
+  // decisionModal(res) {
+  //   if (this.fun.hasValue(res)) this.luegoDecision(res);
 
-    if (this.fun.hasValue(res) && res.bool) {
-      this.fechaFactura['front'] = this.formarFechaFactura(res.Date)['FechaFactura'];
-      this.fechaFactura['back'] = this.fechaFactura['front'];
-      this.FechaFacturaMostrar = this.formarFechaFactura(res.Date)['FechaFacturaMostrar'];
-      this.FacturaAtrasada = true;
-      this.cuerpo.getSaco();
-    }
-  }
+  //   if (this.fun.hasValue(res) && res.bool) {
+  //     this.fechaFactura['front'] = this.formarFechaFactura(res.Date)['FechaFactura'];
+  //     this.fechaFactura['back'] = this.fechaFactura['front'];
+  //     this.FechaFacturaMostrar = this.formarFechaFactura(res.Date)['FechaFacturaMostrar'];
+  //     this.FacturaAtrasada = true;
+  //     this.cuerpo.getSaco();
+  //   }
+  // }
 
   objDevueltoResponse(res) {
-    if (res && res.tipo_modal === 'buscarCliente') {
-      this.propietario_factura = res.data;
-
-      this.form.patchValue(this.propietario_factura);
-      this.enfocarInput('cod-0');
-      const balance = _.parseInt(this.propietario_factura.balance);
-      const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
-
-      if (balance > maxCred - 1000 && balance < maxCred) {
-        this.fun.toastWarning(`Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
-      } else if (balance > maxCred) {
-        this.fun.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
-      }
-      //
-    } else if (res && res.tipo_modal === 'buscarSuplidor') {
+    if (res && res.tipo_modal === 'buscarSuplidor') {
       this.propietario_factura = res.data;
       this.form.patchValue(this.propietario_factura);
       this.enfocarInput('cod-0');
@@ -676,6 +712,8 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
     if (campo === 'filtro') {
       if (this.validarRayaAbajo()) {
+        console.log('ENTOOO');
+
         this.abrirModalFiltro();
         this.desEnfocarInput(salioDe);
       } else this.fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
@@ -692,22 +730,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
       this.propietario_factura = this.form.value;
     } else {
       this.fun.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
-    }
-  }
-
-  setCaretPosition(ctrl, pos) {
-    // Modern browsers
-    if (ctrl.setSelectionRange) {
-      ctrl.focus();
-      ctrl.setSelectionRange(pos, pos);
-
-      // IE8 and below
-    } else if (ctrl.createTextRange) {
-      const range = ctrl.createTextRange();
-      range.collapse(true);
-      range.moveEnd('character', pos);
-      range.moveStart('character', pos);
-      range.select();
     }
   }
 
@@ -728,15 +750,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     return res;
   }
 
-  trimEndNcf() {
-    const input = document.getElementById('ncf') as any;
-    const valor = input.value;
-
-    this.setCaretPosition(input, input.value.length - 8);
-    valor.substring(0, 3);
-    input.value = valor;
-  }
-
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES & SUPLIDORES
   // =============================================
@@ -752,14 +765,68 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
       obj['filtrarSuplidor'] = null;
     }
 
-    this.abrirModal(tipo, obj);
+    this.handleModalForm({
+      component: BuscarClienteSuplidorComponent,
+      inputs: { metodo: this.metodo, palabra_a_buscar: null },
+      id: 'buscarCliente',
+      header: this.metodo === 'venta' ? 'BUSCAR CLIENTE' : 'BUSCAR SUPLIDOR',
+      width: '56.25rem',
+      height: '31.25rem',
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+      },
+    });
   }
 
   // =============================================
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    this.abrirModal('cancelar', null);
+    let si = (instance) => {
+      if (this.action !== 'update') this.resetVariables();
+      if (this.action === 'update') this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`).then(() => this.resetVariables());
+      this.closeModal(instance);
+    };
+
+    let obj = {
+      id: 'cancelar_factura',
+      header: 'Confirmación',
+      texto: 'Seguro que desea cancelar la factura',
+      siFunction: si,
+    };
+
+    this.confirmationModal(obj);
+  }
+
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.handleModalForm({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+        ${obj.texto}
+      </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+
+  closeModal(modalInstance) {
+    console.warn('modalInstance: ', modalInstance);
+
+    modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 
   // =============================================
@@ -779,7 +846,17 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
           this.fun.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
           if (this.condicion_fact === 'Crédito' || this.is_viaje) {
-            this.abrirModal('imprimir', null);
+            const confirmationObj = {
+              id: 'imprimir_factura',
+              texto: 'Seguro que desea imprimir la factura',
+              header: 'Confirmación',
+              siFunction: (instance) => {
+                this.enviarABaseDatos();
+                this.closeModal(instance);
+              },
+              width: '30rem',
+            };
+            this.confirmationModal(confirmationObj);
           } else {
             let articulos_a_cambiar = false;
 
@@ -798,51 +875,68 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
               cambios_articulos: articulos_a_cambiar,
             };
 
-            this.abrirModal('cambio', obj);
+            // TODO:
+            this.handleModalForm({
+              component: FormCantidadEfectivoComponent,
+              inputs: obj,
+              id: 'cambioEfectivo',
+              header: 'Cantidad de efectivo',
+              width: '34.375rem',
+              botones: {
+                aceptar: { show: false, disable: false },
+                cancelar: { show: false, disable: false },
+                dinamico: [
+                  { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+                ],
+              },
+            });
           }
         }
       }
     }
   }
 
-  luegoDecision(arg) {
-    if (arg) {
-      if (this.tipoModal === 'imprimir') {
-        this.enviarABaseDatos();
-      } else if (this.tipoModal === 'cancelar') {
-        if (this.action !== 'update') this.resetVariables();
-        if (this.action === 'update') this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`).then(() => this.resetVariables());
-      }
-    }
+  // luegoDecision(arg) {
+  //   if (arg) {
+  //     if (this.tipoModal === 'imprimir') {
+  //       this.enviarABaseDatos();
+  //     } else if (this.tipoModal === 'cancelar') {
+  //       if (this.action !== 'update') this.resetVariables();
+  //       if (this.action === 'update') this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`).then(() => this.resetVariables());
+  //     }
+  //   }
 
-    if (this.tipoModal === 'salir_layout') {
-      if (arg) this.agregarFacturaALocalStorage();
+  //   if (this.tipoModal === 'salir_layout') {
+  //     if (arg) this.agregarFacturaALocalStorage();
 
-      this.info_cambio['bool'] = true;
+  //     this.info_cambio['bool'] = true;
 
-      this.layServ.nextDecisionCambioMenu(this.info_cambio);
-      this.fun.logRed('salir_layout --> ');
+  //     this.layServ.nextDecisionCambioMenu(this.info_cambio);
+  //     this.fun.logRed('salir_layout --> ');
 
-      this.layServ.nextFacturaGuardada(undefined);
-    } else if (this.tipoModal === 'desplegar_factura') {
-      if (arg) this.agregarFacturaALocalStorage();
+  //     this.layServ.nextFacturaGuardada(undefined);
+  //   } else if (this.tipoModal === 'desplegar_factura') {
+  //     if (arg) this.agregarFacturaALocalStorage();
 
-      setTimeout(() => {
-        this.procesoRelleno(this.objArchivo.factura_para_rellenar);
-        // asignando el archivo_id de la factura que se va a rellenar como el que estara en turno
-        this.objArchivo.archivo_id_en_turno = this.objArchivo.archivo_id_para_rellenar;
-      }, 250);
-    } else if (this.tipoModal === 'archivar_factura') {
-      if (arg) {
-        this.agregarFacturaALocalStorage();
-        setTimeout(() => {
-          modalClass.aquienResponder = 'layout';
-          this.layServ.nextRefresh(true);
-          this.resetVariables();
-        }, 250);
-      }
-    }
-  }
+  //     setTimeout(() => {
+  //       this.procesoRelleno(this.objArchivo.factura_para_rellenar);
+  //       // asignando el archivo_id de la factura que se va a rellenar como el que estara en turno
+  //       this.objArchivo.archivo_id_en_turno = this.objArchivo.archivo_id_para_rellenar;
+  //     }, 250);
+  //   } else if (this.tipoModal === 'archivar_factura') {
+  //     if (arg) {
+  //       console.error('arg=====> ', arg);
+
+  //       this.agregarFacturaALocalStorage();
+  //       setTimeout(() => {
+  //         modalClass.aquienResponder = 'layout';
+  //         this.layServ.nextRefresh(true);
+  //         this.resetVariables();
+  //       }, 250);
+  //     }
+  //   }
+  // }
 
   formarFacturaAGuardar() {
     const factura_a_guardar = this.formarData();
@@ -853,6 +947,8 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
   agregarFacturaALocalStorage() {
     if (!this.propietario_factura) this.propietario_factura = this.form.value;
+
+    console.log('===this.objArchivo=== ', this.objArchivo);
 
     let facturas_localStorage = GLOBAL.duplicarJson(this.objArchivo.facturas_localStorage);
     const factura_a_guardar = GLOBAL.duplicarJson(this.objArchivo.factura_en_turno);
@@ -872,6 +968,15 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     this.fun.setFacturasGuardadas(facturas_localStorage);
   }
 
+  archivarFact(modalInstance) {
+    this.agregarFacturaALocalStorage();
+    setTimeout(() => {
+      modalClass.aquienResponder = 'layout';
+      this.layServ.nextRefresh(true);
+      this.resetVariables();
+      this.closeModal(modalInstance);
+    }, 250);
+  }
   archivarFactura() {
     this.formarObjArchivo().then(() => {
       if (this.checkIfFacturacionEnProceso()) {
@@ -883,7 +988,14 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
           texto_modal: this.fun.hasValue(is_guardada) ? 'Esta factura ya esta archivada ¿desea sobreescribirla?' : '¿Seguro que desea archivar esta factura para continuarla luego?',
         };
 
-        this.abrirModal('dinamico_texto', obj, 'archivar_factura');
+        const confirmationObj = {
+          id: 'archivar_factura',
+          texto: obj.texto_modal,
+          header: 'Confirmación',
+          siFunction: (instance) => this.archivarFact(instance),
+          width: '30rem',
+        };
+        this.confirmationModal(confirmationObj);
       } else {
         this.fun.toastWarning('Debe de iniciar una factura para archivarla', 'AVISO');
       }
@@ -1039,7 +1151,50 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
   }
 
   ingresarFecha() {
-    this.abrirModal('pendiente', null);
+    this.handleModalForm({
+      component: PendienteFormComponent,
+      id: 'facturaPendiente',
+      header: 'Factura pendiente',
+      width: '34.375rem',
+    });
+  }
+
+  async getDataFromModal(arg, search) {
+    console.log('getDataFromModal arg: ', arg);
+    if (arg.modal_id === 'facturaPendiente') {
+      this.fechaFactura['front'] = this.formarFechaFactura(arg.fecha)['FechaFactura'];
+      this.fechaFactura['back'] = this.fechaFactura['front'];
+      this.FechaFacturaMostrar = this.formarFechaFactura(arg.fecha)['FechaFacturaMostrar'];
+      this.FacturaAtrasada = true;
+      this.cuerpo.getSaco();
+    } else if (arg.modal_id == 'cambioEfectivo') {
+      this.fun.logGreen('AQUIIIIII');
+      this.Devuelta = arg.obj.devuelta;
+      this.forma_pago = arg.obj.forma_pago;
+
+      if (this.metodo === 'compra') {
+        if (arg.obj.decision_cambio) {
+          await this.cambiarCostos();
+        }
+        this.CuerpoFactura = this.newCuerpo;
+        this.enviarABaseDatos();
+      } else {
+        this.enviarABaseDatos();
+      }
+    } else if (arg.modal_id == 'buscarCliente') {
+      this.propietario_factura = arg.data;
+
+      this.form.patchValue(this.propietario_factura);
+      this.enfocarInput('cod-0');
+      const balance = _.parseInt(this.propietario_factura.balance);
+      const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
+
+      if (balance > maxCred - 1000 && balance < maxCred) {
+        this.fun.toastWarning(`Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
+      } else if (balance > maxCred) {
+        this.fun.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
+      }
+    }
   }
 
   calcularNuevosPrecios(cant, precio) {

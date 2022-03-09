@@ -5,22 +5,22 @@
       <div class="card card-padding sombra">
         <form [formGroup]="form">
           <div class="row">
-            <div class="col-12 p-0">
+            <div class="col-12 p-0 mb-3">
               <div class="row">
                 <div class="col-6 p-0 pr-2">
-                  <div class="form-group" [appMsgError]="'cedula'" [form]="form">
+                  <div class="form-groupd-flex" style="flex-wrap: nowrap" [appMsgError]="'cedula'" [form]="form">
                     <label class="control-label">Cedula: <span style="color: red">*</span></label>
-                    <input
-                      id="cedula"
-                      type="text"
-                      [textMask]="{ mask: pattern.cedula }"
-                      class="form-control"
-                      formControlName="cedula"
+                    <p-inputMask
                       (keydown.enter)="saltar('campoNombre')"
-                      placeholder="___-_______-_"
-                      autocomplete="off"
                       (keyup)="checkDocumento('cedula', $event)"
-                    />
+                      mask="999-9999999-9"
+                      tabindex="-1"
+                      styleClass="form-control"
+                      inputId="cedula"
+                      placeholder="___-_______-_"
+                      formControlName="cedula"
+                    ></p-inputMask>
+
                     <span id="msgContainer_cedula"></span>
                   </div>
                 </div>
@@ -72,16 +72,17 @@
             <div class="col-6 p-0 pl-2">
               <div class="form-group" [appMsgError]="'telefono'" [form]="form">
                 <label class="control-label">Telefono: <span style="color: red">*</span></label>
-                <input
+
+                <p-inputMask
                   (keydown.enter)="saltar('campoEmail')"
-                  type="text"
-                  id="campoTelefono"
-                  class="form-control"
-                  [textMask]="{ mask: pattern.phone }"
-                  formControlName="telefono"
+                  mask="(999) 999-9999"
+                  tabindex="-1"
+                  styleClass="form-control"
+                  inputId="campoTelefono"
                   placeholder="(___) ___-____"
-                  autocomplete="off"
-                />
+                  formControlName="telefono"
+                ></p-inputMask>
+
                 <span id="msgContainer_telefono"></span>
               </div>
             </div>
@@ -173,12 +174,12 @@
           </div>
         </form>
         <div class="col-12 p-0 mt-3">
-          <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar('boton html', $event)" >
+          <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar('boton html', $event)">
             {{ 'Borrar' }}
           </button>
-          <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde" >{{ boton }}</button>
+          <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde">{{ boton }}</button>
           <!-- [value]="boton"  -->
-          <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="abrirModal('password', usuarioSelected)">Cambiar contraseña</a>
+          <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="showModal()">Cambiar contraseña</a>
         </div>
       </div>
     </div>

@@ -35,7 +35,7 @@ defineLocale('es', esLocale);
     ToastrModule.forRoot({ preventDuplicates: true }),
     AppRoutingModule,
     AngularModule,
-    MDBBootstrapModule,
+    
     BrowserAnimationsModule,
     NgxBootstrapModule,
     NewModalModule,

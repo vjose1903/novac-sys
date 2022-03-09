@@ -7,12 +7,11 @@ import { NotasCredDebComponent } from './notas-cred-deb/notas-cred-deb.component
 import { AngularModule } from '../../modules/angular.module';
 import { TablasModule } from '../components/tablas/tablas.module';
 import { BtncircularModule } from '../components/btncircular/btncircular.module';
-import { TooltipModule } from 'primeng/tooltip';
-import { SidebarModule } from 'primeng/sidebar';
-import { TabViewModule } from 'primeng/tabview';
+
+import { PrimengModule } from '../../modules/primeng.module';
 
 @NgModule({
   declarations: [NotasCredDebComponent, BuscarFacturaComponent],
-  imports: [CommonModule, ManipularFacturasRoutingModule, AngularModule, TablasModule, BtncircularModule, TooltipModule, SidebarModule, TabViewModule],
+  imports: [CommonModule, ManipularFacturasRoutingModule, AngularModule, TablasModule, BtncircularModule, PrimengModule],
 })
 export class ManipularFacturasModule {}

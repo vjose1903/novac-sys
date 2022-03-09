@@ -1,10 +1,10 @@
 <div #cardTabla id="cardTabla" style="height: 100%; position: relative">
   <app-tablas
-    *ngIf="articulos && info"
+    *ngIf="inputs && info"
     [padre]="cardTabla"
     [info]="info"
     [search]="false"
-    [data]="articulos"
+    [data]="inputs"
     (getInfoChange)="getInfoChange($event)"
     [tablaHover]="false"
     [pad]="false"

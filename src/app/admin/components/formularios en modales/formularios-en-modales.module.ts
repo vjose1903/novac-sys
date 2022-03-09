@@ -18,6 +18,8 @@ import { ModalHistorialPagosComponent } from './modal-historial-pagos/modal-hist
 import { ModalSeleccinarArticuloComponent } from './modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 import { MovimientosFormComponent } from './movimientos-form/movimientos-form.component';
 import { PendienteFormComponent } from './pendiente-form/pendiente-form.component';
+import { BuscarClienteSuplidorComponent } from './buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { BuscarArticuloComponent } from './buscar-articulo/buscar-articulo.component';
 
 const components = [
   FormCantidadEfectivoComponent,
@@ -29,11 +31,13 @@ const components = [
   MovimientosFormComponent,
   PendienteFormComponent,
   ModalSeleccinarArticuloComponent,
+  BuscarClienteSuplidorComponent,
+  BuscarArticuloComponent,
 ];
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, FormsModule, NgSelectModule, TablasModule, MDBBootstrapModule, AngularModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule],
+  imports: [CommonModule, FormsModule, NgSelectModule, TablasModule, AngularModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}

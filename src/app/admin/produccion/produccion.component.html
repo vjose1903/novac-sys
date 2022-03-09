@@ -88,7 +88,9 @@
               <div id="inventario_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
                 <div *ngFor="let ingrediente of ingredientes; let i = index" class="ingredientesList d-flex">
                   <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
+
                   <ng-template #cantiTool><div [innerHtml]="lookOters(ingrediente.existencia)"></div></ng-template>
+                  
 
                   <div class="d-flex justify-content-end" style="width: 100%">
                     <span *ngIf="existenciaConTooltip(ingrediente)" [mdbTooltip]="cantiTool" placement="{{ i != 0 ? 'top' : 'botton' }}" class="cantidadInve">
@@ -98,6 +100,7 @@
                       {{ lookprincipal(ingrediente) }}
                     </span>
                   </div>
+
                 </div>
               </div>
             </div>

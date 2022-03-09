@@ -31,7 +31,7 @@ import { PipesModule } from '../../core/pipe/pipes.module';
     TablasModule,
     UploadImgModule,
     AngularModule,
-    MDBBootstrapModule,
+    
     NgxBootstrapModule,
     DirectivesModule,
     PipesModule,

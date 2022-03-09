@@ -5,7 +5,7 @@
       <form [formGroup]="form">
         <div class="row">
           <div class="col-6 p-0">
-            <app-upload-img (getPhotoData)="getPhotoData($event)"></app-upload-img>
+            <app-upload-img (getPhotoData)="getPhotoData($event)" [id]="'img'"></app-upload-img>
           </div>
           <div class="col-6 p-0">
             <div class="row">
@@ -19,24 +19,23 @@
                 </div>
 
                 <div *ngIf="doc_is_cedula" class="form-group" [appMsgError]="'cedula'" [form]="form">
-                  <div class="input-group">
-                    <input
-                      id="cedula"
-                      type="text"
-                      [textMask]="{ mask: cedulaMask }"
-                      class="form-control"
-                      formControlName="cedula"
-                      placeholder="___-_______-_"
-                      (keyup)="checkDocumento('cedula', $event)"
+                  <div class="input-group d-flex" style="flex-wrap: nowrap">
+                    <p-inputMask
                       (keydown.enter)="saltar('campoNombre')"
-                      autocomplete="off"
-                    />
+                      (keyup)="checkDocumento('cedula', $event)"
+                      mask="999-9999999-9"
+                      tabindex="-1"
+                      styleClass="form-control with-right-btn"
+                      inputId="cedula"
+                      placeholder="___-_______-_"
+                      formControlName="cedula"
+                    ></p-inputMask>
 
                     <div
                       (click)="setDocumentoPrincipal('cedula')"
                       class="input-group-append"
-                      mdbTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}"
-                      placement="right"
+                      pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}"
+                      tooltipPosition="right"
                     >
                       <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                     </div>
@@ -45,19 +44,19 @@
                 </div>
 
                 <div *ngIf="!doc_is_cedula" class="form-group" [appMsgError]="'rnc'" [form]="form">
-                  <div class="input-group">
-                    <input
-                      type="text"
-                      class="form-control"
-                      [textMask]="{ mask: rncMask }"
-                      formControlName="rnc"
-                      placeholder="___-_____-_"
-                      autocomplete="off"
-                      (keyup)="checkDocumento('rnc', $event)"
+                  <div class="input-group d-flex" style="flex-wrap: nowrap">
+                    <p-inputMask
                       (keydown.enter)="saltar('campoNombre')"
-                    />
+                      (keyup)="checkDocumento('rnc', $event)"
+                      mask="999-99999-9"
+                      tabindex="-1"
+                      styleClass="form-control with-right-btn"
+                      inputId="rnc"
+                      placeholder="___-_____-_"
+                      formControlName="rnc"
+                    ></p-inputMask>
 
-                    <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" mdbTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" placement="right">
+                    <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                       <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                     </div>
                   </div>
@@ -103,16 +102,17 @@
           <div class="col-6 p-0 pr-2 mt-4">
             <div class="form-group" [appMsgError]="'telefono'" [form]="form">
               <label class="control-label">Telefono: <span style="color: red">*</span></label>
-              <input
-                id="campoTelefono"
-                type="text"
-                class="form-control"
+
+              <p-inputMask
                 (keydown.enter)="saltar('campoSexo')"
-                [textMask]="{ mask: phoneMask }"
-                formControlName="telefono"
+                mask="(999) 999-9999"
+                tabindex="-1"
+                styleClass="form-control"
+                inputId="campoTelefono"
                 placeholder="(___) ___-____"
-                autocomplete="off"
-              />
+                formControlName="telefono"
+              ></p-inputMask>
+
               <span id="msgContainer_telefono"></span>
             </div>
           </div>

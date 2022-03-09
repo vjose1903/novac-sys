@@ -1,0 +1,16 @@
+<div #cardTabla id="cardTabla" style="height: 100%">
+  <app-tablas
+    *ngIf="dataFiltro"
+    [focusRow]="true"
+    [metodo]="metodo"
+    [paraFiltroArticulos]="paraFiltroArticulos"
+    (clickRow)="devolverCLick($event)"
+    [info]="info"
+    [pad]="false"
+    [id_tabla]="'filtroArticulos'"
+    [padre]="cardTabla"
+    [data]="dataFiltro"
+    [search]="false"
+    (paginateChange)="buscarArticulos($event)"
+  ></app-tablas>
+</div>

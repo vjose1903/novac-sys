@@ -14,7 +14,7 @@
         <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
       </select>
 
-      <i class="fas fa-print btn-circle-icon" (click)="makeReporte()" style="transform: translate(33rem, -0.4rem)" mdbTooltip="Reporte de inventario" placement="right"></i>
+      <i class="fas fa-print btn-circle-icon" (click)="makeReporte()" style="transform: translate(33rem, -0.4rem)" pTooltip="Reporte de inventario" tooltipPosition="right"></i>
     </div>
     <div style="height: 100%">
       <app-tablas

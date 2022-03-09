@@ -16,7 +16,7 @@
               id="campoI"
               [(ngModel)]="campo"
               class="form-control inputE"
-              (keydown.enter)="saltar('campoTipoFact', $event.target.value)"
+              (keydown.enter)="saltar(campo == '2' ? 'valorI' : 'campoTipoFact', $event.target.value)"
               (change)="changeSelect($event.target.value)"
               value=""
               [ngClass]="{ disabled: existenComprobantes }"
@@ -56,17 +56,18 @@
               </ng-container>
 
               <ng-container *ngIf="campo === '2'">
-                <input
-                  type="text"
-                  [textMask]="{ mask: ncfMask }"
-                  placeholder="b__________"
-                  class="form-control inputE UPPERCASE"
+                <p-inputMask
                   (keydown.enter)="saltar('buscarFactura', $event.target.value)"
-                  (focus)="$event.target.select()"
-                  id="valorI"
+                  mask="B9999999999"
+                  tabindex="-1"
+                  styleClass="form-control inputE UPPERCASE"
+                  inputId="valorI"
+                  placeholder="B__________"
+                  (onFocus)="$event.target.select()"
                   [disabled]="existenComprobantes || tipo_factura_id == null"
-                />
+                ></p-inputMask>
               </ng-container>
+
               <ng-container *ngIf="campo === '3'">
                 <input
                   type="number"

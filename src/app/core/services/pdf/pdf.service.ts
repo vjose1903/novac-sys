@@ -82,6 +82,8 @@ export class PdfService {
           resolve(respuesta);
         }
       } catch (error) {
+        console.log('error ', error);
+
         const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de pdf.', status: 'no', body: error });
 
         this.fun.toastError('ERROR en el switch de tipos de pdf.', 'ERROR');

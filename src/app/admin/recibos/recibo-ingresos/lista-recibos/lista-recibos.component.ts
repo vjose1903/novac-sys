@@ -8,6 +8,7 @@ import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../../electron/shared-electron-angular';
+import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
 
 @Component({
   selector: 'app-lista-recibos',
@@ -175,13 +176,49 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         break;
 
       case 'anular':
-        const obj = { texto_modal: `Seguro de que desea anular el recibo #${arg.row.numero_recibo}` };
-        this.abrirModal('dinamico_texto', obj, 'anular');
+        const obj = {
+          texto_modal: `Seguro de que desea anular el recibo #${arg.row.numero_recibo}`,
+          siFunction: (instance) => {
+            this.anularRecibo(this.rowSelected.id);
+            instance.closeModal(instance.id, 'anular_recibo');
+          },
+        };
+
+        this.confirmationModal({
+          id: 'anular_recibo',
+          header: '',
+          texto: obj.texto_modal,
+          siFunction: obj.siFunction,
+        });
         break;
 
       default:
         break;
     }
+  }
+
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.handleModalForm({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+        ${obj.texto}
+      </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
   }
 
   getReciboBase64(arg) {
@@ -202,7 +239,31 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
           const obj_pdf = { pdfSrc: res.body, titulo: 'Revisión de recibo de ingreso', height: '25rem', reimprimir: true, fileName: res.file.split('.')[0] };
 
           this.loadServ.isLoading.next(false);
-          this.abrirModal('visor_pdf', obj_pdf);
+
+          this.handleModalForm({
+            component: PdfViewerComponent,
+            inputs: obj_pdf,
+            id: 'revision_recibo',
+            header: obj_pdf.titulo,
+            width: '900px',
+            height: obj_pdf.height,
+            botones: {
+              aceptar: { show: false, disable: false },
+              cancelar: { show: false, disable: false },
+              dinamico: [
+                { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+                {
+                  clase: 'btn btn-verde',
+                  function: (instance) => {
+                    this.imprimir_base64();
+                    instance.closeModal(instance.id, 'cancel');
+                  },
+                  label: 'Imprimir',
+                  disable: false,
+                },
+              ],
+            },
+          });
         }
 
         console.log('res ', res);

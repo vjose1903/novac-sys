@@ -33,7 +33,7 @@ export class NewModalComponent implements OnInit {
     closableEsc: false,
     transitionOptions: '0ms',
     contentStyleClass: '0ms',
-    botones: { aceptar: { show: true, diable: false }, cancelar: { show: true, diable: false } },
+    botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
     getDataModal: (arg?) => {},
 
     closeModal: (id, accion) => {
@@ -43,8 +43,13 @@ export class NewModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.subConfig = MODALCONFIG.subscribe((res) => {
+      console.log('MODALCONFIG.subscribe: ', res);
+
       if (res && res.show) {
         this.renderizarComponente(res);
+        setTimeout(() => {
+          console.warn('BOTONES: ', this.modalsConfig);
+        }, 500);
       } else {
         this.resetConfig(res.id, res.accion);
       }
@@ -134,7 +139,13 @@ export class NewModalComponent implements OnInit {
 
   dynamicFunction(configuration, btn) {
     const modal = _.find(this.modalsConfig, (config) => config.id === configuration.id);
-    modal['instance'][btn['function']]();
+    console.log('Prueba: ', _.has(modal.botones.dinamico, 'function_in_other_component'));
+    console.log('Prueba modal.botones: ', modal.botones);
+    console.log('btns: ', btn);
+    
+    
+    if (_.has(btn, 'function_in_other_component')) modal['instance'][btn['function_in_other_component']]();
+    else btn['function'](modal);
   }
 
   hasValue(arg) {
@@ -143,7 +154,7 @@ export class NewModalComponent implements OnInit {
 
   hasAnyBtn(configuration) {
     const modal = _.find(this.modalsConfig, (config) => config.id === configuration.id);
-    const botones_show = modal?.botones?.aceptar?.show || modal?.botones?.cancelar?.show;
+    const botones_show = modal?.botones?.aceptar?.show || modal?.botones?.cancelar?.show || modal?.botones?.dinamico;
     return botones_show;
   }
 }

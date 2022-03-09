@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { GLOBAL } from '../core/typescript/GLOBAL';
+import { GLOBAL, MODIFIED_CONFIG_FILE } from '../core/typescript/GLOBAL';
 import { IpcService } from '../core/services/ipc.service';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
 import * as _ from 'lodash';
@@ -22,7 +22,7 @@ import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
 import { SingletonService } from '../core/services/singleton.service';
-import { KEYWORD_ELECTRON_PRINT_BASE64, KEYWORD_ELECTRON_TEST } from '../../../electron/shared-electron-angular';
+import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, KEYWORD_ELECTRON_PRINT_BASE64, KEYWORD_ELECTRON_TEST } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
 
 @Component({
@@ -52,6 +52,8 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       this.versionApp = config.app_version;
     });
+
+
   }
 
   abrirModalReporte(obj) {
@@ -63,14 +65,14 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   ngOnDestroy() {}
 
   test() {
-    console.log('----- probandoEncriptar -----');
+    console.log('----- test -----');
 
-    const task = new MessageTask(KEYWORD_ELECTRON_TEST);
+    const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE);
 
     this._ipc
       .sendTask(task)
-      .then((res: string) => console.log('res ', res))
-      .catch((err) => console.log(err));
+      .then((res: string) => MODIFIED_CONFIG_FILE.next(res))
+      .catch((err) => console.error(err));
   }
 
   quitarFocoElectron() {

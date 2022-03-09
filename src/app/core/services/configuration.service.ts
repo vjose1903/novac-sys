@@ -17,6 +17,7 @@ export interface ConfigurationI {
   providedIn: 'root',
 })
 export class ConfigurationService {
+
   constructor() {}
 
   private config: ConfigurationI;

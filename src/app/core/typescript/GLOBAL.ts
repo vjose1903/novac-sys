@@ -1,6 +1,8 @@
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import * as _ from 'lodash';
+import { SingletonService } from '../services/singleton.service';
 
+export const MODIFIED_CONFIG_FILE = new BehaviorSubject<any>(null);
 export const ELECTRON_EVENTS_OBSERVER = new BehaviorSubject<any>(null);
 
 export function applyMixins(derivedCtor: any, constructors: any[]) {
@@ -92,6 +94,7 @@ export class GLOBAL {
   // =========================================================================================================
 
   static Capitalice(str) {
+    if (SingletonService.fun.isEmpty(str)) return;
     const ultimosCaractes = str.length + 1;
     return _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes);
   }

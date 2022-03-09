@@ -1,1 +1,200 @@
-<p>configuraciones works!</p>
+<div class="contenGrid">
+  <div class="navBar d-flex align-items-center">
+    <h4 class="negrita ml-3 mb-0">Configuraciones del sistema para: {{ config?.nombre_empresa }}</h4>
+  </div>
+  <div class="body">
+    <div class="row">
+      <div class="col-12 p-0 mt-4">
+        <form *ngIf="config" [formGroup]="form">
+          <div class="row">
+            <div class="col-12 mb-2">
+              <div>
+                <label class="control-label">Nombre de la empresa: </label>
+                <input
+                  id="campoNombre"
+                  (keyup)="capitalice('nombre_empresa', $event.target.value)"
+                  (keydown.enter)="saltar('campoApellido')"
+                  type="text"
+                  formControlName="nombre_empresa"
+                  placeholder="Introduzca nombre de la empresa"
+                  class="form-control"
+                  autocomplete="off"
+                  autofocus
+                />
+                <span id="msgContainer_nombre_empresa"></span>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <label class="control-label">Logo de la empresa: </label>
+              <app-upload-img [src_img]="logo_empresa" (getPhotoData)="getPhotoData($event)" [id]="'logo_empresa'"></app-upload-img>
+            </div>
+
+            <div class="col-6">
+              <label class="control-label">Logo de la empresa ( para impresión ): </label>
+              <app-upload-img [src_img]="logo_impresion" (getPhotoData)="getPhotoData($event)" [id]="'logo_impresion'"></app-upload-img>
+            </div>
+
+            <div class="col-6 mb-2">
+              <div>
+                <label class="control-label">Rnc: </label>
+                <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="rnc_empresa" mask="999-99999-9"></p-inputMask>
+                <span id="msgContainer_rnc_empresa"></span>
+              </div>
+            </div>
+
+            <div class="col-6 mb-2">
+              <div>
+                <label class="control-label">Telefono: </label>
+                <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="telefono_empresa" mask="(999)-999-9999"></p-inputMask>
+                <span id="msgContainer_telefono_empresa"></span>
+              </div>
+            </div>
+
+            <div class="col-8 mb-2">
+              <div>
+                <label class="control-label">Direccion: </label>
+                <input
+                  id="campoNombre"
+                  (keyup)="capitalice('direccion_empresa', $event.target.value)"
+                  (keydown.enter)="saltar('campoApellido')"
+                  type="text"
+                  formControlName="direccion_empresa"
+                  placeholder="Introduzca nombre de la empresa"
+                  class="form-control"
+                  autocomplete="off"
+                  autofocus
+                />
+                <span id="msgContainer_direccion_empresa"></span>
+              </div>
+            </div>
+
+            <div class="col-4 mb-2">
+              <div>
+                <label class="control-label">Color aplicacion: </label>
+                <p-dropdown [options]="colores" formControlName="color_app" placeholder="Seleccione un color">
+                  <ng-template pTemplate="selectedItem">
+                    <div class="country-item country-item-value d-flex align-items-center" *ngIf="form.controls['color_app'].value">
+                      <div class="colorsito mr-2" [style.background-color]="form.controls['color_app'].value.color"></div>
+                      <div>{{ form.controls['color_app'].value.label }}</div>
+                    </div>
+                  </ng-template>
+                  <ng-template let-colorItem pTemplate="item">
+                    <div class="colorItem-item d-flex align-items-center">
+                      <div class="colorsito mr-2" [style.background-color]="colorItem.color"></div>
+                      <div>{{ colorItem.label }}</div>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+                <span id="msgContainer_color_app"></span>
+              </div>
+            </div>
+
+            <div class="col-6 mb-2">
+              <div>
+                <label class="control-label">Impresora facturación seleccionada: </label>
+                <p-dropdown [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
+                  <ng-template pTemplate="selectedItem">
+                    <div class="country-item country-item-value d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value.displayName">
+                      <div>{{ form.controls['printer_caja_selected'].value.displayName }}</div>
+                    </div>
+                  </ng-template>
+                  <ng-template let-printerItem pTemplate="item">
+                    <div class="printerItem-item d-flex align-items-center">
+                      <div>{{ printerItem.displayName }}</div>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+                <span id="msgContainer_color_app"></span>
+              </div>
+            </div>
+
+            <div class="col-6 mb-2">
+              <div>
+                <label class="control-label">Impresora reportes seleccionada: </label>
+                <p-dropdown [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
+                  <ng-template pTemplate="selectedItem">
+                    <div class="country-item country-item-value d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value.displayName">
+                      <div>{{ form.controls['printer_reportes_selected'].value.displayName }}</div>
+                    </div>
+                  </ng-template>
+                  <ng-template let-printerItem pTemplate="item">
+                    <div class="printerItem-item d-flex align-items-center">
+                      <div>{{ printerItem.displayName }}</div>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+                <span id="msgContainer_color_app"></span>
+              </div>
+            </div>
+
+            <div class="col-12 mb-2 mt-4">
+              <div class="form-group switchDiv">
+                <input formControlName="usa_url_principal" class="apple-switch" type="checkbox" />
+                <span class="ml-2">Usa url principal</span>
+              </div>
+            </div>
+
+            <div class="col-4 mb-2">
+              <div>
+                <label class="control-label">Url Servidor: </label>
+                <input
+                  id="campoNombre"
+                  (keydown.enter)="saltar('campoApellido')"
+                  type="text"
+                  formControlName="url_servidor"
+                  placeholder="Introduzca url del servidor"
+                  class="form-control"
+                  autocomplete="off"
+                  autofocus
+                />
+                <span id="msgContainer_url_servidor"></span>
+              </div>
+            </div>
+            <div class="col-4 mb-2">
+              <div>
+                <label class="control-label">Url Servidor Respaldo: </label>
+                <input
+                  id="campoNombre"
+                  (keydown.enter)="saltar('campoApellido')"
+                  type="text"
+                  formControlName="url_servidor_respaldo"
+                  placeholder="Introduzca url del servidor de respaldo"
+                  class="form-control"
+                  autocomplete="off"
+                  autofocus
+                />
+                <span id="msgContainer_url_servidor_respaldo"></span>
+              </div>
+            </div>
+            <div class="col-4 mb-2">
+              <div>
+                <label class="control-label">Url Servidor Descargas: </label>
+                <input
+                  id="campoNombre"
+                  (keydown.enter)="saltar('campoApellido')"
+                  type="text"
+                  formControlName="url_servidor_descargas"
+                  placeholder="Introduzca url servidor de descargas"
+                  class="form-control"
+                  autocomplete="off"
+                  autofocus
+                />
+                <span id="msgContainer_url_servidor_descargas"></span>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-12" style="position: absolute; bottom: 1rem">
+        <div class="d-flex justify-content-end align-items-center">
+          <a class="btn mr-2" id="btn-blanco" (click)="salir()">Salir</a>
+
+          <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="Guardar" id="btn-verde" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer pr-2 d-flex justify-content-end align-items-center" style="color: white">VjPOS {{ config?.app_version }} - @2020 Desarrollador: Victor J. Vasquez</div>
+</div>

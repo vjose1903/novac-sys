@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
-import { ELECTRON_EVENTS_OBSERVER, GLOBAL } from './core/typescript/GLOBAL';
+import { ELECTRON_EVENTS_OBSERVER, GLOBAL, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
 import { FunctionService } from './core/services/functions.service';
 import { SingletonService } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
@@ -10,6 +10,8 @@ import { LayoutService } from './admin/layout/layout.service';
 import { ConfigurationI, ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
 import { MessageTask } from './core/models/message-task';
+
+import * as _ from 'lodash';
 import {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
   ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS,
@@ -38,6 +40,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
   counter = 0;
   sub: Subscription;
+  subModified: Subscription;
 
   constructor(
     public _ipc: IpcService,
@@ -64,6 +67,10 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     SingletonService.layServ = this.layServ;
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
+
+    this.subModified = MODIFIED_CONFIG_FILE.subscribe((res) => {
+      if (this.fun.hasValue(res)) this.getAppConfig();
+    });
 
     this.sub = ELECTRON_EVENTS_OBSERVER.subscribe((res) => {
       console.log('===== res ', res);
@@ -124,15 +131,21 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   }
 
   async getAppConfig() {
+    console.log('==== getAppConfig ====');
+
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
     this._ipc
       .sendTask(task)
       .then((config: ConfigurationI) => {
-        console.log('config ', config);
+        if (_.has(config, 'err')) {
+          console.error(config);
+        } else {
+          console.log('config ', config);
 
-        this.themeService.setTheme(config.color_app);
-        this.configServ.setConfig = config;
-        this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+          this.themeService.setTheme(config.color_app);
+          this.configServ.setConfig = config;
+          this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+        }
       })
       .catch((err) => {
         console.error(err);

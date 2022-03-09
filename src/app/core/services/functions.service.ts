@@ -44,6 +44,15 @@ export class FunctionService {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: duplicarJson
+  // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
+  // _________________________________________________________________________________________________
+
+  duplicarJson(json: Object | Array<any>) {
+    return _.cloneDeep(json);
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: checkNumbers
   // Descripcion : Esta funcion retorna true si algun caracter de una cadena no es un numero
   // _________________________________________________________________________________________________
@@ -152,6 +161,35 @@ export class FunctionService {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: multiAssing
+  // Descripcion : Esta funcion hace un multiAsignamiento en onjetos a partir de otro objeto
+  // __________________________________________________________________________________________________
+  multiAssing(obj: Object, sources: Array<{ key: string; value: any }>) {
+    for (let index = 0; index < sources.length; index++) {
+      const element = sources[index];
+      obj[element.key] = element.value;
+    }
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: isEmpty
+  // Descripcion : Esta funcion valida que si una variable esta vacia
+  // __________________________________________________________________________________________________
+
+  isEmpty(value) {
+    return (
+      // es null o indefinido
+      value == null ||
+      // si tiene longitud 0
+      (value.hasOwnProperty('length') && value.length === 0) ||
+      // si es un string vacio o con lleno de espacios
+      (typeof value === 'string' && value.trim().length === 0) ||
+      // si es un objeto y no tiene propiedades
+      (value.constructor === Object && Object.keys(value).length === 0)
+    );
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: hasValue
   // Descripcion : Esta funcion valida que si una variable tiene valor
   // __________________________________________________________________________________________________
@@ -193,23 +231,6 @@ export class FunctionService {
       return false;
     }
     return true;
-  }
-  // __________________________________________________________________________________________________
-  // Nombre: isEmpty
-  // Descripcion : Esta funcion valida que si una variable esta vacia
-  // __________________________________________________________________________________________________
-
-  isEmpty(value) {
-    return (
-      // es null o indefinido
-      value == null ||
-      // si tiene longitud 0
-      (value.hasOwnProperty('length') && value.length === 0) ||
-      // si es un string vacio o con lleno de espacios
-      (typeof value === 'string' && value.trim().length === 0) ||
-      // si es un objeto y no tiene propiedades
-      (value.constructor === Object && Object.keys(value).length === 0)
-    );
   }
 
   getAuthToken() {

@@ -63,7 +63,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.dpConfig = Object.assign(
       {},
       {
-
         showWeekNumbers: false,
         dateInputFormat: 'DD/MM/YYYY',
         // maxDate: new Date(),
@@ -314,8 +313,52 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   localAbrirModal(arg?) {
-    arg.ARG.nombre = 'comprobante para ' + arg.ARG.tipoC_ + ' numero: ' + arg.ARG.codigo;
-    this.abrirModal('borrar', arg.ARG);
+    const comprobanteData = arg.ARG;
+    comprobanteData.nombre = 'comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo;
+    const objConfirmationModal = {
+      id: 'eliminar_comprobante',
+      header: 'Confirmar',
+      texto: `Desea eliminar comprobante para ${comprobanteData.tipoC_} numero: ${comprobanteData.codigo}`,
+      width: '510px',
+      siFunction: (instance) => {
+        this.ncfClass.deleteOne(comprobanteData.id).then(
+          () => {
+            this.fun.toastSuccess('comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo + ' borrado', 'CORRECTO');
+            const actualPagination = this.tServ.getPaginationById('lista_ncf');
+            this.getPaquetesNCF(actualPagination);
+            instance.closeModal(instance.id, 'eliminar_comprobante');
+          },
+          (err) => {
+            this.mostrarErrores(err.error);
+          },
+        );
+      },
+    };
+    this.confirmationModal(objConfirmationModal);
+  }
+
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.handleModalForm({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+        ${obj.texto}
+      </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
   }
 
   decisionModal(arg) {

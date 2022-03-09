@@ -15,6 +15,6 @@ import { PrimengModule } from '../../modules/primeng.module';
 
 @NgModule({
   declarations: [IngresosComponent, ListaRecibosComponent, ReciboViajesComponent],
-  imports: [CommonModule, RecibosRoutingModule, AngularModule, MDBBootstrapModule, PrimengModule, TablasModule],
+  imports: [CommonModule, RecibosRoutingModule, AngularModule, PrimengModule, TablasModule],
 })
 export class RecibosModule {}

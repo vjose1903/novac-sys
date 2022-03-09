@@ -25,21 +25,10 @@ import { TabViewModule } from 'primeng/tabview';
 import { ReportesComponent } from '../reportes/reportes.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.module';
 
 @NgModule({
-  declarations: [
-    LayoutComponent,
-    HomeAdminComponent,
-    FacturacionComponent,
-    InventarioComponent,
-    CuerpoFacturaComponent,
-
-    ValidateRayaAbajo,
-    ProduccionComponent,
-
-    ConduceComponent,
-    ReportesComponent,
-  ],
+  declarations: [LayoutComponent, HomeAdminComponent, FacturacionComponent, InventarioComponent, CuerpoFacturaComponent, ValidateRayaAbajo, ProduccionComponent, ConduceComponent, ReportesComponent],
   imports: [
     CommonModule,
     LayoutRoutingModule,
@@ -57,6 +46,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
     MDBBootstrapModule.forRoot(),
     NgbModule,
     DirectivesModule,
+    PdfViewerModule,
   ],
 })
 export class LayoutModule {}

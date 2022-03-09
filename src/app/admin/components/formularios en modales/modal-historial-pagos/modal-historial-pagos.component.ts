@@ -1,13 +1,14 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as _ from 'lodash';
+import { ModalI } from '../../new_modal/modal-class';
 import { TablasService } from '../../tablas/tablas.service';
 @Component({
   selector: 'app-modal-historial-pagos',
   templateUrl: './modal-historial-pagos.component.html',
   styleUrls: ['./modal-historial-pagos.component.scss'],
 })
-export class ModalHistorialPagosComponent implements OnInit {
-  @Input() detalles;
+export class ModalHistorialPagosComponent implements OnInit, ModalI {
+  // @Input() detalles;
   activeIndex = 0;
 
   info_pagos = [
@@ -23,6 +24,11 @@ export class ModalHistorialPagosComponent implements OnInit {
   ];
 
   constructor(private tServ: TablasService) {}
+  modal: any = {};
+  inputs: any;
+  btn_aceptar() {
+    throw new Error('Method not implemented.');
+  }
 
   ngOnInit() {
     this.activeIndex = this.arrayHasData('abonos').cant > 0 ? 0 : 1;
@@ -48,6 +54,6 @@ export class ModalHistorialPagosComponent implements OnInit {
   }
 
   arrayHasData(tipo) {
-    return { disable: this.detalles[tipo].length === 0, cant: this.detalles[tipo].length };
+    return { disable: this.inputs[tipo].length === 0, cant: this.inputs[tipo].length };
   }
 }

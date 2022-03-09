@@ -1,11 +1,11 @@
-<table #tituloFactTable="mdbTable" mdbTable class="table m-auto" [small]="true">
+<table class="table m-auto">
   <thead>
     <tr class="text-center">
       <th class="tiCOD">Codigo</th>
       <th class="tiCAN">Cantidad</th>
       <th class="tiUNI"><span class="ml-3">Unidad</span></th>
       <th class="tiDES">Descripcion</th>
-      <th mdbTooltip="Descuento en %" placement="top" class="tiDESC">Descuento</th>
+      <th pTooltip="Descuento en %" tooltipPosition="top" class="tiDESC">Descuento</th>
       <th class="tiPRE">{{ metodo === 'venta' ? 'Precio' : 'Costo' }}</th>
       <th class="tiTOT">Total</th>
     </tr>
@@ -20,7 +20,7 @@
 
       <td class="DES td0padding"></td>
 
-      <td mdbTooltip="Descuento en %" placement="top" class="DESC td0padding"></td>
+      <td pTooltip="Descuento en %" tooltipPosition="top" class="DESC td0padding"></td>
 
       <td class="PRE td0padding"></td>
 
@@ -54,7 +54,7 @@
           </ng-template>
         </p-overlayPanel>
 
-        <table #cuerpoFactTable="mdbTable" mdbTable class="table m-auto" [small]="true">
+        <table class="table m-auto">
           <tbody>
             <tr>
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->

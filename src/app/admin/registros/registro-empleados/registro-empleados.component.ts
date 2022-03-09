@@ -9,6 +9,7 @@ import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { EmpleadoC } from './empleado';
+import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -150,9 +151,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
               if (this.fun.hasValue(is_user) && is_user.persona.estado) {
                 this.fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR');
-                this.changeStateCampos(false);
-                // this.camposDisabled = false;
-
+                const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
+                this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
+                if (!this.editando) enable_campos = false;
                 return;
               }
 
@@ -300,6 +301,15 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
         this.enfocarInput('cedula');
       });
     }
+  }
+  showModal() {
+    this.handleModalForm({
+      component: ChangePasswordComponent,
+      id: 'changePassword',
+      inputs: this.usuarioSelected,
+      header: 'Cambiar contraseña',
+      width: '30rem',
+    });
   }
 
   decisionModal(arg) {

@@ -335,7 +335,17 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    this.abrirModal('cancelar', null);
+    const confirmationObj = {
+      id: 'archivar_factura',
+      texto: 'Seguro que desea cancelar la factura',
+      header: 'Confirmación',
+      siFunction: (instance) => {
+        this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
+        this.closeModal(instance);
+      },
+      width: '30rem',
+    };
+    this.confirmationModal(confirmationObj);
   }
   // =============================================
   //  MODAL IMPRIMIR
@@ -348,7 +358,18 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         this.fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
       } else {
         const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota, tipo__: 'no_devuelta' };
-        this.abrirModal('imprimir', obj);
+
+        const confirmationObj = {
+          id: 'imprimir_factura',
+          texto: 'Seguro que desea imprimir la factura',
+          header: 'Confirmación',
+          siFunction: (instance) => {
+            this.formarNota(null);
+            this.closeModal(instance);
+          },
+          width: '30rem',
+        };
+        this.confirmationModal(confirmationObj);
       }
     }
   }
@@ -403,6 +424,36 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       }
     }
     return temp;
+  }
+
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.handleModalForm({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+      ${obj.texto}
+    </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+
+  closeModal(modalInstance) {
+    console.warn('modalInstance: ', modalInstance);
+
+    modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 
   async formarNota(dataFact: FacturasI) {

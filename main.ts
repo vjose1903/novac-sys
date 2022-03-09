@@ -2,6 +2,7 @@ import { app, BrowserWindow, screen, ipcMain, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
+const logos = require('./logos.json');
 
 const request = require('request');
 const { exec } = require('child_process');
@@ -13,6 +14,7 @@ import Functions from './electron/functions.js';
 import HandlerConfigFile from './electron/handler-config-file';
 
 import {
+  KEYWORD_ELECTRON_CHANGE_CONFIG_FILE,
   KEYWORD_ELECTRON_EVENT_DECRYPT,
   KEYWORD_ELECTRON_EVENT_ENCRYPT,
   KEYWORD_ELECTRON_GET_APP_CONFIG,
@@ -24,9 +26,11 @@ import {
   MessageTaskInterface,
 } from './electron/shared-electron-angular.js';
 import AppUpdater from './electron/auto-update.js';
+import ReplaceInFile from './electron/replace-in-file.js';
 
 let win: BrowserWindow = null;
 let auto_updater: AppUpdater = null;
+let replace_in_file: ReplaceInFile = null;
 
 const args = process.argv.slice(1);
 const serve = args.some((val) => val === '--serve');
@@ -174,11 +178,15 @@ async function beforeCreateWindow(win_) {
   verificarSumastra();
   borrarLogs();
 
-  HandlerConfigFile.checkConfigFile();
+  HandlerConfigFile.checkConfigFile(win);
 
   // ----- Manejar las actualizaciones -----
   auto_updater = new AppUpdater();
   auto_updater.handleUpdateEvents(win);
+  // ---------------------------------------
+
+  // -------- remplazar en archivos --------
+  replace_in_file = new ReplaceInFile();
   // ---------------------------------------
 
   win.setMenuBarVisibility(false);
@@ -197,22 +205,22 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
 
     switch (arg.eventName) {
       case KEYWORD_ELECTRON_TEST:
-        console.log('AQUIIIII');
+        // test function
+        break;
+      //
+      case KEYWORD_ELECTRON_CHANGE_CONFIG_FILE:
+        const obj = JSON.parse(arg.data);
 
-        const FileName = pathAdd('/factura.pdf');
-
-        const options = { silent: true, deviceName: 'HP_Color_LaserJet_Prro_M479' };
-        win.webContents.print(options, (success, errorType) => {
-          console.log('success ', success);
-          console.log('errorType ', errorType);
-          if (success) {
-            arg.response = success;
+        replace_in_file
+          .replaceFunction(obj)
+          .then((res) => {
+            arg.response = res;
             event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-          } else {
-            arg.response = errorType;
+          })
+          .catch((err) => {
+            arg.response = err;
             event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-          }
-        });
+          });
 
         break;
       //
@@ -249,19 +257,15 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
         break;
       //
       case KEYWORD_ELECTRON_GET_APP_CONFIG:
-        const args_ = process.argv.slice(1);
-        const serve_ = args_.some((val) => val === '--serve');
-        const pjson = require('./package.json');
-
-        Functions.getConfigFile().then((config: any) => {
-          arg.response = JSON.parse(config);
-
-          arg.response['is_development'] = serve_;
-          arg.response['printersList'] = win.webContents.getPrinters();
-          arg.response['app_version'] = pjson.version;
-
-          event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-        });
+        getConfigFile()
+          .then((config) => {
+            arg.response = config;
+            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+          })
+          .catch((err) => {
+            arg.response = err;
+            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+          });
         break;
       //
       case KEYWORD_ELECTRON_SET_APP_CONFIG:
@@ -277,6 +281,27 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
     }
   } catch (error) {}
 }
+
+function getConfigFile() {
+  return new Promise((resolve, reject) => {
+    const args_ = process.argv.slice(1);
+    const serve_ = args_.some((val) => val === '--serve');
+    const pjson = require('./package.json');
+
+    Functions.getConfigFile()
+      .then((config: any) => {
+        var config = JSON.parse(config);
+
+        config['is_development'] = serve_;
+        config['printersList'] = win.webContents.getPrinters();
+        config['app_version'] = pjson.version;
+
+        resolve(config);
+      })
+      .catch((err) => reject({ err: err, msg: 'Error buscando el archivo de configuracion' }));
+  });
+}
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // BORRA EL ARCHIVO DE LOGS
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

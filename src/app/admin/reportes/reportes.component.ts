@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { ReporteC } from './reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../electron/shared-electron-angular';
+import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 
 @Component({
   selector: 'app-reportes',
@@ -144,7 +145,12 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
         this.loadServ.isLoading.next(true);
         const obj = { data: res, type: 'reporte' };
 
-        this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => this.parseDataToVisorPdf(res));
+        this.pdfServ
+          .generatePdf({ oPdf: obj, imprimir: false })
+          .then(async (res) => this.parseDataToVisorPdf(res))
+          .catch(async (err) => {
+            this.loadServ.isLoading.next(false);
+          });
       });
     } else {
       this.fun.toastError(msg_error, 'ERROR');
@@ -240,10 +246,47 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   abrirVisorPdf(obj) {
-    this.abrirModal('visor_pdf', obj);
+    console.log('abrirVisorPdf: ', obj);
+
+    this.handleModalForm({
+      component: PdfViewerComponent,
+      inputs: obj,
+      id: 'revision_recibo',
+      header: obj.titulo,
+      width: '900px',
+      height: obj.height,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => {
+              this.imprimirPDF(obj, instance);
+            },
+            label: 'Imprimir',
+            disable: false,
+          },
+        ],
+      },
+    });
     this.loadServ.isLoading.next(false);
   }
 
+  imprimirPDF(obj_pdf, modalInstance?) {
+    const obj = { base64: obj_pdf.pdfSrc, filename: `${obj_pdf.fileName}.pdf`, type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte', scale: this.scaleImpresion };
+
+    this.pdfServ
+      .imprimirBase64(obj)
+      .then((res) => {
+        if (res.status === 'si') {
+          this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+          if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
+        } else this.fun.toastError(res.msg, 'ERROR');
+      })
+      .catch((err) => this.fun.toastError(err.msg, 'ERROR'));
+  }
   decisionModal(decision) {
     if (decision) {
       if (this.tipoModal === 'visor_pdf') {
