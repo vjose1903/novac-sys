@@ -10,6 +10,7 @@
                 <div class="col-6 p-0 pr-2">
                   <div class="form-groupd-flex" style="flex-wrap: nowrap" [appMsgError]="'cedula'" [form]="form">
                     <label class="control-label">Cedula: <span style="color: red">*</span></label>
+
                     <p-inputMask
                       (keydown.enter)="saltar('campoNombre')"
                       (keyup)="checkDocumento('cedula', $event)"

@@ -161,8 +161,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  initCambioMenu(arg) {
-    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
+  iniciarCambioMenu(arg, callback) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
+    }
   }
 
   noFiltroResponse(res) {

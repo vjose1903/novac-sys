@@ -27,7 +27,7 @@ export class MixinClass extends ModalClass {
     this.arg_mixin = arg;
     const lista_sub = this.arg_mixin ? (this.arg_mixin._lista_subs ? this.arg_mixin._lista_subs : []) : [];
 
-    this._init_layout();
+    this._init_layout(arg.component);
 
     if (lista_sub) {
       this._init_modal(arg, this.layServ);

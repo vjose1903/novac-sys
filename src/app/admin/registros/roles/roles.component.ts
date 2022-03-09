@@ -44,6 +44,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log('~~~~~~ ROLES ~~~~~~');
+
     this._init_mixin({ component: 'reg_roles', _lista_subs: ['decisionModal'] });
     this.necesarioStart();
     this.createForm();
@@ -89,11 +91,11 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     });
   }
 
-  initCambioMenu(arg) {
-    console.log('arg ', arg);
-
+  iniciarCambioMenu(arg, callback) {
+    this.fun.logYellow('iniciarCambioMenu: roles ');
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
     }
   }
 
@@ -107,6 +109,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   decisionModal(arg) {
+    console.log('arg ', arg);
+
     if (arg) {
       const obj = this.fun.duplicarJson(this.seleccionModal);
     }

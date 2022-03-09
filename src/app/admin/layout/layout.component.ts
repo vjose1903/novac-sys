@@ -21,12 +21,11 @@ import { ConfigI } from '../../core/typescript/config-interface';
 })
 export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterContentChecked, AfterViewInit {
   actualMenuItemBack;
-  actualMenyItem;
+  actualMenuItem;
   showLoading;
 
   usuario;
-  printersList: any;
-  OpenPrinterMenu;
+
   imgUser;
   versionApp: any;
   noServer;
@@ -62,8 +61,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       if (routerEvent instanceof NavigationEnd || routerEvent instanceof NavigationCancel || routerEvent instanceof NavigationError) {
         this.showLoading = false;
 
+        console.log('this.initNavigate ', this.initNavigate);
+
         if (this.initNavigate) {
           setTimeout(() => this.checkRouteActiva(), 250);
+
           setTimeout(() => {
             const token = this.fun.getAuthToken();
             if (token) this.checkCuadre();
@@ -76,6 +78,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngOnInit() {
+    console.log('======== INICIO EL LAYOUT COMPONENT ======== ');
     this.initVariables();
     this._init_mixin({ component: 'layout', _lista_subs: ['decisionModal', 'refreshFacturas', 'sacarFacturas'] });
 
@@ -104,6 +107,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     }
 
     this.subDeciMenu = this.layServ.DESICIONCAMBIOMENU.subscribe((res) => {
+      SingletonService.fun.logBlue('DESICIONCAMBIOMENU ', res);
+
       if (res && (res.bool === false || res.bool === true)) {
         if (res.bool && res.verificar) {
           this.ready = false;
@@ -124,13 +129,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
     this.configServ.getConfig().then((config: ConfigI) => {
       this.versionApp = config.app_version;
-      this.printersList = config.printersList;
     });
   }
 
   initVariables() {
     this.showLoading = true;
-    this.OpenPrinterMenu = false;
     this.imgUser = 'assets/img/transparente.png';
     this.noServer = false;
     this._opened = false;
@@ -184,25 +187,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngAfterViewInit() {
+    console.log('path:  ', document.location.pathname);
+
     this.ready = true;
     this.cdRef.detectChanges();
   }
 
   ngAfterContentChecked() {
     this.cdRef.detectChanges();
-  }
-
-  stop(e) {
-    this.OpenPrinterMenu = true;
-    e.stopPropagation();
-  }
-
-  selectPrinter(name) {
-    this.OpenPrinterMenu = false;
-  }
-
-  closePrinterMenu() {
-    this.OpenPrinterMenu = false;
   }
 
   getNombreFacturaGuardada(fact: any) {
@@ -231,6 +223,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
     this.fun.setFacturasGuardadas(allFacturas);
     this.layServ.nextFacturaGuardada(undefined);
+
     if (params && params.quien_llamo !== 'layout') {
       modalClass.aquienResponder = 'cabeza_factura';
       this.layServ.nextSacar({ quien_llamo: 'layout', body: this.layServ.factura_guardada });
@@ -255,7 +248,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       const url = document.location.pathname.split('/')[3];
 
       if (this.fun.hasValue(arg) && !pathname.includes(arg)) {
-        this.layServ.nextCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
+        // this.layServ.nextCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
         setTimeout(() => resolve(true), 100);
       } else setTimeout(() => resolve(true), 100);
     });
@@ -289,14 +282,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.router.navigateByUrl('/');
   }
 
-  mantenimientoCuenta(reg: String) {
-    if (reg === 'usuario') {
-      this.router.navigate(['/admin/mantCuenta', 'INS']);
-    } else if (reg === 'centro') {
-      this.router.navigate(['/admin/mantCentro', 'INS']);
-    }
-  }
-
   // =================================================================================
   // CHECK ROUTE ACTIVA
   // =================================================================================
@@ -306,9 +291,9 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     if (temp_url[1]) {
       const url = temp_url[1].split('/')[0];
       const tipo = temp_url[1].split('/')[1];
-      this.actualMenyItem = url;
+      this.actualMenuItem = url;
 
-      this.actualMenuItemBack = this.fun.duplicarJson(this.actualMenyItem);
+      this.actualMenuItemBack = this.fun.duplicarJson(this.actualMenuItem);
 
       if (url === 'factura') {
         this.activeIndex = tipo === 'venta' ? 0 : 1;
@@ -368,26 +353,46 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
   // NAVEGAR
   // =================================================================================
-  nextCambioMenu(subMenu, url, lleva_modulo?) {
+  cambiarMenu(subMenu, url, lleva_modulo?) {
+    // console.log('  ');
+    // console.log('subMenu ', subMenu);
+    // console.log('url ', url);
+    // console.log('lleva_modulo ', lleva_modulo);
+
     if (!subMenu && !lleva_modulo) this.modulo_select = undefined;
     if (subMenu) this.modulo_select = url;
     let ruta_a_cambiar = '';
     if (!subMenu) ruta_a_cambiar = this.modulo_select ? `/admin/${this.modulo_select}/${url}` : `/admin/${url}`;
 
-    this.actualMenyItem = subMenu ? `${this.modulo_select}_select` : `${this.modulo_select}`;
+    // console.log('ruta_a_cambiar ', ruta_a_cambiar);
+    // console.log('this.modulo_select ', this.modulo_select);
+
+    this.actualMenuItem = subMenu ? `${this.modulo_select}_select` : `${this.modulo_select}`;
+    // console.log('this.actualMenuItem ', this.actualMenuItem);
 
     if (!subMenu) {
       this.ready = false;
-      this.layServ.nextCambioMenu({ bool: true, ruta: ruta_a_cambiar });
+      this.fun.logRed('MANDANDO SIGUIENTE CAMBIO');
+      // console.log(' ');
+      this.runRouterNavigate({ bool: true, ruta: ruta_a_cambiar });
+      // this.layServ.nextCambioMenu({ bool: true, ruta: ruta_a_cambiar });
     }
   }
 
   decisionCambioMenu_(decision) {
+    // console.log("'MMG'");
+
+    // console.log('decision ', decision);
+
     if (decision.bool) {
+      console.log(' ');
+      console.log('decision.ruta ', decision.ruta);
+      console.log(' ');
+
       this.router.navigateByUrl(decision.ruta);
-      this.layServ.nextDecisionCambioMenu(undefined);
-      this.layServ.nextCambioMenu(undefined);
-      setTimeout(() => (this.ready = true), 20);
+      // this.layServ.nextDecisionCambioMenu(undefined);
+      // this.layServ.nextCambioMenu(undefined);
+      setTimeout(() => (this.ready = true), 1);
     } else {
       this.ready = true;
     }

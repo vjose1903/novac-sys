@@ -53,8 +53,11 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     this.getProductosTerminados();
   }
 
-  initCambioMenu(arg) {
-    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
+  iniciarCambioMenu(arg, callback) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
+    }
   }
 
   ngOnDestroy() {

@@ -58,6 +58,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   ) {}
 
   ngOnInit(): void {
+    console.log('======== INICIO EL APP COMPONENT ======== ');
     SingletonService.fun = this.fun;
     SingletonService.zone = this.zone;
     SingletonService.http = this.http;

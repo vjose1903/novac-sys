@@ -171,6 +171,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     const arrayTamanos = [filterHeight, paginationHeight, titulosHeigth, this.quitarAScorll];
 
+    console.log("arrayTamanos ", arrayTamanos);
+
+
     setTimeout(() => {
       let restar = 0;
       for (let i = 0; i < arrayTamanos.length; i++) {

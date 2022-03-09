@@ -81,8 +81,11 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.necesarioStart();
   }
 
-  initCambioMenu(arg) {
-    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
+  iniciarCambioMenu(arg, callback) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
+    }
   }
 
   ngOnDestroy() {

@@ -98,9 +98,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     }
   }
 
-  initCambioMenu(arg) {
+  iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
     }
   }
 
@@ -120,7 +121,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   marcarCheck(arg) {
     const radio = document.getElementById('identificacion-' + arg) as HTMLElement;
-    (radio as any).checked = true;
+    if (radio) (radio as any).checked = true;
   }
 
   getVendedores() {

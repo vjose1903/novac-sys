@@ -30,9 +30,12 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     this._init_mixin({ component: 'reportes', _lista_subs: ['decisionModal', 'objDevuelto'] });
   }
 
-  initCambioMenu(arg) {
+  iniciarCambioMenu(arg, callback) {
+    console.log('arg ', arg);
+
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
     }
   }
 
@@ -43,7 +46,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
         this.makePdf(res.data);
       }
     } else if (res && res.tipo_modal !== 'buscarCliente') this.makePdf(res.data);
-
   }
 
   ngOnDestroy() {
@@ -54,9 +56,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
 
   async makeCuadre(data?) {
     try {
-      let extra = { afterPath: 'custom', parameters: {} };
-
-      extra['parameters'] = { fecha: this.fun.my_dateFormater(data.fecha, false) };
+      let extra = { parameters: { fecha: this.fun.my_dateFormater(data.fecha, false) } };
 
       new CuadreCajaC().createOne({}, extra).then((res) => {
         const obj = { data: res.data, type: 'cuadre_caja' };

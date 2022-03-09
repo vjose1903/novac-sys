@@ -73,9 +73,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
   }
 
-  initCambioMenu(arg) {
+  iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
     }
   }
 
@@ -193,7 +194,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
           resolve(true);
         });
-
       });
     });
   }

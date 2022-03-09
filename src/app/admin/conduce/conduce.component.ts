@@ -57,6 +57,8 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   ngOnInit() {
+    console.log(' ================== INICIO ==================');
+
     this._init_mixin({
       component: 'conduce',
       _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'],
@@ -80,8 +82,11 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     this.enfocarInput('clienteI');
   }
 
-  initCambioMenu(arg) {
-    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
+  iniciarCambioMenu(arg, callback) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
+    }
   }
 
   ngOnDestroy() {

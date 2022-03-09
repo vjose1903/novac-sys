@@ -64,9 +64,10 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     this.necesarioStart();
   }
 
-  initCambioMenu(arg) {
+  iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
     }
   }
 

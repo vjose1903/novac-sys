@@ -53,12 +53,13 @@ export class modalClass extends LayoutClass {
       this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => this.run_subscribe('ARTICULOFILTRADOPORCODIGO', res));
     }
 
+
     if (this._lista.includes('pressEsc')) {
       this.subEsc = this.mServ.PRESSESC.subscribe((res) => this.run_subscribe('PRESSESC', res));
     }
 
     if (this._lista.includes('refreshFacturas')) {
-      this.subRefresh = layServ.REFRESHFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
+      this.subRefresh = layServ.REFRESFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
     }
 
     if (this._lista.includes('noFiltro')) {

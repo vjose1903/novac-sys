@@ -5,50 +5,38 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class LayoutService {
-  private initcambioMenu = new BehaviorSubject<any>(undefined);
-  private desicionCambioMenu = new BehaviorSubject<any>(undefined);
-
-  private facturaGuardada = new BehaviorSubject<any>(undefined);
-
-  private checkCuadreToday = new BehaviorSubject<any>(false);
-  private refresFacturas = new BehaviorSubject<boolean>(false);
-  private sacarFactura = new BehaviorSubject<boolean>(false);
-
-  DESICIONCAMBIOMENU = this.desicionCambioMenu.asObservable();
-  INITCAMBIOMENU = this.initcambioMenu.asObservable();
-
-  FACTURAGUARDADA = this.facturaGuardada.asObservable();
-
-  CHECKCUADRETODAY = this.checkCuadreToday.asObservable();
-  REFRESHFACTURAS = this.refresFacturas.asObservable();
-  SACARFACTURA = this.sacarFactura.asObservable();
+  // INITCAMBIOMENU = new BehaviorSubject<any>(undefined);
+  DESICIONCAMBIOMENU = new BehaviorSubject<any>(undefined);
+  FACTURAGUARDADA = new BehaviorSubject<any>(undefined);
+  CHECKCUADRETODAY = new BehaviorSubject<any>(false);
+  REFRESFACTURAS = new BehaviorSubject<boolean>(false);
+  SACARFACTURA = new BehaviorSubject<boolean>(false);
 
   constructor() {}
 
   public factura_guardada;
 
   nextCheckCuadreToday(nextValue) {
-    this.checkCuadreToday.next(nextValue);
+    this.CHECKCUADRETODAY.next(nextValue);
   }
 
-
   nextSacar(nextValue) {
-    this.sacarFactura.next(nextValue);
+    this.SACARFACTURA.next(nextValue);
   }
 
   nextRefresh(nextValue) {
-    this.refresFacturas.next(nextValue);
+    this.REFRESFACTURAS.next(nextValue);
   }
 
   nextFacturaGuardada(nextValue) {
-    this.facturaGuardada.next(nextValue);
+    this.FACTURAGUARDADA.next(nextValue);
   }
 
-  nextCambioMenu(nextValue) {
-    this.initcambioMenu.next(nextValue);
-  }
+  // nextCambioMenu(nextValue) {
+  //   this.INITCAMBIOMENU.next(nextValue);
+  // }
 
   nextDecisionCambioMenu(nextValue) {
-    this.desicionCambioMenu.next(nextValue);
+    this.DESICIONCAMBIOMENU.next(nextValue);
   }
 }

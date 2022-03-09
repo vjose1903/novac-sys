@@ -67,8 +67,11 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.necesarioStart();
   }
 
-  initCambioMenu(arg) {
-    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
+  iniciarCambioMenu(arg, callback) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
+    }
   }
 
   decisionModal(res: any) {

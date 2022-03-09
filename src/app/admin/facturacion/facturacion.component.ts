@@ -392,7 +392,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     }
   }
 
-  initCambioMenu(arg) {
+  iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
       this.formarObjArchivo().then(() => {
         if (this.checkIfFacturacionEnProceso()) {
@@ -412,17 +412,18 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
             }
           } else obj = { texto_modal: 'Estas a punto de salir del modulo de facturación, ¿desea guardar la factura para continuarla luego?' };
 
-          this.procesoCambio(abrirModal, archivo_id, obj);
+          this.procesoCambio(abrirModal, archivo_id, obj, callback);
         } else {
           this.fun.logYellow('NO HAY NADA EMPEZADO');
           this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta, verificar: true });
           this.layServ.nextFacturaGuardada(undefined);
+          callback({ bool: true });
         }
       });
     }
   }
 
-  procesoCambio(abrirModal, archivo_id, obj) {
+  procesoCambio(abrirModal, archivo_id, obj, callback) {
     if (abrirModal) {
       if (this.layServ.factura_guardada) this.layServ.factura_guardada['archivo_id'] = archivo_id;
       this.abrirModal('dinamico_texto', obj, 'salir_layout');
@@ -430,6 +431,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
       this.info_cambio['bool'] = true;
       this.info_cambio['verificar'] = true;
       this.layServ.nextDecisionCambioMenu(this.info_cambio);
+      callback({ bool: true });
     }
   }
 

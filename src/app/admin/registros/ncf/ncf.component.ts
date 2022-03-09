@@ -88,9 +88,10 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.setDateInputs(new Date());
   }
 
-  initCambioMenu(arg) {
+  iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
     }
   }
 

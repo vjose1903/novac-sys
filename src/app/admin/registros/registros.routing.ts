@@ -1,19 +1,13 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { RegistroArticulosComponent } from './articulos/registro-articulos.component';
-import { NcfComponent } from './ncf/ncf.component';
-import { RegistroClientesComponent } from './registro-clientes/registro-clientes.component';
-import { RegistroEmpleadosComponent } from './registro-empleados/registro-empleados.component';
-import { RegistroSuplidoresComponent } from './registro-suplidores/registro-suplidores.component';
-import { RegistroVehiculoComponent } from './registro-vehiculo/registro-vehiculo.component';
 
 const routes: Routes = [
-  { path: 'clientes', component: RegistroClientesComponent },
-  { path: 'suplidores', component: RegistroSuplidoresComponent },
-  { path: 'ncf', component: NcfComponent },
-  { path: 'articulos', component: RegistroArticulosComponent },
-  { path: 'empleados', component: RegistroEmpleadosComponent },
-  { path: 'camiones', component: RegistroVehiculoComponent },
+  { path: 'clientes', loadChildren: () => import('./registro-clientes/registro-clientes.module').then((m) => m.RegistroClientesModule) },
+  { path: 'suplidores', loadChildren: () => import('./registro-suplidores/registro-suplidores.module').then((m) => m.RegistroSuplidoresModule) },
+  { path: 'ncf', loadChildren: () => import('./ncf/ncf.module').then((m) => m.NcfModule) },
+  { path: 'articulos', loadChildren: () => import('./articulos/registro-articulos.module').then((m) => m.RegistroArticulosModule) },
+  { path: 'empleados', loadChildren: () => import('./registro-empleados/registro-empleados.module').then((m) => m.RegistroEmpleadosModule) },
+  { path: 'camiones', loadChildren: () => import('./registro-vehiculo/registro-vehiculo.module').then((m) => m.RegistroVehiculoModule) },
   { path: 'roles', loadChildren: () => import('./roles/roles.module').then((m) => m.RolesModule) },
 ];
 
@@ -21,5 +15,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-
 export class RegistrosRoutingModule {}

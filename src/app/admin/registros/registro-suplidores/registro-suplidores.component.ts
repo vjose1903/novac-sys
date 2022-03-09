@@ -67,8 +67,11 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.nesesarioStart();
   }
 
-  initCambioMenu(arg) {
-    if (arg.bool) this.layServ.nextDecisionCambioMenu(arg);
+  iniciarCambioMenu(arg, callback) {
+    if (arg.bool) {
+      this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
+    }
   }
 
   ngOnDestroy(): void {
