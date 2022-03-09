@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -14,7 +14,7 @@ import { VehiculoC } from './vehiculo';
   templateUrl: './registro-vehiculo.component.html',
   styleUrls: ['./registro-vehiculo.component.scss'],
 })
-export class RegistroVehiculoComponent extends MixinClass implements OnInit {
+export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnDestroy {
   titulo = '';
   boton = '';
   form: FormGroup;
@@ -43,11 +43,9 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
   empleadosClass = new EmpleadoC();
   modeloClass = new ModeloC();
 
-
   constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService) {
     super();
   }
-
 
   ngOnInit() {
     this._init_mixin({ component: 'reg_vehiculos', _lista_subs: ['decisionModal'] });
@@ -61,9 +59,10 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit {
     this.necesarioStart();
   }
 
-  initCambioMenu(arg) {
+  iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
       this.layServ.nextDecisionCambioMenu(arg);
+      callback({ bool: true });
     }
   }
 
