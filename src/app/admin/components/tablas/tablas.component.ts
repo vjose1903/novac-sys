@@ -152,7 +152,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const titulosDiv = document.getElementById('titulosHeader-' + this.id_tabla);
 
     const array = [filterDiv?.offsetHeight, paginationDiv?.offsetHeight];
-    console.log('array ', array);
+    // console.log('array ', array);
 
     setTimeout(() => {
       let restar = 0;
@@ -162,17 +162,17 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       }
 
       this.tabla_content = this.padre.firstChild;
-      console.log('this.id_tabla ', this.id_tabla);
-      console.log('restar ', restar);
-      console.log('this.tabla_content ', this.tabla_content);
-      console.log('this.tabla_content.offsetHeight ', this.tabla_content.offsetHeight);
+      // console.log('this.id_tabla ', this.id_tabla);
+      // console.log('restar ', restar);
+      // console.log('this.tabla_content ', this.tabla_content);
+      // console.log('this.tabla_content.offsetHeight ', this.tabla_content.offsetHeight);
 
       this.obj_alto = {
         altoTabla: this.tabla_content.offsetHeight - restar,
         altoTbody: this.tabla_content.offsetHeight - restar - (titulosDiv.offsetHeight || 0) - (this.fun.hasValue(paginationDiv) ? 15 : 0), // el -15 es para separar un poco el scroll del paginador
         id: this.id_tabla,
       };
-      console.log('this.obj_alto ', this.obj_alto);
+      // console.log('this.obj_alto ', this.obj_alto);
     }, 100);
   }
 

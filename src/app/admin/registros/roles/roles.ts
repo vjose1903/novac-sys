@@ -10,6 +10,8 @@ export class PermisosC extends CrudG<any> {
     super('permisos');
   }
 }
+
+
 export class AccionesC extends CrudG<any> {
   constructor() {
     super('acciones');

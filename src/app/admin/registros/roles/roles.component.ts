@@ -98,7 +98,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
   createForm() {
     this.form = this.fb.group({
-      id: [{ value: null }],
+      id: [{ value: null, disabled: false }],
       nombre: [{ value: null, disabled: false }, Validators.required],
       descripcion: [{ value: null, disabled: false }, Validators.required],
       activo: [{ value: true, disabled: false }],
@@ -149,7 +149,10 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   formIsInvalid() {
     let res = true;
     if (this.form.valid) {
-      res = false;
+      const all_permiso_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
+      const permiso_acciones_selected = _.map(_.filter(all_permiso_acciones, { selected: true }), 'id');
+
+      res = permiso_acciones_selected.length == 0;
     } else {
       res = true;
     }
@@ -167,11 +170,20 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
   calcularAltoTablaAcciones() {
     this.fun.awaitTyping().then(() => {
-      if (this.fun.hasValue(this.TablasComponent)) {
-        this.TablasComponent.calcularAlto();
-      }
+      if (this.fun.hasValue(this.TablasComponent)) this.TablasComponent.calcularAlto();
     });
   }
 
-  submit() {}
+  submit() {
+    const formulario = this.form.getRawValue();
+
+    const all_permiso_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
+    const permiso_acciones_selected = _.map(_.filter(all_permiso_acciones, { selected: true }), 'id');
+    formulario['permisos_acciones'] = permiso_acciones_selected;
+
+    new RolesC().createUpdateOne(formulario).then((res) => {
+      this.isCreando = false;
+      this.roleSelected = undefined;
+    });
+  }
 }
