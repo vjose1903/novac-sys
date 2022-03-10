@@ -4,8 +4,8 @@
   </div>
 
   <div class="col-12 p-0 colFormularioListado">
-    <div class="d-flex">
-      <div class="form {{ isCreando || roleSelected ? 'showForm' : 'hideForm' }} ">
+    <div class="d-flex h-100">
+      <div *ngIf="isCreando || roleSelected" class="form {{ isCreando || roleSelected ? 'showForm' : 'hideForm' }} ">
         <div class="titulo_card d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
           <h4 class="mb-0">formulario</h4>
         </div>
@@ -48,7 +48,7 @@
               <div class="card-body p-1">
                 <div id="tabla_roles" class="h-100">
                   <div class="row">
-                    <div class="col-5 pl-0 pr-2">
+                    <div class="col-6 pl-0 pr-2">
                       <!-- OPCIONES -->
                       <div class="divPermisos" style="height: 25rem">
                         <ul class="ulPermisos h-100 overflow-auto">
@@ -60,15 +60,17 @@
                       </div>
                     </div>
 
-                    <div class="col-7 p-md-0">
+                    <div class="col-6 p-md-0">
                       <!-- DESCRIPCION PERMISO SELECCIONADO-->
 
-                      <div #tabla_acciones id="tabla_acciones" style="height: 25rem">
+                      <div #tabla_acciones id="cardTabla" class="divAcciones">
                         <app-tablas
+                          class="h-100"
                           *ngIf="permiso_selected?.acciones && infoPermisos"
                           [padre]="tabla_acciones"
                           [search]="false"
                           [paginate]="false"
+                          [(TablasComponent)]="TablasComponent"
                           [info]="infoPermisos"
                           [data]="permiso_selected?.acciones"
                           [id_tabla]="'tabla_acciones'"
@@ -96,15 +98,15 @@
           <button [disabled]="roleSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div class="cardContent">
-          <div #cardTabla id="cardTabla" class="card cardListados">
+          <div #cardTabla id="cardTabla_" class="card cardListados">
             <app-tablas
+              class="h-100"
               *ngIf="listaRoles && info"
               [padre]="cardTabla"
               [info]="info"
               [data]="listaRoles"
               [botones]="botones"
               [id_tabla]="'lista_clientes'"
-              [quitarAScorll]="-20"
               (DevolverInfo)="editarItem($event)"
               (DELETE)="abrirModal('borrar', $event.ARG)"
               [focusRow]="false"

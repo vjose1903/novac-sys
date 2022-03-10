@@ -5,8 +5,6 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class LayoutService {
-  // INITCAMBIOMENU = new BehaviorSubject<any>(undefined);
-  DESICIONCAMBIOMENU = new BehaviorSubject<any>(undefined);
   FACTURAGUARDADA = new BehaviorSubject<any>(undefined);
   CHECKCUADRETODAY = new BehaviorSubject<any>(false);
   REFRESFACTURAS = new BehaviorSubject<boolean>(false);
@@ -30,13 +28,5 @@ export class LayoutService {
 
   nextFacturaGuardada(nextValue) {
     this.FACTURAGUARDADA.next(nextValue);
-  }
-
-  // nextCambioMenu(nextValue) {
-  //   this.INITCAMBIOMENU.next(nextValue);
-  // }
-
-  nextDecisionCambioMenu(nextValue) {
-    this.DESICIONCAMBIOMENU.next(nextValue);
   }
 }

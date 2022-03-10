@@ -134,14 +134,13 @@
   <div class="col-7">
     <h4>Listado Suplidores</h4>
     <div #cardTabla id="cardTabla" class="card cardListados">
-      <app-tablas
+      <app-tablas  class="h-100"
         *ngIf="listaSuplidores && info"
         [padre]="cardTabla"
         [info]="info"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
         (DELETE)="abrirModal('borrar', $event.ARG)"
-        [quitarAScorll]="-20"
         [data]="listaSuplidores"
         [id_tabla]="'listaSuplidores'"
         (paginateChange)="getSuplidores($event)"

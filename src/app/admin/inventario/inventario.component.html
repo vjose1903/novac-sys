@@ -1,4 +1,4 @@
-<div #cardTabla id="cardTabla" class="cardPrincipal sinPadding tamano" style="height: calc(100% - 9vh)">
+<div id="cardTabla" class="cardPrincipal sinPadding tamano" style="height: calc(100% - 9vh)">
   <div class="bordes info justify-content-between">
     <div class="text-center">
       <span style="font-size: 1.2rem"> Cantidad de productos en inventario </span>
@@ -16,8 +16,9 @@
 
       <i class="fas fa-print btn-circle-icon" (click)="makeReporte()" style="transform: translate(33rem, -0.4rem)" mdbTooltip="Reporte de inventario" placement="right"></i>
     </div>
-    <div style="height: 100%">
+    <div #cardTabla class="divRoles">
       <app-tablas
+        class="h-100"
         *ngIf="listaArticulos"
         [padre]="cardTabla"
         [info]="info"
@@ -25,7 +26,6 @@
         [id_tabla]="'inventario'"
         [focusRow]="false"
         [search]="true"
-        [quitarAScorll]="40"
         [paginate]="true"
         [botones]="botones"
         (DevolverInfo)="movimientoInventario($event)"

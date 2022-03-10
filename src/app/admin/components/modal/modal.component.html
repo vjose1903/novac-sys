@@ -341,6 +341,7 @@
   >
     <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
+        class="h-100"
         *ngIf="dataFiltro"
         [focusRow]="true"
         [metodo]="metodo"
@@ -377,6 +378,7 @@
   >
     <div #cardTabla id="cardTabla" style="height: 100%">
       <app-tablas
+        class="h-100"
         [paraFiltroClientes]="tipoModal === 'buscarCliente' ? paraFiltroClientes : paraFiltroSuplidor"
         [focusRow]="true"
         (clickRow)="devolverCLick($event)"

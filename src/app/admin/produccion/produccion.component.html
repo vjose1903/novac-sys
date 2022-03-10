@@ -66,13 +66,7 @@
 
             <div class="col-12 p-0 mt-2">
               <a class="btn mr-2 btn-blanco" (click)="borrar()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
-              <input
-                [disabled]="formIsInvalid()"
-                (click)="agregarAlista()"
-                type="submit"
-                class="btn btn-verde"
-                value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}"
-              />
+              <input [disabled]="formIsInvalid()" (click)="agregarAlista()" type="submit" class="btn btn-verde" value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}" />
             </div>
           </div>
         </div>
@@ -103,13 +97,7 @@
             </div>
             <div class="col-6 p-0 bordes fondoBlanco">
               <div class="text-center tituloIngre">Producción</div>
-              <div
-                id="produccion_scroll"
-                *ngIf="ingredientesParaProduccion.length > 0"
-                class="scroll-container-prod"
-                appOnScroll
-                (scrolling)="ingredientesScroll($event)"
-              >
+              <div id="produccion_scroll" *ngIf="ingredientesParaProduccion.length > 0" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
                 <div *ngFor="let ingrediente of ingredientesParaProduccion; let i = index" class="ingredientesList d-flex">
                   <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
 
@@ -133,9 +121,10 @@
   </div>
 
   <div class="col-12 medio">
-    <div #cardTabla id="cardTabla" class="card card-padding-1 sombra h-100">
-      <div>
+    <div id="cardTabla" class="card card-padding-1 sombra h-100">
+      <div #cardTabla class="divProducciones">
         <app-tablas
+          class="h-100"
           *ngIf="lista_produccion"
           [padre]="cardTabla"
           [info]="info"
@@ -143,7 +132,6 @@
           [search]="false"
           [id_tabla]="'lista_produccion'"
           [colores]="false"
-          [quitarAScorll]="50"
           [botones]="botones"
           (DevolverInfo)="editarItem($event)"
           (DELETE)="abrirModal('remover', $event.ARG)"

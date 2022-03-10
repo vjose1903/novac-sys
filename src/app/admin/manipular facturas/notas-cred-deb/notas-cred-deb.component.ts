@@ -50,7 +50,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'notas', _lista_subs: ['decisionModal', 'objDevuelto'] });
+    this._init_mixin({ component: 'notas', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto'] });
     this.idFactura = this.activeRoute.snapshot.params['id'];
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
@@ -75,7 +75,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }
@@ -116,7 +116,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
             direccion: cliente.direccion,
             rnc: documento.documento,
           };
-          this.fun.logGreen('this.propietario_factura ', this.propietario_factura);
         });
       } catch (error) {}
     } else {
@@ -153,7 +152,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return new Promise(async (resolve) => {
       this.facturaClass.getOne(this.idFactura).then((res_factura) => {
         this.factura = res_factura['data'];
-        this.fun.logRed('this.factura --> ', this.factura);
+
 
         this.facturaClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.factura.numero_comprobante}` }).then((res) => {
           const devueltos = res['data'];
@@ -227,7 +226,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async checkCantidadEnUnidades() {
-    this.fun.logBlue(' ----- checkCantidadEnUnidades ----- ');
     for (let i = 0; i < this.detalleNota.length; i++) {
       const detalle = this.detalleNota[i];
 
@@ -240,7 +238,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       } else {
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * detalle.contenidos[detalle.unidad];
       }
-      this.fun.logRed('detalle ', this.fun.duplicarJson(detalle));
     }
   }
 

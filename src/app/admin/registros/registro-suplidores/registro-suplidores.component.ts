@@ -48,7 +48,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_suplidores', _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_suplidores', is_routing: true, _lista_subs: ['decisionModal'] });
     this.titulo = 'Registro de suplidores';
     this.boton = 'Registrar';
     this.metodo = this.route.snapshot.params['metodo'];
@@ -69,7 +69,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

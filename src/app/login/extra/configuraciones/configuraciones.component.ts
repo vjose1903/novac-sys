@@ -39,8 +39,6 @@ export class ConfiguracionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
-      console.log('config ', config);
-
       this.config = config;
       this.configCopy = this.fun.duplicarJson(config);
       this.createForm(config);
@@ -71,8 +69,6 @@ export class ConfiguracionesComponent implements OnInit {
       page_size_cuadre_caja: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
       page_size_reporte: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
     });
-
-    console.log('this.form ', this.form);
 
     this.logo_empresa = `data:image/png;base64,${data.logo_empresa}`;
     this.logo_impresion = `data:image/png;base64,${data.logo_impresion}`;

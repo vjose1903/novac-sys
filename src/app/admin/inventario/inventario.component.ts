@@ -50,9 +50,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async ngOnInit() {
-    console.log("~~~~~~ INVENTARIO ~~~~~~");
-
-    this._init_mixin({ component: 'inventario', _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'inventario', is_routing: true, _lista_subs: ['decisionModal'] });
     this.necesarioParaEmpezar();
 
     this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res));
@@ -60,7 +58,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

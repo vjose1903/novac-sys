@@ -118,27 +118,27 @@
 
   <div class="col-7">
     <h4>Listado articulos</h4>
-    <div #cardTabla id="cardTabla" class="card cardListados">
-      <div>
-        <select class="form-control filtroNCF" [(ngModel)]="filtro" (change)="filtrarNCF()">
-          <option value="0" disabled>Filtro por tipo de articulos</option>
-          <option value="todos">Todos</option>
-          <option *ngFor="let tipo of lista_tipos_facturas" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
-        </select>
-      </div>
+    <div #cardTabla id="cardTabla" class="card cardListados position-relative">
       <app-tablas
         *ngIf="listaNCF && info"
+        class="h-100"
         [padre]="cardTabla"
         [info]="info"
         [data]="listaNCF"
         [focusRow]="false"
         [id_tabla]="'lista_ncf'"
-        [quitarAScorll]="-20"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
         (paginateChange)="getPaquetesNCF($event)"
         (DELETE)="localAbrirModal($event)"
       ></app-tablas>
+      <div class="filtroNCF">
+        <select class="form-control select" [(ngModel)]="filtro" (change)="filtrarNCF()">
+          <option value="0" disabled>Filtro por tipo de articulos</option>
+          <option value="todos">Todos</option>
+          <option *ngFor="let tipo of lista_tipos_facturas" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+        </select>
+      </div>
     </div>
   </div>
 </div>

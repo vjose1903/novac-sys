@@ -63,13 +63,13 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'recibos_viajes', _lista_subs: ['decisionModal', 'objDevuelto'] });
+    this._init_mixin({ component: 'recibos_viajes', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto'] });
     this.necesarioStart();
   }
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

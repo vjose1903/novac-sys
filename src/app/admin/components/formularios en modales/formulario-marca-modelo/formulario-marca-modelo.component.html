@@ -78,8 +78,9 @@
   </div>
 
   <div class="col-6" style="height: calc(100% - 2.5rem)">
-    <div #cardTabla id="cardTabla" style="height: 100%">
+    <div #cardTabla id="cardTabla" class="divMarcaModelo">
       <app-tablas
+        class="h-100"
         *ngIf="listado && info"
         [padre]="cardTabla"
         [info]="info"

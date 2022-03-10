@@ -61,8 +61,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       if (routerEvent instanceof NavigationEnd || routerEvent instanceof NavigationCancel || routerEvent instanceof NavigationError) {
         this.showLoading = false;
 
-        console.log('this.initNavigate ', this.initNavigate);
-
         if (this.initNavigate) {
           setTimeout(() => this.checkRouteActiva(), 250);
 
@@ -78,9 +76,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngOnInit() {
-    console.log('======== INICIO EL LAYOUT COMPONENT ======== ');
     this.initVariables();
-    this._init_mixin({ component: 'layout', _lista_subs: ['decisionModal', 'refreshFacturas', 'sacarFacturas'] });
+    this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal', 'refreshFacturas', 'sacarFacturas'] });
 
     const token = this.fun.getAuthToken();
 
@@ -105,20 +102,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     } else {
       this.fun.logout();
     }
-
-    this.subDeciMenu = this.layServ.DESICIONCAMBIOMENU.subscribe((res) => {
-      SingletonService.fun.logBlue('DESICIONCAMBIOMENU ', res);
-
-      if (res && (res.bool === false || res.bool === true)) {
-        if (res.bool && res.verificar) {
-          this.ready = false;
-
-          setTimeout(() => this.decisionCambioMenu_(res), 10);
-        } else {
-          this.decisionCambioMenu_(res);
-        }
-      }
-    });
 
     this.subCheckCuadreToday = this.layServ.CHECKCUADRETODAY.subscribe((res) => {
       if (res) {
@@ -172,7 +155,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   checkCuadre() {
     if (!this.chequiando_cuadre) {
-      let extra = { afterPath: 'check_today_cuadre', parameters: {} };
+      let extra = { afterPath: 'check_today_cuadre', parameters: {}, requestParams: [{ key: 'spinner', value: 'no_show' }] };
       this.chequiando_cuadre = true;
       new CuadreCajaC().getAll(extra).then((res) => {
         this.cuadre_hoy = res['data'].existe_cuadre_hoy;
@@ -187,8 +170,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngAfterViewInit() {
-    console.log('path:  ', document.location.pathname);
-
     this.ready = true;
     this.cdRef.detectChanges();
   }
@@ -248,7 +229,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       const url = document.location.pathname.split('/')[3];
 
       if (this.fun.hasValue(arg) && !pathname.includes(arg)) {
-        // this.layServ.nextCambioMenu({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
+        this.runRouterNavigate({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
         setTimeout(() => resolve(true), 100);
       } else setTimeout(() => resolve(true), 100);
     });
@@ -257,7 +238,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   pasarFacturaAfacturacion(fact) {
     if (this.fun.isEmpty(this.factGuardada) || fact.archivo_id != this.factGuardada.archivo_id) {
       this.checkWhereIs(fact.tipo).then((res) => {
-        this.fun.logGreen('pasarFacturaAfacturacion ', fact);
 
         setTimeout(() => {
           if (res) this.layServ.nextFacturaGuardada(fact);
@@ -354,49 +334,31 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // NAVEGAR
   // =================================================================================
   cambiarMenu(subMenu, url, lleva_modulo?) {
-    // console.log('  ');
-    // console.log('subMenu ', subMenu);
-    // console.log('url ', url);
-    // console.log('lleva_modulo ', lleva_modulo);
-
     if (!subMenu && !lleva_modulo) this.modulo_select = undefined;
     if (subMenu) this.modulo_select = url;
     let ruta_a_cambiar = '';
     if (!subMenu) ruta_a_cambiar = this.modulo_select ? `/admin/${this.modulo_select}/${url}` : `/admin/${url}`;
 
-    // console.log('ruta_a_cambiar ', ruta_a_cambiar);
-    // console.log('this.modulo_select ', this.modulo_select);
-
     this.actualMenuItem = subMenu ? `${this.modulo_select}_select` : `${this.modulo_select}`;
-    // console.log('this.actualMenuItem ', this.actualMenuItem);
 
     if (!subMenu) {
       this.ready = false;
-      this.fun.logRed('MANDANDO SIGUIENTE CAMBIO');
-      // console.log(' ');
       this.runRouterNavigate({ bool: true, ruta: ruta_a_cambiar });
-      // this.layServ.nextCambioMenu({ bool: true, ruta: ruta_a_cambiar });
     }
   }
 
-  decisionCambioMenu_(decision) {
-    // console.log("'MMG'");
-
-    // console.log('decision ', decision);
-
-    if (decision.bool) {
-      console.log(' ');
-      console.log('decision.ruta ', decision.ruta);
-      console.log(' ');
-
-      this.router.navigateByUrl(decision.ruta);
-      // this.layServ.nextDecisionCambioMenu(undefined);
-      // this.layServ.nextCambioMenu(undefined);
-      setTimeout(() => (this.ready = true), 1);
+  finalizarCambioMenu(arg) {
+    if (arg.bool && arg.verificar) {
+      this.ready = false;
+      setTimeout(() => this.decisionCambioMenu(arg), 10);
     } else {
-      this.ready = true;
+      this.decisionCambioMenu(arg);
     }
+  }
 
+  decisionCambioMenu(decision) {
+    if (decision.bool) this.router.navigateByUrl(decision.ruta);
+    setTimeout(() => (this.ready = true), 1);
     this.modulo_select = undefined;
   }
 }

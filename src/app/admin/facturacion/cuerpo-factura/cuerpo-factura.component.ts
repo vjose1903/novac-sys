@@ -58,10 +58,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   ngOnInit() {
-    this._init_mixin({
-      component: 'cuerpo_factura',
-      _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'],
-    });
+    this._init_mixin({ component: 'cuerpo_factura', is_routing: false, _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'] });
 
     this.rellenarVariables();
   }

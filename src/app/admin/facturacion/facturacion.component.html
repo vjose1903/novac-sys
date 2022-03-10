@@ -1,7 +1,7 @@
 <div class="cardPrincipal sinPadding tamano" style="height: calc(100% - 9vh)">
   <div class="cabezaFactura">
     <div class="row">
-      <div class="col-3 divRigth pl-0">
+      <div class="col-3 divRight pl-0">
         <div class="row">
           <div class="col-3 p-0">
             <ng-template #tipos_facturas><div [innerHtml]="TiposFacturas"></div></ng-template>
@@ -135,7 +135,7 @@
       </div>
       <!-- ======================================================================================================================================================================== -->
       <!-- ======================================================================================================================================================================== -->
-      <div class="col-5 divRigth">
+      <div class="col-5 divRight">
         <form [formGroup]="form">
           <div class="d-flex" style="height: 1.7rem">
             <h5>
@@ -206,13 +206,13 @@
       <!-- ======================================================================================================================================================================== -->
       <!-- ======================================================================================================================================================================== -->
       <div class="col-4">
-        <div class="encabezadoRigth fecha">
+        <div class="encabezadoRight fecha">
           <span class="titulos w-100">
             Fecha : <strong> {{ fecha }}</strong>
           </span>
         </div>
         <div class="cuadroTotal">RD$ {{ formatoNumero(TOTAL) }}</div>
-        <div *ngIf="FacturaAtrasada" class="encabezadoRigth fechaA">
+        <div *ngIf="FacturaAtrasada" class="encabezadoRight fechaA">
           <span class="w-100 text-danger letrasT">
             Factura atrasada, fecha: <strong> {{ FechaFacturaMostrar }}</strong>
           </span>

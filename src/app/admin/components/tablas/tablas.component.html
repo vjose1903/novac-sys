@@ -1,15 +1,16 @@
-<div #dinamicTable>
-  <div #searchDiv *ngIf="search" class="searchDiv">
+<div #dinamicTable class="dinamicTable position-relative h-100">
+
+  <div id="searchDiv-{{ id_tabla }}" #searchDiv *ngIf="search" class="searchDiv">
     <label class="search-label" for="search">Busqueda </label>
     <div style="max-width: 12rem">
       <input [(ngModel)]="searchText" id="search" class="search-input form-control" (ngModelChange)="awaitTyping($event)" />
     </div>
   </div>
 
-  <div style="border-radius: 10px 10px 0px 0px" class="tableBodyScroll" [ngStyle]="{ height: alto + 'px' }">
-    <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table" [small]="true" id="VICtablas">
+  <div style="border-radius: 10px 10px 0px 0px" class="tableBodyScroll" [ngStyle]="{ height: obj_alto?.altoTabla + 'px' }">
+    <table *ngIf="info" #consorciosTable="mdbTable" mdbTable class="table h-100" [small]="true" id="VICtablas">
       <thead class="text-center position-relative" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
-        <tr #titulosHeader>
+        <tr id="titulosHeader-{{ id_tabla }}" #titulosHeader>
           <th id="{{ row?.titulo }}" *ngFor="let row of info" class="thHead">
             <span [ngSwitch]="row?.tipo">
               <span *ngSwitchCase="'check'">
@@ -34,7 +35,7 @@
           <th *ngIf="botones && botones?.titulo" class="thHead">Acciones</th>
         </tr>
       </thead>
-      <tbody [ngStyle]="{ height: alto + 'px' }">
+      <tbody [ngStyle]="{ height: obj_alto?.altoTbody + 'px' }">
         <ng-container *ngIf="data">
           <tr
             mdbTableCol
@@ -163,7 +164,7 @@
       </tbody>
       <tfoot class="grey lighten-5 w-100"></tfoot>
     </table>
-    <div *ngIf="paginate" #paginationDiv class="Pietabla d-flex flex-row-reverse">
+    <div *ngIf="paginate" id="paginationDiv-{{ id_tabla }}" #paginationDiv class="Pietabla d-flex flex-row-reverse">
       <pagination-controls nextLabel="Siguiente" previousLabel="Anterior" class="my-pagination mr-3" [maxSize]="5" [id]="id_tabla" (pageChange)="pageChange($event)"></pagination-controls>
 
       <div class="btn-group" dropdown [dropup]="true">

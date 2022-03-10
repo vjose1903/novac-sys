@@ -60,7 +60,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.titulo = 'Registro de empleados';
     this.boton = 'Registrar';
 
-    this._init_mixin({ component: 'reg_empleados', _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_empleados', is_routing: true, _lista_subs: ['decisionModal'] });
 
     this.necesarioStart();
   }
@@ -86,7 +86,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

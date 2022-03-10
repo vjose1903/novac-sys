@@ -141,7 +141,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'cabeza_factura', _lista_subs: ['decisionModal', 'objDevuelto', 'sacarFacturas'] });
+    this._init_mixin({ component: 'cabeza_factura', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto', 'sacarFacturas'] });
     this.localeService.use('es');
     this.rellenarVariables();
 
@@ -230,7 +230,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
   getTiposFacturas() {
     return new Promise((resolve) => {
       this.tipoFacturaClass.getAll().then((tiposFacturas) => {
-        this.fun.logRed(' -----getTiposFacturas-----');
         this.lista_tipos_facturas = tiposFacturas;
         resolve(true);
       });
@@ -399,8 +398,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
           let obj;
           let abrirModal = true;
           let archivo_id;
-
-          this.layServ.nextDecisionCambioMenu({ bool: false, ruta: arg.ruta });
+          this.runFinalizarCambioMenu({ bool: false, ruta: arg.ruta });
 
           if (_.get(this.objArchivo, 'archivo_id_en_turno')) {
             if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
@@ -414,8 +412,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
           this.procesoCambio(abrirModal, archivo_id, obj, callback);
         } else {
-          this.fun.logYellow('NO HAY NADA EMPEZADO');
-          this.layServ.nextDecisionCambioMenu({ bool: true, ruta: arg.ruta, verificar: true });
+          this.runFinalizarCambioMenu({ bool: true, ruta: arg.ruta, verificar: true });
           this.layServ.nextFacturaGuardada(undefined);
           callback({ bool: true });
         }
@@ -430,7 +427,8 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     } else {
       this.info_cambio['bool'] = true;
       this.info_cambio['verificar'] = true;
-      this.layServ.nextDecisionCambioMenu(this.info_cambio);
+      this.runFinalizarCambioMenu(this.info_cambio);
+
       callback({ bool: true });
     }
   }
@@ -468,7 +466,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
       this.enfocarInput('cod-0');
       //
     } else if (res && res.tipo_modal === 'cambio') {
-      this.fun.logGreen('AQUIIIIII');
       this.Devuelta = res.data.devuelta;
       this.forma_pago = res.data.forma_pago;
 
@@ -796,9 +793,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
       if (arg) this.agregarFacturaALocalStorage();
 
       this.info_cambio['bool'] = true;
-
-      this.layServ.nextDecisionCambioMenu(this.info_cambio);
-      this.fun.logRed('salir_layout --> ');
+      this.runFinalizarCambioMenu(this.info_cambio);
 
       this.layServ.nextFacturaGuardada(undefined);
     } else if (this.tipoModal === 'desplegar_factura') {

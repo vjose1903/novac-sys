@@ -195,13 +195,13 @@
     <h4>Listado clientes</h4>
     <div #cardTabla id="cardTabla" class="card cardListados">
       <app-tablas
+        class="h-100"
         *ngIf="listaClientes && info"
         [padre]="cardTabla"
         [info]="info"
         [data]="listaClientes"
         [botones]="botones"
         [id_tabla]="'lista_clientes'"
-        [quitarAScorll]="-20"
         (DevolverInfo)="editarItem($event)"
         (DELETE)="abrirModal('borrar', $event.ARG)"
         [focusRow]="false"

@@ -38,15 +38,13 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   permiso_selected: any;
 
   isCreando: boolean = false;
-
+  TablasComponent;
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
     super();
   }
 
   ngOnInit(): void {
-    console.log('~~~~~~ ROLES ~~~~~~');
-
-    this._init_mixin({ component: 'reg_roles', _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_roles', is_routing: true, _lista_subs: ['decisionModal'] });
     this.necesarioStart();
     this.createForm();
 
@@ -92,9 +90,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   iniciarCambioMenu(arg, callback) {
-    this.fun.logYellow('iniciarCambioMenu: roles ');
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }
@@ -109,8 +106,6 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   decisionModal(arg) {
-    console.log('arg ', arg);
-
     if (arg) {
       const obj = this.fun.duplicarJson(this.seleccionModal);
     }
@@ -169,6 +164,14 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   editarItem(item) {}
 
   abrirModal(tipo_modal, arg) {}
+
+  calcularAltoTablaAcciones() {
+    this.fun.awaitTyping().then(() => {
+      if (this.fun.hasValue(this.TablasComponent)) {
+        this.TablasComponent.calcularAlto();
+      }
+    });
+  }
 
   submit() {}
 }

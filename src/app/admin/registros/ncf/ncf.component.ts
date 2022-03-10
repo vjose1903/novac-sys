@@ -81,7 +81,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.localeService.use('es');
-    this._init_mixin({ component: 'reg_ncf', _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_ncf', is_routing: true, _lista_subs: ['decisionModal'] });
     this.titulo = 'Paquetes de numeros comprobantes fiscales';
     this.necesarioStart();
 
@@ -90,7 +90,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

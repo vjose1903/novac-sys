@@ -1,14 +1,18 @@
-.cardListados {
-  padding: 1rem !important;
-}
-
 .filtroNCF {
   position: absolute;
   transform: translate(17rem, -0.01rem);
-  height: calc(1em + 0.8rem + 2px);
   max-width: 18rem;
-  padding: 0rem !important;
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 2;
+  > .select {
+    height: calc(1em + 0.8rem + 2px);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0rem !important;
+    line-height: 2;
+  }
+}
+
+.divTablaNcf {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
 }

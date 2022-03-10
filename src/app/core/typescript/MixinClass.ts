@@ -7,6 +7,7 @@ type lista_sub = 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressE
 
 interface mixinInit {
   component?: String;
+  is_routing: boolean;
   _lista_subs?: Array<lista_sub>;
 }
 
@@ -27,7 +28,7 @@ export class MixinClass extends ModalClass {
     this.arg_mixin = arg;
     const lista_sub = this.arg_mixin ? (this.arg_mixin._lista_subs ? this.arg_mixin._lista_subs : []) : [];
 
-    this._init_layout(arg.component);
+    this._init_layout(arg);
 
     if (lista_sub) {
       this._init_modal(arg, this.layServ);

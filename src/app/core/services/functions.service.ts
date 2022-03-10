@@ -182,6 +182,14 @@ export class FunctionService {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: isFunction
+  // Descripcion : Esta funcion revisa si el argumento pasado es una funcion
+  // _________________________________________________________________________________________________
+
+  isFunction(arg) {
+    return this.hasValue(arg) ? arg instanceof Function : false;
+  }
+  // __________________________________________________________________________________________________
   // Nombre: numFormatTwoDecimals
   // Descripcion : Esta funcion toma un string y lo formatea a dos decimales
   // _________________________________________________________________________________________________

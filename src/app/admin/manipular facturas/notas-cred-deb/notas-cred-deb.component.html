@@ -6,7 +6,7 @@
     <div class="cabezaFactura">
       <div class="row">
         <!-- ============ factura aplicada ============ -->
-        <div class="col-8 divRigth p-0">
+        <div class="col-8 divRight p-0">
           <div class="row">
             <div class="col-12 text-center mb-2">
               <span class="infoFactuApli"> Informacion factura aplicada</span>
@@ -60,7 +60,7 @@
               <span class="infoFactuApli"> Informacion nota {{ tipos[tipoNota] }}</span>
             </div>
             <div class="col-12">
-              <div class="encabezadoRigth fecha">
+              <div class="encabezadoRight fecha">
                 <span class="titulos w-100">
                   Fecha : <strong> {{ fecha }}</strong>
                 </span>
@@ -74,7 +74,7 @@
 
     <!-- ======================================================================================================== -->
     <div #cardTabla id="cardTabla" class="cuerpoFactura mb-2">
-      <app-tablas
+      <app-tablas  class="h-100"
         *ngIf="detalleFacturas"
         [search]="false"
         [paginate]="false"
@@ -87,7 +87,6 @@
         [pad]="false"
         [colorHead]="false"
       ></app-tablas>
-      <!-- [quitarAScorll]="340" -->
     </div>
     <div class="pieFactura">
       <div class="row">

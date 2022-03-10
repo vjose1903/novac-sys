@@ -11,11 +11,11 @@
         <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
       </div> -->
       <app-tablas
+        class="h-100"
         *ngIf="lista_recibos"
         [padre]="cardTabla"
         [info]="info"
         [data]="lista_recibos"
-        [quitarAScorll]="50"
         [tablaHover]="true"
         (clickIcon)="clickIcon($event)"
         (paginateChange)="getRecibos($event)"

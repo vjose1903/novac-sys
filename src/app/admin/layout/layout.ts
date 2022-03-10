@@ -1,6 +1,6 @@
 import { Subscription } from 'rxjs';
 import { SingletonService } from '../../core/services/singleton.service';
-
+import * as _ from 'lodash';
 export class LayoutClass {
   constructor() {}
 
@@ -17,27 +17,26 @@ export class LayoutClass {
 
   private static metodos = {};
   private static lastComponentInitLayout;
-
-  _init_layout(componente) {
+  private static layoutComponent;
+  fun = SingletonService.fun;
+  _init_layout(arg) {
     this.layServ = SingletonService.layServ;
-    console.log('AGREGANDO AL OBJETO DE METODOS: ', componente);
-    LayoutClass.metodos[componente] = this;
-    LayoutClass.lastComponentInitLayout = componente;
-    console.log('LayoutClass.metodos: ', LayoutClass.metodos);
+    if (arg.component == 'layout') LayoutClass.layoutComponent ||= this;
+
+    if (arg.component != 'layout' && arg.is_routing) {
+      LayoutClass.metodos[arg.component] = this;
+      LayoutClass.lastComponentInitLayout = arg.component;
+    }
   }
 
   runRouterNavigate(arg) {
     if (arg && arg.bool) {
       this.info_cambio = arg;
       this.info_cambio['verificar'] = true;
-      this.info_cambio['componente'] = LayoutClass.lastComponentInitLayout;
+
       const tempLastComponent = LayoutClass.lastComponentInitLayout;
 
-      console.log('tempLastComponent ', tempLastComponent);
-      console.log('LayoutClass.metodos ', LayoutClass.metodos);
-      LayoutClass.metodos[LayoutClass.lastComponentInitLayout].iniciarCambioMenu(arg, (callback) => {
-        console.log('= = = = = luego del cambio del menu = = = = = ');
-        console.log('BORRANDO DEL OBJETO DE METODOS: ', tempLastComponent);
+      LayoutClass.metodos[tempLastComponent].iniciarCambioMenu(arg, (callback) => {
         if (callback.bool) delete LayoutClass.metodos[tempLastComponent];
       });
     }
@@ -45,7 +44,9 @@ export class LayoutClass {
 
   iniciarCambioMenu(arg, callback = (arg) => {}) {}
 
-  decisionCambioMenu() {}
+  runFinalizarCambioMenu(arg) {
+    LayoutClass.layoutComponent.finalizarCambioMenu(arg);
+  }
 
   _destroy_layout() {
     if (this.subInit) {

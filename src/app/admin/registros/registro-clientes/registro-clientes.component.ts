@@ -60,7 +60,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_cliente', _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_cliente', is_routing: true, _lista_subs: ['decisionModal'] });
     this.boton = 'Guardar';
     this.titulo = 'Registro de clientes';
 
@@ -100,7 +100,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

@@ -188,14 +188,13 @@
   <div class="col-7">
     <h4>Listado empleados</h4>
     <div #cardTabla id="cardTabla" class="card cardListados">
-      <app-tablas
+      <app-tablas  class="h-100"
         *ngIf="listaEmpleados && info"
         [padre]="cardTabla"
         [info]="info"
         [data]="listaEmpleados"
         [id_tabla]="'listaEmpleados'"
         [focusRow]="false"
-        [quitarAScorll]="-20"
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
         (paginateChange)="getEmpleados($event)"

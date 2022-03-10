@@ -72,7 +72,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_articulo', _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_articulo', is_routing: true, _lista_subs: ['decisionModal'] });
     this.createForm();
     this.FORM = this.form.controls;
 
@@ -83,7 +83,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

@@ -18,10 +18,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   cantiTootip: string;
   ready = false;
 
-  @ViewChild('searchDiv') searchDiv: ElementRef;
-  @ViewChild('paginationDiv') paginationDiv: ElementRef;
-  @ViewChild('titulosHeader') titulosHeader: ElementRef;
-  @ViewChild('searchInput') searchInput: ElementRef;
+  // @ViewChild('searchDiv') searchDiv: ElementRef;
+  // @ViewChild('paginationDiv') paginationDiv: ElementRef;
+  // @ViewChild('titulosHeader') titulosHeader: ElementRef;
+  // @ViewChild('searchInput') searchInput: ElementRef;
   seleccionado_id: any;
 
   // @HostListener('input') oninput() {
@@ -29,6 +29,8 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   // }
 
   element: HTMLElement;
+  tabla_content: HTMLElement;
+  obj_alto: { altoTabla: number; altoTbody: number; id: any } = { altoTabla: 10, altoTbody: 10, id: 0 };
 
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
@@ -80,7 +82,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() tablaHover = true;
   @Input() search = true;
   @Input() paginate = true;
-  @Input() quitarAScorll = 20;
   // @Input() botones = {
   //   titulo: false,
   //   borrar: false,
@@ -110,7 +111,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   subTotalPag: Subscription;
 
-  @Input() alto = 200;
+  // @Input() alto = 200;
   @Input() pad = true;
   select_all_value = false;
 
@@ -145,50 +146,34 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.mostrar = actualPagination['per_page'];
   }
 
-  searchCardTabla(tablaContent, restar) {
-    if (tablaContent.localName === 'app-layout') {
-      this.alto = 807;
-    } else {
-      if (tablaContent.id !== 'cardTabla') {
-        this.searchCardTabla(tablaContent.parentElement, restar);
-      } else {
-        let paddingCard = 0;
-        if (this.pad) {
-          paddingCard = tablaContent.offsetTop;
-          paddingCard *= 2;
-        }
-
-        this.padre.offsetHeight;
-        this.alto = tablaContent.offsetHeight - restar - paddingCard;
-      }
-    }
-  }
-
   calcularAlto() {
-    const filterHeight = this.searchDiv ? this.searchDiv.nativeElement.offsetHeight : 0;
-    const paginationHeight = this.paginationDiv ? this.paginationDiv.nativeElement.offsetHeight : 0;
-    const titulosHeigth = this.titulosHeader ? this.titulosHeader.nativeElement.offsetHeight : 0;
+    const filterDiv = document.getElementById('searchDiv-' + this.id_tabla);
+    const paginationDiv = document.getElementById('paginationDiv-' + this.id_tabla);
+    const titulosDiv = document.getElementById('titulosHeader-' + this.id_tabla);
 
-    const arrayTamanos = [filterHeight, paginationHeight, titulosHeigth, this.quitarAScorll];
-
-    console.log("arrayTamanos ", arrayTamanos);
-
+    const array = [filterDiv?.offsetHeight, paginationDiv?.offsetHeight];
+    console.log('array ', array);
 
     setTimeout(() => {
       let restar = 0;
-      for (let i = 0; i < arrayTamanos.length; i++) {
-        const tamano = arrayTamanos[i];
-        restar += tamano;
+      for (let i = 0; i < array.length; i++) {
+        const element: any = array[i];
+        if (element) restar += element;
       }
 
-      let paddingCard = 0;
-      if (this.pad) {
-        paddingCard = this.padre.offsetTop;
-        paddingCard *= 2;
-      }
+      this.tabla_content = this.padre.firstChild;
+      console.log('this.id_tabla ', this.id_tabla);
+      console.log('restar ', restar);
+      console.log('this.tabla_content ', this.tabla_content);
+      console.log('this.tabla_content.offsetHeight ', this.tabla_content.offsetHeight);
 
-      this.alto = this.padre.offsetHeight - restar - paddingCard;
-    }, 20);
+      this.obj_alto = {
+        altoTabla: this.tabla_content.offsetHeight - restar,
+        altoTbody: this.tabla_content.offsetHeight - restar - (titulosDiv.offsetHeight || 0) - (this.fun.hasValue(paginationDiv) ? 15 : 0), // el -15 es para separar un poco el scroll del paginador
+        id: this.id_tabla,
+      };
+      console.log('this.obj_alto ', this.obj_alto);
+    }, 100);
   }
 
   async ngAfterViewInit() {
@@ -207,7 +192,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
 
     this.cdRef.detectChanges();
-    // this.calcularAlto();
   }
 
   mouseMoveEvent(event, row, column, id) {
@@ -281,7 +265,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.ROW = 'row-';
     this.NUM = 0;
 
-    this.alto = undefined;
     this.searchText = '';
     this.reinicioModal.emit();
     this.tServ.deletePaginationById(this.id_tabla);
@@ -596,7 +579,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     }
 
     if (simpleChanges.data && simpleChanges.info) {
-      if (simpleChanges.data.currentValue && simpleChanges.data.currentValue.length && simpleChanges.info.currentValue) {
+      if (simpleChanges.data.currentValue && simpleChanges.info.currentValue) {
         setTimeout(() => this.calcularAlto(), 250);
       }
     }

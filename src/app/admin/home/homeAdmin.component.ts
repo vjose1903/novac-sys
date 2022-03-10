@@ -19,9 +19,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
 
   cedula = null;
   ngOnInit() {
-    console.log('======== INICIO EL HOME COMPONENT ======== ');
-
-    this._init_mixin({ component: 'home' });
+    this._init_mixin({ component: 'home', is_routing: true });
 
     this.configServ.getConfig().then((config: ConfigI) => {
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
@@ -29,10 +27,8 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   }
 
   iniciarCambioMenu(arg, callback) {
-    console.log('~~~~~~ iniciarCambioMenu ~~~~~~');
-
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

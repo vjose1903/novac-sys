@@ -10,6 +10,7 @@ import { ConfigI } from './config-interface';
 export interface extraArgs {
   afterPath?: any;
   parameters?: any;
+  requestParams?: Array<{ key: any; value: any }>;
 }
 
 export interface responseModel<T> {
@@ -27,17 +28,17 @@ export class CrudG<T> {
 
   async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
-    return (await this.request(url, 'get', null, tipo).toPromise()) as T;
+    return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
   }
 
   async getOne(id: number, arg = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
-    return (await this.request(url, 'get', null, tipo).toPromise()) as T;
+    return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
   }
 
   async deleteOne(id: number, arg = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
-    return (await this.request(url, 'delete', null, tipo).toPromise()) as T;
+    return (await this.request(url, 'delete', null, tipo, arg?.requestParams).toPromise()) as T;
   }
 
   createUpdateOne(data, arg = null, tipo: 'backend' | 'externo' = 'backend') {
@@ -61,12 +62,13 @@ export class CrudG<T> {
 
   async createOne(data, arg = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
-    return (await this.request(url, 'post', data, tipo).toPromise()) as T;
+
+    return (await this.request(url, 'post', data, tipo, arg?.requestParams).toPromise()) as T;
   }
 
   async updateOne(data, arg = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, data.id);
-    return (await this.request(url, 'patch', data, tipo).toPromise()) as T;
+    return (await this.request(url, 'patch', data, tipo, arg?.requestParams).toPromise()) as T;
   }
 
   parseParams(arg) {
@@ -106,29 +108,43 @@ export class CrudG<T> {
     return url;
   }
 
-  request(url, method, data?, tipo?): Observable<any> {
+  request(url, method, data?, tipo?, arg?): Observable<any> {
     const metodo = method.toUpperCase() === 'GET' || method.toUpperCase() === 'DELETE' ? 1 : 2;
 
     switch (metodo) {
       case 1:
-        return this.http[method](url, this.defaultHeaders(tipo));
+        return this.http[method](url, this.requestOptions(tipo, arg));
         break;
 
       case 2:
-        return this.http[method](url, JSON.stringify(data), this.defaultHeaders(tipo));
+        return this.http[method](url, JSON.stringify(data), this.requestOptions(tipo, arg));
         break;
     }
   }
 
-  defaultHeaders(tipo?) {
-    let headers = {
+  requestOptions(tipo?, arg?) {
+    let options = {
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
         Accept: 'Application/json',
       },
+      ...this.formarParametros(arg),
     };
 
-    return headers;
+    return options;
+  }
+
+  formarParametros(params) {
+    const parametros = { params: {} };
+
+    if (params) {
+      for (let i = 0; i < params.length; i++) {
+        const param = params[i];
+        parametros['params'][param.key] = param.value;
+      }
+    }
+
+    return parametros;
   }
 }
 0;

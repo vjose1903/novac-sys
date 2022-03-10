@@ -5,6 +5,7 @@
   <div class="col-7">
     <div #cardTabla id="cardTabla" class="card cardListados p-3">
       <app-tablas
+        class="h-100"
         *ngIf="viajes && info"
         [padre]="cardTabla"
         [info]="info"
@@ -13,7 +14,6 @@
         [data]="viajes"
         [id_tabla]="'lista_viajes'"
         [focusRow]="false"
-        [quitarAScorll]="50"
         [ROW]="'viaje-'"
         (clickRow)="verViaje($event)"
         (paginateChange)="getViajes($event)"

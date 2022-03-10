@@ -96,12 +96,11 @@
     </div>
   </div>
   <div class="col-12 abajo">
-    <div *ngIf="mostrarListaFacturas()" #cardTabla id="cardTabla" class="card card-padding sombra ingreCard h-100">
-      <app-tablas
+    <div *ngIf="mostrarListaFacturas()" #cardTabla id="cardTabla" class="card card-padding sombra  h-100">
+      <app-tablas  class="h-100"
         *ngIf="facturas"
         [padre]="cardTabla"
         [info]="info"
-        [quitarAScorll]="60"
         [id_tabla]="'facturas_params'"
         (clickIcon)="selectFactura($event)"
         [data]="facturas"
@@ -119,7 +118,7 @@
 
 <p-sidebar [(visible)]="showSide" appendTo="body" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }">
   <div #cardTablaNota id="cardTablaNota" class="h-100">
-    <app-tablas
+    <app-tablas  class="h-100"
       *ngIf="showSide"
       [padre]="cardTablaNota"
       [info]="infoNota"

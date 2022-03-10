@@ -57,12 +57,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   ngOnInit() {
-    console.log(' ================== INICIO ==================');
-
-    this._init_mixin({
-      component: 'conduce',
-      _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'],
-    });
+    this._init_mixin({ component: 'conduce', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'] });
 
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
@@ -84,7 +79,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

@@ -60,13 +60,13 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async ngOnInit() {
-    this._init_mixin({ component: 'lista_recibos', _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'lista_recibos', is_routing: true, _lista_subs: ['decisionModal'] });
     this.necesarioStart();
   }
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

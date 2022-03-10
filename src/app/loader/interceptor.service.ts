@@ -2,12 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 
-import { catchError, tap, map, finalize } from 'rxjs/operators';
+import { catchError, map, finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
 import { FunctionService } from '../core/services/functions.service';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-// Note: these are only the initial imports. Add more as needed.
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
@@ -31,7 +30,8 @@ export class InterceptorService implements HttpInterceptor {
 
     let spinner = request.params.get('spinner');
 
-    if (spinner) request.params.delete('spinner'); // remove parameter spinner y no ejecuta el loader
+    let sendParams;
+    if (spinner) sendParams = request.params.delete('spinner', spinner); // creando la nueva instancia de HttpParams sin el parametro spinner
 
     if (!spinner || spinner == 'no_hide') this.startRequest(spinner); // Activa el spinner
 
@@ -44,6 +44,7 @@ export class InterceptorService implements HttpInterceptor {
           uid: `${localStorage.getItem('uid')}`,
           'token-type': `${localStorage.getItem('token-type')}`,
         },
+        params: sendParams,
       });
     }
 
@@ -66,15 +67,11 @@ export class InterceptorService implements HttpInterceptor {
 
       catchError((response: HttpErrorResponse) => {
         if (response.error === null) {
-
           this.fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
-
         } else if ((response.error && _.has(response.error, 'action'), response.error.action === 'close_ssesion')) {
-
           this.fun.toastError(response.error.msg, 'ERROR');
           this.fun.nextCanToast(false);
           this.router.navigateByUrl('/auth/login');
-
         } else {
           if (_.has(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
 

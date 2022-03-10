@@ -71,7 +71,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
   ngOnInit() {
-    this._init_mixin({ component: 'buscar_factura', _lista_subs: ['decisionModal', 'objDevuelto', 'pressEsc', 'noFiltro'] });
+    this._init_mixin({ component: 'buscar_factura', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto', 'pressEsc', 'noFiltro'] });
     this.buscarPara = this.route.snapshot.params['para'];
 
     if (this.buscarPara === 'nota_credito') {
@@ -163,7 +163,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }

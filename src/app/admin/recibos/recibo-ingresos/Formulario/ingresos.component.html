@@ -67,22 +67,23 @@
     </div>
   </div>
   <div class="col-12 medio">
-    <div *ngIf="facturas" #cardTabla id="cardTabla" class="card card-padding sombra ingreCard h-100">
-      <div class="w-100 d-flex justify-content-end">
-        <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
-      </div>
+    <div *ngIf="facturas" #cardTabla id="cardTabla" class="card card-padding sombra h-100">
       <app-tablas
+        class="h-100"
         *ngIf="facturas"
         [padre]="cardTabla"
         [info]="info"
         [data]="facturas"
-        [quitarAScorll]="60"
         (getInfoChange)="getInfoChange($event)"
         (clickIcon)="clickVerPagos($event)"
         [tablaHover]="false"
         [focusRow]="false"
         [id_tabla]="'facturasPendientes'"
       ></app-tablas>
+
+      <div class="w-100 d-flex justify-content-end position-absolute" style="right: 0">
+        <i mdbTooltip="{{ getIcon().tooltip }}" placement="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+      </div>
     </div>
   </div>
   <div class="col-12 abajo">

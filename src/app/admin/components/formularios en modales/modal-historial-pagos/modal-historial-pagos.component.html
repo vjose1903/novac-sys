@@ -27,7 +27,7 @@
     </p-tabPanel>
   </p-tabView>
 
-  <app-tablas
+  <app-tablas  class="h-100"
     *ngIf="detalles['abonos'] && activeIndex == 0"
     [search]="false"
     [paginate]="true"
@@ -40,7 +40,7 @@
     [focusRow]="false"
   ></app-tablas>
 
-  <app-tablas
+  <app-tablas  class="h-100"
     *ngIf="detalles['notas'] && activeIndex == 1"
     [search]="false"
     [paginate]="true"

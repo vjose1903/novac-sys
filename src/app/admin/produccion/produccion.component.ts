@@ -48,14 +48,14 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'produccion', _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'produccion', is_routing: true, _lista_subs: ['decisionModal'] });
 
     this.getProductosTerminados();
   }
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      this.layServ.nextDecisionCambioMenu(arg);
+      this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }
@@ -174,7 +174,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   abilitarBtnConfirmar() {
     let res = true;
-    if (this.lista_produccion.length > 0) res = false;
+    if (this.lista_produccion && this.lista_produccion.length > 0) res = false;
     return res;
   }
 

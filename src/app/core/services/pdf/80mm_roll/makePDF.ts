@@ -37,7 +37,6 @@ export function makePDF(data, file_name, tipo_pdf?) {
   };
 
   const obj = { doc: dd, file: file_name, type: 'file' };
-  SingletonService.fun.logRed('AQUIII ', obj);
   return obj;
 }
 
