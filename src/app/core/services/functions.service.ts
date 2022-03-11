@@ -317,8 +317,8 @@ export class FunctionService {
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
   Capitalice(str) {
-    const ultimosCaractes = str.length + 1;
-    return _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes);
+    const ultimosCaractes = this.hasValue(str) ? str.length + 1 : null;
+    return this.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
   }
 
   // __________________________________________________________________________________________________

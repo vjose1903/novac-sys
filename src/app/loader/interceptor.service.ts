@@ -19,7 +19,7 @@ export class InterceptorService implements HttpInterceptor {
   }
 
   private endRequest(args?): void {
-    if (this.requestCount > 0) this.requestCount--;
+    if (this.requestCount > 0 && args !== 'no_show') this.requestCount--;
 
     if (this.requestCount == 0 && args !== 'no_hide') this.loadServ.isLoading.next(false);
   }

@@ -144,8 +144,8 @@
             <i
               *ngIf="!!!factura_a_editar"
               (click)="abrirModalFiltro()"
-              mdbTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}"
-              placement="right"
+              pTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}"
+              tooltipPosition="right"
               class="fas fa-search ml-3 botonBuscar"
             ></i>
           </div>
@@ -205,8 +205,18 @@
       </div>
       <!-- ======================================================================================================================================================================== -->
       <!-- ======================================================================================================================================================================== -->
-      <div class="col-4">
-        <div class="encabezadoRight fecha">
+      <div
+        class="col-4"
+        style="
+          display: grid;
+          grid-template-rows: min-content;
+          grid-template-areas:
+            '.'
+            '.'
+            '.';
+        "
+      >
+        <div class="encabezadoRigth fecha">
           <span class="titulos w-100">
             Fecha : <strong> {{ fecha }}</strong>
           </span>

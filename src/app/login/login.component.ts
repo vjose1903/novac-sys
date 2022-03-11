@@ -56,16 +56,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
 
       this.form = this.fb.group({ usuario: config.is_development ? 'ADM' : null, password: config.is_development ? '1234567' : null });
     });
-
-    // TESTEANDO EL CODIGO DE BARRAS
-    // const prueba = this.textToBase64Barcode('eJwdy00KwyAQQOGrhFmborbB1G2v0Kxl0AkdGAw1Yzcld+/P8n3w3pCFqSol\nLhBrFzHQd2r/nA3opihpxay94Veu4eQnAyvlByZ6dn6h/HaI4K13ow2jt4Ob\n4znEyzQs9xsYyFiVC5aETTl32XaI7vgAzSYnUg==\n');
-  }
-
-  textToBase64Barcode(text) {
-    var canvas = document.createElement('canvas');
-    JsBarcode(canvas, text, { format: 'CODE128' });
-
-    return canvas.toDataURL('image/png');
   }
 
   abrirModalReporte(obj) {

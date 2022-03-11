@@ -2,8 +2,8 @@
   <div class="col-12">
     <div class="d-flex">
       <h3 class="label w-100">TOTAL: RD$</h3>
-      <span class="negrita w-100 total">
-        {{ ' ' + formatoNumero(data.total_factura) }}
+      <span class="negrita w-100 total text-end">
+        {{ formatoNumero(data.total_factura) }}
       </span>
     </div>
 
@@ -15,9 +15,9 @@
       (keyup)="calcularDevueta()"
       (keydown.enter)="saltar('formaPago')"
       [(ngModel)]="efectivo"
+      (ngModelChange)="validarForm('input')"
       (blur)="revisarPrecio($event.target.value, 'devuelta')"
       id="inputEfectivo"
-
     />
     <h3 class="label w-100 mt-3">FORMA DE PAGO</h3>
     <select [(ngModel)]="formaPago" id="formaPago" (keydown.enter)="saltar('send')" class="form-control inputEfectivo">
@@ -29,18 +29,18 @@
 
     <div *ngIf="tipo === 'devuelta'" class="d-flex mt-3">
       <h3 class="label w-100">DEVUELTA: RD$</h3>
-      <span *ngIf="devuelta" class="negrita w-100 total">
-        {{ ' ' + devuelta }}
+      <span *ngIf="devuelta" class="negrita w-100 total text-end">
+        {{ devuelta }}
       </span>
     </div>
   </div>
 
-  <div class="col-12 {{ tipo !== 'devuelta' ? 'mt-4' : '' }}">
+  <!-- <div class="col-12 {{ tipo !== 'devuelta' ? 'mt-4' : '' }}">
     <div class="form-group">
       <input (click)="cancelar()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
       <input (click)="confirmar()" type="submit" class="btn btn-verde" value="Confirmar" id="btnSend" />
     </div>
-  </div>
+  </div> -->
 </div>
 <!-- ======================================================= -->
 
@@ -49,14 +49,14 @@
     <div class="d-flex">
       <h3 class="label w-100">TOTAL NOTA: RD$</h3>
       <span class="negrita w-100 total">
-        {{ ' ' + formatoNumero(data.total_factura) }}
+        {{ formatoNumero(data.total_factura) }}
       </span>
     </div>
 
     <div class="col-12">
       <div class="form-group">
         <input (click)="cancelar()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-        <input (click)="confirmar()" type="submit" class="btn btn-verde" value="Confirmar" id="btnSend" />
+        <input (click)="btn_aceptar()" type="submit" class="btn btn-verde" value="Confirmar" id="btnSend" />
       </div>
     </div>
   </div>
@@ -67,7 +67,7 @@
     <div class="d-flex">
       <h3 class="label w-100">TOTAL DE COMPRA: RD$</h3>
       <span class="negrita w-100 total">
-        {{ ' ' + formatoNumero(data.total_factura) }}
+        {{ formatoNumero(data.total_factura) }}
       </span>
     </div>
 
@@ -92,7 +92,7 @@
     <div class="col-12">
       <div class="form-group">
         <input (click)="cancelar()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-        <input (click)="confirmar()" type="submit" class="btn btn-verde" value="Confirmar" id="btnSend" />
+        <input (click)="btn_aceptar()" type="submit" class="btn btn-verde" value="Confirmar" id="btnSend" />
       </div>
     </div>
   </div>

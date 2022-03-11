@@ -1,7 +1,7 @@
 <div class="row BuscarFacturaRow">
   <div class="col-12 titulo">
     <h3 class="mb-0">
-      Buscar facturas :<b *ngIf="Para">{{ Para }}</b>
+      Buscar facturas:<b *ngIf="Para">{{ Para }}</b>
     </h3>
   </div>
 
@@ -96,20 +96,24 @@
     </div>
   </div>
   <div class="col-12 abajo">
-    <div *ngIf="mostrarListaFacturas()" #cardTabla id="cardTabla" class="card card-padding sombra  h-100">
-      <app-tablas  class="h-100"
+    <div *ngIf="mostrarListaFacturas()" #cardTabla id="cardTabla" class="card card-padding sombra h-100">
+      <app-tablas
+        class="h-100"
         *ngIf="facturas"
         [padre]="cardTabla"
         [info]="info"
         [id_tabla]="'facturas_params'"
-        (clickIcon)="selectFactura($event)"
+        (clickIcon)="clickIconHandler($event)"
         [data]="facturas"
-        (getInfoChange)="selectFactura($event)"
         (paginateChange)="changePaginate($event)"
         [focusRow]="false"
       ></app-tablas>
+      <!-- (getInfoChange)="selectFactura($event)" -->
     </div>
   </div>
+  <button *ngIf="mostrarListaFacturas()" [disabled]="!(idsFacturasSeleccionadas.length > 0)" [disabled]="" class="btn btn-verde mr-2 footer" value="" (click)="continuarAManipularFactura()">
+    {{ 'Continuar' }}
+  </button>
 </div>
 
 <!-- ============================================================================================================================================ -->
@@ -117,8 +121,9 @@
 <!-- ============================================================================================================================================ -->
 
 <p-sidebar [(visible)]="showSide" appendTo="body" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }">
-  <div #cardTablaNota id="cardTablaNota" class="h-100">
-    <app-tablas  class="h-100"
+  <div #cardTablaNota id="cardTablaNota" class="h-100 divTablaNotas">
+    <app-tablas
+      class="h-100"
       *ngIf="showSide"
       [padre]="cardTablaNota"
       [info]="infoNota"

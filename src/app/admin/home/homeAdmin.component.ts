@@ -17,6 +17,10 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   imgLogo;
   configServ = SingletonService.configServ;
 
+  initCambioMenu(arg) {
+    if (arg.bool) this.runFinalizarCambioMenu(arg);
+  }
+
   cedula = null;
   ngOnInit() {
     this._init_mixin({ component: 'home', is_routing: true });

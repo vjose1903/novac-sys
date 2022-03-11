@@ -3,7 +3,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import { ConfigI } from './src/app/core/typescript/config-interface';
-const logos = require('./logos.json');
 
 const request = require('request');
 const { exec } = require('child_process');

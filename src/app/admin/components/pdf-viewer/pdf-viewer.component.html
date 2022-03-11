@@ -1,0 +1,15 @@
+<div>
+  <ngx-extended-pdf-viewer
+    [showDownloadButton]="false"
+    [showOpenFileButton]="false"
+    [filenameForDownload]="inputs?.fileName"
+    [showSecondaryToolbarButton]="false"
+    [showZoomButtons]="true"
+    [showRotateButton]="false"
+    [showBookmarkButton]="false"
+    [enablePrint]="false"
+    [base64Src]="inputs?.pdfSrc"
+    [useBrowserLocale]="true"
+    [height]="inputs?.height"
+  ></ngx-extended-pdf-viewer>
+</div>

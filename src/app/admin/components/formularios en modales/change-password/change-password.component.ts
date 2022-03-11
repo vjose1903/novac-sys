@@ -3,19 +3,21 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../../registros/registro-empleados/empleado';
+import { ModalI } from '../../new_modal/modal-class';
 
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss'],
 })
-export class ChangePasswordComponent extends MixinClass implements OnInit, AfterViewInit {
+export class ChangePasswordComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
   form: FormGroup;
   element: HTMLElement;
-  @Input() user;
+  // @Input() user;
+  // @Output() cancel = new EventEmitter<any>();
   empleadoClass = new EmpleadoC();
-
-  @Output() cancel = new EventEmitter<any>();
+  modal: any = {};
+  inputs: any;
 
   constructor(private fb: FormBuilder) {
     super();
@@ -31,22 +33,22 @@ export class ChangePasswordComponent extends MixinClass implements OnInit, After
     setTimeout(() => this.enfocarInput('pass'), 50);
   }
 
-  accion(arg) {
-    this.cancel.emit(arg);
-  }
-
-  submit(form) {
-    const objTemp = form.value;
+  btn_aceptar() {
+    const objTemp = this.form.value;
 
     if (objTemp.password === null) {
       this.fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
-      const objT = this.user;
+      const objT = this.inputs;
       const obj = _.omit(objT, ['', 'uid', 'sign_in_count', 'created_at', 'updated_at', 'documentos_de_identidad', 'documento_identidad']);
       obj['password'] = objTemp.password;
-      obj['documentos_de_identidad_attributes'] = this.user.documentos_de_identidad;
+      obj['documentos_de_identidad_attributes'] = this.inputs.documentos_de_identidad;
 
-      this.empleadoClass.createUpdateOne(obj).then(() => this.cancel.emit(false));
+      this.empleadoClass.createUpdateOne(obj).then(() => {
+        const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+        modal.closeModal(this.modal.component_id);
+        modal.getDataModal({ error: false });
+      });
     }
   }
 }

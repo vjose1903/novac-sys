@@ -18,6 +18,7 @@ import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { NewModalModule } from './admin/components/new_modal/modal.module';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
@@ -35,10 +36,11 @@ defineLocale('es', esLocale);
     ToastrModule.forRoot({ preventDuplicates: true }),
     AppRoutingModule,
     AngularModule,
-    MDBBootstrapModule,
+    
     BrowserAnimationsModule,
     NgxBootstrapModule,
     NewModalModule,
+    NgSelectModule
   ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }],
   bootstrap: [AppComponent],

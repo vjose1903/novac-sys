@@ -28,9 +28,13 @@
 
     <ng-template *ngIf="hasAnyBtn(modalConfig)" pTemplate="footer">
       <div class="d-flex justify-content-end align-items-center mt-2">
-        <button *ngIf="modalConfig?.botones?.cancelar?.show" class="btn btn-danger" (click)="cancelarAndAceptar(false, modalConfig.id)" [disabled]="modalConfig?.botones?.cancelar?.disable">Cancelar</button>
+        <button *ngIf="modalConfig?.botones?.cancelar?.show" class="btn btn-danger" (click)="cancelarAndAceptar(false, modalConfig.id)" [disabled]="modalConfig?.botones?.cancelar?.disable">
+          Cancelar
+        </button>
 
-        <button *ngIf="modalConfig?.botones?.aceptar?.show" class="btn btn-verde" (click)="cancelarAndAceptar(true, modalConfig.id)" [disabled]="modalConfig?.botones?.aceptar?.disable">Aceptar</button>
+        <button *ngIf="modalConfig?.botones?.aceptar?.show" class="btn btn-verde" (click)="cancelarAndAceptar(true, modalConfig.id)" [disabled]="modalConfig?.botones?.aceptar?.disable">
+          Aceptar
+        </button>
 
         <ng-container *ngFor="let dynamic_boton of modalConfig?.botones?.dinamico">
           <button [disabled]="dynamic_boton?.disable || false" class="btn {{ dynamic_boton.clase }}" (click)="dynamicFunction(modalConfig, dynamic_boton)">

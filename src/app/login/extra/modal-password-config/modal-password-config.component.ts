@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
+import { ModalI } from '../../../admin/components/new_modal/modal-class';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 
 @Component({
@@ -8,7 +9,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
   templateUrl: './modal-password-config.component.html',
   styleUrls: ['./modal-password-config.component.scss'],
 })
-export class ModalPasswordConfigComponent extends MixinClass implements OnInit {
+export class ModalPasswordConfigComponent extends MixinClass implements OnInit, ModalI {
   public modal: any = {};
   inputs;
   form;
@@ -38,6 +39,7 @@ export class ModalPasswordConfigComponent extends MixinClass implements OnInit {
       const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
       modal.closeModal(this.modal.component_id);
       modal.getDataModal({ error: false });
+      
       setTimeout(() => this.fun.nextCanToast(false), 2000);
     } else {
       this.fun.toastError('Contraseña Incorrecta', 'ERROR');

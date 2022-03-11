@@ -10,7 +10,6 @@
                 <div class="col-6 p-0 pr-2">
                   <div class="form-groupd-flex" style="flex-wrap: nowrap" [appMsgError]="'cedula'" [form]="form">
                     <label class="control-label">Cedula: <span style="color: red">*</span></label>
-
                     <p-inputMask
                       (keydown.enter)="saltar('campoNombre')"
                       (keyup)="checkDocumento('cedula', $event)"
@@ -180,7 +179,7 @@
           </button>
           <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde">{{ boton }}</button>
           <!-- [value]="boton"  -->
-          <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="abrirModal('password', usuarioSelected)">Cambiar contraseña</a>
+          <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="showModal()">Cambiar contraseña</a>
         </div>
       </div>
     </div>
@@ -188,7 +187,8 @@
   <div class="col-7">
     <h4>Listado empleados</h4>
     <div #cardTabla id="cardTabla" class="card cardListados">
-      <app-tablas  class="h-100"
+      <app-tablas
+        class="h-100"
         *ngIf="listaEmpleados && info"
         [padre]="cardTabla"
         [info]="info"

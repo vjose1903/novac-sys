@@ -201,6 +201,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       const documento = this.form.controls[tipo].value;
 
       let enable_campos = false;
+      console.log('documento ', documento);
+      console.log('this.form.controls[tipo].valid ', this.form.controls[tipo].valid);
 
       if (this.form.controls[tipo].valid) {
         if (this.editando && _.some(this.documentos_de_identidad, (doc) => doc.documento === documento)) {

@@ -7,6 +7,8 @@ import { LoaderService } from '../../../app/loader/loader.service';
 import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
+import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 
 @Component({
   selector: 'app-inventario',
@@ -63,31 +65,21 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     }
   }
 
-  async decisionModal(arg) {
-    if (this.tipoModal === 'visor_pdf') arg = { bool: arg };
-
-    if (arg.bool) {
-      if (this.tipoModal === 'visor_pdf') {
-        this.imprimirReporteInventario();
-        this.resetVariables();
-      } else {
-        const actualPagination = this.tServ.getPaginationById('inventario');
-        this.getArticulos(actualPagination);
-      }
-    }
-  }
-
   ngOnDestroy() {
     this._destroy_mixin();
   }
 
-  imprimirReporteInventario() {
-    const obj = { base64: this.seleccionModal.pdfSrc, filename: `${this.seleccionModal.fileName}.pdf`, type: 'reporte' };
+  imprimirReporteInventario(objPDFData, modalInstance?) {
+    const obj = { base64: objPDFData.pdfSrc, filename: `${objPDFData.fileName}.pdf`, type: 'reporte' };
     this.pdfServ
       .imprimirBase64(obj)
       .then((res) => {
-        if (res['status'] === 'si') this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-        else this.fun.toastError(res['msg'], 'ERROR');
+        console.log('res ', res);
+
+        if (res['status'] === 'si') {
+          this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+          if (modalInstance) modalInstance.closeModal(modalInstance.id, 'reporte_inventario');
+        } else this.fun.toastError(res['msg'], 'ERROR');
       })
       .catch((err) => {
         this.fun.toastError(err['msg'], 'ERROR');
@@ -112,9 +104,35 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
       this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
         if (res.status === 'si') {
-          const obj_pdf = { pdfSrc: res.body, titulo: 'Reporte de inventario', height: '76vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+          const obj_pdf = { pdfSrc: res.body, titulo: 'Reporte de inventario', height: '75vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
           this.loadServ.isLoading.next(false);
-          this.abrirModal('visor_pdf', obj_pdf);
+          console.log('PDF CONFIG====> ', obj_pdf);
+
+          this.handleModalForm({
+            component: PdfViewerComponent,
+            inputs: obj_pdf,
+            id: 'reporte_inventario',
+            header: 'Reporte de inventario',
+            width: '900px',
+            botones: {
+              aceptar: { show: false, disable: false },
+              cancelar: { show: false, disable: false },
+              dinamico: [
+                { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+                {
+                  clase: 'btn btn-verde',
+                  function: (instance) => {
+                    console.log('instanceinstanceinstance: ', 'instance');
+
+                    this.imprimirReporteInventario(obj_pdf, instance);
+                    this.resetVariables();
+                  },
+                  label: 'Imprimir',
+                  disable: false,
+                },
+              ],
+            },
+          });
         }
       });
     });
@@ -151,7 +169,27 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   movimientoInventario(arg) {
     this.indexSelected = arg.INDEX;
-    this.abrirModal('inventario', arg.ARG);
+
+    this.handleModalForm({
+      component: MovimientosFormComponent,
+      inputs: arg.ARG,
+      id: 'inventario',
+      header: 'Movimientos de inventario',
+      width: '450px',
+
+      botones: {
+        aceptar: { show: true, disable: false },
+        cancelar: { show: true, disable: false },
+      },
+    });
+  }
+
+  async getDataFromModal(arg, search) {
+    if (arg.modal_id === 'inventario') {
+      const actualPagination = this.tServ.getPaginationById('inventario');
+      actualPagination['searchText'] = this.palabra_buscar;
+      this.getArticulos(actualPagination);
+    }
   }
 
   resetVariables() {

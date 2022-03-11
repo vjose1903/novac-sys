@@ -9,6 +9,7 @@ import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { EmpleadoC } from './empleado';
+import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -303,6 +304,15 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
         this.enfocarInput('cedula');
       });
     }
+  }
+  showModal() {
+    this.handleModalForm({
+      component: ChangePasswordComponent,
+      id: 'changePassword',
+      inputs: this.usuarioSelected,
+      header: 'Cambiar contraseña',
+      width: '30rem',
+    });
   }
 
   decisionModal(arg) {

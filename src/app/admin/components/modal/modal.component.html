@@ -100,14 +100,14 @@
     [blockScroll]="true"
   >
     <div class="p-2">
-      <app-movimientos-form [data]="seleccionModal" (cancel)="accion($event)"></app-movimientos-form>
+      <!-- <app-movimientos-form [data]="seleccionModal" (cancel)="accion($event)"></app-movimientos-form> -->
     </div>
   </p-dialog>
   <!-- ================================================================================================================================ -->
   <!--  CAMBIAR CONTRASEÑA  -->
   <!-- ================================================================================================================================ -->
 
-  <p-dialog
+  <!-- <p-dialog
     *ngIf="tipoModal === 'password'"
     header="Cambiar contraseña"
     [draggable]="false"
@@ -120,7 +120,7 @@
     [blockScroll]="true"
   >
     <app-change-password [user]="seleccionModal" (cancel)="accion($event)"></app-change-password>
-  </p-dialog>
+  </p-dialog> -->
 
   <!-- ================================================================================================================================ -->
   <!--  FORMULARIO CANTIDAD EFECTIVO  -->
@@ -256,7 +256,7 @@
   </p-dialog>
 
   <!-- ================================================================================================================================ -->
-  <!--  IMPRIMIR  FACTURA-->
+  <!--  'IMPRIMIR'  FACTURA-->
   <!-- ================================================================================================================================ -->
 
   <p-dialog
@@ -355,7 +355,7 @@
         [search]="false"
         (paginateChange)="renovarDataFiltros($event)"
         (reinicioModal)="reinicioModal()"
-      ></app-tablas>
+      ></app-tablas> 
     </div>
   </p-dialog>
 
@@ -413,7 +413,7 @@
     [blockScroll]="true"
   >
     <div class="p-0">
-      <app-formar-factura *ngIf="seleccionModal" [factura]="seleccionModal"></app-formar-factura>
+      <!-- <app-formar-factura *ngIf="seleccionModal" [factura]="seleccionModal"></app-formar-factura> -->
     </div>
 
     <!-- TODO: HACER AQUI COMO HICE EN XCREEN PARA PONER LAS PROPIEDADES
@@ -501,7 +501,7 @@
     [draggable]="true"
     [(visible)]="showModal"
     [modal]="true"
-    [style]="{ width: '900px' }"
+    [style]="{ width: ' ' }"
     (onHide)="accion(false)"
   >
     <ngx-extended-pdf-viewer

@@ -71,12 +71,18 @@ div.pieFactura {
   bottom: 0;
 }
 div.cuerpoFactura.mb-2 {
+  display: flex;
   position: absolute;
   width: 100%;
-  // height: calc(100% - 30vh);
   height: 32rem;
 }
 
 .numerosCalculos {
   justify-content: flex-end;
+}
+
+::ng-deep .anularPadding {
+  & .p-tabview-panels {
+    padding: 0 !important;
+  }
 }

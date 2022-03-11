@@ -6,17 +6,22 @@ import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { SingletonService } from '../../../../core/services/singleton.service';
 import { ConfigI } from '../../../../core/typescript/config-interface';
 import { FunctionService } from '../../../../core/services/functions.service';
+import { ModalI } from '../../new_modal/modal-class';
 @Component({
   selector: 'app-formar-factura',
   templateUrl: './formar-factura.component.html',
   styleUrls: ['./formar-factura.component.scss'],
 })
-export class FormarFacturaComponent implements OnInit {
-  @Input() factura;
+export class FormarFacturaComponent implements OnInit, ModalI {
+  // @Input() factura;
 
+  fun = SingletonService.fun;
   configServ = SingletonService.configServ;
   config: ConfigI;
-  constructor(private fun: FunctionService) {}
+  constructor() {}
+  modal: any;
+  inputs: any;
+  btn_aceptar() {}
 
   ngOnInit() {
     // this.factura.detalle_facturas = [

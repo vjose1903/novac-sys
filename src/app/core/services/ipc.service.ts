@@ -78,6 +78,8 @@ export class IpcService {
   }
 
   sendTask(task: MessageTask) {
+    console.log('Enviando tarea:::: o ');
+
     return new Promise(async (resolve, reject) => {
       if (this.isElectron) {
         this.addColaMensaje(task);

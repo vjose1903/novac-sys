@@ -161,6 +161,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       }
     }
   }
+
   disableOption(id, boolean) {
     let optionSelected = _.find(this.listaProductos, (item) => item.id == id);
     optionSelected.optionDisabled = boolean;
@@ -284,7 +285,36 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   abrirModalDinamicText(tipo) {
     const obj = {};
     if (tipo === 'confirmar') obj['texto_modal'] = 'Seguro de que desea confirmar la produccion.';
-    this.abrirModal('dinamico_texto', obj, 'confirmar_produccion');
+
+    this.handleModalForm({
+      id: 'confirmar_produccion',
+      header: 'Confirmar',
+      width: '510px',
+      html: `<p>
+      ${obj['texto_modal']}
+    </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => {
+              this.confirmarProduccion();
+              this.closeModal(instance);
+            },
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+  closeModal(modalInstance) {
+    console.warn('modalInstance: ', modalInstance);
+
+    modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 
   decisionModalP(bool) {

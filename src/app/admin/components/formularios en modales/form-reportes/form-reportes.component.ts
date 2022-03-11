@@ -7,13 +7,15 @@ import * as moment from '../../../../core/javascript/moment';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
+import { ModalI } from '../../new_modal/modal-class';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-form-reportes',
   templateUrl: './form-reportes.component.html',
   styleUrls: ['./form-reportes.component.scss'],
 })
-export class FormVentasComponent extends MixinClass implements OnInit {
+export class FormVentasComponent extends MixinClass implements OnInit, ModalI {
   @Input() tipo_reporte;
   @Input() switches;
 
@@ -50,8 +52,19 @@ export class FormVentasComponent extends MixinClass implements OnInit {
       },
     );
   }
+  modal: any = {};
+  inputs: any;
+  btn_aceptar() {
+    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    modal.closeModal(this.modal.component_id);
+    modal.getDataModal({ data: { ...this.form.value, switches: { ...this.switches } }, modal_id: this.modal.component_id });
+    // throw new Error('Method not implemented.');
+  }
 
   ngOnInit() {
+    console.log('🚀 ~ file: form-reportes.component.ts ~ line 207 ~ FormVentasComponent ~ inputs', this.inputs);
+    this.tipo_reporte = this.inputs.tipo_reporte;
+    this.switches = this.inputs.switches;
     this.localeService.use('es');
     this.necesarioStart();
   }
@@ -81,13 +94,11 @@ export class FormVentasComponent extends MixinClass implements OnInit {
   }
 
   async getClientes(arg) {
-
     if (arg.term && arg.term !== '') {
       this.fun.awaitTyping().then((res) => {
         const extra = { afterPath: `filtro/${arg.term}`, parameters: { paginado: false } };
 
         this.clienteClass.getAll(extra).then((res) => {
-
           res['data'].map((cliente) => {
             cliente.documentos_de_identidad.map((docu) => {
               if (docu.principal) cliente.documento_identidad = docu.documento;

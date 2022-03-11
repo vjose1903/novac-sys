@@ -1,11 +1,31 @@
+.divListadoViajes {
+  display: grid;
+  grid-template-areas:
+    "titulo titulo"
+    "listado formulario";
 
+  grid-template-rows: min-content auto;
+  grid-template-columns: 60% auto;
+  column-gap: 0.5rem;
+  height: 100%;
+
+  .titulo {
+    grid-area: titulo;
+  }
+  .listado {
+    grid-area: listado;
+  }
+  .formulario {
+    grid-area: formulario;
+  }
+}
 
 div.card-header {
   background-color: var(--primary06);
 }
 
 .gris {
-  color: var(--transparente01)
+  color: var(--transparente01);
 }
 
 hr.rayaA.mt-2 {
@@ -13,7 +33,6 @@ hr.rayaA.mt-2 {
 }
 
 .pagoPorcentaje {
-
   display: grid;
   grid-template-areas: "pagado divisor total";
 

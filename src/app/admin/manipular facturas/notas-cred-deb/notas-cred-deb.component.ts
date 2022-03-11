@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
-import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
+import { FacturaC, TiposFacturaC, FacturasI } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
@@ -18,8 +18,10 @@ import { PdfService } from '../../../core/services/pdf/pdf.service';
   styleUrls: ['./notas-cred-deb.component.scss'],
 })
 export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
-  factura;
-  idFactura: any;
+  // factura;
+  tabIndex = 0;
+  idsFacturas: number[];
+  facturasConDetalles: Array<FacturasI>;
   tipoNota: any;
   tituloPag = '';
   factura_aplicada;
@@ -31,13 +33,13 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   TOTAL = 0;
 
   info = [];
-  detalleFacturas: any;
+  // detalleFacturas: any;
   detalleNota = [];
   @ViewChild(TablasComponent) tablas: TablasComponent;
   tipoModal: string;
   tipoFactura: any;
   lista_tipos_facturas: any;
-  propietario_factura: any;
+  // propietario_factura: any;
   paqueteComprobante;
 
   articuloClass = new ArticuloC();
@@ -47,11 +49,12 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   ncfClass = new NcfC();
   constructor(private activeRoute: ActivatedRoute, private router: Router, private pdfServ: PdfService) {
     super();
+    console.log('La data mandada: ', this.router.getCurrentNavigation());
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'notas', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto'] });
-    this.idFactura = this.activeRoute.snapshot.params['id'];
+    this.idsFacturas = JSON.parse(this.activeRoute.snapshot.params['ids']);
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
     this.fecha = moment().format('DD/MM/YYYY');
@@ -87,11 +90,20 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   async necesarioStart() {
     this.lista_tipos_facturas = await this.tiposFacturasClass.getAll();
 
-    this.getFactura().then(async (res_factura) => {
+    let promiseArray = [];
+
+    for (const ids of this.idsFacturas) {
+      promiseArray.push(this.getFactura(ids));
+    }
+
+    Promise.all(promiseArray).then(async (datos) => {
+      console.log('LAS RESPUESTAS: ', datos);
+      this.facturasConDetalles = datos;
+
       await this.formarTitulosTabla();
-      await this.getPropietario(this.factura.cliente_id);
+
       await this.getPaqueteComprobante();
-      this.factura_aplicada = this.factura.numero_comprobante;
+      this.factura_aplicada = this.facturasConDetalles;
     });
   }
 
@@ -103,29 +115,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     });
   }
 
-  async getPropietario(id) {
-    if (id) {
-      try {
-        this.clienteClass.getOne(id).then((res) => {
-          const cliente = res['data'];
-
-          const documento = cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0];
-
-          this.propietario_factura = {
-            nombre: cliente.nombre + ' ' + cliente.apellido,
-            direccion: cliente.direccion,
-            rnc: documento.documento,
-          };
-        });
-      } catch (error) {}
-    } else {
-      this.propietario_factura = {
-        nombre: this.factura.NoCliente_nombre,
-        direccion: this.factura.NoCliente_direccion,
-        rnc: '------------',
-      };
-    }
-  }
   formarTitulosTabla() {
     this.info = [
       { titulo: ' ', tipo: 'inputSwitch', key: 'select', title: '', estilos: [{ width: '3rem' }] },
@@ -148,17 +137,20 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     ];
   }
 
-  async getFactura() {
+  async getFactura(idFact) {
     return new Promise(async (resolve) => {
-      this.facturaClass.getOne(this.idFactura).then((res_factura) => {
-        this.factura = res_factura['data'];
+      this.facturaClass.getOne(idFact).then((res_factura) => {
+        let tempFactData: FacturasI;
+        console.log('ITEM ANTES DE: ', tempFactData);
 
+        tempFactData = res_factura['data'];
+        this.fun.logRed('this.factura --> ', tempFactData);
 
-        this.facturaClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.factura.numero_comprobante}` }).then((res) => {
+        this.facturaClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${tempFactData.numero_comprobante}` }).then((res) => {
           const devueltos = res['data'];
-          const temp = [];
-          for (let i = 0; i < this.factura.detalle_facturas.length; i++) {
-            const detalle = this.factura.detalle_facturas[i];
+
+          for (let i = 0; i < tempFactData.detalle_facturas.length; i++) {
+            const detalle = tempFactData.detalle_facturas[i];
 
             const devueto = devueltos[detalle.id] !== undefined ? devueltos[detalle.id] : 0;
 
@@ -185,13 +177,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
             detalle['total_nota'] = 0;
             detalle['cantidad'] = detalle.cantidad - devueto;
-
-            temp.push(detalle);
           }
 
-          this.detalleFacturas = temp;
-
-          resolve(true);
+          resolve(tempFactData);
         });
       });
     });
@@ -243,21 +231,23 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async selectAll(info) {}
 
-  async getInfoChange(info) {
-    const entidad = info.body[info.index];
+  async getInfoChange(infoTable, factData: FacturasI) {
+    console.log('factData==> ', factData);
+
+    const entidad = infoTable.body[infoTable.index];
     entidad.cant_nota = parseFloat(entidad.cant_nota);
 
-    if (info.cambio === 'cant_nota') {
+    if (infoTable.cambio === 'cant_nota') {
       if (this.tipoNota === 'credito') {
         if (entidad.cant_nota > entidad.cant) {
           this.fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
-          this.tablas.enfocarInput('inputNu-' + info.index);
+          this.tablas.enfocarInput('inputNu-' + infoTable.index);
           setTimeout(() => {
-            this.tablas.resetInput('cant', 'cant_nota', info.index, false);
+            this.tablas.resetInput('cant', 'cant_nota', infoTable.index, false);
           }, 5);
         } else if (isNaN(entidad.cant_nota)) {
-          this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
-          this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
+          this.tablas.resetInput('especificar', 'cant_nota', infoTable.index, false, 0);
+          this.tablas.resetInput('especificar', 'total_nota', infoTable.index, false, 0);
         } else {
           const descuento = entidad.descuento_valor / entidad.cantidad;
 
@@ -266,8 +256,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         }
       } else {
         if (isNaN(entidad.cant_nota)) {
-          this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
-          this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
+          this.tablas.resetInput('especificar', 'cant_nota', infoTable.index, false, 0);
+          this.tablas.resetInput('especificar', 'total_nota', infoTable.index, false, 0);
         }
         const descuento = entidad.descuento_valor / entidad.cantidad;
 
@@ -278,20 +268,20 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       this.checkCantidadEnUnidades();
     }
 
-    if (info.cambio === 'select') {
-      if (!info.value) {
-        this.detalleFacturas[info.index].select = false;
-        this.tablas.resetInput('especificar', 'cant_nota', info.index, false, 0);
-        this.tablas.resetInput('especificar', 'total_nota', info.index, false, 0);
+    if (infoTable.cambio === 'select') {
+      if (!infoTable.value) {
+        factData.detalle_facturas[infoTable.index].select = false;
+        this.tablas.resetInput('especificar', 'cant_nota', infoTable.index, false, 0);
+        this.tablas.resetInput('especificar', 'total_nota', infoTable.index, false, 0);
 
-        const i = this.detalleNota.indexOf(info.body[info.index]);
+        const i = this.detalleNota.indexOf(infoTable.body[infoTable.index]);
         _.pullAt(this.detalleNota, i);
 
         this.sumarTotal();
         this.checkCantidadEnUnidades();
       } else {
-        this.detalleFacturas[info.index].select = true;
-        this.detalleNota.push(info.body[info.index]);
+        factData.detalle_facturas[infoTable.index].select = true;
+        this.detalleNota.push(infoTable.body[infoTable.index]);
       }
     }
   }
@@ -310,7 +300,17 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    this.abrirModal('cancelar', null);
+    const confirmationObj = {
+      id: 'archivar_factura',
+      texto: 'Seguro que desea cancelar la factura',
+      header: 'Confirmación',
+      siFunction: (instance) => {
+        this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
+        this.closeModal(instance);
+      },
+      width: '30rem',
+    };
+    this.confirmationModal(confirmationObj);
   }
   // =============================================
   //  MODAL IMPRIMIR
@@ -323,7 +323,18 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         this.fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
       } else {
         const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota, tipo__: 'no_devuelta' };
-        this.abrirModal('imprimir', obj);
+
+        const confirmationObj = {
+          id: 'imprimir_factura',
+          texto: 'Seguro que desea imprimir la factura',
+          header: 'Confirmación',
+          siFunction: (instance) => {
+            this.formarNota(null);
+            this.closeModal(instance);
+          },
+          width: '30rem',
+        };
+        this.confirmationModal(confirmationObj);
       }
     }
   }
@@ -331,7 +342,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   async decisionModal(res) {
     if (res) {
       if (this.tipoModal === 'imprimir') {
-        this.formarNota();
+        this.formarNota(null);
       } else if (this.tipoModal === 'cancelar') {
         this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
       }
@@ -351,10 +362,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return num;
   }
 
-  formarDetallesNota() {
+  formarDetallesNota(dataFact: FacturasI) {
     const temp = [];
-    for (let i = 0; i < this.detalleFacturas.length; i++) {
-      const element = this.detalleFacturas[i];
+    for (let i = 0; i < dataFact.detalle_facturas.length; i++) {
+      const element = dataFact.detalle_facturas[i];
 
       let unidad_ = element.unidad;
       if (element.select) {
@@ -380,11 +391,41 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return temp;
   }
 
-  async formarNota() {
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.handleModalForm({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+      ${obj.texto}
+    </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+
+  closeModal(modalInstance) {
+    console.warn('modalInstance: ', modalInstance);
+
+    modalInstance.closeModal(modalInstance.id, 'cancelar');
+  }
+
+  async formarNota(dataFact: FacturasI) {
     const empleado = this.fun.getUser();
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
 
-    const cuerpo_fact = this.formarDetallesNota();
+    const cuerpo_fact = this.formarDetallesNota(null);
 
     const cabecera_fact = {};
     cabecera_fact['condicion'] = 'Contado';
@@ -413,12 +454,12 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     cabecera_fact['is_nota'] = true;
     cabecera_fact['tiene_nota'] = false;
 
-    if (this.factura.cliente_id === null) {
+    if (dataFact.facturas.cliente_id === null) {
       cabecera_fact['cliente_id'] = null;
-      cabecera_fact['NoCliente_nombre'] = this.propietario_factura.nombre;
-      cabecera_fact['NoCliente_direccion'] = this.propietario_factura.direccion;
+      cabecera_fact['NoCliente_nombre'] = dataFact.facturas.propietario_factura.nombre;
+      cabecera_fact['NoCliente_direccion'] = dataFact.facturas.propietario_factura.direccion;
     } else {
-      cabecera_fact['cliente_id'] = this.factura.cliente_id;
+      cabecera_fact['cliente_id'] = dataFact.facturas.cliente_id;
     }
 
     cabecera_fact['detalle_facturas'] = cuerpo_fact;
@@ -426,9 +467,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     cabecera_fact['tipo'] = 'nota_' + this.tipoNota;
     cabecera_fact['user_id'] = empleado.id;
     cabecera_fact['aplicada_a'] = this.factura_aplicada;
-    cabecera_fact['factura_id'] = this.factura.id;
+    cabecera_fact['factura_id'] = dataFact.facturas.id;
 
-    if (this.propietario_factura.vendedor_id) cabecera_fact['vendedor_id'] = this.propietario_factura.vendedor_id || null;
+    if (dataFact.facturas.propietario_factura.vendedor_id) cabecera_fact['vendedor_id'] = dataFact.facturas.propietario_factura.vendedor_id || null;
 
     try {
       const res = await this.facturaClass.createOne(cabecera_fact);

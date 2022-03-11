@@ -1,0 +1,16 @@
+<div #cardTabla id="cardTabla" class="h-100 d-flex">
+  <app-tablas
+    *ngIf="dataFiltro"
+    [paraFiltroClientes]="paraFiltroClientes"
+    [focusRow]="true"
+    (clickRow)="devolverCLick($event)"
+    [info]="inputs.metodo === 'venta' ? ventaInfo : compraInfo"
+    [pad]="false"
+    [padre]="cardTabla"
+    [id_tabla]="'filtroCliente'"
+    [data]="dataFiltro"
+    [search]="true"
+    [ROW]="'cliente'"
+    (paginateChange)="buscarClientesOrSuplidor($event)"
+  ></app-tablas>
+</div>

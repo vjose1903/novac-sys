@@ -10,7 +10,10 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 @NgModule({
   declarations: [ModalComponent],
-  imports: [CommonModule, FormulariosEnModalesModule, AngularModule, PrimengModule, TablasModule, NgxBootstrapModule, NgxExtendedPdfViewerModule],
+  imports: [
+    CommonModule, FormulariosEnModalesModule, AngularModule, PrimengModule, TablasModule, NgxBootstrapModule, NgxExtendedPdfViewerModule,
+    
+  ],
   exports: [ModalComponent],
 })
 export class ModalModule {}

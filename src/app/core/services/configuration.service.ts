@@ -5,6 +5,7 @@ import { ConfigI } from '../typescript/config-interface';
   providedIn: 'root',
 })
 export class ConfigurationService {
+
   constructor() {}
 
   private config: ConfigI;

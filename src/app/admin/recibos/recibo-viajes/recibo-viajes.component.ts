@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../registros/registro-empleados/empleado';
@@ -10,13 +9,14 @@ import { ReciboC } from '../recibos';
 import { RecibosService } from '../recibos.service';
 import { FacturaC } from '../../facturacion/factura';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
-import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
+import { FormCantidadEfectivoComponent } from '../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
 
 @Component({
   selector: 'app-recibo-viajes',
   templateUrl: './recibo-viajes.component.html',
   styleUrls: ['./recibo-viajes.component.scss'],
 })
+
 export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;
   info = [
@@ -75,7 +75,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   decisionModal(res: any) {
-    if (this.fun.hasValue(res)) this.reversarUltimaTransaccion(res);
+    if (this.fun.hasValue(res)) this.reversarUltimaTransaccion();
   }
 
   objDevueltoResponse(res) {
@@ -215,18 +215,58 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
     this.ultimo_pago = _.maxBy(this.viaje_selected.pagos, 'id');
   }
-
+  async getDataFromModal(arg, search) {
+    const data = arg.obj;
+    if (arg.modal_id === 'cambioEfectivo_ReciboViajes') {
+      this.devuelta = data.devuelta > 0 ? data.devuelta : 0;
+      this.forma_pago = data.forma_pago;
+      this.total_recibido = data.dinero;
+      this.IMPRIMIR();
+    }
+  }
   accion(bool, tipo) {
     if (bool) {
       let tipoModal = tipo;
-      let obj = {};
-      if (tipo === 'cambio') obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo__: 'no_devuelta', factura_de: 'venta' };
-      else if (tipo === 'dinamico_texto') {
-        tipoModal = 'reversar_transaccion';
-        obj['texto_modal'] = 'Seguro de que desea reversar la ultima transaccion realizada a la factura ' + this.viaje_selected.numero_comprobante;
-      }
 
-      this.abrirModal(tipo, obj, tipoModal);
+      if (tipo === 'cambio') {
+        const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo__: 'no_devuelta', factura_de: 'venta' };
+
+        this.handleModalForm({
+          component: FormCantidadEfectivoComponent,
+          inputs: obj,
+          id: 'cambioEfectivo_ReciboViajes',
+          header: 'Cantidad de efectivo',
+          width: '34.375rem',
+          botones: {
+            aceptar: { show: false, disable: false },
+            cancelar: { show: false, disable: false },
+            dinamico: [
+              {
+                clase: 'btn btn-blanco mr-2',
+                function: (instance) => {
+                  instance.closeModal(instance.id, 'd');
+                },
+                label: 'Cancelar',
+                disable: false,
+              },
+              { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+            ],
+          },
+        });
+      } else if (tipo === 'dinamico_texto') {
+        tipoModal = 'reversar_transaccion';
+        const texto = 'Seguro de que desea reversar la ultima transaccion realizada a la factura ' + this.viaje_selected.numero_comprobante;
+        const objConfirmationModal = {
+          id: 'reversar_transaccion',
+          header: 'Confirmación',
+          siFunction: (instance) => {
+            this.reversarUltimaTransaccion();
+            instance.closeModal(instance.id, 'reversar_transaccion');
+          },
+          texto,
+        };
+        this.confirmationModal(objConfirmationModal);
+      }
     } else {
       if (tipo === 'cambio' || tipo === 'cancelar') {
         this.resetVariables();
@@ -234,18 +274,40 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     }
   }
 
-  async reversarUltimaTransaccion(arg) {
-    if (arg) {
-      try {
-        const extra = { afterPath: `revertir/by_factura/${this.viaje_selected.id}` };
-        this.reciboClass.getAll(extra).then((res) => {
-          const actualPagination = this.tServ.getPaginationById('lista_viajes');
-          this.getViajes(actualPagination);
-          this.resetVariables();
-        });
-      } catch (error) {
-        console.error(error);
-      }
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.handleModalForm({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+        ${obj.texto}
+      </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+
+  async reversarUltimaTransaccion() {
+    try {
+      const extra = { afterPath: `revertir/by_factura/${this.viaje_selected.id}` };
+      this.reciboClass.getAll(extra).then((res) => {
+        const actualPagination = this.tServ.getPaginationById('lista_viajes');
+        this.getViajes(actualPagination);
+        this.resetVariables();
+      });
+    } catch (error) {
+      console.error(error);
     }
   }
 

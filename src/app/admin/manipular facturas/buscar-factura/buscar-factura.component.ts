@@ -11,6 +11,9 @@ import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { PdfViewerComponent } from '../../components/pdf-viewer/pdf-viewer.component';
+import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -48,8 +51,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
   campo = null;
   placeHolder = '';
+
   info = [
-    { titulo: ' ', tipo: 'icon', key: 'estatus', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '2rem' }] },
+    { titulo: ' ', tipo: 'icon', key: 'estatus', text_color: 'colorEstado', color: true, estilos: [{ width: '2rem' }] },
     { titulo: 'Numero Fact', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
     { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
     { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
@@ -58,14 +62,37 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     { titulo: 'Fecha Vencimiento', tipo: 'text', key: 'fechaV' },
     { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', formatoNumero: true },
     { titulo: 'Balance tactura', tipo: 'formatoNumero', key: 'balance', formatoNumero: true },
-    { titulo: 'Seleccione', tipo: 'icon', key: 'select', text_color: 'selectColor', isIcon: true, color: true },
+    {
+      titulo: '7',
+      tipo: 'icon',
+      key: 'view',
+      text_color: 'viewColor',
+      color: true,
+      estilos: [{ width: '0%' }, { color: 'var(--transparente00)' }],
+    },
+    {
+      titulo: 'Acciones',
+      text_tooltip: 'tooltip_select',
+      tipo: 'icon',
+      key: {
+        key: 'selected',
+        source: 'is_selected',
+        clases: [
+          { value: true, clase: 'far fa-check-square' },
+          { value: false, clase: 'far fa-square' },
+        ],
+      },
+      text_color: 'selectedColor',
+      color: true,
+      estilos: [{ width: '9%' }],
+    },
   ];
 
   infoNota = [
     { titulo: 'Fecha', tipo: 'text', key: 'fecha' },
     { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
     { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total_factura', formatoNumero: true },
-    { titulo: 'Seleccione', tipo: 'icon', key: 'select', text_color: 'selectColor', isIcon: true, color: true },
+    { titulo: 'Seleccione', tipo: 'icon', key: 'view', text_color: 'viewColor', color: true },
   ];
 
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
@@ -94,16 +121,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.enfocarInput('campoI');
   }
 
-  objDevueltoResponse(res) {
-    if (res && res.tipo_modal === 'buscarCliente') {
-      this.clienteBuscado = res.data;
-      (document.getElementById('valorI') as any).value = res.data.nombre;
-      this.valor = res.data.id;
-      const actualPagination = this.tServ.getPaginationById('facturas_params');
-      this.pedirFactura('1', res.data.id, actualPagination);
-    }
-  }
-
   pressEscResponse(res) {
     if (this.fun.hasValue(res)) this.enfocarInput('valorI');
   }
@@ -121,44 +138,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         this.loadServ.isLoading.next(false);
         this.fun.toastError(err.msg, 'ERROR');
       });
-  }
-
-  decisionModal(res) {
-    if (res) {
-      if (this.tipoModal === 'mostrarFactura') {
-        if (this.buscarPara === 'anular_factura') {
-          this.facturaSelected['identificadorFact'] =
-            this.campo === '2'
-              ? ' con el comprobante fiscal ' + this.facturaSelected.numero_comprobante
-              : ' con el numero de factura ' + this.formatoNumeroFactura(this.facturaSelected.numero_factura);
-
-          setTimeout(() => this.abrirModal('cancelar', this.facturaSelected), 10);
-          //
-        } else if (this.buscarPara === 'nota_credito' || this.buscarPara === 'nota_debito') {
-          if (res.tipo === 'reimrimir') {
-            const obj = { data: this.notaSelected, type: 'facturacion' };
-            this.reimprimirFactura(obj);
-          } else {
-            const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${this.facturaSelected.id}`;
-            this.router.navigateByUrl(url);
-          }
-        } else if (this.buscarPara === 'solo_ver') {
-          if (res.tipo === 'reimrimir') {
-            const obj = { data: this.facturaSelected, type: 'facturacion' };
-            this.reimprimirFactura(obj);
-          } else {
-            this.facturaClass.getAll({ afterPath: `custom/canUpdate/${this.facturaSelected.id}` }).then((res) => {
-              setTimeout(() => this.editarFactura(), 10);
-            });
-          }
-          //
-        }
-      } else if (this.tipoModal === 'cancelarBusqueda') {
-        this.decisionesModal();
-      }
-    } else {
-      if (this.tipoModal === 'cancelar') setTimeout(() => this.abrirModal('mostrarFactura', this.facturas[0]), 10);
-    }
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -262,13 +241,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       busqueda['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
         fact.fecha = moment(fact.fecha_equivalente).format('DD/MM/YYYY');
-        fact.total_factura = this.fun.formatearNumero(this.fun.redondearAdos(Math.abs(fact.total_factura)));
-        fact.selectColor = 'gris-claro';
-        fact.select = 'far fa-eye-slash';
+        fact.total_factura = this.fun.numFormatTwoDecimals(Math.abs(fact.total_factura));
+        fact.selectedColor = 'gris-claro';
+        fact.viewColor = 'gris-claro';
+        fact.view = 'far fa-eye-slash';
 
-        fact.iconsMoveEvents = [{ key: 'select', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
+        fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
-        fact.customStyles = { 'td-select': { 'font-size': '1.5rem' }, 'td-numero_comprobante': { width: '7rem' } };
+        fact.customStyles = { 'td-view': { 'font-size': '1.5rem' }, 'td-numero_comprobante': { width: '7rem' } };
 
         return fact;
       });
@@ -330,17 +310,20 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.monto = this.fun.formatearNumero(this.fun.redondearAdos(fact.balance));
         fact.pago_a_tiempo = fact.fecha_vencimiento > fechaA ? true : false;
         fact.colorEstado = fact.estado ? 'green' : 'red';
-        fact.selectColor = 'gris-claro';
-        fact.select = 'far fa-eye-slash';
+        fact.viewColor = 'gris-claro';
+        fact.view = 'far fa-eye-slash';
+        fact.is_selected = false;
+        fact.tooltip_select = 'Seleccionar Factura';
 
-        fact.iconsMoveEvents = [{ key: 'select', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
-        // fact.customStyles = [{ select: { estilos: [{ 'font-size': '1.5rem' }] } }, { 'td-estatus': { estilos: [{ width: '2rem' }] } }];
+        fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
+        // fact.customStyles = [{ view: { estilos: [{ 'font-size': '1.5rem' }] } }, { 'td-estatus': { estilos: [{ width: '2rem' }] } }];
         fact.customStyles = {
-          'td-select': { 'font-size': '1.5rem' },
           'td-condicion': { width: '6rem' },
           'td-secuencia': { width: '7rem' },
           'td-numero_comprobante': { width: '7rem' },
           'td-estatus': { width: '2rem' },
+          'td-view': { width: '4%', 'padding-left': '1rem', 'font-size': '1.5rem' },
+          'td-selected': { width: '4%', 'font-size': '1.5rem' },
         };
 
         return fact;
@@ -357,7 +340,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
           this.parseFactura(this.facturas[0], 'venta', this.buscarPara).then((res) => {
             this.facturaSelected = res;
-            this.abrirModal('mostrarFactura', res);
           });
         }
       } else {
@@ -436,25 +418,32 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  selectFactura(item) {
-    if (item.column === 'select') {
-      this.parseFactura(item.row, 'venta', this.buscarPara).then((res) => {
+  clickIconHandler(item) {
+    if (item.column === 'view') {
+      this.parseFactura(item.row, 'venta', 'revisar').then((res) => {
         this.facturaSelected = res;
-        this.abrirModal('mostrarFactura', res);
+
+        this.mostrarFactura(res);
       });
+    } else if (item.column === 'selected') {
+      item.row.is_selected = !item.row.is_selected;
+
+      // const factura_in_turn = _.find(this.facturas, (item) => item.id == item.row.id);
+      // factura_in_turn.is_selected = !factura_in_turn.is_selected;
     }
   }
 
   selectNota(event) {
-    if (event.column === 'select') {
+    if (event.column === 'view') {
       this.parseFactura(event.row, 'nota', 'reimprimir').then((res) => {
         this.notaSelected = res;
-        this.abrirModal('mostrarFactura', res);
+        this.mostrarFactura(res);
       });
     }
   }
 
   confirmarSeleccion() {}
+
   validarRayaAbajo() {
     if (this.NCF) {
       let char = '';
@@ -511,9 +500,23 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   async abrirModalFiltro(nombre) {
     const obj = {
       data: this.listaClientes,
-      filtrarCliente: nombre,
+      palabra_a_buscar: nombre,
+      metodo: 'venta',
     };
-    this.abrirModal('buscarCliente', obj);
+
+    this.handleModalForm({
+      component: BuscarClienteSuplidorComponent,
+      inputs: obj,
+      id: 'buscarCliente',
+      header: 'Buscar cliente',
+      width: '900px',
+      height: '500px',
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        // dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+      },
+    });
   }
 
   formatoNumeroFactura(num) {
@@ -530,6 +533,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (this.tipoModal === 'cancelarBusqueda') this.borrar();
   }
 
+  // get hayFacturasSelecciomnadas(): boolean {
+  //   return _.some(this.facturas, { is_selected: true });
+  // }
+
   async CancelarFactura() {
     try {
       const res = await this.facturaClass.createOne(null, { afterPath: `anular_factura/${this.facturaSelected.id}` });
@@ -537,6 +544,48 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       this.pedirFactura(this.campo, this.valor, actualPagination);
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  get idsFacturasSeleccionadas() {
+    const facturasSelecc = _.filter(this.facturas, { is_selected: true });
+    const ids            = _.map(facturasSelecc, 'id');
+    return ids;
+  }
+
+  continuarAManipularFactura() {
+    const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${JSON.stringify(this.idsFacturasSeleccionadas)}`;
+    this.router.navigateByUrl(url);
+  }
+
+  mostrarFactura(dataFactura) {
+    const toPDFData = { data: dataFactura, type: 'facturacion' };
+    this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
+      if (res.status === 'si') {
+        const obj = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+
+        this.handleModalForm({
+          component: PdfViewerComponent,
+          inputs: obj,
+          id: 'mostrarFactura',
+          header: 'Mostrar Factura',
+          width: '900px',
+          botones: {
+            aceptar: { show: false, disable: false },
+            cancelar: { show: false, disable: false },
+            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+          },
+        });
+      }
+    });
+  }
+  getDataFromModal(arg, search) {
+    if (arg.modal_id === 'buscarCliente') {
+      this.clienteBuscado = arg.data;
+      (document.getElementById('valorI') as any).value = arg.data.nombre;
+      this.valor = arg.data.id;
+      const actualPagination = this.tServ.getPaginationById('facturas_params');
+      this.pedirFactura('1', arg.data.id, actualPagination);
     }
   }
 }

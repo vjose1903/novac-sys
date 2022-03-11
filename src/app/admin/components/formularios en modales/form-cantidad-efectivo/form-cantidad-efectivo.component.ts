@@ -2,13 +2,14 @@ import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter } from '@
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
+import { ModalI } from '../../new_modal/modal-class';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
   templateUrl: './form-cantidad-efectivo.component.html',
   styleUrls: ['./form-cantidad-efectivo.component.scss'],
 })
-export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit {
+export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
   @Input() tipo = 'devuelta';
   @Input() data;
   @Input() debe_cubrir = true;
@@ -24,8 +25,14 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   constructor() {
     super();
   }
+  modal: any = {};
+  inputs: any;
 
   ngOnInit() {
+    this.data = this.inputs;
+    console.log('VIENDO DATOS =====> this.inputs', this.inputs);
+    console.log('VIENDO DATOS =====> this.data', this.data);
+
     this.efectivo = this.formatoNumero(this.data.devuelta);
     this.factura_de = this.data.factura_de;
 
@@ -51,7 +58,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
         this.fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         this.enfocarInput('inputEfectivo');
       } else {
-        this.enfocarInput('btnSend');
+        this.btn_aceptar();
       }
     }
   }
@@ -100,13 +107,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
         tempdecimales = '00';
       }
       //
-      if (
-        splitPrecio.length > 2 ||
-        this.checkNumbers(enteros) ||
-        this.checkLongMillares(enteros) ||
-        this.checkNumbers(tempdecimales) ||
-        this.checkLongMillares(tempdecimales)
-      ) {
+      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
         this.fun.toastError('Valor introducido es invalido', 'ERROR');
         this.enfocarInput(input);
       } else {
@@ -146,8 +147,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   cancelar() {
     this.cancel.emit();
   }
-  confirmar() {
-    const total = this.data.total_factura;
+  btn_aceptar() {
+    // const total = this.data.total_factura;
     const devuelta_ = this.fun.desformatear(this.devuelta);
     const efectivo = this.fun.desformatear(this.efectivo);
     const obj = {
@@ -156,23 +157,41 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       forma_pago: this.formaPago,
       decision_cambio: this.cambiar_articulos === 'si' ? true : false,
     };
-
-    if (this.factura_de === 'venta' && this.tipo !== 'no_devuelta' && total > efectivo) {
+    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    modal.closeModal(this.modal.component_id);
+    if (this.validarForm()) {
       this.fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
     } else {
       if (this.factura_de === 'compra') {
         if (this.cambiar_articulos !== undefined) {
-          this.getDevuelta.emit(obj);
+          modal.getDataModal({ obj, modal_id: this.modal.component_id });
         } else {
           this.fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
         }
       } else {
-        this.getDevuelta.emit(obj);
+        modal.getDataModal({ obj, modal_id: this.modal.component_id });
       }
     }
   }
 
   cambiosEnArticulos(lugar) {
     this.cambiar_articulos = lugar;
+  }
+
+  validarForm(from?): boolean {
+    const total = this.data.total_factura;
+    const devuelta_ = this.fun.desformatear(this.devuelta);
+    const efectivo = this.fun.desformatear(this.efectivo);
+    const validate = this.factura_de === 'venta' && this.tipo !== 'no_devuelta' && total > efectivo;
+    if (from == 'input') {
+      const modal = _.find(this.modal.instance.modalsConfig, { id: this.modal.component_id });
+      const btn = _.find(modal.botones.dinamico, { btn_id: 'btnConfirmar' });
+      console.log('modal.botones.dinamico: ', modal.botones.dinamico);
+      console.log('BOTON DEL DIABLO: ', btn);
+
+      btn.disable = validate;
+    }
+
+    return validate;
   }
 }

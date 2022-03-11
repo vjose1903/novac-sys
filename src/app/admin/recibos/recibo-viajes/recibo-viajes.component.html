@@ -1,8 +1,8 @@
-<div class="row">
-  <div class="col-12">
+<div class="divListadoViajes">
+  <div class="titulo">
     <h4 class="negrita">Listado de viajes</h4>
   </div>
-  <div class="col-7">
+  <div class="listado">
     <div #cardTabla id="cardTabla" class="card cardListados p-3">
       <app-tablas
         class="h-100"
@@ -23,7 +23,7 @@
     </div>
   </div>
 
-  <div class="col-5">
+  <div class="formulario">
     <div>
       <span *ngIf="viajes_pendientes_cant > 0" class="badge text-shadow red text-white mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
       <span *ngIf="viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge text-shadow blue text-white mb-3">Cantidad de viajes completados {{ viajes_completados_cant }}</span>

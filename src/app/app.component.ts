@@ -131,6 +131,8 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   }
 
   async getAppConfig() {
+    console.log('==== getAppConfig ====');
+
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
     this._ipc
       .sendTask(task)

@@ -1,0 +1,16 @@
+<div #cardTabla id="cardTabla" class="h-100 d-flex">
+  <app-tablas
+    *ngIf="dataFiltro"
+    [focusRow]="true"
+    [metodo]="inputs.metodo"
+    [paraFiltroArticulos]="' '"
+    (clickRow)="devolverCLick($event)"
+    [info]="info"
+    [pad]="false"
+    [id_tabla]="'filtroArticulos'"
+    [padre]="cardTabla"
+    [data]="dataFiltro"
+    [search]="false"
+    (paginateChange)="buscarArticulos($event)"
+  ></app-tablas>
+</div>

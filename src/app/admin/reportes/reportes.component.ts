@@ -6,6 +6,9 @@ import * as _ from 'lodash';
 import { ReporteC } from './reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../electron/shared-electron-angular';
+import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
+import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { FormVentasComponent } from '../components/formularios en modales/form-reportes/form-reportes.component';
 
 @Component({
   selector: 'app-reportes',
@@ -155,6 +158,16 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
+  async getDataFromModal(arg: any, search: any) {
+    console.log('🚀 ~ file: reportes.component.ts ~ line 163 ~ ReportesComponent ~ getDataFromModal ~ arg', arg);
+    if (arg && arg.tipo_modal === 'buscarCliente') {
+      if (this.tipoModal === 'cuentas_cobrar_cliente') {
+        arg.data.tipo_ = 1;
+        this.makePdf(arg.data);
+      }
+    } else if (arg && arg.tipo_modal !== 'buscarCliente') this.makePdf(arg.data);
+  }
+
   parseDataToVisorPdf(arg) {
     this.scaleImpresion = arg['scale'] ? arg['scale'] : 'noscale';
     if (arg.status === 'si') {
@@ -205,7 +218,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     else if (tipo === 'cuentas_cobrar_cliente') {
       this.titulo_moda_reporte = 'Reporte de CxC por cliente';
       tipo_modal = 'buscarCliente';
-
+      
       obj['data'] = [];
       obj['filtrarCliente'] = null;
       //
@@ -219,6 +232,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     //
     else if (tipo === 'inventario') {
       this.titulo_moda_reporte = 'Reporte de inventario';
+      tipo_modal = 'inventario';
       abrirModal = false;
       this.makePdf({ tipo_: 1 });
       //
@@ -240,14 +254,71 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       };
     }
 
-    if (abrirModal) this.abrirModal(tipo_modal, obj, tipo);
+    // if (abrirModal) this.abrirModal(tipo_modal, obj, tipo);
+    if (tipo_modal === 'reportes') {
+      // const components = { reportes: FormVentasComponent, buscarCliente: BuscarClienteSuplidorComponent };
+      const objHandler = {
+        component: FormVentasComponent,
+        inputs: obj,
+        id: tipo,
+        header: this.titulo_moda_reporte,
+        width: '510px',
+
+        botones: {
+          aceptar: { show: true, disable: false },
+          cancelar: { show: true, disable: false },
+        },
+      };
+      console.log('🚀 ~ file: reportes.component.ts ~ line 267 ~ ReportesComponent ~ formarObjModal ~ objHandler', objHandler);
+      this.handleModalForm(objHandler);
+    }
+
+    // FormVentasComponent
+    const objFormConfig = {};
   }
 
   abrirVisorPdf(obj) {
-    this.abrirModal('visor_pdf', obj);
+    console.log('abrirVisorPdf: ', obj);
+
+    this.handleModalForm({
+      component: PdfViewerComponent,
+      inputs: obj,
+      id: 'revision_recibo',
+      header: obj.titulo,
+      width: '900px',
+      height: obj.height,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => {
+              this.imprimirPDF(obj, instance);
+            },
+            label: 'Imprimir',
+            disable: false,
+          },
+        ],
+      },
+    });
     this.loadServ.isLoading.next(false);
   }
 
+  imprimirPDF(obj_pdf, modalInstance?) {
+    const obj = { base64: obj_pdf.pdfSrc, filename: `${obj_pdf.fileName}.pdf`, type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte', scale: this.scaleImpresion };
+
+    this.pdfServ
+      .imprimirBase64(obj)
+      .then((res) => {
+        if (res.status === 'si') {
+          this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+          if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
+        } else this.fun.toastError(res.msg, 'ERROR');
+      })
+      .catch((err) => this.fun.toastError(err.msg, 'ERROR'));
+  }
   decisionModal(decision) {
     if (decision) {
       if (this.tipoModal === 'visor_pdf') {
