@@ -41,7 +41,6 @@
 
     <div *ngIf="tipo_reporte === 'cuentas_con_pagos'" class="col-12">
       <label class="control-label">Seleccione cliente: <span style="color: red">*</span> </label>
-
       <ng-select
         formControlName="cliente_id"
         [items]="listaClientes"
@@ -121,7 +120,7 @@
   </div>
 </div>
 
-<div class="mt-4 d-flex justify-content-end">
+<!-- <div class="mt-4 d-flex justify-content-end">
   <button (click)="accion(false)" type="submit" class="btn btn-blanco mr-2">Cerrar</button>
   <button [disabled]="!form.valid" (click)="accion(true)" type="submit" class="btn btn-verde">Aceptar</button>
-</div>
+</div> -->

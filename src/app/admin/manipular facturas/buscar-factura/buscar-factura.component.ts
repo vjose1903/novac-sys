@@ -11,8 +11,9 @@ import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
-import { FormarFacturaComponent } from '../../components/formularios en modales/formar-factura/formar-factura.component';
+import { PdfViewerComponent } from '../../components/pdf-viewer/pdf-viewer.component';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
@@ -613,17 +614,26 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   mostrarFactura(dataFactura) {
-    this.handleModalForm({
-      component: FormarFacturaComponent,
-      inputs: dataFactura,
-      id: 'buscarFactura',
-      header: 'Mostrar Factura',
-      width: '1200px',
-      botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
-      },
+    console.log('🚀 ~ file: buscar-factura.component.ts ~ line 616 ~ BuscarFacturaComponent ~ mostrarFactura ~ dataFactura', dataFactura);
+    const toPDFData = { data: dataFactura, type: 'facturacion' };
+    this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
+      console.log('res ', res);
+      if (res.status === 'si') {
+        const obj = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '83vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+
+        this.handleModalForm({
+          component: PdfViewerComponent,
+          inputs: obj,
+          id: 'mostrarFactura',
+          header: 'Mostrar Factura',
+          width: '900px',
+          botones: {
+            aceptar: { show: false, disable: false },
+            cancelar: { show: false, disable: false },
+            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+          },
+        });
+      }
     });
   }
   getDataFromModal(arg, search) {
