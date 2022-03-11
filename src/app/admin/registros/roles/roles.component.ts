@@ -61,7 +61,29 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     this.getPermisos();
     this.listaRoles = [{ nombre: 'Administrador', descripcion: 'Administrador del sistema', activo: true, activo_: 'SI', activo_tag: 'success' }];
   }
-  getRoles(event) {}
+
+  getRoles(event) {
+    const page = event.page;
+    const per_page = event.per_page;
+    const palabra_a_buscar = event.searchText === '' || event.searchText === null || event.searchText === undefined ? ' ' : event.searchText;
+
+    // const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
+    const extra = { afterPath: ``, parameters: { permisos_acciones: true } };
+
+    this.rolesClass.getAll(extra).then((res) => {
+      res['data'].map((role) => {
+        role.activo_ = role.activo ? 'SI' : 'NO';
+        role.activo_tag = role.activo ? 'success' : 'danger';
+        role.customStyles = { 'td-nombre': { width: '20%' }, 'td-descripcion': { width: '50%', 'text-align': 'left', 'padding-left': '0.5rem' }, 'td-activo_': { width: '10%' } };
+        return role;
+      });
+
+      this.listaRoles = res['data'];
+
+      const obj = { total: res['total_registros'], tabla: 'lista_clientes' };
+      this.tServ.Func_total_paginas(obj);
+    });
+  }
 
   getPermisos() {
     this.listaPermisos.length = 0;
@@ -179,6 +201,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
     const all_permiso_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
     const permiso_acciones_selected = _.map(_.filter(all_permiso_acciones, { selected: true }), 'id');
+
     formulario['permisos_acciones'] = permiso_acciones_selected;
 
     new RolesC().createUpdateOne(formulario).then((res) => {
