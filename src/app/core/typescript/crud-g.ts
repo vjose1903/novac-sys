@@ -78,8 +78,21 @@ export class CrudG<T> {
       if (Object.prototype.hasOwnProperty.call(arg, key)) {
         const value = arg[key];
 
-        if (params.length === 0) params += `?${key}=${value}`;
-        else params += `&${key}=${value}`;
+        if (params.length === 0) params += '?';
+
+        if (typeof value == 'object') {
+          params += `&${key}={`;
+          let inner_object = '';
+          for (const inner_key in value) {
+            const inner_value = value[inner_key];
+
+            if (inner_object.length > 0) inner_object += ',';
+            params += `${inner_key}:${inner_value}`;
+          }
+          params += `}`;
+        } else {
+          params += `&${key}=${value}`;
+        }
       }
     }
     return params;

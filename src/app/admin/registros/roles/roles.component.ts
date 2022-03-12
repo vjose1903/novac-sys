@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { AccionesC, PermisosC, RolesC } from './roles';
@@ -13,13 +13,13 @@ import { TablasService } from '../../components/tablas/tablas.service';
 })
 export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   titulo;
-  form;
+  form: FormGroup;
   listaRoles = [];
   listaPermisos = [];
   info = [
     { titulo: 'Nombre', key: 'nombre', tipo: 'text', estilos: [{ width: '20%' }] },
     { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', estilos: [{ width: '50%' }] },
-    { titulo: 'Activo', key: 'activo_', tag_severity: 'activo_tag', tag_apretada: true, tipo: 'tag', estilos: [{ width: '10%' }] },
+    { titulo: 'Activo', key: 'estado_', tag_severity: 'estado_tag', tag_apretada: true, tipo: 'tag', estilos: [{ width: '10%' }] },
   ];
 
   infoPermisos = [
@@ -39,6 +39,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
   isCreando: boolean = false;
   TablasComponent;
+  palabra_buscar: any;
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
     super();
   }
@@ -59,55 +60,78 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   async necesarioStart() {
     this.getRoles(this.tServ.obj_paginate.default);
     this.getPermisos();
-    this.listaRoles = [{ nombre: 'Administrador', descripcion: 'Administrador del sistema', activo: true, activo_: 'SI', activo_tag: 'success' }];
   }
 
   getRoles(event) {
     const page = event.page;
     const per_page = event.per_page;
-    const palabra_a_buscar = event.searchText === '' || event.searchText === null || event.searchText === undefined ? ' ' : event.searchText;
+    this.palabra_buscar = event.searchText === '' || event.searchText === null || event.searchText === undefined ? ' ' : event.searchText;
 
-    // const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
-    const extra = { afterPath: ``, parameters: { permisos_acciones: true } };
+    const extra = { afterPath: `filtro/${this.palabra_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
 
-    this.rolesClass.getAll(extra).then((res) => {
-      res['data'].map((role) => {
-        role.activo_ = role.activo ? 'SI' : 'NO';
-        role.activo_tag = role.activo ? 'success' : 'danger';
-        role.customStyles = { 'td-nombre': { width: '20%' }, 'td-descripcion': { width: '50%', 'text-align': 'left', 'padding-left': '0.5rem' }, 'td-activo_': { width: '10%' } };
-        return role;
+    this.rolesClass
+      .getAll(extra)
+      .then((res) => {
+        res['data'].map((role) => {
+          role.estado_ = role.estado ? 'SI' : 'NO';
+          role.estado_tag = role.estado ? 'success' : 'danger';
+
+          role.customStyles = { 'td-nombre': { width: '20%' }, 'td-descripcion': { width: '50%', 'text-align': 'left', 'padding-left': '0.5rem' }, 'td-estado_': { width: '10%' } };
+          return role;
+        });
+
+        this.listaRoles = res['data'];
+
+        const obj = { total: res['total_registros'], tabla: 'lista_roles' };
+        this.tServ.Func_total_paginas(obj);
+      })
+      .catch((err) => {
+        if (err.error.total_registros == 0) {
+          this.listaRoles = [];
+          const obj = { total: 0, tabla: 'lista_roles' };
+          this.tServ.Func_total_paginas(obj);
+        }
       });
+  }
 
-      this.listaRoles = res['data'];
-
-      const obj = { total: res['total_registros'], tabla: 'lista_clientes' };
-      this.tServ.Func_total_paginas(obj);
-    });
+  parsePermisos(params: { clean: boolean }) {
+    if (params.clean) {
+      const all_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
+      const all_acciones_selected = _.filter(all_acciones, { selected: true });
+      all_acciones_selected.map((accion) => (accion.selected = false));
+    } else {
+      this.roleSelected.permisos_acciones.forEach((permiso_accion) => {
+        const permiso_en_turno = _.find(this.listaPermisos, (item) => item.id == permiso_accion.permiso.id);
+        const accion_en_turno = _.find(permiso_en_turno.acciones, (item) => item.id == permiso_accion.accion.id);
+        accion_en_turno.selected = true;
+      });
+    }
+    this.boton = params.clean ? 'Registrar' : 'Actualizar';
+    this.permiso_selected = _.first(this.listaPermisos);
   }
 
   getPermisos() {
     this.listaPermisos.length = 0;
 
-    this.permisosClass.getAll({ parameters: { acciones: true } }).then((res) => {
+    this.permisosClass.getAll({ parameters: { permisos_acciones: true } }).then((res) => {
       this.listaPermisos = res.data.map((permiso) => {
-        permiso.acciones = permiso.acciones.map((accion) => {
-          // accion.selected = _.some(this.inputs.data.acciones, (item) => item.id == accion.id);
-          accion.selected = false;
-          accion.nombre = this.my_capitalize(accion.nombre);
-
-          accion['customStyles'] = {
-            'td-nombre': { 'text-align': 'left', 'padding-left': '0.5rem', width: '75%' },
-            'td-selected': { 'justify-content': 'center', 'align-items': 'center', display: 'flex', width: 'auto' },
+        permiso.acciones = permiso.permisos_acciones.map((permiso_accion) => {
+          const accion = {
+            nombre: this.my_capitalize(permiso_accion.accion.nombre),
+            selected: false,
+            id: permiso_accion.accion.id,
+            permiso_accion_id: permiso_accion.id,
+            customStyles: {
+              'td-nombre': { 'text-align': 'left', 'padding-left': '0.5rem', width: '75%' },
+              'td-selected': { 'justify-content': 'center', 'align-items': 'center', display: 'flex', width: 'auto' },
+            },
           };
+
           return accion;
         });
-        delete permiso.permisoAccions;
-
-        // _.omit(permiso, )
 
         return permiso;
       });
-      this.permiso_selected = _.first(this.listaPermisos);
     });
   }
 
@@ -123,7 +147,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
       id: [{ value: null, disabled: false }],
       nombre: [{ value: null, disabled: false }, Validators.required],
       descripcion: [{ value: null, disabled: false }, Validators.required],
-      activo: [{ value: true, disabled: false }],
+      estado: [{ value: true, disabled: false }],
     });
   }
 
@@ -135,6 +159,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
   nuevoRegistro() {
     this.isCreando = true;
+    this.parsePermisos({ clean: true });
   }
 
   iconCantSelected(permiso) {
@@ -181,32 +206,69 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     return res;
   }
 
-  borrar() {
-    this.form.reset();
+  cancelar() {
+    this.form.reset({ estado: true });
     this.roleSelected = undefined;
+    this.isCreando = false;
   }
 
-  editarItem(item) {}
+  editarItem(item) {
+    this.roleSelected = item.ARG;
+    this.form.patchValue(this.roleSelected);
+    this.parsePermisos({ clean: false });
+  }
 
-  abrirModal(tipo_modal, arg) {}
+  abrirModal(tipo_modal, arg) {
+    this.handleModalForm({
+      id: 'delete_role',
+      header: 'CONFIRMACION',
+      width: '30rem',
+      html: `<p> Seguro que desea eliminar el role: <strong>${arg.nombre}</strong> </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'aceptar'), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => this.eliminarRole(instance, arg),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+
+  eliminarRole(modalInstance, roleSelected) {
+    this.rolesClass.deleteOne(roleSelected.id).then(() => {
+      const actualPagination = this.tServ.getPaginationById('lista_roles');
+      actualPagination['searchText'] = this.palabra_buscar;
+      this.getRoles(actualPagination);
+      modalInstance.closeModal(modalInstance.id, 'borrar');
+    });
+  }
 
   calcularAltoTablaAcciones() {
-    this.fun.awaitTyping().then(() => {
-      if (this.fun.hasValue(this.TablasComponent)) this.TablasComponent.calcularAlto();
-    });
+    if (this.fun.hasValue(this.TablasComponent)) this.TablasComponent.calcularAlto();
   }
 
   submit() {
     const formulario = this.form.getRawValue();
 
     const all_permiso_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
-    const permiso_acciones_selected = _.map(_.filter(all_permiso_acciones, { selected: true }), 'id');
+    const permiso_acciones_selected = _.map(_.filter(all_permiso_acciones, { selected: true }), 'permiso_accion_id');
 
     formulario['permisos_acciones'] = permiso_acciones_selected;
 
-    new RolesC().createUpdateOne(formulario).then((res) => {
+    this.rolesClass.createUpdateOne(formulario).then((res) => {
       this.isCreando = false;
       this.roleSelected = undefined;
+
+      const actualPagination = this.tServ.getPaginationById('lista_roles');
+      actualPagination['searchText'] = this.palabra_buscar;
+
+      this.getRoles(actualPagination);
     });
   }
 }
