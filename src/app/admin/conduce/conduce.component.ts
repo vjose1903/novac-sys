@@ -669,11 +669,8 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       texto,
       header: 'Confirmación',
       siFunction: async (instance) => {
-        if (type === 2) {
-          this.sendData();
-        } else {
-          this.cancelarConduce(2);
-        }
+        if (type === 2) this.sendData();
+        else this.cancelarConduce(2);
 
         instance.closeModal(idModal, 'cancelar');
       },
@@ -874,7 +871,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   cancelarConduce(secuencia) {
     if (secuencia === 1) {
-      this.abrirModalDinamicText('Conduce no terminado, ¿Desea cancelarlo?', null);
+      this.abrirModalDinamicText('Conduce no terminado, <b class="negrita">¿Desea cancelarlo?</b>', null);
     } else {
       this.borrar();
       (document.getElementById('clienteI') as any).value = '';

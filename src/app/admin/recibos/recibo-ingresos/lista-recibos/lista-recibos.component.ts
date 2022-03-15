@@ -146,7 +146,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
       case 'anular':
         const obj = {
-          texto_modal: `Seguro de que desea anular el recibo #${arg.row.numero_recibo}`,
+          texto_modal: `Seguro de que desea anular el recibo <b class="negrita"> #${arg.row.numero_recibo} </b>`,
           siFunction: (instance) => {
             this.anularRecibo(this.rowSelected.id);
             instance.closeModal(instance.id, 'anular_recibo');
@@ -155,7 +155,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
         this.confirmationModal({
           id: 'anular_recibo',
-          header: '',
+          header: 'Confirmar',
           texto: obj.texto_modal,
           siFunction: obj.siFunction,
         });
@@ -171,9 +171,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
-      html: `<p>
-        ${obj.texto}
-      </p>`,
+      html: `<p> ${obj.texto} </p>`,
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },
