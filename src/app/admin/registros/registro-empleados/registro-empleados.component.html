@@ -198,7 +198,7 @@
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
         (paginateChange)="getEmpleados($event)"
-        (DELETE)="abrirModal('borrar', $event.ARG)"
+        (DELETE)="eliminarReg($event.ARG)"
       ></app-tablas>
     </div>
   </div>

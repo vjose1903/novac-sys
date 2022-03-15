@@ -213,6 +213,18 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     } else if (this.buscarPara === 'solo_ver') {
       this.Para = ' Visualizar';
     }
+
+    if (this.Para == ' Visualizar') {
+      console.log('ENTRA EN LA CONDICION===>');
+
+      this.info = _.filter(this.info, (infoItem) => {
+        if (infoItem.key === 'view') {
+          infoItem.titulo = 'Acciones';
+          infoItem.estilos = [{ width: '9%' }];
+        }
+        return !(infoItem.key?.key === 'selected');
+      });
+    }
   }
 
   async getTipoFacturas() {
@@ -325,6 +337,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           'td-view': { width: '4%', 'padding-left': '1rem', 'font-size': '1.5rem' },
           'td-selected': { width: '4%', 'font-size': '1.5rem' },
         };
+
+        if (this.Para === ' Visualizar') {
+          delete fact.customStyles['td-selected'];
+          fact.customStyles['td-view'].width = '9%';
+        }
 
         return fact;
       });

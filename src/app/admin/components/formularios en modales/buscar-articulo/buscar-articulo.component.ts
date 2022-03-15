@@ -36,14 +36,18 @@ export class BuscarArticuloComponent implements OnInit, ModalI {
 
     const is_compra = this.inputs.metodo === 'compra' ? true : false;
 
-    const res = await this.articuloClass.getArticulosFiltrado({
-      buscar: this.inputs.filtrarArticulo || ' ',
-      page: page,
-      per_page: per_page,
-      paginado: true,
-      fecha: this.inputs.fecha_articulo,
-      is_compra: is_compra,
-    });
+    const res = await this.articuloClass
+      .getArticulosFiltrado({
+        buscar: this.inputs.filtrarArticulo || ' ',
+        page: page,
+        per_page: per_page,
+        paginado: true,
+        fecha: this.inputs.fecha_articulo,
+        is_compra: is_compra,
+      })
+      .catch((error) => {
+        this.closeThis();
+      });
 
     this.dataFiltro = res.data;
 
@@ -52,8 +56,15 @@ export class BuscarArticuloComponent implements OnInit, ModalI {
   }
 
   devolverCLick(dataARetornar) {
+    const modal = this.closeThis();
+
+    modal.getDataModal({ data: dataARetornar, modal_id: this.modal.component_id, index: this.inputs.index });
+  }
+
+  closeThis() {
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
-    modal.getDataModal({ data: dataARetornar, modal_id: this.modal.component_id, index: this.inputs.index });
+
+    return modal;
   }
 }

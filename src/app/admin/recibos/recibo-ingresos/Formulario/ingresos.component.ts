@@ -325,7 +325,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
               function: (instance) => {
                 this.closeModal(instance);
               },
-              label: 'Cancelar',
+              label: 'Cancelaro',
               disable: false,
             },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },

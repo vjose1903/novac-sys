@@ -325,4 +325,18 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       });
     }
   }
+  eliminarReg(regisData) {
+    const objToSend = {
+      data: regisData,
+      texto: `¿Está seguro que desea eliminar el suplidor <b>${regisData.nombre_completo}</b>?`,
+      siFunction: () => {
+        this.suplidorClass.deleteOne(regisData.id).then((res) => {
+          const actualPagination = this.tServ.getPaginationById('listaSuplidores');
+          this.getSuplidores(actualPagination);
+        });
+      },
+    };
+
+    this.eliminarRegistro(objToSend);
+  }
 }

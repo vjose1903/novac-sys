@@ -373,4 +373,18 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   setDocumentoPrincipal(doc) {
     this.doc_principal = doc;
   }
+
+  eliminarReg(regisData) {
+    const objToSend = {
+      data: regisData,
+      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
+      siFunction: () => {
+        const actualPagination = this.tServ.getPaginationById('lista_clientes');
+        this.clienteClass.deleteOne(regisData.id).then((res) => this.getClientes(actualPagination));
+      },
+    };
+    console.log('🚀 ~ file: registro-clientes.component.ts ~ line 385 ~ RegistroClientesComponent ~ eliminarReg ~ regisData', regisData);
+
+    this.eliminarRegistro(objToSend);
+  }
 }

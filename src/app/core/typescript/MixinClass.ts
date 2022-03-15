@@ -123,6 +123,33 @@ export class MixinClass extends ModalClass {
   logGreen(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? this.fun.duplicarJson(body) : '');
   }
+
+  eliminarRegistro(obj) {
+    this.handleModalForm({
+      id: 'borrar',
+      header: 'Confirmar',
+      width: '510px',
+      html: `<p>
+       ${obj?.texto}
+      </p>`,
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal('borrar', 'cancelar'), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => {
+              obj.siFunction();
+              instance.closeModal('borrar', 'cancelar');
+            },
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
 }
 
 // export interface MixinClass extends ModalClass, modalClass, LayoutClass {}

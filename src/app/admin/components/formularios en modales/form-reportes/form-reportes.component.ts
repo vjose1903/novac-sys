@@ -113,6 +113,7 @@ export class FormVentasComponent extends MixinClass implements OnInit, ModalI {
         });
       });
     } else {
+      console.log('🚀 ~ file: form-reportes.component.ts ~ line 118 ~ FormVentasComponent ~ getClientes ~ else');
       this.listaClientes = [];
     }
   }

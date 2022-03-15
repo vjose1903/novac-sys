@@ -92,53 +92,53 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     this.resetModalVaribales();
   }
 
-  async decisionModal(res) {
-    if (res) {
-      if (this.tipoModal === 'removerArticulo') this.procesoQuitarArticulo();
+  // async decisionModal(res) {
+  //   if (res) {
+  //     if (this.tipoModal === 'removerArticulo') this.procesoQuitarArticulo();
 
-      if (this.tipoModal === 'cancelar_conduce') this.cancelarConduce(2);
+  //     if (this.tipoModal === 'cancelar_conduce') this.cancelarConduce(2);
 
-      if (this.tipoModal === 'imprimir_conduce') await this.sendData();
+  //     if (this.tipoModal === 'imprimir_conduce') await this.sendData();
 
-      setTimeout(() => this.resetModalVaribales(), 1000);
-    }
-  }
+  //     setTimeout(() => this.resetModalVaribales(), 1000);
+  //   }
+  // }
 
-  noFiltroResponse(res) {
-    if (res.tipo == 'buscarCliente') {
-      this.enfocarInput('clienteI');
-      this.selectContenido('clienteI');
-    }
+  // noFiltroResponse(res) {
+  //   if (res.tipo == 'buscarCliente') {
+  //     this.enfocarInput('clienteI');
+  //     this.selectContenido('clienteI');
+  //   }
 
-    if (res.tipo == 'buscarArticulo') {
-      this.enfocarInput(`cod-${res.index}`);
-      this.selectContenido(`cod-${res.index}`);
-    }
-  }
+  //   if (res.tipo == 'buscarArticulo') {
+  //     this.enfocarInput(`cod-${res.index}`);
+  //     this.selectContenido(`cod-${res.index}`);
+  //   }
+  // }
 
-  objDevueltoResponse(res) {
-    if (res) {
-      if (res.tipo_modal === 'buscarCliente') {
-        this.cliente = res.data;
-        (document.getElementById('clienteI') as any).value = res.data.nombre;
-        this.buscarFacturasAdelantadas(res.data.id);
-        setTimeout(() => this.enfocarInput('cod-0'), 10);
-        //
-      } else if (res && res.tipo_modal === 'buscarArticulo') {
-        this.llenarRowDespuesDeFiltro(res);
-        setTimeout(() => this.enfocarInput('can-' + res.index), 10);
-        //
-      } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
-        // mirar aqui el res
-        console.log('Viendo los datos: ', res);
-        this.ajustarSecuencia();
-        this.llenarConduce(res.data.body).then((res) => {
-          this.checkFacturasAdelantadasSelection();
-        });
-      }
-      setTimeout(() => this.resetModalVaribales(), 1000);
-    }
-  }
+  // objDevueltoResponse(res) {
+  //   if (res) {
+  //     if (res.tipo_modal === 'buscarCliente') {
+  //       this.cliente = res.data;
+  //       (document.getElementById('clienteI') as any).value = res.data.nombre;
+  //       this.buscarFacturasAdelantadas(res.data.id);
+  //       setTimeout(() => this.enfocarInput('cod-0'), 10);
+  //       //
+  //     } else if (res && res.tipo_modal === 'buscarArticulo') {
+  //       this.llenarRowDespuesDeFiltro(res);
+  //       setTimeout(() => this.enfocarInput('can-' + res.index), 10);
+  //       //
+  //     } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
+  //       // mirar aqui el res
+  //       console.log('Viendo los datos: ', res);
+  //       this.ajustarSecuencia();
+  //       this.llenarConduce(res.data.body).then((res) => {
+  //         this.checkFacturasAdelantadasSelection();
+  //       });
+  //     }
+  //     setTimeout(() => this.resetModalVaribales(), 1000);
+  //   }
+  // }
 
   articuloFiltroResponse(res) {
     if (res && res.tipo_modal === 'buscarArticulo') {
@@ -198,8 +198,9 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   async getDataFromModal(arg, search) {
     if (arg.modal_id === 'buscarArticulo') {
       console.log('llenarRowDespuesDeFiltro', arg);
+      console.log('================================================================');
       this.llenarRowDespuesDeFiltro(arg);
-      setTimeout(() => this.enfocarInput('can-' + arg.index), 10);
+      // setTimeout(() => this.enfocarInput('can-' + arg.index), 1000);
     }
     if (arg.modal_id === 'buscarCliente') {
       console.log('DESPUES DE BUSCAR CLIENTE: ', arg);
@@ -220,44 +221,47 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   async saltar(input, index) {
-    const fila_actual = this.filasDetalle[index].getRawValue();
-    const fila_siguiente = this.filasDetalle[index + 1].getRawValue();
+    setTimeout(() => {
+      const fila_actual = this.filasDetalle[index].getRawValue();
+      const fila_siguiente = this.filasDetalle[index + 1].getRawValue();
 
-    const { articulo, cod, can, uni, detalle_factura_id } = fila_actual;
+      const { articulo, cod, can, uni, detalle_factura_id } = fila_actual;
 
-    if (index >= 10 && input == 'cod-') this.addItem(index);
+      if (index >= 10 && input == 'cod-') this.addItem(index);
 
-    if (input == 'can-' && this.fun.hasValue(cod)) {
-      if (this.fun.isEmpty(articulo) || cod !== articulo.codigo) {
-        const obj = { filtrarArticulo: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
+      let campo_siguiente = this.fun.hasValue(fila_siguiente['detalle_factura_id']) ? `can-${index + 1}` : this.inputSecuencia;
 
-        this.handleModalForm({
-          component: BuscarArticuloComponent,
-          inputs: obj,
-          id: 'buscarArticulo',
-          header: 'BUSCAR ARTICULO',
-          width: '56.25rem',
-          height: '31.25rem',
-          botones: {
-            aceptar: { show: false, disable: false },
-            cancelar: { show: false, disable: false },
-          },
-        });
-      } else {
-        this.enfocarInput(`can-${index}`);
+      if (input == 'uni-' && this.fun.hasValue(can) && can != 0 && this.fun.hasValue(cod)) {
+        const campo = this.fun.hasValue(detalle_factura_id) ? campo_siguiente : `uni-${index}`;
+        this.enfocarInput(campo);
       }
-    }
 
-    let campo_siguiente = this.fun.hasValue(fila_siguiente['detalle_factura_id']) ? `can-${index + 1}` : this.inputSecuencia;
+      if (input == 'cod-' && this.fun.hasValue(uni) && _.lowerCase(uni) != _.lowerCase('medida')) {
+        if (this.fun.hasValue(can) && can != 0 && this.fun.hasValue(cod)) this.ajustarSecuencia().then(() => this.enfocarInput(campo_siguiente));
+      }
 
-    if (input == 'uni-' && this.fun.hasValue(can) && can != 0 && this.fun.hasValue(cod)) {
-      const campo = this.fun.hasValue(detalle_factura_id) ? campo_siguiente : `uni-${index}`;
-      this.enfocarInput(campo);
-    }
+      if (input == 'can-' && this.fun.hasValue(cod)) {
+        if (this.fun.isEmpty(articulo) || cod !== articulo.codigo) {
+          const obj = { filtrarArticulo: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
 
-    if (input == 'cod-' && this.fun.hasValue(uni) && _.lowerCase(uni) != _.lowerCase('medida')) {
-      if (this.fun.hasValue(can) && can != 0 && this.fun.hasValue(cod)) this.ajustarSecuencia().then(() => this.enfocarInput(campo_siguiente));
-    }
+          console.log('🚀 ~ file: conduce.component.ts ~ line 234 ~ ConduceComponent ~ saltar ~ obj: ', obj);
+          this.handleModalForm({
+            component: BuscarArticuloComponent,
+            inputs: obj,
+            id: 'buscarArticulo',
+            header: 'BUSCAR ARTICULO',
+            width: '56.25rem',
+            height: '31.25rem',
+            botones: {
+              aceptar: { show: false, disable: false },
+              cancelar: { show: false, disable: false },
+            },
+          });
+        } else {
+          this.enfocarInput(`can-${index}`);
+        }
+      }
+    }, 250);
   }
 
   llenarRowDespuesDeFiltro(obj) {
@@ -554,6 +558,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
         (res) => {
           console.log('RESPUESTA facturaClass: ', res);
           this.facturas_adelantadas = res['data'];
+          console.log('🚀 ~ file: conduce.component.ts ~ line 558 ~ ConduceComponent ~ buscarFacturasAdelantadas ~ facturas_adelantadas=>', this.facturas_adelantadas);
           this.facturas_adelantadas.map((factura) => {
             factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
             factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');

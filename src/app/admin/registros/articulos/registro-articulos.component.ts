@@ -750,6 +750,24 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     });
     return formulas;
   }
+
+  eliminarReg(regisData) {
+    const objToSend = {
+      data: regisData,
+      texto: `¿Está seguro que desea eliminar el artículo <b> ${regisData.nombre}</b>?`,
+      siFunction: () => {
+        this.articuloClass.deleteOne(regisData.id).then((res) => {
+          const actualPagination = this.tServ.getPaginationById('listaArticulos');
+          this.getArticulos(actualPagination);
+          this.borrar();
+        });
+      },
+    };
+    console.log('🚀 ~ file: registro-articulos.component.ts ~ line 766 ~ RegistroArticulosComponent ~ eliminarReg ~ regisData', regisData);
+
+    this.eliminarRegistro(objToSend);
+  }
+
   // =============================================
   //  Crear articulo
   // =============================================

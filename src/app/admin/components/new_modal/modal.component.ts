@@ -142,8 +142,8 @@ export class NewModalComponent implements OnInit {
     console.log('Prueba: ', _.has(modal.botones.dinamico, 'function_in_other_component'));
     console.log('Prueba modal.botones: ', modal.botones);
     console.log('btns: ', btn);
-    
-    
+
+
     if (_.has(btn, 'function_in_other_component')) modal['instance'][btn['function_in_other_component']]();
     else btn['function'](modal);
   }

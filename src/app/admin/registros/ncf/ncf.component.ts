@@ -319,7 +319,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     const objConfirmationModal = {
       id: 'eliminar_comprobante',
       header: 'Confirmar',
-      texto: `Desea eliminar comprobante para ${comprobanteData.tipoC_} numero: ${comprobanteData.codigo}`,
+      texto: `Desea eliminar comprobante para <b>${comprobanteData.tipoC_}</b> numero: <b>${comprobanteData.codigo}</b>`,
       width: '510px',
       siFunction: (instance) => {
         this.ncfClass.deleteOne(comprobanteData.id).then(
