@@ -324,7 +324,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   eliminarReg(regisData) {
-    console.log('🚀 ~ file: registro-empleados.component.ts ~ line 327 ~ RegistroEmpleadosComponent ~ eliminarReg ~ regisData', regisData);
     const objToSend = {
       data: regisData,
       texto: `¿Está seguro que desea eliminar el empleado <b>${regisData.nombre_completo}</b>?`,

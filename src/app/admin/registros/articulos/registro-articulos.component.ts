@@ -763,7 +763,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         });
       },
     };
-    console.log('🚀 ~ file: registro-articulos.component.ts ~ line 766 ~ RegistroArticulosComponent ~ eliminarReg ~ regisData', regisData);
 
     this.eliminarRegistro(objToSend);
   }

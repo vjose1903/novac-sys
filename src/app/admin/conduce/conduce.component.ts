@@ -130,7 +130,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   //       //
   //     } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
   //       // mirar aqui el res
-  //       console.log('Viendo los datos: ', res);
   //       this.ajustarSecuencia();
   //       this.llenarConduce(res.data.body).then((res) => {
   //         this.checkFacturasAdelantadasSelection();
@@ -197,22 +196,16 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   async getDataFromModal(arg, search) {
     if (arg.modal_id === 'buscarArticulo') {
-      console.log('llenarRowDespuesDeFiltro', arg);
-      console.log('================================================================');
       this.llenarRowDespuesDeFiltro(arg);
       // setTimeout(() => this.enfocarInput('can-' + arg.index), 1000);
     }
     if (arg.modal_id === 'buscarCliente') {
-      console.log('DESPUES DE BUSCAR CLIENTE: ', arg);
-
       this.cliente = arg.data;
-      console.log('CLIENTE DATA: ', this.cliente);
       (document.getElementById('clienteI') as any).value = arg.data.nombre;
       setTimeout(() => this.enfocarInput('cod-0'), 10);
       this.buscarFacturasAdelantadas(arg.data.id);
     }
     if (arg.modal_id === 'seleccionar_articulos_adelantados') {
-      console.log('seleccionar_articulos_adelantados===> ', arg);
       this.ajustarSecuencia();
       this.llenarConduce(arg.data).then((res) => {
         this.checkFacturasAdelantadasSelection();
@@ -244,7 +237,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
         if (this.fun.isEmpty(articulo) || cod !== articulo.codigo) {
           const obj = { filtrarArticulo: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
 
-          console.log('🚀 ~ file: conduce.component.ts ~ line 234 ~ ConduceComponent ~ saltar ~ obj: ', obj);
           this.handleModalForm({
             component: BuscarArticuloComponent,
             inputs: obj,
@@ -556,9 +548,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     try {
       this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, fact_de: 'venta' }).then(
         (res) => {
-          console.log('RESPUESTA facturaClass: ', res);
           this.facturas_adelantadas = res['data'];
-          console.log('🚀 ~ file: conduce.component.ts ~ line 558 ~ ConduceComponent ~ buscarFacturasAdelantadas ~ facturas_adelantadas=>', this.facturas_adelantadas);
           this.facturas_adelantadas.map((factura) => {
             factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
             factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
@@ -572,13 +562,9 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           });
           this.checkFacturasAdelantadasSelection();
         },
-        (error) => {
-          console.log('ERROR BUSCANDO FACTURAS ADELANTADAS: ', error);
-        },
+        (error) => {},
       );
-    } catch (error) {
-      console.log('ERROR BUSCANDO FACTURAS ADELANTADAS: ', error);
-    }
+    } catch (error) {}
   }
 
   checkFacturasAdelantadasSelection() {
@@ -676,7 +662,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   async abrirModalDinamicText(texto, type) {
     let tipo_modal;
-    console.log('CLIENTE 1 ====> ', this.cliente);
     const idModal = type === 2 ? 'imprimir_conduce' : 'cancelar_conduce';
 
     const confirmationObj = {
@@ -695,7 +680,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       width: '30rem',
     };
 
-    console.log('CLIENTE 3 ====> ', this.cliente);
     this.confirmationModal(confirmationObj);
   }
 
@@ -788,9 +772,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
-      html: `<p>
-        ${obj.texto}
-      </p>`,
+      html: `<p> ${obj.texto} </p>`,
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },
@@ -846,7 +828,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   async sendData() {
     const cabecera_conduce = {};
-    console.log('Datos de cliente===> ', this.cliente);
     cabecera_conduce['cliente_id'] = this.cliente.id;
     cabecera_conduce['numero_conduce'] = '';
     cabecera_conduce['detalle_conduces'] = this.CuerpoConduce;
@@ -855,10 +836,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       const obj = { data: res['data'], type: 'conduce' };
 
       this.cancelarConduce(2);
-      this.pdfServ
-        .generatePdf({ oPdf: obj, imprimir: true })
-        .then((res) => console.log('res ', res))
-        .catch((err) => this.fun.toastError(err['msg'], 'ERROR'));
+      this.pdfServ.generatePdf({ oPdf: obj, imprimir: true }).catch((err) => this.fun.toastError(err['msg'], 'ERROR'));
     });
   }
 
@@ -883,7 +861,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   borrar() {
-    console.log('BORRRRRRRAAAAAANNNNNNDOOOOO ====> ');
     this.resetForm();
     this.cliente = undefined;
     this.CuerpoConduce = [];

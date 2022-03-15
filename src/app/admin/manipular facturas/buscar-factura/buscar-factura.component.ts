@@ -125,14 +125,16 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (this.fun.hasValue(res)) this.enfocarInput('valorI');
   }
 
-  reimprimirFactura(obj) {
+  reimprimirFactura(obj, modalInstance) {
     this.loadServ.isLoading.next(true);
     this.pdfServ
       .generatePdf({ oPdf: obj, imprimir: true })
       .then(async (res) => {
         this.loadServ.isLoading.next(false);
-        if (res.status === 'si') this.fun.toastSuccess(res.msg, 'CORRECTO');
-        else this.fun.toastError(res.msg, 'ERROR');
+        if (res.status === 'si') {
+          this.fun.toastSuccess(res.msg, 'CORRECTO');
+          modalInstance.closeModal(modalInstance.id, 'imprimir');
+        } else this.fun.toastError(res.msg, 'ERROR');
       })
       .catch((err) => {
         this.loadServ.isLoading.next(false);
@@ -215,8 +217,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
 
     if (this.Para == ' Visualizar') {
-      console.log('ENTRA EN LA CONDICION===>');
-
       this.info = _.filter(this.info, (infoItem) => {
         if (infoItem.key === 'view') {
           infoItem.titulo = 'Acciones';
@@ -566,7 +566,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   get idsFacturasSeleccionadas() {
     const facturasSelecc = _.filter(this.facturas, { is_selected: true });
-    const ids            = _.map(facturasSelecc, 'id');
+    const ids = _.map(facturasSelecc, 'id');
     return ids;
   }
 
@@ -579,11 +579,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     const toPDFData = { data: dataFactura, type: 'facturacion' };
     this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
       if (res.status === 'si') {
-        const obj = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
-
-        this.handleModalForm({
+        const inputs = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+        const obj_modal = {
           component: PdfViewerComponent,
-          inputs: obj,
+          inputs: inputs,
           id: 'mostrarFactura',
           header: 'Mostrar Factura',
           width: '900px',
@@ -592,7 +591,17 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             cancelar: { show: false, disable: false },
             dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
           },
-        });
+        };
+
+        if (this.Para == ' Visualizar') {
+          obj_modal.botones.dinamico.push({
+            clase: 'btn btn-amarillo ml-2',
+            function: (instance) => this.reimprimirFactura({ data: this.facturaSelected, type: 'facturacion' }, instance),
+            label: 'Reimprimir',
+            disable: false,
+          });
+        }
+        this.handleModalForm(obj_modal);
       }
     });
   }

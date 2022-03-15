@@ -74,8 +74,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this.pdfServ
       .imprimirBase64(obj)
       .then((res) => {
-        console.log('res ', res);
-
         if (res['status'] === 'si') {
           this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
           if (modalInstance) modalInstance.closeModal(modalInstance.id, 'reporte_inventario');
@@ -106,7 +104,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
         if (res.status === 'si') {
           const obj_pdf = { pdfSrc: res.body, titulo: 'Reporte de inventario', height: '75vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
           this.loadServ.isLoading.next(false);
-          console.log('PDF CONFIG====> ', obj_pdf);
 
           this.handleModalForm({
             component: PdfViewerComponent,
@@ -122,8 +119,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
                 {
                   clase: 'btn btn-verde',
                   function: (instance) => {
-                    console.log('instanceinstanceinstance: ', 'instance');
-
                     this.imprimirReporteInventario(obj_pdf, instance);
                     this.resetVariables();
                   },

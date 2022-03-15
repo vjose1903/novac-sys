@@ -201,8 +201,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       const documento = this.form.controls[tipo].value;
 
       let enable_campos = false;
-      console.log('documento ', documento);
-      console.log('this.form.controls[tipo].valid ', this.form.controls[tipo].valid);
 
       if (this.form.controls[tipo].valid) {
         if (this.editando && _.some(this.documentos_de_identidad, (doc) => doc.documento === documento)) {
@@ -383,7 +381,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         this.clienteClass.deleteOne(regisData.id).then((res) => this.getClientes(actualPagination));
       },
     };
-    console.log('🚀 ~ file: registro-clientes.component.ts ~ line 385 ~ RegistroClientesComponent ~ eliminarReg ~ regisData', regisData);
 
     this.eliminarRegistro(objToSend);
   }

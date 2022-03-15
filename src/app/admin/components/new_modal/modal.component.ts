@@ -43,8 +43,6 @@ export class NewModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.subConfig = MODALCONFIG.subscribe((res) => {
-      console.log('MODALCONFIG.subscribe: ', res);
-
       if (res && res.show) {
         this.renderizarComponente(res);
         setTimeout(() => {
@@ -139,10 +137,6 @@ export class NewModalComponent implements OnInit {
 
   dynamicFunction(configuration, btn) {
     const modal = _.find(this.modalsConfig, (config) => config.id === configuration.id);
-    console.log('Prueba: ', _.has(modal.botones.dinamico, 'function_in_other_component'));
-    console.log('Prueba modal.botones: ', modal.botones);
-    console.log('btns: ', btn);
-
 
     if (_.has(btn, 'function_in_other_component')) modal['instance'][btn['function_in_other_component']]();
     else btn['function'](modal);

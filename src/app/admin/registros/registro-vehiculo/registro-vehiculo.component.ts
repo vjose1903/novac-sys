@@ -242,7 +242,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   eliminarReg(regisData) {
-    console.log('🚀 ~ file: registro-vehiculo.component.ts ~ line 245 ~ RegistroVehiculoComponent ~ eliminarReg ~ regisData', regisData);
     const objToSend = {
       data: regisData,
       texto: `¿Está seguro que desea eliminar el vehículo <b> ${regisData.marca} - ${regisData.modelo}. </b> \n

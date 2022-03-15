@@ -49,7 +49,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   ncfClass = new NcfC();
   constructor(private activeRoute: ActivatedRoute, private router: Router, private pdfServ: PdfService) {
     super();
-    console.log('La data mandada: ', this.router.getCurrentNavigation());
   }
 
   ngOnInit() {
@@ -97,7 +96,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
 
     Promise.all(promiseArray).then(async (datos) => {
-      console.log('LAS RESPUESTAS: ', datos);
       this.facturasConDetalles = datos;
 
       await this.formarTitulosTabla();
@@ -141,7 +139,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return new Promise(async (resolve) => {
       this.facturaClass.getOne(idFact).then((res_factura) => {
         let tempFactData: FacturasI;
-        console.log('ITEM ANTES DE: ', tempFactData);
 
         tempFactData = res_factura['data'];
         this.fun.logRed('this.factura --> ', tempFactData);
@@ -232,8 +229,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   async selectAll(info) {}
 
   async getInfoChange(infoTable, factData: FacturasI) {
-    console.log('factData==> ', factData);
-
     const entidad = infoTable.body[infoTable.index];
     entidad.cant_nota = parseFloat(entidad.cant_nota);
 

@@ -32,7 +32,6 @@ export class BuscarArticuloComponent implements OnInit, ModalI {
     const page = event.page;
     const per_page = event.per_page;
     let palabra_a_buscar = ' ';
-    console.log('MIRANDO: ', this.inputs);
 
     const is_compra = this.inputs.metodo === 'compra' ? true : false;
 

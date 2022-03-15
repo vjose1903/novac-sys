@@ -30,8 +30,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   ngOnInit() {
     this.data = this.inputs;
-    console.log('VIENDO DATOS =====> this.inputs', this.inputs);
-    console.log('VIENDO DATOS =====> this.data', this.data);
 
     this.efectivo = this.formatoNumero(this.data.devuelta);
     this.factura_de = this.data.factura_de;
@@ -187,8 +185,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     if (from == 'input') {
       const modal = _.find(this.modal.instance.modalsConfig, { id: this.modal.component_id });
       const btn = _.find(modal.botones.dinamico, { btn_id: 'btnConfirmar' });
-      console.log('modal.botones.dinamico: ', modal.botones.dinamico);
-      console.log('BOTON DEL DIABLO: ', btn);
 
       btn.disable = validate;
     }

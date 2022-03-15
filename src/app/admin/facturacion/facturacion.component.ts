@@ -711,8 +711,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
     if (campo === 'filtro') {
       if (this.validarRayaAbajo()) {
-        console.log('ENTOOO');
-
         this.abrirModalFiltro();
         this.desEnfocarInput(salioDe);
       } else this.fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
@@ -725,8 +723,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
   iniciarFactura(campo) {
     if (this.condicion_fact !== 'Crédito') {
-      console.log("iniciando factura");
-
       this.enfocarInput(campo);
       this.propietario_factura = this.form.value;
     } else {
@@ -825,8 +821,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
   }
 
   closeModal(modalInstance) {
-    console.warn('modalInstance: ', modalInstance);
-
     modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 
@@ -927,7 +921,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
   //     }, 250);
   //   } else if (this.tipoModal === 'archivar_factura') {
   //     if (arg) {
-  //       console.error('arg=====> ', arg);
 
   //       this.agregarFacturaALocalStorage();
   //       setTimeout(() => {
@@ -1159,7 +1152,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async getDataFromModal(arg, search) {
-    console.log('getDataFromModal arg: ', arg);
     if (arg.modal_id === 'facturaPendiente') {
       this.fechaFactura['front'] = this.formarFechaFactura(arg.fecha)['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];
@@ -1308,10 +1300,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     const obj = { data: res_factura, type: 'facturacion' };
 
     if (this.metodo === 'venta') {
-      this.pdfServ
-        .generatePdf({ oPdf: obj, imprimir: true })
-        .then((res) => console.log('res ', res))
-        .catch((err) => this.fun.toastError('Error imprimiendo la factura', 'ERROR'));
+      this.pdfServ.generatePdf({ oPdf: obj, imprimir: true }).catch((err) => this.fun.toastError('Error imprimiendo la factura', 'ERROR'));
     }
 
     this.layServ.nextCheckCuadreToday(true);

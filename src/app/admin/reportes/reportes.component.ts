@@ -114,9 +114,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       //
     } else if (this.tipoModal === 'cuentas_cobrar_cliente' || this.tipoModal === 'cuentas_cobrar_ant_saldo') {
       extra.parameters = { tipo: data.tipo_ ? data.tipo_ : data.tipo, cliente_id: data.id ? data.id : 1 };
-      console.log('🚀 ~ file: reportes.component.ts ~ line 117 ~ ReportesComponent ~ makePdf ~ data', data);
       tipo = 'cuentas_cobrar';
-      console.log('🚀 ~ file: reportes.component.ts ~ line 117 ~ ReportesComponent ~ makePdf ~ condicioCliente extra', extra);
       //
     } else if (this.tipoModal === 'cuentas_con_pagos') {
       extra.parameters = { desde: this.fun.my_dateFormater(data.desde, false), hasta: this.fun.my_dateFormater(data.hasta, false), cliente_id: data.cliente_id };
@@ -161,7 +159,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async getDataFromModal(arg: any, search: any) {
-    console.log('🚀 ~ file: reportes.component.ts ~ line 163 ~ ReportesComponent ~ getDataFromModal ~ arg', arg);
     if (arg?.modal_id === 'cuentas_cobrar_cliente') {
       arg.data.tipo_ = 1;
       this.makePdf(arg.data);
@@ -284,8 +281,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   abrirVisorPdf(obj) {
-    console.log('abrirVisorPdf: ', obj);
-
     this.handleModalForm({
       component: PdfViewerComponent,
       inputs: obj,
