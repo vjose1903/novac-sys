@@ -11,6 +11,7 @@ import { FacturaC, TiposFacturaC, FacturasI } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { NotaC } from './notas';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -42,6 +43,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   // propietario_factura: any;
   paqueteComprobante;
 
+  notasClass = new NotaC();
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();

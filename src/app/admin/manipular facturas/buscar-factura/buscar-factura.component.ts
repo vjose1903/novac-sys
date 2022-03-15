@@ -13,6 +13,7 @@ import { NcfC } from '../../registros/ncf/ncf';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { PdfViewerComponent } from '../../components/pdf-viewer/pdf-viewer.component';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { NotaC } from '../notas-cred-deb/notas';
 
 @Component({
   selector: 'app-buscar-factura',
@@ -37,6 +38,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   paqueteComprobante: any;
   tipo_factura_id = null;
   valor: any;
+  notasClass = new NotaC();
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();
@@ -91,7 +93,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   infoNota = [
     { titulo: 'Fecha', tipo: 'text', key: 'fecha' },
     { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
-    { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total_factura', formatoNumero: true },
+    { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total', formatoNumero: true },
     { titulo: 'Seleccione', tipo: 'icon', key: 'view', text_color: 'viewColor', color: true },
   ];
 
@@ -235,8 +237,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   getNotas(e) {
     return new Promise(async (resolve) => {
-      const tipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === this.tipo_factu_nota);
-      const busqueda = await this.facturaClass.getAll({ afterPath: 'custom/notas', parameters: { tipo_factura_id: tipoFact.id, page: e.page, per_page: e.per_page, paginado: true } });
+      const page = e.page;
+      const per_page = e.per_page;
+      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+
+      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
+
+      const busqueda = await this.notasClass.getAll(extra);
 
       busqueda['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
@@ -254,6 +261,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       });
 
       this.notas = busqueda['data'];
+      console.log('this.notas ', this.notas);
+
       const obj = { total: busqueda.total_registros, tabla: 'notas' };
 
       this.tServ.Func_total_paginas(obj);
@@ -549,7 +558,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   get idsFacturasSeleccionadas() {
     const facturasSelecc = _.filter(this.facturas, { is_selected: true });
-    const ids            = _.map(facturasSelecc, 'id');
+    const ids = _.map(facturasSelecc, 'id');
     return ids;
   }
 
