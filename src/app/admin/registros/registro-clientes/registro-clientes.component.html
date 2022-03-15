@@ -203,7 +203,7 @@
         [botones]="botones"
         [id_tabla]="'lista_clientes'"
         (DevolverInfo)="editarItem($event)"
-        (DELETE)="abrirModal('borrar', $event.ARG)"
+        (DELETE)="eliminarReg($event.ARG)"
         [focusRow]="false"
         (paginateChange)="getClientes($event)"
       ></app-tablas>

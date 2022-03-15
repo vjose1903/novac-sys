@@ -92,7 +92,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     } else if (this.tipoModal === 'ventas_diarias' || this.tipoModal === 'ventas_rango') {
       let formas_pago = '(';
 
-      this.seleccionModal.switches.array.forEach((item) => {
+      data.switches.array.forEach((item) => {
         if (item.value) formas_pago += `'${item.label}',`;
       });
 
@@ -105,7 +105,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
         hasta: this.fun.my_dateFormater(data.hasta, false),
       };
 
-      if (_.every(this.seleccionModal.switches.array, (item) => item.value === false)) {
+      if (_.every(data.switches.array, (item) => item.value === false)) {
         msg_error = 'Debe seleccionar almenos un metodo de pago.';
         continuar = false;
       }
@@ -159,12 +159,9 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async getDataFromModal(arg: any, search: any) {
-    console.log('🚀 ~ file: reportes.component.ts ~ line 163 ~ ReportesComponent ~ getDataFromModal ~ arg', arg);
-    if (arg && arg.tipo_modal === 'buscarCliente') {
-      if (this.tipoModal === 'cuentas_cobrar_cliente') {
-        arg.data.tipo_ = 1;
-        this.makePdf(arg.data);
-      }
+    if (arg?.modal_id === 'cuentas_cobrar_cliente') {
+      arg.data.tipo_ = 1;
+      this.makePdf(arg.data);
     } else if (arg && arg.tipo_modal !== 'buscarCliente') this.makePdf(arg.data);
   }
 
@@ -218,9 +215,11 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     else if (tipo === 'cuentas_cobrar_cliente') {
       this.titulo_moda_reporte = 'Reporte de CxC por cliente';
       tipo_modal = 'buscarCliente';
-      
+
       obj['data'] = [];
       obj['filtrarCliente'] = null;
+      obj['metodo'] = 'venta';
+
       //
     } else if (tipo === 'cuentas_cobrar_ant_saldo') this.titulo_moda_reporte = 'Reporte de CxC por antiguedad de saldos';
     //
@@ -255,31 +254,33 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     }
 
     // if (abrirModal) this.abrirModal(tipo_modal, obj, tipo);
-    if (tipo_modal === 'reportes') {
-      // const components = { reportes: FormVentasComponent, buscarCliente: BuscarClienteSuplidorComponent };
+    if (tipo_modal !== 'inventario') {
+      const variableData = {
+        reportes: { component: FormVentasComponent, width: '510px' },
+        buscarCliente: {
+          component: BuscarClienteSuplidorComponent,
+          width: '900px',
+          height: '500px',
+          botones: {
+            aceptar: { show: false, disable: false },
+            cancelar: { show: false, disable: false },
+          },
+        },
+      };
       const objHandler = {
-        component: FormVentasComponent,
         inputs: obj,
         id: tipo,
         header: this.titulo_moda_reporte,
-        width: '510px',
-
         botones: {
           aceptar: { show: true, disable: false },
           cancelar: { show: true, disable: false },
         },
       };
-      console.log('🚀 ~ file: reportes.component.ts ~ line 267 ~ ReportesComponent ~ formarObjModal ~ objHandler', objHandler);
-      this.handleModalForm(objHandler);
+      this.handleModalForm({ ...objHandler, ...variableData[tipo_modal] });
     }
-
-    // FormVentasComponent
-    const objFormConfig = {};
   }
 
   abrirVisorPdf(obj) {
-    console.log('abrirVisorPdf: ', obj);
-
     this.handleModalForm({
       component: PdfViewerComponent,
       inputs: obj,

@@ -86,7 +86,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       (err: any) => {},
     );
   }
-  async getVehiculos(e) { 
+  async getVehiculos(e) {
     const page = e.page;
     const per_page = e.per_page;
     const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
@@ -239,6 +239,27 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   capitalice(control, arg) {
     const campo = this.form.get(control);
     campo.setValue(this.fun.Capitalice(arg));
+  }
+
+  eliminarReg(regisData) {
+    const objToSend = {
+      data: regisData,
+      texto: `¿Está seguro que desea eliminar el vehículo <b> ${regisData.marca} - ${regisData.modelo}. </b> \n
+      Propietario: <b>
+       ${regisData.nombreCompleto}
+       </b>?`,
+      siFunction: () => {
+        this.vehiculosClass.deleteOne(regisData.id).then((res) => {
+          this.listaVehiculos = null;
+          this.fun.toastSuccess(`Camion: ${regisData.marca} ${regisData.modelo}  de: ${regisData.nombreCompleto}` + ' borrado.', 'CORRECTO');
+          const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
+          this.getVehiculos(actualPagination);
+          this.borrar();
+        });
+      },
+    };
+
+    this.eliminarRegistro(objToSend);
   }
 
   // =============================================

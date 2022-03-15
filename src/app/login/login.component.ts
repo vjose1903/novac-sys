@@ -100,7 +100,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   // =================================================================
   login() {
     const formulario = this.form.getRawValue();
-    console.log('formulario ', formulario);
 
     if (formulario.usuario == '1973' && formulario.password == '3791') {
       this.openConfigsModal();

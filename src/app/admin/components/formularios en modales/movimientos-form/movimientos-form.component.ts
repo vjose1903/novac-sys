@@ -32,8 +32,6 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   inputs: any;
 
   ngOnInit() {
-    console.log('VIENDO LA  VAINA: ', this.inputs);
-
     this.medidas = _.keys(this.inputs.cantidades);
   }
   ngAfterViewInit() {

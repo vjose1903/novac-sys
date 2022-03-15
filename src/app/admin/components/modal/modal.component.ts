@@ -191,11 +191,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     let obj = arg;
 
     if (tipo_) obj = { tipo: tipo_, body: arg };
-    console.log('obj: ', obj);
 
     this.mServ.ModalDecision(obj);
-
-    // setTimeout(() => this.reinicioModal(), 250);
   }
 
   getDevuelta(arg) {

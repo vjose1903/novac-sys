@@ -144,7 +144,8 @@
     <h4>Listado camiones</h4>
 
     <div #cardTabla class="card cardListados">
-      <app-tablas  class="h-100"
+      <app-tablas
+        class="h-100"
         *ngIf="listaVehiculos && info"
         [padre]="cardTabla"
         [info]="info"
@@ -154,7 +155,7 @@
         [botones]="botones"
         (DevolverInfo)="editarItem($event)"
         (paginateChange)="getVehiculos($event)"
-        (DELETE)="abrirModal('borrar', $event.ARG)"
+        (DELETE)="eliminarReg($event.ARG)"
       ></app-tablas>
     </div>
   </div>

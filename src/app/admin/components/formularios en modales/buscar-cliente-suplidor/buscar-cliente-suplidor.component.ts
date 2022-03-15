@@ -72,8 +72,15 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
     this.tServ.Func_total_paginas(obj);
   }
   devolverCLick(dataARetornar) {
+    const modal = this.closeThis();
+
+    modal.getDataModal({ data: dataARetornar, modal_id: this.modal.component_id });
+  }
+
+  closeThis() {
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
-    modal.getDataModal({ data: dataARetornar, modal_id: this.modal.component_id });
+
+    return modal;
   }
 }

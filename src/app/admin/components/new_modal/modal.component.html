@@ -28,7 +28,7 @@
 
     <ng-template *ngIf="hasAnyBtn(modalConfig)" pTemplate="footer">
       <div class="d-flex justify-content-end align-items-center mt-2">
-        <button *ngIf="modalConfig?.botones?.cancelar?.show" class="btn btn-danger" (click)="cancelarAndAceptar(false, modalConfig.id)" [disabled]="modalConfig?.botones?.cancelar?.disable">
+        <button *ngIf="modalConfig?.botones?.cancelar?.show" class="btn btn-blanco" (click)="cancelarAndAceptar(false, modalConfig.id)" [disabled]="modalConfig?.botones?.cancelar?.disable">
           Cancelar
         </button>
 

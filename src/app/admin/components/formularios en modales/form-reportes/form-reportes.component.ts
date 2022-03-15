@@ -62,7 +62,6 @@ export class FormVentasComponent extends MixinClass implements OnInit, ModalI {
   }
 
   ngOnInit() {
-    console.log('🚀 ~ file: form-reportes.component.ts ~ line 207 ~ FormVentasComponent ~ inputs', this.inputs);
     this.tipo_reporte = this.inputs.tipo_reporte;
     this.switches = this.inputs.switches;
     this.localeService.use('es');

@@ -224,7 +224,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
       id: 'delete_role',
       header: 'CONFIRMACION',
       width: '30rem',
-      html: `<p> Seguro que desea eliminar el role: <strong>${arg.nombre}</strong> </p>`,
+      html: `<p> Seguro que desea eliminar el rol: <strong>${arg.nombre}</strong> </p>`,
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },

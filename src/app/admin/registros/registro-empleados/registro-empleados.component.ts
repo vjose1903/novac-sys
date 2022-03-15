@@ -322,4 +322,17 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       this.empleadosClass.deleteOne(obj.id).then((res) => this.getEmpleados(actualPagination));
     }
   }
+
+  eliminarReg(regisData) {
+    const objToSend = {
+      data: regisData,
+      texto: `¿Está seguro que desea eliminar el empleado <b>${regisData.nombre_completo}</b>?`,
+      siFunction: () => {
+        const actualPagination = this.tServ.getPaginationById('listaEmpleados');
+        this.empleadosClass.deleteOne(regisData.id).then((res) => this.getEmpleados(actualPagination));
+      },
+    };
+
+    this.eliminarRegistro(objToSend);
+  }
 }

@@ -290,9 +290,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       id: 'confirmar_produccion',
       header: 'Confirmar',
       width: '510px',
-      html: `<p>
-      ${obj['texto_modal']}
-    </p>`,
+      html: `<p> ${obj['texto_modal']} </p>`,
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },
