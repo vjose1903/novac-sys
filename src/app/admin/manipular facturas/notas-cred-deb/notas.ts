@@ -1,7 +1,37 @@
+import { SingletonService } from '../../../core/services/singleton.service';
 import { CrudG } from '../../../core/typescript/crud-g';
+import * as _ from 'lodash';
+import * as moment from 'moment';
 
 export class NotaC extends CrudG<any> {
+  fun = SingletonService.fun;
   constructor() {
     super('notas');
+  }
+
+  parseDataToPdf(data) {
+    return new Promise((resolve) => {
+      const pick_nota = ['cliente', 'estado', 'fecha_equivalente', 'id', 'identificador', 'numero_comprobante', 'numero_documento', 'tipo_factura', 'total', 'usuario', 'facturas_aplicadas'];
+      let temp_data_parsed = _.pick(this.fun.duplicarJson(data), pick_nota);
+
+      const data_parsed = this.fun.remplaceKeyFromJson(temp_data_parsed, [
+        { old_key: 'tipo_factura', new_key: 'tipo_pdf' },
+        { old_key: 'facturas_aplicadas', new_key: 'contenido_reporte' },
+      ]);
+
+      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente).format('DD/MM/YYYY');
+      data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
+
+      data_parsed.contenido_reporte.map((factura_aplicada) => {
+        factura_aplicada.fecha = moment(factura_aplicada.cabecera_factura.fecha_equivalente).format('DD/MM/YYYY');
+        factura_aplicada.numero_comprobante = factura_aplicada.cabecera_factura.numero_comprobante;
+        factura_aplicada.total = this.fun.numFormatTwoDecimals(Math.abs(factura_aplicada.total));
+        delete factura_aplicada.cabecera_factura;
+        delete factura_aplicada.detalles_facturas_notas;
+        return factura_aplicada;
+      });
+
+      resolve(data_parsed);
+    });
   }
 }

@@ -6,9 +6,8 @@ import { GLOBAL } from '../typescript/GLOBAL';
 import { ConfigurationService } from './configuration.service';
 import { ConfigI } from '../typescript/config-interface';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root', })
+
 export class FunctionService {
   canToast = false;
 

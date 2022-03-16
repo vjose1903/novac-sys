@@ -4,6 +4,7 @@ const pdfMake = require('pdfmake/build/pdfmake.js');
 const pdfFonts = require('pdfmake/build/vfs_fonts.js');
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
+import * as _8_5x5_5 from './8.5x5.5/makePDF';
 import * as roll80mm from './80mm_roll/makePDF';
 import * as facturasCompraVenta from './facturasCompraVenta';
 import * as recibosIngresos from './recibosIngresos';
@@ -15,11 +16,8 @@ import { MessageTask } from '../../models/message-task';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
 import { ConfigurationService } from '../configuration.service';
 import { ConfigI } from '../../typescript/config-interface';
-import { GLOBAL } from '../../typescript/GLOBAL';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class PdfService {
   fun = SingletonService.fun;
   _ipc = SingletonService._ipc;
@@ -30,7 +28,7 @@ export class PdfService {
     return new Promise((resolve, reject) => {
       let obj;
       let todo_true = true;
-      const data = params.oPdf.data;
+      const data = this.fun.duplicarJson(params.oPdf.data);
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
       const config: ConfigI = this.configServ.getConfig({ isPromise: false });
@@ -81,6 +79,11 @@ export class PdfService {
             obj = options[config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
             break;
 
+          case 'nota':
+            options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
+
+            obj = options[config.pages_sizes.facturacion].makePDF(data, 'nota.pdf', 'notas');
+            break;
           case 'facturacion': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
 

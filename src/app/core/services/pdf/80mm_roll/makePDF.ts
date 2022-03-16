@@ -4,11 +4,11 @@ import { styles_ } from '../utils/files';
 import { SingletonService } from '../../singleton.service';
 import { ConfigI } from '../../../typescript/config-interface';
 import { getContentWithTablaNormal } from '../tabla_normal';
-import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoFacturas';
-import { config_ventas } from '../configuraciones/ventas';
-import { config_recibo_ingreso } from '../configuraciones/recibo_ingreso';
-import { config_conduce } from '../configuraciones/conduce';
-import { config_cuadre_caja } from '../configuraciones/cuadre_caja';
+import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
+import { config_ventas } from '../8.5x5.5/configuraciones/ventas';
+import { config_recibo_ingreso } from '../8.5x5.5/configuraciones/recibo_ingreso';
+import { config_conduce } from '../8.5x5.5/configuraciones/conduce';
+import { config_cuadre_caja } from '../8.5x5.5/configuraciones/cuadre_caja';
 
 const configuraciones = {
   ventas: config_ventas,

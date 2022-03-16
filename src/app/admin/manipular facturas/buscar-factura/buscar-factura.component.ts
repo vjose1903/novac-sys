@@ -260,7 +260,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       busqueda['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
         fact.fecha = moment(fact.fecha_equivalente).format('DD/MM/YYYY');
-        fact.total_factura = this.fun.numFormatTwoDecimals(Math.abs(fact.total_factura));
+        fact.total = Math.abs(fact.total);
         fact.selectedColor = 'gris-claro';
         fact.viewColor = 'gris-claro';
         fact.view = 'far fa-eye-slash';
@@ -449,7 +449,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       this.parseFactura(item.row, 'venta', 'revisar').then((res) => {
         this.facturaSelected = res;
 
-        this.mostrarFactura(res);
+        this.mostrarFactura(res, 'facturacion');
       });
     } else if (item.column === 'selected') {
       item.row.is_selected = !item.row.is_selected;
@@ -461,10 +461,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   selectNota(event) {
     if (event.column === 'view') {
-      this.parseFactura(event.row, 'nota', 'reimprimir').then((res) => {
-        this.notaSelected = res;
-        this.mostrarFactura(res);
-      });
+      this.notaSelected = event.row;
+      this.notasClass.parseDataToPdf(event.row).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota'));
+
+      // this.parseFactura(event.row, 'nota', 'reimprimir').then((res) => {
+      //   this.notaSelected = res;
+      // });
     }
   }
 
@@ -584,8 +586,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.router.navigateByUrl(url);
   }
 
-  mostrarFactura(dataFactura) {
-    const toPDFData = { data: dataFactura, type: 'facturacion' };
+  mostrarFactura(dataFactura, type) {
+    const toPDFData = { data: dataFactura, type: type };
+
     this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
       if (res.status === 'si') {
         const inputs = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
@@ -602,10 +605,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           },
         };
 
-        if (this.Para == ' Visualizar') {
+        if (this.Para == ' Visualizar' || type == 'nota') {
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-amarillo ml-2',
-            function: (instance) => this.reimprimirFactura({ data: this.facturaSelected, type: 'facturacion' }, instance),
+            function: (instance) => this.reimprimirFactura({ data: this.facturaSelected, type: type }, instance),
             label: 'Reimprimir',
             disable: false,
           });
