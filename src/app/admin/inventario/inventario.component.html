@@ -1,22 +1,22 @@
-<div id="cardTabla" class="cardPrincipal sinPadding tamano" style="height: calc(100% - 9vh)">
-  <div class="bordes info justify-content-between">
+<div id="cardTabla" class="cardPrincipal sinPadding mainContent" style="height: calc(100% - 9vh)">
+  <div class="bordes info justify-content-between cantidades">
     <div class="text-center">
       <span style="font-size: 1.2rem"> Cantidad de productos en inventario </span>
       <h4 class="negrita" *ngIf="listaArticulos">{{ cant_inventario }}</h4>
     </div>
   </div>
 
-  <div class="p-2 mt-2" style="height: inherit">
-    <div>
+  <div class="p-2 cuerpo">
+    <div class="divFiltro">
       <select class="form-control filtroArticulos" [(ngModel)]="filtro" (change)="filtrarArticulos()">
         <option value="0" disabled>Filtro por tipo de articulos</option>
         <option value="todos">Todos</option>
         <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
       </select>
 
-      <i class="fas fa-print btn-circle-icon" (click)="makeReporte()" style="transform: translate(33rem, -0.4rem); z-index: 999999" pTooltip="Reporte de inventario" tooltipPosition="right"></i>
+      <i class="fas fa-print btn-circle-icon ml-3" (click)="makeReporte()" style="z-index: 999999" pTooltip="Reporte de inventario" tooltipPosition="right"></i>
     </div>
-    <div #cardTabla class="divRoles">
+    <div #cardTabla class="h-100">
       <app-tablas
         class="h-100"
         *ngIf="listaArticulos"

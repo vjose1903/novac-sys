@@ -45,27 +45,56 @@ app-tablas {
   background-color: #eaebec;
 }
 
-
-.Pietabla {
-  position: absolute;
-  bottom: 0rem;
-  right: 0.5rem;
-  align-items: center;
-}
-
 .table {
   // margin-bottom: 3rem !important;
 }
 
-.tableBodyScroll tbody {
-  display: block;
-  // max-height: calc(100% - 17vh);
-  overflow-y: scroll;
-}
+.dinamicTable {
+  display: grid !important;
+  grid-template-areas:
+    'searchDiv'
+    'divTable';
+  grid-template-rows: min-content auto;
 
-.tableBodyScroll thead,
-tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
+  > .searchDiv {
+    grid-area: searchDiv;
+  }
+
+  > .divTable {
+    grid-area: divTable;
+    > .myTable {
+      display: grid !important;
+
+      grid-template-areas:
+        'thead'
+        'tbody'
+        'tfoot';
+
+      grid-template-rows: [head-start] min-content [body-start] auto [body-end] min-content [foot-end];
+      row-gap: 0.5rem;
+
+      > .thead {
+        grid-area: thead;
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+        border-radius: 10px 10px 0px 0px;
+      }
+
+      > .tbody {
+        grid-area: tbody;
+        overflow: auto;
+        grid-row: body-start / body-end;
+        > tr {
+          display: table;
+          width: 100%;
+          table-layout: fixed;
+        }
+      }
+
+      > .tfoot {
+        grid-area: tfoot;
+      }
+    }
+  }
 }

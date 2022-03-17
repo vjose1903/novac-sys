@@ -1,5 +1,16 @@
 .divMarcaModelo {
   display: flex;
-  flex-flow: column;
+  // flex-flow: column;
   height: 100%;
+}
+
+::ng-deep .panelsStyle {
+  height: 100% !important;
+  & .p-tabview-panels {
+    padding: 0.571rem 0rem !important;
+    height: 94.8% !important;
+  }
+  .p-tabview-panel {
+    height: 100% !important;
+  }
 }

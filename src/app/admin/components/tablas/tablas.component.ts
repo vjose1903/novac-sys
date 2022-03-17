@@ -554,7 +554,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     if (simpleChanges.data && simpleChanges.info) {
       if (simpleChanges.data.currentValue && simpleChanges.info.currentValue) {
-        setTimeout(() => this.calcularAlto(), 250);
+        console.log(" kjmnuoiko");
+
+        // setTimeout(() => this.calcularAlto(), 250);
       }
     }
     if (simpleChanges.seleccionado) {

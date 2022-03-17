@@ -15,8 +15,6 @@
 }
 
 .filtroArticulos {
-  position: absolute;
-  transform: translate(18rem, -0.01rem);
   height: calc(1em + 0.8rem + 2px);
   max-width: 13rem;
   padding: 0rem !important;
@@ -24,4 +22,23 @@
   font-weight: 600;
   line-height: 2;
   z-index: 999999;
+}
+
+.mainContent {
+  display: grid;
+  grid-template-areas: 'cantidades' 'cuerpo';
+  grid-template-rows: min-content auto;
+  > .cantidades {
+    grid-area: cantidades;
+  }
+  > .cuerpo {
+    grid-area: cuerpo;
+    > .divFiltro {
+      position: absolute;
+      transform: translate(18rem, -0.01rem);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
 }
