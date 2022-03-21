@@ -21,13 +21,14 @@ export interface responseModel<T> {
 } // TODO: <================================================================ PARA DESPUES`
 
 export class CrudG<T> {
-  http = SingletonService.http;
-  fun = SingletonService.fun;
+  private http = SingletonService.http;
+  protected fun = SingletonService.fun;
 
-  constructor(public path: string) {}
+  constructor(private path: string) {}
 
   async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
+
     return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
   }
 
@@ -71,7 +72,7 @@ export class CrudG<T> {
     return (await this.request(url, 'patch', data, tipo, arg?.requestParams).toPromise()) as T;
   }
 
-  parseParams(arg) {
+  private parseParams(arg) {
     let params = '';
 
     for (const key in arg) {
@@ -98,7 +99,7 @@ export class CrudG<T> {
     return params;
   }
 
-  getUrlInUse() {
+  private getUrlInUse() {
     const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
     if (!configApp.usa_url_principal) this.fun.logYellow('::::: USANDO LA URL DE RESPALDO :::::');
 
@@ -106,7 +107,7 @@ export class CrudG<T> {
     return url;
   }
 
-  makeUrl(tipo, args?, id = null) {
+  private makeUrl(tipo, args?, id = null) {
     let url = `${this.getUrlInUse()}${this.fun.hasValue(this.path) ? `/${this.path}` : ''}`;
 
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';
@@ -121,7 +122,7 @@ export class CrudG<T> {
     return url;
   }
 
-  request(url, method, data?, tipo?, arg?): Observable<any> {
+  private request(url, method, data?, tipo?, arg?): Observable<any> {
     const metodo = method.toUpperCase() === 'GET' || method.toUpperCase() === 'DELETE' ? 1 : 2;
 
     switch (metodo) {
@@ -135,7 +136,7 @@ export class CrudG<T> {
     }
   }
 
-  requestOptions(tipo?, arg?) {
+  private requestOptions(tipo?, arg?) {
     let options = {
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
@@ -147,7 +148,7 @@ export class CrudG<T> {
     return options;
   }
 
-  formarParametros(params) {
+  private formarParametros(params) {
     const parametros = { params: {} };
 
     if (params) {

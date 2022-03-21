@@ -195,6 +195,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   async getDataFromModal(arg, search) {
+    console.log('🚀 ~ file: conduce.component.ts ~ line 201 ~ ConduceComponent ~ getDataFromModal ~ arg', arg);
     if (arg.modal_id === 'buscarArticulo') {
       this.llenarRowDespuesDeFiltro(arg);
       // setTimeout(() => this.enfocarInput('can-' + arg.index), 1000);

@@ -31,13 +31,13 @@ export class BuscarArticuloComponent implements OnInit, ModalI {
     const copyData = this.fun.duplicarJson(this.dataFiltro);
     const page = event.page;
     const per_page = event.per_page;
-    let palabra_a_buscar = ' ';
+    let palabra_a_buscar = event.searchText || this.inputs.filtrarArticulo || ' ';
 
     const is_compra = this.inputs.metodo === 'compra' ? true : false;
 
     const res = await this.articuloClass
       .getArticulosFiltrado({
-        buscar: this.inputs.filtrarArticulo || ' ',
+        buscar: palabra_a_buscar,
         page: page,
         per_page: per_page,
         paginado: true,

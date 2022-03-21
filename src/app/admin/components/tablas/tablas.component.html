@@ -9,7 +9,7 @@
 
   <!-- TABLA -->
   <div #divTable class="divTable">
-    <table *ngIf="info" class="myTable" id="VICtablas" [ngStyle]="{ height: divTable.offsetHeight + 'px' }">
+    <table *ngIf="info" class="myTable" id="VICtablas">
       <!-- THEAD -->
       <thead class="text-center position-relative thead" [ngClass]="{ 'head-table': colorHead, 'head-table-none': !colorHead }">
         <tr id="titulosHeader-{{ id_tabla }}" #titulosHeader>

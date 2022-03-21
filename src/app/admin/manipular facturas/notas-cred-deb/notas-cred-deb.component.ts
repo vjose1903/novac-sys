@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
-import { FacturaC, TiposFacturaC, FacturasI } from '../../facturacion/factura';
+import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
@@ -46,6 +46,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   notasClass = new NotaC();
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
+  facturaAplicadasClass = new FacturasAplicadasC();
   tiposFacturasClass = new TiposFacturaC();
   clienteClass = new ClienteC();
   ncfClass = new NcfC();
@@ -91,14 +92,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   async necesarioStart() {
     this.lista_tipos_facturas = await this.tiposFacturasClass.getAll();
 
-    let promiseArray = [];
-
-    for (const ids of this.idsFacturas) {
-      promiseArray.push(this.getFactura(ids));
-    }
-
-    Promise.all(promiseArray).then(async (datos) => {
-      this.facturasConDetalles = datos;
+    this.getFacturas().then(async (datos) => {
+      this.facturasConDetalles = datos as FacturasI[];
 
       await this.formarTitulosTabla();
 
@@ -137,46 +132,49 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     ];
   }
 
-  async getFactura(idFact) {
+  async getFacturas() {
     return new Promise(async (resolve) => {
-      this.facturaClass.getOne(idFact).then((res_factura) => {
-        let tempFactData: FacturasI;
+      this.facturaClass.getAll({ afterPath: `custom/get_group/${this.idsFacturas}` }).then((res_factura) => {
+        console.log('🚀 ~ file: notas-cred-deb.component.ts ~ line 144 ~ NotasCredDebComponent ~ this.facturaClass.getAll ~ res_factura', res_factura);
+        let tempFactData: FacturasI[];
 
         tempFactData = res_factura['data'];
         this.fun.logRed('this.factura --> ', tempFactData);
 
-        this.facturaClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${tempFactData.numero_comprobante}` }).then((res) => {
+        // facturas_aplicadas / custom / get_cantidad_devuelto / 13806, 13808;
+        this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${tempFactData.map((data) => data.numero_factura)}` }).then((res) => {
           const devueltos = res['data'];
+          console.log('🚀 ~ file: notas-cred-deb.component.ts ~ line 153 ~ NotasCredDebComponent ~ this.facturaClass.getAll ~ devueltos', devueltos);
 
-          for (let i = 0; i < tempFactData.detalle_facturas.length; i++) {
-            const detalle = tempFactData.detalle_facturas[i];
+          // for (let i = 0; i < tempFactData.detalle_facturas.length; i++) {
+          //   const detalle = tempFactData.detalle_facturas[i];
 
-            const devueto = devueltos[detalle.id] !== undefined ? devueltos[detalle.id] : 0;
+          //   const devueto = devueltos[detalle.id] !== undefined ? devueltos[detalle.id] : 0;
 
-            detalle['select'] = false;
-            detalle['cant'] = detalle.cantidad - devueto;
-            detalle['cant_nota'] = 0;
+          //   detalle['select'] = false;
+          //   detalle['cant'] = detalle.cantidad - devueto;
+          //   detalle['cant_nota'] = 0;
 
-            detalle['customStyles'] = {
-              'td-select': { width: '3rem' },
-              'td-cantidad': { width: '5rem' },
-              'td-total_nota': { width: '7.3rem' },
-              'td-cant_nota': { width: '6rem' },
-              'td-unidad': { width: '4.5rem' },
-              'td-descripcion': { 'text-align': 'left', width: '20rem' },
-            };
+          //   detalle['customStyles'] = {
+          //     'td-select': { width: '3rem' },
+          //     'td-cantidad': { width: '5rem' },
+          //     'td-total_nota': { width: '7.3rem' },
+          //     'td-cant_nota': { width: '6rem' },
+          //     'td-unidad': { width: '4.5rem' },
+          //     'td-descripcion': { 'text-align': 'left', width: '20rem' },
+          //   };
 
-            if (this.tipoNota === 'credito') {
-              detalle['min_'] = 0;
-              detalle['max_'] = detalle.cantidad - devueto;
-            } else {
-              detalle['min_'] = 0;
-              detalle['max_'] = null;
-            }
+          //   if (this.tipoNota === 'credito') {
+          //     detalle['min_'] = 0;
+          //     detalle['max_'] = detalle.cantidad - devueto;
+          //   } else {
+          //     detalle['min_'] = 0;
+          //     detalle['max_'] = null;
+          //   }
 
-            detalle['total_nota'] = 0;
-            detalle['cantidad'] = detalle.cantidad - devueto;
-          }
+          //   detalle['total_nota'] = 0;
+          //   detalle['cantidad'] = detalle.cantidad - devueto;
+          // }
 
           resolve(tempFactData);
         });
@@ -200,7 +198,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     let total = 0;
     for (let i = 0; i < this.detalleNota.length; i++) {
       const detalle = this.detalleNota[i];
+
       const cantidad = detalle.cant_nota;
+
       const descuento = detalle.descuento_valor / detalle.cantidad;
 
       if (this.tipoNota === 'credito') {
@@ -209,6 +209,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         total += cantidad * (detalle.precio - descuento);
       }
     }
+
     this.TOTAL = total;
   }
 
@@ -232,8 +233,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async getInfoChange(infoTable, factData: FacturasI) {
     const entidad = infoTable.body[infoTable.index];
+
     entidad.cant_nota = parseFloat(entidad.cant_nota);
 
+    console.log('🚀 ~ file: notas-cred-deb.component.ts ~ line 237 ~ NotasCredDebComponent ~ getInfoChange ~ infoTable.cambio', infoTable.cambio);
     if (infoTable.cambio === 'cant_nota') {
       if (this.tipoNota === 'credito') {
         if (entidad.cant_nota > entidad.cant) {
@@ -259,6 +262,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         const descuento = entidad.descuento_valor / entidad.cantidad;
 
         const total = entidad.cant_nota * (entidad.precio - descuento);
+
         entidad.total_nota = this.formatoNumero(total);
       }
       this.sumarTotal();

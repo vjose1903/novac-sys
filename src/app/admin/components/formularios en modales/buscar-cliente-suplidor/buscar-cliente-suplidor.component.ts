@@ -45,10 +45,10 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
     const copyData = this.fun.duplicarJson(this.dataFiltro);
     const page = event.page;
     const per_page = event.per_page;
-    let palabra_a_buscar = ' ';
+    let palabra_a_buscar = event.searchText || this.inputs.palabra_a_buscar || ' ';
 
-    if (this.inputs.palabra_a_buscar) palabra_a_buscar = this.fun.isEmpty(this.inputs.palabra_a_buscar) ? ' ' : this.inputs.palabra_a_buscar;
-    else palabra_a_buscar = this.fun.isEmpty(event.searchText) ? ' ' : event.searchText;
+    // if (!this.fun.isEmpty(event.searchText)) palabra_a_buscar = event.searchText;
+    // else if (this.inputs.palabra_a_buscar) palabra_a_buscar = this.fun.isEmpty(this.inputs.palabra_a_buscar) ? ' ' : this.inputs.palabra_a_buscar;
 
     const classDinamic = this.inputs.metodo === 'venta' ? 'clienteClass' : 'suplidorClass';
 
