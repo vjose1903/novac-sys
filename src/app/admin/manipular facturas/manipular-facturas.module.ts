@@ -9,9 +9,10 @@ import { TablasModule } from '../components/tablas/tablas.module';
 import { BtncircularModule } from '../components/btncircular/btncircular.module';
 
 import { PrimengModule } from '../../modules/primeng.module';
+import { DetalleNotaComponent } from './detalle-nota/detalle-nota.component';
 
 @NgModule({
-  declarations: [NotasCredDebComponent, BuscarFacturaComponent],
+  declarations: [NotasCredDebComponent, BuscarFacturaComponent, DetalleNotaComponent],
   imports: [CommonModule, ManipularFacturasRoutingModule, AngularModule, TablasModule, BtncircularModule, PrimengModule],
 })
 export class ManipularFacturasModule {}

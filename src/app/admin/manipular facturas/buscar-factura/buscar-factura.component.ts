@@ -14,6 +14,7 @@ import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { PdfViewerComponent } from '../../components/pdf-viewer/pdf-viewer.component';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { NotaC } from '../notas-cred-deb/notas';
+import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 
 @Component({
   selector: 'app-buscar-factura',
@@ -461,7 +462,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   selectNota(event) {
     if (event.column === 'view') {
       this.notaSelected = event.row;
-      this.notasClass.parseDataToPdf(event.row).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota'));
+      console.log('event.row ', event.row);
+
+      this.notasClass.parseDataToPdf(event.row).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota', event.row));
 
       // this.parseFactura(event.row, 'nota', 'reimprimir').then((res) => {
       //   this.notaSelected = res;
@@ -585,8 +588,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.router.navigateByUrl(url);
   }
 
-  mostrarFactura(dataFactura, type) {
+  mostrarFactura(dataFactura, type, dataDB?) {
     const toPDFData = { data: dataFactura, type: type };
+    const titulo = type === 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
+    console.log('mostrarFactura ~ dataDB', dataDB);
 
     this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
       console.log('res ', res);
@@ -597,7 +602,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           component: PdfViewerComponent,
           inputs: inputs,
           id: 'mostrarFactura',
-          header: 'Mostrar Factura',
+          header: titulo,
           width: '900px',
           botones: {
             aceptar: { show: false, disable: false },
@@ -607,9 +612,18 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         };
 
         if (this.Para == ' Visualizar' || type == 'nota') {
+          if (type == 'nota') {
+            obj_modal.botones.dinamico.push({
+              clase: 'btn btn-gris ml-2',
+              function: (instance) => this.verDetalles(dataDB, instance),
+              label: 'Ver detalles',
+              disable: false,
+            });
+          }
+
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-amarillo ml-2',
-            function: (instance) => this.reimprimirFactura({ data: this.facturaSelected, type: type }, instance),
+            function: (instance) => this.reimprimirFactura({ data: dataFactura, type: type }, instance),
             label: 'Reimprimir',
             disable: false,
           });
@@ -618,6 +632,28 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       }
     });
   }
+
+  verDetalles(dataNota, modalInstance) {
+    console.log('verDetalles ~ dataNota', dataNota);
+
+    const input = { data: dataNota, instanceModalPadre: modalInstance };
+    console.log('input ', input);
+
+    this.handleModalForm({
+      component: DetalleNotaComponent,
+      inputs: input,
+      id: 'buscarCliente',
+      header: `Nota: ${dataNota.numero_comprobante}`,
+      width: '1000px',
+      height: '50rem',
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+      },
+    });
+  }
+
   getDataFromModal(arg, search) {
     if (arg.modal_id === 'buscarCliente') {
       this.clienteBuscado = arg.data;
