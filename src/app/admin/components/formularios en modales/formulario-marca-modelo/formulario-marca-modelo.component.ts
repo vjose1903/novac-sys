@@ -5,19 +5,21 @@ import * as _ from 'lodash';
 import { TablasService } from '../../../components/tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '../../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
+import { ModalI } from '../../new_modal/modal-class';
 
 @Component({
   selector: 'app-formulario-marca-modelo',
   templateUrl: './formulario-marca-modelo.component.html',
   styleUrls: ['./formulario-marca-modelo.component.scss'],
 })
-export class FormularioMarcaModeloComponent extends MixinClass implements OnInit {
+export class FormularioMarcaModeloComponent extends MixinClass implements OnInit, ModalI {
   @Input() tipo_formulario;
 
   componente;
   tituloTabla;
   @Output() accion_ = new EventEmitter<any>();
-  form: FormGroup;
+  formMarca: FormGroup;
+  formModelo: FormGroup;
   info = [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }];
 
   botones = {
@@ -46,28 +48,32 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();
   }
+  modal: any = {};
+  inputs: any;
+  btn_aceptar() {}
 
   ngOnInit() {
     this.createForm();
-
+    this.tipo_formulario = this.inputs.tipo;
     if (this.tipo_formulario === 'marcas') {
-      this.form.controls.descripcion.setValidators([Validators.required]);
       this.componente = 'reg_marcas';
       this.tituloTabla = 'Marcas';
       this.campo1 = 'Marca';
     } else if (this.tipo_formulario === 'modelos') {
-      this.form.controls.descripcion.setValidators([Validators.required]);
-      this.form.controls.marca_id.setValidators([Validators.required]);
       this.componente = 'reg_modelos';
       this.tituloTabla = 'Modelos';
       this.campo1 = 'Marca';
-      this.getMarcas();
 
       this.info = [
         { titulo: 'Marca', key: 'marca_nombre', tipo: 'text' },
         { titulo: 'Modelo', key: 'descripcion', tipo: 'text' },
       ];
     }
+
+    this.formMarca.controls.descripcion.setValidators([Validators.required]);
+    this.formModelo.controls.descripcion.setValidators([Validators.required]);
+    this.formModelo.controls.marca_id.setValidators([Validators.required]);
+    this.getMarcas();
 
     this.pedirNuevaData(this.obj_p);
 
@@ -91,13 +97,17 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     });
   }
 
-  capitalice(control, arg) {
-    const campo = this.form.get(control);
+  capitalice(control, arg, form) {
+    const campo = form.get(control);
     campo.setValue(this.fun.Capitalice(arg));
   }
 
   createForm() {
-    this.form = this.fb.group({
+    this.formMarca = this.fb.group({
+      descripcion: [null],
+      marca_id: [null],
+    });
+    this.formModelo = this.fb.group({
       descripcion: [null],
       marca_id: [null],
     });
@@ -127,8 +137,15 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   accion(arg) {
     this.accion_.emit(arg);
   }
-  async submit() {
-    const obj = this.fun.duplicarJson(this.form.value);
+  closeThis() {
+    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    modal.closeModal(this.modal.component_id);
+
+    return modal;
+  }
+
+  async submit(formToSubmit) {
+    const obj = this.fun.duplicarJson(this[formToSubmit].value);
 
     if (this.tipo_formulario !== 'modelos') delete obj['marca_id'];
 
@@ -154,20 +171,21 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   borrar() {
-    this.form.reset();
+    this.formMarca.reset();
+    this.formModelo.reset();
     this.editando = undefined;
     this.indexSelected = undefined;
     this.seleccionModal = undefined;
     this.boton = 'Guardar';
   }
 
-  editarItem(arg) {
+  editarItem(arg, formName) {
     this.editando = arg.ARG;
 
     this.indexSelected = arg.INDEX;
     if (_.has(arg.ARG, 'marca')) arg.ARG.marca_id = arg.ARG.marca.id;
 
-    this.form.patchValue(arg.ARG);
+    this[formName].patchValue(arg.ARG);
     this.boton = 'Editar';
   }
 

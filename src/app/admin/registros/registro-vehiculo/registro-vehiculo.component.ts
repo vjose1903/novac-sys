@@ -8,6 +8,7 @@ import { TablasService } from '../../components/tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../registro-empleados/empleado';
 import { VehiculoC } from './vehiculo';
+import { FormularioMarcaModeloComponent } from '../../components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
 
 @Component({
   selector: 'app-registro-vehiculo',
@@ -239,6 +240,25 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   capitalice(control, arg) {
     const campo = this.form.get(control);
     campo.setValue(this.fun.Capitalice(arg));
+  }
+
+  abrirModalMarcasYModelos(tipo) {
+    this.handleModalForm({
+      component: FormularioMarcaModeloComponent,
+      inputs: { tipo },
+      id: 'crud_marca_modelo',
+      header: 'Mantenimiento marca & modelo',
+      width: '1000px',
+      height: '650px',
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        // dinamico: [
+        //   { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal('crud_marca_modelo', 'cerrar'), label: 'Cancelar', disable: false },
+        //   { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+        // ],
+      },
+    });
   }
 
   eliminarReg(regisData) {
