@@ -11,7 +11,22 @@ export class NotaC extends CrudG<any> {
 
   parseDataToPdf(data) {
     return new Promise((resolve) => {
-      const pick_nota = ['cliente', 'estado', 'fecha_equivalente', 'id', 'identificador', 'numero_comprobante', 'numero_documento', 'tipo_factura', 'total', 'usuario', 'facturas_aplicadas'];
+      const pick_nota = [
+        'cliente',
+        'estado',
+        'fecha_equivalente',
+        'fecha_valida',
+        'id',
+        'identificador',
+        'numero_comprobante',
+        'numero_documento',
+        'tipo_factura',
+        'total',
+        'usuario',
+        'facturas_aplicadas',
+        'tipo_factura_id',
+      ];
+
       let temp_data_parsed = _.pick(this.fun.duplicarJson(data), pick_nota);
 
       const data_parsed = this.fun.remplaceKeyFromJson(temp_data_parsed, [
@@ -19,7 +34,7 @@ export class NotaC extends CrudG<any> {
         { old_key: 'facturas_aplicadas', new_key: 'contenido_reporte' },
       ]);
 
-      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente).format('DD/MM/YYYY');
+      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente);
       data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
 
       data_parsed.contenido_reporte.map((factura_aplicada) => {

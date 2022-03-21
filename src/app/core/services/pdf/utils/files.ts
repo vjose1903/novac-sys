@@ -3,36 +3,17 @@ export const logoADM =
 
 // ==========
 export const styles_ = {
-  letra7: {
-    fontSize: 7,
-  },
-  letra8: {
-    fontSize: 8,
-  },
-  letra9: {
-    fontSize: 9,
-  },
-  letra10: {
-    fontSize: 10,
-  },
-  letra11: {
-    fontSize: 11,
-  },
-  letra12: {
-    fontSize: 12,
-  },
-  letra13: {
-    fontSize: 13,
-  },
-  letra14: {
-    fontSize: 14,
-  },
-  letra15: {
-    fontSize: 15,
-  },
-  letra17: {
-    fontSize: 17,
-  },
+  letra7: { fontSize: 7 },
+  letra8: { fontSize: 8 },
+  letra9: { fontSize: 9 },
+  letra10: { fontSize: 10 },
+  letra11: { fontSize: 11 },
+  letra12: { fontSize: 12 },
+  letra13: { fontSize: 13 },
+  letra14: { fontSize: 14 },
+  letra15: { fontSize: 15 },
+  letra16: { fontSize: 16 },
+  letra17: { fontSize: 17 },
 };
 // ==========
 

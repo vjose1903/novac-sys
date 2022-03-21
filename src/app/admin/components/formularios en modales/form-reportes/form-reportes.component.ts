@@ -104,6 +104,7 @@ export class FormVentasComponent extends MixinClass implements OnInit, ModalI {
             });
             return cliente;
           });
+          console.log('res[data] ', res['data']);
 
           this.listaClientes = res['data'];
 

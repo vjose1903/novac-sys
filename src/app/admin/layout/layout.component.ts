@@ -29,8 +29,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   imgUser;
   versionApp: any;
   noServer;
-  subDeciMenu: Subscription;
   subCheckCuadreToday: Subscription;
+  subLogOut: Subscription;
   modulo_select: any;
   ready;
   _opened;
@@ -94,13 +94,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         .catch((err) => {
           if (err.status === 0) this.noServer = true;
           else {
-            this.fun.logout();
-            this.router.navigateByUrl('/auth/login');
-            this.noServer = false;
+            this.logOut();
           }
         });
     } else {
-      this.fun.logout();
+      this.logOut();
     }
 
     this.subCheckCuadreToday = this.layServ.CHECKCUADRETODAY.subscribe((res) => {
@@ -108,6 +106,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         this.checkCuadre();
         this.layServ.nextCheckCuadreToday(false);
       }
+    });
+
+    this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
+      console.log('this.subLogOut');
+      if (res) this.logOut();
     });
 
     this.configServ.getConfig().then((config: ConfigI) => {
@@ -129,13 +132,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ngOnDestroy() {
     this._destroy_mixin();
-    if (this.subDeciMenu) this.subDeciMenu.unsubscribe();
     if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
   }
-
-  // decisionModal(arg) {
-  //   if (this.tipoModal === 'quitar_factura' && arg) this.quitarFacturaGuardada({ body: { archivo_id: this.seleccionModal?.archivo_id } });
-  // }
 
   _toggleSidebar(where?) {
     if (where == 'visibleChange') {
@@ -248,7 +246,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   pasarFacturaAfacturacion(fact) {
     if (this.fun.isEmpty(this.factGuardada) || fact.archivo_id != this.factGuardada.archivo_id) {
       this.checkWhereIs(fact.tipo).then((res) => {
-
         setTimeout(() => {
           if (res) this.layServ.nextFacturaGuardada(fact);
         }, 150);
@@ -268,8 +265,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // CERRAR SESION
   // =================================================================================
   logOut() {
-    this.fun.logout();
-    this.router.navigateByUrl('/');
+    this.fun.logout().then(() => {
+      this.router.navigateByUrl('/');
+      this._destroy_layout(true);
+      this.noServer = false;
+    });
   }
 
   // =================================================================================

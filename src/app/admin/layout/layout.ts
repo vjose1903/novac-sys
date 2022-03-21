@@ -48,9 +48,15 @@ export class LayoutClass {
     LayoutClass.layoutComponent.finalizarCambioMenu(arg);
   }
 
-  _destroy_layout() {
+  _destroy_layout(refresh = false) {
     if (this.subInit) {
       if (this.subInit) this.subInit.unsubscribe();
+    }
+
+    if (refresh) {
+      LayoutClass.layoutComponent = undefined;
+      LayoutClass.metodos = {};
+      LayoutClass.lastComponentInitLayout = undefined;
     }
   }
 }

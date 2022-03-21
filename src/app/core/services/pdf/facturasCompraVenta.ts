@@ -194,14 +194,7 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
     // =============================================================
     {
       canvas: [
-        {
-          type: 'rect',
-          x: 10,
-          y: 3,
-          w: 970,
-          h: 2,
-          color: '#000000',
-        },
+        { type: 'rect', x: 10, y: 3, w: 970, h: 2, color: '#000000', },
       ],
     },
 

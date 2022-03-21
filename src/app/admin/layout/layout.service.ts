@@ -7,12 +7,17 @@ import { BehaviorSubject } from 'rxjs';
 export class LayoutService {
   FACTURAGUARDADA = new BehaviorSubject<any>(undefined);
   CHECKCUADRETODAY = new BehaviorSubject<any>(false);
+  LOGOUT = new BehaviorSubject<any>(false);
   REFRESFACTURAS = new BehaviorSubject<boolean>(false);
   SACARFACTURA = new BehaviorSubject<boolean>(false);
 
   constructor() {}
 
   public factura_guardada;
+
+  nextLogOut(nextValue) {
+    this.LOGOUT.next(nextValue);
+  }
 
   nextCheckCuadreToday(nextValue) {
     this.CHECKCUADRETODAY.next(nextValue);

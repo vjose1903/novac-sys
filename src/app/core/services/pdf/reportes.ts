@@ -51,17 +51,8 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
             {
               margin: [0, 17, 0, 0],
               stack: [
-                {
-                  text: configApp.nombre_empresa,
-                  alignment: 'center',
-                  bold: true,
-                  style: 'letra11',
-                },
-                {
-                  text: configApp.direccion_empresa,
-                  alignment: 'center',
-                  style: 'letra10',
-                },
+                { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
+                { text: configApp.direccion_empresa, alignment: 'center', style: 'letra10' },
                 {
                   text: [
                     { text: 'Telefono: ', style: 'letra9', bold: true },
@@ -79,26 +70,17 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
               margin: [pageO === 'portrait' ? 0 : 80, 10, 0, 0],
               stack: [
                 {
-                  text: [
-                    { text: 'Pag... :  ', style: 'letra10', bold: true },
-                    { text: pag, style: 'letra10' },
-                  ],
+                  text: [ { text: 'Pag... :  ', style: 'letra10', bold: true }, { text: pag, style: 'letra10' }, ],
                   alignment: 'left',
                   margin: [60, 19, 0, 0],
                 },
                 {
-                  text: [
-                    { text: 'Fecha : ', style: 'letra10', bold: true },
-                    { text: data.fecha, style: 'letra10' },
-                  ],
+                  text: [ { text: 'Fecha : ', style: 'letra10', bold: true }, { text: data.fecha, style: 'letra10' }, ],
                   alignment: 'left',
                   margin: [60, 3, 0, 0],
                 },
                 {
-                  text: [
-                    { text: 'Emp... :  ', style: 'letra10', bold: true },
-                    { text: data.realizado_por, style: 'letra10' },
-                  ],
+                  text: [ { text: 'Emp... :  ', style: 'letra10', bold: true }, { text: data.realizado_por, style: 'letra10' }, ],
                   alignment: 'left',
                   margin: [60, 3, 0, 0],
                 },
@@ -113,26 +95,9 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
         margin: [0, 15, 0, 0],
         alignment: 'center',
       },
-      data.mostrar_sub_titulo
-        ? {
-            text: data.sub_titulo,
-            style: 'letra10',
-            margin: [15, 10, 0, 0],
-          }
-        : { text: '' },
+      data.mostrar_sub_titulo ? { text: data.sub_titulo, style: 'letra10', margin: [15, 10, 0, 0], } : { text: '' },
 
-      {
-        canvas: [
-          {
-            type: 'rect',
-            x: 10,
-            y: data.mostrar_sub_titulo ? 2 : 10,
-            w: pageO === 'portrait' ? 575 : 823,
-            h: 1.5,
-            color: '#000000',
-          },
-        ],
-      },
+      { canvas: [ { type: 'rect', x: 10, y: data.mostrar_sub_titulo ? 2 : 10, w: pageO === 'portrait' ? 575 : 823, h: 1.5, color: '#000000', }, ], },
     ];
   };
 

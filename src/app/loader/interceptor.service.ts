@@ -7,6 +7,7 @@ import { LoaderService } from './loader.service';
 import { FunctionService } from '../core/services/functions.service';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { SingletonService } from '../core/services/singleton.service';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
@@ -68,10 +69,10 @@ export class InterceptorService implements HttpInterceptor {
       catchError((response: HttpErrorResponse) => {
         if (response.error === null) {
           this.fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
-        } else if ((response.error && _.has(response.error, 'action'), response.error.action === 'close_ssesion')) {
+        } else if (response.error && _.has(response.error, 'action') && response.error.action === 'close_ssesion') {
           this.fun.toastError(response.error.msg, 'ERROR');
           this.fun.nextCanToast(false);
-          this.router.navigateByUrl('/auth/login');
+          SingletonService.layServ.nextLogOut(true);
         } else {
           if (_.has(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
 
