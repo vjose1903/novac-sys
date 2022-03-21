@@ -273,7 +273,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       });
 
       this.notas = busqueda['data'];
-      console.log('this.notas ', this.notas);
 
       const obj = { total: busqueda.total_registros, tabla: 'notas' };
 
@@ -590,8 +589,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     const toPDFData = { data: dataFactura, type: type };
 
     this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
+      console.log('res ', res);
       if (res.status === 'si') {
-        const inputs = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+        const inputs = { pdfSrc: res.body, height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+        console.log('inputs ', inputs);
         const obj_modal = {
           component: PdfViewerComponent,
           inputs: inputs,

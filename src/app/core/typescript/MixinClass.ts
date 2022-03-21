@@ -20,6 +20,7 @@ export class MixinClass extends ModalClass {
   constructor() {
     super();
   }
+
   fun = SingletonService.fun;
   layServ = SingletonService.layServ;
   arg_mixin;
@@ -129,9 +130,7 @@ export class MixinClass extends ModalClass {
       id: 'borrar',
       header: 'Confirmar',
       width: '510px',
-      html: `<p>
-       ${obj?.texto}
-      </p>`,
+      html: `<p> ${obj?.texto} </p>`,
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },

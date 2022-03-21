@@ -6,8 +6,7 @@ import { GLOBAL } from '../typescript/GLOBAL';
 import { ConfigurationService } from './configuration.service';
 import { ConfigI } from '../typescript/config-interface';
 
-@Injectable({ providedIn: 'root', })
-
+@Injectable({ providedIn: 'root' })
 export class FunctionService {
   canToast = false;
 
@@ -316,6 +315,8 @@ export class FunctionService {
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
   Capitalice(str) {
+    console.log("str");
+
     const ultimosCaractes = this.hasValue(str) ? str.length + 1 : null;
     return this.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
   }
@@ -468,19 +469,21 @@ export class FunctionService {
     return localStorage.getItem('access-token');
   }
 
-  async logout(callback = (arg) => {}) {
-    try {
-      localStorage.removeItem('facturas_guardadas');
-      localStorage.removeItem('access-token');
-      localStorage.removeItem('client');
-      localStorage.removeItem('content-type');
-      localStorage.removeItem('expiry');
-      localStorage.removeItem('token-type');
-      localStorage.removeItem('uid');
-      callback(true);
-    } catch (error) {
-      callback(false);
-    }
+  async logout() {
+    return new Promise((resolve) => {
+      try {
+        localStorage.removeItem('facturas_guardadas');
+        localStorage.removeItem('access-token');
+        localStorage.removeItem('client');
+        localStorage.removeItem('content-type');
+        localStorage.removeItem('expiry');
+        localStorage.removeItem('token-type');
+        localStorage.removeItem('uid');
+        resolve(true);
+      } catch (error) {
+        resolve(false);
+      }
+    });
 
     // this.router.navigateByUrl('/auth/login');
   }
