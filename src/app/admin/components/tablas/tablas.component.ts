@@ -268,7 +268,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const info_colum = _.find(this.info, (item) => item.key == key);
     if (!this.disabledInput(this.data[i], info_colum)) {
       this.data[i][key] = !this.data[i][key];
-      const obj = { body: this.data, index: i, cambio: key, value: this.data[i][key] };
+      const obj = { body: this.data, index: i, cambio: key, value: this.data[i][key], id_tabla: this.id_tabla };
 
       if (!auto && _.every(this.data, { select: this.data[i][key] })) this.select_all_value = this.data[i][key];
 
@@ -283,6 +283,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       index: i,
       cambio: key,
       value: valor,
+      id_tabla: this.id_tabla,
     };
     this.getInfoChange.emit(obj);
   }
@@ -423,6 +424,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           index: i,
           cambio: key,
           value: numeroFormateado,
+          id_tabla: this.id_tabla,
         };
         this.getInfoChange.emit(obj);
       }
@@ -544,12 +546,14 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   ngOnChanges(simpleChanges) {
+    console.log('simpleChanges  ', simpleChanges);
     if (simpleChanges.data && simpleChanges.data.currentValue) {
       // ================================================
       // CUSTOM STYLES
       // ================================================
       setTimeout(() => this.changeStylesTitles(), 1);
-      // ================================================
+      // ==========================ß======================
+      console.log('cambio data ');
     }
 
     if (simpleChanges.data && simpleChanges.info) {

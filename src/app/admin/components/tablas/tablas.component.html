@@ -15,7 +15,7 @@
         <tr id="titulosHeader-{{ id_tabla }}" #titulosHeader>
           <th id="{{ row?.titulo }}-{{ id_tabla }}" *ngFor="let row of info" class="thHead">
             <span [ngSwitch]="row?.tipo">
-              <span *ngSwitchCase="'check'">
+              <span *ngSwitchCase="'inputSwitch'">
                 <ng-container *ngIf="!row?.select_all"> {{ row?.titulo }} </ng-container>
 
                 <input
@@ -139,7 +139,7 @@
                 <div *ngIf="!column.checkNumber">
                   <input
                     class="form-control m-0 inputTabla {{ column.inputType ? (column.inputType == 'number' ? 'input_cantidad' : '') : '' }}"
-                    id="inputNu-{{ i }}"
+                    id="input-{{ id_tabla }}-{{ i }}"
                     [min]="dato.min_ ? dato.min_ : 0"
                     [max]="dato.max_ ? dato.max_ : null"
                     type="{{ column.inputType ? column.inputType : 'text' }}"
