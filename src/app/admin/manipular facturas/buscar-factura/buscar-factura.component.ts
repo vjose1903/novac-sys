@@ -329,7 +329,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       const args = { campo, valor, tipo_factura_id: this.tipo_factura_id, adelantada: false, page: e.page, per_page: e.per_page, paginado: true, fact_de: 'venta' };
       const busqueda = await this.facturaClass.getFacturasByParams(args);
-      console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ busqueda', busqueda);
 
       busqueda['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
@@ -346,7 +345,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.tooltip_select = 'Seleccionar Factura';
 
         fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
-        // fact.customStyles = [{ view: { estilos: [{ 'font-size': '1.5rem' }] } }, { 'td-estatus': { estilos: [{ width: '2rem' }] } }];
+
         fact.customStyles = {
           'td-condicion': { width: '6rem' },
           'td-secuencia': { width: '7rem' },
@@ -370,8 +369,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       this.facturas = this.fun.duplicarJson(busqueda['data']);
 
       if (this.facturas.length > 0) {
-        console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ his.tipo_factura_id', this.tipo_factura_id);
-        console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ campo', campo);
         if (this.campo === campos.numeroComprobante || (campo == campos.NumeroFactura && this.tipo_factura_id != '0')) {
           this.facturas[0]['mostrarFacturaPara'] = this.buscarPara;
 
@@ -467,12 +464,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       });
     } else if (item.column === 'selected') {
       item.row.is_selected = !item.row.is_selected;
-      this.idsFacturasSeleccionadas = _.filter(this.facturas, { is_selected: true }).map((factura) => {
-        return factura.id;
-      });
 
-      // const factura_in_turn = _.find(this.facturas, (item) => item.id == item.row.id);
-      // factura_in_turn.is_selected = !factura_in_turn.is_selected;
+      item.row.is_selected ? this.idsFacturasSeleccionadas.push(item.row.id) : _.pull(this.idsFacturasSeleccionadas, item.row.id);
     }
   }
 
@@ -481,10 +474,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       this.notaSelected = event.row;
 
       this.notasClass.parseDataToPdf(event.row).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota', event.row));
-
-      // this.parseFactura(event.row, 'nota', 'reimprimir').then((res) => {
-      //   this.notaSelected = res;
-      // });
     }
   }
 
@@ -527,8 +516,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
           this.pedirFactura(this.campo, valor, actualPagination);
         } else {
-          console.log('🚀 ~ BuscarFacturaComponent ~ saltar ~ valor', valor);
-          console.log('🚀 ~ BuscarFacturaComponent ~ saltar ~ campo', campo);
           if (this.tipo_factura_id === '0') {
             this.pedirFactura(this.campo, valor, actualPagination);
           } else {
@@ -562,7 +549,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },
-        // dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     });
   }
@@ -581,10 +567,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (this.tipoModal === 'cancelarBusqueda') this.borrar();
   }
 
-  // get hayFacturasSelecciomnadas(): boolean {
-  //   return _.some(this.facturas, { is_selected: true });
-  // }
-
   async CancelarFactura() {
     try {
       const res = await this.facturaClass.createOne(null, { afterPath: `anular_factura/${this.facturaSelected.id}` });
@@ -594,12 +576,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       console.error(error);
     }
   }
-
-  // get idsFacturasSeleccionadas() {
-  //   const facturasSelect = _.filter(this.facturas, { is_selected: true });
-  //   const ids = _.map(facturasSelect, 'id');
-  //   return ids;
-  // }
 
   continuarAManipularFactura(idFactSelect?) {
     const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${JSON.stringify(idFactSelect ? [idFactSelect] : this.idsFacturasSeleccionadas)}`;
