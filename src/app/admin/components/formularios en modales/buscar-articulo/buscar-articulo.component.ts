@@ -24,14 +24,15 @@ export class BuscarArticuloComponent implements OnInit, ModalI {
 
   btn_aceptar() {}
   ngOnInit(): void {
-    this.buscarArticulos(this.tServ.obj_paginate.default);
+    this.buscarArticulos(this.tServ.obj_paginate.default, 'init');
   }
 
-  async buscarArticulos(event) {
+  async buscarArticulos(event, where?) {
     const copyData = this.fun.duplicarJson(this.dataFiltro);
     const page = event.page;
     const per_page = event.per_page;
-    let palabra_a_buscar = event.searchText || this.inputs.filtrarArticulo || ' ';
+    // let palabra_a_buscar = event.searchText || this.inputs.filtrarArticulo || ' ';
+    let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : event.searchText || ' ';
 
     const is_compra = this.inputs.metodo === 'compra' ? true : false;
 
