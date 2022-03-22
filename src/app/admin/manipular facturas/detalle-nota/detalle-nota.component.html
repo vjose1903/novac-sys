@@ -1,0 +1,39 @@
+<div class="mainContainer">
+  <div class="d-flex info">
+    <div class="d-flex">
+      <b class="mr-2">Cliente: </b>
+      <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+        <p class="text-black mb-0">{{ inputs.data.cliente.nombre }}</p></p-tag
+      >
+    </div>
+
+    <div class="d-flex ml-3">
+      <b class="mr-2">Total Nota: </b>
+      <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+        <p class="text-black mb-0">{{ numFormat(inputs.data.total) }}</p></p-tag
+      >
+    </div>
+  </div>
+
+  <div class="tabs">
+    <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView">
+      <p-tabPanel *ngFor="let iteraFact of inputs.data.facturas_aplicadas" header="{{ iteraFact.cabecera_factura.numero_comprobante }}">
+        <div #cardTabla id="cardTabla" class="cuerpoFactura h-100">
+          <app-tablas
+            class="h-100"
+            *ngIf="iteraFact.detalles_facturas_notas"
+            [search]="false"
+            [paginate]="false"
+            [id_tabla]="iteraFact.id"
+            [tablaHover]="false"
+            [padre]="cardTabla"
+            [info]="info"
+            [data]="iteraFact.detalles_facturas_notas"
+            [focusRow]="false"
+            [pad]="false"
+          ></app-tablas>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
+  </div>
+</div>

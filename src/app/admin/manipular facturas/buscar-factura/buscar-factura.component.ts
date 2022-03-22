@@ -14,6 +14,7 @@ import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { PdfViewerComponent } from '../../components/pdf-viewer/pdf-viewer.component';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { NotaC } from '../notas-cred-deb/notas';
+import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 
 enum campos {
   cliente = 1,
@@ -328,6 +329,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       const args = { campo, valor, tipo_factura_id: this.tipo_factura_id, adelantada: false, page: e.page, per_page: e.per_page, paginado: true, fact_de: 'venta' };
       const busqueda = await this.facturaClass.getFacturasByParams(args);
+      console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ busqueda', busqueda);
 
       busqueda['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
@@ -368,13 +370,15 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       this.facturas = this.fun.duplicarJson(busqueda['data']);
 
       if (this.facturas.length > 0) {
-        if (this.campo === '2') {
+        console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ his.tipo_factura_id', this.tipo_factura_id);
+        console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ campo', campo);
+        if (this.campo === campos.numeroComprobante || (campo == campos.NumeroFactura && this.tipo_factura_id != '0')) {
           this.facturas[0]['mostrarFacturaPara'] = this.buscarPara;
 
           this.parseFactura(this.facturas[0], 'venta', this.buscarPara).then((res) => {
             const continuar = campo == campos.numeroComprobante || campo == campos.NumeroFactura;
             this.facturaSelected = res;
-            this.mostrarFactura(res, 'facturacion', continuar);
+            this.mostrarFactura(res, 'facturacion', null, continuar);
           });
         }
       } else {
@@ -475,7 +479,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   selectNota(event) {
     if (event.column === 'view') {
       this.notaSelected = event.row;
-      this.notasClass.parseDataToPdf(event.row).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota'));
+
+      this.notasClass.parseDataToPdf(event.row).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota', event.row));
 
       // this.parseFactura(event.row, 'nota', 'reimprimir').then((res) => {
       //   this.notaSelected = res;
@@ -516,12 +521,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       } else if (campo === 'buscarFactura') {
         this.NCF = null;
 
-        if (this.campo === '2') {
+        if (this.campo === campos.numeroComprobante) {
           valor = valor.toUpperCase();
           this.NCF = valor;
 
           this.pedirFactura(this.campo, valor, actualPagination);
         } else {
+          console.log('🚀 ~ BuscarFacturaComponent ~ saltar ~ valor', valor);
+          console.log('🚀 ~ BuscarFacturaComponent ~ saltar ~ campo', campo);
           if (this.tipo_factura_id === '0') {
             this.pedirFactura(this.campo, valor, actualPagination);
           } else {
@@ -599,8 +606,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.router.navigateByUrl(url);
   }
 
-  mostrarFactura(dataFactura, type, continuar?) {
+  mostrarFactura(dataFactura, type, dataDB?, continuar?) {
     const toPDFData = { data: dataFactura, type: type };
+    const titulo = type === 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
 
     let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
     if (continuar)
@@ -615,15 +623,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       });
 
     this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
-      console.log('res ', res);
       if (res.status === 'si') {
         const inputs = { pdfSrc: res.body, height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
-        console.log('inputs ', inputs);
         const obj_modal = {
           component: PdfViewerComponent,
           inputs: inputs,
           id: 'mostrarFactura',
-          header: 'Mostrar Factura',
+          header: titulo,
           width: '900px',
           botones: {
             aceptar: { show: false, disable: false },
@@ -633,15 +639,42 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         };
 
         if (this.Para == ' Visualizar' || type == 'nota') {
+          if (type == 'nota') {
+            obj_modal.botones.dinamico.push({
+              clase: 'btn btn-gris ml-2',
+              function: (instance) => this.verDetalles(dataDB, instance),
+              label: 'Ver detalles',
+              disable: false,
+            });
+          }
+
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-amarillo ml-2',
-            function: (instance) => this.reimprimirFactura({ data: this.facturaSelected, type: type }, instance),
+            function: (instance) => this.reimprimirFactura({ data: dataFactura, type: type }, instance),
             label: 'Reimprimir',
             disable: false,
           });
         }
         this.handleModalForm(obj_modal);
       }
+    });
+  }
+
+  verDetalles(dataNota, modalInstance) {
+    const input = { data: dataNota, instanceModalPadre: modalInstance };
+
+    this.handleModalForm({
+      component: DetalleNotaComponent,
+      inputs: input,
+      id: 'buscarCliente',
+      header: `Nota: ${dataNota.numero_comprobante}`,
+      width: '1000px',
+      height: '30rem',
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+      },
     });
   }
 
