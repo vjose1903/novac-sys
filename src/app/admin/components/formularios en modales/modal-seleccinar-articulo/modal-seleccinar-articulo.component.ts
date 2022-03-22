@@ -44,7 +44,6 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
   ngOnInit() {
     this.inputs = this.fun.duplicarJson(this.inputs);
 
-
     this.inputs.map(async (arti) => {
       arti.customStyles = {
         'td-descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },

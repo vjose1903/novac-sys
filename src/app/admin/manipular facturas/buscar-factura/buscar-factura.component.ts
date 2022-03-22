@@ -462,7 +462,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   selectNota(event) {
     if (event.column === 'view') {
       this.notaSelected = event.row;
-      console.log('event.row ', event.row);
 
       this.notasClass.parseDataToPdf(event.row).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota', event.row));
 
@@ -591,13 +590,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   mostrarFactura(dataFactura, type, dataDB?) {
     const toPDFData = { data: dataFactura, type: type };
     const titulo = type === 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
-    console.log('mostrarFactura ~ dataDB', dataDB);
 
     this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
-      console.log('res ', res);
       if (res.status === 'si') {
         const inputs = { pdfSrc: res.body, height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
-        console.log('inputs ', inputs);
         const obj_modal = {
           component: PdfViewerComponent,
           inputs: inputs,
@@ -634,10 +630,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   verDetalles(dataNota, modalInstance) {
-    console.log('verDetalles ~ dataNota', dataNota);
-
     const input = { data: dataNota, instanceModalPadre: modalInstance };
-    console.log('input ', input);
 
     this.handleModalForm({
       component: DetalleNotaComponent,
@@ -645,7 +638,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       id: 'buscarCliente',
       header: `Nota: ${dataNota.numero_comprobante}`,
       width: '1000px',
-      height: '50rem',
+      height: '30rem',
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },

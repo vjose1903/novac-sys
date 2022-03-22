@@ -376,9 +376,13 @@ body {
 /* TAB VIEW */
 /* ====================================================== */
 .my_tabView {
-  & .p-tabview-panels {
-    border: 0px solid transparent !important;
-  }
+  height: 100%;
+  display: grid;
+  grid-template-areas:
+    "p-tabview-nav-container"
+    "p-tabview-panels";
+
+  grid-template-rows: min-content auto;
 
   & .p-tabview-nav li {
     margin-right: 0 !important;
@@ -399,6 +403,21 @@ body {
       border-color: #c8c8c866 !important;
       color: var(--primary07) !important;
       border-bottom: 2px solid var(--primary06) !important;
+    }
+  }
+
+  > .p-tabview-nav-container {
+    grid-area: p-tabview-nav-container;
+  }
+  > .p-tabview-panels {
+    grid-area: p-tabview-panels;
+    border: 0px solid transparent !important;
+    height: 100%;
+    > p-tabpanel {
+      height: 100%;
+      > .p-tabview-panel {
+        height: 100%;
+      }
     }
   }
 }
