@@ -442,7 +442,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
 
       if (input === 'can-' && this.fun.hasValue(cod)) {
         if (this.fun.isEmpty(articulo) || cod !== articulo.codigo) {
-          const obj = { filtrarArticulo: cod, index, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
+          const obj = { palabra_a_buscar: cod, index, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
           this.handleModalForm({
             component: BuscarArticuloComponent,
             inputs: obj,

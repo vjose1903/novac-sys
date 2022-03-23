@@ -764,7 +764,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
     this.handleModalForm({
       component: BuscarClienteSuplidorComponent,
-      inputs: { metodo: this.metodo, palabra_a_buscar: null },
+      inputs: { metodo: this.metodo, palabra_a_buscar: ' ' },
       id: 'buscarCliente',
       header: this.metodo === 'venta' ? 'BUSCAR CLIENTE' : 'BUSCAR SUPLIDOR',
       width: '56.25rem',

@@ -38,35 +38,38 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
   btn_aceptar() {}
 
   ngOnInit(): void {
-    this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default);
+    this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default, 'init');
   }
 
-  async buscarClientesOrSuplidor(event) {
+  async buscarClientesOrSuplidor(event, where?) {
+    console.log('🚀 ~ BuscarClienteSuplidorComponent ~ buscarClientesOrSuplidor ~ event', event);
     const copyData = this.fun.duplicarJson(this.dataFiltro);
     const page = event.page;
     const per_page = event.per_page;
-    let palabra_a_buscar = event.searchText || this.inputs.palabra_a_buscar || ' ';
+    let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : event.searchText || ' ';
 
     // if (!this.fun.isEmpty(event.searchText)) palabra_a_buscar = event.searchText;
     // else if (this.inputs.palabra_a_buscar) palabra_a_buscar = this.fun.isEmpty(this.inputs.palabra_a_buscar) ? ' ' : this.inputs.palabra_a_buscar;
 
     const classDinamic = this.inputs.metodo === 'venta' ? 'clienteClass' : 'suplidorClass';
 
-    const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
-
-    this.dataFiltro = undefined;
-
-    res.data.map(async (cli) => {
-      cli.nombre = this.fun.Capitalice(cli.nombre);
-      cli.apellido = this.fun.Capitalice(cli.apellido);
-
-      const documento = await cli.documentos_de_identidad.find((doc) => doc.principal === true);
-      cli.documento_identidad = documento ? documento.documento : '----------';
-      return cli;
+    const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } }).catch((error) => {
+      if (where === 'init') this.closeThis();
     });
 
-    if (res.data.length > 0) this.dataFiltro = res.data;
-    if (res.data.length === 0) this.dataFiltro = copyData;
+    if (res.data && res.data.length > 0) {
+      res.data.map(async (cli) => {
+        cli.nombre = this.fun.Capitalice(cli.nombre);
+        cli.apellido = this.fun.Capitalice(cli.apellido);
+
+        const documento = await cli.documentos_de_identidad.find((doc) => doc.principal === true);
+        cli.documento_identidad = documento ? documento.documento : '----------';
+        return cli;
+      });
+      this.dataFiltro = res.data;
+    } else {
+      this.dataFiltro = copyData;
+    }
 
     const obj = { total: res.total_registros, tabla: 'filtroCliente' };
     this.tServ.Func_total_paginas(obj);
