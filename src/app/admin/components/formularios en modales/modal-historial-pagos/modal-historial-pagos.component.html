@@ -1,4 +1,4 @@
-<div #cardTabla id="cardTabla cardListados" style="height: 100%">
+<div style="height: 100%">
   <p-tabView [(activeIndex)]="activeIndex" styleClass="my_tabView" (onChange)="clickTabView($event.index)">
     <p-tabPanel
       [disabled]="arrayHasData('abonos').disable"
@@ -6,11 +6,27 @@
       headerStyleClass="{{ arrayHasData('abonos').disable ? 'noTabView' : '' }}"
       tooltipDisabled="true"
       tooltipStyleClass="{{ arrayHasData('abonos').disable ? 'd-block' : 'd-none' }} tabViewTootip"
+      header="Abonos {{ !arrayHasData('abonos').disable ? '(' + arrayHasData('abonos').cant + ')' : '' }}"
     >
-      <ng-template pTemplate="header">
+      <div class="d-flex h-100" #cardTabla id="cardTabla">
+        <app-tablas
+          class="h-100 w-100"
+          *ngIf="inputs['abonos'] && activeIndex == 0"
+          [search]="false"
+          [paginate]="true"
+          [id_tabla]="'historial_movimientos'"
+          [padre]="cardTabla"
+          [pad]="false"
+          [info]="info_pagos"
+          [data]="inputs['abonos']"
+          [tablaHover]="false"
+          [focusRow]="false"
+        ></app-tablas>
+      </div>
+      <!-- <ng-template pTemplate="header">
         Abonos
         <span *ngIf="!arrayHasData('abonos').disable"> &nbsp;({{ arrayHasData('abonos').cant }})</span>
-      </ng-template>
+      </ng-template> -->
     </p-tabPanel>
 
     <p-tabPanel
@@ -19,39 +35,27 @@
       headerStyleClass="{{ arrayHasData('notas').disable ? 'noTabView' : '' }}"
       tooltipDisabled="true"
       tooltipStyleClass="{{ arrayHasData('notas').disable ? 'd-block' : 'd-none' }} tabViewTootip"
+      header="Notas de crédito {{ !arrayHasData('notas').disable ? '(' + arrayHasData('notas').cant + ')' : '' }}"
     >
-      <ng-template pTemplate="header">
+      <div class="d-flex h-100" #cardTablaNota id="cardTablaNota">
+        <app-tablas
+          class="h-100 w-100"
+          *ngIf="inputs['notas'] && activeIndex == 1"
+          [search]="false"
+          [paginate]="true"
+          [id_tabla]="'historial_movimientos'"
+          [padre]="cardTablaNota"
+          [pad]="false"
+          [info]="info_notas"
+          [data]="inputs['notas']"
+          [tablaHover]="false"
+          [focusRow]="false"
+        ></app-tablas>
+      </div>
+      <!-- <ng-template pTemplate="header">
         Notas de crédito
         <span *ngIf="!arrayHasData('notas').disable"> &nbsp;({{ arrayHasData('notas').cant }})</span>
-      </ng-template>
+      </ng-template> -->
     </p-tabPanel>
   </p-tabView>
-
-  <app-tablas
-    class="h-100"
-    *ngIf="inputs['abonos'] && activeIndex == 0"
-    [search]="false"
-    [paginate]="true"
-    [id_tabla]="'historial_movimientos'"
-    [padre]="cardTabla"
-    [pad]="false"
-    [info]="info_pagos"
-    [data]="inputs['abonos']"
-    [tablaHover]="false"
-    [focusRow]="false"
-  ></app-tablas>
-
-  <app-tablas
-    class="h-100"
-    *ngIf="inputs['notas'] && activeIndex == 1"
-    [search]="false"
-    [paginate]="true"
-    [id_tabla]="'historial_movimientos'"
-    [padre]="cardTabla"
-    [pad]="false"
-    [info]="info_notas"
-    [data]="inputs['notas']"
-    [tablaHover]="false"
-    [focusRow]="false"
-  ></app-tablas>
 </div>

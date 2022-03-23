@@ -219,6 +219,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       obj['data'] = [];
       obj['filtrarCliente'] = null;
       obj['metodo'] = 'venta';
+      obj['palabra_a_buscar'] = ' ';
 
       //
     } else if (tipo === 'cuentas_cobrar_ant_saldo') this.titulo_moda_reporte = 'Reporte de CxC por antiguedad de saldos';

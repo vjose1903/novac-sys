@@ -18,9 +18,9 @@
   <div class="tabs">
     <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView">
       <p-tabPanel *ngFor="let iteraFact of inputs.data.facturas_aplicadas" header="{{ iteraFact.cabecera_factura.numero_comprobante }}">
-        <div #cardTabla id="cardTabla" class="cuerpoFactura h-100">
+        <div #cardTabla id="cardTabla" class="d-flex h-100">
           <app-tablas
-            class="h-100"
+            class="h-100 w-100"
             *ngIf="iteraFact.detalles_facturas_notas"
             [search]="false"
             [paginate]="false"

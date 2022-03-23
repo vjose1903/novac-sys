@@ -151,6 +151,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       }
 
       this.tabla_content = this.padre.firstChild;
+      console.log('🚀 ~ TablasComponent ~ setTimeout ~ this.padre.firstChild', this.padre.firstChild);
 
       // console.log('this.padre ', this.padre);
       // console.log('this.id_tabla ', this.id_tabla);
@@ -558,7 +559,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     if (simpleChanges.data && simpleChanges.info) {
       if (simpleChanges.data.currentValue && simpleChanges.info.currentValue) {
-        // setTimeout(() => this.calcularAlto(), 250);
+        setTimeout(() => this.calcularAlto(), 250);
       }
     }
     if (simpleChanges.seleccionado) {

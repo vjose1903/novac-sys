@@ -50,20 +50,34 @@ app-tablas {
 }
 
 .dinamicTable {
+  padding: 1.5rem 1rem 1.5rem 1rem !important;
+  background: red;
+
   display: grid !important;
-  grid-template-areas:
-    'searchDiv'
-    'divTable';
-  grid-template-rows: min-content auto;
+  // grid-template-areas:
+  //   'searchDiv'
+  //   'divTableFantasma'
+  //   'divTable';
+
+  grid-template-rows: [filter-start] min-content [fantasma-start] auto [fantasma-end];
 
   > .searchDiv {
     grid-area: searchDiv;
+    grid-row: filter-start / fantasma-start;
   }
 
+  > .divTableFantasma {
+    grid-area: divTableFantasma;
+    grid-row: fantasma-start / fantasma-end;
+  }
   > .divTable {
     grid-area: divTable;
+    background: blue;
+    grid-row: fantasma-start / fantasma-end;
+
     > .myTable {
       display: grid !important;
+      height: 100%;
 
       grid-template-areas:
         'thead'
@@ -80,15 +94,17 @@ app-tablas {
         table-layout: fixed;
         border-radius: 10px 10px 0px 0px;
       }
-
-      > .tbody {
+      .divBody {
         grid-area: tbody;
-        overflow: auto;
         grid-row: body-start / body-end;
-        > tr {
-          display: table;
-          width: 100%;
-          table-layout: fixed;
+        overflow-y: auto;
+        > .tbody {
+          overflow: auto;
+          > tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+          }
         }
       }
 

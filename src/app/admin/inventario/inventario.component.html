@@ -16,7 +16,7 @@
 
       <i class="fas fa-print btn-circle-icon ml-3" (click)="makeReporte()" style="z-index: 999999" pTooltip="Reporte de inventario" tooltipPosition="right"></i>
     </div>
-    <div #cardTabla class="h-100">
+    <div #cardTabla class="h-100 divTabla" style="display: flex">
       <app-tablas
         class="h-100"
         *ngIf="listaArticulos"

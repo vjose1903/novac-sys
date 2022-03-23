@@ -96,7 +96,7 @@
     </div>
   </div>
   <div class="col-12 abajo">
-    <div *ngIf="mostrarListaFacturas()" #cardTabla id="cardTabla" class="card card-padding sombra h-100">
+    <div *ngIf="mostrarListaFacturas()" #cardTabla id="cardTabla" class="card sombra h-100">
       <app-tablas
         class="h-100"
         *ngIf="facturas"
@@ -127,7 +127,7 @@
 <!-- SIDE NOTAS -->
 <!-- ============================================================================================================================================ -->
 
-<p-sidebar [(visible)]="showSide" appendTo="body" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }">
+<p-sidebar [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }">
   <div #cardTablaNota id="cardTablaNota" class="h-100 divTablaNotas">
     <app-tablas
       class="h-100"
