@@ -26,19 +26,20 @@
 
 .mainContent {
   display: grid;
-  grid-template-areas: 'cantidades' 'cuerpo';
+  grid-template-areas: "cantidades" "cuerpo";
   grid-template-rows: min-content auto;
   > .cantidades {
     grid-area: cantidades;
   }
   > .cuerpo {
     grid-area: cuerpo;
+    position: relative;
     > .divFiltro {
       position: absolute;
       transform: translate(18rem, -0.01rem);
       display: flex;
       justify-content: space-between;
       align-items: center;
-     }
+    }
   }
 }

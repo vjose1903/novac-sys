@@ -15,7 +15,7 @@
   transition-property: width, border-radius, bottom;
   transition-delay: 0s, 0s, 0.2s;
   padding: 0rem 0rem 0rem 2.5rem;
-  .content {
+  .msg {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -35,7 +35,7 @@
     border-radius: 3rem 1rem 1rem 3rem;
     width: 20rem;
     transition-delay: 0.2s, 0.2s, 0s;
-    .content {
+    .msg {
       width: 100%;
       transition-delay: 0.2s;
     }
@@ -61,29 +61,93 @@
 
 $bodyfont: "Poppins";
 
-/* ============================================== */
-/*        FOOTER                                  */
-/* ============================================== */
-.footerCustom {
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 30px;
-  background-color: var(--secondary04);
-  color: white;
-  padding: 0rem 2rem 0rem 0rem;
-}
+.layout {
+  display: grid;
+  grid-template-areas: "menu content";
+  grid-template-columns: 8rem auto;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
 
-.titulo {
-  font-size: 1.5rem;
-  color: var(--primary10);
-  padding: 0;
-  transform: translate(-37px, -8px);
-  position: absolute;
-  &:hover {
-    cursor: pointer;
-    color: var(--primary09);
+  .menu {
+    grid-area: menu;
+    display: grid;
+    grid-template-areas:
+      "title"
+      "sideBar";
+    grid-template-rows: min-content auto;
+    max-height: inherit;
+
+    > .title {
+      grid-area: title;
+      background-color: #c9c9c9;
+      z-index: 99;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 2rem;
+      overflow: hidden;
+
+      > .titulo {
+        font-size: 1.5rem;
+        color: var(--primary10);
+        font-weight: 400;
+        &:hover {
+          cursor: pointer;
+          color: var(--primary09);
+        }
+      }
+    }
+
+    > .sideBar {
+      grid-area: sideBar;
+      background-color: var(--primary02);
+      max-height: inherit;
+      > .menuContent {
+        overflow: hidden auto;
+        max-height: calc(100% - 2rem);
+      }
+    }
+  }
+
+  .content {
+    grid-area: content;
+    display: grid;
+    grid-template-areas:
+      "navBar"
+      "contenido"
+      "footer";
+
+    grid-template-rows: min-content auto min-content;
+
+    > .navBar {
+      grid-area: navBar;
+      height: 2rem;
+      box-shadow: 1px 1px 5px 0.2px #9c9c9c;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    > .contenido {
+      grid-area: contenido;
+      background-color: #e4e4e4d2;
+      padding: 0.5rem 1rem 2rem 1rem;
+      overflow-y: auto;
+      max-height: calc(100vh - 4rem);
+    }
+
+    > .footer {
+      grid-area: footer;
+      height: 30px;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      background-color: var(--secondary04);
+      color: white;
+      padding: 0rem 2rem 0rem 0rem;
+    }
   }
 }
 
@@ -351,6 +415,7 @@ $bodyfont: "Poppins";
   &:hover .tituloMenu,
   .tituloMenuA {
     transform: scale(0.8) translate(0px, -7.7rem);
+    text-align: center;
   }
 }
 .menuListMant {
@@ -363,6 +428,7 @@ $bodyfont: "Poppins";
   &:hover .tituloMenuMant,
   .tituloMenuAMant {
     transform: scale(0.7) translate(-13px, -9rem);
+    text-align: center;
   }
 }
 
@@ -375,7 +441,8 @@ $bodyfont: "Poppins";
 
   &:hover .tituloMenu1,
   .tituloMenuA1 {
-    transform: scale(0.8) translate(-0.2rem, -7.6rem);
+    transform: scale(0.8) translate(0rem, -7.6rem);
+    text-align: center;
   }
 }
 .menuList2 {
@@ -388,6 +455,7 @@ $bodyfont: "Poppins";
   &:hover .tituloMenu2,
   .tituloMenuA2 {
     transform: scale(0.9) translate(0px, -7.5rem);
+    text-align: center;
   }
 }
 

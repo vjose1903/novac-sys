@@ -95,7 +95,115 @@
   </div>
 </p-sidebar>
 
-<mat-sidenav-container class="sidenav-container">
+<div class="layout">
+  <div class="menu">
+    <div class="title">
+      <span class="titulo" (click)="cambiarMenu(false, 'dashboard')">Menu</span>
+    </div>
+
+    <div class="sideBar">
+      <div class="menuContent">
+        <div class="menuList1 mt-5">
+          <img [ngClass]="actualMenuItem == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/factura.png" alt="Facturacion" (click)="cambiarMenu(true, 'factura')" />
+          <h5 [ngClass]="actualMenuItem == 'factura' ? 'tituloMenuA1' : 'tituloMenu1'"><strong>Facturación</strong></h5>
+
+          <div [ngClass]="actualMenuItem == 'factura_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
+            <h4 class="opcion" (click)="cambiarMenu(false, 'venta/new/0', true)">Venta</h4>
+            <h4 class="opcion" (click)="cambiarMenu(false, 'compra/new/0', true)">Compra</h4>
+          </div>
+        </div>
+        <div class="menuList2">
+          <img [ngClass]="actualMenuItem == 'manipular' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'" src="assets/img/notaM.png" alt="Notas" (click)="cambiarMenu(true, 'manipular')" />
+          <h5 [ngClass]="actualMenuItem == 'manipular' ? 'tituloMenuA2' : 'tituloMenu2'"><strong>Manipular facturas</strong></h5>
+
+          <div [ngClass]="actualMenuItem == 'manipular_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
+            <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/nota_credito', true)">Nota de Crédito</h4>
+            <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/nota_debito', true)">Nota de Débito</h4>
+            <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/solo_ver', true)">Visualizar</h4>
+          </div>
+        </div>
+
+        <div class="menuList">
+          <img [ngClass]="actualMenuItem == 'recibos' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="cambiarMenu(true, 'recibos')" />
+          <h5 [ngClass]="actualMenuItem == 'recibos' ? 'tituloMenuA' : 'tituloMenu'"><strong>Ingresos</strong></h5>
+          <div [ngClass]="actualMenuItem == 'recibos_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
+            <h4 class="opcion" (click)="cambiarMenu(false, 'ingresos', true)">Recibo ingresos</h4>
+            <h4 class="opcion" (click)="cambiarMenu(false, 'viajes', true)">Viajes</h4>
+          </div>
+        </div>
+
+        <div class="menuList">
+          <img [ngClass]="actualMenuItem == 'conduce' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/conduce.png" alt="Facturacion" (click)="cambiarMenu(false, 'conduce')" />
+          <h5 [ngClass]="actualMenuItem == 'conduce' ? 'tituloMenuA' : 'tituloMenu'"><strong>Conduce</strong></h5>
+        </div>
+
+        <div class="menuList">
+          <img [ngClass]="actualMenuItem == 'registros' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/registro.png" alt="Registros" (click)="cambiarMenu(true, 'registros')" />
+          <h5 [ngClass]="actualMenuItem == 'registros' ? 'tituloMenuA' : 'tituloMenu'"><strong>Registros</strong></h5>
+
+          <div [ngClass]="actualMenuItem == 'registros_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
+            <h4 class="opcion" (click)="cambiarMenu(false, 'empleados', true)">Empleados</h4>
+            <h4 class="opcion" (click)="cambiarMenu(false, 'clientes', true)">Clientes</h4>
+            <h4 class="opcion" (click)="cambiarMenu(false, 'suplidores', true)">Suplidores</h4>
+            <h4 class="opcion" (click)="cambiarMenu(false, 'articulos', true)">Articulos</h4>
+            <h4 class="opcion" (click)="cambiarMenu(false, 'camiones', true)">Camiones</h4>
+            <h4 class="opcion" (click)="cambiarMenu(false, 'roles', true)">Roles</h4>
+            <h4 class="opcion" (click)="cambiarMenu(false, 'ncf', true)">NCF</h4>
+          </div>
+        </div>
+        <div class="menuList">
+          <img [ngClass]="actualMenuItem == 'produccion' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/produccion.png" alt="Producción" (click)="cambiarMenu(false, 'produccion')" />
+          <h5 [ngClass]="actualMenuItem == 'produccion' ? 'tituloMenuA' : 'tituloMenu'"><strong>Producción</strong></h5>
+        </div>
+        <div class="menuList">
+          <img [ngClass]="actualMenuItem == 'inventario' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/inventario.png" alt="Inventario" (click)="cambiarMenu(false, 'inventario')" />
+          <h5 [ngClass]="actualMenuItem == 'inventario' ? 'tituloMenuA' : 'tituloMenu'"><strong>Inventario</strong></h5>
+        </div>
+        <div class="menuList">
+          <img [ngClass]="actualMenuItem == 'reportes' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png" alt="Reportes" (click)="cambiarMenu(false, 'reportes')" />
+          <h5 [ngClass]="actualMenuItem == 'reportes' ? 'tituloMenuA' : 'tituloMenu'"><strong>Reportes</strong></h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="navBar">
+      <div class="right">
+        <div class="btn-group" dropdown id="dropCuenta" #dropCuenta>
+          <a id="button-basic" dropdownToggle class="dropdown-toggle" aria-controls="dropdown-basic">
+            <img class="rounded-circle" [src]="imgUser" alt="Admin" />
+            Cuenta <span class="caret"></span>
+          </a>
+          <ul id="dropdown-basic" class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+            <div class="dropdown-header">
+              <h2>{{ usuario?.nombre }}</h2>
+              <p>{{ usuario?.email }}</p>
+            </div>
+            <li class="divider dropdown-divider"></li>
+
+            <li class="divider dropdown-divider"></li>
+            <li role="menuitem">
+              <a class="dropdown-item" id="dropdown-item" (click)="logOut()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="contenido">
+      <router-outlet *ngIf="ready"></router-outlet>
+
+      <div *ngIf="cuadre_hoy" class="cuadre_hoy">
+        <div class="msg">Hoy ya existe un cuadre</div>
+      </div>
+    </div>
+    <div class="footer">VjPOS {{ versionApp }} - @2020 Desarrollador: Victor J. Vasquez</div>
+  </div>
+</div>
+
+<!-- <mat-sidenav-container class="sidenav-container">
+
   <mat-sidenav
     #drawer
     class="sidenav"
@@ -106,7 +214,6 @@
   >
     <mat-toolbar>
       <span class="titulo" (click)="cambiarMenu(false, 'dashboard')">Menu</span>
-      <!-- <img src="" class="img-fluid" /> -->
     </mat-toolbar>
     <mat-nav-list class="text-center">
       <div class="menuList1 mt-5">
@@ -121,14 +228,11 @@
       <div class="menuList2">
         <img [ngClass]="actualMenuItem == 'manipular' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'" src="assets/img/notaM.png" alt="Notas" (click)="cambiarMenu(true, 'manipular')" />
         <h5 [ngClass]="actualMenuItem == 'manipular' ? 'tituloMenuA2' : 'tituloMenu2'"><strong>Manipular facturas</strong></h5>
-        <!-- ultimo -->
 
         <div [ngClass]="actualMenuItem == 'manipular_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
           <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/nota_credito', true)">Nota de Crédito</h4>
           <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/nota_debito', true)">Nota de Débito</h4>
           <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/solo_ver', true)">Visualizar</h4>
-
-          <!-- <h4 class="opcion" (click)="cambiarMenu('buscarFactura', 'anular_factura')">Anular factura</h4> -->
         </div>
       </div>
 
@@ -172,16 +276,6 @@
         <img [ngClass]="actualMenuItem == 'reportes' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png" alt="Reportes" (click)="cambiarMenu(false, 'reportes')" />
         <h5 [ngClass]="actualMenuItem == 'reportes' ? 'tituloMenuA' : 'tituloMenu'"><strong>Reportes</strong></h5>
       </div>
-      <!--
-
-      <div class="menuListMant">
-        <img [ngClass]="actualMenuItem == 'mantenimiento' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/mantenimiento.png" alt="Registros" (click)="cambiarMenu('mantenimiento')" />
-        <h5 [ngClass]="actualMenuItem == 'mantenimiento' ? 'tituloMenuAMant' : 'tituloMenuMant'"><strong>Mantenimiento</strong></h5>
-
-        <div [ngClass]="actualMenuItem == 'mantenimiento' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-          <h4 class="opcion" (click)="cambiarMenu('permisos')">Roles Usuarios</h4>
-        </div>
-      </div> -->
     </mat-nav-list>
   </mat-sidenav>
 
@@ -191,10 +285,6 @@
       <div *ngIf="drawer._animationState == 'void'" title="Mostrar Menu" data-toggle="Tooltip" (click)="drawer.toggle()" id="botonMenu" class="">
         <i class="fas fa-bars m-0 p-0"></i>
       </div>
-
-      <!-- ============================================================================================ -->
-      <!--DROP DOWN DE LA CUENTA -->
-      <!-- ============================================================================================ -->
 
       <div class="right">
         <div class="btn-group" dropdown id="dropCuenta" #dropCuenta>
@@ -209,41 +299,24 @@
             </div>
             <li class="divider dropdown-divider"></li>
 
-            <!-- <li role="menuitem" (click)="modalConfig()">
-              <a class="dropdown-item"><i class="fas fa-cogs"></i>Configuraciones</a>
-            </li> -->
-            <!-- <li role="menuitem" class="itemPrinter" (click)="stop($event)">
-              <a class="dropdown-item"><i class="fas fa-print"></i>Seleccionar impresora</a>
-            </li> -->
             <li class="divider dropdown-divider"></li>
             <li role="menuitem">
               <a class="dropdown-item" id="dropdown-item" (click)="logOut()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
             </li>
           </ul>
         </div>
-        <!-- <div class="selectPrint" [ngClass]="{ open: OpenPrinterMenu }" dropdown>
-          <h3 class="dropdown-item" *ngFor="let print of PrintersInstall" (click)="selectPrinter(print.name)">
-            {{ print.name }}
-          </h3>
-        </div> -->
       </div>
-
-      <!--
-      PARA PONER LOS LI EN FOR
-      <li *ngFor="let choice of items">
-          <a class="dropdown-item" href="#">{{choice}}</a>
-      </li> -->
     </mat-toolbar>
 
     <div class="" style="padding: 0.5rem 1rem 2rem 1rem; height: calc(100% - 60px); overflow-y: auto">
       <router-outlet *ngIf="ready"></router-outlet>
-      <!-- rutas -->
+
       <div *ngIf="cuadre_hoy" class="cuadre_hoy">
         <div class="content">Hoy ya existe un cuadre</div>
       </div>
     </div>
     <div class="footerCustom">VjPOS {{ versionApp }} - @2020 Desarrollador: Victor J. Vasquez</div>
   </mat-sidenav-content>
-</mat-sidenav-container>
+</mat-sidenav-container> -->
 
 <app-modal></app-modal>
