@@ -38,6 +38,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   doc_principal = 'rnc';
   documentos_de_identidad: any;
 
+  isCreando: boolean = false;
+
   myValidators = new customValidators();
   camposDisabled: boolean = true;
   editando: boolean = false;
@@ -231,6 +233,10 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         }
       }
     }
+  }
+
+  nuevoRegistro() {
+    this.isCreando = true;
   }
 
   changeStateCampos(enable = false) {

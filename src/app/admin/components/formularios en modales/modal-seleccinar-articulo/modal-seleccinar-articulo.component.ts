@@ -76,28 +76,38 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
   }
 
   getInfoChange(item) {
+    console.log('🚀 ~ ModalSeleccinarArticuloComponent ~ getInfoChange ~ item', item);
+    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+
     if (item.cambio === 'select') {
-      const articulo = item.body[item.index];
+      this.articulos_selected = _.filter(item.body, { select: true, disable: false });
+      // const articulo = item.body[item.index];
 
-      const _x_ = _.findIndex(this.articulos_selected, (arti) => {
-        return arti.id === articulo.id;
-      });
+      // const _x_ = _.findIndex(this.articulos_selected, (arti) => {
+      //   return arti.id === articulo.id;
+      // });
 
-      if (!item.value) {
-        if (this.articulos_selected[_x_]) {
-          this.articulos_selected[_x_].destroy = 1;
-        } else {
-          articulo.destroy = 1;
-          this.articulos_selected.push(articulo);
-        }
-      } else {
-        if (_x_ !== -1) {
-          this.articulos_selected[_x_].destroy = 0;
-        } else {
-          this.articulos_selected.push(articulo);
-        }
-      }
+      // if (!item.value) {
+      //   if (this.articulos_selected[_x_]) {
+      //     this.articulos_selected[_x_].destroy = 1;
+      //   } else {
+      //     articulo.destroy = 1;
+      //     this.articulos_selected.push(articulo);
+      //   }
+      // } else {
+      //   if (_x_ !== -1) {
+      //     this.articulos_selected[_x_].destroy = 0;
+      //   } else {
+      //     this.articulos_selected.push(articulo);
+      //   }
+      // }
     }
+    setTimeout(() => {
+      modal.botones.dinamico[1].disable;
+      console.log('🚀 ~ ModalSeleccinarArticuloComponent ~ setTimeout ~ modal.botones.dinamico', modal.botones.dinamico);
+      modal.botones.dinamico[1].disable = this.articulos_selected.length == 0;
+      console.log('🚀 ~ ModalSeleccinarArticuloComponent ~ setTimeout ~ this.articulos_selected', this.articulos_selected);
+    }, 50);
   }
 
   modificarFacturaSelected(item) {

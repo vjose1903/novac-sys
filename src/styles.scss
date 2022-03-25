@@ -672,3 +672,43 @@ Not supports in Firefox and IE */
     cursor: pointer;
   }
 }
+
+@mixin registroGridClass {
+  display: grid;
+  grid-template-areas:
+    'titulo_card_area'
+    'card_content_area';
+  grid-template-rows: min-content auto;
+  .tituloCardClass {
+    grid-area: titulo_card_area;
+  }
+  .cardContentClass {
+    grid-area: card_content_area;
+  }
+}
+
+.form {
+  transition: all 0.3s;
+  &.showForm {
+    width: 45%;
+    margin-right: 0.5rem;
+  }
+
+  &.hideForm {
+    width: 0%;
+    overflow: hidden;
+  }
+  @include registroGridClass;
+}
+
+.list {
+  transition: all 0.3s;
+  &.FormList {
+    width: 55%;
+  }
+
+  &.onlyList {
+    width: 100%;
+  }
+  @include registroGridClass;
+}

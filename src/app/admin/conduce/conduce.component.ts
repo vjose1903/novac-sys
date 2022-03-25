@@ -631,7 +631,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
                   cancelar: { show: false, disable: false },
                   dinamico: [
                     { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
-                    { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: false },
+                    { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
                   ],
                 },
               });
@@ -683,7 +683,11 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   llenarConduce(detalles, conteo = 0, firstResolve = null) {
     return new Promise((resolve) => {
+
       firstResolve ??= resolve;
+
+      console.log('🚀 ~ ConduceComponent ~ this.llenarFila ~ detalles', detalles);
+
       this.llenarFila(detalles[conteo], this.secuencia).then((res) => {
         conteo++;
         if (conteo < detalles.length) this.llenarConduce(detalles, conteo, firstResolve);
@@ -707,12 +711,21 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   async llenarFila(element, i) {
     return new Promise((resolve) => {
+      // const validator = (rowArticulo) => rowArticulo.detalle_factura_id == element.id;
+
+      // console.log('🚀 ~ ConduceComponent ~ llenarFila ~ this.ARRAY_ROWARTICULOS', this.fun.duplicarJson(this.ARRAY_ROWARTICULOS.getRawValue()));
+
+      // const result = this.ARRAY_ROWARTICULOS.getRawValue().some(validator);
+      // if (result) resolve(true);
+      console.log('🚀 ~ ConduceComponent ~ returnnewPromise ~ resolve(true);', resolve);
+
       const cant_en_unidades_actual = element.cantidad_en_unidades - element.retirado;
       const multiplo = element.cantidad_en_unidades / element.cantidad;
       const cant_actual = cant_en_unidades_actual / multiplo;
       this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.fechaConduce }).then((result) => {
         const articulo = _.first(result['data']);
         // const cant_en_unidades_actual = cant_en_unidades_actual * multiplo;
+        console.log('🚀 ~ ConduceComponent ~ returnnewPromise ~ this.filasDetalle', this.filasDetalle);
 
         (this.filasDetalle[i] as any).controls['detalle_factura_id'].setValue(element.id);
         // (this.control[i] as any).controls['articulo_id'].setValue(element.articulo_id);
@@ -744,6 +757,8 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           resolve(true);
         }, 100);
       });
+      console.log('🚀 ~ ConduceComponent ~ llenarFila ~ element', element);
+      console.log('🚀 ~ ConduceComponent ~ llenarFila ~ this.ARRAY_ROWARTICULOS', this.ARRAY_ROWARTICULOS.getRawValue());
     });
   }
 

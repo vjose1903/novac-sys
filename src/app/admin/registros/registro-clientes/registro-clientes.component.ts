@@ -27,7 +27,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   listaClientes;
   FORM: any;
   listaTipoArticulos: any;
-
+  isCreando: boolean = false;
   doc_is_cedula = true;
 
   phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
@@ -335,6 +335,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         this.enfocarInput('cedula');
       });
     }
+  }
+
+  nuevoRegistro() {
+    this.isCreando = true;
   }
 
   borrar() {
