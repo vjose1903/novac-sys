@@ -352,7 +352,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.actualMenuItem = subMenu ? `${this.modulo_select}_select` : `${this.modulo_select}`;
 
     if (!subMenu) {
-      this.ready = false;
+      // this.ready = false;
       this.runRouterNavigate({ bool: true, ruta: ruta_a_cambiar });
     }
   }
@@ -371,6 +371,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     setTimeout(() => (this.ready = true), 1);
     this.modulo_select = undefined;
   }
+
+
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
     this.handleModalForm({
       id: obj.id,
