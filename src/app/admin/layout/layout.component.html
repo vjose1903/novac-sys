@@ -1,5 +1,7 @@
 {{ checkFacturaGuardada() }}
 
+<div #fantasma class="fantasma"></div>
+
 <div id="fondoC" *ngIf="noServer" class="h-100 w-100 position-absolute backnegro">
   <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
 </div>
@@ -95,7 +97,7 @@
   </div>
 </p-sidebar>
 
-<div class="layout">
+<div class="layout" [ngStyle]="{ width: fantasma.offsetWidth + 'px', height: fantasma.offsetHeight + 'px' }">
   <div class="menu">
     <div class="title">
       <span class="titulo" (click)="cambiarMenu(false, 'dashboard')">Menu</span>

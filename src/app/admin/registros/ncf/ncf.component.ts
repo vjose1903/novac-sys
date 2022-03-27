@@ -48,6 +48,8 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   Desde;
   Hasta;
 
+  isCreando: boolean = false;
+
   is_editando = false;
   ncfSelected;
 
@@ -296,6 +298,10 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.Hasta = item.hasta;
 
     this.ncfSelected = this.fun.duplicarJson(item);
+  }
+
+  nuevoRegistro() {
+    this.isCreando = true;
   }
 
   editarItem(item) {

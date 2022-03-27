@@ -35,6 +35,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   botones = { titulo: true, borrar: true, editar: true };
 
+  isCreando: boolean = false;
   listaEmpleados;
   editando = false;
   usuarioSelected: any;
@@ -229,7 +230,12 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     return !this.camposDisabled || this.fun.hasValue(this.form.controls.nombre.value);
   }
 
-  borrar(e, a?) {
+  cancelar() {
+    this.form.reset({ estado: true });
+    this.borrar();
+  }
+
+  borrar() {
     this.form.reset();
 
     this.enfocarInput('cedula');
@@ -300,10 +306,14 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       this.empleadosClass.createUpdateOne(objSend).then((res) => {
         const actualPagination = this.tServ.getPaginationById('listaEmpleados');
         this.getEmpleados(actualPagination);
-        this.borrar('submit');
+        this.borrar();
         this.enfocarInput('cedula');
       });
     }
+  }
+
+  nuevoRegistro() {
+    this.isCreando = true;
   }
   showModal() {
     this.handleModalForm({

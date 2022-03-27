@@ -309,6 +309,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
 
   async pedirFactura(campo, valor, e) {
+    console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ valor', valor);
+    console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ campo', campo);
+    console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ e', e);
     try {
       const fechaA = moment().format('YYYY-MM-DD');
 
@@ -352,9 +355,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       this.tServ.Func_total_paginas(obj);
       this.facturas = this.fun.duplicarJson(busqueda['data']);
+      console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ this.facturas', this.facturas);
+      console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ prueba de verdad', this.campo == campos.numeroComprobante || (campo == campos.NumeroFactura && this.tipo_factura_id != '0'));
 
       if (this.facturas.length > 0) {
-        if (this.campo === campos.numeroComprobante || (campo == campos.NumeroFactura && this.tipo_factura_id != '0')) {
+        if (this.campo == campos.numeroComprobante || (campo == campos.NumeroFactura && this.tipo_factura_id != '0')) {
           this.facturas[0]['mostrarFacturaPara'] = this.buscarPara;
 
           this.parseFactura(this.facturas[0], 'venta', this.buscarPara).then((res) => {
@@ -495,7 +500,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       } else if (campo === 'buscarFactura') {
         this.NCF = null;
 
-        if (this.campo === campos.numeroComprobante) {
+        if (this.campo == campos.numeroComprobante) {
           valor = valor.toUpperCase();
           this.NCF = valor;
 
@@ -568,6 +573,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   mostrarFactura(dataFactura, type, dataDB?, continuar?) {
+    console.log('🚀 ~ BuscarFacturaComponent ~ mostrarFactura ~ dataDB', dataDB);
+    console.log('🚀 ~ BuscarFacturaComponent ~ mostrarFactura ~ type', type);
+    console.log('🚀 ~ BuscarFacturaComponent ~ mostrarFactura ~ dataFactura', dataFactura);
+    console.log('🚀 ~ BuscarFacturaComponent ~ mostrarFactura ~ continuar', continuar);
     const toPDFData = { data: dataFactura, type: type };
     const titulo = type === 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
 

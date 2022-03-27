@@ -39,6 +39,8 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   ];
   botones = { titulo: true, borrar: true, editar: true };
 
+  isCreando: boolean = false;
+
   vehiculosClass = new VehiculoC();
   marcasClass = new MarcaC();
   empleadosClass = new EmpleadoC();
@@ -235,6 +237,10 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
         this.borrar();
       });
     }
+  }
+
+  nuevoRegistro() {
+    this.isCreando = true;
   }
 
   capitalice(control, arg) {

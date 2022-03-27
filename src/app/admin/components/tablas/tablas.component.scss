@@ -51,7 +51,6 @@ app-tablas {
 
 .dinamicTable {
   padding: 1.5rem 1rem 1.5rem 1rem !important;
-  background: red;
 
   display: grid !important;
   // grid-template-areas:
@@ -72,7 +71,7 @@ app-tablas {
   }
   > .divTable {
     grid-area: divTable;
-    background: blue;
+
     grid-row: fantasma-start / fantasma-end;
 
     > .myTable {

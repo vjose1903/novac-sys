@@ -48,6 +48,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   articulo_no_paquete = false;
   TIPOARTICULO: any;
 
+  isCreando: boolean = false;
+
   ARRAY_FORMULA: FormArray;
   COMPRADOEN: any;
   MEDIDACAJA: any;
@@ -681,6 +683,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         this.borrar();
       });
     }
+  }
+
+  nuevoRegistro() {
+    this.isCreando = true;
   }
 
   formarContenido() {

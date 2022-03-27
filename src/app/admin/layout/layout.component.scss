@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
 
 .cuadre_hoy {
   position: absolute;
@@ -59,11 +59,18 @@
   }
 }
 
-$bodyfont: "Poppins";
+$bodyfont: 'Poppins';
+
+.fantasma {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+}
 
 .layout {
   display: grid;
-  grid-template-areas: "menu content";
+  grid-template-areas: 'menu content';
   grid-template-columns: 8rem auto;
   min-height: 100vh;
   max-height: 100vh;
@@ -73,8 +80,8 @@ $bodyfont: "Poppins";
     grid-area: menu;
     display: grid;
     grid-template-areas:
-      "title"
-      "sideBar";
+      'title'
+      'sideBar';
     grid-template-rows: min-content auto;
     max-height: inherit;
 
@@ -114,9 +121,9 @@ $bodyfont: "Poppins";
     grid-area: content;
     display: grid;
     grid-template-areas:
-      "navBar"
-      "contenido"
-      "footer";
+      'navBar'
+      'contenido'
+      'footer';
 
     grid-template-rows: min-content auto min-content;
 
@@ -135,6 +142,7 @@ $bodyfont: "Poppins";
       padding: 0.5rem 1rem 2rem 1rem;
       overflow-y: auto;
       max-height: calc(100vh - 4rem);
+      position: relative;
     }
 
     > .footer {
