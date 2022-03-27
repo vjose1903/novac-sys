@@ -37,7 +37,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   isCreando: boolean = false;
   listaEmpleados;
   editando = false;
-  usuarioSelected: any;
+  empleadoSelected: any;
   indexBorrar: any;
   documentos_de_identidad: any;
 
@@ -248,6 +248,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     this.form.controls.password.updateValueAndValidity();
     this.form.controls.confirm_password.updateValueAndValidity();
+
+    this.empleadoSelected = undefined;
+    this.isCreando = true;
   }
 
   fecha(a: any) {
@@ -267,7 +270,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     this.form.patchValue(item.ARG);
 
-    this.usuarioSelected = item.ARG;
+    this.empleadoSelected = item.ARG;
     this.editando = true;
     this.boton = 'Editar';
 
@@ -315,7 +318,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.handleModalForm({
       component: ChangePasswordComponent,
       id: 'changePassword',
-      inputs: this.usuarioSelected,
+      inputs: this.empleadoSelected,
       header: 'Cambiar contraseña',
       width: '30rem',
     });
