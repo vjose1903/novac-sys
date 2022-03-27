@@ -28,7 +28,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   botones = { titulo: true, borrar: true, editar: true };
 
-  titulo = '';
   boton = '';
   form: FormGroup;
 
@@ -78,7 +77,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.createForm();
     this.FORM = this.form.controls;
 
-    this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
     this.necesarioStart();
   }
@@ -277,7 +275,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.enfocarInput('nombre');
     this.form.controls.is_detallable.setValue(false);
     this.form.controls.existencia.setValue(0);
-    this.titulo = 'Registro de articulos';
     this.boton = 'Registrar';
     this.TIPOARTICULO = '';
     this.recalcular = false;
@@ -608,7 +605,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.borrar();
     this.form.patchValue(articulo);
     this.productoEditando = item.ARG;
-    this.titulo = 'Editar producto: ' + articulo.nombre;
     this.boton = 'Editar';
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';

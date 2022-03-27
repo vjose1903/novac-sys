@@ -1,16 +1,16 @@
-<div class="row" style="height: calc(100% - 60px)">
+<div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita">{{ titulo }}</h4>
+    <h4 class="negrita">Registro de clientes</h4>
   </div>
 
-  <div class="col-12 pr-0">
+  <div class="col-12 pr-0 colFormularioListado">
     <div class="d-flex h-100">
-      <div class="contenedorRegistro" *ngIf="isCreando || roleSelected" class="form {{ isCreando || roleSelected ? 'showForm' : 'hideForm' }} ">
-        <div class="tituloCardClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
+      <div class="contenedorRegistro" *ngIf="isCreando || clienteSelected" class="form {{ isCreando || clienteSelected ? 'showForm' : 'hideForm' }} ">
+        <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
           <h4 class="mb-0">Formulario</h4>
         </div>
 
-        <div class="card card-padding" style="height: min-content">
+        <div class="card cardFormClass">
           <form [formGroup]="form">
             <div class="row">
               <div class="col-6 p-0">
@@ -191,14 +191,14 @@
                 </div>
               </div>
 
-              <div class="col-12 form-group" style="display: flex; justify-content: space-between">
+              <div class="col-12 form-group p-0" style="display: flex; justify-content: space-between">
                 <div>
                   <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
 
                   <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
                 </div>
                 <div>
-                  <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="isCreando = false; borrar()" style="max-width: 6rem" />
+                  <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
                 </div>
               </div>
             </div>
@@ -206,10 +206,10 @@
         </div>
       </div>
 
-      <div class="list {{ isCreando || roleSelected ? 'FormList' : 'onlyList' }}">
+      <div class="list {{ isCreando || clienteSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
-          <h4>Listado clientes</h4>
-          <button [disabled]="roleSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <h4 class="mb-0">Listado clientes</h4>
+          <button [disabled]="clienteSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <app-tablas

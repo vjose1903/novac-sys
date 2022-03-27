@@ -304,7 +304,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
     setTimeout(async () => {
       if (this.facturas_localStorage.length > 0) {
-        document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.fun.getFacturasguardadas().length);
+        if (document.getElementById('btn_side_facturas')) document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.fun.getFacturasguardadas().length);
 
         for (let i = 0; i < this.facturas_localStorage.length; i++) {
           const fact = this.facturas_localStorage[i];
@@ -336,7 +336,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         }
         this.facturas_localStorage = _.orderBy(this.facturas_localStorage, ['archivo_id'], ['asc']);
       } else {
-        document.getElementById('btn_side_facturas').removeAttribute('data-cant-facturas');
+        if (document.getElementById('btn_side_facturas')) document.getElementById('btn_side_facturas').removeAttribute('data-cant-facturas');
       }
     }, 20);
   }
