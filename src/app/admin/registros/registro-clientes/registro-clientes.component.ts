@@ -106,6 +106,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   marcarCheck(arg) {
     const radio = document.getElementById('identificacion-' + arg) as HTMLElement;
     if (radio) (radio as any).checked = true;
+
     this.changeIdent(arg == 'cedula');
     this.setDocumentoPrincipal(arg);
   }
@@ -166,7 +167,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
       const doc_principal = _.find(documentos, (doc) => doc.principal);
 
-      this.marcarCheck(doc_principal['descripcion']);
+      setTimeout(() => this.marcarCheck(doc_principal['descripcion']), 1);
     }
   }
 
@@ -338,7 +339,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.boton = 'Guardar';
     this.editando = false;
     this.changeStateCampos(false);
-    this.changeIdent(true);
     this.clienteSelected = undefined;
     this.isCreando = true;
 

@@ -266,8 +266,10 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.documentos_de_identidad = item.ARG.documentos_de_identidad;
     this.editando = true;
     this.suplidorSelected = this.fun.duplicarJson(item.ARG);
-    this.patchDocumentos(item.ARG.documentos_de_identidad);
+
     this.changeStateCampos(true);
+
+    this.patchDocumentos(item.ARG.documentos_de_identidad);
   }
 
   patchDocumentos(documentos) {
@@ -279,7 +281,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
       const doc_principal = _.find(documentos, (doc) => doc.principal);
 
-      this.marcarCheck(doc_principal['descripcion']);
+      setTimeout(() => this.marcarCheck(doc_principal['descripcion']), 1);
     }
   }
 
