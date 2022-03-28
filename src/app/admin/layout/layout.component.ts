@@ -34,8 +34,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   modulo_select: any;
   ready;
   _opened;
-  facturas_localStorage: any;
-  factGuardada;
+  // facturas_localStorage: any;
+  // factGuardada;
   isHandset$: Observable<boolean>;
   lRun;
   activeIndex;
@@ -123,7 +123,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.imgUser = 'assets/img/transparente.png';
     this.noServer = false;
     this._opened = false;
-    this.factGuardada = undefined;
+    // this.factGuardada = undefined;
     this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
     this.activeIndex = 0;
     this.lRun = false;
@@ -135,21 +135,21 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
   }
 
-  _toggleSidebar(where?) {
-    if (where == 'visibleChange') {
-      if (this.ant_event_change_visibility == 'visibleChange') {
-        this._opened = false;
-        this.ant_event_change_visibility = undefined;
-      } else this.ant_event_change_visibility = where;
-    } else {
-      this.ant_event_change_visibility = where;
-      this._opened = !this._opened;
-    }
-  }
+  // _toggleSidebar(where?) {
+  //   if (where == 'visibleChange') {
+  //     if (this.ant_event_change_visibility == 'visibleChange') {
+  //       this._opened = false;
+  //       this.ant_event_change_visibility = undefined;
+  //     } else this.ant_event_change_visibility = where;
+  //   } else {
+  //     this.ant_event_change_visibility = where;
+  //     this._opened = !this._opened;
+  //   }
+  // }
 
-  checkFacturaGuardada() {
-    this.factGuardada = this.layServ.factura_guardada;
-  }
+  // checkFacturaGuardada() {
+  //   this.factGuardada = this.layServ.factura_guardada;
+  // }
 
   checkCuadre() {
     if (!this.chequiando_cuadre) {
@@ -176,90 +176,90 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.cdRef.detectChanges();
   }
 
-  getNombreFacturaGuardada(fact: any) {
-    let nombre = '';
-    if (fact) {
-      if (fact.tipo === 'venta') nombre = fact['NoCliente_nombre'] ? fact['NoCliente_nombre'] : fact['cliente'] ? fact['cliente']['nombre'] : '';
-      else if (fact['suplidor']) nombre = fact['suplidor'] ? fact['suplidor']['nombre'] : '';
-    }
-    return nombre;
-  }
+  // getNombreFacturaGuardada(fact: any) {
+  //   let nombre = '';
+  //   if (fact) {
+  //     if (fact.tipo === 'venta') nombre = fact['NoCliente_nombre'] ? fact['NoCliente_nombre'] : fact['cliente'] ? fact['cliente']['nombre'] : '';
+  //     else if (fact['suplidor']) nombre = fact['suplidor'] ? fact['suplidor']['nombre'] : '';
+  //   }
 
-  abrirModalFacturaGuardada(fact, e) {
-    const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.', archivo_id: fact.archivo_id };
-    const confirmationObj = {
-      id: 'quitar_factura',
-      texto: obj.texto_modal,
-      header: 'Confirmación',
-      siFunction: (instance) => {
-        this.quitarFacturaGuardada({ body: { archivo_id: obj.archivo_id } });
-      },
-      width: '30rem',
-    };
-    this.confirmationModal(confirmationObj);
+  //   return nombre;
+  // }
 
-    e.stopPropagation();
-  }
+  // abrirModalFacturaGuardada(fact, e) {
+  //   const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.', archivo_id: fact.archivo_id };
+  //   const confirmationObj = {
+  //     id: 'quitar_factura',
+  //     texto: obj.texto_modal,
+  //     header: 'Confirmación',
+  //     siFunction: (instance) => {
+  //       this.quitarFacturaGuardada({ body: { archivo_id: obj.archivo_id } });
+  //       instance.closeModal(instance.id, 'quitar_factura');
+  //     },
+  //     width: '30rem',
+  //   };
+  //   this.confirmationModal(confirmationObj);
 
-  quitarFacturaGuardada(params?) {
-    const fact = params.body;
-    let index;
-    const allFacturas = this.fun.getFacturasguardadas();
+  //   e.stopPropagation();
+  // }
 
-    if (fact) index = _.findIndex(allFacturas, (o: any) => o.archivo_id === fact?.archivo_id);
+  // quitarFacturaGuardada(params?) {
+  //   const fact = params.body;
+  //   let index;
+  //   const allFacturas = this.fun.getFacturasguardadas();
 
-    _.pullAt(allFacturas, index);
+  //   if (fact) index = _.findIndex(allFacturas, (o: any) => o.archivo_id === fact?.archivo_id);
 
-    this.fun.setFacturasGuardadas(allFacturas);
-    this.layServ.nextFacturaGuardada(undefined);
+  //   _.pullAt(allFacturas, index);
 
-    if (params && params.quien_llamo !== 'layout') {
-      modalClass.aquienResponder = 'cabeza_factura';
-      this.layServ.nextSacar({ quien_llamo: 'layout', body: this.layServ.factura_guardada });
-    }
+  //   this.fun.setFacturasGuardadas(allFacturas);
 
-    this.refreshResponse();
-  }
+  //   if (params && params.quien_llamo !== 'layout') {
+  //     modalClass.aquienResponder = 'cabeza_factura';
+  //     this.layServ.nextSacar({ quien_llamo: 'layout', body: this.layServ.factura_guardada });
+  //   }
 
-  clickTabView(where) {
-    const can = !this.countCantFactSaved(where).disable;
+  //   this.refreshResponse();
+  // }
 
-    if (can) {
-      if (this.activeIndex === (where === 'venta' ? 0 : 1)) {
-        this.checkWhereIs(where);
-      }
-    } else this.activeIndex = where === 'compra' ? 0 : 1;
-  }
+  // clickTabView(where) {
+  //   const can = !this.countCantFactSaved(where).disable;
 
-  checkWhereIs(arg?) {
-    return new Promise((resolve) => {
-      const pathname = document.location.pathname;
-      const url = document.location.pathname.split('/')[3];
+  //   if (can) {
+  //     if (this.activeIndex === (where === 'venta' ? 0 : 1)) {
+  //       this.checkWhereIs(where);
+  //     }
+  //   } else this.activeIndex = where === 'compra' ? 0 : 1;
+  // }
 
-      if (this.fun.hasValue(arg) && !pathname.includes(arg)) {
-        this.runRouterNavigate({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
-        setTimeout(() => resolve(true), 100);
-      } else setTimeout(() => resolve(true), 100);
-    });
-  }
+  // checkWhereIs(arg?) {
+  //   return new Promise((resolve) => {
+  //     const pathname = document.location.pathname;
+  //     const url = document.location.pathname.split('/')[3];
 
-  pasarFacturaAfacturacion(fact) {
-    if (this.fun.isEmpty(this.factGuardada) || fact.archivo_id != this.factGuardada.archivo_id) {
-      this.checkWhereIs(fact.tipo).then((res) => {
-        setTimeout(() => {
-          if (res) this.layServ.nextFacturaGuardada(fact);
-        }, 150);
-      });
-    }
-  }
+  //     if (this.fun.hasValue(arg) && !pathname.includes(arg)) {
+  //       this.runRouterNavigate({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
+  //       setTimeout(() => resolve(true), 100);
+  //     } else setTimeout(() => resolve(true), 100);
+  //   });
+  // }
 
-  refreshResponse() {
-    this.getFacturasGuardadas();
-  }
+  // pasarFacturaAfacturacion(fact) {
+  //   if (this.fun.isEmpty(this.factGuardada) || fact.archivo_id != this.factGuardada.archivo_id) {
+  //     this.checkWhereIs(fact.tipo).then((res) => {
+  //       setTimeout(() => {
+  //       }, 150);
+  //     });
+  //   }
+  // }
 
-  sacarResponse(res) {
-    this.quitarFacturaGuardada(res);
-  }
+  // refreshResponse() {
+  //   this.getFacturasGuardadas();
+  // }
+
+  // sacarResponse(res) {
+  //   this.quitarFacturaGuardada(res);
+  // }
 
   // =================================================================================
   // CERRAR SESION
@@ -284,11 +284,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       this.actualMenuItem = url;
 
       this.actualMenuItemBack = this.fun.duplicarJson(this.actualMenuItem);
-
-      if (url === 'factura') {
-        this.activeIndex = tipo === 'venta' ? 0 : 1;
-        this.getFacturasGuardadas();
-      }
     }
   }
 
@@ -297,49 +292,22 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     return { disable: array_fact.length === 0, cant: array_fact.length };
   }
 
-  async getFacturasGuardadas() {
-    this.facturas_localStorage = this.fun.getFacturasguardadas();
+  // async getFacturasGuardadas() {
+  //   this.facturas_localStorage = this.fun.getFacturasguardadas();
 
-    this.facturas_localStorage = _.filter(this.facturas_localStorage, (o: any) => o.tipo === (this.activeIndex === 0 ? 'venta' : 'compra'));
+  //   this.facturas_localStorage = _.filter(this.facturas_localStorage, (o: any) => o.tipo === (this.activeIndex === 0 ? 'venta' : 'compra'));
 
-    setTimeout(async () => {
-      if (this.facturas_localStorage.length > 0) {
-        document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.fun.getFacturasguardadas().length);
+  //   setTimeout(async () => {
+  //     if (this.facturas_localStorage.length > 0) {
+  //       document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.fun.getFacturasguardadas().length);
 
-        for (let i = 0; i < this.facturas_localStorage.length; i++) {
-          const fact = this.facturas_localStorage[i];
-          if (fact.suplidor_id) {
-            const suplidor = await this.suplidorClass.getOne(fact.suplidor_id);
+  //       this.facturas_localStorage = _.orderBy(this.facturas_localStorage, ['archivo_id'], ['asc']);
 
-            fact['suplidor'] = {
-              nombre: `${suplidor.nombre} ${suplidor.apellido ? suplidor.apellido : ''}`,
-              direccion: `${suplidor.direccion}`,
-              telefono: `${suplidor.telefono}`,
-              limite_credito: `${suplidor.limite_credito}`,
-              id: suplidor.id,
-            };
-          }
-          if (fact.cliente_id) {
-            try {
-              const cliente = await this.clienteClass.getOne(fact.cliente_id);
-
-              fact['cliente'] = {
-                nombre: `${cliente.nombre} ${cliente.apellido ? cliente.apellido : ''}`,
-                direccion: `${cliente.direccion}`,
-                telefono: `${cliente.telefono}`,
-                limite_credito: `${cliente.limite_credito}`,
-                vendedor_id: `${Number(cliente.vendedor_id)}`,
-                id: cliente.id,
-              };
-            } catch (error) {}
-          }
-        }
-        this.facturas_localStorage = _.orderBy(this.facturas_localStorage, ['archivo_id'], ['asc']);
-      } else {
-        document.getElementById('btn_side_facturas').removeAttribute('data-cant-facturas');
-      }
-    }, 20);
-  }
+  //     } else {
+  //       document.getElementById('btn_side_facturas').removeAttribute('data-cant-facturas');
+  //     }
+  //   }, 20);
+  // }
   // =================================================================================
   // NAVEGAR
   // =================================================================================
@@ -352,12 +320,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.actualMenuItem = subMenu ? `${this.modulo_select}_select` : `${this.modulo_select}`;
 
     if (!subMenu) {
-      this.ready = false;
+      // this.ready = false;
       this.runRouterNavigate({ bool: true, ruta: ruta_a_cambiar });
     }
   }
 
   finalizarCambioMenu(arg) {
+    console.log('arg ', arg);
+
     if (arg.bool && arg.verificar) {
       this.ready = false;
       setTimeout(() => this.decisionCambioMenu(arg), 10);
@@ -371,29 +341,29 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     setTimeout(() => (this.ready = true), 1);
     this.modulo_select = undefined;
   }
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p>
-      ${obj.texto}
-    </p>`,
-      botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
-  }
+  // confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+  //   this.handleModalForm({
+  //     id: obj.id,
+  //     header: obj.header,
+  //     width: obj.width || '30rem',
+  //     html: `<p>
+  //     ${obj.texto}
+  //   </p>`,
+  //     botones: {
+  //       aceptar: { show: false, disable: false },
+  //       cancelar: { show: false, disable: false },
+  //       dinamico: [
+  //         { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+  //         {
+  //           clase: 'btn btn-verde',
+  //           function: (instance) => obj.siFunction(instance),
+  //           label: 'SI',
+  //           disable: false,
+  //         },
+  //       ],
+  //     },
+  //   });
+  // }
 
   closeModal(modalInstance) {
     modalInstance.closeModal(modalInstance.id, 'cancelar');

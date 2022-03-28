@@ -59,7 +59,7 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('refreshFacturas')) {
-      this.subRefresh = layServ.REFRESFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
+      // this.subRefresh = layServ.REFRESFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
     }
 
     if (this._lista.includes('noFiltro')) {
@@ -67,7 +67,7 @@ export class modalClass extends LayoutClass {
     }
 
     if (this._lista.includes('sacarFacturas')) {
-      this.subRefresh = layServ.SACARFACTURA.subscribe((res) => this.run_subscribe('SACARFACTURA', res));
+      // this.subRefresh = layServ.SACARFACTURA.subscribe((res) => this.run_subscribe('SACARFACTURA', res));
     }
   }
 

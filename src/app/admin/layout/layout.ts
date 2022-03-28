@@ -4,7 +4,6 @@ import * as _ from 'lodash';
 export class LayoutClass {
   constructor() {}
 
-  info_cambio = {};
   ruta_a_cambiar = '';
   url_actual = '';
 
@@ -31,9 +30,6 @@ export class LayoutClass {
 
   runRouterNavigate(arg) {
     if (arg && arg.bool) {
-      this.info_cambio = arg;
-      this.info_cambio['verificar'] = true;
-
       const tempLastComponent = LayoutClass.lastComponentInitLayout;
 
       LayoutClass.metodos[tempLastComponent].iniciarCambioMenu(arg, (callback) => {

@@ -1,101 +1,10 @@
-{{ checkFacturaGuardada() }}
+<!-- {{ checkFacturaGuardada() }} -->
 
 <div #fantasma class="fantasma"></div>
 
 <div id="fondoC" *ngIf="noServer" class="h-100 w-100 position-absolute backnegro">
   <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
 </div>
-
-<span *ngIf="actualMenuItemBack == 'factura'" id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera')">
-  <i id="triangualo" class="fas fa-caret-left text-white"></i>
-</span>
-
-<p-sidebar
-  #my_sidebar
-  *ngIf="actualMenuItemBack == 'factura'"
-  styleClass="my_sidebar  {{ _opened ? 'side_open' : 'side_closed' }}"
-  [position]="'right'"
-  [visible]="_opened"
-  [modal]="true"
-  [showCloseIcon]="false"
-  [baseZIndex]="1"
-  [dismissible]="true"
-  [closeOnEscape]="true"
-  [blockScroll]="true"
-  (visibleChange)="_toggleSidebar('visibleChange')"
->
-  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro')">
-    <i id="triangualo" class="fas fa-caret-left text-white"></i>
-  </span>
-  <div class="contendioSidebar w-100 h-100">
-    <div class="head w-100">
-      <span class="tituloSidebar negrita">Facturas guardadas</span>
-    </div>
-
-    <div class="cuerpoContenidoSidar w-100 h-96">
-      <ng-container>
-        <div class="mt-2"></div>
-        <p-tabView [(activeIndex)]="activeIndex" styleClass="my_tabView" (onChange)="clickTabView($event.index === 0 ? 'venta' : 'compra')">
-          <p-tabPanel
-            [disabled]="countCantFactSaved('venta').disable"
-            tooltip="No tiene facturas de Venta guardadas"
-            headerStyleClass="{{ countCantFactSaved('venta').disable ? 'noTabView' : '' }}"
-            tooltipDisabled="true"
-            tooltipStyleClass="{{ countCantFactSaved('venta').disable ? 'd-block' : 'd-none' }} tabViewTootip"
-          >
-            <ng-template pTemplate="header">
-              Venta
-              <span *ngIf="!countCantFactSaved('venta').disable"> &nbsp;({{ countCantFactSaved('venta').cant }})</span>
-            </ng-template>
-          </p-tabPanel>
-
-          <p-tabPanel
-            [disabled]="countCantFactSaved('compra').disable"
-            tooltip="No tiene facturas de Compra guardadas"
-            headerStyleClass="{{ countCantFactSaved('compra').disable ? 'noTabView' : '' }}"
-            tooltipDisabled="true"
-            tooltipStyleClass="{{ countCantFactSaved('compra').disable ? 'd-block' : 'd-none' }} tabViewTootip"
-          >
-            <ng-template pTemplate="header">
-              Compra
-              <span *ngIf="!countCantFactSaved('compra').disable"> &nbsp;({{ countCantFactSaved('compra').cant }})</span>
-            </ng-template>
-          </p-tabPanel>
-        </p-tabView>
-
-        <h6 *ngIf="facturas_localStorage?.length === 0" class="mt-3 no_fact">No tiene Facturas guardadas por el momento!!</h6>
-        <div *ngIf="facturas_localStorage?.length > 0">
-          <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="pasarFacturaAfacturacion(fact)">
-            <div class="colorsito bg-raya-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}{{ fact?.action === 'update' ? '-orange' : '' }}"></div>
-
-            <div class="info_fact h-100 {{ factGuardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
-              <i class="fas fa-history {{ fact.FacturaAtrasada ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}"></i>
-              <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}"></i>
-              <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar factura" tooltipPosition="left"></i>
-              <span
-                class="negrita text-mayuscula text-separado-2 texto-borde-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}
-            texto-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}"
-                >{{ my_capitalize(fact?.tipo) }}
-              </span>
-              <span class="text-gris-oscuro" *ngIf="fact?.action === 'update'"> (Editando)</span>
-              <br />
-              <span class="clienteFactura">
-                <span class="negrita"> {{ fact?.tipo === 'venta' ? 'Cliente' : 'Suplidor' }}:</span>
-                {{ getNombreFacturaGuardada(fact) }}
-              </span>
-              <br />
-              <span class="info_factura"> <span class="negrita"> Condición:</span> {{ fact?.condicion }} </span>
-              <br />
-              <span class="info_factura"> <span class="negrita"> Articulos:</span> {{ fact?.detalle_facturas.length }} </span>
-              <br />
-              <span class="info_factura"> <span class="negrita"> Total facturado:</span> {{ formatoNumero(fact?.total_factura) }} </span>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-    </div>
-  </div>
-</p-sidebar>
 
 <div class="layout" [ngStyle]="{ width: fantasma.offsetWidth + 'px', height: fantasma.offsetHeight + 'px' }">
   <div class="menu">

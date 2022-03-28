@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Orbitron&display=swap");
+@import url('https://fonts.googleapis.com/css?family=Orbitron&display=swap');
 .cabezaFactura {
   background-color: var(--primary01);
   border-radius: 1rem 1rem 0rem 0rem !important;
@@ -41,7 +41,7 @@
   width: 100%;
   background-color: var(--primary10);
   border-radius: 0.5rem;
-  font-family: "Orbitron", sans-serif;
+  font-family: 'Orbitron', sans-serif;
   font-size: 2rem;
   color: white;
   bottom: 1rem;
@@ -140,4 +140,179 @@ mdb-popover-container {
 
 .numerosCalculos {
   justify-content: flex-end;
+}
+
+.btn_side_bar_facturas {
+  position: absolute;
+  transform: translate(-1.6rem, 49vh);
+  background-color: var(--transparente05);
+  height: 2.5rem;
+  width: 1rem;
+  border-radius: 4.5rem 0rem 0rem 4.5rem;
+  &:hover {
+    background-color: var(--transparente05);
+    cursor: pointer;
+  }
+  > i#triangualo {
+    margin: 0;
+    color: #f3ee32;
+  }
+
+  &.out-side {
+    right: 0;
+    z-index: 99;
+    transform: translate(0rem, 49vh) !important;
+  }
+}
+
+[data-cant-facturas]::after {
+  content: attr(data-cant-facturas);
+  background-color: #fd2543;
+  padding: 0rem 0.3rem;
+  border: 1px solid #8c0a0a;
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-5px, -1.2rem);
+  color: white;
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+
+::ng-deep .my_sidebar {
+  z-index: 9999 !important;
+  padding: 0.5rem 0rem 0.5rem 0.5rem !important;
+  opacity: 1 !important;
+  box-shadow: -13px 0px 20px 0 #00000029 !important;
+  flex-direction: inherit !important;
+  .p-sidebar-header {
+    display: none;
+  }
+  .p-sidebar-content {
+    overflow: initial !important;
+    padding: 0 !important;
+    width: calc(100% - 0.5rem);
+  }
+
+  &.side_open {
+    .p-sidebar-content {
+      > .btn_side_bar_facturas {
+        > #triangualo {
+          transform: rotate(180deg) translate(-3px, 0px);
+        }
+      }
+    }
+  }
+
+  > .contendioSidebar {
+    overflow: hidden;
+    > .head {
+      width: 100%;
+      border-bottom: 1px solid var(--transparente05) !important;
+      margin-bottom: 1rem;
+      > .tituloSidebar {
+        font-size: 1.5rem;
+        color: var(--primary10);
+        padding: 0;
+        font-weight: 500;
+      }
+    }
+
+    > .cuerpoContenidoSidar {
+      overflow: auto;
+      > .no_fact {
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+.factura_guardada {
+  min-height: 8rem;
+  position: relative;
+  .colorsito {
+    height: -webkit-fill-available;
+    position: absolute;
+    width: 0.4rem;
+    border-radius: 5px 0px 0px 5px;
+  }
+
+  .info_fact {
+    padding: 0.2rem 0.2rem 0.2rem 0.5rem;
+    border: 1px solid #d7d7d7;
+    border-radius: 5px;
+    box-shadow: 1.5px 0.5px 2.4px #8080806e;
+
+    &.activa {
+      background-color: #b8b8b852;
+      box-shadow: 0px 0px 5.4px #0000006e !important;
+    }
+
+    &:hover {
+      cursor: pointer;
+      background-color: #80808020;
+    }
+    > .btn_borrar_factura_gurdada {
+      position: absolute;
+      right: 0;
+      color: gray;
+      transform: translate(-12px, 5px);
+      &:hover {
+        color: #750f0f;
+      }
+    }
+
+    > .iconFacturaGuardada {
+      position: absolute;
+      right: -6px;
+      bottom: 11px;
+      color: var(--transparente05);
+      font-size: 1.5rem;
+
+      &.is_atrasada {
+        color: #f37d20a1 !important;
+      }
+    }
+    > .tipoFactura {
+      font-size: 1.3rem;
+      color: var(--primary10);
+    }
+  }
+}
+
+#triangualo {
+  transition: all 1s;
+}
+
+.texto-green {
+  color: #2c942cc9;
+}
+.texto-yellow {
+  color: #f5e206c9;
+}
+
+.texto-borde-green {
+  -webkit-text-stroke: 1px #257d25ac;
+}
+.texto-borde-yellow {
+  -webkit-text-stroke: 1px #a99c0eaf;
+}
+
+.bg-raya-green {
+  background-color: #38ab38c9;
+  border: 1px solid #257d25a5;
+}
+.bg-raya-yellow {
+  background-color: #f5e206c9;
+  border: 1px solid #a99c0e9f;
+}
+.bg-raya-yellow-orange {
+  background: linear-gradient(180deg, #f3ee32 0%, #f3ee32 43%, #ffa400 100%);
+}
+.bg-raya-green-orange {
+  background: linear-gradient(180deg, #38ab38c9 0%, #38ab38c9 43%, #ffa400 100%);
+}
+
+.tipoFactura:first-letter {
+  text-transform: uppercase;
+  color: red !important;
 }

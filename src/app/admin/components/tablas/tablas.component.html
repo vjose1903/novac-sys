@@ -46,7 +46,7 @@
             <tr
               *ngFor="let dato of data | paginate: { id: id_tabla, itemsPerPage: mostrar, currentPage: pagActual, totalItems: total_registros }; index as i"
               class="text-center"
-              id="{{ ROW }}{{ i }}"
+              id="{{ ROW }}{{ getIndex(i) }}"
               [ngClass]="{
                 tdHover: tablaHover,
                 tdNoHover: !tablaHover,
@@ -61,15 +61,15 @@
               <td
                 *ngFor="let column of info; let j = index"
                 class="tableTD"
-                id="td-{{ column.key.key ? column.key.key : column.key }}-{{ i }}"
-                [ngStyle]="getStyle(column.key, i)"
+                id="td-{{ column.key.key ? column.key.key : column.key }}-{{ getIndex(i) }}"
+                [ngStyle]="getStyle(column.key, getIndex(i))"
                 [ngSwitch]="column.tipo"
               >
                 <span
                   *ngSwitchCase="'text'"
                   [pTooltip]="column.text_tooltip ? dato[column.text_tooltip] : ''"
-                  [tooltipPosition]="i != 0 ? 'top' : 'bottom'"
-                  id="{{ column.key }}-{{ i }}"
+                  [tooltipPosition]="getIndex(i) != 0 ? 'top' : 'bottom'"
+                  id="{{ column.key }}-{{ getIndex(i) }}"
                   style="width: 100%"
                   class="text-{{ column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black' }}"
                 >
@@ -78,9 +78,9 @@
 
                 <span
                   *ngSwitchCase="'cantidades'"
-                  id="{{ column.key }}-{{ i }}"
+                  id="{{ column.key }}-{{ getIndex(i) }}"
                   pTooltip="{{ lookOters(dato[column.key]).Padre }} {{ lookOters(dato[column.key]).Hijo === undefined ? '' : lookOters(dato[column.key]).Hijo }}"
-                  [tooltipPosition]="i != 0 ? 'top' : 'bottom'"
+                  [tooltipPosition]="getIndex(i) != 0 ? 'top' : 'bottom'"
                   style="width: 100%"
                 >
                   {{ lookprincipal(dato[column.key]) }}
@@ -88,9 +88,9 @@
 
                 <span
                   *ngSwitchCase="'tag'"
-                  id="{{ column.key }}-{{ i }}"
+                  id="{{ column.key }}-{{ getIndex(i) }}"
                   [pTooltip]="column.text_tooltip ? dato[column.text_tooltip] : ''"
-                  tooltipPosition="{{ i != 0 ? 'top' : 'bottom' }}"
+                  tooltipPosition="{{ getIndex(i) != 0 ? 'top' : 'bottom' }}"
                   style="width: 100%"
                 >
                   <p-tag
@@ -112,8 +112,8 @@
                 <span *ngSwitchCase="'icon'">
                   <span *ngIf="dato._destroy !== '1'" [pTooltip]="column.text_tooltip ? dato[column.text_tooltip] : ''" [tooltipPosition]="i != 0 ? 'top' : 'bottom'">
                     <i
-                      id="{{ column.key }}-{{ i }}"
-                      (click)="iconBtn(column.key, i, dato)"
+                      id="{{ column.key }}-{{ getIndex(i) }}"
+                      (click)="iconBtn(column.key, getIndex(i), dato)"
                       class="{{ getIconClass(column, dato) }} {{ dato.iconHover ? 'c-pointer' : '' }}   text-{{
                         column.color ? (dato[column.text_color] ? dato[column.text_color] : 'black') : 'black'
                       }}"
@@ -125,17 +125,17 @@
 
                 <span
                   *ngSwitchCase="'formatoNumero'"
-                  id="{{ column.key }}-{{ i }}"
+                  id="{{ column.key }}-{{ getIndex(i) }}"
                   style="width: 100%"
                   [pTooltip]="column.text_tooltip ? dato[column.text_tooltip] : ''"
-                  [tooltipPosition]="i != 0 ? 'top' : 'bottom'"
+                  [tooltipPosition]="getIndex(i) != 0 ? 'top' : 'bottom'"
                 >
                   {{ formatoNumero(dato[column.key]) }}
                 </span>
 
                 <span *ngSwitchCase="'inputSwitch'" [pTooltip]="column.text_tooltip ? dato[column.text_tooltip] : ''" [tooltipPosition]="i != 0 ? 'top' : 'bottom'">
                   <div class="form-group m-0 switchDiv">
-                    <input class="apple-switch" [ngClass]="{ disabled: disabledInput(dato, column) }" type="checkbox" (change)="changeValorCheck(column.key, i)" [checked]="dato[column.key]" />
+                    <input class="apple-switch" [ngClass]="{ disabled: disabledInput(dato, column) }" type="checkbox" (change)="changeValorCheck(column.key, getIndex(i), false, dato)" [checked]="dato[column.key]" />
                     <span class="ml-2">{{ column.title }}</span>
                   </div>
                 </span>
@@ -144,33 +144,33 @@
                   <div *ngIf="!column.checkNumber">
                     <input
                       class="form-control m-0 inputTabla {{ column.inputType ? (column.inputType == 'number' ? 'input_cantidad' : '') : '' }}"
-                      id="input-{{ id_tabla }}-{{ i }}"
+                      id="input-{{ id_tabla }}-{{ getIndex(i) }}"
                       [min]="dato.min_ ? dato.min_ : 0"
                       [max]="dato.max_ ? dato.max_ : null"
                       type="{{ column.inputType ? column.inputType : 'text' }}"
                       [value]="dato[column.key]"
                       [ngClass]="{ disabled: disabledInput(dato, column) }"
-                      (keyup)="changeValorInput(column.key, i, $event.target.value)"
-                      (change)="changeValorInput(column.key, i, $event.target.value)"
+                      (keyup)="changeValorInput(column.key, getIndex(i), $event.target.value, dato)"
+                      (change)="changeValorInput(column.key, getIndex(i), $event.target.value, dato)"
                     />
                   </div>
                   <div *ngIf="column.checkNumber">
                     <input
                       class="form-control m-0 inputTabla"
                       type="text"
-                      id="input-{{ i }}"
+                      id="input-{{ getIndex(i) }}"
                       [value]="dato[column.key]"
-                      (blur)="revisarPrecio(i, $event.target.value, column.key, 'input-' + i)"
+                      (blur)="revisarPrecio(i, $event.target.value, column.key, 'input-' + getIndex(i), dato)"
                       [ngClass]="{ disabled: disabledInput(dato, column) }"
-                      (keyup)="changeValorInput(column.key, i, $event.target.value)"
-                      (change)="changeValorInput(column.key, i, $event.target.value)"
+                      (keyup)="changeValorInput(column.key, getIndex(i), $event.target.value, dato)"
+                      (change)="changeValorInput(column.key, getIndex(i), $event.target.value, dato)"
                     />
                   </div>
                 </span>
               </td>
 
-              <td id="td-acciones-{{ i }}" class="btnAccion tableTD" *ngIf="botones && botones?.titulo">
-                <app-btnacciones [row]="dato" [i]="i" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
+              <td id="td-acciones-{{ getIndex(i) }}" class="btnAccion tableTD" *ngIf="botones && botones?.titulo">
+                <app-btnacciones [row]="dato" [i]="getIndex(i)" [data]="data" [botones]="botones" (deleteBTN)="delete($event)" (DevolverInfoBTN)="devolverInfo($event)"></app-btnacciones>
               </td>
             </tr>
           </ng-container>

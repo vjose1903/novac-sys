@@ -46,6 +46,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   previous: any = [];
   searchText = '';
   @Input() ROW = 'row-';
+  PAGE = 'page-';
   NUM = 0;
   IDROW = 'row-0';
 
@@ -265,22 +266,26 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     });
   }
 
-  changeValorCheck(key, i, auto = false) {
+  changeValorCheck(key, index, auto = false, dato?) {
     const info_colum = _.find(this.info, (item) => item.key == key);
-    if (!this.disabledInput(this.data[i], info_colum)) {
-      this.data[i][key] = !this.data[i][key];
-      const obj = { body: this.data, index: i, cambio: key, value: this.data[i][key], id_tabla: this.id_tabla };
 
-      if (!auto && _.every(this.data, { select: this.data[i][key] })) this.select_all_value = this.data[i][key];
+    console.log('🚀 ~ TablasComponent ~ changeValorCheck ~ dato', dato);
+
+    if (!this.disabledInput(dato, info_colum)) {
+      dato[key] = !dato[key];
+      const obj = { body: this.data, rowChanged: dato, index, cambio: key, value: dato[key], id_tabla: this.id_tabla };
+
+      if (!auto && _.every(this.data, { select: dato[key] })) this.select_all_value = dato[key];
 
       this.getInfoChange.emit(obj);
     }
   }
 
-  changeValorInput(key, i, valor) {
+  changeValorInput(key, i, valor, dato) {
     this.data[i][key] = valor;
     const obj = {
       body: this.data,
+      rowChanged: dato,
       index: i,
       cambio: key,
       value: valor,
@@ -292,6 +297,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   iconBtn(key, i, row_) {
     const column_key = _.has(key, 'key') ? key.key : key;
     const obj = {
+      rowChanged: row_,
       index: i,
       column: column_key,
       row: row_,
@@ -380,7 +386,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     return res;
   }
 
-  revisarPrecio(i, valor, key, input) {
+  revisarPrecio(i, valor, key, input, dato) {
     const precioTEMPO = valor;
 
     if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
@@ -422,6 +428,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         this.data[i][key] = numeroFormateado;
         const obj = {
           body: this.data,
+          rowChanged: dato,
           index: i,
           cambio: key,
           value: numeroFormateado,
@@ -647,7 +654,19 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     element.click();
   }
 
+  getIndex(index) {
+    const pageIndex = (this.pagActual - 1) * this.mostrar + index;
+
+    const validate = this.fun.isEmpty(this.data[pageIndex]);
+    if (validate) {
+      return index;
+    } else {
+      return pageIndex;
+    }
+  }
+
   enfocarInput(arg) {
+    console.log('🚀 ~ TablasComponent ~ enfocarInput ~ arg', arg);
     const element = document.getElementById(arg) as HTMLElement;
     element.focus();
   }

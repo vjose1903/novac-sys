@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from '../../core/javascript/moment';
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
-import { GLOBAL, tipos_facturas } from '../../core/typescript/GLOBAL';
+import { applyMixins, GLOBAL, tipos_facturas } from '../../core/typescript/GLOBAL';
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { MixinClass } from '../../core/typescript/MixinClass';
@@ -18,16 +18,18 @@ import { PdfService } from '../../core/services/pdf/pdf.service';
 import { PendienteFormComponent } from '../components/formularios en modales/pendiente-form/pendiente-form.component';
 import { FormCantidadEfectivoComponent } from '../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { FactsLocalStorage } from './factsLocalStorage';
 
 @Component({
   selector: 'app-facturacion',
   templateUrl: './facturacion.component.html',
   styleUrls: ['./facturacion.component.scss'],
 })
-export class FacturacionComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
+export class FacturacionComponent extends FactsLocalStorage implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
 
   secuenciaKeys = [];
+  info_cambio: any;
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
@@ -130,7 +132,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     private pdfServ: PdfService,
   ) {
     super();
-
     this.form = this.fb.group({
       id: [],
       nombre: [],
@@ -148,54 +149,55 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     this.localeService.use('es');
     this.rellenarVariables();
 
-    this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((facturaGuardada) => {
-      if (this.fun.hasValue(facturaGuardada)) {
-        let obj = { texto_modal: '' };
+    // this.subFactG = this.layServ.FACTURAGUARDADA.subscribe((facturaGuardada) => {
+    //   if (this.fun.hasValue(facturaGuardada)) {
+    //     let obj = { texto_modal: '' };
 
-        this.formarObjArchivo(facturaGuardada).then(() => {
-          let abrir_modal = true;
-          const is_factura_en_proceso = this.checkIfFacturacionEnProceso();
+    //     this.formarObjArchivo(facturaGuardada).then(() => {
+    //       let abrir_modal = true;
+    //       const is_factura_en_proceso = this.checkIfFacturacionEnProceso();
 
-          if (is_factura_en_proceso) {
-            // para saber si la factura que estaba en turno era una factura ya archivada
-            if (this.objArchivo.archivo_id_en_turno) {
-              if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
-                this.fun.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
-                this.procesoRelleno(this.objArchivo.factura_para_rellenar);
-                abrir_modal = false;
-              } else {
-                obj.texto_modal = 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?';
-              }
-            } else obj.texto_modal = '¿Desea archivar la factura que esta en proceso?';
+    //       if (is_factura_en_proceso) {
+    //         // para saber si la factura que estaba en turno era una factura ya archivada
+    //         if (this.objArchivo.archivo_id_en_turno) {
+    //           if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
+    //             this.fun.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
+    //             this.procesoRelleno(this.objArchivo.factura_para_rellenar);
+    //             abrir_modal = false;
+    //           } else {
+    //             obj.texto_modal = 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?';
+    //           }
+    //         } else obj.texto_modal = '¿Desea archivar la factura que esta en proceso?';
 
-            if (abrir_modal) {
-              const confirmationObj = {
-                id: 'archivar_factura',
-                texto: obj.texto_modal,
-                header: 'Confirmación',
-                siFunction: (instance) => this.archivarFact(instance),
-                width: '30rem',
-              };
-              this.confirmationModal(confirmationObj);
-            }
-          } else {
-            this.procesoRelleno(facturaGuardada);
-          }
-          // si el modal no se abrira asignando el archivo_id de la factura que se va a rellenar como el que estara en turno
-          if (!abrir_modal || !is_factura_en_proceso) this.objArchivo.archivo_id_en_turno = facturaGuardada.archivo_id;
-          this.layServ.factura_guardada = this.fun.duplicarJson(facturaGuardada);
-        });
-      }
-    });
+    //         if (abrir_modal) {
+    //           const confirmationObj = {
+    //             id: 'archivar_factura',
+    //             texto: obj.texto_modal,
+    //             header: 'Confirmación',
+    //             siFunction: (instance) => this.archivarFact(instance),
+    //             width: '30rem',
+    //           };
+    //           this.confirmationModal(confirmationObj);
+    //         }
+    //       } else {
+    //         this.procesoRelleno(facturaGuardada);
+    //       }
+    //       // si el modal no se abrira asignando el archivo_id de la factura que se va a rellenar como el que estara en turno
+    //       if (!abrir_modal || !is_factura_en_proceso) this.objArchivo.archivo_id_en_turno = facturaGuardada.archivo_id;
+    //       this.layServ.factura_guardada = this.fun.duplicarJson(facturaGuardada);
+    //     });
+    //   }
+    // });
   }
 
   ngOnDestroy(): void {
     this._destroy_mixin();
-    this.subFactG.unsubscribe();
+    // this.subFactG.unsubscribe();
   }
 
   ngAfterViewInit() {
     this.usuario = this.fun.getUser();
+    this.getFacturasGuardadas();
   }
 
   sacarResponse(res) {
@@ -240,6 +242,46 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     });
   }
 
+  confirmarCambio(factura) {
+    if (this.fun.hasValue(factura)) {
+      let obj = { texto_modal: '' };
+
+      this.formarObjArchivo(factura).then(() => {
+        let abrir_modal = true;
+        const is_factura_en_proceso = this.checkIfFacturacionEnProceso();
+
+        if (is_factura_en_proceso) {
+          // para saber si la factura que estaba en turno era una factura ya archivada
+          if (this.objArchivo.archivo_id_en_turno) {
+            if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
+              this.fun.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
+              this.procesoRelleno(this.objArchivo.factura_para_rellenar);
+              abrir_modal = false;
+            } else {
+              obj.texto_modal = 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?';
+            }
+          } else obj.texto_modal = '¿Desea archivar la factura que esta en proceso?';
+
+          if (abrir_modal) {
+            const confirmationObj = {
+              id: 'archivar_factura',
+              texto: obj.texto_modal,
+              header: 'Confirmación',
+              siFunction: (instance) => this.archivarFact(instance),
+              width: '30rem',
+            };
+            this.confirmationModal(confirmationObj);
+          }
+        } else {
+          this.procesoRelleno(factura);
+        }
+        // si el modal no se abrira asignando el archivo_id de la factura que se va a rellenar como el que estara en turno
+        if (!abrir_modal || !is_factura_en_proceso) this.objArchivo.archivo_id_en_turno = factura.archivo_id;
+        this.layServ.factura_guardada = this.fun.duplicarJson(factura);
+      });
+    }
+  }
+
   getTiposFacturas() {
     return new Promise((resolve) => {
       this.tipoFacturaClass.getAll().then((tiposFacturas) => {
@@ -251,6 +293,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
   rellenarVariables() {
     this.getTiposFacturas().then((resultado) => {
+      this.info_cambio = {};
       this.fechaFactura = {};
       this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];
@@ -322,7 +365,8 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
             setTimeout(() => {
               this.getCuerpoFactura(factura['detalle_facturas'], true);
               modalClass.aquienResponder = 'layout';
-              this.layServ.nextRefresh(true);
+              // this.layServ.nextRefresh(true);
+              this._sideBarOpened = false;
               resolve(true);
             }, 250);
           });
@@ -406,18 +450,20 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
+      this.info_cambio = arg;
+      this.info_cambio['verificar'] = true;
+
       this.formarObjArchivo().then(() => {
         if (this.checkIfFacturacionEnProceso()) {
           let obj = { texto_modal: '' };
           let abrirModal = true;
           let archivo_id;
-          this.runFinalizarCambioMenu({ bool: false, ruta: arg.ruta });
+          // this.runFinalizarCambioMenu({ bool: false, ruta: arg.ruta });
 
-          if (_.get(this.objArchivo, 'archivo_id_en_turno')) {
+          if (this.objArchivo.archivo_id_en_turno) {
             if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
               this.fun.toastWarning('La factura que estaba realizando esta archivada para poder utilizarla luego.', 'AVISO');
               abrirModal = false;
-              this.layServ.nextFacturaGuardada(undefined);
             } else {
               obj.texto_modal = 'La factura que esta en proceso ya se encuentra archivada ¿desea sobreescribirla?';
             }
@@ -426,7 +472,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
           this.procesoCambio(abrirModal, archivo_id, obj, callback);
         } else {
           this.runFinalizarCambioMenu({ bool: true, ruta: arg.ruta, verificar: true });
-          this.layServ.nextFacturaGuardada(undefined);
+
           callback({ bool: true });
         }
       });
@@ -442,10 +488,8 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
         this.info_cambio['bool'] = true;
 
         this.runFinalizarCambioMenu(this.info_cambio);
-        this.fun.logRed('salir_layout --> ');
-        this.closeModal(instance);
 
-        this.layServ.nextFacturaGuardada(undefined);
+        this.closeModal(instance);
       };
 
       const confirmationObj = {
@@ -726,7 +770,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
       this.enfocarInput(campo);
       this.propietario_factura = this.form.value;
     } else {
-      this.fun.toastWarning('Para facturar a credito debe de seleccionar un cliente', 'Aviso');
+      this.fun.toastWarning('Para facturar a crédito debe de seleccionar un cliente', 'Aviso');
     }
   }
 
@@ -910,7 +954,6 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
   //     this.layServ.nextDecisionCambioMenu(this.info_cambio);
   //     this.fun.logRed('salir_layout --> ');
 
-  //     this.layServ.nextFacturaGuardada(undefined);
   //   } else if (this.tipoModal === 'desplegar_factura') {
   //     if (arg) this.agregarFacturaALocalStorage();
 
@@ -941,8 +984,10 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
   agregarFacturaALocalStorage() {
     if (!this.propietario_factura) this.propietario_factura = this.form.value;
+    console.log('🚀 ~ FacturacionComponent ~ agregarFacturaALocalStorage ~ this.form.value', this.form.value);
 
     let facturas_localStorage = this.fun.duplicarJson(this.objArchivo.facturas_localStorage);
+    console.log('🚀 ~ FacturacionComponent ~ agregarFacturaALocalStorage ~ facturas_localStorage', facturas_localStorage);
     const factura_a_guardar = this.fun.duplicarJson(this.objArchivo.factura_en_turno);
 
     let index_fact_archivada = _.findIndex(facturas_localStorage, (facts: any) => facts?.archivo_id === this.objArchivo.archivo_id_en_turno);
@@ -953,18 +998,21 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     } else {
       facturas_localStorage = _.orderBy(facturas_localStorage, ['archivo_id'], ['asc']);
       factura_a_guardar['archivo_id'] = facturas_localStorage.length > 0 ? _.last(facturas_localStorage).archivo_id + 1 : 1;
+      if (!this.fun.isEmpty(this.propietario_factura.id)) factura_a_guardar[this.metodo === 'venta' ? 'cliente' : 'suplidor'] = this.propietario_factura;
       facturas_localStorage.push(factura_a_guardar);
     }
     facturas_localStorage = _.orderBy(facturas_localStorage, ['archivo_id'], ['asc']);
 
+    console.log('🚀 ~ FacturacionComponent ~ agregarFacturaALocalStorage ~ factura_a_guardar', factura_a_guardar);
     this.fun.setFacturasGuardadas(facturas_localStorage);
   }
 
   archivarFact(modalInstance) {
     this.agregarFacturaALocalStorage();
+    this.getFacturasGuardadas();
     setTimeout(() => {
       modalClass.aquienResponder = 'layout';
-      this.layServ.nextRefresh(true);
+      // this.layServ.nextRefresh(true);
       this.resetVariables();
       this.closeModal(modalInstance);
     }, 250);
@@ -1207,7 +1255,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
 
     if (this.fun.hasValue(is_guardada)) {
       modalClass.aquienResponder = 'layout';
-      this.layServ.nextSacar({ quien_llamo: 'facturacion', body: this.layServ.factura_guardada });
+      // this.layServ.nextSacar({ quien_llamo: 'facturacion', body: this.layServ.factura_guardada });
     }
   }
 
@@ -1309,3 +1357,7 @@ export class FacturacionComponent extends MixinClass implements OnInit, OnDestro
     else await this.resetVariables();
   }
 }
+
+// export interface FacturacionComponent extends FactsLocalStorage {}
+
+// applyMixins(FacturacionComponent, [FactsLocalStorage]);

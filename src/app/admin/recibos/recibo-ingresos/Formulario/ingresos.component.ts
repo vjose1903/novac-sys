@@ -408,12 +408,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   getInfoChange(item) {
+    console.log('🚀 ~ IngresosComponent ~ getInfoChange ~ item', item);
     if (item.cambio === 'pagoT' && item.value) {
       this.tablas.resetInput('balance', 'monto', item.index, true);
     }
     if (item.cambio === 'select') {
+      console.log('🚀 ~ IngresosComponent ~ getInfoChange ~ item', item);
       if (!item.value) {
-        this.facturas[item.index].pagoT = false;
+        item.rowChanged.pagoT = false;
         this.tablas.resetInput('especificar', 'monto', item.index, true, 0);
       }
     }
@@ -426,12 +428,12 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       const total = item.body[item.index].balance;
       const monto = this.fun.desformatear(item.value);
 
-      if (monto === total) this.facturas[item.index].pagoT = true;
+      if (monto === total) item.rowChanged.pagoT = true;
 
       if (monto > total) {
         this.ExisteMontoMayor = true;
         this.fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
-        this.facturas[item.index].monto = this.facturas[item.index].balance;
+        item.rowChanged.monto = item.rowChanged.balance;
         this.tablas.enfocarInput('input-' + item.index);
       } else {
         this.ExisteMontoMayor = false;
