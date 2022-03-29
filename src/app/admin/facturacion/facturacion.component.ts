@@ -1198,7 +1198,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.fechaFactura['back'] = this.fechaFactura['front'];
       this.FechaFacturaMostrar = this.formarFechaFactura(arg.fecha)['FechaFacturaMostrar'];
       this.FacturaAtrasada = true;
-      this.cuerpo.getSaco();
     } else if (arg.modal_id == 'cambioEfectivo') {
       this.fun.logGreen('AQUIIIIII');
       this.Devuelta = arg.obj.devuelta;
