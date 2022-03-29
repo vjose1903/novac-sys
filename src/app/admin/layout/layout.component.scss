@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
+@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
 
 .cuadre_hoy {
   position: absolute;
@@ -59,7 +59,7 @@
   }
 }
 
-$bodyfont: 'Poppins';
+$bodyfont: "Poppins";
 
 .fantasma {
   position: absolute;
@@ -70,7 +70,7 @@ $bodyfont: 'Poppins';
 
 .layout {
   display: grid;
-  grid-template-areas: 'menu content';
+  grid-template-areas: "menu content";
   grid-template-columns: 8rem auto;
   min-height: 100vh;
   max-height: 100vh;
@@ -80,15 +80,15 @@ $bodyfont: 'Poppins';
     grid-area: menu;
     display: grid;
     grid-template-areas:
-      'title'
-      'sideBar';
+      "title"
+      "sideBar";
     grid-template-rows: min-content auto;
     max-height: inherit;
 
     > .title {
       grid-area: title;
       background-color: #c9c9c9;
-      z-index: 99;
+      // z-index: 99;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -121,9 +121,9 @@ $bodyfont: 'Poppins';
     grid-area: content;
     display: grid;
     grid-template-areas:
-      'navBar'
-      'contenido'
-      'footer';
+      "navBar"
+      "contenido"
+      "footer";
 
     grid-template-rows: min-content auto min-content;
 
@@ -259,107 +259,6 @@ $bodyfont: 'Poppins';
   text-transform: uppercase;
   color: red !important;
 }
-
-// .factura_guardada {
-//   min-height: 8rem;
-//   position: relative;
-//   .colorsito {
-//     height: -webkit-fill-available;
-//     position: absolute;
-//     width: 0.4rem;
-//     border-radius: 5px 0px 0px 5px;
-//   }
-
-//   .info_fact {
-//     padding: 0.2rem 0.2rem 0.2rem 0.5rem;
-//     border: 1px solid #d7d7d7;
-//     border-radius: 5px;
-//     box-shadow: 1.5px 0.5px 2.4px #8080806e;
-
-//     &.activa {
-//       background-color: #b8b8b852;
-//       box-shadow: 0px 0px 5.4px #0000006e !important;
-//     }
-
-//     &:hover {
-//       cursor: pointer;
-//       background-color: #80808020;
-//     }
-//     > .btn_borrar_factura_gurdada {
-//       position: absolute;
-//       right: 0;
-//       color: gray;
-//       transform: translate(-12px, 5px);
-//       &:hover {
-//         color: #750f0f;
-//       }
-//     }
-
-//     > .iconFacturaGuardada {
-//       position: absolute;
-//       right: -6px;
-//       bottom: 11px;
-//       color: var(--transparente05);
-//       font-size: 1.5rem;
-
-//       &.is_atrasada {
-//         color: #f37d20a1 !important;
-//       }
-//     }
-//     > .tipoFactura {
-//       font-size: 1.3rem;
-//       color: var(--primary10);
-//     }
-//   }
-// }
-
-// ::ng-deep .my_sidebar {
-//   z-index: 9999 !important;
-//   padding: 0.5rem 0rem 0.5rem 0.5rem !important;
-//   opacity: 1 !important;
-//   box-shadow: -13px 0px 20px 0 #00000029 !important;
-//   flex-direction: inherit !important;
-//   .p-sidebar-header {
-//     display: none;
-//   }
-//   .p-sidebar-content {
-//     overflow: initial !important;
-//     padding: 0 !important;
-//     width: calc(100% - 0.5rem);
-//   }
-
-//   &.side_open {
-//     .p-sidebar-content {
-//       > .btn_side_bar_facturas {
-//         > #triangualo {
-//           transform: rotate(180deg) translate(-3px, 0px);
-//         }
-//       }
-//     }
-//   }
-
-//   > .contendioSidebar {
-//     overflow: hidden;
-//     > .head {
-//       width: 100%;
-//       border-bottom: 1px solid var(--transparente05) !important;
-//       margin-bottom: 1rem;
-//       > .tituloSidebar {
-//         font-size: 1.5rem;
-//         color: var(--primary10);
-//         padding: 0;
-//         font-weight: 500;
-//       }
-//     }
-
-//     > .cuerpoContenidoSidar {
-//       overflow: auto;
-//       > .no_fact {
-//         font-weight: 400;
-//       }
-//     }
-//   }
-// }
 
 /* ============================================== */
 /*        Menu                                    */

@@ -178,12 +178,14 @@ mdb-popover-container {
   font-size: 0.7rem;
 }
 
+
 ::ng-deep .my_sidebar {
   z-index: 9999 !important;
   padding: 0.5rem !important;
   opacity: 1 !important;
   box-shadow: -13px 0px 20px 0 #00000029 !important;
   flex-direction: inherit !important;
+  display: block !important;
   .p-sidebar-header {
     display: none;
   }
