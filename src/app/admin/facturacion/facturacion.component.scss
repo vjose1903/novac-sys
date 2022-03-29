@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Orbitron&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Orbitron&display=swap");
 .cabezaFactura {
   background-color: var(--primary01);
   border-radius: 1rem 1rem 0rem 0rem !important;
@@ -41,7 +41,7 @@
   width: 100%;
   background-color: var(--primary10);
   border-radius: 0.5rem;
-  font-family: 'Orbitron', sans-serif;
+  font-family: "Orbitron", sans-serif;
   font-size: 2rem;
   color: white;
   bottom: 1rem;
@@ -180,7 +180,7 @@ mdb-popover-container {
 
 ::ng-deep .my_sidebar {
   z-index: 9999 !important;
-  padding: 0.5rem 0rem 0.5rem 0.5rem !important;
+  padding: 0.5rem !important;
   opacity: 1 !important;
   box-shadow: -13px 0px 20px 0 #00000029 !important;
   flex-direction: inherit !important;
@@ -190,7 +190,38 @@ mdb-popover-container {
   .p-sidebar-content {
     overflow: initial !important;
     padding: 0 !important;
-    width: calc(100% - 0.5rem);
+
+    > .contendioSidebar {
+      overflow: hidden;
+      display: grid;
+
+      grid-template-areas:
+        "head"
+        "cuerpoContenidoSidar";
+      row-gap: 0.5rem;
+      grid-template-rows: min-content auto;
+
+      > .head {
+        grid-area: head;
+        width: 100%;
+        border-bottom: 1px solid var(--transparente05) !important;
+        > .tituloSidebar {
+          font-size: 1.5rem;
+          color: var(--primary10);
+          padding: 0;
+          font-weight: 500;
+        }
+      }
+
+      > .cuerpoContenidoSidar {
+        grid-area: cuerpoContenidoSidar;
+
+        overflow: hidden;
+        > .no_fact {
+          font-weight: 400;
+        }
+      }
+    }
   }
 
   &.side_open {
@@ -199,28 +230,6 @@ mdb-popover-container {
         > #triangualo {
           transform: rotate(180deg) translate(-3px, 0px);
         }
-      }
-    }
-  }
-
-  > .contendioSidebar {
-    overflow: hidden;
-    > .head {
-      width: 100%;
-      border-bottom: 1px solid var(--transparente05) !important;
-      margin-bottom: 1rem;
-      > .tituloSidebar {
-        font-size: 1.5rem;
-        color: var(--primary10);
-        padding: 0;
-        font-weight: 500;
-      }
-    }
-
-    > .cuerpoContenidoSidar {
-      overflow: auto;
-      > .no_fact {
-        font-weight: 400;
       }
     }
   }

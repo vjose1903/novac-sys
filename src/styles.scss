@@ -411,7 +411,7 @@ body {
     grid-area: p-tabview-panels;
     border: 0px solid transparent !important;
     height: 100%;
-    overflow-y: auto;
+    // overflow-y: auto;
     > p-tabpanel {
       height: 100%;
       > .p-tabview-panel {
