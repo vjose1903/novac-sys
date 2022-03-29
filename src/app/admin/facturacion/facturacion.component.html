@@ -317,12 +317,11 @@
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
   <div class="contendioSidebar w-100 h-100">
-    <div class="head w-100">
+    <div class="head">
       <span class="tituloSidebar negrita">Facturas guardadas</span>
     </div>
 
-    <div class="cuerpoContenidoSidar w-100 h-96">
-      <div class="mt-2"></div>
+    <div class="cuerpoContenidoSidar w-100">
       <p-tabView [(activeIndex)]="activeIndex" styleClass="my_tabView" (onChange)="clickTabView($event.index)">
         <p-tabPanel
           [disabled]="countCantFactSaved('venta').disable"

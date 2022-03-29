@@ -1,16 +1,21 @@
-<div class="row" style="height: calc(100% - 60px)">
+<div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita">{{ titulo }}</h4>
+    <h4 class="negrita">Registro de paquetes de comprobantes fiscales</h4>
   </div>
 
-  <div class="col-12 p-0">
+  <div class="col-12 p-0 colFormularioListado">
     <div class="d-flex h-100">
-      <div class="contenedorRegistro" *ngIf="isCreando || roleSelected" class="form {{ isCreando || roleSelected ? 'showForm' : 'hideForm' }} " style="grid-template-rows: min-content min-content">
-        <div class="tituloCardClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
+      <div
+        class="contenedorRegistro"
+        *ngIf="isCreando || paqueteSelected"
+        class="form {{ isCreando || paqueteSelected ? 'showForm' : 'hideForm' }} "
+        style="grid-template-rows: min-content min-content"
+      >
+        <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
           <h4 class="mb-0">Formulario</h4>
         </div>
 
-        <div class="card card-padding sombra" style="height: min-content">
+        <div class="card cardFormClass">
           <div class="row">
             <div class="col-12 p-0">
               <div class="form-group">
@@ -98,7 +103,7 @@
                 />
               </div>
             </div>
-            <div *ngIf="is_editando" class="col-12">
+            <div *ngIf="is_editando" class="col-12 p-0">
               <div class="row">
                 <div class="col-6">
                   <div class="d-flex">
@@ -115,28 +120,26 @@
               </div>
             </div>
 
-            <div class="col-12 p-0 mt-3">
-              <div class="col-12 form-group" style="display: flex; justify-content: space-between">
-                <div>
-                  <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-                  <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
-                </div>
-                <div>
-                  <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="isCreando = false; borrar()" style="max-width: 6rem" />
-                </div>
+            <div class="col-12 p-0 mt-3" style="display: flex; justify-content: space-between">
+              <div>
+                <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+              </div>
+              <div>
+                <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="list {{ isCreando || roleSelected ? 'FormList' : 'onlyList' }}">
+      <div class="list {{ isCreando || paqueteSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
-          <h4>Listado articulos</h4>
+          <h4 class="mb-0">Listado de comprobantes</h4>
 
-          <button [disabled]="roleSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <button [disabled]="paqueteSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
-        <div #cardTabla id="cardTabla" class="card cardListados position-relative cardContentClass">
+        <div #cardTabla id="cardTabla" class="card cardContentClass">
           <app-tablas
             *ngIf="listaNCF && info"
             class="h-100"
@@ -150,9 +153,9 @@
             (paginateChange)="getPaquetesNCF($event)"
             (DELETE)="localAbrirModal($event)"
           ></app-tablas>
-          <div class="filtroNCF" style="top: 2.5rem; left: 3rem">
+          <div class="filtroNCF" style="top: 1.5rem; left: 0.5rem">
             <select class="form-control select" [(ngModel)]="filtro" (change)="filtrarNCF()">
-              <option value="0" disabled>Filtro por tipo de articulos</option>
+              <option value="0" disabled>Filtrar por tipo</option>
               <option value="todos">Todos</option>
               <option *ngFor="let tipo of lista_tipos_facturas" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
             </select>

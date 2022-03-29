@@ -307,21 +307,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     return res;
   }
 
-  async calcularPrecio(detalle, factura) {
-    if (detalle.calcular_saco) {
-      const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente)['FechaFactura'];
-
-      this.articuloClass.getArticulosFiltrado({ buscar: 'Saco sistema', fecha: fechaFactura, paginado: false }).then((res) => {
-        const precio_saco = res.data[0].precio_principal;
-        detalle.precio = detalle.precio + precio_saco;
-        detalle.total = detalle.precio * detalle.cantidad;
-      });
-    } else {
-      detalle.precio = detalle.precio;
-    }
-
-    return detalle;
-  }
 
   async pedirFactura(campo, valor, e) {
     console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ valor', valor);

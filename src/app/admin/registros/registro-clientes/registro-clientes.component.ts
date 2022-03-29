@@ -14,25 +14,14 @@ import { EmpleadoC } from '../registro-empleados/empleado';
   styleUrls: ['./registro-clientes.component.scss'],
 })
 export class RegistroClientesComponent extends MixinClass implements OnInit, OnDestroy {
-  titulo = '';
   boton = '';
   form: FormGroup;
-  detallableArray: FormArray;
-  isDetallable = false;
-  medida: boolean;
 
-  articuloSelected;
-
-  vendersePorSelected;
   listaClientes;
   FORM: any;
-  listaTipoArticulos: any;
   isCreando: boolean = false;
   doc_is_cedula = true;
 
-  phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-  cedulaMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
-  rncMask = [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/];
   PhotoData: any;
   doc_principal = 'cedula';
 
@@ -51,7 +40,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   camposDisabled: boolean = true;
   editando: boolean = false;
   myValidators = new customValidators();
-
+  clienteSelected;
   clienteClass = new ClienteC();
   empleadosClass = new EmpleadoC();
 
@@ -62,15 +51,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   ngOnInit() {
     this._init_mixin({ component: 'reg_cliente', is_routing: true, _lista_subs: ['decisionModal'] });
     this.boton = 'Guardar';
-    this.titulo = 'Registro de clientes';
 
     this.createForm();
 
     this.necesarioStart();
-    setTimeout(() => {
-      this.marcarCheck('cedula');
-      this.enfocarInput('cedula');
-    }, 200);
   }
 
   createForm() {
@@ -122,6 +106,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   marcarCheck(arg) {
     const radio = document.getElementById('identificacion-' + arg) as HTMLElement;
     if (radio) (radio as any).checked = true;
+
+    this.changeIdent(arg == 'cedula');
+    this.setDocumentoPrincipal(arg);
   }
 
   getVendedores() {
@@ -164,8 +151,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.patchDocumentos(item.ARG.documentos_de_identidad);
 
     this.form.controls.maximo_credito.setValue(this.fun.formatearNumero(this.fun.redondearAdos(item.ARG.maximo_credito)));
+    this.clienteSelected = this.fun.duplicarJson(item.ARG);
 
-    this.titulo = 'Editar cliente: ' + item.ARG.nombre;
     this.boton = 'Editar';
     this.editando = true;
     this.changeStateCampos(true);
@@ -179,9 +166,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       });
 
       const doc_principal = _.find(documentos, (doc) => doc.principal);
-      this.changeIdent(doc_principal['descripcion'] === 'cedula');
-      this.doc_principal = doc_principal['descripcion'];
-      this.marcarCheck(doc_principal['descripcion']);
+
+      setTimeout(() => this.marcarCheck(doc_principal['descripcion']), 1);
     }
   }
 
@@ -339,6 +325,11 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   nuevoRegistro() {
     this.isCreando = true;
+
+    setTimeout(() => {
+      this.marcarCheck('cedula');
+      this.enfocarInput('cedula');
+    }, 200);
   }
 
   borrar() {
@@ -346,11 +337,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.doc_is_cedula = true;
     this.documentos_de_identidad = undefined;
     this.boton = 'Guardar';
-    this.titulo = 'Registro de clientes';
-    this.doc_principal = 'cedula';
     this.editando = false;
     this.changeStateCampos(false);
-    this.changeIdent(true);
+    this.clienteSelected = undefined;
+    this.isCreando = true;
 
     setTimeout(() => {
       this.enfocarInput('cedula');

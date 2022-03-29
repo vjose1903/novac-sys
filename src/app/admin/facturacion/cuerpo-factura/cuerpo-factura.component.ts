@@ -48,7 +48,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   @Output() getFechaFactura = new EventEmitter<any>();
 
   tipoModal: string;
-  saco_sistema: any;
 
   articuloClass = new ArticuloC();
   minCodigo;
@@ -163,15 +162,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     });
   }
 
-  ngAfterViewInit() {
-    this.getSaco();
-  }
-
-  async getSaco() {
-    this.articuloClass.getArticulosFiltrado({ buscar: 'Saco sistema', fecha: this.fechaFactura, paginado: false }).then((res) => {
-      this.saco_sistema = res['data'][0];
-    });
-  }
+  ngAfterViewInit() {}
 
   ngOnChanges(simpleChanges) {}
 
@@ -201,72 +192,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
 
   ModificarClass(item, clase, action) {
     this.fun.ModificarClass(item, clase, action);
-  }
-
-  async calcularSacoEnRow(i, row, articulo, lugar) {
-    return new Promise((resolve, reject) => {
-      try {
-        const operacion = row.calcular_saco;
-        const se_calcula = row.se_calcula_saco;
-        const row_unidad = (this.filasDetalle[i] as any).controls['uni'].value;
-        const precio_saco = this.saco_sistema.precio_principal;
-
-        let calculo = 0;
-
-        if (row_unidad == articulo.medida) {
-          calculo = articulo.precio_principal;
-        } else {
-          const splitUnidad = _.split(row_unidad, ' ');
-          let unity = splitUnidad[0];
-          let peso = 100 / Number(splitUnidad[2]);
-
-          calculo = unity == 'Saco' ? articulo.precio_principal / peso : articulo.contenido_articulos[0].precio;
-        }
-
-        const descripcion = (this.filasDetalle[i] as any).controls['des'].value;
-
-        let precio = calculo;
-        if (operacion) {
-          if (moment(this.fechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.fecha_ingreso).format('YYYY-MM-DD')) precio = calculo + precio_saco;
-          (this.filasDetalle[i] as any).controls['des'].setValue(`${articulo.nombre}`);
-          (this.filasDetalle[i] as any).controls['pre'].setValue(this.fun.numFormatTwoDecimals(precio));
-        } else {
-          (this.filasDetalle[i] as any).controls['pre'].setValue(this.fun.numFormatTwoDecimals(precio));
-          if (se_calcula || lugar === 'select') (this.filasDetalle[i] as any).controls['des'].setValue(`${descripcion}*`);
-        }
-
-        resolve(true);
-      } catch (error) {
-        this.fun.toastError('Error calculando el precio del saco', 'ERROR');
-        resolve(false);
-      }
-    });
-  }
-
-  async CalculoSacos(i, lugar, e?) {
-    try {
-      const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
-
-      if (e) e.stopPropagation();
-
-      if (this.metodo === 'venta') {
-        const articulo = (this.filasDetalle[i] as any).controls['articulo'].value;
-
-        if (articulo.calcular_saco) {
-          const row = (this.filasDetalle[i] as any).value;
-
-          if (unidad) {
-            this.calcularSacoEnRow(i, row, articulo, lugar).then((res) => (res ? this.calcularTotalRow(i) : () => {}));
-          } else {
-            this.fun.toastWarning('Para calcular los sacos debe de seleccionar una unidad', 'AVISO');
-            (this.filasDetalle[i] as any).controls['calcular_saco'].setValue(true);
-          }
-        } else {
-          if (e) this.fun.toastError('A este articulo no se le calculan los sacos', 'ERROR');
-          (this.filasDetalle[i] as any).controls['calcular_saco'].setValue(false);
-        }
-      }
-    } catch (error) {}
   }
 
   selectedRow(i, bool) {
@@ -408,13 +333,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
 
     campos['uni'].setValue(uni);
 
-    if (this.metodo === 'venta') {
-      try {
-        this.calcularSacoEnRow(j, row, articulo, 'llenarFact').then((res) => (res ? this.calcularTotalRow(j) : () => {}));
-      } catch (error) {}
-    } else {
-      this.calcularTotalRow(j);
-    }
+    this.calcularTotalRow(j);
 
     this.ajustarSecuencia();
   }
@@ -539,10 +458,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
           (this.filasDetalle[i] as any).controls['uni'].setValue(unidad);
           (this.filasDetalle[i] as any).controls['pre'].setValue(this.fun.numFormatTwoDecimals(this.metodo === 'venta' ? this.precioDetalle : costoDetalle));
           (this.filasDetalle[i] as any).controls['costo'].setValue(costoDetalle);
-
-          if (this.metodo === 'venta' && moment(this.fechaFactura).format('YYYY-MM-DD') > moment(this.saco_sistema.fecha_ingreso).format('YYYY-MM-DD')) {
-            this.CalculoSacos(i, 'select', undefined);
-          }
 
           this.calcularTotalRow(i).then(() => {
             this.ajustarSecuencia().then(() => {

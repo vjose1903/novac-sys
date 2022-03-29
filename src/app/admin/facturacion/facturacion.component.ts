@@ -534,7 +534,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // }
 
   objDevueltoResponse(res) {
-     if (res && res.tipo_modal === 'buscarSuplidor') {
+    if (res && res.tipo_modal === 'buscarSuplidor') {
       this.propietario_factura = res.data;
       this.form.patchValue(this.propietario_factura);
       this.enfocarInput('cod-0');

@@ -14,7 +14,7 @@ import { ModalI } from '../../new_modal/modal-class';
 })
 export class FormularioMarcaModeloComponent extends MixinClass implements OnInit, ModalI {
   @Input() tipo_formulario;
-
+  tabIndex;
   componente;
   tituloTabla;
   @Output() accion_ = new EventEmitter<any>();
@@ -55,11 +55,14 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   ngOnInit() {
     this.createForm();
     this.tipo_formulario = this.inputs.tipo;
+
     if (this.tipo_formulario === 'marcas') {
+      this.tabIndex = 0;
       this.componente = 'reg_marcas';
       this.tituloTabla = 'Marcas';
       this.campo1 = 'Marca';
     } else if (this.tipo_formulario === 'modelos') {
+      this.tabIndex = 1;
       this.componente = 'reg_modelos';
       this.tituloTabla = 'Modelos';
       this.campo1 = 'Marca';
