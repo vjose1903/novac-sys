@@ -16,7 +16,6 @@ import { FormularioMarcaModeloComponent } from '../../components/formularios en 
   styleUrls: ['./registro-vehiculo.component.scss'],
 })
 export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnDestroy {
-  titulo = '';
   boton = '';
   form: FormGroup;
   phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
@@ -29,7 +28,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   listaPropietarios = [];
 
   listaModelos: any;
-  vehiculoEditando: any;
+  vehiculoSelected: any;
 
   info = [
     { titulo: 'Propietario', key: 'nombreCompleto', tipo: 'text' },
@@ -55,7 +54,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.createForm();
     this.FORM = this.form.controls;
 
-    this.titulo = 'Registro de camiones';
     this.boton = 'Registrar';
 
     this.enfocarInput('user_id');
@@ -152,15 +150,14 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     }
   }
 
-  borrar() {
-    this.vehiculoEditando = null;
+  borrar(reset = false) {
+    this.vehiculoSelected = undefined;
     this.form.reset();
     this.restartCampo('nombre_no_empleado');
     this.restartCampo('apellido_no_empleado');
     this.restartCampo('telefono_no_empleado');
     this.enfocarInput('user_id');
-
-    this.titulo = 'Registro de camiones';
+    if (reset) this.isCreando = true;
     this.boton = 'Registrar';
   }
   selectPropietario() {
@@ -201,9 +198,8 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     const vehiculo = item.ARG;
     this.borrar();
     this.is_editando = true;
-    this.vehiculoEditando = item.ARG;
+    this.vehiculoSelected = item.ARG;
 
-    this.titulo = `Editar Camion: ${vehiculo.marca} ${vehiculo.modelo}  de: ${vehiculo.nombreCompleto}`;
     this.boton = 'Editar';
 
     await this.form.patchValue(vehiculo);

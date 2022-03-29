@@ -17,7 +17,6 @@ import { ChangePasswordComponent } from '../../components/formularios en modales
 })
 export class RegistroEmpleadosComponent extends MixinClass implements OnInit, OnDestroy {
   form: FormGroup;
-  titulo = '';
   boton = '';
   pattern = pattern;
 
@@ -38,7 +37,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   isCreando: boolean = false;
   listaEmpleados;
   editando = false;
-  usuarioSelected: any;
+  empleadoSelected: any;
   indexBorrar: any;
   documentos_de_identidad: any;
 
@@ -59,7 +58,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   ngOnInit() {
     this.localeService.use('es');
-    this.titulo = 'Registro de empleados';
     this.boton = 'Registrar';
 
     this._init_mixin({ component: 'reg_empleados', is_routing: true, _lista_subs: ['decisionModal'] });
@@ -239,7 +237,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.form.reset();
 
     this.enfocarInput('cedula');
-    this.titulo = 'Registro de empleados';
     this.boton = 'Registrar';
     this.editando = false;
     this.documentos_de_identidad = undefined;
@@ -251,6 +248,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     this.form.controls.password.updateValueAndValidity();
     this.form.controls.confirm_password.updateValueAndValidity();
+
+    this.empleadoSelected = undefined;
+    this.isCreando = true;
   }
 
   fecha(a: any) {
@@ -270,9 +270,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     this.form.patchValue(item.ARG);
 
-    this.usuarioSelected = item.ARG;
+    this.empleadoSelected = item.ARG;
     this.editando = true;
-    this.titulo = 'Editar empleado: ' + item.ARG.nombre;
     this.boton = 'Editar';
 
     this.form.controls.password.setValidators(null);
@@ -319,7 +318,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.handleModalForm({
       component: ChangePasswordComponent,
       id: 'changePassword',
-      inputs: this.usuarioSelected,
+      inputs: this.empleadoSelected,
       header: 'Cambiar contraseña',
       width: '30rem',
     });

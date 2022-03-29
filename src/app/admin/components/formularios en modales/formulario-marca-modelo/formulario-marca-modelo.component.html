@@ -1,16 +1,11 @@
-<!-- <div class="row" style="height: calc(100% - 60px);"> -->
 <div style="height: 100%">
-  <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView panelsStyle anularPadding" style="height: 100% !important">
-    <!-- <div class="col-12" style="max-height: 2rem">
-      <h4>{{ tituloTabla }}</h4>
-    </div> -->
+  <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView panelsStyle anularPadding">
     <p-tabPanel header="Marcas">
-      <form [formGroup]="formMarca" style="height: 100%">
-        <div class="row" style="min-height: 60%; max-height: 100%">
+      <form [formGroup]="formMarca" class="h-100">
+        <div class="row h-100">
           <div class="col-6 contenedorRegistro" style="padding-left: 0 !important">
             <div class="card card-padding sombra">
               <div>
-                <!-- *ngIf="tipo_formulario !== 'modelos'" -->
                 <div class="form-group">
                   <label class="control-label">{{ campo1 }}: <span style="color: red">*</span></label>
                   <input
@@ -48,11 +43,10 @@
     </p-tabPanel>
 
     <!---------------------------------------------------------------------------------------------------------------------------------------------------->
-    <!-- *ngIf="tipo_formulario === 'modelos'"
-*ngIf="tipo_formulario === 'modelos'" -->
+
     <p-tabPanel header="Modelos">
-      <form [formGroup]="formModelo" style="height: 100%">
-        <div class="row" style="min-height: 60%; max-height: 100%">
+      <form [formGroup]="formModelo" class="h-100">
+        <div class="row h-100">
           <div class="col-6 contenedorRegistro" style="padding-left: 0 !important">
             <div class="row card card-padding sombra">
               <div class="col-12">
@@ -114,7 +108,7 @@
 </ng-template>
 
 <ng-template #tablaMarcaModelo let-data="data">
-  <div #cardTabla id="cardTabla" class="divMarcaModelo">
+  <div #cardTabla id="cardTabla" class="card cardListados">
     <app-tablas
       class="h-100"
       *ngIf="listado && info"

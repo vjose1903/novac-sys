@@ -33,9 +33,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   subLogOut: Subscription;
   modulo_select: any;
   ready;
-  _opened;
   // facturas_localStorage: any;
-  // factGuardada;
   isHandset$: Observable<boolean>;
   lRun;
   activeIndex;
@@ -122,8 +120,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.showLoading = true;
     this.imgUser = 'assets/img/transparente.png';
     this.noServer = false;
-    this._opened = false;
-    // this.factGuardada = undefined;
     this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
     this.activeIndex = 0;
     this.lRun = false;
@@ -134,22 +130,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this._destroy_mixin();
     if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
   }
-
-  // _toggleSidebar(where?) {
-  //   if (where == 'visibleChange') {
-  //     if (this.ant_event_change_visibility == 'visibleChange') {
-  //       this._opened = false;
-  //       this.ant_event_change_visibility = undefined;
-  //     } else this.ant_event_change_visibility = where;
-  //   } else {
-  //     this.ant_event_change_visibility = where;
-  //     this._opened = !this._opened;
-  //   }
-  // }
-
-  // checkFacturaGuardada() {
-  //   this.factGuardada = this.layServ.factura_guardada;
-  // }
 
   checkCuadre() {
     if (!this.chequiando_cuadre) {
@@ -175,83 +155,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   ngAfterContentChecked() {
     this.cdRef.detectChanges();
   }
-
-  // getNombreFacturaGuardada(fact: any) {
-  //   let nombre = '';
-  //   if (fact) {
-  //     if (fact.tipo === 'venta') nombre = fact['NoCliente_nombre'] ? fact['NoCliente_nombre'] : fact['cliente'] ? fact['cliente']['nombre'] : '';
-  //     else if (fact['suplidor']) nombre = fact['suplidor'] ? fact['suplidor']['nombre'] : '';
-  //   }
-
-  //   return nombre;
-  // }
-
-  // abrirModalFacturaGuardada(fact, e) {
-  //   const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.', archivo_id: fact.archivo_id };
-  //   const confirmationObj = {
-  //     id: 'quitar_factura',
-  //     texto: obj.texto_modal,
-  //     header: 'Confirmación',
-  //     siFunction: (instance) => {
-  //       this.quitarFacturaGuardada({ body: { archivo_id: obj.archivo_id } });
-  //       instance.closeModal(instance.id, 'quitar_factura');
-  //     },
-  //     width: '30rem',
-  //   };
-  //   this.confirmationModal(confirmationObj);
-
-  //   e.stopPropagation();
-  // }
-
-  // quitarFacturaGuardada(params?) {
-  //   const fact = params.body;
-  //   let index;
-  //   const allFacturas = this.fun.getFacturasguardadas();
-
-  //   if (fact) index = _.findIndex(allFacturas, (o: any) => o.archivo_id === fact?.archivo_id);
-
-  //   _.pullAt(allFacturas, index);
-
-  //   this.fun.setFacturasGuardadas(allFacturas);
-
-  //   if (params && params.quien_llamo !== 'layout') {
-  //     modalClass.aquienResponder = 'cabeza_factura';
-  //     this.layServ.nextSacar({ quien_llamo: 'layout', body: this.layServ.factura_guardada });
-  //   }
-
-  //   this.refreshResponse();
-  // }
-
-  // clickTabView(where) {
-  //   const can = !this.countCantFactSaved(where).disable;
-
-  //   if (can) {
-  //     if (this.activeIndex === (where === 'venta' ? 0 : 1)) {
-  //       this.checkWhereIs(where);
-  //     }
-  //   } else this.activeIndex = where === 'compra' ? 0 : 1;
-  // }
-
-  // checkWhereIs(arg?) {
-  //   return new Promise((resolve) => {
-  //     const pathname = document.location.pathname;
-  //     const url = document.location.pathname.split('/')[3];
-
-  //     if (this.fun.hasValue(arg) && !pathname.includes(arg)) {
-  //       this.runRouterNavigate({ bool: true, ruta: `/admin/factura/${arg}/new/0` });
-  //       setTimeout(() => resolve(true), 100);
-  //     } else setTimeout(() => resolve(true), 100);
-  //   });
-  // }
-
-  // pasarFacturaAfacturacion(fact) {
-  //   if (this.fun.isEmpty(this.factGuardada) || fact.archivo_id != this.factGuardada.archivo_id) {
-  //     this.checkWhereIs(fact.tipo).then((res) => {
-  //       setTimeout(() => {
-  //       }, 150);
-  //     });
-  //   }
-  // }
 
   // refreshResponse() {
   //   this.getFacturasGuardadas();
@@ -287,27 +190,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     }
   }
 
-  countCantFactSaved(tipo) {
-    const array_fact = _.filter(this.fun.getFacturasguardadas(), (o: any) => o.tipo === tipo);
-    return { disable: array_fact.length === 0, cant: array_fact.length };
-  }
-
-  // async getFacturasGuardadas() {
-  //   this.facturas_localStorage = this.fun.getFacturasguardadas();
-
-  //   this.facturas_localStorage = _.filter(this.facturas_localStorage, (o: any) => o.tipo === (this.activeIndex === 0 ? 'venta' : 'compra'));
-
-  //   setTimeout(async () => {
-  //     if (this.facturas_localStorage.length > 0) {
-  //       document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.fun.getFacturasguardadas().length);
-
-  //       this.facturas_localStorage = _.orderBy(this.facturas_localStorage, ['archivo_id'], ['asc']);
-
-  //     } else {
-  //       document.getElementById('btn_side_facturas').removeAttribute('data-cant-facturas');
-  //     }
-  //   }, 20);
-  // }
   // =================================================================================
   // NAVEGAR
   // =================================================================================
@@ -320,7 +202,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.actualMenuItem = subMenu ? `${this.modulo_select}_select` : `${this.modulo_select}`;
 
     if (!subMenu) {
-      // this.ready = false;
       this.runRouterNavigate({ bool: true, ruta: ruta_a_cambiar });
     }
   }
@@ -340,32 +221,5 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     if (decision.bool) this.router.navigateByUrl(decision.ruta);
     setTimeout(() => (this.ready = true), 1);
     this.modulo_select = undefined;
-  }
-  // confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-  //   this.handleModalForm({
-  //     id: obj.id,
-  //     header: obj.header,
-  //     width: obj.width || '30rem',
-  //     html: `<p>
-  //     ${obj.texto}
-  //   </p>`,
-  //     botones: {
-  //       aceptar: { show: false, disable: false },
-  //       cancelar: { show: false, disable: false },
-  //       dinamico: [
-  //         { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-  //         {
-  //           clase: 'btn btn-verde',
-  //           function: (instance) => obj.siFunction(instance),
-  //           label: 'SI',
-  //           disable: false,
-  //         },
-  //       ],
-  //     },
-  //   });
-  // }
-
-  closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 }

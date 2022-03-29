@@ -1,4 +1,4 @@
-<div #dinamicTable class="dinamicTable position-relative" [ngStyle]="{ height: padre.firstChild.offsetHeight + 'px' }">
+<div #dinamicTable class="dinamicTable position-relative" [ngStyle]="{ height: padre.firstChild.offsetHeight + 'px', padding: pad ? '1.5rem 1rem 1.5rem 1rem' : '0rem' }">
   <!-- h-100 -->
   <div id="searchDiv-{{ id_tabla }}" #searchDiv *ngIf="search" class="searchDiv">
     <label class="search-label" for="search">Busqueda </label>

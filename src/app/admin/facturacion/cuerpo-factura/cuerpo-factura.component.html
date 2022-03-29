@@ -37,13 +37,6 @@
         <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
           <ng-template pTemplate>
             <ul class="dropRowConfig" role="menu">
-              <li *ngIf="metodo === 'venta'" role="menuitem">
-                <div class="form-group my-1 switchDiv">
-                  <input formControlName="calcular_saco" class="apple-switch" type="checkbox" (change)="CalculoSacos(i, 'select', $event)" />
-                  <span class="ml-2">Calcular saco</span>
-                </div>
-              </li>
-
               <li role="menuitem" (click)="modalRemover(i, $event)" class="hoverlable">
                 <a class="" id="dropdown-item">
                   <i class="far fa-trash-alt text-red btnBorrar"></i>

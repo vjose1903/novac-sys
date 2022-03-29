@@ -189,14 +189,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     });
   }
 
-  async getPrecioSaco(factura, callback = (arg) => {}) {
-    const fechaFactura = this.formarFechaFactura(factura.fecha_equivalente)['FechaFactura'];
-
-    this.articuloClass.getArticulosFiltrado({ buscar: 'Saco sistema', fecha: fechaFactura, paginado: false }).then((res) => {
-      callback({ estado: true, precio_saco: res.data[0].precio_principal });
-    });
-  }
-
   getIndexNota(id_) {
     return _.findIndex(this.detalleNota, { id: id_ });
   }
