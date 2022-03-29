@@ -374,7 +374,7 @@ body {
 /* TAB VIEW */
 /* ====================================================== */
 .my_tabView {
-  height: 100%;
+  height: auto;
   display: grid;
   grid-template-areas:
     'p-tabview-nav-container'
