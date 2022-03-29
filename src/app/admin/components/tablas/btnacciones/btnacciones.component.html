@@ -1,15 +1,15 @@
-<span pTooltip="Mostrar" (click)="devolverInfo(row, 'mostrar')" tooltipPosition="{{ i === 0 ? 'bottom' : 'top' }}" *ngIf="botones.mostrar">
-  <i class="far fa-eye" ></i>
+<span (click)="devolverInfo(row, 'mostrar')" *ngIf="botones.mostrar">
+  <i class="far fa-eye" pTooltip="Mostrar" tooltipPosition="{{ i === 0 ? 'bottom' : 'top' }}"></i>
 </span>
 
-<span pTooltip="Editar" (click)="devolverInfo(row, 'editar')" tooltipPosition="{{ i === 0 ? 'bottom' : 'top' }}" *ngIf="botones.editar">
-  <i class="fas fa-pencil-alt" ></i>
+<span (click)="devolverInfo(row, 'editar')" *ngIf="botones.editar">
+  <i class="fas fa-pencil-alt" pTooltip="Editar" tooltipPosition="{{ i === 0 ? 'bottom' : 'top' }}"></i>
 </span>
 
-<span pTooltip="Borrar" (click)="delete(row)" tooltipPosition="{{ i === 0 ? 'bottom' : 'top' }}" *ngIf="botones.borrar">
-  <i class="far fa-trash-alt" ></i>
+<span (click)="delete(row)" *ngIf="botones.borrar">
+  <i class="far fa-trash-alt" pTooltip="Borrar" tooltipPosition="{{ i === 0 ? 'bottom' : 'top' }}"></i>
 </span>
 
-<span pTooltip="Movimientos de inventario" (click)="devolverInfo(row, 'inventario')" tooltipPosition="{{ i === 0 ? 'bottom' : 'top' }}" *ngIf="botones.inventario">
-  <i class="fas fa-dolly" ></i>
+<span (click)="devolverInfo(row, 'inventario')" *ngIf="botones.inventario">
+  <i class="fas fa-dolly" pTooltip="Movimientos de inventario" tooltipPosition="{{ i === 0 ? 'bottom' : 'top' }}"></i>
 </span>

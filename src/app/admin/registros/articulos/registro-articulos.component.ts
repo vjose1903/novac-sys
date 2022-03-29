@@ -54,7 +54,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   MEDIDACAJA: any;
   is_combo = false;
   recalcular = false;
-  productoEditando: any;
 
   vendido_en: any;
   listaMateriasPrimas = [];
@@ -177,7 +176,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     if (tipo_check === 'materia prima') {
       this.form.controls.is_materia_prima.setValue(true);
     } else {
-      this.form.controls.is_materia_prima.setValue(this.productoEditando ? this.productoEditando.is_materia_prima : false);
+      this.form.controls.is_materia_prima.setValue(this.articuloSelected ? this.articuloSelected.is_materia_prima : false);
     }
 
     if (tipo_check !== 'producto terminado' && tipo_check !== 'materia prima') this.form.controls.calcular_saco.setValue(false);
@@ -269,8 +268,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
   }
 
-  borrar() {
-    this.productoEditando = null;
+  borrar(reset = false) {
+    this.articuloSelected = undefined;
     this.form.reset();
     this.enfocarInput('nombre');
     this.form.controls.is_detallable.setValue(false);
@@ -278,11 +277,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.boton = 'Registrar';
     this.TIPOARTICULO = '';
     this.recalcular = false;
-
     if (this.is_combo) this.resetArray();
 
     this.is_combo = false;
     this.form.controls['rowFormula'].reset();
+
+    if (reset) this.isCreando = true;
   }
 
   resetCompradoEn(value) {
@@ -558,8 +558,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.TIPOARTICULO = null;
     this.resetArray();
 
-    for (let i = 0; i < this.productoEditando.formulas_productos_terminados.length; i++) {
-      const ingredient = this.productoEditando.formulas_productos_terminados[i];
+    for (let i = 0; i < this.articuloSelected.formulas_productos_terminados.length; i++) {
+      const ingredient = this.articuloSelected.formulas_productos_terminados[i];
       this.addItem();
       this.fillFormula(ingredient, i, true);
     }
@@ -604,7 +604,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     this.borrar();
     this.form.patchValue(articulo);
-    this.productoEditando = item.ARG;
+    this.articuloSelected = item.ARG;
     this.boton = 'Editar';
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';

@@ -14,7 +14,6 @@ import { NcfC } from './ncf';
   styleUrls: ['./ncf.component.scss'],
 })
 export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
-  titulo;
   form;
   boton = 'Ingresar';
   listaNCF;
@@ -84,7 +83,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   ngOnInit() {
     this.localeService.use('es');
     this._init_mixin({ component: 'reg_ncf', is_routing: true, _lista_subs: ['decisionModal'] });
-    this.titulo = 'Paquetes de numeros comprobantes fiscales';
     this.necesarioStart();
 
     this.setDateInputs(new Date());
@@ -281,11 +279,11 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.is_editando = false;
     this.ncfSelected = undefined;
     this.tipo_articulo_id = -1;
-    this.titulo = 'Paquetes de numeros comprobantes fiscales';
     this.boton = 'Ingresar';
     this.paqueteSelected = undefined;
     this.Desde = undefined;
     this.Hasta = undefined;
+    this.isCreando = true;
 
     this.setDateInputs(new Date());
   }
@@ -309,7 +307,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (item.METODO === 'editar') {
       this.paqueteSelected = item.ARG;
-      this.titulo = ' Editar paquete de NCF numero: ' + item.ARG.codigo + ' de: ' + item.ARG.tipoC_;
       this.boton = 'Editar';
 
       this.estado = item.ARG.estado;

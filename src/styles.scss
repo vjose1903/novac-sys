@@ -401,6 +401,7 @@ body {
   }
   > .p-tabview-panels {
     grid-area: p-tabview-panels;
+    background-color: transparent !important;
     border: 0px solid transparent !important;
     height: 100%;
     > p-tabpanel {
@@ -665,6 +666,13 @@ Not supports in Firefox and IE */
   }
 }
 
+@mixin my_cards {
+  border-radius: 1rem !important;
+  height: 100%;
+  background-color: white;
+  box-shadow: 0px 4px 14px -6px black;
+}
+
 .rowResgitro {
   height: 100%;
   display: grid;
@@ -684,7 +692,7 @@ Not supports in Firefox and IE */
       > .form {
         transition: all 0.3s;
         &.showForm {
-          width: 45%;
+          width: 50%;
           margin-right: 0.5rem;
         }
 
@@ -704,7 +712,7 @@ Not supports in Firefox and IE */
           display: flex;
           justify-content: space-between;
           align-items: center;
-          min-height: 3.3rem
+          min-height: 3.3rem;
         }
 
         > .cardFormClass {
@@ -720,7 +728,7 @@ Not supports in Firefox and IE */
       > .list {
         transition: all 0.3s;
         &.FormList {
-          width: 55%;
+          width: 50%;
         }
 
         &.onlyList {
@@ -739,13 +747,13 @@ Not supports in Firefox and IE */
 
         > .cardContentClass {
           grid-area: card_content_area;
-
-          border-radius: 1rem !important;
-          height: 100%;
-          background-color: white;
-          box-shadow: 0px 4px 14px -6px black;
+          @include my_cards;
         }
       }
     }
   }
+}
+
+.cardListados {
+  @include my_cards;
 }

@@ -1,4 +1,4 @@
-<div class="row h-100 rowResgitro">
+<div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo">
     <h4 class="negrita">Registro de articulos</h4>
   </div>
@@ -621,7 +621,7 @@
           <div class="row">
             <div class="col-12 mt-3 p-0" style="display: flex; justify-content: space-between">
               <div>
-                <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                <a class="btn mr-2" id="btn-blanco" (click)="borrar(true)">Borrar</a>
                 <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
 
                 <ng-container *ngIf="TIPOARTICULO === 'Producto terminado' && recalcular === true">
@@ -629,7 +629,7 @@
                 </ng-container>
               </div>
               <div>
-                <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="isCreando = false; borrar()" style="max-width: 6rem" />
+                <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(true); isCreando = false" style="max-width: 6rem" />
               </div>
             </div>
           </div>

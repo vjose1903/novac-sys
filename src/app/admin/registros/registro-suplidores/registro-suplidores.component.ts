@@ -82,7 +82,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   async nesesarioStart() {
     await this.getSuplidores(this.tServ.obj_paginate.default);
-    this.enfocarInput('campoRnc');
+    this.enfocarInput('rnc');
     this.marcarCheck('rnc');
   }
 
@@ -92,34 +92,30 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   async getSuplidores(e) {
-    try {
-      const page = e.page;
-      const per_page = e.per_page;
-      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+    const page = e.page;
+    const per_page = e.per_page;
+    const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
 
-      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
 
-      this.suplidorClass.getAll(extra).then((res) => {
-        res['data'].map((suplidor) => {
-          suplidor.documentos_de_identidad.map((docu) => {
-            if (docu.principal) suplidor.documento = docu.documento;
-          });
-          suplidor.codigo = _.padStart(suplidor.id, 5, '0');
-          return suplidor;
+    this.suplidorClass.getAll(extra).then((res) => {
+      res['data'].map((suplidor) => {
+        suplidor.documentos_de_identidad.map((docu) => {
+          if (docu.principal) suplidor.documento = docu.documento;
         });
-
-        this.listaSuplidores = res['data'];
-        const obj = { total: res['total_registros'], tabla: 'listaSuplidores' };
-        this.tServ.Func_total_paginas(obj);
+        suplidor.codigo = _.padStart(suplidor.id, 5, '0');
+        return suplidor;
       });
-    } catch (error) {
-      this.fun.toastError('Error buscando suplidores registrados.', 'ERROR');
-    }
+
+      this.listaSuplidores = res['data'];
+      const obj = { total: res['total_registros'], tabla: 'listaSuplidores' };
+      this.tServ.Func_total_paginas(obj);
+    });
   }
 
   marcarCheck(arg) {
     const radio = document.getElementById('identificacion-' + arg) as HTMLElement;
-    (radio as any).checked = true;
+    if (radio) (radio as any).checked = true;
     this.changeIdent(arg == 'cedula');
     this.setDocumentoPrincipal(arg);
   }
@@ -136,11 +132,9 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.isCreando = true;
     this.changeStateCampos(false);
 
-    this.changeIdent(false);
-
     setTimeout(() => {
       this.marcarCheck('rnc');
-      this.enfocarInput('campoRnc');
+      this.enfocarInput('rnc');
     }, 2);
   }
 
@@ -270,6 +264,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.changeStateCampos(true);
 
     this.patchDocumentos(item.ARG.documentos_de_identidad);
+    setTimeout(() => this.enfocarInput('rnc'), 1);
   }
 
   patchDocumentos(documentos) {

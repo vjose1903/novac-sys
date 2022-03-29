@@ -150,7 +150,7 @@
       </div>
       <div class="list {{ isCreando || suplidorSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
-          <h4>Listado Suplidores</h4>
+          <h4 classs="mb-0">Listado Suplidores</h4>
           <button [disabled]="suplidorSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
