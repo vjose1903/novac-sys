@@ -178,7 +178,6 @@ mdb-popover-container {
   font-size: 0.7rem;
 }
 
-
 ::ng-deep .my_sidebar {
   z-index: 9999 !important;
   padding: 0.5rem !important;
@@ -254,8 +253,12 @@ mdb-popover-container {
     box-shadow: 1.5px 0.5px 2.4px #8080806e;
 
     &.activa {
-      background-color: #b8b8b852;
-      box-shadow: 0px 0px 5.4px #0000006e !important;
+      background-color: #e0ed4952;
+      box-shadow: 0px 0px 5.4px #c3b71a !important;
+      &:hover{
+        background-color: #949c3752;
+
+      }
     }
 
     &:hover {

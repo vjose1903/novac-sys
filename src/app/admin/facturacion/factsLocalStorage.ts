@@ -11,7 +11,6 @@ export class FactsLocalStorage extends MixinClass {
   _sideBarOpened = false;
   activeIndex = 0;
   facturas_localStorage: any;
-  factGuardada;
 
   _toggleSidebar(where?, tipo_factura?) {
     this.activeIndex = tipo_factura === 'venta' ? 0 : 1;
@@ -124,14 +123,4 @@ export class FactsLocalStorage extends MixinClass {
 
     return nombre;
   }
-
-  checkFacturaGuardada() {
-    this.factGuardada = this.layServ.factura_guardada;
-  }
-
-  // pasarFacturaAfacturacion(fact) {
-  //   console.log('🚀 ~ FactsLocalStorage ~ pasarFacturaAfacturacion ~ fact', fact);
-  //   if (this.fun.isEmpty(this.factGuardada) || fact.archivo_id != this.factGuardada.archivo_id) {
-  //   }
-  // }
 }

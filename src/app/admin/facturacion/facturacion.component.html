@@ -335,7 +335,7 @@
             <span *ngIf="!countCantFactSaved('venta').disable"> &nbsp;({{ countCantFactSaved('venta').cant }})</span>
           </ng-template>
 
-          <ng-container *ngTemplateOutlet="cardFactura"> </ng-container>
+          <ng-container *ngTemplateOutlet="facturas_guardadas"> </ng-container>
         </p-tabPanel>
 
         <p-tabPanel
@@ -349,17 +349,17 @@
             Compra
             <span *ngIf="!countCantFactSaved('compra').disable"> &nbsp;({{ countCantFactSaved('compra').cant }})</span>
           </ng-template>
-          <ng-container *ngTemplateOutlet="cardFactura"> </ng-container>
+          <ng-container *ngTemplateOutlet="facturas_guardadas"> </ng-container>
         </p-tabPanel>
       </p-tabView>
 
-      <ng-template #cardFactura>
+      <ng-template #facturas_guardadas>
         <h6 *ngIf="facturas_localStorage?.length === 0" class="mt-3 no_fact">No tiene Facturas guardadas por el momento!!</h6>
-        <div *ngIf="facturas_localStorage?.length > 0">
-          <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="confirmarCambio(fact)">
+        <div *ngIf="facturas_localStorage?.length > 0" class="h-100">
+          <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="setFacturaArchivada(fact)">
             <div class="colorsito bg-raya-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}{{ fact?.action === 'update' ? '-orange' : '' }}"></div>
 
-            <div class="info_fact h-100 {{ factGuardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
+            <div class="info_fact h-100 {{ layServ?.factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
               <i class="fas fa-history {{ fact.FacturaAtrasada ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}"></i>
               <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}"></i>
               <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar factura" tooltipPosition="left"></i>

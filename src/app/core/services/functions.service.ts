@@ -72,6 +72,17 @@ export class FunctionService {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: pushAt
+  // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
+  // _________________________________________________________________________________________________
+  pushAt(arr, index, newItem) {
+    const copyArr = this.duplicarJson(arr);
+    arr.length = 0;
+    const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
+    newArr.forEach((item) => arr.push(item));
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: checkLongMillares
   // Descripcion : Esta funcion validad que los millares sean de 3 en 3
   // _________________________________________________________________________________________________
