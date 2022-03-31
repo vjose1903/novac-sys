@@ -10,8 +10,6 @@ export class LayoutService {
 
   constructor() {}
 
-  public factura_guardada;
-
   nextLogOut(nextValue) {
     this.LOGOUT.next(nextValue);
   }

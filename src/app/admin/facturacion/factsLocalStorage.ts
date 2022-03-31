@@ -11,6 +11,7 @@ export class FactsLocalStorage extends MixinClass {
   _sideBarOpened = false;
   activeIndex = 0;
   facturas_localStorage: any;
+  factura_guardada;
 
   _toggleSidebar(where?, tipo_factura?) {
     this.activeIndex = tipo_factura === 'venta' ? 0 : 1;
@@ -57,31 +58,31 @@ export class FactsLocalStorage extends MixinClass {
     }, 20);
   }
 
-  quitarFacturaGuardada(params?) {
-    const fact = params.body;
+  quitarFacturaGuardada(archivo_id) {
     let index;
     const allFacturas = this.fun.getFacturasguardadas();
+    console.log('archivo_id ', archivo_id);
 
-    if (fact) index = _.findIndex(allFacturas, (o: any) => o.archivo_id === fact?.archivo_id);
+    if (archivo_id) {
+      if (this.factura_guardada.archivo_id == archivo_id) this.factura_guardada = undefined;
+      index = _.findIndex(allFacturas, (item: any) => item.archivo_id === archivo_id);
 
-    _.pullAt(allFacturas, index);
+      _.pullAt(allFacturas, index);
 
-    this.fun.setFacturasGuardadas(allFacturas);
+      console.log('this ', this);
+      this.fun.setFacturasGuardadas(allFacturas);
 
-    // if (params && params.quien_llamo !== 'layout') {
-    //   this.layServ.nextSacar({ quien_llamo: 'layout', body: this.layServ.factura_guardada });
-    // }
-    this.getFacturasGuardadas();
+      this.getFacturasGuardadas();
+    }
   }
 
   abrirModalFacturaGuardada(fact, e) {
-    const obj = { texto_modal: 'Estas seguro que desea quitar esta factura de la lista.', archivo_id: fact.archivo_id };
     const confirmationObj = {
       id: 'quitar_factura',
-      texto: obj.texto_modal,
+      texto: 'Estas seguro que desea quitar esta factura de la lista.',
       header: 'Confirmación',
       siFunction: (instance) => {
-        this.quitarFacturaGuardada({ body: { archivo_id: obj.archivo_id } });
+        this.quitarFacturaGuardada(fact.archivo_id);
         instance.closeModal(instance.id, 'quitar_factura');
       },
       width: '30rem',
@@ -90,29 +91,8 @@ export class FactsLocalStorage extends MixinClass {
 
     e.stopPropagation();
   }
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p>
-      ${obj.texto}
-    </p>`,
-      botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance, obj.id), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
-  }
+
+  confirmationModal(obj) {}
 
   getNombreFacturaGuardada(fact: any) {
     let nombre = '';
