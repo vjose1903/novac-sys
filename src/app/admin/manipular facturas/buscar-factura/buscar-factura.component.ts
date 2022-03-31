@@ -155,6 +155,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
+      arg['verificar'] = true;
       this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
@@ -306,7 +307,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
     return res;
   }
-
 
   async pedirFactura(campo, valor, e) {
     try {
