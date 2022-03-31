@@ -309,9 +309,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
 
   async pedirFactura(campo, valor, e) {
-    console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ valor', valor);
-    console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ campo', campo);
-    console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ e', e);
     try {
       const fechaA = moment().format('YYYY-MM-DD');
 
@@ -355,8 +352,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       this.tServ.Func_total_paginas(obj);
       this.facturas = this.fun.duplicarJson(busqueda['data']);
-      console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ this.facturas', this.facturas);
-      console.log('🚀 ~ BuscarFacturaComponent ~ pedirFactura ~ prueba de verdad', this.campo == campos.numeroComprobante || (campo == campos.NumeroFactura && this.tipo_factura_id != '0'));
 
       if (this.facturas.length > 0) {
         if (this.campo == campos.numeroComprobante || (campo == campos.NumeroFactura && this.tipo_factura_id != '0')) {
@@ -573,10 +568,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   mostrarFactura(dataFactura, type, dataDB?, continuar?) {
-    console.log('🚀 ~ BuscarFacturaComponent ~ mostrarFactura ~ dataDB', dataDB);
-    console.log('🚀 ~ BuscarFacturaComponent ~ mostrarFactura ~ type', type);
-    console.log('🚀 ~ BuscarFacturaComponent ~ mostrarFactura ~ dataFactura', dataFactura);
-    console.log('🚀 ~ BuscarFacturaComponent ~ mostrarFactura ~ continuar', continuar);
     const toPDFData = { data: dataFactura, type: type };
     const titulo = type === 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
 
@@ -608,6 +599,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           },
         };
 
+        // TODO: poner por aqui que si es solo_ver agregue el boton de editar aqui abajo dejo lo que tiene que hacer el boton de editar
+
+        /*
+          this.facturaClass.getAll({ afterPath: `custom/canUpdate/${this.facturaSelected.id}` }).then((res) => {
+              setTimeout(() => this.editarFactura(), 10);
+            });
+        */
         if (this.Para == ' Visualizar' || type == 'nota') {
           if (type == 'nota') {
             obj_modal.botones.dinamico.push({
