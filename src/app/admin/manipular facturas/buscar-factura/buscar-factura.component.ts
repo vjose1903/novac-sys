@@ -307,7 +307,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     return res;
   }
 
-
   async pedirFactura(campo, valor, e) {
     try {
       const fechaA = moment().format('YYYY-MM-DD');
@@ -616,12 +615,22 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             });
           }
 
+          const editButton = {
+            clase: 'btn btn-verde ml-2',
+            function: (instance) => {
+              this.editarFactura();
+              instance.closeModal(instance.id, 'mostrarFactura');
+            },
+            label: 'Editar',
+            disable: false,
+          };
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-amarillo ml-2',
             function: (instance) => this.reimprimirFactura({ data: dataFactura, type: type }, instance),
             label: 'Reimprimir',
             disable: false,
           });
+          if (this.buscarPara == 'solo_ver') obj_modal.botones.dinamico.push(editButton);
         }
         this.handleModalForm(obj_modal);
       }
