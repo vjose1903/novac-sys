@@ -27,8 +27,8 @@
 .mainContent {
   display: grid;
   grid-template-areas:
-    'cantidades'
-    'cuerpo';
+    "cantidades"
+    "cuerpo";
   grid-template-rows: min-content auto;
   > .cantidades {
     grid-area: cantidades;
@@ -38,8 +38,8 @@
     position: relative;
     display: grid;
     grid-template-areas:
-    'divFiltro'
-    'divTabla';
+      "divFiltro"
+      "divTabla";
     grid-template-rows: min-content auto;
 
     > .divFiltro {
@@ -48,6 +48,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #a5a5a5;
     }
     > .divTabla {
       grid-area: divTabla;
