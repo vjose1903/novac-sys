@@ -19,9 +19,8 @@ export class modalClass extends LayoutClass {
   subArticuloFiltro: Subscription;
   subObj: Subscription;
   subEsc: Subscription;
-  subRefresh: Subscription;
   subNoFiltro: Subscription;
-  subSacar: Subscription;
+
 
   _lista = [];
 
@@ -53,21 +52,12 @@ export class modalClass extends LayoutClass {
       this.subArticuloFiltro = this.mServ.ARTICULOFILTRADOPORCODIGO.subscribe((res) => this.run_subscribe('ARTICULOFILTRADOPORCODIGO', res));
     }
 
-
     if (this._lista.includes('pressEsc')) {
       this.subEsc = this.mServ.PRESSESC.subscribe((res) => this.run_subscribe('PRESSESC', res));
     }
 
-    if (this._lista.includes('refreshFacturas')) {
-      // this.subRefresh = layServ.REFRESFACTURAS.subscribe((res) => this.run_subscribe('REFRESHFACTURAS', res));
-    }
-
     if (this._lista.includes('noFiltro')) {
       this.subNoFiltro = this.mServ.NOFILTRO.subscribe((res) => this.run_subscribe('NOFILTRO', res));
-    }
-
-    if (this._lista.includes('sacarFacturas')) {
-      // this.subRefresh = layServ.SACARFACTURA.subscribe((res) => this.run_subscribe('SACARFACTURA', res));
     }
   }
 
@@ -102,13 +92,6 @@ export class modalClass extends LayoutClass {
           _this.noFiltroResponse(res);
           break;
 
-        case 'REFRESHFACTURAS':
-          if (res) _this.refreshResponse(res);
-          break;
-
-        case 'SACARFACTURA':
-          if (res) _this.sacarResponse(res);
-          break;
       }
     }
   }
@@ -133,7 +116,6 @@ export class modalClass extends LayoutClass {
   noFiltroResponse(res) {}
   objDevueltoResponse(res) {}
   refreshResponse(res) {}
-  sacarResponse(res) {}
   reporte(data: any) {}
 
   _destroy_modal() {
@@ -147,11 +129,7 @@ export class modalClass extends LayoutClass {
 
     if (this._lista.includes('pressEsc') && this.subEsc) this.subEsc.unsubscribe();
 
-    if (this._lista.includes('refreshFacturas') && this.subRefresh) this.subRefresh.unsubscribe();
-
     if (this._lista.includes('noFiltro') && this.subNoFiltro) this.subNoFiltro.unsubscribe();
-
-    if (this._lista.includes('sacarFacturas') && this.subSacar) this.subSacar.unsubscribe();
 
     if (this._lista.includes('')) {
     }

@@ -75,7 +75,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ngOnInit() {
     this.initVariables();
-    this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal', 'refreshFacturas', 'sacarFacturas'] });
+    this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal',] });
 
     const token = this.fun.getAuthToken();
 
@@ -156,13 +156,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.cdRef.detectChanges();
   }
 
-  // refreshResponse() {
-  //   this.getFacturasGuardadas();
-  // }
 
-  // sacarResponse(res) {
-  //   this.quitarFacturaGuardada(res);
-  // }
 
   // =================================================================================
   // CERRAR SESION

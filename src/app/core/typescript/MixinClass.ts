@@ -3,7 +3,7 @@ import * as moment from '../javascript/moment';
 import { ModalClass } from '../../admin/components/new_modal/modal-class';
 import { SingletonService } from '../services/singleton.service';
 
-type lista_sub = 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'refreshFacturas' | 'sacarFacturas' | 'noFiltro';
+type lista_sub = 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'noFiltro';
 
 interface mixinInit {
   component?: String;
