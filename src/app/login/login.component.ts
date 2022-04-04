@@ -111,11 +111,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
           this.router.navigateByUrl('/admin/dashboard');
         })
         .catch((error) => {
-          if (error.status === 0) {
-            this.fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
-          } else {
-            this.fun.toastError('Datos de acceso proporcionados estan incorrectos', 'ERROR');
-          }
+          if (error.status === 0) this.fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
         });
     }
   }
