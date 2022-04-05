@@ -8,6 +8,7 @@ import { TablasService } from '../../components/tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 import * as $ from 'jquery';
+import { OtrosCostosFormComponent } from './otros-costos-form/otros-costos-form.component';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -679,6 +680,21 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         this.borrar();
       });
     }
+  }
+
+  openOtrosCostos() {
+    this.handleModalForm({
+      id: 'mantenimiento_otros_costos',
+      header: 'Mantenimiento de otros costos',
+      width: '1000px',
+      height: '650px',
+      component: OtrosCostosFormComponent,
+      botones: {
+        aceptar: { show: false },
+        cancelar: { show: false },
+        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cerrar'), label: 'CERRAR', disable: false }],
+      },
+    });
   }
 
   nuevoRegistro() {

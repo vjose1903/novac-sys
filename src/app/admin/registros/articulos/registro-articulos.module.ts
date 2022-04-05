@@ -9,9 +9,10 @@ import { TablasModule } from '../../components/tablas/tablas.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
+import { OtrosCostosFormComponent } from './otros-costos-form/otros-costos-form.component';
 
 @NgModule({
-  declarations: [RegistroArticulosComponent],
-  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule, PipesModule, NgxBootstrapModule],
+  declarations: [RegistroArticulosComponent, OtrosCostosFormComponent],
+  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule, PipesModule, NgxBootstrapModule, DirectivesModule],
 })
 export class RegistroArticulosModule {}

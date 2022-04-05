@@ -160,6 +160,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     if (reset) this.isCreando = true;
     this.boton = 'Registrar';
   }
+
   selectPropietario() {
     if (this.form.controls.user_id.value === -1) {
       this.form.controls.nombre_no_empleado.enable();

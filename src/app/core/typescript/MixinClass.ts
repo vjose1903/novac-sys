@@ -126,6 +126,11 @@ export class MixinClass extends ModalClass {
   }
 
   eliminarRegistro(obj) {
+    const noFunction = (instance: any) => {
+      console.log('instance ', instance);
+
+      instance.closeModal('borrar', 'cancelar');
+    };
     this.handleModalForm({
       id: 'borrar',
       header: 'Confirmar',
@@ -135,7 +140,7 @@ export class MixinClass extends ModalClass {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal('borrar', 'cancelar'), label: 'NO', disable: false },
+          { clase: 'btn btn-blanco mr-2', function: (instance) => noFunction(instance), label: 'NO', disable: false },
           {
             clase: 'btn btn-verde',
             function: (instance) => {

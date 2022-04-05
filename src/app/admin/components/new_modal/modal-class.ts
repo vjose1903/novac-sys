@@ -9,8 +9,8 @@ export interface ModalI {
   btn_aceptar(): any;
 }
 export interface ButtonsI {
-  aceptar: { show: boolean; disable: boolean };
-  cancelar: { show: boolean; disable: boolean };
+  aceptar: { show: boolean; disable?: boolean };
+  cancelar: { show: boolean; disable?: boolean };
   dinamico?: Array<{ btn_id?: string; clase: string; label: string; function?: Function; function_in_other_component?: string; disable: boolean }>;
 }
 

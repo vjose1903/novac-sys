@@ -639,7 +639,10 @@
       <div class="list {{ isCreando || articuloSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado articulos</h4>
-          <button [disabled]="articuloSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <div class="d-flex">
+            <button (click)="openOtrosCostos()" class="btn btn-gris mr-2">Otros costos</button>
+            <button [disabled]="articuloSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          </div>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <app-tablas

@@ -45,9 +45,6 @@ export class NewModalComponent implements OnInit {
     this.subConfig = MODALCONFIG.subscribe((res) => {
       if (res && res.show) {
         this.renderizarComponente(res);
-        setTimeout(() => {
-          console.warn('BOTONES: ', this.modalsConfig);
-        }, 500);
       } else {
         this.resetConfig(res.id, res.accion);
       }
@@ -56,10 +53,13 @@ export class NewModalComponent implements OnInit {
 
   resetConfig(id_, accion) {
     const modal = _.find(this.modalsConfig, (config) => config.id === id_);
+    console.log('modal ', modal);
+
     const data = { modal: modal, accion: accion };
     if (modal) modal.onHide(data);
 
     this.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
+    console.log('this.modalsConfig ', this.modalsConfig);
   }
 
   handleConfig(config) {
