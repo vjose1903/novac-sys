@@ -2,6 +2,7 @@ import { EventEmitter, OnChanges } from '@angular/core';
 import { Component, OnInit, OnDestroy, Input, Output, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
+import { fun } from '../../../../core/services/functions.service';
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
@@ -42,7 +43,7 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
   }
 
   ngOnInit() {
-    this.inputs = this.fun.duplicarJson(this.inputs);
+    this.inputs = fun.duplicarJson(this.inputs);
 
     this.inputs.map(async (arti) => {
       arti.customStyles = {

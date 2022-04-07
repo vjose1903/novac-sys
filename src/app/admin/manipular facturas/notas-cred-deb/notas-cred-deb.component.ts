@@ -12,6 +12,7 @@ import { NcfC } from '../../registros/ncf/ncf';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { NotaC } from './notas';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -143,7 +144,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         let tempFactData: FacturasI[];
 
         tempFactData = res_factura['data'];
-        this.fun.logRed('this.factura --> ', tempFactData);
 
         // facturas_aplicadas / custom / get_cantidad_devuelto / 13806, 13808;
         this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.idsFacturas}` }).then((res) => {
@@ -238,7 +238,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     if (infoTable.cambio === 'cant_nota') {
       if (this.tipoNota === 'credito') {
         if (entidad.cant_nota > entidad.cant) {
-          this.fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
+          fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
           this.enfocarInput(`input-${infoTable.id_tabla}-${infoTable.index}`);
           setTimeout(() => {
             entidad.cant_nota = entidad.cant;
@@ -289,7 +289,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   formatoNumero(num) {
-    return this.fun.formatearNumero(this.fun.redondearAdos(num));
+    return fun.formatearNumero(fun.redondearAdos(num));
   }
   formatoNumeroFactura(num) {
     return _.padStart(num, 8, '0');
@@ -319,10 +319,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   // =============================================
   imprimirFactura() {
     if (this.detalleNota.length === 0) {
-      this.fun.toastWarning('Nota de ' + this.tipoNota + ' no puede estar vacía.', 'Aviso');
+      fun.toastWarning('Nota de ' + this.tipoNota + ' no puede estar vacía.', 'Aviso');
     } else {
       if (this.TOTAL === 0) {
-        this.fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
+        fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
       } else {
         const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota, tipo__: 'no_devuelta' };
 
@@ -378,12 +378,12 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           articulo_id: element.articulo_id,
           cantidad: element.cant_nota,
           cantidad_en_unidades: element.cantidad_en_unidades_nota,
-          total: this.fun.desformatear(element.total_nota),
+          total: fun.desformatear(element.total_nota),
           descuento_valor: element.descuento_valor ? (element.descuento_valor !== null ? element.descuento_valor : 0) : 0,
           descuento_porciento: element.descuento_porciento ? (element.descuento_porciento !== null ? element.descuento_porciento : 0) : 0,
           itbis: 0,
           unidad: unidad_,
-          precio: this.fun.desformatear(element.precio),
+          precio: fun.desformatear(element.precio),
           calcular_saco: element.calcular_saco,
         };
 
@@ -475,7 +475,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           total: this.totalIndividual(factura),
           detalles_facturas_notas: _.filter(factura.detalle_facturas, (data) => data.select == true && data.cant_nota > 0).map((detalle) => {
             let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades', 'itbis', 'costo', 'precio', 'total_nota', 'descuento']);
-            objDetalleTemp['total'] = this.fun.desformatear(objDetalleTemp.total_nota);
+            objDetalleTemp['total'] = fun.desformatear(objDetalleTemp.total_nota);
             objDetalleTemp['cantidad'] = detalle.cant_nota;
             delete objDetalleTemp.total_nota;
             objDetalleTemp['detalle_factura_id'] = detalle.id;
@@ -505,11 +505,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this.pdfServ
       .generatePdf({ oPdf: obj, imprimir: true })
       .then(async (res) => {
-        if (res.status === 'si') this.fun.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
-        else this.fun.toastError(res.msg, 'ERROR');
+        if (res.status === 'si') fun.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
+        else fun.toastError(res.msg, 'ERROR');
 
         this.layServ.nextCheckCuadreToday(true);
       })
-      .catch((err) => this.fun.toastError(err.msg, 'ERROR'));
+      .catch((err) => fun.toastError(err.msg, 'ERROR'));
   }
 }

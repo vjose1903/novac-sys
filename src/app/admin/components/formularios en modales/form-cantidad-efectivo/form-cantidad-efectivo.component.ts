@@ -3,6 +3,7 @@ import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalI } from '../../new_modal/modal-class';
+import { fun } from '../../../../core/services/functions.service';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
@@ -53,7 +54,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     }
     if (campo === 'send') {
       if (this.tipo !== 'no_devuelta' && this.efectivo < this.data.total_factura) {
-        this.fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
+        fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         this.enfocarInput('inputEfectivo');
       } else {
         this.btn_aceptar();
@@ -62,7 +63,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   formatoNumero(num) {
-    return this.fun.formatearNumero(this.fun.redondearAdos(num));
+    return fun.formatearNumero(fun.redondearAdos(num));
   }
 
   checkNumbers(arg) {
@@ -106,7 +107,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       }
       //
       if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
-        this.fun.toastError('Valor introducido es invalido', 'ERROR');
+        fun.toastError('Valor introducido es invalido', 'ERROR');
         this.enfocarInput(input);
       } else {
         //
@@ -128,7 +129,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
           precioTEMP = _.join(temp, '.');
         }
 
-        const numeroFormateado = this.fun.formatearNumero(this.fun.redondearAdos(precioTEMP));
+        const numeroFormateado = fun.formatearNumero(fun.redondearAdos(precioTEMP));
 
         this.data.devuelta = numeroFormateado;
         this.efectivo = numeroFormateado;
@@ -137,7 +138,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
   calcularDevueta() {
     const total = this.data.total_factura;
-    const efectivo = this.fun.desformatear(this.efectivo);
+    const efectivo = fun.desformatear(this.efectivo);
     const dev = efectivo - total;
     this.devuelta = this.formatoNumero(dev);
   }
@@ -147,8 +148,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
   btn_aceptar() {
     // const total = this.data.total_factura;
-    const devuelta_ = this.fun.desformatear(this.devuelta);
-    const efectivo = this.fun.desformatear(this.efectivo);
+    const devuelta_ = fun.desformatear(this.devuelta);
+    const efectivo = fun.desformatear(this.efectivo);
     const obj = {
       dinero: efectivo,
       devuelta: this.devuelta ? devuelta_ : 0,
@@ -158,13 +159,13 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
     if (this.validarForm()) {
-      this.fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
+      fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
     } else {
       if (this.factura_de === 'compra') {
         if (this.cambiar_articulos !== undefined) {
           modal.getDataModal({ obj, modal_id: this.modal.component_id });
         } else {
-          this.fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
+          fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
         }
       } else {
         modal.getDataModal({ obj, modal_id: this.modal.component_id });
@@ -178,8 +179,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   validarForm(from?): boolean {
     const total = this.data.total_factura;
-    const devuelta_ = this.fun.desformatear(this.devuelta);
-    const efectivo = this.fun.desformatear(this.efectivo);
+    const devuelta_ = fun.desformatear(this.devuelta);
+    const efectivo = fun.desformatear(this.efectivo);
     const validate = this.tipo !== 'no_devuelta' && total > efectivo;
 
     if (from == 'input') {

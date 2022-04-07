@@ -8,6 +8,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
 import { SuplidorC } from './suplidores';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -88,7 +89,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(this.fun.Capitalice(arg));
+    campo.setValue(fun.Capitalice(arg));
   }
 
   async getSuplidores(e) {
@@ -145,7 +146,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         if (!_.endsWith(formulario[this.doc_principal], '_')) {
           const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
           if (this.doc_principal == 'cedula') {
-            if (this.fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
+            if (fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
           } else this.enfocarInput(campo);
         }
       } else this.enfocarInput(campo);
@@ -186,14 +187,14 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
           return;
         }
 
-        this.fun
+        fun
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
           .then((res) => {
             if (res['data'].length) {
               const is_suplidor = _.find(res['data'], (item) => item.persona_is === 'Suplidor');
 
-              if (this.fun.hasValue(is_suplidor) && is_suplidor.persona.estado) {
-                this.fun.toastError(`${_.capitalize(tipo)} pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR');
+              if (fun.hasValue(is_suplidor) && is_suplidor.persona.estado) {
+                fun.toastError(`${_.capitalize(tipo)} pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR');
 
                 const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
                 this.doc_is_cedula = documento_original.descripcion == 'cedula' ? true : false;
@@ -204,7 +205,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
                 return;
               }
 
-              const persona = this.fun.hasValue(is_suplidor) ? is_suplidor.persona : _.head(res['data']).persona;
+              const persona = fun.hasValue(is_suplidor) ? is_suplidor.persona : _.head(res['data']).persona;
 
               this.form.patchValue(persona);
 
@@ -259,7 +260,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.form.patchValue(item.ARG);
     this.documentos_de_identidad = item.ARG.documentos_de_identidad;
     this.editando = true;
-    this.suplidorSelected = this.fun.duplicarJson(item.ARG);
+    this.suplidorSelected = fun.duplicarJson(item.ARG);
 
     this.changeStateCampos(true);
 
@@ -309,11 +310,11 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       return element;
     });
 
-    formulario.documentos_de_identidad = _.filter(documentos_identidad, (doc) => this.fun.hasValue(doc.documento));
+    formulario.documentos_de_identidad = _.filter(documentos_identidad, (doc) => fun.hasValue(doc.documento));
     formulario.estado = true;
 
     if (!this.form.controls[this.doc_principal].value) {
-      this.fun.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
+      fun.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
       // paso todas las validaciones
     } else {
       this.suplidorClass.createUpdateOne(formulario).then((res) => {

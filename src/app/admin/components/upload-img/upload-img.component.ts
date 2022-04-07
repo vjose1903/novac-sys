@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { FunctionService } from '../../../core/services/functions.service';
+import { fun } from '../../../core/services/functions.service';
 import { RequestC } from '../../../core/typescript/requests';
 
 @Component({
@@ -19,7 +19,7 @@ export class UploadImgComponent implements OnInit {
   @Input() id;
   @Output() getPhotoData = new EventEmitter<any>();
 
-  constructor(private fun: FunctionService) {}
+  constructor() {}
 
   ngOnInit() {}
 
@@ -39,7 +39,7 @@ export class UploadImgComponent implements OnInit {
       this.requestClass.createOne(obj, { afterPath: 'imagenes' }).then((res) => {
         console.log('res ', res);
       });
-    } else this.fun.toastError('Debe de seleccionar una foto primero', 'ERROR');
+    } else fun.toastError('Debe de seleccionar una foto primero', 'ERROR');
   }
 
   onFileChange(ev) {

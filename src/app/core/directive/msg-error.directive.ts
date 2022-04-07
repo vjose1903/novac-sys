@@ -1,7 +1,7 @@
 import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import * as _ from 'lodash';
-import { FunctionService } from '../services/functions.service';
+import { fun } from '../services/functions.service';
 import { SingletonService } from '../services/singleton.service';
 
 @Directive({
@@ -15,7 +15,6 @@ export class MsgErrorDirective {
   id_msg;
   msgContainer;
 
-  fun = SingletonService.fun;
   isSubscription = false;
 
   constructor(private el: ElementRef) {}
@@ -83,7 +82,7 @@ export class MsgErrorDirective {
 
           const errors = this.form.controls[this.id].errors;
 
-          if (this.fun.hasValue(errors) && !this.form.controls[this.id].valid && (this.form.controls[this.id].dirty || this.form.controls[this.id].touched)) {
+          if (fun.hasValue(errors) && !this.form.controls[this.id].valid && (this.form.controls[this.id].dirty || this.form.controls[this.id].touched)) {
             response.render = true;
 
             if (errors.required) response.msg = 'Este campo es requerido.';

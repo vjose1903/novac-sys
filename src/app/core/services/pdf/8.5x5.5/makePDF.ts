@@ -11,7 +11,7 @@ import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
 import { config_conduce } from './configuraciones/conduce';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
-import { FunctionService } from '../../functions.service';
+import { fun } from '../../functions.service';
 
 const configuraciones = {
   notas: config_notas,
@@ -22,7 +22,6 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
-  const fun = SingletonService.fun;
   const is_compra = data?.FACTURA_DE === 'compra' ? true : false;
 
   const is_suplidor = is_compra;
@@ -34,7 +33,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
     pageSize: configuration.pageSize,
     pageMargins: configuration.pageMargins,
     header: (currentPage, pageCount, pageSize) => cabeceraPDF({ data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf }),
-    content: contenidoPDF({ fun, data, is_suplidor, configApp, tipo_pdf }),
+    content: contenidoPDF({ data, is_suplidor, configApp, tipo_pdf }),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
@@ -89,8 +88,8 @@ function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSi
 // CONTENIDO
 // ==========================================================================================================================================================
 
-function contenidoPDF(args: { fun: FunctionService; data: any; is_suplidor: any; configApp: ConfigI; tipo_pdf: any }) {
-  const { fun, data, is_suplidor, configApp, tipo_pdf } = args;
+function contenidoPDF(args: { data: any; is_suplidor: any; configApp: ConfigI; tipo_pdf: any }) {
+  const { data, is_suplidor, configApp, tipo_pdf } = args;
 
   const configuration = configuraciones[tipo_pdf];
 
@@ -131,7 +130,7 @@ function contenidoPDF(args: { fun: FunctionService; data: any; is_suplidor: any;
 
   const detalle_resumen_stack = _.last(content);
 
-  detalle_resumen_stack.stack.push(parseFirmasPdf({ tipo_pdf, fun }));
+  detalle_resumen_stack.stack.push(parseFirmasPdf({ tipo_pdf }));
 
   // cliente
 
@@ -141,8 +140,8 @@ function contenidoPDF(args: { fun: FunctionService; data: any; is_suplidor: any;
   return content;
 }
 
-function parseFirmasPdf(args: { fun: FunctionService; tipo_pdf: any }) {
-  const { fun, tipo_pdf } = args;
+function parseFirmasPdf(args: { tipo_pdf: any }) {
+  const { tipo_pdf } = args;
 
   if (!firmas[tipo_pdf].length) return [{ text: '' }];
 
@@ -331,10 +330,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
       key: 'direccion',
       item: {
         alignment: 'left',
-        text: [
-          { text: 'Dirección            : ', bold: true, style: 'letra12' },
-          is_suplidor ? { text: data?.suplidor.direccion || '', style: 'letra12' } : { text: data?.cliente.direccion || '', style: 'letra12' },
-        ],
+        text: [{ text: 'Dirección            : ', bold: true, style: 'letra12' }, is_suplidor ? { text: data?.suplidor.direccion || '', style: 'letra12' } : { text: data?.cliente.direccion || '', style: 'letra12' }],
       },
     },
   ];

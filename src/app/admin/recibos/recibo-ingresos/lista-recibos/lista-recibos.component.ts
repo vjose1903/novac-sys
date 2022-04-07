@@ -9,6 +9,7 @@ import { ReciboC } from '../../recibos';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../../electron/shared-electron-angular';
 import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
+import { fun } from '../../../../core/services/functions.service';
 
 @Component({
   selector: 'app-lista-recibos',
@@ -125,7 +126,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
       this.reciboClass.getAll(extra).then((res) => {
         res['data'] = this.mapeoRecibos(res['data']);
-        this.lista_recibos = this.fun.duplicarJson(res['data']);
+        this.lista_recibos = fun.duplicarJson(res['data']);
 
         const obj = { total: res['total_registros'], tabla: 'listaRecibos' };
         this.tServ.Func_total_paginas(obj);
@@ -241,10 +242,10 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     this.pdfServ
       .imprimirBase64(obj)
       .then(async (res) => {
-        if (res['status'] === 'si') this.fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
-        else this.fun.toastError(res['msg'], 'ERROR');
+        if (res['status'] === 'si') fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
+        else fun.toastError(res['msg'], 'ERROR');
       })
-      .catch((err) => this.fun.toastError(err['msg'], 'ERROR'));
+      .catch((err) => fun.toastError(err['msg'], 'ERROR'));
   }
 
   async anularRecibo(id) {

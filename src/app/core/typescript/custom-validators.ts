@@ -1,5 +1,6 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import * as _ from 'lodash';
+import { fun } from '../services/functions.service';
 import { SingletonService } from '../services/singleton.service';
 
 export class customValidators {
@@ -11,7 +12,7 @@ export class customValidators {
       if (!_.endsWith(control.value, '_')) {
         const docSinGuiones = _.join(_.split(control.value, '-'), '');
 
-        if (SingletonService.fun.ValidaCedula(docSinGuiones)) is_correct = true;
+        if (fun.ValidaCedula(docSinGuiones)) is_correct = true;
       }
 
       return is_correct ? null : { invalidCedula: { value: control.value } };

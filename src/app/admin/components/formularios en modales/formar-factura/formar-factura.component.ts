@@ -5,8 +5,8 @@ import * as moment from '../../../../core/javascript/moment';
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { SingletonService } from '../../../../core/services/singleton.service';
 import { ConfigI } from '../../../../core/typescript/config-interface';
-import { FunctionService } from '../../../../core/services/functions.service';
 import { ModalI } from '../../new_modal/modal-class';
+import { fun } from '../../../../core/services/functions.service';
 @Component({
   selector: 'app-formar-factura',
   templateUrl: './formar-factura.component.html',
@@ -15,7 +15,6 @@ import { ModalI } from '../../new_modal/modal-class';
 export class FormarFacturaComponent implements OnInit, ModalI {
   // @Input() factura;
 
-  fun = SingletonService.fun;
   configServ = SingletonService.configServ;
   config: ConfigI;
   constructor() {}
@@ -38,7 +37,7 @@ export class FormarFacturaComponent implements OnInit, ModalI {
   }
 
   formatoNumero(num) {
-    return this.fun.formatearNumero(this.fun.redondearAdos(num));
+    return fun.numFormatTwoDecimals(num);
   }
 
   formatoNumeroFactura(num) {

@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { SingletonService } from '../../../core/services/singleton.service';
-import { GLOBAL, MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
+import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
-import { FunctionService } from '../../../core/services/functions.service';
 import { MessageTask } from '../../../core/models/message-task';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
 import { ConfigI } from '../../../core/typescript/config-interface';
+import { fun } from '../../../core/services/functions.service';
+import { SharedService } from '../../../core/services/shared.service';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
@@ -35,12 +36,12 @@ export class ConfiguracionesComponent implements OnInit {
 
   configCopy;
 
-  constructor(private fb: FormBuilder, private fun: FunctionService) {}
+  constructor(private fb: FormBuilder, public sharedServ: SharedService) {}
 
   ngOnInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
       this.config = config;
-      this.configCopy = this.fun.duplicarJson(config);
+      this.configCopy = fun.duplicarJson(config);
       this.createForm(config);
     });
   }
@@ -86,7 +87,7 @@ export class ConfiguracionesComponent implements OnInit {
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(this.fun.Capitalice(arg));
+    campo.setValue(fun.Capitalice(arg));
   }
 
   saltar(input) {}
@@ -157,18 +158,18 @@ export class ConfiguracionesComponent implements OnInit {
       array_replacement: array_replacement,
     };
 
-    if (this.fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
+    if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
 
     const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, objChange);
 
     this._ipc
       .sendTask(task)
       .then((res: string) => {
-        this.fun.nextCanToast(true);
-        this.fun.toastSuccess('Configuración de la aplicación cambiada correctamente.', 'CORRECTO');
+        this.sharedServ.nextCanToast(true);
+        fun.toastSuccess('Configuración de la aplicación cambiada correctamente.', 'CORRECTO');
         setTimeout(() => {
           MODIFIED_CONFIG_FILE.next(res);
-          this.fun.nextCanToast(false);
+          this.sharedServ.nextCanToast(false);
           this.salir();
         }, 250);
       })
@@ -181,7 +182,7 @@ export class ConfiguracionesComponent implements OnInit {
 
     for (let i = 0; i < keysConfig.length; i++) {
       const key = keysConfig[i];
-      if (this.fun.hasValue(copyObjLevel[key])) {
+      if (fun.hasValue(copyObjLevel[key])) {
         if (typeof copyObjLevel[key] == 'string') {
           if (copyObjLevel[key] != obj[key]) {
             if (logosKeys.includes(key)) {

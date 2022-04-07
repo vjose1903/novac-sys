@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FunctionService } from '../../../core/services/functions.service';
+import { fun } from '../../../core/services/functions.service';
 import { ModalI } from '../../components/new_modal/modal-class';
-
 @Component({
   selector: 'app-detalle-nota',
   templateUrl: './detalle-nota.component.html',
   styleUrls: ['./detalle-nota.component.scss'],
 })
 export class DetalleNotaComponent implements OnInit, ModalI {
-  constructor(private fun: FunctionService) {}
+  constructor() {}
   modal: {};
   inputs: any;
   tabIndex = 0;
@@ -39,7 +38,7 @@ export class DetalleNotaComponent implements OnInit, ModalI {
   }
 
   numFormat(str) {
-    return this.fun.numFormatTwoDecimals(str);
+    return fun.numFormatTwoDecimals(str);
   }
 
   btn_aceptar() {

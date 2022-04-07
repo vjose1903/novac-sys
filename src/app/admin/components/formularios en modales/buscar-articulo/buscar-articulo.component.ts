@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ModalI } from '../../new_modal/modal-class';
 import { TablasService } from '../../tablas/tablas.service';
 import * as _ from 'lodash';
-import { FunctionService } from '../../../../core/services/functions.service';
+import { fun } from '../../../../core/services/functions.service';
 @Component({
   selector: 'app-buscar-articulo',
   templateUrl: './buscar-articulo.component.html',
@@ -12,7 +11,7 @@ import { FunctionService } from '../../../../core/services/functions.service';
 })
 export class BuscarArticuloComponent implements OnInit, ModalI {
   articuloClass = new ArticuloC();
-  constructor(private tServ: TablasService, private fun: FunctionService) {}
+  constructor(private tServ: TablasService) {}
   dataFiltro;
   modal: any = {};
   inputs: any;
@@ -28,7 +27,7 @@ export class BuscarArticuloComponent implements OnInit, ModalI {
   }
 
   async buscarArticulos(event, where?) {
-    const copyData = this.fun.duplicarJson(this.dataFiltro);
+    const copyData = fun.duplicarJson(this.dataFiltro);
     const page = event.page;
     const per_page = event.per_page;
     // let palabra_a_buscar = event.searchText || this.inputs.filtrarArticulo || ' ';

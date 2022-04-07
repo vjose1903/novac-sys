@@ -6,6 +6,7 @@ import { SingletonService } from '../services/singleton.service';
 import * as _ from 'lodash';
 import { AppConfig } from '../../../environments/environment';
 import { ConfigI } from './config-interface';
+import { fun } from '../services/functions.service';
 
 export interface extraArgs {
   afterPath?: any;
@@ -22,7 +23,6 @@ export interface responseModel<T> {
 
 export class CrudG<T> {
   private http = SingletonService.http;
-  protected fun = SingletonService.fun;
 
   constructor(private path: string) {}
 
@@ -101,14 +101,14 @@ export class CrudG<T> {
 
   private getUrlInUse() {
     const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
-    if (!configApp.usa_url_principal) this.fun.logYellow('::::: USANDO LA URL DE RESPALDO :::::');
+    if (!configApp.usa_url_principal) fun.logYellow('::::: USANDO LA URL DE RESPALDO :::::');
 
     const url = configApp.is_development ? AppConfig.url_server : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     return url;
   }
 
   private makeUrl(tipo, args?, id = null) {
-    let url = `${this.getUrlInUse()}${this.fun.hasValue(this.path) ? `/${this.path}` : ''}`;
+    let url = `${this.getUrlInUse()}${fun.hasValue(this.path) ? `/${this.path}` : ''}`;
 
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';
 
@@ -116,8 +116,8 @@ export class CrudG<T> {
     // if (tipo === 'externo') return `${this.path}`;
 
     if (id) url += `/${id}`;
-    if (_.has(args, 'afterPath') && this.fun.hasValue(args.afterPath)) url += `/${args.afterPath}`;
-    if (_.has(args, 'parameters') && this.fun.hasValue(args.parameters)) url += this.parseParams(args.parameters);
+    if (_.has(args, 'afterPath') && fun.hasValue(args.afterPath)) url += `/${args.afterPath}`;
+    if (_.has(args, 'parameters') && fun.hasValue(args.parameters)) url += this.parseParams(args.parameters);
 
     return url;
   }

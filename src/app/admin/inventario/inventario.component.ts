@@ -9,6 +9,7 @@ import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
+import { fun } from '../../core/services/functions.service';
 
 @Component({
   selector: 'app-inventario',
@@ -75,17 +76,17 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       .imprimirBase64(obj)
       .then((res) => {
         if (res['status'] === 'si') {
-          this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+          fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
           if (modalInstance) modalInstance.closeModal(modalInstance.id, 'reporte_inventario');
-        } else this.fun.toastError(res['msg'], 'ERROR');
+        } else fun.toastError(res['msg'], 'ERROR');
       })
       .catch((err) => {
-        this.fun.toastError(err['msg'], 'ERROR');
+        fun.toastError(err['msg'], 'ERROR');
       });
   }
 
   formatoNumero(num) {
-    return this.fun.formatearNumero(this.fun.redondearAdos(num));
+    return fun.formatearNumero(fun.redondearAdos(num));
   }
 
   async necesarioParaEmpezar() {
@@ -149,7 +150,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
         arti.customStyles = { 'td-codigo': { width: '4rem' }, 'td-nombre': { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
       });
 
-      this.listaArticulos = this.fun.duplicarJson(res.data);
+      this.listaArticulos = fun.duplicarJson(res.data);
 
       const obj = { total: res.total_registros, tabla: 'inventario' };
       this.tServ.Func_total_paginas(obj);

@@ -9,6 +9,7 @@ import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
 import { ModalI } from '../../new_modal/modal-class';
 import * as _ from 'lodash';
+import { fun } from '../../../../core/services/functions.service';
 
 @Component({
   selector: 'app-form-reportes',
@@ -18,6 +19,7 @@ import * as _ from 'lodash';
 export class FormVentasComponent extends MixinClass implements OnInit, ModalI {
   @Input() tipo_reporte;
   @Input() switches;
+  fun = fun;
 
   @Output() seleccion = new EventEmitter<any>();
   form: FormGroup;
@@ -79,12 +81,12 @@ export class FormVentasComponent extends MixinClass implements OnInit, ModalI {
 
   async getArticulos(arg) {
     if (arg.term && arg.term !== '') {
-      this.fun.awaitTyping().then((res) => {
+      fun.awaitTyping().then((res) => {
         try {
           this.articuloClass.getArticulosFiltrado({ buscar: arg.term, fecha: this.Fecha, paginado: false, is_compra: true }).then((res) => (this.listaArticulos = res['data']));
         } catch (error) {
           console.error(error);
-          this.fun.toastError('Error buscando articulos registrados.', 'ERROR');
+          fun.toastError('Error buscando articulos registrados.', 'ERROR');
         }
       });
     } else {
@@ -94,7 +96,7 @@ export class FormVentasComponent extends MixinClass implements OnInit, ModalI {
 
   async getClientes(arg) {
     if (arg.term && arg.term !== '') {
-      this.fun.awaitTyping().then((res) => {
+      fun.awaitTyping().then((res) => {
         const extra = { afterPath: `filtro/${arg.term}`, parameters: { paginado: false } };
 
         this.clienteClass.getAll(extra).then((res) => {

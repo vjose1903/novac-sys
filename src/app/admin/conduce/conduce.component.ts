@@ -11,6 +11,7 @@ import { PdfService } from '../../core/services/pdf/pdf.service';
 import { BuscarArticuloComponent } from '../components/formularios en modales/buscar-articulo/buscar-articulo.component';
 import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { ModalSeleccinarArticuloComponent } from '../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
+import { fun } from '../../core/services/functions.service';
 
 @Component({
   selector: 'app-conduce',
@@ -147,7 +148,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   pressEscResponse(res) {
-    if (this.fun.hasValue(res)) {
+    if (fun.hasValue(res)) {
       this.enfocarInput('cod-' + res);
       this.selectContenido('cod-' + res);
     }
@@ -169,7 +170,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   async reajustarExcedentes(conteo = 0) {
-    const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
+    const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
 
     this.checkCantidadExede(conteo, 'proceso_quitar_articulo', (excede) => {
       if (excede) this.rowsExcede.push(conteo);
@@ -186,7 +187,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   ajustarSecuencia() {
     return new Promise((resolve) => {
-      const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
+      const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
       this.secuencia = filas_ocupadas.length;
 
       this.inputSecuencia = 'cod-' + this.secuencia;
@@ -195,7 +196,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   async getDataFromModal(arg, search) {
-    console.log('🚀 ~ file: conduce.component.ts ~ line 201 ~ ConduceComponent ~ getDataFromModal ~ arg', arg);
     if (arg.modal_id === 'buscarArticulo') {
       this.llenarRowDespuesDeFiltro(arg);
       // setTimeout(() => this.enfocarInput('can-' + arg.index), 1000);
@@ -223,19 +223,19 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
       if (index >= 10 && input == 'cod-') this.addItem(index);
 
-      let campo_siguiente = this.fun.hasValue(fila_siguiente['detalle_factura_id']) ? `can-${index + 1}` : this.inputSecuencia;
+      let campo_siguiente = fun.hasValue(fila_siguiente['detalle_factura_id']) ? `can-${index + 1}` : this.inputSecuencia;
 
-      if (input == 'uni-' && this.fun.hasValue(can) && can != 0 && this.fun.hasValue(cod)) {
-        const campo = this.fun.hasValue(detalle_factura_id) ? campo_siguiente : `uni-${index}`;
+      if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) {
+        const campo = fun.hasValue(detalle_factura_id) ? campo_siguiente : `uni-${index}`;
         this.enfocarInput(campo);
       }
 
-      if (input == 'cod-' && this.fun.hasValue(uni) && _.lowerCase(uni) != _.lowerCase('medida')) {
-        if (this.fun.hasValue(can) && can != 0 && this.fun.hasValue(cod)) this.ajustarSecuencia().then(() => this.enfocarInput(campo_siguiente));
+      if (input == 'cod-' && fun.hasValue(uni) && _.lowerCase(uni) != _.lowerCase('medida')) {
+        if (fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.ajustarSecuencia().then(() => this.enfocarInput(campo_siguiente));
       }
 
-      if (input == 'can-' && this.fun.hasValue(cod)) {
-        if (this.fun.isEmpty(articulo) || cod !== articulo.codigo) {
+      if (input == 'can-' && fun.hasValue(cod)) {
+        if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
           const obj = { filtrarArticulo: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
 
           this.handleModalForm({
@@ -266,7 +266,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
       if (ARTICULO.descripcion === 'Producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
-      this.fun.toastError(msg, 'ERROR');
+      fun.toastError(msg, 'ERROR');
 
       setTimeout(() => {
         this.enfocarInput('cod-' + index);
@@ -276,12 +276,12 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       const cantidades = ARTICULO.cantidades;
 
       if (ARTICULO.existencia > 0 && ARTICULO.aviso_existencia > cantidades[ARTICULO.medida_alerta]) {
-        let cant_restante = this.fun.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]);
+        let cant_restante = fun.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]);
 
         let msg = `Solo quedan ${cant_restante} ${ARTICULO.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
 
         if (ARTICULO.descripcion === 'Producto terminado') msg = `Solo quedan ${cant_restante} ${ARTICULO.medida_alerta} de este producto, debe de producir mas!!!`;
-        this.fun.toastWarning(msg, 'AVISO');
+        fun.toastWarning(msg, 'AVISO');
       }
 
       (this.filasDetalle[index] as any).controls['articulo'].setValue(ARTICULO);
@@ -337,14 +337,14 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   calcularPrecioSaco(cant, precio) {
     const res = (cant / 100) * precio;
-    return this.fun.redondearAdos(res);
+    return fun.redondearAdos(res);
   }
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES
   // =============================================
 
   async abrirModalFiltro(nombre) {
-    if (this.fun.hasValue(nombre)) {
+    if (fun.hasValue(nombre)) {
       const obj = { data: [], palabra_a_buscar: nombre, metodo: 'venta' };
 
       this.handleModalForm({
@@ -385,7 +385,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     const fila_actual = this.filasDetalle[i].getRawValue();
     const articulo = fila_actual['articulo'];
 
-    if (this.fun.hasValue(articulo)) {
+    if (fun.hasValue(articulo)) {
       this.calcularCantidadEnUnidades({ index: i });
 
       const rowsIgual = _.map(
@@ -405,7 +405,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           excede = res['data'];
 
           if (excede) {
-            this.fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+            fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
 
             // proceso_quitar_articulo
 
@@ -425,7 +425,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           }
         });
       } catch (error) {
-        if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
+        if (error.error) fun.toastError(error.error.msg, 'ERROR');
 
         callback(false);
       }
@@ -451,7 +451,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     const { uni, can, can_ant } = this.filasDetalle[i].getRawValue();
 
     if (can != can_ant) {
-      if (this.fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
+      if (fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
       (this.filasDetalle[i] as any).controls['can_ant'].setValue(can);
     }
   }
@@ -489,9 +489,9 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   setInputDrop(index) {
-    if (this.fun.hasValue(index)) {
+    if (fun.hasValue(index)) {
       const { articulo } = this.filasDetalle[index].getRawValue();
-      if (this.fun.hasValue(articulo)) this.inputDrop = `uni-${index}`;
+      if (fun.hasValue(articulo)) this.inputDrop = `uni-${index}`;
     } else {
       this.inputDrop = undefined;
     }
@@ -541,7 +541,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     const lista = [`cod-${i}`, `can-${i}`, `uni-${i}`, `des-${i}`];
 
     lista.forEach((row) => {
-      if (this.checkIfRowContainArticulo(i)) this.fun.ModificarClass(row, 'inputOscuro', bool ? 'add' : 'remove');
+      if (this.checkIfRowContainArticulo(i)) fun.ModificarClass(row, 'inputOscuro', bool ? 'add' : 'remove');
     });
   }
 
@@ -686,7 +686,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
       firstResolve ??= resolve;
 
-      console.log('🚀 ~ ConduceComponent ~ this.llenarFila ~ detalles', detalles);
 
       this.llenarFila(detalles[conteo], this.secuencia).then((res) => {
         conteo++;
@@ -713,11 +712,9 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     return new Promise((resolve) => {
       // const validator = (rowArticulo) => rowArticulo.detalle_factura_id == element.id;
 
-      // console.log('🚀 ~ ConduceComponent ~ llenarFila ~ this.ARRAY_ROWARTICULOS', this.fun.duplicarJson(this.ARRAY_ROWARTICULOS.getRawValue()));
 
       // const result = this.ARRAY_ROWARTICULOS.getRawValue().some(validator);
       // if (result) resolve(true);
-      console.log('🚀 ~ ConduceComponent ~ returnnewPromise ~ resolve(true);', resolve);
 
       const cant_en_unidades_actual = element.cantidad_en_unidades - element.retirado;
       const multiplo = element.cantidad_en_unidades / element.cantidad;
@@ -725,7 +722,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.fechaConduce }).then((result) => {
         const articulo = _.first(result['data']);
         // const cant_en_unidades_actual = cant_en_unidades_actual * multiplo;
-        console.log('🚀 ~ ConduceComponent ~ returnnewPromise ~ this.filasDetalle', this.filasDetalle);
 
         (this.filasDetalle[i] as any).controls['detalle_factura_id'].setValue(element.id);
         // (this.control[i] as any).controls['articulo_id'].setValue(element.articulo_id);
@@ -757,8 +753,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           resolve(true);
         }, 100);
       });
-      console.log('🚀 ~ ConduceComponent ~ llenarFila ~ element', element);
-      console.log('🚀 ~ ConduceComponent ~ llenarFila ~ this.ARRAY_ROWARTICULOS', this.ARRAY_ROWARTICULOS.getRawValue());
     });
   }
 
@@ -771,9 +765,9 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     const can = fila_actual['can'];
     if (detalle_factura_id && can > max_can) {
       if (can_original > max_can) {
-        this.fun.toastError('No puede introducir una cantidad mayor a la cantidad restante de la factura ', 'ERROR');
+        fun.toastError('No puede introducir una cantidad mayor a la cantidad restante de la factura ', 'ERROR');
       } else {
-        this.fun.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR');
+        fun.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR');
       }
       (this.filasDetalle[i] as any).controls['can'].setValue(max_can);
       this.enfocarInput('can-' + i);
@@ -811,21 +805,21 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   async imprimirConduce() {
-    const filas_ocupadas = _.filter(this.filasDetalle, (item) => this.fun.hasValue(item.value.articulo));
+    const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
 
     if (this.rowsExcede.length) {
-      this.fun.toastWarning('No puede hacer el conduce, existiendo artículos que exceden su cantidad en el inventario', 'Aviso');
+      fun.toastWarning('No puede hacer el conduce, existiendo artículos que exceden su cantidad en el inventario', 'Aviso');
     } else if (!this.cliente) {
-      this.fun.toastWarning('Conduce no tiene cliente', 'Aviso');
+      fun.toastWarning('Conduce no tiene cliente', 'Aviso');
     } else if (filas_ocupadas.length === 0) {
-      this.fun.toastWarning('Conduce no tiene Articulos', 'Aviso');
+      fun.toastWarning('Conduce no tiene Articulos', 'Aviso');
     } else {
       this.CuerpoConduce = [];
       for (let i = 0; i < filas_ocupadas.length; i++) {
         const fila = filas_ocupadas[i].getRawValue();
         const detalle = _.pick(fila, ['detalle_factura_id', 'articulo.id', 'can', 'cantidad_en_unidades', 'uni', 'id']);
 
-        let detalle_parsed = this.fun.remplaceKeyFromJson(detalle, [
+        let detalle_parsed = fun.remplaceKeyFromJson(detalle, [
           { old_key: 'can', new_key: 'cantidad' },
           { old_key: 'uni', new_key: 'unidad' },
         ]);
@@ -849,7 +843,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       const obj = { data: res['data'], type: 'conduce' };
 
       this.cancelarConduce(2);
-      this.pdfServ.generatePdf({ oPdf: obj, imprimir: true }).catch((err) => this.fun.toastError(err['msg'], 'ERROR'));
+      this.pdfServ.generatePdf({ oPdf: obj, imprimir: true }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
     });
   }
 

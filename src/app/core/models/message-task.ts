@@ -7,7 +7,7 @@ export class MessageTask {
   id: string;
   eventName: string;
   data: any;
-  fun = SingletonService.fun;
+
   fn = new BehaviorSubject<any>({});
 
   constructor(eventName: string, data: string | object = '') {

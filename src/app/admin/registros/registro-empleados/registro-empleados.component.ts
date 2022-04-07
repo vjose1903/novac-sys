@@ -10,6 +10,7 @@ import { pattern } from '../../../core/typescript/constantes';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { EmpleadoC } from './empleado';
 import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
+import { fun } from '../../../core/services/functions.service';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -103,7 +104,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(this.fun.Capitalice(arg));
+    campo.setValue(fun.Capitalice(arg));
   }
 
   async getEmpleados(e) {
@@ -129,7 +130,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
         this.tServ.Func_total_paginas(obj);
       });
     } catch (error) {
-      this.fun.toastError('Error buscando empleados registrados.', 'ERROR');
+      fun.toastError('Error buscando empleados registrados.', 'ERROR');
     }
   }
 
@@ -145,22 +146,22 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
           return;
         }
 
-        this.fun
+        fun
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
           .then((res) => {
             if (res['data'].length) {
               const is_user = _.find(res['data'], (item) => item.persona_is === 'User');
 
-              if (this.fun.hasValue(is_user) && is_user.persona.estado) {
-                this.fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR');
+              if (fun.hasValue(is_user) && is_user.persona.estado) {
+                fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR');
                 const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
                 this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
                 if (!this.editando) enable_campos = false;
                 return;
               }
 
-              // const documento = this.fun.hasValue(is_user) ? _.omit(is_user, ['persona', 'persona_is']) : _.omit(_.head(res['data']), ['persona', 'persona_is']);
-              const persona = this.fun.hasValue(is_user) ? is_user.persona : _.head(res['data']).persona;
+              // const documento = fun.hasValue(is_user) ? _.omit(is_user, ['persona', 'persona_is']) : _.omit(_.head(res['data']), ['persona', 'persona_is']);
+              const persona = fun.hasValue(is_user) ? is_user.persona : _.head(res['data']).persona;
 
               // persona.fecha_nacimiento = this.fecha(persona.fecha_nacimiento);
 
@@ -195,7 +196,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       if (campo == 'campoNombre') {
         if (!_.endsWith(formulario['cedula'], '_')) {
           const docSinGuiones = _.join(_.split(formulario['cedula'], '-'), '');
-          if (this.fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
+          if (fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
         }
       } else this.enfocarInput(campo);
     } else {
@@ -225,7 +226,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   nombreHasValue() {
-    return !this.camposDisabled || this.fun.hasValue(this.form.controls.nombre.value);
+    return !this.camposDisabled || fun.hasValue(this.form.controls.nombre.value);
   }
 
   cancelar() {
@@ -265,7 +266,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     if (this.documentos_de_identidad.length) {
       const doc = item.ARG.documentos_de_identidad.filter((doc) => doc.principal === true);
-      if (item.ARG.documentos_de_identidad.length > 0 && this.fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
+      if (item.ARG.documentos_de_identidad.length > 0 && fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
     }
 
     this.form.patchValue(item.ARG);
@@ -300,7 +301,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     const objSend = _.omit(formulario, ['cedula']);
 
     if (!this.editando && objSend.password === null) {
-      this.fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
+      fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
       this.empleadosClass.createUpdateOne(objSend).then((res) => {
         const actualPagination = this.tServ.getPaginationById('listaEmpleados');

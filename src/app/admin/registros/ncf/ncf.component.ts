@@ -7,6 +7,7 @@ import { TablasService } from '../../components/tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from './ncf';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-ncf',
@@ -131,7 +132,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   async getTiposFacturas() {
     try {
       this.lista_tipos_facturas = await this.tiposFacturasClass.getAll();
-      const temp = this.fun.duplicarJson(this.lista_tipos_facturas);
+      const temp = fun.duplicarJson(this.lista_tipos_facturas);
       for (let i = 0; i < temp.length; i++) {
         const element = temp[i];
         if (!element.referencia || element.referencia === '02' || element.referencia === '00') {
@@ -144,7 +145,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   filtrarNCF() {
     if (this.filtro === 'todos') {
-      this.listaNCF = this.fun.duplicarJson(this.listaNCFBack);
+      this.listaNCF = fun.duplicarJson(this.listaNCFBack);
     } else {
       this.listaNCF = this.listaNCFBack.filter((pack) => Number(pack.tipo_factura_id) === Number(this.filtro));
     }
@@ -183,7 +184,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       });
 
       this.listaNCF = tempNCF;
-      this.listaNCFBack = this.fun.duplicarJson(tempNCF);
+      this.listaNCFBack = fun.duplicarJson(tempNCF);
 
       const obj = { total: res.total_registros, tabla: 'lista_ncf' };
 
@@ -191,7 +192,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     } catch (error) {
       console.error(error);
 
-      this.fun.toastError('Error buscando Paquetes de NCF registrados.', 'ERROR');
+      fun.toastError('Error buscando Paquetes de NCF registrados.', 'ERROR');
     }
   }
 
@@ -253,14 +254,14 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       const actualPagination = this.tServ.getPaginationById('lista_ncf');
       this.getPaquetesNCF(actualPagination);
       if (this.is_editando) {
-        this.fun.toastSuccess('Comprobante editado', 'CORRECTO');
+        fun.toastSuccess('Comprobante editado', 'CORRECTO');
       } else {
-        this.fun.toastSuccess('Comprobante ingresado', 'CORRECTO');
+        fun.toastSuccess('Comprobante ingresado', 'CORRECTO');
       }
       this.borrar();
     } catch (error) {
       console.error(error);
-      this.fun.toastError(error.error.msg, 'ERROR');
+      fun.toastError(error.error.msg, 'ERROR');
     }
   }
 
@@ -295,7 +296,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.Desde = item.desde;
     this.Hasta = item.hasta;
 
-    this.ncfSelected = this.fun.duplicarJson(item);
+    this.ncfSelected = fun.duplicarJson(item);
   }
 
   nuevoRegistro() {
@@ -327,7 +328,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       siFunction: (instance) => {
         this.ncfClass.deleteOne(comprobanteData.id).then(
           () => {
-            this.fun.toastSuccess('comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo + ' borrado', 'CORRECTO');
+            fun.toastSuccess('comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo + ' borrado', 'CORRECTO');
             const actualPagination = this.tServ.getPaginationById('lista_ncf');
             this.getPaquetesNCF(actualPagination);
             instance.closeModal(instance.id, 'eliminar_comprobante');
@@ -367,11 +368,11 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   decisionModal(arg) {
     if (arg !== null && arg !== undefined) {
-      const obj = this.fun.duplicarJson(this.seleccionModal);
+      const obj = fun.duplicarJson(this.seleccionModal);
       if (arg && obj) {
         this.ncfClass.deleteOne(obj.id).then(
           () => {
-            this.fun.toastSuccess('comprobante para ' + obj.tipoC_ + ' numero: ' + obj.codigo + ' borrado', 'CORRECTO');
+            fun.toastSuccess('comprobante para ' + obj.tipoC_ + ' numero: ' + obj.codigo + ' borrado', 'CORRECTO');
             const actualPagination = this.tServ.getPaginationById('lista_ncf');
             this.getPaquetesNCF(actualPagination);
           },
@@ -386,7 +387,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   mostrarErrores(arg) {
     if (Array.isArray(arg)) {
       arg.forEach((error) => {
-        this.fun.toastError(error, 'ERROR');
+        fun.toastError(error, 'ERROR');
       });
     } else {
       for (const key in arg) {
@@ -394,7 +395,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
           const element = arg[key];
 
           if (key !== 'status') {
-            this.fun.toastError(element, 'ERROR');
+            fun.toastError(element, 'ERROR');
           }
         }
       }

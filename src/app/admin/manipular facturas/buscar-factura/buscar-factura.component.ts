@@ -15,6 +15,7 @@ import { PdfViewerComponent } from '../../components/pdf-viewer/pdf-viewer.compo
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { NotaC } from '../notas-cred-deb/notas';
 import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
+import { fun } from '../../../core/services/functions.service';
 
 enum campos {
   cliente = 1,
@@ -133,7 +134,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   pressEscResponse(res) {
-    if (this.fun.hasValue(res)) this.enfocarInput('valorI');
+    if (fun.hasValue(res)) this.enfocarInput('valorI');
   }
 
   reimprimirFactura(obj, modalInstance) {
@@ -143,13 +144,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       .then(async (res) => {
         this.loadServ.isLoading.next(false);
         if (res.status === 'si') {
-          this.fun.toastSuccess(res.msg, 'CORRECTO');
+          fun.toastSuccess(res.msg, 'CORRECTO');
           modalInstance.closeModal(modalInstance.id, 'imprimir');
-        } else this.fun.toastError(res.msg, 'ERROR');
+        } else fun.toastError(res.msg, 'ERROR');
       })
       .catch((err) => {
         this.loadServ.isLoading.next(false);
-        this.fun.toastError(err.msg, 'ERROR');
+        fun.toastError(err.msg, 'ERROR');
       });
   }
 
@@ -207,13 +208,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             : `Los comprobantes para ${tipoFact.descripcion} se estan agotando, solo quedan ${restante}`;
 
         if (secuencia >= limite) {
-          this.fun.toastWarning(msg, 'AVISO');
+          fun.toastWarning(msg, 'AVISO');
         }
       }
     } catch (error) {
       this.existenComprobantes = true;
       console.error(error);
-      this.fun.toastError(error.error.msg, 'ERROR');
+      fun.toastError(error.error.msg, 'ERROR');
     }
   }
 
@@ -321,7 +322,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.fechaV = moment(fact.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
         fact.pagoT = true;
         fact.estatus = fact.estado ? 'fas fa-check' : 'fas fa-times';
-        fact.monto = this.fun.formatearNumero(this.fun.redondearAdos(fact.balance));
+        fact.monto = fun.formatearNumero(fun.redondearAdos(fact.balance));
         fact.pago_a_tiempo = fact.fecha_vencimiento > fechaA ? true : false;
         fact.colorEstado = fact.estado ? 'green' : 'red';
         fact.viewColor = 'gris-claro';
@@ -351,7 +352,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       const obj = { total: busqueda.total_registros, tabla: 'facturas_params' };
 
       this.tServ.Func_total_paginas(obj);
-      this.facturas = this.fun.duplicarJson(busqueda['data']);
+      this.facturas = fun.duplicarJson(busqueda['data']);
 
       if (this.facturas.length > 0) {
         if (this.campo == campos.numeroComprobante || (campo == campos.NumeroFactura && this.tipo_factura_id != '0')) {
@@ -366,14 +367,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       } else {
         if (this.campo === '1') {
           if (this.tipo_factura_id === '0') {
-            this.fun.toastError('Este cliente no tiene facturas a credito a su nombre', 'ERROR');
+            fun.toastError('Este cliente no tiene facturas a credito a su nombre', 'ERROR');
           } else {
-            this.fun.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
+            fun.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
           }
         } else if (this.campo === '3') {
-          this.fun.toastError('No existen facturas con este número.', 'ERROR');
+          fun.toastError('No existen facturas con este número.', 'ERROR');
         } else if (this.campo === '2') {
-          this.fun.toastError('La factura buscada no existe', 'ERROR');
+          fun.toastError('La factura buscada no existe', 'ERROR');
         }
       }
     } catch (error) {
@@ -512,7 +513,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       }
     } else {
       if (campo === 'buscarFactura') {
-        this.fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
+        fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
       }
     }
   }

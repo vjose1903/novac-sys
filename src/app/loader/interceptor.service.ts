@@ -4,14 +4,15 @@ import { Observable, throwError } from 'rxjs';
 
 import { catchError, map, finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
-import { FunctionService } from '../core/services/functions.service';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { SingletonService } from '../core/services/singleton.service';
+import { fun } from '../core/services/functions.service';
+import { SharedService } from '../core/services/shared.service';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
-  constructor(public loadServ: LoaderService, private fun: FunctionService, private router: Router) {}
+  constructor(public loadServ: LoaderService, public sharedServ: SharedService) {}
   requestCount: number = 0;
 
   private startRequest(args?): void {
@@ -26,8 +27,8 @@ export class InterceptorService implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    this.fun.nextCanToast(false);
-    const token = this.fun.getAuthToken();
+    this.sharedServ.nextCanToast(false);
+    const token = fun.getAuthToken();
 
     let spinner = request.params.get('spinner');
 
@@ -62,18 +63,25 @@ export class InterceptorService implements HttpInterceptor {
           });
         }
 
-        this.fun.nextCanToast(true);
+        this.sharedServ.nextCanToast(true);
         return event;
       }),
 
       catchError((response: HttpErrorResponse) => {
         if (response.error === null) {
-          this.fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
+          fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
         } else if (response.error && _.has(response.error, 'action') && response.error.action === 'close_ssesion') {
+          console.log(" ");
+          console.log(" ");
+          console.log("=====================");
+          console.log(" response ", response);
+          console.log("=====================");
+          console.log(" ");
+          console.log(" ");
 
-          this.fun.toastError(response.error.msg, 'ERROR');
-          this.fun.nextCanToast(false);
-          SingletonService.layServ.nextLogOut(true);
+          fun.toastError(response.error.msg, 'ERROR');
+          this.sharedServ.nextCanToast(false);
+          SingletonService.layServ.nextLogOut({ bool: true, quien: 'close_ssesion' });
         } else {
           if (_.has(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
 
@@ -98,9 +106,9 @@ export class InterceptorService implements HttpInterceptor {
       for (let i = 0; i < menssages.length; i++) {
         const menssage = menssages[i];
 
-        if (tipo_ === 'success') this.fun.toastSuccess(menssage, 'CORRECTO');
-        if (tipo_ === 'warning') this.fun.toastWarning(menssage, 'AVISO');
-        if (tipo_ === 'error') this.fun.toastError(menssage, 'ERROR');
+        if (tipo_ === 'success') fun.toastSuccess(menssage, 'CORRECTO');
+        if (tipo_ === 'warning') fun.toastWarning(menssage, 'AVISO');
+        if (tipo_ === 'error') fun.toastError(menssage, 'ERROR');
       }
     }
   }

@@ -6,6 +6,7 @@ import { TablasService } from '../../../components/tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '../../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { ModalI } from '../../new_modal/modal-class';
+import { fun } from '../../../../core/services/functions.service';
 
 @Component({
   selector: 'app-formulario-marca-modelo',
@@ -92,7 +93,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   getMarcas(palabra_a_buscar = ' ', paginado = false, page = 1, per_page = 1) {
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado, page, per_page } };
     this.marcasClass.getAll(extra).then((res) => {
-      if (!paginado) this.listaMarcas = this.fun.duplicarJson(res);
+      if (!paginado) this.listaMarcas = fun.duplicarJson(res);
       if (paginado) {
         this.listado = res.data;
         this.tServ.Func_total_paginas({ total: res.total_registros, tabla: 'tabla_frm_marca_modelo' });
@@ -102,7 +103,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
   capitalice(control, arg, form) {
     const campo = form.get(control);
-    campo.setValue(this.fun.Capitalice(arg));
+    campo.setValue(fun.Capitalice(arg));
   }
 
   createForm() {
@@ -148,11 +149,11 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   async submit(formToSubmit) {
-    const obj = this.fun.duplicarJson(this[formToSubmit].value);
+    const obj = fun.duplicarJson(this[formToSubmit].value);
 
     if (this.tipo_formulario !== 'modelos') delete obj['marca_id'];
 
-    if (this.fun.hasValue(this.editando)) obj.id = this.editando.id;
+    if (fun.hasValue(this.editando)) obj.id = this.editando.id;
 
     const clase = this.tipo_formulario === 'modelos' ? this.modeloClass : this.marcasClass;
 
@@ -160,7 +161,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   onSuccess() {
-    this.fun.toastSuccess(`Item ${this.editando ? 'actualizado' : 'creado'} correctamente.`, 'CORRECTO');
+    fun.toastSuccess(`Item ${this.editando ? 'actualizado' : 'creado'} correctamente.`, 'CORRECTO');
 
     this.pedirNuevaData(this.obj_p);
 

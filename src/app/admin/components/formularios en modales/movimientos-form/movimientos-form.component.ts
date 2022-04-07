@@ -1,7 +1,6 @@
-import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
-
-import { GLOBAL } from '../../../../core/typescript/GLOBAL';
+import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalI } from '../../new_modal/modal-class';
 import { MovimientosC } from './movimiento-model';
@@ -39,7 +38,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   }
 
   formatoNumero(arg) {
-    return this.fun.formatearNumero(this.fun.redondearAdos(arg));
+    return fun.numFormatTwoDecimals(arg);
   }
 
   mostrarExistencia(arg) {
@@ -96,10 +95,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
     }
   }
   btn_aceptar() {
-    const empleado = this.fun.getUser();
-
     const obj = {
-      user_id: empleado.id,
       articulo_id: this.inputs.id,
       cantidad: this.cantidad,
       accion: this.tipo_movimiento,
@@ -108,30 +104,16 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
       tipo_salida: this.tipo_salida,
     };
 
-    this.movimientosC.createOne(obj).then(
-      (res) => {
-        this.fun.toastSuccess(_.capitalize(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
-        this.resetForm();
+    this.movimientosC.createOne(obj).then((res) => {
+      fun.toastSuccess(_.capitalize(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
+      this.resetForm();
 
-        const obj = { bool: true, body: res.articulo };
+      const obj = { bool: true, body: res.articulo };
 
-        const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-        modal.closeModal('inventario', 'cancelar');
-        modal.getDataModal({ data: obj, modal_id: this.modal.component_id });
-      },
-      (err) => {
-        console.error(err.error);
-        this.mostrarErrores(err.error);
-      },
-    );
-  }
-  mostrarErrores(arg) {
-    for (const error in arg) {
-      if (arg.hasOwnProperty(error)) {
-        const element = arg[error];
-        this.fun.toastError(element, 'Error');
-      }
-    }
+      const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+      modal.closeModal('inventario', 'cancelar');
+      modal.getDataModal({ data: obj, modal_id: this.modal.component_id });
+    });
   }
 
   resetForm() {

@@ -3,10 +3,10 @@ import { Subscription } from 'rxjs';
 import { ModalService } from './modal.service';
 import { TablasService } from '../tablas/tablas.service';
 import { GLOBAL } from '../../../core/typescript/GLOBAL';
-import { FunctionService } from '../../../core/services/functions.service';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { SuplidorC } from '../../registros/registro-suplidores/suplidores';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-modal',
@@ -76,7 +76,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
     { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
-  constructor(public mServ: ModalService, private tServ: TablasService, public fun: FunctionService) {}
+  constructor(public mServ: ModalService, private tServ: TablasService) {}
 
   element: HTMLElement;
   subShow: Subscription;
@@ -86,7 +86,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
-      if (this.fun.hasValue(res)) {
+      if (fun.hasValue(res)) {
         if (!this.paraFiltroArticulos && !this.paraFiltroClientes && !this.paraFiltroSuplidor) this.showModal = res;
 
         if (res === false) {
@@ -100,13 +100,13 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     });
 
     this.subTipo = this.mServ.TIPOMODAL.subscribe((res) => {
-      if (this.fun.hasValue(res)) {
+      if (fun.hasValue(res)) {
         this.tipoModal = res;
       }
     });
 
     this.subSelec = this.mServ.SELECCIONMODAL.subscribe((res) => {
-      if (this.fun.hasValue(res)) {
+      if (fun.hasValue(res)) {
         if (res.filtrarArticulo || res.filtrarCliente || res.filtrarSuplidor) {
           this.seleccionModal = res.data;
         } else {
@@ -264,15 +264,15 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   }
 
   async renovarDataFiltros(e, buscando?, fecha_articulo?) {
-    const copyData = this.fun.duplicarJson(this.dataFiltro);
-    if (this.fun.isEmpty(e)) e = this.tServ.obj_paginate.default;
+    const copyData = fun.duplicarJson(this.dataFiltro);
+    if (fun.isEmpty(e)) e = this.tServ.obj_paginate.default;
 
     const page = e.page;
     const per_page = e.per_page;
     let palabra_a_buscar = ' ';
 
-    if (buscando) palabra_a_buscar = this.fun.isEmpty(buscando) ? ' ' : buscando;
-    else palabra_a_buscar = this.fun.isEmpty(e.searchText) ? ' ' : e.searchText;
+    if (buscando) palabra_a_buscar = fun.isEmpty(buscando) ? ' ' : buscando;
+    else palabra_a_buscar = fun.isEmpty(e.searchText) ? ' ' : e.searchText;
 
     try {
       if (this.tipoModal === 'buscarArticulo') {
@@ -280,7 +280,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
         const res = await this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: page, per_page: per_page, paginado: true, fecha: fecha_articulo, is_compra: is_compra });
 
-        if (this.fun.is_number(palabra_a_buscar) && res.data.length === 1) {
+        if (fun.is_number(palabra_a_buscar) && res.data.length === 1) {
           this.articuloFiltradoPorCodigo(res);
         } else {
           this.dataFiltro = res.data;
@@ -295,8 +295,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.dataFiltro = undefined;
 
         res.data.map(async (cli) => {
-          cli.nombre = this.fun.Capitalice(cli.nombre);
-          cli.apellido = this.fun.Capitalice(cli.apellido);
+          cli.nombre = fun.Capitalice(cli.nombre);
+          cli.apellido = fun.Capitalice(cli.apellido);
 
           const documento = await cli.documentos_de_identidad.find((doc) => doc.principal === true);
           cli.documento_identidad = documento ? documento.documento : '----------';
@@ -316,7 +316,7 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.dataFiltro = undefined;
 
         res.data.map(async (supli) => {
-          supli.nombre = this.fun.Capitalice(supli.nombre);
+          supli.nombre = fun.Capitalice(supli.nombre);
           const documento = await supli.documentos_de_identidad.find((doc) => doc.principal === true);
           supli.documento_identidad = documento ? documento.documento : '----------';
 

@@ -1,7 +1,7 @@
-import { GLOBAL } from './GLOBAL';
 import * as moment from '../javascript/moment';
 import { ModalClass } from '../../admin/components/new_modal/modal-class';
 import { SingletonService } from '../services/singleton.service';
+import { fun } from '../services/functions.service';
 
 type lista_sub = 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'noFiltro';
 
@@ -21,7 +21,6 @@ export class MixinClass extends ModalClass {
     super();
   }
 
-  fun = SingletonService.fun;
   layServ = SingletonService.layServ;
   arg_mixin;
 
@@ -53,12 +52,12 @@ export class MixinClass extends ModalClass {
     const fechaTemp = moment(date).format('YYYY-MM-DD');
     const obj = {};
     obj['FechaFactura'] = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
-    obj['FechaFacturaMostrar'] = this.fun.my_dateFormater(obj['FechaFactura']) + ' - ' + this.fun.my_houreFormater(obj['FechaFactura']);
+    obj['FechaFacturaMostrar'] = fun.my_dateFormater(obj['FechaFactura']) + ' - ' + fun.my_houreFormater(obj['FechaFactura']);
     return obj;
   }
   // =========================================================================================================
   my_timeDateFormater(str) {
-    return `${this.fun.my_dateFormater(str)} - ${this.my_houreFormater(str)}`;
+    return `${fun.my_dateFormater(str)} - ${this.my_houreFormater(str)}`;
   }
 
   // =========================================================================================================
@@ -98,7 +97,7 @@ export class MixinClass extends ModalClass {
   }
   // =========================================================================================================
   formatoNumero(num) {
-    return this.fun.formatearNumero(this.fun.redondearAdos(num)) + '  ';
+    return fun.formatearNumero(fun.redondearAdos(num)) + '  ';
   }
   // 301,755.67
 
@@ -110,19 +109,19 @@ export class MixinClass extends ModalClass {
 
   // =========================================================================================================
   logBlue(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? this.fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? fun.duplicarJson(body) : '');
   }
 
   logYellow(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? this.fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? fun.duplicarJson(body) : '');
   }
 
   logRed(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? this.fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? fun.duplicarJson(body) : '');
   }
 
   logGreen(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? this.fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? fun.duplicarJson(body) : '');
   }
 
   eliminarRegistro(obj) {

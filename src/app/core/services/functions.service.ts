@@ -2,35 +2,19 @@ import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
-import { GLOBAL } from '../typescript/GLOBAL';
+
 import { ConfigurationService } from './configuration.service';
 import { ConfigI } from '../typescript/config-interface';
+import { SingletonService } from './singleton.service';
 
-@Injectable({ providedIn: 'root' })
-export class FunctionService {
-  canToast = false;
+export class fun {
+  constructor() {}
 
-  currentUser = null;
-  // configServ: ConfigurationService;
-  constructor(private toastr: ToastrService, public configServ: ConfigurationService) {}
-
-  nextCanToast(nextValue) {
-    this.canToast = nextValue;
-  }
-
-  setUser(currentUser) {
-    this.currentUser = currentUser;
-  }
-
-  getUser() {
-    return this.currentUser;
-  }
-
-  getFacturasguardadas() {
+  static getFacturasguardadas() {
     return JSON.parse(localStorage.getItem('facturas_guardadas')) || [];
   }
 
-  setFacturasGuardadas(facturas) {
+  static setFacturasGuardadas(facturas) {
     localStorage.removeItem('facturas_guardadas');
     localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
 
@@ -47,7 +31,7 @@ export class FunctionService {
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
   // _________________________________________________________________________________________________
 
-  duplicarJson(json: Object | Array<any>) {
+  static duplicarJson(json: Object | Array<any>) {
     return _.cloneDeep(json);
   }
 
@@ -56,7 +40,7 @@ export class FunctionService {
   // Descripcion : Esta funcion retorna true si algun caracter de una cadena no es un numero
   // _________________________________________________________________________________________________
 
-  checkNumbers(arg) {
+  static checkNumbers(arg) {
     let res = false;
     for (let i = 0; i < arg.length; i++) {
       const tempCaracter = arg.charAt(i);
@@ -75,7 +59,7 @@ export class FunctionService {
   // Nombre: pushAt
   // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
   // _________________________________________________________________________________________________
-  pushAt(arr, index, newItem) {
+  static pushAt(arr, index, newItem) {
     const copyArr = this.duplicarJson(arr);
     arr.length = 0;
     const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
@@ -86,7 +70,7 @@ export class FunctionService {
   // Nombre: checkLongMillares
   // Descripcion : Esta funcion validad que los millares sean de 3 en 3
   // _________________________________________________________________________________________________
-  checkLongMillares(num) {
+  static checkLongMillares(num) {
     let res = false;
     const splitNum = _.split(num, ',');
 
@@ -99,12 +83,12 @@ export class FunctionService {
     return res;
   }
 
-  revisarPrecio(input, id): any {
+  static revisarPrecio(input, id): any {
     return new Promise((resolve) => {
       const precioTEMPO = input.value;
       const res = { number: null, error: true };
 
-      if (this.hasValue(precioTEMPO)) {
+      if (fun.hasValue(precioTEMPO)) {
         const splitPrecio = _.split(precioTEMPO, '.');
         let precioTEMP;
         let enteros = splitPrecio[0];
@@ -112,13 +96,13 @@ export class FunctionService {
 
         if (tempdecimales === undefined) tempdecimales = '00';
 
-        if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
-          this.toastError('Valor introducido es invalido', 'ERROR');
+        if (splitPrecio.length > 2 || fun.checkNumbers(enteros) || fun.checkLongMillares(enteros) || fun.checkNumbers(tempdecimales) || fun.checkLongMillares(tempdecimales)) {
+          fun.toastError('Valor introducido es invalido', 'ERROR');
           document.getElementById(id).focus();
         } else {
           //
           if (splitPrecio.length === 2) {
-            if (this.isEmpty(enteros)) enteros = '0';
+            if (fun.isEmpty(enteros)) enteros = '0';
 
             let decimales;
             if (tempdecimales.length > 2) decimales = tempdecimales.substring(0, 2);
@@ -141,7 +125,7 @@ export class FunctionService {
   // Descripcion : Esta funcion le da formato de numero a un string
   // _________________________________________________________________________________________________
 
-  formatearNumero(nStr) {
+  static formatearNumero(nStr) {
     if (nStr !== undefined) {
       nStr += '';
       const x = nStr.split('.');
@@ -159,7 +143,7 @@ export class FunctionService {
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
 
-  redondearAdos(num) {
+  static redondearAdos(num) {
     const string = num + '';
     const splitStr = _.split(string, '.');
 
@@ -186,8 +170,8 @@ export class FunctionService {
   // Descripcion : Esta funcion toma un string y lo vuelve entero y lo redondea a 2 decimales
   // _________________________________________________________________________________________________
 
-  parseFloatTwoDecimals(sTnum) {
-    return this.desformatear(this.redondearAdos(sTnum));
+  static parseFloatTwoDecimals(sTnum) {
+    return fun.desformatear(fun.redondearAdos(sTnum));
   }
 
   // __________________________________________________________________________________________________
@@ -195,22 +179,22 @@ export class FunctionService {
   // Descripcion : Esta funcion revisa si el argumento pasado es una funcion
   // _________________________________________________________________________________________________
 
-  isFunction(arg) {
-    return this.hasValue(arg) ? arg instanceof Function : false;
+  static isFunction(arg) {
+    return fun.hasValue(arg) ? arg instanceof Function : false;
   }
   // __________________________________________________________________________________________________
   // Nombre: numFormatTwoDecimals
   // Descripcion : Esta funcion toma un string y lo formatea a dos decimales
   // _________________________________________________________________________________________________
-  numFormatTwoDecimals(num) {
-    return this.formatearNumero(this.redondearAdos(num));
+  static numFormatTwoDecimals(num) {
+    return fun.formatearNumero(fun.redondearAdos(num));
   }
 
   // __________________________________________________________________________________________________
   // Nombre: desformatear
   // Descripcion : Esta funcion toma un string y lo vuelve un entero
   // _________________________________________________________________________________________________
-  desformatear(sTnum: any) {
+  static desformatear(sTnum: any) {
     const number = typeof sTnum == 'string' ? parseFloat(sTnum.replaceAll(',', '')) : sTnum;
     return number;
 
@@ -236,7 +220,7 @@ export class FunctionService {
   // Descripcion : Esta funcion busca una persona sea empleado, cliente o suplidor por su documento de identidad
   // _________________________________________________________________________________________________
 
-  getPersonaByDocIdentidad(params: { documento: any; tipo: 'cedula' | 'rnc' }) {
+  static getPersonaByDocIdentidad(params: { documento: any; tipo: 'cedula' | 'rnc' }) {
     return new Promise((resolve, reject) => {
       let extra = { afterPath: 'persona', parameters: {} };
 
@@ -254,7 +238,7 @@ export class FunctionService {
   // Descripcion : Esta funcion redondea un numero a la decena mayor al mismo
   // _________________________________________________________________________________________________
 
-  roundDecenaMayor(value) {
+  static roundDecenaMayor(value) {
     if (0 > value) {
       const decenaMenor = Math.ceil(value / 10) * 10;
       return decenaMenor + 10;
@@ -268,7 +252,7 @@ export class FunctionService {
   // Descripcion : Esta funcion Valida una cedula
   // _________________________________________________________________________________________________
 
-  ValidaCedula(cedula) {
+  static ValidaCedula(cedula) {
     // Declaración de variables a nivel de método o función.
     let verificador = 0;
     let digito = 0;
@@ -288,7 +272,7 @@ export class FunctionService {
         suma += digito;
       }
       /*Obtenemos el verificador restandole la decena mayor a la sumatoria*/
-      verificador = this.roundDecenaMayor(suma) - suma;
+      verificador = fun.roundDecenaMayor(suma) - suma;
 
       // si el verificador da igual a la resta esta correcta
 
@@ -320,7 +304,7 @@ export class FunctionService {
   // Nombre: ModificarClass
   // Descripcion : Esta funcion añada o quita una clase de un elemento html
   // _________________________________________________________________________________________________
-  ModificarClass(item, clase, action: 'add' | 'remove') {
+  static ModificarClass(item, clase, action: 'add' | 'remove') {
     if (document.getElementById(item)) document.getElementById(item).classList[action](clase);
   }
 
@@ -328,16 +312,16 @@ export class FunctionService {
   // Nombre: Capitalice
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
-  Capitalice(str) {
-    const ultimosCaractes = this.hasValue(str) ? str.length + 1 : null;
-    return this.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
+  static Capitalice(str) {
+    const ultimosCaractes = fun.hasValue(str) ? str.length + 1 : null;
+    return fun.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
   }
 
   // __________________________________________________________________________________________________
   // Nombre: my_houreFormater
   // Descripcion : Esta formatea una hora
   // _________________________________________________________________________________________________
-  my_houreFormater(str) {
+  static my_houreFormater(str) {
     const dateObj = new Date(str);
 
     let hours = dateObj.getHours();
@@ -354,7 +338,7 @@ export class FunctionService {
   // Nombre: my_dateFormater
   // Descripcion : Esta formatea un date
   // _________________________________________________________________________________________________
-  my_dateFormater(str, front = true) {
+  static my_dateFormater(str, front = true) {
     str = str + '';
     let dateObj = new Date(str);
 
@@ -372,7 +356,7 @@ export class FunctionService {
   // Nombre: awaitTyping
   // Descripcion : Esta funcion espera a que terminen de escribir para ejecutar una funcion
   // _________________________________________________________________________________________________
-  is_number(caracter) {
+  static is_number(caracter) {
     if (typeof caracter === 'number') caracter = `${caracter}`;
     let ascii = caracter.charCodeAt(0);
 
@@ -384,7 +368,7 @@ export class FunctionService {
   // Descripcion : Esta funcion espera a que terminen de escribir para ejecutar una funcion
   // _________________________________________________________________________________________________
 
-  is_letter(caracter) {
+  static is_letter(caracter) {
     let ascii = caracter.toUpperCase().charCodeAt(0);
     return ascii >= 65 && ascii <= 90;
   }
@@ -393,11 +377,11 @@ export class FunctionService {
   // Descripcion : Esta funcion espera a que terminen de escribir para ejecutar una funcion
   // _________________________________________________________________________________________________
 
-  timeout;
-  awaitTyping(event?) {
+  static timeout;
+  static awaitTyping(event?) {
     const promise = new Promise((resolve) => {
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(() => {
+      clearTimeout(fun.timeout);
+      fun.timeout = setTimeout(() => {
         if (!event || event.keyCode != 13) resolve(true);
       }, 500);
     });
@@ -408,7 +392,7 @@ export class FunctionService {
   // Nombre: multiAssing
   // Descripcion : Esta funcion hace un multiAsignamiento en onjetos a partir de otro objeto
   // __________________________________________________________________________________________________
-  multiAssing(obj: Object, sources: Array<{ key: string; value: any }>) {
+  static multiAssing(obj: Object, sources: Array<{ key: string; value: any }>) {
     for (let index = 0; index < sources.length; index++) {
       const element = sources[index];
       obj[element.key] = element.value;
@@ -420,7 +404,7 @@ export class FunctionService {
   // Descripcion : Esta funcion valida que si una variable esta vacia
   // __________________________________________________________________________________________________
 
-  isEmpty(value) {
+  static isEmpty(value) {
     return (
       // es null o indefinido
       value == null ||
@@ -438,15 +422,15 @@ export class FunctionService {
   // Descripcion : Esta funcion valida que si una variable tiene valor
   // __________________________________________________________________________________________________
 
-  hasValue(value) {
-    return !this.isEmpty(value);
+  static hasValue(value) {
+    return !fun.isEmpty(value);
   }
 
   // __________________________________________________________________________________________________
   // Nombre: scrollTo
   // Descripcion : Esta funcion mueve el scroll hasta un elemento proporcionados
   // __________________________________________________________________________________________________
-  scrollTo(id, block_: any = 'start', inline_: any = 'center') {
+  static scrollTo(id, block_: any = 'start', inline_: any = 'center') {
     if (id && document.getElementById(`${id}`)) document.getElementById(`${id}`).scrollIntoView({ behavior: 'smooth', block: block_, inline: inline_ });
   }
 
@@ -454,7 +438,7 @@ export class FunctionService {
   // Nombre: remplaceKeyFromJson
   // Descripcion : Esta funcion cambia los key especificados de un objeto json
   // __________________________________________________________________________________________________
-  remplaceKeyFromJson(json, params) {
+  static remplaceKeyFromJson(json, params) {
     let jsonString = JSON.stringify(json);
 
     for (let i = 0; i < params.length; i++) {
@@ -468,7 +452,7 @@ export class FunctionService {
   // Nombre: IsJsonString
   // Descripcion : Esta funcion valida que un string sea un json valido
   // __________________________________________________________________________________________________
-  IsJsonString(str) {
+  static IsJsonString(str) {
     try {
       JSON.parse(str);
     } catch (e) {
@@ -477,11 +461,11 @@ export class FunctionService {
     return true;
   }
 
-  getAuthToken() {
+  static getAuthToken() {
     return localStorage.getItem('access-token');
   }
 
-  async logout() {
+  static async logout() {
     return new Promise((resolve) => {
       try {
         localStorage.removeItem('facturas_guardadas');
@@ -500,25 +484,25 @@ export class FunctionService {
     // this.router.navigateByUrl('/auth/login');
   }
 
-  decryptConfigPassword(str) {
+  static decryptConfigPassword(str) {
     const str_remplace = btoa(str);
-    const config: ConfigI = this.configServ.getConfig({ isPromise: false });
+    const config: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
     return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
   }
 
-  logBlue(text: any, body?) {
+  static logBlue(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? body : '');
   }
 
-  logYellow(text: any, body?) {
+  static logYellow(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? body : '');
   }
 
-  logRed(text: any, body?) {
+  static logRed(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? body : '');
   }
 
-  logGreen(text: any, body?) {
+  static logGreen(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? body : '');
   }
 
@@ -526,15 +510,15 @@ export class FunctionService {
   // TOASTS
   // =====================================================================
 
-  toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (this.canToast) this.toastr.success(msg || '', titulo || '');
+  static toastSuccess(msg?, titulo = 'CORRECTO') {
+    if (SingletonService.sharedServ.canToast) SingletonService.toastr.success(msg || '', titulo || '');
   }
 
-  toastError(msg?, titulo = 'ERROR') {
-    if (this.canToast) this.toastr.error(msg || '', titulo || '');
+  static toastError(msg?, titulo = 'ERROR') {
+    if (SingletonService.sharedServ.canToast) SingletonService.toastr.error(msg || '', titulo || '');
   }
 
-  toastWarning(msg?, titulo = 'AVISO') {
-    if (this.canToast) this.toastr.warning(msg || '', titulo || '');
+  static toastWarning(msg?, titulo = 'AVISO') {
+    if (SingletonService.sharedServ.canToast) SingletonService.toastr.warning(msg || '', titulo || '');
   }
 }

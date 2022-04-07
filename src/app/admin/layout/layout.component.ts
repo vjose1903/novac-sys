@@ -7,12 +7,14 @@ import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationErr
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { GLOBAL } from '../../core/typescript/GLOBAL';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
+import { CurrentUserService } from '../../core/services/current-user.service';
 import { modalClass } from '../components/modal/modal';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
 import { SingletonService } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/typescript/config-interface';
+import { fun } from '../../core/services/functions.service';
 
 @Component({
   selector: 'app-layout',
@@ -33,6 +35,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   noServer;
   subCheckCuadreToday: Subscription;
   subLogOut: Subscription;
+  subRouter: Subscription;
 
   ready;
   // facturas_localStorage: any;
@@ -49,10 +52,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   requestClass = new RequestC();
   chequiando_cuadre: boolean;
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef) {
+  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
     super();
 
-    this.router.events.subscribe((routerEvent: Event) => {
+    this.subRouter = this.router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
         this.initNavigate = true;
@@ -65,7 +68,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
           setTimeout(() => this.checkRouteActiva(), 250);
 
           setTimeout(() => {
-            const token = this.fun.getAuthToken();
+            const token = fun.getAuthToken();
             if (token) this.checkCuadre();
           }, 500);
 
@@ -76,10 +79,12 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngOnInit() {
+    console.log(' INIT ----- LayoutComponent -----');
+
     this.initVariables();
     this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal'] });
 
-    const token = this.fun.getAuthToken();
+    const token = fun.getAuthToken();
 
     if (token) {
       this.requestClass
@@ -128,9 +133,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngOnDestroy() {
+    console.log(' DESTROY ----- LayoutComponent -----');
     this._destroy_mixin();
     if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
     if (this.subLogOut) this.subLogOut.unsubscribe();
+    if (this.subRouter) this.subRouter.unsubscribe();
   }
 
   checkCuadre() {
@@ -146,7 +153,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   setUser(user) {
     this.usuario = user;
-    this.fun.setUser(user);
+    this.currentUserServ.setUser(user);
   }
 
   ngAfterViewInit() {
@@ -162,7 +169,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // CERRAR SESION
   // =================================================================================
   logOut() {
-    this.fun.logout().then(() => {
+    this.layServ.nextLogOut(false);
+    fun.logout().then(() => {
       this.router.navigateByUrl('/');
       this._destroy_layout(true);
       this.noServer = false;
@@ -191,15 +199,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
   isVistaActual(arg) {
     let res = false;
-    if (this.fun.hasValue(this.actualModule) && arg == this.actualModule) {
+    if (fun.hasValue(this.actualModule) && arg == this.actualModule) {
       res = true;
     } else {
-      if (this.fun.hasValue(this.actualPath) && this.actualPath.includes(arg)) res = true;
+      if (fun.hasValue(this.actualPath) && this.actualPath.includes(arg)) res = true;
     }
     return res;
   }
 
-  // TODO: seguir aqui revisando que cuando navege en un subMenu no se redirija a el mismo otra vez
   cambiarMenu(args: { url; navigate; hasModule }) {
     let next_cambio_menu = '';
 
@@ -211,7 +218,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         this.actualPath = next_cambio_menu;
         this.runRouterNavigate({ bool: true, ruta: this.actualPath });
       } else {
-        this.fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
+        fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
       }
     } else {
       this.actualModule = args.url;

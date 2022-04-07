@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
 import { ModalI } from '../../../admin/components/new_modal/modal-class';
+import { fun } from '../../../core/services/functions.service';
+import { SharedService } from '../../../core/services/shared.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 
 @Component({
@@ -14,7 +16,7 @@ export class ModalPasswordConfigComponent extends MixinClass implements OnInit, 
   inputs;
   form;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private sharedServ: SharedService) {
     super();
   }
 
@@ -30,20 +32,20 @@ export class ModalPasswordConfigComponent extends MixinClass implements OnInit, 
   }
 
   btn_aceptar() {
-    this.fun.nextCanToast(true);
+    this.sharedServ.nextCanToast(true);
     let data = this.form.getRawValue();
 
-    const is_correct = this.fun.decryptConfigPassword(data.password);
+    const is_correct = fun.decryptConfigPassword(data.password);
 
     if (is_correct) {
       const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
       modal.closeModal(this.modal.component_id);
       modal.getDataModal({ error: false });
-      
-      setTimeout(() => this.fun.nextCanToast(false), 2000);
+
+      setTimeout(() => this.sharedServ.nextCanToast(false), 2000);
     } else {
-      this.fun.toastError('Contraseña Incorrecta', 'ERROR');
-      setTimeout(() => this.fun.nextCanToast(false), 2000);
+      fun.toastError('Contraseña Incorrecta', 'ERROR');
+      setTimeout(() => this.sharedServ.nextCanToast(false), 2000);
     }
   }
 }

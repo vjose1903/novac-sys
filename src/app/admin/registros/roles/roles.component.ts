@@ -5,6 +5,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { AccionesC, PermisosC, RolesC } from './roles';
 import * as _ from 'lodash';
 import { TablasService } from '../../components/tablas/tablas.service';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-roles',
@@ -159,7 +160,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
   decisionModal(arg) {
     if (arg) {
-      const obj = this.fun.duplicarJson(this.seleccionModal);
+      const obj = fun.duplicarJson(this.seleccionModal);
     }
   }
 
@@ -256,7 +257,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   calcularAltoTablaAcciones() {
-    if (this.fun.hasValue(this.TablasComponent)) this.TablasComponent.calcularAlto();
+    if (fun.hasValue(this.TablasComponent)) this.TablasComponent.calcularAlto();
   }
 
   submit() {

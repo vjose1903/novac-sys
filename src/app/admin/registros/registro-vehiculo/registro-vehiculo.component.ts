@@ -9,6 +9,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../registro-empleados/empleado';
 import { VehiculoC } from './vehiculo';
 import { FormularioMarcaModeloComponent } from '../../components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-registro-vehiculo',
@@ -111,7 +112,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       const res = await this.marcasClass.getAll();
       this.listaMarcas = res;
     } catch (error) {
-      this.fun.toastError('Error buscando articulos', 'ERROR');
+      fun.toastError('Error buscando articulos', 'ERROR');
     }
   }
 
@@ -224,11 +225,11 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   decisionModal(arg) {
     if (arg) {
-      const obj = this.fun.duplicarJson(this.seleccionModal);
+      const obj = fun.duplicarJson(this.seleccionModal);
 
       this.vehiculosClass.deleteOne(obj.id).then((res) => {
         this.listaVehiculos = null;
-        this.fun.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
+        fun.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
         const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
         this.getVehiculos(actualPagination);
         this.borrar();
@@ -242,7 +243,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(this.fun.Capitalice(arg));
+    campo.setValue(fun.Capitalice(arg));
   }
 
   abrirModalMarcasYModelos(tipo) {
@@ -274,7 +275,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       siFunction: () => {
         this.vehiculosClass.deleteOne(regisData.id).then((res) => {
           this.listaVehiculos = null;
-          this.fun.toastSuccess(`Camion: ${regisData.marca} ${regisData.modelo}  de: ${regisData.nombreCompleto}` + ' borrado.', 'CORRECTO');
+          fun.toastSuccess(`Camion: ${regisData.marca} ${regisData.modelo}  de: ${regisData.nombreCompleto}` + ' borrado.', 'CORRECTO');
           const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
           this.getVehiculos(actualPagination);
           this.borrar();
@@ -313,19 +314,19 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
         const res = await this.vehiculosClass.updateOne(obj);
 
-        this.fun.toastSuccess('Vehiculo editando con exito.', 'Correcto');
+        fun.toastSuccess('Vehiculo editando con exito.', 'Correcto');
       } else {
         msg_error = 'Error registrando vehiculo';
 
         const res = await this.vehiculosClass.createOne(obj);
 
-        this.fun.toastSuccess('Vehiculo registrado con exito.', 'Correcto');
+        fun.toastSuccess('Vehiculo registrado con exito.', 'Correcto');
       }
       this.borrar();
       const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
       this.getVehiculos(actualPagination);
     } catch (error) {
-      this.fun.toastError(msg_error, 'ERROR');
+      fun.toastError(msg_error, 'ERROR');
     }
   }
 }

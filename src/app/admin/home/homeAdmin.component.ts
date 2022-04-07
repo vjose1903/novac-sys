@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { GLOBAL } from '../../core/typescript/GLOBAL';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { SingletonService } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/typescript/config-interface';
@@ -23,6 +22,8 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
 
   cedula = null;
   ngOnInit() {
+    console.log('----- HomeAdminComponent -----');
+
     this._init_mixin({ component: 'home', is_routing: true });
 
     this.configServ.getConfig().then((config: ConfigI) => {

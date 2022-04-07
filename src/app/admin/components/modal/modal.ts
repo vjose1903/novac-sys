@@ -21,10 +21,8 @@ export class modalClass extends LayoutClass {
   subEsc: Subscription;
   subNoFiltro: Subscription;
 
-
   _lista = [];
 
-  fun = SingletonService.fun;
   zone = SingletonService.zone;
   _ipc = SingletonService._ipc;
   mServ = SingletonService.mServ;
@@ -91,7 +89,6 @@ export class modalClass extends LayoutClass {
         case 'NOFILTRO':
           _this.noFiltroResponse(res);
           break;
-
       }
     }
   }

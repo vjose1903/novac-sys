@@ -4,13 +4,14 @@ export const DATATABLE = new BehaviorSubject<any>({});
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { SingletonService } from '../../../core/services/singleton.service';
+import { fun } from '../../../core/services/functions.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TablasService {
   data;
-  fun = SingletonService.fun;
+
   private total_paginas = new BehaviorSubject<any>({ tabla: 'tabla', total: 0 });
 
   TOTALPAGINAS = this.total_paginas.asObservable();
@@ -50,11 +51,11 @@ export class TablasService {
   }
 
   initPagination(id, params) {
-    if (this.fun.isEmpty(this.obj_paginate[id])) this.obj_paginate[id] = this.fun.duplicarJson(params);
+    if (fun.isEmpty(this.obj_paginate[id])) this.obj_paginate[id] = fun.duplicarJson(params);
   }
 
   getPaginationById(id) {
-    if (this.fun.isEmpty(this.obj_paginate[id])) this.obj_paginate[id] = this.fun.duplicarJson(this.obj_paginate.default);
+    if (fun.isEmpty(this.obj_paginate[id])) this.obj_paginate[id] = fun.duplicarJson(this.obj_paginate.default);
 
     return this.obj_paginate[id];
   }

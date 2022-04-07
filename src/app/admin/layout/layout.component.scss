@@ -3,11 +3,12 @@
 
 .cuadre_hoy {
   position: absolute;
-  bottom: -3rem;
+  left: 1rem;
+  bottom: -0.2rem;
   border-radius: 3rem 3rem 3rem 3rem;
   background-color: red;
-  height: 5rem;
-  width: 5rem;
+  height: 4rem;
+  width: 4rem;
   box-shadow: 0 0 0 0 #ff0000;
   transform: scale(1);
   animation: pulse 1.5s infinite;
@@ -15,6 +16,7 @@
   transition-property: width, border-radius, bottom;
   transition-delay: 0s, 0s, 0.2s;
   padding: 0rem 0rem 0rem 2.5rem;
+  z-index: 0;
   .msg {
     display: flex;
     justify-content: center;
@@ -30,7 +32,7 @@
     transition-delay: 0.2s;
   }
   &:hover {
-    bottom: 0.5rem;
+    bottom: 2.7rem;
     cursor: help;
     border-radius: 3rem 1rem 1rem 3rem;
     width: 20rem;
@@ -84,7 +86,7 @@ $bodyfont: "Poppins";
       "sideBar";
     grid-template-rows: min-content auto;
     max-height: inherit;
-
+    z-index: 1;
     > .title {
       grid-area: title;
       background-color: #c9c9c9;
@@ -118,6 +120,7 @@ $bodyfont: "Poppins";
   }
 
   .content {
+    position: relative;
     grid-area: content;
     display: grid;
     grid-template-areas:
@@ -155,6 +158,7 @@ $bodyfont: "Poppins";
       background-color: var(--secondary04);
       color: white;
       padding: 0rem 2rem 0rem 0rem;
+      z-index: 2;
     }
   }
 }

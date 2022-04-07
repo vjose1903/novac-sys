@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FunctionService } from '../../../../core/services/functions.service';
-import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
 import { ModalI } from '../../new_modal/modal-class';
 import { TablasService } from '../../tablas/tablas.service';
 import * as _ from 'lodash';
 import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
+import { fun } from '../../../../core/services/functions.service';
 @Component({
   selector: 'app-buscar-cliente-suplidor',
   templateUrl: './buscar-cliente-suplidor.component.html',
@@ -15,7 +14,7 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   dataFiltro;
-  constructor(private tServ: TablasService, private fun: FunctionService) {}
+  constructor(private tServ: TablasService) {}
   modal: any = {};
   inputs: any;
   paraFiltroClientes;
@@ -42,13 +41,13 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
   }
 
   async buscarClientesOrSuplidor(event, where?) {
-    const copyData = this.fun.duplicarJson(this.dataFiltro);
+    const copyData = fun.duplicarJson(this.dataFiltro);
     const page = event.page;
     const per_page = event.per_page;
     let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : event.searchText || ' ';
 
-    // if (!this.fun.isEmpty(event.searchText)) palabra_a_buscar = event.searchText;
-    // else if (this.inputs.palabra_a_buscar) palabra_a_buscar = this.fun.isEmpty(this.inputs.palabra_a_buscar) ? ' ' : this.inputs.palabra_a_buscar;
+    // if (!fun.isEmpty(event.searchText)) palabra_a_buscar = event.searchText;
+    // else if (this.inputs.palabra_a_buscar) palabra_a_buscar = fun.isEmpty(this.inputs.palabra_a_buscar) ? ' ' : this.inputs.palabra_a_buscar;
 
     const classDinamic = this.inputs.metodo === 'venta' ? 'clienteClass' : 'suplidorClass';
 
@@ -58,8 +57,8 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
 
     if (res.data && res.data.length > 0) {
       res.data.map(async (cli) => {
-        cli.nombre = this.fun.Capitalice(cli.nombre);
-        cli.apellido = this.fun.Capitalice(cli.apellido);
+        cli.nombre = fun.Capitalice(cli.nombre);
+        cli.apellido = fun.Capitalice(cli.apellido);
 
         const documento = await cli.documentos_de_identidad.find((doc) => doc.principal === true);
         cli.documento_identidad = documento ? documento.documento : '----------';

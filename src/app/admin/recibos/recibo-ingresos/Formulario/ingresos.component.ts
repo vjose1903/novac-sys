@@ -12,6 +12,7 @@ import { FacturaC } from '../../../facturacion/factura';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { FormCantidadEfectivoComponent } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { fun } from '../../../../core/services/functions.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -130,7 +131,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   formatoNumero(num) {
-    return this.fun.formatearNumero(this.fun.redondearAdos(num));
+    return fun.numFormatTwoDecimals(num);
   }
 
   areAllSelected() {
@@ -206,7 +207,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
       this.totalFacturado += factura.total_factura;
       this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
-      this.totalPagadoPorciento = parseFloat(this.fun.numFormatTwoDecimals(this.totalPagadoPorciento));
+      this.totalPagadoPorciento = parseFloat(fun.numFormatTwoDecimals(this.totalPagadoPorciento));
       return factura;
     });
 
@@ -233,7 +234,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   isOneFacturaWithMonto() {
-    const valid = _.some(this.facturas, (factura) => factura.select && this.fun.desformatear(factura.monto) > 0);
+    const valid = _.some(this.facturas, (factura) => factura.select && fun.desformatear(factura.monto) > 0);
     return valid;
   }
 
@@ -259,7 +260,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       temp.push({
         cabecera_factura_id: fact.id,
         pago_total: fact.pagoT,
-        deposito: this.fun.desformatear(fact.monto),
+        deposito: fun.desformatear(fact.monto),
         descripcion:
           this.tipo_recibo === 'Pago factura'
             ? fact.pagoT
@@ -269,7 +270,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         pago_a_tiempo: fact.pago_a_tiempo,
       });
 
-      total += this.fun.desformatear(fact.monto);
+      total += fun.desformatear(fact.monto);
     }
 
     const obj = { total_recibo: total, detalle: temp };
@@ -305,7 +306,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
-      this.fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
+      fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo__: 'devuelta' };
@@ -393,11 +394,11 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         .generatePdf({ oPdf: obj_print, imprimir: true })
         .then(async (res) => {
           if (res.status === 'si') {
-          } else this.fun.toastError(res.msg, 'ERROR');
+          } else fun.toastError(res.msg, 'ERROR');
 
           this.layServ.nextCheckCuadreToday(true);
         })
-        .catch((err) => this.fun.toastError(err.msg, 'ERROR'));
+        .catch((err) => fun.toastError(err.msg, 'ERROR'));
     });
   }
 
@@ -408,12 +409,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   getInfoChange(item) {
-    console.log('🚀 ~ IngresosComponent ~ getInfoChange ~ item', item);
     if (item.cambio === 'pagoT' && item.value) {
       this.tablas.resetInput('balance', 'monto', item.index, true);
     }
     if (item.cambio === 'select') {
-      console.log('🚀 ~ IngresosComponent ~ getInfoChange ~ item', item);
       if (!item.value) {
         item.rowChanged.pagoT = false;
         this.tablas.resetInput('especificar', 'monto', item.index, true, 0);
@@ -422,17 +421,17 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (item.cambio === 'monto') {
       if (!item.value) {
-        this.fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+        fun.toastWarning('Debe de introducir un Monto', 'AVISO');
         this.tablas.enfocarInput('input-' + item.index);
       }
       const total = item.body[item.index].balance;
-      const monto = this.fun.desformatear(item.value);
+      const monto = fun.desformatear(item.value);
 
       if (monto === total) item.rowChanged.pagoT = true;
 
       if (monto > total) {
         this.ExisteMontoMayor = true;
-        this.fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+        fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
         item.rowChanged.monto = item.rowChanged.balance;
         this.tablas.enfocarInput('input-' + item.index);
       } else {
@@ -443,12 +442,12 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   sumarTotalRecibo() {
-    this.recibiendo = _.reduce(this.facturas, (sum, item) => this.fun.desformatear(item.monto) + sum, 0);
+    this.recibiendo = _.reduce(this.facturas, (sum, item) => fun.desformatear(item.monto) + sum, 0);
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
   }
 
   async abrirModalFiltro(nombre) {
-    if (this.fun.hasValue(nombre)) {
+    if (fun.hasValue(nombre)) {
       const obj = {
         data: [],
         palabra_a_buscar: nombre,

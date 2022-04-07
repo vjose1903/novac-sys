@@ -16,10 +16,10 @@ import { MessageTask } from '../../models/message-task';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
 import { ConfigurationService } from '../configuration.service';
 import { ConfigI } from '../../typescript/config-interface';
+import { fun } from '../functions.service';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
-  fun = SingletonService.fun;
   _ipc = SingletonService._ipc;
 
   constructor(public configServ: ConfigurationService) {}
@@ -28,7 +28,7 @@ export class PdfService {
     return new Promise((resolve, reject) => {
       let obj;
       let todo_true = true;
-      const data = this.fun.duplicarJson(params.oPdf.data);
+      const data = fun.duplicarJson(params.oPdf.data);
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
       const config: ConfigI = this.configServ.getConfig({ isPromise: false });
@@ -73,7 +73,7 @@ export class PdfService {
             data.identificador = data.numero_documento;
 
             data.contenido_reporte.map((detalle) => {
-              detalle['cantidad'] = `${this.fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+              detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
             });
 
             obj = options[config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
@@ -92,7 +92,7 @@ export class PdfService {
             data.tipo_pdf = data.tipo_factura.toUpperCase();
 
             data.contenido_reporte.map((detalle) => {
-              detalle['cantidad'] = `${this.fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+              detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
             });
 
             obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', 'ventas');
@@ -135,7 +135,7 @@ export class PdfService {
           });
         } else {
           const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
-          this.fun.toastError('Error generando el pdf.', 'ERROR');
+          fun.toastError('Error generando el pdf.', 'ERROR');
           resolve(respuesta);
         }
       } catch (error) {
@@ -143,7 +143,7 @@ export class PdfService {
 
         const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de pdf.', status: 'no', body: error });
 
-        this.fun.toastError('ERROR en el switch de tipos de pdf.', 'ERROR');
+        fun.toastError('ERROR en el switch de tipos de pdf.', 'ERROR');
         reject(respuesta);
       }
     });

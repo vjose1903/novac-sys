@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { FunctionService } from '../../../../core/services/functions.service';
+import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { TablasService } from '../../../components/tablas/tablas.service';
 import { OtrosCostosC } from './otroCosto';
@@ -11,7 +11,7 @@ import { OtrosCostosC } from './otroCosto';
   styleUrls: ['./otros-costos-form.component.scss'],
 })
 export class OtrosCostosFormComponent extends MixinClass implements OnInit {
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private tServ: TablasService) {
+  constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();
   }
 
@@ -52,8 +52,8 @@ export class OtrosCostosFormComponent extends MixinClass implements OnInit {
     this.listado = [];
     const res = await this.OtrosCostosClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
     res.data.map((otroCosto) => {
-      otroCosto.precio = this.fun.numFormatTwoDecimals(otroCosto.precio);
-      otroCosto.costo = this.fun.numFormatTwoDecimals(otroCosto.costo);
+      otroCosto.precio = fun.numFormatTwoDecimals(otroCosto.precio);
+      otroCosto.costo = fun.numFormatTwoDecimals(otroCosto.costo);
       return otroCosto;
     });
 
@@ -72,14 +72,14 @@ export class OtrosCostosFormComponent extends MixinClass implements OnInit {
   revisarPrecio(id) {
     const input = this.form.controls[id];
 
-    this.fun.revisarPrecio(input, id).then((res) => {
+    fun.revisarPrecio(input, id).then((res) => {
       if (!res.error) input.setValue(res.number);
     });
   }
 
   capitalice(control, arg, form) {
     const campo = form.get(control);
-    campo.setValue(this.fun.Capitalice(arg));
+    campo.setValue(fun.Capitalice(arg));
   }
 
   editarItem(item) {
@@ -111,8 +111,8 @@ export class OtrosCostosFormComponent extends MixinClass implements OnInit {
   submit() {
     const formulario = this.form.getRawValue();
 
-    formulario.precio = this.fun.desformatear(formulario.precio);
-    formulario.costo = this.fun.desformatear(formulario.costo);
+    formulario.precio = fun.desformatear(formulario.precio);
+    formulario.costo = fun.desformatear(formulario.costo);
 
     this.OtrosCostosClass.createUpdateOne(formulario).then((res) => {
       const actualPagination = this.tServ.getPaginationById('otrosCostos');

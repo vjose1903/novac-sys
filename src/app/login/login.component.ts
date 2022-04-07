@@ -9,16 +9,7 @@ var JsBarcode = require('jsbarcode');
 
 import * as Rx from 'rxjs';
 
-import {
-  compra_contado_valor_fiscal,
-  compra_credito_valor_fiscal,
-  conduce,
-  nota_credito,
-  recibo_de_ingreso,
-  venta_contado_consumo,
-  ventas_productos_rango,
-  venta_credito_consumo,
-} from '../../assets/facturas';
+import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
 
 import { ModalService } from '../admin/components/modal/modal.service';
 import { PdfService } from '../core/services/pdf/pdf.service';
@@ -28,6 +19,8 @@ import { SingletonService } from '../core/services/singleton.service';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, KEYWORD_ELECTRON_PRINT_BASE64, KEYWORD_ELECTRON_TEST } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
 import { ConfigI } from '../core/typescript/config-interface';
+import { fun } from '../core/services/functions.service';
+import { CurrentUserService } from '../core/services/current-user.service';
 
 @Component({
   selector: 'app-login',
@@ -45,7 +38,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   requestClass = new RequestC();
   configServ = SingletonService.configServ;
 
-  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public mServ: ModalService, public pdfServ: PdfService) {
+  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public mServ: ModalService, public pdfServ: PdfService, public currentUserServ: CurrentUserService) {
     super();
   }
 
@@ -82,16 +75,16 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
   formularioIsInvalid() {
     if (this.form) {
       const formulario = this.form.getRawValue();
-      return this.fun.isEmpty(formulario.usuario) || this.fun.isEmpty(formulario.password);
+      return fun.isEmpty(formulario.usuario) || fun.isEmpty(formulario.password);
     }
   }
 
   saltar(input) {
     const formulario = this.form.getRawValue();
     if (input == 'send') {
-      if (this.fun.hasValue(formulario.password)) this.login();
+      if (fun.hasValue(formulario.password)) this.login();
     } else {
-      if (this.fun.hasValue(formulario.usuario)) this.enfocarInput(input);
+      if (fun.hasValue(formulario.usuario)) this.enfocarInput(input);
     }
   }
 
@@ -107,11 +100,13 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then((res) => {
-          this.fun.setUser(res.data);
+          this.currentUserServ.setUser(res.data);
+          console.log("ANDO AQUIII");
+
           this.router.navigateByUrl('/admin/dashboard');
         })
         .catch((error) => {
-          if (error.status === 0) this.fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
+          if (error.status === 0) fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
         });
     }
   }

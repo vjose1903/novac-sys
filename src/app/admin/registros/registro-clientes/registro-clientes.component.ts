@@ -7,6 +7,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { ClienteC } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -100,7 +101,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(this.fun.Capitalice(arg));
+    campo.setValue(fun.Capitalice(arg));
   }
 
   marcarCheck(arg) {
@@ -150,8 +151,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     this.patchDocumentos(item.ARG.documentos_de_identidad);
 
-    this.form.controls.maximo_credito.setValue(this.fun.formatearNumero(this.fun.redondearAdos(item.ARG.maximo_credito)));
-    this.clienteSelected = this.fun.duplicarJson(item.ARG);
+    this.form.controls.maximo_credito.setValue(fun.formatearNumero(fun.redondearAdos(item.ARG.maximo_credito)));
+    this.clienteSelected = fun.duplicarJson(item.ARG);
 
     this.boton = 'Editar';
     this.editando = true;
@@ -194,14 +195,14 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
           return;
         }
 
-        await this.fun
+        await fun
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: tipo })
           .then((res) => {
             if (res['data'].length) {
               const is_cliente = _.find(res['data'], (item) => item.persona_is === 'Cliente');
 
-              if (this.fun.hasValue(is_cliente) && is_cliente.persona.estado) {
-                this.fun.toastError(`${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
+              if (fun.hasValue(is_cliente) && is_cliente.persona.estado) {
+                fun.toastError(`${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
                 const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
                 this.doc_is_cedula = documento_original.descripcion == 'cedula' ? true : false;
                 const otro_doc = documento_original.descripcion == 'cedula' ? 'rnc' : 'cedula';
@@ -211,8 +212,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
                 return;
               }
 
-              // const documento = this.fun.hasValue(is_cliente) ? _.omit(is_cliente, ['persona', 'persona_is']) : _.omit(_.head(res['data']), ['persona', 'persona_is']);
-              const persona = this.fun.hasValue(is_cliente) ? is_cliente.persona : _.head(res['data']).persona;
+              // const documento = fun.hasValue(is_cliente) ? _.omit(is_cliente, ['persona', 'persona_is']) : _.omit(_.head(res['data']), ['persona', 'persona_is']);
+              const persona = fun.hasValue(is_cliente) ? is_cliente.persona : _.head(res['data']).persona;
 
               // persona.fecha_nacimiento = this.fecha(persona.fecha_nacimiento);
 
@@ -252,7 +253,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         if (!_.endsWith(formulario[this.doc_principal], '_')) {
           const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
           if (this.doc_principal == 'cedula') {
-            if (this.fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
+            if (fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
           } else this.enfocarInput(campo);
         }
       } else this.enfocarInput(campo);
@@ -275,7 +276,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   revisarPrecio(id) {
     const input = this.form.controls[id];
-    this.fun.revisarPrecio(input, id).then((res) => {
+    fun.revisarPrecio(input, id).then((res) => {
       if (!res.error) input.setValue(res.number);
     });
   }
@@ -296,10 +297,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       return element;
     });
 
-    formulario.documentos_de_identidad = _.filter(documentos_identidad, (doc) => this.fun.hasValue(doc.documento));
+    formulario.documentos_de_identidad = _.filter(documentos_identidad, (doc) => fun.hasValue(doc.documento));
 
     if (!this.form.controls[this.doc_principal].value) {
-      this.fun.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
+      fun.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
 
       // paso todas las validaciones
     } else {
@@ -312,7 +313,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       formulario.estado = true;
 
       formulario['balance'] = 0;
-      formulario.maximo_credito = this.fun.desformatear(formulario.maximo_credito);
+      formulario.maximo_credito = fun.desformatear(formulario.maximo_credito);
 
       this.clienteClass.createUpdateOne(formulario).then((res) => {
         const actualPagination = this.tServ.getPaginationById('lista_clientes');

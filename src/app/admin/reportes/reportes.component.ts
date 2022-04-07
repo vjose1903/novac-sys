@@ -9,6 +9,7 @@ import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../electron/shared-elect
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { FormVentasComponent } from '../components/formularios en modales/form-reportes/form-reportes.component';
+import { fun } from '../../core/services/functions.service';
 
 @Component({
   selector: 'app-reportes',
@@ -57,7 +58,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
 
   async makeCuadre(data?) {
     try {
-      let extra = { parameters: { fecha: this.fun.my_dateFormater(data.fecha, false) } };
+      let extra = { parameters: { fecha: fun.my_dateFormater(data.fecha, false) } };
 
       new CuadreCajaC().createOne({}, extra).then((res) => {
         const obj = { data: res.data, type: 'cuadre_caja' };
@@ -69,7 +70,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       });
     } catch (error) {
       console.error(error);
-      this.fun.toastError(error.error.msg, 'ERROR');
+      fun.toastError(error.error.msg, 'ERROR');
     }
   }
 
@@ -101,8 +102,8 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
         tipo: data.tipo,
         condicion: data.condicion,
         formas_pago: formas_pago,
-        desde: this.fun.my_dateFormater(data.desde, false),
-        hasta: this.fun.my_dateFormater(data.hasta, false),
+        desde: fun.my_dateFormater(data.desde, false),
+        hasta: fun.my_dateFormater(data.hasta, false),
       };
 
       if (_.every(data.switches.array, (item) => item.value === false)) {
@@ -117,21 +118,21 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       tipo = 'cuentas_cobrar';
       //
     } else if (this.tipoModal === 'cuentas_con_pagos') {
-      extra.parameters = { desde: this.fun.my_dateFormater(data.desde, false), hasta: this.fun.my_dateFormater(data.hasta, false), cliente_id: data.cliente_id };
+      extra.parameters = { desde: fun.my_dateFormater(data.desde, false), hasta: fun.my_dateFormater(data.hasta, false), cliente_id: data.cliente_id };
       tipo = 'cuentas_con_pagos';
       //
     } else if (this.tipoModal === 'recibos') {
-      extra.parameters = { desde: this.fun.my_dateFormater(data.desde, false), hasta: this.fun.my_dateFormater(data.hasta, false), tipo_recibo: data.tipo, order: 'ASC' };
+      extra.parameters = { desde: fun.my_dateFormater(data.desde, false), hasta: fun.my_dateFormater(data.hasta, false), tipo_recibo: data.tipo, order: 'ASC' };
       tipo = 'recibos';
       //
     } else if (this.tipoModal === 'ventas_productos') {
-      if (data.tipo == '1') extra.parameters = { desde: this.fun.my_dateFormater(data.fecha, false) };
-      else extra.parameters = { desde: this.fun.my_dateFormater(data.desde, false), hasta: this.fun.my_dateFormater(data.hasta, false) };
+      if (data.tipo == '1') extra.parameters = { desde: fun.my_dateFormater(data.fecha, false) };
+      else extra.parameters = { desde: fun.my_dateFormater(data.desde, false), hasta: fun.my_dateFormater(data.hasta, false) };
 
       tipo = 'ventas_productos';
       //
     } else if (this.tipoModal === 'suplidor_prod') {
-      extra.parameters = { articulo_id: data.articulo_id, desde: this.fun.my_dateFormater(data.desde, false), hasta: this.fun.my_dateFormater(data.hasta, false) };
+      extra.parameters = { articulo_id: data.articulo_id, desde: fun.my_dateFormater(data.desde, false), hasta: fun.my_dateFormater(data.hasta, false) };
       tipo = 'suplidor_prod';
       //
     } else if (this.tipoModal === 'inventario') {
@@ -154,7 +155,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
           });
       });
     } else {
-      this.fun.toastError(msg_error, 'ERROR');
+      fun.toastError(msg_error, 'ERROR');
     }
   }
 
@@ -194,7 +195,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       this.abrirVisorPdf(obj);
     } else {
       this.loadServ.isLoading.next(false);
-      this.fun.toastError(arg.msg, 'ERROR');
+      fun.toastError(arg.msg, 'ERROR');
     }
   }
 
@@ -315,11 +316,11 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       .imprimirBase64(obj)
       .then((res) => {
         if (res.status === 'si') {
-          this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+          fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
           if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
-        } else this.fun.toastError(res.msg, 'ERROR');
+        } else fun.toastError(res.msg, 'ERROR');
       })
-      .catch((err) => this.fun.toastError(err.msg, 'ERROR'));
+      .catch((err) => fun.toastError(err.msg, 'ERROR'));
   }
   decisionModal(decision) {
     if (decision) {
@@ -329,10 +330,10 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
         this.pdfServ
           .imprimirBase64(obj)
           .then((res) => {
-            if (res.status === 'si') this.fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-            else this.fun.toastError(res.msg, 'ERROR');
+            if (res.status === 'si') fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+            else fun.toastError(res.msg, 'ERROR');
           })
-          .catch((err) => this.fun.toastError(err.msg, 'ERROR'));
+          .catch((err) => fun.toastError(err.msg, 'ERROR'));
         //
       } else if (this.tipoModal === 'cuadre') {
         this.makeCuadre();

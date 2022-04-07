@@ -7,7 +7,6 @@ export class LayoutClass {
   ruta_a_cambiar = '';
   url_actual = '';
 
-  subInit: Subscription;
   subDeciMenu: Subscription;
 
   subRefresh: Subscription;
@@ -17,7 +16,7 @@ export class LayoutClass {
   private static metodos = {};
   private static lastComponentInitLayout;
   private static layoutComponent;
-  fun = SingletonService.fun;
+
   _init_layout(arg) {
     this.layServ = SingletonService.layServ;
     if (arg.component == 'layout') LayoutClass.layoutComponent ||= this;
@@ -45,10 +44,6 @@ export class LayoutClass {
   }
 
   _destroy_layout(refresh = false) {
-    if (this.subInit) {
-      if (this.subInit) this.subInit.unsubscribe();
-    }
-
     if (refresh) {
       LayoutClass.layoutComponent = undefined;
       LayoutClass.metodos = {};

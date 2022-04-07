@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { fun } from '../../core/services/functions.service';
 import { SingletonService } from '../../core/services/singleton.service';
 import { MixinClass } from '../../core/typescript/MixinClass';
 
@@ -29,7 +30,7 @@ export class FactsLocalStorage extends MixinClass {
   }
 
   countCantFactSaved(tipo) {
-    const array_fact = _.filter(this.fun.getFacturasguardadas(), (o: any) => o.tipo === tipo);
+    const array_fact = _.filter(fun.getFacturasguardadas(), (o: any) => o.tipo === tipo);
     return { disable: array_fact.length === 0, cant: array_fact.length };
   }
 
@@ -41,11 +42,9 @@ export class FactsLocalStorage extends MixinClass {
 
   async getFacturasGuardadas() {
     const obj = { 0: 'venta', 1: 'compra' };
-    console.log('🚀 ~ FactsLocalStorage ~ getFacturasGuardadas ~ getFacturasGuardadas');
-    this.facturas_localStorage = this.fun.getFacturasguardadas();
+    this.facturas_localStorage = fun.getFacturasguardadas();
 
     this.facturas_localStorage = _.filter(this.facturas_localStorage, (o: any) => o.tipo === obj[this.activeIndex]);
-    console.log('🚀 ~ FactsLocalStorage ~ getFacturasGuardadas ~ this.facturas_localStorage', this.facturas_localStorage);
 
     setTimeout(async () => {
       if (this.facturas_localStorage.length > 0) {
@@ -60,8 +59,7 @@ export class FactsLocalStorage extends MixinClass {
 
   quitarFacturaGuardada(archivo_id) {
     let index;
-    const allFacturas = this.fun.getFacturasguardadas();
-    console.log('archivo_id ', archivo_id);
+    const allFacturas = fun.getFacturasguardadas();
 
     if (archivo_id) {
       if (this.factura_guardada.archivo_id == archivo_id) this.factura_guardada = undefined;
@@ -69,8 +67,7 @@ export class FactsLocalStorage extends MixinClass {
 
       _.pullAt(allFacturas, index);
 
-      console.log('this ', this);
-      this.fun.setFacturasGuardadas(allFacturas);
+      fun.setFacturasGuardadas(allFacturas);
 
       this.getFacturasGuardadas();
     }

@@ -1,9 +1,9 @@
-import { Component, OnInit, ComponentFactoryResolver, ViewChild, Input, ComponentRef, ViewChildren, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MODALCONFIG } from './modal.service';
 import { ModalDirective } from './modal.directive';
 import * as _ from 'lodash';
-import { FunctionService } from '../../../core/services/functions.service';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-new-modal',
@@ -13,7 +13,7 @@ import { FunctionService } from '../../../core/services/functions.service';
 export class NewModalComponent implements OnInit {
   @ViewChildren(ModalDirective) modal_receptor: ModalDirective;
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private fun: FunctionService, private cdRef: ChangeDetectorRef) {}
+  constructor(private componentFactoryResolver: ComponentFactoryResolver, private cdRef: ChangeDetectorRef) {}
 
   subConfig: Subscription;
 
@@ -53,13 +53,11 @@ export class NewModalComponent implements OnInit {
 
   resetConfig(id_, accion) {
     const modal = _.find(this.modalsConfig, (config) => config.id === id_);
-    console.log('modal ', modal);
 
     const data = { modal: modal, accion: accion };
     if (modal) modal.onHide(data);
 
     this.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
-    console.log('this.modalsConfig ', this.modalsConfig);
   }
 
   handleConfig(config) {
@@ -143,7 +141,7 @@ export class NewModalComponent implements OnInit {
   }
 
   hasValue(arg) {
-    return this.fun.hasValue(arg);
+    return fun.hasValue(arg);
   }
 
   hasAnyBtn(configuration) {

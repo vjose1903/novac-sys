@@ -1,10 +1,8 @@
-import { Component, OnInit, ViewChild, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter, OnDestroy, OnChanges, ElementRef } from '@angular/core';
-
+import { Component, OnInit, AfterViewInit, HostListener, ChangeDetectorRef, Input, Output, EventEmitter, OnDestroy, OnChanges, ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
-import { FunctionService } from '../../../core/services/functions.service';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-tablas',
@@ -110,7 +108,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   listaMostrar = [5, 20, 40, 60];
   total_registros;
 
-  constructor(private cdRef: ChangeDetectorRef, private tServ: TablasService, private fun: FunctionService) {}
+  constructor(private cdRef: ChangeDetectorRef, private tServ: TablasService) {}
 
   ngOnInit() {
     this.subTotalPag = this.tServ.TOTALPAGINAS.subscribe((res) => {
@@ -154,7 +152,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   //     this.obj_alto = {
   //       altoTabla: this.tabla_content.offsetHeight - restar,
-  //       altoTbody: this.tabla_content.offsetHeight - restar - (titulosDiv.offsetHeight || 0) - (this.fun.hasValue(paginationDiv) ? 15 : 0), // el -15 es para separar un poco el scroll del paginador
+  //       altoTbody: this.tabla_content.offsetHeight - restar - (titulosDiv.offsetHeight || 0) - (fun.hasValue(paginationDiv) ? 15 : 0), // el -15 es para separar un poco el scroll del paginador
   //       id: this.id_tabla,
   //     };
   //   }, 100);
@@ -184,14 +182,14 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           if (event === 'hover') {
             for (let i = 0; i < moveEvent.hover.length; i++) {
               const overEvent = moveEvent.hover[i];
-              this.fun.ModificarClass(id, moveEvent.leave[i], 'remove');
-              this.fun.ModificarClass(id, overEvent, 'add');
+              fun.ModificarClass(id, moveEvent.leave[i], 'remove');
+              fun.ModificarClass(id, overEvent, 'add');
             }
           } else {
             for (let i = 0; i < moveEvent.leave.length; i++) {
               const overEvent = moveEvent.leave[i];
-              this.fun.ModificarClass(id, moveEvent.hover[i], 'remove');
-              this.fun.ModificarClass(id, overEvent, 'add');
+              fun.ModificarClass(id, moveEvent.hover[i], 'remove');
+              fun.ModificarClass(id, overEvent, 'add');
             }
           }
         }
@@ -237,10 +235,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     if (referencia === 'especificar') {
       this.data[i][destino] = especifico;
     } else {
-      const copia = this.fun.duplicarJson(this.data[i][referencia]);
+      const copia = fun.duplicarJson(this.data[i][referencia]);
 
       if (formatear) {
-        this.data[i][destino] = this.fun.formatearNumero(this.fun.redondearAdos(copia));
+        this.data[i][destino] = fun.formatearNumero(fun.redondearAdos(copia));
       } else {
         this.data[i][destino] = copia;
       }
@@ -293,7 +291,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   cambiaMostrar(num: number) {
-    const temp = this.fun.duplicarJson(this.ROW + '0');
+    const temp = fun.duplicarJson(this.ROW + '0');
     this.IDROW = null;
     this.mostrar = num;
 
@@ -306,7 +304,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   pageChange(arg, tipo = '') {
-    const temp = this.fun.duplicarJson(this.ROW + '0');
+    const temp = fun.duplicarJson(this.ROW + '0');
     this.IDROW = null;
     this.pagActual = tipo === 'filtro' ? 1 : arg;
 
@@ -388,7 +386,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
       }
       //
       if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
-        this.fun.toastError('Valor introducido es invalido', 'ERROR');
+        fun.toastError('Valor introducido es invalido', 'ERROR');
         this.enfocarInput(input);
       } else {
         //
@@ -410,7 +408,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
           precioTEMP = _.join(temp, '.');
         }
 
-        const numeroFormateado = this.fun.formatearNumero(this.fun.redondearAdos(precioTEMP));
+        const numeroFormateado = fun.formatearNumero(fun.redondearAdos(precioTEMP));
 
         this.data[i][key] = numeroFormateado;
         const obj = {
@@ -429,7 +427,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   // ===================================================================================================
 
   formatoNumero(num) {
-    return this.fun.formatearNumero(this.fun.redondearAdos(num));
+    return fun.formatearNumero(fun.redondearAdos(num));
   }
 
   lookOters(objeto) {
@@ -440,10 +438,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const fin1 = values[1] > 1 ? this.medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? this.medidas[keys[2]] : keys[2];
 
-    const principal = this.fun.formatearNumero(this.fun.redondearAdos(values[0])) + '  ' + fin;
+    const principal = fun.formatearNumero(fun.redondearAdos(values[0])) + '  ' + fin;
 
-    const padre = this.fun.formatearNumero(this.fun.redondearAdos(values[1])) + '  ' + fin1;
-    const hijo = this.fun.formatearNumero(values[2]) + '  ' + fin2;
+    const padre = fun.formatearNumero(fun.redondearAdos(values[1])) + '  ' + fin1;
+    const hijo = fun.formatearNumero(values[2]) + '  ' + fin2;
 
     let cantiTootip = { Padre: undefined, Hijo: undefined };
     if (keys.length > 1) {
@@ -464,7 +462,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     const values = _.values(objeto);
     const fin = values[0] > 1 ? this.medidas[keys[0]] : keys[0];
 
-    return this.fun.formatearNumero(this.fun.redondearAdos(values[0])) + '  ' + fin;
+    return fun.formatearNumero(fun.redondearAdos(values[0])) + '  ' + fin;
   }
 
   getStyle(column, i) {
@@ -574,7 +572,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   async searchItems() {
-    const temp = this.fun.duplicarJson(this.ROW + '0');
+    const temp = fun.duplicarJson(this.ROW + '0');
     this.IDROW = null;
     // ------------------------------------------------------------------------------
 
@@ -592,9 +590,9 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
     if (this.metodo === 'venta' && this.paraFiltroArticulos !== null && arg.existencia === 0) {
       if (arg.descripcion === 'Producto terminado') {
-        this.fun.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
+        fun.toastError('Producto agotado, debe de producir mas!!!', 'ERROR');
       } else {
-        this.fun.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
+        fun.toastError('Producto agotado, debe de comprar mas!!!', 'ERROR');
       }
     } else {
       this.clickRow.emit(arg);
@@ -620,7 +618,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.NUM = this.NUM - 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
 
-    this.fun.scrollTo(this.IDROW, 'center');
+    fun.scrollTo(this.IDROW, 'center');
     this.enfocarInput(this.IDROW);
   }
 
@@ -630,7 +628,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.NUM = this.NUM + 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
 
-    this.fun.scrollTo(this.IDROW, 'center');
+    fun.scrollTo(this.IDROW, 'center');
     this.enfocarInput(this.IDROW);
   }
 
@@ -642,7 +640,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   getIndex(index) {
     const pageIndex = (this.pagActual - 1) * this.mostrar + index;
 
-    const validate = this.fun.isEmpty(this.data[pageIndex]);
+    const validate = fun.isEmpty(this.data[pageIndex]);
     if (validate) {
       return index;
     } else {

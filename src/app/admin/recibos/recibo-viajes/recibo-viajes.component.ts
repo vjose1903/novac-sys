@@ -10,6 +10,7 @@ import { RecibosService } from '../recibos.service';
 import { FacturaC } from '../../facturacion/factura';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { FormCantidadEfectivoComponent } from '../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -75,7 +76,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   decisionModal(res: any) {
-    if (this.fun.hasValue(res)) this.reversarUltimaTransaccion();
+    if (fun.hasValue(res)) this.reversarUltimaTransaccion();
   }
 
   objDevueltoResponse(res) {
@@ -98,7 +99,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   formatoNumero(num) {
-    return this.fun.numFormatTwoDecimals(num);
+    return fun.numFormatTwoDecimals(num);
   }
 
   async getChoferes() {
@@ -144,26 +145,26 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       this.viajes = res.data;
       this.viajes_cant = res.total_registros ? res.total_registros : 0;
 
-      this.viajes_completados_cant = this.viajes.filter((v) => this.fun.hasValue(v.fecha_completada)).length;
-      this.viajes_pendientes_cant = this.viajes.filter((v) => this.fun.isEmpty(v.fecha_completada)).length;
+      this.viajes_completados_cant = this.viajes.filter((v) => fun.hasValue(v.fecha_completada)).length;
+      this.viajes_pendientes_cant = this.viajes.filter((v) => fun.isEmpty(v.fecha_completada)).length;
 
       setTimeout(() => {
         this.viajes_cant_porciento = (this.viajes_completados_cant / this.viajes_cant) * 100;
-        this.viajes_cant_porciento = this.fun.numFormatTwoDecimals(this.viajes_cant_porciento);
+        this.viajes_cant_porciento = fun.numFormatTwoDecimals(this.viajes_cant_porciento);
       }, 5);
 
       this.viajes = _.orderBy(this.viajes, ['id'], ['desc']);
     } catch (error) {
       console.error(error);
 
-      if (error.error) this.fun.toastError(error.error.msg, 'ERROR');
+      if (error.error) fun.toastError(error.error.msg, 'ERROR');
     }
   }
 
   // ----------------------------------------
   checkChofer() {
     if (this.choferes.length > 0) {
-      this.is_chofer_selected = this.fun.hasValue(this.chofer_id);
+      this.is_chofer_selected = fun.hasValue(this.chofer_id);
     } else this.is_chofer_selected = false;
 
     this.salio_en_chofer = true;
@@ -175,7 +176,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   // ----------------------------------------
   checkCamion() {
     if (this.camiones.length > 0) {
-      this.is_camion_selected = this.fun.hasValue(this.camion_id);
+      this.is_camion_selected = fun.hasValue(this.camion_id);
     } else this.is_camion_selected = false;
 
     this.salio_en_camion = true;
@@ -211,7 +212,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
     this.monto_pendiente = this.viaje_selected.balance;
     this.totalPagadoPorciento = (this.totalPagado / this.viaje_selected.total_factura) * 100;
-    this.totalPagadoPorciento = this.fun.numFormatTwoDecimals(this.totalPagadoPorciento);
+    this.totalPagadoPorciento = fun.numFormatTwoDecimals(this.totalPagadoPorciento);
 
     this.ultimo_pago = _.maxBy(this.viaje_selected.pagos, 'id');
   }
@@ -318,7 +319,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     temp.push({
       cabecera_factura_id: this.viaje_selected.id,
       pago_total: pagado_total,
-      deposito: this.fun.desformatear(this.total_recibido),
+      deposito: fun.desformatear(this.total_recibido),
       descripcion: pagado_total
         ? 'Saldo ' + this.viaje_selected.numero_comprobante + ' ' + moment(this.viaje_selected.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
         : 'Abono ' + this.viaje_selected.numero_comprobante + ' ' + moment(this.viaje_selected.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss'),
@@ -354,10 +355,10 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         .generatePdf({ oPdf: obj_print, imprimir: true })
         .then(async (res) => {
           if (res.status === 'si') {
-          } else this.fun.toastError(res.msg, 'ERROR');
+          } else fun.toastError(res.msg, 'ERROR');
           this.layServ.nextCheckCuadreToday(true);
         })
-        .catch((err) => this.fun.toastError(err.msg, 'ERROR'));
+        .catch((err) => fun.toastError(err.msg, 'ERROR'));
     });
   }
 

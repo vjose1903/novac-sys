@@ -109,12 +109,11 @@
 
     <div class="contenido">
       <router-outlet *ngIf="ready"></router-outlet>
-
-      <div *ngIf="cuadre_hoy" class="cuadre_hoy">
-        <div class="msg">Hoy ya existe un cuadre</div>
-      </div>
     </div>
     <div class="footer">VjPOS {{ versionApp }} - @2020 Desarrollador: Victor J. Vasquez</div>
+    <div *ngIf="cuadre_hoy" class="cuadre_hoy">
+      <div class="msg">Hoy ya existe un cuadre</div>
+    </div>
   </div>
 </div>
 
