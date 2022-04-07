@@ -19,7 +19,7 @@ export class OtrosCostosFormComponent extends MixinClass implements OnInit {
   listado = [];
   info = [
     { titulo: 'Descripcion', key: 'descripcion', tipo: 'text' },
-    { titulo: 'Costo', key: 'costo', tipo: 'formatoNumero' },
+    { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero' },
   ];
 
   OtrosCostosClass: OtrosCostosC;
@@ -38,7 +38,9 @@ export class OtrosCostosFormComponent extends MixinClass implements OnInit {
     this.form = this.fb.group({
       id: [null],
       descripcion: [{ value: null, disabled: false }, Validators.required],
+      key: [{ value: null, disabled: false }, Validators.required],
       costo: [{ value: null, disabled: false }, Validators.required],
+      precio: [{ value: null, disabled: false }, Validators.required],
       estado: [true],
     });
   }
@@ -50,6 +52,8 @@ export class OtrosCostosFormComponent extends MixinClass implements OnInit {
     this.listado = [];
     const res = await this.OtrosCostosClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
     res.data.map((otroCosto) => {
+      otroCosto.precio = this.fun.numFormatTwoDecimals(otroCosto.precio);
+      otroCosto.costo = this.fun.numFormatTwoDecimals(otroCosto.costo);
       return otroCosto;
     });
 
@@ -65,21 +69,27 @@ export class OtrosCostosFormComponent extends MixinClass implements OnInit {
     this.otroCostoSelect = undefined;
   }
 
+  revisarPrecio(id) {
+    const input = this.form.controls[id];
+
+    this.fun.revisarPrecio(input, id).then((res) => {
+      if (!res.error) input.setValue(res.number);
+    });
+  }
+
   capitalice(control, arg, form) {
     const campo = form.get(control);
     campo.setValue(this.fun.Capitalice(arg));
   }
 
   editarItem(item) {
-    console.log('item ', item);
     this.boton = 'Editar';
     this.otroCostoSelect = item.ARG;
     this.form.patchValue(item.ARG);
+    this.form.controls.key.disable();
   }
 
   eliminarReg(regisData) {
-    console.log('regisData ', regisData);
-
     const objToSend = {
       data: regisData,
       texto: `¿Está seguro que desea eliminar el otro costo <b>${regisData.ARG.descripcion}</b>?`,
@@ -95,11 +105,14 @@ export class OtrosCostosFormComponent extends MixinClass implements OnInit {
   borrar() {
     this.initVariables();
     this.form.reset({ estado: true });
+    this.form.controls.key.enable();
   }
 
   submit() {
     const formulario = this.form.getRawValue();
-    console.log('formulario ', formulario);
+
+    formulario.precio = this.fun.desformatear(formulario.precio);
+    formulario.costo = this.fun.desformatear(formulario.costo);
 
     this.OtrosCostosClass.createUpdateOne(formulario).then((res) => {
       const actualPagination = this.tServ.getPaginationById('otrosCostos');

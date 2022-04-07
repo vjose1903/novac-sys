@@ -136,38 +136,29 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.mostrar = actualPagination['per_page'];
   }
 
-  calcularAlto() {
-    const filterDiv = document.getElementById('searchDiv-' + this.id_tabla);
-    const paginationDiv = document.getElementById('paginationDiv-' + this.id_tabla);
-    const titulosDiv = document.getElementById('titulosHeader-' + this.id_tabla);
+  // calcularAlto() {
+  //   const filterDiv = document.getElementById('searchDiv-' + this.id_tabla);
+  //   const paginationDiv = document.getElementById('paginationDiv-' + this.id_tabla);
+  //   const titulosDiv = document.getElementById('titulosHeader-' + this.id_tabla);
 
-    const array = [filterDiv?.offsetHeight, paginationDiv?.offsetHeight];
-    // console.log('array ', array);
+  //   const array = [filterDiv?.offsetHeight, paginationDiv?.offsetHeight];
 
-    setTimeout(() => {
-      let restar = 0;
-      for (let i = 0; i < array.length; i++) {
-        const element: any = array[i];
-        if (element) restar += element;
-      }
+  //   setTimeout(() => {
+  //     let restar = 0;
+  //     for (let i = 0; i < array.length; i++) {
+  //       const element: any = array[i];
+  //       if (element) restar += element;
+  //     }
 
-      this.tabla_content = this.padre.firstChild;
-      console.log('🚀 ~ TablasComponent ~ setTimeout ~ this.padre.firstChild', this.padre.firstChild);
+  //     this.tabla_content = this.padre.firstChild;
 
-      // console.log('this.padre ', this.padre);
-      // console.log('this.id_tabla ', this.id_tabla);
-      // console.log('restar ', restar);
-      // console.log('this.tabla_content ', this.tabla_content);
-      // console.log('this.tabla_content.offsetHeight ', this.tabla_content.offsetHeight);
-
-      this.obj_alto = {
-        altoTabla: this.tabla_content.offsetHeight - restar,
-        altoTbody: this.tabla_content.offsetHeight - restar - (titulosDiv.offsetHeight || 0) - (this.fun.hasValue(paginationDiv) ? 15 : 0), // el -15 es para separar un poco el scroll del paginador
-        id: this.id_tabla,
-      };
-      // console.log('this.obj_alto ', this.obj_alto);
-    }, 100);
-  }
+  //     this.obj_alto = {
+  //       altoTabla: this.tabla_content.offsetHeight - restar,
+  //       altoTbody: this.tabla_content.offsetHeight - restar - (titulosDiv.offsetHeight || 0) - (this.fun.hasValue(paginationDiv) ? 15 : 0), // el -15 es para separar un poco el scroll del paginador
+  //       id: this.id_tabla,
+  //     };
+  //   }, 100);
+  // }
 
   async ngAfterViewInit() {
     if (this.data && this.info) {
@@ -215,8 +206,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     if (typeof column.key == 'object') {
       const source = column.key.source;
       const clase_in_turn = _.find(column.key.clases, (item) => item.value == dato[source]);
-      // console.log("clase_in_turn ", clase_in_turn);
-      // console.log("  ");
 
       res = clase_in_turn.clase;
     }
@@ -268,8 +257,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
 
   changeValorCheck(key, index, auto = false, dato?) {
     const info_colum = _.find(this.info, (item) => item.key == key);
-
-    console.log('🚀 ~ TablasComponent ~ changeValorCheck ~ dato', dato);
 
     if (!this.disabledInput(dato, info_colum)) {
       dato[key] = !dato[key];
@@ -554,19 +541,17 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   ngOnChanges(simpleChanges) {
-    console.log('simpleChanges  ', simpleChanges);
     if (simpleChanges.data && simpleChanges.data.currentValue) {
       // ================================================
       // CUSTOM STYLES
       // ================================================
       setTimeout(() => this.changeStylesTitles(), 1);
       // ==========================ß======================
-      console.log('cambio data ');
     }
 
     if (simpleChanges.data && simpleChanges.info) {
       if (simpleChanges.data.currentValue && simpleChanges.info.currentValue) {
-        setTimeout(() => this.calcularAlto(), 250);
+        // setTimeout(() => this.calcularAlto(), 250);
       }
     }
     if (simpleChanges.seleccionado) {
@@ -666,7 +651,6 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
   }
 
   enfocarInput(arg) {
-    console.log('🚀 ~ TablasComponent ~ enfocarInput ~ arg', arg);
     const element = document.getElementById(arg) as HTMLElement;
     element.focus();
   }

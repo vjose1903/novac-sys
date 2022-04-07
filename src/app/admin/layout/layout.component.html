@@ -7,71 +7,78 @@
 <div class="layout" [ngStyle]="{ width: fantasma.offsetWidth + 'px', height: fantasma.offsetHeight + 'px' }">
   <div class="menu">
     <div class="title">
-      <span class="titulo" (click)="cambiarMenu(false, 'dashboard')">Menu</span>
+      <span class="titulo" (click)="cambiarMenu({ url: 'dashboard', navigate: true, hasModule: false })">Menu</span>
     </div>
 
     <div class="sideBar">
       <div class="menuContent">
-        <div class="menuList1 mt-5">
-          <img [ngClass]="actualMenuItem == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/factura.png" alt="Facturacion" (click)="cambiarMenu(true, 'factura')" />
-          <h5 [ngClass]="actualMenuItem == 'factura' ? 'tituloMenuA1' : 'tituloMenu1'"><strong>Facturación</strong></h5>
+        <div class="menuList">
+          <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('factura') }" [innerText]="'Facturación'"></h5>
+          <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('factura') }" src="assets/img/factura.png" alt="Facturacion" (click)="cambiarMenu({ url: 'factura', navigate: false, hasModule: false })" />
 
-          <div [ngClass]="actualMenuItem == 'factura_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
-            <h4 class="opcion" (click)="cambiarMenu(false, 'venta/new/0', true)">Venta</h4>
-            <h4 class="opcion" (click)="cambiarMenu(false, 'compra/new/0', true)">Compra</h4>
-          </div>
-        </div>
-        <div class="menuList2">
-          <img [ngClass]="actualMenuItem == 'manipular' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'" src="assets/img/notaM.png" alt="Notas" (click)="cambiarMenu(true, 'manipular')" />
-          <h5 [ngClass]="actualMenuItem == 'manipular' ? 'tituloMenuA2' : 'tituloMenu2'"><strong>Manipular facturas</strong></h5>
-
-          <div [ngClass]="actualMenuItem == 'manipular_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
-            <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/nota_credito', true)">Nota de Crédito</h4>
-            <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/nota_debito', true)">Nota de Débito</h4>
-            <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/solo_ver', true)">Visualizar</h4>
+          <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('factura') }">
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'venta/new/0' }" (click)="cambiarMenu({ url: 'venta/new/0', navigate: true, hasModule: true })">Venta</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'compra/new/0' }" (click)="cambiarMenu({ url: 'compra/new/0', navigate: true, hasModule: true })">Compra</h4>
           </div>
         </div>
 
         <div class="menuList">
-          <img [ngClass]="actualMenuItem == 'recibos' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="cambiarMenu(true, 'recibos')" />
-          <h5 [ngClass]="actualMenuItem == 'recibos' ? 'tituloMenuA' : 'tituloMenu'"><strong>Ingresos</strong></h5>
-          <div [ngClass]="actualMenuItem == 'recibos_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-            <h4 class="opcion" (click)="cambiarMenu(false, 'ingresos', true)">Recibo ingresos</h4>
-            <h4 class="opcion" (click)="cambiarMenu(false, 'viajes', true)">Viajes</h4>
+          <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('manipular') }" [innerText]="'Manipular\nfacturas'"></h5>
+          <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('manipular') }" src="assets/img/notaM.png" alt="Notas" (click)="cambiarMenu({ url: 'manipular', navigate: false, hasModule: false })" />
+
+          <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('manipular') }">
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'buscarFactura/nota_credito' }" (click)="cambiarMenu({ url: 'buscarFactura/nota_credito', navigate: true, hasModule: true })">Nota de Crédito</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'buscarFactura/nota_debito' }" (click)="cambiarMenu({ url: 'buscarFactura/nota_debito', navigate: true, hasModule: true })">Nota de Débito</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'buscarFactura/solo_ver' }" (click)="cambiarMenu({ url: 'buscarFactura/solo_ver', navigate: true, hasModule: true })">Visualizar</h4>
           </div>
         </div>
 
         <div class="menuList">
-          <img [ngClass]="actualMenuItem == 'conduce' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/conduce.png" alt="Facturacion" (click)="cambiarMenu(false, 'conduce')" />
-          <h5 [ngClass]="actualMenuItem == 'conduce' ? 'tituloMenuA' : 'tituloMenu'"><strong>Conduce</strong></h5>
-        </div>
+          <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('recibos') }" [innerText]="'Ingresos'"></h5>
+          <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('recibos') }" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="cambiarMenu({ url: 'recibos', navigate: false, hasModule: false })" />
 
-        <div class="menuList">
-          <img [ngClass]="actualMenuItem == 'registros' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/registro.png" alt="Registros" (click)="cambiarMenu(true, 'registros')" />
-          <h5 [ngClass]="actualMenuItem == 'registros' ? 'tituloMenuA' : 'tituloMenu'"><strong>Registros</strong></h5>
-
-          <div [ngClass]="actualMenuItem == 'registros_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-            <h4 class="opcion" (click)="cambiarMenu(false, 'empleados', true)">Empleados</h4>
-            <h4 class="opcion" (click)="cambiarMenu(false, 'clientes', true)">Clientes</h4>
-            <h4 class="opcion" (click)="cambiarMenu(false, 'suplidores', true)">Suplidores</h4>
-            <h4 class="opcion" (click)="cambiarMenu(false, 'articulos', true)">Articulos</h4>
-            <h4 class="opcion" (click)="cambiarMenu(false, 'camiones', true)">Camiones</h4>
-            <h4 class="opcion" (click)="cambiarMenu(false, 'roles', true)">Roles</h4>
-            <h4 class="opcion" (click)="cambiarMenu(false, 'ncf', true)">NCF</h4>
+          <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('recibos') }">
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'ingresos' }" (click)="cambiarMenu({ url: 'ingresos', navigate: true, hasModule: true })">Recibo ingresos</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'viajes' }" (click)="cambiarMenu({ url: 'viajes', navigate: true, hasModule: true })">Viajes</h4>
           </div>
         </div>
+
         <div class="menuList">
-          <img [ngClass]="actualMenuItem == 'produccion' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/produccion.png" alt="Producción" (click)="cambiarMenu(false, 'produccion')" />
-          <h5 [ngClass]="actualMenuItem == 'produccion' ? 'tituloMenuA' : 'tituloMenu'"><strong>Producción</strong></h5>
+          <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('conduce') }" [innerText]="'Conduce'"></h5>
+          <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('conduce') }" src="assets/img/conduce.png" alt="Facturacion" (click)="cambiarMenu({ url: 'conduce', navigate: true, hasModule: false })" />
         </div>
+
         <div class="menuList">
-          <img [ngClass]="actualMenuItem == 'inventario' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/inventario.png" alt="Inventario" (click)="cambiarMenu(false, 'inventario')" />
-          <h5 [ngClass]="actualMenuItem == 'inventario' ? 'tituloMenuA' : 'tituloMenu'"><strong>Inventario</strong></h5>
+          <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('registros') }" [innerText]="'Registros'"></h5>
+          <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('registros') }" src="assets/img/registro.png" alt="Registros" (click)="cambiarMenu({ url: 'registros', navigate: false, hasModule: false })" />
+
+          <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('registros') }">
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'empleados' }" (click)="cambiarMenu({ url: 'empleados', navigate: true, hasModule: true })">Empleados</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'clientes' }" (click)="cambiarMenu({ url: 'clientes', navigate: true, hasModule: true })">Clientes</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'suplidores' }" (click)="cambiarMenu({ url: 'suplidores', navigate: true, hasModule: true })">Suplidores</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'articulos' }" (click)="cambiarMenu({ url: 'articulos', navigate: true, hasModule: true })">Articulos</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'camiones' }" (click)="cambiarMenu({ url: 'camiones', navigate: true, hasModule: true })">Camiones</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'roles' }" (click)="cambiarMenu({ url: 'roles', navigate: true, hasModule: true })">Roles</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'ncf' }" (click)="cambiarMenu({ url: 'ncf', navigate: true, hasModule: true })">NCF</h4>
+          </div>
         </div>
+
         <div class="menuList">
-          <img [ngClass]="actualMenuItem == 'reportes' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png" alt="Reportes" (click)="cambiarMenu(false, 'reportes')" />
-          <h5 [ngClass]="actualMenuItem == 'reportes' ? 'tituloMenuA' : 'tituloMenu'"><strong>Reportes</strong></h5>
+          <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('produccion') }" [innerText]="'Producción'"></h5>
+          <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('produccion') }" src="assets/img/produccion.png" alt="Producción" (click)="cambiarMenu({ url: 'produccion', navigate: true, hasModule: false })" />
         </div>
+
+        <div class="menuList">
+          <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('inventario') }" [innerText]="'Inventario'"></h5>
+          <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('inventario') }" src="assets/img/inventario.png" alt="Inventario" (click)="cambiarMenu({ url: 'inventario', navigate: true, hasModule: false })" />
+        </div>
+
+        <div class="menuList">
+          <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('reportes') }" [innerText]="'Reportes'"></h5>
+          <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('reportes') }" src="assets/img/reporte.png" alt="Reportes" (click)="cambiarMenu({ url: 'reportes', navigate: true, hasModule: false })" />
+        </div>
+
+        <div class="menuList"></div>
       </div>
     </div>
   </div>
@@ -110,122 +117,5 @@
     <div class="footer">VjPOS {{ versionApp }} - @2020 Desarrollador: Victor J. Vasquez</div>
   </div>
 </div>
-
-<!-- <mat-sidenav-container class="sidenav-container">
-
-  <mat-sidenav
-    #drawer
-    class="sidenav"
-    fixedInViewport
-    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-    [mode]="(isHandset$ | async) ? 'over' : 'side'"
-    [opened]="(isHandset$ | async) === false"
-  >
-    <mat-toolbar>
-      <span class="titulo" (click)="cambiarMenu(false, 'dashboard')">Menu</span>
-    </mat-toolbar>
-    <mat-nav-list class="text-center">
-      <div class="menuList1 mt-5">
-        <img [ngClass]="actualMenuItem == 'factura' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/factura.png" alt="Facturacion" (click)="cambiarMenu(true, 'factura')" />
-        <h5 [ngClass]="actualMenuItem == 'factura' ? 'tituloMenuA1' : 'tituloMenu1'"><strong>Facturación</strong></h5>
-
-        <div [ngClass]="actualMenuItem == 'factura_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
-          <h4 class="opcion" (click)="cambiarMenu(false, 'venta/new/0', true)">Venta</h4>
-          <h4 class="opcion" (click)="cambiarMenu(false, 'compra/new/0', true)">Compra</h4>
-        </div>
-      </div>
-      <div class="menuList2">
-        <img [ngClass]="actualMenuItem == 'manipular' ? 'iconosMenuA bajarUnPoco' : 'iconosMenu bajarUnPoco'" src="assets/img/notaM.png" alt="Notas" (click)="cambiarMenu(true, 'manipular')" />
-        <h5 [ngClass]="actualMenuItem == 'manipular' ? 'tituloMenuA2' : 'tituloMenu2'"><strong>Manipular facturas</strong></h5>
-
-        <div [ngClass]="actualMenuItem == 'manipular_select' ? 'subMenuFacturaA' : 'subMenuFactura'">
-          <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/nota_credito', true)">Nota de Crédito</h4>
-          <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/nota_debito', true)">Nota de Débito</h4>
-          <h4 class="opcion" (click)="cambiarMenu(false, 'buscarFactura/solo_ver', true)">Visualizar</h4>
-        </div>
-      </div>
-
-      <div class="menuList">
-        <img [ngClass]="actualMenuItem == 'recibos' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="cambiarMenu(true, 'recibos')" />
-        <h5 [ngClass]="actualMenuItem == 'recibos' ? 'tituloMenuA' : 'tituloMenu'"><strong>Ingresos</strong></h5>
-        <div [ngClass]="actualMenuItem == 'recibos_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-          <h4 class="opcion" (click)="cambiarMenu(false, 'ingresos', true)">Recibo ingresos</h4>
-          <h4 class="opcion" (click)="cambiarMenu(false, 'viajes', true)">Viajes</h4>
-        </div>
-      </div>
-
-      <div class="menuList">
-        <img [ngClass]="actualMenuItem == 'conduce' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/conduce.png" alt="Facturacion" (click)="cambiarMenu(false, 'conduce')" />
-        <h5 [ngClass]="actualMenuItem == 'conduce' ? 'tituloMenuA' : 'tituloMenu'"><strong>Conduce</strong></h5>
-      </div>
-
-      <div class="menuList">
-        <img [ngClass]="actualMenuItem == 'registros' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/registro.png" alt="Registros" (click)="cambiarMenu(true, 'registros')" />
-        <h5 [ngClass]="actualMenuItem == 'registros' ? 'tituloMenuA' : 'tituloMenu'"><strong>Registros</strong></h5>
-
-        <div [ngClass]="actualMenuItem == 'registros_select' ? 'subMenuRegistrosA' : 'subMenuRegistros'">
-          <h4 class="opcion" (click)="cambiarMenu(false, 'empleados', true)">Empleados</h4>
-          <h4 class="opcion" (click)="cambiarMenu(false, 'clientes', true)">Clientes</h4>
-          <h4 class="opcion" (click)="cambiarMenu(false, 'suplidores', true)">Suplidores</h4>
-          <h4 class="opcion" (click)="cambiarMenu(false, 'articulos', true)">Articulos</h4>
-          <h4 class="opcion" (click)="cambiarMenu(false, 'camiones', true)">Camiones</h4>
-          <h4 class="opcion" (click)="cambiarMenu(false, 'roles', true)">Roles</h4>
-          <h4 class="opcion" (click)="cambiarMenu(false, 'ncf', true)">NCF</h4>
-        </div>
-      </div>
-      <div class="menuList">
-        <img [ngClass]="actualMenuItem == 'produccion' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/produccion.png" alt="Producción" (click)="cambiarMenu(false, 'produccion')" />
-        <h5 [ngClass]="actualMenuItem == 'produccion' ? 'tituloMenuA' : 'tituloMenu'"><strong>Producción</strong></h5>
-      </div>
-      <div class="menuList">
-        <img [ngClass]="actualMenuItem == 'inventario' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/inventario.png" alt="Inventario" (click)="cambiarMenu(false, 'inventario')" />
-        <h5 [ngClass]="actualMenuItem == 'inventario' ? 'tituloMenuA' : 'tituloMenu'"><strong>Inventario</strong></h5>
-      </div>
-      <div class="menuList">
-        <img [ngClass]="actualMenuItem == 'reportes' ? 'iconosMenuA' : 'iconosMenu'" src="assets/img/reporte.png" alt="Reportes" (click)="cambiarMenu(false, 'reportes')" />
-        <h5 [ngClass]="actualMenuItem == 'reportes' ? 'tituloMenuA' : 'tituloMenu'"><strong>Reportes</strong></h5>
-      </div>
-    </mat-nav-list>
-  </mat-sidenav>
-
-  <mat-sidenav-content>
-    <mat-toolbar class="d-flex justify-content-between">
-      <div *ngIf="drawer._animationState != 'void'"></div>
-      <div *ngIf="drawer._animationState == 'void'" title="Mostrar Menu" data-toggle="Tooltip" (click)="drawer.toggle()" id="botonMenu" class="">
-        <i class="fas fa-bars m-0 p-0"></i>
-      </div>
-
-      <div class="right">
-        <div class="btn-group" dropdown id="dropCuenta" #dropCuenta>
-          <a id="button-basic" dropdownToggle class="dropdown-toggle" aria-controls="dropdown-basic">
-            <img class="rounded-circle" [src]="imgUser" alt="Admin" />
-            Cuenta <span class="caret"></span>
-          </a>
-          <ul id="dropdown-basic" class="dropdown-menu" role="menu" aria-labelledby="button-basic">
-            <div class="dropdown-header">
-              <h2>{{ usuario?.nombre }}</h2>
-              <p>{{ usuario?.email }}</p>
-            </div>
-            <li class="divider dropdown-divider"></li>
-
-            <li class="divider dropdown-divider"></li>
-            <li role="menuitem">
-              <a class="dropdown-item" id="dropdown-item" (click)="logOut()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </mat-toolbar>
-
-    <div class="" style="padding: 0.5rem 1rem 2rem 1rem; height: calc(100% - 60px); overflow-y: auto">
-      <router-outlet *ngIf="ready"></router-outlet>
-
-      <div *ngIf="cuadre_hoy" class="cuadre_hoy">
-        <div class="content">Hoy ya existe un cuadre</div>
-      </div>
-    </div>
-    <div class="footerCustom">VjPOS {{ versionApp }} - @2020 Desarrollador: Victor J. Vasquez</div>
-  </mat-sidenav-content>
-</mat-sidenav-container> -->
 
 <app-modal></app-modal>

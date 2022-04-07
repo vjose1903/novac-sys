@@ -20,8 +20,10 @@ import { ConfigI } from '../../core/typescript/config-interface';
   styleUrls: ['./layout.component.scss'],
 })
 export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterContentChecked, AfterViewInit {
-  actualMenuItemBack;
-  actualMenuItem;
+  actualPath;
+  actualRuta;
+  actualModule;
+
   showLoading;
 
   usuario;
@@ -31,7 +33,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   noServer;
   subCheckCuadreToday: Subscription;
   subLogOut: Subscription;
-  modulo_select: any;
+
   ready;
   // facturas_localStorage: any;
   isHandset$: Observable<boolean>;
@@ -75,7 +77,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ngOnInit() {
     this.initVariables();
-    this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal',] });
+    this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal'] });
 
     const token = this.fun.getAuthToken();
 
@@ -107,7 +109,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
-      console.log('this.subLogOut');
       if (res) this.logOut();
     });
 
@@ -129,6 +130,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   ngOnDestroy() {
     this._destroy_mixin();
     if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
+    if (this.subLogOut) this.subLogOut.unsubscribe();
   }
 
   checkCuadre() {
@@ -156,8 +158,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.cdRef.detectChanges();
   }
 
-
-
   // =================================================================================
   // CERRAR SESION
   // =================================================================================
@@ -174,35 +174,51 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
 
   checkRouteActiva() {
-    const temp_url = document.location.href.split('admin/');
-    if (temp_url[1]) {
-      const url = temp_url[1].split('/')[0];
-      const tipo = temp_url[1].split('/')[1];
-      this.actualMenuItem = url;
+    this.actualPath = document.location.pathname;
+    const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
 
-      this.actualMenuItemBack = this.fun.duplicarJson(this.actualMenuItem);
+    if (pathSplit.length >= 3) {
+      this.actualModule = pathSplit[1];
+      this.actualRuta = _.join(pathSplit.slice(2, pathSplit.length), '/');
+    } else {
+      this.actualModule = undefined;
+      this.actualRuta = _.join(pathSplit.slice(1, pathSplit.length), '/');
     }
   }
 
   // =================================================================================
   // NAVEGAR
   // =================================================================================
-  cambiarMenu(subMenu, url, lleva_modulo?) {
-    if (!subMenu && !lleva_modulo) this.modulo_select = undefined;
-    if (subMenu) this.modulo_select = url;
-    let ruta_a_cambiar = '';
-    if (!subMenu) ruta_a_cambiar = this.modulo_select ? `/admin/${this.modulo_select}/${url}` : `/admin/${url}`;
+  isVistaActual(arg) {
+    let res = false;
+    if (this.fun.hasValue(this.actualModule) && arg == this.actualModule) {
+      res = true;
+    } else {
+      if (this.fun.hasValue(this.actualPath) && this.actualPath.includes(arg)) res = true;
+    }
+    return res;
+  }
 
-    this.actualMenuItem = subMenu ? `${this.modulo_select}_select` : `${this.modulo_select}`;
+  // TODO: seguir aqui revisando que cuando navege en un subMenu no se redirija a el mismo otra vez
+  cambiarMenu(args: { url; navigate; hasModule }) {
+    let next_cambio_menu = '';
 
-    if (!subMenu) {
-      this.runRouterNavigate({ bool: true, ruta: ruta_a_cambiar });
+    if (args.navigate) {
+      this.actualRuta = args.url;
+      next_cambio_menu = this.actualModule && args.hasModule ? `/admin/${this.actualModule}/${this.actualRuta}` : `/admin/${this.actualRuta}`;
+
+      if (this.actualPath !== next_cambio_menu) {
+        this.actualPath = next_cambio_menu;
+        this.runRouterNavigate({ bool: true, ruta: this.actualPath });
+      } else {
+        this.fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
+      }
+    } else {
+      this.actualModule = args.url;
     }
   }
 
   finalizarCambioMenu(arg) {
-    console.log('arg ', arg);
-
     if (arg.bool && arg.verificar) {
       this.ready = false;
       setTimeout(() => this.decisionCambioMenu(arg), 10);
@@ -212,8 +228,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   decisionCambioMenu(decision) {
-    if (decision.bool) this.router.navigateByUrl(decision.ruta);
+    if (decision.bool) {
+      this.actualModule = undefined;
+      this.router.navigateByUrl(decision.ruta);
+    } else {
+      this.checkRouteActiva();
+    }
+
     setTimeout(() => (this.ready = true), 1);
-    this.modulo_select = undefined;
   }
 }

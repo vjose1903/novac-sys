@@ -210,23 +210,26 @@ export class FunctionService {
   // Nombre: desformatear
   // Descripcion : Esta funcion toma un string y lo vuelve un entero
   // _________________________________________________________________________________________________
-  desformatear(sTnum) {
-    let temp = 0;
+  desformatear(sTnum: any) {
+    const number = typeof sTnum == 'string' ? parseFloat(sTnum.replaceAll(',', '')) : sTnum;
+    return number;
 
-    if (sTnum) {
-      const x = _.split(sTnum, ',');
-      if (x.length === 1) {
-        temp += parseFloat(x[0]);
-        return temp;
-      } else if (x.length >= 2) {
-        let joined = '';
-        joined = _.join(x, '');
-        temp += parseFloat(joined);
-        return temp;
-      }
-    } else {
-      return sTnum;
-    }
+    // let temp = 0;
+
+    // if (sTnum) {
+    //   const x = _.split(sTnum, ',');
+    //   if (x.length === 1) {
+    //     temp += parseFloat(x[0]);
+    //     return temp;
+    //   } else if (x.length >= 2) {
+    //     let joined = '';
+    //     joined = _.join(x, '');
+    //     temp += parseFloat(joined);
+    //     return temp;
+    //   }
+    // } else {
+    //   return sTnum;
+    // }
   }
   // __________________________________________________________________________________________________
   // Nombre: getPersonaByDocIdentidad
@@ -326,8 +329,6 @@ export class FunctionService {
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
   Capitalice(str) {
-    console.log("str");
-
     const ultimosCaractes = this.hasValue(str) ? str.length + 1 : null;
     return this.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
   }

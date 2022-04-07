@@ -70,6 +70,7 @@ export class InterceptorService implements HttpInterceptor {
         if (response.error === null) {
           this.fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
         } else if (response.error && _.has(response.error, 'action') && response.error.action === 'close_ssesion') {
+
           this.fun.toastError(response.error.msg, 'ERROR');
           this.fun.nextCanToast(false);
           SingletonService.layServ.nextLogOut(true);

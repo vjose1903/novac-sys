@@ -71,7 +71,7 @@ $bodyfont: "Poppins";
 .layout {
   display: grid;
   grid-template-areas: "menu content";
-  grid-template-columns: 8rem auto;
+  grid-template-columns: 7rem auto;
   min-height: 100vh;
   max-height: 100vh;
   overflow: hidden;
@@ -88,7 +88,6 @@ $bodyfont: "Poppins";
     > .title {
       grid-area: title;
       background-color: #c9c9c9;
-      // z-index: 99;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -111,8 +110,9 @@ $bodyfont: "Poppins";
       background-color: var(--primary02);
       max-height: inherit;
       > .menuContent {
-        overflow: hidden auto;
-        max-height: calc(100% - 2rem);
+        overflow: auto;
+        display: grid;
+        max-height: 100%;
       }
     }
   }
@@ -264,162 +264,86 @@ $bodyfont: "Poppins";
 /*        Menu                                    */
 /* ============================================== */
 
-.subMenuRegistros,
-.subMenuFactura {
-  display: none;
-  transform: scale(0);
-}
-
-.subMenuRegistrosA,
-.subMenuFacturaA {
-  transform: scale(1);
-  background-color: var(--primary04);
-  color: white;
-}
-
-.opcion {
-  font-size: 1rem !important;
-  padding: 0.5rem;
-  background-color: var(--primary04);
-  font-family: $bodyfont;
-  &:hover {
-    width: 100%;
-    filter: brightness(0.6);
-    cursor: pointer;
-  }
-}
-
 .menuList {
-  list-style: none;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  min-height: 7rem;
+  position: relative;
+
   .tituloMenu {
     transform: scale(0);
+    font-size: inherit;
+    // position: absolute;
     transition: all 0.2s;
+    margin: 0;
+    width: 100%;
+
+    &.tituloMenuA {
+      font-weight: 600;
+    }
   }
 
   &:hover .tituloMenu,
   .tituloMenuA {
-    transform: scale(0.8) translate(0px, -7.7rem);
-    text-align: center;
+    // transform: scale(0.8) translate(0px, -7.7rem);
+    transform: scale(1);
   }
-}
-.menuListMant {
-  list-style: none;
-  .tituloMenuMant {
-    transform: scale(0);
-    transition: all 0.2s;
-  }
-
-  &:hover .tituloMenuMant,
-  .tituloMenuAMant {
-    transform: scale(0.7) translate(-13px, -9rem);
-    text-align: center;
-  }
-}
-
-.menuList1 {
-  list-style: none;
-  .tituloMenu1 {
-    transform: scale(0);
-    transition: all 0.2s;
-  }
-
-  &:hover .tituloMenu1,
-  .tituloMenuA1 {
-    transform: scale(0.8) translate(0rem, -7.6rem);
-    text-align: center;
-  }
-}
-.menuList2 {
-  list-style: none;
-  .tituloMenu2 {
-    transform: scale(0);
-    transition: all 0.2s;
-  }
-
-  &:hover .tituloMenu2,
-  .tituloMenuA2 {
-    transform: scale(0.9) translate(0px, -7.5rem);
-    text-align: center;
-  }
-}
-
-.bajarUnPoco {
-  transform: translate(0px, 1rem) !important;
-}
-.iconosMenu {
-  border: 3px solid #4141417a;
-  border-radius: 50%;
-  position: relative;
-  display: block;
-  margin: 0rem auto 0px auto;
-  filter: grayscale(50%);
-  height: 4.5rem;
-  width: 4.5rem;
-}
-
-.iconosMenuA {
-  background: var(--primary10);
-  border: 3px solid #4141417a;
-  border-radius: 50%;
-  position: relative;
-  display: block;
-  margin: auto;
-  height: 4.5rem;
-  width: 4.5rem;
-  filter: grayscale(10%);
-  filter: contrast(-20%);
-}
-
-.iconosMenu:hover {
-  filter: grayscale(10%);
-  transform: scale(1.02);
-  filter: contrast(-20%);
-}
-.mat-drawer-content {
-  overflow: hidden !important;
-}
-
-mat-nav-list {
-  background-color: var(--primary02);
-  overflow: hidden auto;
-  height: calc(100% - 32px);
-}
-mat-list-item {
-  margin: 2rem 0rem 2rem 0rem;
-}
-
-.mat-drawer-inner-container {
-  overflow: hidden !important;
-  width: 6.5rem;
-}
-
-.sidenav {
-  width: 7rem;
-}
-
-// titulito de menu
-.sidenav .mat-toolbar {
-  background-color: #e2e2e2;
-  box-shadow: 1px 1px 5px 0.2px #9c9c9c;
   text-align: center;
+
+  .iconosMenu {
+    border: 3px solid #4141417a;
+    border-radius: 50%;
+    margin: 0rem auto 0px auto;
+    filter: grayscale(50%);
+    height: 4.5rem;
+    width: 4.5rem;
+    &.iconosMenuA {
+      background: var(--primary10);
+      filter: grayscale(10%) contrast(-20%);
+    }
+
+    &:hover {
+      filter: grayscale(10%);
+      transform: scale(1.05);
+      filter: contrast(-20%);
+    }
+  }
+
+  .subMenuFactura {
+    overflow: hidden;
+    max-height: 0;
+    transition: all 0.5s;
+    width: 100%;
+
+    &.subMenuFacturaA {
+      margin-top: 0.5rem;
+      max-height: 100rem;
+      background-color: var(--primary04);
+      color: white;
+    }
+
+    > .opcion {
+      font-size: 1rem !important;
+      padding: 0.5rem;
+      background-color: var(--primary04);
+      font-family: $bodyfont;
+      &.activa {
+        background-color: var(--primary09);
+      }
+      &:hover {
+        width: 100%;
+        filter: brightness(0.6);
+        cursor: pointer;
+      }
+    }
+  }
 }
 
-/* ============================================== */
-/*        BOTON MENU                              */
-/* ============================================== */
-#botonMenu {
-  border-radius: 50%;
-  background-color: var(--primary04);
-  margin: 5px;
-  justify-content: center;
-  display: flex;
-  align-items: center;
-  padding: 0.42rem;
-}
-#botonMenu:hover {
-  cursor: pointer;
-  background-color: var(--primary04);
-}
 .fa-bars:before {
   margin: -12px 0px 0px 0px;
   transform: translate(8px, 1px) !important;
@@ -430,20 +354,6 @@ mat-list-item {
 /*        barra superior                          */
 /* ============================================== */
 
-.mat-toolbar.mat-primary {
-  z-index: 1;
-}
-.mat-toolbar {
-  background-color: #f5f5f5;
-  box-shadow: 1px 1px 5px 0.2px #dfdfdf;
-}
-.mat-toolbar-row,
-.mat-toolbar-single-row {
-  display: block;
-  padding: 0.5rem;
-  align-content: center;
-  height: 2rem;
-}
 .right {
   float: right;
   margin-right: 1rem;
@@ -463,16 +373,4 @@ mat-list-item {
 
 .fas {
   margin-right: 1rem;
-}
-
-.selectPrint {
-  transform: translate(-25.1rem, 16.5rem);
-  background-color: white;
-  border-radius: 0.2rem;
-  position: absolute;
-  max-width: 13.7rem;
-  display: none;
-  &.open {
-    display: block !important;
-  }
 }

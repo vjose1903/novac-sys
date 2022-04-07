@@ -1,5 +1,5 @@
 <div #dinamicTable class="dinamicTable position-relative" [ngStyle]="{ height: padre.firstChild.offsetHeight + 'px', padding: pad ? '1.5rem 1rem 1.5rem 1rem' : '0rem' }">
-  <!-- h-100 -->
+  <!-- FILTER -->
   <div id="searchDiv-{{ id_tabla }}" #searchDiv *ngIf="search" class="searchDiv">
     <label class="search-label" for="search">Busqueda </label>
     <div style="max-width: 12rem">
@@ -41,7 +41,6 @@
       <!-- TBODY -->
       <div class="divBody">
         <tbody class="tbody">
-          <!-- [ngStyle]="{ height: obj_alto.altoTbody + 'px' }" -->
           <ng-container *ngIf="data">
             <tr
               *ngFor="let dato of data | paginate: { id: id_tabla, itemsPerPage: mostrar, currentPage: pagActual, totalItems: total_registros }; index as i"
@@ -135,7 +134,13 @@
 
                 <span *ngSwitchCase="'inputSwitch'" [pTooltip]="column.text_tooltip ? dato[column.text_tooltip] : ''" [tooltipPosition]="i != 0 ? 'top' : 'bottom'">
                   <div class="form-group m-0 switchDiv">
-                    <input class="apple-switch" [ngClass]="{ disabled: disabledInput(dato, column) }" type="checkbox" (change)="changeValorCheck(column.key, getIndex(i), false, dato)" [checked]="dato[column.key]" />
+                    <input
+                      class="apple-switch"
+                      [ngClass]="{ disabled: disabledInput(dato, column) }"
+                      type="checkbox"
+                      (change)="changeValorCheck(column.key, getIndex(i), false, dato)"
+                      [checked]="dato[column.key]"
+                    />
                     <span class="ml-2">{{ column.title }}</span>
                   </div>
                 </span>
@@ -195,5 +200,4 @@
       </tfoot>
     </table>
   </div>
-  <!-- FILTER -->
 </div>

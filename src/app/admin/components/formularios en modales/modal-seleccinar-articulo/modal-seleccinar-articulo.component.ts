@@ -76,7 +76,6 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
   }
 
   getInfoChange(item) {
-    console.log('🚀 ~ ModalSeleccinarArticuloComponent ~ getInfoChange ~ item', item);
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
 
     if (item.cambio === 'select') {
@@ -104,9 +103,7 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
     }
     setTimeout(() => {
       modal.botones.dinamico[1].disable;
-      console.log('🚀 ~ ModalSeleccinarArticuloComponent ~ setTimeout ~ modal.botones.dinamico', modal.botones.dinamico);
       modal.botones.dinamico[1].disable = this.articulos_selected.length == 0;
-      console.log('🚀 ~ ModalSeleccinarArticuloComponent ~ setTimeout ~ this.articulos_selected', this.articulos_selected);
     }, 50);
   }
 

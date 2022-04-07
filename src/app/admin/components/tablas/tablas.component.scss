@@ -50,12 +50,8 @@ app-tablas {
 }
 
 .dinamicTable {
-
   display: grid !important;
-  // grid-template-areas:
-  //   'searchDiv'
-  //   'divTableFantasma'
-  //   'divTable';
+  column-gap: 0rem;
 
   grid-template-rows: [filter-start] min-content [fantasma-start] auto [fantasma-end];
 
@@ -78,9 +74,9 @@ app-tablas {
       height: 100%;
 
       grid-template-areas:
-        'thead'
-        'tbody'
-        'tfoot';
+        "thead"
+        "tbody"
+        "tfoot";
 
       grid-template-rows: [head-start] min-content [body-start] auto [body-end] min-content [foot-end];
       row-gap: 0.5rem;

@@ -42,7 +42,6 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
   }
 
   async buscarClientesOrSuplidor(event, where?) {
-    console.log('🚀 ~ BuscarClienteSuplidorComponent ~ buscarClientesOrSuplidor ~ event', event);
     const copyData = this.fun.duplicarJson(this.dataFiltro);
     const page = event.page;
     const per_page = event.per_page;
