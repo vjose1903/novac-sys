@@ -51,7 +51,7 @@
                   <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotas) }}</span>
                 </span>
                 <span class="w-100 detalleBalance badge text-shadow bg-danger text-white mb-2">
-                  <span> Debiendo:</span> <span>RD$ {{ formatoNumero(totalFacturado - totalPagado) }}</span>
+                  <span> Debiendo:</span> <span>RD$ {{ formatoNumero(totalFacturado - totalPagado - totalNotas) }}</span>
                 </span>
               </div>
             </div>
@@ -73,6 +73,7 @@
         *ngIf="facturas"
         [padre]="cardTabla"
         [info]="info"
+        [pad]="false"
         [data]="facturas"
         (getInfoChange)="getInfoChange($event)"
         (clickIcon)="clickVerPagos($event)"

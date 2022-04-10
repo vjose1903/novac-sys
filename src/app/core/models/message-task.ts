@@ -1,7 +1,6 @@
-import * as moment from 'moment';
+import * as moment from '../javascript/moment';
 import { BehaviorSubject } from 'rxjs';
 import * as _ from 'lodash';
-import { SingletonService } from '../services/singleton.service';
 
 export class MessageTask {
   id: string;

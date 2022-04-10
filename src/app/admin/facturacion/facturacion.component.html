@@ -69,7 +69,7 @@
           <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
           <select
             id="venta"
-            (keydown.enter)="saltar(modo_factura === 'normal' ? 'nom' : modo_factura === 'viaje' ? 'fecha_equivalente' : 'buscarCliente', $event.target.value, $event.target.id)"
+            (keydown.enter)="saltar(modo_factura == 'normal' ? 'nom' : modo_factura == 'viaje' ? 'fecha_viaje' : 'buscarCliente', $event.target.value, $event.target.id)"
             (change)="selectModoFactura($event.target.value)"
             class="form-control inputE"
             [(ngModel)]="modo_factura"
@@ -89,20 +89,20 @@
           <span class="mt-1"><strong>Fecha viaje:</strong></span>
           <input
             type="text"
-            (keydown.enter)="saltar('buscarCliente', $event.target.value, $event.target.id)"
+            (keydown.enter)="saltar('blur', $event.target.value, $event.target.id)"
             [bsConfig]="dpConfig"
             placeholder="mm/dd/aaaa"
             class="form-control inputE"
-            id="fecha_equivalente"
-            (ngModelChange)="enfocarInput('fecha_equivalente')"
+            id="fecha_viaje"
             [(ngModel)]="fecha_viaje"
             #dp="bsDatepicker"
             placement="bottom"
             bsDatepicker
             tabindex="-1"
             (blur)="checkCambiosModoyCondicionFactura($event.target)"
-          />
-        </div>
+            />
+          </div>
+          <!-- (ngModelChange)="enfocarInput('fecha_viaje')" -->
 
         <div *ngIf="metodo === 'compra'">
           <span class="mt-2"><strong>Número comprobante:</strong></span>
@@ -126,14 +126,14 @@
               placeholder="mm/dd/aaaa"
               class="form-control inputE"
               id="fecha_vencimiento"
-              (ngModelChange)="enfocarInput('fecha_vencimiento')"
               [(ngModel)]="fecha_vencimiento"
               #dp="bsDatepicker"
               placement="bottom"
               bsDatepicker
               tabindex="-1"
-            />
-          </div>
+              />
+            </div>
+            <!-- (ngModelChange)="enfocarInput('fecha_vencimiento')" -->
         </div>
       </div>
       <!-- ======================================================================================================================================================================== -->

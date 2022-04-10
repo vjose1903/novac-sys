@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from '../../core/javascript/moment';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { ModalHistorialPagosComponent } from '../components/formularios en modales/modal-historial-pagos/modal-historial-pagos.component';
-import { ModalI } from '../components/new_modal/modal-class';
 @Injectable({
   providedIn: 'root',
 })
@@ -22,10 +21,10 @@ export class RecibosService extends MixinClass {
 
       for (let i = 0; i < notas.length; i++) {
         const nota = notas[i];
-        nota.total_factura = Math.abs(nota.total_factura);
+        nota.total = Math.abs(nota.total);
         nota.fecha_equivalente = moment(nota.fecha_equivalente).format('DD/MM/YYYY');
       }
-    
+
       const obj = { abonos: pagos, notas: notas };
       this.handleModalForm({
         component: ModalHistorialPagosComponent,

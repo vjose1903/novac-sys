@@ -51,30 +51,17 @@
                     autocomplete="off"
                     id="nombre"
                   />
-                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
-                    Este Campo es obligatorio
-                  </div>
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">Este Campo es obligatorio</div>
                 </div>
               </div>
               <div class="col-6 p-0">
                 <div class="form-group">
                   <label class="control-label">Tipo: <span style="color: red">*</span></label>
-                  <select
-                    (keydown.enter)="saltar(TIPOARTICULO !== 'Producto terminado' ? 'comprado' : 'vendido')"
-                    id="tipo"
-                    formControlName="tipo_articulo_id"
-                    (change)="selectTipoArticulo($event.target.value)"
-                    class="form-control"
-                    value=""
-                  >
+                  <select (keydown.enter)="saltar(TIPOARTICULO !== 'Producto terminado' ? 'comprado' : 'vendido')" id="tipo" formControlName="tipo_articulo_id" (change)="selectTipoArticulo($event.target.value)" class="form-control" value="">
                     <option value="{{ null }}" disabled>Tipo de articulo</option>
                     <option *ngFor="let tipo of listaTipoArticulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
                   </select>
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['tipo_articulo_id'].valid && (form.controls['tipo_articulo_id'].dirty || form.controls['tipo_articulo_id'].touched)"
-                  >
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['tipo_articulo_id'].valid && (form.controls['tipo_articulo_id'].dirty || form.controls['tipo_articulo_id'].touched)">
                     Seleccione tipo de articulo
                   </div>
                 </div>
@@ -87,9 +74,7 @@
                     <option value="{{ null }}" disabled>Tipo</option>
                     <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
                   </select>
-                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">
-                    Seleccione una opcion
-                  </div>
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">Seleccione una opcion</div>
                 </div>
               </div>
             </div>
@@ -107,9 +92,7 @@
                     <option value="Caja">Caja</option>
                     <option value="Unidad">Unidad</option>
                   </select>
-                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)">
-                    Seleccione una opcion
-                  </div>
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)">Seleccione una opcion</div>
                 </div>
               </div>
               <!--  -->
@@ -120,9 +103,7 @@
                     <option value="{{ null }}" disabled>Tipo</option>
                     <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
                   </select>
-                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">
-                    Seleccione una opcion
-                  </div>
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">Seleccione una opcion</div>
                 </div>
               </div>
               <!--  -->
@@ -141,13 +122,7 @@
                     autocomplete="off"
                     (blur)="revisarPrecio('costo_principal')"
                   />
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)"
-                  >
-                    Este Campo es obligatorio
-                  </div>
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)">Este Campo es obligatorio</div>
                 </div>
               </div>
               <div class="col-6 pr-0">
@@ -165,13 +140,7 @@
                     (blur)="calculatePriceLibra()"
                     (blur)="revisarPrecio('precio_principal')"
                   />
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)"
-                  >
-                    Este Campo es obligatorio
-                  </div>
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)">Este Campo es obligatorio</div>
                 </div>
               </div>
               <div class="col-6 p-0">
@@ -194,15 +163,7 @@
 
                     <div class="col-6 p-0">
                       <select
-                        (keydown.enter)="
-                          saltar(
-                            form.controls['medida'].value === 'Quintal'
-                              ? 'precio_libra'
-                              : form.controls['medida'].value === 'Unidad' || form.controls['medida'].value === 'Libra'
-                              ? 'send'
-                              : 'contenidoPadre'
-                          )
-                        "
+                        (keydown.enter)="saltar(form.controls['medida'].value === 'Quintal' ? 'precio_libra' : form.controls['medida'].value === 'Unidad' || form.controls['medida'].value === 'Libra' ? 'send' : 'contenidoPadre')"
                         class="form-control"
                         formControlName="medida_alerta"
                         id="medida_alerta"
@@ -214,13 +175,7 @@
                       </select>
                     </div>
                   </div>
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)"
-                  >
-                    Este Campo es obligatorio
-                  </div>
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)">Este Campo es obligatorio</div>
                   <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="articulo_no_paquete">Este Articulo no contiene Paquetes</div>
                 </div>
               </div>
@@ -286,28 +241,12 @@
                       </div>
                       <!--  -->
                       <div class="col-1 p-0">
-                        <input
-                          type="text"
-                          id="medida_formula-{{ j }}"
-                          tabindex="-1"
-                          formControlName="medida_formula"
-                          style="border-radius: 0rem 0.25rem 0.25rem 0rem !important; padding: 0.2rem"
-                          class="form-control disabled"
-                          autocomplete="off"
-                        />
+                        <input type="text" id="medida_formula-{{ j }}" tabindex="-1" formControlName="medida_formula" style="border-radius: 0rem 0.25rem 0.25rem 0rem !important; padding: 0.2rem" class="form-control disabled" autocomplete="off" />
                       </div>
                       <!--  -->
                       <div class="col-3 pr-0">
                         <div class="form-group mb-0">
-                          <input
-                            type="text"
-                            id="costo_formula-{{ j }}"
-                            tabindex="-1"
-                            formControlName="costo_formula"
-                            [ngClass]="{ badAlert: checkCostoFormula(formula) }"
-                            class="form-control disabled"
-                            autocomplete="off"
-                          />
+                          <input type="text" id="costo_formula-{{ j }}" tabindex="-1" formControlName="costo_formula" [ngClass]="{ badAlert: checkCostoFormula(formula) }" class="form-control disabled" autocomplete="off" />
                         </div>
                       </div>
                       <div class="col-1 pl-2 p-0">
@@ -340,13 +279,7 @@
                       (focus)="$event.target.select()"
                       autocomplete="off"
                     />
-                    <div
-                      class="alerta text-danger ml-1"
-                      style="font-size: 12px"
-                      *ngIf="!form.controls['otros_costos'].valid && (form.controls['otros_costos'].dirty || form.controls['otros_costos'].touched)"
-                    >
-                      Este Campo es obligatorio
-                    </div>
+                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['otros_costos'].valid && (form.controls['otros_costos'].dirty || form.controls['otros_costos'].touched)">Este Campo es obligatorio</div>
                   </div>
                 </div>
                 <div class="col-4 pl-0">
@@ -364,13 +297,7 @@
                       autocomplete="off"
                       (blur)="revisarPrecio('costo_principal')"
                     />
-                    <div
-                      class="alerta text-danger ml-1"
-                      style="font-size: 12px"
-                      *ngIf="!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)"
-                    >
-                      Este Campo es obligatorio
-                    </div>
+                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)">Este Campo es obligatorio</div>
                   </div>
                 </div>
 
@@ -388,11 +315,7 @@
                       autocomplete="off"
                       (blur)="calculatePriceLibra(); revisarPrecio('precio_principal')"
                     />
-                    <div
-                      class="alerta text-danger ml-1"
-                      style="font-size: 12px"
-                      *ngIf="!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)"
-                    >
+                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)">
                       Este Campo es obligatorio
                     </div>
                   </div>
@@ -416,24 +339,13 @@
                       </div>
 
                       <div class="col-6 p-0">
-                        <select
-                          (keydown.enter)="saltar('send')"
-                          class="form-control"
-                          formControlName="medida_alerta"
-                          id="medida_alerta"
-                          (change)="seleccionarContenidoCaja()"
-                          [ngClass]="{ badAlert: articulo_no_paquete }"
-                        >
+                        <select (keydown.enter)="saltar('send')" class="form-control" formControlName="medida_alerta" id="medida_alerta" (change)="seleccionarContenidoCaja()" [ngClass]="{ badAlert: articulo_no_paquete }">
                           <option value="{{ null }}" disabled></option>
                           <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                         </select>
                       </div>
                     </div>
-                    <div
-                      class="alerta text-danger ml-1"
-                      style="font-size: 12px"
-                      *ngIf="!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)"
-                    >
+                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)">
                       Este Campo es obligatorio
                     </div>
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="articulo_no_paquete">Este Articulo no se contiene Paquetes</div>
@@ -451,23 +363,8 @@
                 <label class="control-label">Precio por libra </label>
 
                 <div class="form-group">
-                  <input
-                    (keydown.enter)="saltar('send')"
-                    (focus)="$event.target.select()"
-                    type="text"
-                    id="precio_libra"
-                    formControlName="precio_libra"
-                    class="form-control"
-                    (blur)="revisarPrecio('precio_libra')"
-                    autocomplete="off"
-                  />
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['precio_libra'].valid && (form.controls['precio_libra'].dirty || form.controls['precio_libra'].touched)"
-                  >
-                    Cantidad de la caja
-                  </div>
+                  <input (keydown.enter)="saltar('send')" (focus)="$event.target.select()" type="text" id="precio_libra" formControlName="precio_libra" class="form-control" (blur)="revisarPrecio('precio_libra')" autocomplete="off" />
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['precio_libra'].valid && (form.controls['precio_libra'].dirty || form.controls['precio_libra'].touched)">Cantidad de la caja</div>
                 </div>
               </div>
             </div>
@@ -494,11 +391,7 @@
                     min="1"
                     autocomplete="off"
                   />
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['cantidad_contenido_padre'].valid && (form.controls['cantidad_contenido_padre'].dirty || form.controls['cantidad_contenido_padre'].touched)"
-                  >
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['cantidad_contenido_padre'].valid && (form.controls['cantidad_contenido_padre'].dirty || form.controls['cantidad_contenido_padre'].touched)">
                     Cantidad de la caja
                   </div>
                 </div>
@@ -512,11 +405,7 @@
                     <option *ngIf="form.controls['medida'].value === 'Caja'" value="Paquete">Paquete</option>
                     <option *ngIf="form.controls['medida'].value === 'Caja'" value="Unidad">Unidad</option>
                   </select>
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['medida_contenido_padre'].valid && (form.controls['medida_contenido_padre'].dirty || form.controls['medida_contenido_padre'].touched)"
-                  >
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida_contenido_padre'].valid && (form.controls['medida_contenido_padre'].dirty || form.controls['medida_contenido_padre'].touched)">
                     Este Campo es obligatorio
                   </div>
                 </div>
@@ -537,13 +426,7 @@
                     (blur)="calculatePriceHijo()"
                     autocomplete="off"
                   />
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['precio_padre'].valid && (form.controls['precio_padre'].dirty || form.controls['precio_padre'].touched)"
-                  >
-                    Este Campo es obligatorio
-                  </div>
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['precio_padre'].valid && (form.controls['precio_padre'].dirty || form.controls['precio_padre'].touched)">Este Campo es obligatorio</div>
                 </div>
               </div>
             </div>
@@ -567,11 +450,7 @@
                     class="form-control input_cantidad"
                     autocomplete="off"
                   />
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['cantidad_contenido_hijo'].valid && (form.controls['cantidad_contenido_hijo'].dirty || form.controls['cantidad_contenido_hijo'].touched)"
-                  >
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['cantidad_contenido_hijo'].valid && (form.controls['cantidad_contenido_hijo'].dirty || form.controls['cantidad_contenido_hijo'].touched)">
                     Cantidad del paquete
                   </div>
                 </div>
@@ -583,11 +462,7 @@
                     <option value="{{ null }}" disabled>Seleccione</option>
                     <option value="Unidad">Unidad</option>
                   </select>
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['medida_contenido_hijo'].valid && (form.controls['medida_contenido_hijo'].dirty || form.controls['medida_contenido_hijo'].touched)"
-                  >
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida_contenido_hijo'].valid && (form.controls['medida_contenido_hijo'].dirty || form.controls['medida_contenido_hijo'].touched)">
                     Este Campo es obligatorio
                   </div>
                 </div>
@@ -607,13 +482,7 @@
                     (blur)="revisarPrecio('precio_hijo')"
                     autocomplete="off"
                   />
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['precio_hijo'].valid && (form.controls['precio_hijo'].dirty || form.controls['precio_hijo'].touched)"
-                  >
-                    Este Campo es obligatorio
-                  </div>
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['precio_hijo'].valid && (form.controls['precio_hijo'].dirty || form.controls['precio_hijo'].touched)">Este Campo es obligatorio</div>
                 </div>
               </div>
             </div>
@@ -640,7 +509,6 @@
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado articulos</h4>
           <div class="d-flex">
-            <button (click)="openOtrosCostos()" class="btn btn-gris mr-2">Otros costos</button>
             <button [disabled]="articuloSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
           </div>
         </div>

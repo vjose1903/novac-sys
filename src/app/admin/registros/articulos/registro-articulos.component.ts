@@ -2,13 +2,11 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@ang
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
+import * as moment from '../../../core/javascript/moment';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 import * as $ from 'jquery';
-import { OtrosCostosFormComponent } from './otros-costos-form/otros-costos-form.component';
 import { fun } from '../../../core/services/functions.service';
 
 @Component({
@@ -681,21 +679,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         this.borrar();
       });
     }
-  }
-
-  openOtrosCostos() {
-    this.handleModalForm({
-      id: 'mantenimiento_otros_costos',
-      header: 'Mantenimiento de otros costos',
-      width: '1000px',
-      height: '650px',
-      component: OtrosCostosFormComponent,
-      botones: {
-        aceptar: { show: false },
-        cancelar: { show: false },
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cerrar'), label: 'CERRAR', disable: false }],
-      },
-    });
   }
 
   nuevoRegistro() {

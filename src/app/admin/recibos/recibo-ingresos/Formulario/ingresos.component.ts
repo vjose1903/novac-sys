@@ -201,7 +201,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       };
 
       this.totalPagado = _.reduce(factura.pagos, (acumulado, item) => acumulado + item.deposito, this.totalPagado);
-      this.totalNotas = _.reduce(factura.notas, (acumulado, item) => acumulado + Math.abs(item.total_factura), this.totalNotas);
+      this.totalNotas = _.reduce(factura.notas, (acumulado, item) => acumulado + Math.abs(item.total), this.totalNotas);
 
       factura.subrayar = factura.is_viaje;
 

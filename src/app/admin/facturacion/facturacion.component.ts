@@ -538,22 +538,28 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const condicion = this.condicion_fact;
     const tipo_factura = this.tipoFactura;
     let buscar = false;
-
-    if (this.metodo === 'venta') {
+    fun.logRed('sali_de ', sali_de);
+    if (this.metodo == 'venta') {
       setTimeout(() => {
         const voy_a = document.activeElement.id;
+        fun.logYellow('voy_a ', voy_a);
         const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
 
-        if (sali_de === 'venta' && condicion === 'Crédito' && nombre === 'Cliente contado') {
-          if (voy_a !== 'fecha_equivalente' && voy_a === 'nom') buscar = true;
+        if (sali_de == 'venta' && condicion == 'Crédito' && nombre == 'Cliente contado') {
+          if (voy_a != 'fecha_viaje' && voy_a == 'nom') buscar = true;
         }
-        if (sali_de === 'venta' && tipo_factura === '01' && voy_a !== 'fecha_equivalente' && nombre === 'Cliente contado') buscar = true;
 
-        if (sali_de === 'venta' && valor === 'adelantada' && nombre === 'Cliente contado') buscar = true;
+        fun.logGreen('buscar ', buscar);
 
-        if (sali_de === 'venta' && condicion === 'Contado' && valor === 'normal' && voy_a !== 'nom' && voy_a !== 'dir') this.iniciarFactura('cod-0');
+        if (sali_de == 'venta' && tipo_factura == '01' && voy_a != 'fecha_viaje' && nombre == 'Cliente contado') buscar = true;
 
-        if (sali_de === 'fecha_equivalente' && condicion === 'Crédito' && nombre === 'Cliente contado') buscar = true;
+        if (sali_de == 'venta' && valor == 'adelantada' && nombre == 'Cliente contado') buscar = true;
+        fun.logBlue('buscar ', buscar);
+
+        if (sali_de == 'venta' && condicion == 'Contado' && valor == 'normal' && voy_a != 'nom' && voy_a != 'dir') this.iniciarFactura('cod-0');
+
+        if (sali_de == 'fecha_viaje' && nombre == 'Cliente contado') buscar = true;
+        fun.logOrange('buscar ', buscar);
 
         if (buscar) this.abrirModalFiltro();
       }, 250);
@@ -580,7 +586,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         num = index;
       }
 
-      if (num < 10 || char === '_') return false;
+      if (num < 10 || char == '_') return false;
       else return true;
     }
   }
@@ -671,30 +677,35 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   saltar(campo, valor?, salioDe?) {
-    if (campo === 'buscarCliente') {
+    if (campo == 'blur') {
+      this.desEnfocarInput(salioDe);
+      return;
+    }
+
+    if (campo == 'buscarCliente') {
       this.desEnfocarInput(salioDe);
       this.abrirModalFiltro();
     }
 
-    if (campo === 'condicion') this.checkTipoFactura(campo, valor, false);
+    if (campo == 'condicion') this.checkTipoFactura(campo, valor, false);
 
-    if (campo === 'venta') {
+    if (campo == 'venta') {
       this.desEnfocarInput(salioDe);
       this.enfocarInput(campo);
     }
 
-    if (campo === 'costo' || campo === 'fecha_vencimiento' || campo === 'fecha_equivalente') this.enfocarInput(campo);
+    if (campo == 'costo' || campo == 'fecha_viaje' || campo == 'fecha_equivalente') this.enfocarInput(campo);
 
-    if (campo === 'pago') {
-      if (this.metodo === 'compra' && !this.tipos_costosYgastos.includes(valor)) {
+    if (campo == 'pago') {
+      if (this.metodo == 'compra' && !this.tipos_costosYgastos.includes(valor)) {
         fun.toastError('El tipo de costo y gasto introducido es incorrecto.', 'ERROR');
       } else {
         this.CostoYgasto = valor;
-        if (this.condicion_fact === 'Contado') {
-          const enfocar = this.metodo === 'compra' && campo === 'pago' ? 'ncf' : campo;
+        if (this.condicion_fact == 'Contado') {
+          const enfocar = this.metodo == 'compra' && campo == 'pago' ? 'ncf' : campo;
           this.enfocarInput(enfocar);
         } else {
-          if (this.metodo === 'venta') {
+          if (this.metodo == 'venta') {
             this.enfocarInput('nom');
           } else {
             this.enfocarInput('ncf');

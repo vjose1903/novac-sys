@@ -18,7 +18,7 @@ export class ModalHistorialPagosComponent implements OnInit, ModalI {
 
   info_notas = [
     { titulo: 'NO. comprobante', tipo: 'text', key: 'numero_comprobante' },
-    { titulo: 'Crédito', tipo: 'formatoNumero', key: 'total_factura', formatoNumero: true },
+    { titulo: 'Crédito', tipo: 'formatoNumero', key: 'total', formatoNumero: true },
     { titulo: 'Fecha nota', tipo: 'text', key: 'fecha_equivalente' },
   ];
 

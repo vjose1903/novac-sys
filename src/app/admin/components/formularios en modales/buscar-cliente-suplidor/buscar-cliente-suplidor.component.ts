@@ -37,6 +37,8 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
   btn_aceptar() {}
 
   ngOnInit(): void {
+    console.log(" ----- INIT BUSCAR CLIENTE  ----- ");
+
     this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default, 'init');
   }
 
@@ -46,14 +48,15 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
     const per_page = event.per_page;
     let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : event.searchText || ' ';
 
-    // if (!fun.isEmpty(event.searchText)) palabra_a_buscar = event.searchText;
-    // else if (this.inputs.palabra_a_buscar) palabra_a_buscar = fun.isEmpty(this.inputs.palabra_a_buscar) ? ' ' : this.inputs.palabra_a_buscar;
-
     const classDinamic = this.inputs.metodo === 'venta' ? 'clienteClass' : 'suplidorClass';
 
     const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } }).catch((error) => {
       if (where === 'init') this.closeThis();
     });
+
+    console.log(' ');
+    console.log('res ', res);
+    console.log(' ');
 
     if (res.data && res.data.length > 0) {
       res.data.map(async (cli) => {

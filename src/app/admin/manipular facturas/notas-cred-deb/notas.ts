@@ -1,7 +1,6 @@
-import { SingletonService } from '../../../core/services/singleton.service';
 import { CrudG } from '../../../core/typescript/crud-g';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from '../../../core/javascript/moment';
 import { fun } from '../../../core/services/functions.service';
 
 export class NotaC extends CrudG<any> {

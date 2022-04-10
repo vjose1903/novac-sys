@@ -489,21 +489,36 @@ export class fun {
     const config: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
     return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
   }
+  // ----------------------------------------------------------------------------------------------------------
 
   static logBlue(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? body : '');
   }
+  // ----------------------------------------------------------------------------------------------------------
 
   static logYellow(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? body : '');
   }
+  // ----------------------------------------------------------------------------------------------------------
 
   static logRed(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? body : '');
   }
+  // ----------------------------------------------------------------------------------------------------------
 
   static logGreen(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? body : '');
+  }
+
+  // ----------------------------------------------------------------------------------------------------------
+
+  static logOrange(text: any, body?) {
+    console.log(`%c ${text}`, 'background: #00000000; color: #df8211', body !== undefined ? body : '');
+  }
+  // ----------------------------------------------------------------------------------------------------------
+
+  static logPurple(text: any, body?) {
+    console.log(`%c ${text}`, 'background: #00000000; color: #9954d9', body !== undefined ? body : '');
   }
 
   // =====================================================================
