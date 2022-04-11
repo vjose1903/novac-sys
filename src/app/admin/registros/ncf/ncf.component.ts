@@ -24,8 +24,8 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   usado = false;
 
   info = [
-    { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '3.5rem' }] },
-    { titulo: 'Tipo', tipo: 'text', key: 'tipoC' },
+    { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '3rem' }] },
+    { titulo: 'Tipo', tipo: 'text', key: 'tipoC', estilos: [{ width: '2rem' }] },
     { titulo: 'Secuencia', tipo: 'text', key: 'secuencia_' },
     { titulo: 'Desde', tipo: 'text', key: 'desde' },
     { titulo: 'Hasta', tipo: 'text', key: 'hasta' },
@@ -177,7 +177,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
           ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
 
-          ncf.customStyles = { 'td-usado_': { width: '3.5rem' }, 'td-codigo': { width: '3.5rem' }, 'td-estado_': { width: '3.5rem' } };
+          ncf.customStyles = { 'td-codigo': { width: '3rem' }, 'td-tipoC': { width: '2rem' }, 'td-usado_': { width: '3.5rem' }, 'td-estado_': { width: '3.5rem' } };
 
           tempNCF.push(ncf);
         }

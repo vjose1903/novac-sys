@@ -154,11 +154,11 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
               if (fun.hasValue(is_user) && is_user.persona.estado) {
                 fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR');
-                const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
-                this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
                 if (!this.editando) enable_campos = false;
                 return;
               }
+              const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
+              this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
 
               // const documento = fun.hasValue(is_user) ? _.omit(is_user, ['persona', 'persona_is']) : _.omit(_.head(res['data']), ['persona', 'persona_is']);
               const persona = fun.hasValue(is_user) ? is_user.persona : _.head(res['data']).persona;

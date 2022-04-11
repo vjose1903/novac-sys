@@ -191,19 +191,22 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
           .then((res) => {
             if (res['data'].length) {
+              console.log('res ', res);
               const is_suplidor = _.find(res['data'], (item) => item.persona_is === 'Suplidor');
+              console.log('is_suplidor ', is_suplidor);
+              console.log('fun.hasValue(is_suplidor) ', fun.hasValue(is_suplidor));
 
               if (fun.hasValue(is_suplidor) && is_suplidor.persona.estado) {
                 fun.toastError(`${_.capitalize(tipo)} pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR');
-
-                const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
-                this.doc_is_cedula = documento_original.descripcion == 'cedula' ? true : false;
-                const otro_doc = documento_original.descripcion == 'cedula' ? 'rnc' : 'cedula';
-                this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
-                this.form.controls[otro_doc].setValue(null);
                 if (!this.editando) enable_campos = false;
                 return;
               }
+
+              const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
+              this.doc_is_cedula = documento_original.descripcion == 'cedula' ? true : false;
+              const otro_doc = documento_original.descripcion == 'cedula' ? 'rnc' : 'cedula';
+              this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
+              this.form.controls[otro_doc].setValue(null);
 
               const persona = fun.hasValue(is_suplidor) ? is_suplidor.persona : _.head(res['data']).persona;
 
@@ -237,6 +240,11 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   nuevoRegistro() {
     this.isCreando = true;
+
+    setTimeout(() => {
+      this.marcarCheck('rnc');
+      this.enfocarInput('rnc');
+    }, 200);
   }
 
   changeStateCampos(enable = false) {

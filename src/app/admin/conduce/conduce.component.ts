@@ -236,7 +236,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
       if (input == 'can-' && fun.hasValue(cod)) {
         if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
-          const obj = { filtrarArticulo: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
+          const obj = { palabra_a_buscar: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
 
           this.handleModalForm({
             component: BuscarArticuloComponent,
@@ -683,9 +683,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   llenarConduce(detalles, conteo = 0, firstResolve = null) {
     return new Promise((resolve) => {
-
       firstResolve ??= resolve;
-
 
       this.llenarFila(detalles[conteo], this.secuencia).then((res) => {
         conteo++;
@@ -711,7 +709,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   async llenarFila(element, i) {
     return new Promise((resolve) => {
       // const validator = (rowArticulo) => rowArticulo.detalle_factura_id == element.id;
-
 
       // const result = this.ARRAY_ROWARTICULOS.getRawValue().some(validator);
       // if (result) resolve(true);
