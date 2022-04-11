@@ -17,6 +17,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   form: FormGroup;
   listaRoles = [];
   listaPermisos = [];
+
   info = [
     { titulo: 'Nombre', key: 'nombre', tipo: 'text', estilos: [{ width: '20%' }] },
     { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', estilos: [{ width: '50%' }] },
@@ -46,7 +47,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this._init_mixin({ component: 'reg_roles', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_roles', is_routing: true });
     this.necesarioStart();
     this.createForm();
 
@@ -158,12 +159,6 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     this.enfocarInput('campo_nombre');
   }
 
-  decisionModal(arg) {
-    if (arg) {
-      const obj = fun.duplicarJson(this.seleccionModal);
-    }
-  }
-
   nuevoRegistro() {
     this.isCreando = true;
     this.parsePermisos({ clean: true });
@@ -220,6 +215,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   editarItem(item) {
+    this.borrar();
     this.roleSelected = item.ARG;
     this.form.patchValue(this.roleSelected);
     this.parsePermisos({ clean: false });
@@ -271,6 +267,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     this.rolesClass.createUpdateOne(formulario).then((res) => {
       this.isCreando = false;
       this.roleSelected = undefined;
+      this.borrar();
 
       const actualPagination = this.tServ.getPaginationById('lista_roles');
       actualPagination['searchText'] = this.palabra_buscar;
