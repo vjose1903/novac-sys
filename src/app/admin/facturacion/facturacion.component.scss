@@ -1,4 +1,23 @@
 @import url("https://fonts.googleapis.com/css?family=Orbitron&display=swap");
+
+.overlayCamion {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  li {
+    padding: 0.5rem;
+    &:hover {
+      background-color: #e3e3e3;
+    }
+    &.active {
+      background-color: #c2c2c2;
+      &:hover {
+        background-color: #bbbbbb;
+      }
+    }
+  }
+}
+
 .cabezaFactura {
   background-color: var(--primary01);
   border-radius: 1rem 1rem 0rem 0rem !important;
@@ -255,9 +274,8 @@ mdb-popover-container {
     &.activa {
       background-color: #e0ed4952;
       box-shadow: 0px 0px 5.4px #c3b71a !important;
-      &:hover{
+      &:hover {
         background-color: #949c3752;
-
       }
     }
 

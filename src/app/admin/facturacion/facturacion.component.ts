@@ -22,6 +22,7 @@ import { FactsLocalStorage } from './factsLocalStorage';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { fun } from '../../core/services/functions.service';
+import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
 
 @Component({
   selector: 'app-facturacion',
@@ -33,6 +34,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   secuenciaKeys = [];
   info_cambio: any;
+
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
@@ -123,7 +125,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   ncfClass = new NcfC();
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
-
+  vehiculoClass = new VehiculoC();
+  overlay;
+  camionSelected: any;
+  camiones = [];
   constructor(
     public mServ: ModalService,
 
@@ -226,6 +231,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.fecha_equivalente = new Date();
       this.fecha_viaje = new Date();
       this.articulosAcambiar = [];
+      this.overlay = undefined;
+      this.camionSelected = undefined;
 
       this.factServ.setTipos(this.metodo, (res) => {
         if (res) {
@@ -239,6 +246,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (this.metodo === 'venta') {
         this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higüero', telefono: null });
+        this.getCamiones();
       } else {
         this.form.reset();
       }
@@ -538,28 +546,26 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const condicion = this.condicion_fact;
     const tipo_factura = this.tipoFactura;
     let buscar = false;
-    fun.logRed('sali_de ', sali_de);
+
     if (this.metodo == 'venta') {
       setTimeout(() => {
         const voy_a = document.activeElement.id;
-        fun.logYellow('voy_a ', voy_a);
         const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
 
         if (sali_de == 'venta' && condicion == 'Crédito' && nombre == 'Cliente contado') {
           if (voy_a != 'fecha_viaje' && voy_a == 'nom') buscar = true;
         }
 
-        fun.logGreen('buscar ', buscar);
-
         if (sali_de == 'venta' && tipo_factura == '01' && voy_a != 'fecha_viaje' && nombre == 'Cliente contado') buscar = true;
 
         if (sali_de == 'venta' && valor == 'adelantada' && nombre == 'Cliente contado') buscar = true;
-        fun.logBlue('buscar ', buscar);
 
         if (sali_de == 'venta' && condicion == 'Contado' && valor == 'normal' && voy_a != 'nom' && voy_a != 'dir') this.iniciarFactura('cod-0');
 
-        if (sali_de == 'fecha_viaje' && nombre == 'Cliente contado') buscar = true;
-        fun.logOrange('buscar ', buscar);
+        if (sali_de == 'fecha_viaje' && nombre == 'Cliente contado') {
+          console.log('DANDO CLICK');
+          document.getElementById('btnCamion').click();
+        }
 
         if (buscar) this.abrirModalFiltro();
       }, 250);
@@ -757,6 +763,33 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return res;
   }
 
+  openOverlay(event, overlay) {
+    console.log('ANDO AQUIII');
+
+    this.overlay = overlay;
+    this.overlay.toggle(event);
+    setTimeout(() => this.enfocarInput('searchCamion'), 5);
+    if (event) event.stopPropagation();
+  }
+
+  seleccionarCamion(camion) {
+    this.camionSelected = camion;
+  }
+
+  async getCamiones() {
+    const extra = { afterPath: `filtro/ `, parameters: { paginado: false } };
+
+    this.vehiculoClass.getAll(extra).then((res) => {
+      this.camiones = res['data'];
+    });
+  }
+
+  filterCamion(event) {
+    fun.awaitTyping(event).then((item: any) => {
+      const valor_a_buscar = item.target.value;
+      console.log('item ', item);
+    });
+  }
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES & SUPLIDORES
   // =============================================

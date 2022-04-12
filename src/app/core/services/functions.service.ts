@@ -353,8 +353,8 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: awaitTyping
-  // Descripcion : Esta funcion espera a que terminen de escribir para ejecutar una funcion
+  // Nombre: is_number
+  // Descripcion : Esta funcion evalua si un parametro pasado es un numero
   // _________________________________________________________________________________________________
   static is_number(caracter) {
     if (typeof caracter === 'number') caracter = `${caracter}`;
@@ -364,8 +364,8 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: awaitTyping
-  // Descripcion : Esta funcion espera a que terminen de escribir para ejecutar una funcion
+  // Nombre: is_letter
+  // Descripcion : Esta funcion evalua si un parametro pasado es un caracter
   // _________________________________________________________________________________________________
 
   static is_letter(caracter) {
@@ -382,7 +382,7 @@ export class fun {
     const promise = new Promise((resolve) => {
       clearTimeout(fun.timeout);
       fun.timeout = setTimeout(() => {
-        if (!event || event.keyCode != 13) resolve(true);
+        if (!event || event.keyCode != 13) resolve(event);
       }, 500);
     });
     return promise;
