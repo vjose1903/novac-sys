@@ -28,6 +28,7 @@ import { teclasCode } from '../../core/typescript/constantes';
   templateUrl: './facturacion.component.html',
   styleUrls: ['./facturacion.component.scss'],
 })
+
 export class FacturacionComponent extends FactsLocalStorage implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
 
