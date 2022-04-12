@@ -23,7 +23,6 @@ import { InventarioComponent } from '../inventario/inventario.component';
 import { ProduccionComponent } from '../produccion/produccion.component';
 import { TabViewModule } from 'primeng/tabview';
 import { ReportesComponent } from '../reportes/reportes.component';
-import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.module';
 
@@ -43,7 +42,6 @@ import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.mo
     NgSelectModule,
     FormsModule,
     ModalModule,
-    MDBBootstrapModule.forRoot(),
     NgbModule,
     DirectivesModule,
     PdfViewerModule,

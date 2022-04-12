@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { TabViewModule } from 'primeng/tabview';
 import { AngularModule } from '../../../modules/angular.module';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';

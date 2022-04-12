@@ -9,9 +9,9 @@
           <div class="col-3 p-0">
             <ng-template #tipos_facturas><div [innerHtml]="TiposFacturas"></div></ng-template>
             <span class="titulos"><strong>Tipo:</strong></span>
+            <!-- [mdbPopover]="tipos_facturas" -->
             <input
               placement="right"
-              [mdbPopover]="tipos_facturas"
               triggers="focus"
               type="text"
               (keydown.enter)="saltar('condicion', tipoFact.value)"
@@ -47,9 +47,9 @@
           <div *ngIf="metodo === 'compra'" class="col-3 pr-0">
             <ng-template #tipos_costos><div [innerHtml]="TiposCostosGastos"></div></ng-template>
             <span class="titulos"><strong>Gasto:</strong></span>
+            <!-- [mdbPopover]="tipos_costos" -->
             <input
               placement="right"
-              [mdbPopover]="tipos_costos"
               triggers="focus"
               type="text"
               (keydown.enter)="saltar('pago', costo.value)"
