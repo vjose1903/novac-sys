@@ -102,22 +102,42 @@
               tabindex="-1"
               (blur)="checkCambiosModoyCondicionFactura($event.target)"
             />
-
-            <i id="btnCamion" class="fas fa-truck-moving btn-circle-icon ml-3" (click)="openOverlay($event, overlayCamion)" style="z-index: 999999" pTooltip="Seleccionar Camion" tooltipPosition="top"></i>
+            <div class="ml-3 position-relative">
+              <i
+                id="btnCamion"
+                class="fas fa-truck-moving btn-circle-icon"
+                (click)="openOverlay($event, overlayCamion)"
+                style="z-index: 999999"
+                [pTooltip]="camionSelected ? getCamionLabel(camionSelected) : 'Seleccionar camión'"
+                tooltipPosition="top"
+              ></i>
+              <div class="indicadorCamion" [ngClass]="{ no_selected: !camionSelected, selected: camionSelected }">
+                <i class="fa-solid" [ngClass]="{ 'fa-x': !camionSelected, 'fa-check': camionSelected }"></i>
+              </div>
+            </div>
           </div>
           <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #overlayCamion styleClass="dropConfigs" appendTo="body">
             <ng-template pTemplate>
-              <div class="containCamiones"> 
+              <div class="containCamiones">
                 <div class="filter">
-                  <input id="searchCamion" class="search-input form-control" (keyup)="filterCamion($event)" />
+                  <!-- <input id="searchCamion" class="search-input form-control" (keyup)="filterCamion($event)"  /> -->
+                  <input
+                    id="searchCamion"
+                    class="search-input form-control"
+                    [filterTarget]="filterCamionesTargets"
+                    [DataFilter]="copyCamiones"
+                    (onFilter)="filterCamion($event)"
+                    (blur)="checkCamionSeleccionado()"
+                    (keydown.enter)="seleccionarCamion($event)"
+                  />
                 </div>
 
                 <ul class="overlayCamion" role="menu">
-                <li *ngFor="let camion of camiones" role="menuitem" (click)="seleccionarCamion(camion)" class="hoverlable">
-                  <a class="" id="dropdown-item"> {{ camion.marca }} {{ camion.modelo }} - {{ camion.anio }} ({{ camion.propietario.nombre }} {{ camion.propietario.apellido }}) </a>
-                </li>
-              </ul>
-            </div>
+                  <li *ngFor="let camion of camiones; let index_camion = index" role="menuitem" (click)="seleccionarCamion(camion)" class="hoverlable" [ngClass]="{ active: camionSelected?.id == camion.id, indicador: camion_row == index_camion }">
+                    <a id="dropdown-item"> {{ getCamionLabel(camion) }} </a>
+                  </li>
+                </ul>
+              </div>
             </ng-template>
           </p-overlayPanel>
         </div>

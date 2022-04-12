@@ -35,6 +35,41 @@ export class fun {
     return _.cloneDeep(json);
   }
 
+  static my_filter_data(copyData, searchText, targets) {
+    function pick_object(obj, array_string = []) {
+      for (const key in obj) {
+        const value = obj[key];
+
+        if (typeof value != 'boolean') {
+          if (typeof value == 'number') array_string.push(`${value}`);
+          if (typeof value == 'string') array_string.push(value);
+          if (typeof value == 'object') pick_object(value, array_string);
+        }
+      }
+
+      return array_string;
+    }
+
+    const promise = new Promise((resolve) => {
+      fun.awaitTyping().then((res) => {
+        if (typeof searchText == 'number') searchText = `${searchText}`;
+        if (this.isEmpty(searchText)) resolve(copyData);
+
+        const data_filtered = copyData.filter((obj) => {
+          const obj_picked = _.pick(obj, targets);
+          const array_picked = pick_object(obj_picked);
+
+          const is_include = _.some(array_picked, (value: any) => value.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
+
+          return is_include;
+        });
+
+        resolve(data_filtered);
+      });
+    });
+
+    return promise;
+  }
   // __________________________________________________________________________________________________
   // Nombre: checkNumbers
   // Descripcion : Esta funcion retorna true si algun caracter de una cadena no es un numero

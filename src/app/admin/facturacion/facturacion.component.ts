@@ -1,16 +1,14 @@
-import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, OnChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from '../../core/javascript/moment';
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
-import { applyMixins, GLOBAL, tipos_facturas } from '../../core/typescript/GLOBAL';
+import { tipos_facturas } from '../../core/typescript/GLOBAL';
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { MixinClass } from '../../core/typescript/MixinClass';
 import { FacturacionService } from './facturacion.service';
 import { modalClass } from '../components/modal/modal';
-import { Subscription } from 'rxjs';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from './factura';
 import { NcfC } from '../registros/ncf/ncf';
@@ -23,6 +21,7 @@ import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { fun } from '../../core/services/functions.service';
 import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
+import { teclasCode } from '../../core/typescript/constantes';
 
 @Component({
   selector: 'app-facturacion',
@@ -38,12 +37,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
-    // arriba 38
-    // abajo 40
-    // enter 13
-    // control 17
-    // shift 16
-    // alt 18
     event.stopPropagation();
     const key = event.keyCode;
 
@@ -53,9 +46,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const combinacion = _.join(this.secuenciaKeys, '_');
       this.secuenciaKeys = [];
 
-      if (combinacion === '17_80') this.imprimirFactura();
+      if (combinacion === `${teclasCode.control}_${teclasCode.p}`) this.imprimirFactura();
 
-      if (combinacion === '17_71') this.archivarFactura();
+      if (combinacion === `${teclasCode.control}_${teclasCode.g}`) this.archivarFactura();
+
+      if (fun.hasValue(this.overlay)) this.mover_indicador_camion(key);
     }
   }
 
@@ -126,9 +121,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   vehiculoClass = new VehiculoC();
+
   overlay;
   camionSelected: any;
   camiones = [];
+  camion_row;
+  filterCamionesTargets;
+  copyCamiones;
+
   constructor(
     public mServ: ModalService,
 
@@ -233,6 +233,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.articulosAcambiar = [];
       this.overlay = undefined;
       this.camionSelected = undefined;
+      this.camion_row = 0;
+      this.filterCamionesTargets = ['marca', 'modelo', 'anio'];
 
       this.factServ.setTipos(this.metodo, (res) => {
         if (res) {
@@ -562,10 +564,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         if (sali_de == 'venta' && condicion == 'Contado' && valor == 'normal' && voy_a != 'nom' && voy_a != 'dir') this.iniciarFactura('cod-0');
 
-        if (sali_de == 'fecha_viaje' && nombre == 'Cliente contado') {
-          console.log('DANDO CLICK');
-          document.getElementById('btnCamion').click();
-        }
+        if (sali_de == 'fecha_viaje' && nombre == 'Cliente contado') document.getElementById('btnCamion').click();
 
         if (buscar) this.abrirModalFiltro();
       }, 250);
@@ -764,16 +763,32 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   openOverlay(event, overlay) {
-    console.log('ANDO AQUIII');
-
     this.overlay = overlay;
     this.overlay.toggle(event);
     setTimeout(() => this.enfocarInput('searchCamion'), 5);
     if (event) event.stopPropagation();
   }
 
-  seleccionarCamion(camion) {
-    this.camionSelected = camion;
+  seleccionarCamion(event) {
+    this.camionSelected = this.camiones[this.camion_row];
+    setTimeout(() => {
+      this.abrirModalFiltro();
+      this.overlay.hide(event);
+    }, 5);
+  }
+
+  getCamionLabel(camion) {
+    return `${camion.marca} ${camion.modelo} - ${camion.anio} (${camion.propietario.nombre} ${camion.propietario.apellido})`;
+  }
+
+  mover_indicador_camion(key) {
+    if (key == teclasCode.arriba) {
+      if (this.camion_row == 0) this.camion_row = this.camiones.length - 1;
+      else this.camion_row--;
+    } else if (key == teclasCode.abajo) {
+      if (this.camion_row == this.camiones.length - 1) this.camion_row = 0;
+      else this.camion_row++;
+    }
   }
 
   async getCamiones() {
@@ -781,14 +796,20 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     this.vehiculoClass.getAll(extra).then((res) => {
       this.camiones = res['data'];
+      this.copyCamiones = fun.duplicarJson(res['data']);
     });
   }
 
-  filterCamion(event) {
-    fun.awaitTyping(event).then((item: any) => {
-      const valor_a_buscar = item.target.value;
-      console.log('item ', item);
-    });
+  filterCamion(camionesFiltrados) {
+    this.camiones.length = 0;
+    for (const camion of camionesFiltrados) this.camiones.push(camion);
+  }
+
+  checkCamionSeleccionado() {
+    if (fun.isEmpty(this.camionSelected)) {
+      fun.toastWarning('Debe de seleccionar un camión para el viaje', 'Aviso');
+      setTimeout(() => this.enfocarInput('searchCamion'), 5);
+    }
   }
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES & SUPLIDORES
