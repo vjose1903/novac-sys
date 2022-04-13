@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
@@ -61,7 +60,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.localeService.use('es');
     this.boton = 'Registrar';
 
-    this._init_mixin({ component: 'reg_empleados', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_empleados', is_routing: true,  });
 
     this.necesarioStart();
   }
@@ -289,13 +288,13 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     documentos_identidad.map((element) => {
       // haciendo la estructura para mandar los documentos a la base de datos
       const doc_backend = _.find(this.documentos_de_identidad, (doc) => _.lowerCase(doc.descripcion) === _.lowerCase(element.descripcion));
-
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = true;
       return element;
     });
 
     formulario.documentos_de_identidad = documentos_identidad;
+    formulario['ids_roles'] = "2";
     formulario.estado = true;
 
     const objSend = _.omit(formulario, ['cedula']);
@@ -315,23 +314,11 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   nuevoRegistro() {
     this.isCreando = true;
   }
+
   showModal() {
-    this.handleModalForm({
-      component: ChangePasswordComponent,
-      id: 'changePassword',
-      inputs: this.empleadoSelected,
-      header: 'Cambiar contraseña',
-      width: '30rem',
-    });
+    this.handleModalForm({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem', });
   }
 
-  decisionModal(arg) {
-    if (arg) {
-      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      const actualPagination = this.tServ.getPaginationById('listaEmpleados');
-      this.empleadosClass.deleteOne(obj.id).then((res) => this.getEmpleados(actualPagination));
-    }
-  }
 
   eliminarReg(regisData) {
     const objToSend = {
