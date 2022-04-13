@@ -5,10 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
 import { AppComponent } from './app.component';
-import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxBootstrapModule } from './modules/ngx-bootstrap.module';
-import { AngularModule } from './modules/angular.module';
 import { ToastrModule } from 'ngx-toastr';
 import { NgInitDirective } from './directives/ngInit';
 import { PrimengModule } from './modules/primeng.module';
@@ -35,8 +33,6 @@ defineLocale('es', esLocale);
     CoreModule,
     ToastrModule.forRoot({ preventDuplicates: true }),
     AppRoutingModule,
-    AngularModule,
-
     BrowserAnimationsModule,
     NgxBootstrapModule,
     NewModalModule,

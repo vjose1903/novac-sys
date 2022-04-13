@@ -7,23 +7,25 @@
       <div class="col-3 divRight pl-0">
         <div class="row">
           <div class="col-3 p-0">
-            <ng-template #tipos_facturas><div [innerHtml]="TiposFacturas"></div></ng-template>
             <span class="titulos"><strong>Tipo:</strong></span>
             <input
               placement="right"
-              [mdbPopover]="tipos_facturas"
               triggers="focus"
               type="text"
               (keydown.enter)="saltar('condicion', tipoFact.value)"
               class="form-control tipo inputE"
               [(ngModel)]="tipoFactura"
               id="tipoFact"
-              (blur)="checkTipoFactura('condicion', tipoFact.value, true)"
+              (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
               #tipoFact
-              (focus)="setWidthPop(true, $event.target)"
+              (focus)="tiposFacturas.toggle($event)"
               tabindex="-1"
               [readOnly]="!!factura_a_editar"
             />
+
+            <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
+              <div style="width: 18rem" [innerHtml]="TiposFacturas"></div>
+            </p-overlayPanel>
           </div>
 
           <div class="{{ metodo === 'compra' ? 'col-6' : 'col-9' }} pr-0">
@@ -45,11 +47,9 @@
           </div>
 
           <div *ngIf="metodo === 'compra'" class="col-3 pr-0">
-            <ng-template #tipos_costos><div [innerHtml]="TiposCostosGastos"></div></ng-template>
             <span class="titulos"><strong>Gasto:</strong></span>
             <input
               placement="right"
-              [mdbPopover]="tipos_costos"
               triggers="focus"
               type="text"
               (keydown.enter)="saltar('pago', costo.value)"
@@ -59,9 +59,13 @@
               #costo
               [readOnly]="!!factura_a_editar"
               [ngClass]="{ disabled: !!factura_a_editar }"
-              (focus)="setWidthPop(false, $event.target)"
+              (focus)="gastosFacturas.toggle($event)"
+              (blur)="gastosFacturas.hide()"
               tabindex="-1"
             />
+            <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #gastosFacturas appendTo="body">
+              <div style="width: 26rem" [innerHtml]="TiposCostosGastos"></div>
+            </p-overlayPanel>
           </div>
         </div>
 
@@ -120,7 +124,6 @@
             <ng-template pTemplate>
               <div class="containCamiones">
                 <div class="filter">
-                  <!-- <input id="searchCamion" class="search-input form-control" (keyup)="filterCamion($event)"  /> -->
                   <input
                     id="searchCamion"
                     class="search-input form-control"

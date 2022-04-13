@@ -37,15 +37,14 @@
               "node_modules/primeicons/primeicons.css",
 
               "./node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
-
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
               "node_modules/@fortawesome/fontawesome-free/css/solid.css",
               "node_modules/@fortawesome/fontawesome-free/css/regular.css",
               "node_modules/@fortawesome/fontawesome-free/css/brands.css",
               "node_modules/@fortawesome/fontawesome-free/css/fontawesome.css",
 
-              "node_modules/angular-bootstrap-md/assets/scss/bootstrap/bootstrap.scss",
-              "node_modules/angular-bootstrap-md/assets/scss/mdb.scss",
 
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/animate.css/animate.css",

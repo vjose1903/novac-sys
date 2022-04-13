@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from '../../core/javascript/moment';
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
-import { tipos_facturas } from '../../core/typescript/GLOBAL';
+import {  tipos_facturas } from '../../core/typescript/GLOBAL';
 import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { FacturacionService } from './facturacion.service';
@@ -1327,7 +1327,3 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     else await this.resetVariables();
   }
 }
-
-// export interface FacturacionComponent extends FactsLocalStorage {}
-
-// applyMixins(FacturacionComponent, [FactsLocalStorage]);

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GLOBAL, MODIFIED_CONFIG_FILE } from '../core/typescript/GLOBAL';
@@ -27,7 +27,7 @@ import { CurrentUserService } from '../core/services/current-user.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
+export class LoginComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   form: FormGroup;
   errorC = '';
   errorU = '';
@@ -49,6 +49,10 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
 
       this.form = this.fb.group({ usuario: config.is_development ? 'ADM' : null, password: config.is_development ? '1234567' : null });
     });
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.enfocarInput('Iusuario'), 5);
   }
 
   abrirModalReporte(obj) {
@@ -101,7 +105,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy {
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then((res) => {
           this.currentUserServ.setUser(res.data);
-          console.log("ANDO AQUIII");
+          console.log('ANDO AQUIII');
 
           this.router.navigateByUrl('/admin/dashboard');
         })

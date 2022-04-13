@@ -7,14 +7,12 @@ import { IngresosComponent } from './recibo-ingresos/Formulario/ingresos.compone
 import { ListaRecibosComponent } from './recibo-ingresos/lista-recibos/lista-recibos.component';
 import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
 
-import { MDBBootstrapModule } from 'angular-bootstrap-md';
-
 import { TablasModule } from '../components/tablas/tablas.module';
-import { AngularModule } from '../../modules/angular.module';
 import { PrimengModule } from '../../modules/primeng.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [IngresosComponent, ListaRecibosComponent, ReciboViajesComponent],
-  imports: [CommonModule, RecibosRoutingModule, AngularModule, PrimengModule, TablasModule],
+  imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule],
 })
 export class RecibosModule {}

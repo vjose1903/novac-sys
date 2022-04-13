@@ -1,11 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { TabViewModule } from 'primeng/tabview';
-import { AngularModule } from '../../../modules/angular.module';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../tablas/tablas.module';
@@ -20,6 +17,7 @@ import { MovimientosFormComponent } from './movimientos-form/movimientos-form.co
 import { PendienteFormComponent } from './pendiente-form/pendiente-form.component';
 import { BuscarClienteSuplidorComponent } from './buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { BuscarArticuloComponent } from './buscar-articulo/buscar-articulo.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const components = [
   FormCantidadEfectivoComponent,
@@ -37,7 +35,7 @@ const components = [
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, FormsModule, NgSelectModule, TablasModule, AngularModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule],
+  imports: [CommonModule, NgSelectModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}

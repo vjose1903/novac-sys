@@ -58,7 +58,7 @@
             <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'suplidores' }" (click)="cambiarMenu({ url: 'suplidores', navigate: true, hasModule: true })">Suplidores</h4>
             <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'articulos' }" (click)="cambiarMenu({ url: 'articulos', navigate: true, hasModule: true })">Articulos</h4>
             <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'camiones' }" (click)="cambiarMenu({ url: 'camiones', navigate: true, hasModule: true })">Camiones</h4>
-            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'roles' }" (click)="cambiarMenu({ url: 'roles', navigate: true, hasModule: true })">Roles</h4>
+            <!-- <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'roles' }" (click)="cambiarMenu({ url: 'roles', navigate: true, hasModule: true })">Roles</h4> -->
             <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'ncf' }" (click)="cambiarMenu({ url: 'ncf', navigate: true, hasModule: true })">NCF</h4>
           </div>
         </div>
@@ -86,23 +86,25 @@
   <div class="content">
     <div class="navBar">
       <div class="right">
-        <div class="btn-group" dropdown id="dropCuenta" #dropCuenta>
-          <a id="button-basic" dropdownToggle class="dropdown-toggle" aria-controls="dropdown-basic">
+        <div class="btn-group" id="dropCuenta">
+          <span class="dropdown-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
             <img class="rounded-circle" [src]="imgUser" alt="Admin" />
             Cuenta <span class="caret"></span>
-          </a>
-          <ul id="dropdown-basic" class="dropdown-menu" role="menu" aria-labelledby="button-basic">
-            <div class="dropdown-header">
-              <h2>{{ usuario?.nombre }}</h2>
-              <p>{{ usuario?.email }}</p>
-            </div>
-            <li class="divider dropdown-divider"></li>
+          </span>
 
-            <li class="divider dropdown-divider"></li>
-            <li role="menuitem">
-              <a class="dropdown-item" id="dropdown-item" (click)="logOut()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
-            </li>
-          </ul>
+          <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #dropdownCuenta styleClass="overlayCuenta" appendTo="body">
+            <ul class="dropdown-cuenta">
+              <div class="dropdown-header">
+                <h3>{{ usuario?.nombre }}</h3>
+                <p>{{ usuario?.email }}</p>
+              </div>
+              <li class="divider dropdown-divider"></li>
+
+              <li role="menuitem">
+                <a class="dropdown-item" id="dropdown-item" (click)="logOut(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
+              </li>
+            </ul>
+          </p-overlayPanel>
         </div>
       </div>
     </div>

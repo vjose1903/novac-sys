@@ -82,6 +82,7 @@ export class MixinClass extends ModalClass {
   // =========================================================================================================
   enfocarInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
+
     if (element) element.focus();
   }
   // =========================================================================================================
