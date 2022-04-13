@@ -7,9 +7,7 @@
       <div class="col-3 divRight pl-0">
         <div class="row">
           <div class="col-3 p-0">
-            <ng-template #tipos_facturas><div [innerHtml]="TiposFacturas"></div></ng-template>
             <span class="titulos"><strong>Tipo:</strong></span>
-            <!-- [mdbPopover]="tipos_facturas" -->
             <input
               placement="right"
               triggers="focus"
@@ -18,12 +16,16 @@
               class="form-control tipo inputE"
               [(ngModel)]="tipoFactura"
               id="tipoFact"
-              (blur)="checkTipoFactura('condicion', tipoFact.value, true)"
+              (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
               #tipoFact
-              (focus)="setWidthPop(true, $event.target)"
+              (focus)="tiposFacturas.toggle($event)"
               tabindex="-1"
               [readOnly]="!!factura_a_editar"
             />
+
+            <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
+              <div style="width: 18rem" [innerHtml]="TiposFacturas"></div>
+            </p-overlayPanel>
           </div>
 
           <div class="{{ metodo === 'compra' ? 'col-6' : 'col-9' }} pr-0">
@@ -45,9 +47,7 @@
           </div>
 
           <div *ngIf="metodo === 'compra'" class="col-3 pr-0">
-            <ng-template #tipos_costos><div [innerHtml]="TiposCostosGastos"></div></ng-template>
             <span class="titulos"><strong>Gasto:</strong></span>
-            <!-- [mdbPopover]="tipos_costos" -->
             <input
               placement="right"
               triggers="focus"
@@ -59,9 +59,13 @@
               #costo
               [readOnly]="!!factura_a_editar"
               [ngClass]="{ disabled: !!factura_a_editar }"
-              (focus)="setWidthPop(false, $event.target)"
+              (focus)="gastosFacturas.toggle($event)"
+              (blur)="gastosFacturas.hide()"
               tabindex="-1"
             />
+            <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #gastosFacturas appendTo="body">
+              <div style="width: 26rem" [innerHtml]="TiposCostosGastos"></div>
+            </p-overlayPanel>
           </div>
         </div>
 
@@ -87,22 +91,60 @@
 
         <div *ngIf="modo_factura === 'viaje'">
           <span class="mt-1"><strong>Fecha viaje:</strong></span>
-          <input
-            type="text"
-            (keydown.enter)="saltar('blur', $event.target.value, $event.target.id)"
-            [bsConfig]="dpConfig"
-            placeholder="mm/dd/aaaa"
-            class="form-control inputE"
-            id="fecha_viaje"
-            [(ngModel)]="fecha_viaje"
-            #dp="bsDatepicker"
-            placement="bottom"
-            bsDatepicker
-            tabindex="-1"
-            (blur)="checkCambiosModoyCondicionFactura($event.target)"
+          <div class="d-flex justify-content-between align-items-center">
+            <input
+              type="text"
+              (keydown.enter)="saltar('blur', $event.target.value, $event.target.id)"
+              [bsConfig]="dpConfig"
+              placeholder="mm/dd/aaaa"
+              class="form-control inputE"
+              id="fecha_viaje"
+              [(ngModel)]="fecha_viaje"
+              #dp="bsDatepicker"
+              placement="bottom"
+              bsDatepicker
+              tabindex="-1"
+              (blur)="checkCambiosModoyCondicionFactura($event.target)"
             />
+            <div class="ml-3 position-relative">
+              <i
+                id="btnCamion"
+                class="fas fa-truck-moving btn-circle-icon"
+                (click)="openOverlay($event, overlayCamion)"
+                style="z-index: 999999"
+                [pTooltip]="camionSelected ? getCamionLabel(camionSelected) : 'Seleccionar camión'"
+                tooltipPosition="top"
+              ></i>
+              <div class="indicadorCamion" [ngClass]="{ no_selected: !camionSelected, selected: camionSelected }">
+                <i class="fa-solid" [ngClass]="{ 'fa-x': !camionSelected, 'fa-check': camionSelected }"></i>
+              </div>
+            </div>
           </div>
-          <!-- (ngModelChange)="enfocarInput('fecha_viaje')" -->
+          <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #overlayCamion styleClass="dropConfigs" appendTo="body">
+            <ng-template pTemplate>
+              <div class="containCamiones">
+                <div class="filter">
+                  <input
+                    id="searchCamion"
+                    class="search-input form-control"
+                    [filterTarget]="filterCamionesTargets"
+                    [DataFilter]="copyCamiones"
+                    (onFilter)="filterCamion($event)"
+                    (blur)="checkCamionSeleccionado()"
+                    (keydown.enter)="seleccionarCamion($event)"
+                  />
+                </div>
+
+                <ul class="overlayCamion" role="menu">
+                  <li *ngFor="let camion of camiones; let index_camion = index" role="menuitem" (click)="seleccionarCamion(camion)" class="hoverlable" [ngClass]="{ active: camionSelected?.id == camion.id, indicador: camion_row == index_camion }">
+                    <a id="dropdown-item"> {{ getCamionLabel(camion) }} </a>
+                  </li>
+                </ul>
+              </div>
+            </ng-template>
+          </p-overlayPanel>
+        </div>
+        <!-- (ngModelChange)="enfocarInput('fecha_viaje')" -->
 
         <div *ngIf="metodo === 'compra'">
           <span class="mt-2"><strong>Número comprobante:</strong></span>
@@ -131,9 +173,9 @@
               placement="bottom"
               bsDatepicker
               tabindex="-1"
-              />
-            </div>
-            <!-- (ngModelChange)="enfocarInput('fecha_vencimiento')" -->
+            />
+          </div>
+          <!-- (ngModelChange)="enfocarInput('fecha_vencimiento')" -->
         </div>
       </div>
       <!-- ======================================================================================================================================================================== -->
@@ -144,13 +186,7 @@
             <h5>
               <strong>{{ metodo === 'venta' ? 'Cliente' : 'Suplidor' }}:</strong>
             </h5>
-            <i
-              *ngIf="!!!factura_a_editar"
-              (click)="abrirModalFiltro()"
-              pTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}"
-              tooltipPosition="right"
-              class="fas fa-search ml-3 botonBuscar"
-            ></i>
+            <i *ngIf="!!!factura_a_editar" (click)="abrirModalFiltro()" pTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
           </div>
           <div class="row">
             <div class="col-7 pl-0">
@@ -168,18 +204,14 @@
                 [ngClass]="{ disabled: activarNombreDireccion() }"
               />
               <input id="id" type="hidden" formControlName="id" />
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">
-                Este Campo es obligatorio
-              </div>
+              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">Este Campo es obligatorio</div>
             </div>
 
             <div class="col-5 pr-0">
               <div class="form-group">
                 <span class="control-label titulos">Telefono:</span>
                 <input type="text" class="form-control inputE disabled" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" [readOnly]="true" tabindex="-1" />
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['telefono'].valid && (form.controls['telefono'].dirty || form.controls['telefono'].touched)">
-                  Introduzca el numero de telefono
-                </div>
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['telefono'].valid && (form.controls['telefono'].dirty || form.controls['telefono'].touched)">Introduzca el numero de telefono</div>
               </div>
             </div>
 
@@ -198,9 +230,7 @@
                   [ngClass]="{ disabled: activarNombreDireccion() }"
                   tabindex="-1"
                 />
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['direccion'].valid && (form.controls['direccion'].dirty || form.controls['direccion'].touched)">
-                  Este Campo es obligatorio
-                </div>
+                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['direccion'].valid && (form.controls['direccion'].dirty || form.controls['direccion'].touched)">Este Campo es obligatorio</div>
               </div>
             </div>
           </div>
@@ -255,12 +285,7 @@
             <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
           </div>
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
-            <app-btncircular
-              [alto]="'100px'"
-              [accion]="factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura'"
-              [nombreImg]="'guardarFactura'"
-              (click)="archivarFactura()"
-            ></app-btncircular>
+            <app-btncircular [alto]="'100px'" [accion]="factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura'" [nombreImg]="'guardarFactura'" (click)="archivarFactura()"></app-btncircular>
           </div>
 
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">

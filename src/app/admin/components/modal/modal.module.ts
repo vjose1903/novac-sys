@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AngularModule } from '../../../modules/angular.module';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../tablas/tablas.module';
 import { ModalComponent } from './modal.component';
@@ -10,10 +9,7 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 @NgModule({
   declarations: [ModalComponent],
-  imports: [
-    CommonModule, FormulariosEnModalesModule, AngularModule, PrimengModule, TablasModule, NgxBootstrapModule, NgxExtendedPdfViewerModule,
-    
-  ],
+  imports: [CommonModule, FormulariosEnModalesModule, PrimengModule, TablasModule, NgxBootstrapModule, NgxExtendedPdfViewerModule],
   exports: [ModalComponent],
 })
 export class ModalModule {}

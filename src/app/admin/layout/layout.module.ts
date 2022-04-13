@@ -3,10 +3,8 @@ import { CommonModule } from '@angular/common';
 
 import { LayoutRoutingModule } from './layout.routing';
 import { LayoutComponent } from './layout.component';
-import { AngularModule } from '../../modules/angular.module';
 import { PrimengModule } from '../../modules/primeng.module';
 import { ModalModule } from '../components/modal/modal.module';
-import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 
@@ -25,6 +23,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { ReportesComponent } from '../reportes/reportes.component';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [LayoutComponent, HomeAdminComponent, FacturacionComponent, InventarioComponent, CuerpoFacturaComponent, ValidateRayaAbajo, ProduccionComponent, ConduceComponent, ReportesComponent],
@@ -35,7 +34,6 @@ import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.mo
     TablasModule,
     CommonModule,
     TabViewModule,
-    AngularModule,
     OverlayPanelModule,
     BtncircularModule,
     NgxBootstrapModule,
@@ -45,6 +43,7 @@ import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.mo
     NgbModule,
     DirectivesModule,
     PdfViewerModule,
+    ReactiveFormsModule
   ],
 })
 export class LayoutModule {}

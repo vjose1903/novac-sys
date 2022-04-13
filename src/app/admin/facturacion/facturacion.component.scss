@@ -1,4 +1,55 @@
 @import url("https://fonts.googleapis.com/css?family=Orbitron&display=swap");
+
+.overlayCamion {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  li {
+    padding: 0.5rem;
+    &:hover {
+      background-color: #e3e3e3;
+    }
+    &.active {
+      background-color: var(--transparente02);
+      &:hover {
+        background-color: var(--transparente05);
+      }
+    }
+
+    &.indicador {
+      background-color: #e2e2e2;
+      &:hover {
+        background-color: #d0cfcf;
+      }
+    }
+  }
+}
+
+.indicadorCamion {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  border-radius: 50%;
+  padding: 0.75rem 0.67rem 0.6rem 0.67rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.no_selected {
+    background-color: #ff4b4b;
+  }
+  &.selected {
+    background-color: #028d02;
+  }
+
+  i {
+    color: white;
+    position: absolute;
+    -webkit-text-stroke: 1px white;
+    font-size: 0.8rem;
+  }
+}
+
 .cabezaFactura {
   background-color: var(--primary01);
   border-radius: 1rem 1rem 0rem 0rem !important;
@@ -110,9 +161,6 @@ div.cuerpoFactura.mb-2 {
   }
 }
 
-.borderTOP {
-  border-top: 1px solid grey;
-}
 .mostrarNumeros {
   margin-right: 2rem;
   display: flex;
@@ -126,21 +174,6 @@ div.cuerpoFactura.mb-2 {
   width: 3rem;
 }
 
-.popover-body {
-  min-width: 22rem !important;
-  background-color: red !important;
-}
-mdb-popover-container {
-  background-color: red !important;
-}
-
-.divPop {
-  max-width: 21rem !important;
-}
-
-.numerosCalculos {
-  justify-content: flex-end;
-}
 
 .btn_side_bar_facturas {
   position: absolute;
@@ -255,9 +288,8 @@ mdb-popover-container {
     &.activa {
       background-color: #e0ed4952;
       box-shadow: 0px 0px 5.4px #c3b71a !important;
-      &:hover{
+      &:hover {
         background-color: #949c3752;
-
       }
     }
 

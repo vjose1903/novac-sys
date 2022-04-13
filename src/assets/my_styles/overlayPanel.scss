@@ -2,12 +2,15 @@
 
 .p-overlaypanel {
   .p-overlaypanel-content {
-    background: #c7c7c7 !important;
+    background: white !important;
     color: #1d253b  !important;
   }
   &::before,
   &::after {
-    border-bottom-color: #c7c7c7 !important;
+    border-bottom-color: white !important;
+  }
+  &::after {
+    // transform: translate(0px , 1px )!important;
   }
 
   &.oscuro {

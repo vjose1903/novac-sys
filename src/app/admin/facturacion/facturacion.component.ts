@@ -20,26 +20,24 @@ import { FactsLocalStorage } from './factsLocalStorage';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { fun } from '../../core/services/functions.service';
+import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
+import { teclasCode } from '../../core/typescript/constantes';
 
 @Component({
   selector: 'app-facturacion',
   templateUrl: './facturacion.component.html',
   styleUrls: ['./facturacion.component.scss'],
 })
+
 export class FacturacionComponent extends FactsLocalStorage implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
 
   secuenciaKeys = [];
   info_cambio: any;
+
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
-    // arriba 38
-    // abajo 40
-    // enter 13
-    // control 17
-    // shift 16
-    // alt 18
     event.stopPropagation();
     const key = event.keyCode;
 
@@ -49,9 +47,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const combinacion = _.join(this.secuenciaKeys, '_');
       this.secuenciaKeys = [];
 
-      if (combinacion === '17_80') this.imprimirFactura();
+      if (combinacion === `${teclasCode.control}_${teclasCode.p}`) this.imprimirFactura();
 
-      if (combinacion === '17_71') this.archivarFactura();
+      if (combinacion === `${teclasCode.control}_${teclasCode.g}`) this.archivarFactura();
+
+      if (fun.hasValue(this.overlay)) this.mover_indicador_camion(key);
     }
   }
 
@@ -121,6 +121,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   ncfClass = new NcfC();
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
+  vehiculoClass = new VehiculoC();
+
+  overlay;
+  camionSelected: any;
+  camiones = [];
+  camion_row;
+  filterCamionesTargets;
+  copyCamiones;
 
   constructor(
     public mServ: ModalService,
@@ -224,6 +232,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.fecha_equivalente = new Date();
       this.fecha_viaje = new Date();
       this.articulosAcambiar = [];
+      this.overlay = undefined;
+      this.camionSelected = undefined;
+      this.camion_row = 0;
+      this.filterCamionesTargets = ['marca', 'modelo', 'anio'];
 
       this.factServ.setTipos(this.metodo, (res) => {
         if (res) {
@@ -237,6 +249,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (this.metodo === 'venta') {
         this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higüero', telefono: null });
+        this.getCamiones();
       } else {
         this.form.reset();
       }
@@ -536,28 +549,23 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const condicion = this.condicion_fact;
     const tipo_factura = this.tipoFactura;
     let buscar = false;
-    fun.logRed('sali_de ', sali_de);
+
     if (this.metodo == 'venta') {
       setTimeout(() => {
         const voy_a = document.activeElement.id;
-        fun.logYellow('voy_a ', voy_a);
         const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
 
         if (sali_de == 'venta' && condicion == 'Crédito' && nombre == 'Cliente contado') {
           if (voy_a != 'fecha_viaje' && voy_a == 'nom') buscar = true;
         }
 
-        fun.logGreen('buscar ', buscar);
-
         if (sali_de == 'venta' && tipo_factura == '01' && voy_a != 'fecha_viaje' && nombre == 'Cliente contado') buscar = true;
 
         if (sali_de == 'venta' && valor == 'adelantada' && nombre == 'Cliente contado') buscar = true;
-        fun.logBlue('buscar ', buscar);
 
         if (sali_de == 'venta' && condicion == 'Contado' && valor == 'normal' && voy_a != 'nom' && voy_a != 'dir') this.iniciarFactura('cod-0');
 
-        if (sali_de == 'fecha_viaje' && nombre == 'Cliente contado') buscar = true;
-        fun.logOrange('buscar ', buscar);
+        if (sali_de == 'fecha_viaje' && nombre == 'Cliente contado') document.getElementById('btnCamion').click();
 
         if (buscar) this.abrirModalFiltro();
       }, 250);
@@ -755,6 +763,55 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return res;
   }
 
+  openOverlay(event, overlay) {
+    this.overlay = overlay;
+    this.overlay.toggle(event);
+    setTimeout(() => this.enfocarInput('searchCamion'), 5);
+    if (event) event.stopPropagation();
+  }
+
+  seleccionarCamion(event) {
+    this.camionSelected = this.camiones[this.camion_row];
+    setTimeout(() => {
+      this.abrirModalFiltro();
+      this.overlay.hide(event);
+    }, 5);
+  }
+
+  getCamionLabel(camion) {
+    return `${camion.marca} ${camion.modelo} - ${camion.anio} (${camion.propietario.nombre} ${camion.propietario.apellido})`;
+  }
+
+  mover_indicador_camion(key) {
+    if (key == teclasCode.arriba) {
+      if (this.camion_row == 0) this.camion_row = this.camiones.length - 1;
+      else this.camion_row--;
+    } else if (key == teclasCode.abajo) {
+      if (this.camion_row == this.camiones.length - 1) this.camion_row = 0;
+      else this.camion_row++;
+    }
+  }
+
+  async getCamiones() {
+    const extra = { afterPath: `filtro/ `, parameters: { paginado: false } };
+
+    this.vehiculoClass.getAll(extra).then((res) => {
+      this.camiones = res['data'];
+      this.copyCamiones = fun.duplicarJson(res['data']);
+    });
+  }
+
+  filterCamion(camionesFiltrados) {
+    this.camiones.length = 0;
+    for (const camion of camionesFiltrados) this.camiones.push(camion);
+  }
+
+  checkCamionSeleccionado() {
+    if (fun.isEmpty(this.camionSelected)) {
+      fun.toastWarning('Debe de seleccionar un camión para el viaje', 'Aviso');
+      setTimeout(() => this.enfocarInput('searchCamion'), 5);
+    }
+  }
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES & SUPLIDORES
   // =============================================
@@ -1270,7 +1327,3 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     else await this.resetVariables();
   }
 }
-
-// export interface FacturacionComponent extends FactsLocalStorage {}
-
-// applyMixins(FacturacionComponent, [FactsLocalStorage]);

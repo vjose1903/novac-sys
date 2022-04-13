@@ -78,7 +78,7 @@
                 <span
                   *ngSwitchCase="'cantidades'"
                   id="{{ column.key }}-{{ getIndex(i) }}"
-                  pTooltip="{{ lookOters(dato[column.key]).Padre }} {{ lookOters(dato[column.key]).Hijo === undefined ? '' : lookOters(dato[column.key]).Hijo }}"
+                  pTooltip="{{ lookOters(dato[column.key]).Padre }} {{ lookOters(dato[column.key]).Hijo == undefined ? '' : lookOters(dato[column.key]).Hijo }}"
                   [tooltipPosition]="getIndex(i) != 0 ? 'top' : 'bottom'"
                   style="width: 100%"
                 >
