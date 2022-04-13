@@ -43,7 +43,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     NgbModule,
     DirectivesModule,
     PdfViewerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
 })
 export class LayoutModule {}
