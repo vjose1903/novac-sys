@@ -127,7 +127,7 @@
                   formControlName="fecha_nacimiento"
                   #dp="bsDatepicker"
                   placement="top"
-                  bsDatepicker
+                bsDatepicker
                 />
                 <span id="msgContainer_fecha_nacimiento"></span>
               </div>
@@ -136,13 +136,15 @@
                 <div class="form-group" [appMsgError]="'role'" [form]="form">
                   <label class="control-label">Role: <span style="color: red">*</span></label>
 
-                  <select (keydown.enter)="saltar(editando ? 'send' : 'campoPassword')" id="campoRole" formControlName="role" class="form-control">
+
+                  <p-multiSelect [options]="listRoles" defaultLabel="Selección de roles" optionLabel="id"></p-multiSelect>
+                  <!-- <select (keydown.enter)="saltar(editando ? 'send' : 'campoPassword')" id="campoRole" formControlName="role" class="form-control">
                     <option value="" disabled selected hidden>Role</option>
                     <option value="A">Administrador</option>
                     <option value="V">Vendedor</option>
                     <option value="U">Cajero</option>
                     <option value="C">Chofer</option>
-                  </select>
+                  </select> -->
 
                   <span id="msgContainer_role"></span>
                 </div>

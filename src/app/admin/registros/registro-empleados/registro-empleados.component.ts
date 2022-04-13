@@ -10,6 +10,7 @@ import { TablasService } from '../../components/tablas/tablas.service';
 import { EmpleadoC } from './empleado';
 import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
 import { fun } from '../../../core/services/functions.service';
+import { RolesC } from '../roles/roles';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -43,6 +44,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   camposDisabled = true;
   empleadosClass = new EmpleadoC();
+  rolesClass = new RolesC();
+  listRoles: [];
 
   constructor(private fb: FormBuilder, private localeService: BsLocaleService, private tServ: TablasService) {
     super();
@@ -60,7 +63,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.localeService.use('es');
     this.boton = 'Registrar';
 
-    this._init_mixin({ component: 'reg_empleados', is_routing: true,  });
+    this._init_mixin({ component: 'reg_empleados', is_routing: true });
 
     this.necesarioStart();
   }
@@ -98,6 +101,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   async necesarioStart() {
     await this.createForm();
     await this.getEmpleados(this.tServ.obj_paginate.default);
+    await this.getRoles();
     this.enfocarInput('cedula');
   }
 
@@ -131,6 +135,18 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     } catch (error) {
       fun.toastError('Error buscando empleados registrados.', 'ERROR');
     }
+  }
+
+  async getRoles() {
+    await this.rolesClass.getAll().then(
+      (res) => {
+        this.listRoles = res.data;
+      },
+      (error) => {
+        console.log('Error obteniendo roles: ', error);
+      },
+    );
+    console.log('🚀 ~ RegistroEmpleadosComponent ~ necesarioStart ~ listRoles', this.listRoles);
   }
 
   checkDocumento(tipo, e?) {
@@ -294,7 +310,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     });
 
     formulario.documentos_de_identidad = documentos_identidad;
-    formulario['ids_roles'] = "2";
+    formulario['ids_roles'] = '2';
     formulario.estado = true;
 
     const objSend = _.omit(formulario, ['cedula']);
@@ -316,9 +332,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   showModal() {
-    this.handleModalForm({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem', });
+    this.handleModalForm({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem' });
   }
-
 
   eliminarReg(regisData) {
     const objToSend = {

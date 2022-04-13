@@ -25,7 +25,6 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   ];
 
   infoPermisos = [
-
     { titulo: 'Descripcion', key: 'nombre', tipo: 'text', estilos: [{ 'text-align': 'left' }, { 'padding-left': '0.5rem' }, { width: '75%' }] },
     { titulo: 'Activo', key: 'selected', tipo: 'inputSwitch', estilos: [{ width: '25%' }] },
   ];
