@@ -42,7 +42,7 @@
         id="cantidad"
         min="1"
         (keydown.enter)="saltar('motivo')"
-        (focus)="selectContenido('cantidad')"
+        (focus)="$event.target.select()"
         type="number"
         class="form-control input_cantidad"
         [(ngModel)]="cantidad"

@@ -7,14 +7,18 @@ app-tablas {
   font-size: 0.9rem;
 }
 .head-table {
-  background-color: var(--primary06);
+  background-color: var(--primary06) !important;
 }
 .head-table-none {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 
 .bg-selected {
-  background-color: #e7e7e7;
+  background-color: var(----transparente05) !important;
+}
+
+.bg-light {
+  background-color: #dbd8d8 !important;
 }
 
 .dropCantReg {
