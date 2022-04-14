@@ -123,7 +123,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   vehiculoClass = new VehiculoC();
 
   overlay;
-  camionSelected: any;
+  camionesSelected: any;
   camiones = [];
   camion_row;
   filterCamionesTargets;
@@ -232,7 +232,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.fecha_viaje = new Date();
       this.articulosAcambiar = [];
       this.overlay = undefined;
-      this.camionSelected = undefined;
+      this.camionesSelected = [];
       this.camion_row = 0;
       this.filterCamionesTargets = ['marca', 'modelo', 'anio', 'propietario.nombre', 'propietario.apellido'];
 
@@ -568,7 +568,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         if (buscar) this.abrirModalFiltro();
 
-        if (this.modo_factura != 'viaje') this.camionSelected = undefined;
+        if (this.modo_factura != 'viaje') this.camionesSelected = [];
       }, 250);
     }
   }
@@ -769,6 +769,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   seleccionarCamion(camion?) {
+    // TODO: estructura de camiones seleccionados [{vehiculo_id:#}]
     if (this.camiones.length) {
       this.camionSelected = fun.duplicarJson(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
 
@@ -1296,7 +1297,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['is_adelantada'] = this.is_adelantada;
     cabecera_fact['is_viaje'] = this.is_viaje;
     cabecera_fact['is_nota'] = false;
-    cabecera_fact['camion_id'] = this.camionSelected?.id;
+    cabecera_fact['camiones_viajes'] = this.camionesSelected;
 
     if (this.metodo === 'venta') {
       if (fun.isEmpty(this.propietario_factura) || fun.isEmpty(this.propietario_factura.id)) {
