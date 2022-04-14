@@ -131,13 +131,24 @@
                     [DataFilter]="copyCamiones"
                     (onFilter)="filterCamion($event)"
                     (blur)="checkCamionSeleccionado()"
-                    (keydown.enter)="seleccionarCamion($event)"
+                    (keydown.enter)="seleccionarCamion()"
                   />
                 </div>
 
                 <ul class="overlayCamion" role="menu">
-                  <li *ngFor="let camion of camiones; let index_camion = index" role="menuitem" (click)="seleccionarCamion(camion)" class="hoverlable" [ngClass]="{ active: camionSelected?.id == camion.id, indicador: camion_row == index_camion }">
+                  <li
+                    id="overlayCamion-{{ index_camion }}"
+                    *ngFor="let camion of camiones; let index_camion = index"
+                    role="menuitem"
+                    (click)="seleccionarCamion(camion)"
+                    class="hoverlable"
+                    [ngClass]="{ active: camionSelected?.id == camion.id, indicador: camion_row == index_camion }"
+                  >
                     <a id="dropdown-item"> {{ getCamionLabel(camion) }} </a>
+                  </li>
+
+                  <li *ngIf="camiones.length == 0" role="menuitem" class="hoverlable">
+                    <a id="dropdown-item"> No existen camiones con las especificaciones introducidas. </a>
                   </li>
                 </ul>
               </div>
