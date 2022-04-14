@@ -769,36 +769,47 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   seleccionarCamion(camion?) {
-    // TODO: estructura de camiones seleccionados [{vehiculo_id:#}]
     if (this.camiones.length) {
-      this.camionSelected = fun.duplicarJson(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
+      const camion_en_turno = fun.duplicarJson(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
 
-      setTimeout(() => {
-        if (fun.isEmpty(this.propietario_factura) && fun.isEmpty(this.propietario_factura?.id)) this.abrirModalFiltro();
-        else this.cuerpo.seleccionarCampoEnTurno();
-
-        this.cerrarOverlayCamion();
-      }, 5);
+      if (this.checkCamionIsSelected(camion_en_turno)) {
+        _.pull(this.camionesSelected, _.find(this.camionesSelected, { vehiculo_id: camion_en_turno.id }));
+      } else {
+        this.camionesSelected.push({ vehiculo_id: camion_en_turno.id });
+      }
     } else {
-      if (this.camionSelected) {
-        this.cerrarOverlayCamion();
-        this.cuerpo.seleccionarCampoEnTurno();
-      } else fun.toastWarning('Debe de seleccionar un camión para el viaje.', 'Aviso');
+      if (this.camionesSelected.length) this.saliendoDeCamionOverlay();
+      else fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
     }
   }
 
+  checkCamionIsSelected(camion) {
+    return _.some(this.camionesSelected, { vehiculo_id: camion.id });
+  }
+
   checkCamionSeleccionado() {
-    if (fun.isEmpty(this.camionSelected)) {
-      fun.toastWarning('Debe de seleccionar un camión para el viaje.', 'Aviso');
-      setTimeout(() => this.enfocarInput('searchCamion'), 5);
-    } else {
-      if (this.overlay) this.cerrarOverlayCamion();
-    }
+    const containCamiones = document.getElementById('overlayCamion');
+    setTimeout(() => {
+      const voy_a = document.activeElement;
+      console.log('quii');
+
+      if (!containCamiones.contains(voy_a)) {
+        if (!this.camionesSelected.length) {
+          fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
+          setTimeout(() => this.enfocarInput('searchCamion'), 5);
+        } else {
+          if (this.overlay) this.saliendoDeCamionOverlay();
+        }
+      } else {
+        setTimeout(() => this.enfocarInput('searchCamion'), 5);
+      }
+    }, 250);
   }
 
   cerrarOverlayCamion() {
     this.filterCamion(this.copyCamiones);
     this.overlay.hide();
+    this.camion_row = 0;
   }
 
   getCamionLabel(camion) {
@@ -812,17 +823,36 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     } else if (key == teclasCode.abajo) {
       if (this.camion_row == this.camiones.length - 1) this.camion_row = 0;
       else this.camion_row++;
+    } else if (key == teclasCode.esc) {
+      this.saliendoDeCamionOverlay();
     }
 
     fun.scrollTo(`overlayCamion-${this.camion_row}`, 'center');
+  }
+
+  saliendoDeCamionOverlay() {
+    setTimeout(() => {
+      if (!this.camionesSelected.length) {
+        fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
+      } else {
+        if (fun.isEmpty(this.propietario_factura) && fun.isEmpty(this.propietario_factura?.id)) this.abrirModalFiltro();
+        else this.cuerpo.seleccionarCampoEnTurno();
+
+        this.cerrarOverlayCamion();
+      }
+    }, 5);
   }
 
   async getCamiones() {
     const extra = { afterPath: `filtro/ `, parameters: { paginado: false } };
 
     this.vehiculoClass.getAll(extra).then((res) => {
-      this.camiones = [...res['data'], ...res['data'], ...res['data'], ...res['data'], ...res['data'], ...res['data'], ...res['data'], ...res['data'], ...res['data']];
-      this.copyCamiones = fun.duplicarJson(res['data']);
+      this.camiones = res['data'].map((camion) => {
+        camion.selected = false;
+        return camion;
+      });
+
+      this.copyCamiones = fun.duplicarJson(this.camiones);
     });
   }
 
@@ -868,7 +898,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   cancelarFactura() {
     let si = (instance) => {
       if (this.action !== 'update') this.resetVariables();
-      if (this.action === 'update') this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`).then(() => this.resetVariables());
+      if (this.action == 'update') this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`).then(() => this.resetVariables());
       this.closeModal(instance);
     };
 

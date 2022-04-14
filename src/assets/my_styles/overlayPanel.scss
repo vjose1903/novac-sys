@@ -1,9 +1,7 @@
-
-
 .p-overlaypanel {
   .p-overlaypanel-content {
     background: white !important;
-    color: #1d253b  !important;
+    color: #1d253b !important;
   }
   &::before,
   &::after {
@@ -22,6 +20,10 @@
       border-bottom-color: #b8b8b8 !important;
     }
   }
+}
+
+.p-overlaypanel-close {
+  background: var(--primary09) !important;
 }
 
 .datta-dark {
@@ -46,6 +48,21 @@
         border-bottom-color: #262a31 !important;
       }
     }
+  }
+}
+
+.filterOverlay {
+  position: relative;
+  display: flex;
+  align-items: center;
+  input {
+    padding-right: 2.3rem;
+  }
+  i {
+    position: absolute;
+    right: 0.8rem;
+    color: #0000004a;
+    font-size: 1.1rem;
   }
 }
 
