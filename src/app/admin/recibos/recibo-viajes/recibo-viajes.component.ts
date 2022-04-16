@@ -216,6 +216,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
     this.ultimo_pago = _.maxBy(this.viaje_selected.pagos, 'id');
   }
+
   async getDataFromModal(arg, search) {
     const data = arg.obj;
     if (arg.modal_id === 'cambioEfectivo_ReciboViajes') {
@@ -225,6 +226,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       this.IMPRIMIR();
     }
   }
+
   accion(bool, tipo) {
     if (bool) {
       let tipoModal = tipo;

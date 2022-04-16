@@ -338,7 +338,7 @@ $bodyfont: "Poppins";
       background-color: var(--primary04);
       font-family: $bodyfont;
       &.activa {
-        background-color: var(--primary09);
+        background-color: var(--primary09) !important;
       }
       &:hover {
         width: 100%;

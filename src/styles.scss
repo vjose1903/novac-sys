@@ -359,6 +359,21 @@ body {
   &.text-shadow {
     text-shadow: 1px 1px 1px #000000cf;
   }
+  &.red {
+    background-color: #eb3a3a;
+  }
+
+  &.green {
+    background-color: #1ade48;
+  }
+
+  &.blue {
+    background-color: #1a44de;
+  }
+
+  &.yellow {
+    background-color: #e9e61e;
+  }
 }
 
 .bg-secondary {
