@@ -1024,7 +1024,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (!fun.isEmpty(this.propietario_factura.id)) factura_a_guardar[this.metodo === 'venta' ? 'cliente' : 'suplidor'] = this.propietario_factura;
 
     if (index_fact_archivada && index_fact_archivada >= 0) {
-      factura_a_guardar['archivo_id'] = this.factura_guardada.archivo_id;
+      factura_a_guardar['archivo_id'] = this.factura_guardada?.archivo_id;
       facturas_localStorage[index_fact_archivada] = factura_a_guardar;
     } else {
       facturas_localStorage = _.orderBy(facturas_localStorage, ['archivo_id'], ['asc']);
@@ -1051,7 +1051,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.formarObjArchivo().then(() => {
         let is_guardada = false;
 
-        if (this.factura_guardada && this.factura_guardada.archivo_id) is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id == this.factura_guardada.archivo_id);
+        if (this.factura_guardada && this.factura_guardada?.archivo_id) is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id == this.factura_guardada?.archivo_id);
 
         const texto_modal = is_guardada ? 'Esta factura ya esta archivada ¿desea sobreescribirla?' : '¿Seguro que desea archivar esta factura para continuarla luego?';
 
