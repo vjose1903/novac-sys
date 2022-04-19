@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RegistroVehiculoRoutingModule } from './registro-vehiculo.routing';
 import { RegistroVehiculoComponent } from './registro-vehiculo.component';
 import { TablasModule } from '../../components/tablas/tablas.module';
+import { NewTablasModule } from '../../components/new_tablas/tablas.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 
@@ -13,6 +14,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     CommonModule,
     RegistroVehiculoRoutingModule,
     TablasModule,
+    NewTablasModule,
     ReactiveFormsModule,
     FormsModule,
     NgSelectModule,

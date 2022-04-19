@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../../registros/registro-empleados/empleado';
-import { ModalI } from '../../new_modal/modal-class';
+import { ModalI } from '../../modal/modal-class';
 
 @Component({
   selector: 'app-change-password',

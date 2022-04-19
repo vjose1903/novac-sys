@@ -1,14 +1,22 @@
-import { Injectable } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
+import * as moment from '../javascript/moment';
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 
-import { ConfigurationService } from './configuration.service';
 import { ConfigI } from '../typescript/config-interface';
 import { SingletonService } from './singleton.service';
+import { BehaviorSubject } from 'rxjs';
 
+export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun {
   constructor() {}
+
+  // ----------------------------------------------------------------------------------------------------------
+
+  static setWindowSize(nextValue) {
+    windowSize.next(nextValue);
+  }
+
+  getWindowSize = windowSize.asObservable();
 
   static getFacturasguardadas() {
     return JSON.parse(localStorage.getItem('facturas_guardadas')) || [];
@@ -26,6 +34,15 @@ export class fun {
     }
   }
 
+  // __________________________________________________________________________________________________
+  // Nombre: date_formater
+  // Descripcion : Esta funcion formatea una fecha con los parametros establecidos
+  // _________________________________________________________________________________________________
+  static date_formater(params: { date: any; dateFormat?: 'DD/MM/YYYY'; con_hora?: boolean }) {
+    let fecha = moment(params.date).format(params.dateFormat);
+    if (params.con_hora) fecha += ` - ${moment(params.date).format('LT')}`;
+    return fecha;
+  }
   // __________________________________________________________________________________________________
   // Nombre: duplicarJson
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
@@ -554,6 +571,43 @@ export class fun {
 
   static logPurple(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #9954d9', body !== undefined ? body : '');
+  }
+
+  // ----------------------------------------------------------------------------------------------------------
+  static LightenDarkenColor(col, amt) {
+    col = parseInt(col, 16);
+
+    return (((col & 0x0000ff) + amt) | ((((col >> 8) & 0x00ff) + amt) << 8) | (((col >> 16) + amt) << 16))?.toString(16);
+  }
+
+  /* Suma el porcentaje indicado a un color (RR, GG o BB) hexadecimal para aclararlo */
+  static addLight(color: any, amount: any) {
+    let cc = parseInt(color, 16) + amount;
+    let c = cc > 255 ? 255 : cc;
+    c = c?.toString(16).length > 1 ? c?.toString(16) : `0${c?.toString(16)}`;
+    return c;
+  }
+
+  /* Aclara un color hexadecimal de 6 caracteres #RRGGBB segun el porcentaje indicado */
+  static lighten(color: any, amount: any) {
+    color = color.indexOf('#') >= 0 ? color.substring(1, color.length) : color;
+    amount = parseInt(`${(255 * amount) / 100}`);
+    return (color = `#${this.addLight(color.substring(0, 2), amount)}${this.addLight(color.substring(2, 4), amount)}${this.addLight(color.substring(4, 6), amount)}`);
+  }
+
+  /* Resta el porcentaje indicado a un color (RR, GG o BB) hexadecimal para oscurecerlo */
+  static subtractLight(color: any, amount: any) {
+    let cc = parseInt(color, 16) - amount;
+    let c: any = cc < 0 ? 0 : cc;
+    c = c?.toString(16).length > 1 ? c?.toString(16) : `0${c?.toString(16)}`;
+    return c;
+  }
+
+  /* Oscurece un color hexadecimal de 6 caracteres #RRGGBB segun el porcentaje indicado */
+  static darken(color: any, amount: any) {
+    color = color.indexOf('#') >= 0 ? color.substring(1, color.length) : color;
+    amount = parseInt(`${(255 * amount) / 100}`);
+    return (color = `#${this.subtractLight(color.substring(0, 2), amount)}${this.subtractLight(color.substring(2, 4), amount)}${this.subtractLight(color.substring(4, 6), amount)}`);
   }
 
   // =====================================================================

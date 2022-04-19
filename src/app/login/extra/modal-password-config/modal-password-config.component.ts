@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import { ModalI } from '../../../admin/components/new_modal/modal-class';
+import { ModalI } from '../../../admin/components/modal/modal-class';
 import { fun } from '../../../core/services/functions.service';
 import { SharedService } from '../../../core/services/shared.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';

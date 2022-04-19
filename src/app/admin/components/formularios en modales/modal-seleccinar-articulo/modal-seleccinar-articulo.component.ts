@@ -6,7 +6,7 @@ import { fun } from '../../../../core/services/functions.service';
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
-import { ModalI } from '../../new_modal/modal-class';
+import { ModalI } from '../../modal/modal-class';
 
 @Component({
   selector: 'app-modal-seleccinar-articulo',

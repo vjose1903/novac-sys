@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import { SingletonService } from '../../../core/services/singleton.service';
 import { LayoutClass } from '../../layout/layout';
 import { MODALCONFIG } from './modal.service';
 

@@ -15,7 +15,7 @@ import { AppRoutingModule } from './app.routing';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
-import { NewModalModule } from './admin/components/new_modal/modal.module';
+import { NewModalModule } from './admin/components/modal/modal.module';
 import { FormulariosEnModalesModule } from './admin/components/formularios en modales/formularios-en-modales.module';
 import { NgSelectModule } from '@ng-select/ng-select';
 

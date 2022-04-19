@@ -1,0 +1,15 @@
+.table-btn-icon {
+  margin: 2px 5px !important;
+  /* padding: 2px; */
+  cursor: pointer;
+  font-size: 1rem !important;
+  &:hover {
+    color: #20b9d5 !important;
+  }
+
+  &.disable {
+    filter: brightness(0.6);
+    color: grey !important;
+    cursor: not-allowed !important;
+  }
+}

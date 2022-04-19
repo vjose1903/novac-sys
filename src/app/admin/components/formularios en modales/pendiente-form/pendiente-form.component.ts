@@ -4,7 +4,7 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { ModalI } from '../../new_modal/modal-class';
+import { ModalI } from '../../modal/modal-class';
 import * as _ from 'lodash';
 
 @Component({

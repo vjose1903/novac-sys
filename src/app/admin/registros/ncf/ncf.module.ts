@@ -4,10 +4,11 @@ import { NcfRoutingModule } from './ncf.routing';
 import { NcfComponent } from './ncf.component';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 import { TablasModule } from '../../components/tablas/tablas.module';
+import { NewTablasModule } from '../../components/new_tablas/tablas.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [NcfComponent],
-  imports: [CommonModule, NcfRoutingModule, FormsModule, ReactiveFormsModule, NgxBootstrapModule, TablasModule],
+  imports: [CommonModule, NcfRoutingModule, FormsModule, ReactiveFormsModule, NgxBootstrapModule, TablasModule, NewTablasModule],
 })
 export class NcfModule {}

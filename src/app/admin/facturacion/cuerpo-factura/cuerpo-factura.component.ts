@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnDestroy} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -43,7 +43,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   @Output() getCuerpoFactura = new EventEmitter<any>();
   @Output() getFechaFactura = new EventEmitter<any>();
 
-
   articuloClass = new ArticuloC();
   minCodigo;
 
@@ -57,8 +56,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     this.rellenarVariables();
   }
-
-
 
   articuloFiltroResponse(res) {
     this.objDevueltoResponse(res);
@@ -152,8 +149,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-
-
   async procesoQuitarArticulo() {
     await this.sacarDescuento(this.indexRemove);
     await this.removeItem(this.indexRemove);
@@ -178,16 +173,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     else this.minCodigo = undefined;
   }
 
-  ModificarClass(item, clase, action) {
-    fun.ModificarClass(item, clase, action);
-  }
-
   selectedRow(i, bool) {
     const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i, 'pre-' + i, 'desc-' + i, 'tot-' + i];
     lista.forEach((row) => {
       if (this.checkIfRowContainArticulo(i)) {
         const action = bool ? 'add' : 'remove';
-        this.ModificarClass(row, 'inputOscuro', action);
+        fun.ModificarClass(row, 'inputOscuro', action);
       }
     });
   }

@@ -12,6 +12,7 @@ import { ValidateRayaAbajo } from '../../directives/validaciones';
 import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
 import { BtncircularModule } from '../components/btncircular/btncircular.module';
 import { TablasModule } from '../components/tablas/tablas.module';
+import { NewTablasModule } from '../components/new_tablas/tablas.module';
 import { ConduceComponent } from '../conduce/conduce.component';
 import { CuerpoFacturaComponent } from '../facturacion/cuerpo-factura/cuerpo-factura.component';
 import { FacturacionComponent } from '../facturacion/facturacion.component';
@@ -31,6 +32,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     LayoutRoutingModule,
     PrimengModule,
     TablasModule,
+    NewTablasModule,
     CommonModule,
     TabViewModule,
     OverlayPanelModule,

@@ -113,8 +113,17 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
       }
     });
 
-    // this.probandoEncriptar();
+    window.onresize = (e) => this.resize.bind(this)(e);
+
     this.getAppConfig();
+  }
+
+  ngAfterViewInit(): void {
+    fun.setWindowSize(window);
+  }
+
+  resize() {
+    fun.setWindowSize(window);
   }
 
   downloadProgression(object) {
@@ -170,11 +179,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
       .sendTask(task)
       .then((res) => {})
       .catch((err) => {});
-  }
-
-  ngAfterViewInit(): void {
-    // this.themeService.setTheme('blue');
-    // this.themeService.setTheme('red');
   }
 
   timeConvert(d) {

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as _ from 'lodash';
-import { ModalI } from '../../new_modal/modal-class';
+import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../tablas/tablas.service';
 @Component({
   selector: 'app-modal-historial-pagos',

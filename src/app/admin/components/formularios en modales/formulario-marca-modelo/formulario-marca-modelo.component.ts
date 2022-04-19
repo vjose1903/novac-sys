@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { TablasService } from '../../../components/tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '../../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
-import { ModalI } from '../../new_modal/modal-class';
+import { ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 
 @Component({

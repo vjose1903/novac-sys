@@ -1,8 +1,12 @@
 import { Subscription } from 'rxjs';
 import { SingletonService } from '../../core/services/singleton.service';
+import { TablaClass } from '../components/new_tablas/tabla-class';
 import * as _ from 'lodash';
-export class LayoutClass {
-  constructor() {}
+
+export class LayoutClass extends TablaClass {
+  constructor() {
+    super();
+  }
 
   ruta_a_cambiar = '';
   url_actual = '';

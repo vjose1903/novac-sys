@@ -1,5 +1,5 @@
 import * as moment from '../javascript/moment';
-import { ModalClass } from '../../admin/components/new_modal/modal-class';
+import { ModalClass } from '../../admin/components/modal/modal-class';
 import { SingletonService } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
 

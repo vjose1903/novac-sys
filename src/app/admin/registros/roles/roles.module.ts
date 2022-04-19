@@ -6,10 +6,12 @@ import { RolesComponent } from './roles.component';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { TablasModule } from '../../components/tablas/tablas.module';
+import { NewTablasModule } from '../../components/new_tablas/tablas.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 
 @NgModule({
   declarations: [RolesComponent],
-  imports: [CommonModule, RolesRoutingModule, TablasModule, AngularResizedEventModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule],
+  imports: [CommonModule, RolesRoutingModule, TablasModule, NewTablasModule, AngularResizedEventModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule],
 })
 export class RolesModule {}

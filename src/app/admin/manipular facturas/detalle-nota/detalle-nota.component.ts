@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { fun } from '../../../core/services/functions.service';
-import { ModalI } from '../../components/new_modal/modal-class';
+import { ModalI } from '../../components/modal/modal-class';
 @Component({
   selector: 'app-detalle-nota',
   templateUrl: './detalle-nota.component.html',

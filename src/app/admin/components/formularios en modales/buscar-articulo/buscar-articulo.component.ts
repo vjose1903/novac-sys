@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ArticuloC } from '../../../registros/articulos/articulo';
-import { ModalI } from '../../new_modal/modal-class';
+import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../tablas/tablas.service';
 import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
