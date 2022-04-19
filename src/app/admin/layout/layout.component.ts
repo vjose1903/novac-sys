@@ -15,6 +15,7 @@ import { RequestC } from '../../core/typescript/requests';
 import { SingletonService } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { fun } from '../../core/services/functions.service';
+import { NgxPermissionsService } from 'ngx-permissions';
 
 @Component({
   selector: 'app-layout',
@@ -52,7 +53,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   requestClass = new RequestC();
   chequiando_cuadre: boolean;
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
+  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService, private permissionsService: NgxPermissionsService) {
     super();
 
     this.subRouter = this.router.events.subscribe((routerEvent: Event) => {
@@ -94,6 +95,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
           if (res.data.sexo === 'm') this.imgUser = 'assets/img/userH.png';
           else this.imgUser = 'assets/img/userM.png';
 
+          const permisos = res.data.permisos.map((perm) => perm.permiso);
+          this.permissionsService.loadPermissions(permisos);
           this.lRun = true;
         })
         .catch((err) => {

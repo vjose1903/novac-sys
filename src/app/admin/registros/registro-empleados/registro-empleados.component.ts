@@ -30,7 +30,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     { titulo: 'Nombre', tipo: 'text', key: 'nombreCompleto' },
     { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
     { titulo: 'Cedula', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Role', tipo: 'text', key: 'role_' },
+    { titulo: 'Role', tipo: 'textList', key: 'roles' },
   ];
 
   botones = { titulo: true, borrar: true, editar: true };
@@ -83,7 +83,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       fecha_nacimiento: [{ value: null, disabled: true }, Validators.required],
       password: [{ value: null, disabled: true }, Validators.compose([Validators.minLength(6), Validators.required])],
       confirm_password: [{ value: null, disabled: true }, Validators.required],
-      role: [{ value: null, disabled: true }, Validators.required],
+      ids_roles: [{ value: null, disabled: true }, Validators.required],
     });
   }
 
@@ -146,7 +146,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
         console.log('Error obteniendo roles: ', error);
       },
     );
-    console.log('🚀 ~ RegistroEmpleadosComponent ~ necesarioStart ~ listRoles', this.listRoles);
   }
 
   checkDocumento(tipo, e?) {
@@ -173,6 +172,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
                 return;
               }
               const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
+              console.log('🚀 ~ RegistroEmpleadosComponent ~ .then ~ documento_original', documento_original);
+              console.log('🚀 ~ RegistroEmpleadosComponent ~ .then ~ this.documentos_de_identidad', this.documentos_de_identidad);
               this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
 
               // const documento = fun.hasValue(is_user) ? _.omit(is_user, ['persona', 'persona_is']) : _.omit(_.head(res['data']), ['persona', 'persona_is']);
@@ -232,7 +233,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   changeStateCampos(enable = false) {
-    ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'role'].forEach((campo) => {
+    ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
       if (!enable) this.form.controls[campo].reset();
 
@@ -277,14 +278,15 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   editarItem(item) {
+    this.form.reset();
     this.documentos_de_identidad = item.ARG.documentos_de_identidad;
 
     if (this.documentos_de_identidad.length) {
       const doc = item.ARG.documentos_de_identidad.filter((doc) => doc.principal === true);
       if (item.ARG.documentos_de_identidad.length > 0 && fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
     }
-
-    this.form.patchValue(item.ARG);
+    const objPerson = Object.assign({}, item.ARG, { ids_roles: (item.ARG.roles || []).map((rol) => rol.id) });
+    this.form.patchValue(objPerson);
 
     this.empleadoSelected = item.ARG;
     this.editando = true;
@@ -310,7 +312,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     });
 
     formulario.documentos_de_identidad = documentos_identidad;
-    formulario['ids_roles'] = '2';
+    // formulario['ids_roles'] = formulario.roles;
     formulario.estado = true;
 
     const objSend = _.omit(formulario, ['cedula']);

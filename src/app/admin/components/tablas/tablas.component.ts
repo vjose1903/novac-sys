@@ -552,6 +552,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         // setTimeout(() => this.calcularAlto(), 250);
       }
     }
+
     if (simpleChanges.seleccionado) {
       if (simpleChanges.seleccionado.currentValue) {
         this.seleccionado_id = simpleChanges.seleccionado.currentValue.id;
@@ -569,6 +570,17 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         $this.searchItems();
       }
     }, 500);
+  }
+
+  makeTextList(data) {
+    let text = '';
+
+    for (const rol of data) {
+      if (text != '') text += ', ';
+
+      text += rol?.nombre;
+    }
+    return text;
   }
 
   async searchItems() {
