@@ -213,7 +213,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   cambiarMenu(args: { url; navigate }) {
     let next_cambio_menu = '';
-
+    // TODO: aqui agrega que si tiene permiso de ir a la ruta que quiere ir no haga nada
     if (args.navigate) {
       next_cambio_menu = `/admin/${args.url}`;
 
