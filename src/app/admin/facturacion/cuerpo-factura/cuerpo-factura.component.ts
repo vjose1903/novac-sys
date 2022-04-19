@@ -346,6 +346,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     window.history.back();
   }
 
+  seleccionarCampoEnTurno() {
+    this.ajustarSecuencia().then((res) => this.enfocarInput(this.inputSecuencia));
+  }
+
   async saltar(input, index) {
     setTimeout(() => {
       const { articulo, cod, can, uni } = this.filasDetalle[index].getRawValue();

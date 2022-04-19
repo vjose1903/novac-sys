@@ -60,9 +60,8 @@ export class FactsLocalStorage extends MixinClass {
   quitarFacturaGuardada(archivo_id) {
     let index;
     const allFacturas = fun.getFacturasguardadas();
-
     if (archivo_id) {
-      if (this.factura_guardada.archivo_id == archivo_id) this.factura_guardada = undefined;
+      if (this.factura_guardada?.archivo_id == archivo_id) this.factura_guardada = undefined;
       index = _.findIndex(allFacturas, (item: any) => item.archivo_id === archivo_id);
 
       _.pullAt(allFacturas, index);

@@ -55,7 +55,7 @@ export class fun {
         if (typeof searchText == 'number') searchText = `${searchText}`;
         if (this.isEmpty(searchText)) resolve(copyData);
 
-        const data_filtered = copyData.filter((obj) => {
+        const data_filtered = fun.duplicarJson(copyData).filter((obj) => {
           const obj_picked = _.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 

@@ -5,6 +5,7 @@ export const pattern = {
 };
 
 export enum teclasCode {
+  esc = 27,
   arriba = 38,
   abajo = 40,
   enter = 13,

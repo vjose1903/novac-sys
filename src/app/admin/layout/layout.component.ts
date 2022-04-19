@@ -80,8 +80,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngOnInit() {
-    console.log(' INIT ----- LayoutComponent -----');
-
     this.initVariables();
     this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal'] });
 
@@ -136,7 +134,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngOnDestroy() {
-    console.log(' DESTROY ----- LayoutComponent -----');
     this._destroy_mixin();
     if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
     if (this.subLogOut) this.subLogOut.unsubscribe();
@@ -171,6 +168,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
   // CERRAR SESION
   // =================================================================================
+  refreshPage() {
+    location.reload();
+  }
+
+  // =================================================================================
+  // CERRAR SESION
+  // =================================================================================
   logOut() {
     this.layServ.nextLogOut(false);
     fun.logout().then(() => {
@@ -195,6 +199,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       this.actualModule = undefined;
       this.actualRuta = _.join(pathSplit.slice(1, pathSplit.length), '/');
     }
+    this.ready = true;
   }
 
   // =================================================================================
@@ -202,24 +207,21 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
   isVistaActual(arg) {
     let res = false;
-    if (fun.hasValue(this.actualModule) && arg == this.actualModule) {
+
+    if ((fun.hasValue(this.actualModule) && arg == this.actualModule) || (fun.hasValue(this.actualPath) && this.actualPath.includes(arg)) || (fun.hasValue(this.actualRuta) && this.actualRuta.includes(arg))) {
       res = true;
-    } else {
-      if (fun.hasValue(this.actualPath) && this.actualPath.includes(arg)) res = true;
     }
     return res;
   }
 
-  cambiarMenu(args: { url; navigate; hasModule }) {
+  cambiarMenu(args: { url; navigate }) {
     let next_cambio_menu = '';
-
+    // TODO: aqui agrega que si tiene permiso de ir a la ruta que quiere ir no haga nada
     if (args.navigate) {
-      this.actualRuta = args.url;
-      next_cambio_menu = this.actualModule && args.hasModule ? `/admin/${this.actualModule}/${this.actualRuta}` : `/admin/${this.actualRuta}`;
+      next_cambio_menu = `/admin/${args.url}`;
 
       if (this.actualPath !== next_cambio_menu) {
-        this.actualPath = next_cambio_menu;
-        this.runRouterNavigate({ bool: true, ruta: this.actualPath });
+        this.runRouterNavigate({ bool: true, ruta: next_cambio_menu });
       } else {
         fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
       }
@@ -229,22 +231,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   finalizarCambioMenu(arg) {
-    if (arg.bool && arg.verificar) {
-      this.ready = false;
-      setTimeout(() => this.decisionCambioMenu(arg), 10);
-    } else {
-      this.decisionCambioMenu(arg);
-    }
-  }
+    if (arg.bool && arg.verificar) this.ready = false;
 
-  decisionCambioMenu(decision) {
-    if (decision.bool) {
+    if (arg.bool) {
       this.actualModule = undefined;
-      this.router.navigateByUrl(decision.ruta);
+      this.router.navigateByUrl(arg.ruta);
     } else {
       this.checkRouteActiva();
     }
-
-    setTimeout(() => (this.ready = true), 1);
   }
 }

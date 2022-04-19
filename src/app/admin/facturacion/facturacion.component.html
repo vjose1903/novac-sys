@@ -107,23 +107,16 @@
               (blur)="checkCambiosModoyCondicionFactura($event.target)"
             />
             <div class="ml-3 position-relative">
-              <i
-                id="btnCamion"
-                class="fas fa-truck-moving btn-circle-icon"
-                (click)="openOverlay($event, overlayCamion)"
-                style="z-index: 999999"
-                [pTooltip]="camionSelected ? getCamionLabel(camionSelected) : 'Seleccionar camión'"
-                tooltipPosition="top"
-              ></i>
-              <div class="indicadorCamion" [ngClass]="{ no_selected: !camionSelected, selected: camionSelected }">
-                <i class="fa-solid" [ngClass]="{ 'fa-x': !camionSelected, 'fa-check': camionSelected }"></i>
+              <i id="btnCamion" class="fas fa-truck-moving btn-circle-icon" (click)="openOverlay($event, overlayCamion)" style="z-index: 999999" pTooltip="Seleccionar camión" tooltipPosition="top"></i>
+              <div class="indicadorCamion" [ngClass]="{ no_selected: !camionesSelected.length, selected: camionesSelected.length }">
+                <i class="fa-solid" [ngClass]="{ 'fa-x': !camionesSelected.length, 'fa-check': camionesSelected.length }"></i>
               </div>
             </div>
           </div>
-          <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #overlayCamion styleClass="dropConfigs" appendTo="body">
+          <p-overlayPanel [dismissable]="false" [showCloseIcon]="camionesSelected.length" #overlayCamion styleClass="dropConfigs">
             <ng-template pTemplate>
-              <div class="containCamiones">
-                <div class="filter">
+              <div id="overlayCamion" class="containCamiones">
+                <div class="filterOverlay">
                   <input
                     id="searchCamion"
                     class="search-input form-control"
@@ -131,13 +124,21 @@
                     [DataFilter]="copyCamiones"
                     (onFilter)="filterCamion($event)"
                     (blur)="checkCamionSeleccionado()"
-                    (keydown.enter)="seleccionarCamion($event)"
+                    (keydown.enter)="seleccionarCamion()"
                   />
+                  <i class="fa-solid fa-magnifying-glass"></i>
                 </div>
 
                 <ul class="overlayCamion" role="menu">
-                  <li *ngFor="let camion of camiones; let index_camion = index" role="menuitem" (click)="seleccionarCamion(camion)" class="hoverlable" [ngClass]="{ active: camionSelected?.id == camion.id, indicador: camion_row == index_camion }">
-                    <a id="dropdown-item"> {{ getCamionLabel(camion) }} </a>
+                  <li id="overlayCamion-{{ index_camion }}" *ngFor="let camion of camiones; let index_camion = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: camion_row == index_camion }">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span id="dropdown-item" class="mr-3"> {{ getCamionLabel(camion) }} </span>
+                      <input class="apple-switch" [ngClass]="{ disabled: action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion)" [checked]="checkCamionIsSelected(camion)" />
+                    </div>
+                  </li>
+
+                  <li *ngIf="camiones.length == 0" role="menuitem" class="hoverlable">
+                    <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
                   </li>
                 </ul>
               </div>
@@ -393,7 +394,7 @@
             texto-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}"
                 >{{ my_capitalize(fact?.tipo) }}
               </span>
-              <span class="text-gris-oscuro" *ngIf="fact?.action === 'update'"> (Editando)</span>
+              <span class="text-gris-oscuro" *ngIf="fact?.action == 'update'"> (Editando)</span>
               <br />
               <span class="clienteFactura">
                 <span class="negrita"> {{ fact?.tipo === 'venta' ? 'Cliente' : 'Suplidor' }}:</span>
