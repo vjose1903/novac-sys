@@ -9,7 +9,6 @@ import { TablasModule } from '../tablas/tablas.module';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { FormCantidadEfectivoComponent } from './form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { FormVentasComponent } from './form-reportes/form-reportes.component';
-import { FormarFacturaComponent } from './formar-factura/formar-factura.component';
 import { FormularioMarcaModeloComponent } from './formulario-marca-modelo/formulario-marca-modelo.component';
 import { ModalHistorialPagosComponent } from './modal-historial-pagos/modal-historial-pagos.component';
 import { ModalSeleccinarArticuloComponent } from './modal-seleccinar-articulo/modal-seleccinar-articulo.component';
@@ -22,7 +21,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 const components = [
   FormCantidadEfectivoComponent,
   ModalHistorialPagosComponent,
-  FormarFacturaComponent,
   ChangePasswordComponent,
   FormularioMarcaModeloComponent,
   FormVentasComponent,
@@ -35,7 +33,7 @@ const components = [
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, NgSelectModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule],
+  imports: [CommonModule, TablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}

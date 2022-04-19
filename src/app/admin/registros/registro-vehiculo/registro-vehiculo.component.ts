@@ -51,7 +51,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_vehiculos', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_vehiculos', is_routing: true });
     this.createForm();
     this.FORM = this.form.controls;
 
@@ -223,20 +223,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.selectPropietario();
   }
 
-  decisionModal(arg) {
-    if (arg) {
-      const obj = fun.duplicarJson(this.seleccionModal);
-
-      this.vehiculosClass.deleteOne(obj.id).then((res) => {
-        this.listaVehiculos = null;
-        fun.toastSuccess(`Camion: ${obj.marca} ${obj.modelo}  de: ${obj.nombreCompleto}` + ' borrado.', 'CORRECTO');
-        const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
-        this.getVehiculos(actualPagination);
-        this.borrar();
-      });
-    }
-  }
-
   nuevoRegistro() {
     this.isCreando = true;
   }
@@ -257,10 +243,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },
-        // dinamico: [
-        //   { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal('crud_marca_modelo', 'cerrar'), label: 'Cancelar', disable: false },
-        //   { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
-        // ],
       },
     });
   }
@@ -268,10 +250,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   eliminarReg(regisData) {
     const objToSend = {
       data: regisData,
-      texto: `¿Está seguro que desea eliminar el vehículo <b> ${regisData.marca} - ${regisData.modelo}. </b> \n
-      Propietario: <b>
-       ${regisData.nombreCompleto}
-       </b>?`,
+      texto: `¿Está seguro que desea eliminar el vehículo <b> ${regisData.marca} - ${regisData.modelo}. </b> \n Propietario: <b> ${regisData.nombreCompleto} </b>?`,
       siFunction: () => {
         this.vehiculosClass.deleteOne(regisData.id).then((res) => {
           this.listaVehiculos = null;

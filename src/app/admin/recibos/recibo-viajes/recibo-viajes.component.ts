@@ -17,7 +17,6 @@ import { fun } from '../../../core/services/functions.service';
   templateUrl: './recibo-viajes.component.html',
   styleUrls: ['./recibo-viajes.component.scss'],
 })
-
 export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;
   info = [
@@ -64,7 +63,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'recibos_viajes', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto'] });
+    this._init_mixin({ component: 'recibos_viajes', is_routing: true });
     this.necesarioStart();
   }
 

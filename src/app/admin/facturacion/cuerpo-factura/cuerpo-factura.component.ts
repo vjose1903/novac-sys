@@ -1,9 +1,7 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, OnDestroy, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy} from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import * as moment from '../../../core/javascript/moment';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
 import { fun } from '../../../core/services/functions.service';
@@ -13,13 +11,10 @@ import { fun } from '../../../core/services/functions.service';
   templateUrl: './cuerpo-factura.component.html',
   styleUrls: ['./cuerpo-factura.component.scss'],
 })
-export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDestroy {
   form: FormGroup;
   ARRAY_ROWFACTURAS;
 
-  seleccionModal;
-  showModal;
-  modalSearch;
   UnidadesArticulo;
   drop;
 
@@ -48,7 +43,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   @Output() getCuerpoFactura = new EventEmitter<any>();
   @Output() getFechaFactura = new EventEmitter<any>();
 
-  tipoModal: string;
 
   articuloClass = new ArticuloC();
   minCodigo;
@@ -59,14 +53,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'cuerpo_factura', is_routing: false, _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'] });
+    this._init_mixin({ component: 'cuerpo_factura', is_routing: false });
 
     this.rellenarVariables();
   }
 
-  decisionModal(res) {
-    if (this.tipoModal === 'removerArticulo' && res) this.procesoQuitarArticulo();
-  }
+
 
   articuloFiltroResponse(res) {
     this.objDevueltoResponse(res);
@@ -126,9 +118,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   async rellenarVariables() {
     return new Promise(async (resolve, reject) => {
       this.ARRAY_ROWFACTURAS = undefined;
-      this.seleccionModal = undefined;
-      this.showModal = false;
-      this.modalSearch = true;
       this.UnidadesArticulo = [];
       this.precioDetalle = undefined;
       this.TOTAL = 0;
@@ -163,9 +152,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     });
   }
 
-  ngAfterViewInit() {}
 
-  ngOnChanges(simpleChanges) {}
 
   async procesoQuitarArticulo() {
     await this.sacarDescuento(this.indexRemove);
@@ -564,10 +551,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     }
   }
 
-  sacarDescuento(i) {
+  sacarDescuento(index) {
     let acuDesc = 0;
 
-    const currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila == i);
+    const currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila == index);
 
     if (fun.hasValue(currentDescuento)) {
       _.remove(this.listaDeDescuentos, currentDescuento);
@@ -577,13 +564,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     }
   }
 
-  calculosDescuentoGeneral(descuento, i) {
+  calculosDescuentoGeneral(descuento, index) {
     let acuDesc = 0;
 
-    let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila === i);
+    let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila === index);
 
     if (fun.hasValue(currentDescuento)) currentDescuento.desc = descuento;
-    else this.listaDeDescuentos.push({ fila: i, desc: descuento });
+    else this.listaDeDescuentos.push({ fila: index, desc: descuento });
 
     this.listaDeDescuentos.forEach((element) => (acuDesc = acuDesc + element.desc));
 

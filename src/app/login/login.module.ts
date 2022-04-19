@@ -5,7 +5,6 @@ import { LoginRoutingModule } from './login.routing';
 import { LoginComponent } from './login.component';
 import { NgxBootstrapModule } from '../modules/ngx-bootstrap.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ModalModule } from '../admin/components/modal/modal.module';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
 import { ConfiguracionesComponent } from './extra/configuraciones/configuraciones.component';
 import { InputMaskModule } from 'primeng/inputmask';
@@ -14,6 +13,6 @@ import { DropdownModule } from 'primeng/dropdown';
 import { DirectivesModule } from '../core/directive/directives.module';
 @NgModule({
   declarations: [LoginComponent, ModalPasswordConfigComponent, ConfiguracionesComponent],
-  imports: [CommonModule, LoginRoutingModule, NgxBootstrapModule, FormsModule, ReactiveFormsModule, ModalModule, InputMaskModule, UploadImgModule, DropdownModule, DirectivesModule],
+  imports: [CommonModule, LoginRoutingModule, NgxBootstrapModule, FormsModule, ReactiveFormsModule, InputMaskModule, UploadImgModule, DropdownModule, DirectivesModule],
 })
 export class LoginModule {}

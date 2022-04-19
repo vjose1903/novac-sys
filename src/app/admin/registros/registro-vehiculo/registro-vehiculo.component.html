@@ -5,12 +5,7 @@
 
   <div class="col-12 p-0 colFormularioListado">
     <div class="d-flex h-100">
-      <div
-        class="contenedorRegistro"
-        *ngIf="isCreando || vehiculoSelected"
-        class="form {{ isCreando || vehiculoSelected ? 'showForm' : 'hideForm' }} "
-        style="grid-template-rows: min-content min-content"
-      >
+      <div class="contenedorRegistro" *ngIf="isCreando || vehiculoSelected" class="form {{ isCreando || vehiculoSelected ? 'showForm' : 'hideForm' }} " style="grid-template-rows: min-content min-content">
         <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
           <h4 class="mb-0">Formulario</h4>
         </div>
@@ -44,13 +39,7 @@
                     autocomplete="off"
                     id="nombre"
                   />
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['nombre_no_empleado'].valid && (form.controls['nombre_no_empleado'].dirty || form.controls['nombre_no_empleado'].touched)"
-                  >
-                    Introduzca el nombre
-                  </div>
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre_no_empleado'].valid && (form.controls['nombre_no_empleado'].dirty || form.controls['nombre_no_empleado'].touched)">Introduzca el nombre</div>
                 </div>
               </div>
 
@@ -68,11 +57,7 @@
                     id="apellido"
                   />
 
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['apellido_no_empleado'].valid && (form.controls['apellido_no_empleado'].dirty || form.controls['apellido_no_empleado'].touched)"
-                  >
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['apellido_no_empleado'].valid && (form.controls['apellido_no_empleado'].dirty || form.controls['apellido_no_empleado'].touched)">
                     Introduzca el apellido
                   </div>
                 </div>
@@ -84,11 +69,7 @@
 
                   <p-inputMask mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono_no_empleado"></p-inputMask>
 
-                  <div
-                    class="alerta text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!form.controls['telefono_no_empleado'].valid && (form.controls['telefono_no_empleado'].dirty || form.controls['telefono_no_empleado'].touched)"
-                  >
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['telefono_no_empleado'].valid && (form.controls['telefono_no_empleado'].dirty || form.controls['telefono_no_empleado'].touched)">
                     Introduzca el numero de telefono
                   </div>
                 </div>
@@ -150,16 +131,16 @@
             </div>
           </form>
         </div>
-        <div class="mt-4 p-2" style="height: min-content">
-          <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('marcas')">Marcas</a>
-          <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('modelos')">Modelos</a>
-        </div>
       </div>
 
       <div class="list {{ isCreando || vehiculoSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 classs="mb-0">Listado camiones</h4>
-          <button [disabled]="vehiculoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <div class="mt-4 p-2" style="height: min-content">
+            <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('marcas')">Marcas</a>
+            <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('modelos')">Modelos</a>
+            <button [disabled]="vehiculoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          </div>
         </div>
 
         <div #cardTabla id="cardTabla" class="card cardContentClass">

@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
@@ -51,7 +50,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_suplidores', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_suplidores', is_routing: true });
     this.titulo = 'Registro de suplidores';
     this.boton = 'Registrar';
     this.metodo = this.route.snapshot.params['metodo'];
@@ -333,15 +332,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     }
   }
 
-  async decisionModal(arg) {
-    if (arg) {
-      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      this.suplidorClass.deleteOne(obj.id).then((res) => {
-        const actualPagination = this.tServ.getPaginationById('listaSuplidores');
-        this.getSuplidores(actualPagination);
-      });
-    }
-  }
   eliminarReg(regisData) {
     const objToSend = {
       data: regisData,

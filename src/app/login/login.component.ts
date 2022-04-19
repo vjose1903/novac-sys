@@ -1,17 +1,15 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { GLOBAL, MODIFIED_CONFIG_FILE } from '../core/typescript/GLOBAL';
+import { MODIFIED_CONFIG_FILE } from '../core/typescript/GLOBAL';
 import { IpcService } from '../core/services/ipc.service';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
 import * as _ from 'lodash';
-var JsBarcode = require('jsbarcode');
 
 import * as Rx from 'rxjs';
 
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
 
-import { ModalService } from '../admin/components/modal/modal.service';
 import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
@@ -38,7 +36,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   requestClass = new RequestC();
   configServ = SingletonService.configServ;
 
-  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public mServ: ModalService, public pdfServ: PdfService, public currentUserServ: CurrentUserService) {
+  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public pdfServ: PdfService, public currentUserServ: CurrentUserService) {
     super();
   }
 
@@ -53,12 +51,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
   ngAfterViewInit(): void {
     setTimeout(() => this.enfocarInput('Iusuario'), 5);
-  }
-
-  abrirModalReporte(obj) {
-    this.mServ.modalTipo('visor_pdf');
-    this.mServ.ModalSeleccion(obj);
-    this.mServ.mostrarModal(true);
   }
 
   ngOnDestroy() {}
@@ -184,7 +176,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
         const objBase = { base64: res.body, filename: res.file, type: this.tipo_prueba };
 
         const obj = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
-        this.abrirModalReporte(obj);
+        // this.abrirModalReporte(obj);
       }
     });
   }

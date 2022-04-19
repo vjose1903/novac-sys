@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -39,7 +38,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   buscarPara: any;
   NCF;
   Para: string;
-  tipoModal: any;
 
   lista_tipos_facturas: any;
   existenComprobantes = false;
@@ -110,7 +108,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
   ngOnInit() {
-    this._init_mixin({ component: 'buscar_factura', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto', 'pressEsc', 'noFiltro'] });
+    this._init_mixin({ component: 'buscar_factura', is_routing: true });
     this.buscarPara = this.route.snapshot.params['para'];
 
     if (this.buscarPara === 'nota_credito') {
@@ -202,10 +200,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         const limite = hasta - porciento;
         const restante = hasta - secuencia + 1;
 
-        const msg =
-          this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
-            ? `Ultimo comprobante para ${tipoFact.descripcion}.`
-            : `Los comprobantes para ${tipoFact.descripcion} se estan agotando, solo quedan ${restante}`;
+        const msg = this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete' ? `Ultimo comprobante para ${tipoFact.descripcion}.` : `Los comprobantes para ${tipoFact.descripcion} se estan agotando, solo quedan ${restante}`;
 
         if (secuencia >= limite) {
           fun.toastWarning(msg, 'AVISO');
@@ -420,7 +415,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   borrar(tipo = '') {
-    this.tipoModal = null;
     this.NCF = null;
     this.facturas = undefined;
     if (tipo !== 'salir') {
@@ -544,14 +538,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   editarFactura() {
-    this.router.navigateByUrl(`/admin/factura/venta/update/${this.facturaSelected.id}`);
+    this.facturaClass.getAll({ afterPath: `custom/canUpdate/${this.facturaSelected.id}` }).then((res) => {
+      setTimeout(() => this.router.navigateByUrl(`/admin/factura/venta/update/${this.facturaSelected.id}`), 10);
+    });
   }
 
-  decisionesModal() {
-    if (this.buscarPara === 'anular_factura') this.CancelarFactura();
 
-    if (this.tipoModal === 'cancelarBusqueda') this.borrar();
-  }
 
   async CancelarFactura() {
     try {
@@ -600,13 +592,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           },
         };
 
-        // TODO: poner por aqui que si es solo_ver agregue el boton de editar aqui abajo dejo lo que tiene que hacer el boton de editar
-
-        /*
-          this.facturaClass.getAll({ afterPath: `custom/canUpdate/${this.facturaSelected.id}` }).then((res) => {
-              setTimeout(() => this.editarFactura(), 10);
-            });
-        */
         if (this.Para == ' Visualizar' || type == 'nota') {
           if (type == 'nota') {
             obj_modal.botones.dinamico.push({
@@ -626,12 +611,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             label: 'Editar',
             disable: false,
           };
+
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-amarillo ml-2',
             function: (instance) => this.reimprimirFactura({ data: dataFactura, type: type }, instance),
             label: 'Reimprimir',
             disable: false,
           });
+
           if (this.buscarPara == 'solo_ver') obj_modal.botones.dinamico.push(editButton);
         }
         this.handleModalForm(obj_modal);

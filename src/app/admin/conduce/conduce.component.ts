@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
-import { GLOBAL } from '../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from '../../core/javascript/moment';
 import { MixinClass } from '../../core/typescript/MixinClass';
@@ -61,7 +60,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'conduce', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'] });
+    this._init_mixin({ component: 'conduce', is_routing: true });
 
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
@@ -90,55 +89,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   ngOnDestroy() {
     this._destroy_mixin();
-    this.resetModalVaribales();
   }
-
-  // async decisionModal(res) {
-  //   if (res) {
-  //     if (this.tipoModal === 'removerArticulo') this.procesoQuitarArticulo();
-
-  //     if (this.tipoModal === 'cancelar_conduce') this.cancelarConduce(2);
-
-  //     if (this.tipoModal === 'imprimir_conduce') await this.sendData();
-
-  //     setTimeout(() => this.resetModalVaribales(), 1000);
-  //   }
-  // }
-
-  // noFiltroResponse(res) {
-  //   if (res.tipo == 'buscarCliente') {
-  //     this.enfocarInput('clienteI');
-  //     this.selectContenido('clienteI');
-  //   }
-
-  //   if (res.tipo == 'buscarArticulo') {
-  //     this.enfocarInput(`cod-${res.index}`);
-  //     this.selectContenido(`cod-${res.index}`);
-  //   }
-  // }
-
-  // objDevueltoResponse(res) {
-  //   if (res) {
-  //     if (res.tipo_modal === 'buscarCliente') {
-  //       this.cliente = res.data;
-  //       (document.getElementById('clienteI') as any).value = res.data.nombre;
-  //       this.buscarFacturasAdelantadas(res.data.id);
-  //       setTimeout(() => this.enfocarInput('cod-0'), 10);
-  //       //
-  //     } else if (res && res.tipo_modal === 'buscarArticulo') {
-  //       this.llenarRowDespuesDeFiltro(res);
-  //       setTimeout(() => this.enfocarInput('can-' + res.index), 10);
-  //       //
-  //     } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
-  //       // mirar aqui el res
-  //       this.ajustarSecuencia();
-  //       this.llenarConduce(res.data.body).then((res) => {
-  //         this.checkFacturasAdelantadasSelection();
-  //       });
-  //     }
-  //     setTimeout(() => this.resetModalVaribales(), 1000);
-  //   }
-  // }
 
   articuloFiltroResponse(res) {
     if (res && res.tipo_modal === 'buscarArticulo') {
@@ -152,10 +103,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       this.enfocarInput('cod-' + res);
       this.selectContenido('cod-' + res);
     }
-  }
-
-  resetModalVaribales() {
-    this.tipoModal = undefined;
   }
 
   ngAfterViewInit() {
@@ -618,7 +565,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           conteo++;
           if (conteo >= factura.detalle_facturas.length)
             setTimeout(() => {
-              // TODO:
+
               this.handleModalForm({
                 component: ModalSeleccinarArticuloComponent,
                 inputs: factura.detalle_facturas,

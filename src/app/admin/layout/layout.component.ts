@@ -5,10 +5,8 @@ import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
 import { MixinClass } from '../../core/typescript/MixinClass';
-import { GLOBAL } from '../../core/typescript/GLOBAL';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { CurrentUserService } from '../../core/services/current-user.service';
-import { modalClass } from '../components/modal/modal';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
@@ -80,7 +78,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ngOnInit() {
     this.initVariables();
-    this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'layout', is_routing: false });
 
     const token = fun.getAuthToken();
 

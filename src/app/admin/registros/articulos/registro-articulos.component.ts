@@ -72,7 +72,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_articulo', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_articulo', is_routing: true });
     this.createForm();
     this.FORM = this.form.controls;
 
@@ -668,17 +668,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.form.controls.tipo_articulo_id.setValue(articulo['tipo_articulo_id']);
     this.form.controls.costo_principal.setValue(fun.numFormatTwoDecimals(articulo.costo_principal));
     this.form.controls.precio_principal.setValue(fun.numFormatTwoDecimals(articulo.precio_principal));
-  }
-
-  decisionModal(arg) {
-    if (arg) {
-      const obj = fun.duplicarJson(this.seleccionModal);
-      this.articuloClass.deleteOne(obj.id).then((res) => {
-        const actualPagination = this.tServ.getPaginationById('listaArticulos');
-        this.getArticulos(actualPagination);
-        this.borrar();
-      });
-    }
   }
 
   nuevoRegistro() {

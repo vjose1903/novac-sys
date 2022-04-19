@@ -2,12 +2,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { TablasService } from '../../../components/tablas/tablas.service';
-import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
-import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../../electron/shared-electron-angular';
 import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../../../core/services/functions.service';
 
@@ -53,6 +51,8 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       estilos: [{ width: '9%' }, { color: '#000' }],
     },
   ];
+  pdfSrc;
+  fileName;
   lista_recibos;
   rowSelected: any;
   reciboClass = new ReciboC();
@@ -62,7 +62,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async ngOnInit() {
-    this._init_mixin({ component: 'lista_recibos', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'lista_recibos', is_routing: true });
     this.necesarioStart();
   }
 
@@ -254,23 +254,5 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       const actualPagination = this.tServ.getPaginationById('listaRecibos');
       this.reciboClass.getAll(extra).then((res) => this.getRecibos(actualPagination));
     } catch (error) {}
-  }
-
-  decisionModal(res) {
-    if (res) {
-      switch (this.tipoModal) {
-        case 'visor_pdf':
-          this.imprimir_base64();
-          break;
-
-        case 'anular':
-          this.anularRecibo(this.rowSelected.id);
-          break;
-
-        default:
-          break;
-      }
-    }
-    this.rowSelected = undefined;
   }
 }

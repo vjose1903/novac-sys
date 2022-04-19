@@ -5,10 +5,8 @@ import * as moment from '../../core/javascript/moment';
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { tipos_facturas } from '../../core/typescript/GLOBAL';
-import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { FacturacionService } from './facturacion.service';
-import { modalClass } from '../components/modal/modal';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from './factura';
 import { NcfC } from '../registros/ncf/ncf';
@@ -129,16 +127,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   filterCamionesTargets;
   copyCamiones;
 
-  constructor(
-    public mServ: ModalService,
-
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private localeService: BsLocaleService,
-    public factServ: FacturacionService,
-    public pdfServ: PdfService,
-  ) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService, public pdfServ: PdfService) {
     super();
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
@@ -149,7 +138,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'cabeza_factura', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto'] });
+    this._init_mixin({ component: 'cabeza_factura', is_routing: true });
     this.localeService.use('es');
     this.rellenarVariables();
   }
@@ -271,13 +260,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.rellenarCampos(null, 'fact_guardada', factura).then(() => {
           this.enfocarInput('cod-0');
 
-          // TODO: revisar cuando cambie el backend para las facturas
-
           this.cuerpo.llenarFactura(factura['detalle_facturas'], true, (res) => {
             setTimeout(() => {
               this.getCuerpoFactura(factura['detalle_facturas'], true);
-              modalClass.aquienResponder = 'layout';
-              // this.layServ.nextRefresh(true);
+
               this._sideBarOpened = false;
               resolve(true);
             }, 250);
@@ -498,48 +484,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
-  // decisionModal(res) {
-  //   if (fun.hasValue(res)) this.luegoDecision(res);
-
-  //   if (fun.hasValue(res) && res.bool) {
-  //     this.fechaFactura['front'] = this.formarFechaFactura(res.Date)['FechaFactura'];
-  //     this.fechaFactura['back'] = this.fechaFactura['front'];
-  //     this.FechaFacturaMostrar = this.formarFechaFactura(res.Date)['FechaFacturaMostrar'];
-  //     this.FacturaAtrasada = true;
-  //     this.cuerpo.getSaco();
-  //   }
-  // }
-
-  objDevueltoResponse(res) {
-    if (res && res.tipo_modal === 'buscarSuplidor') {
-      this.propietario_factura = res.data;
-      this.form.patchValue(this.propietario_factura);
-      this.enfocarInput('cod-0');
-      //
-    } else if (res && res.tipo_modal === 'cambio') {
-      this.Devuelta = res.data.devuelta;
-      this.forma_pago = res.data.forma_pago;
-
-      if (this.metodo === 'compra') {
-        if (res.data.decision_cambio) {
-          this.cambiarCostos();
-        }
-        this.CuerpoFactura = this.newCuerpo;
-        this.enviarABaseDatos();
-      } else {
-        this.enviarABaseDatos();
-      }
-    }
-  }
-
   checkIfFacturacionEnProceso() {
     return this.CuerpoFactura.length;
-  }
-
-  setWidthPop(bool, e) {
-    e.select();
-    const size = bool ? '18rem' : '26rem';
-    document.documentElement.style.setProperty('--popInfo', size);
   }
 
   checkCambiosModoyCondicionFactura(arg) {
@@ -868,15 +814,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
 
   abrirModalFiltro() {
-    let tipo = 'buscarCliente';
     let obj = {};
     obj['data'] = [];
 
     if (this.metodo === 'venta') obj['filtrarCliente'] = null;
-    if (this.metodo === 'compra') {
-      tipo = 'buscarSuplidor';
-      obj['filtrarSuplidor'] = null;
-    }
+    if (this.metodo === 'compra') obj['filtrarSuplidor'] = null;
 
     this.handleModalForm({
       component: BuscarClienteSuplidorComponent,
@@ -983,7 +925,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               cambios_articulos: articulos_a_cambiar,
             };
 
-            // TODO:
             this.handleModalForm({
               component: FormCantidadEfectivoComponent,
               inputs: obj,

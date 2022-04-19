@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../core/typescript/GLOBAL';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { TablasService } from '../components/tablas/tablas.service';
 import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
@@ -25,6 +24,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   element: any;
   optionsMedidas = ['Quintal', 'Libra'];
+  // TODO: ver como sustituir esta variable de seleccion modal
   seleccionModal: any;
   tipoModal: string;
 
@@ -49,7 +49,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'produccion', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'produccion', is_routing: true });
 
     this.getProductosTerminados();
   }

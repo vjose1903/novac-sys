@@ -50,7 +50,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_cliente', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_cliente', is_routing: true });
     this.boton = 'Guardar';
 
     this.createForm();
@@ -73,14 +73,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       maximo_credito: [{ value: null, disabled: true }, Validators.required],
       vendedor_id: [{ value: null, disabled: true }, Validators.required],
     });
-  }
-
-  async decisionModal(arg) {
-    if (arg) {
-      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      const actualPagination = this.tServ.getPaginationById('lista_clientes');
-      this.clienteClass.deleteOne(obj.id).then((res) => this.getClientes(actualPagination));
-    }
   }
 
   iniciarCambioMenu(arg, callback) {

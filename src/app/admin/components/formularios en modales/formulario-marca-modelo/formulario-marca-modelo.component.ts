@@ -37,11 +37,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   listaModelos: any;
   listaTipoArticulos: any;
   editando: any;
-  seleccionModal: any;
+
   indexSelected: any;
-  tipoModal: string;
-  showModal: boolean;
-  element;
 
   marcasClass = new MarcaC();
   modeloClass = new ModeloC();
@@ -149,7 +146,9 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   async submit(formToSubmit) {
-    const obj = fun.duplicarJson(this[formToSubmit].value);
+    console.log('formToSubmit ', formToSubmit);
+
+    const obj = fun.duplicarJson(formToSubmit.value);
 
     if (this.tipo_formulario !== 'modelos') delete obj['marca_id'];
 
@@ -179,42 +178,35 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.formModelo.reset();
     this.editando = undefined;
     this.indexSelected = undefined;
-    this.seleccionModal = undefined;
+
     this.boton = 'Guardar';
   }
 
-  editarItem(arg, formName) {
+  editarItem(arg, form) {
+    console.log('formName ', form);
+    console.log('arg ', arg);
     this.editando = arg.ARG;
 
     this.indexSelected = arg.INDEX;
     if (_.has(arg.ARG, 'marca')) arg.ARG.marca_id = arg.ARG.marca.id;
 
-    this[formName].patchValue(arg.ARG);
+    form.patchValue(arg.ARG);
     this.boton = 'Editar';
   }
 
-  async decisionBorrar(arg) {
-    if (arg) {
-      const clase = this.tipo_formulario === 'modelos' ? this.modeloClass : this.marcasClass;
-      await clase.deleteOne(this.seleccionModal.id);
+  eliminarReg(regisData) {
+    const objToSend = {
+      data: regisData,
+      texto: `¿Está seguro que desea eliminar ${this.tipo_formulario == 'modelos' ? 'el modelo' : 'la marca'}: <b> ${regisData.descripcion} </b>?`,
+      siFunction: () => {
+        const clase = this.tipo_formulario === 'modelos' ? this.modeloClass : this.marcasClass;
+        clase.deleteOne(regisData.id).then((res) => {
+          // TODO: ver si aqui en vdd no tengo que buscar la paginacion actual
+          this.pedirNuevaData(this.obj_p);
+        });
+      },
+    };
 
-      this.pedirNuevaData(this.obj_p);
-      this.reinicioModal();
-    }
-  }
-
-  abrirModal(arg) {
-    this.seleccionModal = arg.ARG;
-    this.indexSelected = arg.INDEX;
-    this.tipoModal = 'borrar';
-
-    this.showModal = true;
-  }
-  reinicioModal() {
-    this.seleccionModal = undefined;
-    this.indexSelected = undefined;
-    this.tipoModal = undefined;
-    this.editando = undefined;
-    this.showModal = undefined;
+    this.eliminarRegistro(objToSend);
   }
 }

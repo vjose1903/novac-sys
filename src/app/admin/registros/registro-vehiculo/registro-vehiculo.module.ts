@@ -16,7 +16,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     ReactiveFormsModule,
     FormsModule,
     NgSelectModule,
-    // TODO: quitar el ngSelect de aqui
+    // TODO: quitar el ngSelect de aqui cuando se sustituya el ng select del html
   ],
 })
 export class RegistroVehiculoModule {}

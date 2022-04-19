@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import * as moment from '../../../core/javascript/moment';
 import { TablasService } from '../../components/tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -19,7 +18,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   boton = 'Ingresar';
   listaNCF;
 
-  seleccionModal: any;
   estado = false;
   usado = false;
 
@@ -83,7 +81,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.localeService.use('es');
-    this._init_mixin({ component: 'reg_ncf', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_ncf', is_routing: true });
     this.necesarioStart();
 
     this.setDateInputs(new Date());
@@ -326,17 +324,12 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       texto: `Desea eliminar comprobante para <b>${comprobanteData.tipoC_}</b> numero: <b>${comprobanteData.codigo}</b>`,
       width: '510px',
       siFunction: (instance) => {
-        this.ncfClass.deleteOne(comprobanteData.id).then(
-          () => {
-            fun.toastSuccess('comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo + ' borrado', 'CORRECTO');
-            const actualPagination = this.tServ.getPaginationById('lista_ncf');
-            this.getPaquetesNCF(actualPagination);
-            instance.closeModal(instance.id, 'eliminar_comprobante');
-          },
-          (err) => {
-            this.mostrarErrores(err.error);
-          },
-        );
+        this.ncfClass.deleteOne(comprobanteData.id).then((res) => {
+          fun.toastSuccess('comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo + ' borrado', 'CORRECTO');
+          const actualPagination = this.tServ.getPaginationById('lista_ncf');
+          this.getPaquetesNCF(actualPagination);
+          instance.closeModal(instance.id, 'eliminar_comprobante');
+        });
       },
     };
     this.confirmationModal(objConfirmationModal);
@@ -364,41 +357,5 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
         ],
       },
     });
-  }
-
-  decisionModal(arg) {
-    if (arg !== null && arg !== undefined) {
-      const obj = fun.duplicarJson(this.seleccionModal);
-      if (arg && obj) {
-        this.ncfClass.deleteOne(obj.id).then(
-          () => {
-            fun.toastSuccess('comprobante para ' + obj.tipoC_ + ' numero: ' + obj.codigo + ' borrado', 'CORRECTO');
-            const actualPagination = this.tServ.getPaginationById('lista_ncf');
-            this.getPaquetesNCF(actualPagination);
-          },
-          (err) => {
-            this.mostrarErrores(err.error);
-          },
-        );
-      }
-    }
-  }
-
-  mostrarErrores(arg) {
-    if (Array.isArray(arg)) {
-      arg.forEach((error) => {
-        fun.toastError(error, 'ERROR');
-      });
-    } else {
-      for (const key in arg) {
-        if (arg.hasOwnProperty(key)) {
-          const element = arg[key];
-
-          if (key !== 'status') {
-            fun.toastError(element, 'ERROR');
-          }
-        }
-      }
-    }
   }
 }

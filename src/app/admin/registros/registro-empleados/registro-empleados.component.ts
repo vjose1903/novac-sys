@@ -61,7 +61,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.localeService.use('es');
     this.boton = 'Registrar';
 
-    this._init_mixin({ component: 'reg_empleados', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_empleados', is_routing: true });
 
     this.necesarioStart();
   }
@@ -323,14 +323,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       header: 'Cambiar contraseña',
       width: '30rem',
     });
-  }
-
-  decisionModal(arg) {
-    if (arg) {
-      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      const actualPagination = this.tServ.getPaginationById('listaEmpleados');
-      this.empleadosClass.deleteOne(obj.id).then((res) => this.getEmpleados(actualPagination));
-    }
   }
 
   eliminarReg(regisData) {

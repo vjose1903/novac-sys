@@ -34,8 +34,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   listaArticulos;
 
   tipo_articulos;
-  indexSelected: any;
-  seleccionModal: any;
+
   filtrado = false;
   filtro = 'todos';
 
@@ -53,7 +52,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async ngOnInit() {
-    this._init_mixin({ component: 'inventario', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'inventario', is_routing: true });
     this.necesarioParaEmpezar();
 
     this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res));
@@ -164,8 +163,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   movimientoInventario(arg) {
-    this.indexSelected = arg.INDEX;
-
     this.handleModalForm({
       component: MovimientosFormComponent,
       inputs: arg.ARG,
@@ -191,6 +188,5 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   resetVariables() {
     this.pdfSrc = undefined;
     this.fileName = undefined;
-    this.tipoModal = undefined;
   }
 }

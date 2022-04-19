@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { LayoutRoutingModule } from './layout.routing';
 import { LayoutComponent } from './layout.component';
 import { PrimengModule } from '../../modules/primeng.module';
-import { ModalModule } from '../components/modal/modal.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 
@@ -39,11 +38,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     NgxBootstrapModule,
     NgSelectModule,
     FormsModule,
-    ModalModule,
     NgbModule,
     DirectivesModule,
     PdfViewerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+
   ],
 })
 export class LayoutModule {}

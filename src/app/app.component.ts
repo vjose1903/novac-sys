@@ -5,7 +5,6 @@ import { ELECTRON_EVENTS_OBSERVER, GLOBAL, MODIFIED_CONFIG_FILE } from './core/t
 
 import { SingletonService } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
-import { ModalService } from './admin/components/modal/modal.service';
 import { LayoutService } from './admin/layout/layout.service';
 import { ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
@@ -53,7 +52,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
     public zone: NgZone,
     public http: HttpClient,
-    public mServ: ModalService,
+
     public layServ: LayoutService,
     public configServ: ConfigurationService,
     public themeService: ThemeService,
@@ -66,7 +65,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     SingletonService.http = this.http;
     SingletonService.configServ = this.configServ;
 
-    SingletonService.mServ = this.mServ;
     SingletonService._ipc = this._ipc;
     SingletonService.layServ = this.layServ;
     SingletonService.toastr = this.toastr;

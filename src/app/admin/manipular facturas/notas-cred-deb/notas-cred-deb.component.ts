@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewChild, OnDestroy, ChangeDetectorRef } from '@angular/core';
-
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -21,6 +19,7 @@ import { fun } from '../../../core/services/functions.service';
 })
 export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
   // factura;
+
   tabIndex = 0;
   idsFacturas: number[];
   facturasConDetalles: Array<FacturasI>;
@@ -34,15 +33,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   fecha: string;
   TOTAL = 0;
   convertObj = { credito: -1, debito: 1 };
-
   info = [];
-  // detalleFacturas: any;
   detalleNota = [];
-  @ViewChild(TablasComponent) tablas: TablasComponent;
-  tipoModal: string;
   tipoFactura: any;
   lista_tipos_facturas: any;
-  // propietario_factura: any;
   paqueteComprobante;
 
   notasClass = new NotaC();
@@ -57,7 +51,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'notas', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto'] });
+    this._init_mixin({ component: 'notas', is_routing: true });
     this.idsFacturas = JSON.parse(this.activeRoute.snapshot.params['ids']);
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
@@ -74,11 +68,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this.necesarioStart();
   }
 
-  objDevueltoResponse(res) {
-    if (res && res.tipo_modal === 'cambio') {
-      this.decisionModal(res.data);
-    }
-  }
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
@@ -246,9 +235,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         } else if (isNaN(entidad.cant_nota)) {
           entidad.cant_nota = 0;
           entidad.total_nota = 0;
-
-          // this.tablas.resetInput('especificar', 'cant_nota', infoTable.index, false, 0);
-          // this.tablas.resetInput('especificar', 'total_nota', infoTable.index, false, 0);
         } else {
           const descuento = entidad.descuento_valor / entidad.cantidad;
 
@@ -337,16 +323,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           width: '30rem',
         };
         this.confirmationModal(confirmationObj);
-      }
-    }
-  }
-
-  async decisionModal(res) {
-    if (res) {
-      if (this.tipoModal === 'imprimir') {
-        this.formarNota(null);
-      } else if (this.tipoModal === 'cancelar') {
-        this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
       }
     }
   }

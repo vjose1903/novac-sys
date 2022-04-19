@@ -8,20 +8,8 @@
               <div>
                 <div class="form-group">
                   <label class="control-label">{{ campo1 }}: <span style="color: red">*</span></label>
-                  <input
-                    (keyup)="capitalice('descripcion', $event.target.value, formMarca)"
-                    (focus)="$event.target.select()"
-                    type="text"
-                    id="descripcion"
-                    formControlName="descripcion"
-                    class="form-control mb-2"
-                    autocomplete="off"
-                  />
-                  <div
-                    class="alerta position-absolute text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!formMarca.controls['descripcion'].valid && (formMarca.controls['descripcion'].dirty || formMarca.controls['descripcion'].touched)"
-                  >
+                  <input (keyup)="capitalice('descripcion', $event.target.value, formMarca)" (focus)="$event.target.select()" type="text" id="descripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
+                  <div class="alerta position-absolute text-danger ml-1" style="font-size: 12px" *ngIf="!formMarca.controls['descripcion'].valid && (formMarca.controls['descripcion'].dirty || formMarca.controls['descripcion'].touched)">
                     Este Campo es obligatorio
                   </div>
                 </div>
@@ -64,20 +52,8 @@
               <div class="col-12">
                 <div class="form-group">
                   <label class="control-label">Modelo: <span style="color: red">*</span></label>
-                  <input
-                    (keyup)="capitalice('descripcion', $event.target.value, formModelo)"
-                    (focus)="$event.target.select()"
-                    type="text"
-                    id="descripcion"
-                    formControlName="descripcion"
-                    class="form-control mb-2"
-                    autocomplete="off"
-                  />
-                  <div
-                    class="alerta position-absolute text-danger ml-1"
-                    style="font-size: 12px"
-                    *ngIf="!formModelo.controls['descripcion'].valid && (formModelo.controls['descripcion'].dirty || formModelo.controls['descripcion'].touched)"
-                  >
+                  <input (keyup)="capitalice('descripcion', $event.target.value, formModelo)" (focus)="$event.target.select()" type="text" id="descripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
+                  <div class="alerta position-absolute text-danger ml-1" style="font-size: 12px" *ngIf="!formModelo.controls['descripcion'].valid && (formModelo.controls['descripcion'].dirty || formModelo.controls['descripcion'].touched)">
                     Este Campo es obligatorio
                   </div>
                 </div>
@@ -118,28 +94,9 @@
       [focusRow]="false"
       [botones]="botones"
       (DevolverInfo)="editarItem($event, data.form)"
-      (DELETE)="abrirModal($event)"
+      (DELETE)="eliminarReg($event.ARG)"
       [id_tabla]="'tabla_frm_' + data.formName"
       (paginateChange)="pedirNuevaData($event)"
     ></app-tablas>
   </div>
 </ng-template>
-
-<div *ngIf="showModal" class="overlay">
-  <p-dialog
-    *ngIf="tipoModal === 'borrar' && seleccionModal"
-    header="Confirmar"
-    [(visible)]="showModal"
-    [responsive]="true"
-    [style]="{ width: '350px', minWidth: '200px' }"
-    (onHide)="reinicioModal()"
-    [blockScroll]="true"
-  >
-    <p *ngIf="tipo_formulario !== 'modelos'">Desea remover {{ seleccionModal.descripcion }} de la lista</p>
-    <p *ngIf="tipo_formulario == 'modelos'">Desea remover {{ seleccionModal.marca.descripcion }} {{ seleccionModal.descripcion }} de la lista</p>
-    <p-footer>
-      <button (click)="reinicioModal()" type="submit" class="btn btn-blanco mr-2">NO</button>
-      <button (click)="decisionBorrar(true)" type="submit" class="btn" id="btn-verde">SI</button>
-    </p-footer>
-  </p-dialog>
-</div>
