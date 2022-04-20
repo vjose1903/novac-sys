@@ -189,8 +189,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     console.log(' ');
     fun.logOrange(' --- checkRouteActiva ---');
     // TODO: ver como consigo solo la ruta relativa al sistema y si no tiene modulo borrar el modulo seleccionado
-    this.actualPath = document.location.pathname;
+    const location = window.location.href;
+    const actualPath = location.slice(location.indexOf('/admin'), location.length);
+
+    this.actualPath = actualPath;
     const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
+
+    fun.logBlue("pathSplit.length ", pathSplit.length);
 
     if (pathSplit.length >= 3) {
       this.actualModule = pathSplit[1];
