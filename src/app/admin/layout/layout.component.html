@@ -53,13 +53,13 @@
           <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('registros') }" src="assets/img/registro.png" alt="Registros" (click)="cambiarMenu({ url: 'registros', navigate: false })" />
 
           <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('registros') }">
-            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'empleados' }" (click)="cambiarMenu({ url: 'registros/empleados', navigate: true })">Empleados</h4>
-            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'clientes' }" (click)="cambiarMenu({ url: 'registros/clientes', navigate: true })">Clientes</h4>
-            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'suplidores' }" (click)="cambiarMenu({ url: 'registros/suplidores', navigate: true })">Suplidores</h4>
-            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'articulos' }" (click)="cambiarMenu({ url: 'registros/articulos', navigate: true })">Articulos</h4>
-            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'camiones' }" (click)="cambiarMenu({ url: 'registros/camiones', navigate: true })">Camiones</h4>
-            <!-- <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'roles' }" (click)="cambiarMenu({ url: 'registros/roles', navigate: true  })">Roles</h4> -->
-            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'ncf' }" (click)="cambiarMenu({ url: 'registros/ncf', navigate: true })">NCF</h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'empleados' }" (click)="cambiarMenu({ url: 'registros/empleados', navigate: true })">Empleados - {{actualRuta}} </h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'clientes' }" (click)="cambiarMenu({ url: 'registros/clientes', navigate: true })">Clientes - {{actualRuta}} </h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'suplidores' }" (click)="cambiarMenu({ url: 'registros/suplidores', navigate: true })">Suplidores - {{actualRuta}} </h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'articulos' }" (click)="cambiarMenu({ url: 'registros/articulos', navigate: true })">Articulos - {{actualRuta}} </h4>
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'camiones' }" (click)="cambiarMenu({ url: 'registros/camiones', navigate: true })">Camiones - {{actualRuta}} </h4>
+            <!-- <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'roles' }" (click)="cambiarMenu({ url: 'registros/roles', navigate: true  })">Roles - {{actualRuta}} </h4> -->
+            <h4 class="opcion" [ngClass]="{ activa: actualRuta == 'ncf' }" (click)="cambiarMenu({ url: 'registros/ncf', navigate: true })">NCF - {{actualRuta}} </h4>
           </div>
         </div>
 
