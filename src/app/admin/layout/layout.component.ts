@@ -163,7 +163,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   // =================================================================================
-  // CERRAR SESION
+  // Refrescar el programa
   // =================================================================================
   refreshPage() {
     location.reload();
@@ -186,16 +186,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
 
   checkRouteActiva() {
-    console.log(' ');
-    fun.logOrange(' --- checkRouteActiva ---');
-    // TODO: ver como consigo solo la ruta relativa al sistema y si no tiene modulo borrar el modulo seleccionado
     const location = window.location.href;
     const actualPath = location.slice(location.indexOf('/admin'), location.length);
 
     this.actualPath = actualPath;
     const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
-
-    fun.logBlue("pathSplit.length ", pathSplit.length);
 
     if (pathSplit.length >= 3) {
       this.actualModule = pathSplit[1];
@@ -204,10 +199,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       this.actualModule = undefined;
       this.actualRuta = _.join(pathSplit.slice(1, pathSplit.length), '/');
     }
-    console.log('this.actualPath', this.actualPath);
-    console.log('this.actualModule', this.actualModule);
-    console.log('this.actualRuta', this.actualRuta);
-    console.log(' ');
     this.ready = true;
   }
 
@@ -227,23 +218,15 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     let next_cambio_menu = '';
     // TODO: aqui agrega que si tiene permiso de ir a la ruta que quiere ir no haga nada
 
-    console.log(' ');
-    console.log('args ', args);
-
     if (args.navigate) {
-      fun.logBlue('NAVEGANDO');
       next_cambio_menu = `/admin/${args.url}`;
-      console.log('next_cambio_menu ', next_cambio_menu);
 
       if (this.actualPath !== next_cambio_menu) {
-        fun.logGreen('SALIENDO ');
         this.runRouterNavigate({ bool: true, ruta: next_cambio_menu });
       } else {
-        fun.logYellow('YA SE ENCUENRTRA AQUIII ');
         fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
       }
     } else {
-      fun.logRed('CAMBIANDO MODULO SELECTED');
       this.actualModule = args.url;
     }
   }
