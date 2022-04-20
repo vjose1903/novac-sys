@@ -34,6 +34,16 @@ export interface table_info {
   click?: Function;
   iconsArray?: Array<any>;
 }
+
+interface obj_paginate {
+  show: boolean;
+  page?: number;
+  per_page?: number;
+  per_page_options?: Array<number>;
+  search?: string;
+  is_local?: boolean;
+}
+
 export interface table_config {
   padding?: string;
   padre_component?: any;
@@ -51,7 +61,7 @@ export interface table_config {
   table_size?: 'sm';
   backgroundColor?: any;
   total_count?: any;
-  obj_paginate?: any;
+  obj_paginate?: obj_paginate;
 }
 
 @Component({
@@ -204,28 +214,28 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   paginatorChange(e, id) {
     const page = e.page + 1;
-    const limit = e.rows;
+    const per_page = e.rows;
     const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
 
-    this.tServ.modifyPaginationById(id, [{ page: page }, { limit: limit }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
+    this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
 
     const actualPage = this.getActualPageElement();
     const clikeado_por = actualPage.getAttribute('clikeado_por');
 
     if (fun.isEmpty(clikeado_por) || clikeado_por !== 'maquina') {
       if (actualPagination.is_local) {
-        this.localPagination(page, limit, 'paginatorChange');
+        this.localPagination(page, per_page, 'paginatorChange');
       } else {
-        this.config.padre_component[this.config.peticion_data]({ limit: limit, page: page, search: null });
+        this.config.padre_component[this.config.peticion_data]({ per_page: per_page, page: page, search: null });
       }
     }
   }
 
-  localPagination(page, limit, desde = '') {
+  localPagination(page, per_page, desde = '') {
     const copyData = fun.duplicarJson(this.copyData);
 
-    const inicio = (page - 1) * limit;
-    const final = inicio + limit;
+    const inicio = (page - 1) * per_page;
+    const final = inicio + per_page;
 
     const dataParsed = _.slice(copyData, inicio, final);
 
@@ -373,7 +383,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.copyData = fun.duplicarJson(data);
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
-      this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.limit, 'updateDataCopy');
+      this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'updateDataCopy');
     }
   }
 
@@ -441,30 +451,16 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     // }, 250);
   }
 
-  // isDisable(dato, column) {
-  //   let res = false;
+  getIndex(index) {
+    const pageIndex = (this.pagActual - 1) * this.config.obj_paginate.per_page + index;
 
-  //   if (_.has(column, 'disable')) {
-  //     let temp_res = false;
-
-  //     for (let i = 0; i < column.disable.length; i++) {
-  //       const element = column.disable[i];
-
-  //       if (_.some(column.disable, (conf) => conf.kind === 'selected')) temp_res = Number(dato.id) !== Number(this.seleccionado || 0);
-
-  //       if (temp_res) break;
-
-  //       if (element.kind === 'campo') {
-  //         if (element.value.length === 0) temp_res = dato[element.target] ? false : true;
-  //         else temp_res = _.some(element.value, (value) => value == dato[element.target]);
-  //         // if (element.value.length === 0) temp_res = !!dato[element.target];
-  //       }
-  //     }
-  //     res = temp_res;
-  //   }
-
-  //   return this.config.read ? true : res;
-  // }
+    const validate = fun.isEmpty(this.data[pageIndex]);
+    if (validate) {
+      return index;
+    } else {
+      return pageIndex;
+    }
+  }
 
   disabledInput(dato, column) {
     let res = false;
@@ -524,7 +520,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   //   this.mdbTablePagination.setMaxVisibleItemsNumberTo(items);
   // }
   functionsBtnDinamic(params) {
-    this.config.padre_component.handleBtnsDinamic(params);
+    if (this.config.padre_component.handleBtnsDinamic) {
+      this.config.padre_component.handleBtnsDinamic(params);
+    } else {
+      console.error('Debe de implementar la funcion handleBtnsDinamic en el componente padre de la tabla');
+    }
   }
 
   clickROW(arg, quien = '') {

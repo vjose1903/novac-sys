@@ -691,6 +691,7 @@ Not supports in Firefox and IE */
 @mixin my_cards {
   border-radius: 1rem !important;
   height: 100%;
+  max-height:52rem;
   background-color: white;
   box-shadow: 0px 4px 14px -6px black;
 }

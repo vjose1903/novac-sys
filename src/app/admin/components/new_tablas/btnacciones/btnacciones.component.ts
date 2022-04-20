@@ -4,23 +4,33 @@ import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
 
+interface inner_btn {
+  show: boolean;
+  name?: string;
+  tooltip?: string;
+  tooltipKey?: string;
+  permiso?: string;
+  icon?: string;
+}
+
+export interface botonesI {
+  dinamico?: Array<inner_btn>;
+  borrar?: inner_btn;
+  editar?: inner_btn;
+  mostrar?: inner_btn;
+}
 @Component({
   selector: 'app-btnacciones',
   templateUrl: './btnacciones.component.html',
   styleUrls: ['./btnacciones.component.scss'],
 })
 export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
-  @Input() botones: any = {
-    dinamic: [],
-    borrar: { show: false, permiso: null },
-    editar: { show: false, permiso: null },
-    mostrar: { show: false, permiso: null },
-  };
+  @Input() botones: botonesI;
 
   btnList = {
-    borrar: { icon: 'far fa-trash-alt', action: 'delete', func: this.delete, tooltip: 'Borrar' },
-    editar: { icon: 'fas fa-pencil-alt', action: 'editar', func: this.devolverInfo, tooltip: 'Editar' },
-    mostrar: { icon: 'far fa-eye', action: 'mostrar', func: this.devolverInfo, tooltip: 'Mostrar' },
+    borrar: { icon: 'far fa-trash-alt', action: 'delete', func: this.clickBtn, tooltip: 'Borrar' },
+    editar: { icon: 'fas fa-pencil-alt', action: 'editar', func: this.clickBtn, tooltip: 'Editar' },
+    mostrar: { icon: 'far fa-eye', action: 'mostrar', func: this.clickBtn, tooltip: 'Mostrar' },
   };
 
   @Input() index_body: any;
@@ -29,9 +39,8 @@ export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
   @Input() id_tabla;
 
   @Output() functionsBtnDinamic = new EventEmitter<any>();
-  @Output() panicoBTN = new EventEmitter<any>();
-  @Output() DevolverInfoBTN = new EventEmitter<any>();
-  @Output() deleteBTN = new EventEmitter<any>();
+  @Output() clickBoton = new EventEmitter<any>();
+
 
   subWidth: Subscription;
   windowsWidth;
@@ -94,24 +103,18 @@ export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
     return index;
   }
 
-  handleFunctionsBtnDinamic(e, btn_dinamic, dato) {
+  handleFunctionsBtnDinamic(event, btn_dinamic, dato) {
     const params = { name: btn_dinamic['name'], data: dato, id_tabla: this.id_tabla };
 
     this.functionsBtnDinamic.emit(params);
-    if (e) e.stopPropagation();
+    if (event) event.stopPropagation();
   }
 
-  devolverInfo(e, arg, metodo?, this_?) {
-    this_ ||= this;
-    const obj = { data: arg, action: metodo };
+  clickBtn(e, arg, metodo?) {
+    const obj = { data: arg, action: metodo, id_tabla: this.id_tabla };
 
-    this_.DevolverInfoBTN.emit(obj);
+    this.clickBoton.emit(obj);
     if (e) e.stopPropagation();
-  }
-
-  delete(e, arg) {
-    this.deleteBTN.emit(arg);
-    e.stopPropagation();
   }
 
   convertNum(num) {

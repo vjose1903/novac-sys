@@ -8,6 +8,7 @@ import * as moment from '../../../core/javascript/moment';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 import * as $ from 'jquery';
 import { fun } from '../../../core/services/functions.service';
+import { table_config } from '../../components/new_tablas/tablas.component';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -26,7 +27,27 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', formatoNumero: true, estilos: [{ width: '20%' }] },
   ];
 
-  botones = { titulo: true, borrar: true, editar: true };
+  table_config: table_config = {
+    info: [
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }] },
+      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
+      { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
+      { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', estilos: [{ width: '20%' }] },
+    ],
+
+    id_tabla: 'articulos',
+    padre_component: this,
+    peticion_data: 'getArticulos',
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+  };
+
+  botones = {
+    editar: { show: true, permiso: null },
+    borrar: { show: true, permiso: null },
+  };
+
+  // botones = { titulo: true, borrar: true, editar: true };
 
   boton = '';
   form: FormGroup;
@@ -63,6 +84,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     { backend: 'Saco', front: 'Saco' },
     { backend: 'Galon', front: 'Galón' },
   ];
+  tablaComponent;
 
   fechaFactura: string;
   articuloClass = new ArticuloC();
@@ -92,18 +114,15 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.borrar();
   }
 
-  filtroFormula(item) {
-    return item._destroy !== '1';
-  }
-
-  async filtrarArticulo(e) {
-    this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
-    await this.getArticulos(e);
-  }
+  // async filtrarArticulo(e) {
+  //   this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
+  //   await this.getArticulos(e);
+  // }
 
   async necesarioStart() {
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
-    await this.getArticulos(this.tServ.obj_paginate.default);
+    // await this.getArticulos(this.tServ.obj_paginate.default);
+    await this.getArticulos({ page: 1, per_page: 20, search: ' ' });
     this.getTipoArticulos();
     this.enfocarInput('nombre');
   }
@@ -126,12 +145,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     });
   }
 
-  async getArticulos(e) {
-    const page = e.page;
-    const per_page = e.per_page;
-    const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+  async getArticulos(params?: { per_page: number; page: number; search: string }) {
+    // async getArticulos(e) {
 
-    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: page, per_page: per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
+    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+
+    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
       res.data.map(async (arti) => {
         arti.customStyles = {
           'td-codigo': { width: '11%' },
@@ -142,10 +161,11 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       });
 
       this.listaArticulos = res.data;
+      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
 
-      const obj = { total: res.total_registros, tabla: 'listaArticulos' };
+      // const obj = { total: res.total_registros, tabla: 'listaArticulos' };
 
-      this.tServ.Func_total_paginas(obj);
+      // this.tServ.Func_total_paginas(obj);
     });
   }
 
@@ -597,6 +617,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     } catch (error) {
       fun.toastError(recalcular ? 'Error recalculando los costos de la formula.' : 'Error rellenando los campos del formulario', 'ERROR');
     }
+  }
+
+  tableClick_action(params) {
+    console.log('params ', params);
   }
 
   async editarItem(item) {

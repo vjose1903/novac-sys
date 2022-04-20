@@ -2,19 +2,15 @@ export class TablaClass {
   handle_table_events(event) {
     switch (event.type) {
       case 'click_action':
-        this.tableClick_action({ info: event.info, id_tabla: event.id_tabla });
+        this.tableClick_action(event.info);
         break;
 
       case 'clickRow':
-        this.tableClickRow({ info: event.info, id_tabla: event.id_tabla });
+        this.tableClickRow(event.info);
         break;
 
       case 'clickIcon':
-        this.tableClickIcon({ info: event.info, id_tabla: event.id_tabla });
-        break;
-
-      case 'delete':
-        this.modalDelete({ info: event.info, id_tabla: event.id_tabla });
+        this.tableClickIcon(event.info);
         break;
 
       default:
@@ -23,7 +19,6 @@ export class TablaClass {
   }
 
   tableClick_action(arg) {}
-  modalDelete(arg) {}
   tableClickRow(arg) {}
   tableClickIcon(arg) {}
 }

@@ -2,15 +2,7 @@
   <!-- FILTER -->
   <div id="searchDiv-{{ config.id_tabla }}" *ngIf="config?.filtrar" class="searchDiv d-flex align-items-center" style="max-width: 17rem">
     <label class="search-label mr-2" for="search">Busqueda </label>
-    <input
-      *ngIf="config?.filtrar?.local"
-      id="search-{{ config.id_tabla }}"
-      class="search-input form-control min"
-      [filterTarget]="config.filterTargets"
-      [DataFilter]="copyData"
-      (onFilter)="dataLocalFilter($event)"
-      (keyup)="filter($event)"
-    />
+    <input *ngIf="config?.filtrar?.local" id="search-{{ config.id_tabla }}" class="search-input form-control min" [filterTarget]="config.filterTargets" [DataFilter]="copyData" (onFilter)="dataLocalFilter($event)" (keyup)="filter($event)" />
     <input *ngIf="!config?.filtrar?.local" id="search-{{ config.id_tabla }}" class="search-input form-control min" (keyup)="filter($event)" />
   </div>
   <!-- TABLA -->
@@ -35,13 +27,12 @@
               <tr
                 *ngFor="let dato of data; let index_body = index"
                 class="text-center"
-                id="row-{{ index_body }}"
+                id="row-{{ getIndex(index_body) }}"
                 [ngClass]="{
                   greenTd: dato?.greenTd && config?.colores,
                   danger: !dato?.activo && config?.colores,
                   warning: dato?.panico > 0 && config?.colores,
                   'bg-selected': config?.colores && seleccionado == dato?.id,
-                  'd-none': dato?._destroy === '1',
                   'bg-light': config.focusRow && RowElement.id == IDROW,
                   'bg-more-light': dato?.subrayar
                 }"
@@ -52,15 +43,15 @@
               >
                 <td
                   *ngFor="let column of config.info; let index_column = index"
-                  class="tableTD {{ config.table_size }} b-sizing {{ column.tipo === 'index' ? 'index' : '' }}"
-                  id="td-{{ config.id_tabla }}-{{ column.key }}-{{ index_body }}"
-                  [ngStyle]="getStyle(column.key, index_body)"
+                  class="tableTD {{ config.table_size }} b-sizing {{ column.tipo == 'index' ? 'index' : '' }}"
+                  id="td-{{ config.id_tabla }}-{{ column.key }}-{{ getIndex(index_body) }}"
+                  [ngStyle]="getStyle(column.key, getIndex(index_body))"
                 >
                   <span class="titulo_sm"> {{ column?.titulo_sm }} </span>
 
-                  <span *ngIf="dato._destroy !== '1'" [ngSwitch]="column.tipo">
+                  <span [ngSwitch]="column.tipo">
                     <span *ngSwitchCase="'index'" class="d-flex justify-content-center align-items-center">
-                      <span class="text-bold-700">{{ (tServ.getPaginationById(config.id_tabla).page - 1) * tServ.getPaginationById(config.id_tabla).limit + (index_body + 1) }}</span>
+                      <span class="text-bold-700">{{ (tServ.getPaginationById(config.id_tabla).page - 1) * tServ.getPaginationById(config.id_tabla).limit + (getIndex(index_body) + 1) }}</span>
                     </span>
 
                     <span *ngSwitchCase="'img'" class="d-flex justify-content-center align-items-center">
@@ -69,19 +60,11 @@
 
                     <span *ngSwitchCase="'icon'" class="d-flex justify-content-center align-items-center w-100">
                       <ng-container *ngFor="let objIcon of column.iconsArray">
-                        <span
-                          *ngIf="showIcon(objIcon, dato)"
-                          class="span_icon"
-                          [ngClass]="{ icon_disable: disabledInput(dato, objIcon) }"
-                          pTooltip="{{ dato[objIcon.rowTooltip] || null }}"
-                          tooltipPosition="top"
-                        >
+                        <span *ngIf="showIcon(objIcon, dato)" class="span_icon" [ngClass]="{ icon_disable: disabledInput(dato, objIcon) }" pTooltip="{{ dato[objIcon.rowTooltip] || null }}" tooltipPosition="top">
                           <i
-                            id="{{ config.id_tabla }}-{{ objIcon.key }}-{{ index_body }}"
-                            (click)="iconBtn(column.key, index_body, dato, $event, objIcon)"
-                            class=" iconPress {{ dato[objIcon.key] }} {{ dato.iconHover ? 'c-pointer' : '' }} {{
-                              objIcon.color ? (dato[objIcon.text_color] ? 'text-' + dato[objIcon.text_color] : 'text-black') : 'letras'
-                            }}"
+                            id="{{ config.id_tabla }}-{{ objIcon.key }}-{{ getIndex(index_body) }}"
+                            (click)="iconBtn(column.key, getIndex(index_body), dato, $event, objIcon)"
+                            class=" iconPress {{ dato[objIcon.key] }} {{ dato.iconHover ? 'c-pointer' : '' }} {{ objIcon.color ? (dato[objIcon.text_color] ? 'text-' + dato[objIcon.text_color] : 'text-black') : 'letras' }}"
                             (mouseenter)="mouseMoveEvent('hover', dato, objIcon.key, $event.target.id)"
                             (mouseleave)="mouseMoveEvent('leave', dato, objIcon.key, $event.target.id)"
                           ></i>
@@ -89,7 +72,7 @@
                       </ng-container>
                     </span>
 
-                    <div *ngSwitchCase="'tag'" (click)="checkHasClickFuntion(column, dato, index_body, $event)" class="d-flex justify-content-center align-items-center">
+                    <div *ngSwitchCase="'tag'" (click)="checkHasClickFuntion(column, dato, getIndex(index_body), $event)" class="d-flex justify-content-center align-items-center">
                       <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: dato, column: column }"></ng-container>
                     </div>
 
@@ -98,12 +81,12 @@
                     </span>
 
                     <span *ngSwitchCase="'switch'" class="d-flex justify-content-center align-items-center">
-                      <span *ngIf="column.remplace && seleccionado != dato?.id" class="w-100" [ngStyle]="getStyle(column.key, index_body)">
+                      <span *ngIf="column.remplace && seleccionado != dato?.id" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
                         <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: dato, column: column }"></ng-container>
                       </span>
 
                       <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace" class="table_switch">
-                        <p-inputSwitch (onChange)="changeValorCheck(dato, column.key, index_body)" styleClass="size-sm" [ngModel]="getValueForm(column, dato)"></p-inputSwitch>
+                        <p-inputSwitch (onChange)="changeValorCheck(dato, column.key, getIndex(index_body))" styleClass="size-sm" [ngModel]="getValueForm(column, dato)"></p-inputSwitch>
                       </div>
                     </span>
 
@@ -127,27 +110,27 @@
                     </span>
 
                     <span *ngSwitchCase="'input'" class="d-flex justify-content-center align-items-center">
-                      <span *ngIf="column.remplace && seleccionado != dato?.id" class="w-100" [ngStyle]="getStyle(column.key, index_body)">
+                      <span *ngIf="column.remplace && seleccionado != dato?.id" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
                         <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: dato, column: column }"></ng-container>
                       </span>
                       <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace" class="table_input">
                         <input
                           #inputTable
                           class="form-control m-0 inputTabla"
-                          id="inputNu-{{ index_body }}"
+                          id="inputNu-{{ getIndex(index_body) }}"
                           [min]="dato.min_ ? dato.min_ : 0"
                           [max]="dato.max_ ? dato.max_ : null"
                           type="{{ column.inputType ? column.inputType : 'text' }}"
                           [value]="getValueForm(column, dato)"
-                          [disabled]="disabledInput(column.disable, index_body)"
-                          (keyup)="changeValorInput(column.key, index_body, $event.target.value, dato)"
-                          (change)="changeValorInput(column.key, index_body, $event.target.value, dato)"
+                          [disabled]="disabledInput(column.disable, getIndex(index_body))"
+                          (keyup)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
+                          (change)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
                         />
                         <i pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, dato)"></i>
                       </div>
                     </span>
 
-                    <span *ngSwitchDefault id="{{ column.key }}-{{ index_body }}" style="width: 100%" pTooltip="{{ dato[column.rowTooltip] || null }}" tooltipPosition="top">
+                    <span *ngSwitchDefault id="{{ column.key }}-{{ getIndex(index_body) }}" style="width: 100%" pTooltip="{{ dato[column.rowTooltip] || null }}" tooltipPosition="top">
                       {{ getValueForm(column, dato) }}
                       {{ column.alerta ? (config?.colores ? (dato.activo ? '' : '(Inactivo)') : '') : '' }}
                       {{ dato.panico == 3 && config?.colores ? '(PANICO General)' : dato.panico == 2 && config?.colores ? '(PANICO Pagos)' : dato.panico == 1 && config?.colores ? '(PANICO Ventas)' : '' }}
@@ -155,17 +138,16 @@
                   </span>
                 </td>
 
-                <td [ngClass]="{ 'd-none': fun.isEmpty(botones) }" *ngIf="dato._destroy !== '1' && fun.hasValue(botones)" class="btnAccion tableTD" (click)="clickROW(dato, 'Td')">
+                <td [ngClass]="{ 'd-none': fun.isEmpty(botones) }" *ngIf="fun.hasValue(botones)" class="btnAccion tableTD" (click)="clickROW(dato, 'Td')">
                   <span class="titulo_sm"> Acciones </span>
                   <app-btnacciones
-                    [index_body]="index_body"
+                    [index_body]="getIndex(index_body)"
                     [id_tabla]="config.id_tabla"
                     [dato]="dato"
                     [data]="data"
                     [botones]="botones"
                     (functionsBtnDinamic)="functionsBtnDinamic($event)"
-                    (deleteBTN)="delete($event)"
-                    (DevolverInfoBTN)="handle_table_events('click_action', $event)"
+                    (clickBoton)="handle_table_events('click_action', $event)"
                   ></app-btnacciones>
                 </td>
               </tr>
