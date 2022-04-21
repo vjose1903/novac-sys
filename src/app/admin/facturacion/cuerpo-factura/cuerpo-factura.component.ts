@@ -174,13 +174,32 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     await this.ajustarSecuencia();
   }
 
+  checkDisable(input, index, verificate) {
+    let isDisable = false;
+
+    if (verificate) {
+      if (fun.isEmpty(this.propietario)) isDisable = true;
+      if (!isDisable && input == 'desc-') isDisable = this.readDescuento();
+      if (!isDisable && input == 'pre-') isDisable = this.readPrecio();
+    } else {
+      isDisable = true;
+    }
+
+    fun.ModificarClass(`${input}${index}`, 'disabled', isDisable ? 'add' : 'remove');
+
+    if (isDisable) {
+      this.desEnfocarInput(`${input}${index}`);
+      document.getElementById(`${input}${index}`)['value'] = null;
+    }
+  }
+
   readPrecio() {
-    const res = this.metodo === 'compra' && this.propietario ? false : true;
+    const res = this.metodo == 'compra' && this.propietario ? false : true;
     return res;
   }
 
   readDescuento() {
-    const res = this.metodo === 'venta' && this.propietario ? false : true;
+    const res = this.metodo == 'venta' && this.propietario ? false : true;
     return res;
   }
 
@@ -352,35 +371,37 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
 
   async saltar(input, index) {
     setTimeout(() => {
-      const { articulo, cod, can, uni } = this.filasDetalle[index].getRawValue();
+      if (fun.hasValue(this.propietario)) {
+        const { articulo, cod, can, uni } = this.filasDetalle[index].getRawValue();
 
-      if (index >= 10 && input === 'cod-') this.addItem(index);
+        if (index >= 10 && input === 'cod-') this.addItem(index);
 
-      if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.enfocarInput('uni-' + index);
+        if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.enfocarInput('uni-' + index);
 
-      if ((input === 'cod-' || input === 'pre-') && fun.hasValue(cod) && fun.hasValue(can) && can != 0 && fun.hasValue(uni)) {
-        if (input === 'cod-') index++;
+        if ((input === 'cod-' || input === 'pre-') && fun.hasValue(cod) && fun.hasValue(can) && can != 0 && fun.hasValue(uni)) {
+          if (input === 'cod-') index++;
 
-        this.ajustarSecuencia().then((res) => this.enfocarInput(input == 'cod-' ? this.inputSecuencia : `${input}${index}`));
-      }
+          this.ajustarSecuencia().then((res) => this.enfocarInput(input == 'cod-' ? this.inputSecuencia : `${input}${index}`));
+        }
 
-      if (input === 'can-' && fun.hasValue(cod)) {
-        if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
-          const obj = { palabra_a_buscar: cod, index, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
-          this.handleModalForm({
-            component: BuscarArticuloComponent,
-            inputs: obj,
-            id: 'buscarArticulo',
-            header: 'BUSCAR ARTICULO',
-            width: '56.25rem',
-            height: '31.25rem',
-            botones: {
-              aceptar: { show: false, disable: false },
-              cancelar: { show: false, disable: false },
-            },
-          });
-        } else {
-          this.enfocarInput(`can-${index}`);
+        if (input === 'can-' && fun.hasValue(cod)) {
+          if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
+            const obj = { palabra_a_buscar: cod, index, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
+            this.handleModalForm({
+              component: BuscarArticuloComponent,
+              inputs: obj,
+              id: 'buscarArticulo',
+              header: 'BUSCAR ARTICULO',
+              width: '56.25rem',
+              height: '31.25rem',
+              botones: {
+                aceptar: { show: false, disable: false },
+                cancelar: { show: false, disable: false },
+              },
+            });
+          } else {
+            this.enfocarInput(`can-${index}`);
+          }
         }
       }
     }, 0);

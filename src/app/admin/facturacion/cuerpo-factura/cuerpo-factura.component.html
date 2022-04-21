@@ -32,12 +32,12 @@
 <div class="cuadro" #cuadro class="scrollContainer">
   <!-- <div class="cuadro" #cuadro [ngClass]="{ sinFlow: secuencia <= 12, conFlow: secuencia >= 13 }"> -->
   <form [formGroup]="form" action="">
-    <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWFACTURAS?.controls; let i = index">
-      <div [formGroupName]="i">
+    <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWFACTURAS?.controls; let index_cuerpo = index">
+      <div [formGroupName]="index_cuerpo">
         <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
           <ng-template pTemplate>
             <ul class="dropRowConfig" role="menu">
-              <li role="menuitem" (click)="modalRemover(i, $event)" class="hoverlable">
+              <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable">
                 <a class="" id="dropdown-item">
                   <i class="far fa-trash-alt text-red btnBorrar"></i>
                   Quitar Producto
@@ -51,13 +51,13 @@
           <tbody>
             <tr>
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
-              <td *ngIf="propietario" class="sombreado2" (mouseover)="selectedRow(i, true)" (mouseleave)="selectedRow(i, false)">
+              <td *ngIf="propietario" class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
                 <div class="btn-group">
-                  <div *ngIf="checkIfRowContainArticulo(i)" style="padding: 3px" (click)="dropRowConfig.toggle($event)">
+                  <div *ngIf="checkIfRowContainArticulo(index_cuerpo)" style="padding: 3px" (click)="dropRowConfig.toggle($event)">
                     <i class="fas fa-ellipsis-v btnConfig"></i>
                   </div>
 
-                  <div *ngIf="!checkIfRowContainArticulo(i)" style="padding: 3px">
+                  <div *ngIf="!checkIfRowContainArticulo(index_cuerpo)" style="padding: 3px">
                     <i class="fas fa-ellipsis-v btnConfigDis"></i>
                   </div>
                 </div>
@@ -70,11 +70,11 @@
                     [ngClass]="{ disabled: !propietario }"
                     type="text"
                     class="form-control entrada"
-                    id="cod-{{ i }}"
+                    id="cod-{{ index_cuerpo }}"
                     [maxlength]="minCodigo"
-                    (focus)="verificarSecuencia(i)"
-                    (keyup)="checkCodigo(i)"
-                    (keyup.enter)="saltar('can-', i)"
+                    (focus)="verificarSecuencia(index_cuerpo); checkDisable('cod-', index_cuerpo, true)"
+                    (keyup)="checkCodigo(index_cuerpo); checkDisable('cod-', index_cuerpo, true)"
+                    (keyup.enter)="saltar('can-', index_cuerpo)"
                     formControlName="cod"
                     tabindex="-1"
                   />
@@ -89,11 +89,12 @@
                     type="number"
                     min="1"
                     class="form-control entrada input_cantidad"
-                    id="can-{{ i }}"
-                    (keyup.enter)="saltar('uni-', i)"
+                    id="can-{{ index_cuerpo }}"
+                    (keyup)="checkDisable('can-', index_cuerpo, true)"
+                    (keyup.enter)="saltar('uni-', index_cuerpo)"
                     formControlName="can"
-                    (focus)="verificarSecuencia(i)"
-                    (blur)="calcularTotalRow(i); saliDeCantidad(i)"
+                    (focus)="verificarSecuencia(index_cuerpo); checkDisable('can-', index_cuerpo, true)"
+                    (blur)="calcularTotalRow(index_cuerpo); saliDeCantidad(index_cuerpo)"
                     tabindex="-1"
                   />
                 </div>
@@ -104,29 +105,30 @@
                 <div class="form-group m-0">
                   <input
                     [ngClass]="{ disabled: !propietario }"
-                    *ngIf="inputDrop !== 'uni-' + i"
+                    *ngIf="inputDrop !== 'uni-' + index_cuerpo"
                     type="text"
                     class="form-control entrada"
-                    id="uni-{{ i }}"
-                    (mouseenter)="setInputDrop(i); llenarArrayUnidades(i); verificarSecuencia(i, false)"
-                    (focus)="setInputDrop(i); llenarArrayUnidades(i); verificarSecuencia(i)"
-                    (keyup.enter)="saltar(metodo === 'venta' ? 'cod-' : 'pre-', i)"
-                    (blur)="calcularTotalRow(i)"
+                    id="uni-{{ index_cuerpo }}"
+                    (mouseenter)="setInputDrop(index_cuerpo); llenarArrayUnidades(index_cuerpo); verificarSecuencia(index_cuerpo, false)"
+                    (focus)="setInputDrop(index_cuerpo); llenarArrayUnidades(index_cuerpo); verificarSecuencia(index_cuerpo); checkDisable('uni-', index_cuerpo, true)"
+                    (keyup.enter)="saltar(metodo === 'venta' ? 'cod-' : 'pre-', index_cuerpo)"
+                    (keyup)="checkDisable('uni-', index_cuerpo, true)"
+                    (blur)="calcularTotalRow(index_cuerpo)"
                     formControlName="uni"
                     tabindex="-1"
                   />
 
-                  <div *ngIf="inputDrop === 'uni-' + i">
+                  <div *ngIf="inputDrop === 'uni-' + index_cuerpo">
                     <select
                       value="Medida"
                       formControlName="uni"
-                      (change)="selectMedidaChange($event.target.value, i)"
+                      (change)="selectMedidaChange($event.target.value, index_cuerpo)"
                       class="form-control entrada"
                       style="border-radius: 0"
-                      id="uni-{{ i }}"
-                      (keyup.enter)="saltar(metodo === 'venta' ? 'cod-' : 'pre-', i)"
-                      (mouseleave)="setInputDrop(undefined); calcularTotalRow(i)"
-                      (blur)="setInputDrop(undefined); calcularTotalRow(i)"
+                      id="uni-{{ index_cuerpo }}"
+                      (keyup.enter)="saltar(metodo === 'venta' ? 'cod-' : 'pre-', index_cuerpo)"
+                      (mouseleave)="setInputDrop(undefined); calcularTotalRow(index_cuerpo)"
+                      (blur)="setInputDrop(undefined); calcularTotalRow(index_cuerpo)"
                       tabindex="-1"
                     >
                       <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
@@ -138,7 +140,15 @@
               <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
               <td class="DES td0padding">
                 <div class="form-group m-0">
-                  <input type="text" class="form-control entrada inDES disabled" id="des-{{ i }}" formControlName="des" tabindex="-1" />
+                  <input
+                    type="text"
+                    class="form-control entrada inDES disabled"
+                    id="des-{{ index_cuerpo }}"
+                    formControlName="des"
+                    tabindex="-1"
+                    (focus)="checkDisable('des-', index_cuerpo, false)"
+                    (keyup)="checkDisable('des-', index_cuerpo, false)"
+                  />
                 </div>
               </td>
 
@@ -149,12 +159,13 @@
                   <input
                     type="number"
                     class="form-control entrada campoNumeros input_cantidad"
-                    id="desc-{{ i }}"
-                    (focus)="verificarSecuencia(i)"
-                    (keyup.enter)="enfocarInput('cod-' + (i + 1))"
+                    id="desc-{{ index_cuerpo }}"
+                    (focus)="verificarSecuencia(index_cuerpo); checkDisable('desc-', index_cuerpo, true)"
+                    (keyup)="checkDisable('desc-', index_cuerpo, true)"
+                    (keyup.enter)="enfocarInput('cod-' + (index_cuerpo + 1))"
                     formControlName="descuento_porciento"
-                    (blur)="calcularDescuento(i)"
-                    (emptied)="calcularDescuento(i)"
+                    (blur)="calcularDescuento(index_cuerpo)"
+                    (emptied)="calcularDescuento(index_cuerpo)"
                     [ngClass]="{ disabled: readDescuento() }"
                     tabindex="-1"
                   />
@@ -165,11 +176,12 @@
                 <div class="form-group m-0">
                   <input
                     type="text"
-                    (blur)="calcularTotalRow(i); revisarPrecio(i)"
-                    (focus)="$event.target.select()"
+                    (blur)="calcularTotalRow(index_cuerpo); revisarPrecio(index_cuerpo)"
+                    (focus)="$event.target.select(); checkDisable('pre-', index_cuerpo, true)"
                     class="form-control entrada campoNumeros {{ metodo === 'venta' ? 'inPRE' : '' }}"
-                    (keyup.enter)="calcularTotalRow(i); enfocarInput('cod-' + (i + 1))"
-                    id="pre-{{ i }}"
+                    (keyup)="checkDisable('pre-', index_cuerpo, true)"
+                    (keyup.enter)="calcularTotalRow(index_cuerpo); enfocarInput('cod-' + (index_cuerpo + 1))"
+                    id="pre-{{ index_cuerpo }}"
                     formControlName="pre"
                     [ngClass]="{ disabled: readPrecio() }"
                     tabindex="-1"
@@ -180,8 +192,16 @@
               <!--  ::::::::::::  TOTAL  ::::::::::::  -->
               <td class="TOT td0padding">
                 <div class="form-group m-0">
-                  <input type="text" class="form-control entrada inTOT campoNumeros disabled" id="tot-{{ i }}" formControlName="tot" tabindex="-1" />
-                  <input type="hidden" [value]="i" formControlName="secuencia" tabindex="-1" />
+                  <input
+                    type="text"
+                    class="form-control entrada inTOT campoNumeros disabled"
+                    id="tot-{{ index_cuerpo }}"
+                    formControlName="tot"
+                    tabindex="-1"
+                    (focus)="checkDisable('tot-', index_cuerpo, false)"
+                    (keyup)="checkDisable('tot-', index_cuerpo, false)"
+                  />
+                  <input type="hidden" [value]="index_cuerpo" formControlName="secuencia" tabindex="-1" />
                 </div>
               </td>
             </tr>
