@@ -6,6 +6,7 @@ export interface ConfigI {
   logo_empresa:              string;
   logo_impresion:            string;
   color_app:                 string;
+  gitUser:                   string;
   url_servidor:              string;
   url_servidor_respaldo:     string;
   url_servidor_descargas:    string;
