@@ -10,7 +10,7 @@ import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../../electron/shared-electron-angular';
 import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../../../core/services/functions.service';
-
+import { Permisos } from '../../../../core/typescript/permisos';
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
@@ -56,6 +56,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   lista_recibos;
   rowSelected: any;
   reciboClass = new ReciboC();
+  permissions = Permisos;
 
   constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
     super();

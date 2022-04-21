@@ -10,9 +10,10 @@ import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
 import { TablasModule } from '../components/tablas/tablas.module';
 import { PrimengModule } from '../../modules/primeng.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [IngresosComponent, ListaRecibosComponent, ReciboViajesComponent],
-  imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule],
+  imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule, NgxPermissionsModule.forChild()],
 })
 export class RecibosModule {}

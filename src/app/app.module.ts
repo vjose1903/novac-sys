@@ -42,5 +42,6 @@ defineLocale('es', esLocale);
   ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }],
   bootstrap: [AppComponent],
+  exports: [NgxPermissionsModule],
 })
 export class AppModule {}

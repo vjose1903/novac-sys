@@ -2,7 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { NgxPermissionsGuard } from 'ngx-permissions';
 import { RegistroEmpleadosComponent } from './registro-empleados.component';
-const permisos = ['user_create', 'user_read_all', 'user_read_one', 'user_update', 'user_destroy', 'user_get_filtrados'];
+import { Permisos } from '../../../core/typescript/permisos';
+
+
 const routes: Routes = [
   {
     path: '',
@@ -10,7 +12,7 @@ const routes: Routes = [
     canActivate: [NgxPermissionsGuard],
     data: {
       permissions: {
-        only: permisos,
+        only: Object.values(Permisos.user),
       },
     },
   },

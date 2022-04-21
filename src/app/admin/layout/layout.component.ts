@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, AfterViewInit, ElementRef } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -16,6 +16,7 @@ import { SingletonService } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { fun } from '../../core/services/functions.service';
 import { NgxPermissionsService } from 'ngx-permissions';
+
 
 @Component({
   selector: 'app-layout',
@@ -52,6 +53,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
   chequiando_cuadre: boolean;
+
+  // menuItemsWithSubMenu = [
+  //   {
+  //     nombre: 'registro',
+  //     has_items: true,
+  //     permisos: [Object.values(Permisos.user), Object.values(Permisos.cliente), Object.values(Permisos.suplidor), Object.values(Permisos.articulo), Object.values(Permisos.vehiculo), Object.values(Permisos.role), Object.values(Permisos.nota)],
+  //   },
+  // ];
 
   constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService, private permissionsService: NgxPermissionsService) {
     super();
@@ -94,7 +103,9 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
           else this.imgUser = 'assets/img/userM.png';
 
           const permisos = res.data.permisos.map((perm) => perm.permiso);
+
           this.permissionsService.loadPermissions(permisos);
+
           this.lRun = true;
         })
         .catch((err) => {
@@ -158,11 +169,21 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ngAfterViewInit() {
     this.ready = true;
+    this.parseMenu();
     this.cdRef.detectChanges();
   }
 
   ngAfterContentChecked() {
     this.cdRef.detectChanges();
+  }
+
+  parseMenu() {
+    for (const keyFather in this.allPermissionsObj) {
+      for (const keyChild in this.allPermissionsObj[keyFather]) {
+        const subMenuProp = this.allPermissionsObj[keyFather][keyChild];
+        this.allPermissionsObj[keyFather].flatt = _.union(this.allPermissionsObj[keyFather].flatt, subMenuProp);
+      }
+    }
   }
 
   // =================================================================================
@@ -239,5 +260,9 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     } else {
       this.checkRouteActiva();
     }
+  }
+
+  viendo(data: HTMLDivElement) {
+    return data?.childElementCount || 0;
   }
 }

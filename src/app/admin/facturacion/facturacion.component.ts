@@ -22,6 +22,7 @@ import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { fun } from '../../core/services/functions.service';
 import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
 import { teclasCode } from '../../core/typescript/constantes';
+import { Permisos } from '../../core/typescript/permisos';
 
 @Component({
   selector: 'app-facturacion',
@@ -128,6 +129,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   camion_row;
   filterCamionesTargets;
   copyCamiones;
+  permissions = Permisos;
 
   constructor(
     public mServ: ModalService,
