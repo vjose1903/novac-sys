@@ -16,6 +16,7 @@ import { BuscarClienteSuplidorComponent } from '../../components/formularios en 
 import { NotaC } from '../notas-cred-deb/notas';
 import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 import { fun } from '../../../core/services/functions.service';
+import { Permisos } from '../../../core/typescript/permisos';
 
 enum campos {
   cliente = 1,
@@ -57,6 +58,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   showSide: boolean = false;
   TablasComponent;
   idsFacturasSeleccionadas = [];
+  permissions = Permisos;
 
   constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
     super();
@@ -202,10 +204,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         const limite = hasta - porciento;
         const restante = hasta - secuencia + 1;
 
-        const msg =
-          this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
-            ? `Ultimo comprobante para ${tipoFact.descripcion}.`
-            : `Los comprobantes para ${tipoFact.descripcion} se estan agotando, solo quedan ${restante}`;
+        const msg = this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete' ? `Ultimo comprobante para ${tipoFact.descripcion}.` : `Los comprobantes para ${tipoFact.descripcion} se estan agotando, solo quedan ${restante}`;
 
         if (secuencia >= limite) {
           fun.toastWarning(msg, 'AVISO');

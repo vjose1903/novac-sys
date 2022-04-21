@@ -22,10 +22,10 @@
               [ngClass]="{ disabled: existenComprobantes }"
             >
               <option [value]="null" selected disabled>Escoger tipo</option>
-              <option value="1">Por cliente</option>
-              <option value="2">Por numero comprobante</option>
-              <option value="3">Por numero factura</option>
-              <option value="4">Ultimas 50 facturas</option>
+              <option *ngxPermissionsOnly="" value="1">Por cliente</option>
+              <option *ngxPermissionsOnly="" value="2">Por numero comprobante</option>
+              <option *ngxPermissionsOnly="" value="3">Por numero factura</option>
+              <option *ngxPermissionsOnly="" value="4">Ultimas 50 facturas</option>
             </select>
           </div>
           <div class="d-flex">

@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { NgxPermissionsGuard } from 'ngx-permissions';
+import { Permisos } from '../../core/typescript/permisos';
 import { ConduceComponent } from '../conduce/conduce.component';
 import { FacturacionComponent } from '../facturacion/facturacion.component';
 import { HomeAdminComponent } from '../home/homeAdmin.component';
@@ -57,6 +59,12 @@ const routes: Routes = [
       {
         path: 'reportes',
         component: ReportesComponent,
+        canActivate: [NgxPermissionsGuard],
+        data: {
+          permissions: {
+            only: Object.values(Permisos.reporte),
+          },
+        },
       },
     ],
   },
