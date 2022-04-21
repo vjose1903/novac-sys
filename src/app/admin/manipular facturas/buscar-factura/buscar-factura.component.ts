@@ -110,7 +110,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
   ngOnInit() {
-    this._init_mixin({ component: 'buscar_factura', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto', 'pressEsc', 'noFiltro'] });
+    this._init_mixin({ component: 'buscar_factura', is_routing: true });
     this.buscarPara = this.route.snapshot.params['para'];
 
     if (this.buscarPara === 'nota_credito') {
@@ -202,10 +202,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         const limite = hasta - porciento;
         const restante = hasta - secuencia + 1;
 
-        const msg =
-          this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete'
-            ? `Ultimo comprobante para ${tipoFact.descripcion}.`
-            : `Los comprobantes para ${tipoFact.descripcion} se estan agotando, solo quedan ${restante}`;
+        const msg = this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete' ? `Ultimo comprobante para ${tipoFact.descripcion}.` : `Los comprobantes para ${tipoFact.descripcion} se estan agotando, solo quedan ${restante}`;
 
         if (secuencia >= limite) {
           fun.toastWarning(msg, 'AVISO');

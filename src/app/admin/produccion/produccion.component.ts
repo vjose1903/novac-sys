@@ -49,7 +49,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'produccion', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'produccion', is_routing: true });
 
     this.getProductosTerminados();
   }

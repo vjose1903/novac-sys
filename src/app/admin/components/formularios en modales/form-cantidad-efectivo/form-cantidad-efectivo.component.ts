@@ -16,7 +16,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   @Input() debe_cubrir = true;
 
   element: any;
-  devuelta;
+  devuelta = '0.00';
   efectivo: string;
   formaPago = 'Efectivo';
   @Output() getDevuelta = new EventEmitter<any>();
@@ -35,16 +35,14 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     this.efectivo = this.formatoNumero(this.data.devuelta);
     this.factura_de = this.data.factura_de;
 
-    if (!this.data.cambios_articulos) {
-      this.cambiar_articulos = 'no';
-    }
+    if (!this.data.cambios_articulos) this.cambiar_articulos = 'no';
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      if (this.factura_de !== 'compra' && this.tipo === 'devuelta') {
-        this.enfocarInput('inputEfectivo');
-      }
+      if (this.factura_de != 'compra' && this.tipo == 'devuelta') this.enfocarInput('inputEfectivo');
+
+      if (this.factura_de == 'compra' && !this.data.cambios_articulos) this.disableBtnConfirm(false);
     }, 250);
   }
 
@@ -63,110 +61,44 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   formatoNumero(num) {
-    return fun.formatearNumero(fun.redondearAdos(num));
+    return fun.numFormatTwoDecimals(num);
   }
 
-  checkNumbers(arg) {
-    let res = false;
-    for (let i = 0; i < arg.length; i++) {
-      const tempCaracter = arg.charAt(i);
-      if (tempCaracter !== ',') {
-        const caracter = _.parseInt(tempCaracter);
-        if (_.isNaN(caracter)) {
-          res = true;
-        }
-      }
-    }
-    return res;
-  }
-  checkLongMillares(num) {
-    let res = false;
-    const splitNum = _.split(num, ',');
-    splitNum.forEach((element, i) => {
-      if (i !== 0) {
-        if (element.length !== 3) {
-          res = true;
-        }
-      }
+  revisarPrecio(input) {
+    fun.revisarPrecio(input, `inputEfectivo`).then((res) => {
+      if (!res.error) input.value = res.number;
     });
-    return res;
   }
 
-  revisarPrecio(valor, input) {
-    const precioTEMPO = valor;
-
-    if (precioTEMPO !== null && precioTEMPO !== undefined && precioTEMPO !== '' && precioTEMPO !== ' ') {
-      const splitPrecio = _.split(precioTEMPO, '.');
-
-      let precioTEMP;
-
-      let enteros = splitPrecio[0];
-      let tempdecimales = splitPrecio[1];
-      if (tempdecimales === undefined) {
-        tempdecimales = '00';
-      }
-      //
-      if (splitPrecio.length > 2 || this.checkNumbers(enteros) || this.checkLongMillares(enteros) || this.checkNumbers(tempdecimales) || this.checkLongMillares(tempdecimales)) {
-        fun.toastError('Valor introducido es invalido', 'ERROR');
-        this.enfocarInput(input);
-      } else {
-        //
-        if (splitPrecio.length === 2) {
-          if (enteros === '' || enteros === ' ') {
-            enteros = '0';
-          }
-          let decimales;
-          if (tempdecimales.length > 2) {
-            decimales = tempdecimales.substring(0, 2);
-          } else {
-            decimales = _.padEnd(tempdecimales, 2, '0');
-          }
-          const temp = [enteros, decimales];
-          precioTEMP = _.join(temp, '.');
-        } else if (splitPrecio.length === 1) {
-          const decimales = '00';
-          const temp = [enteros, decimales];
-          precioTEMP = _.join(temp, '.');
-        }
-
-        const numeroFormateado = fun.formatearNumero(fun.redondearAdos(precioTEMP));
-
-        this.data.devuelta = numeroFormateado;
-        this.efectivo = numeroFormateado;
-      }
-    }
-  }
   calcularDevueta() {
     const total = this.data.total_factura;
     const efectivo = fun.desformatear(this.efectivo);
     const dev = efectivo - total;
-    this.devuelta = this.formatoNumero(dev);
+
+    this.devuelta = this.formatoNumero(isNaN(dev) ? '0.00' : dev);
   }
 
   cancelar() {
     this.cancel.emit();
   }
+
   btn_aceptar() {
-    // const total = this.data.total_factura;
     const devuelta_ = fun.desformatear(this.devuelta);
     const efectivo = fun.desformatear(this.efectivo);
-    const obj = {
-      dinero: efectivo,
-      devuelta: this.devuelta ? devuelta_ : 0,
-      forma_pago: this.formaPago,
-      decision_cambio: this.cambiar_articulos === 'si' ? true : false,
-    };
+    const obj = { dinero: efectivo, devuelta: this.devuelta ? devuelta_ : 0, forma_pago: this.formaPago, decision_cambio: this.cambiar_articulos === 'si' ? true : false };
+
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
-    if (this.validarForm()) {
-      fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
+
+    if (this.factura_de == 'compra') {
+      if (this.cambiar_articulos != undefined) {
+        modal.getDataModal({ obj, modal_id: this.modal.component_id });
+      } else {
+        fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
+      }
     } else {
-      if (this.factura_de === 'compra') {
-        if (this.cambiar_articulos !== undefined) {
-          modal.getDataModal({ obj, modal_id: this.modal.component_id });
-        } else {
-          fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
-        }
+      if (this.validarForm()) {
+        fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
       } else {
         modal.getDataModal({ obj, modal_id: this.modal.component_id });
       }
@@ -175,21 +107,24 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   cambiosEnArticulos(lugar) {
     this.cambiar_articulos = lugar;
+    this.disableBtnConfirm(false);
   }
 
   validarForm(from?): boolean {
     const total = this.data.total_factura;
-    const devuelta_ = fun.desformatear(this.devuelta);
     const efectivo = fun.desformatear(this.efectivo);
-    const validate = this.tipo !== 'no_devuelta' && total > efectivo;
 
-    if (from == 'input') {
-      const modal = _.find(this.modal.instance.modalsConfig, { id: this.modal.component_id });
-      const btn = _.find(modal.botones.dinamico, { btn_id: 'btnConfirmar' });
+    const isInvalid = isNaN(efectivo) ? true : this.tipo != 'no_devuelta' && total > efectivo;
 
-      btn.disable = validate;
-    }
+    if (from == 'input') this.disableBtnConfirm(isInvalid);
 
-    return validate;
+    return isInvalid;
+  }
+
+  disableBtnConfirm(validate) {
+    const modal = _.find(this.modal.instance.modalsConfig, { id: this.modal.component_id });
+    const btn = _.find(modal.botones.dinamico, { btn_id: 'btnConfirmar' });
+
+    btn.disable = validate;
   }
 }

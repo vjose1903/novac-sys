@@ -59,7 +59,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'cuerpo_factura', is_routing: false, _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'] });
+    this._init_mixin({ component: 'cuerpo_factura', is_routing: false });
 
     this.rellenarVariables();
   }
@@ -517,9 +517,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     });
   }
 
-  revisarPrecio(i) {
-    let input = (this.filasDetalle[i] as any).controls['pre'];
-    fun.revisarPrecio(input, `pre-${i}`).then((res) => {
+  revisarPrecio(index) {
+    let input = (this.filasDetalle[index] as any).controls['pre'];
+    fun.revisarPrecio(input, `pre-${index}`).then((res) => {
       if (!res.error) input.setValue(res.number);
     });
   }
@@ -698,7 +698,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
         this.UnidadesArticulo.push({ value: articulo.medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[articulo.medida] });
       }
 
-      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco && this.metodo != 'compra') this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
 
       if (articulo.is_detallable || this.metodo == 'compra') {
         articulo.contenido_articulos.forEach((element) => {

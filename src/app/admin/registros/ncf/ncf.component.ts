@@ -83,7 +83,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.localeService.use('es');
-    this._init_mixin({ component: 'reg_ncf', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_ncf', is_routing: true});
     this.necesarioStart();
 
     this.setDateInputs(new Date());

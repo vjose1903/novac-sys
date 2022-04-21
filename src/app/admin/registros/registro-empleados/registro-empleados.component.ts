@@ -61,7 +61,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.localeService.use('es');
     this.boton = 'Registrar';
 
-    this._init_mixin({ component: 'reg_empleados', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_empleados', is_routing: true});
 
     this.necesarioStart();
   }

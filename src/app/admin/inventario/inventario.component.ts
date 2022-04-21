@@ -53,7 +53,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async ngOnInit() {
-    this._init_mixin({ component: 'inventario', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'inventario', is_routing: true });
     this.necesarioParaEmpezar();
 
     this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res));

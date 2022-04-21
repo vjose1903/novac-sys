@@ -20,3 +20,4 @@ import { NgSelectModule } from '@ng-select/ng-select';
   ],
 })
 export class RegistroVehiculoModule {}
+

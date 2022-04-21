@@ -61,7 +61,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'conduce', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'] });
+    this._init_mixin({ component: 'conduce', is_routing: true});
 
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),

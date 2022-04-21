@@ -88,7 +88,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'ingresos', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto', 'noFiltro'] });
+    this._init_mixin({ component: 'ingresos', is_routing: true});
 
     this.necesarioStart();
   }

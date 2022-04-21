@@ -80,7 +80,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ngOnInit() {
     this.initVariables();
-    this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'layout', is_routing: false});
 
     const token = fun.getAuthToken();
 
