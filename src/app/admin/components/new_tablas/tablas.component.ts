@@ -221,7 +221,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     const actualPage = this.getActualPageElement();
     const clikeado_por = actualPage.getAttribute('clikeado_por');
-    fun.logRed('clikeado_por ', clikeado_por);
 
     if (fun.isEmpty(clikeado_por) || clikeado_por != 'maquina') {
       if (actualPagination.is_local) {
@@ -262,42 +261,32 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   divPaginatorChangeWidth(event) {
-    // this.zone.run(() => this.setCantPagView(event.newWidth, 'width_paginator'));
+    this.setCantPagView(event.newWidth, 'width_paginator');
   }
 
   setCantPagView(width, tipo) {
-    let actual = 0;
+    let actual = 1;
 
-    console.log(' ');
-    console.log(' tipo ', tipo);
     if (tipo == 'width_page') {
-      console.log('width ', width);
-
-      if (width >= 545) actual = 5;
-      else if (width <= 545 && width > 486) actual = 4;
-      else if (width <= 486 && width > 442) actual = 3;
-      else if (width <= 442) actual = 2;
-      console.log(' actual ', actual);
-    } else if (tipo == 'width_paginator') {
-      // if (width >= 380) actual = 5;
-      // else if (width <= 379 && width > 346) actual = 4;
-      // else if (width <= 345 && width > 315) actual = 3;
-      // else if (width <= 314 && width > 281) actual = 2;
-      // else if (width <= 280) actual = 1;
+      const divPaginator = document.getElementById('divPaginator');
+      width = divPaginator.offsetWidth;
     }
 
-    const actualPage = this.getActualPageElement();
+    if (width >= 382) actual = 5;
+    else if (width <= 381 && width > 348) actual = 4;
+    else if (width <= 349 && width > 317) actual = 3;
+    else if (width <= 317 && width > 283) actual = 2;
+    else if (width <= 283) actual = 1;
 
-    fun.logBlue('actualPage ', actualPage);
+    const actualPage = this.getActualPageElement();
 
     this.zone.run(() => {
       setTimeout(() => {
         if (actualPage) actualPage.setAttribute('clikeado_por', 'maquina');
         actualPage.click();
         setTimeout(() => actualPage.removeAttribute('clikeado_por'), 2000);
-        fun.logOrange('actual ', actual);
         this.cantPagesView = actual;
-        fun.logGreen('this.cantPagesView ', this.cantPagesView);
+        this.cdRef.detectChanges();
       }, 100);
     });
   }
