@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
@@ -11,6 +10,7 @@ import { TablasService } from '../../components/tablas/tablas.service';
 import { EmpleadoC } from './empleado';
 import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
 import { fun } from '../../../core/services/functions.service';
+import { RolesC } from '../roles/roles';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -30,7 +30,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     { titulo: 'Nombre', tipo: 'text', key: 'nombreCompleto' },
     { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
     { titulo: 'Cedula', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Role', tipo: 'text', key: 'role_' },
+    { titulo: 'Role', tipo: 'textList', key: 'roles', key_value:'nombre' },
   ];
 
   botones = { titulo: true, borrar: true, editar: true };
@@ -44,6 +44,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   camposDisabled = true;
   empleadosClass = new EmpleadoC();
+  rolesClass = new RolesC();
+  listRoles: [];
 
   constructor(private fb: FormBuilder, private localeService: BsLocaleService, private tServ: TablasService) {
     super();
@@ -81,7 +83,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       fecha_nacimiento: [{ value: null, disabled: true }, Validators.required],
       password: [{ value: null, disabled: true }, Validators.compose([Validators.minLength(6), Validators.required])],
       confirm_password: [{ value: null, disabled: true }, Validators.required],
-      role: [{ value: null, disabled: true }, Validators.required],
+      ids_roles: [{ value: null, disabled: true }, Validators.required],
     });
   }
 
@@ -99,6 +101,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   async necesarioStart() {
     await this.createForm();
     await this.getEmpleados(this.tServ.obj_paginate.default);
+    await this.getRoles();
     this.enfocarInput('cedula');
   }
 
@@ -134,6 +137,17 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     }
   }
 
+  async getRoles() {
+    await this.rolesClass.getAll().then(
+      (res) => {
+        this.listRoles = res.data;
+      },
+      (error) => {
+        console.log('Error obteniendo roles: ', error);
+      },
+    );
+  }
+
   checkDocumento(tipo, e?) {
     if (e.key != 'Enter') {
       const cedula = this.form.controls[tipo].value;
@@ -158,6 +172,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
                 return;
               }
               const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
+              console.log('🚀 ~ RegistroEmpleadosComponent ~ .then ~ documento_original', documento_original);
+              console.log('🚀 ~ RegistroEmpleadosComponent ~ .then ~ this.documentos_de_identidad', this.documentos_de_identidad);
               this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
 
               // const documento = fun.hasValue(is_user) ? _.omit(is_user, ['persona', 'persona_is']) : _.omit(_.head(res['data']), ['persona', 'persona_is']);
@@ -217,7 +233,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   changeStateCampos(enable = false) {
-    ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'role'].forEach((campo) => {
+    ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
       if (!enable) this.form.controls[campo].reset();
 
@@ -262,14 +278,15 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   editarItem(item) {
+    this.form.reset();
     this.documentos_de_identidad = item.ARG.documentos_de_identidad;
 
     if (this.documentos_de_identidad.length) {
       const doc = item.ARG.documentos_de_identidad.filter((doc) => doc.principal === true);
       if (item.ARG.documentos_de_identidad.length > 0 && fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
     }
-
-    this.form.patchValue(item.ARG);
+    const objPerson = Object.assign({}, item.ARG, { ids_roles: (item.ARG.roles || []).map((rol) => rol.id) });
+    this.form.patchValue(objPerson);
 
     this.empleadoSelected = item.ARG;
     this.editando = true;
@@ -289,13 +306,13 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     documentos_identidad.map((element) => {
       // haciendo la estructura para mandar los documentos a la base de datos
       const doc_backend = _.find(this.documentos_de_identidad, (doc) => _.lowerCase(doc.descripcion) === _.lowerCase(element.descripcion));
-
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = true;
       return element;
     });
 
     formulario.documentos_de_identidad = documentos_identidad;
+    // formulario['ids_roles'] = formulario.roles;
     formulario.estado = true;
 
     const objSend = _.omit(formulario, ['cedula']);
@@ -315,14 +332,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   nuevoRegistro() {
     this.isCreando = true;
   }
+
   showModal() {
-    this.handleModalForm({
-      component: ChangePasswordComponent,
-      id: 'changePassword',
-      inputs: this.empleadoSelected,
-      header: 'Cambiar contraseña',
-      width: '30rem',
-    });
+    this.handleModalForm({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem' });
   }
 
   eliminarReg(regisData) {

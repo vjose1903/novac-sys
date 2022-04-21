@@ -133,7 +133,6 @@
                     <span *ngSwitchDefault id="{{ column.key }}-{{ getIndex(index_body) }}" style="width: 100%" pTooltip="{{ dato[column.rowTooltip] || null }}" tooltipPosition="top">
                       {{ getValueForm(column, dato) }}
                       {{ column.alerta ? (config?.colores ? (dato.activo ? '' : '(Inactivo)') : '') : '' }}
-                      {{ dato.panico == 3 && config?.colores ? '(PANICO General)' : dato.panico == 2 && config?.colores ? '(PANICO Pagos)' : dato.panico == 1 && config?.colores ? '(PANICO Ventas)' : '' }}
                     </span>
                   </span>
                 </td>

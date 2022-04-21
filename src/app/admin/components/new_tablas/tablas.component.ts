@@ -183,15 +183,20 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.tServ.deletePaginationById(this.config.id_tabla);
   }
 
-  getValueForm(col, rowData, ri?) {
-    switch (col.tipo) {
+  getValueForm(column, data) {
+    switch (column.tipo) {
+      case 'textList':
+        return _.reduce(_.get(data, column.key), (acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${_.get(item, column.key_value)}`, '');
+
       case 'formatoNumero':
-        return this.formatoNumero(_.get(rowData, col.key));
+        return this.formatoNumero(_.get(data, column.key));
+
       case 'date':
-        const fecha = fun.date_formater({ date: _.get(rowData, col.key), dateFormat: 'DD/MM/YYYY', con_hora: true });
+        const fecha = fun.date_formater({ date: _.get(data, column.key), dateFormat: 'DD/MM/YYYY', con_hora: true });
         return fecha;
+
       default:
-        return _.get(rowData, col.key);
+        return _.get(data, column.key);
     }
   }
 
@@ -220,9 +225,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
 
     const actualPage = this.getActualPageElement();
-    const clikeado_por = actualPage.getAttribute('clikeado_por');
+    const clickeado_por = actualPage.getAttribute('clickeado_por');
 
-    if (fun.isEmpty(clikeado_por) || clikeado_por != 'maquina') {
+    if (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina') {
       if (actualPagination.is_local) {
         this.localPagination(page, per_page, 'paginatorChange');
       } else {
@@ -272,23 +277,23 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       width = divPaginator.offsetWidth;
     }
 
-    if (width >= 382) actual = 5;
-    else if (width <= 381 && width > 348) actual = 4;
-    else if (width <= 349 && width > 317) actual = 3;
-    else if (width <= 317 && width > 283) actual = 2;
-    else if (width <= 283) actual = 1;
+    if (width > 385) actual = 5;
+    else if (width <= 385 && width > 350) actual = 4;
+    else if (width <= 350 && width > 320) actual = 3;
+    else if (width <= 320 && width > 285) actual = 2;
+    else if (width <= 285) actual = 1;
 
     const actualPage = this.getActualPageElement();
 
-    this.zone.run(() => {
-      setTimeout(() => {
-        if (actualPage) actualPage.setAttribute('clikeado_por', 'maquina');
+    setTimeout(() => {
+      this.zone.run(() => {
+        if (actualPage) actualPage.setAttribute('clickeado_por', 'maquina');
         actualPage.click();
-        setTimeout(() => actualPage.removeAttribute('clikeado_por'), 2000);
+        setTimeout(() => actualPage.removeAttribute('clickeado_por'), 2000);
         this.cantPagesView = actual;
         this.cdRef.detectChanges();
-      }, 100);
-    });
+      });
+    }, 100);
   }
 
   getColor(myColor) {
