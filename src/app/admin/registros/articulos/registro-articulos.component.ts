@@ -20,21 +20,15 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   //  TABLAS
   // =============================================
 
-  info = [
-    { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }] },
-    { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
-    { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
-    { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', formatoNumero: true, estilos: [{ width: '20%' }] },
-  ];
-
   table_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
+      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }] },
       { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
       { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', estilos: [{ width: '20%' }] },
     ],
-
+    colores: true,
+    padding: '0.5rem',
     id_tabla: 'articulos',
     padre_component: this,
     peticion_data: 'getArticulos',
@@ -154,9 +148,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       res.data.map(async (arti) => {
         arti.customStyles = {
           'td-codigo': { width: '11%' },
-          'td-nombre': { width: '39%', 'text-align': 'left', 'padding-left': '0.5rem' },
+          'td-nombre': { width: '37%', 'text-align': 'left', 'padding-left': '0.5rem' },
           'td-medida': { width: '13%' },
-          'td-precio_principal': { width: '18%' },
+          'td-precio_principal': { width: '20%' },
         };
       });
 
@@ -620,15 +614,14 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   tableClick_action(params) {
-    console.log('params ', params);
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.eliminarReg(params.data);
   }
 
-  async editarItem(item) {
-    const articulo = item.ARG;
-
+  async editarItem(articulo) {
     this.borrar();
     this.form.patchValue(articulo);
-    this.articuloSelected = item.ARG;
+    this.articuloSelected = articulo;
     this.boton = 'Editar';
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';

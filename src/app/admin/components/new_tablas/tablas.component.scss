@@ -86,7 +86,7 @@
               table-layout: fixed;
 
               &.bg-selected {
-                background: var(----transparente05) !important;
+                background: var(--transparente05) !important;
               }
 
               &.bg-light {
@@ -104,7 +104,7 @@
 
                 text-align: center;
                 border-top: 0px solid transparent !important;
-                border-bottom: 0.5px solid #c6c6c69e;
+                border-bottom: 0.5px solid #e5e5e59e;
                 vertical-align: middle !important;
 
                 padding: 0.4rem 0rem !important;
@@ -159,11 +159,11 @@
           > .Pietabla {
             ::ng-deep {
               .paginator-dinamic-table {
-                padding: 0.5rem 0rem 0rem 0rem;
+                border: 0px solid transparent !important;
                 background: transparent !important;
                 .p-paginator-element {
                   &:hover {
-                    background-color: #207483a2 !important;
+                    background-color: var(----transparente04) !important;
                   }
                 }
 
@@ -173,10 +173,10 @@
                     min-width: 2rem;
                     height: 2rem;
                     &.p-highlight {
-                      background-color: #20b9d5 !important;
+                      background-color: var(--primary07) !important;
                     }
                     &:hover {
-                      background-color: #207483a2 !important;
+                      background-color: var(--primary09) !important;
                     }
                   }
                 }
@@ -202,7 +202,7 @@
                   align-items: center;
                   &:hover,
                   &:focus {
-                    border-color: #20b9d5 !important;
+                    background-color: var(--primary07) !important;
                   }
                 }
               }
@@ -218,7 +218,6 @@
   height: 35px !important;
   width: 35px !important;
 }
-
 
 ::ng-deep {
   .btn-table-cellphone {

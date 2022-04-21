@@ -51,7 +51,7 @@
 
                   <span [ngSwitch]="column.tipo">
                     <span *ngSwitchCase="'index'" class="d-flex justify-content-center align-items-center">
-                      <span class="text-bold-700">{{ (tServ.getPaginationById(config.id_tabla).page - 1) * tServ.getPaginationById(config.id_tabla).limit + (getIndex(index_body) + 1) }}</span>
+                      <span class="text-bold-700">{{ (tServ.getPaginationById(config.id_tabla).page - 1) * tServ.getPaginationById(config.id_tabla).per_page + (getIndex(index_body) + 1) }}</span>
                     </span>
 
                     <span *ngSwitchCase="'img'" class="d-flex justify-content-center align-items-center">
@@ -158,19 +158,21 @@
         <tfoot class="tfoot w-100">
           <div *ngIf="config?.obj_paginate && config?.obj_paginate.show != false" id="paginationDiv-{{ config.id_tabla }}" class="Pietabla d-flex align-items-center justify-content-between w-100">
             <div>
-              <h6 class="d-none d-md-block m-0">Total de registros: {{ config.total_count }}</h6>
+              <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ config.total_count }}</h6>
             </div>
 
-            <p-paginator
-              id="paginator-{{ config.id_tabla }}"
-              [rows]="tServ.getPaginationById(config.id_tabla)?.limit"
-              [pageLinkSize]="cantPagesView"
-              [totalRecords]="config.total_count"
-              [rowsPerPageOptions]="tServ.getPaginationById(config.id_tabla)?.per_page_options"
-              styleClass="paginator-dinamic-table"
-              dropdownAppendTo="body"
-              (onPageChange)="paginatorChange($event, config.id_tabla)"
-            ></p-paginator>
+            <div class="w-100 d-flex justify-content-end align-items-center" (resized)="divPaginatorChangeWidth($event)">
+              <p-paginator
+                id="paginator-{{ config.id_tabla }}"
+                [rows]="tServ.getPaginationById(config.id_tabla)?.per_page"
+                [pageLinkSize]="cantPagesView"
+                [totalRecords]="config.total_count"
+                [rowsPerPageOptions]="tServ.getPaginationById(config.id_tabla)?.per_page_options"
+                styleClass="paginator-dinamic-table"
+                dropdownAppendTo="body"
+                (onPageChange)="paginatorChange($event, config.id_tabla)"
+              ></p-paginator>
+            </div>
           </div>
         </tfoot>
       </table>

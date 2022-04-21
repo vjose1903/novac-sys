@@ -1,3 +1,4 @@
+
 export class TablaClass {
   handle_table_events(event) {
     switch (event.type) {

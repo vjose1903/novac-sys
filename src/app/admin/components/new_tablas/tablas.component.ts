@@ -129,7 +129,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     this.subWidth = new fun().getWindowSize.subscribe((res) => {
       if (res) {
-        this.setCantPagView(res.innerWidth);
+        this.setCantPagView(res.innerWidth, 'width_page');
       }
     });
 
@@ -221,8 +221,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     const actualPage = this.getActualPageElement();
     const clikeado_por = actualPage.getAttribute('clikeado_por');
+    fun.logRed('clikeado_por ', clikeado_por);
 
-    if (fun.isEmpty(clikeado_por) || clikeado_por !== 'maquina') {
+    if (fun.isEmpty(clikeado_por) || clikeado_por != 'maquina') {
       if (actualPagination.is_local) {
         this.localPagination(page, per_page, 'paginatorChange');
       } else {
@@ -260,23 +261,45 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.tServ.modifyPaginationById(id, [{ page: pageMostar }]);
   }
 
-  setCantPagView(width) {
+  divPaginatorChangeWidth(event) {
+    // this.zone.run(() => this.setCantPagView(event.newWidth, 'width_paginator'));
+  }
+
+  setCantPagView(width, tipo) {
     let actual = 0;
 
-    if (width >= 528) actual = 5;
-    else if (width <= 527 && width > 486) actual = 4;
-    else if (width <= 486 && width > 442) actual = 3;
-    else if (width <= 442) actual = 2;
+    console.log(' ');
+    console.log(' tipo ', tipo);
+    if (tipo == 'width_page') {
+      console.log('width ', width);
+
+      if (width >= 545) actual = 5;
+      else if (width <= 545 && width > 486) actual = 4;
+      else if (width <= 486 && width > 442) actual = 3;
+      else if (width <= 442) actual = 2;
+      console.log(' actual ', actual);
+    } else if (tipo == 'width_paginator') {
+      // if (width >= 380) actual = 5;
+      // else if (width <= 379 && width > 346) actual = 4;
+      // else if (width <= 345 && width > 315) actual = 3;
+      // else if (width <= 314 && width > 281) actual = 2;
+      // else if (width <= 280) actual = 1;
+    }
 
     const actualPage = this.getActualPageElement();
 
-    if (actualPage) {
-      actualPage.setAttribute('clikeado_por', 'maquina');
-      actualPage.click();
-      setTimeout(() => actualPage.removeAttribute('clikeado_por'), 2000);
-    }
+    fun.logBlue('actualPage ', actualPage);
 
-    this.zone.run(() => (this.cantPagesView = actual));
+    this.zone.run(() => {
+      setTimeout(() => {
+        if (actualPage) actualPage.setAttribute('clikeado_por', 'maquina');
+        actualPage.click();
+        setTimeout(() => actualPage.removeAttribute('clikeado_por'), 2000);
+        fun.logOrange('actual ', actual);
+        this.cantPagesView = actual;
+        fun.logGreen('this.cantPagesView ', this.cantPagesView);
+      }, 100);
+    });
   }
 
   getColor(myColor) {
