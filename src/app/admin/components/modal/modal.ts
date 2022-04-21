@@ -70,6 +70,7 @@ export class modalClass extends LayoutClass {
             // _this.reiniciarVariables([VM._4, VM._5, VM._9, VM._7]);
             _this.reiniciarVariables([VM._4, VM._5, VM._7]);
           }
+
           break;
 
         case 'OBJDEVUELTO':

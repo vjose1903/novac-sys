@@ -57,7 +57,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'notas', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto'] });
+    this._init_mixin({ component: 'notas', is_routing: true});
     this.idsFacturas = JSON.parse(this.activeRoute.snapshot.params['ids']);
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 

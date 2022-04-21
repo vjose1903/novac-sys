@@ -51,7 +51,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_vehiculos', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_vehiculos', is_routing: true});
     this.createForm();
     this.FORM = this.form.controls;
 

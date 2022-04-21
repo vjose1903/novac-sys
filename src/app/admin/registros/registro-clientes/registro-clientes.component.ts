@@ -50,7 +50,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_cliente', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_cliente', is_routing: true});
     this.boton = 'Guardar';
 
     this.createForm();

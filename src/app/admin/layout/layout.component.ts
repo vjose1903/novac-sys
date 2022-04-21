@@ -90,7 +90,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ngOnInit() {
     this.initVariables();
-    this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'layout', is_routing: false});
 
     const token = fun.getAuthToken();
 
@@ -187,7 +187,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   // =================================================================================
-  // CERRAR SESION
+  // Refrescar el programa
   // =================================================================================
   refreshPage() {
     location.reload();
@@ -210,7 +210,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
 
   checkRouteActiva() {
-    this.actualPath = document.location.pathname;
+    const location = window.location.href;
+    const actualPath = location.slice(location.indexOf('/admin'), location.length);
+
+    this.actualPath = actualPath;
     const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
 
     if (pathSplit.length >= 3) {
@@ -238,6 +241,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   cambiarMenu(args: { url; navigate }) {
     let next_cambio_menu = '';
     // TODO: aqui agrega que si tiene permiso de ir a la ruta que quiere ir no haga nada
+
     if (args.navigate) {
       next_cambio_menu = `/admin/${args.url}`;
 

@@ -72,7 +72,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_articulo', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_articulo', is_routing: true});
     this.createForm();
     this.FORM = this.form.controls;
 

@@ -31,7 +31,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   titulo_moda_reporte;
 
   ngOnInit() {
-    this._init_mixin({ component: 'reportes', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto'] });
+    this._init_mixin({ component: 'reportes', is_routing: true});
   }
 
   iniciarCambioMenu(arg, callback) {
