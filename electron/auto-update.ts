@@ -26,10 +26,7 @@ export default class AppUpdater {
 
     autoUpdater.setFeedURL({ provider: 'generic', url: conf.url_servidor_descargas });
 
-    setTimeout(() => {
-      console.log('DIQUE BUSCANDO ACTUALIZACION EN: ', autoUpdater.getFeedURL());
-      autoUpdater.checkForUpdatesAndNotify();
-    }, 100);
+    setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 100);
   }
 
   handleUpdateEvents(win: BrowserWindow) {
@@ -39,7 +36,7 @@ export default class AppUpdater {
     setTimeout(() => this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...' } }), 10000);
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, () => {
-      this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...' } });
+      this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...', url: autoUpdater.getFeedURL() } });
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, (info: any) => {
