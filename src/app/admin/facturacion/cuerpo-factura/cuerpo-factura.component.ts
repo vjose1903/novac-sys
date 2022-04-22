@@ -243,7 +243,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
       }
     }
 
-    this.form.reset();
+    if (this.form) this.form.reset();
     this.TOTAL = 0;
     this.ITBIS = 0;
     this.secuencia = 0;

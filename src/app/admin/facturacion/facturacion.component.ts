@@ -149,7 +149,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'cabeza_factura', is_routing: true});
+    this._init_mixin({ component: 'cabeza_factura', is_routing: true });
     this.localeService.use('es');
     this.rellenarVariables();
   }
@@ -250,7 +250,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higüero', telefono: null });
         this.getCamiones();
       } else {
-        this.form.reset();
+        if (this.form) this.form.reset();
       }
 
       if (this.action === 'update') {
