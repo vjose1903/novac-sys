@@ -43,15 +43,18 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   ngOnInit() {
+
+  }
+
+  ngAfterViewInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
+      console.log("AQUIII");
+
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       this.versionApp = config.app_version;
 
       this.form = this.fb.group({ usuario: config.is_development ? 'ADM' : null, password: config.is_development ? '1234567' : null });
     });
-  }
-
-  ngAfterViewInit(): void {
     setTimeout(() => this.enfocarInput('Iusuario'), 5);
   }
 

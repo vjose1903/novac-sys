@@ -41,7 +41,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   imgLogo;
   tiempo_restante;
   objPercent;
-
+  configReady = false;
   counter = 0;
   sub: Subscription;
   subModified: Subscription;
@@ -146,6 +146,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+          this.configReady = true;
         }
       })
       .catch((err) => {
