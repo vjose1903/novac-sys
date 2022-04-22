@@ -10,13 +10,26 @@ import {
   ELECTRON_EVENT_UPDATE_ERROR,
   KEYWORD_ELECTRON_RESPONSE,
 } from './shared-electron-angular';
+import Functions from './functions';
+import { ConfigI } from '../src/app/core/typescript/config-interface';
 
 export default class AppUpdater {
   constructor() {
     const log = require('electron-log');
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
+  }
+
+  async checkForUpdates() {
+    const confTemp = (await Functions.getConfigFile()) as any;
+    const conf: ConfigI = JSON.parse(confTemp);
+
+    autoUpdater.setFeedURL({ provider: 'generic', url: conf.url_servidor_descargas });
+
+    setTimeout(() => {
+      console.log('DIQUE BUSCANDO ACTUALIZACION EN: ', autoUpdater.getFeedURL());
+      autoUpdater.checkForUpdatesAndNotify();
+    }, 100);
   }
 
   handleUpdateEvents(win: BrowserWindow) {

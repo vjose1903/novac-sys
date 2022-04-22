@@ -285,9 +285,6 @@ function getActualGitUser() {
 
     if (serve_) {
       cmd(`git config --get user.name`, async (res_username) => {
-        console.log('res_username ', res_username);
-        console.log('res_username.STDOUT.trim() ', res_username.STDOUT.trim());
-
         resolve(res_username.STDOUT.trim());
       });
     } else {
@@ -305,8 +302,6 @@ function getConfigFile() {
     Functions.getConfigFile()
       .then(async (config: any) => {
         var config = JSON.parse(config);
-        const gitUser = await getActualGitUser();
-        console.log('######## ', gitUser);
 
         config['is_development'] = serve_;
         config['gitUser'] = await getActualGitUser();
