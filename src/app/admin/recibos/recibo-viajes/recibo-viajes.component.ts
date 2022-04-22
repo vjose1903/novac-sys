@@ -232,7 +232,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       let tipoModal = tipo;
 
       if (tipo === 'cambio') {
-        const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo__: 'no_devuelta', factura_de: 'venta' };
+        const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo_modal: 'no_devuelta', factura_de: 'venta' };
 
         this.handleModalForm({
           component: FormCantidadEfectivoComponent,
@@ -259,6 +259,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       } else if (tipo === 'dinamico_texto') {
         tipoModal = 'reversar_transaccion';
         const texto = 'Seguro de que desea reversar la ultima transaccion realizada a la factura ' + this.viaje_selected.numero_comprobante;
+
         const objConfirmationModal = {
           id: 'reversar_transaccion',
           header: 'Confirmación',
@@ -268,6 +269,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           },
           texto,
         };
+
         this.confirmationModal(objConfirmationModal);
       }
     } else {

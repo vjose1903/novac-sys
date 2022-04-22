@@ -146,8 +146,8 @@ export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         }
 
         if (this.tipoModal === 'cambio' && res) {
-          if (this.seleccionModal.tipo__) {
-            this.tipoDevuelta = this.seleccionModal.tipo__;
+          if (this.seleccionModal.tipo_modal) {
+            this.tipoDevuelta = this.seleccionModal.tipo_modal;
           }
         }
         if (res.texto_modal) {

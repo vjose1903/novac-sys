@@ -324,7 +324,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       if (this.TOTAL === 0) {
         fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
       } else {
-        const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota, tipo__: 'no_devuelta' };
+        const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota, tipo_modal: 'no_devuelta' };
 
         const confirmationObj = {
           id: 'imprimir_factura',

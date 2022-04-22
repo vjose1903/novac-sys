@@ -718,27 +718,28 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       }
     }
 
-    if (campo === 'nom') {
-      if (this.metodo === 'venta') this.enfocarInput('nom');
+    if (campo == 'nom') {
+      if (this.metodo == 'venta') this.enfocarInput('nom');
       else this.enfocarInput('ncf');
     }
 
-    if (campo === 'filtro') {
+    if (campo == 'filtro') {
       if (this.validarRayaAbajo()) {
         this.abrirModalFiltro();
         this.desEnfocarInput(salioDe);
       } else fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
     }
 
-    if (campo === 'dir' && valor !== null) this.enfocarInput(campo);
+    if (campo == 'dir' && fun.hasValue(valor)) this.enfocarInput(campo);
 
-    if (campo === 'cod-0' && valor !== null) this.iniciarFactura(campo);
+    if (campo == 'cod-0' && fun.hasValue(valor)) this.iniciarFactura(campo);
   }
 
   iniciarFactura(campo) {
     if (this.condicion_fact !== 'Crédito') {
-      this.enfocarInput(campo);
       this.propietario_factura = this.form.value;
+
+      setTimeout(() => this.enfocarInput(campo), 10);
     } else {
       fun.toastWarning('Para facturar a crédito debe de seleccionar un cliente', 'Aviso');
     }
@@ -791,7 +792,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const containCamiones = document.getElementById('overlayCamion');
     setTimeout(() => {
       const voy_a = document.activeElement;
-      console.log('quii');
 
       if (!containCamiones.contains(voy_a)) {
         if (!this.camionesSelected.length) {
@@ -978,7 +978,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             const obj = {
               total_factura: this.TOTAL,
               devuelta: this.action == 'update' ? this.factura_a_editar.devuelta + this.factura_a_editar.total_factura : 0,
-              tipo__: 'devuelta',
+              tipo_modal: 'devuelta',
               factura_de: this.metodo,
               cambios_articulos: articulos_a_cambiar,
             };

@@ -88,7 +88,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'ingresos', is_routing: true});
+    this._init_mixin({ component: 'ingresos', is_routing: true });
 
     this.necesarioStart();
   }
@@ -102,10 +102,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._destroy_mixin();
-  }
-
-  decisionModal(res: any) {
-    if (res && this.tipoModal === 'cancelar_ingreso') this.cancelarIgreso();
   }
 
   objDevueltoResponse(res) {
@@ -239,9 +235,13 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   cancelarIgreso() {
+    console.log('TAMBIEN AQUII');
+
     this.facturas = null;
     this.clienteAdepositar = undefined;
     (document.getElementById('clienteI') as any).value = null;
+
+    console.log('this.facturas ', this.facturas);
 
     this.resetVariables();
 
@@ -283,7 +283,12 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       id: 'cancelar_ingreso',
       header: 'Confirmación',
       texto: 'Seguro de que desea cancelar la operacion.',
-      siFunction: this.cancelarIgreso,
+      siFunction: (instance) => {
+        console.log('ANDO AQUIII');
+
+        this.cancelarIgreso();
+        instance.closeModal(instance.id, 'cancelar');
+      },
     };
     this.confirmationModal(obj);
   }
@@ -309,7 +314,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
-      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo__: 'devuelta' };
+      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo_modal: 'devuelta' };
 
       this.handleModalForm({
         component: FormCantidadEfectivoComponent,
@@ -326,7 +331,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
               function: (instance) => {
                 this.closeModal(instance);
               },
-              label: 'Cancelaro',
+              label: 'Cancelar',
               disable: false,
             },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
