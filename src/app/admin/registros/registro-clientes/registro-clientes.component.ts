@@ -119,23 +119,29 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   async getClientes(params?: { per_page: number; page: number; search: string }) {
-    console.log('getClientes ');
+    return new Promise<any>((resolve, reject) => {
+      console.log('getClientes ');
 
-    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
+      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
-    this.clienteClass.getAll(extra).then((res) => {
-      res['data'].map((cliente) => {
-        cliente.documentos_de_identidad.map((docu) => {
-          if (docu.principal) cliente.documento_identidad = docu.documento;
+      this.clienteClass.getAll(extra).then((res) => {
+
+        fun.logGreen('res ', res);
+
+        res['data'].map((cliente) => {
+          cliente.documentos_de_identidad.map((docu) => {
+            if (docu.principal) cliente.documento_identidad = docu.documento;
+          });
+          return cliente;
         });
-        return cliente;
+
+        this.listaClientes = res['data'];
+
+        this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+        resolve(true);
       });
-
-      this.listaClientes = res['data'];
-
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     });
   }
 
