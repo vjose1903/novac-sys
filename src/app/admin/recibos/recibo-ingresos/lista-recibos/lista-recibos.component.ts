@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
-import { TablasService } from '../../../components/tablas/tablas.service';
+import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
@@ -129,7 +129,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         this.lista_recibos = fun.duplicarJson(res['data']);
 
         const obj = { total: res['total_registros'], tabla: 'listaRecibos' };
-        this.tServ.Func_total_paginas(obj);
+        // this.tServ.Func_total_paginas(obj);
       });
     } catch (error) {}
   }

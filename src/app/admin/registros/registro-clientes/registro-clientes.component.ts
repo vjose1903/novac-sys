@@ -27,7 +27,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   PhotoData: any;
   doc_principal = 'cedula';
 
-  indexSeleccionado: any;
   vendedores;
   documentos_de_identidad: any;
 
@@ -119,29 +118,20 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   async getClientes(params?: { per_page: number; page: number; search: string }) {
-    return new Promise<any>((resolve, reject) => {
-      console.log('getClientes ');
+    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
-      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
-
-      this.clienteClass.getAll(extra).then((res) => {
-
-        fun.logGreen('res ', res);
-
-        res['data'].map((cliente) => {
-          cliente.documentos_de_identidad.map((docu) => {
-            if (docu.principal) cliente.documento_identidad = docu.documento;
-          });
-          return cliente;
-        });
-
-        this.listaClientes = res['data'];
-
-        this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
-        resolve(true);
+    this.clienteClass.getAll(extra).then((res) => {
+      res['data'].map((cliente) => {
+        const doc = _.find(cliente.documentos_de_identidad, { principal: true });
+        cliente.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
+        return cliente;
       });
+
+      this.listaClientes = res['data'];
+
+      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     });
   }
 
@@ -149,20 +139,37 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.PhotoData = img;
   }
 
-  editarItem(item) {
-    this.indexSeleccionado = item.INDEX;
-    this.documentos_de_identidad = item.ARG.documentos_de_identidad;
+  tableClick_action(params) {
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.eliminarReg(params.data);
+  }
 
-    this.form.patchValue(item.ARG);
+  editarItem(data) {
+    this.documentos_de_identidad = data.documentos_de_identidad;
 
-    this.patchDocumentos(item.ARG.documentos_de_identidad);
+    this.form.patchValue(data);
 
-    this.form.controls.maximo_credito.setValue(fun.formatearNumero(fun.redondearAdos(item.ARG.maximo_credito)));
-    this.clienteSelected = fun.duplicarJson(item.ARG);
+    this.patchDocumentos(data.documentos_de_identidad);
+
+    this.form.controls.maximo_credito.setValue(fun.formatearNumero(fun.redondearAdos(data.maximo_credito)));
+    this.clienteSelected = fun.duplicarJson(data);
 
     this.boton = 'Editar';
     this.editando = true;
     this.changeStateCampos(true);
+  }
+
+  eliminarReg(regisData) {
+    const objToSend = {
+      data: regisData,
+      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
+      siFunction: () => {
+        const actualPagination = this.tServ.getPaginationById('lista_clientes');
+        this.clienteClass.deleteOne(regisData.id).then((res) => this.getClientes(actualPagination));
+      },
+    };
+
+    this.eliminarRegistro(objToSend);
   }
 
   patchDocumentos(documentos) {
@@ -371,18 +378,5 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   setDocumentoPrincipal(doc) {
     this.doc_principal = doc;
-  }
-
-  eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
-      siFunction: () => {
-        const actualPagination = this.tServ.getPaginationById('lista_clientes');
-        this.clienteClass.deleteOne(regisData.id).then((res) => this.getClientes(actualPagination));
-      },
-    };
-
-    this.eliminarRegistro(objToSend);
   }
 }

@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { AccionesC, PermisosC, RolesC } from './roles';
 import * as _ from 'lodash';
-import { TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { fun } from '../../../core/services/functions.service';
 
 @Component({
@@ -86,13 +86,13 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
         this.listaRoles = res['data'];
 
         const obj = { total: res['total_registros'], tabla: 'lista_roles' };
-        this.tServ.Func_total_paginas(obj);
+        // this.tServ.Func_total_paginas(obj);
       })
       .catch((err) => {
         if (err.error.total_registros == 0) {
           this.listaRoles = [];
           const obj = { total: 0, tabla: 'lista_roles' };
-          this.tServ.Func_total_paginas(obj);
+          // this.tServ.Func_total_paginas(obj);
         }
       });
   }

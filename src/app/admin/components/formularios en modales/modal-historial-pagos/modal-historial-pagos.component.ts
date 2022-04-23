@@ -41,13 +41,13 @@ export class ModalHistorialPagosComponent implements OnInit, ModalI {
       if (cantidad > 0) {
         this.activeIndex = index;
         const obj = { total: cantidad, tabla: 'historial_movimientos' };
-        this.tServ.Func_total_paginas(obj);
+        // this.tServ.Func_total_paginas(obj);
       } else this.activeIndex = 1;
     } else {
       if (cantidad > 0) {
         this.activeIndex = index;
         const obj = { total: cantidad, tabla: 'historial_movimientos' };
-        this.tServ.Func_total_paginas(obj);
+        // this.tServ.Func_total_paginas(obj);
       } else this.activeIndex = 0;
     }
   }

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasComponent } from '../../components/tablas/tablas.component';
-import { TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../loader/loader.service';
 import { ArticuloC } from '../../registros/articulos/articulo';
@@ -282,7 +282,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       const obj = { total: busqueda.total_registros, tabla: 'notas' };
 
-      this.tServ.Func_total_paginas(obj);
+      // this.tServ.Func_total_paginas(obj);
       resolve(true);
     });
   }
@@ -346,7 +346,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       const obj = { total: busqueda.total_registros, tabla: 'facturas_params' };
 
-      this.tServ.Func_total_paginas(obj);
+      // this.tServ.Func_total_paginas(obj);
       this.facturas = fun.duplicarJson(busqueda['data']);
 
       if (this.facturas.length > 0) {

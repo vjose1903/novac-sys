@@ -293,7 +293,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   tableClick_action(params) {
     if (params.action == 'update') this.editarItem(params.data);
-    if (params.action == 'delete') this.elimiarReg(params.data);
+    if (params.action == 'delete') this.eliminarReg(params.data);
   }
 
   editarItem(data) {
@@ -312,7 +312,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  elimiarReg(data?) {
+  eliminarReg(data?) {
     const comprobanteData = data;
     comprobanteData.nombre = 'comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo;
 

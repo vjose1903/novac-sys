@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
@@ -109,7 +109,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
       this.listaSuplidores = res['data'];
       const obj = { total: res['total_registros'], tabla: 'listaSuplidores' };
-      this.tServ.Func_total_paginas(obj);
+      // this.tServ.Func_total_paginas(obj);
     });
   }
 

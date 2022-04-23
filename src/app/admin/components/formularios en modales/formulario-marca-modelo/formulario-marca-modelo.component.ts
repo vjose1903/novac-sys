@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
-import { TablasService } from '../../../components/tablas/tablas.service';
+import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '../../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { ModalI } from '../../modal/modal-class';
@@ -93,7 +93,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       if (!paginado) this.listaMarcas = fun.duplicarJson(res);
       if (paginado) {
         this.listado = res.data;
-        this.tServ.Func_total_paginas({ total: res.total_registros, tabla: 'tabla_frm_marca_modelo' });
+        // this.tServ.Func_total_paginas({ total: res.total_registros, tabla: 'tabla_frm_marca_modelo' });
       }
     });
   }
@@ -128,7 +128,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
         });
 
         this.listado = modeloRes.data;
-        this.tServ.Func_total_paginas({ total: modeloRes.total_registros, tabla: 'tabla_frm_marca_modelo' });
+        // this.tServ.Func_total_paginas({ total: modeloRes.total_registros, tabla: 'tabla_frm_marca_modelo' });
       });
     } else if (this.componente === 'reg_marcas') {
       this.getMarcas(palabra_a_buscar, true, arg.page, arg.per_page);

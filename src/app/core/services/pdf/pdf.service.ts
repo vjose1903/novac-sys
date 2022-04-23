@@ -48,7 +48,7 @@ export class PdfService {
             data.contenido_reporte = data.detalle_recibos;
             data.usuario = data.user.nombre_completo;
 
-            documento = _.find(data.cliente.documentos_de_identidad, (item) => item.principal);
+            documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
             data.cliente.rnc = documento ? documento.documento : '----------';
 
             data.contenido_reporte.map((detalle) => {
@@ -64,7 +64,7 @@ export class PdfService {
             options = { '80mm_roll': roll80mm, '8.5x5.5': conduce, '8.5x11': conduce };
             data.contenido_reporte = data.detalle_conduces;
 
-            documento = _.find(data.cliente.documentos_de_identidad, (item) => item.principal);
+            documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
             data.cliente.rnc = documento ? documento.documento : '----------';
 
             data.tipo_pdf = 'CONDUCE DE MERCANCIA';

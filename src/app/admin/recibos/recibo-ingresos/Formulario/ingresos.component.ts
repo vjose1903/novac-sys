@@ -4,7 +4,7 @@ import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as moment from '../../../../core/javascript/moment';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../../../components/tablas/tablas.component';
-import { TablasService } from '../../../components/tablas/tablas.service';
+import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ReciboC } from '../../recibos';
 import { RecibosService } from '../../recibos.service';
@@ -213,7 +213,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
     const obj = { total: this.facturas.lenght, tabla: 'facturasPendientes' };
 
-    this.tServ.Func_total_paginas(obj);
+    // this.tServ.Func_total_paginas(obj);
   }
 
   // 134215.75+27725+106099.56+139550.75+2970+159379.56+110629.31+92004.56+32554.89

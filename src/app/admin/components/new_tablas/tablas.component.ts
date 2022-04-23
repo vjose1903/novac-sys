@@ -33,6 +33,7 @@ export interface table_info {
   alt?: any;
   click?: Function;
   iconsArray?: Array<any>;
+  key_value?: string;
 }
 
 interface obj_paginate {
@@ -178,56 +179,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     });
   }
 
-  filter(event) {
-    console.log(' ');
-    console.log(' ');
-    console.log(' ');
-
-    const search = event.target.value;
-
-    if (_.has(this.config, 'filtrar') && !this.config.filtrar.local) {
-      fun.awaitTyping(event).then(() => {
-        if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
-          const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
-          let buscando = false;
-          if (fun.hasValue(search)) {
-            // TODO: ver si puedo poner que se ponga solo en la pagina 1 al filtrar
-            // console.log('search TIENE VALOR');
-            // console.log('actualPagination.ant_page ', actualPagination.ant_page);
-            if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.config.id_tabla, [{ ant_page: actualPagination.page }]);
-            buscando = true;
-          } else if (fun.isEmpty(search) && fun.hasValue(actualPagination.ant_page)) {
-            this.tServ.modifyPaginationById(this.config.id_tabla, [{ page: actualPagination.ant_page }]);
-
-            this.tServ.modifyPaginationById(this.config.id_tabla, [{ ant_page: null }]);
-          }
-
-          // console.log('actualPagination ', actualPagination);
-          fun.logOrange('search ', search);
-
-          this.config.padre_functions.data_request({ per_page: actualPagination.per_page, page: actualPagination.page, search: search }).then((res) => {
-            if (res) {
-              console.log('###########');
-              console.log('###########');
-              console.log('###########');
-
-              setTimeout(() => {
-                const btnFirst = this.getPaginatorElement('btn_primero');
-                btnFirst.setAttribute('id', `${this.config.id_tabla}-btnFirst`);
-                btnFirst.setAttribute('clickeado_por', 'maquina');
-                btnFirst.click();
-              }, 100);
-            }
-          });
-        } else {
-          fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
-        }
-      });
-    }
-
-    this.tServ.modifyPaginationById(this.config.id_tabla, [{ search: search }]);
-  }
-
   changeConfig(array) {
     this.zone.run(() => {
       array.forEach((element) => {
@@ -268,53 +219,69 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
-  getPaginatorElement(tipo) {
-    const paginator = document.getElementById(`paginator-${this.config.id_tabla}`);
-    // console.log('paginator ', paginator);
+  filter(event) {
+    const search = event.target.value;
 
-    let paginatorElement;
-    if (paginator && tipo == 'actual') paginatorElement = paginator.getElementsByClassName('p-highlight')[0];
-    if (paginator && tipo == 'btn_primero') {
-      fun.logRed('=============> ', paginator.getElementsByClassName('p-paginator-first')[0]);
-
-      paginatorElement = paginator.getElementsByClassName('p-paginator-first')[0];
-    }
-
-    return paginatorElement;
-  }
-
-  paginatorChange(event, id) {
-    const page = event.page + 1;
-    const per_page = event.rows;
-    const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
-
-    console.log('page ', page);
-
-    this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
-
-    const btnFirst = document.getElementById(`${this.config.id_tabla}-btnFirst`);
-    const btnFirst_clickeado_por = btnFirst.getAttribute('clickeado_por');
-
-    console.log('btnFirst ', btnFirst);
-
-    const actualPage = this.getPaginatorElement('actual');
-    const clickeado_por = actualPage.getAttribute('clickeado_por');
-    console.log('clickeado_por ', clickeado_por);
-
-    if ((fun.isEmpty(btnFirst) || btnFirst_clickeado_por != 'maquina') && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
-      if (actualPagination.is_local) {
-        this.localPagination(page, per_page, 'paginatorChange');
-      } else {
-        console.log('ANDO AQUIII');
-
+    if (_.has(this.config, 'filtrar') && !this.config.filtrar.local) {
+      fun.awaitTyping(event).then(() => {
         if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
-          console.log('ANDO AQUIII TAMBIEN');
-          this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
+          const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
+
+          if (fun.hasValue(search)) {
+
+            if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.config.id_tabla, [{ ant_page: actualPagination.page }]);
+            this.tServ.modifyPaginationById(this.config.id_tabla, [{ page: 1 }]);
+          } else if (fun.isEmpty(search) && fun.hasValue(actualPagination.ant_page)) {
+            this.tServ.modifyPaginationById(this.config.id_tabla, [{ page: actualPagination.ant_page }]);
+            this.tServ.modifyPaginationById(this.config.id_tabla, [{ ant_page: null }]);
+          }
+
+          this.config.padre_functions.data_request({ per_page: actualPagination.per_page, page: actualPagination.page, search: search });
         } else {
           fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
         }
-      }
+      });
     }
+
+    this.tServ.modifyPaginationById(this.config.id_tabla, [{ search: search }]);
+  }
+
+  getPaginatorPageByNumber(number) {
+    let paginatorPage = undefined;
+    const paginator = document.getElementById(`paginator-${this.config.id_tabla}`);
+
+    if (paginator) {
+      const paginator_pages = document.getElementsByClassName('p-paginator-pages');
+      paginatorPage = _.find(_.head(paginator_pages).children, { outerText: `${number || 1}` });
+    }
+    return paginatorPage;
+  }
+
+  paginatorChange(event, id) {
+    setTimeout(() => {
+      const page = event.page + 1;
+      const per_page = event.rows;
+      const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
+
+      this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
+
+      const actualPage = this.getPaginatorPageByNumber(page);
+      const clickeado_por = actualPage.getAttribute('clickeado_por');
+
+      if (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina') {
+        if (actualPagination.is_local) {
+          this.localPagination(page, per_page, 'paginatorChange');
+        } else {
+          if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
+            this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
+          } else {
+            fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
+          }
+        }
+      }
+
+      this.cdRef.detectChanges();
+    }, 150);
   }
 
   localPagination(page, per_page, desde = '') {
@@ -352,6 +319,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   setCantPagView(width, tipo) {
     let actual = 1;
+    const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
 
     if (tipo == 'width_page') {
       const divPaginator = document.getElementById('divPaginator');
@@ -364,7 +332,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     else if (width <= 320 && width > 285) actual = 2;
     else if (width <= 285) actual = 1;
 
-    const actualPage = this.getPaginatorElement('actual');
+    const actualPage = this.getPaginatorPageByNumber(actualPagination?.page);
 
     setTimeout(() => {
       this.zone.run(() => {

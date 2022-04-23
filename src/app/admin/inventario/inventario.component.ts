@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
 import { GLOBAL } from '../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
-import { TablasService } from '../components/tablas/tablas.service';
+import { TablasService } from '../components/new_tablas/tablas.service';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
 import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
@@ -152,7 +152,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       this.listaArticulos = fun.duplicarJson(res.data);
 
       const obj = { total: res.total_registros, tabla: 'inventario' };
-      this.tServ.Func_total_paginas(obj);
+      // this.tServ.Func_total_paginas(obj);
     });
   }
 

@@ -37,7 +37,7 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
   btn_aceptar() {}
 
   ngOnInit(): void {
-    console.log(" ----- INIT BUSCAR CLIENTE  ----- ");
+    console.log(' ----- INIT BUSCAR CLIENTE  ----- ');
 
     this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default, 'init');
   }
@@ -59,13 +59,12 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
     console.log(' ');
 
     if (res.data && res.data.length > 0) {
-      res.data.map(async (cli) => {
-        cli.nombre = fun.Capitalice(cli.nombre);
-        cli.apellido = fun.Capitalice(cli.apellido);
-
-        const documento = await cli.documentos_de_identidad.find((doc) => doc.principal === true);
-        cli.documento_identidad = documento ? documento.documento : '----------';
-        return cli;
+      res.data.map(async (entidad) => {
+        entidad.nombre = fun.Capitalice(entidad.nombre);
+        entidad.apellido = fun.Capitalice(entidad.apellido);
+        const doc = _.find(entidad.documentos_de_identidad, { principal: true });
+        entidad.documento_identidad = doc ? doc.documento : '----------';
+        return entidad;
       });
       this.dataFiltro = res.data;
     } else {
@@ -73,7 +72,7 @@ export class BuscarClienteSuplidorComponent implements OnInit, ModalI {
     }
 
     const obj = { total: res.total_registros, tabla: 'filtroCliente' };
-    this.tServ.Func_total_paginas(obj);
+    // this.tServ.Func_total_paginas(obj);
   }
   devolverCLick(dataARetornar) {
     const modal = this.closeThis();

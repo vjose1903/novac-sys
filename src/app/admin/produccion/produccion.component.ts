@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '../../core/typescript/MixinClass';
-import { TablasService } from '../components/tablas/tablas.service';
+import { TablasService } from '../components/new_tablas/tablas.service';
 import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
 import { ProduccionC } from './produccion';
 import * as $ from 'jquery';
@@ -254,7 +254,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
     this.lista_produccion.push(obj);
 
-    this.tServ.Func_total_paginas({ total: this.lista_produccion.length, tabla: 'lista_produccion' });
+    // this.tServ.Func_total_paginas({ total: this.lista_produccion.length, tabla: 'lista_produccion' });
 
     this.disableOption(this.producto_terminado_en_turno.id, true);
     this.articuloEditando = undefined;
@@ -330,7 +330,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
         this.borrar();
       }
     }
-    this.tServ.Func_total_paginas({ total: this.lista_produccion.length, tabla: 'lista_produccion' });
+    // this.tServ.Func_total_paginas({ total: this.lista_produccion.length, tabla: 'lista_produccion' });
   }
 
   formarIngredientes(ingredientes) {

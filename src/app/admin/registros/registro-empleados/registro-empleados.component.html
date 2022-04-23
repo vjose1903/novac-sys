@@ -204,19 +204,9 @@
           <button [disabled]="empleadoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <app-tablas
-            class="h-100 gridTablaClass"
-            *ngIf="listaEmpleados && info"
-            [padre]="cardTabla"
-            [info]="info"
-            [data]="listaEmpleados"
-            [id_tabla]="'listaEmpleados'"
-            [focusRow]="false"
-            [botones]="botones"
-            (DevolverInfo)="editarItem($event)"
-            (paginateChange)="getEmpleados($event)"
-            (DELETE)="eliminarReg($event.ARG)"
-          ></app-tablas>
+
+          <dinamic-table [cardTabla]="cardTabla" [(data)]="listaEmpleados" [seleccionado]="empleadoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+
         </div>
       </div>
     </div>

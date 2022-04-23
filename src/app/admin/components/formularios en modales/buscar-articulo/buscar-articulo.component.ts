@@ -51,7 +51,7 @@ export class BuscarArticuloComponent implements OnInit, ModalI {
     this.dataFiltro = res.data;
 
     const obj = { total: res.total_registros, tabla: 'filtroArticulos' };
-    this.tServ.Func_total_paginas(obj);
+    // this.tServ.Func_total_paginas(obj);
   }
 
   devolverCLick(dataARetornar) {

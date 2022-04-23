@@ -6,11 +6,12 @@ import * as moment from '../../../core/javascript/moment';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
-import { TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { EmpleadoC } from './empleado';
 import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
 import { fun } from '../../../core/services/functions.service';
 import { RolesC } from '../roles/roles';
+import { table_config } from '../../components/new_tablas/tablas.component';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -23,17 +24,23 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
-  rolesF = { V: 'Vendedora', A: 'Administradora', U: 'Cajera', C: 'Chofer' };
-  rolesM = { V: 'Vendedor', A: 'Administrador', U: 'Cajero', C: 'Chofer' };
+  table_config: table_config = {
+    info: [
+      { titulo: 'Nombre', tipo: 'text', key: 'nombreCompleto' },
+      { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+      { titulo: 'Cedula', tipo: 'text', key: 'documento_identidad' },
+      { titulo: 'Role', tipo: 'textList', key: 'roles', key_value: 'nombre' },
+    ],
 
-  info = [
-    { titulo: 'Nombre', tipo: 'text', key: 'nombreCompleto' },
-    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
-    { titulo: 'Cedula', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Role', tipo: 'textList', key: 'roles', key_value: 'nombre' },
-  ];
-
-  botones = { titulo: true, borrar: true, editar: true };
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'lista_empleados',
+    padre_functions: { data_request: (params) => this.getEmpleados(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+  };
+  tablaComponent;
 
   isCreando: boolean = false;
   listaEmpleados;
@@ -49,14 +56,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   constructor(private fb: FormBuilder, private localeService: BsLocaleService, private tServ: TablasService) {
     super();
-    this.dpConfig = Object.assign(
-      {},
-      {
-        showWeekNumbers: false,
-        maxDate: new Date(),
-        dateInputFormat: 'DD/MM/YYYY',
-      },
-    );
+    this.dpConfig = Object.assign({}, { showWeekNumbers: false, maxDate: new Date(), dateInputFormat: 'DD/MM/YYYY' });
   }
 
   ngOnInit() {
@@ -109,28 +109,24 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     const campo = this.form.get(control);
     campo.setValue(fun.Capitalice(arg));
   }
-
-  async getEmpleados(e) {
+  async getEmpleados(params?: { per_page: number; page: number; search: string }) {
     try {
-      const page = e.page;
-      const per_page = e.per_page;
-      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
+      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
       this.empleadosClass.getAll(extra).then((res) => {
-        res['data'].map((cli) => {
-          cli.nombreCompleto = cli.nombre + ' ' + cli.apellido;
-          cli.role_ = cli.sexo === 'm' ? this.rolesM[cli.role] : this.rolesF[cli.role];
-          cli.documentos_de_identidad.map((docu) => {
-            if (docu.principal) cli.documento_identidad = docu.documento;
-          });
-          return cli;
+        res['data'].map((empleado) => {
+          empleado.nombreCompleto = empleado.nombre + ' ' + empleado.apellido;
+          const doc = _.find(empleado.documentos_de_identidad, { principal: true });
+
+          empleado.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
+
+          return empleado;
         });
 
         this.listaEmpleados = res['data'];
-        const obj = { total: res['total_registros'], tabla: 'listaEmpleados' };
-        this.tServ.Func_total_paginas(obj);
+        this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
       });
     } catch (error) {
       fun.toastError('Error buscando empleados registrados.', 'ERROR');
@@ -277,18 +273,36 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     return fechaFormato;
   }
 
-  editarItem(item) {
+  tableClick_action(params) {
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.eliminarReg(params.data);
+  }
+
+  eliminarReg(regisData) {
+    const objToSend = {
+      data: regisData,
+      texto: `¿Está seguro que desea eliminar el empleado <b>${regisData.nombre_completo}</b>?`,
+      siFunction: () => {
+        const actualPagination = this.tServ.getPaginationById('listaEmpleados');
+        this.empleadosClass.deleteOne(regisData.id).then((res) => this.getEmpleados(actualPagination));
+      },
+    };
+
+    this.eliminarRegistro(objToSend);
+  }
+
+  editarItem(data) {
     this.form.reset();
-    this.documentos_de_identidad = item.ARG.documentos_de_identidad;
+    this.documentos_de_identidad = data.documentos_de_identidad;
 
     if (this.documentos_de_identidad.length) {
-      const doc = item.ARG.documentos_de_identidad.filter((doc) => doc.principal === true);
-      if (item.ARG.documentos_de_identidad.length > 0 && fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
+      const doc = data.documentos_de_identidad.filter((doc) => doc.principal === true);
+      if (data.documentos_de_identidad.length > 0 && fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
     }
-    const objPerson = Object.assign({}, item.ARG, { ids_roles: (item.ARG.roles || []).map((rol) => rol.id) });
+    const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map((rol) => rol.id) });
     this.form.patchValue(objPerson);
 
-    this.empleadoSelected = item.ARG;
+    this.empleadoSelected = data;
     this.editando = true;
     this.boton = 'Editar';
 
@@ -335,18 +349,5 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   showModal() {
     this.handleModalForm({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem' });
-  }
-
-  eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el empleado <b>${regisData.nombre_completo}</b>?`,
-      siFunction: () => {
-        const actualPagination = this.tServ.getPaginationById('listaEmpleados');
-        this.empleadosClass.deleteOne(regisData.id).then((res) => this.getEmpleados(actualPagination));
-      },
-    };
-
-    this.eliminarRegistro(objToSend);
   }
 }
