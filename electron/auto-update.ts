@@ -1,4 +1,4 @@
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, NsisUpdater } from 'electron-updater';
 import { BrowserWindow, dialog } from 'electron';
 
 import {
@@ -18,13 +18,14 @@ export default class AppUpdater {
     const log = require('electron-log');
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
+    this.checkForUpdates();
   }
 
   async checkForUpdates() {
     const confTemp = (await Functions.getConfigFile()) as any;
     const conf: ConfigI = JSON.parse(confTemp);
 
-    autoUpdater.setFeedURL({ provider: 'generic', url: conf.url_servidor_descargas });
+    const autoUpdater = new NsisUpdater({ provider: 'generic', url: conf.url_servidor_descargas });
 
     setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 100);
   }
@@ -33,7 +34,7 @@ export default class AppUpdater {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // AUTO UPDATE EVENTS
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    setTimeout(() => this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...' } }), 10000);
+    // setTimeout(() => this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...' } }), 10000);
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, () => {
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...', url: autoUpdater.getFeedURL() } });
