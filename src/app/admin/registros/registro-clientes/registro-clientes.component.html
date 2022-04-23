@@ -40,12 +40,7 @@
                           formControlName="cedula"
                         ></p-inputMask>
 
-                        <div
-                          (click)="setDocumentoPrincipal('cedula')"
-                          class="input-group-append"
-                          pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}"
-                          tooltipPosition="right"
-                        >
+                        <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                           <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                         </div>
                       </div>
@@ -65,12 +60,7 @@
                           formControlName="rnc"
                         ></p-inputMask>
 
-                        <div
-                          (click)="setDocumentoPrincipal('rnc')"
-                          class="input-group-append"
-                          pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}"
-                          tooltipPosition="right"
-                        >
+                        <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                           <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                         </div>
                       </div>
@@ -117,15 +107,7 @@
                 <div class="form-group" [appMsgError]="'telefono'" [form]="form">
                   <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
-                  <p-inputMask
-                    (keydown.enter)="saltar('campoSexo')"
-                    mask="(999) 999-9999"
-                    tabindex="-1"
-                    styleClass="form-control"
-                    inputId="campoTelefono"
-                    placeholder="(___) ___-____"
-                    formControlName="telefono"
-                  ></p-inputMask>
+                  <p-inputMask (keydown.enter)="saltar('campoSexo')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono"></p-inputMask>
 
                   <span id="msgContainer_telefono"></span>
                 </div>
@@ -158,16 +140,7 @@
                 <div class="form-group" [appMsgError]="'maximo_credito'" [form]="form">
                   <label class="control-label">Limite de credito: <span style="color: red">*</span></label>
 
-                  <input
-                    type="text"
-                    class="form-control"
-                    (blur)="revisarPrecio('maximo_credito')"
-                    formControlName="maximo_credito"
-                    id="maximo_credito"
-                    (keydown.enter)="saltar('campoVendedor')"
-                    placeholder="cantidad maxima"
-                    autocomplete="off"
-                  />
+                  <input type="text" class="form-control" (blur)="revisarPrecio('maximo_credito')" formControlName="maximo_credito" id="maximo_credito" (keydown.enter)="saltar('campoVendedor')" placeholder="cantidad maxima" autocomplete="off" />
                   <span id="msgContainer_maximo_credito"> </span>
                 </div>
               </div>
@@ -212,7 +185,9 @@
           <button [disabled]="clienteSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <app-tablas
+          <dinamic-table [cardTabla]="cardTabla" [(data)]="listaClientes" [seleccionado]="clienteSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+
+          <!-- <app-tablas
             class="h-100"
             *ngIf="listaClientes && info"
             [padre]="cardTabla"
@@ -224,7 +199,7 @@
             (DELETE)="eliminarReg($event.ARG)"
             [focusRow]="false"
             (paginateChange)="getClientes($event)"
-          ></app-tablas>
+          ></app-tablas> -->
         </div>
       </div>
     </div>

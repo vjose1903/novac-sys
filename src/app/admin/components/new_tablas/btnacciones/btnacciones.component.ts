@@ -3,29 +3,15 @@ import { Subscription } from 'rxjs';
 
 import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
+import { botonesTableI } from '../tablas.component';
 
-interface inner_btn {
-  show: boolean;
-  name?: string;
-  tooltip?: string;
-  tooltipKey?: string;
-  permiso?: string;
-  icon?: string;
-}
-
-export interface botonesI {
-  dinamico?: Array<inner_btn>;
-  borrar?: inner_btn;
-  editar?: inner_btn;
-  mostrar?: inner_btn;
-}
 @Component({
   selector: 'app-btnacciones',
   templateUrl: './btnacciones.component.html',
   styleUrls: ['./btnacciones.component.scss'],
 })
 export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
-  @Input() botones: botonesI;
+  @Input() botones: botonesTableI;
 
   btnList = {
     borrar: { icon: 'far fa-trash-alt', action: 'delete', func: this.clickBtn, tooltip: 'Borrar' },
@@ -40,7 +26,6 @@ export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
 
   @Output() functionsBtnDinamic = new EventEmitter<any>();
   @Output() clickBoton = new EventEmitter<any>();
-
 
   subWidth: Subscription;
   windowsWidth;

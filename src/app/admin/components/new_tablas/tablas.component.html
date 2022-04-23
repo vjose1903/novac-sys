@@ -15,7 +15,7 @@
             <th *ngFor="let row of config.info; let index_head = index" class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " id="titulo_{{ config.id_tabla }}_{{ row.key }}">
               <span pTooltip="{{ row.tooltip || null }}" tooltipPosition="top" class="titulo no-theme text-dark"> {{ row.titulo }} </span>
             </th>
-            <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(botones) }">
+            <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }">
               <span class="titulo no-theme text-dark"> Acciones </span>
             </th>
           </tr>
@@ -64,7 +64,7 @@
                           <i
                             id="{{ config.id_tabla }}-{{ objIcon.key }}-{{ getIndex(index_body) }}"
                             (click)="iconBtn(column.key, getIndex(index_body), dato, $event, objIcon)"
-                            class=" iconPress {{ dato[objIcon.key] }} {{ dato.iconHover ? 'c-pointer' : '' }} {{ objIcon.color ? (dato[objIcon.text_color] ? 'text-' + dato[objIcon.text_color] : 'text-black') : 'letras' }}"
+                            class=" iconPress {{ dato[objIcon.key] }} {{ dato.iconHover ? 'c-pointer' : '' }} {{ dato[objIcon.text_color] ? 'text-' + dato[objIcon.text_color] : 'text-black' }}"
                             (mouseenter)="mouseMoveEvent('hover', dato, objIcon.key, $event.target.id)"
                             (mouseleave)="mouseMoveEvent('leave', dato, objIcon.key, $event.target.id)"
                           ></i>
@@ -137,14 +137,14 @@
                   </span>
                 </td>
 
-                <td [ngClass]="{ 'd-none': fun.isEmpty(botones) }" *ngIf="fun.hasValue(botones)" class="btnAccion tableTD" (click)="clickROW(dato, 'Td')">
+                <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(dato, 'Td')">
                   <span class="titulo_sm"> Acciones </span>
                   <app-btnacciones
                     [index_body]="getIndex(index_body)"
                     [id_tabla]="config.id_tabla"
                     [dato]="dato"
                     [data]="data"
-                    [botones]="botones"
+                    [botones]="config.botones"
                     (functionsBtnDinamic)="functionsBtnDinamic($event)"
                     (clickBoton)="handle_table_events('click_action', $event)"
                   ></app-btnacciones>

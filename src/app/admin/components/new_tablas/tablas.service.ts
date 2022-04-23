@@ -14,8 +14,9 @@ export class TablasService {
 
   public obj_paginate = {
     default: {
+      ant_page: null,
       page: 1,
-      limit: 10,
+      per_page: 20,
       per_page_options: [10, 15, 20, 30],
       search: ' ',
       is_local: false,

@@ -44,9 +44,30 @@ interface obj_paginate {
   is_local?: boolean;
 }
 
+interface inner_btn {
+  show: boolean;
+  name?: string;
+  tooltip?: string;
+  tooltipKey?: string;
+  permiso?: string;
+  icon?: string;
+}
+
+export interface botonesTableI {
+  dinamico?: Array<inner_btn>;
+  borrar?: inner_btn;
+  editar?: inner_btn;
+  mostrar?: inner_btn;
+}
+
+interface padreFunctionsI {
+  handleBtnsDinamic?: Function;
+  data_request?: Function;
+}
+
 export interface table_config {
   padding?: string;
-  padre_component?: any;
+  padre_functions?: padreFunctionsI;
   colores?: Boolean;
   read?: Boolean;
   focusRow?: Boolean;
@@ -57,11 +78,12 @@ export interface table_config {
   id?: String;
   id_tabla?: String;
   info?: Array<table_info>;
-  peticion_data?: any;
+  data_request?: any;
   table_size?: 'sm';
   backgroundColor?: any;
   total_count?: any;
   obj_paginate?: obj_paginate;
+  botones?: botonesTableI;
 }
 
 @Component({
@@ -85,12 +107,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   @Output() TablasComponentChange = new EventEmitter<any>();
 
   @Input() cardTabla;
-  @Input() botones;
 
   @Input() print_log = false;
   @Input() seleccionado: any;
   @Input() data = [];
-  @Input() config: table_config = { padre_component: null };
+  @Input() config: table_config = { padre_functions: null };
 
   // output
   @Output() table_events = new EventEmitter<any>();
@@ -162,7 +183,28 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     if (_.has(this.config, 'filtrar') && !this.config.filtrar.local) {
       fun.awaitTyping(event).then(() => {
-        if (typeof this.config.padre_component?.['tableFilter'] == 'function') this.config.padre_component['tableFilter'](search, this.config.id_tabla);
+        if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
+          const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
+
+          if (fun.hasValue(search)) {
+            // TODO: ver si puedo poner que se ponga solo en la pagina 1 al filtrar
+            // console.log('search TIENE VALOR');
+            // console.log('actualPagination.ant_page ', actualPagination.ant_page);
+            if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.config.id_tabla, [{ ant_page: actualPagination.page }]);
+
+            this.tServ.modifyPaginationById(this.config.id_tabla, [{ page: 1 }]);
+          } else if (fun.isEmpty(search) && fun.hasValue(actualPagination.ant_page)) {
+            this.tServ.modifyPaginationById(this.config.id_tabla, [{ page: actualPagination.ant_page }]);
+
+            this.tServ.modifyPaginationById(this.config.id_tabla, [{ ant_page: null }]);
+          }
+
+          // console.log('actualPagination ', actualPagination);
+
+          this.config.padre_functions.data_request({ per_page: actualPagination.per_page, page: actualPagination.page, search: search });
+        } else {
+          fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
+        }
       });
     }
     this.tServ.modifyPaginationById(this.config.id_tabla, [{ search: search }]);
@@ -222,16 +264,26 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const per_page = e.rows;
     const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
 
+    console.log('page ', page);
+
     this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
 
     const actualPage = this.getActualPageElement();
     const clickeado_por = actualPage.getAttribute('clickeado_por');
+    console.log('clickeado_por ', clickeado_por);
 
     if (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina') {
       if (actualPagination.is_local) {
         this.localPagination(page, per_page, 'paginatorChange');
       } else {
-        this.config.padre_component[this.config.peticion_data]({ per_page: per_page, page: page, search: null });
+        console.log('ANDO AQUIII');
+
+        if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
+          console.log('ANDO AQUIII TAMBIEN');
+          this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
+        } else {
+          fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
+        }
       }
     }
   }
@@ -274,7 +326,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     if (tipo == 'width_page') {
       const divPaginator = document.getElementById('divPaginator');
-      width = divPaginator.offsetWidth;
+      if (divPaginator) width = divPaginator.offsetWidth;
     }
 
     if (width > 385) actual = 5;
@@ -287,9 +339,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     setTimeout(() => {
       this.zone.run(() => {
-        if (actualPage) actualPage.setAttribute('clickeado_por', 'maquina');
-        actualPage.click();
-        setTimeout(() => actualPage.removeAttribute('clickeado_por'), 2000);
+        if (actualPage) {
+          actualPage.setAttribute('clickeado_por', 'maquina');
+          actualPage.click();
+          setTimeout(() => actualPage.removeAttribute('clickeado_por'), 2000);
+        }
+
         this.cantPagesView = actual;
         this.cdRef.detectChanges();
       });
@@ -537,10 +592,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   //   this.mdbTablePagination.setMaxVisibleItemsNumberTo(items);
   // }
   functionsBtnDinamic(params) {
-    if (this.config.padre_component.handleBtnsDinamic) {
-      this.config.padre_component.handleBtnsDinamic(params);
+    if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.handleBtnsDinamic) {
+      this.config.padre_functions.handleBtnsDinamic(params);
     } else {
-      console.error('Debe de implementar la funcion handleBtnsDinamic en el componente padre de la tabla');
+      fun.logRed('----- Debe de implementar la funcion handleBtnsDinamic en el componente padre de la tabla ----');
     }
   }
 

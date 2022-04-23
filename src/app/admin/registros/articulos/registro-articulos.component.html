@@ -513,7 +513,7 @@
           </div>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <dinamic-table [botones]="botones" [cardTabla]="cardTabla" [(data)]="listaArticulos" [seleccionado]="articuloSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          <dinamic-table [cardTabla]="cardTabla" [(data)]="listaArticulos" [seleccionado]="articuloSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
           <!-- <app-tablas
             class="h-100"
             *ngIf="listaArticulos && info"

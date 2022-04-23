@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@ang
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import * as moment from '../../../core/javascript/moment';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
@@ -30,15 +30,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     colores: true,
     padding: '0.5rem',
     id_tabla: 'articulos',
-    padre_component: this,
-    peticion_data: 'getArticulos',
+    padre_functions: { data_request: (params) => this.getArticulos(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-  };
-
-  botones = {
-    editar: { show: true, permiso: null },
-    borrar: { show: true, permiso: null },
+    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
   };
 
   // botones = { titulo: true, borrar: true, editar: true };

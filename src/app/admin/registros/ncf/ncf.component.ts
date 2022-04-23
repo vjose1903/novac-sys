@@ -2,11 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as moment from '../../../core/javascript/moment';
-import { TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from './ncf';
 import { fun } from '../../../core/services/functions.service';
+import { table_config } from '../../components/new_tablas/tablas.component';
 
 @Component({
   selector: 'app-ncf',
@@ -21,18 +22,26 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   estado = false;
   usado = false;
 
-  info = [
-    { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '3rem' }] },
-    { titulo: 'Tipo', tipo: 'text', key: 'tipoC', estilos: [{ width: '2rem' }] },
-    { titulo: 'Secuencia', tipo: 'text', key: 'secuencia_' },
-    { titulo: 'Desde', tipo: 'text', key: 'desde' },
-    { titulo: 'Hasta', tipo: 'text', key: 'hasta' },
-    { titulo: 'Usado', tipo: 'icon', key: 'usado_', text_color: 'colorUsado', isIcon: true, color: true, estilos: [{ width: '3.5rem' }] },
-    { titulo: 'Activo', tipo: 'icon', key: 'estado_', text_color: 'colorEstado', isIcon: true, color: true, estilos: [{ width: '3.5rem' }] },
-  ];
+  table_config: table_config = {
+    info: [
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '5rem' }] },
+      { titulo: 'Tipo', tipo: 'text', key: 'tipoC', estilos: [{ width: '3rem' }] },
+      { titulo: 'Secuencia', tipo: 'text', key: 'secuencia_' },
+      { titulo: 'Desde', tipo: 'text', key: 'desde' },
+      { titulo: 'Hasta', tipo: 'text', key: 'hasta' },
+      { titulo: 'Usado', tipo: 'icon', key: 'usado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'usado_', text_color: 'colorUsado' }] },
+      { titulo: 'Activo', tipo: 'icon', key: 'estado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
+    ],
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'lista_ncf',
+    padre_functions: { data_request: (params) => this.getPaquetesNCF(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+  };
 
   filtro: any = 0;
-  botones = { titulo: true, borrar: true, editar: true };
 
   lista_tipos_facturas: any;
 
@@ -42,14 +51,13 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   public dpConfigValidez: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   aletarTipoArticulo = false;
-  paqueteSelected: string;
+  ncfSelected;
   Desde;
   Hasta;
 
   isCreando: boolean = false;
 
   is_editando = false;
-  ncfSelected;
 
   desdeAlert = false;
   hastaAlert = false;
@@ -58,25 +66,12 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();
   ncfClass = new NcfC();
+
+  tablaComponent;
   constructor(private tServ: TablasService, private localeService: BsLocaleService) {
     super();
-    this.dpConfig = Object.assign(
-      {},
-      {
-        showWeekNumbers: false,
-        dateInputFormat: 'DD/MM/YYYY',
-        // maxDate: new Date(),
-      },
-    );
-
-    this.dpConfigValidez = Object.assign(
-      {},
-      {
-        showWeekNumbers: false,
-        minDate: this.fechaCompra,
-        dateInputFormat: 'DD/MM/YYYY',
-      },
-    );
+    this.dpConfig = Object.assign({}, { showWeekNumbers: false, dateInputFormat: 'DD/MM/YYYY' });
+    this.dpConfigValidez = Object.assign({}, { showWeekNumbers: false, minDate: this.fechaCompra, dateInputFormat: 'DD/MM/YYYY' });
   }
 
   ngOnInit() {
@@ -149,14 +144,11 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  async getPaquetesNCF(e) {
+  async getPaquetesNCF(params?: { per_page: number; page: number; search: string }) {
     try {
-      const page = e.page;
-      const per_page = e.per_page;
-      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
-      // `secuencia_comprobantes/filtro/${arg}?page=${page}&per_page=${per_page}&paginado=${paginado}`
+      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const res = await this.ncfClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
+      const res = await this.ncfClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
 
       const tempNCF = [];
       res.data.forEach((ncf) => {
@@ -175,7 +167,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
           ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
 
-          ncf.customStyles = { 'td-codigo': { width: '3rem' }, 'td-tipoC': { width: '2rem' }, 'td-usado_': { width: '3.5rem' }, 'td-estado_': { width: '3.5rem' } };
+          ncf.customStyles = { 'td-codigo': { width: '5rem' }, 'td-tipoC': { width: '3rem' }, 'td-usado_': { width: '4rem' }, 'td-estado_': { width: '4rem' } };
 
           tempNCF.push(ncf);
         }
@@ -184,9 +176,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       this.listaNCF = tempNCF;
       this.listaNCFBack = fun.duplicarJson(tempNCF);
 
-      const obj = { total: res.total_registros, tabla: 'lista_ncf' };
-
-      this.tServ.Func_total_paginas(obj);
+      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     } catch (error) {
       console.error(error);
 
@@ -279,7 +269,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.ncfSelected = undefined;
     this.tipo_articulo_id = -1;
     this.boton = 'Ingresar';
-    this.paqueteSelected = undefined;
+    this.ncfSelected = undefined;
     this.Desde = undefined;
     this.Hasta = undefined;
     this.isCreando = true;
@@ -301,23 +291,31 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.isCreando = true;
   }
 
-  editarItem(item) {
-    this.is_editando = true;
+  tableClick_action(params) {
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.elimiarReg(params.data);
+  }
 
-    if (item.METODO === 'editar') {
-      this.paqueteSelected = item.ARG;
+  editarItem(data) {
+    if (data.usado) {
+      fun.toastWarning('Los comprobantes usados no pueden ser editados.', 'AVISO');
+    } else {
+      this.is_editando = true;
+
+      this.ncfSelected = data;
       this.boton = 'Editar';
 
-      this.estado = item.ARG.estado;
-      this.usado = item.ARG.usado;
+      this.estado = data.estado;
+      this.usado = data.usado;
 
-      this.llenarCampos(item.ARG);
+      this.llenarCampos(data);
     }
   }
 
-  localAbrirModal(arg?) {
-    const comprobanteData = arg.ARG;
+  elimiarReg(data?) {
+    const comprobanteData = data;
     comprobanteData.nombre = 'comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo;
+
     const objConfirmationModal = {
       id: 'eliminar_comprobante',
       header: 'Confirmar',
@@ -325,7 +323,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       width: '510px',
       siFunction: (instance) => {
         this.ncfClass.deleteOne(comprobanteData.id).then((res) => {
-          fun.toastSuccess('comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo + ' borrado', 'CORRECTO');
           const actualPagination = this.tServ.getPaginationById('lista_ncf');
           this.getPaquetesNCF(actualPagination);
           instance.closeModal(instance.id, 'eliminar_comprobante');
