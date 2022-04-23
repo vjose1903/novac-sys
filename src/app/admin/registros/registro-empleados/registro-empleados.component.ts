@@ -30,7 +30,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     { titulo: 'Nombre', tipo: 'text', key: 'nombreCompleto' },
     { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
     { titulo: 'Cedula', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Role', tipo: 'textList', key: 'roles', key_value:'nombre' },
+    { titulo: 'Role', tipo: 'textList', key: 'roles', key_value: 'nombre' },
   ];
 
   botones = { titulo: true, borrar: true, editar: true };

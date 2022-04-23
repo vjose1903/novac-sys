@@ -239,7 +239,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higüero', telefono: null });
         this.getCamiones();
       } else {
-        this.form.reset();
+        if (this.form) this.form.reset();
       }
 
       if (this.action === 'update') {
@@ -664,27 +664,28 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       }
     }
 
-    if (campo === 'nom') {
-      if (this.metodo === 'venta') this.enfocarInput('nom');
+    if (campo == 'nom') {
+      if (this.metodo == 'venta') this.enfocarInput('nom');
       else this.enfocarInput('ncf');
     }
 
-    if (campo === 'filtro') {
+    if (campo == 'filtro') {
       if (this.validarRayaAbajo()) {
         this.abrirModalFiltro();
         this.desEnfocarInput(salioDe);
       } else fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
     }
 
-    if (campo === 'dir' && valor !== null) this.enfocarInput(campo);
+    if (campo == 'dir' && fun.hasValue(valor)) this.enfocarInput(campo);
 
-    if (campo === 'cod-0' && valor !== null) this.iniciarFactura(campo);
+    if (campo == 'cod-0' && fun.hasValue(valor)) this.iniciarFactura(campo);
   }
 
   iniciarFactura(campo) {
     if (this.condicion_fact !== 'Crédito') {
-      this.enfocarInput(campo);
       this.propietario_factura = this.form.value;
+
+      setTimeout(() => this.enfocarInput(campo), 10);
     } else {
       fun.toastWarning('Para facturar a crédito debe de seleccionar un cliente', 'Aviso');
     }
@@ -737,7 +738,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const containCamiones = document.getElementById('overlayCamion');
     setTimeout(() => {
       const voy_a = document.activeElement;
-      console.log('quii');
 
       if (!containCamiones.contains(voy_a)) {
         if (!this.camionesSelected.length) {
@@ -886,16 +886,16 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
   async imprimirFactura() {
     if (!this.propietario_factura) {
-      if (this.metodo === 'compra') fun.toastWarning('Factura no tiene suplidor seleccionado', 'Aviso');
+      if (this.metodo == 'compra') fun.toastWarning('Factura no tiene suplidor seleccionado', 'Aviso');
       else fun.toastWarning('Factura no tiene cliente seleccionado', 'Aviso');
     } else {
-      if (this.CuerpoFactura.length === 0) {
+      if (this.CuerpoFactura.length == 0) {
         fun.toastWarning('Factura incompleta!!!', 'Aviso');
       } else {
-        if (this.TOTAL === 0) {
+        if (this.TOTAL == 0) {
           fun.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
-          if (this.condicion_fact === 'Crédito' || this.is_viaje) {
+          if (this.condicion_fact == 'Crédito' || this.is_viaje) {
             const confirmationObj = {
               id: 'imprimir_factura',
               texto: 'Seguro que desea imprimir la factura',
@@ -910,7 +910,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           } else {
             let articulos_a_cambiar = false;
 
-            if (this.metodo === 'compra') {
+            if (this.metodo == 'compra') {
               const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
               this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
             }
@@ -919,8 +919,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
             const obj = {
               total_factura: this.TOTAL,
-              devuelta: this.action === 'update' ? this.factura_a_editar.devuelta + this.factura_a_editar.total_factura : 0,
-              tipo__: 'devuelta',
+              devuelta: this.action == 'update' ? this.factura_a_editar.devuelta + this.factura_a_editar.total_factura : 0,
+              tipo_modal: 'devuelta',
               factura_de: this.metodo,
               cambios_articulos: articulos_a_cambiar,
             };

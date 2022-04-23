@@ -44,7 +44,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     DirectivesModule,
     PdfViewerModule,
     ReactiveFormsModule,
-
   ],
 })
 export class LayoutModule {}

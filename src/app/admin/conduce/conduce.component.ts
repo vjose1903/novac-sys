@@ -565,7 +565,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           conteo++;
           if (conteo >= factura.detalle_facturas.length)
             setTimeout(() => {
-
               this.handleModalForm({
                 component: ModalSeleccinarArticuloComponent,
                 inputs: factura.detalle_facturas,

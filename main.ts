@@ -278,6 +278,21 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
   } catch (error) {}
 }
 
+function getActualGitUser() {
+  return new Promise<any>((resolve, reject) => {
+    const args_ = process.argv.slice(1);
+    const serve_ = args_.some((val) => val === '--serve');
+
+    if (serve_) {
+      cmd(`git config --get user.name`, async (res_username) => {
+        resolve(res_username.STDOUT.trim());
+      });
+    } else {
+      resolve(undefined);
+    }
+  });
+}
+
 function getConfigFile() {
   return new Promise((resolve, reject) => {
     const args_ = process.argv.slice(1);
@@ -285,10 +300,11 @@ function getConfigFile() {
     const pjson = require('./package.json');
 
     Functions.getConfigFile()
-      .then((config: any) => {
+      .then(async (config: any) => {
         var config = JSON.parse(config);
 
         config['is_development'] = serve_;
+        config['gitUser'] = await getActualGitUser();
         config['printersList'] = win.webContents.getPrinters();
         config['app_version'] = pjson.version;
 
@@ -345,8 +361,7 @@ function verificarSumastra() {
 function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
   // const interval = setInterval(() => {
 
-  const command =
-    process.platform === 'darwin' ? `unzip "${pathAdd(path_local_extension)}" -d "${pathAdd()}"` : `powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`;
+  const command = process.platform === 'darwin' ? `unzip "${pathAdd(path_local_extension)}" -d "${pathAdd()}"` : `powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`;
 
   cmd(command, (res) => {
     if (res.status) {
@@ -443,8 +458,7 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
-  const command =
-    process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+  const command = process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
   cmd(command, (res_local) => {
     if (res_local.status) {
@@ -476,8 +490,7 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
   if (conf.url_servidor_descargas) {
     await downloadFile(`${conf.url_servidor_descargas}${paht_server}`, path_local_content, path_local_extension, (res) => {
       if (res.status) {
-        const command =
-          process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+        const command = process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
         cmd(command, (res_local_before_descarga) => {
           if (res_local_before_descarga.status) {
