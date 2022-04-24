@@ -113,8 +113,6 @@ export class MixinClass extends ModalClass {
 
   eliminarRegistro(obj) {
     const noFunction = (instance: any) => {
-      console.log('instance ', instance);
-
       instance.closeModal('borrar', 'cancelar');
     };
     this.handleModalForm({

@@ -35,12 +35,7 @@
                       formControlName="cedula"
                     ></p-inputMask>
 
-                    <div
-                      (click)="setDocumentoPrincipal('cedula')"
-                      class="input-group-append"
-                      pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}"
-                      tooltipPosition="right"
-                    >
+                    <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                       <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                     </div>
                   </div>
@@ -60,12 +55,7 @@
                       formControlName="rnc"
                     ></p-inputMask>
 
-                    <div
-                      (click)="setDocumentoPrincipal('rnc')"
-                      class="input-group-append"
-                      pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}"
-                      tooltipPosition="right"
-                    >
+                    <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                       <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                     </div>
                   </div>
@@ -76,15 +66,7 @@
               <div class="col-6 p-0 pl-2">
                 <div class="form-group mb-2" [appMsgError]="'telefono'" [form]="form">
                   <label class="control-label">Telefono: <span style="color: red">*</span></label>
-                  <p-inputMask
-                    (keydown.enter)="saltar('campoNombre')"
-                    mask="(999) 999-9999"
-                    tabindex="-1"
-                    styleClass="form-control"
-                    inputId="campoTelefono"
-                    placeholder="(___) ___-____"
-                    formControlName="telefono"
-                  ></p-inputMask>
+                  <p-inputMask (keydown.enter)="saltar('campoNombre')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono"></p-inputMask>
 
                   <span id="msgContainer_telefono"></span>
                 </div>
@@ -120,15 +102,7 @@
               <div class="col-12 p-0">
                 <div class="form-group" [appMsgError]="'direccion'" [form]="form">
                   <label class="control-label">Direccion: <span style="color: red">*</span></label>
-                  <textarea
-                    id="campoDir"
-                    formControlName="direccion"
-                    (keyup)="capitalice('direccion', $event.target.value)"
-                    placeholder="Ingrese la direccion"
-                    cols="100"
-                    rows="3"
-                    class="form-control"
-                  ></textarea>
+                  <textarea id="campoDir" formControlName="direccion" (keyup)="capitalice('direccion', $event.target.value)" placeholder="Ingrese la direccion" cols="100" rows="3" class="form-control"></textarea>
                   <span id="msgContainer_direccion"></span>
                 </div>
               </div>
@@ -154,19 +128,7 @@
           <button [disabled]="suplidorSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <app-tablas
-            class="h-100"
-            *ngIf="listaSuplidores && info"
-            [padre]="cardTabla"
-            [info]="info"
-            [botones]="botones"
-            (DevolverInfo)="editarItem($event)"
-            (DELETE)="eliminarReg($event.ARG)"
-            [data]="listaSuplidores"
-            [id_tabla]="'listaSuplidores'"
-            (paginateChange)="getSuplidores($event)"
-            [focusRow]="false"
-          ></app-tablas>
+          <dinamic-table [cardTabla]="cardTabla" [(data)]="listaSuplidores" [seleccionado]="suplidorSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
         </div>
       </div>
     </div>

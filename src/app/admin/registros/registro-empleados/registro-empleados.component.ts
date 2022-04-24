@@ -119,7 +119,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
         res['data'].map((empleado) => {
           empleado.nombreCompleto = empleado.nombre + ' ' + empleado.apellido;
           const doc = _.find(empleado.documentos_de_identidad, { principal: true });
-
           empleado.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
 
           return empleado;
