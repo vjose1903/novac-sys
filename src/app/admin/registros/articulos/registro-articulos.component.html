@@ -514,19 +514,7 @@
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <dinamic-table [cardTabla]="cardTabla" [(data)]="listaArticulos" [seleccionado]="articuloSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
-          <!-- <app-tablas
-            class="h-100"
-            *ngIf="listaArticulos && info"
-            [padre]="cardTabla"
-            [info]="info"
-            [data]="listaArticulos"
-            [id_tabla]="'listaArticulos'"
-            [focusRow]="false"
-            [botones]="botones"
-            (DevolverInfo)="editarItem($event)"
-            (paginateChange)="filtrarArticulo($event)"
-            (DELETE)="eliminarReg($event.ARG)"
-          ></app-tablas> -->
+
         </div>
       </div>
     </div>

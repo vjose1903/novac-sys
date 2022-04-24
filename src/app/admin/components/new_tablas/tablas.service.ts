@@ -2,15 +2,13 @@ import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { BehaviorSubject } from 'rxjs';
 import { fun } from '../../../core/services/functions.service';
+import { paginateI } from './tablas.component';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TablasService {
   constructor() {}
-
-  private alto = new BehaviorSubject<any>(undefined);
-  ALTO = this.alto.asObservable();
 
   public obj_paginate = {
     default: {
@@ -23,11 +21,7 @@ export class TablasService {
     },
   };
 
-  setAltoTabla(nextValue) {
-    this.alto.next(nextValue);
-  }
-
-  initPagination(id, params) {
+  initPagination(id, params: paginateI) {
     this.obj_paginate[id] = params;
   }
 
@@ -35,7 +29,7 @@ export class TablasService {
     return this.obj_paginate[id];
   }
 
-  modifyPaginationById(id, params) {
+  modifyPaginationById(id, params: Array<paginateI>) {
     params.forEach((param) => {
       const key = _.keys(param)[0];
 

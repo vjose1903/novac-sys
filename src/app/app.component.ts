@@ -69,6 +69,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     SingletonService.layServ = this.layServ;
     SingletonService.toastr = this.toastr;
     SingletonService.sharedServ = this.sharedServ;
+    SingletonService.cdRef = this.cdRef;
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
 

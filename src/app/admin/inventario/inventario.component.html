@@ -1,36 +1,68 @@
-<div id="cardTabla" class="cardPrincipal sinPadding mainContent">
-  <div class="bordes info justify-content-between cantidades">
+<div class="mainInventario">
+  <div class="colTitulo">
+    <h4 class="negrita mb-1">Inventario</h4>
+    <h4 class="mb-2">
+      Cantidad de productos en inventario: <strong>{{ cant_inventario }}</strong>
+    </h4>
+  </div>
+
+  <div class="cuerpo p-0">
+    <div #cardTabla id="cardTabla" class="card cardListados">
+      <dinamic-table [cardTabla]="cardTabla" [(data)]="listaArticulos" [(TablasComponent)]="tablaComponent" [config]="table_roles_config" (table_events)="handle_table_events($event)"></dinamic-table>
+
+      <div class="divFiltro">
+        <select class="form-control filtroArticulos" [(ngModel)]="filtro" (change)="filtrarArticulos()">
+          <option value="0" disabled>Filtro por tipo de articulos</option>
+          <option value="todos">Todos</option>
+          <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+        </select>
+
+        <i class="fas fa-print btn-circle-icon ml-3 btnReporte" (click)="makeReporte()" style="z-index: 999999" pTooltip="Reporte de inventario" tooltipPosition="right"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="cardPrincipal sinPadding mainContent">
+  <div class="justify-content-between cantidades">
     <div class="text-center">
       <span style="font-size: 1.2rem"> Cantidad de productos en inventario </span>
       <h4 class="negrita" *ngIf="listaArticulos">{{ cant_inventario }}</h4>
     </div>
   </div>
 
-  <div class="p-2 cuerpo">
-    <div class="divFiltro">
-      <select class="form-control filtroArticulos" [(ngModel)]="filtro" (change)="filtrarArticulos()">
-        <option value="0" disabled>Filtro por tipo de articulos</option>
-        <option value="todos">Todos</option>
-        <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
-      </select>
+  <div class="cuerpo">
+    <div class="p-2 innerCuerpo">
+      <div class="divFiltro">
+        <select class="form-control filtroArticulos" [(ngModel)]="filtro" (change)="filtrarArticulos()">
+          <option value="0" disabled>Filtro por tipo de articulos</option>
+          <option value="todos">Todos</option>
+          <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+        </select>
 
-      <i class="fas fa-print btn-circle-icon ml-3" (click)="makeReporte()" style="z-index: 999999" pTooltip="Reporte de inventario" tooltipPosition="right"></i>
-    </div>
-    <div #cardTabla class="h-100 divTabla" style="display: flex">
-      <app-tablas
-        class="h-100"
-        *ngIf="listaArticulos"
-        [padre]="cardTabla"
-        [info]="info"
-        [data]="listaArticulos"
-        [id_tabla]="'inventario'"
-        [focusRow]="false"
-        [search]="true"
-        [paginate]="true"
-        [botones]="botones"
-        (DevolverInfo)="movimientoInventario($event)"
-        (paginateChange)="getArticulos($event)"
-      ></app-tablas>
+        <i class="fas fa-print btn-circle-icon ml-3" (click)="makeReporte()" style="z-index: 999999" pTooltip="Reporte de inventario" tooltipPosition="right"></i>
+      </div>
+
+      <div class="h-100 divTabla">
+        <div #cardTabla class="divInnerTabla">
+
+
+          <app-tablas
+          class="h-100"
+          *ngIf="listaArticulos"
+          [padre]="cardTabla"
+          [info]="info"
+          [data]="listaArticulos"
+          [id_tabla]="'inventario'"
+          [focusRow]="false"
+          [search]="true"
+          [paginate]="true"
+          [botones]="botones"
+          (DevolverInfo)="movimientoInventario($event)"
+          (paginateChange)="getArticulos($event)"
+        ></app-tablas>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</div> -->

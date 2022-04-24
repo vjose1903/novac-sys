@@ -1,3 +1,11 @@
+export enum medidas {
+  Libra = 'Libras',
+  Quintal = 'Quintales',
+  Caja = 'Cajas',
+  Paquete = 'Paquetes',
+  Unidad = 'Unidades',
+  Saco = 'Sacos',
+}
 
 export class TablaClass {
   handle_table_events(event) {

@@ -52,12 +52,11 @@ export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
     for (const key in this.botones) {
       const boton = this.botones[key];
 
-      if (key === 'dinamic') {
+      if (key == 'dinamico') {
         if (boton.length) {
           for (const btn_dinamic of boton) {
             this.items.push({
               icon: btn_dinamic['icon'],
-              // command: () => this.handleFunctionsBtnDinamic(btn_dinamic),
               command: (arg) => {
                 const index = this.getSpeedDial(arg);
                 const dato = this.data[index];

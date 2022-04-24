@@ -5,6 +5,7 @@ import { ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '../../../core/services/functions.service';
+import { medidas } from './tabla-class';
 
 export interface table_info {
   titulo?: string;
@@ -36,9 +37,10 @@ export interface table_info {
   key_value?: string;
 }
 
-interface obj_paginate {
-  show: boolean;
+export interface paginateI {
+  show?: boolean;
   page?: number;
+  ant_page?: number;
   per_page?: number;
   per_page_options?: Array<number>;
   search?: string;
@@ -83,7 +85,7 @@ export interface table_config {
   table_size?: 'sm';
   backgroundColor?: any;
   total_count?: any;
-  obj_paginate?: obj_paginate;
+  obj_paginate?: paginateI;
   botones?: botonesTableI;
 }
 
@@ -102,8 +104,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   altoTabla;
   altoTbody;
 
-  // @Input()  = 'tabla';
-
   @Input() TablasComponent;
   @Output() TablasComponentChange = new EventEmitter<any>();
 
@@ -116,7 +116,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   // output
   @Output() table_events = new EventEmitter<any>();
-
   @Output() dataChange = new EventEmitter<any>();
 
   cantPagesView: number = 5;
@@ -124,10 +123,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   pagActual = 1;
 
   total_registros;
-  tabla_content: HTMLElement;
-  pageAfterFilter: any;
 
-  sub: Subscription;
   subWidth: Subscription;
 
   fun = fun;
@@ -145,10 +141,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   ngOnInit() {
-    this.sub = this.tServ.ALTO.subscribe((res) => {
-      // if (res) this.setHeight(res);
-    });
-
     this.subWidth = new fun().getWindowSize.subscribe((res) => {
       if (res) {
         this.setCantPagView(res.innerWidth, 'width_page');
@@ -166,7 +158,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   ngAfterViewInit() {
-    if (this.data && this.data.length > 0) this.updateDataCopy(this.data, 'ngAfterViewInit');
+    if (this.data && this.data.length > 0) this.updateDataCopy(this.data);
 
     this.handleConfig();
   }
@@ -189,7 +181,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
     this.subWidth.unsubscribe();
     this.tServ.deletePaginationById(this.config.id_tabla);
   }
@@ -283,6 +274,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }, 150);
   }
 
+
+
   localPagination(page, per_page, desde = '') {
     const copyData = fun.duplicarJson(this.copyData);
 
@@ -299,17 +292,25 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.data.length = 0;
     newData.forEach((dato) => this.data.push(dato));
     const id = this.config.id_tabla;
+    const actualPagination = this.tServ.getPaginationById(id);
 
-    let pageMostar = 1;
-    this.pageAfterFilter ||= this.tServ.getPaginationById(id)['page'];
+    let new_obj_pagination = { ant_page: null, page: null };
+    console.log('actualPagination ', actualPagination);
 
-    if (_.isEqual(this.data, this.copyData)) {
-      pageMostar = this.pageAfterFilter;
+    if (fun.hasValue(actualPagination) && actualPagination.show) {
+      if (fun.isEmpty(actualPagination['ant_page'])) {
+        new_obj_pagination = { ant_page: actualPagination.page, page: 1 };
+      } else {
+        if (_.isEqual(this.data, this.copyData)) new_obj_pagination = { page: actualPagination.ant_page, ant_page: null };
+      }
 
-      this.pageAfterFilter = undefined;
+      for (const key in new_obj_pagination) {
+        const element = {};
+        element[key] = new_obj_pagination[key];
+
+        this.tServ.modifyPaginationById(id, [element]);
+      }
     }
-
-    this.tServ.modifyPaginationById(id, [{ page: pageMostar }]);
   }
 
   divPaginatorChangeWidth(event) {
@@ -393,6 +394,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     return res;
   }
+
   changeStylesTitles() {
     for (let i = 0; i < this.config.info.length; i++) {
       const info: any = this.config.info[i];
@@ -447,27 +449,62 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.handle_table_events('inputChange', obj);
   }
 
-  updateDataCopy(data, desde = '') {
+  updateDataCopy(data) {
+    fun.logYellow('----- updateDataCopy -----');
     this.copyData = fun.duplicarJson(data);
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
       this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'updateDataCopy');
     }
+    this.cdRef.detectChanges();
   }
 
   ngOnChanges(change) {
     if (change.data && change.data.currentValue) {
-      this.updateDataCopy(this.data, 'ngOnChanges');
+      this.updateDataCopy(this.data);
 
       // ================================================
       // CUSTOM STYLES
       // ================================================
-      setTimeout(() => {
-        this.changeStylesTitles();
-      }, 10);
+      setTimeout(() => this.changeStylesTitles(), 10);
       // ================================================
     }
     this.cdRef.detectChanges();
+  }
+
+  lookOters(objeto) {
+    const keys = _.keys(objeto);
+    const values = _.values(objeto);
+
+    const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
+    const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
+    const fin2 = values[2] > 1 ? medidas[keys[2]] : keys[2];
+
+    const principal = fun.formatearNumero(fun.redondearAdos(values[0])) + '  ' + fin;
+
+    const padre = fun.formatearNumero(fun.redondearAdos(values[1])) + '  ' + fin1;
+    const hijo = fun.formatearNumero(values[2]) + '  ' + fin2;
+
+    let cantiTootip = { Padre: undefined, Hijo: undefined };
+    if (keys.length > 1) {
+      if (keys.length === 2) {
+        cantiTootip = { Padre: padre, Hijo: undefined };
+      } else {
+        cantiTootip = { Padre: padre, Hijo: hijo };
+      }
+    } else {
+      cantiTootip = { Padre: principal, Hijo: undefined };
+    }
+
+    return cantiTootip;
+  }
+
+  lookprincipal(objeto) {
+    const keys = _.keys(objeto);
+    const values = _.values(objeto);
+    const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
+
+    return fun.formatearNumero(fun.redondearAdos(values[0])) + '  ' + fin;
   }
 
   iconBtn(key, i, data, e, objIcon) {
@@ -584,9 +621,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return placeholder ? placeholder : 'seleccione';
   }
 
-  // changeVisibleItems(items) {
-  //   this.mdbTablePagination.setMaxVisibleItemsNumberTo(items);
-  // }
   functionsBtnDinamic(params) {
     if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.handleBtnsDinamic) {
       this.config.padre_functions.handleBtnsDinamic(params);
@@ -597,19 +631,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   clickROW(arg, quien = '') {
     const has_inputs = _.some(this.config.info, (info: any) => info.tipo == 'input');
-
     this.handle_table_events('clickRow', arg);
   }
 
   handle_table_events(type, arg) {
     this.table_events.emit({ type: type, info: arg, id_tabla: this.config.id_tabla });
-  }
-
-  delete(arg) {
-    this.handle_table_events('delete', arg);
-  }
-
-  pararProgagacion(e) {
-    e.stopPropagation();
   }
 }
