@@ -228,7 +228,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
           const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
 
           if (fun.hasValue(search)) {
-
             if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.config.id_tabla, [{ ant_page: actualPagination.page }]);
             this.tServ.modifyPaginationById(this.config.id_tabla, [{ page: 1 }]);
           } else if (fun.isEmpty(search) && fun.hasValue(actualPagination.ant_page)) {
@@ -263,12 +262,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       const per_page = event.rows;
       const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
 
-      this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
-
       const actualPage = this.getPaginatorPageByNumber(page);
       const clickeado_por = actualPage.getAttribute('clickeado_por');
 
-      if (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina') {
+      if (page != actualPagination.page && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
+        this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
+
         if (actualPagination.is_local) {
           this.localPagination(page, per_page, 'paginatorChange');
         } else {

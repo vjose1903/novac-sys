@@ -144,19 +144,7 @@
         </div>
 
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <app-tablas
-            class="h-100"
-            *ngIf="listaVehiculos && info"
-            [padre]="cardTabla"
-            [info]="info"
-            [data]="listaVehiculos"
-            [focusRow]="false"
-            [id_tabla]="'lista_vehiculos'"
-            [botones]="botones"
-            (DevolverInfo)="editarItem($event)"
-            (paginateChange)="getVehiculos($event)"
-            (DELETE)="eliminarReg($event.ARG)"
-          ></app-tablas>
+          <dinamic-table [cardTabla]="cardTabla" [(data)]="listaVehiculos" [seleccionado]="vehiculoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
         </div>
       </div>
     </div>
