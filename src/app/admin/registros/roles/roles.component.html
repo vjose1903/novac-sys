@@ -62,20 +62,8 @@
                   <div class="col-6 p-md-0">
                     <!-- DESCRIPCION PERMISO SELECCIONADO-->
 
-                    <div #tabla_acciones id="cardTabla" class="divAcciones">
-                      <app-tablas
-                        class="h-100"
-                        *ngIf="permiso_selected?.acciones && infoPermisos"
-                        [padre]="tabla_acciones"
-                        [search]="false"
-                        [paginate]="false"
-                        [(TablasComponent)]="TablasComponent"
-                        [info]="infoPermisos"
-                        [data]="permiso_selected?.acciones"
-                        [id_tabla]="'tabla_acciones'"
-                        (DevolverInfo)="editarItem($event)"
-                        [focusRow]="false"
-                      ></app-tablas>
+                    <div #tabla_acciones class="divAcciones">
+                      <dinamic-table [cardTabla]="tabla_acciones" [(data)]="permiso_selected.acciones" [(TablasComponent)]="tablaPermisosComponent" [config]="table_permisos_config" (table_events)="handle_table_events($event)"></dinamic-table>
                     </div>
                   </div>
                 </div>
@@ -100,20 +88,8 @@
           <h4 class="mb-0">Listado roles</h4>
           <button [disabled]="roleSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
-        <div #cardTabla id="cardTabla_" class="card cardContentClass">
-          <app-tablas
-            class="h-100"
-            *ngIf="listaRoles && info"
-            [padre]="cardTabla"
-            [info]="info"
-            [data]="listaRoles"
-            [botones]="botones"
-            [id_tabla]="'lista_roles'"
-            (DevolverInfo)="editarItem($event)"
-            (DELETE)="abrirModal('borrar', $event.ARG)"
-            [focusRow]="false"
-            (paginateChange)="getRoles($event)"
-          ></app-tablas>
+        <div #cardTabla class="card cardContentClass">
+          <dinamic-table [cardTabla]="cardTabla" [(data)]="listaRoles" [seleccionado]="roleSelected?.id" [(TablasComponent)]="tablaRolesComponent" [config]="table_roles_config" (table_events)="handle_table_events($event)"></dinamic-table>
         </div>
       </div>
     </div>

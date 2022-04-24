@@ -86,7 +86,9 @@
                       </span>
 
                       <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace" class="table_switch">
-                        <p-inputSwitch (onChange)="changeValorCheck(dato, column.key, getIndex(index_body))" styleClass="size-sm" [ngModel]="getValueForm(column, dato)"></p-inputSwitch>
+                        <input class="apple-switch" [ngClass]="{ disabled: disabledInput(dato, column) }" type="checkbox" (change)="changeValorCheck(dato, column.key, getIndex(index_body))" [checked]="getValueForm(column, dato)" />
+
+                        <!-- <p-inputSwitch (onChange)="changeValorCheck(dato, column.key, getIndex(index_body))" styleClass="size-sm" [ngModel]="getValueForm(column, dato)"></p-inputSwitch> -->
                       </div>
                     </span>
 

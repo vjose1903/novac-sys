@@ -112,6 +112,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     });
 
     this.listaVehiculos = _.orderBy(res.data, ['id'], ['asc']);
+
     this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
   }
 
