@@ -27,13 +27,13 @@
               <tr
                 *ngFor="let dato of data; let index_body = index"
                 class="text-center"
-                id="row-{{ getIndex(index_body) }}"
+                id="row-{{ config.id_tabla }}-{{ getIndex(index_body) }}"
                 [ngClass]="{
                   greenTd: dato?.greenTd && config?.colores,
                   danger: !dato?.activo && config?.colores,
                   warning: dato?.panico > 0 && config?.colores,
                   'bg-selected': config?.colores && seleccionado == dato?.id,
-                  'bg-light': config.focusRow && RowElement.id == IDROW,
+                  'bg-light': config.focusRow && RowElement.id == row_id,
                   'bg-more-light': dato?.subrayar
                 }"
                 style="cursor: pointer; color: var(--letras)"

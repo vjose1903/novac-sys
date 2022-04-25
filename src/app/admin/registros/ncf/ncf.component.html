@@ -1,6 +1,6 @@
 <div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita">Registro de paquetes de comprobantes fiscales</h4>
+    <h4 class="negrita mb-0">Registro de paquetes de comprobantes fiscales</h4>
   </div>
 
   <div class="col-12 p-0 colFormularioListado">
@@ -112,14 +112,16 @@
           <button [disabled]="ncfSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <dinamic-table [cardTabla]="cardTabla" [(data)]="listaNCF" [seleccionado]="ncfSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          <div class="divTabla">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="listaNCF" [seleccionado]="ncfSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
 
-          <div class="filtroNCF" style="top: 0.6rem; left: 1rem">
-            <select class="form-control select" [(ngModel)]="filtro" (change)="filtrarNCF()">
-              <option value="0" disabled>Filtrar por tipo</option>
-              <option value="todos">Todos</option>
-              <option *ngFor="let tipo of lista_tipos_facturas" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
-            </select>
+            <div class="filtroNCF" style="top: 0.6rem; left: 1rem">
+              <select class="form-control select" [(ngModel)]="filtro" (change)="filtrarNCF()">
+                <option value="0" disabled>Filtrar por tipo</option>
+                <option value="todos">Todos</option>
+                <option *ngFor="let tipo of lista_tipos_facturas" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>

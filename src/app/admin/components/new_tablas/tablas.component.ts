@@ -1,93 +1,12 @@
-import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, OnDestroy, NgZone } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, OnDestroy, NgZone, HostListener } from '@angular/core';
 
 import * as _ from 'lodash';
 import { ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '../../../core/services/functions.service';
-import { medidas } from './tabla-class';
-
-export interface table_info {
-  titulo?: string;
-  titulo_sm?: string;
-  tooltip?: string;
-  key?: string;
-  tipo?: string;
-  tag_severity?: string;
-  remplace?: any;
-  data?: any;
-  placeholder?: string;
-  optionLabel?: any;
-  optionValue?: any;
-  estilos?: Array<any>;
-  inputType?: string;
-  rowTooltip?: string;
-  alerta?: boolean;
-  tag_color?: string;
-  tag_apretada?: boolean;
-  disable?: any;
-  color?: string;
-  text_color?: string;
-  dateFormat?: any;
-  hours?: any;
-  src?: any;
-  alt?: any;
-  click?: Function;
-  iconsArray?: Array<any>;
-  key_value?: string;
-}
-
-export interface paginateI {
-  show?: boolean;
-  page?: number;
-  ant_page?: number;
-  per_page?: number;
-  per_page_options?: Array<number>;
-  search?: string;
-  is_local?: boolean;
-}
-
-interface inner_btn {
-  show: boolean;
-  name?: string;
-  tooltip?: string;
-  tooltipKey?: string;
-  permiso?: string;
-  icon?: string;
-}
-
-export interface botonesTableI {
-  dinamico?: Array<inner_btn>;
-  borrar?: inner_btn;
-  editar?: inner_btn;
-  mostrar?: inner_btn;
-}
-
-interface padreFunctionsI {
-  handleBtnsDinamic?: Function;
-  data_request?: Function;
-}
-
-export interface table_config {
-  padding?: string;
-  padre_functions?: padreFunctionsI;
-  colores?: Boolean;
-  read?: Boolean;
-  focusRow?: Boolean;
-  extraCalculo?: Number;
-  filtrar?: any;
-  localFilter?: Boolean;
-  filterTargets?: any;
-  id?: String;
-  id_tabla?: String;
-  info?: Array<table_info>;
-  data_request?: any;
-  table_size?: 'sm';
-  backgroundColor?: any;
-  total_count?: any;
-  obj_paginate?: paginateI;
-  botones?: botonesTableI;
-}
+import { medidas, table_config } from './tabla-class';
+import { teclasCode } from '../../../core/typescript/constantes';
 
 @Component({
   selector: 'dinamic-table',
@@ -95,9 +14,31 @@ export interface table_config {
   styleUrls: ['./tablas.component.scss'],
 })
 export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  @ViewChild('dinamicTable', { static: false }) dinamicTable: ElementRef;
+  ready = false;
 
-  IDROW = 'row-0';
+  @HostListener('window:keyup', ['$event'])
+  handleKeyboardEvent(event: any) {
+
+
+    if (this.config.focusRow && this.ready) {
+      const key = event.keyCode;
+      event.stopPropagation();
+      console.log('key ', key);
+      console.log('teclasCode._arriba ', teclasCode._arriba);
+      console.log('teclasCode._abajo ', teclasCode._abajo);
+      console.log('  ');
+      console.log('key == teclasCode._arriba ', key == teclasCode._arriba);
+      console.log('key == teclasCode._abajo ', key == teclasCode._abajo);
+
+
+      if (key == teclasCode._arriba) this.mover_foco('up');
+      else if (key == teclasCode._abajo) this.mover_foco('down');
+      else if (key == teclasCode._enter) this.ENTER(this.row_id);
+    }
+  }
+
+  row_id;
+  actualRowIndex = 0;
   copyData: any;
 
   seleccionado_id: any;
@@ -151,6 +92,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.TablasComponentChange.emit(this.TablasComponent);
 
     this.checkPagination();
+    this.row_id = `row-${this.config.id_tabla}-${this.actualRowIndex}`;
+    setTimeout(() => (this.ready = true), 250);
   }
 
   checkPagination() {
@@ -273,8 +216,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       this.cdRef.detectChanges();
     }, 150);
   }
-
-
 
   localPagination(page, per_page, desde = '') {
     const copyData = fun.duplicarJson(this.copyData);
@@ -636,5 +577,30 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   handle_table_events(type, arg) {
     this.table_events.emit({ type: type, info: arg, id_tabla: this.config.id_tabla });
+  }
+
+  // ========================================================================
+  //  FUNCIONES DE LAS TECLAS DE LAS FECHAS
+  // ========================================================================
+
+  mover_foco(direccion: 'up' | 'down') {
+    if (direccion == 'up') {
+      if (this.actualRowIndex == 0) this.actualRowIndex = this.data.length;
+      else this.actualRowIndex = this.actualRowIndex - 1;
+    }
+    if (direccion == 'down') {
+      if (this.actualRowIndex == this.data.length - 1) this.actualRowIndex = 0;
+      else this.actualRowIndex = this.actualRowIndex + 1;
+    }
+    this.row_id = `row-${this.config.id_tabla}-${this.actualRowIndex}`;
+
+    fun.scrollTo({ id: this.row_id, behavior: 'smooth', block: 'center', inline: 'center' });
+    fun.enfocarInput(this.row_id);
+
+  }
+
+  ENTER(arg) {
+    const element = document.getElementById(arg) as any;
+    element.click();
   }
 }

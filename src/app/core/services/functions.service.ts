@@ -482,8 +482,8 @@ export class fun {
   // Nombre: scrollTo
   // Descripcion : Esta funcion mueve el scroll hasta un elemento proporcionados
   // __________________________________________________________________________________________________
-  static scrollTo(id, block_: any = 'start', inline_: any = 'center') {
-    if (id && document.getElementById(`${id}`)) document.getElementById(`${id}`).scrollIntoView({ behavior: 'smooth', block: block_, inline: inline_ });
+  static scrollTo(params: { id: string; block: 'start' | 'center' | 'end' | 'nearest'; inline: 'start' | 'center' | 'end' | 'nearest'; behavior: 'auto' | 'smooth' }) {
+    if (params.id && document.getElementById(`${params.id}`)) document.getElementById(`${params.id}`).scrollIntoView({ behavior: params.behavior, block: params.block, inline: params.inline });
   }
 
   // __________________________________________________________________________________________________
@@ -511,6 +511,43 @@ export class fun {
       return false;
     }
     return true;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: clickInput
+  // Descripcion : Esta funcion hace click en un elemento html
+  // __________________________________________________________________________________________________
+  static clickInput(arg) {
+    const element = document.getElementById(arg) as HTMLElement;
+    if (element) element.click();
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: enfocarInput
+  // Descripcion : Esta funcion enfoca un elemento html
+  // __________________________________________________________________________________________________
+  static enfocarInput(arg) {
+    const element = document.getElementById(arg) as HTMLElement;
+
+    if (element) element.focus();
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: desEnfocarInput
+  // Descripcion : Esta funcion desenfoca un elemento html
+  // __________________________________________________________________________________________________
+  static desEnfocarInput(arg) {
+    const element = document.getElementById(arg) as HTMLElement;
+    if (element) element.blur();
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: selectContenido
+  // Descripcion : Esta funcion selecciona el contenido de un elemento html
+  // __________________________________________________________________________________________________
+  static selectContenido(arg) {
+    const element = document.getElementById(arg) as any;
+    if (element) element.select();
   }
 
   static getAuthToken() {

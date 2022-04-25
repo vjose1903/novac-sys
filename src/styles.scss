@@ -14,11 +14,11 @@ $bodyfont: "Poppins";
   max-height: inherit;
 }
 
-.si-wrap{
+.si-wrap {
   flex-wrap: wrap;
 }
 
-.no-wrap{
+.no-wrap {
   white-space: nowrap;
 }
 
@@ -705,6 +705,7 @@ Not supports in Firefox and IE */
 }
 
 .rowResgitro {
+  max-height: calc(100vh - 4rem);
   height: 100%;
   display: grid;
   grid-template-areas:
@@ -778,7 +779,14 @@ Not supports in Firefox and IE */
 
         > .cardContentClass {
           grid-area: card_content_area;
-          @include my_cards;
+          border-radius: 1rem !important;
+          position: relative;
+          > .divTabla {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            @include my_cards;
+          }
         }
       }
     }

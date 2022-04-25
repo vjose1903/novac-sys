@@ -11,7 +11,8 @@ import { EmpleadoC } from './empleado';
 import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
 import { fun } from '../../../core/services/functions.service';
 import { RolesC } from '../roles/roles';
-import { table_config } from '../../components/new_tablas/tablas.component';
+import { table_config } from '../../components/new_tablas/tabla-class';
+
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',

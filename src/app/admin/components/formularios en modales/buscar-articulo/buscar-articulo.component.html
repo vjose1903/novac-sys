@@ -1,5 +1,5 @@
 <div #cardTabla id="cardTabla" class="h-100 d-flex">
-  <app-tablas
+  <!-- <app-tablas
     *ngIf="dataFiltro"
     [focusRow]="true"
     [metodo]="inputs.metodo"
@@ -12,5 +12,6 @@
     [data]="dataFiltro"
     [search]="false"
     (paginateChange)="buscarArticulos($event)"
-  ></app-tablas>
+  ></app-tablas> -->
+  <dinamic-table [cardTabla]="cardTabla" [(data)]="dataFiltro"  [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
 </div>

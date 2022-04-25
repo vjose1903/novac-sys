@@ -8,7 +8,7 @@ import { customValidators } from '../../../core/typescript/custom-validators';
 import { ClienteC } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tablas.component';
+import { table_config } from '../../components/new_tablas/tabla-class';
 
 @Component({
   selector: 'app-registro-clientes',

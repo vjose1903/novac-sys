@@ -10,7 +10,7 @@ import { EmpleadoC } from '../registro-empleados/empleado';
 import { VehiculoC } from './vehiculo';
 import { FormularioMarcaModeloComponent } from '../../components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tablas.component';
+import { table_config } from '../../components/new_tablas/tabla-class';
 
 @Component({
   selector: 'app-registro-vehiculo',

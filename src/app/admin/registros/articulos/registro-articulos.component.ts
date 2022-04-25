@@ -8,7 +8,7 @@ import * as moment from '../../../core/javascript/moment';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 import * as $ from 'jquery';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tablas.component';
+import { table_config } from '../../components/new_tablas/tabla-class';
 
 @Component({
   selector: 'app-registro-articulos',

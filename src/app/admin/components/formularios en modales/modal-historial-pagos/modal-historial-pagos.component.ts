@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../tablas/tablas.service';

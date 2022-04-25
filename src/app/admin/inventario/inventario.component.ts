@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
-import { GLOBAL } from '../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { TablasService } from '../components/new_tablas/tablas.service';
 import { MixinClass } from '../../core/typescript/MixinClass';
@@ -10,8 +9,8 @@ import { PdfService } from '../../core/services/pdf/pdf.service';
 import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../core/services/functions.service';
-import { table_config } from '../components/new_tablas/tablas.component';
 import { SingletonService } from '../../core/services/singleton.service';
+import { table_config } from '../components/new_tablas/tabla-class';
 
 @Component({
   selector: 'app-inventario',
@@ -40,8 +39,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   };
 
   tablaComponent;
-
-  info = [];
 
   cant_inventario = 0;
   botones = { titulo: true, inventario: true };

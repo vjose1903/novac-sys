@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { BehaviorSubject } from 'rxjs';
 import { fun } from '../../../core/services/functions.service';
-import { paginateI } from './tablas.component';
+import { paginateI } from './tabla-class';
 
 @Injectable({
   providedIn: 'root',

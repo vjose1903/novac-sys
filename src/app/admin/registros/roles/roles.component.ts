@@ -5,7 +5,7 @@ import { AccionesC, PermisosC, RolesC } from './roles';
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tablas.component';
+import { table_config } from '../../components/new_tablas/tabla-class';
 
 @Component({
   selector: 'app-roles',

@@ -1,6 +1,6 @@
 <div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita">Registro de camiones</h4>
+    <h4 class="negrita mb-0">Registro de camiones</h4>
   </div>
 
   <div class="col-12 p-0 colFormularioListado">
@@ -136,7 +136,7 @@
       <div class="list {{ isCreando || vehiculoSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 classs="mb-0">Listado camiones</h4>
-          <div class="mt-4 p-2" style="height: min-content">
+          <div class="" style="height: min-content">
             <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('marcas')">Marcas</a>
             <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('modelos')">Modelos</a>
             <button [disabled]="vehiculoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
@@ -144,7 +144,9 @@
         </div>
 
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <dinamic-table [cardTabla]="cardTabla" [(data)]="listaVehiculos" [seleccionado]="vehiculoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          <div class="divTabla">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="listaVehiculos" [seleccionado]="vehiculoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
         </div>
       </div>
     </div>

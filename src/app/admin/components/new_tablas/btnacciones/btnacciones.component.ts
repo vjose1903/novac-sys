@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 
 import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
-import { botonesTableI } from '../tablas.component';
+import { botonesTableI } from '../tabla-class';
 
 @Component({
   selector: 'app-btnacciones',

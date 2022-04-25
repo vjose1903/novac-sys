@@ -1,6 +1,6 @@
 <div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita">Registro de empleados</h4>
+    <h4 class="negrita mb-0">Registro de empleados</h4>
   </div>
 
   <div class="col-12 p-0 colFormularioListado">
@@ -38,16 +38,7 @@
               <div class="col-6 p-0 pr-2">
                 <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                   <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                  <input
-                    type="text"
-                    formControlName="nombre"
-                    (keyup)="capitalice('nombre', $event.target.value)"
-                    id="campoNombre"
-                    (keydown.enter)="saltar('campoApellido')"
-                    placeholder="Introduzca nombre"
-                    class="form-control"
-                    autocomplete="off"
-                  />
+                  <input type="text" formControlName="nombre" (keyup)="capitalice('nombre', $event.target.value)" id="campoNombre" (keydown.enter)="saltar('campoApellido')" placeholder="Introduzca nombre" class="form-control" autocomplete="off" />
                   <span id="msgContainer_nombre"></span>
                 </div>
               </div>
@@ -81,15 +72,7 @@
                 <div class="form-group" [appMsgError]="'telefono'" [form]="form">
                   <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
-                  <p-inputMask
-                    (keydown.enter)="saltar('campoEmail')"
-                    mask="(999) 999-9999"
-                    tabindex="-1"
-                    styleClass="form-control"
-                    inputId="campoTelefono"
-                    placeholder="(___) ___-____"
-                    formControlName="telefono"
-                  ></p-inputMask>
+                  <p-inputMask (keydown.enter)="saltar('campoEmail')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono"></p-inputMask>
 
                   <span id="msgContainer_telefono"></span>
                 </div>
@@ -117,18 +100,7 @@
 
               <div class="col-6 p-0 pr-2" [appMsgError]="'fecha_nacimiento'" [form]="form">
                 <label class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
-                <input
-                  type="text"
-                  id="campoFecha"
-                  [bsConfig]="dpConfig"
-                  (keydown.enter)="saltar('campoRole')"
-                  placeholder="dd/mm/aaaa"
-                  class="form-control"
-                  formControlName="fecha_nacimiento"
-                  #dp="bsDatepicker"
-                  placement="top"
-                  bsDatepicker
-                />
+                <input type="text" id="campoFecha" [bsConfig]="dpConfig" (keydown.enter)="saltar('campoRole')" placeholder="dd/mm/aaaa" class="form-control" formControlName="fecha_nacimiento" #dp="bsDatepicker" placement="top" bsDatepicker />
                 <span id="msgContainer_fecha_nacimiento"></span>
               </div>
 
@@ -151,31 +123,14 @@
               <div class="col-6 p-0 pr-2">
                 <div *ngIf="!editando" class="form-group" [appMsgError]="'password'" [form]="form">
                   <label class="control-label">Contraseña:<span style="color: red">*</span></label>
-                  <input
-                    (keydown.enter)="saltar('campoConfirmPassword')"
-                    id="campoPassword"
-                    type="password"
-                    formControlName="password"
-                    placeholder="Introduzca contraseña"
-                    class="form-control"
-                    autocomplete="off"
-                  />
+                  <input (keydown.enter)="saltar('campoConfirmPassword')" id="campoPassword" type="password" formControlName="password" placeholder="Introduzca contraseña" class="form-control" autocomplete="off" />
                   <span id="msgContainer_password"></span>
                 </div>
               </div>
               <div class="col-6 p-0 pl-2">
                 <div *ngIf="!editando" class="form-group" [appMsgError]="'confirm_password'" [form]="form">
                   <label class="control-label">Confirmar Contraseña:<span style="color: red">*</span></label>
-                  <input
-                    type="password"
-                    id="campoConfirmPassword"
-                    compare="password"
-                    (keydown.enter)="saltar('send')"
-                    formControlName="confirm_password"
-                    placeholder="Introduzca contraseña"
-                    class="form-control"
-                    autocomplete="off"
-                  />
+                  <input type="password" id="campoConfirmPassword" compare="password" (keydown.enter)="saltar('send')" formControlName="confirm_password" placeholder="Introduzca contraseña" class="form-control" autocomplete="off" />
                   <span id="msgContainer_confirm_password"></span>
                 </div>
               </div>
@@ -204,9 +159,9 @@
           <button [disabled]="empleadoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-
-          <dinamic-table [cardTabla]="cardTabla" [(data)]="listaEmpleados" [seleccionado]="empleadoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
-
+          <div class="divTabla">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="listaEmpleados" [seleccionado]="empleadoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
         </div>
       </div>
     </div>

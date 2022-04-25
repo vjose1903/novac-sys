@@ -44,9 +44,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const combinacion = _.join(this.secuenciaKeys, '_');
       this.secuenciaKeys = [];
 
-      if (combinacion === `${teclasCode.control}_${teclasCode.p}`) this.imprimirFactura();
+      if (combinacion === `${teclasCode._control}_${teclasCode._p}`) this.imprimirFactura();
 
-      if (combinacion === `${teclasCode.control}_${teclasCode.g}`) this.archivarFactura();
+      if (combinacion === `${teclasCode._control}_${teclasCode._g}`) this.archivarFactura();
 
       if (fun.hasValue(this.overlay)) this.mover_indicador_camion(key);
     }
@@ -763,17 +763,18 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   mover_indicador_camion(key) {
-    if (key == teclasCode.arriba) {
+    if (key == teclasCode._arriba) {
       if (this.camion_row == 0) this.camion_row = this.camiones.length - 1;
       else this.camion_row--;
-    } else if (key == teclasCode.abajo) {
+    } else if (key == teclasCode._abajo) {
       if (this.camion_row == this.camiones.length - 1) this.camion_row = 0;
       else this.camion_row++;
-    } else if (key == teclasCode.esc) {
+    } else if (key == teclasCode._esc) {
       this.saliendoDeCamionOverlay();
     }
 
-    fun.scrollTo(`overlayCamion-${this.camion_row}`, 'center');
+
+    fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
   saliendoDeCamionOverlay() {
@@ -806,7 +807,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.camiones.length = 0;
     for (const camion of camionesFiltrados) this.camiones.push(camion);
     this.camion_row = 0;
-    fun.scrollTo(`overlayCamion-${this.camion_row}`, 'center');
+    fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
+
   }
 
   // =============================================

@@ -1,6 +1,6 @@
 <div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita">Registro de suplidor</h4>
+    <h4 class="negrita mb-0">Registro de suplidor</h4>
   </div>
 
   <div class="col-12 pr-0 colFormularioListado">
@@ -128,7 +128,9 @@
           <button [disabled]="suplidorSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <dinamic-table [cardTabla]="cardTabla" [(data)]="listaSuplidores" [seleccionado]="suplidorSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          <div class="divTabla">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="listaSuplidores" [seleccionado]="suplidorSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@ import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
 import { SuplidorC } from './suplidores';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tablas.component';
+import { table_config } from '../../components/new_tablas/tabla-class';
 
 @Component({
   selector: 'app-registro-suplidores',
