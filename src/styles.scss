@@ -796,3 +796,11 @@ Not supports in Firefox and IE */
 .cardListados {
   @include my_cards;
 }
+
+.input_fantasma {
+  border: 0px solid transparent !important;
+  background: transparent !important;
+  width: 0;
+  height: 0;
+  position: absolute;
+}

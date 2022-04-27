@@ -34,7 +34,8 @@
           </div>
           <div class="col-12">
             <div #cardTabla id="cardTabla" class="card sombra bordeRedondeado factAdelantadas overflowHidden">
-              <app-tablas  class="h-100"
+              <app-tablas
+                class="h-100"
                 *ngIf="facturas_adelantadas && info"
                 [padre]="cardTabla"
                 [info]="info"
@@ -56,7 +57,7 @@
   <!-- ================================================================================================================================================ -->
   <div *ngIf="cliente" class="col-12 mt-3 abajo">
     <div class="card sombra bordeRedondeado h-100">
-      <table class="table m-auto">
+      <table class="table mb-0">
         <thead>
           <tr class="text-center">
             <th class="tiCOD">Codigo</th>

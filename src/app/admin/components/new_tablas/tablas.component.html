@@ -1,4 +1,5 @@
 <div #dinamicTable class="dinamicTable position-relative" [ngStyle]="{ height: cardTabla?.offsetHeight + 'px', width: cardTabla?.offsetWidth + 'px', padding: config.padding }">
+
   <!-- FILTER -->
   <div id="searchDiv-{{ config.id_tabla }}" *ngIf="config?.filtrar" class="searchDiv d-flex align-items-center" style="max-width: 17rem; z-index: 9">
     <label class="search-label mr-2" for="search">Busqueda </label>
@@ -39,7 +40,7 @@
                 style="cursor: pointer; color: var(--letras)"
                 [ngStyle]="{ 'background-color': this.changeBackGroundColor(dato) }"
                 #RowElement
-                (click)="clickROW(dato, 'Tr')"
+                (click)="clickROW(dato, index_body)"
               >
                 <td
                   *ngFor="let column of config.info; let index_column = index"
@@ -149,7 +150,7 @@
                   </span>
                 </td>
 
-                <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(dato, 'Td')">
+                <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(dato, index_body)">
                   <span class="titulo_sm"> Acciones </span>
                   <app-btnacciones
                     [index_body]="getIndex(index_body)"

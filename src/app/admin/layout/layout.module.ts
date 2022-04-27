@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { LayoutRoutingModule } from './layout.routing';
 import { LayoutComponent } from './layout.component';
 import { PrimengModule } from '../../modules/primeng.module';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 
 import { DirectivesModule } from '../../core/directive/directives.module';
@@ -40,7 +39,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     NgxBootstrapModule,
     NgSelectModule,
     FormsModule,
-    NgbModule,
     DirectivesModule,
     PdfViewerModule,
     ReactiveFormsModule,

@@ -8,5 +8,13 @@ export const MODALCONFIG = new BehaviorSubject<any>({});
   providedIn: 'root',
 })
 export class ModalService {
+  modalsConfig = [];
   constructor() {}
+
+  isModalOpen(type: 'least_one') {
+    let res = false;
+
+    if (type == 'least_one') res = this.modalsConfig.length >= 1;
+    return res;
+  }
 }

@@ -160,13 +160,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  noFiltroResponse(res) {
-    if (res.tipo == 'buscarCliente') {
-      this.enfocarInput('valorI');
-      this.selectContenido('valorI');
-    }
-  }
-
   ngOnDestroy(): void {
     this._destroy_mixin();
     this.borrar('salir');
@@ -543,8 +536,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-
-
   async CancelarFactura() {
     try {
       const res = await this.facturaClass.createOne(null, { afterPath: `anular_factura/${this.facturaSelected.id}` });
@@ -645,12 +636,17 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   getDataFromModal(arg, search) {
-    if (arg.modal_id === 'buscarCliente') {
-      this.clienteBuscado = arg.data;
-      (document.getElementById('valorI') as any).value = arg.data.nombre;
-      this.valor = arg.data.id;
-      const actualPagination = this.tServ.getPaginationById('facturas_params');
-      this.pedirFactura('1', arg.data.id, actualPagination);
+    if (arg.modal_id == 'buscarCliente') {
+      if (arg?.tipo == 'data_no_found') {
+        this.enfocarInput('valorI');
+        this.selectContenido('valorI');
+      } else {
+        this.clienteBuscado = arg.data;
+        (document.getElementById('valorI') as any).value = arg.data.nombre;
+        this.valor = arg.data.id;
+        const actualPagination = this.tServ.getPaginationById('facturas_params');
+        this.pedirFactura('1', arg.data.id, actualPagination);
+      }
     }
   }
 }

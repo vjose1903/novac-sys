@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as moment from '../../../../core/javascript/moment';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasComponent } from '../../../components/tablas/tablas.component';
@@ -104,28 +103,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this._destroy_mixin();
   }
 
-  objDevueltoResponse(res) {
-    if (res && res.tipo_modal === 'buscarCliente') {
-      this.clienteAdepositar = res.data;
-
-      (document.getElementById('clienteI') as any).value = `${res.data.nombre} ${res.data.apellido}`;
-      const actualPagination = this.tServ.getPaginationById('facturasPendientes');
-
-      this.pedirFacturasPorCliente(res.data.id, actualPagination);
-    } else if (res && res.tipo_modal === 'cambio') {
-      this.devuelta = res.data.devuelta;
-      this.forma_pago = res.data.forma_pago;
-      this.sendIngreso();
-    }
-  }
-
-  noFiltroResponse(res) {
-    if (res.tipo == 'buscarCliente') {
-      this.enfocarInput('clienteI');
-      this.selectContenido('clienteI');
-    }
-  }
-
   formatoNumero(num) {
     return fun.numFormatTwoDecimals(num);
   }
@@ -160,19 +137,16 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.sumarTotalRecibo();
   }
 
-  async pedirFacturasPorCliente(cliente_id, e) {
+  async pedirFacturasPorCliente(cliente_id, params?: { per_page: number; page: number; search: string }) {
     this.facturas = undefined;
     this.totalFacturado = 0;
     this.totalPagado = 0;
     this.totalNotas = 0;
     this.totalPagadoPorciento = 0;
 
-    const page = e.page;
-    const per_page = e.per_page;
-
     const fechaA = moment().format('YYYY-MM-DD');
 
-    const factTemp = await this.facturaClass.getAll({ afterPath: `cliente/${cliente_id}/pagada/false`, parameters: { page, per_page, paginado: false } });
+    const factTemp = await this.facturaClass.getAll({ afterPath: `cliente/${cliente_id}/pagada/false`, parameters: { page: params.page, per_page: params.per_page, paginado: false } });
     this.facturas = factTemp.data;
 
     this.facturas.map((factura) => {
@@ -216,7 +190,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     // this.tServ.Func_total_paginas(obj);
   }
 
-  // 134215.75+27725+106099.56+139550.75+2970+159379.56+110629.31+92004.56+32554.89
   async necesarioStart() {
     this.enfocarInput('clienteI');
   }
@@ -235,13 +208,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   cancelarIgreso() {
-    console.log('TAMBIEN AQUII');
-
     this.facturas = null;
     this.clienteAdepositar = undefined;
     (document.getElementById('clienteI') as any).value = null;
-
-    console.log('this.facturas ', this.facturas);
 
     this.resetVariables();
 
@@ -284,8 +253,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       header: 'Confirmación',
       texto: 'Seguro de que desea cancelar la operacion.',
       siFunction: (instance) => {
-        console.log('ANDO AQUIII');
-
         this.cancelarIgreso();
         instance.closeModal(instance.id, 'cancelar');
       },
@@ -301,12 +268,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
 
     if (arg.modal_id === 'buscarCliente') {
-      this.clienteAdepositar = arg.data;
-
-      (document.getElementById('clienteI') as any).value = `${arg.data.nombre} ${arg.data.apellido}`;
-      const actualPagination = this.tServ.getPaginationById('facturasPendientes');
-
-      this.pedirFacturasPorCliente(arg.data.id, actualPagination);
+      if (arg?.tipo == 'data_no_found') {
+        this.enfocarInput('clienteI');
+        this.selectContenido('clienteI');
+      } else {
+        this.clienteAdepositar = arg.data;
+        (document.getElementById('clienteI') as any).value = `${arg.data.nombre} ${arg.data.apellido}`;
+        this.pedirFacturasPorCliente(arg.data.id, this.tServ.obj_paginate.default);
+      }
     }
   }
   async confirmarIgreso() {

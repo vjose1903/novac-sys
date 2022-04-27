@@ -18,22 +18,13 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
-
-
     if (this.config.focusRow && this.ready) {
       const key = event.keyCode;
-      event.stopPropagation();
-      console.log('key ', key);
-      console.log('teclasCode._arriba ', teclasCode._arriba);
-      console.log('teclasCode._abajo ', teclasCode._abajo);
-      console.log('  ');
-      console.log('key == teclasCode._arriba ', key == teclasCode._arriba);
-      console.log('key == teclasCode._abajo ', key == teclasCode._abajo);
-
 
       if (key == teclasCode._arriba) this.mover_foco('up');
       else if (key == teclasCode._abajo) this.mover_foco('down');
       else if (key == teclasCode._enter) this.ENTER(this.row_id);
+      // event.stopPropagation();
     }
   }
 
@@ -501,11 +492,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const pageIndex = (this.pagActual - 1) * this.config.obj_paginate.per_page + index;
 
     const validate = fun.isEmpty(this.data[pageIndex]);
-    if (validate) {
-      return index;
-    } else {
-      return pageIndex;
-    }
+
+    return validate ? index : pageIndex;
   }
 
   disabledInput(dato, column) {
@@ -570,9 +558,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
-  clickROW(arg, quien = '') {
+  clickROW(data, index) {
     const has_inputs = _.some(this.config.info, (info: any) => info.tipo == 'input');
-    this.handle_table_events('clickRow', arg);
+    const obj = { data, index, id_tabla: this.config.id_tabla };
+    this.handle_table_events('clickRow', obj);
   }
 
   handle_table_events(type, arg) {
@@ -585,7 +574,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   mover_foco(direccion: 'up' | 'down') {
     if (direccion == 'up') {
-      if (this.actualRowIndex == 0) this.actualRowIndex = this.data.length;
+      if (this.actualRowIndex == 0) this.actualRowIndex = this.data.length - 1;
       else this.actualRowIndex = this.actualRowIndex - 1;
     }
     if (direccion == 'down') {
@@ -593,14 +582,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       else this.actualRowIndex = this.actualRowIndex + 1;
     }
     this.row_id = `row-${this.config.id_tabla}-${this.actualRowIndex}`;
+    this.cdRef.detectChanges();
 
     fun.scrollTo({ id: this.row_id, behavior: 'smooth', block: 'center', inline: 'center' });
     fun.enfocarInput(this.row_id);
-
   }
 
   ENTER(arg) {
     const element = document.getElementById(arg) as any;
-    element.click();
+    setTimeout(() => element.click(), 10);
   }
 }

@@ -11,6 +11,7 @@ import { BuscarArticuloComponent } from '../components/formularios en modales/bu
 import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { ModalSeleccinarArticuloComponent } from '../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 import { fun } from '../../core/services/functions.service';
+import { ModalService } from '../components/modal/modal.service';
 
 @Component({
   selector: 'app-conduce',
@@ -55,7 +56,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   conduceClass = new ConduceC();
   facturaClass = new FacturaC();
 
-  constructor(private fb: FormBuilder, private pdfServ: PdfService) {
+  constructor(private fb: FormBuilder, private pdfServ: PdfService, public mServ: ModalService) {
     super();
   }
 
@@ -89,13 +90,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   ngOnDestroy() {
     this._destroy_mixin();
-  }
-
-  articuloFiltroResponse(res) {
-    if (res && res.tipo_modal === 'buscarArticulo') {
-      this.llenarRowDespuesDeFiltro(res);
-      setTimeout(() => this.enfocarInput('can-' + res.index), 10);
-    }
   }
 
   pressEscResponse(res) {
@@ -143,11 +137,15 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   async getDataFromModal(arg, search) {
-    if (arg.modal_id === 'buscarArticulo') {
-      this.llenarRowDespuesDeFiltro(arg);
-      // setTimeout(() => this.enfocarInput('can-' + arg.index), 1000);
+    if (arg.modal_id == 'buscar_articulo') {
+      if (arg?.tipo == 'data_no_found') {
+        this.enfocarInput(`cod-${arg.index}`);
+        this.selectContenido(`cod-${arg.index}`);
+      } else {
+        this.llenarRowDespuesDeFiltro(arg);
+      }
     }
-    if (arg.modal_id === 'buscarCliente') {
+    if (arg.modal_id == 'buscarCliente') {
       this.cliente = arg.data;
       (document.getElementById('clienteI') as any).value = arg.data.nombre;
       setTimeout(() => this.enfocarInput('cod-0'), 10);
@@ -168,7 +166,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
       const { articulo, cod, can, uni, detalle_factura_id } = fila_actual;
 
-      if (index >= 10 && input == 'cod-') this.addItem(index);
+      if (index >= 10 && input == 'can-') this.addItem(index);
 
       let campo_siguiente = fun.hasValue(fila_siguiente['detalle_factura_id']) ? `can-${index + 1}` : this.inputSecuencia;
 
@@ -188,7 +186,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           this.handleModalForm({
             component: BuscarArticuloComponent,
             inputs: obj,
-            id: 'buscarArticulo',
+            id: 'buscar_articulo',
             header: 'BUSCAR ARTICULO',
             width: '56.25rem',
             height: '31.25rem',
@@ -197,6 +195,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
               cancelar: { show: false, disable: false },
             },
           });
+          this.enfocarInput('input_fantasma');
         } else {
           this.enfocarInput(`can-${index}`);
         }
@@ -381,9 +380,10 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     }
   }
 
-  addItem(i): void {
+  addItem(index): void {
+    fun.logPurple(' ----- AÑADIENDO MAS FILAS A LA TABLA DE CONDUCE ----- ');
     this.ARRAY_ROWARTICULOS = this.form.get('rowFactura') as FormArray;
-    this.ARRAY_ROWARTICULOS.push(this.createItem(i));
+    this.ARRAY_ROWARTICULOS.push(this.createItem(index));
   }
 
   removeItem(i: number) {

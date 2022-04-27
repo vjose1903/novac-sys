@@ -1,6 +1,6 @@
 import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { MODALCONFIG } from './modal.service';
+import { MODALCONFIG, ModalService } from './modal.service';
 import { ModalDirective } from './modal.directive';
 import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
@@ -13,11 +13,9 @@ import { fun } from '../../../core/services/functions.service';
 export class NewModalComponent implements OnInit {
   @ViewChildren(ModalDirective) modal_receptor: ModalDirective;
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private cdRef: ChangeDetectorRef) {}
+  constructor(private componentFactoryResolver: ComponentFactoryResolver, private cdRef: ChangeDetectorRef, public mServ: ModalService) {}
 
   subConfig: Subscription;
-
-  modalsConfig = [];
 
   defaultModalConfig: any = {
     show: false,
@@ -41,6 +39,10 @@ export class NewModalComponent implements OnInit {
     },
   };
 
+  get modalsConfig() {
+    return this.mServ.modalsConfig;
+  }
+
   ngOnInit(): void {
     this.subConfig = MODALCONFIG.subscribe((res) => {
       if (res && res.show) {
@@ -57,7 +59,7 @@ export class NewModalComponent implements OnInit {
     const data = { modal: modal, accion: accion };
     if (modal) modal.onHide(data);
 
-    this.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
+    this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
   }
 
   handleConfig(config) {

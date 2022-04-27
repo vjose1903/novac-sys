@@ -57,25 +57,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     this.rellenarVariables();
   }
 
-  articuloFiltroResponse(res) {
-    this.objDevueltoResponse(res);
-  }
-
-  noFiltroResponse(res) {
-    if (res.tipo == 'buscarArticulo') {
-      this.enfocarInput(`cod-${res.index}`);
-      this.selectContenido(`cod-${res.index}`);
-    }
-  }
-
-  objDevueltoResponse(res) {
-    if (res && res.tipo_modal === 'buscarArticulo') this.llenarRowDespuesDeFiltro(res);
-  }
-
-  pressEscResponse(res) {
-    if (fun.hasValue(res)) setTimeout(() => this.enfocarInput('cod-' + res), 250);
-  }
-
   escucharCambiosEnForm() {
     this.form.valueChanges.subscribe((res) => {
       if (fun.hasValue(res)) this.emitirCambiosForm(res);
@@ -257,9 +238,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  addItem(i): void {
+  addItem(index): void {
+    fun.logPurple(' ----- AÑADIENDO MAS FILAS A LA TABLA DE FACTURAS ----- ');
     this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as FormArray;
-    this.ARRAY_ROWFACTURAS.push(this.createItem(i));
+    this.ARRAY_ROWFACTURAS.push(this.createItem(index));
   }
 
   removeItem(i: number) {
@@ -377,6 +359,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
                 cancelar: { show: false, disable: false },
               },
             });
+            this.enfocarInput('input_fantasma');
           } else {
             this.enfocarInput(`can-${index}`);
           }
@@ -729,7 +712,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async getDataFromModal(arg, search) {
-    this.llenarRowDespuesDeFiltro(arg);
+    if (arg?.tipo == 'data_no_found') {
+      this.enfocarInput(`cod-${arg.index}`);
+      this.selectContenido(`cod-${arg.index}`);
+    } else {
+      this.llenarRowDespuesDeFiltro(arg);
+    }
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
