@@ -773,7 +773,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.saliendoDeCamionOverlay();
     }
 
-
     fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
@@ -808,7 +807,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     for (const camion of camionesFiltrados) this.camiones.push(camion);
     this.camion_row = 0;
     fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
-
   }
 
   // =============================================
@@ -818,6 +816,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   abrirModalFiltro() {
     let obj = {};
     obj['data'] = [];
+    const input_activo = document?.activeElement?.id;
+
+    if (fun.hasValue(input_activo)) this.desEnfocarInput(input_activo);
 
     if (this.metodo === 'venta') obj['filtrarCliente'] = null;
     if (this.metodo === 'compra') obj['filtrarSuplidor'] = null;
