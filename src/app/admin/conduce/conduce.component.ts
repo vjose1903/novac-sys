@@ -12,6 +12,7 @@ import { BuscarArticuloComponent } from '../components/formularios en modales/bu
 import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { ModalSeleccinarArticuloComponent } from '../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 import { fun } from '../../core/services/functions.service';
+import { Permisos } from '../../core/typescript/permisos';
 
 @Component({
   selector: 'app-conduce',
@@ -55,13 +56,15 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   articuloClass = new ArticuloC();
   conduceClass = new ConduceC();
   facturaClass = new FacturaC();
+  permissions = Permisos;
+  formPermissions = [Permisos.role.create, Permisos.role.update];
 
   constructor(private fb: FormBuilder, private pdfServ: PdfService) {
     super();
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'conduce', is_routing: true});
+    this._init_mixin({ component: 'conduce', is_routing: true });
 
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),

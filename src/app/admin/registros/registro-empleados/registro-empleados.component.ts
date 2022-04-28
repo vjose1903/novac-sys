@@ -11,6 +11,7 @@ import { EmpleadoC } from './empleado';
 import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
 import { fun } from '../../../core/services/functions.service';
 import { RolesC } from '../roles/roles';
+import { Permisos } from '../../../core/typescript/permisos';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -46,6 +47,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   empleadosClass = new EmpleadoC();
   rolesClass = new RolesC();
   listRoles: [];
+  permissions = Permisos;
+  formPermissions = [Permisos.user.create, Permisos.user.update];
 
   constructor(private fb: FormBuilder, private localeService: BsLocaleService, private tServ: TablasService) {
     super();

@@ -7,7 +7,7 @@ export const Permisos = {
     destroy: 'articulo_destroy',
     get_stock: 'articulo_get_stock',
     get_filtrados: 'articulo_get_filtrados',
-    check_excede: 'articulo_check_excede',
+    check_excede: ' articulo_check_excede',
     read_formula: 'articulo_read_formula',
     update_formula: 'articulo_update_formula',
   },

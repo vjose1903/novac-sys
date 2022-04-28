@@ -7,7 +7,7 @@
             <h2 class="negrita">Conduce</h2>
           </div>
           <div class="col-12 p-0 colCard">
-            <div class="card card-padding sombra h-100">
+            <div *ngxPermissionsOnly="permissions.conduce.get_filtrados" class="card card-padding sombra h-100">
               <div class="form-group">
                 <label class="control-label">Cliente: </label>
                 <input
@@ -34,7 +34,8 @@
           </div>
           <div class="col-12">
             <div #cardTabla id="cardTabla" class="card sombra bordeRedondeado factAdelantadas overflowHidden">
-              <app-tablas  class="h-100"
+              <app-tablas
+                class="h-100"
                 *ngIf="facturas_adelantadas && info"
                 [padre]="cardTabla"
                 [info]="info"

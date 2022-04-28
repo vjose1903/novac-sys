@@ -17,7 +17,6 @@ import { ConfigI } from '../../core/typescript/config-interface';
 import { fun } from '../../core/services/functions.service';
 import { NgxPermissionsService } from 'ngx-permissions';
 
-
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
@@ -90,7 +89,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ngOnInit() {
     this.initVariables();
-    this._init_mixin({ component: 'layout', is_routing: false});
+    this._init_mixin({ component: 'layout', is_routing: false });
 
     const token = fun.getAuthToken();
 

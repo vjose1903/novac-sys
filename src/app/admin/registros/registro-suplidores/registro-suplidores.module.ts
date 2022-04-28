@@ -7,9 +7,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TablasModule } from '../../components/tablas/tablas.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PrimengModule } from '../../../modules/primeng.module';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [RegistroSuplidoresComponent],
-  imports: [CommonModule, RegistroSuplidoresRoutingModule, ReactiveFormsModule, FormsModule, TablasModule, DirectivesModule, PrimengModule],
+  imports: [CommonModule, RegistroSuplidoresRoutingModule, ReactiveFormsModule, FormsModule, TablasModule, DirectivesModule, PrimengModule, NgxPermissionsModule],
 })
 export class RegistroSuplidoresModule {}

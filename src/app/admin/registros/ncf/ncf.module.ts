@@ -5,9 +5,10 @@ import { NcfComponent } from './ncf.component';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 import { TablasModule } from '../../components/tablas/tablas.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [NcfComponent],
-  imports: [CommonModule, NcfRoutingModule, FormsModule, ReactiveFormsModule, NgxBootstrapModule, TablasModule],
+  imports: [CommonModule, NcfRoutingModule, FormsModule, ReactiveFormsModule, NgxBootstrapModule, TablasModule, NgxPermissionsModule],
 })
 export class NcfModule {}

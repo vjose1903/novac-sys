@@ -8,6 +8,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from './ncf';
 import { fun } from '../../../core/services/functions.service';
+import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
   selector: 'app-ncf',
@@ -60,6 +61,8 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();
   ncfClass = new NcfC();
+  permissions = Permisos;
+  formPermissions = [Permisos.secuencia_comprobante.create, Permisos.secuencia_comprobante.update];
   constructor(private tServ: TablasService, private localeService: BsLocaleService) {
     super();
     this.dpConfig = Object.assign(
@@ -83,7 +86,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.localeService.use('es');
-    this._init_mixin({ component: 'reg_ncf', is_routing: true});
+    this._init_mixin({ component: 'reg_ncf', is_routing: true });
     this.necesarioStart();
 
     this.setDateInputs(new Date());

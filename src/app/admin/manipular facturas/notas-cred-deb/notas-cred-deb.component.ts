@@ -13,6 +13,7 @@ import { ClienteC } from '../../registros/registro-clientes/cliente';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { NotaC } from './notas';
 import { fun } from '../../../core/services/functions.service';
+import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -52,12 +53,14 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   tiposFacturasClass = new TiposFacturaC();
   clienteClass = new ClienteC();
   ncfClass = new NcfC();
+  permissions = Permisos;
+
   constructor(private activeRoute: ActivatedRoute, private router: Router, private pdfServ: PdfService, private cdRef: ChangeDetectorRef) {
     super();
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'notas', is_routing: true});
+    this._init_mixin({ component: 'notas', is_routing: true });
     this.idsFacturas = JSON.parse(this.activeRoute.snapshot.params['ids']);
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 

@@ -8,9 +8,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../../components/tablas/tablas.module';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [RegistroClientesComponent],
-  imports: [CommonModule, RegistroClientesRoutingModule, UploadImgModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, TablasModule],
+  imports: [CommonModule, RegistroClientesRoutingModule, UploadImgModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, TablasModule, NgxPermissionsModule],
 })
 export class RegistroClientesModule {}

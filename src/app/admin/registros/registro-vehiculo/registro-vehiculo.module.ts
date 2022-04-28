@@ -6,6 +6,7 @@ import { RegistroVehiculoComponent } from './registro-vehiculo.component';
 import { TablasModule } from '../../components/tablas/tablas.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [RegistroVehiculoComponent],
@@ -16,8 +17,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     ReactiveFormsModule,
     FormsModule,
     NgSelectModule,
+    NgxPermissionsModule,
     // TODO: quitar el ngSelect de aqui
   ],
 })
 export class RegistroVehiculoModule {}
-

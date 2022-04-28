@@ -9,6 +9,7 @@ import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
 import { SuplidorC } from './suplidores';
 import { fun } from '../../../core/services/functions.service';
+import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -45,6 +46,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   camposDisabled: boolean = true;
   editando: boolean = false;
   suplidorClass = new SuplidorC();
+  permissions = Permisos;
+  formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
 
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
     super();

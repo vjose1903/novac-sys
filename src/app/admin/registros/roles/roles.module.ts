@@ -7,9 +7,10 @@ import { PrimengModule } from '../../../modules/primeng.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { TablasModule } from '../../components/tablas/tablas.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [RolesComponent],
-  imports: [CommonModule, RolesRoutingModule, TablasModule, AngularResizedEventModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule],
+  imports: [CommonModule, RolesRoutingModule, TablasModule, AngularResizedEventModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule],
 })
 export class RolesModule {}

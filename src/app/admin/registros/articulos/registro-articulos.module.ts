@@ -10,9 +10,10 @@ import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [RegistroArticulosComponent],
-  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule, PipesModule, NgxBootstrapModule, DirectivesModule, OverlayPanelModule],
+  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule, PipesModule, NgxBootstrapModule, DirectivesModule, OverlayPanelModule, NgxPermissionsModule],
 })
 export class RegistroArticulosModule {}
