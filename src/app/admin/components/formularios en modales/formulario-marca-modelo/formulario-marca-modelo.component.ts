@@ -17,46 +17,59 @@ import { table_config } from '../../new_tablas/tabla-class';
 export class FormularioMarcaModeloComponent extends MixinClass implements OnInit, ModalI {
   @Input() tipo_formulario;
   tabIndex;
-  componente;
+
   tituloTabla;
   @Output() accion_ = new EventEmitter<any>();
   formMarca: FormGroup;
   formModelo: FormGroup;
 
-  table_config: table_config = {
-    info: [],
+  table_marca_config: table_config = {
+    info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }],
     colores: true,
     padding: '0.5rem',
-    id_tabla: '',
+    id_tabla: 'listado_marcas',
     padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
   };
+  tablaMarcaComponent: any;
+
+  table_modelo_config: table_config = {
+    info: [
+      { titulo: 'Marca', key: 'marca_nombre', tipo: 'text' },
+      { titulo: 'Modelo', key: 'descripcion', tipo: 'text' },
+    ],
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'listado_modelos',
+    padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+  };
+  tablaModeloComponent: any;
 
   info = [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }];
 
-  botones = {
-    titulo: true,
-    borrar: true,
-    editar: true,
-  };
+  botones = { titulo: true, borrar: true, editar: true };
+  componente = { 0: 'listado_marcas', 1: 'listado_modelos' };
 
-  listado;
-  boton = 'Guardar';
+  listadoMarcas;
+  marcaSelected;
+
+  listadoModelos;
+  modeloSelected;
+
   campo1;
   campo2;
-  listaMarcas: any;
-  listaModelos: any;
-  listaTipoArticulos: any;
-  editando: any;
+  editando = false;
 
-  indexSelected: any;
+  listaMarcas: any;
+  listaTipoArticulos: any;
 
   marcasClass = new MarcaC();
   modeloClass = new ModeloC();
-  tablaModeloComponent: any;
-  tablaMarcaComponent: any;
 
   constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();
@@ -72,45 +85,56 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
     if (this.tipo_formulario === 'marcas') {
       this.tabIndex = 0;
-      this.componente = 'reg_marcas';
       this.tituloTabla = 'Marcas';
       this.campo1 = 'Marca';
-      this.table_config.info = [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }];
     } else if (this.tipo_formulario === 'modelos') {
       this.tabIndex = 1;
-      this.componente = 'reg_modelos';
       this.tituloTabla = 'Modelos';
       this.campo1 = 'Marca';
-
-      this.table_config.info = [
-        { titulo: 'Marca', key: 'marca_nombre', tipo: 'text' },
-        { titulo: 'Modelo', key: 'descripcion', tipo: 'text' },
-      ];
     }
 
     this.formMarca.controls.descripcion.setValidators([Validators.required]);
     this.formModelo.controls.descripcion.setValidators([Validators.required]);
     this.formModelo.controls.marca_id.setValidators([Validators.required]);
-    this.getMarcas();
+
+    this.getMarcas({ paginado: false, search: ' ', page: 1, per_page: 1 });
 
     this.pedirNuevaData(this.tServ.obj_paginate.default);
 
     setTimeout(() => {
-      if (this.tipo_formulario === 'modelos') {
-        this.enfocarInput('marca_modal');
-      } else {
-        this.enfocarInput('descripcion');
-      }
+      if (this.tipo_formulario === 'modelos') this.enfocarInput('marca_modal');
+      else this.enfocarInput('descripcion');
     }, 200);
   }
 
-  getMarcas(palabra_a_buscar = ' ', paginado = false, page = 1, per_page = 1) {
-    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado, page, per_page } };
+  getMarcas(params) {
+    console.log(' ');
+    fun.logYellow('------ PIDIENDO MARCAS ------');
+    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: params.paginado, page: params.page, per_page: params.per_page } };
     this.marcasClass.getAll(extra).then((res) => {
-      if (!paginado) this.listaMarcas = fun.duplicarJson(res);
-      if (paginado) {
-        this.listado = res.data;
+      if (!params.paginado) this.listaMarcas = fun.duplicarJson(res);
+      if (params.paginado) {
+        this.listadoMarcas = res.data;
+        this.tablaMarcaComponent.changeConfig([{ total_count: res.total_registros }]);
       }
+    });
+  }
+
+  getModelos(params) {
+    console.log(' ');
+    fun.logRed('------ PIDIENDO MODELOS ------');
+    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: true, page: params.page, per_page: params.per_page } };
+
+    this.modeloClass.getAll(extra).then((res) => {
+      res.data.map((obj) => {
+        obj.marca_nombre = obj.marca.descripcion;
+        return obj;
+      });
+
+      this.listadoModelos = res.data;
+      this.tablaModeloComponent.changeConfig([{ total_count: res.total_registros }]);
     });
   }
 
@@ -123,37 +147,35 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.formMarca = this.fb.group({
       descripcion: [null],
       marca_id: [null],
+      id: [null],
     });
+
     this.formModelo = this.fb.group({
       descripcion: [null],
       marca_id: [null],
+      id: [null],
     });
   }
 
+  clickTabView(index) {
+    const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex]);
+    this.pedirNuevaData(actual_pagination);
+  }
+
   async pedirNuevaData(params?: { per_page: number; page: number; search: string }) {
-    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
-
-    this.listado = [];
-    if (this.componente === 'reg_modelos') {
-      const extra = { afterPath: `filtro/${' '}`, parameters: { paginado: true, page: params.page, per_page: params.per_page } };
-
-      this.modeloClass.getAll(extra).then((modeloRes) => {
-        modeloRes.data.map((obj) => {
-          obj.marca_nombre = obj.marca.descripcion;
-          return obj;
-        });
-
-        this.listado = modeloRes.data;
-        // this.tServ.Func_total_paginas({ total: modeloRes.total_registros, tabla: 'tabla_frm_marca_modelo' });
-      });
-    } else if (this.componente === 'reg_marcas') {
-      this.getMarcas(palabra_a_buscar, true, params.page, params.per_page);
+    if (!this.isShowMarcas()) {
+      this.getModelos(params);
+    } else if (this.isShowMarcas()) {
+      params['paginado'] = true;
+      this.getMarcas(params);
+      this.getMarcas({ paginado: false, search: ' ', page: 1, per_page: 1 });
     }
   }
 
   accion(arg) {
     this.accion_.emit(arg);
   }
+
   closeThis() {
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
@@ -162,60 +184,70 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   async submit(formToSubmit) {
-    console.log('formToSubmit ', formToSubmit);
+    const obj = fun.duplicarJson(formToSubmit.getRawValue());
+    const metodo = fun.hasValue(obj?.id) ? 'actualizado' : 'creado';
 
-    const obj = fun.duplicarJson(formToSubmit.value);
+    if (this.isShowMarcas() && _.has(obj, 'marca_id')) delete obj['marca_id'];
 
-    if (this.tipo_formulario !== 'modelos') delete obj['marca_id'];
+    const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
 
-    if (fun.hasValue(this.editando)) obj.id = this.editando.id;
-
-    const clase = this.tipo_formulario === 'modelos' ? this.modeloClass : this.marcasClass;
-
-    await clase.createUpdateOne(obj).then(() => this.onSuccess());
+    await clase.createUpdateOne(obj).then(() => this.onSuccess(metodo));
   }
 
-  onSuccess() {
-    fun.toastSuccess(`Item ${this.editando ? 'actualizado' : 'creado'} correctamente.`, 'CORRECTO');
+  onSuccess(metodo) {
+    fun.toastSuccess(`Item ${metodo} correctamente.`, 'CORRECTO');
 
     this.pedirNuevaData(this.tServ.obj_paginate.default);
 
     this.borrar();
 
-    if (this.tipo_formulario === 'modelos') this.enfocarInput('marca_modal');
-    else this.enfocarInput('descripcion');
+    if (this.isShowMarcas()) this.enfocarInput('descripcion');
+    else this.enfocarInput('marca_modal');
+  }
+
+  isShowMarcas() {
+    return this.componente[this.tabIndex] == 'listado_marcas';
+  }
+
+  tableClick_action(params) {
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.eliminarReg(params.data);
   }
 
   borrar() {
-    this.formMarca.reset();
-    this.formModelo.reset();
-    this.editando = undefined;
-    this.indexSelected = undefined;
+    if (this.isShowMarcas()) {
+      this.formMarca.reset();
+      this.marcaSelected = undefined;
+    } else {
+      this.formModelo.reset();
+      this.modeloSelected = undefined;
+    }
 
-    this.boton = 'Guardar';
+    this.editando = false;
   }
 
-  editarItem(arg, form) {
-    console.log('formName ', form);
-    console.log('arg ', arg);
-    this.editando = arg.ARG;
+  editarItem(data) {
+    const form = this.isShowMarcas() ? this.formMarca : this.formModelo;
 
-    this.indexSelected = arg.INDEX;
-    if (_.has(arg.ARG, 'marca')) arg.ARG.marca_id = arg.ARG.marca.id;
+    if (this.isShowMarcas()) this.marcaSelected = data;
+    else this.modeloSelected = data;
 
-    form.patchValue(arg.ARG);
-    this.boton = 'Editar';
+    this.editando = true;
+
+    if (_.has(data, 'marca')) data.marca_id = data.marca.id;
+
+    form.patchValue(data);
   }
 
   eliminarReg(regisData) {
     const objToSend = {
       data: regisData,
-      texto: `¿Está seguro que desea eliminar ${this.tipo_formulario == 'modelos' ? 'el modelo' : 'la marca'}: <b> ${regisData.descripcion} </b>?`,
+      texto: `¿Está seguro que desea eliminar ${this.isShowMarcas() ? 'la marca' : 'el modelo'}: <b> ${regisData.descripcion} </b>?`,
       siFunction: () => {
-        const clase = this.tipo_formulario === 'modelos' ? this.modeloClass : this.marcasClass;
+        const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
         clase.deleteOne(regisData.id).then((res) => {
-          // TODO: ver si aqui en vdd no tengo que buscar la paginacion actual
-          this.pedirNuevaData(this.tServ.obj_paginate.default);
+          const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex]);
+          this.pedirNuevaData(actual_pagination);
         });
       },
     };

@@ -1,5 +1,5 @@
 <div style="height: 100%">
-  <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView panelsStyle anularPadding">
+  <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView panelsStyle anularPadding" (onChange)="clickTabView($event.index)">
     <p-tabPanel header="Marcas">
       <form [formGroup]="formMarca" class="h-100">
         <div class="row h-100">
@@ -17,14 +17,20 @@
 
               <div class="row">
                 <div class="col-12 mt-3">
-                  <ng-container *ngTemplateOutlet="accionButtons; context: { data: { form: formMarca } }"> </ng-container>
+                  <div class="form-group">
+                    <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
+                    <a *ngIf="marcaSelected" class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
+                    <input [disabled]="!formMarca.valid" (click)="submit(formMarca)" type="submit" class="btn" value="{{ marcaSelected ? 'Editar' : 'Guardar' }}" id="btn-verde" />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="col-6">
-            <ng-container *ngTemplateOutlet="tablaMarcaModelo; context: { data: { form: formMarca, formName: 'formMarca' } }"> </ng-container>
+            <div #cardMarca class="h-100">
+              <dinamic-table [cardTabla]="cardMarca" [(data)]="listadoMarcas" [seleccionado]="marcaSelected?.id" [(TablasComponent)]="tablaMarcaComponent" [config]="table_marca_config" (table_events)="handle_table_events($event)"></dinamic-table>
+            </div>
           </div>
         </div>
       </form>
@@ -60,16 +66,26 @@
               </div>
               <div class="row">
                 <div class="col-12 mt-3">
-                  <ng-container *ngTemplateOutlet="accionButtons; context: { data: { form: formModelo } }"> </ng-container>
+                  <div class="form-group">
+                    <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
+                    <a *ngIf="modeloSelected" class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
+                    <input [disabled]="!formModelo.valid" (click)="submit(formModelo)" type="submit" class="btn" value="{{ modeloSelected ? 'Editar' : 'Guardar' }}" id="btn-verde" />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <div class="col-6">
-            <div #cardModelo>
-              <dinamic-table [cardTabla]="cardModelo" [(data)]="listado" [seleccionado]="editando?.id" [(TablasComponent)]="tablaModeloComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+            <div #cardModelo class="h-100">
+              <dinamic-table
+                [cardTabla]="cardModelo"
+                [(data)]="listadoModelos"
+                [seleccionado]="modeloSelected?.id"
+                [(TablasComponent)]="tablaModeloComponent"
+                [config]="table_modelo_config"
+                (table_events)="handle_table_events($event)"
+              ></dinamic-table>
             </div>
-            <ng-container *ngTemplateOutlet="tablaMarcaModelo; context: { data: { form: formModelo, formName: 'formModelo' } }"> </ng-container>
           </div>
         </div>
       </form>
@@ -77,29 +93,3 @@
     <!---------------------------------------------------------------------------------------------------------------------------------------------------->
   </p-tabView>
 </div>
-
-<ng-template #accionButtons let-data="data">
-  <div class="form-group">
-    <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
-    <a *ngIf="editando" class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
-    <input [disabled]="!data.form.valid" (click)="submit(data.form)" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
-  </div>
-</ng-template>
-
-<ng-template #tablaMarcaModelo let-data="data">
-  <div #cardTabla id="cardTabla" class="card cardListados">
-    <app-tablas
-      class="h-100"
-      *ngIf="listado && info"
-      [padre]="cardTabla"
-      [info]="info"
-      [data]="listado"
-      [focusRow]="false"
-      [botones]="botones"
-      (DevolverInfo)="editarItem($event, data.form)"
-      (DELETE)="eliminarReg($event.ARG)"
-      [id_tabla]="'tabla_frm_' + data.formName"
-      (paginateChange)="pedirNuevaData($event)"
-    ></app-tablas>
-  </div>
-</ng-template>
