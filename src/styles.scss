@@ -1,9 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
-@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
-$bodyfont: "Poppins";
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
+$bodyfont: 'Poppins';
 
-@import "~@ng-select/ng-select/themes/default.theme.css";
-@import "./animateCss.scss";
+@import '~@ng-select/ng-select/themes/default.theme.css';
+@import './animateCss.scss';
 
 @import "./assets/my_styles/modal.scss";
 @import "./assets/my_styles/forms.scss";
@@ -36,14 +36,14 @@ $bodyfont: "Poppins";
 }
 
 .text-poppins {
-  font-family: "Poppins" !important;
+  font-family: 'Poppins' !important;
 }
 
 .ng-dropdown-panel {
   z-index: 9999999 !important;
 }
 
-html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
+html[dir='ltr'] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
   right: 2px !important;
   top: 0 !important;
 }
@@ -133,8 +133,8 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
   }
 }
 
-.form-control[type="text"],
-.form-control[type="number"] {
+.form-control[type='text'],
+.form-control[type='number'] {
   pointer-events: initial;
   &:read-only {
     pointer-events: none !important;
@@ -398,8 +398,8 @@ body {
   height: 100%;
   display: grid;
   grid-template-areas:
-    "p-tabview-nav-container"
-    "p-tabview-panels";
+    'p-tabview-nav-container'
+    'p-tabview-panels';
 
   grid-template-rows: min-content auto;
 
@@ -492,7 +492,7 @@ input.apple-switch {
 }
 
 input.apple-switch:after {
-  content: "";
+  content: '';
   position: absolute;
   top: 1px;
   left: 1px;
@@ -696,6 +696,51 @@ Not supports in Firefox and IE */
   }
 }
 
+.multiSelectPrimeng {
+  .p-multiselect {
+    width: 100%;
+    border-radius: 0.25rem !important;
+    background-color: #ffffffe8 !important;
+    color: #1d253b !important;
+    box-shadow: 1px 1px 4px 0px #1d253b3d !important;
+    border: 1px solid #ced4da;
+    &:hover {
+      cursor: pointer;
+      border: 1px solid #ced4da;
+    }
+    // .p-multiselect-label-container {
+    // }
+  }
+
+  .p-multiselect.p-multiselect-chip .p-multiselect-token {
+    background: var(--primary04) !important;
+  }
+  .p-checkbox .p-checkbox-box.p-highlight {
+    background: var(--primary02) !important;
+  }
+  .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
+    background: var(--primary04) !important;
+  }
+  .p-multiselect-panel .p-multiselect-items .p-multiselect-item:focus {
+    box-shadow: none !important;
+  }
+
+  .p-inputtext:enabled:focus {
+  }
+  .p-multiselect-close {
+    &:hover {
+      background: var(--primary01) !important;
+      color: var(--primary04) !important;
+    }
+  }
+  .p-disabled {
+    background-color: #e9ecef !important;
+    touch-action: none;
+    pointer-events: none;
+    opacity: 1;
+  }
+}
+
 @mixin my_cards {
   border-radius: 1rem !important;
   height: 100%;
@@ -709,8 +754,8 @@ Not supports in Firefox and IE */
   height: 100%;
   display: grid;
   grid-template-areas:
-    "colTitulo"
-    "colFormularioListado";
+    'colTitulo'
+    'colFormularioListado';
 
   grid-template-rows: min-content auto;
 
@@ -735,8 +780,8 @@ Not supports in Firefox and IE */
 
         display: grid;
         grid-template-areas:
-          "titulo_card_area"
-          "card_content_area";
+          'titulo_card_area'
+          'card_content_area';
         grid-template-rows: min-content auto;
 
         > .tituloFormClass {
@@ -769,8 +814,8 @@ Not supports in Firefox and IE */
 
         display: grid;
         grid-template-areas:
-          "titulo_card_area"
-          "card_content_area";
+          'titulo_card_area'
+          'card_content_area';
         grid-template-rows: min-content auto;
 
         > .tituloCardClass {

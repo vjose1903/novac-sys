@@ -12,6 +12,7 @@ import { BuscarClienteSuplidorComponent } from '../components/formularios en mod
 import { ModalSeleccinarArticuloComponent } from '../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 import { fun } from '../../core/services/functions.service';
 import { ModalService } from '../components/modal/modal.service';
+import { Permisos } from '../../core/typescript/permisos';
 
 @Component({
   selector: 'app-conduce',
@@ -55,6 +56,8 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   articuloClass = new ArticuloC();
   conduceClass = new ConduceC();
   facturaClass = new FacturaC();
+  permissions = Permisos;
+  formPermissions = [Permisos.role.create, Permisos.role.update];
 
   constructor(private fb: FormBuilder, private pdfServ: PdfService, public mServ: ModalService) {
     super();

@@ -19,6 +19,7 @@ import { MessageTask } from '../core/models/message-task';
 import { ConfigI } from '../core/typescript/config-interface';
 import { fun } from '../core/services/functions.service';
 import { CurrentUserService } from '../core/services/current-user.service';
+import { LayoutService } from '../admin/layout/layout.service';
 
 @Component({
   selector: 'app-login',
@@ -40,14 +41,10 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     super();
   }
 
-  ngOnInit() {
-
-  }
+  ngOnInit() {}
 
   ngAfterViewInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
-      console.log("AQUIII");
-
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       this.versionApp = config.app_version;
 
@@ -99,10 +96,9 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then((res) => {
-          this.currentUserServ.setUser(res.data);
-          console.log('ANDO AQUIII');
-
-          this.router.navigateByUrl('/admin/dashboard');
+          this.currentUserServ.setUser(res.data).then(() => {
+            this.router.navigateByUrl('/admin/dashboard');
+          });
         })
         .catch((error) => {
           if (error.status === 0) fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');

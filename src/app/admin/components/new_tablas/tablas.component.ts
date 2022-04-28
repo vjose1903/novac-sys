@@ -382,7 +382,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   updateDataCopy(data) {
-    fun.logYellow('----- updateDataCopy -----');
     this.copyData = fun.duplicarJson(data);
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {

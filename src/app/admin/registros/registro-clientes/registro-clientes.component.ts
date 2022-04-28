@@ -9,6 +9,7 @@ import { ClienteC } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
+import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -52,6 +53,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   clienteSelected;
   clienteClass = new ClienteC();
   empleadosClass = new EmpleadoC();
+  permissions = Permisos;
+  formPermissions = [Permisos.cliente.create, Permisos.cliente.update];
 
   constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();

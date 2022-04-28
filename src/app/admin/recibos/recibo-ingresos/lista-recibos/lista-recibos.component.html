@@ -2,12 +2,11 @@
   <div class="col-12 mb-2">
     <h3 class="negrita">Recibos de ingreso</h3>
   </div>
-  <div class="col-12 mb-3">
+  <div *ngxPermissionsOnly="permissions.recibo_ingreso.create" class="col-12 mb-3">
     <button class="btn btn-verde" (click)="navegar()">Nuevo recibo <i class="fas fa-hand-holding-usd"></i></button>
   </div>
   <div class="col-12">
     <div #cardTabla id="cardTabla" class="card cardListados rec">
-      
       <app-tablas
         class="h-100"
         *ngIf="lista_recibos"

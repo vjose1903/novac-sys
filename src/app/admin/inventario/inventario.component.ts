@@ -149,7 +149,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async getArticulos(params?: { per_page: number; page: number; search: string }) {
-    console.log('>>>>> ', params.page);
+
 
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
 

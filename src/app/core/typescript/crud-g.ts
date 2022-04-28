@@ -22,8 +22,6 @@ export interface responseModel<T> {
 } // TODO: <================================================================ PARA DESPUES`
 
 export class CrudG<T> {
-  private http = SingletonService.http;
-
   constructor(private path: string) {}
 
   async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
@@ -113,7 +111,6 @@ export class CrudG<T> {
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';
 
     if (tipo === 'externo') return `${proxyurl}${this.path}`;
-    // if (tipo === 'externo') return `${this.path}`;
 
     if (id) url += `/${id}`;
     if (_.has(args, 'afterPath') && fun.hasValue(args.afterPath)) url += `/${args.afterPath}`;
@@ -127,11 +124,11 @@ export class CrudG<T> {
 
     switch (metodo) {
       case 1:
-        return this.http[method](url, this.requestOptions(tipo, arg));
+        return SingletonService.http[method](url, this.requestOptions(tipo, arg));
         break;
 
       case 2:
-        return this.http[method](url, JSON.stringify(data), this.requestOptions(tipo, arg));
+        return SingletonService.http[method](url, JSON.stringify(data), this.requestOptions(tipo, arg));
         break;
     }
   }

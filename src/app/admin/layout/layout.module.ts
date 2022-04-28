@@ -22,6 +22,8 @@ import { TabViewModule } from 'primeng/tabview';
 import { ReportesComponent } from '../reportes/reportes.component';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.module';
+import { NgxPermissionsModule } from 'ngx-permissions';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
@@ -42,6 +44,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     DirectivesModule,
     PdfViewerModule,
     ReactiveFormsModule,
+    NgxPermissionsModule.forChild(),
   ],
 })
 export class LayoutModule {}

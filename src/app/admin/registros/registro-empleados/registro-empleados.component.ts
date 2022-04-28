@@ -13,6 +13,7 @@ import { fun } from '../../../core/services/functions.service';
 import { RolesC } from '../roles/roles';
 import { table_config } from '../../components/new_tablas/tabla-class';
 
+import { Permisos } from '../../../core/typescript/permisos';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -54,6 +55,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   empleadosClass = new EmpleadoC();
   rolesClass = new RolesC();
   listRoles: [];
+  permissions = Permisos;
+  formPermissions = [Permisos.user.create, Permisos.user.update];
 
   constructor(private fb: FormBuilder, private localeService: BsLocaleService, private tServ: TablasService) {
     super();
@@ -299,6 +302,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       const doc = data.documentos_de_identidad.filter((doc) => doc.principal === true);
       if (data.documentos_de_identidad.length > 0 && fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
     }
+
     const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map((rol) => rol.id) });
     this.form.patchValue(objPerson);
 

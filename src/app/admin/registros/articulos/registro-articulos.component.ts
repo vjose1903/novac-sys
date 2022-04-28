@@ -9,6 +9,8 @@ import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 import * as $ from 'jquery';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
+import { Permisos } from '../../../core/typescript/permisos';
+import { NgxPermissionsService } from 'ngx-permissions';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -78,13 +80,21 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   fechaFactura: string;
   articuloClass = new ArticuloC();
   tipoArticuloClass = new TipoArticuloC();
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService) {
+  permissions = Permisos;
+  formPermissions = [Permisos.articulo.create, Permisos.articulo.update];
+  hasPermissionUpdateFormula = false;
+  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'reg_articulo', is_routing: true });
     this.createForm();
+
+    this.permissionsService.hasPermission('articulo_update_formula').then((result) => {
+      this.hasPermissionUpdateFormula = result;
+    });
+
     this.FORM = this.form.controls;
 
     this.boton = 'Registrar';
@@ -131,6 +141,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.listaTipoArticulos = [];
     this.tipoArticuloClass.getAll().then((res) => {
       this.listaTipoArticulos = fun.duplicarJson(res);
+      console.log('🚀 ~ file: registro-articulos.component.ts ~ line 135 ~ RegistroArticulosComponent ~ this.tipoArticuloClass.getAll ~ this.listaTipoArticulos', this.listaTipoArticulos);
     });
   }
 
@@ -328,14 +339,15 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   // =============================================
 
   createItem(): FormGroup {
+    const permission = this.hasPermissionUpdateFormula;
     return this.fb.group({
-      id: [null],
-      articulo_id: [null],
-      cantidad_formula: [null],
-      medida_formula: [null],
-      costo_formula: [null],
-      precio_formula: [null],
-      _destroy: [null],
+      id: [{ value: null, disabled: !permission }],
+      articulo_id: [{ value: null, disabled: !permission }],
+      cantidad_formula: [{ value: null, disabled: !permission }],
+      medida_formula: [{ value: null, disabled: !permission }],
+      costo_formula: [{ value: null, disabled: !permission }],
+      precio_formula: [{ value: null, disabled: !permission }],
+      _destroy: [{ value: null, disabled: !permission }],
     });
   }
 

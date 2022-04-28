@@ -15,6 +15,7 @@ import { BuscarClienteSuplidorComponent } from '../../components/formularios en 
 import { NotaC } from '../notas-cred-deb/notas';
 import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 import { fun } from '../../../core/services/functions.service';
+import { Permisos } from '../../../core/typescript/permisos';
 
 enum campos {
   cliente = 1,
@@ -55,6 +56,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   showSide: boolean = false;
   TablasComponent;
   idsFacturasSeleccionadas = [];
+  permissions = Permisos;
 
   constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
     super();

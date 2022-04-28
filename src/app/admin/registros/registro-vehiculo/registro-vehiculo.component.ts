@@ -11,6 +11,7 @@ import { VehiculoC } from './vehiculo';
 import { FormularioMarcaModeloComponent } from '../../components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
+import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
   selector: 'app-registro-vehiculo',
@@ -57,7 +58,8 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   marcasClass = new MarcaC();
   empleadosClass = new EmpleadoC();
   modeloClass = new ModeloC();
-
+  permissions = Permisos;
+  formPermissions = [Permisos.vehiculo.create, Permisos.vehiculo.update];
   constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService) {
     super();
   }

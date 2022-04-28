@@ -27,6 +27,7 @@ import { ConfigI } from './core/typescript/config-interface';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
+import { CurrentUserService } from './core/services/current-user.service';
 
 @Component({
   selector: 'app-root',
@@ -44,6 +45,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   counter = 0;
   sub: Subscription;
   subModified: Subscription;
+  is_permisos_load = false;
 
   constructor(
     public _ipc: IpcService,
@@ -58,11 +60,13 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
+
+    private currentUserServ: CurrentUserService,
   ) {}
 
   ngOnInit(): void {
-    SingletonService.zone = this.zone;
     SingletonService.http = this.http;
+    SingletonService.zone = this.zone;
     SingletonService.configServ = this.configServ;
 
     SingletonService._ipc = this._ipc;
@@ -123,6 +127,17 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     fun.setWindowSize(window);
   }
 
+  getActualPath() {
+    const location = window.location.href;
+    const initSlice = location.indexOf('/admin') == -1 ? location.indexOf('/auth') : location.indexOf('/admin');
+    const actualPath = location.slice(initSlice, location.length);
+    return actualPath;
+  }
+
+  ngAfterContentChecked() {
+    this.cdRef.detectChanges();
+  }
+
   resize() {
     fun.setWindowSize(window);
   }
@@ -148,19 +163,35 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     this._ipc
       .sendTask(task)
       .then((config: ConfigI) => {
-        console.log('config ', config);
         if (_.has(config, 'err')) {
         } else {
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
           this.configReady = true;
+          this.validateUserAndLoadPermisos();
         }
       })
       .catch((err) => {
         console.error(err);
       });
   }
+
+  validateUserAndLoadPermisos() {
+    this.currentUserServ
+      .validateUser()
+      .then((res) => {
+        this.is_permisos_load = true;
+      })
+      .catch((error) => {
+        const actualPath = this.getActualPath();
+        fun.logGreen('actualPath ', actualPath);
+        fun.logOrange('error ', error);
+
+        if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
+      });
+  }
+
   async probandoEncriptar() {
     const task = new MessageTask(KEYWORD_ELECTRON_EVENT_ENCRYPT, { hola: 'mundo' });
 
@@ -197,7 +228,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
   duplicarDataProgreso(json) {}
 
-  ngAfterContentChecked() {
-    this.cdRef.detectChanges();
+  logOut() {
+    this.layServ.nextLogOut({ bool: true, quien: 'appComponent' });
   }
 }

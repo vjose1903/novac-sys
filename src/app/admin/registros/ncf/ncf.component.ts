@@ -8,6 +8,7 @@ import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from './ncf';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
+import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
   selector: 'app-ncf',
@@ -68,6 +69,9 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   ncfClass = new NcfC();
 
   tablaComponent;
+  permissions = Permisos;
+  formPermissions = [Permisos.secuencia_comprobante.create, Permisos.secuencia_comprobante.update];
+
   constructor(private tServ: TablasService, private localeService: BsLocaleService) {
     super();
     this.dpConfig = Object.assign({}, { showWeekNumbers: false, dateInputFormat: 'DD/MM/YYYY' });

@@ -10,9 +10,10 @@ import { BtncircularModule } from '../components/btncircular/btncircular.module'
 import { PrimengModule } from '../../modules/primeng.module';
 import { DetalleNotaComponent } from './detalle-nota/detalle-nota.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [NotasCredDebComponent, BuscarFacturaComponent, DetalleNotaComponent],
-  imports: [CommonModule, ManipularFacturasRoutingModule, TablasModule, NewTablasModule, BtncircularModule, PrimengModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, ManipularFacturasRoutingModule, TablasModule, NewTablasModule, BtncircularModule, PrimengModule, FormsModule, ReactiveFormsModule, NgxPermissionsModule.forChild()],
 })
 export class ManipularFacturasModule {}

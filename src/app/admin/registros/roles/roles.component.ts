@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
+import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
   selector: 'app-roles',
@@ -60,6 +61,9 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   isCreando: boolean = false;
   TablasComponent;
   palabra_buscar: any;
+  permissions = Permisos;
+  formPermissions = [Permisos.role.create, Permisos.role.update];
+
   constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();
   }
