@@ -16,6 +16,7 @@ import { Permisos } from '../../../core/typescript/permisos';
   templateUrl: './registro-clientes.component.html',
   styleUrls: ['./registro-clientes.component.scss'],
 })
+
 export class RegistroClientesComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
   form: FormGroup;

@@ -7,6 +7,7 @@ import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '../../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
+import { table_config } from '../../new_tablas/tabla-class';
 
 @Component({
   selector: 'app-formulario-marca-modelo',
@@ -21,6 +22,18 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   @Output() accion_ = new EventEmitter<any>();
   formMarca: FormGroup;
   formModelo: FormGroup;
+
+  table_config: table_config = {
+    info: [],
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: '',
+    padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+  };
+
   info = [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }];
 
   botones = {
@@ -42,10 +55,13 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
   marcasClass = new MarcaC();
   modeloClass = new ModeloC();
-  obj_p = this.tServ.obj_paginate.default;
+  tablaModeloComponent: any;
+  tablaMarcaComponent: any;
+
   constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();
   }
+
   modal: any = {};
   inputs: any;
   btn_aceptar() {}
@@ -59,13 +75,14 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       this.componente = 'reg_marcas';
       this.tituloTabla = 'Marcas';
       this.campo1 = 'Marca';
+      this.table_config.info = [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }];
     } else if (this.tipo_formulario === 'modelos') {
       this.tabIndex = 1;
       this.componente = 'reg_modelos';
       this.tituloTabla = 'Modelos';
       this.campo1 = 'Marca';
 
-      this.info = [
+      this.table_config.info = [
         { titulo: 'Marca', key: 'marca_nombre', tipo: 'text' },
         { titulo: 'Modelo', key: 'descripcion', tipo: 'text' },
       ];
@@ -76,7 +93,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.formModelo.controls.marca_id.setValidators([Validators.required]);
     this.getMarcas();
 
-    this.pedirNuevaData(this.obj_p);
+    this.pedirNuevaData(this.tServ.obj_paginate.default);
 
     setTimeout(() => {
       if (this.tipo_formulario === 'modelos') {
@@ -93,7 +110,6 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       if (!paginado) this.listaMarcas = fun.duplicarJson(res);
       if (paginado) {
         this.listado = res.data;
-        // this.tServ.Func_total_paginas({ total: res.total_registros, tabla: 'tabla_frm_marca_modelo' });
       }
     });
   }
@@ -114,12 +130,12 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     });
   }
 
-  async pedirNuevaData(arg) {
-    const palabra_a_buscar = arg.searchText === '' || arg.searchText === null || arg.searchText === undefined ? ' ' : arg.searchText;
+  async pedirNuevaData(params?: { per_page: number; page: number; search: string }) {
+    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     this.listado = [];
     if (this.componente === 'reg_modelos') {
-      const extra = { afterPath: `filtro/${' '}`, parameters: { paginado: true, page: arg.page, per_page: arg.per_page } };
+      const extra = { afterPath: `filtro/${' '}`, parameters: { paginado: true, page: params.page, per_page: params.per_page } };
 
       this.modeloClass.getAll(extra).then((modeloRes) => {
         modeloRes.data.map((obj) => {
@@ -131,7 +147,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
         // this.tServ.Func_total_paginas({ total: modeloRes.total_registros, tabla: 'tabla_frm_marca_modelo' });
       });
     } else if (this.componente === 'reg_marcas') {
-      this.getMarcas(palabra_a_buscar, true, arg.page, arg.per_page);
+      this.getMarcas(palabra_a_buscar, true, params.page, params.per_page);
     }
   }
 
@@ -162,15 +178,12 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   onSuccess() {
     fun.toastSuccess(`Item ${this.editando ? 'actualizado' : 'creado'} correctamente.`, 'CORRECTO');
 
-    this.pedirNuevaData(this.obj_p);
+    this.pedirNuevaData(this.tServ.obj_paginate.default);
 
     this.borrar();
 
-    if (this.tipo_formulario === 'modelos') {
-      this.enfocarInput('marca_modal');
-    } else {
-      this.enfocarInput('descripcion');
-    }
+    if (this.tipo_formulario === 'modelos') this.enfocarInput('marca_modal');
+    else this.enfocarInput('descripcion');
   }
 
   borrar() {
@@ -202,7 +215,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
         const clase = this.tipo_formulario === 'modelos' ? this.modeloClass : this.marcasClass;
         clase.deleteOne(regisData.id).then((res) => {
           // TODO: ver si aqui en vdd no tengo que buscar la paginacion actual
-          this.pedirNuevaData(this.obj_p);
+          this.pedirNuevaData(this.tServ.obj_paginate.default);
         });
       },
     };

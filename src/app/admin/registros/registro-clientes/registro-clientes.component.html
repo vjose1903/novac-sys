@@ -186,7 +186,7 @@
           <h4 class="mb-0">Listado clientes</h4>
           <button *ngxPermissionsOnly="permissions.cliente.create" [disabled]="clienteSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
-        <div #cardTabla id="cardTabla" class="card cardContentClass">
+          <div #cardTabla id="cardTabla" class="card cardContentClass">
           <div class="divTabla">
             <dinamic-table [cardTabla]="cardTabla" [(data)]="listaClientes" [seleccionado]="clienteSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
           </div>

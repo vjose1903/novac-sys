@@ -66,6 +66,9 @@
             </div>
           </div>
           <div class="col-6">
+            <div #cardModelo>
+              <dinamic-table [cardTabla]="cardModelo" [(data)]="listado" [seleccionado]="editando?.id" [(TablasComponent)]="tablaModeloComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+            </div>
             <ng-container *ngTemplateOutlet="tablaMarcaModelo; context: { data: { form: formModelo, formName: 'formModelo' } }"> </ng-container>
           </div>
         </div>
