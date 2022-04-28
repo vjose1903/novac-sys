@@ -171,7 +171,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
           ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
 
-          ncf.customStyles = { 'td-codigo': { width: '5rem' }, 'td-tipoC': { width: '3rem' }, 'td-usado_': { width: '4rem' }, 'td-estado_': { width: '4rem' } };
+          ncf.customStyles = { codigo: { width: '5rem' }, tipoC: { width: '3rem' }, usado_: { width: '4rem' }, estado_: { width: '4rem' } };
 
           tempNCF.push(ncf);
         }

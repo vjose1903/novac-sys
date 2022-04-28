@@ -268,7 +268,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
         fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
-        fact.customStyles = { 'td-view': { 'font-size': '1.5rem' }, 'td-numero_comprobante': { width: '7rem' } };
+        fact.customStyles = { 'view': { 'font-size': '1.5rem' }, 'numero_comprobante': { width: '7rem' } };
 
         return fact;
       });
@@ -323,17 +323,17 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
         fact.customStyles = {
-          'td-condicion': { width: '6rem' },
-          'td-secuencia': { width: '7rem' },
-          'td-numero_comprobante': { width: '7rem' },
-          'td-estatus': { width: '2rem' },
-          'td-view': { width: '4%', 'padding-left': '1rem', 'font-size': '1.5rem' },
-          'td-selected': { width: '4%', 'font-size': '1.5rem' },
+          'condicion': { width: '6rem' },
+          'secuencia': { width: '7rem' },
+          'numero_comprobante': { width: '7rem' },
+          'estatus': { width: '2rem' },
+          'view': { width: '4%', 'padding-left': '1rem', 'font-size': '1.5rem' },
+          'selected': { width: '4%', 'font-size': '1.5rem' },
         };
 
         if (this.Para === ' Visualizar') {
-          delete fact.customStyles['td-selected'];
-          fact.customStyles['td-view'].width = '9%';
+          delete fact.customStyles['selected'];
+          fact.customStyles['view'].width = '9%';
         }
 
         return fact;

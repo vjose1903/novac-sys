@@ -7,7 +7,7 @@
             <h2 class="negrita">Conduce</h2>
           </div>
           <div class="col-12 p-0 colCard">
-            <div *ngxPermissionsOnly="permissions.conduce.get_filtrados" class="card card-padding sombra h-100">
+            <div *ngxPermissionsOnly="permissions.cliente.get_filtrados" class="card card-padding sombra h-100">
               <div class="form-group">
                 <label class="control-label">Cliente: </label>
                 <input
@@ -33,8 +33,9 @@
             <h3>Ventas adelantadas</h3>
           </div>
           <div class="col-12">
-            <div #cardTabla id="cardTabla" class="card sombra bordeRedondeado factAdelantadas overflowHidden">
-              <app-tablas
+            <div #cardTablaAdelantadas id="cardTabla" class="card sombra bordeRedondeado factAdelantadas overflowHidden">
+              <dinamic-table [cardTabla]="cardTablaAdelantadas" [(data)]="facturas_adelantadas" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+              <!-- <app-tablas
                 class="h-100"
                 *ngIf="facturas_adelantadas && info"
                 [padre]="cardTabla"
@@ -46,7 +47,7 @@
                 [focusRow]="false"
                 (clickRow)="SeleccionarFactruaAdelantada($event)"
                 tabindex="-1"
-              ></app-tablas>
+              ></app-tablas> -->
             </div>
           </div>
         </div>

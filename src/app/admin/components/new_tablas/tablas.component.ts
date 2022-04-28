@@ -288,7 +288,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     let styles = {};
 
     if (this.data.length && this.data[i] && this.data[i].customStyles) {
-      const estilos = this.data[i].customStyles[`td-${column}`];
+      const estilos = this.data[i].customStyles[column];
 
       if (Array.isArray(estilos)) {
         for (const item of estilos) {

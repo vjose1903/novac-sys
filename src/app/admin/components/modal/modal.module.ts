@@ -5,7 +5,6 @@ import { ModalDirective } from './modal.directive';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-
 @NgModule({
   declarations: [NewModalComponent, ModalDirective],
   imports: [CommonModule, DialogModule, FormsModule, ReactiveFormsModule],

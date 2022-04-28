@@ -152,12 +152,12 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
               detalle['cant_nota'] = 0;
 
               detalle['customStyles'] = {
-                'td-select': { width: '3rem' },
-                'td-cantidad': { width: '5rem' },
-                'td-total_nota': { width: '7.3rem' },
-                'td-cant_nota': { width: '6rem' },
-                'td-unidad': { width: '4.5rem' },
-                'td-descripcion': { 'text-align': 'left', width: '20rem' },
+                'select': { width: '3rem' },
+                'cantidad': { width: '5rem' },
+                'total_nota': { width: '7.3rem' },
+                'cant_nota': { width: '6rem' },
+                'unidad': { width: '4.5rem' },
+                'descripcion': { 'text-align': 'left', width: '20rem' },
               };
 
               if (this.tipoNota === 'credito') {

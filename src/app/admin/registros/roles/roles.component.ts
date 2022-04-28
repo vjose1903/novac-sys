@@ -98,7 +98,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
           role.estado_ = role.estado ? 'SI' : 'NO';
           role.estado_tag = role.estado ? 'success' : 'danger';
 
-          role.customStyles = { 'td-nombre': { width: '20%', 'text-align': 'left' }, 'td-descripcion': { width: '50%', 'text-align': 'left', 'padding-left': '0.5rem' }, 'td-estado_': { width: '10%' } };
+          role.customStyles = { nombre: { width: '20%', 'text-align': 'left' }, descripcion: { width: '50%', 'text-align': 'left', 'padding-left': '0.5rem' }, estado_: { width: '10%' } };
           return role;
         });
 
@@ -141,8 +141,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
             id: permiso_accion.accion.id,
             permiso_accion_id: permiso_accion.id,
             customStyles: {
-              'td-nombre': { 'text-align': 'left', 'padding-left': '0.5rem', width: '75%' },
-              'td-selected': { 'justify-content': 'center', 'align-items': 'center', display: 'flex', width: 'auto' },
+              nombre: { 'text-align': 'left', 'padding-left': '0.5rem', width: '75%' },
+              selected: { 'justify-content': 'center', 'align-items': 'center', display: 'flex', width: 'auto' },
             },
           };
 

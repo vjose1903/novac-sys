@@ -164,10 +164,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
 
       factura.customStyles = {
-        'td-historyPagos': { width: '2rem', 'font-size': '1rem' },
-        'td-select': { width: '6rem' },
-        'td-pagoT': { width: '6rem' },
-        'td-numero_comprobante': { width: '7rem' },
+        'historyPagos': { width: '2rem', 'font-size': '1rem' },
+        'select': { width: '6rem' },
+        'pagoT': { width: '6rem' },
+        'numero_comprobante': { width: '7rem' },
       };
 
       this.totalPagado = _.reduce(factura.pagos, (acumulado, item) => acumulado + item.deposito, this.totalPagado);

@@ -45,12 +45,12 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
 
     this.inputs.map(async (arti) => {
       arti.customStyles = {
-        'td-descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
-        'td-cantidad': { width: '9%' },
-        'td-unidad': { width: '15%' },
-        'td-retirado_mostrar': { width: '9%' },
-        'td-restante_mostrar': { width: '15%' },
-        'td-select': { width: '6.5%' },
+        'descripcion': { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
+        'cantidad': { width: '9%' },
+        'unidad': { width: '15%' },
+        'retirado_mostrar': { width: '9%' },
+        'restante_mostrar': { width: '15%' },
+        'select': { width: '6.5%' },
       };
 
       return arti;

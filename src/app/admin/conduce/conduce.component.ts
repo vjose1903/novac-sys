@@ -13,6 +13,7 @@ import { ModalSeleccinarArticuloComponent } from '../components/formularios en m
 import { fun } from '../../core/services/functions.service';
 import { ModalService } from '../components/modal/modal.service';
 import { Permisos } from '../../core/typescript/permisos';
+import { table_config } from '../components/new_tablas/tabla-class';
 
 @Component({
   selector: 'app-conduce',
@@ -40,13 +41,19 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   TOTAL: number;
 
-  info = [
-    { titulo: '1', key: 'detalles_selected', tipo: 'icon', isIcon: true, estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }] },
-    { titulo: 'Numero Fact', key: 'secuencia', tipo: 'text' },
-    { titulo: 'NCF', key: 'numero_comprobante', tipo: 'text' },
-    { titulo: 'Fecha Facturacion', key: 'fecha', tipo: 'text' },
-    { titulo: 'Total Facturado', key: 'total_factura', tipo: 'formatoNumero', formatoNumero: true },
-  ];
+  info = [];
+
+  table_config: table_config = {
+    info: [
+      { titulo: '1', tipo: 'icon', key: 'some_is_selected', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'detalles_selected' }] },
+      { titulo: 'Numero Fact', key: 'secuencia', tipo: 'text' },
+      { titulo: 'NCF', key: 'numero_comprobante', tipo: 'text' },
+      { titulo: 'Fecha Facturacion', key: 'fecha', tipo: 'text' },
+      { titulo: 'Total Facturado', key: 'total_factura', tipo: 'formatoNumero' },
+    ],
+    id_tabla: 'lista_roles',
+    obj_paginate: { show: false },
+  };
 
   facturaAdelantadaSelected;
   CuerpoConduce = [];
@@ -503,7 +510,12 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           this.facturas_adelantadas.map((factura) => {
             factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
             factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
-            factura.customStyles = { 'td-detalles_selected': { width: '2rem' } };
+            factura.customStyles = {
+              some_is_selected: [
+                { key: 'some_is_selected', isTd: true, estilos: 'width: 2rem !important;' },
+                { key: 'detalles_selected', estilos: 'width: 2rem !important' },
+              ],
+            };
 
             for (let i = 0; i < factura.detalle_facturas.length; i++) {
               const detalle = factura.detalle_facturas[i];
@@ -538,7 +550,12 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     });
   }
 
-  async SeleccionarFactruaAdelantada(factura) {
+  tableClickRow(event) {
+    console.log('event ', event);
+    this.seleccionarFactruaAdelantada(event.data);
+  }
+
+  async seleccionarFactruaAdelantada(factura) {
     if (factura) {
       this.checkFacturasAdelantadasSelection();
       let conteo = 0;

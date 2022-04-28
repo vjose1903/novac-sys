@@ -153,10 +153,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
       res.data.map(async (arti) => {
         arti.customStyles = {
-          'td-codigo': { width: '11%' },
-          'td-nombre': { width: '37%', 'text-align': 'left', 'padding-left': '0.5rem' },
-          'td-medida': { width: '13%' },
-          'td-precio_principal': { width: '20%' },
+          codigo: { width: '11%' },
+          nombre: { width: '37%', 'text-align': 'left', 'padding-left': '0.5rem' },
+          medida: { width: '13%' },
+          precio_principal: { width: '20%' },
         };
       });
 

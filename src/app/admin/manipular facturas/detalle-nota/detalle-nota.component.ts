@@ -27,9 +27,9 @@ export class DetalleNotaComponent implements OnInit, ModalI {
       factura_aplicada.detalles_facturas_notas.map((detalle) => {
         detalle.descripcion = detalle.articulo.nombre;
         detalle.customStyles = {
-          'td-descripcion': { width: '50%', 'padding-left': '1rem', 'text-align': 'left' },
-          'td-cantidad': { width: '25%' },
-          'td-unidad': { width: '25%' },
+          descripcion: { width: '50%', 'padding-left': '1rem', 'text-align': 'left' },
+          cantidad: { width: '25%' },
+          unidad: { width: '25%' },
         };
         return detalle;
       });

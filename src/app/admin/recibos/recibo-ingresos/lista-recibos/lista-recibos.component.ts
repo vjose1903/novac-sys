@@ -96,13 +96,13 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       ];
 
       recibo['customStyles'] = {
-        'td-tipo_recibo': { width: '3%', 'font-size': '1rem' },
-        'td-cliente_': { 'text-align': 'start', 'padding-left': '1.5rem' },
-        'td-numero_recibo': { width: '8%' },
-        'td-numero_factura': { width: '12%' },
-        'td-total': { width: '12%', 'text-align': 'end', 'padding-right': '1.5rem' },
-        'td-ver': { width: '4%', 'padding-left': '1rem', 'font-size': '1rem' },
-        'td-anular': { width: '4%', 'font-size': '1rem' },
+        tipo_recibo: { width: '3%', 'font-size': '1rem' },
+        cliente_: { 'text-align': 'start', 'padding-left': '1.5rem' },
+        numero_recibo: { width: '8%' },
+        numero_factura: { width: '12%' },
+        total: { width: '12%', 'text-align': 'end', 'padding-right': '1.5rem' },
+        ver: { width: '4%', 'padding-left': '1rem', 'font-size': '1rem' },
+        anular: { width: '4%', 'font-size': '1rem' },
       };
 
       return recibo;

@@ -149,8 +149,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async getArticulos(params?: { per_page: number; page: number; search: string }) {
-
-
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
 
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
@@ -158,7 +156,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro }).then((res) => {
       res.data.map((arti) => {
-        arti.customStyles = { 'td-codigo': { width: '4rem' }, 'td-nombre': { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
+        arti.customStyles = { codigo: { width: '4rem' }, nombre: { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
       });
 
       this.listaArticulos = fun.duplicarJson(res.data);
