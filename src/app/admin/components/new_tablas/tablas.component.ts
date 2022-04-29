@@ -499,7 +499,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     // this.paginate_info = {
     //   page: this.pagActual,
     //   per_page: this.mostrar,
-    //   search: this.search === '' ? ' ' : this.search,
+    //   search: this.search == '' ? ' ' : this.search,
     // };
     // this.paginateChange.emit(this.paginate_info);
     // setTimeout(() => {
@@ -508,7 +508,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   getIndex(index) {
-    const pageIndex = (this.pagActual - 1) * this.config.obj_paginate.per_page + index;
+
+    const pageIndex = (this.pagActual - 1) * this.config?.obj_paginate?.per_page + index;
 
     const validate = fun.isEmpty(this.data[pageIndex]);
 

@@ -100,18 +100,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._init_mixin({ component: 'ingresos', is_routing: true });
-
     this.necesarioStart();
-
-    this.rellenoPruebas();
-  }
-
-  rellenoPruebas() {
-    new ClienteC().getAll({ afterPath: `filtro/jose manuel`, parameters: { page: 1, per_page: 2, paginado: true } }).then((response) => {
-      this.clienteAdepositar = _.head(response.data);
-      (document.getElementById('clienteI') as any).value = `${this.clienteAdepositar.nombre} ${this.clienteAdepositar.apellido}`;
-      this.pedirFacturasPorCliente(this.clienteAdepositar.id, this.tServ.obj_paginate.default);
-    });
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -216,8 +205,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
 
     setTimeout(() => {
-      console.log('res ', res);
-
       this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     }, 100);
   }
@@ -232,8 +219,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   cancelarIgreso() {
-    this.facturas = null;
-    console.log('this.facturas ', this.facturas);
+    this.facturas.length = 0;
 
     this.clienteAdepositar = undefined;
     (document.getElementById('clienteI') as any).value = null;

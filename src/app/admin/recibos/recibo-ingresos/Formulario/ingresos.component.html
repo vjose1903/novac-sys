@@ -67,7 +67,7 @@
     </div>
   </div>
   <div class="col-12 medio">
-    <div *ngIf="facturas" class="card sombra cardFacturas br-1">
+    <div *ngIf="facturas && facturas?.length" class="card sombra cardFacturas br-1">
       <div class="bonton_select_all">
         <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
       </div>
@@ -80,7 +80,7 @@
     </div>
   </div>
   <div class="col-12 abajo">
-    <div *ngIf="facturas" class="d-flex justify-content-end">
+    <div *ngIf="facturas && facturas?.length" class="d-flex justify-content-end">
       <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
       <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
     </div>
