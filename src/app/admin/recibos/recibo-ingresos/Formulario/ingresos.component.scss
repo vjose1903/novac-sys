@@ -1,12 +1,3 @@
-.btnSelect {
-  position: absolute;
-  font-size: 1.5rem;
-  margin-right: 1rem;
-  &:hover {
-    cursor: pointer;
-  }
-}
-
 .gris {
   color: var(--transparente01);
 }
@@ -35,6 +26,41 @@
   }
   .medio {
     grid-area: medio;
+
+    > .cardFacturas {
+      display: grid;
+      grid-template-areas:
+        "bonton_select_all"
+        "divFantasma";
+      grid-template-rows: min-content auto;
+      height: 100%;
+
+      > .bonton_select_all {
+        grid-area: bonton_select_all;
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        > .btnSelect {
+          font-size: 1.5rem;
+          margin-right: 1rem;
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
+      > .divFantasma {
+        grid-area: divFantasma;
+        position: relative;
+
+        > .tablaIngresos {
+          position: absolute;
+          height: 100%;
+          width: 100%;
+        }
+      }
+    }
   }
   .abajo {
     grid-area: abajo;

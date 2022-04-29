@@ -67,23 +67,15 @@
     </div>
   </div>
   <div class="col-12 medio">
-    <div *ngIf="facturas" #cardTabla id="cardTabla" class="card card-padding sombra h-100 d-flex">
-      <app-tablas
-        class="h-100"
-        *ngIf="facturas"
-        [padre]="cardTabla"
-        [info]="info"
-        [pad]="false"
-        [data]="facturas"
-        (getInfoChange)="getInfoChange($event)"
-        (clickIcon)="clickVerPagos($event)"
-        [tablaHover]="false"
-        [focusRow]="false"
-        [id_tabla]="'facturasPendientes'"
-      ></app-tablas>
+    <div *ngIf="facturas" class="card sombra cardFacturas br-1">
+      <div class="bonton_select_all">
+        <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+      </div>
 
-      <div class="w-100 d-flex justify-content-end position-absolute" style="right: 0">
-        <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="top" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+      <div class="divFantasma">
+        <div #cardTabla id="cardTabla" class="tablaIngresos">
+          <dinamic-table [cardTabla]="cardTabla" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        </div>
       </div>
     </div>
   </div>

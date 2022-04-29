@@ -13,10 +13,28 @@
         <thead class="text-center position-relative thead letras">
           <tr id="titulosHeader-{{ config.id_tabla }}" class="titulosHeader">
             <th *ngFor="let row of config.info; let index_head = index" class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " id="titulo_{{ config.id_tabla }}_{{ row.key }}">
-              <span pTooltip="{{ row.tooltip || null }}" tooltipPosition="top" class="titulo"> {{ row.titulo }} </span>
+              <span [ngSwitch]="row?.tipo">
+                <span *ngSwitchCase="'inputSwitch'">
+                  <ng-container *ngIf="!row?.select_all"> {{ row?.titulo }} </ng-container>
+
+                  <input
+                    *ngIf="row?.select_all"
+                    class="apple-switch"
+                    type="checkbox"
+                    [checked]="are_all_selected(row)"
+                    pTooltip="{{ are_all_selected(row) ? 'Deseleccionar todo' : 'Seleccionar todo' }}"
+                    tooltipPosition="top"
+                    (change)="changeValorSelectAll(row)"
+                  />
+                </span>
+
+                <span *ngSwitchDefault>
+                  <span pTooltip="{{ row.tooltip || null }}" tooltipPosition="top" class="titulo"> {{ row.titulo }} </span>
+                </span>
+              </span>
             </th>
             <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }">
-              <span class="titulo no-theme text-dark"> Acciones </span>
+              <span class="titulo"> Acciones </span>
             </th>
           </tr>
         </thead>
@@ -131,20 +149,29 @@
                         <input
                           #inputTable
                           class="form-control m-0 inputTabla"
-                          id="inputNu-{{ getIndex(index_body) }}"
+                          id="input-{{ config.id_tabla }}-{{ column.key }}-{{ getIndex(index_body) }}"
                           [min]="dato.min_ ? dato.min_ : 0"
                           [max]="dato.max_ ? dato.max_ : null"
                           type="{{ column.inputType ? column.inputType : 'text' }}"
                           [value]="getValueForm(column, dato)"
-                          [disabled]="disabledInput(column.disable, getIndex(index_body))"
+                          [disabled]="disabledInput(dato, column)"
+                          (blur)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, index_body)"
                           (keyup)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
                           (change)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
                         />
-                        <i pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, dato)"></i>
+
+                        <i *ngIf="column.can_reset" pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, dato)"></i>
                       </div>
                     </span>
 
-                    <span *ngSwitchDefault id="{{ column.key }}-{{ getIndex(index_body) }}" style="width: 100%" pTooltip="{{ dato[column.rowTooltip] || null }}" tooltipPosition="top">
+                    <span
+                      *ngSwitchDefault
+                      id="{{ column.key }}-{{ getIndex(index_body) }}"
+                      class=" {{ dato[column.text_color] ? 'text-' + dato[column.text_color] : 'text-black' }}"
+                      style="width: 100%"
+                      pTooltip="{{ dato[column.rowTooltip] || null }}"
+                      tooltipPosition="top"
+                    >
                       {{ getValueForm(column, dato) }}
                       {{ column.alerta ? (config?.colores ? (dato.activo ? '' : '(Inactivo)') : '') : '' }}
                     </span>

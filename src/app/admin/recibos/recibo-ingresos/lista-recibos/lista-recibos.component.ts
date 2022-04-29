@@ -98,7 +98,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         numero_factura: { width: '12%' },
         total: { width: '12%', 'text-align': 'end', 'padding-right': '1.5rem' },
         actions: [
-          { key: 'actions', isTd: true, estilos: 'width: 9% !important; padding-left: 1rem !important; font-size:1rem !important' },
+          { key: 'actions', isTd: true, estilos: 'width: 9% !important; padding-left: 1rem !important' },
           { key: 'ver', estilos: 'font-size:1rem !important' },
           { key: 'anular', estilos: 'margin-left: 1rem !important; font-size:1rem !important' },
         ],

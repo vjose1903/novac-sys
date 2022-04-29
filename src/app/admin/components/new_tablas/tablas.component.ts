@@ -369,6 +369,27 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
+  changeValorSelectAll(info) {
+    console.log('info ', info);
+
+    // this.data.forEach((data, index) => {
+    //   if ((this.select_all_value && !data.select) || (!this.select_all_value && data.select)) this.changeValorCheck('select', index);
+    // });
+  }
+
+  are_all_selected(info) {
+    return true;
+  }
+
+  checkNumber(input, column, index_body) {
+    if (column.checkNumber) {
+      const id = `input-${this.config.id_tabla}-${column.key}-${this.getIndex(index_body)}`;
+      fun.revisarPrecio(input, id).then((res) => {
+        if (!res.error) input.value = res.number;
+      });
+    }
+  }
+
   changeValorInput(key, index, value, data) {
     const newData = fun.duplicarJson(data);
     newData[key] = value;
@@ -522,28 +543,31 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return this.config.read ? true : res;
   }
 
-  resetInput(referencia, destino, i, formatear, especifico?) {
+  resetInput(key, referencia, index, formatear, especifico?) {
+    const id = `input-${this.config.id_tabla}-${key}-${this.getIndex(index)}`;
+    const input = document.getElementById(id);
+
     if (referencia === 'especificar') {
-      this.data[i][destino] = especifico;
+      input['value'] = especifico;
     } else {
-      const copia = fun.duplicarJson(this.data[i][referencia]);
+      const copia = fun.duplicarJson(this.data[index][referencia]);
 
       if (formatear) {
-        this.data[i][destino] = fun.numFormatTwoDecimals(copia);
+        input['value'] = fun.formatearNumero(fun.redondearAdos(copia));
       } else {
-        this.data[i][destino] = copia;
+        input['value'] = copia;
       }
     }
   }
 
-  changeValorCheck(dato, column, i) {
+  changeValorCheck(dato, column, index) {
     const is_disable = this.disabledInput(dato, column);
 
     if (!is_disable) {
       const key = column.key;
       dato[key] = !dato[key];
 
-      const obj = { data: this.data, index: i, cambio: key, value: dato, id_tabla: this.config.id_tabla };
+      const obj = { data: dato, index: index, key: key, value: dato[key], id_tabla: this.config.id_tabla };
       this.handle_table_events('inputChange', obj);
     }
   }

@@ -11,6 +11,9 @@ export interface table_info {
   optionLabel?: any;
   optionValue?: any;
   estilos?: Array<any>;
+  select_all?: boolean;
+  checkNumber?: boolean;
+  can_reset?: boolean;
   inputType?: string;
   rowTooltip?: string;
   alerta?: boolean;
