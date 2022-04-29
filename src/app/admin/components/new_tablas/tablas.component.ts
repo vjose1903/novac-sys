@@ -92,8 +92,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   ngAfterViewInit() {
+    this.changeStylesTitles();
     if (this.data && this.data.length > 0) this.updateDataCopy(this.data);
-
     this.handleConfig();
   }
 

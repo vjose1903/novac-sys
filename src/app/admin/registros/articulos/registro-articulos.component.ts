@@ -163,9 +163,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.listaArticulos = res.data;
       this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
 
-      // const obj = { total: res.total_registros, tabla: 'listaArticulos' };
 
-      // this.tServ.Func_total_paginas(obj);
     });
   }
 

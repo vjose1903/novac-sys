@@ -24,8 +24,14 @@ export interface table_info {
   src?: any;
   alt?: any;
   click?: Function;
-  iconsArray?: Array<any>;
+  iconsArray?: Array<iconsI>;
   key_value?: string;
+}
+interface iconsI {
+  key: string;
+  rowTooltip?: string;
+  tooltip?: string;
+  text_color?: string;
 }
 
 export interface paginateI {

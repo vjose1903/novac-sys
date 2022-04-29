@@ -1,24 +1,13 @@
-<div class="row">
-  <div class="col-12 mb-2">
+<div class="mainRecibos">
+  <div class="mb-2 titulo">
     <h3 class="negrita">Recibos de ingreso</h3>
   </div>
-  <div *ngxPermissionsOnly="permissions.recibo_ingreso.create" class="col-12 mb-3">
+  <div *ngxPermissionsOnly="permissions.recibo_ingreso.create" class="mb-3 botonNuevo">
     <button class="btn btn-verde" (click)="navegar()">Nuevo recibo <i class="fas fa-hand-holding-usd"></i></button>
   </div>
-  <div class="col-12">
-    <div #cardTabla id="cardTabla" class="card cardListados rec">
-      <app-tablas
-        class="h-100"
-        *ngIf="lista_recibos"
-        [padre]="cardTabla"
-        [info]="info"
-        [data]="lista_recibos"
-        [tablaHover]="true"
-        (clickIcon)="clickIcon($event)"
-        (paginateChange)="getRecibos($event)"
-        [focusRow]="false"
-        [id_tabla]="'listaRecibos'"
-      ></app-tablas>
+  <div class="divTabla">
+    <div #cardTabla id="cardTabla" class="card cardListados">
+      <dinamic-table [cardTabla]="cardTabla" [(data)]="lista_recibos" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
     </div>
   </div>
 </div>
