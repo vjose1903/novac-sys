@@ -115,7 +115,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   ngOnDestroy() {
-    this.subWidth.unsubscribe();
+    if (this.subWidth) this.subWidth.unsubscribe();
     this.tServ.deletePaginationById(this.config.id_tabla);
   }
 
@@ -227,7 +227,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const actualPagination = this.tServ.getPaginationById(id);
 
     let new_obj_pagination = { ant_page: null, page: null };
-    console.log('actualPagination ', actualPagination);
 
     if (fun.hasValue(actualPagination) && actualPagination.show) {
       if (fun.isEmpty(actualPagination['ant_page'])) {
@@ -537,12 +536,16 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
-  changeValorCheck(data, key, i) {
-    data[key] = !data[key];
+  changeValorCheck(dato, column, i) {
+    const is_disable = this.disabledInput(dato, column);
 
-    const obj = { data: this.data, index: i, cambio: key, value: data, id_tabla: this.config.id_tabla };
+    if (!is_disable) {
+      const key = column.key;
+      dato[key] = !dato[key];
 
-    this.handle_table_events('inputChange', obj);
+      const obj = { data: this.data, index: i, cambio: key, value: dato, id_tabla: this.config.id_tabla };
+      this.handle_table_events('inputChange', obj);
+    }
   }
 
   getDropPlaceholder(placeholder) {

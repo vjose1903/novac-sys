@@ -161,6 +161,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       setTimeout(() => this.enfocarInput('cod-0'), 10);
       this.buscarFacturasAdelantadas(arg.data.id);
     }
+
     if (arg.modal_id === 'seleccionar_articulos_adelantados') {
       this.ajustarSecuencia();
       this.llenarConduce(arg.data).then((res) => {
@@ -534,7 +535,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     this.facturas_adelantadas.map((item) => {
       item.detalle_facturas.map((detalle) => {
         const formArray = this.form.get('rowFactura') as FormArray;
-        const existe = formArray.value.find((d) => d.detalle_factura_id === detalle.id);
+        const existe = formArray.value.find((d) => d.detalle_factura_id == detalle.id);
 
         detalle.select = !!existe;
         detalle.disable = !!existe;
@@ -551,7 +552,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   tableClickRow(event) {
-    console.log('event ', event);
     this.seleccionarFactruaAdelantada(event.data);
   }
 
@@ -559,15 +559,15 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     if (factura) {
       this.checkFacturasAdelantadasSelection();
       let conteo = 0;
-      factura.detalle_facturas.map(async (arti) => {
-        this.articuloClass.getArticulosFiltrado({ buscar: arti.codigo, fecha: this.fechaConduce, parameters: { contenido: true } }).then((res_articulo) => {
+      factura.detalle_facturas.map(async (detalle) => {
+        this.articuloClass.getArticulosFiltrado({ buscar: detalle.codigo, fecha: this.fechaConduce, parameters: { contenido: true } }).then((res_articulo) => {
           const articulo = _.first(res_articulo['data']);
           const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.' };
           const contenidos_format = this.formatContenidos(articulo.contenido);
 
           const arrayMostrar = [
-            { num: arti.retirado, medida: '' },
-            { num: arti.cantidad_en_unidades - arti.retirado, medida: '' },
+            { num: detalle.retirado, medida: '' },
+            { num: detalle.cantidad_en_unidades - detalle.retirado, medida: '' },
           ];
 
           for (let j = 0; j < arrayMostrar.length; j++) {
@@ -579,8 +579,10 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
             element.medida = contenidoSelected ? `${cantidad} ${abreviaturas[contenidoSelected[0]]}` : null;
           }
 
-          arti.retirado_mostrar = arrayMostrar[0].medida;
-          arti.restante_mostrar = arrayMostrar[1].medida;
+          detalle.retirado_mostrar = arrayMostrar[0].medida;
+          detalle.restante_mostrar = arrayMostrar[1].medida;
+
+          if (detalle.disable == false) detalle.disable = fun.isEmpty(detalle.restante_mostrar);
 
           conteo++;
           if (conteo >= factura.detalle_facturas.length)
@@ -603,7 +605,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
               });
             }, 250);
 
-          return arti;
+          return detalle;
         });
       });
     }

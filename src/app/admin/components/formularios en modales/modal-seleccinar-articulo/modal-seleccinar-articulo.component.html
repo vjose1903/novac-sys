@@ -1,5 +1,7 @@
-<div #cardTabla id="cardTabla" style="height: 100%; position: relative; display: flex">
-  <app-tablas
+<div #tablaArticulosAdelantados id="cardTabla" style="height: 100%; position: relative; display: flex">
+  <dinamic-table [cardTabla]="tablaArticulosAdelantados" [(data)]="inputs" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+
+  <!-- <app-tablas
     class="h-100"
     *ngIf="inputs && info"
     [padre]="cardTabla"
@@ -11,5 +13,5 @@
     [pad]="false"
     [colorHead]="false"
     [focusRow]="false"
-  ></app-tablas>
+  ></app-tablas> -->
 </div>

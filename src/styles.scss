@@ -488,6 +488,7 @@ input.apple-switch {
   transition-duration: 500ms;
   &.disabled {
     filter: brightness(0.9) !important;
+    pointer-events: none!important;
   }
 }
 

@@ -1,5 +1,4 @@
 <div #dinamicTable class="dinamicTable position-relative" [ngStyle]="{ height: cardTabla?.offsetHeight + 'px', width: cardTabla?.offsetWidth + 'px', padding: config.padding }">
-
   <!-- FILTER -->
   <div id="searchDiv-{{ config.id_tabla }}" *ngIf="config?.filtrar" class="searchDiv d-flex align-items-center" style="max-width: 17rem; z-index: 9">
     <label class="search-label mr-2" for="search">Busqueda </label>
@@ -14,7 +13,7 @@
         <thead class="text-center position-relative thead letras">
           <tr id="titulosHeader-{{ config.id_tabla }}" class="titulosHeader">
             <th *ngFor="let row of config.info; let index_head = index" class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " id="titulo_{{ config.id_tabla }}_{{ row.key }}">
-              <span pTooltip="{{ row.tooltip || null }}" tooltipPosition="top" class="titulo no-theme text-dark"> {{ row.titulo }} </span>
+              <span pTooltip="{{ row.tooltip || null }}" tooltipPosition="top" class="titulo"> {{ row.titulo }} </span>
             </th>
             <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }">
               <span class="titulo no-theme text-dark"> Acciones </span>
@@ -97,7 +96,7 @@
                       </span>
 
                       <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace" class="table_switch">
-                        <input class="apple-switch" [ngClass]="{ disabled: disabledInput(dato, column) }" type="checkbox" (change)="changeValorCheck(dato, column.key, getIndex(index_body))" [checked]="getValueForm(column, dato)" />
+                        <input class="apple-switch" [ngClass]="{ disabled: disabledInput(dato, column) }" type="checkbox" (change)="changeValorCheck(dato, column, getIndex(index_body))" [checked]="getValueForm(column, dato)" />
 
                         <!-- <p-inputSwitch (onChange)="changeValorCheck(dato, column.key, getIndex(index_body))" styleClass="size-sm" [ngModel]="getValueForm(column, dato)"></p-inputSwitch> -->
                       </div>

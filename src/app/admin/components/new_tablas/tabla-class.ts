@@ -104,6 +104,10 @@ export class TablaClass {
         this.tableClickIcon(event.info);
         break;
 
+      case 'inputChange':
+        this.tableInputChange(event.info);
+        break;
+
       default:
         break;
     }
@@ -112,4 +116,5 @@ export class TablaClass {
   tableClick_action(arg) {}
   tableClickRow(arg) {}
   tableClickIcon(arg) {}
+  tableInputChange(arg) {}
 }

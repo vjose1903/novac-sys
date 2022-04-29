@@ -123,11 +123,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngAfterViewInit() {
-    this.setUser();
-
     this.ready = true;
     this.parseMenu();
     this.cdRef.detectChanges();
+
+    setTimeout(() => this.setUser(), 100);
   }
 
   ngAfterContentChecked() {
