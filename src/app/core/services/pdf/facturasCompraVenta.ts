@@ -32,7 +32,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
     header: (currentPage, pageCount, pageSize) => {
       return cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, pageCount, configApp);
     },
-    content: contenidoFacturaVenta(data, is_nota, is_contado, is_venta),
+    content: contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
@@ -232,7 +232,7 @@ function calcularPrecio(cant, precio, tipo) {
   return fun_.redondearAdos(res);
 }
 
-function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
+function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: ConfigI) {
   const tempBody = [];
   const _break = is_contado ? 6 : 26;
 
@@ -405,12 +405,12 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
                             svg: `<svg viewBox="0 0 700 180">
                             <rect height="180" width="55" fill="#ffffff" rx="5" ry="5" x="0" y="0" stroke="black" />
 
-                            <text transform="translate(18, 165) rotate(-90)" font-weight="bold" style="font-size: 12px" > ADM AGROINDUSTRIAL SRL </text>
-                            <text transform="translate(30, 175) rotate(-90)" style="font-size: 9px"> Autopista Duarte Km0 El Higuero, La Vega </text>
+                            <text transform="translate(18, 165) rotate(-90)" font-weight="bold" style="font-size: 12px" > ${configApp.nombre_empresa} </text>
+                            <text transform="translate(30, 175) rotate(-90)" style="font-size: 9px"> ${configApp.direccion_empresa}a </text>
                             <text transform="translate(45, 175) rotate(-90)" font-weight="bold" style="font-size: 9px" > Telefono: </text>
-                            <text transform="translate(45, 136) rotate(-90)" style="font-size: 9px"> 809-573-0060 - </text>
+                            <text transform="translate(45, 136) rotate(-90)" style="font-size: 9px"> ${configApp.telefono_empresa} - </text>
                             <text transform="translate(45, 75) rotate(-90)" font-weight="bold" style="font-size: 9px" > Rnc: </text>
-                            <text transform="translate(45, 57) rotate(-90)" style="font-size: 9px"> 131-99603-5 </text>
+                            <text transform="translate(45, 57) rotate(-90)" style="font-size: 9px"> ${configApp.rnc_empresa} </text>
                         </svg>`,
                           },
                         ],
@@ -432,7 +432,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta) {
 
 
                         <text transform="translate(10, 45)" style="font-size: 11px"> Debo y pagaré a  </text>
-                        <text transform="translate(95, 45)" style="font-size: 11px" font-weight="bold"> ADM AGROINDUSTRIAL SRL </text>
+                        <text transform="translate(95, 45)" style="font-size: 11px" font-weight="bold"> ${configApp.nombre_empresa} </text>
                         <text transform="translate(240, 45)" style="font-size: 11px"> la cantidad de :  </text>
 
                         <text transform="translate(10, 63)" style="font-size: 12px" font-weight="bold"> *** ${numero_letra}  *** </text>
