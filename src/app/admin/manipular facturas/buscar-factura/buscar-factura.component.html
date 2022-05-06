@@ -90,9 +90,11 @@
     </div>
   </div>
   <div class="col-12 abajo">
-    <div *ngIf="mostrarListaFacturas()" #cardTabla id="cardTabla" class="card sombra h-100">
-      <app-tablas class="h-100" *ngIf="facturas" [padre]="cardTabla" [info]="info" [id_tabla]="'facturas_params'" (clickIcon)="clickIconHandler($event)" [data]="facturas" (paginateChange)="changePaginate($event)" [focusRow]="false"></app-tablas>
-      <!-- (getInfoChange)="selectFactura($event)" -->
+    <div *ngIf="mostrarListaFacturas()" #cardTablaVerFacturas class="card sombra h-100 tablaContent br-1">
+      <div class="divTabla">
+        <dinamic-table [cardTabla]="cardTablaVerFacturas" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+      </div>
+      <!-- <app-tablas class="h-100" *ngIf="facturas" [padre]="cardTabla" [info]="info" [id_tabla]="'facturas_params'" (clickIcon)="clickIconHandler($event)" [data]="facturas" (paginateChange)="changePaginate($event)" [focusRow]="false"></app-tablas> -->
     </div>
   </div>
   <button *ngIf="mostrarListaFacturas() && Para !== ' Visualizar'" [disabled]="!(idsFacturasSeleccionadas.length > 0)" [disabled]="" class="btn btn-verde mr-2 footer" value="" (click)="continuarAManipularFactura()">

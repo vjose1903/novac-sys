@@ -11,8 +11,8 @@ echo.
 cd "C:\Users\victor vasquez\codigo fuente adm\adm-agroindustrial"
 
 echo "----- borrado de la carpet de la ultima release -----"
-echo "rmdir /s /q "actualizacion" "
-rmdir /s /q "actualizacion"
+echo "Remove-item ".\actualizacion\" -Recurse -Force -Verbose"
+Remove-item ".\actualizacion\" -Recurse -Force -Verbose
 echo.
 echo.
 TIMEOUT 3  > nul
@@ -26,17 +26,9 @@ echo.
 TIMEOUT 3  > nul
 
 echo.
-echo "----- cambio de nombre carpeta release -----"
-echo "ren release actualizacion"
-ren release actualizacion
-echo.
-echo.
-TIMEOUT 3  > nul
-
-echo.
 echo "----- borrado de la carpeta innecesaria en actualizacion -----"
-echo "rmdir /s /q 'actualizacion/win-unpacked/' "
-rmdir /s /q "actualizacion/win-unpacked/"
+echo "Remove-item "actualizacion/win-unpacked/" -Recurse -Force -Verbose "
+Remove-item "actualizacion/win-unpacked/" -Recurse -Force -Verbose
 echo.
 echo.
 TIMEOUT 3  > nul

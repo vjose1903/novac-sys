@@ -35,6 +35,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   subCheckCuadreToday: Subscription;
   subLogOut: Subscription;
   subRouter: Subscription;
+  subCurrentUser: Subscription;
 
   ready;
   // facturas_localStorage: any;
@@ -91,6 +92,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       if (res) this.logOut();
     });
 
+    this.subCurrentUser = this.currentUserServ.CURENTUSER.subscribe((res) => {
+      if (res) this.setUser(res);
+    });
+
     this.configServ.getConfig().then((config: ConfigI) => (this.versionApp = config.app_version));
   }
 
@@ -126,16 +131,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.ready = true;
     this.parseMenu();
     this.cdRef.detectChanges();
-
-    setTimeout(() => this.setUser(), 100);
   }
 
   ngAfterContentChecked() {
     this.cdRef.detectChanges();
   }
 
-  setUser() {
-    this.usuario = this.currentUserServ.getUser();
+  setUser(usuario) {
+    this.usuario = usuario;
     if (this.usuario.sexo === 'm') this.imgUser = 'assets/img/userH.png';
     else this.imgUser = 'assets/img/userM.png';
   }

@@ -35,19 +35,6 @@
           <div class="col-12">
             <div #cardTablaAdelantadas id="cardTabla" class="card sombra bordeRedondeado factAdelantadas overflowHidden">
               <dinamic-table [cardTabla]="cardTablaAdelantadas" [(data)]="facturas_adelantadas" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
-              <!-- <app-tablas
-                class="h-100"
-                *ngIf="facturas_adelantadas && info"
-                [padre]="cardTabla"
-                [info]="info"
-                [ROW]="'row_adelantada'"
-                [search]="false"
-                [paginate]="false"
-                [data]="facturas_adelantadas"
-                [focusRow]="false"
-                (clickRow)="SeleccionarFactruaAdelantada($event)"
-                tabindex="-1"
-              ></app-tablas> -->
             </div>
           </div>
         </div>

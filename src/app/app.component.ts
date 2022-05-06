@@ -178,6 +178,8 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   }
 
   validateUserAndLoadPermisos() {
+    console.log("################## a validar usuario ################## ");
+
     this.currentUserServ
       .validateUser()
       .then((res) => {
@@ -185,8 +187,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
       })
       .catch((error) => {
         const actualPath = this.getActualPath();
-        fun.logGreen('actualPath ', actualPath);
-        fun.logOrange('error ', error);
 
         if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });

@@ -58,7 +58,8 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
 
   tableInputChange(event) {
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    if (event.cambio == 'select') this.articulos_selected = _.filter(this.inputs, { select: true, disable: false });
+    if (event.key == 'select') this.articulos_selected = _.filter(this.inputs, { select: true, disable: false });
+
     setTimeout(() => (modal.botones.dinamico[1].disable = this.articulos_selected.length == 0), 50);
   }
 }

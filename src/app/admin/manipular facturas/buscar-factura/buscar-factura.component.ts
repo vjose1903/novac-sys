@@ -16,6 +16,7 @@ import { NotaC } from '../notas-cred-deb/notas';
 import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
+import { table_config } from '../../components/new_tablas/tabla-class';
 
 enum campos {
   cliente = 1,
@@ -64,16 +65,49 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   campo = null;
   placeHolder = '';
 
+  table_config: table_config = {
+    info: [
+      { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' }] },
+      { titulo: 'Numero Fact', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
+      { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
+      { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+      { titulo: 'Condicion', tipo: 'text', key: 'condicion', estilos: [{ width: '6rem' }] },
+      { titulo: 'Fecha Facturación', tipo: 'text', key: 'fecha' },
+      { titulo: 'Fecha Vencimiento', tipo: 'text', key: 'fechaV' },
+      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
+      { titulo: 'Balance tactura', tipo: 'formatoNumero', key: 'balance' },
+      {
+        titulo: 'Acciones',
+        tipo: 'icon',
+        key: 'actions',
+        estilos: [{ width: '9%' }],
+        iconsArray: [
+          { key: 'view', tooltip: 'Ver factura', text_color: 'viewColor' },
+          {
+            id: 'select',
+            key: {
+              key: 'selected',
+              source: 'is_selected',
+              clases: [
+                { value: true, clase: 'far fa-check-square' },
+                { value: false, clase: 'far fa-square' },
+              ],
+            },
+            rowTooltip: 'tooltip_select',
+          },
+        ],
+      },
+    ],
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'lista_ncf',
+    padre_functions: { data_request: (params) => this.pedirFactura(this.campo, this.valor, params) },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+  };
+
+  tablaComponent;
+
   info = [
-    { titulo: ' ', tipo: 'icon', key: 'estatus', text_color: 'colorEstado', color: true, estilos: [{ width: '2rem' }] },
-    { titulo: 'Numero Fact', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
-    { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
-    { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
-    { titulo: 'Condicion', tipo: 'text', key: 'condicion', estilos: [{ width: '6rem' }] },
-    { titulo: 'Fecha Facturación', tipo: 'text', key: 'fecha' },
-    { titulo: 'Fecha Vencimiento', tipo: 'text', key: 'fechaV' },
-    { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', formatoNumero: true },
-    { titulo: 'Balance tactura', tipo: 'formatoNumero', key: 'balance', formatoNumero: true },
     {
       titulo: '7',
       tipo: 'icon',
@@ -126,9 +160,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   async necesarioStart() {
     await this.getTipoFacturas();
 
-    this.tServ.initPagination('facturas_params', this.tServ.obj_paginate.default);
+    // this.tServ.initPagination('facturas_params', this.tServ.obj_paginate.default);
 
-    if (this.buscarPara === 'nota_credito' || this.buscarPara === 'nota_debito') await this.getPaqueteComprobante();
+    if (this.buscarPara == 'nota_credito' || this.buscarPara == 'nota_debito') await this.getPaqueteComprobante();
 
     this.enfocarInput('campoI');
   }
@@ -220,13 +254,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
 
     if (this.Para == ' Visualizar') {
-      this.info = _.filter(this.info, (infoItem) => {
-        if (infoItem.key === 'view') {
-          infoItem.titulo = 'Acciones';
-          infoItem.estilos = [{ width: '9%' }];
-        }
-        return !(infoItem.key?.key === 'selected');
-      });
+      const td_actions = _.find(this.table_config.info, { key: 'actions' });
+      const btn_select = _.find(td_actions.iconsArray, { id: 'select' });
+      fun.logGreen('td_actions: ',td_actions);
+      fun.logRed('btn_select: ',btn_select);
+
+      _.pull(td_actions.iconsArray, btn_select);
     }
   }
 
@@ -268,7 +301,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
         fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
-        fact.customStyles = { 'view': { 'font-size': '1.5rem' }, 'numero_comprobante': { width: '7rem' } };
+        fact.customStyles = { view: { 'font-size': '1.5rem' }, numero_comprobante: { width: '7rem' } };
 
         return fact;
       });
@@ -285,9 +318,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   mostrarListaFacturas() {
     let res = false;
     if (this.facturas && this.facturas.length > 0) {
-      if (this.campo === '1' || this.campo === '4') {
+      if (this.campo == campos.cliente || this.campo == campos.ultimas50) {
         res = true;
-      } else if (this.campo === '3' && this.tipo_factura_id === '0') {
+      } else if (this.campo == campos.NumeroFactura && this.tipo_factura_id == '0') {
         res = true;
       } else {
         res = false;
@@ -298,23 +331,23 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
     return res;
   }
-
-  async pedirFactura(campo, valor, e) {
+  async pedirFactura(campo, valor, params?: { per_page: number; page: number; search: string }) {
     try {
       const fechaA = moment().format('YYYY-MM-DD');
 
-      const args = { campo, valor, tipo_factura_id: this.tipo_factura_id, adelantada: false, page: e.page, per_page: e.per_page, paginado: true, fact_de: 'venta' };
-      const busqueda = await this.facturaClass.getFacturasByParams(args);
+      const args = { campo, valor, tipo_factura_id: this.tipo_factura_id, adelantada: false, page: params.page, per_page: params.per_page, paginado: true, fact_de: 'venta' };
+      const res = await this.facturaClass.getFacturasByParams(args);
 
-      busqueda['data'].map((fact) => {
+      res['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
         fact.fecha = moment(fact.fecha_equivalente).format('DD/MM/YYYY');
         fact.fechaV = moment(fact.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
         fact.pagoT = true;
-        fact.estatus = fact.estado ? 'fas fa-check' : 'fas fa-times';
+        fact.is_active = fact.estado ? 'fas fa-check' : 'fas fa-times';
+        fact.is_active_tooltip = fact.estado ? 'Factura Activa' : 'Factura Inactiva';
         fact.monto = fun.formatearNumero(fun.redondearAdos(fact.balance));
         fact.pago_a_tiempo = fact.fecha_vencimiento > fechaA ? true : false;
-        fact.colorEstado = fact.estado ? 'green' : 'red';
+        fact.colorIsActive = fact.estado ? 'green' : 'red';
         fact.viewColor = 'gris-claro';
         fact.view = 'far fa-eye-slash';
         fact.is_selected = this.idsFacturasSeleccionadas.includes(fact.id);
@@ -323,26 +356,23 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
         fact.customStyles = {
-          'condicion': { width: '6rem' },
-          'secuencia': { width: '7rem' },
-          'numero_comprobante': { width: '7rem' },
-          'estatus': { width: '2rem' },
-          'view': { width: '4%', 'padding-left': '1rem', 'font-size': '1.5rem' },
-          'selected': { width: '4%', 'font-size': '1.5rem' },
+          condicion: { width: '6rem' },
+          secuencia: { width: '7rem' },
+          numero_comprobante: { width: '7rem' },
+          estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }],
+          actions: [
+            { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
+            { key: 'view', estilos: 'font-size: 1.2rem !important' },
+            { key: 'selected', estilos: 'margin-left: 0.5rem !important; font-size: 1.2rem !important;' },
+          ],
         };
 
-        if (this.Para === ' Visualizar') {
-          delete fact.customStyles['selected'];
-          fact.customStyles['view'].width = '9%';
-        }
+        if (this.Para == ' Visualizar') _.pull(fact.customStyles.actions, _.find(fact.customStyles.actions, { key: 'selected' }));
 
         return fact;
       });
 
-      const obj = { total: busqueda.total_registros, tabla: 'facturas_params' };
-
-      // this.tServ.Func_total_paginas(obj);
-      this.facturas = fun.duplicarJson(busqueda['data']);
+      this.facturas = fun.duplicarJson(res['data']);
 
       if (this.facturas.length > 0) {
         if (this.campo == campos.numeroComprobante || (campo == campos.NumeroFactura && this.tipo_factura_id != '0')) {
@@ -353,17 +383,19 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             this.facturaSelected = res;
             this.mostrarFactura(res, 'facturacion', null, continuar);
           });
+        } else {
+          setTimeout(() => this.tablaComponent.changeConfig([{ total_count: res.total_registros }]), 100);
         }
       } else {
-        if (this.campo === '1') {
-          if (this.tipo_factura_id === '0') {
+        if (this.campo == campos.cliente) {
+          if (this.tipo_factura_id == '0') {
             fun.toastError('Este cliente no tiene facturas a credito a su nombre', 'ERROR');
           } else {
             fun.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
           }
-        } else if (this.campo === '3') {
+        } else if (this.campo == campos.NumeroFactura) {
           fun.toastError('No existen facturas con este número.', 'ERROR');
-        } else if (this.campo === '2') {
+        } else if (this.campo == campos.numeroComprobante) {
           fun.toastError('La factura buscada no existe', 'ERROR');
         }
       }
@@ -391,7 +423,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       this.tipo_factura_id = '0';
       this.valor = '0';
 
-      this.pedirFactura(this.campo, '0', this.tServ.getPaginationById('facturas_params'));
+      this.pedirFactura(this.campo, '0', this.tServ.obj_paginate.default);
     }
   }
 
@@ -430,19 +462,24 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  clickIconHandler(item) {
-    if (item.column === 'view') {
-      this.parseFactura(item.row, 'venta', 'revisar').then((res) => {
-        this.facturaSelected = res;
+  tableClickIcon(params) {
+    if (params.columnKey == 'actions') {
+      if (params.iconKey == 'view') {
 
-        this.mostrarFactura(res, 'facturacion');
-      });
-    } else if (item.column === 'selected') {
-      item.row.is_selected = !item.row.is_selected;
+        this.parseFactura(params.data, 'venta', 'revisar').then((res) => {
+          this.facturaSelected = res;
 
-      item.row.is_selected ? this.idsFacturasSeleccionadas.push(item.row.id) : _.pull(this.idsFacturasSeleccionadas, item.row.id);
+          this.mostrarFactura(res, 'facturacion');
+        });
+      }
+      if (params.idIcon == 'select') {
+        params.data.is_selected = !params.data.is_selected;
+
+        params.data.is_selected ? this.idsFacturasSeleccionadas.push(params.data.id) : _.pull(this.idsFacturasSeleccionadas, params.data.id);
+      }
     }
   }
+
 
   selectNota(event) {
     if (event.column === 'view') {

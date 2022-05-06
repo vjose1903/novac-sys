@@ -30,8 +30,21 @@ export interface table_info {
   iconsArray?: Array<iconsI>;
   key_value?: string;
 }
-interface iconsI {
+
+interface keySourceArray {
+  value: any;
+  clase: string;
+}
+
+interface keySource {
   key: string;
+  source: string;
+  clases: Array<keySourceArray>;
+}
+
+interface iconsI {
+  id?: string | number;
+  key: string | keySource;
   rowTooltip?: string;
   tooltip?: string;
   text_color?: string;

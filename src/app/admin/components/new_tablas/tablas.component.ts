@@ -283,16 +283,16 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return this.tServ.getColor(myColor);
   }
 
-  getStyle(column, i) {
+  getStyle(column, index) {
     let styles = {};
 
-    if (this.data.length && this.data[i] && this.data[i].customStyles) {
-      const estilos = this.data[i].customStyles[column];
+    if (this.data.length && this.data[index] && this.data[index].customStyles) {
+      const estilos = this.data[index].customStyles[column];
 
       if (Array.isArray(estilos)) {
         for (const item of estilos) {
           const startId = item.isTd ? 'td-' : '';
-          const elemento = document.getElementById(`${startId}${this.config.id_tabla}-${item.key}-${i}`);
+          const elemento = document.getElementById(`${startId}${this.config.id_tabla}-${item.key}-${index}`);
 
           if (elemento) elemento.setAttribute('style', item.estilos);
         }
@@ -459,13 +459,35 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   iconBtn(key, i, data, e, objIcon) {
-    const obj = { id_tabla: this.config.id_tabla, index: i, columnKey: key, iconKey: objIcon.key, data: data, rowEditing: this.rowEditing };
+    const obj = { id_tabla: this.config.id_tabla, index: i, idIcon: objIcon.id, columnKey: key, iconKey: objIcon.key, data: data, rowEditing: this.rowEditing };
 
     const is_disable = this.disabledInput(data, objIcon);
 
     if (!is_disable) this.handle_table_events('clickIcon', obj);
 
     e.stopPropagation();
+  }
+
+  getIconClass(objIcon, dato) {
+    let res = '';
+    if (typeof objIcon.key == 'string') res = dato[objIcon.key];
+
+    if (typeof objIcon.key == 'object') {
+      const source = objIcon.key.source;
+      const clase_in_turn = _.find(objIcon.key.clases, (item) => item.value == dato[source]);
+
+      res = clase_in_turn.clase;
+    }
+    return res;
+  }
+
+  getIconKey(objIcon) {
+    let res = '';
+    if (typeof objIcon.key == 'string') res = objIcon.key;
+
+    if (typeof objIcon.key == 'object') res = objIcon.key.key;
+
+    return res;
   }
 
   showIcon(objIcon, data) {
@@ -508,7 +530,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   getIndex(index) {
-
     const pageIndex = (this.pagActual - 1) * this.config?.obj_paginate?.per_page + index;
 
     const validate = fun.isEmpty(this.data[pageIndex]);

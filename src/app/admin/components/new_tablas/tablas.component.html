@@ -90,11 +90,11 @@
                       <ng-container *ngFor="let objIcon of column.iconsArray">
                         <span *ngIf="showIcon(objIcon, dato)" class="span_icon" [ngClass]="{ icon_disable: disabledInput(dato, objIcon) }">
                           <i
-                            id="{{ config.id_tabla }}-{{ objIcon.key }}-{{ getIndex(index_body) }}"
+                            id="{{ config.id_tabla }}-{{ getIconKey(objIcon) }}-{{ getIndex(index_body) }}"
                             pTooltip="{{ dato[objIcon.rowTooltip] || objIcon.tooltip || ' ' }}"
                             tooltipPosition="top"
                             (click)="iconBtn(column.key, getIndex(index_body), dato, $event, objIcon)"
-                            class=" iconPress {{ dato[objIcon.key] }} {{ dato.iconHover ? 'c-pointer' : '' }} {{ dato[objIcon.text_color] ? 'text-' + dato[objIcon.text_color] : 'text-black' }}"
+                            class=" iconPress {{ getIconClass(objIcon, dato) }} {{ dato.iconHover ? 'c-pointer' : '' }} {{ dato[objIcon.text_color] ? 'text-' + dato[objIcon.text_color] : 'text-black' }}"
                             (mouseenter)="mouseMoveEvent('hover', dato, objIcon.key, $event.target.id)"
                             (mouseleave)="mouseMoveEvent('leave', dato, objIcon.key, $event.target.id)"
                           ></i>
