@@ -1,8 +1,7 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TablasComponent } from '../../components/tablas/tablas.component';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../loader/loader.service';
@@ -36,7 +35,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   clienteBuscado: any;
   listaClientes;
   facturaSelected: any;
-  @ViewChild(TablasComponent) tablas: TablasComponent;
   buscarPara: any;
   NCF;
   Para: string;
@@ -100,56 +98,36 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     ],
     colores: true,
     padding: '0.5rem',
-    id_tabla: 'lista_ncf',
+    id_tabla: 'lista_facturas',
     padre_functions: { data_request: (params) => this.pedirFactura(this.campo, this.valor, params) },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
   tablaComponent;
 
-  info = [
-    {
-      titulo: '7',
-      tipo: 'icon',
-      key: 'view',
-      text_color: 'viewColor',
-      color: true,
-      estilos: [{ width: '0%' }, { color: 'var(--transparente00)' }],
-    },
-    {
-      titulo: 'Acciones',
-      text_tooltip: 'tooltip_select',
-      tipo: 'icon',
-      key: {
-        key: 'selected',
-        source: 'is_selected',
-        clases: [
-          { value: true, clase: 'far fa-check-square' },
-          { value: false, clase: 'far fa-square' },
-        ],
-      },
-      text_color: 'selectedColor',
-      color: true,
-      estilos: [{ width: '9%' }],
-    },
-  ];
+  table_notas_config: table_config = {
+    info: [
+      { titulo: 'Fecha', tipo: 'text', key: 'fecha' },
+      { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+      { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total' },
+      { titulo: 'Acciones', tipo: 'icon', key: 'actions', iconsArray: [{ key: 'view', tooltip: 'Ver Nota', text_color: 'viewColor' }] },
+    ],
+    colores: true,
+    filtrar: { local: false },
+    id_tabla: 'lista_notas',
+    padre_functions: { data_request: (params) => this.pedirNotas(params) },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+  };
 
-  infoNota = [
-    { titulo: 'Fecha', tipo: 'text', key: 'fecha' },
-    { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
-    { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total', formatoNumero: true },
-    { titulo: 'Seleccione', tipo: 'icon', key: 'view', text_color: 'viewColor', color: true },
-  ];
-
-  ncfMask = [/b/, /[0-9]/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
+  tablaNotasComponent;
 
   ngOnInit() {
     this._init_mixin({ component: 'buscar_factura', is_routing: true });
     this.buscarPara = this.route.snapshot.params['para'];
 
-    if (this.buscarPara === 'nota_credito') {
+    if (this.buscarPara == 'nota_credito') {
       this.tipo_factu_nota = '04';
-    } else if (this.buscarPara === 'nota_debito') {
+    } else if (this.buscarPara == 'nota_debito') {
       this.tipo_factu_nota = '03';
     }
 
@@ -159,8 +137,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async necesarioStart() {
     await this.getTipoFacturas();
-
-    // this.tServ.initPagination('facturas_params', this.tServ.obj_paginate.default);
 
     if (this.buscarPara == 'nota_credito' || this.buscarPara == 'nota_debito') await this.getPaqueteComprobante();
 
@@ -256,8 +232,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (this.Para == ' Visualizar') {
       const td_actions = _.find(this.table_config.info, { key: 'actions' });
       const btn_select = _.find(td_actions.iconsArray, { id: 'select' });
-      fun.logGreen('td_actions: ',td_actions);
-      fun.logRed('btn_select: ',btn_select);
+      fun.logGreen('td_actions: ', td_actions);
+      fun.logRed('btn_select: ', btn_select);
 
       _.pull(td_actions.iconsArray, btn_select);
     }
@@ -274,24 +250,19 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async openSide() {
-    this.tServ.initPagination('notas', this.tServ.obj_paginate.default);
-
-    this.getNotas(this.tServ.getPaginationById('notas'));
+    this.pedirNotas(this.tServ.obj_paginate.default);
     this.showSide = true;
-    setTimeout(() => this.TablasComponent.calcularAlto(), 100);
   }
 
-  getNotas(e) {
+  async pedirNotas(params?: { per_page: number; page: number; search: string }) {
     return new Promise(async (resolve) => {
-      const page = e.page;
-      const per_page = e.per_page;
-      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
+      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
-      const busqueda = await this.notasClass.getAll(extra);
+      const res = await this.notasClass.getAll(extra);
 
-      busqueda['data'].map((fact) => {
+      res['data'].map((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
         fact.fecha = moment(fact.fecha_equivalente).format('DD/MM/YYYY');
         fact.total = Math.abs(fact.total);
@@ -301,16 +272,17 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
         fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
-        fact.customStyles = { view: { 'font-size': '1.5rem' }, numero_comprobante: { width: '7rem' } };
+        fact.customStyles = {
+          actions: [{ key: 'view', estilos: 'font-size: 1.2rem !important' }],
+          numero_comprobante: { width: '7rem' },
+        };
 
         return fact;
       });
 
-      this.notas = busqueda['data'];
+      this.notas = res['data'];
 
-      const obj = { total: busqueda.total_registros, tabla: 'notas' };
-
-      // this.tServ.Func_total_paginas(obj);
+      this.tablaNotasComponent.changeConfig([{ total_count: res.total_registros }]);
       resolve(true);
     });
   }
@@ -463,48 +435,27 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   tableClickIcon(params) {
-    if (params.columnKey == 'actions') {
-      if (params.iconKey == 'view') {
-
-        this.parseFactura(params.data, 'venta', 'revisar').then((res) => {
-          this.facturaSelected = res;
-
-          this.mostrarFactura(res, 'facturacion');
-        });
+    if (params.id_tabla == 'lista_notas') {
+      if (params.columnKey == 'actions') {
+        if (params.iconKey == 'view') {
+          this.notaSelected = params.data;
+          this.notasClass.parseDataToPdf(params.data).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota', params.data));
+        }
       }
-      if (params.idIcon == 'select') {
-        params.data.is_selected = !params.data.is_selected;
+    } else if (params.id_tabla == 'lista_facturas') {
+      if (params.columnKey == 'actions') {
+        if (params.iconKey == 'view') {
+          this.parseFactura(params.data, 'venta', 'revisar').then((res) => {
+            this.facturaSelected = res;
 
-        params.data.is_selected ? this.idsFacturasSeleccionadas.push(params.data.id) : _.pull(this.idsFacturasSeleccionadas, params.data.id);
-      }
-    }
-  }
+            this.mostrarFactura(res, 'facturacion');
+          });
+        }
+        if (params.idIcon == 'select') {
+          params.data.is_selected = !params.data.is_selected;
 
-
-  selectNota(event) {
-    if (event.column === 'view') {
-      this.notaSelected = event.row;
-
-      this.notasClass.parseDataToPdf(event.row).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota', event.row));
-    }
-  }
-
-  confirmarSeleccion() {}
-
-  validarRayaAbajo() {
-    if (this.NCF) {
-      let char = '';
-      let num = 0;
-      for (let index = 0; index < this.NCF.length; index++) {
-        const c = this.NCF.charAt(index);
-        char = c;
-        num = index;
-      }
-
-      if (num < 10 || char === '_') {
-        return false;
-      } else {
-        return true;
+          params.data.is_selected ? this.idsFacturasSeleccionadas.push(params.data.id) : _.pull(this.idsFacturasSeleccionadas, params.data.id);
+        }
       }
     }
   }

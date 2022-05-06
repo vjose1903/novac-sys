@@ -44,6 +44,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   @Input() print_log = false;
   @Input() seleccionado: any;
   @Input() data = [];
+  @Input() post_id: any = '';
   @Input() config: table_config = { padre_functions: null };
 
   // output
@@ -83,12 +84,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.TablasComponentChange.emit(this.TablasComponent);
 
     this.checkPagination();
-    this.row_id = `row-${this.config.id_tabla}-${this.actualRowIndex}`;
+    this.row_id = `row-${this.config.id_tabla + this.post_id}-${this.actualRowIndex}`;
     setTimeout(() => (this.ready = true), 250);
   }
 
   checkPagination() {
-    this.tServ.initPagination(this.config.id_tabla, this.config.obj_paginate || this.tServ.obj_paginate.default);
+    this.tServ.initPagination(this.config.id_tabla + this.post_id, this.config.obj_paginate || this.tServ.obj_paginate.default);
   }
 
   ngAfterViewInit() {
@@ -116,7 +117,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ngOnDestroy() {
     if (this.subWidth) this.subWidth.unsubscribe();
-    this.tServ.deletePaginationById(this.config.id_tabla);
+    this.tServ.deletePaginationById(this.config.id_tabla + this.post_id);
   }
 
   getValueForm(column, data) {
@@ -137,7 +138,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   checkHasClickFuntion(column, dato, i, e) {
-    const obj = { id_tabla: this.config.id_tabla, index: i, data: dato, column: column };
+    const obj = { id_tabla: this.config.id_tabla + this.post_id, index: i, data: dato, column: column };
     if (column.click) {
       column.click(obj);
       e.stopPropagation();
@@ -150,14 +151,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (_.has(this.config, 'filtrar') && !this.config.filtrar.local) {
       fun.awaitTyping(event).then(() => {
         if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
-          const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
+          const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id);
 
           if (fun.hasValue(search)) {
-            if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.config.id_tabla, [{ ant_page: actualPagination.page }]);
-            this.tServ.modifyPaginationById(this.config.id_tabla, [{ page: 1 }]);
+            if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ ant_page: actualPagination.page }]);
+            this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ page: 1 }]);
           } else if (fun.isEmpty(search) && fun.hasValue(actualPagination.ant_page)) {
-            this.tServ.modifyPaginationById(this.config.id_tabla, [{ page: actualPagination.ant_page }]);
-            this.tServ.modifyPaginationById(this.config.id_tabla, [{ ant_page: null }]);
+            this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ page: actualPagination.ant_page }]);
+            this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ ant_page: null }]);
           }
 
           this.config.padre_functions.data_request({ per_page: actualPagination.per_page, page: actualPagination.page, search: search });
@@ -167,12 +168,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       });
     }
 
-    this.tServ.modifyPaginationById(this.config.id_tabla, [{ search: search }]);
+    this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ search: search }]);
   }
 
   getPaginatorPageByNumber(number) {
     let paginatorPage = undefined;
-    const paginator = document.getElementById(`paginator-${this.config.id_tabla}`);
+    const paginator = document.getElementById(`paginator-${this.config.id_tabla + this.post_id}`);
 
     if (paginator) {
       const paginator_pages = document.getElementsByClassName('p-paginator-pages');
@@ -185,7 +186,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     setTimeout(() => {
       const page = event.page + 1;
       const per_page = event.rows;
-      const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
+      const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id);
 
       const actualPage = this.getPaginatorPageByNumber(page);
       const clickeado_por = actualPage.getAttribute('clickeado_por');
@@ -223,7 +224,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   dataLocalFilter(newData) {
     this.data.length = 0;
     newData.forEach((dato) => this.data.push(dato));
-    const id = this.config.id_tabla;
+    const id = this.config.id_tabla + this.post_id;
     const actualPagination = this.tServ.getPaginationById(id);
 
     let new_obj_pagination = { ant_page: null, page: null };
@@ -250,7 +251,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   setCantPagView(width, tipo) {
     let actual = 1;
-    const actualPagination = this.tServ.getPaginationById(this.config.id_tabla);
+    const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id);
 
     if (tipo == 'width_page') {
       const divPaginator = document.getElementById('divPaginator');
@@ -292,7 +293,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       if (Array.isArray(estilos)) {
         for (const item of estilos) {
           const startId = item.isTd ? 'td-' : '';
-          const elemento = document.getElementById(`${startId}${this.config.id_tabla}-${item.key}-${index}`);
+          const elemento = document.getElementById(`${startId}${this.config.id_tabla + this.post_id}-${item.key}-${index}`);
 
           if (elemento) elemento.setAttribute('style', item.estilos);
         }
@@ -340,7 +341,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
           list_estilos_titulos += `${key}: ${value} !important; `;
         }
 
-        const columna = document.getElementById(`titulo_${this.config.id_tabla}_${info.key}`) as any;
+        const columna = document.getElementById(`titulo_${this.config.id_tabla + this.post_id}_${info.key}`) as any;
 
         if (columna) columna.setAttribute('style', list_estilos_titulos);
       }
@@ -383,7 +384,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   checkNumber(input, column, index_body) {
     if (column.checkNumber) {
-      const id = `input-${this.config.id_tabla}-${column.key}-${this.getIndex(index_body)}`;
+      const id = `input-${this.config.id_tabla + this.post_id}-${column.key}-${this.getIndex(index_body)}`;
       fun.revisarPrecio(input, id).then((res) => {
         if (!res.error) input.value = res.number;
       });
@@ -396,7 +397,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     this.rowEditing = newData;
 
-    const obj = { data, newData, index, key, value, id_tabla: this.config.id_tabla };
+    const obj = { data, newData, index, key, value, id_tabla: this.config.id_tabla + this.post_id };
 
     this.handle_table_events('inputChange', obj);
   }
@@ -459,7 +460,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   iconBtn(key, i, data, e, objIcon) {
-    const obj = { id_tabla: this.config.id_tabla, index: i, idIcon: objIcon.id, columnKey: key, iconKey: objIcon.key, data: data, rowEditing: this.rowEditing };
+    const obj = { id_tabla: this.config.id_tabla + this.post_id, index: i, idIcon: objIcon.id, columnKey: key, iconKey: objIcon.key, data: data, rowEditing: this.rowEditing };
 
     const is_disable = this.disabledInput(data, objIcon);
 
@@ -566,7 +567,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   resetInput(key, referencia, index, formatear, especifico?) {
-    const id = `input-${this.config.id_tabla}-${key}-${this.getIndex(index)}`;
+    const id = `input-${this.config.id_tabla + this.post_id}-${key}-${this.getIndex(index)}`;
     const input = document.getElementById(id);
 
     if (referencia === 'especificar') {
@@ -589,7 +590,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       const key = column.key;
       dato[key] = !dato[key];
 
-      const obj = { data: dato, index: index, key: key, value: dato[key], id_tabla: this.config.id_tabla };
+      const obj = { data: dato, index: index, key: key, value: dato[key], id_tabla: this.config.id_tabla + this.post_id };
       this.handle_table_events('inputChange', obj);
     }
   }
@@ -608,12 +609,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   clickROW(data, index) {
     const has_inputs = _.some(this.config.info, (info: any) => info.tipo == 'input');
-    const obj = { data, index, id_tabla: this.config.id_tabla };
+    const obj = { data, index, id_tabla: this.config.id_tabla + this.post_id };
     this.handle_table_events('clickRow', obj);
   }
 
   handle_table_events(type, arg) {
-    this.table_events.emit({ type: type, info: arg, id_tabla: this.config.id_tabla });
+    this.table_events.emit({ type: type, info: arg, id_tabla: this.config.id_tabla + this.post_id });
   }
 
   // ========================================================================
@@ -629,7 +630,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       if (this.actualRowIndex == this.data.length - 1) this.actualRowIndex = 0;
       else this.actualRowIndex = this.actualRowIndex + 1;
     }
-    this.row_id = `row-${this.config.id_tabla}-${this.actualRowIndex}`;
+    this.row_id = `row-${this.config.id_tabla + this.post_id}-${this.actualRowIndex}`;
     this.cdRef.detectChanges();
 
     fun.scrollTo({ id: this.row_id, behavior: 'smooth', block: 'center', inline: 'center' });

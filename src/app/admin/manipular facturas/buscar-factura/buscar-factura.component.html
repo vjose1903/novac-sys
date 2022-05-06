@@ -107,18 +107,9 @@
 <!-- ============================================================================================================================================ -->
 
 <p-sidebar [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }">
-  <div #cardTablaNota id="cardTablaNota" class="h-100 divTablaNotas">
-    <app-tablas
-      class="h-100"
-      *ngIf="showSide"
-      [padre]="cardTablaNota"
-      [info]="infoNota"
-      [id_tabla]="'notas'"
-      (clickIcon)="selectNota($event)"
-      [data]="notas"
-      [(TablasComponent)]="TablasComponent"
-      (paginateChange)="getNotas($event)"
-      [focusRow]="false"
-    ></app-tablas>
+  <div #cardTablaNota id="cardTablaNota" class="divTablaNotas">
+    <div class="innerTablasNotas">
+      <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
+    </div>
   </div>
 </p-sidebar>

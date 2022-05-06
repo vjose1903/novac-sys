@@ -1,5 +1,5 @@
 <div *ngIf="facturasConDetalles" class="h-100 w-100">
-  <p-tabView [(activeIndex)]="tabIndex" (onClose)="onCloseTab($event)" styleClass="my_tabView anularPadding">
+  <p-tabView  [scrollable]="true" [(activeIndex)]="tabIndex" (onClose)="onCloseTab($event)" styleClass="my_tabView anularPadding">
     <p-tabPanel
       id="p-tabView-fact-{{ iteraFact.id }}"
       #tabPanel
