@@ -12,7 +12,7 @@ export default class HandlerConfigFile {
     direccion_empresa: 'Autopista Duarte Km0 El Higüero, La Vega',
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'ADM Agroindustrial S.R.L',
+    nombre_empresa: 'Agropecuaria Delia y Milo, S.R.L AGRODEMI',
     rnc_empresa: '131-99603-5',
     telefono_empresa: '(809)-573-0060',
     url_servidor: 'http://admservidor.ddns.net:9090',

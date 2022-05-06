@@ -404,13 +404,12 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: C
                           {
                             svg: `<svg viewBox="0 0 700 180">
                             <rect height="180" width="55" fill="#ffffff" rx="5" ry="5" x="0" y="0" stroke="black" />
-
-                            <text transform="translate(18, 165) rotate(-90)" font-weight="bold" style="font-size: 12px" > ${configApp.nombre_empresa} </text>
-                            <text transform="translate(30, 175) rotate(-90)" style="font-size: 9px"> ${configApp.direccion_empresa}a </text>
-                            <text transform="translate(45, 175) rotate(-90)" font-weight="bold" style="font-size: 9px" > Telefono: </text>
-                            <text transform="translate(45, 136) rotate(-90)" style="font-size: 9px"> ${configApp.telefono_empresa} - </text>
-                            <text transform="translate(45, 75) rotate(-90)" font-weight="bold" style="font-size: 9px" > Rnc: </text>
-                            <text transform="translate(45, 57) rotate(-90)" style="font-size: 9px"> ${configApp.rnc_empresa} </text>
+                            <text transform="translate(16, 178) rotate(-90)" font-weight="bold" style="font-size: 9px" > ${configApp.nombre_empresa} </text>
+                            <text transform="translate(30, 175) rotate(-90)" style="font-size: 9px"> ${configApp.direccion_empresa} </text>
+                            <text transform="translate(45, 176) rotate(-90)" font-weight="bold" style="font-size: 9px" > Telefono: </text>
+                            <text transform="translate(45, 137) rotate(-90)" style="font-size: 9px"> ${configApp.telefono_empresa} - </text>
+                            <text transform="translate(45, 73) rotate(-90)" font-weight="bold" style="font-size: 9px" > Rnc: </text>
+                            <text transform="translate(45, 55) rotate(-90)" style="font-size: 9px"> ${configApp.rnc_empresa} </text>
                         </svg>`,
                           },
                         ],
@@ -433,7 +432,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: C
 
                         <text transform="translate(10, 45)" style="font-size: 11px"> Debo y pagaré a  </text>
                         <text transform="translate(95, 45)" style="font-size: 11px" font-weight="bold"> ${configApp.nombre_empresa} </text>
-                        <text transform="translate(240, 45)" style="font-size: 11px"> la cantidad de :  </text>
+                        <text transform="translate(${configApp.nombre_empresa.length * 7.9}, 45)" style="font-size: 11px"> la cantidad de :  </text>
 
                         <text transform="translate(10, 63)" style="font-size: 12px" font-weight="bold"> *** ${numero_letra}  *** </text>
 
