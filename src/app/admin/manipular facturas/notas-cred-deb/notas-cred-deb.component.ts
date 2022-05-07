@@ -12,6 +12,8 @@ import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { NotaC } from './notas';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
+import { table_config } from '../../components/new_tablas/tabla-class';
+import { SingletonService } from '../../../core/services/singleton.service';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -26,11 +28,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   facturasConDetalles: Array<FacturasI>;
   tipoNota: any;
   tituloPag = '';
-  factura_aplicada;
-  tipos = {
-    credito: 'crédito',
-    debito: 'débito',
-  };
+
+  tipos = { credito: 'crédito', debito: 'débito' };
+
   fecha: string;
   TOTAL = 0;
   convertObj = { credito: -1, debito: 1 };
@@ -48,6 +48,33 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   clienteClass = new ClienteC();
   ncfClass = new NcfC();
   permissions = Permisos;
+
+  table_config: table_config = {
+    info: [
+      { titulo: ' ', tipo: 'switch', select_all: true, key: 'select', estilos: [{ width: '3.5rem' }] },
+      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }] },
+      {
+        titulo: null,
+        key: 'cant_nota',
+        tipo: 'input',
+        inputType: 'number',
+        disable: [{ kind: 'campo', target: 'select', value: [false] }],
+        estilos: [{ width: '6rem' }],
+      },
+      { titulo: 'Cantidad', key: 'cantidad', tipo: 'formatoNumero', estilos: [{ width: '5rem' }] },
+      { titulo: 'Unidad', key: 'unidad', tipo: 'text', estilos: [{ width: '4.5rem' }] },
+      { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero' },
+      { titulo: 'Descuento', key: 'descuento_valor', tipo: 'formatoNumero' },
+      { titulo: 'Total Facturado', key: 'total', tipo: 'formatoNumero' },
+      { titulo: 'Total nota', key: 'total_nota', tipo: 'input', disable: [{ kind: 'always' }], estilos: [{ width: '8rem' }] },
+    ],
+    id_tabla: 'notas',
+    obj_paginate: { show: false },
+    redondo: false,
+    colorTitulo: false,
+  };
+
+  tablaComponent;
 
   constructor(private activeRoute: ActivatedRoute, private router: Router, private pdfServ: PdfService, private cdRef: ChangeDetectorRef) {
     super();
@@ -87,11 +114,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     this.getFacturas().then(async (datos) => {
       this.facturasConDetalles = datos as FacturasI[];
-
       await this.formarTitulosTabla();
-
       await this.getPaqueteComprobante();
-      this.factura_aplicada = this.facturasConDetalles;
     });
   }
 
@@ -104,25 +128,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   formarTitulosTabla() {
-    this.info = [
-      { titulo: ' ', tipo: 'inputSwitch', select_all: true, key: 'select', title: '', estilos: [{ width: '3rem' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }] },
-      {
-        titulo: this.tipoNota === 'credito' ? 'Devolver' : 'Aumentar',
-        key: 'cant_nota',
-        formatoNumero: true,
-        tipo: 'input',
-        inputType: 'number',
-        disable: [{ kind: 'campo', target: 'select', value: [false] }],
-        estilos: [{ width: '6rem' }],
-      },
-      { titulo: 'Cantidad', key: 'cantidad', tipo: 'formatoNumero', formatoNumero: true, estilos: [{ width: '5rem' }] },
-      { titulo: 'Unidad', key: 'unidad', tipo: 'text', estilos: [{ width: '4.5rem' }] },
-      { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero', formatoNumero: true },
-      { titulo: 'Descuento', key: 'descuento_valor', tipo: 'formatoNumero', formatoNumero: true },
-      { titulo: 'Total Facturado', key: 'total', tipo: 'formatoNumero', formatoNumero: true },
-      { titulo: 'Total nota', key: 'total_nota', tipo: 'input', disable: [{ kind: 'always' }], estilos: [{ width: '8rem' }] },
-    ];
+    const FilaCantNota = _.find(this.table_config.info, { key: 'cant_nota' });
+    FilaCantNota.titulo = this.tipoNota === 'credito' ? 'Devolver' : 'Aumentar';
   }
 
   onCloseTab(eventData) {
@@ -132,11 +139,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   async getFacturas() {
     return new Promise(async (resolve) => {
       this.facturaClass.getAll({ afterPath: `custom/get_group/${this.idsFacturas}` }).then((res_factura) => {
-        let tempFactData: FacturasI[];
+        let tempFactData: FacturasI[] = res_factura['data'];
 
-        tempFactData = res_factura['data'];
-
-        // facturas_aplicadas / custom / get_cantidad_devuelto / 13806, 13808;
         this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.idsFacturas}` }).then((res) => {
           const devueltos = res['data'];
 
@@ -152,25 +156,19 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
               detalle['cant_nota'] = 0;
 
               detalle['customStyles'] = {
-                'select': { width: '3rem' },
-                'cantidad': { width: '5rem' },
-                'total_nota': { width: '7.3rem' },
-                'cant_nota': { width: '6rem' },
-                'unidad': { width: '4.5rem' },
-                'descripcion': { 'text-align': 'left', width: '20rem' },
+                select: { width: '3.5rem' },
+                cantidad: { width: '5rem' },
+                total_nota: { width: '7.3rem' },
+                cant_nota: { width: '6rem' },
+                unidad: { width: '4.5rem' },
+                descripcion: { 'text-align': 'left', width: '20rem' },
               };
 
-              if (this.tipoNota === 'credito') {
-                detalle['min_'] = 0;
-                detalle['max_'] = detalle.cantidad - devueto;
-              } else {
-                detalle['min_'] = 0;
-                detalle['max_'] = null;
-              }
+              detalle['min_'] = 0;
+              detalle['max_'] = this.tipoNota == 'credito' ? detalle.cantidad - devueto : null;
 
-              detalle['total_nota'] = 0;
+              detalle['total_nota'] = '0.00';
               detalle['cantidad'] = detalle.cantidad - devueto;
-              // }
 
               resolve(tempFactData);
             }
@@ -180,16 +178,13 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     });
   }
 
-  getIndexNota(id_) {
-    return _.findIndex(this.detalleNota, { id: id_ });
-  }
-
   async sumarTotal() {
     let total = 0;
+
     for (let i = 0; i < this.detalleNota.length; i++) {
       const detalle = this.detalleNota[i];
 
-      const cantidad = detalle.cant_nota;
+      const cantidad = fun.desformatear(detalle.cant_nota);
 
       const descuento = detalle.descuento_valor / detalle.cantidad;
 
@@ -209,71 +204,67 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
       if (!detalle.cantidad_en_unidades_nota) detalle.cantidad_en_unidades_nota = 0;
 
-      if (detalle.unidad === 'Saco' && detalle.se_calcula_saco) {
+      if (detalle.unidad == 'Saco' && detalle.se_calcula_saco) {
         const peso = this.obtenerSaco(detalle.descripcion, 'peso');
 
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * peso;
       } else {
-        detalle.cantidad_en_unidades_nota = detalle.cant_nota * detalle.contenidos[detalle.unidad];
+        const unidad = detalle.peso_saco ? `${detalle.unidad}_${detalle.peso_saco}` : detalle.unidad;
+        detalle.cantidad_en_unidades_nota = detalle.cant_nota * detalle.contenidos[unidad];
       }
     }
   }
 
   async selectAll(info) {}
 
-  async getInfoChange(infoTable, factData: FacturasI) {
-    const entidad = infoTable.body[infoTable.index];
+  tableInputChange(params) {
 
-    entidad.cant_nota = parseFloat(entidad.cant_nota);
+    if (params.key == 'select') {
+      if (!params.value) {
+        params.data.total_nota = '0.00';
+        params.data.cant_nota = 0;
+        const index = _.findIndex(this.detalleNota, { id: params.data.id });
+        _.pullAt(this.detalleNota, index);
+      } else {
+        this.detalleNota.push(params.data);
+      }
+    }
 
-    if (infoTable.cambio === 'cant_nota') {
-      if (this.tipoNota === 'credito') {
-        if (entidad.cant_nota > entidad.cant) {
+    if (params.key == 'cant_nota') {
+      const cant_nota = fun.desformatear(params.value);
+
+      if (this.tipoNota == 'credito') {
+
+        if (cant_nota > params.data.cant) {
           fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
-          this.enfocarInput(`input-${infoTable.id_tabla}-${infoTable.index}`);
-          setTimeout(() => {
-            entidad.cant_nota = entidad.cant;
-          }, 5);
-        } else if (isNaN(entidad.cant_nota)) {
-          entidad.cant_nota = 0;
-          entidad.total_nota = 0;
+          this.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
+        } else if (isNaN(cant_nota)) {
+          params.data.cant_nota = 0;
+          params.data.total_nota = '0.00';
         } else {
-          const descuento = entidad.descuento_valor / entidad.cantidad;
 
-          const total = entidad.cant_nota * (entidad.precio - descuento);
-          entidad.total_nota = this.formatoNumero(total);
+          const descuento = params.data.descuento_valor / params.data.cantidad;
+
+          const total = cant_nota * (fun.desformatear(params.data.precio) - descuento);
+          params.data.total_nota = this.formatoNumero(total);
+          params.data.cant_nota = cant_nota;
         }
       } else {
-        if (isNaN(entidad.cant_nota)) {
-          entidad.cant_nota = 0;
-          entidad.total_nota = 0;
+        if (isNaN(cant_nota)) {
+          params.data.cant_nota = 0;
+          params.data.total_nota = '0.00';
         }
-        const descuento = entidad.descuento_valor / entidad.cantidad;
+        const descuento = params.data.descuento_valor / params.data.cantidad;
 
-        const total = entidad.cant_nota * (entidad.precio - descuento);
-
-        entidad.total_nota = this.formatoNumero(total);
-      }
-      this.sumarTotal();
-      this.checkCantidadEnUnidades();
-    }
-
-    if (infoTable.cambio === 'select') {
-      if (!infoTable.value) {
-        factData.detalle_facturas[infoTable.index].select = false;
-        entidad.total_nota = 0;
-        entidad.cant_nota = 0;
-
-        const i = this.detalleNota.indexOf(infoTable.body[infoTable.index]);
-        _.pullAt(this.detalleNota, i);
-
-        this.sumarTotal();
-        this.checkCantidadEnUnidades();
-      } else {
-        factData.detalle_facturas[infoTable.index].select = true;
-        this.detalleNota.push(infoTable.body[infoTable.index]);
+        const total = cant_nota * (params.data.precio - descuento);
+        params.data.total_nota = this.formatoNumero(total);
+        params.data.cant_nota = cant_nota;
       }
     }
+
+    this.sumarTotal();
+    this.checkCantidadEnUnidades();
+    // SingletonService.cdRef.detectChanges();
   }
 
   formatoNumero(num) {
@@ -306,7 +297,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   //  MODAL IMPRIMIR
   // =============================================
   imprimirFactura() {
-    if (this.detalleNota.length === 0) {
+    const facturasLlenas = _.filter(this.facturasConDetalles, (factura) => this.totalIndividual(factura) > 0);
+    if (facturasLlenas.length == 0) {
       fun.toastWarning('Nota de ' + this.tipoNota + ' no puede estar vacía.', 'Aviso');
     } else {
       if (this.TOTAL === 0) {
@@ -319,7 +311,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           texto: 'Seguro que desea imprimir la factura',
           header: 'Confirmación',
           siFunction: (instance) => {
-            this.formarNota(null);
+            this.formarNota();
             this.closeModal(instance);
           },
           width: '30rem',
@@ -428,7 +420,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return numb;
   }
 
-  async formarNota(dataFact: FacturasI) {
+  async formarNota() {
     const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
     const fecha_valida = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
 

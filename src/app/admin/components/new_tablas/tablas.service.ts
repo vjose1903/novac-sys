@@ -22,10 +22,10 @@ export class TablasService {
   };
 
   initPagination(id, params: paginateI) {
-    this.obj_paginate[id] = params;
+    if (this.obj_paginate[id] == undefined) this.obj_paginate[id] = params;
   }
 
-  getPaginationById(id) {
+  getPaginationById(id, quien?) {
     return this.obj_paginate[id];
   }
 

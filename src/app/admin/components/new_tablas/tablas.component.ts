@@ -100,7 +100,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   handleConfig() {
     if (!this.config.padding) this.config.padding = '0rem';
+    if (!_.has(this.config, 'redondo')) this.config.redondo = true;
+    if (!_.has(this.config, 'colorTitulo')) this.config.colorTitulo = true;
     if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, (info) => _.values(_.pick(info, ['key']))[0]);
+
     this.config.info.map((item) => {
       if (!_.has(item, 'titulo_sm')) item.titulo_sm = item.titulo;
     });
@@ -151,7 +154,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (_.has(this.config, 'filtrar') && !this.config.filtrar.local) {
       fun.awaitTyping(event).then(() => {
         if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
-          const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id);
+          const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id, 'filter');
 
           if (fun.hasValue(search)) {
             if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ ant_page: actualPagination.page }]);
@@ -186,7 +189,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     setTimeout(() => {
       const page = event.page + 1;
       const per_page = event.rows;
-      const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id);
+      const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id,'paginatorChange');
 
       const actualPage = this.getPaginatorPageByNumber(page);
       const clickeado_por = actualPage.getAttribute('clickeado_por');
@@ -225,7 +228,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.data.length = 0;
     newData.forEach((dato) => this.data.push(dato));
     const id = this.config.id_tabla + this.post_id;
-    const actualPagination = this.tServ.getPaginationById(id);
+    const actualPagination = this.tServ.getPaginationById(id,'dataLocalFilter');
 
     let new_obj_pagination = { ant_page: null, page: null };
 
@@ -251,7 +254,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   setCantPagView(width, tipo) {
     let actual = 1;
-    const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id);
+    const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id,'setCantPagView');
 
     if (tipo == 'width_page') {
       const divPaginator = document.getElementById('divPaginator');
@@ -371,7 +374,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorSelectAll(info) {
-    console.log('info ', info);
 
     // this.data.forEach((data, index) => {
     //   if ((this.select_all_value && !data.select) || (!this.select_all_value && data.select)) this.changeValorCheck('select', index);
@@ -477,7 +479,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       const source = objIcon.key.source;
       const clase_in_turn = _.find(objIcon.key.clases, (item) => item.value == dato[source]);
 
-      res = clase_in_turn.clase;
+      res = clase_in_turn?.clase;
     }
     return res;
   }

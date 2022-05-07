@@ -85,6 +85,8 @@ export interface table_config {
   padding?: string;
   padre_functions?: padreFunctionsI;
   colores?: Boolean;
+  redondo?: Boolean;
+  colorTitulo?: Boolean;
   read?: Boolean;
   focusRow?: Boolean;
   extraCalculo?: Number;

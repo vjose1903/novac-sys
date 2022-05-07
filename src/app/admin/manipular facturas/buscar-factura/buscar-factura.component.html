@@ -94,7 +94,6 @@
       <div class="divTabla">
         <dinamic-table [cardTabla]="cardTablaVerFacturas" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
       </div>
-      <!-- <app-tablas class="h-100" *ngIf="facturas" [padre]="cardTabla" [info]="info" [id_tabla]="'facturas_params'" (clickIcon)="clickIconHandler($event)" [data]="facturas" (paginateChange)="changePaginate($event)" [focusRow]="false"></app-tablas> -->
     </div>
   </div>
   <button *ngIf="mostrarListaFacturas() && Para !== ' Visualizar'" [disabled]="!(idsFacturasSeleccionadas.length > 0)" [disabled]="" class="btn btn-verde mr-2 footer" value="" (click)="continuarAManipularFactura()">
@@ -106,10 +105,10 @@
 <!-- SIDE NOTAS -->
 <!-- ============================================================================================================================================ -->
 
-<p-sidebar [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }">
+<p-sidebar [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }" (onHide)="onHideSide()	">
   <div #cardTablaNota id="cardTablaNota" class="divTablaNotas">
     <div class="innerTablasNotas">
-      <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
+      <dinamic-table *ngIf="notas.length" [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
     </div>
   </div>
 </p-sidebar>

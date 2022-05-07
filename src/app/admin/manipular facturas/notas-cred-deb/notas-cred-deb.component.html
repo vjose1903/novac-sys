@@ -1,5 +1,5 @@
 <div *ngIf="facturasConDetalles" class="h-100 w-100">
-  <p-tabView  [scrollable]="true" [(activeIndex)]="tabIndex" (onClose)="onCloseTab($event)" styleClass="my_tabView anularPadding">
+  <p-tabView [scrollable]="true" [(activeIndex)]="tabIndex" (onClose)="onCloseTab($event)" styleClass="my_tabView anularPadding">
     <p-tabPanel
       id="p-tabView-fact-{{ iteraFact.id }}"
       #tabPanel
@@ -55,9 +55,7 @@
                     </span>
                     <span class="d-block">
                       <b class="negrita">Valida hasta :</b> &nbsp;
-                      <span *ngIf="iteraFact.numero_factura">{{
-                        iteraFact.tipo_factura_id === 3 ? 'No aplica' : iteraFact.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(iteraFact.fecha_valida)
-                      }}</span>
+                      <span *ngIf="iteraFact.numero_factura">{{ iteraFact.tipo_factura_id === 3 ? 'No aplica' : iteraFact.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(iteraFact.fecha_valida) }}</span>
                     </span>
                   </div>
                 </div>
@@ -83,22 +81,10 @@
         </div>
 
         <!-- ======================================================================================================== -->
-        <div #cardTabla id="cardTabla" class="cuerpoFactura mb-2">
-          <app-tablas
-            class="h-100"
-            *ngIf="iteraFact.detalle_facturas"
-            [search]="false"
-            [paginate]="false"
-            [id_tabla]="iteraFact.id"
-            [tablaHover]="false"
-            [padre]="cardTabla"
-            [info]="info"
-            (getInfoChange)="getInfoChange($event, iteraFact)"
-            [data]="iteraFact.detalle_facturas"
-            [focusRow]="false"
-            [pad]="false"
-            [colorHead]="false"
-          ></app-tablas>
+        <div #cardTablaNotas id="cardTabla" class="cuerpoFactura mb-2">
+          <div class="tablaNotas">
+            <dinamic-table [cardTabla]="cardTablaNotas" [(data)]="iteraFact.detalle_facturas" [post_id]="'-' + iteraFact.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
         </div>
         <div class="pieFactura">
           <div class="row" style="border-top: 2px solid #c7c9ca">
