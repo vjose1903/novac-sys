@@ -430,7 +430,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  async selectMedidaChange(arg, i) {
+  async selectMedidaChange(arg, index) {
     const medidaSelected = _.find(this.UnidadesArticulo, (unidad) => unidad.value === arg);
 
     this.precioDetalle = medidaSelected.precio;
@@ -438,18 +438,18 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const unidad = medidaSelected.value;
 
     if (unidad.toLowerCase() === 'medida') {
-      (this.filasDetalle[i] as any).controls['uni'].setValue(null);
+      (this.filasDetalle[index] as any).controls['uni'].setValue(null);
     } else {
-      this.checkCantidadExede(i, 'change', (excede) => {
+      this.checkCantidadExede(index, 'change', (excede) => {
         if (!excede) {
-          (this.filasDetalle[i] as any).controls['uni'].setValue(unidad);
-          (this.filasDetalle[i] as any).controls['pre'].setValue(fun.numFormatTwoDecimals(this.metodo === 'venta' ? this.precioDetalle : costoDetalle));
-          (this.filasDetalle[i] as any).controls['costo'].setValue(costoDetalle);
+          (this.filasDetalle[index] as any).controls['uni'].setValue(unidad);
+          (this.filasDetalle[index] as any).controls['pre'].setValue(fun.numFormatTwoDecimals(this.metodo === 'venta' ? this.precioDetalle : costoDetalle));
+          (this.filasDetalle[index] as any).controls['costo'].setValue(costoDetalle);
 
-          this.calcularTotalRow(i).then(() => {
+          this.calcularTotalRow(index).then(() => {
             this.ajustarSecuencia().then(() => {
-              if (this.metodo === 'venta') this.enfocarInput(this.inputSecuencia);
-              else this.enfocarInput(`pre-${i}`);
+              if (this.metodo == 'venta') this.enfocarInput(this.inputSecuencia);
+              else this.enfocarInput(`pre-${index}`);
             });
           });
         }
