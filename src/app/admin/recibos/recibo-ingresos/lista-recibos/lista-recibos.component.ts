@@ -73,13 +73,13 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   mapeoRecibos(res) {
     res.map((recibo) => {
-      recibo['tipo_recibo'] = recibo.chofer ? 'fas fa-truck-moving' : 'fas fa-comment-dollar';
+      recibo['tipo_recibo'] = recibo.choferes_viajes.length ? 'fas fa-truck-moving' : 'fas fa-comment-dollar';
       recibo['numero_recibo'] = _.padStart(recibo.numero_recibo, 8, '0');
       recibo['cliente_'] = `${recibo.cliente.nombre} ${recibo.cliente.apellido}`;
       recibo['numero_factura'] = recibo.detalle_recibos.length === 1 ? recibo.detalle_recibos[0].descripcion.split(' ')[1] : 'Varios...';
       recibo['ver'] = 'far fa-eye';
       recibo['anular'] = 'far fa-trash-alt';
-      recibo['tooltip_tipo'] = recibo.chofer ? 'Factura de Viaje' : 'Factura a crédito';
+      recibo['tooltip_tipo'] = recibo.choferes_viajes.length ? 'Factura de Viaje' : 'Factura a crédito';
       recibo['tooltip_ver'] = 'Ver';
       recibo['tooltip_anular'] = 'Anular';
 

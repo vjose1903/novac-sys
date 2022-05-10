@@ -5,9 +5,7 @@ export interface ReciboI {
   user_id?: number;
   tipo_factura_id?: number;
   cliente_id?: number;
-  vehiculo_id?: null;
   total?: number;
-  chofer?: null;
   forma_pago?: string;
   numero_recibo?: number;
   incidencia?: null;
@@ -17,7 +15,8 @@ export interface ReciboI {
   cliente?: any;
   user?: any;
   detalle_recibos?: any;
-
+  camiones_viajes?: any;
+  choferes_viajes?: any;
   total_registros?: any;
   data?: any;
 }

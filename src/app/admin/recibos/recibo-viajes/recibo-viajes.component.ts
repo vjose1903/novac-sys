@@ -345,8 +345,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       });
     }
 
-    //     choferes_viajes  user_id
-    // camiones_viajes vehiculo_id
     const obj = {
       cliente_id: this.viaje_selected.cliente_id,
       total: this.total_recibido,
