@@ -3,8 +3,12 @@
     <h4 class="negrita">Listado de viajes</h4>
   </div>
   <div class="listado">
-    <div #cardTabla id="cardTabla" class="card cardListados p-3">
-      <app-tablas
+    <div #cardTablaViaje id="cardTabla" class="card cardListados">
+      <div class="divTabla">
+        <dinamic-table [cardTabla]="cardTablaViaje" [seleccionado]="viaje_selected?.id" [(data)]="viajes" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+      </div>
+
+      <!-- <app-tablas
         class="h-100"
         *ngIf="viajes && info"
         [padre]="cardTabla"
@@ -17,7 +21,7 @@
         [ROW]="'viaje-'"
         (clickRow)="verViaje($event)"
         (paginateChange)="getViajes($event)"
-      ></app-tablas>
+      ></app-tablas> -->
       <!-- (DevolverInfo)="editarItem($event)" -->
       <!-- (DELETE)="abrirModal($event)" -->
     </div>
@@ -47,14 +51,14 @@
     </div>
     <hr class="rayaA mt-2" />
 
-    <div *ngIf="viaje_selected?.id !== -1" class="mt-4">
-      <div class="card sombra">
+    <div *ngIf="viaje_selected" class="mt-4 d-flex justify-content-center">
+      <div class="card sombra" style="width: 29.5rem">
         <div class="card-header position-relative d-flex align-items-center">
           <h4 class="negrita mb-0">Viaje seleccionado</h4>
           <i
             class="fas fa-bars btn-icon"
             style="position: absolute; right: 1rem"
-            [ngClass]="{ disabled: !viaje_selected.pagos.length && !viaje_selected.notas.length }"
+            [ngClass]="{ disabled: !viaje_selected?.pagos.length && !viaje_selected?.notas.length }"
             pTooltip="Historial de movimientos"
             tooltipPosition="left"
             (click)="abrir_historial()"
@@ -93,34 +97,57 @@
             <hr class="rayaA mt-2" />
           </div>
 
-          <div class="form-group mt-4">
-            <label class="control-label">Viaje realizado por: <span style="color: red">*</span></label>
-            <select [(ngModel)]="chofer_id" class="form-control" (ngModelChange)="checkChofer()" (blur)="checkChofer()" (focus)="entroEnChofer()">
-              <option *ngFor="let item of choferes" value="{{ item.id }}">{{ item.nombreCompleto }}</option>
-              <option *ngIf="!is_choferes_register" disable>No tiene Choferes registrados</option>
-            </select>
-            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="is_choferes_register && !is_chofer_selected && salio_en_chofer">Debe de seleccionar un chofer</div>
-            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!is_choferes_register">Debe de registrar un chofer</div>
-          </div>
+          <form [formGroup]="form">
+            <div class="form-group mt-4 "[appMsgError]="'choferes_viajes'" [form]="form">
+              <label class="control-label">Viaje realizado por: <span style="color: red">*</span></label>
 
-          <div class="form-group mt-2">
-            <label class="control-label">Camion utilizado: <span style="color: red">*</span></label>
-            <select [(ngModel)]="camion_id" class="form-control" (ngModelChange)="checkCamion()" (blur)="checkCamion()" (focus)="entroEnCamion()">
-              <option *ngFor="let item of camiones" value="{{ item.id }}">{{ item.marca }} {{ item.modelo }} - {{ item.anio }} ({{ item.propietario.nombre }} {{ item.propietario.apellido }})</option>
-              <option *ngIf="!is_camiones_register" disable>No tiene camiones registrados</option>
-            </select>
-            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="is_camiones_register && !is_camion_selected && salio_en_camion">Debe de seleccionar un camion</div>
-            <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!is_camiones_register">Debe de registrar un camion</div>
-          </div>
+              <p-multiSelect
+                class="multiSelectPrimeng"
+                [options]="choferes"
+                formControlName="choferes_viajes"
+                emptyMessage="No tiene choferes registrados"
+                emptyFilterMessage="Sin resultados"
+                [displaySelectedLabel]="false"
+                [showToggleAll]="false"
+                defaultLabel="Seleccione"
+                filterBy="nombreCompleto"
+                optionLabel="nombreCompleto"
+                display="chip"
+                >
+              </p-multiSelect>
+              <span id="msgContainer_choferes_viajes"></span>
+            </div>
+
+            <div class="form-group mt-2" [appMsgError]="'camiones_viajes'" [form]="form">
+              <label class="control-label">Camion/es utilizado/s: <span style="color: red">*</span></label>
+
+              <p-multiSelect
+                class="multiSelectPrimeng"
+                [options]="camiones"
+                formControlName="camiones_viajes"
+                emptyMessage="No tiene camiones registrados"
+                emptyFilterMessage="Sin resultados"
+                [displaySelectedLabel]="false"
+                [showToggleAll]="false"
+                defaultLabel="Seleccione"
+                filterBy="marca,modelo,anio"
+                optionLabel="item_label"
+                display="chip"
+              >
+              </p-multiSelect>
+
+              <span id="msgContainer_camiones_viajes"></span>
+            </div>
+          </form>
 
           <hr class="rayaA mt-2" />
 
           <div class="d-inline-flex flex-nowrap justify-content-end">
             <button (click)="accion(false, 'cancelar')" class="btn btn-blanco mr-2">Cancelar</button>
 
-            <!-- <button [disabled]="(!is_chofer_selected && !is_camion_selected) || viaje_selected.fecha_completada" (click)="accion(true, 'cambio')" class="btn btn-verde"> -->
+            <!-- <button [disabled]="(!is_chofer_selected && !is_camion_selected) || viaje_selected?.fecha_completada" (click)="accion(true, 'cambio')" class="btn btn-verde"> -->
 
-            <button [disabled]="abilitarRecibir()" (click)="accion(true, 'cambio')" class="btn btn-verde">Recibir efectivo</button>
+            <button [disabled]="formIsInvalid()" (click)="accion(true, 'cambio')" class="btn btn-verde">Recibir efectivo</button>
             <button *ngIf="ultimo_pago?.is_ultimo" (click)="accion(true, 'dinamico_texto')" class="btn btn-amarillo ml-2">Reversar ultima transacción</button>
           </div>
         </div>

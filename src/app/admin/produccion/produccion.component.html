@@ -58,7 +58,7 @@
             </div>
 
             <div class="col-12 p-0 mt-2">
-              <a class="btn mr-2 btn-blanco" (click)="borrar()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
+              <a class="btn mr-2 btn-blanco" (click)="borrarForm()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
               <input [disabled]="formIsInvalid()" (click)="agregarAlista()" type="submit" class="btn btn-verde" value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}" />
             </div>
           </div>
@@ -106,21 +106,6 @@
         <div class="divTabla">
           <dinamic-table [cardTabla]="cardTablaProd" [seleccionado]="articuloEditando?.id" [(data)]="lista_produccion" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
         </div>
-        <!-- <app-tablas
-          class="h-100"
-          *ngIf="lista_produccion"
-          [padre]="cardTabla"
-          [info]="info"
-          [data]="lista_produccion"
-          [search]="false"
-          [id_tabla]="'lista_produccion'"
-          [colores]="false"
-          [botones]="botones"
-          (DevolverInfo)="editarItem($event)"
-          (paginateChange)="paginateChange($event)"
-        ></app-tablas> -->
-
-        <!-- (DELETE)="abrirModal('remover', $event.ARG)" -->
       </div>
     </div>
   </div>

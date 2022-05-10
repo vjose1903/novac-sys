@@ -587,6 +587,7 @@ Not supports in Firefox and IE */
 ::-webkit-scrollbar {
   background-color: inherit;
   width: 7px;
+  height: 7px;
   &:hover {
     cursor: pointer !important;
   }
@@ -717,8 +718,19 @@ Not supports in Firefox and IE */
       cursor: pointer;
       border: 1px solid #ced4da;
     }
-    // .p-multiselect-label-container {
-    // }
+    .p-multiselect-label {
+      .multi-select-item-values {
+        overflow: auto;
+        display: flex;
+        column-gap: 0.5rem ;
+        .multi-select-item {
+          background: var(--primary04) !important;
+          color: white;
+          padding: 0rem 0.5rem;
+          border-radius: 0.7rem ;
+        }
+      }
+    }
   }
 
   .p-multiselect.p-multiselect-chip .p-multiselect-token {
