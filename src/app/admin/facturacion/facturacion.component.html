@@ -73,7 +73,7 @@
           <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
           <select
             id="venta"
-            (keydown.enter)="saltar(modo_factura == 'normal' ? 'nom' : modo_factura == 'viaje' ? 'fecha_viaje' : 'buscarCliente', $event.target.value, $event.target.id)"
+            (keydown.enter)="saltar(modo_factura == 'normal' && condicion_fact == 'Contado' ? 'nom' : modo_factura == 'viaje' ? 'fecha_viaje' : 'buscarCliente', $event.target.value, $event.target.id)"
             (change)="selectModoFactura($event.target.value)"
             class="form-control inputE"
             [(ngModel)]="modo_factura"

@@ -239,7 +239,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   addItem(index): void {
-    fun.logPurple(' ----- AÑADIENDO MAS FILAS A LA TABLA DE FACTURAS ----- ');
     this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as FormArray;
     this.ARRAY_ROWFACTURAS.push(this.createItem(index));
   }
@@ -326,7 +325,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   seleccionarCampoEnTurno() {
-    this.ajustarSecuencia().then((res) => this.enfocarInput(this.inputSecuencia));
+    setTimeout(() => {
+      this.ajustarSecuencia().then((res) => this.enfocarInput(this.inputSecuencia));
+    }, 100);
   }
 
   async saltar(input, index) {
@@ -334,7 +335,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       if (fun.hasValue(this.propietario)) {
         const { articulo, cod, can, uni } = this.filasDetalle[index].getRawValue();
 
-        if (index >= 10 && input === 'cod-') this.addItem(index);
+        if (index >= 10 && input === 'can-') this.addItem(index);
 
         if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.enfocarInput('uni-' + index);
 

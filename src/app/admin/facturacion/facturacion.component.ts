@@ -248,7 +248,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.factura_a_editar = {};
         this.rellenarCampos(id_factura, 'editar').then(() => {
           this.cuerpo.llenarFactura(this.factura_a_editar.detalle_facturas);
-          this.enfocarInput('cod-0');
+          this.cuerpo.seleccionarCampoEnTurno();
         });
       } else {
         setTimeout(() => this.enfocarInput('tipoFact'), 5);
@@ -260,7 +260,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return new Promise((resolve) => {
       try {
         this.rellenarCampos(null, 'fact_guardada', factura).then(() => {
-          this.enfocarInput('cod-0');
+          this.cuerpo.seleccionarCampoEnTurno();
 
           this.cuerpo.llenarFactura(factura['detalle_facturas'], true, (res) => {
             setTimeout(() => {
@@ -740,6 +740,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const containCamiones = document.getElementById('overlayCamion');
     setTimeout(() => {
       const voy_a = document.activeElement;
+      console.log('>> ', containCamiones.contains(voy_a));
 
       if (!containCamiones.contains(voy_a)) {
         if (!this.camionesSelected.length) {
@@ -772,21 +773,32 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       if (this.camion_row == this.camiones.length - 1) this.camion_row = 0;
       else this.camion_row++;
     } else if (key == teclasCode._esc) {
-      this.saliendoDeCamionOverlay();
+      this.saliendoDeCamionOverlay('teclado');
     }
 
     fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
-  saliendoDeCamionOverlay() {
+  saliendoDeCamionOverlay(where?) {
     setTimeout(() => {
       if (!this.camionesSelected.length) {
         fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
       } else {
-        if (fun.isEmpty(this.propietario_factura) && fun.isEmpty(this.propietario_factura?.id)) this.abrirModalFiltro();
-        else this.cuerpo.seleccionarCampoEnTurno();
+        if (fun.isEmpty(where) || where != 'teclado') {
+          console.log('this.propietario_factura ', this.propietario_factura);
+          console.log('this.propietario_factura.cliente_id ', this.propietario_factura?.id);
 
-        this.cerrarOverlayCamion();
+          if (fun.isEmpty(this.propietario_factura) || fun.isEmpty(this.propietario_factura?.id)) this.abrirModalFiltro();
+          else this.cuerpo.seleccionarCampoEnTurno();
+
+          this.cerrarOverlayCamion();
+        } else {
+          if (where == 'teclado') {
+            this.desEnfocarInput('searchCamion');
+
+            this.cerrarOverlayCamion();
+          }
+        }
       }
     }, 5);
   }
@@ -1195,7 +1207,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.propietario_factura = arg.data;
 
       this.form.patchValue(this.propietario_factura);
-      this.enfocarInput('cod-0');
       const balance = _.parseInt(this.propietario_factura.balance);
       const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
 
@@ -1204,6 +1215,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       } else if (balance > maxCred) {
         fun.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
       }
+      console.log('ANDO AQUIII');
+
+      this.cuerpo.seleccionarCampoEnTurno();
     }
   }
 

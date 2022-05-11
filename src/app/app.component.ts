@@ -169,7 +169,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
           this.validateUserAndLoadPermisos();
-          setTimeout(() => (this.configReady = true), 1000);
+          setTimeout(() => (this.configReady = true), 500);
         }
       })
       .catch((err) => {
