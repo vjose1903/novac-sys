@@ -1,22 +1,35 @@
 import { Component, OnInit } from '@angular/core';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { fun } from '../../../core/services/functions.service';
-import { ModalI } from '../../components/new_modal/modal-class';
+import { ModalI } from '../../components/modal/modal-class';
+import { table_config } from '../../components/new_tablas/tabla-class';
 @Component({
   selector: 'app-detalle-nota',
   templateUrl: './detalle-nota.component.html',
   styleUrls: ['./detalle-nota.component.scss'],
 })
-export class DetalleNotaComponent implements OnInit, ModalI {
-  constructor() {}
+export class DetalleNotaComponent extends MixinClass implements OnInit, ModalI {
+  constructor() {
+    super();
+  }
+
   modal: {};
   inputs: any;
   tabIndex = 0;
 
-  info = [
-    { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '50%' }, { 'padding-left': '1rem' }] },
-    { titulo: 'Cantidad', key: 'cantidad', tipo: 'formatoNumero', formatoNumero: true, estilos: [{ width: '25%' }] },
-    { titulo: 'Unidad', key: 'unidad', tipo: 'text', estilos: [{ width: '25%' }] },
-  ];
+  tablaComponent;
+
+  table_config: table_config = {
+    info: [
+      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '50%' }, { 'padding-left': '1rem' }] },
+      { titulo: 'Cantidad', key: 'cantidad', tipo: 'formatoNumero', estilos: [{ width: '25%' }] },
+      { titulo: 'Unidad', key: 'unidad', tipo: 'text', estilos: [{ width: '25%' }] },
+    ],
+    id_tabla: 'detalles_notas',
+    obj_paginate: { show: false },
+  };
+
+  show: boolean = true;
 
   ngOnInit(): void {
     this.parseInfo();
@@ -27,14 +40,19 @@ export class DetalleNotaComponent implements OnInit, ModalI {
       factura_aplicada.detalles_facturas_notas.map((detalle) => {
         detalle.descripcion = detalle.articulo.nombre;
         detalle.customStyles = {
-          'td-descripcion': { width: '50%', 'padding-left': '1rem', 'text-align': 'left' },
-          'td-cantidad': { width: '25%' },
-          'td-unidad': { width: '25%' },
+          descripcion: { width: '50%', 'padding-left': '1rem', 'text-align': 'left' },
+          cantidad: { width: '25%' },
+          unidad: { width: '25%' },
         };
         return detalle;
       });
       return factura_aplicada;
     });
+  }
+
+  clickTabView(index) {
+    this.show = false;
+    setTimeout(() => (this.show = true), 10);
   }
 
   numFormat(str) {

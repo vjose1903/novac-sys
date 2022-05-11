@@ -1,119 +1,99 @@
 <div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita">Registro de roles</h4>
+    <h4 class="negrita mb-0">Registro de roles</h4>
   </div>
 
   <div class="col-12 p-0 colFormularioListado">
     <div class="d-flex h-100">
-      <div *ngIf="isCreando || roleSelected" class="form {{ isCreando || roleSelected ? 'showForm' : 'hideForm' }} ">
-        <div class="tituloFormClass">
-          <h4 class="mb-0">Formulario</h4>
-        </div>
-        <div class="card cardFormClass">
-          <form [formGroup]="form">
-            <div class="row">
-              <div class="col-12 p-0">
-                <div class="form-group switchDiv">
-                  <input formControlName="estado" class="apple-switch" type="checkbox" />
-                  <span class="ml-2">Activo</span>
-                </div>
-              </div>
-
-              <div class="col-12 p-0">
-                <div class="form-group" [appMsgError]="'nombre'" [form]="form">
-                  <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                  <input type="text" class="form-control" formControlName="nombre" id="campo_nombre" (keydown.enter)="saltar('campoVendedor')" placeholder="Introduzca nombre" autocomplete="off" />
-                  <span id="msgContainer_nombre"></span>
-                </div>
-              </div>
-
-              <div class="col-12 p-0">
-                <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
-                  <label class="control-label">Descripción: <span style="color: red">*</span></label>
-                  <textarea id="motivo" formControlName="descripcion" class="form-control" rows="3"></textarea>
-                  <span id="msgContainer_descripcion"></span>
-                </div>
-              </div>
-            </div>
-          </form>
-
-          <div class="card cardPermisos">
-            <div class="card-header position-relative d-flex align-items-center p-2">
-              <div class="d-flex justify-content-between align-items-center w-100">
-                <h5 class="title margin mb-0">Permisos</h5>
-              </div>
-            </div>
-
-            <div class="card-body p-1">
-              <div id="tabla_roles" class="h-100">
-                <div class="row">
-                  <div class="col-6 pl-0 pr-2">
-                    <!-- OPCIONES -->
-                    <div class="divPermisos" style="height: 25rem">
-                      <ul class="ulPermisos h-100 overflow-auto">
-                        <li *ngFor="let permiso of listaPermisos" [ngClass]="{ 'bg-selected': permiso_selected?.id === permiso.id }" (click)="selectPermiso(permiso)">
-                          <i pTooltip="{{ iconCantSelected(permiso).tooltip }}" tooltipPosition="top" (click)="selectOrDeselectAll(permiso)" [class]="iconCantSelected(permiso).icon"></i>
-                          <span class="ml-1 descripcion"> {{ my_capitalize(permiso.nombre) }}</span>
-                        </li>
-                      </ul>
-                    </div>
+      <ng-container *ngxPermissionsOnly="formPermissions">
+        <div *ngIf="isCreando || roleSelected" class="form {{ isCreando || roleSelected ? 'showForm' : 'hideForm' }} ">
+          <div class="tituloFormClass">
+            <h4 class="mb-0">Formulario</h4>
+          </div>
+          <div class="card cardFormClass">
+            <form [formGroup]="form">
+              <div class="row">
+                <div class="col-12 p-0">
+                  <div class="form-group switchDiv">
+                    <input formControlName="estado" class="apple-switch" type="checkbox" />
+                    <span class="ml-2">Activo</span>
                   </div>
+                </div>
 
-                  <div class="col-6 p-md-0">
-                    <!-- DESCRIPCION PERMISO SELECCIONADO-->
+                <div class="col-12 p-0">
+                  <div class="form-group" [appMsgError]="'nombre'" [form]="form">
+                    <label class="control-label">Nombre: <span style="color: red">*</span></label>
+                    <input type="text" class="form-control" formControlName="nombre" id="campo_nombre" (keydown.enter)="saltar('campoVendedor')" placeholder="Introduzca nombre" autocomplete="off" />
+                    <span id="msgContainer_nombre"></span>
+                  </div>
+                </div>
 
-                    <div #tabla_acciones id="cardTabla" class="divAcciones">
-                      <app-tablas
-                        class="h-100"
-                        *ngIf="permiso_selected?.acciones && infoPermisos"
-                        [padre]="tabla_acciones"
-                        [search]="false"
-                        [paginate]="false"
-                        [(TablasComponent)]="TablasComponent"
-                        [info]="infoPermisos"
-                        [data]="permiso_selected?.acciones"
-                        [id_tabla]="'tabla_acciones'"
-                        (DevolverInfo)="editarItem($event)"
-                        [focusRow]="false"
-                      ></app-tablas>
+                <div class="col-12 p-0">
+                  <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
+                    <label class="control-label">Descripción: <span style="color: red">*</span></label>
+                    <textarea id="motivo" formControlName="descripcion" class="form-control" rows="3"></textarea>
+                    <span id="msgContainer_descripcion"></span>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <div class="card cardPermisos">
+              <div class="card-header position-relative d-flex align-items-center p-2">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                  <h5 class="title margin mb-0">Permisos</h5>
+                </div>
+              </div>
+
+              <div class="card-body p-1">
+                <div id="tabla_roles" class="h-100">
+                  <div class="row">
+                    <div class="col-6 pl-0 pr-2">
+                      <!-- OPCIONES -->
+                      <div class="divPermisos" style="height: 25rem">
+                        <ul class="ulPermisos h-100 overflow-auto">
+                          <li *ngFor="let permiso of listaPermisos" [ngClass]="{ 'bg-selected': permiso_selected?.id === permiso.id }" (click)="selectPermiso(permiso)">
+                            <i pTooltip="{{ iconCantSelected(permiso).tooltip }}" tooltipPosition="top" (click)="selectOrDeselectAll(permiso)" [class]="iconCantSelected(permiso).icon"></i>
+                            <span class="ml-1 descripcion"> {{ my_capitalize(permiso.nombre) }}</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div class="col-6 p-md-0">
+                      <!-- DESCRIPCION PERMISO SELECCIONADO-->
+
+                      <div #tabla_acciones class="divAcciones">
+                        <dinamic-table [cardTabla]="tabla_acciones" [(data)]="permiso_selected.acciones" [(TablasComponent)]="tablaPermisosComponent" [config]="table_permisos_config" (table_events)="handle_table_events($event)"></dinamic-table>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div class="form-group mt-4 d-flex justify-content-between align-items-center">
-            <div>
-              <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-              <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
-            </div>
-            <div>
-              <a class="btn mr-2" id="btn-blanco" (click)="cancelar()">Cerrar</a>
+              <div class="form-group mt-4 d-flex justify-content-between align-items-center">
+                <div>
+                  <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                  <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+                </div>
+                <div>
+                  <a class="btn mr-2" id="btn-blanco" (click)="cancelar()">Cerrar</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </ng-container>
 
       <div class="list {{ isCreando || roleSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado roles</h4>
-          <button [disabled]="roleSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <button *ngxPermissionsOnly="permissions.role.create" [disabled]="roleSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
-        <div #cardTabla id="cardTabla_" class="card cardContentClass">
-          <app-tablas
-            class="h-100"
-            *ngIf="listaRoles && info"
-            [padre]="cardTabla"
-            [info]="info"
-            [data]="listaRoles"
-            [botones]="botones"
-            [id_tabla]="'lista_roles'"
-            (DevolverInfo)="editarItem($event)"
-            (DELETE)="abrirModal('borrar', $event.ARG)"
-            [focusRow]="false"
-            (paginateChange)="getRoles($event)"
-          ></app-tablas>
+        <div #cardTabla class="card cardContentClass">
+          <div class="divTabla">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="listaRoles" [seleccionado]="roleSelected?.id" [(TablasComponent)]="tablaRolesComponent" [config]="table_roles_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
         </div>
       </div>
     </div>

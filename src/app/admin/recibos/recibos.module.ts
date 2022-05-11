@@ -8,11 +8,14 @@ import { ListaRecibosComponent } from './recibo-ingresos/lista-recibos/lista-rec
 import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
 
 import { TablasModule } from '../components/tablas/tablas.module';
+import { NewTablasModule } from '../components/new_tablas/tablas.module';
 import { PrimengModule } from '../../modules/primeng.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxPermissionsModule } from 'ngx-permissions';
+import { DirectivesModule } from '../../core/directive/directives.module';
 
 @NgModule({
   declarations: [IngresosComponent, ListaRecibosComponent, ReciboViajesComponent],
-  imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule],
+  imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule,DirectivesModule, TablasModule, NewTablasModule, NgxPermissionsModule.forChild()],
 })
 export class RecibosModule {}

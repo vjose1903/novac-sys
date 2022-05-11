@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
-import { SingletonService } from '../../../core/services/singleton.service';
-import { modalClass } from '../modal/modal';
+import { LayoutClass } from '../../layout/layout';
 import { MODALCONFIG } from './modal.service';
 
 export interface ModalI {
@@ -14,12 +13,10 @@ export interface ButtonsI {
   dinamico?: Array<{ btn_id?: string; clase: string; label: string; function?: Function; function_in_other_component?: string; disable: boolean }>;
 }
 
-export class ModalClass extends modalClass {
+export class ModalClass extends LayoutClass {
   constructor() {
     super();
   }
-
-  modalServ = SingletonService.mServ;
 
   handleModalForm(params: {
     id: string;

@@ -1,17 +1,15 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { GLOBAL, MODIFIED_CONFIG_FILE } from '../core/typescript/GLOBAL';
+import { MODIFIED_CONFIG_FILE } from '../core/typescript/GLOBAL';
 import { IpcService } from '../core/services/ipc.service';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
 import * as _ from 'lodash';
-var JsBarcode = require('jsbarcode');
 
 import * as Rx from 'rxjs';
 
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
 
-import { ModalService } from '../admin/components/modal/modal.service';
 import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
@@ -21,6 +19,7 @@ import { MessageTask } from '../core/models/message-task';
 import { ConfigI } from '../core/typescript/config-interface';
 import { fun } from '../core/services/functions.service';
 import { CurrentUserService } from '../core/services/current-user.service';
+import { LayoutService } from '../admin/layout/layout.service';
 
 @Component({
   selector: 'app-login',
@@ -38,30 +37,20 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   requestClass = new RequestC();
   configServ = SingletonService.configServ;
 
-  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public mServ: ModalService, public pdfServ: PdfService, public currentUserServ: CurrentUserService) {
+  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public pdfServ: PdfService, public currentUserServ: CurrentUserService) {
     super();
   }
 
-  ngOnInit() {
-
-  }
+  ngOnInit() {}
 
   ngAfterViewInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
-      console.log("AQUIII");
-
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       this.versionApp = config.app_version;
 
-      this.form = this.fb.group({ usuario: config.is_development ? 'ADM' : null, password: config.is_development ? '1234567' : null });
+      this.form = this.fb.group({ usuario: config.is_development ? 'ADMIN' : null, password: config.is_development ? '1234567' : null });
     });
     setTimeout(() => this.enfocarInput('Iusuario'), 5);
-  }
-
-  abrirModalReporte(obj) {
-    this.mServ.modalTipo('visor_pdf');
-    this.mServ.ModalSeleccion(obj);
-    this.mServ.mostrarModal(true);
   }
 
   ngOnDestroy() {}
@@ -107,10 +96,9 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then((res) => {
-          this.currentUserServ.setUser(res.data);
-          console.log('ANDO AQUIII');
-
-          this.router.navigateByUrl('/admin/dashboard');
+          this.currentUserServ.setUser(res.data).then(() => {
+            this.router.navigateByUrl('/admin/dashboard');
+          });
         })
         .catch((error) => {
           if (error.status === 0) fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
@@ -187,7 +175,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
         const objBase = { base64: res.body, filename: res.file, type: this.tipo_prueba };
 
         const obj = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
-        this.abrirModalReporte(obj);
+        // this.abrirModalReporte(obj);
       }
     });
   }

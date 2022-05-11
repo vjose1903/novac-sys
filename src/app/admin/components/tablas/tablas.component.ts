@@ -552,6 +552,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         // setTimeout(() => this.calcularAlto(), 250);
       }
     }
+
     if (simpleChanges.seleccionado) {
       if (simpleChanges.seleccionado.currentValue) {
         this.seleccionado_id = simpleChanges.seleccionado.currentValue.id;
@@ -569,6 +570,10 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
         $this.searchItems();
       }
     }, 500);
+  }
+
+  makeTextList(column, data) {
+    return _.reduce(_.get(data, column.key), (acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${_.get(item, column.key_value)}`, '');
   }
 
   async searchItems() {
@@ -618,7 +623,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.NUM = this.NUM - 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
 
-    fun.scrollTo(this.IDROW, 'center');
+    fun.scrollTo({ id: this.IDROW, behavior: 'smooth', block: 'center', inline: 'center' });
     this.enfocarInput(this.IDROW);
   }
 
@@ -628,7 +633,7 @@ export class TablasComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.NUM = this.NUM + 1;
     this.IDROW = this.ROW + _.toString(this.NUM);
 
-    fun.scrollTo(this.IDROW, 'center');
+    fun.scrollTo({ id: this.IDROW, behavior: 'smooth', block: 'center', inline: 'center' });
     this.enfocarInput(this.IDROW);
   }
 

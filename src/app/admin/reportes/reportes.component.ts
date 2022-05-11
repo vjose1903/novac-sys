@@ -19,6 +19,7 @@ import { fun } from '../../core/services/functions.service';
 export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   pdfSrc: any;
   fileName: any;
+  // TODO: ver como en la data del get data from modal buscar cual modal esta respondiendo
   tipoModal: string;
   scaleImpresion: any;
   reporteClass = new ReporteC();
@@ -31,7 +32,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   titulo_moda_reporte;
 
   ngOnInit() {
-    this._init_mixin({ component: 'reportes', is_routing: true});
+    this._init_mixin({ component: 'reportes', is_routing: true });
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -41,19 +42,8 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  objDevueltoResponse(res) {
-    if (res && res.tipo_modal === 'buscarCliente') {
-      if (this.tipoModal === 'cuentas_cobrar_cliente') {
-        res.data.tipo_ = 1;
-        this.makePdf(res.data);
-      }
-    } else if (res && res.tipo_modal !== 'buscarCliente') this.makePdf(res.data);
-  }
-
   ngOnDestroy() {
     this._destroy_mixin();
-    if (this.subDeci) this.subDeci.unsubscribe();
-    if (this.subObj) this.subObj.unsubscribe();
   }
 
   async makeCuadre(data?) {
@@ -321,23 +311,5 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
         } else fun.toastError(res.msg, 'ERROR');
       })
       .catch((err) => fun.toastError(err.msg, 'ERROR'));
-  }
-  decisionModal(decision) {
-    if (decision) {
-      if (this.tipoModal === 'visor_pdf') {
-        const obj = { base64: this.seleccionModal.pdfSrc, filename: `${this.seleccionModal.fileName}.pdf`, type: this.fileName === 'cuadre.pdf' ? 'cuadre' : 'reporte', scale: this.scaleImpresion };
-
-        this.pdfServ
-          .imprimirBase64(obj)
-          .then((res) => {
-            if (res.status === 'si') fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-            else fun.toastError(res.msg, 'ERROR');
-          })
-          .catch((err) => fun.toastError(err.msg, 'ERROR'));
-        //
-      } else if (this.tipoModal === 'cuadre') {
-        this.makeCuadre();
-      }
-    }
   }
 }

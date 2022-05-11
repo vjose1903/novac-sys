@@ -5,7 +5,6 @@ import { ELECTRON_EVENTS_OBSERVER, GLOBAL, MODIFIED_CONFIG_FILE } from './core/t
 
 import { SingletonService } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
-import { ModalService } from './admin/components/modal/modal.service';
 import { LayoutService } from './admin/layout/layout.service';
 import { ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
@@ -28,6 +27,7 @@ import { ConfigI } from './core/typescript/config-interface';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
+import { CurrentUserService } from './core/services/current-user.service';
 
 @Component({
   selector: 'app-root',
@@ -45,6 +45,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   counter = 0;
   sub: Subscription;
   subModified: Subscription;
+  is_permisos_load = false;
 
   constructor(
     public _ipc: IpcService,
@@ -53,24 +54,26 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
     public zone: NgZone,
     public http: HttpClient,
-    public mServ: ModalService,
+
     public layServ: LayoutService,
     public configServ: ConfigurationService,
     public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
+
+    private currentUserServ: CurrentUserService,
   ) {}
 
   ngOnInit(): void {
-    SingletonService.zone = this.zone;
     SingletonService.http = this.http;
+    SingletonService.zone = this.zone;
     SingletonService.configServ = this.configServ;
 
-    SingletonService.mServ = this.mServ;
     SingletonService._ipc = this._ipc;
     SingletonService.layServ = this.layServ;
     SingletonService.toastr = this.toastr;
     SingletonService.sharedServ = this.sharedServ;
+    SingletonService.cdRef = this.cdRef;
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
 
@@ -115,8 +118,28 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
       }
     });
 
-    // this.probandoEncriptar();
+    window.onresize = (e) => this.resize.bind(this)(e);
+
     this.getAppConfig();
+  }
+
+  ngAfterViewInit(): void {
+    fun.setWindowSize(window);
+  }
+
+  getActualPath() {
+    const location = window.location.href;
+    const initSlice = location.indexOf('/admin') == -1 ? location.indexOf('/auth') : location.indexOf('/admin');
+    const actualPath = location.slice(initSlice, location.length);
+    return actualPath;
+  }
+
+  ngAfterContentChecked() {
+    this.cdRef.detectChanges();
+  }
+
+  resize() {
+    fun.setWindowSize(window);
   }
 
   downloadProgression(object) {
@@ -140,19 +163,35 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     this._ipc
       .sendTask(task)
       .then((config: ConfigI) => {
-        console.log('config ', config);
         if (_.has(config, 'err')) {
         } else {
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
           this.configReady = true;
+          this.validateUserAndLoadPermisos();
         }
       })
       .catch((err) => {
         console.error(err);
       });
   }
+
+  validateUserAndLoadPermisos() {
+    console.log("################## a validar usuario ################## ");
+
+    this.currentUserServ
+      .validateUser()
+      .then((res) => {
+        this.is_permisos_load = true;
+      })
+      .catch((error) => {
+        const actualPath = this.getActualPath();
+
+        if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
+      });
+  }
+
   async probandoEncriptar() {
     const task = new MessageTask(KEYWORD_ELECTRON_EVENT_ENCRYPT, { hola: 'mundo' });
 
@@ -175,11 +214,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
       .catch((err) => {});
   }
 
-  ngAfterViewInit(): void {
-    // this.themeService.setTheme('blue');
-    // this.themeService.setTheme('red');
-  }
-
   timeConvert(d) {
     d = Number(d);
     const h = Math.floor(d / 3600);
@@ -194,7 +228,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
   duplicarDataProgreso(json) {}
 
-  ngAfterContentChecked() {
-    this.cdRef.detectChanges();
+  logOut() {
+    this.layServ.nextLogOut({ bool: true, quien: 'appComponent' });
   }
 }

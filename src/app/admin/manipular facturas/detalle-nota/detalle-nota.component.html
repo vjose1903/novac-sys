@@ -16,24 +16,23 @@
   </div>
 
   <div class="tabs">
-    <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView">
-      <p-tabPanel *ngFor="let iteraFact of inputs.data.facturas_aplicadas" header="{{ iteraFact.cabecera_factura.numero_comprobante }}">
-        <div #cardTabla id="cardTabla" class="d-flex h-100">
-          <app-tablas
-            class="h-100 w-100"
-            *ngIf="iteraFact.detalles_facturas_notas"
-            [search]="false"
-            [paginate]="false"
-            [id_tabla]="iteraFact.id"
-            [tablaHover]="false"
-            [padre]="cardTabla"
-            [info]="info"
-            [data]="iteraFact.detalles_facturas_notas"
-            [focusRow]="false"
-            [pad]="false"
-          ></app-tablas>
-        </div>
-      </p-tabPanel>
-    </p-tabView>
+    <div class="fantasma">
+      <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView detalle-notas" [scrollable]="true"(onChange)="clickTabView($event.index)" >
+        <p-tabPanel *ngFor="let iteraFact of inputs.data.facturas_aplicadas" header="{{ iteraFact.cabecera_factura.numero_comprobante }}">
+          <div #cardTablaDetalleNota id="cardTabla" class="divTabla">
+            <div *ngIf="show" class="innerTablaNotas">
+              <dinamic-table
+                [cardTabla]="cardTablaDetalleNota"
+                [post_id]="'-' + iteraFact.id"
+                [(data)]="iteraFact.detalles_facturas_notas"
+                [(TablasComponent)]="tablaComponent"
+                [config]="table_config"
+                (table_events)="handle_table_events($event)"
+              ></dinamic-table>
+            </div>
+          </div>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
   </div>
 </div>

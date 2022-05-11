@@ -1,0 +1,318 @@
+.index {
+  background: #80808021;
+}
+
+.show_color {
+  min-height: 1.5rem;
+  min-width: 1.5rem;
+  width: 1.5rem;
+  border-radius: 3px;
+  margin: auto;
+
+  &.sm {
+    min-height: 1rem !important;
+    min-width: 1rem !important;
+    width: 1rem !important;
+  }
+}
+
+.dinamicTable {
+  display: grid !important;
+  column-gap: 0rem;
+  grid-template-rows: [filter-start] min-content [filter-end fantasma-start] auto [fantasma-end];
+  grid-template-columns: [filter-start fantasma-start] auto [filter-end fantasma-end];
+
+  > .searchDiv {
+    // ------- grid-row-start / grid-column-start / grid-row-end / grid-column-end | itemname;
+    grid-area: filter-start / filter-start / filter-end / filter-end;
+  }
+
+  > .divTableFantasma {
+    // ------- grid-row-start / grid-column-start / grid-row-end / grid-column-end | itemname;
+    grid-area: fantasma-start / fantasma-start / fantasma-end / fantasma-end;
+
+    position: relative;
+
+    > .divTable {
+      position: absolute;
+
+      > .myTable {
+        display: grid !important;
+        height: 100% !important;
+
+        grid-template-areas:
+          "thead"
+          "tbody"
+          "tfoot";
+
+        grid-template-rows: [head-start] min-content [body-start] auto [body-end] min-content [foot-end];
+
+        > .thead {
+          grid-area: thead;
+          display: table;
+          width: 100%;
+          table-layout: fixed;
+          font-size: 0.8rem !important;
+
+          &:not(&.colorRirulo) {
+            border-bottom: 1px solid grey !important;
+          }
+
+          &.redondo {
+            border-radius: 10px 10px 0px 0px;
+          }
+
+          &.colorTitulo {
+            background: var(--primary06);
+          }
+          .thHead {
+            &:first-child {
+              padding-left: 1rem !important;
+            }
+            &:last-child {
+              padding-right: 1rem !important;
+            }
+
+            padding: 0.6rem 0rem !important;
+            &.sm {
+              padding: 0.3rem 0rem !important;
+            }
+          }
+        }
+        .divBody {
+          grid-area: tbody;
+          grid-row: body-start / body-end;
+          overflow-y: auto;
+
+          > .tbody {
+            overflow: auto;
+            height: 100%;
+            > tr {
+              display: table;
+              width: 100%;
+              table-layout: fixed;
+
+              &.bg-selected {
+                background: var(--transparente05) !important;
+              }
+
+              &.bg-light {
+                background-color: #dbd8d8 !important;
+              }
+
+              &:hover {
+                background-color: #e9e9e9 !important;
+              }
+
+              > td {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                text-align: center;
+                border-top: 0px solid transparent !important;
+                border-bottom: 0.5px solid #e5e5e59e;
+                vertical-align: middle !important;
+
+                padding: 0.4rem 0rem !important;
+                &:first-child {
+                  padding-left: 1rem !important;
+                }
+                &:last-child {
+                  padding-right: 1rem !important;
+                }
+
+                &.sm {
+                  padding: 0.2rem 0rem !important;
+                }
+
+                .span_icon {
+                  &.icon_disable {
+                    pointer-events: none !important;
+                    > .iconPress {
+                      filter: brightness(0.6);
+                      cursor: pointer !important;
+                    }
+                  }
+                }
+
+                .table_input {
+                  position: relative;
+                  display: flex;
+                  align-items: center;
+                  > .inputTabla {
+                    &.refresh {
+                      padding-right: 2rem;
+                    }
+                  }
+                  > .icon {
+                    cursor: pointer;
+                    position: absolute;
+                    right: 0.5rem;
+                    &:hover {
+                      transform: scale(1.2);
+                    }
+                  }
+                }
+
+                &.btnAccion {
+                }
+              }
+            }
+          }
+        }
+
+        > .tfoot {
+          padding-top: 0.5rem;
+          grid-area: tfoot;
+          > .Pietabla {
+            ::ng-deep {
+              .paginator-dinamic-table {
+                border: 0px solid transparent !important;
+                background: transparent !important;
+                .p-paginator-element {
+                  &:hover {
+                    background-color: var(--transparente04) !important;
+                  }
+                }
+
+                > .p-paginator-pages {
+                  .p-paginator-page {
+                    font-size: 0.75rem;
+                    min-width: 2rem;
+                    height: 2rem;
+                    &.p-highlight {
+                      background-color: var(--primary07) !important;
+                    }
+                    &:hover {
+                      background-color: var(--primary09) !important;
+                    }
+                  }
+                }
+
+                .p-dropdown {
+                  max-width: 3.2rem !important;
+                  border: 1px solid #7b818a !important;
+                  .p-dropdown-trigger {
+                    width: 1rem !important;
+                    margin-right: 0.2rem;
+                  }
+
+                  .p-dropdown-label {
+                    padding: 0 0.3rem !important;
+                    background-color: transparent !important;
+                    border: 0px solid transparent !important;
+                  }
+                }
+
+                .p-paginator-rpp-options {
+                  height: 2rem;
+                  display: flex;
+                  align-items: center;
+                  &:hover,
+                  &:focus {
+                    background-color: var(--primary07) !important;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin speeddial-icons {
+  height: 35px !important;
+  width: 35px !important;
+}
+
+::ng-deep {
+  .btn-table-cellphone {
+    > button {
+      background: var(--primary05) !important;
+      border-color: var(--primary05) !important;
+      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+
+      @include speeddial-icons;
+      &:hover {
+        filter: brightness(0.6);
+      }
+    }
+    position: inherit !important;
+  }
+
+  .p-speeddial-item {
+    z-index: 999 !important;
+    box-shadow: 0px 0px 11px 3px #00000082;
+    border-radius: 50%;
+  }
+
+  .p-speeddial-action {
+    background: #495057eb !important;
+    @include speeddial-icons;
+    &:hover {
+      background: #1a1c1feb !important;
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+
+  .titulo_sm {
+    display: none;
+  }
+
+  .divTable tbody {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+  .titulo_sm {
+    display: none;
+  }
+
+  .divTable tbody {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+  .titulosHeader {
+    display: none !important;
+  }
+
+  .titulo_sm {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .divTable tbody {
+    font-size: 0.9rem;
+  }
+
+  .tableTD {
+    display: flex !important;
+    justify-content: space-between;
+    width: 100% !important ;
+    float: right !important;
+    clear: left !important;
+  }
+
+  .tfoot {
+    padding-top: 0.2rem !important;
+  }
+}

@@ -1,71 +1,20 @@
-import { Injectable, OnChanges } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import * as _ from 'lodash';
+
+export const MODALCONFIG = new BehaviorSubject<any>({});
 
 @Injectable({
   providedIn: 'root',
 })
 export class ModalService {
-  private tipoModal = new BehaviorSubject<any>(undefined);
-  private showModal = new BehaviorSubject<boolean>(false);
-  private calcularHeight = new BehaviorSubject<boolean>(false);
-  private seleccionModal = new BehaviorSubject<any>(undefined);
-  private decisionModal = new BehaviorSubject<any>(undefined);
-  private ObjDevuelto = new BehaviorSubject<any>(undefined);
-  private noFiltro = new BehaviorSubject<any>(undefined);
-  private press_Esc = new BehaviorSubject<any>(undefined);
-  private tabla_modal_change = new BehaviorSubject<any>(undefined);
-  private articuloFiltradoPorCodigo = new BehaviorSubject<any>(undefined);
-
-  TIPOMODAL = this.tipoModal.asObservable();
-  SHOWMODAL = this.showModal.asObservable();
-  CALCULARHEIGHT = this.calcularHeight.asObservable();
-  SELECCIONMODAL = this.seleccionModal.asObservable();
-  DECISIONMODAL = this.decisionModal.asObservable();
-  OBJDEVUELTO = this.ObjDevuelto.asObservable();
-  NOFILTRO = this.noFiltro.asObservable();
-  PRESSESC = this.press_Esc.asObservable();
-  TABLA_MODAL_CHANGE = this.tabla_modal_change.asObservable();
-  ARTICULOFILTRADOPORCODIGO = this.articuloFiltradoPorCodigo.asObservable();
-
+  modalsConfig = [];
   constructor() {}
 
-  getArticuloFiltradoPorCodigo(nextValue) {
-    this.articuloFiltradoPorCodigo.next(nextValue);
-  }
+  isModalOpen(type: 'least_one') {
+    let res = false;
 
-  func_tabla_modal_change(nextValue) {
-    this.tabla_modal_change.next(nextValue);
-  }
-
-  mostrarModal(nextValue) {
-    this.showModal.next(nextValue);
-  }
-
-  modalTipo(nextValue) {
-    this.tipoModal.next(nextValue);
-  }
-
-  ModalSeleccion(nextValue) {
-    this.seleccionModal.next(nextValue);
-  }
-
-  ModalTablaHeight(nextValue) {
-    this.calcularHeight.next(nextValue);
-  }
-
-  ModalDecision(nextValue) {
-    this.decisionModal.next(nextValue);
-  }
-
-  ModalObj(nextValue) {
-    this.ObjDevuelto.next(nextValue);
-  }
-
-  ModalNoFiltro(nextValue) {
-    this.noFiltro.next(nextValue);
-  }
-
-  pressEsc(nextValue) {
-    this.press_Esc.next(nextValue);
+    if (type == 'least_one') res = this.modalsConfig.length >= 1;
+    return res;
   }
 }

@@ -121,7 +121,7 @@ export interface DetalleFactura {
   contenidos: Contenidos;
   select: boolean;
   cant: number;
-  cant_nota: number;
+  cant_nota: number|string;
   total_nota: string | number;
   cantidad_en_unidades_nota: null;
   [propName: string]: any;

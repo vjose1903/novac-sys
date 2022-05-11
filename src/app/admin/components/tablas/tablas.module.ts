@@ -8,7 +8,7 @@ import { PrimengModule } from '../../../modules/primeng.module';
 
 @NgModule({
   declarations: [BTNACCIONESComponent, TablasComponent],
-  imports: [CommonModule, FormsModule, NgxBootstrapModule, PrimengModule],
+  imports: [CommonModule, FormsModule, NgxBootstrapModule, PrimengModule, ],
   exports: [BTNACCIONESComponent, TablasComponent],
 })
 export class TablasModule {}

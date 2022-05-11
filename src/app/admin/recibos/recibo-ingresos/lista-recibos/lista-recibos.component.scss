@@ -1,3 +1,25 @@
-.rec {
-  min-height: calc(100vh - 13rem) !important;
+.mainRecibos {
+  height: 100%;
+  display: grid;
+  grid-template-areas:
+    "titulo"
+    "botonNuevo"
+    "divTabla";
+  grid-template-rows: min-content min-content auto;
+
+  .titulo {
+    grid-area: titulo;
+  }
+  .botonNuevo {
+    grid-area: botonNuevo;
+  }
+  .divTabla {
+    grid-area: divTabla;
+    position: relative;
+    > .cardListados {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+  }
 }

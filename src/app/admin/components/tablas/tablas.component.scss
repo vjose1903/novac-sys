@@ -53,6 +53,15 @@ app-tablas {
   // margin-bottom: 3rem !important;
 }
 
+.textElipsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .dinamicTable {
   display: grid !important;
   column-gap: 0rem;
@@ -78,9 +87,9 @@ app-tablas {
       height: 100%;
 
       grid-template-areas:
-        "thead"
-        "tbody"
-        "tfoot";
+        'thead'
+        'tbody'
+        'tfoot';
 
       grid-template-rows: [head-start] min-content [body-start] auto [body-end] min-content [foot-end];
 

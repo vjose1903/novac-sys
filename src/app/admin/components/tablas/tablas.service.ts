@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 export const DATATABLE = new BehaviorSubject<any>({});
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
-import { SingletonService } from '../../../core/services/singleton.service';
 import { fun } from '../../../core/services/functions.service';
 
 @Injectable({

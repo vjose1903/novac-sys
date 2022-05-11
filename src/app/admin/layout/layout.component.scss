@@ -142,8 +142,9 @@ $bodyfont: "Poppins";
     > .contenido {
       grid-area: contenido;
       background-color: #e4e4e4d2;
-      padding: 0.5rem 1rem 2rem 1rem;
+      padding: 0.8rem 1rem;
       overflow-y: auto;
+
       max-height: calc(100vh - 4rem);
       position: relative;
     }

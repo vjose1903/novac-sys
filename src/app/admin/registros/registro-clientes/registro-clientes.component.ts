@@ -2,18 +2,21 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../core/typescript/GLOBAL';
-import { TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { ClienteC } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado';
 import { fun } from '../../../core/services/functions.service';
+import { table_config } from '../../components/new_tablas/tabla-class';
+import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
   styleUrls: ['./registro-clientes.component.scss'],
 })
+
 export class RegistroClientesComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
   form: FormGroup;
@@ -26,17 +29,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   PhotoData: any;
   doc_principal = 'cedula';
 
-  indexSeleccionado: any;
   vendedores;
   documentos_de_identidad: any;
-
-  info = [
-    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-    { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
-    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
-    { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
-  ];
-  botones = { titulo: true, borrar: true, editar: true };
 
   camposDisabled: boolean = true;
   editando: boolean = false;
@@ -44,13 +38,32 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   clienteSelected;
   clienteClass = new ClienteC();
   empleadosClass = new EmpleadoC();
+  permissions = Permisos;
+  formPermissions = [Permisos.cliente.create, Permisos.cliente.update];
+
+  table_config: table_config = {
+    info: [
+      { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
+      { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
+      { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+      { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
+    ],
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'lista_ncf',
+    padre_functions: { data_request: (params) => this.getClientes(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: this.permissions.cliente.update }, borrar: { show: true, permiso: this.permissions.cliente.destroy } },
+  };
+  tablaComponent;
 
   constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_cliente', is_routing: true});
+    this._init_mixin({ component: 'reg_cliente', is_routing: true });
     this.boton = 'Guardar';
 
     this.createForm();
@@ -73,14 +86,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       maximo_credito: [{ value: null, disabled: true }, Validators.required],
       vendedor_id: [{ value: null, disabled: true }, Validators.required],
     });
-  }
-
-  async decisionModal(arg) {
-    if (arg) {
-      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      const actualPagination = this.tServ.getPaginationById('lista_clientes');
-      this.clienteClass.deleteOne(obj.id).then((res) => this.getClientes(actualPagination));
-    }
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -117,25 +122,21 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.empleadosClass.getAll(extra).then((res) => (this.vendedores = res['data']));
   }
 
-  async getClientes(e) {
-    const page = e.page;
-    const per_page = e.per_page;
-    const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+  async getClientes(params?: { per_page: number; page: number; search: string }) {
+    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
     this.clienteClass.getAll(extra).then((res) => {
       res['data'].map((cliente) => {
-        cliente.documentos_de_identidad.map((docu) => {
-          if (docu.principal) cliente.documento_identidad = docu.documento;
-        });
+        const doc = _.find(cliente.documentos_de_identidad, { principal: true });
+        cliente.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
         return cliente;
       });
 
       this.listaClientes = res['data'];
 
-      const obj = { total: res['total_registros'], tabla: 'lista_clientes' };
-      this.tServ.Func_total_paginas(obj);
+      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     });
   }
 
@@ -143,20 +144,37 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.PhotoData = img;
   }
 
-  editarItem(item) {
-    this.indexSeleccionado = item.INDEX;
-    this.documentos_de_identidad = item.ARG.documentos_de_identidad;
+  tableClick_action(params) {
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.eliminarReg(params.data);
+  }
 
-    this.form.patchValue(item.ARG);
+  editarItem(data) {
+    this.documentos_de_identidad = data.documentos_de_identidad;
 
-    this.patchDocumentos(item.ARG.documentos_de_identidad);
+    this.form.patchValue(data);
 
-    this.form.controls.maximo_credito.setValue(fun.formatearNumero(fun.redondearAdos(item.ARG.maximo_credito)));
-    this.clienteSelected = fun.duplicarJson(item.ARG);
+    this.patchDocumentos(data.documentos_de_identidad);
+
+    this.form.controls.maximo_credito.setValue(fun.formatearNumero(fun.redondearAdos(data.maximo_credito)));
+    this.clienteSelected = fun.duplicarJson(data);
 
     this.boton = 'Editar';
     this.editando = true;
     this.changeStateCampos(true);
+  }
+
+  eliminarReg(regisData) {
+    const objToSend = {
+      data: regisData,
+      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
+      siFunction: () => {
+        const actualPagination = this.tServ.getPaginationById('lista_clientes');
+        this.clienteClass.deleteOne(regisData.id).then((res) => this.getClientes(actualPagination));
+      },
+    };
+
+    this.eliminarRegistro(objToSend);
   }
 
   patchDocumentos(documentos) {
@@ -365,18 +383,5 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   setDocumentoPrincipal(doc) {
     this.doc_principal = doc;
-  }
-
-  eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
-      siFunction: () => {
-        const actualPagination = this.tServ.getPaginationById('lista_clientes');
-        this.clienteClass.deleteOne(regisData.id).then((res) => this.getClientes(actualPagination));
-      },
-    };
-
-    this.eliminarRegistro(objToSend);
   }
 }

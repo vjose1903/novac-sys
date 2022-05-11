@@ -1,61 +1,55 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
-import { TablasService } from '../../../components/tablas/tablas.service';
-import { GLOBAL } from '../../../../core/typescript/GLOBAL';
+import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
-import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../../electron/shared-electron-angular';
 import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../../../core/services/functions.service';
-
+import { Permisos } from '../../../../core/typescript/permisos';
+import { table_config } from '../../../components/new_tablas/tabla-class';
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
   styleUrls: ['./lista-recibos.component.scss'],
 })
 export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestroy {
-  info = [
-    {
-      titulo: '1',
-      key: 'tipo_recibo',
-      text_tooltip: 'tooltip_tipo',
-      text_color: 'colorEstado',
-      tipo: 'icon',
-      isIcon: true,
-      color: true,
-      estilos: [{ width: '3%' }, { color: 'var(--transparente00)' }],
-    },
-    { titulo: 'No. recibo', estilos: [{ width: '8%' }], key: 'numero_recibo', tipo: 'text' },
-    { titulo: 'Cliente', key: 'cliente_', tipo: 'text', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
-    { titulo: 'No. factura', key: 'numero_factura', tipo: 'text', estilos: [{ width: '12%' }] },
-    { titulo: 'Total recibido', key: 'total', tipo: 'text', formatoNumero: true, estilos: [{ width: '12%' }, { 'text-align': 'end' }] },
-    {
-      titulo: '7',
-      key: 'ver',
-      text_color: 'colorNegro',
-      text_tooltip: 'tooltip_ver',
-      tipo: 'icon',
-      isIcon: true,
-      color: true,
-      estilos: [{ width: '0%' }, { color: 'var(--transparente00)' }],
-    },
-    {
-      titulo: 'Acciones',
-      key: 'anular',
-      text_color: 'colorNegro',
-      text_tooltip: 'tooltip_anular',
-      tipo: 'icon',
-      isIcon: true,
-      color: true,
-      estilos: [{ width: '9%' }, { color: '#000' }],
-    },
-  ];
+  table_config: table_config = {
+    info: [
+      { titulo: '|', tipo: 'icon', key: 'tipo_', estilos: [{ width: '3%' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'tipo_recibo', rowTooltip: 'tooltip_tipo', text_color: 'colorEstado' }] },
+
+      { titulo: 'No. recibo', estilos: [{ width: '8%' }], key: 'numero_recibo', tipo: 'text' },
+      { titulo: 'Cliente', key: 'cliente_', tipo: 'text', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
+      { titulo: 'No. factura', key: 'numero_factura', tipo: 'text', estilos: [{ width: '12%' }] },
+      { titulo: 'Total recibido', key: 'total', tipo: 'formatoNumero', estilos: [{ width: '12%' }, { 'text-align': 'end' }] },
+      {
+        titulo: 'Acciones',
+        tipo: 'icon',
+        key: 'actions',
+        estilos: [{ width: '9%' }, { color: '#000' }],
+        iconsArray: [
+          { key: 'ver', rowTooltip: 'tooltip_ver', text_color: 'colorNegro' },
+          { key: 'anular', rowTooltip: 'tooltip_anular', text_color: 'colorNegro' },
+        ],
+      },
+    ],
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'listado_recibos',
+    padre_functions: { data_request: (params) => this.getRecibos(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+  };
+  tablaComponent;
+
+  pdfSrc;
+  fileName;
   lista_recibos;
   rowSelected: any;
   reciboClass = new ReciboC();
+  permissions = Permisos;
 
   constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
     super();
@@ -79,13 +73,13 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   mapeoRecibos(res) {
     res.map((recibo) => {
-      recibo['tipo_recibo'] = recibo.chofer ? 'fas fa-truck-moving' : 'fas fa-comment-dollar';
+      recibo['tipo_recibo'] = recibo.choferes_viajes.length ? 'fas fa-truck-moving' : 'fas fa-comment-dollar';
       recibo['numero_recibo'] = _.padStart(recibo.numero_recibo, 8, '0');
       recibo['cliente_'] = `${recibo.cliente.nombre} ${recibo.cliente.apellido}`;
       recibo['numero_factura'] = recibo.detalle_recibos.length === 1 ? recibo.detalle_recibos[0].descripcion.split(' ')[1] : 'Varios...';
       recibo['ver'] = 'far fa-eye';
       recibo['anular'] = 'far fa-trash-alt';
-      recibo['tooltip_tipo'] = recibo.chofer ? 'Factura de Viaje' : 'Factura a crédito';
+      recibo['tooltip_tipo'] = recibo.choferes_viajes.length ? 'Factura de Viaje' : 'Factura a crédito';
       recibo['tooltip_ver'] = 'Ver';
       recibo['tooltip_anular'] = 'Anular';
 
@@ -95,13 +89,19 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       ];
 
       recibo['customStyles'] = {
-        'td-tipo_recibo': { width: '3%', 'font-size': '1rem' },
-        'td-cliente_': { 'text-align': 'start', 'padding-left': '1.5rem' },
-        'td-numero_recibo': { width: '8%' },
-        'td-numero_factura': { width: '12%' },
-        'td-total': { width: '12%', 'text-align': 'end', 'padding-right': '1.5rem' },
-        'td-ver': { width: '4%', 'padding-left': '1rem', 'font-size': '1rem' },
-        'td-anular': { width: '4%', 'font-size': '1rem' },
+        tipo_: [
+          { key: 'tipo_', isTd: true, estilos: 'width: 3% !important; font-size: 1rem !important' },
+          { key: 'tipo_recibo', estilos: 'font-size: 1rem !important' },
+        ],
+        cliente_: { 'text-align': 'start', 'padding-left': '1.5rem' },
+        numero_recibo: { width: '8%' },
+        numero_factura: { width: '12%' },
+        total: { width: '12%', 'text-align': 'end', 'padding-right': '1.5rem' },
+        actions: [
+          { key: 'actions', isTd: true, estilos: 'width: 9% !important; padding-left: 1rem !important' },
+          { key: 'ver', estilos: 'font-size:1rem !important' },
+          { key: 'anular', estilos: 'margin-left: 1rem !important; font-size:1rem !important' },
+        ],
       };
 
       return recibo;
@@ -113,23 +113,17 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     await this.getRecibos(this.tServ.obj_paginate.default);
   }
 
-  async getRecibos(e) {
+  async getRecibos(params?: { per_page: number; page: number; search: string }) {
     try {
-      const page = e.page;
-      const per_page = e.per_page;
-      const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const extra = {
-        afterPath: `filtro/${palabra_a_buscar}`,
-        parameters: { page: page, per_page: per_page, paginado: true },
-      };
+      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
       this.reciboClass.getAll(extra).then((res) => {
         res['data'] = this.mapeoRecibos(res['data']);
         this.lista_recibos = fun.duplicarJson(res['data']);
 
-        const obj = { total: res['total_registros'], tabla: 'listaRecibos' };
-        this.tServ.Func_total_paginas(obj);
+        this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
       });
     } catch (error) {}
   }
@@ -138,32 +132,34 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     this.router.navigateByUrl('/admin/recibos/ingresos/new');
   }
 
-  clickIcon(arg) {
-    this.rowSelected = arg.row;
-    switch (arg.column) {
-      case 'ver':
-        this.getReciboBase64(arg.row);
-        break;
+  tableClickIcon(event) {
+    console.log('arg ', event);
+    const recibo_selected = event.data;
 
-      case 'anular':
-        const obj = {
-          texto_modal: `Seguro de que desea anular el recibo <b class="negrita"> #${arg.row.numero_recibo} </b>`,
-          siFunction: (instance) => {
-            this.anularRecibo(this.rowSelected.id);
+    if (event.columnKey) {
+      switch (event.iconKey) {
+        case 'ver':
+          this.getReciboBase64(recibo_selected);
+          break;
+
+        case 'anular':
+          const texto_modal = `Seguro de que desea anular el recibo <b class="negrita"> #${recibo_selected.numero_recibo} </b>`;
+          const siFunction = (instance) => {
+            this.anularRecibo(recibo_selected.id);
             instance.closeModal(instance.id, 'anular_recibo');
-          },
-        };
+          };
 
-        this.confirmationModal({
-          id: 'anular_recibo',
-          header: 'Confirmar',
-          texto: obj.texto_modal,
-          siFunction: obj.siFunction,
-        });
-        break;
+          this.confirmationModal({
+            id: 'anular_recibo',
+            header: 'Confirmar',
+            texto: texto_modal,
+            siFunction: siFunction,
+          });
+          break;
 
-      default:
-        break;
+        default:
+          break;
+      }
     }
   }
 
@@ -254,23 +250,5 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       const actualPagination = this.tServ.getPaginationById('listaRecibos');
       this.reciboClass.getAll(extra).then((res) => this.getRecibos(actualPagination));
     } catch (error) {}
-  }
-
-  decisionModal(res) {
-    if (res) {
-      switch (this.tipoModal) {
-        case 'visor_pdf':
-          this.imprimir_base64();
-          break;
-
-        case 'anular':
-          this.anularRecibo(this.rowSelected.id);
-          break;
-
-        default:
-          break;
-      }
-    }
-    this.rowSelected = undefined;
   }
 }

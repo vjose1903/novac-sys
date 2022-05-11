@@ -48,7 +48,7 @@
                   </div>
 
                   <div class="col-8 pr-0">
-                    <select (keydown.enter)="saltar('agregar')" class="form-control inputE" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()" (blur)="calcularCantidadAProduccir()">
+                    <select (keydown.enter)="saltar('agregar')" class="form-control inputE" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()">
                       <option value="{{ null }}" disabled></option>
                       <option *ngFor="let item of optionsMedidas" value="{{ item }}">{{ item }}</option>
                     </select>
@@ -58,7 +58,7 @@
             </div>
 
             <div class="col-12 p-0 mt-2">
-              <a class="btn mr-2 btn-blanco" (click)="borrar()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
+              <a class="btn mr-2 btn-blanco" (click)="borrarForm()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
               <input [disabled]="formIsInvalid()" (click)="agregarAlista()" type="submit" class="btn btn-verde" value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}" />
             </div>
           </div>
@@ -79,7 +79,6 @@
                   <div pTooltip="{{ existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : '' }} " [tooltipPosition]="i != 0 ? 'top' : 'bottom'" style="width: 100%">
                     {{ lookprincipal(ingrediente) }}
                   </div>
-
                 </div>
               </div>
             </div>
@@ -103,28 +102,17 @@
 
   <div class="col-12 medio">
     <div id="cardTabla" class="card card-padding-1 sombra h-100">
-      <div #cardTabla class="divProducciones">
-        <app-tablas
-          class="h-100"
-          *ngIf="lista_produccion"
-          [padre]="cardTabla"
-          [info]="info"
-          [data]="lista_produccion"
-          [search]="false"
-          [id_tabla]="'lista_produccion'"
-          [colores]="false"
-          [botones]="botones"
-          (DevolverInfo)="editarItem($event)"
-          (DELETE)="abrirModal('remover', $event.ARG)"
-          (paginateChange)="paginateChange($event)"
-        ></app-tablas>
+      <div #cardTablaProd class="divProducciones">
+        <div class="divTabla">
+          <dinamic-table [cardTabla]="cardTablaProd" [seleccionado]="articuloEditando?.id" [(data)]="lista_produccion" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-12 abajo">
     <div class="d-flex justify-content-end w-100">
-      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModal('cancelarP', null)" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar')" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP', 'Seguro de que desea cancelar la produccion.', null)" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar', 'Seguro de que desea confirmar la produccion.', null)" type="submit" class="btn" value="Confirmar" id="btn-verde" />
     </div>
   </div>
 </div>

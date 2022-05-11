@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
-import { GLOBAL } from '../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import * as moment from '../../core/javascript/moment';
 import { MixinClass } from '../../core/typescript/MixinClass';
@@ -12,6 +11,9 @@ import { BuscarArticuloComponent } from '../components/formularios en modales/bu
 import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { ModalSeleccinarArticuloComponent } from '../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 import { fun } from '../../core/services/functions.service';
+import { ModalService } from '../components/modal/modal.service';
+import { Permisos } from '../../core/typescript/permisos';
+import { table_config } from '../components/new_tablas/tabla-class';
 
 @Component({
   selector: 'app-conduce',
@@ -39,13 +41,19 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   TOTAL: number;
 
-  info = [
-    { titulo: '1', key: 'detalles_selected', tipo: 'icon', isIcon: true, estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }] },
-    { titulo: 'Numero Fact', key: 'secuencia', tipo: 'text' },
-    { titulo: 'NCF', key: 'numero_comprobante', tipo: 'text' },
-    { titulo: 'Fecha Facturacion', key: 'fecha', tipo: 'text' },
-    { titulo: 'Total Facturado', key: 'total_factura', tipo: 'formatoNumero', formatoNumero: true },
-  ];
+  info = [];
+
+  table_config: table_config = {
+    info: [
+      { titulo: '1', tipo: 'icon', key: 'some_is_selected', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'detalles_selected' }] },
+      { titulo: 'Numero Fact', key: 'secuencia', tipo: 'text' },
+      { titulo: 'NCF', key: 'numero_comprobante', tipo: 'text' },
+      { titulo: 'Fecha Facturacion', key: 'fecha', tipo: 'text' },
+      { titulo: 'Total Facturado', key: 'total_factura', tipo: 'formatoNumero' },
+    ],
+    id_tabla: 'lista_roles',
+    obj_paginate: { show: false },
+  };
 
   facturaAdelantadaSelected;
   CuerpoConduce = [];
@@ -55,13 +63,15 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   articuloClass = new ArticuloC();
   conduceClass = new ConduceC();
   facturaClass = new FacturaC();
+  permissions = Permisos;
+  formPermissions = [Permisos.role.create, Permisos.role.update];
 
-  constructor(private fb: FormBuilder, private pdfServ: PdfService) {
+  constructor(private fb: FormBuilder, private pdfServ: PdfService, public mServ: ModalService) {
     super();
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'conduce', is_routing: true});
+    this._init_mixin({ component: 'conduce', is_routing: true });
 
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
@@ -90,61 +100,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   ngOnDestroy() {
     this._destroy_mixin();
-    this.resetModalVaribales();
-  }
-
-  // async decisionModal(res) {
-  //   if (res) {
-  //     if (this.tipoModal === 'removerArticulo') this.procesoQuitarArticulo();
-
-  //     if (this.tipoModal === 'cancelar_conduce') this.cancelarConduce(2);
-
-  //     if (this.tipoModal === 'imprimir_conduce') await this.sendData();
-
-  //     setTimeout(() => this.resetModalVaribales(), 1000);
-  //   }
-  // }
-
-  // noFiltroResponse(res) {
-  //   if (res.tipo == 'buscarCliente') {
-  //     this.enfocarInput('clienteI');
-  //     this.selectContenido('clienteI');
-  //   }
-
-  //   if (res.tipo == 'buscarArticulo') {
-  //     this.enfocarInput(`cod-${res.index}`);
-  //     this.selectContenido(`cod-${res.index}`);
-  //   }
-  // }
-
-  // objDevueltoResponse(res) {
-  //   if (res) {
-  //     if (res.tipo_modal === 'buscarCliente') {
-  //       this.cliente = res.data;
-  //       (document.getElementById('clienteI') as any).value = res.data.nombre;
-  //       this.buscarFacturasAdelantadas(res.data.id);
-  //       setTimeout(() => this.enfocarInput('cod-0'), 10);
-  //       //
-  //     } else if (res && res.tipo_modal === 'buscarArticulo') {
-  //       this.llenarRowDespuesDeFiltro(res);
-  //       setTimeout(() => this.enfocarInput('can-' + res.index), 10);
-  //       //
-  //     } else if (res.tipo_modal === 'seleccionar_articulos_adelantados') {
-  //       // mirar aqui el res
-  //       this.ajustarSecuencia();
-  //       this.llenarConduce(res.data.body).then((res) => {
-  //         this.checkFacturasAdelantadasSelection();
-  //       });
-  //     }
-  //     setTimeout(() => this.resetModalVaribales(), 1000);
-  //   }
-  // }
-
-  articuloFiltroResponse(res) {
-    if (res && res.tipo_modal === 'buscarArticulo') {
-      this.llenarRowDespuesDeFiltro(res);
-      setTimeout(() => this.enfocarInput('can-' + res.index), 10);
-    }
   }
 
   pressEscResponse(res) {
@@ -152,10 +107,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       this.enfocarInput('cod-' + res);
       this.selectContenido('cod-' + res);
     }
-  }
-
-  resetModalVaribales() {
-    this.tipoModal = undefined;
   }
 
   ngAfterViewInit() {
@@ -196,16 +147,21 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   async getDataFromModal(arg, search) {
-    if (arg.modal_id === 'buscarArticulo') {
-      this.llenarRowDespuesDeFiltro(arg);
-      // setTimeout(() => this.enfocarInput('can-' + arg.index), 1000);
+    if (arg.modal_id == 'buscar_articulo') {
+      if (arg?.tipo == 'data_no_found') {
+        this.enfocarInput(`cod-${arg.index}`);
+        this.selectContenido(`cod-${arg.index}`);
+      } else {
+        this.llenarRowDespuesDeFiltro(arg);
+      }
     }
-    if (arg.modal_id === 'buscarCliente') {
+    if (arg.modal_id == 'buscarCliente') {
       this.cliente = arg.data;
       (document.getElementById('clienteI') as any).value = arg.data.nombre;
       setTimeout(() => this.enfocarInput('cod-0'), 10);
       this.buscarFacturasAdelantadas(arg.data.id);
     }
+
     if (arg.modal_id === 'seleccionar_articulos_adelantados') {
       this.ajustarSecuencia();
       this.llenarConduce(arg.data).then((res) => {
@@ -221,7 +177,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
       const { articulo, cod, can, uni, detalle_factura_id } = fila_actual;
 
-      if (index >= 10 && input == 'cod-') this.addItem(index);
+      if (index >= 10 && input == 'can-') this.addItem(index);
 
       let campo_siguiente = fun.hasValue(fila_siguiente['detalle_factura_id']) ? `can-${index + 1}` : this.inputSecuencia;
 
@@ -241,7 +197,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           this.handleModalForm({
             component: BuscarArticuloComponent,
             inputs: obj,
-            id: 'buscarArticulo',
+            id: 'buscar_articulo',
             header: 'BUSCAR ARTICULO',
             width: '56.25rem',
             height: '31.25rem',
@@ -250,6 +206,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
               cancelar: { show: false, disable: false },
             },
           });
+          this.enfocarInput('input_fantasma');
         } else {
           this.enfocarInput(`can-${index}`);
         }
@@ -434,9 +391,10 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     }
   }
 
-  addItem(i): void {
+  addItem(index): void {
+    fun.logPurple(' ----- AÑADIENDO MAS FILAS A LA TABLA DE CONDUCE ----- ');
     this.ARRAY_ROWARTICULOS = this.form.get('rowFactura') as FormArray;
-    this.ARRAY_ROWARTICULOS.push(this.createItem(i));
+    this.ARRAY_ROWARTICULOS.push(this.createItem(index));
   }
 
   removeItem(i: number) {
@@ -553,7 +511,12 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           this.facturas_adelantadas.map((factura) => {
             factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
             factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
-            factura.customStyles = { 'td-detalles_selected': { width: '2rem' } };
+            factura.customStyles = {
+              some_is_selected: [
+                { key: 'some_is_selected', isTd: true, estilos: 'width: 2rem !important;' },
+                { key: 'detalles_selected', estilos: 'width: 2rem !important' },
+              ],
+            };
 
             for (let i = 0; i < factura.detalle_facturas.length; i++) {
               const detalle = factura.detalle_facturas[i];
@@ -572,7 +535,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     this.facturas_adelantadas.map((item) => {
       item.detalle_facturas.map((detalle) => {
         const formArray = this.form.get('rowFactura') as FormArray;
-        const existe = formArray.value.find((d) => d.detalle_factura_id === detalle.id);
+        const existe = formArray.value.find((d) => d.detalle_factura_id == detalle.id);
 
         detalle.select = !!existe;
         detalle.disable = !!existe;
@@ -588,19 +551,23 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     });
   }
 
-  async SeleccionarFactruaAdelantada(factura) {
+  tableClickRow(event) {
+    this.seleccionarFactruaAdelantada(event.data);
+  }
+
+  async seleccionarFactruaAdelantada(factura) {
     if (factura) {
       this.checkFacturasAdelantadasSelection();
       let conteo = 0;
-      factura.detalle_facturas.map(async (arti) => {
-        this.articuloClass.getArticulosFiltrado({ buscar: arti.codigo, fecha: this.fechaConduce, parameters: { contenido: true } }).then((res_articulo) => {
+      factura.detalle_facturas.map(async (detalle) => {
+        this.articuloClass.getArticulosFiltrado({ buscar: detalle.codigo, fecha: this.fechaConduce, parameters: { contenido: true } }).then((res_articulo) => {
           const articulo = _.first(res_articulo['data']);
           const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.' };
           const contenidos_format = this.formatContenidos(articulo.contenido);
 
           const arrayMostrar = [
-            { num: arti.retirado, medida: '' },
-            { num: arti.cantidad_en_unidades - arti.retirado, medida: '' },
+            { num: detalle.retirado, medida: '' },
+            { num: detalle.cantidad_en_unidades - detalle.retirado, medida: '' },
           ];
 
           for (let j = 0; j < arrayMostrar.length; j++) {
@@ -612,13 +579,14 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
             element.medida = contenidoSelected ? `${cantidad} ${abreviaturas[contenidoSelected[0]]}` : null;
           }
 
-          arti.retirado_mostrar = arrayMostrar[0].medida;
-          arti.restante_mostrar = arrayMostrar[1].medida;
+          detalle.retirado_mostrar = arrayMostrar[0].medida;
+          detalle.restante_mostrar = arrayMostrar[1].medida;
+
+          if (detalle.disable == false) detalle.disable = fun.isEmpty(detalle.restante_mostrar);
 
           conteo++;
           if (conteo >= factura.detalle_facturas.length)
             setTimeout(() => {
-              // TODO:
               this.handleModalForm({
                 component: ModalSeleccinarArticuloComponent,
                 inputs: factura.detalle_facturas,
@@ -637,7 +605,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
               });
             }, 250);
 
-          return arti;
+          return detalle;
         });
       });
     }

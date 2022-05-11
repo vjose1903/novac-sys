@@ -12,5 +12,28 @@
   }
   .tabs {
     grid-area: tabs;
+    > .fantasma {
+      position: relative;
+      height: 100%;
+    }
+  }
+}
+
+::ng-deep {
+  .my_tabView.detalle-notas {
+    position: absolute !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
+}
+
+.divTabla {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  > .innerTablaNotas {
+    position: absolute;
+    height: 100%;
+    width: 100%;
   }
 }
