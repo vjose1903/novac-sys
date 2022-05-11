@@ -50,7 +50,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     ],
     colores: true,
     padding: '0.5rem',
-    id_tabla: 'lista_ncf',
+    id_tabla: 'lista_clientes',
     padre_functions: { data_request: (params) => this.getClientes(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
