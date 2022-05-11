@@ -1,20 +1,19 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, AfterViewInit, ElementRef } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
 import { MixinClass } from '../../core/typescript/MixinClass';
-import { GLOBAL } from '../../core/typescript/GLOBAL';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { CurrentUserService } from '../../core/services/current-user.service';
-import { modalClass } from '../components/modal/modal';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
 import { SingletonService } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { fun } from '../../core/services/functions.service';
+import { NgxPermissionsService } from 'ngx-permissions';
 
 @Component({
   selector: 'app-layout',
@@ -36,11 +35,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   subCheckCuadreToday: Subscription;
   subLogOut: Subscription;
   subRouter: Subscription;
+  subCurrentUser: Subscription;
 
   ready;
   // facturas_localStorage: any;
   isHandset$: Observable<boolean>;
-  lRun;
   activeIndex;
   initNavigate = true;
   cuadre_hoy;
@@ -80,29 +79,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ngOnInit() {
     this.initVariables();
-    this._init_mixin({ component: 'layout', is_routing: false, _lista_subs: ['decisionModal'] });
-
-    const token = fun.getAuthToken();
-
-    if (token) {
-      this.requestClass
-        .getAll({ afterPath: 'auth/validate_token' })
-        .then((res) => {
-          this.setUser(res.data);
-          if (res.data.sexo === 'm') this.imgUser = 'assets/img/userH.png';
-          else this.imgUser = 'assets/img/userM.png';
-
-          this.lRun = true;
-        })
-        .catch((err) => {
-          if (err.status === 0) this.noServer = true;
-          else {
-            this.logOut();
-          }
-        });
-    } else {
-      this.logOut();
-    }
+    this._init_mixin({ component: 'layout', is_routing: false });
 
     this.subCheckCuadreToday = this.layServ.CHECKCUADRETODAY.subscribe((res) => {
       if (res) {
@@ -115,9 +92,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       if (res) this.logOut();
     });
 
-    this.configServ.getConfig().then((config: ConfigI) => {
-      this.versionApp = config.app_version;
+    this.subCurrentUser = this.currentUserServ.CURENTUSER.subscribe((res) => {
+      if (res) this.setUser(res);
     });
+
+    this.configServ.getConfig().then((config: ConfigI) => (this.versionApp = config.app_version));
   }
 
   initVariables() {
@@ -126,7 +105,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.noServer = false;
     this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
     this.activeIndex = 0;
-    this.lRun = false;
+
     this.cuadre_hoy = false;
   }
 
@@ -148,13 +127,9 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     }
   }
 
-  setUser(user) {
-    this.usuario = user;
-    this.currentUserServ.setUser(user);
-  }
-
   ngAfterViewInit() {
     this.ready = true;
+    this.parseMenu();
     this.cdRef.detectChanges();
   }
 
@@ -162,8 +137,23 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.cdRef.detectChanges();
   }
 
+  setUser(usuario) {
+    this.usuario = usuario;
+    if (this.usuario.sexo === 'm') this.imgUser = 'assets/img/userH.png';
+    else this.imgUser = 'assets/img/userM.png';
+  }
+
+  parseMenu() {
+    for (const keyFather in this.allPermissionsObj) {
+      for (const keyChild in this.allPermissionsObj[keyFather]) {
+        const subMenuProp = this.allPermissionsObj[keyFather][keyChild];
+        this.allPermissionsObj[keyFather].flatt = _.union(this.allPermissionsObj[keyFather].flatt, subMenuProp);
+      }
+    }
+  }
+
   // =================================================================================
-  // CERRAR SESION
+  // Refrescar el programa
   // =================================================================================
   refreshPage() {
     location.reload();
@@ -186,7 +176,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
 
   checkRouteActiva() {
-    this.actualPath = document.location.pathname;
+    const location = window.location.href;
+    const actualPath = location.slice(location.indexOf('/admin'), location.length);
+
+    this.actualPath = actualPath;
     const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
 
     if (pathSplit.length >= 3) {
@@ -213,6 +206,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   cambiarMenu(args: { url; navigate }) {
     let next_cambio_menu = '';
+    // TODO: aqui agrega que si tiene permiso de ir a la ruta que quiere ir no haga nada
 
     if (args.navigate) {
       next_cambio_menu = `/admin/${args.url}`;

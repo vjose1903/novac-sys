@@ -1,4 +1,4 @@
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, NsisUpdater } from 'electron-updater';
 import { BrowserWindow, dialog } from 'electron';
 
 import {
@@ -10,23 +10,34 @@ import {
   ELECTRON_EVENT_UPDATE_ERROR,
   KEYWORD_ELECTRON_RESPONSE,
 } from './shared-electron-angular';
+import Functions from './functions';
+import { ConfigI } from '../src/app/core/typescript/config-interface';
 
 export default class AppUpdater {
   constructor() {
     const log = require('electron-log');
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
+    this.checkForUpdates();
+  }
+
+  async checkForUpdates() {
+    const confTemp = (await Functions.getConfigFile()) as any;
+    const conf: ConfigI = JSON.parse(confTemp);
+
+    const autoUpdater = new NsisUpdater({ provider: 'generic', url: conf.url_servidor_descargas });
+
+    setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 100);
   }
 
   handleUpdateEvents(win: BrowserWindow) {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // AUTO UPDATE EVENTS
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    setTimeout(() => this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...' } }), 10000);
+    // setTimeout(() => this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...' } }), 10000);
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, () => {
-      this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...' } });
+      this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...', url: autoUpdater.getFeedURL() } });
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, (info: any) => {
@@ -36,7 +47,7 @@ export default class AppUpdater {
         type: 'info',
         buttons: ['ok'],
         title: 'Actualización disponible',
-        message: 'VjPOS presenta una nueva actualizacion se empezará a descargar ahora.',
+        message: 'Novac System presenta una nueva actualizacion se empezará a descargar ahora.',
         detail: `Version a descargar: ${info.version}`,
       };
     });

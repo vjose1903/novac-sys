@@ -1,12 +1,23 @@
-.textoNota {
-  color: #ff0000b6;
-  font-weight: 600;
-}
-p {
-  font-size: 1.3rem;
-  font-weight: 400;
+::ng-deep {
+  .webcam-wrapper {
+    // transform: scaleX(-1);
+  }
+
+  .camera-switch {
+    position: absolute;
+    top: 1rem !important;
+    right: 1rem !important;
+  }
 }
 
-::ng-deep .seleccionar_articulos_adelantados {
-  padding: 0 1rem !important;
+.pos {
+  position: absolute;
+}
+
+.hole {
+  border-radius: 5px;
+  border: 4px dashed rgba(221, 221, 221, 0.541);
+  position: absolute;
+  box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.616);
+  z-index: 9;
 }

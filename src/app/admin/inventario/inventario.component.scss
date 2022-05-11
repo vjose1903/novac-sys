@@ -4,16 +4,6 @@
   height: 100%;
 }
 
-.bordes {
-  border: 2px solid var(--primary09);
-}
-
-.info {
-  background-color: var(--transparente05);
-  border-radius: 10px;
-  box-shadow: 1px 1px 4px grey;
-}
-
 .filtroArticulos {
   height: calc(1em + 0.8rem + 2px);
   max-width: 13rem;
@@ -24,35 +14,40 @@
   z-index: 999999;
 }
 
-.mainContent {
+.mainInventario {
+  height: 100%;
   display: grid;
   grid-template-areas:
-    "cantidades"
+    "colTitulo"
     "cuerpo";
   grid-template-rows: min-content auto;
-  > .cantidades {
-    grid-area: cantidades;
+
+  > .colTitulo {
+    grid-area: colTitulo;
   }
   > .cuerpo {
     grid-area: cuerpo;
+
     position: relative;
-    display: grid;
-    grid-template-areas:
-      "divFiltro"
-      "divTabla";
-    grid-template-rows: min-content auto;
+    > .cardListados {
+      position: absolute;
+      height: 100%;
+      width: 100%;
 
-    > .divFiltro {
-      grid-area: divFiltro;
+      > .divFiltro {
+        position: absolute;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding-left: 18rem;
 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid #a5a5a5;
-    }
-    > .divTabla {
-      grid-area: divTabla;
+        > .filtroArticulos {
+          margin-top: 0.6rem;
+        }
+        > .btnReporte {
+          margin: 0.15rem 0.5rem 0rem 0rem;
+        }
+      }
     }
   }
 }

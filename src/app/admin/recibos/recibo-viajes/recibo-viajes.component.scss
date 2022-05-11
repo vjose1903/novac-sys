@@ -14,11 +14,22 @@
   }
   .listado {
     grid-area: listado;
+
+    > .cardListados {
+      position: relative;
+      > .divTabla {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+    }
   }
   .formulario {
     grid-area: formulario;
+
   }
 }
+
 
 div.card-header {
   background-color: var(--primary06);

@@ -7,7 +7,7 @@ import * as moment from '../../../../core/javascript/moment';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
-import { ModalI } from '../../new_modal/modal-class';
+import { ModalI } from '../../modal/modal-class';
 import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
 

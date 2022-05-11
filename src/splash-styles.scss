@@ -1,0 +1,85 @@
+.splash-container {
+  position: relative;
+  .msg {
+    position: absolute;
+    right: 3rem;
+    top: 2rem;
+    background: #298dcd87;
+    padding: 0.2rem 1rem;
+    border-radius: 1rem;
+  }
+  @media (min-width: 1000px) and (max-width: 1169px) {
+    .msg {
+      font-size: 1.4rem;
+    }
+  }
+
+  @media (max-width: 999px) {
+    .msg {
+      font-size: 1.4rem;
+    }
+  }
+
+  .logo {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+  }
+
+  @media (min-width: 1550px) {
+    .logo {
+      width: 45vw;
+    }
+  }
+
+  @media (min-width: 1310px) and (max-width: 1549px) {
+    .logo {
+      width: 50vw;
+    }
+  }
+
+  @media (min-width: 1170px) and (max-width: 1309px) {
+    .logo {
+      top: 2rem;
+      width: 55vw;
+    }
+  }
+
+  @media (min-width: 1000px) and (max-width: 1169px) {
+    .logo {
+      top: 3rem;
+      width: 58vw;
+    }
+  }
+
+  @media (max-width: 999px) {
+    .logo {
+      top: 5rem;
+      width: 64vw;
+    }
+  }
+
+  .inspot {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+  }
+
+  .rayas {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+
+  @media (min-width: 1000px) and (max-width: 1200px) {
+    .rayas {
+      width: 45rem;
+    }
+  }
+
+  @media (max-width: 999px) {
+    .rayas {
+      width: 42rem;
+    }
+  }
+}

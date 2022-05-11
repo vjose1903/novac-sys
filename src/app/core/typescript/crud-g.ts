@@ -22,8 +22,6 @@ export interface responseModel<T> {
 } // TODO: <================================================================ PARA DESPUES`
 
 export class CrudG<T> {
-  private http = SingletonService.http;
-
   constructor(private path: string) {}
 
   async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
@@ -103,7 +101,7 @@ export class CrudG<T> {
     const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
     if (!configApp.usa_url_principal) fun.logYellow('::::: USANDO LA URL DE RESPALDO :::::');
 
-    const url = configApp.is_development ? AppConfig.url_server : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
+    const url = configApp.is_development ? AppConfig[configApp.gitUser] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     return url;
   }
 
@@ -113,7 +111,6 @@ export class CrudG<T> {
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';
 
     if (tipo === 'externo') return `${proxyurl}${this.path}`;
-    // if (tipo === 'externo') return `${this.path}`;
 
     if (id) url += `/${id}`;
     if (_.has(args, 'afterPath') && fun.hasValue(args.afterPath)) url += `/${args.afterPath}`;
@@ -127,11 +124,11 @@ export class CrudG<T> {
 
     switch (metodo) {
       case 1:
-        return this.http[method](url, this.requestOptions(tipo, arg));
+        return SingletonService.http[method](url, this.requestOptions(tipo, arg));
         break;
 
       case 2:
-        return this.http[method](url, JSON.stringify(data), this.requestOptions(tipo, arg));
+        return SingletonService.http[method](url, JSON.stringify(data), this.requestOptions(tipo, arg));
         break;
     }
   }

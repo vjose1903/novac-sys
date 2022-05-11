@@ -1,14 +1,11 @@
 import * as moment from '../javascript/moment';
-import { ModalClass } from '../../admin/components/new_modal/modal-class';
+import { ModalClass } from '../../admin/components/modal/modal-class';
 import { SingletonService } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
-
-type lista_sub = 'decisionModal' | 'objDevuelto' | 'articuloPorCodigo' | 'pressEsc' | 'noFiltro';
 
 interface mixinInit {
   component?: String;
   is_routing: boolean;
-  _lista_subs?: Array<lista_sub>;
 }
 
 interface fechaFactura {
@@ -26,23 +23,12 @@ export class MixinClass extends ModalClass {
 
   _init_mixin(arg?: mixinInit) {
     this.arg_mixin = arg;
-    const lista_sub = this.arg_mixin ? (this.arg_mixin._lista_subs ? this.arg_mixin._lista_subs : []) : [];
 
     this._init_layout(arg);
-
-    if (lista_sub) {
-      this._init_modal(arg, this.layServ);
-    }
   }
 
   _destroy_mixin(algo?) {
     this._destroy_layout();
-
-    const lista_sub = this.arg_mixin ? (this.arg_mixin._lista_subs ? this.arg_mixin._lista_subs : undefined) : undefined;
-
-    if (lista_sub) {
-      this._destroy_modal();
-    }
   }
 
   // =========================================================================================================
@@ -127,8 +113,6 @@ export class MixinClass extends ModalClass {
 
   eliminarRegistro(obj) {
     const noFunction = (instance: any) => {
-      console.log('instance ', instance);
-
       instance.closeModal('borrar', 'cancelar');
     };
     this.handleModalForm({
@@ -155,7 +139,3 @@ export class MixinClass extends ModalClass {
     });
   }
 }
-
-// export interface MixinClass extends ModalClass, modalClass, LayoutClass {}
-
-// applyMixins(MixinClass, [ModalClass, modalClass, LayoutClass]);

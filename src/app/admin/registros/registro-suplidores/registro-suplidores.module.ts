@@ -5,11 +5,13 @@ import { RegistroSuplidoresRoutingModule } from './registro-suplidores.routing';
 import { RegistroSuplidoresComponent } from './registro-suplidores.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TablasModule } from '../../components/tablas/tablas.module';
+import { NewTablasModule } from '../../components/new_tablas/tablas.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PrimengModule } from '../../../modules/primeng.module';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [RegistroSuplidoresComponent],
-  imports: [CommonModule, RegistroSuplidoresRoutingModule, ReactiveFormsModule, FormsModule, TablasModule, DirectivesModule, PrimengModule],
+  imports: [CommonModule, RegistroSuplidoresRoutingModule, ReactiveFormsModule, FormsModule, TablasModule, NewTablasModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild()],
 })
 export class RegistroSuplidoresModule {}

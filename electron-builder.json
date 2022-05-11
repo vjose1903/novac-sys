@@ -1,5 +1,5 @@
 {
-  "productName": "adm-agroindustrial",
+  "productName": "NOVAC - AGRODEMI",
   "directories": {
     "output": "actualizacion/"
   },
@@ -44,11 +44,5 @@
   "linux": {
     "icon": "./src/assets/icons/mac/icon.icns",
     "target": ["AppImage"]
-  },
-  "publish": [
-    {
-      "provider": "generic",
-      "url": "http://admservidor.ddns.net:9090/actualizacion"
-    }
-  ]
+  }
 }

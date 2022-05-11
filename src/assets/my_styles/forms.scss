@@ -121,8 +121,8 @@ textarea {
   &:disabled {
     background-color: #e9ecef !important;
 
-    touch-action: none;
-    pointer-events: none;
+    touch-action: none !important;
+    pointer-events: none !important;
   }
 
   &.with-right-btn {

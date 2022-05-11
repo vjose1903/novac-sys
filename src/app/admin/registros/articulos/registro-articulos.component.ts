@@ -2,12 +2,15 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@ang
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import * as moment from '../../../core/javascript/moment';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 import * as $ from 'jquery';
 import { fun } from '../../../core/services/functions.service';
+import { table_config } from '../../components/new_tablas/tabla-class';
+import { Permisos } from '../../../core/typescript/permisos';
+import { NgxPermissionsService } from 'ngx-permissions';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -18,15 +21,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   // =============================================
   //  TABLAS
   // =============================================
-
-  info = [
-    { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }] },
-    { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
-    { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
-    { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', formatoNumero: true, estilos: [{ width: '20%' }] },
-  ];
-
-  botones = { titulo: true, borrar: true, editar: true };
 
   boton = '';
   form: FormGroup;
@@ -67,13 +61,38 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   fechaFactura: string;
   articuloClass = new ArticuloC();
   tipoArticuloClass = new TipoArticuloC();
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService) {
+  permissions = Permisos;
+  formPermissions = [Permisos.articulo.create, Permisos.articulo.update];
+  hasPermissionUpdateFormula = false;
+
+  table_config: table_config = {
+    info: [
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
+      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }] },
+      { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
+      { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', estilos: [{ width: '20%' }] },
+    ],
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'articulos',
+    padre_functions: { data_request: (params) => this.getArticulos(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: this.permissions.articulo.update }, borrar: { show: true, permiso: this.permissions.articulo.destroy } },
+  };
+  tablaComponent;
+  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_articulo', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'reg_articulo', is_routing: true });
     this.createForm();
+
+    this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then((result) => {
+      this.hasPermissionUpdateFormula = result;
+    });
+
     this.FORM = this.form.controls;
 
     this.boton = 'Registrar';
@@ -92,18 +111,15 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.borrar();
   }
 
-  filtroFormula(item) {
-    return item._destroy !== '1';
-  }
-
-  async filtrarArticulo(e) {
-    this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
-    await this.getArticulos(e);
-  }
+  // async filtrarArticulo(e) {
+  //   this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
+  //   await this.getArticulos(e);
+  // }
 
   async necesarioStart() {
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
-    await this.getArticulos(this.tServ.obj_paginate.default);
+    // await this.getArticulos(this.tServ.obj_paginate.default);
+    await this.getArticulos({ page: 1, per_page: 20, search: ' ' });
     this.getTipoArticulos();
     this.enfocarInput('nombre');
   }
@@ -123,29 +139,27 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.listaTipoArticulos = [];
     this.tipoArticuloClass.getAll().then((res) => {
       this.listaTipoArticulos = fun.duplicarJson(res);
+      console.log('🚀 ~ file: registro-articulos.component.ts ~ line 135 ~ RegistroArticulosComponent ~ this.tipoArticuloClass.getAll ~ this.listaTipoArticulos', this.listaTipoArticulos);
     });
   }
 
-  async getArticulos(e) {
-    const page = e.page;
-    const per_page = e.per_page;
-    const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+  async getArticulos(params?: { per_page: number; page: number; search: string }) {
+    // async getArticulos(e) {
 
-    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: page, per_page: per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
+    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+
+    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
       res.data.map(async (arti) => {
         arti.customStyles = {
-          'td-codigo': { width: '11%' },
-          'td-nombre': { width: '39%', 'text-align': 'left', 'padding-left': '0.5rem' },
-          'td-medida': { width: '13%' },
-          'td-precio_principal': { width: '18%' },
+          codigo: { width: '11%' },
+          nombre: { width: '37%', 'text-align': 'left', 'padding-left': '0.5rem' },
+          medida: { width: '13%' },
+          precio_principal: { width: '20%' },
         };
       });
 
       this.listaArticulos = res.data;
-
-      const obj = { total: res.total_registros, tabla: 'listaArticulos' };
-
-      this.tServ.Func_total_paginas(obj);
+      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     });
   }
 
@@ -319,14 +333,15 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   // =============================================
 
   createItem(): FormGroup {
+    const permission = this.hasPermissionUpdateFormula;
     return this.fb.group({
-      id: [null],
-      articulo_id: [null],
-      cantidad_formula: [null],
-      medida_formula: [null],
-      costo_formula: [null],
-      precio_formula: [null],
-      _destroy: [null],
+      id: [{ value: null, disabled: !permission }],
+      articulo_id: [{ value: null, disabled: !permission }],
+      cantidad_formula: [{ value: null, disabled: !permission }],
+      medida_formula: [{ value: null, disabled: !permission }],
+      costo_formula: [{ value: null, disabled: !permission }],
+      precio_formula: [{ value: null, disabled: !permission }],
+      _destroy: [{ value: null, disabled: !permission }],
     });
   }
 
@@ -599,12 +614,15 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
   }
 
-  async editarItem(item) {
-    const articulo = item.ARG;
+  tableClick_action(params) {
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.eliminarReg(params.data);
+  }
 
+  async editarItem(articulo) {
     this.borrar();
     this.form.patchValue(articulo);
-    this.articuloSelected = item.ARG;
+    this.articuloSelected = articulo;
     this.boton = 'Editar';
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
@@ -668,17 +686,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.form.controls.tipo_articulo_id.setValue(articulo['tipo_articulo_id']);
     this.form.controls.costo_principal.setValue(fun.numFormatTwoDecimals(articulo.costo_principal));
     this.form.controls.precio_principal.setValue(fun.numFormatTwoDecimals(articulo.precio_principal));
-  }
-
-  decisionModal(arg) {
-    if (arg) {
-      const obj = fun.duplicarJson(this.seleccionModal);
-      this.articuloClass.deleteOne(obj.id).then((res) => {
-        const actualPagination = this.tServ.getPaginationById('listaArticulos');
-        this.getArticulos(actualPagination);
-        this.borrar();
-      });
-    }
   }
 
   nuevoRegistro() {

@@ -1,9 +1,7 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, OnDestroy, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import * as moment from '../../../core/javascript/moment';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
 import { fun } from '../../../core/services/functions.service';
@@ -13,13 +11,10 @@ import { fun } from '../../../core/services/functions.service';
   templateUrl: './cuerpo-factura.component.html',
   styleUrls: ['./cuerpo-factura.component.scss'],
 })
-export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDestroy {
   form: FormGroup;
   ARRAY_ROWFACTURAS;
 
-  seleccionModal;
-  showModal;
-  modalSearch;
   UnidadesArticulo;
   drop;
 
@@ -48,8 +43,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   @Output() getCuerpoFactura = new EventEmitter<any>();
   @Output() getFechaFactura = new EventEmitter<any>();
 
-  tipoModal: string;
-
   articuloClass = new ArticuloC();
   minCodigo;
 
@@ -59,32 +52,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'cuerpo_factura', is_routing: false, _lista_subs: ['decisionModal', 'objDevuelto', 'articuloPorCodigo', 'pressEsc', 'noFiltro'] });
+    this._init_mixin({ component: 'cuerpo_factura', is_routing: false });
 
     this.rellenarVariables();
-  }
-
-  decisionModal(res) {
-    if (this.tipoModal === 'removerArticulo' && res) this.procesoQuitarArticulo();
-  }
-
-  articuloFiltroResponse(res) {
-    this.objDevueltoResponse(res);
-  }
-
-  noFiltroResponse(res) {
-    if (res.tipo == 'buscarArticulo') {
-      this.enfocarInput(`cod-${res.index}`);
-      this.selectContenido(`cod-${res.index}`);
-    }
-  }
-
-  objDevueltoResponse(res) {
-    if (res && res.tipo_modal === 'buscarArticulo') this.llenarRowDespuesDeFiltro(res);
-  }
-
-  pressEscResponse(res) {
-    if (fun.hasValue(res)) setTimeout(() => this.enfocarInput('cod-' + res), 250);
   }
 
   escucharCambiosEnForm() {
@@ -126,9 +96,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   async rellenarVariables() {
     return new Promise(async (resolve, reject) => {
       this.ARRAY_ROWFACTURAS = undefined;
-      this.seleccionModal = undefined;
-      this.showModal = false;
-      this.modalSearch = true;
       this.UnidadesArticulo = [];
       this.precioDetalle = undefined;
       this.TOTAL = 0;
@@ -163,10 +130,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     });
   }
 
-  ngAfterViewInit() {}
-
-  ngOnChanges(simpleChanges) {}
-
   async procesoQuitarArticulo() {
     await this.sacarDescuento(this.indexRemove);
     await this.removeItem(this.indexRemove);
@@ -174,13 +137,32 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     await this.ajustarSecuencia();
   }
 
+  checkDisable(input, index, verificate) {
+    let isDisable = false;
+
+    if (verificate) {
+      if (fun.isEmpty(this.propietario)) isDisable = true;
+      if (!isDisable && input == 'desc-') isDisable = this.readDescuento();
+      if (!isDisable && input == 'pre-') isDisable = this.readPrecio();
+    } else {
+      isDisable = true;
+    }
+
+    fun.ModificarClass(`${input}${index}`, 'disabled', isDisable ? 'add' : 'remove');
+
+    if (isDisable) {
+      this.desEnfocarInput(`${input}${index}`);
+      document.getElementById(`${input}${index}`)['value'] = null;
+    }
+  }
+
   readPrecio() {
-    const res = this.metodo === 'compra' && this.propietario ? false : true;
+    const res = this.metodo == 'compra' && this.propietario ? false : true;
     return res;
   }
 
   readDescuento() {
-    const res = this.metodo === 'venta' && this.propietario ? false : true;
+    const res = this.metodo == 'venta' && this.propietario ? false : true;
     return res;
   }
 
@@ -191,16 +173,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     else this.minCodigo = undefined;
   }
 
-  ModificarClass(item, clase, action) {
-    fun.ModificarClass(item, clase, action);
-  }
-
   selectedRow(i, bool) {
     const lista = ['cod-' + i, 'can-' + i, 'uni-' + i, 'des-' + i, 'pre-' + i, 'desc-' + i, 'tot-' + i];
     lista.forEach((row) => {
       if (this.checkIfRowContainArticulo(i)) {
         const action = bool ? 'add' : 'remove';
-        this.ModificarClass(row, 'inputOscuro', action);
+        fun.ModificarClass(row, 'inputOscuro', action);
       }
     });
   }
@@ -224,7 +202,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
       }
     }
 
-    this.form.reset();
+    if (this.form) this.form.reset();
     this.TOTAL = 0;
     this.ITBIS = 0;
     this.secuencia = 0;
@@ -260,9 +238,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     });
   }
 
-  addItem(i): void {
+  addItem(index): void {
     this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as FormArray;
-    this.ARRAY_ROWFACTURAS.push(this.createItem(i));
+    this.ARRAY_ROWFACTURAS.push(this.createItem(index));
   }
 
   removeItem(i: number) {
@@ -347,40 +325,45 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   seleccionarCampoEnTurno() {
-    this.ajustarSecuencia().then((res) => this.enfocarInput(this.inputSecuencia));
+    setTimeout(() => {
+      this.ajustarSecuencia().then((res) => this.enfocarInput(this.inputSecuencia));
+    }, 100);
   }
 
   async saltar(input, index) {
     setTimeout(() => {
-      const { articulo, cod, can, uni } = this.filasDetalle[index].getRawValue();
+      if (fun.hasValue(this.propietario)) {
+        const { articulo, cod, can, uni } = this.filasDetalle[index].getRawValue();
 
-      if (index >= 10 && input === 'cod-') this.addItem(index);
+        if (index >= 10 && input === 'can-') this.addItem(index);
 
-      if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.enfocarInput('uni-' + index);
+        if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.enfocarInput('uni-' + index);
 
-      if ((input === 'cod-' || input === 'pre-') && fun.hasValue(cod) && fun.hasValue(can) && can != 0 && fun.hasValue(uni)) {
-        if (input === 'cod-') index++;
+        if ((input === 'cod-' || input === 'pre-') && fun.hasValue(cod) && fun.hasValue(can) && can != 0 && fun.hasValue(uni)) {
+          if (input === 'cod-') index++;
 
-        this.ajustarSecuencia().then((res) => this.enfocarInput(input == 'cod-' ? this.inputSecuencia : `${input}${index}`));
-      }
+          this.ajustarSecuencia().then((res) => this.enfocarInput(input == 'cod-' ? this.inputSecuencia : `${input}${index}`));
+        }
 
-      if (input === 'can-' && fun.hasValue(cod)) {
-        if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
-          const obj = { palabra_a_buscar: cod, index, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
-          this.handleModalForm({
-            component: BuscarArticuloComponent,
-            inputs: obj,
-            id: 'buscarArticulo',
-            header: 'BUSCAR ARTICULO',
-            width: '56.25rem',
-            height: '31.25rem',
-            botones: {
-              aceptar: { show: false, disable: false },
-              cancelar: { show: false, disable: false },
-            },
-          });
-        } else {
-          this.enfocarInput(`can-${index}`);
+        if (input === 'can-' && fun.hasValue(cod)) {
+          if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
+            const obj = { palabra_a_buscar: cod, index, metodo: this.metodo, data: [], fecha_articulo: this.fechaFactura };
+            this.handleModalForm({
+              component: BuscarArticuloComponent,
+              inputs: obj,
+              id: 'buscarArticulo',
+              header: 'BUSCAR ARTICULO',
+              width: '56.25rem',
+              height: '31.25rem',
+              botones: {
+                aceptar: { show: false, disable: false },
+                cancelar: { show: false, disable: false },
+              },
+            });
+            this.enfocarInput('input_fantasma');
+          } else {
+            this.enfocarInput(`can-${index}`);
+          }
         }
       }
     }, 0);
@@ -448,7 +431,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     }
   }
 
-  async selectMedidaChange(arg, i) {
+  async selectMedidaChange(arg, index) {
     const medidaSelected = _.find(this.UnidadesArticulo, (unidad) => unidad.value === arg);
 
     this.precioDetalle = medidaSelected.precio;
@@ -456,18 +439,18 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     const unidad = medidaSelected.value;
 
     if (unidad.toLowerCase() === 'medida') {
-      (this.filasDetalle[i] as any).controls['uni'].setValue(null);
+      (this.filasDetalle[index] as any).controls['uni'].setValue(null);
     } else {
-      this.checkCantidadExede(i, 'change', (excede) => {
+      this.checkCantidadExede(index, 'change', (excede) => {
         if (!excede) {
-          (this.filasDetalle[i] as any).controls['uni'].setValue(unidad);
-          (this.filasDetalle[i] as any).controls['pre'].setValue(fun.numFormatTwoDecimals(this.metodo === 'venta' ? this.precioDetalle : costoDetalle));
-          (this.filasDetalle[i] as any).controls['costo'].setValue(costoDetalle);
+          (this.filasDetalle[index] as any).controls['uni'].setValue(unidad);
+          (this.filasDetalle[index] as any).controls['pre'].setValue(fun.numFormatTwoDecimals(this.metodo === 'venta' ? this.precioDetalle : costoDetalle));
+          (this.filasDetalle[index] as any).controls['costo'].setValue(costoDetalle);
 
-          this.calcularTotalRow(i).then(() => {
+          this.calcularTotalRow(index).then(() => {
             this.ajustarSecuencia().then(() => {
-              if (this.metodo === 'venta') this.enfocarInput(this.inputSecuencia);
-              else this.enfocarInput(`pre-${i}`);
+              if (this.metodo == 'venta') this.enfocarInput(this.inputSecuencia);
+              else this.enfocarInput(`pre-${index}`);
             });
           });
         }
@@ -517,9 +500,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     });
   }
 
-  revisarPrecio(i) {
-    let input = (this.filasDetalle[i] as any).controls['pre'];
-    fun.revisarPrecio(input, `pre-${i}`).then((res) => {
+  revisarPrecio(index) {
+    let input = (this.filasDetalle[index] as any).controls['pre'];
+    fun.revisarPrecio(input, `pre-${index}`).then((res) => {
       if (!res.error) input.setValue(res.number);
     });
   }
@@ -564,10 +547,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     }
   }
 
-  sacarDescuento(i) {
+  sacarDescuento(index) {
     let acuDesc = 0;
 
-    const currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila == i);
+    const currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila == index);
 
     if (fun.hasValue(currentDescuento)) {
       _.remove(this.listaDeDescuentos, currentDescuento);
@@ -577,13 +560,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
     }
   }
 
-  calculosDescuentoGeneral(descuento, i) {
+  calculosDescuentoGeneral(descuento, index) {
     let acuDesc = 0;
 
-    let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila === i);
+    let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila === index);
 
     if (fun.hasValue(currentDescuento)) currentDescuento.desc = descuento;
-    else this.listaDeDescuentos.push({ fila: i, desc: descuento });
+    else this.listaDeDescuentos.push({ fila: index, desc: descuento });
 
     this.listaDeDescuentos.forEach((element) => (acuDesc = acuDesc + element.desc));
 
@@ -698,7 +681,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
         this.UnidadesArticulo.push({ value: articulo.medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[articulo.medida] });
       }
 
-      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco && this.metodo != 'compra') this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
 
       if (articulo.is_detallable || this.metodo == 'compra') {
         articulo.contenido_articulos.forEach((element) => {
@@ -730,7 +713,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   async getDataFromModal(arg, search) {
-    this.llenarRowDespuesDeFiltro(arg);
+    if (arg?.tipo == 'data_no_found') {
+      this.enfocarInput(`cod-${arg.index}`);
+      this.selectContenido(`cod-${arg.index}`);
+    } else {
+      this.llenarRowDespuesDeFiltro(arg);
+    }
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {

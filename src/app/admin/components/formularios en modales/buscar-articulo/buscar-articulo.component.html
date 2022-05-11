@@ -1,16 +1,3 @@
-<div #cardTabla id="cardTabla" class="h-100 d-flex">
-  <app-tablas
-    *ngIf="dataFiltro"
-    [focusRow]="true"
-    [metodo]="inputs.metodo"
-    [paraFiltroArticulos]="' '"
-    (clickRow)="devolverCLick($event)"
-    [info]="info"
-    [pad]="false"
-    [id_tabla]="'filtroArticulos'"
-    [padre]="cardTabla"
-    [data]="dataFiltro"
-    [search]="false"
-    (paginateChange)="buscarArticulos($event)"
-  ></app-tablas>
+<div #cardTablaArticulo id="cardTabla" class="h-100 d-flex">
+  <dinamic-table [cardTabla]="cardTablaArticulo" [(data)]="dataFiltro" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
 </div>

@@ -73,7 +73,7 @@
           <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
           <select
             id="venta"
-            (keydown.enter)="saltar(modo_factura == 'normal' ? 'nom' : modo_factura == 'viaje' ? 'fecha_viaje' : 'buscarCliente', $event.target.value, $event.target.id)"
+            (keydown.enter)="saltar(modo_factura == 'normal' && condicion_fact == 'Contado' ? 'nom' : modo_factura == 'viaje' ? 'fecha_viaje' : 'buscarCliente', $event.target.value, $event.target.id)"
             (change)="selectModoFactura($event.target.value)"
             class="form-control inputE"
             [(ngModel)]="modo_factura"
@@ -279,7 +279,7 @@
     <div class="row mx-0 w-100">
       <div class="col-7">
         <div class="row">
-          <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }} ">
+          <div *ngxPermissionsOnly="metodo == 'venta' ? permissions.factura_venta.create : permissions.factura_compra.create" class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }} ">
             <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Imprimir Factura' : 'Editar Factura'" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
           </div>
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">

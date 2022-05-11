@@ -5,10 +5,8 @@ import * as moment from '../../core/javascript/moment';
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { tipos_facturas } from '../../core/typescript/GLOBAL';
-import { ModalService } from '../components/modal/modal.service';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { FacturacionService } from './facturacion.service';
-import { modalClass } from '../components/modal/modal';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from './factura';
 import { NcfC } from '../registros/ncf/ncf';
@@ -22,6 +20,7 @@ import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { fun } from '../../core/services/functions.service';
 import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
 import { teclasCode } from '../../core/typescript/constantes';
+import { Permisos } from '../../core/typescript/permisos';
 
 @Component({
   selector: 'app-facturacion',
@@ -46,9 +45,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const combinacion = _.join(this.secuenciaKeys, '_');
       this.secuenciaKeys = [];
 
-      if (combinacion === `${teclasCode.control}_${teclasCode.p}`) this.imprimirFactura();
+      if (combinacion === `${teclasCode._control}_${teclasCode._p}`) this.imprimirFactura();
 
-      if (combinacion === `${teclasCode.control}_${teclasCode.g}`) this.archivarFactura();
+      if (combinacion === `${teclasCode._control}_${teclasCode._g}`) this.archivarFactura();
 
       if (fun.hasValue(this.overlay)) this.mover_indicador_camion(key);
     }
@@ -128,17 +127,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   camion_row;
   filterCamionesTargets;
   copyCamiones;
+  permissions = Permisos;
 
-  constructor(
-    public mServ: ModalService,
-
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private localeService: BsLocaleService,
-    public factServ: FacturacionService,
-    public pdfServ: PdfService,
-  ) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService, public pdfServ: PdfService) {
     super();
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
@@ -149,7 +140,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'cabeza_factura', is_routing: true, _lista_subs: ['decisionModal', 'objDevuelto'] });
+    this._init_mixin({ component: 'cabeza_factura', is_routing: true });
     this.localeService.use('es');
     this.rellenarVariables();
   }
@@ -250,14 +241,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higüero', telefono: null });
         this.getCamiones();
       } else {
-        this.form.reset();
+        if (this.form) this.form.reset();
       }
 
       if (this.action === 'update') {
         this.factura_a_editar = {};
         this.rellenarCampos(id_factura, 'editar').then(() => {
           this.cuerpo.llenarFactura(this.factura_a_editar.detalle_facturas);
-          this.enfocarInput('cod-0');
+          this.cuerpo.seleccionarCampoEnTurno();
         });
       } else {
         setTimeout(() => this.enfocarInput('tipoFact'), 5);
@@ -269,15 +260,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return new Promise((resolve) => {
       try {
         this.rellenarCampos(null, 'fact_guardada', factura).then(() => {
-          this.enfocarInput('cod-0');
-
-          // TODO: revisar cuando cambie el backend para las facturas
+          this.cuerpo.seleccionarCampoEnTurno();
 
           this.cuerpo.llenarFactura(factura['detalle_facturas'], true, (res) => {
             setTimeout(() => {
               this.getCuerpoFactura(factura['detalle_facturas'], true);
-              modalClass.aquienResponder = 'layout';
-              // this.layServ.nextRefresh(true);
+
               this._sideBarOpened = false;
               resolve(true);
             }, 250);
@@ -498,48 +486,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
-  // decisionModal(res) {
-  //   if (fun.hasValue(res)) this.luegoDecision(res);
-
-  //   if (fun.hasValue(res) && res.bool) {
-  //     this.fechaFactura['front'] = this.formarFechaFactura(res.Date)['FechaFactura'];
-  //     this.fechaFactura['back'] = this.fechaFactura['front'];
-  //     this.FechaFacturaMostrar = this.formarFechaFactura(res.Date)['FechaFacturaMostrar'];
-  //     this.FacturaAtrasada = true;
-  //     this.cuerpo.getSaco();
-  //   }
-  // }
-
-  objDevueltoResponse(res) {
-    if (res && res.tipo_modal === 'buscarSuplidor') {
-      this.propietario_factura = res.data;
-      this.form.patchValue(this.propietario_factura);
-      this.enfocarInput('cod-0');
-      //
-    } else if (res && res.tipo_modal === 'cambio') {
-      this.Devuelta = res.data.devuelta;
-      this.forma_pago = res.data.forma_pago;
-
-      if (this.metodo === 'compra') {
-        if (res.data.decision_cambio) {
-          this.cambiarCostos();
-        }
-        this.CuerpoFactura = this.newCuerpo;
-        this.enviarABaseDatos();
-      } else {
-        this.enviarABaseDatos();
-      }
-    }
-  }
-
   checkIfFacturacionEnProceso() {
     return this.CuerpoFactura.length;
-  }
-
-  setWidthPop(bool, e) {
-    e.select();
-    const size = bool ? '18rem' : '26rem';
-    document.documentElement.style.setProperty('--popInfo', size);
   }
 
   checkCambiosModoyCondicionFactura(arg) {
@@ -718,27 +666,28 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       }
     }
 
-    if (campo === 'nom') {
-      if (this.metodo === 'venta') this.enfocarInput('nom');
+    if (campo == 'nom') {
+      if (this.metodo == 'venta') this.enfocarInput('nom');
       else this.enfocarInput('ncf');
     }
 
-    if (campo === 'filtro') {
+    if (campo == 'filtro') {
       if (this.validarRayaAbajo()) {
         this.abrirModalFiltro();
         this.desEnfocarInput(salioDe);
       } else fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
     }
 
-    if (campo === 'dir' && valor !== null) this.enfocarInput(campo);
+    if (campo == 'dir' && fun.hasValue(valor)) this.enfocarInput(campo);
 
-    if (campo === 'cod-0' && valor !== null) this.iniciarFactura(campo);
+    if (campo == 'cod-0' && fun.hasValue(valor)) this.iniciarFactura(campo);
   }
 
   iniciarFactura(campo) {
     if (this.condicion_fact !== 'Crédito') {
-      this.enfocarInput(campo);
       this.propietario_factura = this.form.value;
+
+      setTimeout(() => this.enfocarInput(campo), 10);
     } else {
       fun.toastWarning('Para facturar a crédito debe de seleccionar un cliente', 'Aviso');
     }
@@ -791,7 +740,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const containCamiones = document.getElementById('overlayCamion');
     setTimeout(() => {
       const voy_a = document.activeElement;
-      console.log('quii');
+      console.log('>> ', containCamiones.contains(voy_a));
 
       if (!containCamiones.contains(voy_a)) {
         if (!this.camionesSelected.length) {
@@ -817,28 +766,39 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   mover_indicador_camion(key) {
-    if (key == teclasCode.arriba) {
+    if (key == teclasCode._arriba) {
       if (this.camion_row == 0) this.camion_row = this.camiones.length - 1;
       else this.camion_row--;
-    } else if (key == teclasCode.abajo) {
+    } else if (key == teclasCode._abajo) {
       if (this.camion_row == this.camiones.length - 1) this.camion_row = 0;
       else this.camion_row++;
-    } else if (key == teclasCode.esc) {
-      this.saliendoDeCamionOverlay();
+    } else if (key == teclasCode._esc) {
+      this.saliendoDeCamionOverlay('teclado');
     }
 
-    fun.scrollTo(`overlayCamion-${this.camion_row}`, 'center');
+    fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
-  saliendoDeCamionOverlay() {
+  saliendoDeCamionOverlay(where?) {
     setTimeout(() => {
       if (!this.camionesSelected.length) {
         fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
       } else {
-        if (fun.isEmpty(this.propietario_factura) && fun.isEmpty(this.propietario_factura?.id)) this.abrirModalFiltro();
-        else this.cuerpo.seleccionarCampoEnTurno();
+        if (fun.isEmpty(where) || where != 'teclado') {
+          console.log('this.propietario_factura ', this.propietario_factura);
+          console.log('this.propietario_factura.cliente_id ', this.propietario_factura?.id);
 
-        this.cerrarOverlayCamion();
+          if (fun.isEmpty(this.propietario_factura) || fun.isEmpty(this.propietario_factura?.id)) this.abrirModalFiltro();
+          else this.cuerpo.seleccionarCampoEnTurno();
+
+          this.cerrarOverlayCamion();
+        } else {
+          if (where == 'teclado') {
+            this.desEnfocarInput('searchCamion');
+
+            this.cerrarOverlayCamion();
+          }
+        }
       }
     }, 5);
   }
@@ -860,7 +820,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.camiones.length = 0;
     for (const camion of camionesFiltrados) this.camiones.push(camion);
     this.camion_row = 0;
-    fun.scrollTo(`overlayCamion-${this.camion_row}`, 'center');
+    fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
   // =============================================
@@ -868,15 +828,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
 
   abrirModalFiltro() {
-    let tipo = 'buscarCliente';
     let obj = {};
     obj['data'] = [];
+    const input_activo = document?.activeElement?.id;
+
+    if (fun.hasValue(input_activo)) this.desEnfocarInput(input_activo);
 
     if (this.metodo === 'venta') obj['filtrarCliente'] = null;
-    if (this.metodo === 'compra') {
-      tipo = 'buscarSuplidor';
-      obj['filtrarSuplidor'] = null;
-    }
+    if (this.metodo === 'compra') obj['filtrarSuplidor'] = null;
 
     this.handleModalForm({
       component: BuscarClienteSuplidorComponent,
@@ -944,16 +903,16 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
   async imprimirFactura() {
     if (!this.propietario_factura) {
-      if (this.metodo === 'compra') fun.toastWarning('Factura no tiene suplidor seleccionado', 'Aviso');
+      if (this.metodo == 'compra') fun.toastWarning('Factura no tiene suplidor seleccionado', 'Aviso');
       else fun.toastWarning('Factura no tiene cliente seleccionado', 'Aviso');
     } else {
-      if (this.CuerpoFactura.length === 0) {
+      if (this.CuerpoFactura.length == 0) {
         fun.toastWarning('Factura incompleta!!!', 'Aviso');
       } else {
-        if (this.TOTAL === 0) {
+        if (this.TOTAL == 0) {
           fun.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
-          if (this.condicion_fact === 'Crédito' || this.is_viaje) {
+          if (this.condicion_fact == 'Crédito' || this.is_viaje) {
             const confirmationObj = {
               id: 'imprimir_factura',
               texto: 'Seguro que desea imprimir la factura',
@@ -968,7 +927,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           } else {
             let articulos_a_cambiar = false;
 
-            if (this.metodo === 'compra') {
+            if (this.metodo == 'compra') {
               const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
               this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
             }
@@ -977,13 +936,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
             const obj = {
               total_factura: this.TOTAL,
-              devuelta: this.action === 'update' ? this.factura_a_editar.devuelta + this.factura_a_editar.total_factura : 0,
-              tipo__: 'devuelta',
+              devuelta: this.action == 'update' ? this.factura_a_editar.devuelta + this.factura_a_editar.total_factura : 0,
+              tipo_modal: 'devuelta',
               factura_de: this.metodo,
               cambios_articulos: articulos_a_cambiar,
             };
 
-            // TODO:
             this.handleModalForm({
               component: FormCantidadEfectivoComponent,
               inputs: obj,
@@ -1249,7 +1207,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.propietario_factura = arg.data;
 
       this.form.patchValue(this.propietario_factura);
-      this.enfocarInput('cod-0');
       const balance = _.parseInt(this.propietario_factura.balance);
       const maxCred = _.parseInt(this.propietario_factura.maximo_credito);
 
@@ -1258,6 +1215,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       } else if (balance > maxCred) {
         fun.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
       }
+      console.log('ANDO AQUIII');
+
+      this.cuerpo.seleccionarCampoEnTurno();
     }
   }
 

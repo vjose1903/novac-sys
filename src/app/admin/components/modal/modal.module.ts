@@ -1,15 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PrimengModule } from '../../../modules/primeng.module';
-import { TablasModule } from '../tablas/tablas.module';
-import { ModalComponent } from './modal.component';
-import { FormulariosEnModalesModule } from '../formularios en modales/formularios-en-modales.module';
-import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
-import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { NewModalComponent } from './modal.component';
+import { ModalDirective } from './modal.directive';
+import { DialogModule } from 'primeng/dialog';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [ModalComponent],
-  imports: [CommonModule, FormulariosEnModalesModule, PrimengModule, TablasModule, NgxBootstrapModule, NgxExtendedPdfViewerModule],
-  exports: [ModalComponent],
+  declarations: [NewModalComponent, ModalDirective],
+  imports: [CommonModule, DialogModule, FormsModule, ReactiveFormsModule],
+  exports: [NewModalComponent],
 })
-export class ModalModule {}
+export class NewModalModule {}

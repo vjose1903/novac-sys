@@ -1,14 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
-import { TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
 import { SuplidorC } from './suplidores';
 import { fun } from '../../../core/services/functions.service';
+import { table_config } from '../../components/new_tablas/tabla-class';
+import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -17,23 +18,13 @@ import { fun } from '../../../core/services/functions.service';
 })
 export class RegistroSuplidoresComponent extends MixinClass implements OnInit, OnDestroy {
   form: FormGroup;
-  titulo = '';
+
   boton = '';
   metodo;
   pattern = pattern;
 
   listaSuplidores;
 
-  // =============================================
-  //  TABLAS
-  // =============================================
-
-  info = [
-    { titulo: 'Cod.', tipo: 'text', key: 'codigo' },
-    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-    { titulo: 'Rnc', tipo: 'text', key: 'documento' },
-  ];
-  botones = { titulo: true, borrar: true, editar: true };
   suplidorSelected;
   doc_is_cedula = false;
   doc_principal = 'rnc';
@@ -45,14 +36,32 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   camposDisabled: boolean = true;
   editando: boolean = false;
   suplidorClass = new SuplidorC();
+  permissions = Permisos;
+  table_config: table_config = {
+    info: [
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo' },
+      { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
+      { titulo: 'Rnc', tipo: 'text', key: 'documento_identidad' },
+    ],
+
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'lista_empleados',
+    padre_functions: { data_request: (params) => this.getSuplidores(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: this.permissions.suplidor.update }, borrar: { show: true, permiso: this.permissions.suplidor.destroy } },
+  };
+  tablaComponent;
+  formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
 
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
     super();
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'reg_suplidores', is_routing: true, _lista_subs: ['decisionModal'] });
-    this.titulo = 'Registro de suplidores';
+    this._init_mixin({ component: 'reg_suplidores', is_routing: true });
+
     this.boton = 'Registrar';
     this.metodo = this.route.snapshot.params['metodo'];
 
@@ -92,25 +101,22 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     campo.setValue(fun.Capitalice(arg));
   }
 
-  async getSuplidores(e) {
-    const page = e.page;
-    const per_page = e.per_page;
-    const palabra_a_buscar = e.searchText === '' || e.searchText === null || e.searchText === undefined ? ' ' : e.searchText;
+  async getSuplidores(params?: { per_page: number; page: number; search: string }) {
+    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
     this.suplidorClass.getAll(extra).then((res) => {
       res['data'].map((suplidor) => {
-        suplidor.documentos_de_identidad.map((docu) => {
-          if (docu.principal) suplidor.documento = docu.documento;
-        });
+        const doc = _.find(suplidor.documentos_de_identidad, { principal: true });
+        suplidor.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
+
         suplidor.codigo = _.padStart(suplidor.id, 5, '0');
         return suplidor;
       });
 
       this.listaSuplidores = res['data'];
-      const obj = { total: res['total_registros'], tabla: 'listaSuplidores' };
-      this.tServ.Func_total_paginas(obj);
+      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     });
   }
 
@@ -123,7 +129,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   borrar() {
     this.form.reset();
-    this.titulo = 'Registro de suplidores';
     this.boton = 'Registrar';
 
     this.doc_is_cedula = false;
@@ -262,17 +267,36 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.doc_principal = doc;
   }
 
-  editarItem(item) {
-    this.titulo = 'Editar suplidor: ' + item.ARG.nombre;
+  tableClick_action(params) {
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.eliminarReg(params.data);
+  }
+
+  eliminarReg(regisData) {
+    const objToSend = {
+      data: regisData,
+      texto: `¿Está seguro que desea eliminar el suplidor <b>${regisData.nombre_completo}</b>?`,
+      siFunction: () => {
+        this.suplidorClass.deleteOne(regisData.id).then((res) => {
+          const actualPagination = this.tServ.getPaginationById('listaSuplidores');
+          this.getSuplidores(actualPagination);
+        });
+      },
+    };
+
+    this.eliminarRegistro(objToSend);
+  }
+
+  editarItem(data) {
     this.boton = 'Editar';
-    this.form.patchValue(item.ARG);
-    this.documentos_de_identidad = item.ARG.documentos_de_identidad;
+    this.form.patchValue(data);
+    this.documentos_de_identidad = data.documentos_de_identidad;
     this.editando = true;
-    this.suplidorSelected = fun.duplicarJson(item.ARG);
+    this.suplidorSelected = fun.duplicarJson(data);
 
     this.changeStateCampos(true);
 
-    this.patchDocumentos(item.ARG.documentos_de_identidad);
+    this.patchDocumentos(data.documentos_de_identidad);
     setTimeout(() => this.enfocarInput('rnc'), 1);
   }
 
@@ -331,29 +355,5 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         this.borrar();
       });
     }
-  }
-
-  async decisionModal(arg) {
-    if (arg) {
-      const obj = JSON.parse(JSON.stringify(this.seleccionModal));
-      this.suplidorClass.deleteOne(obj.id).then((res) => {
-        const actualPagination = this.tServ.getPaginationById('listaSuplidores');
-        this.getSuplidores(actualPagination);
-      });
-    }
-  }
-  eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el suplidor <b>${regisData.nombre_completo}</b>?`,
-      siFunction: () => {
-        this.suplidorClass.deleteOne(regisData.id).then((res) => {
-          const actualPagination = this.tServ.getPaginationById('listaSuplidores');
-          this.getSuplidores(actualPagination);
-        });
-      },
-    };
-
-    this.eliminarRegistro(objToSend);
   }
 }

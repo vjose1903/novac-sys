@@ -1,222 +1,183 @@
 <div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita">Registro de empleados</h4>
+    <h4 class="negrita mb-0">Registro de empleados</h4>
   </div>
 
   <div class="col-12 p-0 colFormularioListado">
     <div class="d-flex h-100">
-      <div class="contenedorRegistro" *ngIf="isCreando || empleadoSelected" class="form {{ isCreando || empleadoSelected ? 'showForm' : 'hideForm' }} ">
-        <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
-          <h4 class="mb-0">Formulario</h4>
-        </div>
+      <ng-container *ngxPermissionsOnly="formPermissions">
+        <div class="contenedorRegistro" *ngIf="isCreando || empleadoSelected" class="form {{ isCreando || empleadoSelected ? 'showForm' : 'hideForm' }} ">
+          <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
+            <h4 class="mb-0">Formulario</h4>
+          </div>
 
-        <div class="card cardFormClass">
-          <form [formGroup]="form">
-            <div class="row">
-              <div class="col-12 p-0 mb-3">
-                <div class="row">
-                  <div class="col-6 p-0 pr-2">
-                    <div class="form-groupd-flex" style="flex-wrap: nowrap" [appMsgError]="'cedula'" [form]="form">
-                      <label class="control-label">Cedula: <span style="color: red">*</span></label>
-                      <p-inputMask
-                        (keydown.enter)="saltar('campoNombre')"
-                        (keyup)="checkDocumento('cedula', $event)"
-                        mask="999-9999999-9"
-                        tabindex="-1"
-                        styleClass="form-control"
-                        inputId="cedula"
-                        placeholder="___-_______-_"
-                        formControlName="cedula"
-                      ></p-inputMask>
+          <div class="card cardFormClass">
+            <form [formGroup]="form">
+              <div class="row">
+                <div class="col-12 p-0 mb-3">
+                  <div class="row">
+                    <div class="col-6 p-0 pr-2">
+                      <div class="form-groupd-flex" style="flex-wrap: nowrap" [appMsgError]="'cedula'" [form]="form">
+                        <label class="control-label">Cedula: <span style="color: red">*</span></label>
+                        <p-inputMask
+                          (keydown.enter)="saltar('campoNombre')"
+                          (keyup)="checkDocumento('cedula', $event)"
+                          mask="999-9999999-9"
+                          tabindex="-1"
+                          styleClass="form-control"
+                          inputId="cedula"
+                          placeholder="___-_______-_"
+                          formControlName="cedula"
+                        ></p-inputMask>
 
-                      <span id="msgContainer_cedula"></span>
+                        <span id="msgContainer_cedula"></span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="col-6 p-0 pr-2">
-                <div class="form-group" [appMsgError]="'nombre'" [form]="form">
-                  <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                  <input
-                    type="text"
-                    formControlName="nombre"
-                    (keyup)="capitalice('nombre', $event.target.value)"
-                    id="campoNombre"
-                    (keydown.enter)="saltar('campoApellido')"
-                    placeholder="Introduzca nombre"
-                    class="form-control"
-                    autocomplete="off"
-                  />
-                  <span id="msgContainer_nombre"></span>
+                <div class="col-6 p-0 pr-2">
+                  <div class="form-group" [appMsgError]="'nombre'" [form]="form">
+                    <label class="control-label">Nombre: <span style="color: red">*</span></label>
+                    <input type="text" formControlName="nombre" (keyup)="capitalice('nombre', $event.target.value)" id="campoNombre" (keydown.enter)="saltar('campoApellido')" placeholder="Introduzca nombre" class="form-control" autocomplete="off" />
+                    <span id="msgContainer_nombre"></span>
+                  </div>
+                </div>
+
+                <div class="col-6 p-0 pl-2">
+                  <div class="form-group" [appMsgError]="'apellido'" [form]="form">
+                    <label class="control-label">Apellido: <span style="color: red">*</span></label>
+                    <input
+                      type="text"
+                      id="campoApellido"
+                      formControlName="apellido"
+                      (keyup)="capitalice('apellido', $event.target.value)"
+                      (keydown.enter)="saltar('campoUsuario')"
+                      placeholder="Introduzca apellido"
+                      class="form-control"
+                      autocomplete="off"
+                    />
+                    <span id="msgContainer_apellido"></span>
+                  </div>
+                </div>
+
+                <div class="col-6 p-0 pr-2">
+                  <div class="form-group" [appMsgError]="'usuario'" [form]="form">
+                    <label class="control-label">Usuario: <span style="color: red">*</span></label>
+                    <input (keydown.enter)="saltar('campoTelefono')" type="text" id="campoUsuario" formControlName="usuario" placeholder="Introduzca usuario" class="form-control" autocomplete="off" />
+                    <span id="msgContainer_usuario"></span>
+                  </div>
+                </div>
+
+                <div class="col-6 p-0 pl-2">
+                  <div class="form-group" [appMsgError]="'telefono'" [form]="form">
+                    <label class="control-label">Telefono: <span style="color: red">*</span></label>
+
+                    <p-inputMask (keydown.enter)="saltar('campoEmail')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono"></p-inputMask>
+
+                    <span id="msgContainer_telefono"></span>
+                  </div>
+                </div>
+
+                <div class="col-8 p-0 pr-2">
+                  <div class="form-group" [appMsgError]="'email'" [form]="form">
+                    <label class="control-label">Email: <span style="color: red">*</span> </label>
+                    <input id="campoEmail" (keydown.enter)="saltar('campoSexo')" type="text" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
+                    <span id="msgContainer_email"></span>
+                  </div>
+                </div>
+
+                <div class="col-4 p-0 pl-2">
+                  <div class="form-group" [appMsgError]="'sexo'" [form]="form">
+                    <label class="control-label">Sexo: <span style="color: red">*</span></label>
+                    <select id="campoSexo" (keydown.enter)="saltar('campoFecha')" formControlName="sexo" class="form-control">
+                      <option value="" disabled selected hidden>Sexo</option>
+                      <option value="m">Masculino</option>
+                      <option value="f">Femenino</option>
+                    </select>
+                    <span id="msgContainer_sexo"></span>
+                  </div>
+                </div>
+
+                <div class="col-6 p-0 pr-2" [appMsgError]="'fecha_nacimiento'" [form]="form">
+                  <label class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
+                  <input type="text" id="campoFecha" [bsConfig]="dpConfig" (keydown.enter)="saltar('campoRole')" placeholder="dd/mm/aaaa" class="form-control" formControlName="fecha_nacimiento" #dp="bsDatepicker" placement="top" bsDatepicker />
+                  <span id="msgContainer_fecha_nacimiento"></span>
+                </div>
+
+                <div class="col-6 p-0 pl-2">
+                  <div class="form-group" [appMsgError]="'ids_roles'" [form]="form">
+                    <label class="control-label">Role: <span style="color: red">*</span></label>
+
+                    <p-multiSelect
+                      class="multiSelectPrimeng"
+                      [options]="listRoles"
+                      formControlName="ids_roles"
+                      defaultLabel="Selección de roles"
+                      optionLabel="nombre"
+                      optionValue="id"
+                      emptyFilterMessage="Sin resultados"
+                      display="chip"
+                      [displaySelectedLabel]="false"
+                      [showToggleAll]="false"
+                      filterBy="nombre,descripcion"
+                    >
+                    </p-multiSelect>
+                    <!-- <select (keydown.enter)="saltar(editando ? 'send' : 'campoPassword')" id="campoRole" formControlName="role" class="form-control">
+                      <option value="" disabled selected hidden>Role</option>
+                      <option value="A">Administrador</option>
+                      <option value="V">Vendedor</option>
+                      <option value="U">Cajero</option>
+                      <option value="C">Chofer</option>
+                    </select> -->
+
+                    <span id="msgContainer_ids_roles"></span>
+                  </div>
+                </div>
+
+                <div class="col-6 p-0 pr-2">
+                  <div *ngIf="!editando" class="form-group" [appMsgError]="'password'" [form]="form">
+                    <label class="control-label">Contraseña:<span style="color: red">*</span></label>
+                    <input (keydown.enter)="saltar('campoConfirmPassword')" id="campoPassword" type="password" formControlName="password" placeholder="Introduzca contraseña" class="form-control" autocomplete="off" />
+                    <span id="msgContainer_password"></span>
+                  </div>
+                </div>
+                <div class="col-6 p-0 pl-2">
+                  <div *ngIf="!editando" class="form-group" [appMsgError]="'confirm_password'" [form]="form">
+                    <label class="control-label">Confirmar Contraseña:<span style="color: red">*</span></label>
+                    <input type="password" id="campoConfirmPassword" compare="password" (keydown.enter)="saltar('send')" formControlName="confirm_password" placeholder="Introduzca contraseña" class="form-control" autocomplete="off" />
+                    <span id="msgContainer_confirm_password"></span>
+                  </div>
                 </div>
               </div>
-
-              <div class="col-6 p-0 pl-2">
-                <div class="form-group" [appMsgError]="'apellido'" [form]="form">
-                  <label class="control-label">Apellido: <span style="color: red">*</span></label>
-                  <input
-                    type="text"
-                    id="campoApellido"
-                    formControlName="apellido"
-                    (keyup)="capitalice('apellido', $event.target.value)"
-                    (keydown.enter)="saltar('campoUsuario')"
-                    placeholder="Introduzca apellido"
-                    class="form-control"
-                    autocomplete="off"
-                  />
-                  <span id="msgContainer_apellido"></span>
-                </div>
+            </form>
+            <div class="p-0 mt-3" style="display: flex; justify-content: space-between">
+              <div>
+                <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar()">
+                  {{ 'Borrar' }}
+                </button>
+                <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde">{{ boton }}</button>
+                <!-- [value]="boton"  -->
+                <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="showModal()">Cambiar contraseña</a>
               </div>
-
-              <div class="col-6 p-0 pr-2">
-                <div class="form-group" [appMsgError]="'usuario'" [form]="form">
-                  <label class="control-label">Usuario: <span style="color: red">*</span></label>
-                  <input (keydown.enter)="saltar('campoTelefono')" type="text" id="campoUsuario" formControlName="usuario" placeholder="Introduzca usuario" class="form-control" autocomplete="off" />
-                  <span id="msgContainer_usuario"></span>
-                </div>
+              <div>
+                <button class="btn mr-2" value="" id="btn-blanco" (click)="borrar(); isCreando = false">
+                  {{ 'Cerrar' }}
+                </button>
               </div>
-
-              <div class="col-6 p-0 pl-2">
-                <div class="form-group" [appMsgError]="'telefono'" [form]="form">
-                  <label class="control-label">Telefono: <span style="color: red">*</span></label>
-
-                  <p-inputMask
-                    (keydown.enter)="saltar('campoEmail')"
-                    mask="(999) 999-9999"
-                    tabindex="-1"
-                    styleClass="form-control"
-                    inputId="campoTelefono"
-                    placeholder="(___) ___-____"
-                    formControlName="telefono"
-                  ></p-inputMask>
-
-                  <span id="msgContainer_telefono"></span>
-                </div>
-              </div>
-
-              <div class="col-8 p-0 pr-2">
-                <div class="form-group" [appMsgError]="'email'" [form]="form">
-                  <label class="control-label">Email: <span style="color: red">*</span> </label>
-                  <input id="campoEmail" (keydown.enter)="saltar('campoSexo')" type="text" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
-                  <span id="msgContainer_email"></span>
-                </div>
-              </div>
-
-              <div class="col-4 p-0 pl-2">
-                <div class="form-group" [appMsgError]="'sexo'" [form]="form">
-                  <label class="control-label">Sexo: <span style="color: red">*</span></label>
-                  <select id="campoSexo" (keydown.enter)="saltar('campoFecha')" formControlName="sexo" class="form-control">
-                    <option value="" disabled selected hidden>Sexo</option>
-                    <option value="m">Masculino</option>
-                    <option value="f">Femenino</option>
-                  </select>
-                  <span id="msgContainer_sexo"></span>
-                </div>
-              </div>
-
-              <div class="col-6 p-0 pr-2" [appMsgError]="'fecha_nacimiento'" [form]="form">
-                <label class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
-                <input
-                  type="text"
-                  id="campoFecha"
-                  [bsConfig]="dpConfig"
-                  (keydown.enter)="saltar('campoRole')"
-                  placeholder="dd/mm/aaaa"
-                  class="form-control"
-                  formControlName="fecha_nacimiento"
-                  #dp="bsDatepicker"
-                  placement="top"
-                  bsDatepicker
-                />
-                <span id="msgContainer_fecha_nacimiento"></span>
-              </div>
-
-              <div class="col-6 p-0 pl-2">
-                <div class="form-group" [appMsgError]="'role'" [form]="form">
-                  <label class="control-label">Role: <span style="color: red">*</span></label>
-
-                  <select (keydown.enter)="saltar(editando ? 'send' : 'campoPassword')" id="campoRole" formControlName="role" class="form-control">
-                    <option value="" disabled selected hidden>Role</option>
-                    <option value="A">Administrador</option>
-                    <option value="V">Vendedor</option>
-                    <option value="U">Cajero</option>
-                    <option value="C">Chofer</option>
-                  </select>
-
-                  <span id="msgContainer_role"></span>
-                </div>
-              </div>
-
-              <div class="col-6 p-0 pr-2">
-                <div *ngIf="!editando" class="form-group" [appMsgError]="'password'" [form]="form">
-                  <label class="control-label">Contraseña:<span style="color: red">*</span></label>
-                  <input
-                    (keydown.enter)="saltar('campoConfirmPassword')"
-                    id="campoPassword"
-                    type="password"
-                    formControlName="password"
-                    placeholder="Introduzca contraseña"
-                    class="form-control"
-                    autocomplete="off"
-                  />
-                  <span id="msgContainer_password"></span>
-                </div>
-              </div>
-              <div class="col-6 p-0 pl-2">
-                <div *ngIf="!editando" class="form-group" [appMsgError]="'confirm_password'" [form]="form">
-                  <label class="control-label">Confirmar Contraseña:<span style="color: red">*</span></label>
-                  <input
-                    type="password"
-                    id="campoConfirmPassword"
-                    compare="password"
-                    (keydown.enter)="saltar('send')"
-                    formControlName="confirm_password"
-                    placeholder="Introduzca contraseña"
-                    class="form-control"
-                    autocomplete="off"
-                  />
-                  <span id="msgContainer_confirm_password"></span>
-                </div>
-              </div>
-            </div>
-          </form>
-          <div class="p-0 mt-3" style="display: flex; justify-content: space-between">
-            <div>
-              <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar()">
-                {{ 'Borrar' }}
-              </button>
-              <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde">{{ boton }}</button>
-              <!-- [value]="boton"  -->
-              <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="showModal()">Cambiar contraseña</a>
-            </div>
-            <div>
-              <button class="btn mr-2" value="" id="btn-blanco" (click)="borrar(); isCreando = false">
-                {{ 'Cerrar' }}
-              </button>
             </div>
           </div>
         </div>
-      </div>
+      </ng-container>
       <div class="list {{ isCreando || empleadoSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado empleados</h4>
-          <button [disabled]="empleadoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <button *ngxPermissionsOnly="permissions.user.create" [disabled]="empleadoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <app-tablas
-            class="h-100 gridTablaClass"
-            *ngIf="listaEmpleados && info"
-            [padre]="cardTabla"
-            [info]="info"
-            [data]="listaEmpleados"
-            [id_tabla]="'listaEmpleados'"
-            [focusRow]="false"
-            [botones]="botones"
-            (DevolverInfo)="editarItem($event)"
-            (paginateChange)="getEmpleados($event)"
-            (DELETE)="eliminarReg($event.ARG)"
-          ></app-tablas>
+          <div class="divTabla">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="listaEmpleados" [seleccionado]="empleadoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
         </div>
       </div>
     </div>

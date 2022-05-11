@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { AccionesC, PermisosC, RolesC } from './roles';
 import * as _ from 'lodash';
-import { TablasService } from '../../components/tablas/tablas.service';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { fun } from '../../../core/services/functions.service';
+import { table_config } from '../../components/new_tablas/tabla-class';
+import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
   selector: 'app-roles',
@@ -18,17 +19,36 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   listaRoles = [];
   listaPermisos = [];
 
-  info = [
-    { titulo: 'Nombre', key: 'nombre', tipo: 'text', estilos: [{ width: '20%' }] },
-    { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', estilos: [{ width: '50%' }] },
-    { titulo: 'Activo', key: 'estado_', tag_severity: 'estado_tag', tag_apretada: true, tipo: 'tag', estilos: [{ width: '10%' }] },
-  ];
+  permissions = Permisos;
+  formPermissions = [Permisos.role.create, Permisos.role.update];
+  table_roles_config: table_config = {
+    info: [
+      { titulo: 'Nombre', key: 'nombre', tipo: 'text', estilos: [{ width: '20%' }, { 'text-align': 'left' }] },
+      { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', estilos: [{ width: '50%' }, { 'text-align': 'left' }] },
+      { titulo: 'Activo', key: 'estado_', tag_severity: 'estado_tag', tag_apretada: true, tipo: 'tag', estilos: [{ width: '10%' }] },
+    ],
 
-  infoPermisos = [
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'lista_roles',
+    padre_functions: { data_request: (params) => this.getRoles(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: this.permissions.role.update }, borrar: { show: true, permiso: this.permissions.role.destroy } },
+  };
+  tablaRolesComponent;
 
-    { titulo: 'Descripcion', key: 'nombre', tipo: 'text', estilos: [{ 'text-align': 'left' }, { 'padding-left': '0.5rem' }, { width: '75%' }] },
-    { titulo: 'Activo', key: 'selected', tipo: 'inputSwitch', estilos: [{ width: '25%' }] },
-  ];
+  table_permisos_config: table_config = {
+    info: [
+      { titulo: 'Descripcion', key: 'nombre', tipo: 'text', estilos: [{ 'text-align': 'left' }, { 'padding-left': '0.5rem' }, { width: '75%' }] },
+      { titulo: 'Activo', key: 'selected', tipo: 'switch', estilos: [{ width: '25%' }] },
+    ],
+
+    id_tabla: 'lista_acciones',
+    filtrar: { local: true },
+    obj_paginate: { show: false },
+  };
+  tablaPermisosComponent;
 
   botones = { titulo: true, borrar: true, editar: true };
   boton: string;
@@ -43,7 +63,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   isCreando: boolean = false;
   TablasComponent;
   palabra_buscar: any;
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
+
+  constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();
   }
 
@@ -65,12 +86,10 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     this.getPermisos();
   }
 
-  getRoles(event) {
-    const page = event.page;
-    const per_page = event.per_page;
-    this.palabra_buscar = event.searchText === '' || event.searchText === null || event.searchText === undefined ? ' ' : event.searchText;
+  async getRoles(params?: { per_page: number; page: number; search: string }) {
+    this.palabra_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-    const extra = { afterPath: `filtro/${this.palabra_buscar}`, parameters: { page: page, per_page: per_page, paginado: true } };
+    const extra = { afterPath: `filtro/${this.palabra_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
     this.rolesClass
       .getAll(extra)
@@ -79,20 +98,17 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
           role.estado_ = role.estado ? 'SI' : 'NO';
           role.estado_tag = role.estado ? 'success' : 'danger';
 
-          role.customStyles = { 'td-nombre': { width: '20%' }, 'td-descripcion': { width: '50%', 'text-align': 'left', 'padding-left': '0.5rem' }, 'td-estado_': { width: '10%' } };
+          role.customStyles = { nombre: { width: '20%', 'text-align': 'left' }, descripcion: { width: '50%', 'text-align': 'left', 'padding-left': '0.5rem' }, estado_: { width: '10%' } };
           return role;
         });
 
         this.listaRoles = res['data'];
-
-        const obj = { total: res['total_registros'], tabla: 'lista_roles' };
-        this.tServ.Func_total_paginas(obj);
+        this.tablaRolesComponent.changeConfig([{ total_count: res.total_registros }]);
       })
       .catch((err) => {
         if (err.error.total_registros == 0) {
           this.listaRoles = [];
-          const obj = { total: 0, tabla: 'lista_roles' };
-          this.tServ.Func_total_paginas(obj);
+          this.tablaRolesComponent.changeConfig([{ total_count: 0 }]);
         }
       });
   }
@@ -125,8 +141,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
             id: permiso_accion.accion.id,
             permiso_accion_id: permiso_accion.id,
             customStyles: {
-              'td-nombre': { 'text-align': 'left', 'padding-left': '0.5rem', width: '75%' },
-              'td-selected': { 'justify-content': 'center', 'align-items': 'center', display: 'flex', width: 'auto' },
+              nombre: { 'text-align': 'left', 'padding-left': '0.5rem', width: '75%' },
+              selected: { 'justify-content': 'center', 'align-items': 'center', display: 'flex', width: 'auto' },
             },
           };
 
@@ -215,19 +231,24 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     this.isCreando = false;
   }
 
-  editarItem(item) {
+  tableClick_action(params) {
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.eliminarReg(params.data);
+  }
+
+  editarItem(data) {
     this.borrar();
-    this.roleSelected = item.ARG;
+    this.roleSelected = data;
     this.form.patchValue(this.roleSelected);
     this.parsePermisos({ clean: false });
   }
 
-  abrirModal(tipo_modal, arg) {
+  eliminarReg(data) {
     this.handleModalForm({
       id: 'delete_role',
       header: 'CONFIRMACION',
       width: '30rem',
-      html: `<p> Seguro que desea eliminar el rol: <strong>${arg.nombre}</strong> </p>`,
+      html: `<p> Seguro que desea eliminar el rol: <strong>${data.nombre}</strong> </p>`,
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },
@@ -235,7 +256,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'aceptar'), label: 'NO', disable: false },
           {
             clase: 'btn btn-verde',
-            function: (instance) => this.eliminarRole(instance, arg),
+            function: (instance) => this.eliminarRole(instance, data),
             label: 'SI',
             disable: false,
           },
@@ -253,10 +274,6 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     });
   }
 
-  calcularAltoTablaAcciones() {
-    if (fun.hasValue(this.TablasComponent)) this.TablasComponent.calcularAlto();
-  }
-
   submit() {
     const formulario = this.form.getRawValue();
 
@@ -264,6 +281,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     const permiso_acciones_selected = _.map(_.filter(all_permiso_acciones, { selected: true }), 'permiso_accion_id');
 
     formulario['permisos_acciones'] = permiso_acciones_selected;
+    console.log('formulario ', formulario);
 
     this.rolesClass.createUpdateOne(formulario).then((res) => {
       this.isCreando = false;

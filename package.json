@@ -1,7 +1,7 @@
 {
   "name": "adm-agroindustrial",
-  "version": "0.33.3",
-  "description": "Sistema facturacion e inventario VjPOS, Para ADM agroindustrial",
+  "version": "0.34.5",
+  "description": "Sistema facturacion e inventario NOVAC, Para AGRODEMI",
   "author": {
     "name": "Victor Jose Vásquez Santos",
     "email": "vjose1903@outlook.es"
@@ -34,7 +34,7 @@
     "@fortawesome/fontawesome-free": "^6.0.0",
     "@ng-bootstrap/ng-bootstrap": "^9.0.2",
     "@ng-select/ng-select": "^6.1.0",
-    "angular-resize-event": "^2.1.0",
+    "angular-resize-event": "2.1.0",
     "animate.css": "~4.1.1",
     "bootstrap": "^4.6.0",
     "chart.js": "^2.9.4",
@@ -48,6 +48,7 @@
     "ngx-bootstrap": "8.0.0",
     "ngx-extended-pdf-viewer": "^8.2.0",
     "ngx-pagination": "^5.0.0",
+    "ngx-permissions": "13.0.1",
     "ngx-toastr": "^13.2.0",
     "pdfmake": "^0.1.70",
     "primeicons": "^4.1.0",

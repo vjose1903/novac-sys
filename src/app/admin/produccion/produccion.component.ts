@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../core/typescript/GLOBAL';
 import { MixinClass } from '../../core/typescript/MixinClass';
-import { TablasService } from '../components/tablas/tablas.service';
+import { TablasService } from '../components/new_tablas/tablas.service';
 import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
 import { ProduccionC } from './produccion';
 import * as $ from 'jquery';
 import { fun } from '../../core/services/functions.service';
+import { table_config } from '../components/new_tablas/tabla-class';
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
@@ -25,16 +25,21 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   element: any;
   optionsMedidas = ['Quintal', 'Libra'];
-  seleccionModal: any;
-  tipoModal: string;
 
-  info = [
-    { titulo: 'Producto', tipo: 'text', key: 'nombre' },
-    { titulo: 'Cantidad', tipo: 'text', key: 'cantidad', formatoNumero: true },
-    { titulo: 'Medida', tipo: 'text', key: 'medida' },
-  ];
+  info = [];
 
-  botones = { titulo: true, borrar: true, editar: true };
+  table_config: table_config = {
+    info: [
+      { titulo: 'Producto', tipo: 'text', key: 'nombre' },
+      { titulo: 'Cantidad', tipo: 'text', key: 'cantidad' },
+      { titulo: 'Medida', tipo: 'text', key: 'medida' },
+    ],
+    colores: true,
+    id_tabla: 'lista_produccion',
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
+    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+  };
+  tablaComponent;
 
   listaProductos = [];
   articuloEditando: any;
@@ -44,14 +49,16 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   constructor(private tServ: TablasService) {
     super();
   }
-  ngAfterViewInit(): void {
-    this.enfocarSelect();
-  }
 
   ngOnInit() {
-    this._init_mixin({ component: 'produccion', is_routing: true, _lista_subs: ['decisionModal'] });
+    this._init_mixin({ component: 'produccion', is_routing: true });
 
     this.getProductosTerminados();
+  }
+
+  ngAfterViewInit(): void {
+    this.enfocarSelect();
+    this.tablaComponent.changeConfig([{ total_count: 0 }]);
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -63,14 +70,6 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   ngOnDestroy() {
     this._destroy_mixin();
-  }
-
-  decisionModal(res) {
-    if (fun.hasValue(res) && (this.tipoModal === 'remover' || this.tipoModal === 'cancelarP')) {
-      this.decisionModalP(res);
-    } else if (fun.hasValue(res) && this.tipoModal === 'confirmar_produccion') {
-      this.confirmarProduccion();
-    }
   }
 
   enfocarSelect() {
@@ -153,7 +152,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   saltar(campo) {
-    if (campo !== 'agregar') {
+    if (campo != 'agregar') {
       this.enfocarInput(campo);
     } else {
       if (this.producto_terminado_en_turno) {
@@ -227,71 +226,89 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     }
   }
 
-  borrar() {
-    if (this.articuloEditando) this.agregarAlista();
-
+  borrarForm() {
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
-    this.producto_terminado_en_turno = null;
-    this.medida_producir = null;
-    this.cantidad_producir = null;
-    this.articuloEditando = undefined;
+    [this.producto_terminado_en_turno, this.medida_producir, this.cantidad_producir, this.articuloEditando] = Array(4).fill(null);
   }
 
-  paginateChange(arg) {}
-
   agregarAlista() {
-    const obj = {
-      nombre: this.producto_terminado_en_turno.nombre,
-      cantidad: this.cantidad_producir,
-      cantidad_en_unidades: this.medida_producir === 'Quintal' ? this.cantidad_producir * 100 : this.cantidad_producir,
-      medida: this.medida_producir,
-      articulo_id: _.parseInt(this.producto_terminado_en_turno.id),
-      id: _.parseInt(this.producto_terminado_en_turno.id),
-      ingredientes: this.ingredientesParaProduccion,
-      formulas_productos_terminados: this.producto_terminado_en_turno.formulas_productos_terminados,
-    };
+    const prod_en_lista = _.find(this.lista_produccion, { id: this.producto_terminado_en_turno.id });
+    if (prod_en_lista) {
+      prod_en_lista.cantidad = this.cantidad_producir;
+      prod_en_lista.cantidad_en_unidades = this.medida_producir == 'Quintal' ? this.cantidad_producir * 100 : this.cantidad_producir;
+      prod_en_lista.medida = this.medida_producir;
+      prod_en_lista.ingredientes = this.ingredientesParaProduccion;
+    } else {
+      const obj = {
+        nombre: this.producto_terminado_en_turno.nombre,
+        cantidad: this.cantidad_producir,
+        cantidad_en_unidades: this.medida_producir == 'Quintal' ? this.cantidad_producir * 100 : this.cantidad_producir,
+        medida: this.medida_producir,
+        articulo_id: _.parseInt(this.producto_terminado_en_turno.id),
+        id: _.parseInt(this.producto_terminado_en_turno.id),
+        ingredientes: this.ingredientesParaProduccion,
+        formulas_productos_terminados: this.producto_terminado_en_turno.formulas_productos_terminados,
+      };
 
-    this.lista_produccion.push(obj);
-
-    this.tServ.Func_total_paginas({ total: this.lista_produccion.length, tabla: 'lista_produccion' });
+      this.lista_produccion.push(obj);
+      setTimeout(() => this.tablaComponent.changeConfig([{ total_count: this.lista_produccion.length }]), 100);
+    }
 
     this.disableOption(this.producto_terminado_en_turno.id, true);
     this.articuloEditando = undefined;
-    this.borrar();
+    this.borrarForm();
     this.enfocarSelect();
   }
 
-  editarItem(item) {
-    if (this.articuloEditando) this.agregarAlista();
+  tableClick_action(params) {
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.abrirModalDinamicText('borrar', `Seguro de que desea remover el producto: <b>${params.data.nombre}</b>, de esta producción.`, params.data);
+  }
 
+  editarItem(data) {
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
-    this.producto_terminado_en_turno = item.ARG;
-    this.cantidad_producir = item.ARG.cantidad;
-    this.medida_producir = item.ARG.medida;
+    this.cantidad_producir = data.cantidad;
+    this.medida_producir = data.medida;
 
-    this.articuloEditando = item.ARG;
+    this.producto_terminado_en_turno = _.find(this.listaProductos, { id: data.id });
+    this.articuloEditando = data;
 
     setTimeout(() => {
       this.getIngredients();
-      this.calcularCantidadAProduccir();
-
-      this.seleccionModal = item.ARG;
-      this.tipoModal = 'remover';
-      this.decisionModalP(true);
+      this.ingredientesParaProduccion = data.ingredientes;
     }, 5);
   }
 
-  abrirModalDinamicText(tipo) {
-    const obj = {};
-    if (tipo === 'confirmar') obj['texto_modal'] = 'Seguro de que desea confirmar la produccion.';
+  eliminarReg(data) {
+    this.disableOption(data.id, false);
+    _.remove(this.lista_produccion, { articulo_id: data.id });
+    this.tablaComponent.changeConfig([{ total_count: this.lista_produccion.length }]);
+  }
+
+  abrirModalDinamicText(tipo, texto_modal, data) {
+    const functions = {
+      confirmar: (instance, data?) => {
+        this.confirmarProduccion();
+        this.closeModal(instance);
+      },
+      borrar: (instance, data) => {
+        this.eliminarReg(data);
+        this.closeModal(instance);
+      },
+      cancelarP: (instance, data) => {
+        this.borrarForm();
+        this.lista_produccion.length = 0;
+        this.closeModal(instance);
+      },
+    };
 
     this.handleModalForm({
-      id: 'confirmar_produccion',
+      id: 'produccion_modal',
       header: 'Confirmar',
       width: '510px',
-      html: `<p> ${obj['texto_modal']} </p>`,
+      html: `<p> ${texto_modal} </p>`,
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },
@@ -299,10 +316,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
           { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           {
             clase: 'btn btn-verde',
-            function: (instance) => {
-              this.confirmarProduccion();
-              this.closeModal(instance);
-            },
+            function: (instance) => functions[tipo](instance, data),
             label: 'SI',
             disable: false,
           },
@@ -310,27 +324,9 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       },
     });
   }
+
   closeModal(modalInstance) {
-    console.warn('modalInstance: ', modalInstance);
-
     modalInstance.closeModal(modalInstance.id, 'cancelar');
-  }
-
-  decisionModalP(bool) {
-    const listaTemp = JSON.parse(JSON.stringify(this.lista_produccion));
-    if (bool) {
-      if (this.tipoModal === 'remover') {
-        this.lista_produccion = [];
-        this.disableOption(this.seleccionModal.articulo_id, false);
-        this.lista_produccion = _.remove(listaTemp, (item) => item.articulo_id !== this.seleccionModal.articulo_id);
-      } else {
-        this.lista_produccion.forEach((element) => this.disableOption(element.articulo_id, false));
-
-        this.lista_produccion = [];
-        this.borrar();
-      }
-    }
-    this.tServ.Func_total_paginas({ total: this.lista_produccion.length, tabla: 'lista_produccion' });
   }
 
   formarIngredientes(ingredientes) {
@@ -349,7 +345,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async confirmarProduccion() {
-    const obj = JSON.parse(JSON.stringify(this.lista_produccion));
+    const obj = fun.duplicarJson(this.lista_produccion);
     const produccion_send = {};
 
     const detalle = [];
@@ -369,8 +365,9 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     produccion_send['detalles_produccion'] = detalle;
 
     this.produccionClass.createUpdateOne(produccion_send).then((res) => {
-      this.decisionModalP('cancelarP');
       this.getProductosTerminados();
+      this.borrarForm();
+      this.lista_produccion.length = 0;
     });
   }
 }

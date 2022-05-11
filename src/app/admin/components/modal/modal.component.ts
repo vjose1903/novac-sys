@@ -1,355 +1,154 @@
-import { Component, OnInit, Input, OnChanges, OnDestroy, HostListener, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { ModalService } from './modal.service';
-import { TablasService } from '../tablas/tablas.service';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
-import { ArticuloC } from '../../registros/articulos/articulo';
-import { SuplidorC } from '../../registros/registro-suplidores/suplidores';
-import { ClienteC } from '../../registros/registro-clientes/cliente';
+import { MODALCONFIG, ModalService } from './modal.service';
+import { ModalDirective } from './modal.directive';
+import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
 
 @Component({
-  selector: 'app-modal',
+  selector: 'app-new-modal',
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
 })
-export class ModalComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
-  altoDiv;
-  showModal = false;
+export class NewModalComponent implements OnInit {
+  @ViewChildren(ModalDirective) modal_receptor: ModalDirective;
 
-  seleccionModal: any;
-  tipoModal;
-  paraFiltroClientes: any;
-  paraFiltroSuplidor: any;
-  tituloModal;
-  mostrar_para: any;
-  identificadorFact: any;
-  tipoDevuelta: any;
-  cant_notas_credito = 0;
-  cant_notas_debito = 0;
-  index;
-  fecha_articulo: any;
-  returnArticulosSeleccionado = false;
-  filtrar = false;
-  dataFiltro;
-  articuloClass = new ArticuloC();
-  suplidorClass = new SuplidorC();
-  clienteClass = new ClienteC();
-  @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
-    if (this.showModal) {
-      this.showModal = false;
-      const obj = { total: 0, tabla: 'tabla' };
+  constructor(private componentFactoryResolver: ComponentFactoryResolver, private cdRef: ChangeDetectorRef, public mServ: ModalService) {}
 
-      this.tServ.Func_total_paginas(obj);
-      this.mServ.func_tabla_modal_change(undefined);
+  subConfig: Subscription;
 
-      if (this.tipoModal === 'buscarArticulo') {
-        this.mServ.pressEsc(this.index);
-        setTimeout(() => this.mServ.pressEsc(undefined), 1000);
+  defaultModalConfig: any = {
+    show: false,
+    component: undefined,
+    width: '40rem',
+    height: undefined,
+    inputs: undefined,
+    header: '',
+    html: undefined,
+    position: 'center',
+    instance: undefined,
+    closable: true,
+    closableEsc: false,
+    transitionOptions: '0ms',
+    contentStyleClass: '0ms',
+    botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
+    getDataModal: (arg?) => {},
+
+    closeModal: (id, accion) => {
+      this.cancelarAndAceptar(false, id, accion);
+    },
+  };
+
+  get modalsConfig() {
+    return this.mServ.modalsConfig;
+  }
+
+  ngOnInit(): void {
+    this.subConfig = MODALCONFIG.subscribe((res) => {
+      if (res && res.show) {
+        this.renderizarComponente(res);
       } else {
-        this.mServ.pressEsc({});
+        this.resetConfig(res.id, res.accion);
       }
+    });
+  }
+
+  resetConfig(id_, accion) {
+    const modal = _.find(this.modalsConfig, (config) => config.id === id_);
+
+    const data = { modal: modal, accion: accion };
+    if (modal) modal.onHide(data);
+
+    this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
+  }
+
+  handleConfig(config) {
+    const modalConfig = config;
+    modalConfig['closeModal'] = this.defaultModalConfig.closeModal;
+    this.modalsConfig.push(modalConfig);
+  }
+
+  searchInArray(array, source, target) {
+    return _.find(array, (config) => config[source] === target);
+  }
+
+  changeConfig(array, id_modal) {
+    const modal = _.find(this.modalsConfig, (config) => config.id === id_modal);
+
+    array.forEach((element) => {
+      const key = _.keys(element)[0];
+      modal[key] = element[key];
+    });
+
+    this.cdRef.detectChanges();
+  }
+
+  renderizarComponente(config) {
+    this.handleConfig(config);
+
+    const currentConfig = this.searchInArray(this.modalsConfig, 'id', config.id);
+
+    if (currentConfig.component) {
+      setTimeout(() => {
+        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(currentConfig.component as any);
+
+        const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
+
+        let viewContainerRef = currentReceptor.viewContainerRef;
+
+        viewContainerRef.clear();
+        viewContainerRef.remove();
+
+        const componente = viewContainerRef.createComponent(componentFactory);
+
+        componente['instance'].inputs = config['inputs'];
+
+        if (componente['instance'].modal) componente['instance'].modal = { instance: this, component_id: config.id };
+
+        currentConfig['instance'] = componente['instance'];
+      }, 1);
     }
+    // setTimeout(() => this.checkModalStyle(config.id), 2500);
   }
 
-  @Input() listaArticulos: any;
-  texto: any;
-
-  infoArticulos = [
-    { titulo: 'Descripción', tipo: 'text', key: 'nombre' },
-    { titulo: 'Existencia', tipo: 'cantidades', key: 'cantidades', cantidades: true },
-  ];
-
-  paraFiltroArticulos;
-  metodo;
-  infoCliente = [
-    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-    { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
-    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
-    { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
-  ];
-
-  infoSuplidor = [
-    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
-    { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
-  ];
-  constructor(public mServ: ModalService, private tServ: TablasService) {}
-
-  element: HTMLElement;
-  subShow: Subscription;
-  subTipo: Subscription;
-  subSelec: Subscription;
-  // subCalcularHeigth: Subscription;
-
-  ngOnInit() {
-    this.subShow = this.mServ.SHOWMODAL.subscribe((res) => {
-      if (fun.hasValue(res)) {
-        if (!this.paraFiltroArticulos && !this.paraFiltroClientes && !this.paraFiltroSuplidor) this.showModal = res;
-
-        if (res === false) {
-          this.showModal = res;
-          this.mServ.mostrarModal(undefined);
-        }
-      } else {
-        this.showModal = false;
-        this.reinicioModal();
-      }
-    });
-
-    this.subTipo = this.mServ.TIPOMODAL.subscribe((res) => {
-      if (fun.hasValue(res)) {
-        this.tipoModal = res;
-      }
-    });
-
-    this.subSelec = this.mServ.SELECCIONMODAL.subscribe((res) => {
-      if (fun.hasValue(res)) {
-        if (res.filtrarArticulo || res.filtrarCliente || res.filtrarSuplidor) {
-          this.seleccionModal = res.data;
-        } else {
-          this.seleccionModal = res;
-        }
-
-        this.paraFiltroArticulos = res.filtrarArticulo;
-        this.paraFiltroClientes = res.filtrarCliente;
-        this.paraFiltroSuplidor = res.filtrarSuplidor;
-        this.fecha_articulo = res.fecha_articulo;
-
-        this.metodo = res.metodo;
-        this.identificadorFact = res.identificadorFact;
-        this.index = res.index;
-
-        if (this.tipoModal === 'buscarArticulo') {
-          this.renovarDataFiltros(this.tServ.getPaginationByModal(), this.paraFiltroArticulos, this.fecha_articulo);
-        } else if (this.tipoModal === 'buscarCliente') {
-          this.tituloModal = 'Buscar cliente';
-
-          this.renovarDataFiltros(this.tServ.getPaginationByModal(), this.paraFiltroClientes, this.fecha_articulo);
-        } else {
-          this.tituloModal = 'Buscar suplidor';
-          this.renovarDataFiltros(this.tServ.getPaginationByModal(), this.paraFiltroSuplidor, this.fecha_articulo);
-        }
-
-        if (this.tipoModal === 'mostrarFactura' && res) {
-          this.mostrar_para = res.mostrarFacturaPara;
-
-          if (this.seleccionModal.tiene_nota && this.seleccionModal.notas.length > 0) {
-            // TODO: usar reduce aqui
-            for (let i = 0; i < this.seleccionModal.notas.length; i++) {
-              const nota = this.seleccionModal.notas[i];
-              if (nota.tipo_factura_id === 5) this.cant_notas_credito++;
-              if (nota.tipo_factura_id === 4) this.cant_notas_debito++;
-            }
-          }
-        }
-
-        if (this.tipoModal === 'cambio' && res) {
-          if (this.seleccionModal.tipo__) {
-            this.tipoDevuelta = this.seleccionModal.tipo__;
-          }
-        }
-        if (res.texto_modal) {
-          this.texto = res.texto_modal;
-        }
-      }
-    });
+  checkModalStyle(config) {
+    // const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
   }
 
-  ngAfterViewInit() {}
-
-  ngOnDestroy() {
-    if (this.subShow) this.subShow.unsubscribe();
-    if (this.subTipo) this.subTipo.unsubscribe();
-    if (this.subSelec) this.subSelec.unsubscribe();
-
-    // this.subCalcularHeigth.unsubscribe();
-    this.reinicioModal();
+  onHideModal(id_) {
+    MODALCONFIG.next({ show: false, id: id_ });
   }
 
-  ngOnChanges(simpleChanges) {
-    // if (this.seleccionModal) {
-    //   if (this.tipoModal === 'buscar') {
-    //     this.paraFiltroArticulos = (this.seleccionModal as any).filtrar;
-    //   }
-    // }
-  }
-
-  selectArticulosAdelantados() {
-    this.returnArticulosSeleccionado = true;
-    setTimeout(() => (this.returnArticulosSeleccionado = false), 250);
-  }
-
-  getDatePendiente(date) {
-    const obj = { bool: true, Date: date };
-    this.accion(obj);
-  }
-
-  accion(arg, tipo_?) {
-    let obj = arg;
-
-    if (tipo_) obj = { tipo: tipo_, body: arg };
-
-    this.mServ.ModalDecision(obj);
-  }
-
-  getDevuelta(arg) {
-    const obj = { dinero: arg.dinero, devuelta: arg.devuelta, forma_pago: arg.forma_pago, decision_cambio: arg.decision_cambio };
-    this.devolverCLick(obj);
-    this.reinicioModal();
-  }
-
-  reinicioModal() {
-    this.seleccionModal = undefined;
-    this.paraFiltroArticulos = undefined;
-    this.paraFiltroClientes = undefined;
-    this.paraFiltroSuplidor = undefined;
-    this.cant_notas_credito = 0;
-    this.cant_notas_debito = 0;
-    this.filtrar = true;
-  }
-
-  formReporteAccion(arg) {
-    const bool = arg.bool;
-    const obj_ = arg.obj;
-
-    let obj;
-    obj = { data: obj_, tipo_modal: this.tipoModal };
-
+  cancelarAndAceptar(bool, id_, accion?) {
     if (!bool) {
-      obj = undefined;
-      this.showModal = false;
+      MODALCONFIG.next({ show: false, id: id_, accion: accion ? accion : 'cancelar' });
+      return;
     }
 
-    this.mServ.ModalObj(obj);
-    this.reinicioModal();
-  }
+    const modal = _.find(this.modalsConfig, (config) => config.id === id_);
 
-  devolverCLick(arg) {
-    const obj = {
-      data: arg,
-      tipo_modal: this.tipoModal,
-    };
-
-    if (this.tipoModal === 'buscarArticulo') obj['index'] = this.index;
-
-    this.mServ.ModalObj(obj);
-  }
-
-  noFiltro(tipo, palabra_a_buscar) {
-    this.reinicioModal();
-    this.mServ.ModalNoFiltro({ tipo: tipo, index: this.index, palabra_a_buscar: palabra_a_buscar });
-  }
-
-  articuloFiltradoPorCodigo(articulo) {
-    const obj = {
-      data: articulo.data[0],
-      index: this.index,
-      tipo_modal: this.tipoModal,
-    };
-
-    this.mServ.getArticuloFiltradoPorCodigo(obj);
-
-    this.reinicioModal();
-  }
-
-  refrescarFiltro() {
-    // lo comente para que no se borre el input de la tabla que lo borre el usuario
-    setTimeout(() => {
-      const element = document.getElementById('search') as any;
-      if (element) element.select();
-    }, 100);
-  }
-
-  async renovarDataFiltros(e, buscando?, fecha_articulo?) {
-    const copyData = fun.duplicarJson(this.dataFiltro);
-    if (fun.isEmpty(e)) e = this.tServ.obj_paginate.default;
-
-    const page = e.page;
-    const per_page = e.per_page;
-    let palabra_a_buscar = ' ';
-
-    if (buscando) palabra_a_buscar = fun.isEmpty(buscando) ? ' ' : buscando;
-    else palabra_a_buscar = fun.isEmpty(e.searchText) ? ' ' : e.searchText;
-
-    try {
-      if (this.tipoModal === 'buscarArticulo') {
-        const is_compra = this.metodo === 'compra' ? true : false;
-
-        const res = await this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: page, per_page: per_page, paginado: true, fecha: fecha_articulo, is_compra: is_compra });
-
-        if (fun.is_number(palabra_a_buscar) && res.data.length === 1) {
-          this.articuloFiltradoPorCodigo(res);
-        } else {
-          this.dataFiltro = res.data;
-          this.mostrarModalLuegoDeBuscarData();
-          const obj = { total: res.total_registros, tabla: 'filtroArticulos' };
-          this.tServ.Func_total_paginas(obj);
-        }
-        //
-      } else if (this.tipoModal === 'buscarCliente') {
-        const res = await this.clienteClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
-
-        this.dataFiltro = undefined;
-
-        res.data.map(async (cli) => {
-          cli.nombre = fun.Capitalice(cli.nombre);
-          cli.apellido = fun.Capitalice(cli.apellido);
-
-          const documento = await cli.documentos_de_identidad.find((doc) => doc.principal === true);
-          cli.documento_identidad = documento ? documento.documento : '----------';
-          return cli;
-        });
-
-        if (res.data.length > 0) this.dataFiltro = res.data;
-        if (res.data.length === 0) this.dataFiltro = copyData;
-
-        this.mostrarModalLuegoDeBuscarData();
-
-        const obj = { total: res.total_registros, tabla: 'filtroCliente' };
-        this.tServ.Func_total_paginas(obj);
-      } else if (this.tipoModal === 'buscarSuplidor') {
-        const res = await this.suplidorClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page, per_page, paginado: true } });
-
-        this.dataFiltro = undefined;
-
-        res.data.map(async (supli) => {
-          supli.nombre = fun.Capitalice(supli.nombre);
-          const documento = await supli.documentos_de_identidad.find((doc) => doc.principal === true);
-          supli.documento_identidad = documento ? documento.documento : '----------';
-
-          return supli;
-        });
-
-        if (res.data.length > 0) this.dataFiltro = res.data;
-        if (res.data.length === 0) this.dataFiltro = copyData;
-        this.mostrarModalLuegoDeBuscarData();
-
-        const obj = { total: res.total_registros, tabla: 'filtroSuplidor' };
-        this.tServ.Func_total_paginas(obj);
-      }
-      this.filtrar = true;
-    } catch (error) {
-      let tipo = '';
-
-      if (this.tipoModal === 'buscarArticulo') {
-        tipo = 'buscarArticulo';
-        setTimeout(() => this.mServ.mostrarModal(false), 250);
-      }
-
-      if (this.tipoModal === 'buscarCliente') tipo = 'buscarCliente';
-
-      if (this.tipoModal === 'buscarSuplidor') tipo = 'buscarSuplidor';
-
-      this.noFiltro(tipo, palabra_a_buscar);
-
-      this.refrescarFiltro();
+    if (modal['instance']) {
+      modal['instance'].btn_aceptar();
+    } else {
+      modal.getDataModal({ bool: bool, inputs: modal.inputs, id: modal.id });
+      modal.closeModal(modal.id, 'aceptar');
     }
   }
 
-  mostrarModalLuegoDeBuscarData() {
-    setTimeout(() => (this.showModal = true), 250);
+  dynamicFunction(configuration, btn) {
+    const modal = _.find(this.modalsConfig, (config) => config.id === configuration.id);
+
+    if (_.has(btn, 'function_in_other_component')) modal['instance'][btn['function_in_other_component']]();
+    else btn['function'](modal);
+  }
+
+  hasValue(arg) {
+    return fun.hasValue(arg);
+  }
+
+  hasAnyBtn(configuration) {
+    const modal = _.find(this.modalsConfig, (config) => config.id === configuration.id);
+    const botones_show = modal?.botones?.aceptar?.show || modal?.botones?.cancelar?.show || modal?.botones?.dinamico;
+    return botones_show;
   }
 }

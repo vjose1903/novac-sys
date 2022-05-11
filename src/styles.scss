@@ -9,9 +9,19 @@ $bodyfont: "Poppins";
 @import "./assets/my_styles/forms.scss";
 @import "./assets/my_styles/btns.scss";
 @import "./assets/my_styles/overlayPanel.scss";
+@import "./splash-styles.scss";
+
 
 .h-inherit {
   max-height: inherit;
+}
+
+.si-wrap {
+  flex-wrap: wrap;
+}
+
+.no-wrap {
+  white-space: nowrap;
 }
 
 .overflowHidden {
@@ -247,6 +257,10 @@ body {
 // CARDS
 // ========================================================
 
+.br-1 {
+  border-radius: 1rem !important;
+}
+
 .card-padding {
   padding: 1.5rem 1rem 1.5rem 1rem;
   border-radius: 1rem !important;
@@ -419,6 +433,10 @@ body {
 
   > .p-tabview-nav-container {
     grid-area: p-tabview-nav-container;
+    > .p-tabview-nav-btn {
+      background: grey;
+      @include primengFocus;
+    }
   }
   > .p-tabview-panels {
     grid-area: p-tabview-panels;
@@ -453,8 +471,8 @@ body {
 .searchDiv {
   display: flex;
   .search-input {
-    margin: 0rem 0rem 0.8rem 0.5rem;
-    height: calc(1em + 0.8rem + 2px);
+    margin: 0rem 0rem 0.3rem 0.5rem;
+    height: calc(1em + 0.5rem + 2px);
     padding: 0.5rem 0.5rem;
     font-size: 0.8rem;
     font-weight: 600;
@@ -480,6 +498,7 @@ input.apple-switch {
   transition-duration: 500ms;
   &.disabled {
     filter: brightness(0.9) !important;
+    pointer-events: none !important;
   }
 }
 
@@ -570,6 +589,7 @@ Not supports in Firefox and IE */
 ::-webkit-scrollbar {
   background-color: inherit;
   width: 7px;
+  height: 7px;
   &:hover {
     cursor: pointer !important;
   }
@@ -688,6 +708,62 @@ Not supports in Firefox and IE */
   }
 }
 
+.multiSelectPrimeng {
+  .p-multiselect {
+    width: 100%;
+    border-radius: 0.25rem !important;
+    background-color: #ffffffe8 !important;
+    color: #1d253b !important;
+    box-shadow: 1px 1px 4px 0px #1d253b3d !important;
+    border: 1px solid #ced4da;
+    &:hover {
+      cursor: pointer;
+      border: 1px solid #ced4da;
+    }
+    .p-multiselect-label {
+      .multi-select-item-values {
+        overflow: auto;
+        display: flex;
+        column-gap: 0.5rem;
+        .multi-select-item {
+          background: var(--primary04) !important;
+          color: white;
+          padding: 0rem 0.5rem;
+          border-radius: 0.7rem;
+        }
+      }
+    }
+  }
+
+  .p-multiselect.p-multiselect-chip .p-multiselect-token {
+    background: var(--primary04) !important;
+  }
+  .p-checkbox .p-checkbox-box.p-highlight {
+    background: var(--primary02) !important;
+  }
+  .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
+    background: var(--primary04) !important;
+  }
+  .p-multiselect-panel .p-multiselect-items .p-multiselect-item:focus {
+    box-shadow: none !important;
+  }
+
+  .p-inputtext:enabled:focus {
+  }
+  .p-multiselect-close {
+    &:hover {
+      background: var(--primary01) !important;
+      color: var(--primary04) !important;
+    }
+  }
+  .p-disabled {
+    background-color: #e9ecef !important;
+    touch-action: none;
+    pointer-events: none;
+    opacity: 1;
+  }
+}
+
 @mixin my_cards {
   border-radius: 1rem !important;
   height: 100%;
@@ -696,6 +772,7 @@ Not supports in Firefox and IE */
 }
 
 .rowResgitro {
+  max-height: calc(100vh - 4rem);
   height: 100%;
   display: grid;
   grid-template-areas:
@@ -769,7 +846,14 @@ Not supports in Firefox and IE */
 
         > .cardContentClass {
           grid-area: card_content_area;
-          @include my_cards;
+          border-radius: 1rem !important;
+          position: relative;
+          > .divTabla {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            @include my_cards;
+          }
         }
       }
     }
@@ -778,4 +862,12 @@ Not supports in Firefox and IE */
 
 .cardListados {
   @include my_cards;
+}
+
+.input_fantasma {
+  border: 0px solid transparent !important;
+  background: transparent !important;
+  width: 0;
+  height: 0;
+  position: absolute;
 }

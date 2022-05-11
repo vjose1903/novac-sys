@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalI } from '../new_modal/modal-class';
+import { ModalI } from '../modal/modal-class';
 @Component({
   selector: 'app-pdf-viewer',
   templateUrl: './pdf-viewer.component.html',
