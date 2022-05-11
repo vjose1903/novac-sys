@@ -18,6 +18,7 @@ import { PendienteFormComponent } from './pendiente-form/pendiente-form.componen
 import { BuscarClienteSuplidorComponent } from './buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { BuscarArticuloComponent } from './buscar-articulo/buscar-articulo.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 const components = [
   FormCantidadEfectivoComponent,
@@ -34,7 +35,7 @@ const components = [
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, TablasModule, NewTablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule],
+  imports: [CommonModule, TablasModule, NewTablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule, NgxPermissionsModule],
   exports: components,
 })
 

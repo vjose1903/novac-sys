@@ -85,7 +85,6 @@
                 <div class="col-6 p-0 pr-2">
                   <div class="form-group">
                     <label class="control-label">Marca: <span style="color: red">*</span></label>
-                    <!-- <input (focus)="$event.target.select()" type="text" formControlName="marca" placeholder="Introduzca marca" class="form-control" autocomplete="off" id="marca" /> -->
                     <ng-select id="marca" formControlName="marca" (change)="selectMarca()" [items]="listaMarcas" bindLabel="descripcion" bindValue="id" [clearable]="false">
                       <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                         <div>
@@ -134,10 +133,6 @@
               </div>
             </form>
           </div>
-          <!-- <div class="mt-4 p-2" style="height: min-content">
-            <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('marcas')">Marcas</a>
-            <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('modelos')">Modelos</a>
-          </div> -->
         </div>
       </ng-container>
 
@@ -145,9 +140,9 @@
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 classs="mb-0">Listado camiones</h4>
           <div class="" style="height: min-content">
-            <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('marcas')">Marcas</a>
-            <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('modelos')">Modelos</a>
-            <button [disabled]="vehiculoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+            <a *ngIf="hasPermissionsMarca" class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('marcas')">Marcas</a>
+            <a *ngIf="hasPermissionsModelo" class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('modelos')">Modelos</a>
+            <button *ngxPermissionsOnly="permissions.vehiculo.create" [disabled]="vehiculoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
           </div>
         </div>
 

@@ -8,6 +8,8 @@ import { MarcaC, ModeloC } from '../../../components/formularios en modales/form
 import { ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../new_tablas/tabla-class';
+import { Permisos } from '../../../../core/typescript/permisos';
+import { NgxPermissionsService } from 'ngx-permissions';
 
 @Component({
   selector: 'app-formulario-marca-modelo',
@@ -22,7 +24,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   @Output() accion_ = new EventEmitter<any>();
   formMarca: FormGroup;
   formModelo: FormGroup;
-
+  permissions = Permisos;
   table_marca_config: table_config = {
     info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }],
     colores: true,
@@ -31,7 +33,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+    botones: { editar: { show: true, permiso: this.permissions.marca.update }, borrar: { show: true, permiso: this.permissions.marca.destroy } },
   };
   tablaMarcaComponent: any;
 
@@ -46,7 +48,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+    botones: { editar: { show: true, permiso: this.permissions.modelo.update }, borrar: { show: true, permiso: this.permissions.modelo.destroy } },
   };
   tablaModeloComponent: any;
 
@@ -71,7 +73,12 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   marcasClass = new MarcaC();
   modeloClass = new ModeloC();
 
-  constructor(private fb: FormBuilder, private tServ: TablasService) {
+  hasPermissionsMarca: boolean;
+  hasPermissionsModelo: boolean;
+  hasPermissionsMarcaCreate: boolean;
+  hasPermissionsModeloCreate: boolean;
+
+  constructor(private fb: FormBuilder, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
 
@@ -105,11 +112,19 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       if (this.tipo_formulario === 'modelos') this.enfocarInput('marca_modal');
       else this.enfocarInput('descripcion');
     }, 200);
+
+    this.checkPermissions();
+  }
+  checkPermissions() {
+    this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then((result) => (this.hasPermissionsMarca = result));
+    this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then((result) => (this.hasPermissionsModelo = result));
+
+    this.permissionsService.hasPermission([this.permissions.marca.create, this.permissions.marca.update]).then((result) => (this.hasPermissionsMarcaCreate = result));
+    this.permissionsService.hasPermission([this.permissions.modelo.create, this.permissions.modelo.update]).then((result) => (this.hasPermissionsModeloCreate = result));
+
   }
 
   getMarcas(params) {
-    console.log(' ');
-    fun.logYellow('------ PIDIENDO MARCAS ------');
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: params.paginado, page: params.page, per_page: params.per_page } };
     this.marcasClass.getAll(extra).then((res) => {
@@ -122,8 +137,6 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   getModelos(params) {
-    console.log(' ');
-    fun.logRed('------ PIDIENDO MODELOS ------');
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: true, page: params.page, per_page: params.per_page } };
 
@@ -144,22 +157,21 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   createForm() {
-    this.formMarca = this.fb.group({
-      descripcion: [null],
-      marca_id: [null],
-      id: [null],
-    });
+    this.formMarca = this.fb.group({ descripcion: [null], marca_id: [null], id: [null] });
 
-    this.formModelo = this.fb.group({
-      descripcion: [null],
-      marca_id: [null],
-      id: [null],
-    });
+    this.formModelo = this.fb.group({ descripcion: [null], marca_id: [null], id: [null] });
   }
 
-  clickTabView(index) {
-    const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex]);
-    this.pedirNuevaData(actual_pagination);
+  clickTabView() {
+    const has_permisos = { 0: this.hasPermissionsMarca, 1: this.hasPermissionsModelo };
+
+    if (has_permisos[this.tabIndex]) {
+      const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex]);
+      this.pedirNuevaData(actual_pagination);
+    } else {
+      fun.toastError('No tiene permisos para realizar esta accion', 'No Autorizado');
+      setTimeout(() => (this.tabIndex = this.tabIndex == 0 ? 1 : 0), 1);
+    }
   }
 
   async pedirNuevaData(params?: { per_page: number; page: number; search: string }) {

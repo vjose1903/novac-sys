@@ -32,6 +32,15 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   vendedores;
   documentos_de_identidad: any;
 
+  camposDisabled: boolean = true;
+  editando: boolean = false;
+  myValidators = new customValidators();
+  clienteSelected;
+  clienteClass = new ClienteC();
+  empleadosClass = new EmpleadoC();
+  permissions = Permisos;
+  formPermissions = [Permisos.cliente.create, Permisos.cliente.update];
+
   table_config: table_config = {
     info: [
       { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
@@ -45,17 +54,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     padre_functions: { data_request: (params) => this.getClientes(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+    botones: { editar: { show: true, permiso: this.permissions.cliente.update }, borrar: { show: true, permiso: this.permissions.cliente.destroy } },
   };
   tablaComponent;
-  camposDisabled: boolean = true;
-  editando: boolean = false;
-  myValidators = new customValidators();
-  clienteSelected;
-  clienteClass = new ClienteC();
-  empleadosClass = new EmpleadoC();
-  permissions = Permisos;
-  formPermissions = [Permisos.cliente.create, Permisos.cliente.update];
 
   constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();

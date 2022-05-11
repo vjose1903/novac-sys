@@ -23,24 +23,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   estado = false;
   usado = false;
 
-  table_config: table_config = {
-    info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '5rem' }] },
-      { titulo: 'Tipo', tipo: 'text', key: 'tipoC', estilos: [{ width: '3rem' }] },
-      { titulo: 'Secuencia', tipo: 'text', key: 'secuencia_' },
-      { titulo: 'Desde', tipo: 'text', key: 'desde' },
-      { titulo: 'Hasta', tipo: 'text', key: 'hasta' },
-      { titulo: 'Usado', tipo: 'icon', key: 'usado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'usado_', text_color: 'colorUsado' }] },
-      { titulo: 'Activo', tipo: 'icon', key: 'estado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
-    ],
-    colores: true,
-    padding: '0.5rem',
-    id_tabla: 'lista_ncf',
-    padre_functions: { data_request: (params) => this.getPaquetesNCF(params) },
-    filtrar: { local: false },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
-  };
+
 
   filtro: any = 0;
 
@@ -67,9 +50,27 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();
   ncfClass = new NcfC();
-
-  tablaComponent;
   permissions = Permisos;
+
+  table_config: table_config = {
+    info: [
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '5rem' }] },
+      { titulo: 'Tipo', tipo: 'text', key: 'tipoC', estilos: [{ width: '3rem' }] },
+      { titulo: 'Secuencia', tipo: 'text', key: 'secuencia_' },
+      { titulo: 'Desde', tipo: 'text', key: 'desde' },
+      { titulo: 'Hasta', tipo: 'text', key: 'hasta' },
+      { titulo: 'Usado', tipo: 'icon', key: 'usado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'usado_', text_color: 'colorUsado' }] },
+      { titulo: 'Activo', tipo: 'icon', key: 'estado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
+    ],
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'lista_ncf',
+    padre_functions: { data_request: (params) => this.getPaquetesNCF(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: this.permissions.secuencia_comprobante.update }, borrar: { show: true, permiso: this.permissions.secuencia_comprobante.destroy } },
+  };
+  tablaComponent;
   formPermissions = [Permisos.secuencia_comprobante.create, Permisos.secuencia_comprobante.update];
 
   constructor(private tServ: TablasService, private localeService: BsLocaleService) {

@@ -12,6 +12,7 @@ import { FormularioMarcaModeloComponent } from '../../components/formularios en 
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
+import { NgxPermissionsService } from 'ngx-permissions';
 
 @Component({
   selector: 'app-registro-vehiculo',
@@ -33,6 +34,13 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   listaModelos: any;
   vehiculoSelected: any;
 
+  isCreando: boolean = false;
+
+  vehiculosClass = new VehiculoC();
+  marcasClass = new MarcaC();
+  empleadosClass = new EmpleadoC();
+  modeloClass = new ModeloC();
+  permissions = Permisos;
   table_config: table_config = {
     info: [
       { titulo: 'Propietario', key: 'nombreCompleto', tipo: 'text' },
@@ -47,20 +55,13 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     padre_functions: { data_request: (params) => this.getVehiculos(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+    botones: { editar: { show: true, permiso: this.permissions.vehiculo.update }, borrar: { show: true, permiso: this.permissions.vehiculo.destroy } },
   };
-
   tablaComponent;
-
-  isCreando: boolean = false;
-
-  vehiculosClass = new VehiculoC();
-  marcasClass = new MarcaC();
-  empleadosClass = new EmpleadoC();
-  modeloClass = new ModeloC();
-  permissions = Permisos;
   formPermissions = [Permisos.vehiculo.create, Permisos.vehiculo.update];
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService) {
+  hasPermissionsMarca: boolean;
+  hasPermissionsModelo: boolean;
+  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
 
@@ -91,6 +92,11 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.getVehiculos(this.tServ.obj_paginate.default);
     this.getPropietarios();
     this.getMarcas();
+    this.checkPermisos();
+  }
+  checkPermisos() {
+    this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then((result) => (this.hasPermissionsMarca = result));
+    this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then((result) => (this.hasPermissionsModelo = result));
   }
 
   async getPropietarios() {
@@ -194,8 +200,8 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     const marca_selected_id = this.form.controls.marca.value;
     if (marca_selected_id) {
       const res = await this.modeloClass.getAll({ afterPath: `por_marca/${marca_selected_id}` });
-
       this.listaModelos = res;
+      this.form.controls.modelo.reset();
       callback(true);
     }
   }

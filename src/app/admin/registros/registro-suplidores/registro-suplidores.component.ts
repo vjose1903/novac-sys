@@ -25,10 +25,18 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   listaSuplidores;
 
-  // =============================================
-  //  TABLAS
-  // =============================================
+  suplidorSelected;
+  doc_is_cedula = false;
+  doc_principal = 'rnc';
+  documentos_de_identidad: any;
 
+  isCreando: boolean = false;
+
+  myValidators = new customValidators();
+  camposDisabled: boolean = true;
+  editando: boolean = false;
+  suplidorClass = new SuplidorC();
+  permissions = Permisos;
   table_config: table_config = {
     info: [
       { titulo: 'Cod.', tipo: 'text', key: 'codigo' },
@@ -42,22 +50,9 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     padre_functions: { data_request: (params) => this.getSuplidores(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+    botones: { editar: { show: true, permiso: this.permissions.suplidor.update }, borrar: { show: true, permiso: this.permissions.suplidor.destroy } },
   };
   tablaComponent;
-
-  suplidorSelected;
-  doc_is_cedula = false;
-  doc_principal = 'rnc';
-  documentos_de_identidad: any;
-
-  isCreando: boolean = false;
-
-  myValidators = new customValidators();
-  camposDisabled: boolean = true;
-  editando: boolean = false;
-  suplidorClass = new SuplidorC();
-  permissions = Permisos;
   formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
 
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private tServ: TablasService) {

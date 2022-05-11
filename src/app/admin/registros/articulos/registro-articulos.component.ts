@@ -22,24 +22,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   //  TABLAS
   // =============================================
 
-  table_config: table_config = {
-    info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }] },
-      { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
-      { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', estilos: [{ width: '20%' }] },
-    ],
-    colores: true,
-    padding: '0.5rem',
-    id_tabla: 'articulos',
-    padre_functions: { data_request: (params) => this.getArticulos(params) },
-    filtrar: { local: false },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
-  };
-
-  // botones = { titulo: true, borrar: true, editar: true };
-
   boton = '';
   form: FormGroup;
 
@@ -75,7 +57,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     { backend: 'Saco', front: 'Saco' },
     { backend: 'Galon', front: 'Galón' },
   ];
-  tablaComponent;
 
   fechaFactura: string;
   articuloClass = new ArticuloC();
@@ -83,6 +64,23 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   permissions = Permisos;
   formPermissions = [Permisos.articulo.create, Permisos.articulo.update];
   hasPermissionUpdateFormula = false;
+
+  table_config: table_config = {
+    info: [
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
+      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }] },
+      { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
+      { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', estilos: [{ width: '20%' }] },
+    ],
+    colores: true,
+    padding: '0.5rem',
+    id_tabla: 'articulos',
+    padre_functions: { data_request: (params) => this.getArticulos(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: this.permissions.articulo.update }, borrar: { show: true, permiso: this.permissions.articulo.destroy } },
+  };
+  tablaComponent;
   constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
@@ -91,7 +89,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this._init_mixin({ component: 'reg_articulo', is_routing: true });
     this.createForm();
 
-    this.permissionsService.hasPermission('articulo_update_formula').then((result) => {
+    this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then((result) => {
       this.hasPermissionUpdateFormula = result;
     });
 
@@ -162,8 +160,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
       this.listaArticulos = res.data;
       this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
-
-
     });
   }
 

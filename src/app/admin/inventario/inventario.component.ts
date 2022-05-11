@@ -11,6 +11,7 @@ import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.componen
 import { fun } from '../../core/services/functions.service';
 import { SingletonService } from '../../core/services/singleton.service';
 import { table_config } from '../components/new_tablas/tabla-class';
+import { Permisos } from '../../core/typescript/permisos';
 
 @Component({
   selector: 'app-inventario',
@@ -22,7 +23,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   // =============================================
   //  TABLAS
   // =============================================
-
+  permissions = Permisos;
   table_roles_config: table_config = {
     info: [
       { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '4rem' }] },
@@ -35,7 +36,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     padre_functions: { data_request: (params) => this.getArticulos(params), handleBtnsDinamic: (params) => this.movimientoInventario(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { dinamico: [{ show: true, icon: 'fas fa-dolly', permiso: null, name: 'movimiento_inventario', tooltip: 'Movimientos de inventario' }] },
+    botones: { dinamico: [{ show: true, icon: 'fas fa-dolly', permiso: this.permissions.movimiento_inventario.create, name: 'movimiento_inventario', tooltip: 'Movimientos de inventario' }] },
   };
 
   tablaComponent;

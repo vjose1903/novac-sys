@@ -26,6 +26,19 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
+  isCreando: boolean = false;
+  listaEmpleados;
+  editando = false;
+  empleadoSelected: any;
+  indexBorrar: any;
+  documentos_de_identidad: any;
+
+  camposDisabled = true;
+  empleadosClass = new EmpleadoC();
+  rolesClass = new RolesC();
+  listRoles: [];
+  permissions = Permisos;
+
   table_config: table_config = {
     info: [
       { titulo: 'Nombre', tipo: 'text', key: 'nombreCompleto' },
@@ -40,22 +53,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     padre_functions: { data_request: (params) => this.getEmpleados(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+    botones: { editar: { show: true, permiso: this.permissions.user.update }, borrar: { show: true, permiso: this.permissions.user.destroy } },
   };
   tablaComponent;
-
-  isCreando: boolean = false;
-  listaEmpleados;
-  editando = false;
-  empleadoSelected: any;
-  indexBorrar: any;
-  documentos_de_identidad: any;
-
-  camposDisabled = true;
-  empleadosClass = new EmpleadoC();
-  rolesClass = new RolesC();
-  listRoles: [];
-  permissions = Permisos;
   formPermissions = [Permisos.user.create, Permisos.user.update];
 
   constructor(private fb: FormBuilder, private localeService: BsLocaleService, private tServ: TablasService) {
@@ -286,7 +286,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       data: regisData,
       texto: `¿Está seguro que desea eliminar el empleado <b>${regisData.nombre_completo}</b>?`,
       siFunction: () => {
-        const actualPagination = this.tServ.getPaginationById('listaEmpleados');
+        const actualPagination = this.tServ.getPaginationById('lista_empleados');
         this.empleadosClass.deleteOne(regisData.id).then((res) => this.getEmpleados(actualPagination));
       },
     };
@@ -330,16 +330,15 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     });
 
     formulario.documentos_de_identidad = documentos_identidad;
-    // formulario['ids_roles'] = formulario.roles;
     formulario.estado = true;
 
     const objSend = _.omit(formulario, ['cedula']);
 
-    if (!this.editando && objSend.password === null) {
+    if (!this.editando && fun.isEmpty(objSend.password)) {
       fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
       this.empleadosClass.createUpdateOne(objSend).then((res) => {
-        const actualPagination = this.tServ.getPaginationById('listaEmpleados');
+        const actualPagination = this.tServ.getPaginationById('lista_empleados');
         this.getEmpleados(actualPagination);
         this.borrar();
         this.enfocarInput('cedula');

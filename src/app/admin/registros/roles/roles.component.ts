@@ -19,6 +19,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   listaRoles = [];
   listaPermisos = [];
 
+  permissions = Permisos;
+  formPermissions = [Permisos.role.create, Permisos.role.update];
   table_roles_config: table_config = {
     info: [
       { titulo: 'Nombre', key: 'nombre', tipo: 'text', estilos: [{ width: '20%' }, { 'text-align': 'left' }] },
@@ -32,7 +34,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     padre_functions: { data_request: (params) => this.getRoles(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
+    botones: { editar: { show: true, permiso: this.permissions.role.update }, borrar: { show: true, permiso: this.permissions.role.destroy } },
   };
   tablaRolesComponent;
 
@@ -61,8 +63,6 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   isCreando: boolean = false;
   TablasComponent;
   palabra_buscar: any;
-  permissions = Permisos;
-  formPermissions = [Permisos.role.create, Permisos.role.update];
 
   constructor(private fb: FormBuilder, private tServ: TablasService) {
     super();
