@@ -46,7 +46,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     colores: true,
     padding: '0.5rem',
-    id_tabla: 'lista_empleados',
+    id_tabla: 'lista_suplidores',
     padre_functions: { data_request: (params) => this.getSuplidores(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
@@ -278,7 +278,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       texto: `¿Está seguro que desea eliminar el suplidor <b>${regisData.nombre_completo}</b>?`,
       siFunction: () => {
         this.suplidorClass.deleteOne(regisData.id).then((res) => {
-          const actualPagination = this.tServ.getPaginationById('listaSuplidores');
+          const actualPagination = this.tServ.getPaginationById('lista_suplidores');
           this.getSuplidores(actualPagination);
         });
       },
@@ -350,7 +350,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       // paso todas las validaciones
     } else {
       this.suplidorClass.createUpdateOne(formulario).then((res) => {
-        const actualPagination = this.tServ.getPaginationById('listaSuplidores');
+        const actualPagination = this.tServ.getPaginationById('lista_suplidores');
         this.getSuplidores(actualPagination);
         this.borrar();
       });
