@@ -9,6 +9,8 @@ $bodyfont: "Poppins";
 @import "./assets/my_styles/forms.scss";
 @import "./assets/my_styles/btns.scss";
 @import "./assets/my_styles/overlayPanel.scss";
+@import "./splash-styles.scss";
+
 
 .h-inherit {
   max-height: inherit;
@@ -722,12 +724,12 @@ Not supports in Firefox and IE */
       .multi-select-item-values {
         overflow: auto;
         display: flex;
-        column-gap: 0.5rem ;
+        column-gap: 0.5rem;
         .multi-select-item {
           background: var(--primary04) !important;
           color: white;
           padding: 0rem 0.5rem;
-          border-radius: 0.7rem ;
+          border-radius: 0.7rem;
         }
       }
     }

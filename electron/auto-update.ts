@@ -47,7 +47,7 @@ export default class AppUpdater {
         type: 'info',
         buttons: ['ok'],
         title: 'Actualización disponible',
-        message: 'VjPOS presenta una nueva actualizacion se empezará a descargar ahora.',
+        message: 'Novac System presenta una nueva actualizacion se empezará a descargar ahora.',
         detail: `Version a descargar: ${info.version}`,
       };
     });

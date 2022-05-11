@@ -168,8 +168,8 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-          this.configReady = true;
           this.validateUserAndLoadPermisos();
+          setTimeout(() => (this.configReady = true), 1000);
         }
       })
       .catch((err) => {
@@ -178,7 +178,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   }
 
   validateUserAndLoadPermisos() {
-    console.log("################## a validar usuario ################## ");
+    console.log('################## a validar usuario ################## ');
 
     this.currentUserServ
       .validateUser()

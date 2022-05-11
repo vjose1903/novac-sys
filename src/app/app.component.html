@@ -1,4 +1,9 @@
-<div *ngIf="!configReady" class="w-100 h-100 d-flex justify-content-center align-items-center">Cargando archivo de configuración</div>
+<div *ngIf="!configReady" class="h-100 w-100 splash-container">
+  <h2 class="msg">Cargando archivo de configuración</h2>
+  <img class="logo" src="assets/img/logo_splash.png" />
+  <img class="rayas" src="assets/img/splash_screen_rayas.png" />
+  <img class="inspot" src="assets/img/inspot_splash.png" />
+</div>
 
 <div id="fondoC" *ngIf="loading" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
   <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt="" />
@@ -18,7 +23,6 @@
   <p-progressBar [value]="objPercent?.percent"></p-progressBar>
   <div class="mr-2">
     <span> </span>
-    <!-- <span class="negrita">Tiempo restante: {{ tiempo_restante }} </span> -->
   </div>
 </p-dialog>
 
