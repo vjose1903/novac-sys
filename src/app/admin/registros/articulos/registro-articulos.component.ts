@@ -74,7 +74,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     ],
     colores: true,
     padding: '0.5rem',
-    id_tabla: 'articulos',
+    id_tabla: 'lista_articulos',
     padre_functions: { data_request: (params) => this.getArticulos(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
@@ -139,7 +139,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.listaTipoArticulos = [];
     this.tipoArticuloClass.getAll().then((res) => {
       this.listaTipoArticulos = fun.duplicarJson(res);
-      console.log('🚀 ~ file: registro-articulos.component.ts ~ line 135 ~ RegistroArticulosComponent ~ this.tipoArticuloClass.getAll ~ this.listaTipoArticulos', this.listaTipoArticulos);
     });
   }
 
@@ -766,7 +765,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       texto: `¿Está seguro que desea eliminar el artículo <b> ${regisData.nombre}</b>?`,
       siFunction: () => {
         this.articuloClass.deleteOne(regisData.id).then((res) => {
-          const actualPagination = this.tServ.getPaginationById('listaArticulos');
+          const actualPagination = this.tServ.getPaginationById('lista_articulos');
           this.getArticulos(actualPagination);
           this.borrar();
         });

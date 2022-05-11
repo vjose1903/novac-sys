@@ -51,7 +51,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       { titulo: 'Fecha Facturacion', key: 'fecha', tipo: 'text' },
       { titulo: 'Total Facturado', key: 'total_factura', tipo: 'formatoNumero' },
     ],
-    id_tabla: 'lista_roles',
+    id_tabla: 'lista_conduces',
     obj_paginate: { show: false },
   };
 
