@@ -23,7 +23,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   metodo;
   pattern = pattern;
 
-  listaSuplidores;
+  listaSuplidores = [];
 
   suplidorSelected;
   doc_is_cedula = false;
@@ -106,6 +106,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
+    this.listaSuplidores.length = 0;
     this.suplidorClass.getAll(extra).then((res) => {
       res['data'].map((suplidor) => {
         const doc = _.find(suplidor.documentos_de_identidad, { principal: true });

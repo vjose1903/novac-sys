@@ -91,6 +91,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
     const extra = { afterPath: `filtro/${this.palabra_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
+    this.listaRoles.length = 0;
     this.rolesClass
       .getAll(extra)
       .then((res) => {

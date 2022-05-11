@@ -16,12 +16,11 @@ import { Permisos } from '../../../core/typescript/permisos';
   templateUrl: './registro-clientes.component.html',
   styleUrls: ['./registro-clientes.component.scss'],
 })
-
 export class RegistroClientesComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
   form: FormGroup;
 
-  listaClientes;
+  listaClientes = [];
   FORM: any;
   isCreando: boolean = false;
   doc_is_cedula = true;
@@ -126,7 +125,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
-
+    this.listaClientes.length = 0;
     this.clienteClass.getAll(extra).then((res) => {
       res['data'].map((cliente) => {
         const doc = _.find(cliente.documentos_de_identidad, { principal: true });

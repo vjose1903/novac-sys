@@ -27,7 +27,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
   isCreando: boolean = false;
-  listaEmpleados;
+  listaEmpleados = [];
   editando = false;
   empleadoSelected: any;
   indexBorrar: any;
@@ -119,6 +119,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
+      this.listaEmpleados.length = 0;
       this.empleadosClass.getAll(extra).then((res) => {
         res['data'].map((empleado) => {
           empleado.nombreCompleto = empleado.nombre + ' ' + empleado.apellido;

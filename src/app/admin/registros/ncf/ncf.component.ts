@@ -18,12 +18,10 @@ import { Permisos } from '../../../core/typescript/permisos';
 export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   form;
   boton = 'Ingresar';
-  listaNCF;
+  listaNCF = [];
 
   estado = false;
   usado = false;
-
-
 
   filtro: any = 0;
 
@@ -45,7 +43,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   desdeAlert = false;
   hastaAlert = false;
-  listaNCFBack: any[];
+  listaNCFBack = [];
 
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();
@@ -154,7 +152,8 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
       const res = await this.ncfClass.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
-
+      this.listaNCF.length = 0;
+      this.listaNCFBack.length = 0;
       const tempNCF = [];
       res.data.forEach((ncf) => {
         if (ncf.tipo_factura_id !== 1 && ncf.tipo_factura_id !== 3) {

@@ -31,7 +31,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   articuloSelected;
 
   vendersePorSelected;
-  listaArticulos;
+  listaArticulos = [];
   FORM: any;
   listaTipoArticulos: any;
 
@@ -147,6 +147,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
+    this.listaArticulos.length = 0;
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
       res.data.map(async (arti) => {
         arti.customStyles = {
