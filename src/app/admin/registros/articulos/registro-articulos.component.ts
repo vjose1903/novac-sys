@@ -55,6 +55,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   vendidoEn = [
     { backend: 'Unidad', front: 'Unidad' },
     { backend: 'Saco', front: 'Saco' },
+    { backend: 'Galon', front: 'Galón' },
+    { backend: 'Funda', front: 'Funda' },
   ];
 
   fechaFactura: string;
@@ -165,6 +167,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   ngOnChanges() {
     this.cdRef.detectChanges();
   }
+  showContenido(value) {
+    const array = ['Caja', 'Saco', 'Galon', 'Funda', 'Producto'];
+    return array.includes(value);
+  }
 
   revisarPrecio(id) {
     const input = this.form.controls[id];
@@ -192,16 +198,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.form.controls.is_materia_prima.setValue(this.articuloSelected ? this.articuloSelected.is_materia_prima : false);
     }
 
-    if (tipo_check !== 'producto terminado' && tipo_check !== 'materia prima') this.form.controls.calcular_saco.setValue(false);
-
     if (tipo_check == 'producto terminado') {
       await this.getMateriasP().then((res) => {
         this.addItem();
-        this.resetCompradoEn('Quintal');
-        this.fillDropAlerta('Quintal');
+        this.resetCompradoEn('Producto');
         this.is_combo = true;
-        this.form.controls.medida.setValue('Quintal');
-        this.form.controls.calcular_saco.setValue(true);
+        this.form.controls.medida.setValue('Producto');
         this.form.controls.costo_principal.reset(null);
         this.form.controls.precio_principal.reset(null);
       });
@@ -209,6 +211,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.resetArray();
       this.is_combo = false;
     }
+
+    this.form.controls.calcular_saco.setValue(false);
   }
 
   capitalice(control, arg) {
@@ -305,6 +309,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     fields.forEach((field) => {
       this.form.controls[field].reset(null);
+      console.log('.');
     });
 
     this.FORM.rowFormula.reset();
@@ -320,6 +325,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       fun.toastWarning('Solo se le puede calcular el saco a los productos comprados en Quintal o Libra');
       this.form.controls.calcular_saco.setValue(false);
     }
+
     this.fillDropAlerta(value);
   }
 
@@ -358,14 +364,23 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   async getCosto(index, dropdown) {
     const control = this.form.controls['rowFormula'] as FormArray;
-
+    const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onzas: 'Oz' };
+    const arrayUnidades = Object.keys(unidades);
     (control.controls[index] as any).controls['costo_formula'].setValue(null);
 
     let extra = { afterPath: '', parameters: { costos: true } };
 
     this.articuloClass.getOne(control.value[index].articulo_id, extra).then((res) => {
-      const costos = res.data.costos.Libra || res.data.costos.Unidad;
-      const medida = fun.hasValue(res.data.costos.Unidad) ? 'Und.' : 'Lbs.';
+      let costos;
+      let medida;
+      for (const unidad_en_turno of arrayUnidades) {
+        if (fun.hasValue(res.data.costos[unidad_en_turno])) {
+          costos = res.data.costos[unidad_en_turno];
+          medida = unidades[unidad_en_turno];
+        }
+      }
+
+      console.log('res.data ', res.data);
 
       (control.controls[index] as any).controls['medida_formula'].setValue(medida);
 
@@ -530,6 +545,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     else if (medida == 'Saco') this.optionsAlerta = ['Saco', 'Libra'];
     else if (medida == 'Caja') this.optionsAlerta = ['Caja', 'Paquete', 'Unidad'];
     else if (medida == 'Unidad') this.optionsAlerta = ['Unidad'];
+    else if (medida == 'Galon') this.optionsAlerta = ['Galon', 'Onzas'];
+    else if (medida == 'Producto') this.optionsAlerta = ['Producto', 'Unidad'];
   }
 
   seleccionarContenidoCaja() {
@@ -630,8 +647,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       const res = await this.getMateriasP();
 
       if (articulo.formulas_productos_terminados.length) {
-        this.form.controls.medida.setValue('Quintal');
-        this.fillDropAlerta('Quintal');
+        this.form.controls.medida.setValue('Producto');
+        this.resetCompradoEn('Producto');
 
         for (let i = 0; i < articulo.formulas_productos_terminados.length; i++) {
           const ingredient = articulo.formulas_productos_terminados[i];

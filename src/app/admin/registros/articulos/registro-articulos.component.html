@@ -16,21 +16,22 @@
               <div class="row">
                 <div class="col-12 p-0">
                   <div class="row">
-                    <div class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center pl-0">
+                    <div class="col-6 d-flex align-items-center pl-0">
                       <div class="form-group switchDiv">
                         <input formControlName="is_detallable" class="apple-switch" type="checkbox" />
                         <span class="ml-2">Detallable</span>
                       </div>
                     </div>
 
-                    <div *ngIf="TIPOARTICULO && TIPOARTICULO !== 'Materia prima'" class="col-4 p-0 d-flex align-items-center">
+                    <div *ngIf="TIPOARTICULO && TIPOARTICULO !== 'Materia prima'" class="col-6 p-0 d-flex align-items-center">
                       <div class="form-group switchDiv">
                         <input formControlName="is_materia_prima" class="apple-switch" type="checkbox" />
                         <span class="ml-1">Funciona como materia prima</span>
                       </div>
                     </div>
 
-                    <div *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'" class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
+                    <div *ngIf="false" class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
+                      <!-- <div *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'" class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center"> -->
                       <div class="form-group switchDiv">
                         <input formControlName="calcular_saco" class="apple-switch" type="checkbox" (change)="cambiarCalcularSaco()" />
                         <span class="ml-2">Calcular saco</span>
@@ -94,6 +95,8 @@
                       <option value="Saco">Saco</option>
                       <option value="Caja">Caja</option>
                       <option value="Unidad">Unidad</option>
+                      <option value="Galon">Galón</option>
+                      <option value="Funda">Funda</option>
                     </select>
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)">Seleccione una opcion</div>
                   </div>
@@ -175,7 +178,7 @@
                           (change)="seleccionarContenidoCaja()"
                           [ngClass]="{ badAlert: articulo_no_paquete }"
                         >
-                          <option [value]="null" disabled></option>
+                          <option [value]="null" disabled>Seleccione</option>
                           <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                         </select>
                       </div>
@@ -194,7 +197,7 @@
 
               <div *ngIf="TIPOARTICULO == 'Producto terminado'">
                 <ng-container *ngxPermissionsOnly="permissions.articulo.read_formula">
-                  <label class="control-label">Formula (1 QUINTAL) : </label>
+                  <label class="control-label">Formula (1 FUNDA) : </label>
                   <div class="row mb-2 p-0">
                     <div class="col-5">Ingredientes</div>
                     <div class="col-3 pr-0">Cantidad</div>
@@ -350,7 +353,7 @@
 
                         <div class="col-6 p-0">
                           <select (keydown.enter)="saltar('send')" class="form-control" formControlName="medida_alerta" id="medida_alerta" (change)="seleccionarContenidoCaja()" [ngClass]="{ badAlert: articulo_no_paquete }">
-                            <option [value]="null" disabled></option>
+                            <option [value]="null" disabled>Seleccione</option>
                             <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                           </select>
                         </div>
@@ -382,9 +385,9 @@
               <hr *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Saco'" class="raya" />
 
               <!-- ======================================================================================================================= -->
-              <!--  CONTENIDO DE LA CAJA O SACO -->
+              <!--  CONTENIDO DE LA CAJA O SACO O GALON -->
               <!-- ======================================================================================================================= -->
-              <div class="row" *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Saco'">
+              <div class="row" *ngIf="showContenido(form.controls['medida'].value)">
                 <span class="w-100 text-green">Contenido {{ form.controls['medida'].value }}</span>
 
                 <div class="col-3 p-0">
@@ -410,10 +413,11 @@
                   <div class="form-group">
                     <label class="control-label text-transparent">medida </label>
                     <select (keydown.enter)="saltar('precio_padre')" id="medidaPadre" formControlName="medida_contenido_padre" (change)="seleccionarContenidoCaja()" class="form-control" value="">
-                      <option *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Saco'" [value]="null" disabled>Seleccione</option>
+                      <option [value]="null" disabled>Seleccione</option>
                       <option *ngIf="form.controls['medida'].value === 'Saco'" value="Libra">Libra</option>
                       <option *ngIf="form.controls['medida'].value === 'Caja'" value="Paquete">Paquete</option>
-                      <option *ngIf="form.controls['medida'].value === 'Caja'" value="Unidad">Unidad</option>
+                      <option *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Producto' || form.controls['medida'].value === 'Funda'" value="Unidad">Unidad</option>
+                      <option *ngIf="form.controls['medida'].value === 'Galon'" value="Onzas">Onzas</option>
                     </select>
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida_contenido_padre'].valid && (form.controls['medida_contenido_padre'].dirty || form.controls['medida_contenido_padre'].touched)">
                       Este Campo es obligatorio

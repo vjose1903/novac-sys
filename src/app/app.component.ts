@@ -169,7 +169,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
           this.validateUserAndLoadPermisos();
-          setTimeout(() => (this.configReady = true), 500);
         }
       })
       .catch((err) => {
@@ -183,7 +182,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     this.currentUserServ
       .validateUser()
       .then((res) => {
-        this.is_permisos_load = true;
+        [this.is_permisos_load, this.configReady] = Array(2).fill(true);
       })
       .catch((error) => {
         const actualPath = this.getActualPath();
