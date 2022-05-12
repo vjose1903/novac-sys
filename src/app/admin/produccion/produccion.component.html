@@ -49,7 +49,7 @@
 
                   <div class="col-8 pr-0">
                     <select (keydown.enter)="saltar('agregar')" class="form-control inputE" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()">
-                      <option value="{{ null }}" disabled></option>
+                      <option [value]="null" disabled></option>
                       <option *ngFor="let item of optionsMedidas" value="{{ item }}">{{ item }}</option>
                     </select>
                   </div>

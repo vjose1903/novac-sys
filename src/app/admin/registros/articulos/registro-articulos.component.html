@@ -59,7 +59,7 @@
                   <div class="form-group">
                     <label class="control-label">Tipo: <span style="color: red">*</span></label>
                     <select (keydown.enter)="saltar(TIPOARTICULO !== 'Producto terminado' ? 'comprado' : 'vendido')" id="tipo" formControlName="tipo_articulo_id" (change)="selectTipoArticulo($event.target.value)" class="form-control" value="">
-                      <option value="{{ null }}" disabled>Tipo de articulo</option>
+                      <option [value]="null" disabled>Tipo de articulo</option>
                       <ng-container *ngFor="let tipo of listaTipoArticulos">
                         <option [disabled]="tipo.id == 3 ? !hasPermissionUpdateFormula : false" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
                       </ng-container>
@@ -74,7 +74,7 @@
                   <div class="form-group">
                     <label class="control-label">Vendido en: <span style="color: red">*</span></label>
                     <select formControlName="vendido_en" (keydown.enter)="saltar('cantidad_formula', -1)" id="vendido" class="form-control" value="">
-                      <option value="{{ null }}" disabled>Tipo</option>
+                      <option [value]="null" disabled>Tipo</option>
                       <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
                     </select>
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">Seleccione una opcion</div>
@@ -88,7 +88,7 @@
                     <label class="control-label">Comprado en: <span style="color: red">*</span></label>
                     <!-- (keydown.enter)="saltar(TIPOARTICULO === 'Materia prima' ? 'vendido' : 'costo_principal')" -->
                     <select formControlName="medida" (keydown.enter)="saltar('vendido')" id="comprado" class="form-control" (change)="resetCompradoEn($event.target.value)">
-                      <option value="{{ null }}" disabled>Tipo</option>
+                      <option [value]="null" disabled>Tipo</option>
                       <option value="Quintal">Quintal</option>
                       <option value="Libra">Libra</option>
                       <option value="Saco">Saco</option>
@@ -103,7 +103,7 @@
                   <div class="form-group">
                     <label class="control-label">Vendido en: <span style="color: red">*</span></label>
                     <select formControlName="vendido_en" (keydown.enter)="saltar('costo_principal')" id="vendido" class="form-control" value="">
-                      <option value="{{ null }}" disabled>Tipo</option>
+                      <option [value]="null" disabled>Tipo</option>
                       <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
                     </select>
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">Seleccione una opcion</div>
@@ -175,7 +175,7 @@
                           (change)="seleccionarContenidoCaja()"
                           [ngClass]="{ badAlert: articulo_no_paquete }"
                         >
-                          <option value="{{ null }}" disabled></option>
+                          <option [value]="null" disabled></option>
                           <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                         </select>
                       </div>
@@ -350,7 +350,7 @@
 
                         <div class="col-6 p-0">
                           <select (keydown.enter)="saltar('send')" class="form-control" formControlName="medida_alerta" id="medida_alerta" (change)="seleccionarContenidoCaja()" [ngClass]="{ badAlert: articulo_no_paquete }">
-                            <option value="{{ null }}" disabled></option>
+                            <option [value]="null" disabled></option>
                             <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                           </select>
                         </div>
@@ -410,7 +410,7 @@
                   <div class="form-group">
                     <label class="control-label text-transparent">medida </label>
                     <select (keydown.enter)="saltar('precio_padre')" id="medidaPadre" formControlName="medida_contenido_padre" (change)="seleccionarContenidoCaja()" class="form-control" value="">
-                      <option *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Saco'" value="{{ null }}" disabled>Seleccione</option>
+                      <option *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Saco'" [value]="null" disabled>Seleccione</option>
                       <option *ngIf="form.controls['medida'].value === 'Saco'" value="Libra">Libra</option>
                       <option *ngIf="form.controls['medida'].value === 'Caja'" value="Paquete">Paquete</option>
                       <option *ngIf="form.controls['medida'].value === 'Caja'" value="Unidad">Unidad</option>
@@ -469,7 +469,7 @@
                   <div class="form-group">
                     <label class="control-label text-transparent">medida </label>
                     <select (keydown.enter)="saltar('precio_hijo')" id="medidaHijo" formControlName="medida_contenido_hijo" class="form-control" value="">
-                      <option value="{{ null }}" disabled>Seleccione</option>
+                      <option [value]="null" disabled>Seleccione</option>
                       <option value="Unidad">Unidad</option>
                     </select>
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida_contenido_hijo'].valid && (form.controls['medida_contenido_hijo'].dirty || form.controls['medida_contenido_hijo'].touched)">

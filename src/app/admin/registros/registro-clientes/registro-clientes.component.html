@@ -118,7 +118,7 @@
                   <div class="form-group" [appMsgError]="'sexo'" [form]="form">
                     <label class="control-label">Sexo: <span style="color: red">*</span></label>
                     <select id="campoSexo" formControlName="sexo" class="form-control" (keydown.enter)="saltar('campoDias')">
-                      <option value="{{ null }}" disabled>Sexo</option>
+                      <option [value]="null" disabled>Sexo</option>
                       <option value="M">Masculino</option>
                       <option value="F">Femenino</option>
                     </select>
@@ -129,7 +129,7 @@
                   <div class="form-group" [appMsgError]="'limite_credito'" [form]="form">
                     <label class="control-label">Dias credito: <span style="color: red">*</span></label>
                     <select id="campoDias" formControlName="limite_credito" class="form-control" (keydown.enter)="saltar('maximo_credito')">
-                      <option value="{{ null }}" disabled>Seleccione</option>
+                      <option [value]="null" disabled>Seleccione</option>
                       <option value="15">15 dias</option>
                       <option value="30">30 dias</option>
                     </select>
@@ -150,7 +150,7 @@
                   <div class="form-group" [appMsgError]="'vendedor_id'" [form]="form">
                     <label class="control-label">Vendedor: <span style="color: red">*</span></label>
                     <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('campoDir')">
-                      <option value="{{ null }}" disabled>Seleccione</option>
+                      <option [value]="null" disabled>Seleccione</option>
                       <option *ngFor="let item of vendedores" value="{{ item.id }}">{{ item.nombreCompleto }}</option>
                     </select>
                     <span id="msgContainer_vendedor_id"></span>
