@@ -45,7 +45,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   counter = 0;
   sub: Subscription;
   subModified: Subscription;
-  is_permisos_load = false;
 
   constructor(
     public _ipc: IpcService,
@@ -182,11 +181,12 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     this.currentUserServ
       .validateUser()
       .then((res) => {
-        [this.is_permisos_load, this.configReady] = Array(2).fill(true);
+        console.log("res ", res);
+
+        setTimeout(() => (this.configReady = true), 500);
       })
       .catch((error) => {
         const actualPath = this.getActualPath();
-
         if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });
   }

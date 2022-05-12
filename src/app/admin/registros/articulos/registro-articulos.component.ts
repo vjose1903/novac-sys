@@ -68,7 +68,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   table_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '12%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
       { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }] },
       { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
       { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', estilos: [{ width: '20%' }] },
@@ -144,15 +144,13 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async getArticulos(params?: { per_page: number; page: number; search: string }) {
-    // async getArticulos(e) {
-
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     this.listaArticulos.length = 0;
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
       res.data.map(async (arti) => {
         arti.customStyles = {
-          codigo: { width: '11%' },
+          codigo: { width: '12%' },
           nombre: { width: '37%', 'text-align': 'left', 'padding-left': '0.5rem' },
           medida: { width: '13%' },
           precio_principal: { width: '20%' },
@@ -389,7 +387,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   async getCosto(index, dropdown) {
     const control = this.form.controls['rowFormula'] as FormArray;
-    const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onzas: 'Oz' };
+    const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onzas: 'Oz.' };
     const arrayUnidades = Object.keys(unidades);
     (control.controls[index] as any).controls['costo_formula'].setValue(null);
 
@@ -607,21 +605,31 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(ingredient.articulo_combo));
 
     try {
-      const costo = materiaPrima?.costos?.Libra?.costo || materiaPrima?.costos?.Unidad?.costo;
-      const precio = materiaPrima?.costos?.Libra?.precio || materiaPrima?.costos?.Unidad?.precio;
+      const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onzas: 'Oz.' };
+      const arrayUnidades = Object.keys(unidades);
 
-      const medida = fun.hasValue(materiaPrima.costos.Unidad) ? 'Und.' : 'Lbs.';
+      let costo_en_turno;
+      let precio_en_turno;
+      let medida_en_turno;
+      for (const unidad_en_turno of arrayUnidades) {
+        if (fun.hasValue(materiaPrima.costos[unidad_en_turno])) {
+          costo_en_turno = materiaPrima.costos[unidad_en_turno].costo;
+          precio_en_turno = materiaPrima.costos[unidad_en_turno].precio;
+          medida_en_turno = unidades[unidad_en_turno];
+        }
+      }
+
       const control_en_turno = (control.controls[i] as any).controls;
 
       if (recalcular) {
-        control_en_turno['costo_formula'].setValue(fun.numFormatTwoDecimals(costo));
-        control_en_turno['precio_formula'].setValue(fun.numFormatTwoDecimals(precio));
+        control_en_turno['costo_formula'].setValue(fun.numFormatTwoDecimals(costo_en_turno));
+        control_en_turno['precio_formula'].setValue(fun.numFormatTwoDecimals(precio_en_turno));
       } else {
         control_en_turno['costo_formula'].setValue(fun.numFormatTwoDecimals(ingredient.costo));
         control_en_turno['precio_formula'].setValue(fun.numFormatTwoDecimals(ingredient.precio));
       }
 
-      control_en_turno['medida_formula'].setValue(medida);
+      control_en_turno['medida_formula'].setValue(medida_en_turno);
       control_en_turno['articulo_id'].setValue(ingredient.articulo_combo);
       control_en_turno['id'].setValue(ingredient.id || null);
 
@@ -645,6 +653,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.MEDIDACAJA = '';
     this.TIPOARTICULO = articulo.descripcion;
     this.is_combo = articulo.is_combo;
+
+    console.log('articulo ', articulo);
 
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
       this.COMPRADOEN = 'Quintal';
@@ -703,6 +713,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.form.controls.tipo_articulo_id.setValue(articulo['tipo_articulo_id']);
     this.form.controls.costo_principal.setValue(fun.numFormatTwoDecimals(articulo.costo_principal));
     this.form.controls.precio_principal.setValue(fun.numFormatTwoDecimals(articulo.precio_principal));
+    this.form.controls.medida_alerta.setValue(articulo.medida_alerta);
   }
 
   nuevoRegistro() {
@@ -719,8 +730,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       articulo_id: formulario.id,
       id: formulario.id_contenido_padre,
       costo: _.isString(formulario.costo_padre) ? parseFloat(formulario.costo_padre) : formulario.costo_padre,
-      precio: fun.desformatear(formulario.medida === 'Caja' || formulario.medida === 'Saco' ? formulario.precio_padre : formulario.precio_libra),
-      cantidad: formulario.medida === 'Caja' || formulario.medida === 'Saco' ? formulario.cantidad_contenido_padre : 100,
+      precio: fun.desformatear(['Caja', 'Saco', 'Producto','Galon'].includes(formulario.medida) ? formulario.precio_padre : formulario.precio_libra),
+      cantidad: ['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.cantidad_contenido_padre : 100,
       medida: formulario.medida_contenido_padre,
       condicion: 'padre',
     };
@@ -761,7 +772,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   formarFormula() {
     const array = this.ARRAY_FORMULA.value;
     const formulas = [];
-
+    const unidades = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onzas' };
     array.forEach((element) => {
       const obj = {
         id: _.parseInt(element.id ? element.id : null),
@@ -769,7 +780,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         cantidad: fun.desformatear(element.cantidad_formula),
         costo: fun.desformatear(element.costo_formula),
         precio: fun.desformatear(element.precio_formula),
-        medida: element.medida_formula == 'Und.' ? 'Unidad' : 'Libra',
+        medida: unidades[element.medida_formula],
         // _destroy: element._destroy ? element._destroy : null,
       };
       formulas.push(obj);
@@ -825,7 +836,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     if (obj.is_combo || (array && array.length)) {
       obj['is_combo'] = true;
-      obj['vendido_en'] = 'Saco';
       obj['otros_costos'] = formulario.otros_costos;
       obj['formulas_productos_terminados'] = this.formarFormula();
     }

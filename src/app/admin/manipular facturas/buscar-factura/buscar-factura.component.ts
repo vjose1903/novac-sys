@@ -319,7 +319,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.pagoT = true;
         fact.is_active = fact.estado ? 'fas fa-check' : 'fas fa-times';
         fact.is_active_tooltip = fact.estado ? 'Factura Activa' : 'Factura Inactiva';
-        fact.monto = fun.formatearNumero(fun.redondearAdos(fact.balance));
+        fact.monto = fun.numFormatTwoDecimals(fact.balance);
         fact.pago_a_tiempo = fact.fecha_vencimiento > fechaA ? true : false;
         fact.colorIsActive = fact.estado ? 'green' : 'red';
         fact.viewColor = 'gris-claro';

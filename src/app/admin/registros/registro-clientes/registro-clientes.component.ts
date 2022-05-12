@@ -155,7 +155,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     this.patchDocumentos(data.documentos_de_identidad);
 
-    this.form.controls.maximo_credito.setValue(fun.formatearNumero(fun.redondearAdos(data.maximo_credito)));
+    this.form.controls.maximo_credito.setValue(fun.numFormatTwoDecimals(data.maximo_credito));
     this.clienteSelected = fun.duplicarJson(data);
 
     this.boton = 'Editar';

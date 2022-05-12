@@ -100,10 +100,10 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     const fin1 = values[1] > 1 ? this.medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? this.medidas[keys[2]] : keys[2];
 
-    const principal = fun.formatearNumero(fun.redondearAdos(values[0])) + '  ' + fin;
+    const principal = fun.numFormatTwoDecimals(values[0]) + '  ' + fin;
 
-    const padre = fun.formatearNumero(fun.redondearAdos(values[1])) + '  ' + fin1;
-    const hijo = fun.formatearNumero(fun.redondearAdos(values[2])) + '  ' + fin2;
+    const padre = fun.numFormatTwoDecimals(values[1]) + '  ' + fin1;
+    const hijo = fun.numFormatTwoDecimals(values[2]) + '  ' + fin2;
 
     let cantiTootip = ``;
     if (keys.length > 1) {

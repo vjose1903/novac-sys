@@ -1,5 +1,6 @@
 .splash-container {
   position: relative;
+  background: #e8e8e8;
   .msg {
     position: absolute;
     right: 3rem;
@@ -24,6 +25,7 @@
     position: absolute;
     top: 1rem;
     left: 1rem;
+    filter: drop-shadow(2px 2px 5px #00000061);
   }
 
   @media (min-width: 1550px) {

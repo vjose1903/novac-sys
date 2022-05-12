@@ -97,7 +97,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   formatoNumero(num) {
-    return fun.formatearNumero(fun.redondearAdos(num));
+    return fun.numFormatTwoDecimals(num);
   }
 
   async necesarioParaEmpezar() {
@@ -159,6 +159,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       res.data.map((arti) => {
         arti.customStyles = { codigo: { width: '4rem' }, nombre: { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
       });
+
 
       this.listaArticulos = fun.duplicarJson(res.data);
       this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
