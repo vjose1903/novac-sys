@@ -362,6 +362,31 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     control.removeAt(i);
   }
 
+  checkCostoFormula(fila) {
+    let res = false;
+    const fila_formulario = fun.duplicarJson(fila.value);
+    const articulo = this.listaMateriasPrimas.find((val) => Number(val.id) === Number(fila_formulario.articulo_id));
+
+    if (fila_formulario.costo_formula && fun.hasValue(articulo)) {
+      const arrayUnidades = ['Unidad', 'Libra', 'Onzas'];
+      let costo_en_turno;
+      let costo;
+      for (const unidad_en_turno of arrayUnidades) {
+        if (fun.hasValue(articulo.costos[unidad_en_turno])) {
+          costo_en_turno = articulo.costos[unidad_en_turno];
+          costo = fun.numFormatTwoDecimals(costo_en_turno.costo);
+        }
+      }
+
+      if (fun.desformatear(costo) != fun.desformatear(fila_formulario.costo_formula)) {
+        res = true;
+        setTimeout(() => (this.recalcular = true), 10);
+      }
+    }
+
+    return res;
+  }
+
   async getCosto(index, dropdown) {
     const control = this.form.controls['rowFormula'] as FormArray;
     const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onzas: 'Oz' };
@@ -371,21 +396,21 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     let extra = { afterPath: '', parameters: { costos: true } };
 
     this.articuloClass.getOne(control.value[index].articulo_id, extra).then((res) => {
-      let costos;
-      let medida;
+      let costo_en_turno;
+      let medida_en_turno;
       for (const unidad_en_turno of arrayUnidades) {
         if (fun.hasValue(res.data.costos[unidad_en_turno])) {
-          costos = res.data.costos[unidad_en_turno];
-          medida = unidades[unidad_en_turno];
+          costo_en_turno = res.data.costos[unidad_en_turno];
+          medida_en_turno = unidades[unidad_en_turno];
         }
       }
 
       console.log('res.data ', res.data);
 
-      (control.controls[index] as any).controls['medida_formula'].setValue(medida);
+      (control.controls[index] as any).controls['medida_formula'].setValue(medida_en_turno);
 
-      (control.controls[index] as any).controls['costo_formula'].setValue(fun.numFormatTwoDecimals(costos.costo));
-      (control.controls[index] as any).controls['precio_formula'].setValue(fun.numFormatTwoDecimals(costos.precio));
+      (control.controls[index] as any).controls['costo_formula'].setValue(fun.numFormatTwoDecimals(costo_en_turno.costo));
+      (control.controls[index] as any).controls['precio_formula'].setValue(fun.numFormatTwoDecimals(costo_en_turno.precio));
 
       this.calculateCostoPT();
       dropdown.hide();
@@ -558,26 +583,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     } else {
       this.articulo_no_paquete = false;
     }
-  }
-
-  checkCostoFormula(fila) {
-    let res = false;
-
-    const fila_formulario = fun.duplicarJson(fila.value);
-
-    const articulo = this.listaMateriasPrimas.find((val) => Number(val.id) === Number(fila_formulario.articulo_id));
-
-    if (fila_formulario.costo_formula && fun.hasValue(articulo)) {
-      const costo_temp = fun.hasValue(articulo.costos.Unidad) ? articulo.costos.Unidad.costo : articulo.costos.Libra.costo;
-      const costo = fun.numFormatTwoDecimals(costo_temp);
-
-      if (fun.desformatear(costo) !== fun.desformatear(fila_formulario.costo_formula)) {
-        res = true;
-        setTimeout(() => (this.recalcular = true), 10);
-      }
-    }
-
-    return res;
   }
 
   async recalcularFunc() {
