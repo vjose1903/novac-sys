@@ -23,7 +23,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   boton = '';
   form: FormGroup;
   phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-  listaVehiculos;
+  listaVehiculos = [];
   FORM: any;
 
   listaMarcas = [];
@@ -112,6 +112,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
+    this.listaVehiculos.length = 0;
     const res = await this.vehiculosClass.getAll(extra);
 
     res.data.map((val) => {

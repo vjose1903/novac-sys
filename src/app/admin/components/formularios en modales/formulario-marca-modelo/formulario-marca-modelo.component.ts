@@ -57,10 +57,10 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   botones = { titulo: true, borrar: true, editar: true };
   componente = { 0: 'listado_marcas', 1: 'listado_modelos' };
 
-  listadoMarcas;
+  listadoMarcas = [];
   marcaSelected;
 
-  listadoModelos;
+  listadoModelos = [];
   modeloSelected;
 
   campo1;
@@ -121,12 +121,12 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
     this.permissionsService.hasPermission([this.permissions.marca.create, this.permissions.marca.update]).then((result) => (this.hasPermissionsMarcaCreate = result));
     this.permissionsService.hasPermission([this.permissions.modelo.create, this.permissions.modelo.update]).then((result) => (this.hasPermissionsModeloCreate = result));
-
   }
 
   getMarcas(params) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: params.paginado, page: params.page, per_page: params.per_page } };
+    this.listadoMarcas.length = 0;
     this.marcasClass.getAll(extra).then((res) => {
       if (!params.paginado) this.listaMarcas = fun.duplicarJson(res);
       if (params.paginado) {
@@ -140,6 +140,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: true, page: params.page, per_page: params.per_page } };
 
+    this.listadoModelos.length = 0;
     this.modeloClass.getAll(extra).then((res) => {
       res.data.map((obj) => {
         obj.marca_nombre = obj.marca.descripcion;

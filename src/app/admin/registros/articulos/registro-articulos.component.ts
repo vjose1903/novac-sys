@@ -31,7 +31,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   articuloSelected;
 
   vendersePorSelected;
-  listaArticulos;
+  listaArticulos = [];
   FORM: any;
   listaTipoArticulos: any;
 
@@ -55,7 +55,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   vendidoEn = [
     { backend: 'Unidad', front: 'Unidad' },
     { backend: 'Saco', front: 'Saco' },
-    { backend: 'Galon', front: 'Galón' },
   ];
 
   fechaFactura: string;
@@ -147,6 +146,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
+    this.listaArticulos.length = 0;
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
       res.data.map(async (arti) => {
         arti.customStyles = {
@@ -194,7 +194,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     if (tipo_check !== 'producto terminado' && tipo_check !== 'materia prima') this.form.controls.calcular_saco.setValue(false);
 
-    if (tipo_check === 'producto terminado') {
+    if (tipo_check == 'producto terminado') {
       await this.getMateriasP().then((res) => {
         this.addItem();
         this.resetCompradoEn('Quintal');
@@ -301,18 +301,14 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   resetCompradoEn(value) {
     const formulario = this.form.getRawValue();
 
-    this.form.controls.medida_contenido_padre.setValue(null);
-    this.form.controls.medida_contenido_hijo.setValue(null);
-    this.form.controls.cantidad_contenido_padre.setValue(null);
-    this.form.controls.cantidad_contenido_hijo.setValue(null);
+    const fields = ['medida_alerta', 'medida_contenido_padre', 'medida_contenido_hijo', 'cantidad_contenido_padre', 'cantidad_contenido_hijo', 'precio_padre', 'precio_libra', 'precio_hijo'];
 
-    this.form.controls.precio_padre.setValue(null);
-    this.form.controls.precio_libra.setValue(null);
-    this.form.controls.precio_hijo.setValue(null);
+    fields.forEach((field) => {
+      this.form.controls[field].reset(null);
+    });
 
     this.FORM.rowFormula.reset();
 
-    this.form.controls.medida_alerta.setValue(null);
     this.COMPRADOEN = value;
 
     if (value === 'Quintal') {
