@@ -21,6 +21,8 @@ import { fun } from '../../core/services/functions.service';
 import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
 import { teclasCode } from '../../core/typescript/constantes';
 import { Permisos } from '../../core/typescript/permisos';
+import { ConfigI } from '../../core/typescript/config-interface';
+import { SingletonService } from '../../core/services/singleton.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -128,7 +130,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   filterCamionesTargets;
   copyCamiones;
   permissions = Permisos;
-
+  configApp: ConfigI;
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService, public pdfServ: PdfService) {
     super();
 
@@ -142,6 +144,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   ngOnInit() {
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
     this.localeService.use('es');
+    this.configApp = SingletonService.configServ.getConfig({ isPromise: false });
     this.rellenarVariables();
   }
 
@@ -238,8 +241,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       });
 
       if (this.metodo === 'venta') {
-        this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: 'Autopista duarte KM 0 el Higüero', telefono: null });
-        this.getCamiones();
+        this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
+        // this.getCamiones();
       } else {
         if (this.form) this.form.reset();
       }
@@ -567,7 +570,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
             this.paqueteComprobante = paquete.data;
 
-            if (this.paqueteComprobante.fecha_valida !== null) {
+            if (fun.hasValue(this.paqueteComprobante.fecha_valida)) {
               const desde = this.paqueteComprobante.desde;
               const hasta = this.paqueteComprobante.hasta;
               const secuencia = this.paqueteComprobante.secuencia;
@@ -594,11 +597,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             }
             resolve(true);
           } catch (error) {
-            if (error.error.msg) {
-              fun.toastError(error.error.msg, 'ERROR');
-            } else {
-              fun.toastError('Error calculando la secuencia de comprobantes.', 'AVISO');
-            }
+            if (fun.isEmpty(error.error.msg)) fun.toastError('Error calculando la secuencia de comprobantes.', 'AVISO');
 
             this.enfocarInput('tipoFact');
             resolve(false);

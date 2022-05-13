@@ -26,8 +26,8 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   permissions = Permisos;
   table_roles_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '4rem' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '35rem' }, { 'text-align': 'left' }, { 'padding-left': '2rem' }] },
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '5.5rem' }, { 'text-align': 'left' }] },
+      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '35rem' }, { 'text-align': 'left' }] },
       { titulo: 'Cantidad', tipo: 'cantidades', key: 'cantidades' },
       { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal' },
     ],
@@ -97,7 +97,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   formatoNumero(num) {
-    return fun.formatearNumero(fun.redondearAdos(num));
+    return fun.numFormatTwoDecimals(num);
   }
 
   async necesarioParaEmpezar() {
@@ -157,7 +157,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro }).then((res) => {
       res.data.map((arti) => {
-        arti.customStyles = { codigo: { width: '4rem' }, nombre: { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
+        arti.customStyles = { codigo: { width: '5.5rem', 'text-align': 'left' }, nombre: { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
       });
 
       this.listaArticulos = fun.duplicarJson(res.data);

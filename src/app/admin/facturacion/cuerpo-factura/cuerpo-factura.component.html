@@ -3,34 +3,33 @@
     <tr class="text-center">
       <th class="tiCOD">Codigo</th>
       <th class="tiCAN">Cantidad</th>
-      <th class="tiUNI"><span class="ml-3">Unidad</span></th>
+      <th class="tiUNI">Unidad</th>
       <th class="tiDES">Descripcion</th>
-      <th pTooltip="Descuento en %" tooltipPosition="top" class="tiDESC">Descuento</th>
+      <th class="tiDESC">Descuento</th>
       <th class="tiPRE">{{ metodo === 'venta' ? 'Precio' : 'Costo' }}</th>
       <th class="tiTOT">Total</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td class="COD td0padding"></td>
+      <td class="COD p-0"></td>
 
-      <td class="CAN td0padding"></td>
+      <td class="CAN p-0"></td>
 
-      <td class="UNI td0padding"></td>
+      <td class="UNI p-0"></td>
 
-      <td class="DES td0padding"></td>
+      <td class="DES p-0"></td>
 
-      <td pTooltip="Descuento en %" tooltipPosition="top" class="DESC td0padding"></td>
+      <td class="DESC p-0"></td>
 
-      <td class="PRE td0padding"></td>
+      <td class="PRE p-0"></td>
 
-      <td class="TOT td0padding"></td>
+      <td class="TOT p-0"></td>
     </tr>
   </tbody>
 </table>
 
 <div class="cuadro" #cuadro class="scrollContainer">
-  <!-- <div class="cuadro" #cuadro [ngClass]="{ sinFlow: secuencia <= 12, conFlow: secuencia >= 13 }"> -->
   <form [formGroup]="form" action="">
     <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWFACTURAS?.controls; let index_cuerpo = index">
       <div [formGroupName]="index_cuerpo">
@@ -64,7 +63,7 @@
               </td>
 
               <!--  ::::::::::::  CODIGO  ::::::::::::  -->
-              <td class="COD td0padding">
+              <td class="COD p-0">
                 <div class="form-group m-0">
                   <input
                     [ngClass]="{ disabled: !propietario }"
@@ -82,7 +81,7 @@
               </td>
 
               <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
-              <td class="CAN td0padding">
+              <td class="CAN p-0">
                 <div class="form-group m-0">
                   <input
                     [ngClass]="{ disabled: !propietario }"
@@ -101,7 +100,7 @@
               </td>
 
               <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
-              <td class="UNI td0padding">
+              <td class="UNI p-0">
                 <div class="form-group m-0">
                   <input
                     [ngClass]="{ disabled: !propietario }"
@@ -138,7 +137,7 @@
               </td>
 
               <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
-              <td class="DES td0padding">
+              <td class="DES p-0">
                 <div class="form-group m-0">
                   <input
                     type="text"
@@ -154,7 +153,7 @@
 
               <!--  ::::::::::::  DESCUENTO  ::::::::::::  -->
 
-              <td class="DESC td0padding">
+              <td class="DESC p-0">
                 <div class="form-group m-0">
                   <input
                     type="number"
@@ -163,16 +162,16 @@
                     (focus)="verificarSecuencia(index_cuerpo); checkDisable('desc-', index_cuerpo, true)"
                     (keyup)="checkDisable('desc-', index_cuerpo, true)"
                     (keyup.enter)="enfocarInput('cod-' + (index_cuerpo + 1))"
-                    formControlName="descuento_porciento"
+                    formControlName="descuento_valor"
                     (blur)="calcularDescuento(index_cuerpo)"
                     (emptied)="calcularDescuento(index_cuerpo)"
-                    [ngClass]="{ disabled: readDescuento() }"
+                    [ngClass]="{ disabled: !propietario }"
                     tabindex="-1"
                   />
                 </div>
               </td>
               <!--  ::::::::::::  PRECIO  ::::::::::::  -->
-              <td class="PRE td0padding">
+              <td class="PRE p-0">
                 <div class="form-group m-0">
                   <input
                     type="text"
@@ -190,7 +189,7 @@
               </td>
 
               <!--  ::::::::::::  TOTAL  ::::::::::::  -->
-              <td class="TOT td0padding">
+              <td class="TOT p-0">
                 <div class="form-group m-0">
                   <input
                     type="text"

@@ -427,6 +427,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   lookOters(objeto) {
+
     const keys = _.keys(objeto);
     const values = _.values(objeto);
 
@@ -434,14 +435,15 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? medidas[keys[2]] : keys[2];
 
-    const principal = fun.formatearNumero(fun.redondearAdos(values[0])) + '  ' + fin;
+    const principal = fun.numFormatTwoDecimals(values[0]) + '  ' + fin;
 
-    const padre = fun.formatearNumero(fun.redondearAdos(values[1])) + '  ' + fin1;
+    const padre = fun.numFormatTwoDecimals(values[1]) + '  ' + fin1;
     const hijo = fun.formatearNumero(values[2]) + '  ' + fin2;
 
     let cantiTootip = { Padre: undefined, Hijo: undefined };
+
     if (keys.length > 1) {
-      if (keys.length === 2) {
+      if (keys.length == 2) {
         cantiTootip = { Padre: padre, Hijo: undefined };
       } else {
         cantiTootip = { Padre: padre, Hijo: hijo };
@@ -458,7 +460,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const values = _.values(objeto);
     const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
 
-    return fun.formatearNumero(fun.redondearAdos(values[0])) + '  ' + fin;
+    return fun.numFormatTwoDecimals(values[0]) + '  ' + fin;
   }
 
   iconBtn(key, i, data, e, objIcon) {
@@ -578,7 +580,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       const copia = fun.duplicarJson(this.data[index][referencia]);
 
       if (formatear) {
-        input['value'] = fun.formatearNumero(fun.redondearAdos(copia));
+        input['value'] = fun.numFormatTwoDecimals(copia);
       } else {
         input['value'] = copia;
       }

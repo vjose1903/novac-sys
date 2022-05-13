@@ -76,8 +76,10 @@
                 <div *ngFor="let ingrediente of ingredientes; let i = index" class="ingredientesList d-flex">
                   <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
 
-                  <div pTooltip="{{ existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : '' }} " [tooltipPosition]="i != 0 ? 'top' : 'bottom'" style="width: 100%">
-                    {{ lookprincipal(ingrediente) }}
+                  <div style="width: 100%">
+                    <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="i != 0 ? 'top' : 'bottom'">
+                      {{ lookprincipal(ingrediente) }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -88,8 +90,10 @@
                 <div *ngFor="let ingrediente of ingredientesParaProduccion; let index_ingrediente = index" class="ingredientesList d-flex">
                   <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
 
-                  <div pTooltip="{{ existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : '' }} " [tooltipPosition]="index_ingrediente != 0 ? 'top' : 'bottom'" style="width: 100%">
-                    {{ lookprincipal(ingrediente) }}
+                  <div class="" style="width: 100%">
+                    <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index_ingrediente != 0 ? 'top' : 'bottom'">
+                      {{ lookprincipal(ingrediente) }}
+                    </span>
                   </div>
                 </div>
               </div>
