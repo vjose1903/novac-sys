@@ -13,16 +13,13 @@
   //   opacity: 1 !important;
   // }
 }
-.columna0padding,
-.td0padding {
-  padding: 0 !important;
-}
+
 .filaFact {
   padding: 0rem 0.9rem;
   width: 100vw;
 }
 // ====================================================
-// TAMAÑO DE LOS TITULOS
+// TAMAÑO DE LAS FILAS
 // ====================================================
 .COD {
   max-width: 2rem;
@@ -31,10 +28,10 @@
   max-width: 1rem;
 }
 .DES {
-  max-width: 7rem;
+  max-width: 6.4rem;
 }
 .DESC {
-  max-width: 1rem;
+  max-width: 1.7rem;
 }
 .UNI {
   max-width: 2rem;
@@ -47,25 +44,24 @@
 }
 
 // ====================================================
-// TAMAÑO DE LAS FILAS
+// TAMAÑO DE LOS TITULOS
 // ====================================================
 
 .tiCOD {
-  width: 10%;
+  width: 9%;
 }
 .tiCAN {
-  width: 9%;
+  width: 11%;
 }
 .tiUNI {
   width: 10%;
   text-align: left;
 }
 .tiDES {
-  width: 39%;
+  width: 37%;
 }
 .tiDESC {
   width: 8%;
-  padding: 0rem 0rem 0.5rem 1rem;
 }
 
 .tiPRE {

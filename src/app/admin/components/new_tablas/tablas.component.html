@@ -22,14 +22,14 @@
                     class="apple-switch"
                     type="checkbox"
                     [checked]="are_all_selected(row)"
-                    pTooltip="{{ are_all_selected(row) ? 'Deseleccionar todo' : 'Seleccionar todo' }}"
+                    [pTooltip]="are_all_selected(row) ? 'Deseleccionar todo' : 'Seleccionar todo'"
                     tooltipPosition="top"
                     (change)="changeValorSelectAll(row)"
                   />
                 </span>
 
                 <span *ngSwitchDefault>
-                  <span pTooltip="{{ row.tooltip || null }}" tooltipPosition="top" class="titulo"> {{ row.titulo }} </span>
+                  <span [pTooltip]="row.tooltip || ''" tooltipPosition="top" class="titulo"> {{ row.titulo }} </span>
                 </span>
               </span>
             </th>
@@ -75,7 +75,7 @@
                     <span
                       *ngSwitchCase="'cantidades'"
                       id="{{ column.key }}-{{ getIndex(index_body) }}"
-                      pTooltip="{{ lookOters(dato[column.key]).Padre }} {{ lookOters(dato[column.key]).Hijo == undefined ? '' : lookOters(dato[column.key]).Hijo }}"
+                      pTooltip="{{ lookOters(dato[column.key]).Padre }}   {{ lookOters(dato[column.key]).Hijo == undefined ? '' : lookOters(dato[column.key]).Hijo }}"
                       [tooltipPosition]="getIndex(index_body) != 0 ? 'top' : 'bottom'"
                       style="width: 100%"
                     >
@@ -91,7 +91,7 @@
                         <span *ngIf="showIcon(objIcon, dato)" class="span_icon" [ngClass]="{ icon_disable: disabledInput(dato, objIcon) }">
                           <i
                             id="{{ config.id_tabla + post_id }}-{{ getIconKey(objIcon) }}-{{ getIndex(index_body) }}"
-                            pTooltip="{{ dato[objIcon.rowTooltip] || objIcon.tooltip || ' ' }}"
+                            [pTooltip]="dato[objIcon.rowTooltip] || objIcon.tooltip || ''"
                             tooltipPosition="top"
                             (click)="iconBtn(column.key, getIndex(index_body), dato, $event, objIcon)"
                             class=" iconPress {{ getIconClass(objIcon, dato) }} {{ dato.iconHover ? 'c-pointer' : '' }} {{ dato[objIcon.text_color] ? 'text-' + dato[objIcon.text_color] : 'text-black' }}"
@@ -169,7 +169,7 @@
                       id="{{ column.key }}-{{ getIndex(index_body) }}"
                       class=" {{ dato[column.text_color] ? 'text-' + dato[column.text_color] : 'text-black' }}"
                       style="width: 100%"
-                      pTooltip="{{ dato[column.rowTooltip] || null }}"
+                      [pTooltip]="dato[column.rowTooltip] || ''"
                       tooltipPosition="top"
                     >
                       {{ getValueForm(column, dato) }}

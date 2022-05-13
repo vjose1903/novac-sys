@@ -366,7 +366,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const articulo = this.listaMateriasPrimas.find((val) => Number(val.id) === Number(fila_formulario.articulo_id));
 
     if (fila_formulario.costo_formula && fun.hasValue(articulo)) {
-      const arrayUnidades = ['Unidad', 'Libra', 'Onzas'];
+      const arrayUnidades = ['Unidad', 'Libra', 'Onza'];
       let costo_en_turno;
       let costo;
       for (const unidad_en_turno of arrayUnidades) {
@@ -387,7 +387,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   async getCosto(index, dropdown) {
     const control = this.form.controls['rowFormula'] as FormArray;
-    const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onzas: 'Oz.' };
+    const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
     const arrayUnidades = Object.keys(unidades);
     (control.controls[index] as any).controls['costo_formula'].setValue(null);
 
@@ -568,7 +568,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     else if (medida == 'Saco') this.optionsAlerta = ['Saco', 'Libra'];
     else if (medida == 'Caja') this.optionsAlerta = ['Caja', 'Paquete', 'Unidad'];
     else if (medida == 'Unidad') this.optionsAlerta = ['Unidad'];
-    else if (medida == 'Galon') this.optionsAlerta = ['Galon', 'Onzas'];
+    else if (medida == 'Galon') this.optionsAlerta = ['Galon', 'Onza'];
     else if (medida == 'Producto') this.optionsAlerta = ['Producto', 'Unidad'];
   }
 
@@ -605,7 +605,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(ingredient.articulo_combo));
 
     try {
-      const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onzas: 'Oz.' };
+      const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
       const arrayUnidades = Object.keys(unidades);
 
       let costo_en_turno;
@@ -772,7 +772,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   formarFormula() {
     const array = this.ARRAY_FORMULA.value;
     const formulas = [];
-    const unidades = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onzas' };
+    const unidades = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onza' };
     array.forEach((element) => {
       const obj = {
         id: _.parseInt(element.id ? element.id : null),

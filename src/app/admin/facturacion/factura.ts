@@ -84,7 +84,7 @@ export interface FacturasI {
   suplidor: Suplidor;
   usuario: string;
   vendedor: string;
-  notas: Notas[];
+  notas:any;
   pagos: Pago[];
   [propName: string]: any;
 }
@@ -101,7 +101,6 @@ export interface DetalleFactura {
   articulo_id: number;
   total: number;
   descuento_valor: number;
-  descuento_porciento: number;
   itbis: number;
   cantidad: number;
   cantidad_en_unidades: number;
@@ -121,7 +120,7 @@ export interface DetalleFactura {
   contenidos: Contenidos;
   select: boolean;
   cant: number;
-  cant_nota: number|string;
+  cant_nota: number | string;
   total_nota: string | number;
   cantidad_en_unidades_nota: null;
   [propName: string]: any;
@@ -185,7 +184,6 @@ export interface DetalleFacturaNota {
   retirado?: null;
   retirado_en_venta?: null;
   descuento_valor?: number;
-  descuento_porciento?: number;
   created_at?: Date;
   updated_at?: Date;
   calcular_saco?: boolean;

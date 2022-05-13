@@ -26,7 +26,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   inputSecuencia;
   inputDrop;
   filasDetalle;
-  llevaDescuento;
   DESCUENTO;
   listaDeDescuentos;
 
@@ -74,8 +73,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         fila.articulo_id = fila?.articulo?.id;
         fila.cantidad = fila.can;
         fila.total = fun.desformatear(fila.tot);
-        fila.descuento_valor = fila.descuento_valor ? (fila.descuento_valor !== null ? fila.descuento_valor : 0) : 0;
-        fila.descuento_porciento = fila.descuento_porciento ? (fila.descuento_porciento !== null ? fila.descuento_porciento : 0) : 0;
+        fila.descuento_valor = fila.descuento_valor ? (fun.hasValue(fila.descuento_valor) ? fila.descuento_valor : 0) : 0;
         fila.itbis = 0;
         fila.unidad = fila.uni;
         fila.precio = fun.desformatear(fila.pre);
@@ -104,7 +102,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       this.inputSecuencia = 'cod-0';
       this.inputDrop = undefined;
       this.filasDetalle = undefined;
-      this.llevaDescuento = undefined;
       this.DESCUENTO = 0;
       this.listaDeDescuentos = [];
       this.sacos = [25, 50, 100];
@@ -142,7 +139,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     if (verificate) {
       if (fun.isEmpty(this.propietario)) isDisable = true;
-      if (!isDisable && input == 'desc-') isDisable = this.readDescuento();
       if (!isDisable && input == 'pre-') isDisable = this.readPrecio();
     } else {
       isDisable = true;
@@ -196,12 +192,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   //  RESETEAR FORMULARIO
   // =============================================
   RESETCUERPO() {
-    if (this.filasDetalle) {
-      for (let i = 0; i < this.filasDetalle.length; i++) {
-        (this.filasDetalle[i] as any).controls['descuento_porciento'].enable();
-      }
-    }
-
     if (this.form) this.form.reset();
     this.TOTAL = 0;
     this.ITBIS = 0;
@@ -227,7 +217,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       uni: [null],
       pre: [null],
       costo: [null],
-      descuento_porciento: [null],
       descuento_valor: [null],
       tot: [null],
       secuencia: [i],
@@ -280,10 +269,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const campos = (this.filasDetalle[j] as any).controls;
 
     campos['pre'].setValue(this.metodo === 'venta' ? fun.numFormatTwoDecimals(row.precio) : fun.numFormatTwoDecimals(row.costo));
-
     campos['costo'].setValue(fun.numFormatTwoDecimals(row.costo));
-
-    campos['descuento_porciento'].setValue(row.descuento_porciento || null);
     campos['descuento_valor'].setValue(row.descuento_valor);
     campos['tot'].setValue(fun.numFormatTwoDecimals(row.total));
 
@@ -300,13 +286,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     campos['articulo'].setValue(articulo);
 
-    if (row.tipo === 'Materia prima') {
-      campos['descuento_porciento'].disable({ onlySelf: true });
-      campos['is_materia_prima'].setValue(true);
-    } else {
-      campos['descuento_porciento'].enable();
-      campos['is_materia_prima'].setValue(false);
-    }
+    campos['is_materia_prima'].setValue(row.tipo == 'Materia prima');
 
     let uni = row.peso_saco ? 'Saco de ' + row.peso_saco + ' libras' : row.unidad;
 
@@ -512,37 +492,30 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const precioTEMP = (this.filasDetalle[i] as any).controls['pre'].value;
     const precio = fun.desformatear(precioTEMP);
     const cantidad = (this.filasDetalle[i] as any).controls['can'].value;
-    let descuento = (this.filasDetalle[i] as any).controls['descuento_porciento'].value;
 
-    if (descuento >= 0 && descuento <= 100) {
+    let descuento = (this.filasDetalle[i] as any).controls['descuento_valor'].value;
+
+    if (descuento >= 0) {
       const total = precio * cantidad;
 
       if (fun.hasValue(codido) && (fun.isEmpty(descuento) || descuento == 0)) {
-        (this.filasDetalle[i] as any).controls['descuento_porciento'].reset();
         (this.filasDetalle[i] as any).controls['descuento_valor'].reset();
         (this.filasDetalle[i] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(total));
-
         this.sacarDescuento(i);
       }
 
-      let calculoDesc = 0;
       let nuevoTotal = 0;
       if (fun.hasValue(codido) && fun.hasValue(precio) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
-        descuento = descuento / 100;
-
-        calculoDesc = precio * descuento * cantidad;
-        (this.filasDetalle[i] as any).controls['descuento_valor'].setValue(calculoDesc);
-        nuevoTotal = total - calculoDesc;
+        nuevoTotal = total - descuento;
 
         (this.filasDetalle[i] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
         this.calculosTotalesGenerales();
-        this.calculosDescuentoGeneral(calculoDesc, i);
+        this.calculosDescuentoGeneral(descuento, i);
         this.ajustarSecuencia();
       }
     } else {
-      if (descuento > 100) fun.toastWarning('El descuento es calculado en porciento, el valor del descuento no puede ser mayor a 100', 'AVISO');
-      if (descuento < 0) fun.toastWarning('El descuento es calculado en porciento, el valor del descuento no puede ser menor a 0', 'AVISO');
-      (this.filasDetalle[i] as any).controls['descuento_porciento'].setValue(0);
+      if (descuento < 0) fun.toastWarning('El descuento no puede ser menor a 0', 'AVISO');
+      (this.filasDetalle[i] as any).controls['descuento_valor'].setValue(0);
       this.enfocarInput(`desc-${i}`);
     }
   }
@@ -654,14 +627,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       (this.filasDetalle[index] as any).controls['can_ant'].setValue(null);
       (this.filasDetalle[index] as any).controls['uni'].setValue(null);
 
-      if (this.metodo === 'venta') {
-        const objConditions = { si: { value: true, func: 'disable' }, no: { value: false, func: 'enable' } };
-
-        const condition = ARTICULO.descripcion === 'Materia prima' ? 'si' : 'no';
-
-        (this.filasDetalle[index] as any).controls['descuento_porciento'][objConditions[condition].func]();
-        (this.filasDetalle[index] as any).controls['is_materia_prima'].setValue([objConditions[condition].value]);
-      }
+      if (this.metodo === 'venta') (this.filasDetalle[index] as any).controls['is_materia_prima'].setValue(ARTICULO.descripcion == 'Materia prima');
 
       setTimeout(() => this.enfocarInput('can-' + index), 0);
     }

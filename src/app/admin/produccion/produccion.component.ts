@@ -6,7 +6,7 @@ import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
 import { ProduccionC } from './produccion';
 import * as $ from 'jquery';
 import { fun } from '../../core/services/functions.service';
-import { table_config } from '../components/new_tablas/tabla-class';
+import { medidas, table_config } from '../components/new_tablas/tabla-class';
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
@@ -21,10 +21,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   ingredientes = [];
   ingredientesParaProduccion = [];
 
-  medidas = { Libra: 'Libras', Quintal: 'Quintales', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades' };
-
-  element: any;
-  optionsMedidas = ['Quintal', 'Libra'];
+  optionsMedidas = ['Producto', 'Unidad'];
 
   info = [];
 
@@ -96,9 +93,9 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     const keys = _.keys(objeto);
     const values = _.values(objeto);
 
-    const fin = values[0] > 1 ? this.medidas[keys[0]] : keys[0];
-    const fin1 = values[1] > 1 ? this.medidas[keys[1]] : keys[1];
-    const fin2 = values[2] > 1 ? this.medidas[keys[2]] : keys[2];
+    const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
+    const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
+    const fin2 = values[2] > 1 ? medidas[keys[2]] : keys[2];
 
     const principal = fun.numFormatTwoDecimals(values[0]) + '  ' + fin;
 
@@ -107,7 +104,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
     let cantiTootip = ``;
     if (keys.length > 1) {
-      if (keys.length === 2) cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
+      if (keys.length == 2) cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
       else cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br> <span>${hijo}</span><br> </div>`;
     } else cantiTootip = `<div style=" max-width: 21rem;" > <span> ${principal} </span><br></div>`;
 
@@ -125,8 +122,9 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   existenciaConTooltip(objeto) {
     let llevaTooltip = true;
 
-    if (_.has(objeto.existencia, 'Caja')) llevaTooltip = objeto.existencia.Unidad > objeto.contenido.Caja && objeto.existencia.Caja > 0;
-    else if (_.has(objeto.existencia, 'Saco')) llevaTooltip = objeto.existencia.Libra > objeto.contenido.Saco && objeto.existencia.Saco > 0;
+    if (_.has(objeto.existencia, 'Caja')) llevaTooltip = objeto.existencia.Unidad >= objeto.contenido.Caja && objeto.existencia.Caja > 0;
+    else if (_.has(objeto.existencia, 'Saco')) llevaTooltip = objeto.existencia.Libra >= objeto.contenido.Saco && objeto.existencia.Saco > 0;
+    else if (_.has(objeto.existencia, 'Galon')) llevaTooltip = objeto.existencia.Onza >= objeto.contenido.Galon && objeto.existencia.Galon > 0;
     else llevaTooltip = objeto.existencia.Libra > 100;
 
     return llevaTooltip;
@@ -136,15 +134,19 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     let mostrar;
 
     if (_.has(objeto.existencia, 'Caja')) {
-      if (objeto.existencia.Unidad > objeto.contenido.Caja && objeto.existencia.Caja > 0) {
+      if (objeto.existencia.Unidad >= objeto.contenido.Caja && objeto.existencia.Caja > 0) {
         mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Caja)} ${objeto.existencia.Caja === 1 ? 'Caja' : 'Cajas'}`;
       } else mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Unidad)} ${objeto.existencia.Unidad === 1 ? 'Unidad' : 'Unidades'}`;
     } else if (_.has(objeto.existencia, 'Saco')) {
-      if (objeto.existencia.Libra > objeto.contenido.Saco && objeto.existencia.Saco > 0) {
+      if (objeto.existencia.Libra >= objeto.contenido.Saco && objeto.existencia.Saco > 0) {
         mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Saco)} ${objeto.existencia.Saco === 1 ? 'Saco' : 'sacos'}`;
       } else mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
+    } else if (_.has(objeto.existencia, 'Galon')) {
+      if (objeto.existencia.Onza >= objeto.contenido.Galon && objeto.existencia.Galon > 0) {
+        mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Galon)} ${objeto.existencia.Galon === 1 ? 'Galon' : 'Galones'}`;
+      } else mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Onza)} ${objeto.existencia.Onza === 1 ? 'Onza' : 'Onzas'}`;
     } else {
-      if (objeto.existencia.Libra > 100) mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Quintal)} ${objeto.existencia.Quintal === 1 ? 'Quintal' : 'Quintales'}`;
+      if (objeto.existencia.Libra >= 100) mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Quintal)} ${objeto.existencia.Quintal === 1 ? 'Quintal' : 'Quintales'}`;
       else mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
     }
 
@@ -181,42 +183,53 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   calcularCantidadAProduccir() {
     this.ingredientesParaProduccion = [];
-
     if (this.cantidad_producir && this.medida_producir) {
-      this.ingredientes.forEach(async (ingre) => {
-        let cantidadFormula = ingre.cantidad;
+      this.ingredientes.forEach(async (ingrediente) => {
+        let cantidad_formula = ingrediente.cantidad;
+        let contenidos_ingrediente = ingrediente.contenido;
+        const contenido_a_producir = {};
+        let cantidad_calculada = cantidad_formula * this.cantidad_producir;
 
-        if (this.medida_producir === 'Libra' && ingre.medida === 'Libra') cantidadFormula = cantidadFormula / 100;
+        let cantidad_anterior = 0;
 
-        let cantidad_calculada = cantidadFormula * this.cantidad_producir;
+        for (const key in contenidos_ingrediente) {
+          const contenido = contenidos_ingrediente[key];
 
-        let obj: any = { Quintal: cantidad_calculada / 100, Libra: cantidad_calculada };
-
-        if (ingre.medida == 'Unidad') obj = { Caja: cantidad_calculada / ingre.contenido.Caja, Unidad: cantidad_calculada };
-
-        if (this.lista_produccion.length > 0) {
-          const ingredientesIguales = _.filter(this.lista_produccion, (item) => item.articulo_combo == ingre.articulo_combo);
-          cantidad_calculada = _.reduce(ingredientesIguales, (acumulado, item) => acumulado + item.cantidad, cantidad_calculada);
+          if (!key.includes('Saco_')) {
+            contenido_a_producir[key] = cantidad_calculada / contenido;
+          }
         }
 
-        const extra = { afterPath: `check_excede/${ingre.articulo_combo}`, parameters: { cantidad: cantidad_calculada } };
+        if (this.lista_produccion.length > 0) {
+          const all_ingredientes = _.flattenDeep(
+            _.map(this.lista_produccion, (producto) => {
+              const producto_distinto_en_lista = producto.articulo_id != ingrediente.articulo_id ? _.get(producto, 'ingredientes') : [];
+              return producto_distinto_en_lista;
+            }),
+          );
+          const ingredientesIguales = _.filter(all_ingredientes, (item) => item.articulo_combo == ingrediente.articulo_combo);
+          if (ingredientesIguales.length) cantidad_calculada = _.reduce(ingredientesIguales, (acumulado, item) => acumulado + item.cantidad_en_unidades, cantidad_calculada);
+        }
+
+        const extra = { afterPath: `check_excede/${ingrediente.articulo_combo}`, parameters: { cantidad: cantidad_calculada } };
+
         await this.articuloClass.getAll(extra).then((res) => {
           const excede = res['data'];
           if (excede) {
             this.cantidad_producir = null;
             this.ingredientesParaProduccion = [];
 
-            fun.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.producto_terminado_en_turno.nombre, 'ERROR');
+            fun.toastError('No tiene suficiente ' + ingrediente.nombre + ', para realizar la cantidad introducida de ' + this.producto_terminado_en_turno.nombre, 'ERROR');
             this.enfocarInput('cantidad_producir');
           } else {
             this.ingredientesParaProduccion.push({
-              nombre: ingre.nombre,
-              existencia: obj,
-              articulo_id: ingre.articulo_id,
-              contenido: ingre.contenido,
-              articulo_combo: ingre.articulo_combo,
-              cantidad_en_unidades: ingre.medida == 'Unidad' ? obj.Unidad : obj.Libra,
-              medida: ingre.medida,
+              nombre: ingrediente.nombre,
+              existencia: contenido_a_producir,
+              articulo_id: ingrediente.articulo_id,
+              contenido: ingrediente.contenido,
+              articulo_combo: ingrediente.articulo_combo,
+              cantidad_en_unidades: contenido_a_producir[ingrediente.medida],
+              medida: ingrediente.medida,
             });
 
             this.ingredientesParaProduccion = _.orderBy(this.ingredientesParaProduccion, ['articulo_combo'], ['asc']);
@@ -225,6 +238,52 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       });
     }
   }
+  // calcularCantidadAProduccir() {
+  //   this.ingredientesParaProduccion = [];
+
+  //   if (this.cantidad_producir && this.medida_producir) {
+  //     this.ingredientes.forEach(async (ingre) => {
+  //       let cantidadFormula = ingre.cantidad;
+
+  //       // if (this.medida_producir == 'Libra' && ingre.medida === 'Libra') cantidadFormula = cantidadFormula / 100;
+
+  //       let cantidad_calculada = cantidadFormula * this.cantidad_producir;
+
+  //       let obj: any = { Producto: cantidad_calculada / ingre.cantidad, Unidad: cantidad_calculada };
+
+  //       if (ingre.medida == 'Unidad') obj = { Caja: cantidad_calculada / ingre.contenido.Caja, Unidad: cantidad_calculada };
+
+  //       if (this.lista_produccion.length > 0) {
+  //         const ingredientesIguales = _.filter(this.lista_produccion, (item) => item.articulo_combo == ingre.articulo_combo);
+  //         cantidad_calculada = _.reduce(ingredientesIguales, (acumulado, item) => acumulado + item.cantidad, cantidad_calculada);
+  //       }
+
+  //       const extra = { afterPath: `check_excede/${ingre.articulo_combo}`, parameters: { cantidad: cantidad_calculada } };
+  //       await this.articuloClass.getAll(extra).then((res) => {
+  //         const excede = res['data'];
+  //         if (excede) {
+  //           this.cantidad_producir = null;
+  //           this.ingredientesParaProduccion = [];
+
+  //           fun.toastError('No tiene suficiente ' + ingre.nombre + ', para realizar la cantidad introducida de ' + this.producto_terminado_en_turno.nombre, 'ERROR');
+  //           this.enfocarInput('cantidad_producir');
+  //         } else {
+  //           this.ingredientesParaProduccion.push({
+  //             nombre: ingre.nombre,
+  //             existencia: obj,
+  //             articulo_id: ingre.articulo_id,
+  //             contenido: ingre.contenido,
+  //             articulo_combo: ingre.articulo_combo,
+  //             cantidad_en_unidades: ingre.medida == 'Unidad' ? obj.Unidad : obj.Libra,
+  //             medida: ingre.medida,
+  //           });
+
+  //           this.ingredientesParaProduccion = _.orderBy(this.ingredientesParaProduccion, ['articulo_combo'], ['asc']);
+  //         }
+  //       });
+  //     });
+  //   }
+  // }
 
   borrarForm() {
     this.ingredientes = [];
@@ -236,14 +295,14 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     const prod_en_lista = _.find(this.lista_produccion, { id: this.producto_terminado_en_turno.id });
     if (prod_en_lista) {
       prod_en_lista.cantidad = this.cantidad_producir;
-      prod_en_lista.cantidad_en_unidades = this.medida_producir == 'Quintal' ? this.cantidad_producir * 100 : this.cantidad_producir;
+      prod_en_lista.cantidad_en_unidades = this.cantidad_producir * this.producto_terminado_en_turno.contenido[this.medida_producir];
       prod_en_lista.medida = this.medida_producir;
       prod_en_lista.ingredientes = this.ingredientesParaProduccion;
     } else {
       const obj = {
         nombre: this.producto_terminado_en_turno.nombre,
         cantidad: this.cantidad_producir,
-        cantidad_en_unidades: this.medida_producir == 'Quintal' ? this.cantidad_producir * 100 : this.cantidad_producir,
+        cantidad_en_unidades: this.cantidad_producir * this.producto_terminado_en_turno.contenido[this.medida_producir],
         medida: this.medida_producir,
         articulo_id: _.parseInt(this.producto_terminado_en_turno.id),
         id: _.parseInt(this.producto_terminado_en_turno.id),

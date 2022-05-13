@@ -427,8 +427,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   lookOters(objeto) {
-    console.log(' ');
-    console.log('objeto ', objeto);
 
     const keys = _.keys(objeto);
     const values = _.values(objeto);
