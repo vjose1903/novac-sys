@@ -30,14 +30,17 @@ export default class HandlerConfigFile {
     },
   };
 
-  static checkConfigFile(win: BrowserWindow) {
+  static checkConfigFile(win: BrowserWindow, callback = (res) => {}) {
     if (!fs.existsSync(pathAdd('/app_config.config'))) {
       this.default_config.printer_caja_selected = Functions.getDefaultPrinter(win);
       this.default_config.printer_reportes_selected = Functions.getDefaultPrinter(win);
 
       Functions.setConfigFile(JSON.stringify(this.default_config)).then(() => {
         console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
+        callback(true);
       });
+    } else {
+      callback(true);
     }
   }
 }

@@ -160,7 +160,9 @@ try {
     // dock icon is clicked and there are no other windows open.
     if (win === null)
       createWindow()
-        .then((res) => beforeCreateWindow(res))
+        .then((win_) => {
+          beforeCreateWindow(win_);
+        })
         .catch(() => app.quit());
   });
 } catch (e) {
@@ -168,9 +170,7 @@ try {
   // throw e;
 }
 
-async function beforeCreateWindow(win_) {
-  win = win_;
-
+async function beforeCreateWindow(win) {
   verificarSumastra();
   borrarLogs();
 

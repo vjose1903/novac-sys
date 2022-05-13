@@ -118,12 +118,11 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     });
 
     window.onresize = (e) => this.resize.bind(this)(e);
-
-    this.getAppConfig();
   }
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
+    setTimeout(() => this.getAppConfig(), 1000);
   }
 
   getActualPath() {
