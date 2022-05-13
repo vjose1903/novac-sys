@@ -189,7 +189,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     setTimeout(() => {
       const page = event.page + 1;
       const per_page = event.rows;
-      const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id,'paginatorChange');
+      const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id, 'paginatorChange');
 
       const actualPage = this.getPaginatorPageByNumber(page);
       const clickeado_por = actualPage.getAttribute('clickeado_por');
@@ -200,6 +200,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         if (actualPagination.is_local) {
           this.localPagination(page, per_page, 'paginatorChange');
         } else {
+
           if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
             this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
           } else {
@@ -228,7 +229,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.data.length = 0;
     newData.forEach((dato) => this.data.push(dato));
     const id = this.config.id_tabla + this.post_id;
-    const actualPagination = this.tServ.getPaginationById(id,'dataLocalFilter');
+    const actualPagination = this.tServ.getPaginationById(id, 'dataLocalFilter');
 
     let new_obj_pagination = { ant_page: null, page: null };
 
@@ -254,7 +255,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   setCantPagView(width, tipo) {
     let actual = 1;
-    const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id,'setCantPagView');
+    const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id, 'setCantPagView');
 
     if (tipo == 'width_page') {
       const divPaginator = document.getElementById('divPaginator');
@@ -374,7 +375,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorSelectAll(info) {
-
     // this.data.forEach((data, index) => {
     //   if ((this.select_all_value && !data.select) || (!this.select_all_value && data.select)) this.changeValorCheck('select', index);
     // });

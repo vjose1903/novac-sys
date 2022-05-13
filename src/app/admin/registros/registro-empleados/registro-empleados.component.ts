@@ -143,7 +143,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
         this.listRoles = res.data;
       },
       (error) => {
-        console.log('Error obteniendo roles: ', error);
+        console.error('Error obteniendo roles: ', error);
       },
     );
   }
@@ -172,14 +172,10 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
                 return;
               }
               const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
-              console.log('🚀 ~ RegistroEmpleadosComponent ~ .then ~ documento_original', documento_original);
-              console.log('🚀 ~ RegistroEmpleadosComponent ~ .then ~ this.documentos_de_identidad', this.documentos_de_identidad);
+
               this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
 
-              // const documento = fun.hasValue(is_user) ? _.omit(is_user, ['persona', 'persona_is']) : _.omit(_.head(res['data']), ['persona', 'persona_is']);
               const persona = fun.hasValue(is_user) ? is_user.persona : _.head(res['data']).persona;
-
-              // persona.fecha_nacimiento = this.fecha(persona.fecha_nacimiento);
 
               this.form.patchValue(persona);
               if (persona.estado) this.form.controls.id.setValue(null);

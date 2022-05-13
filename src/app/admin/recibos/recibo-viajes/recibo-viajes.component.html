@@ -7,30 +7,13 @@
       <div class="divTabla">
         <dinamic-table [cardTabla]="cardTablaViaje" [seleccionado]="viaje_selected?.id" [(data)]="viajes" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
       </div>
-
-      <!-- <app-tablas
-        class="h-100"
-        *ngIf="viajes && info"
-        [padre]="cardTabla"
-        [info]="info"
-        [seleccionado]="viaje_selected"
-        [search]="true"
-        [data]="viajes"
-        [id_tabla]="'lista_viajes'"
-        [focusRow]="false"
-        [ROW]="'viaje-'"
-        (clickRow)="verViaje($event)"
-        (paginateChange)="getViajes($event)"
-      ></app-tablas> -->
-      <!-- (DevolverInfo)="editarItem($event)" -->
-      <!-- (DELETE)="abrirModal($event)" -->
     </div>
   </div>
 
   <div class="formulario">
     <div>
-      <span *ngIf="viajes_pendientes_cant > 0" class="badge text-shadow red text-white mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
-      <span *ngIf="viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge text-shadow blue text-white mb-3">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
+      <span *ngIf="viajes?.length &&viajes_pendientes_cant > 0" class="badge text-shadow red text-white mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
+      <span *ngIf="viajes?.length &&viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge text-shadow blue text-white mb-3">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
       <span *ngIf="viajes?.length == 0" class="badge text-shadow green text-white mb-3">No tiene viajes pendientes</span>
 
       <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant == 0" class="badge text-shadow green text-white mb-3">Todos los viajes fueron completados</span>

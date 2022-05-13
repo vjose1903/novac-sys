@@ -177,11 +177,10 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   }
 
   validateUserAndLoadPermisos() {
-    console.log('################## a validar usuario ################## ');
-
     this.currentUserServ
       .validateUser()
       .then((res) => {
+
         this.is_permisos_load = true;
         setTimeout(() => (this.configReady = true), 500);
       })

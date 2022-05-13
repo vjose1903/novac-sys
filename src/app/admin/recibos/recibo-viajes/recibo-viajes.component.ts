@@ -30,12 +30,13 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante' },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
     ],
+    padre_functions: { data_request: (params) => this.getViajes(params) },
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_viajes',
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
+    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
-
+  // TODO:poner la peticion de paginacion
   tablaComponent;
 
   viajes = [];
@@ -132,6 +133,8 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
   async getViajes(params?: { per_page: number; page: number; search: string }) {
     try {
+      this.viajes_completados_cant = 0;
+      this.viajes_pendientes_cant = 0;
       this.viajes.length = 0;
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 

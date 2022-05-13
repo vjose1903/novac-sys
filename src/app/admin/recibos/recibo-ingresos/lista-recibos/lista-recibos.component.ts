@@ -133,7 +133,6 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   tableClickIcon(event) {
-    console.log('arg ', event);
     const recibo_selected = event.data;
 
     if (event.columnKey) {

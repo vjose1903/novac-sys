@@ -5,7 +5,7 @@
   <img class="inspot" src="assets/img/inspot_splash.png" />
 </div>
 
-<div id="fondoC" *ngIf="loading" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
+<div id="fondoC" *ngIf="loading && configReady" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
   <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt="" />
   <span class="text"> CARGANDO ... </span>
 </div>
