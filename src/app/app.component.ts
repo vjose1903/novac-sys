@@ -45,7 +45,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   counter = 0;
   sub: Subscription;
   subModified: Subscription;
-  is_permisos_load = false;
 
   constructor(
     public _ipc: IpcService,
@@ -180,9 +179,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     this.currentUserServ
       .validateUser()
       .then((res) => {
-
-        this.is_permisos_load = true;
-        setTimeout(() => (this.configReady = true), 500);
+        setTimeout(() => (this.configReady = true), 1000);
       })
       .catch((error) => {
         this.configReady = true;
