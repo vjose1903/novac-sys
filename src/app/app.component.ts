@@ -118,12 +118,11 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     });
 
     window.onresize = (e) => this.resize.bind(this)(e);
-
-    this.getAppConfig();
   }
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
+    setTimeout(() => this.getAppConfig(), 1000);
   }
 
   getActualPath() {
@@ -184,6 +183,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
       .catch((error) => {
         this.configReady = true;
         const actualPath = this.getActualPath();
+
         if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });
   }
