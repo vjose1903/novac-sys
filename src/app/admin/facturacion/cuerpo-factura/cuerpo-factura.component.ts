@@ -127,8 +127,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  async procesoQuitarArticulo() {
-    await this.sacarDescuento(this.indexRemove);
+  async procesoQuitarArticulo(key) {
+    await this.sacarDescuento(key);
     await this.removeItem(this.indexRemove);
     await this.calculosTotalesGenerales();
     await this.ajustarSecuencia();
@@ -208,6 +208,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   createItem(i): FormGroup {
     return this.fb.group({
+      key: [null],
       articulo: [null],
       id: [],
       cod: [null],
@@ -487,61 +488,58 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  calcularDescuento(i) {
-    const codido = (this.filasDetalle[i] as any).controls['cod'].value;
-    const precioTEMP = (this.filasDetalle[i] as any).controls['pre'].value;
+  calcularDescuento(index) {
+    const codido = (this.filasDetalle[index] as any).controls['cod'].value;
+    const precioTEMP = (this.filasDetalle[index] as any).controls['pre'].value;
+    const key = (this.filasDetalle[index] as any).controls['key'].value;
     const precio = fun.desformatear(precioTEMP);
-    const cantidad = (this.filasDetalle[i] as any).controls['can'].value;
+    const cantidad = (this.filasDetalle[index] as any).controls['can'].value;
 
-    let descuento = (this.filasDetalle[i] as any).controls['descuento_valor'].value;
+    let descuento = (this.filasDetalle[index] as any).controls['descuento_valor'].value;
 
     if (descuento >= 0) {
       const total = precio * cantidad;
 
       if (fun.hasValue(codido) && (fun.isEmpty(descuento) || descuento == 0)) {
-        (this.filasDetalle[i] as any).controls['descuento_valor'].reset();
-        (this.filasDetalle[i] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(total));
-        this.sacarDescuento(i);
+        (this.filasDetalle[index] as any).controls['descuento_valor'].reset();
+        (this.filasDetalle[index] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(total));
+        this.sacarDescuento(key);
       }
 
       let nuevoTotal = 0;
       if (fun.hasValue(codido) && fun.hasValue(precio) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
         nuevoTotal = total - descuento;
 
-        (this.filasDetalle[i] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
+        (this.filasDetalle[index] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
         this.calculosTotalesGenerales();
-        this.calculosDescuentoGeneral(descuento, i);
+        this.calculosDescuentoGeneral(descuento, key);
         this.ajustarSecuencia();
       }
     } else {
       if (descuento < 0) fun.toastWarning('El descuento no puede ser menor a 0', 'AVISO');
-      (this.filasDetalle[i] as any).controls['descuento_valor'].setValue(0);
-      this.enfocarInput(`desc-${i}`);
+      (this.filasDetalle[index] as any).controls['descuento_valor'].setValue(0);
+      this.enfocarInput(`desc-${index}`);
     }
   }
 
-  sacarDescuento(index) {
-    let acuDesc = 0;
-
-    const currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila == index);
+  sacarDescuento(key) {
+    const currentDescuento = _.find(this.listaDeDescuentos, (item) => item.key == key);
 
     if (fun.hasValue(currentDescuento)) {
       _.remove(this.listaDeDescuentos, currentDescuento);
-      this.listaDeDescuentos.forEach((element) => (acuDesc = acuDesc + element.desc));
+      const acuDesc = _.reduce(this.listaDeDescuentos, (acumulado, item) => acumulado + item.desc, 0);
 
       this.getCalculosDinero.emit({ tipo: 'descuento', monto: acuDesc });
     }
   }
 
-  calculosDescuentoGeneral(descuento, index) {
-    let acuDesc = 0;
-
-    let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.fila === index);
+  calculosDescuentoGeneral(descuento, key) {
+    let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.key === key);
 
     if (fun.hasValue(currentDescuento)) currentDescuento.desc = descuento;
-    else this.listaDeDescuentos.push({ fila: index, desc: descuento });
+    else this.listaDeDescuentos.push({ key: key, desc: descuento });
 
-    this.listaDeDescuentos.forEach((element) => (acuDesc = acuDesc + element.desc));
+    const acuDesc = _.reduce(this.listaDeDescuentos, (acumulado, item) => acumulado + item.desc, 0);
 
     this.getCalculosDinero.emit({ tipo: 'descuento', monto: acuDesc });
   }
@@ -558,14 +556,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  modalRemover(i, e?) {
-    const name = (this.filasDetalle[i] as any).controls['des'].value;
-    const unidad = (this.filasDetalle[i] as any).controls['uni'].value;
+  modalRemover(index, event?) {
+    const name = (this.filasDetalle[index] as any).controls['des'].value;
+    const unidad = (this.filasDetalle[index] as any).controls['uni'].value;
+    const key = (this.filasDetalle[index] as any).controls['key'].value;
     let obj = {};
     obj['nombre'] = unidad ? `${name} (${unidad})` : name;
 
     if (name) {
-      this.indexRemove = i;
+      this.indexRemove = index;
 
       const confirmationObj = {
         id: 'removerArticulo',
@@ -573,14 +572,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         header: 'Confirmación',
         siFunction: (instance) => {
           this.closeModal(instance);
-          this.procesoQuitarArticulo();
+          this.procesoQuitarArticulo(key);
         },
         width: '30rem',
       };
       this.confirmationModal(confirmationObj);
     }
 
-    if (e) e.stopPropagation();
+    if (event) event.stopPropagation();
   }
 
   setInputDrop(index) {
@@ -620,6 +619,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       }
 
       (this.filasDetalle[index] as any).controls['articulo'].setValue(ARTICULO);
+      (this.filasDetalle[index] as any).controls['key'].setValue(fun.generateKey());
       (this.filasDetalle[index] as any).controls['cod'].setValue(ARTICULO.codigo);
       (this.filasDetalle[index] as any).controls['des'].setValue(ARTICULO.nombre);
       (this.filasDetalle[index] as any).controls['calcular_saco'].setValue(ARTICULO.calcular_saco);
