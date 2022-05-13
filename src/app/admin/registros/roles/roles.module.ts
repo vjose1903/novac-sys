@@ -5,7 +5,6 @@ import { RolesRoutingModule } from './roles.routing';
 import { RolesComponent } from './roles.component';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
-import { TablasModule } from '../../components/tablas/tablas.module';
 import { NewTablasModule } from '../../components/new_tablas/tablas.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
@@ -13,6 +12,6 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 @NgModule({
   declarations: [RolesComponent],
 
-  imports: [CommonModule, RolesRoutingModule, TablasModule, NewTablasModule, AngularResizedEventModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild()],
+  imports: [CommonModule, RolesRoutingModule, NewTablasModule, AngularResizedEventModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild()],
 })
 export class RolesModule {}

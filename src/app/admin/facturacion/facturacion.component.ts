@@ -740,7 +740,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const containCamiones = document.getElementById('overlayCamion');
     setTimeout(() => {
       const voy_a = document.activeElement;
-      console.log('>> ', containCamiones.contains(voy_a));
 
       if (!containCamiones.contains(voy_a)) {
         if (!this.camionesSelected.length) {
@@ -785,9 +784,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
       } else {
         if (fun.isEmpty(where) || where != 'teclado') {
-          console.log('this.propietario_factura ', this.propietario_factura);
-          console.log('this.propietario_factura.cliente_id ', this.propietario_factura?.id);
-
           if (fun.isEmpty(this.propietario_factura) || fun.isEmpty(this.propietario_factura?.id)) this.abrirModalFiltro();
           else this.cuerpo.seleccionarCampoEnTurno();
 
@@ -1215,7 +1211,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       } else if (balance > maxCred) {
         fun.toastError(` Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
       }
-      console.log('ANDO AQUIII');
 
       this.cuerpo.seleccionarCampoEnTurno();
     }

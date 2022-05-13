@@ -282,7 +282,6 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     const permiso_acciones_selected = _.map(_.filter(all_permiso_acciones, { selected: true }), 'permiso_accion_id');
 
     formulario['permisos_acciones'] = permiso_acciones_selected;
-    console.log('formulario ', formulario);
 
     this.rolesClass.createUpdateOne(formulario).then((res) => {
       this.isCreando = false;

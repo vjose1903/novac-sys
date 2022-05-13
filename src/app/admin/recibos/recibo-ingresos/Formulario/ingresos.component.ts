@@ -1,8 +1,7 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../../core/javascript/moment';
 import { NgSelectConfig } from '@ng-select/ng-select';
-import { TablasComponent } from '../../../components/tablas/tablas.component';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ReciboC } from '../../recibos';
@@ -13,7 +12,6 @@ import { FormCantidadEfectivoComponent } from '../../../components/formularios e
 import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../../components/new_tablas/tabla-class';
-import { ClienteC } from '../../../registros/registro-clientes/cliente';
 
 @Component({
   selector: 'app-ingresos',
@@ -412,7 +410,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   tableInputChange(params) {
-    console.log('params ', params);
 
     if (params.key == 'select') {
       if (!params.value) {

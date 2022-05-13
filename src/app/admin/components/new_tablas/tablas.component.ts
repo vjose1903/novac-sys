@@ -200,6 +200,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         if (actualPagination.is_local) {
           this.localPagination(page, per_page, 'paginatorChange');
         } else {
+
           if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
             this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
           } else {

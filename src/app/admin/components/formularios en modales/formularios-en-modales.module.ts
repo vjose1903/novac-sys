@@ -5,7 +5,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { TabViewModule } from 'primeng/tabview';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 import { PrimengModule } from '../../../modules/primeng.module';
-import { TablasModule } from '../tablas/tablas.module';
 import { NewTablasModule } from '../new_tablas/tablas.module';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { FormCantidadEfectivoComponent } from './form-cantidad-efectivo/form-cantidad-efectivo.component';
@@ -35,7 +34,7 @@ const components = [
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, TablasModule, NewTablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule, NgxPermissionsModule],
+  imports: [CommonModule, NewTablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule, NgxPermissionsModule],
   exports: components,
 })
 

@@ -197,10 +197,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
           .then((res) => {
             if (res['data'].length) {
-              console.log('res ', res);
               const is_suplidor = _.find(res['data'], (item) => item.persona_is === 'Suplidor');
-              console.log('is_suplidor ', is_suplidor);
-              console.log('fun.hasValue(is_suplidor) ', fun.hasValue(is_suplidor));
 
               if (fun.hasValue(is_suplidor) && is_suplidor.persona.estado) {
                 fun.toastError(`${_.capitalize(tipo)} pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR');

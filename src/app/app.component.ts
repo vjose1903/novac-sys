@@ -176,16 +176,13 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   }
 
   validateUserAndLoadPermisos() {
-    console.log('################## a validar usuario ################## ');
-
     this.currentUserServ
       .validateUser()
       .then((res) => {
-        console.log("res ", res);
-
-        setTimeout(() => (this.configReady = true), 500);
+        setTimeout(() => (this.configReady = true), 1000);
       })
       .catch((error) => {
+        this.configReady = true;
         const actualPath = this.getActualPath();
         if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });
