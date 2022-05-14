@@ -45,6 +45,27 @@ export class FacturasAplicadasC extends CrudG<any> {
 //
 //   "Set quicktype target language"
 
+export enum tipo_factura_id {
+  Factura_sin_comprobante = 1,
+  Factura_con_valor_fiscal = 2,
+  Factura_de_consumo = 3,
+  Nota_de_debito = 4,
+  Nota_de_credito = 5,
+  Comprobante_de_compras = 6,
+  Registro_de_unico_ingreso = 7,
+  Comprobante_para_gastos_menores = 8,
+  Comprobante_de_regimen_especiales = 9,
+  Comprobante_gubernamental = 10,
+  Comprobante_para_exportaciones = 11,
+  Comprobantes_para_pago_al_exterior = 12,
+  Venta_Contado = 13,
+  Compra = 14,
+  Conduce = 15,
+  Produccion = 16,
+  Recibo_ingreso = 17,
+  Venta_Credito = 18,
+  Pre_factura = 19,
+}
 export interface FacturasI {
   id: number;
   tipo_factura_id: number;
@@ -84,7 +105,7 @@ export interface FacturasI {
   suplidor: Suplidor;
   usuario: string;
   vendedor: string;
-  notas:any;
+  notas: any;
   pagos: Pago[];
   [propName: string]: any;
 }

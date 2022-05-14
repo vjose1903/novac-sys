@@ -1,11 +1,10 @@
 import * as _ from 'lodash';
 import { fun } from '../../core/services/functions.service';
-import { SingletonService } from '../../core/services/singleton.service';
-import { MixinClass } from '../../core/typescript/MixinClass';
+import { PreFacturaClass } from './preFacturas';
 
-export class FactsLocalStorage extends MixinClass {
-  constructor() {
-    super();
+export class FactsLocalStorage extends PreFacturaClass {
+  constructor(pdfServ) {
+    super(pdfServ);
   }
 
   ant_event_change_visibility;

@@ -37,5 +37,4 @@ const components = [
   imports: [CommonModule, NewTablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, NgxBootstrapModule, NgbModule, TabViewModule, NgxPermissionsModule],
   exports: components,
 })
-
 export class FormulariosEnModalesModule {}

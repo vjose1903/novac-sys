@@ -28,6 +28,7 @@
                           inputId="cedula"
                           placeholder="___-_______-_"
                           formControlName="cedula"
+                          [autoClear]="false"
                         ></p-inputMask>
 
                         <span id="msgContainer_cedula"></span>
@@ -73,7 +74,7 @@
                   <div class="form-group" [appMsgError]="'telefono'" [form]="form">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
-                    <p-inputMask (keydown.enter)="saltar('campoEmail')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono"></p-inputMask>
+                    <p-inputMask (keydown.enter)="saltar('campoEmail')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono"[autoClear]="false" ></p-inputMask>
 
                     <span id="msgContainer_telefono"></span>
                   </div>

@@ -65,6 +65,7 @@
                   placeholder="B__________"
                   (onFocus)="$event.target.select()"
                   [disabled]="existenComprobantes || tipo_factura_id == null"
+                  [autoClear]="false"
                 ></p-inputMask>
               </ng-container>
 
