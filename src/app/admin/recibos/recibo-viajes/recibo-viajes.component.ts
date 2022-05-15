@@ -40,7 +40,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   tablaComponent;
 
-
   viajes = [];
   viaje_selected;
   ultimo_pago;
@@ -197,6 +196,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   verViaje(data) {
+    this.form.reset();
     this.monto_pendiente = 0;
     this.totalPagado = 0;
     this.totalPagadoPorciento = 0;
@@ -213,6 +213,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   selectCamionesFactura(factura) {
     const camiones_selected = [];
+
     factura.camiones.forEach((camion_viaje) => {
       const camion_en_turno = _.find(this.camiones, { id: camion_viaje.vehiculo_id });
       if (fun.hasValue(camion_en_turno)) camiones_selected.push(camion_en_turno);
