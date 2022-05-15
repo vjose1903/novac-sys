@@ -501,8 +501,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.enfocarInput('nom');
     }
   }
-  selectPreFactura(data) {
-    fun.logGreen('data ', data);
+
+  selectPreFactura(data, modalInstance) {
+    fun.logGreen('data >> ', data);
+    modalInstance.closeModal(modalInstance.id, 'continuar');
   }
 
   checkIfFacturacionEnProceso() {
@@ -905,10 +907,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         if (this.TOTAL == 0) {
           fun.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
-          if (this.condicion_fact == 'Crédito' || this.is_viaje) {
+          if (this.condicion_fact == 'Crédito' || this.is_viaje || this.modo_factura == 'Pre_factura') {
             const confirmationObj = {
               id: 'imprimir_factura',
-              texto: 'Seguro que desea imprimir la factura',
+              texto: `Seguro que desea imprimir la ${this.modo_factura == 'Pre_factura' ? 'Pre-factura' : 'factura'}`,
               header: 'Confirmación',
               siFunction: (instance) => {
                 this.enviarABaseDatos();
@@ -1295,7 +1297,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
 
     cabecera_fact['detalle_facturas'] = cuerpo_fact;
-    cabecera_fact['FACTURA_DE'] = this.metodo == 'venta' ? (this.condicion_fact == 'Contado' ? tipo_factura_id.Venta_Contado : tipo_factura_id.Venta_Credito) : tipo_factura_id.Compra;
+    cabecera_fact['FACTURA_DE'] = this.modo_factura == 'Pre_factura' ? tipo_factura_id.Pre_factura : this.metodo == 'venta' ? (this.condicion_fact == 'Contado' ? tipo_factura_id.Venta_Contado : tipo_factura_id.Venta_Credito) : tipo_factura_id.Compra;
     cabecera_fact['tipo'] = this.modo_factura == 'Pre_factura' ? 'Pre_factura' : this.metodo;
 
     cabecera_fact['tiene_nota'] = this.factura_a_editar ? this.factura_a_editar.tiene_nota : false;
@@ -1310,6 +1312,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let res;
     const metodo = this.action === 'update' ? 'editar_factura' : '';
+    console.log('cabecera_fact ', cabecera_fact);
 
     if (metodo === 'editar_factura') res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_editar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);

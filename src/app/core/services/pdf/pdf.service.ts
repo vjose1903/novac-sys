@@ -17,6 +17,7 @@ import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-el
 import { ConfigurationService } from '../configuration.service';
 import { ConfigI } from '../../typescript/config-interface';
 import { fun } from '../functions.service';
+import { tipo_factura_id } from '../../../admin/facturacion/factura';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
@@ -95,7 +96,8 @@ export class PdfService {
               detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
             });
 
-            obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', 'ventas');
+            /* Llamando a la función makePDF desde el archivo facturasCompraVenta.ts. */
+            obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.Pre_factura ? 'pre_factura' : 'ventas');
             break;
 
           case 'cuadre_caja': // SI SI

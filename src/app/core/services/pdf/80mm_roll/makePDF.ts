@@ -9,8 +9,11 @@ import { config_ventas } from '../8.5x5.5/configuraciones/ventas';
 import { config_recibo_ingreso } from '../8.5x5.5/configuraciones/recibo_ingreso';
 import { config_conduce } from '../8.5x5.5/configuraciones/conduce';
 import { config_cuadre_caja } from '../8.5x5.5/configuraciones/cuadre_caja';
+import { config_pre_factura } from '../8.5x5.5/configuraciones/pre_factura';
+import { fun } from '../../functions.service';
 
 const configuraciones = {
+  pre_factura: config_pre_factura,
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
   conduce: config_conduce,
@@ -45,6 +48,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
 // ==========================================================================================================================================================
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
+  fun.logPurple('tipo_pdf => ', tipo_pdf);
   const configuration = configuraciones[tipo_pdf];
 
   data.tipo_tabla = 'normal';
@@ -283,10 +287,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
       key: 'telefono',
       item: {
         alignment: 'left',
-        text: [
-          { text: 'Telefono             : ', bold: true, style: 'letra10' },
-          is_suplidor ? { text: data.suplidor.telefono || '', style: 'letra10' } : { text: data.cliente.telefono || '', style: 'letra10' },
-        ],
+        text: [{ text: 'Telefono             : ', bold: true, style: 'letra10' }, is_suplidor ? { text: data.suplidor.telefono || '', style: 'letra10' } : { text: data.cliente.telefono || '', style: 'letra10' }],
       },
     },
   ];

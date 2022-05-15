@@ -26,16 +26,21 @@ export class PreFacturaClass extends MixinClass {
 
   async buscarPreFactura(numero) {
     try {
-      const res = await this.facturaClass.getAll({ afterPath: `custom/pre-factura/${numero}` });
+      //       id
+      // tipo
+      // desde
+      // hasta
+      const res = await this.facturaClass.getAll({ afterPath: `custom/pre_factura/${numero}`, parameters: { tipo: 'single', paginado: false } });
+      console.log(`res  => `, res);
       const pre_factura = res['data'];
       pre_factura.secuencia = _.padStart(pre_factura.numero_factura, 8, '0');
       // pre_factura.fecha = moment(pre_factura.fecha_equivalente).format('DD/MM/YYYY');
       // pre_factura.fechaV = moment(pre_factura.fecha_vencimiento).isValid() ? moment(pre_factura.fecha_vencimiento).format('DD/MM/YYYY') : '';
       pre_factura.monto = fun.numFormatTwoDecimals(pre_factura.balance);
-
-      fun.toastError('No existe Pre-factura con este número.', 'ERROR');
+      this.mostrarFactura(pre_factura);
+      // fun.toastError('No existe Pre-factura con este número.', 'ERROR');
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   }
 
@@ -43,8 +48,8 @@ export class PreFacturaClass extends MixinClass {
   //  MODAL PARA BUSCAR PRE FACTURA
   // =============================================
 
-  mostrarFactura(dataFactura, type, dataDB?, continuar?) {
-    const toPDFData = { data: dataFactura, type: type };
+  mostrarFactura(dataFactura) {
+    const toPDFData = { data: dataFactura, type: 'facturacion' };
 
     this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
       if (res.status === 'si') {
@@ -60,7 +65,7 @@ export class PreFacturaClass extends MixinClass {
             cancelar: { show: false, disable: false },
             dinamico: [
               { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false },
-              { clase: 'btn btn-verde ', function: () => this.selectPreFactura(dataFactura), label: 'Continuar', disable: false },
+              { clase: 'btn btn-verde ', function: (instance) => this.selectPreFactura(dataFactura, instance), label: 'Continuar', disable: false },
             ],
           },
         };
@@ -70,5 +75,5 @@ export class PreFacturaClass extends MixinClass {
     });
   }
 
-  selectPreFactura(data) {}
+  selectPreFactura(data, modalInstance) {}
 }
