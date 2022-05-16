@@ -41,6 +41,7 @@
       <input id="cantidad" min="1" (keydown.enter)="saltar('motivo')" (focus)="$event.target.select()" type="number" class="form-control input_cantidad" [(ngModel)]="cantidad" placeholder="Introduzca la cantidad" autocomplete="off" />
     </div>
   </div>
+
   <div *ngIf="medida && cantidad" class="col-12 mb-3">
     <div class="contenedorAvisosMov">
       {{ mostrarExistencia('mov') }} <br />

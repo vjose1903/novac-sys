@@ -4,7 +4,7 @@
 <div class="cardPrincipal sinPadding tamano" style="position: relative">
   <div class="cabezaFactura">
     <div class="row">
-      <div class="col-3 divRight pl-0">
+      <div *ngIf="metodo != 'pre-venta'" class="col-3 divRight pl-0">
         <div class="row">
           <div class="col-3 p-0">
             <span class="titulos"><strong>Tipo:</strong></span>
@@ -84,7 +84,6 @@
           >
             <option value="" disabled selected>Modo de venta</option>
             <option value="normal">Normal</option>
-            <option value="Pre_factura">Pre-factura</option>
             <!-- <option value="viaje">Viaje</option> -->
             <!-- <option *ngIf="condicion_fact === 'Contado'" value="adelantada">Adelantada</option> -->
           </select>
@@ -194,18 +193,17 @@
               tabindex="-1"
             />
           </div>
-          <!-- (ngModelChange)="enfocarInput('fecha_vencimiento')" -->
         </div>
       </div>
       <!-- ======================================================================================================================================================================== -->
       <!-- ======================================================================================================================================================================== -->
-      <div class="col-5 divRight">
+      <div class="{{ metodo != 'pre-venta' ? 'col-5 divRight' : 'col-8' }}">
         <form [formGroup]="form">
           <div class="d-flex" style="height: 1.7rem">
             <h5>
-              <strong>{{ metodo === 'venta' ? 'Cliente' : 'Suplidor' }}:</strong>
+              <strong>{{ metodo === 'venta' || metodo === 'pre-venta' ? 'Cliente' : 'Suplidor' }}:</strong>
             </h5>
-            <i *ngIf="!!!factura_a_editar" (click)="abrirModalFiltro()" pTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
+            <i *ngIf="!!!factura_a_editar" (click)="abrirModalFiltro()" pTooltip="{{ metodo === 'venta' || metodo === 'pre-venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
           </div>
           <div class="row">
             <div class="col-7 pl-0">
@@ -234,7 +232,7 @@
               </div>
             </div>
 
-            <div class="col-12 pl-0">
+            <div class="col-12 p-0">
               <div class="form-group">
                 <span class="control-label titulos mr-2">Direccion:</span>
                 <input
@@ -287,6 +285,8 @@
       [propietario]="propietario_factura"
       [factura]="factura_a_editar"
       [action]="action"
+      [modo_factura]="modo_factura"
+      [pre_factura_selected]="pre_factura_selected"
       [metodo]="metodo"
       [fechaFactura]="fechaFactura?.front"
       (getCuerpoFactura)="getCuerpoFactura($event)"

@@ -24,9 +24,10 @@ import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.mo
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RemoverArticuloComponent } from '../facturacion/cuerpo-factura/remover-articulo/remover-articulo.component';
 
 @NgModule({
-  declarations: [LayoutComponent, HomeAdminComponent, FacturacionComponent, InventarioComponent, CuerpoFacturaComponent, ValidateRayaAbajo, ProduccionComponent, ConduceComponent, ReportesComponent],
+  declarations: [LayoutComponent, HomeAdminComponent, RemoverArticuloComponent, FacturacionComponent, InventarioComponent, CuerpoFacturaComponent, ValidateRayaAbajo, ProduccionComponent, ConduceComponent, ReportesComponent],
   imports: [
     CommonModule,
     LayoutRoutingModule,

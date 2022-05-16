@@ -21,6 +21,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
 import { NgxPermissionsModule } from 'ngx-permissions';
+
 defineLocale('es', esLocale);
 
 @NgModule({
