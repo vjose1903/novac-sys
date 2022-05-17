@@ -18,6 +18,7 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
+
   const is_compra = data.FACTURA_DE === 'compra' ? true : false;
 
   const is_suplidor = is_compra;
@@ -240,6 +241,16 @@ function parseInfoFactura(data, tipo_pdf) {
         text: [
           { text: 'Condición           : ', bold: true, style: 'letra10' },
           { text: fun_.my_capitalize(data.condicion || ''), style: 'letra10' },
+        ],
+      },
+    },
+    {
+      key: 'valida',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'Válida Hasta       : ', bold: true, style: 'letra10' },
+          { text: data.tipo_factura_id == 3 ? 'No aplica.' : fun_.my_dateFormater(data?.fecha_valida), style: 'letra10' },
         ],
       },
     },
