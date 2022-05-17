@@ -67,6 +67,7 @@ export class ConfiguracionesComponent implements OnInit {
       page_size_recibo_ingreso: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
       page_size_conduce: [{ value: this.getValuePageSize(data, 'pages_sizes.conduce'), disabled: false }, Validators.required],
       page_size_facturacion: [{ value: this.getValuePageSize(data, 'pages_sizes.facturacion'), disabled: false }, Validators.required],
+      page_size_nota: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
       page_size_cuadre_caja: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
       page_size_reporte: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
     });
@@ -111,6 +112,7 @@ export class ConfiguracionesComponent implements OnInit {
       recibo_ingreso: formulario.page_size_recibo_ingreso.descripcion,
       conduce: formulario.page_size_conduce.descripcion,
       facturacion: formulario.page_size_facturacion.descripcion,
+      nota: formulario.page_size_nota.descripcion,
       cuadre_caja: formulario.page_size_cuadre_caja.descripcion,
       reporte: formulario.page_size_reporte.descripcion,
     };

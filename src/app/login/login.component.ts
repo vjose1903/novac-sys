@@ -97,7 +97,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then((res) => {
           this.currentUserServ.setUser(res.data).then(() => {
-            this.router.navigateByUrl('/admin/dashboard');
+            setTimeout(() => this.router.navigateByUrl('/admin/dashboard'), 500);
           });
         })
         .catch((error) => {

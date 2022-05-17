@@ -279,7 +279,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   cancelarFactura() {
     const confirmationObj = {
       id: 'archivar_factura',
-      texto: 'Seguro que desea cancelar la factura',
+      texto: 'Seguro que desea cancelar la operación',
       header: 'Confirmación',
       siFunction: (instance) => {
         this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
@@ -289,6 +289,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     };
     this.confirmationModal(confirmationObj);
   }
+
   // =============================================
   //  MODAL IMPRIMIR
   // =============================================
@@ -304,7 +305,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
         const confirmationObj = {
           id: 'imprimir_factura',
-          texto: 'Seguro que desea imprimir la factura',
+          texto: 'Seguro que desea imprimir la nota',
           header: 'Confirmación',
           siFunction: (instance) => {
             this.formarNota();

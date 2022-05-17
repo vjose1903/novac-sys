@@ -214,7 +214,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     } catch (error) {
       this.existenComprobantes = true;
       console.error(error);
-      fun.toastError(error.error.msg, 'ERROR');
+      // fun.toastError(error.error.msg, 'ERROR');
     }
   }
 
@@ -443,6 +443,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
           this.notaSelected = params.data;
+          console.log("this.notaSelected ", this.notaSelected);
+
           this.notasClass.parseDataToPdf(params.data).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota', params.data));
         }
       }

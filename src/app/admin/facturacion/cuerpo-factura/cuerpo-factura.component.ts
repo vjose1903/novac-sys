@@ -83,9 +83,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         fila.precio = fun.desformatear(fila.pre);
         fila.costo = fun.desformatear(fila.costo);
 
-        let omitir = ['cod', 'can', 'can_ant', 'des', 'uni', 'pre', 'tot', 'secuencia', 'verificado'];
+        let omitir = ['cod', 'can', 'can_ant', 'des', 'uni', 'pre', 'tot', 'key', 'secuencia', 'verificado'];
 
-        if (this.metodo === 'compra') omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'secuencia', 'verificado'];
+        if (this.metodo === 'compra') omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'key', 'secuencia', 'verificado'];
 
         const obj = _.omit(fila, omitir);
 
@@ -304,11 +304,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  llenarFilas(row, articulo, j) {
-    const cant_en_unidades_actual = row.cantidad_en_unidades;
-    const multiplo = row.cantidad_en_unidades / row.cantidad;
-    const cant_actual = cant_en_unidades_actual / multiplo;
-    const campos = (this.filasDetalle[j] as any).controls;
+  llenarFilas(row, articulo, index) {
+    const campos = (this.filasDetalle[index] as any).controls;
 
     campos['pre'].setValue(this.metodo === 'venta' || this.metodo === 'pre-venta' ? fun.numFormatTwoDecimals(row.precio) : fun.numFormatTwoDecimals(row.costo));
     campos['costo'].setValue(fun.numFormatTwoDecimals(row.costo));
@@ -317,15 +314,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     campos['cod'].setValue(articulo.codigo);
 
-    // campos['can'].setValue(cant_actual);
-    // campos['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
     campos['can'].setValue(row.cantidad);
     campos['key'].setValue(fun.generateKey());
     campos['cantidad_en_unidades'].setValue(row.cantidad_en_unidades);
 
-    campos['des'].setValue(_.capitalize(articulo.nombre));
+    campos['des'].setValue(`${_.capitalize(articulo.nombre)} ${row.is_defectuoso ? ' (defectuoso)' : ''}`);
 
     campos['calcular_saco'].setValue(row.calcular_saco);
+    campos['is_defectuoso'].setValue(row.is_defectuoso);
 
     campos['articulo'].setValue(articulo);
 
@@ -335,7 +331,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     campos['uni'].setValue(uni);
 
-    this.calcularTotalRow(j);
+    this.calcularTotalRow(index);
 
     this.ajustarSecuencia();
   }
@@ -405,8 +401,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   saliDeCantidad(i) {
     const { uni, can, can_ant } = this.filasDetalle[i].getRawValue();
+
     if (can != can_ant) {
-      if (fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
+      if (this.metodo === 'venta' && !this.pre_factura_selected && fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
       (this.filasDetalle[i] as any).controls['can_ant'].setValue(can);
     }
   }
@@ -433,7 +430,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       await this.articuloClass.getAll(extra).then((res) => {
         excede = res['data'];
 
-        if ((this.metodo === 'venta' || this.metodo === 'pre-venta') && excede) {
+        if (this.metodo === 'venta' && !this.pre_factura_selected && excede) {
           fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
 
           setTimeout(() => {

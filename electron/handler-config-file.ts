@@ -13,7 +13,7 @@ export default class HandlerConfigFile {
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
     nombre_empresa: 'Panaderia & Reposteria Brendy',
-    rnc_empresa: '000-00000-0',
+    rnc_empresa: '132-35083-9',
     telefono_empresa: '(829)-423-1678',
     url_servidor: 'http://admservidor.ddns.net:9090',
     url_servidor_descargas: 'http://admservidor.ddns.net:9090',

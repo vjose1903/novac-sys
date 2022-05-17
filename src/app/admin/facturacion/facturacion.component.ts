@@ -157,8 +157,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   ngAfterViewInit() {
     this.getFacturasGuardadas();
-    this.numero_pre_factura = '00000002';
-    this.checkNumeroPreFactura();
   }
 
   formarObjArchivo(factura_para_rellenar?) {
@@ -510,7 +508,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.buscarPreFactura(this.numero_pre_factura);
       }
     } else {
-      this.enfocarInput('nom');
+      if (this.condicion_fact == 'Contado') this.enfocarInput('nom');
+      else {
+        this.abrirModalFiltro();
+        this.desEnfocarInput('numero_pre_factura');
+      }
     }
   }
 
@@ -1307,6 +1309,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['is_viaje'] = this.is_viaje;
     cabecera_fact['is_nota'] = false;
     cabecera_fact['camiones_viajes'] = this.camionesSelected;
+    cabecera_fact['pre_factura'] = fun.hasValue(this.pre_factura_selected) ? this.pre_factura_selected?.id : null;
 
     if (this.metodo === 'venta' || this.metodo == 'pre-venta') {
       if (fun.isEmpty(this.propietario_factura) || fun.isEmpty(this.propietario_factura.id)) {
