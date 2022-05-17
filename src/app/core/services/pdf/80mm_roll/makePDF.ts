@@ -11,7 +11,7 @@ import { config_conduce } from './configuraciones/conduce';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { config_pre_factura } from './configuraciones/pre_factura';
 import { fun } from '../../functions.service';
-import { config_notas } from '../8.5x5.5/configuraciones/notas';
+import { config_notas } from './configuraciones/notas';
 
 const configuraciones = {
   pre_factura: config_pre_factura,
@@ -52,7 +52,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
   fun.logPurple('tipo_pdf => ', tipo_pdf);
   const configuration = configuraciones[tipo_pdf];
-  console.log("configuration ", configuration);
+  console.log('configuration ', configuration);
 
   data.tipo_tabla = 'normal';
 
@@ -247,6 +247,16 @@ function parseInfoFactura(data, tipo_pdf) {
         text: [
           { text: 'Condición           : ', bold: true, style: 'letra10' },
           { text: fun_.my_capitalize(data.condicion || ''), style: 'letra10' },
+        ],
+      },
+    },
+    {
+      key: 'valida',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'Válida Hasta       : ', bold: true, style: 'letra10' },
+          { text: data.tipo_factura_id == 3 ? 'No aplica.' : fun_.my_dateFormater(data?.fecha_valida), style: 'letra10' },
         ],
       },
     },
