@@ -7,6 +7,7 @@ import { BuscarArticuloComponent } from '../../components/formularios en modales
 import { fun } from '../../../core/services/functions.service';
 import { RemoverArticuloComponent } from './remover-articulo/remover-articulo.component';
 import { razon_remover } from './remover-articulo/contantes';
+import { timeStamp } from 'console';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -48,6 +49,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   articuloClass = new ArticuloC();
   minCodigo;
+  productosDevueltos: any;
+  dropRowConfig: any;
 
   constructor(private fb: FormBuilder) {
     super();
@@ -83,22 +86,26 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         fila.precio = fun.desformatear(fila.pre);
         fila.costo = fun.desformatear(fila.costo);
 
-        let omitir = ['cod', 'can', 'can_ant', 'des', 'uni', 'pre', 'tot', 'key', 'secuencia', 'verificado'];
+        let omitir = ['cod', 'can', 'can_ant', 'des', 'uni', 'pre', 'tot', 'key', 'secuencia', 'verificado', 'is_materia_prima'];
 
-        if (this.metodo === 'compra') omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'key', 'secuencia', 'verificado'];
+        if (this.metodo === 'compra') omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'key', 'secuencia', 'verificado', 'is_materia_prima'];
 
         const obj = _.omit(fila, omitir);
 
         if (fila.cantidad && fila.unidad) detalle_factura.push(fun.duplicarJson(obj));
       }
     });
-    this.getCuerpoFactura.emit(JSON.stringify(detalle_factura));
+    console.log('detalle_factura ', detalle_factura);
+
+    this.getCuerpoFactura.emit({ tipo: 'cuerpo', data: fun.duplicarJson(detalle_factura) });
+    this.getCuerpoFactura.emit({ tipo: 'devuelto', data: this.productosDevueltos });
   }
 
   async rellenarVariables() {
     return new Promise(async (resolve, reject) => {
       this.ARRAY_ROWFACTURAS = undefined;
       this.UnidadesArticulo = [];
+      this.productosDevueltos = [];
       this.precioDetalle = undefined;
       this.TOTAL = 0;
       this.ITBIS = 0;
@@ -142,29 +149,46 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   retirarArticuloPreFactura(key, data) {
     const detalle_actual = _.find(this.filasDetalle, (detalle) => detalle.value.key == key);
     const cantidad_articulo_original = detalle_actual.value.can;
+    // is_devuelto
     detalle_actual.controls.can.setValue(detalle_actual.value.can - data.cantidad);
 
     if (data.cantidad < cantidad_articulo_original) {
       if (data.razon == razon_remover.producto_defectuoso) {
-        const producto_defectuoso = fun.duplicarJson(detalle_actual.value);
-
-        setTimeout(() => {
-          producto_defectuoso.can = data.cantidad;
-          producto_defectuoso.cantidad = data.cantidad;
-          producto_defectuoso.cantidad_en_unidades = data.cantidad * producto_defectuoso.articulo.contenido[producto_defectuoso.articulo.medida];
-
-          producto_defectuoso.id = null;
-          producto_defectuoso.key = fun.generateKey();
-          producto_defectuoso.is_defectuoso = true;
-          producto_defectuoso.precio /= 2;
-          producto_defectuoso.total /= 2;
-          producto_defectuoso.des += ' (defectuoso)';
-          // TODO: revisar en la funcion de llenarFilas por que no se agrega el (defectuoso)
-
-          this.llenarFilas(producto_defectuoso, producto_defectuoso.articulo, this.secuencia);
-        }, 10);
+        const producto_defectuoso = this.parsearProductoDevueltos(fun.duplicarJson(detalle_actual.value), data, true);
+        setTimeout(() => this.llenarFilas(producto_defectuoso, producto_defectuoso.articulo, this.secuencia), 10);
+        //
+      } else if (data.razon == razon_remover.no_venta) {
+        const producto_devuelto = this.parsearProductoDevueltos(fun.duplicarJson(detalle_actual.value), data, false);
+        setTimeout(() => this.modificarProductosDevueltos('add', producto_devuelto), 10);
+        //
       }
     } else if (detalle_actual.value.can == data.cantidad) this.pasosQuitarArticulo;
+  }
+
+  modificarProductosDevueltos(action, data) {
+    if (action == 'add') {
+      const producto = _.pick(data, ['articulo_id', 'cantidad', 'articulo', 'calcular_saco', 'cantidad_en_unidades', 'costo', 'descuento_valor', 'id', 'is_defectuoso', 'is_devuelto', 'itbis', 'precio', 'total', 'unidad']);
+      producto['articulo_id'] = producto.articulo.id;
+
+      this.productosDevueltos.push(producto);
+    }
+    // if (action == 'remove') this.productosDevueltos.push(data);
+
+    console.log('this.productosDevueltos ', this.productosDevueltos);
+  }
+
+  parsearProductoDevueltos(producto, data, is_defectuoso) {
+    producto.can = data.cantidad;
+    producto.cantidad = data.cantidad;
+    producto.cantidad_en_unidades = data.cantidad * producto.articulo.contenido[producto.articulo.medida];
+    producto.id = null;
+    producto.key = fun.generateKey();
+    producto['is_defectuoso'] = is_defectuoso;
+    producto['is_devuelto'] = true;
+
+    if (is_defectuoso) producto.precio /= 2;
+    if (is_defectuoso) producto.total /= 2;
+    return producto;
   }
 
   async pasosQuitarArticulo(key) {
@@ -172,6 +196,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     await this.removeItem(this.indexRemove);
     await this.calculosTotalesGenerales();
     await this.ajustarSecuencia();
+  }
+
+  abrirOverlay(dropRowConfig, event) {
+    this.dropRowConfig = dropRowConfig;
+    this.dropRowConfig.toggle(event);
   }
 
   checkDisable(input, index, verificate) {
@@ -266,6 +295,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       calcular_saco: [false],
       verificado: [false],
       is_defectuoso: [false],
+      is_devuelto: [false],
     });
   }
 
@@ -322,6 +352,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     campos['calcular_saco'].setValue(row.calcular_saco);
     campos['is_defectuoso'].setValue(row.is_defectuoso);
+    campos['is_devuelto'].setValue(row.is_devuelto || false);
 
     campos['articulo'].setValue(articulo);
 
@@ -618,6 +649,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       },
     });
 
+    if (this.dropRowConfig) this.dropRowConfig.hide();
     if (event) event.stopPropagation();
   }
 

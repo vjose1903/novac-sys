@@ -23,7 +23,7 @@ export interface ConfigI {
 export interface PagesSizes {
   conduce:         string;
   cuadre_caja:     string;
-  nota:     string;
+  nota:            string;
   facturacion:     string;
   recibo_ingreso:  string;
   reporte:         string;

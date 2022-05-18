@@ -52,7 +52,7 @@
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
               <td *ngIf="propietario" class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
                 <div class="btn-group">
-                  <div *ngIf="checkIfRowContainArticulo(index_cuerpo)" style="padding: 3px" (click)="dropRowConfig.toggle($event)">
+                  <div *ngIf="checkIfRowContainArticulo(index_cuerpo)" style="padding: 3px" (click)="abrirOverlay(dropRowConfig, $event)">
                     <i class="fas fa-ellipsis-v btnConfig"></i>
                   </div>
 

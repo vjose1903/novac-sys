@@ -29,4 +29,8 @@
     cursor: pointer !important;
     filter: grayscale(0%);
   }
+
+  &.disabled {
+    filter: grayscale(79%) brightness(79%)!important;
+  }
 }

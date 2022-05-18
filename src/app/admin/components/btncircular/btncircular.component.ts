@@ -10,9 +10,9 @@ export class BTNcircularComponent implements OnInit, AfterViewInit {
   @Input() accion;
   @Input() alto;
   @Input() ancho;
-  @Input() disable = false;
+  @Input() disabled = false;
 
-  @Output() click = new EventEmitter<any>();
+  @Output() pulsar = new EventEmitter<any>();
   element: HTMLElement;
   constructor() {}
 
@@ -20,5 +20,9 @@ export class BTNcircularComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.element = document.getElementById('btn-' + this.accion) as HTMLElement;
     this.element.style.height = this.alto;
+  }
+
+  click() {
+    if (!this.disabled) this.pulsar.emit();
   }
 }

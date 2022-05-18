@@ -126,6 +126,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
         accion_en_turno.selected = true;
       });
     }
+
     this.boton = params.clean ? 'Registrar' : 'Actualizar';
     this.permiso_selected = _.first(this.listaPermisos);
   }

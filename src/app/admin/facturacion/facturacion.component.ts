@@ -34,6 +34,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   secuenciaKeys = [];
   info_cambio: any;
+  productosDevueltos: any[];
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
@@ -275,7 +276,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
           this.cuerpo.llenarFactura(factura['detalle_facturas'], true, (res) => {
             setTimeout(() => {
-              this.getCuerpoFactura(factura['detalle_facturas'], true);
+              this.getCuerpoFactura({ tipo: 'cuerpo', data: factura['detalle_facturas'] });
 
               this._sideBarOpened = false;
               resolve(true);
@@ -944,7 +945,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             let articulos_a_cambiar = false;
 
             if (this.metodo == 'compra') {
-              const cuerpo_fact = JSON.parse(JSON.stringify(this.CuerpoFactura));
+              const cuerpo_fact = fun.duplicarJson(this.CuerpoFactura);
               this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
             }
 
@@ -1061,23 +1062,23 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  OBTENER LA DATA DEL CUERPO
   // =============================================git
 
-  getCuerpoFactura(arg, recuperar?) {
+  getCuerpoFactura(arg) {
     this.CuerpoFactura = [];
-    let obj;
+    this.productosDevueltos = [];
 
-    if (!recuperar) obj = JSON.parse(arg);
-    else obj = arg;
+    if (arg.tipo == 'cuerpo') {
+      this.CuerpoFactura = arg.data;
 
-    this.CuerpoFactura = obj;
-
-    if (this.metodo === 'venta' || this.metodo == 'pre-venta') {
-      this.CuerpoFactura.map((articulo) => {
-        delete articulo.is_materia_prima;
-        articulo.retirado = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
-        articulo.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
-        return articulo;
-      });
+      if (this.metodo === 'venta' || this.metodo == 'pre-venta') {
+        this.CuerpoFactura.map((articulo) => {
+          articulo.retirado = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
+          articulo.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
+          return articulo;
+        });
+      }
     }
+
+    if (arg.tipo == 'devuelto') this.productosDevueltos = arg.data;
   }
 
   prueba() {}
