@@ -95,7 +95,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         if (fila.cantidad && fila.unidad) detalle_factura.push(fun.duplicarJson(obj));
       }
     });
-    console.log('detalle_factura ', detalle_factura);
+    fun.logRed('>>>> ', detalle_factura);
 
     this.getCuerpoFactura.emit({ tipo: 'cuerpo', data: fun.duplicarJson(detalle_factura) });
     this.getCuerpoFactura.emit({ tipo: 'devuelto', data: this.productosDevueltos });
@@ -151,6 +151,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const cantidad_articulo_original = detalle_actual.value.can;
     // is_devuelto
     detalle_actual.controls.can.setValue(detalle_actual.value.can - data.cantidad);
+    detalle_actual.controls.cantidad_en_unidades.setValue(detalle_actual.value.can * detalle_actual.value.articulo.contenido[detalle_actual.value.articulo.medida]);
 
     if (data.cantidad < cantidad_articulo_original) {
       if (data.razon == razon_remover.producto_defectuoso) {
@@ -184,6 +185,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     producto.id = null;
     producto.key = fun.generateKey();
     producto['is_defectuoso'] = is_defectuoso;
+    producto['from_pre_factura'] = true;
     producto['is_devuelto'] = true;
 
     if (is_defectuoso) producto.precio /= 2;
@@ -203,12 +205,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     this.dropRowConfig.toggle(event);
   }
 
-  checkDisable(input, index, verificate) {
+  checkDisable(input, index, verificate, data?) {
     let isDisable = false;
+    const disable_on_pre_factura = ['cod-', 'can-', 'uni-', 'desc-'];
 
     if (verificate) {
       if (fun.isEmpty(this.propietario)) isDisable = true;
       if (!isDisable && input == 'pre-') isDisable = this.readPrecio();
+
+      if (disable_on_pre_factura.includes(input) && data?.from_pre_factura) isDisable = true;
     } else {
       isDisable = true;
     }
@@ -269,6 +274,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     this.inputDrop = undefined;
     this.DESCUENTO = 0;
     this.listaDeDescuentos = [];
+    this.productosDevueltos = [];
   }
 
   // =============================================
@@ -296,6 +302,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       verificado: [false],
       is_defectuoso: [false],
       is_devuelto: [false],
+      from_pre_factura: [false],
     });
   }
 
@@ -311,26 +318,28 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   // =============================================
   //  MODIFICAR FACTURA
   // =============================================
-  async llenarFactura(rows, is_guardada?, callback = (arg) => {}) {
-    this.rellenarVariables().then(async (res) => {
-      if (res) {
-        for (let index = 0; index < rows.length; index++) {
-          const row = rows[index];
-          let articulo = row.articulo;
+  async llenarFactura(rows, is_guardada?) {
+    return new Promise<any>((resolve, reject) => {
+      this.rellenarVariables().then(async (res) => {
+        if (res) {
+          for (let index = 0; index < rows.length; index++) {
+            const row = rows[index];
+            let articulo = row.articulo;
 
-          try {
-            if (!is_guardada) {
-              this.articuloClass.getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura }).then((res_articulo) => this.llenarFilas(row, _.first(res_articulo['data']), index));
-            } else {
-              this.llenarFilas(row, articulo, index);
-            }
-          } catch (error) {}
+            try {
+              if (!is_guardada) {
+                this.articuloClass.getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura }).then((res_articulo) => this.llenarFilas(row, _.first(res_articulo['data']), index));
+              } else {
+                this.llenarFilas(row, articulo, index);
+              }
+            } catch (error) {}
+          }
+
+          resolve(true);
+        } else {
+          resolve(false);
         }
-
-        callback(true);
-      } else {
-        callback(false);
-      }
+      });
     });
   }
 
@@ -353,6 +362,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     campos['calcular_saco'].setValue(row.calcular_saco);
     campos['is_defectuoso'].setValue(row.is_defectuoso);
     campos['is_devuelto'].setValue(row.is_devuelto || false);
+    campos['from_pre_factura'].setValue(row.from_pre_factura || false);
 
     campos['articulo'].setValue(articulo);
 
@@ -376,7 +386,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   seleccionarCampoEnTurno() {
     setTimeout(() => {
-      this.ajustarSecuencia().then((res) => this.enfocarInput(this.inputSecuencia));
+      fun.logPurple('this.inputSecuencia ', this.inputSecuencia);
+      this.ajustarSecuencia().then((res) => setTimeout(() => this.enfocarInput(this.inputSecuencia), 10));
     }, 100);
   }
 
@@ -424,6 +435,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     return new Promise((resolve) => {
       const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
       this.secuencia = filas_ocupadas.length;
+      console.log('filas_ocupadas ', filas_ocupadas);
 
       this.inputSecuencia = 'cod-' + this.secuencia;
       resolve(true);

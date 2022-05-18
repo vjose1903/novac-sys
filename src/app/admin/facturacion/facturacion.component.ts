@@ -23,6 +23,7 @@ import { teclasCode } from '../../core/typescript/constantes';
 import { Permisos } from '../../core/typescript/permisos';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { SingletonService } from '../../core/services/singleton.service';
+import { NgxPermissionsService } from 'ngx-permissions';
 
 @Component({
   selector: 'app-facturacion',
@@ -35,6 +36,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   secuenciaKeys = [];
   info_cambio: any;
   productosDevueltos: any[];
+  hasPermissionPreVenta: boolean;
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
@@ -135,7 +137,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   permissions = Permisos;
   configApp: ConfigI;
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService, public pdfServ: PdfService) {
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private localeService: BsLocaleService,
+    public factServ: FacturacionService,
+    public pdfServ: PdfService,
+    private permissionsService: NgxPermissionsService,
+  ) {
     super(pdfServ);
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
@@ -150,6 +160,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.localeService.use('es');
     this.configApp = SingletonService.configServ.getConfig({ isPromise: false });
     this.rellenarVariables();
+
+    // this.permissionsService.hasPermission(this.permissions.pre_venta.).then((result) => (this.hasPermissionPreVenta = result));
   }
 
   ngOnDestroy(): void {
@@ -201,39 +213,24 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.metodo = this.route.snapshot.params['tipo'];
       this.action = this.route.snapshot.params['action'];
       const id_factura = this.route.snapshot.params['id'];
-
       this.info_cambio = {};
       this.fechaFactura = {};
       this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];
       this.FechaFacturaMostrar = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
-      this.action = undefined;
-      this.factura_a_editar = undefined;
-      this.is_adelantada = false;
-      this.is_viaje = false;
 
       this.modo_factura = this.metodo == 'pre-venta' ? 'Pre_factura' : 'normal';
       this.condicion_fact = this.metodo == 'pre-venta' ? 'Crédito' : 'Contado';
       this.forma_pago = 'Efectivo';
-      this.propietario_factura = undefined;
-      this.objArchivo = undefined;
-      this.CuerpoFactura = [];
-      this.DESCUENTO = 0.0;
-      this.BRUTO = 0.0;
-      this.TOTAL = 0.0;
-      this.ITBIS = 0;
-      this.NCFcompra = undefined;
+
       this.CostoYgasto = '';
-      // this.facturaGuardada = undefined;
-      this.factura_guardada = undefined;
-      this.FacturaAtrasada = false;
-      this.fecha_vencimiento = new Date();
-      this.fecha_equivalente = new Date();
-      this.fecha_viaje = new Date();
-      this.articulosAcambiar = [];
-      this.overlay = undefined;
-      this.camionesSelected = [];
-      this.camion_row = 0;
+
+      [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
+      [this.is_adelantada, this.is_viaje, this.FacturaAtrasada] = Array(3).fill(false);
+      [this.CuerpoFactura, this.articulosAcambiar, this.camionesSelected] = Array(3).fill([]);
+      [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row] = Array(5).fill(0);
+      [this.numero_pre_factura, this.NCFcompra, this.pre_factura_selected, this.action, this.factura_a_editar, this.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] = Array(9).fill(undefined);
+
       this.filterCamionesTargets = ['marca', 'modelo', 'anio', 'propietario.nombre', 'propietario.apellido'];
 
       this.factServ.setTipos(this.metodo, (res) => {
@@ -274,7 +271,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.rellenarCampos(null, 'fact_guardada', factura).then(() => {
           this.cuerpo.seleccionarCampoEnTurno();
 
-          this.cuerpo.llenarFactura(factura['detalle_facturas'], true, (res) => {
+          this.cuerpo.llenarFactura(factura['detalle_facturas'], true).then((res) => {
             setTimeout(() => {
               this.getCuerpoFactura({ tipo: 'cuerpo', data: factura['detalle_facturas'] });
 
@@ -521,8 +518,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.pre_factura_selected = data;
 
     this.rellenarCampos(null, 'pre-factura', data).then(() => {
-      this.cuerpo.llenarFactura(data.detalle_facturas);
-      this.cuerpo.seleccionarCampoEnTurno();
+      this.cuerpo.llenarFactura(data.detalle_facturas).then((res) => {
+        setTimeout(() => this.cuerpo.seleccionarCampoEnTurno(), 250);
+      });
     });
 
     modalInstance.closeModal(modalInstance.id, 'continuar');
@@ -1063,9 +1061,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================git
 
   getCuerpoFactura(arg) {
-    this.CuerpoFactura = [];
-    this.productosDevueltos = [];
-
     if (arg.tipo == 'cuerpo') {
       this.CuerpoFactura = arg.data;
 
@@ -1076,9 +1071,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           return articulo;
         });
       }
+      console.log('this.CuerpoFactura ', this.CuerpoFactura);
     }
 
-    if (arg.tipo == 'devuelto') this.productosDevueltos = arg.data;
+    if (arg.tipo == 'devuelto') {
+      this.productosDevueltos = arg.data;
+    }
   }
 
   prueba() {}
@@ -1266,7 +1264,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const tipoFact = _.find(this.lista_tipos_facturas, { referencia: this.tipoFactura });
     const tipoPreFactura = _.find(this.lista_tipos_facturas, { descripcion: 'Pre_factura' });
 
-    let cuerpo_fact = fun.duplicarJson(this.CuerpoFactura);
+    let cuerpo_fact = [...fun.duplicarJson(this.CuerpoFactura), ...this.productosDevueltos];
 
     const cabecera_fact = {};
     cabecera_fact['condicion'] = this.condicion_fact;

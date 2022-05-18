@@ -26,21 +26,24 @@ export class PreFacturaClass extends MixinClass {
 
   async buscarPreFactura(numero) {
     try {
-      //       id
-      // tipo
-      // desde
-      // hasta
       const res = await this.facturaClass.getAll({ afterPath: `custom/pre_factura/${numero}`, parameters: { tipo: 'single', paginado: false } });
       console.log(`res  => `, res);
       const pre_factura = res['data'];
-      pre_factura.secuencia = _.padStart(pre_factura.numero_factura, 8, '0');
-      // pre_factura.fecha = moment(pre_factura.fecha_equivalente).format('DD/MM/YYYY');
-      // pre_factura.fechaV = moment(pre_factura.fecha_vencimiento).isValid() ? moment(pre_factura.fecha_vencimiento).format('DD/MM/YYYY') : '';
-      pre_factura.monto = fun.numFormatTwoDecimals(pre_factura.balance);
+
+      console.log(`pre_factura  => `, pre_factura);
+      pre_factura.detalle_facturas = pre_factura.detalle_facturas.map((detalle) => {
+        console.log("detalle ", detalle);
+
+        detalle.from_pre_factura = true;
+        return detalle;
+      });
+
+      console.log('AQUII');
+
       this.mostrarFactura(pre_factura);
       // fun.toastError('No existe Pre-factura con este número.', 'ERROR');
     } catch (error) {
-      // console.error(error);
+      console.error(error);
     }
   }
 

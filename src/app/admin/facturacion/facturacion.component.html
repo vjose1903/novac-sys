@@ -89,20 +89,22 @@
           </select>
         </div>
 
-        <div *ngIf="modo_factura === 'normal' && metodo === 'venta'">
-          <span class="mt-1"><strong>No. Pre-factura:</strong></span>
+        <ng-container *ngxPermissionsOnly="permissions.pre_venta.create">
+          <div *ngIf="modo_factura === 'normal' && metodo === 'venta' && condicion_fact == 'Contado'">
+            <span class="mt-1"><strong>No. Pre-factura:</strong></span>
 
-          <p-inputMask
-            (keydown.enter)="saltar('buscar_pre_factura', $event.target.value, $event.target.id)"
-            [(ngModel)]="numero_pre_factura"
-            mask="99999999"
-            tabindex="-1"
-            styleClass="form-control inputE"
-            inputId="numero_pre_factura"
-            placeholder="________"
-            [autoClear]="false"
-          ></p-inputMask>
-        </div>
+            <p-inputMask
+              (keydown.enter)="saltar('buscar_pre_factura', $event.target.value, $event.target.id)"
+              [(ngModel)]="numero_pre_factura"
+              mask="99999999"
+              tabindex="-1"
+              styleClass="form-control inputE"
+              inputId="numero_pre_factura"
+              placeholder="________"
+              [autoClear]="false"
+            ></p-inputMask>
+          </div>
+        </ng-container>
 
         <div *ngIf="modo_factura === 'viaje'">
           <span class="mt-1"><strong>Fecha viaje:</strong></span>
