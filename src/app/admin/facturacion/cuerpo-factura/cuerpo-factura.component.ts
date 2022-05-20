@@ -192,7 +192,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   //  RESETEAR FORMULARIO
   // =============================================
   RESETCUERPO() {
-    if (this.form) this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
     this.TOTAL = 0;
     this.ITBIS = 0;
     this.secuencia = 0;

@@ -202,8 +202,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         this.is_combo = true;
         this.form.controls.medida.setValue('Quintal');
         this.form.controls.calcular_saco.setValue(true);
-        this.form.controls.costo_principal.reset(null);
-        this.form.controls.precio_principal.reset(null);
+        if (fun.hasValue(this.form)) this.form.controls.costo_principal.reset(null);
+        if (fun.hasValue(this.form)) this.form.controls.precio_principal.reset(null);
       });
     } else {
       this.resetArray();
@@ -283,17 +283,17 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   borrar(reset = false) {
     this.articuloSelected = undefined;
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
     this.enfocarInput('nombre');
-    this.form.controls.is_detallable.setValue(false);
-    this.form.controls.existencia.setValue(0);
+    if (fun.hasValue(this.form))this.form.controls.is_detallable.setValue(false);
+    if (fun.hasValue(this.form))this.form.controls.existencia.setValue(0);
     this.boton = 'Registrar';
     this.TIPOARTICULO = '';
     this.recalcular = false;
     if (this.is_combo) this.resetArray();
 
     this.is_combo = false;
-    this.form.controls['rowFormula'].reset();
+    if (fun.hasValue(this.form)) this.form.controls['rowFormula'].reset();
 
     if (reset) this.isCreando = true;
   }
@@ -304,10 +304,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const fields = ['medida_alerta', 'medida_contenido_padre', 'medida_contenido_hijo', 'cantidad_contenido_padre', 'cantidad_contenido_hijo', 'precio_padre', 'precio_libra', 'precio_hijo'];
 
     fields.forEach((field) => {
-      this.form.controls[field].reset(null);
+      if (fun.hasValue(this.form)) this.form.controls[field].reset(null);
     });
 
-    this.FORM.rowFormula.reset();
+    if (fun.hasValue(this.FORM)) this.FORM.rowFormula.reset();
 
     this.COMPRADOEN = value;
 

@@ -231,7 +231,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   changeStateCampos(enable = false) {
     ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
-      if (!enable) this.form.controls[campo].reset();
+      if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
 
       this.camposDisabled = !enable;
     });
@@ -242,12 +242,12 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   cancelar() {
-    this.form.reset({ estado: true });
+    if (fun.hasValue(this.form)) this.form.reset({ estado: true });
     this.borrar();
   }
 
   borrar() {
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
 
     this.enfocarInput('cedula');
     this.boton = 'Registrar';
@@ -292,7 +292,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   editarItem(data) {
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
     this.documentos_de_identidad = data.documentos_de_identidad;
 
     if (this.documentos_de_identidad.length) {

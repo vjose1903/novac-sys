@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { BehaviorSubject } from 'rxjs';
+import { Permisos } from '../typescript/permisos';
 import { RequestC } from '../typescript/requests';
 import { fun } from './functions.service';
 
@@ -39,7 +40,11 @@ export class CurrentUserService {
 
       this.permissionsService.loadPermissions(permisos);
 
-      resolve(true);
+      this.permissionsService.hasPermission(Permisos.user.create).then((res) => {
+        console.log('res ', res);
+
+        setTimeout(() => resolve(true), 100);
+      });
     });
   }
 

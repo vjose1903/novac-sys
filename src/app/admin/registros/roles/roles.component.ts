@@ -172,7 +172,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   borrar() {
-    this.form.reset({ estado: true });
+    if (fun.hasValue(this.form)) this.form.reset({ estado: true });
     this.parsePermisos({ clean: true });
     this.enfocarInput('campo_nombre');
   }
@@ -227,7 +227,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   cancelar() {
-    this.form.reset({ estado: true });
+    if (fun.hasValue(this.form)) this.form.reset({ estado: true });
     this.roleSelected = undefined;
     this.isCreando = false;
   }

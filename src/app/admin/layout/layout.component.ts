@@ -20,7 +20,7 @@ import { NgxPermissionsService } from 'ngx-permissions';
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
 })
-export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterContentChecked, AfterViewInit {
+export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   actualPath;
   actualRuta;
   actualModule;
@@ -130,14 +130,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   ngAfterViewInit() {
     this.ready = true;
     this.parseMenu();
-    this.cdRef.detectChanges();
-  }
 
-  ngAfterContentChecked() {
     this.cdRef.detectChanges();
   }
 
   setUser(usuario) {
+    const location = window.location.href;
+    console.log('location ', location);
+
     this.usuario = usuario;
     if (this.usuario.sexo === 'm') this.imgUser = 'assets/img/userH.png';
     else this.imgUser = 'assets/img/userM.png';

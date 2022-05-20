@@ -64,6 +64,9 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   ) {}
 
   ngOnInit(): void {
+    const location = window.location.href;
+    console.log('location ', location);
+
     SingletonService.http = this.http;
     SingletonService.zone = this.zone;
     SingletonService.configServ = this.configServ;
@@ -166,7 +169,8 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-          this.validateUserAndLoadPermisos();
+          fun.logGreen('YA SETEE LA COFIG');
+          setTimeout(() => this.validateUserAndLoadPermisos(), 10);
         }
       })
       .catch((err) => {
@@ -178,7 +182,11 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     this.currentUserServ
       .validateUser()
       .then((res) => {
-        setTimeout(() => (this.configReady = true), 1000);
+        console.log("ANDO AQUIII");
+        setTimeout(() => {
+          fun.logOrange('termine proceso');
+          this.configReady = true;
+        }, 1000);
       })
       .catch((error) => {
         this.configReady = true;

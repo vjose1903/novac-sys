@@ -438,7 +438,7 @@ const t_c = {
     isBreak: true,
     only_titulo: false,
     break: 40,
-    widths: [24, 60, 70, '*', 50, 50, 'auto'],
+    widths: [24, 60, '*', 50, 50, 'auto'],
     mostrar_total: true,
     info: [
       {
@@ -459,15 +459,6 @@ const t_c = {
         key: 'fecha_equivalente',
         alignment_body: 'left',
         formato_fecha: true,
-      },
-      {
-        text: 'Factura',
-        style: 'letra10',
-        alignment_titulo: 'left',
-        noWrap: true,
-        style_body: 'letra10',
-        key: 'factura',
-        alignment_body: 'left',
       },
       {
         text: 'Cliente',

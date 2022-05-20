@@ -244,9 +244,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
         this.getCamiones();
       } else {
-        if (this.form) this.form.reset();
+        if (fun.hasValue(this.form)) this.form.reset();
       }
-
 
       if (this.action === 'update') {
         this.factura_a_editar = {};

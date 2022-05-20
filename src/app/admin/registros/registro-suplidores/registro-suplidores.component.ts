@@ -129,7 +129,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   borrar() {
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
     this.boton = 'Registrar';
 
     this.doc_is_cedula = false;
@@ -255,7 +255,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     ['nombre', 'telefono', 'direccion', 'email'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
-      if (!enable) this.form.controls[campo].reset();
+      if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
 
       this.camposDisabled = !enable;
     });

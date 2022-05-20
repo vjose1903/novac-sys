@@ -171,7 +171,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   borrar(reset = false) {
     this.vehiculoSelected = undefined;
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
     this.restartCampo('nombre_no_empleado');
     this.restartCampo('apellido_no_empleado');
     this.restartCampo('telefono_no_empleado');
@@ -194,7 +194,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   restartCampo(campo) {
     this.form.controls[campo].disable();
-    this.form.controls[campo].reset(null);
+    if (fun.hasValue(this.form)) this.form.controls[campo].reset(null);
   }
 
   async selectMarca(callback = (arg) => {}) {
@@ -202,7 +202,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     if (marca_selected_id) {
       const res = await this.modeloClass.getAll({ afterPath: `por_marca/${marca_selected_id}` });
       this.listaModelos = res;
-      this.form.controls.modelo.reset();
+      if (fun.hasValue(this.form)) this.form.controls.modelo.reset();
       callback(true);
     }
   }

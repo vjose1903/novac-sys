@@ -14,6 +14,7 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [RegistroArticulosComponent],
-  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, NewTablasModule, DirectivesModule, OverlayPanelModule, NgxPermissionsModule.forChild()],
+  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, NewTablasModule, DirectivesModule, OverlayPanelModule, NgxPermissionsModule],
 })
+
 export class RegistroArticulosModule {}

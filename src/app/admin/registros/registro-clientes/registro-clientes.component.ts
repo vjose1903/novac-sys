@@ -194,7 +194,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     ['nombre', 'apellido', 'direccion', 'sexo', 'telefono', 'limite_credito', 'maximo_credito', 'vendedor_id'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
-      if (!enable) this.form.controls[campo].reset();
+      if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
 
       this.camposDisabled = !enable;
     });
@@ -351,7 +351,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   borrar() {
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
     this.doc_is_cedula = true;
     this.documentos_de_identidad = undefined;
     this.boton = 'Guardar';
