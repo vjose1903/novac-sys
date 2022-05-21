@@ -340,7 +340,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
       let unidad_ = element.unidad;
       if (element.select) {
-        if (unidad_ === 'Saco') unidad_ = this.obtenerSaco(element.descripcion, 'descripcion');
+        if (unidad_ == 'Saco') unidad_ = this.obtenerSaco(element.descripcion, 'descripcion');
 
         const fila = {
           detalle_factura_nota: element.id,
@@ -438,13 +438,13 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       };
 
       for (const factura of facturasLlenas) {
-        // if (this.totalIndividual(factura) == 0) continue;
         const objTemp = {
           cabecera_factura_id: factura.id,
           total: this.totalIndividual(factura),
           detalles_facturas_notas: _.filter(factura.detalle_facturas, (data) => data.select == true && data.cant_nota > 0).map((detalle) => {
-            let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades', 'itbis', 'costo', 'precio', 'total_nota', 'descuento']);
+            let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'costo', 'precio', 'total_nota', 'descuento']);
             objDetalleTemp['total'] = fun.desformatear(objDetalleTemp.total_nota);
+            objDetalleTemp['cantidad_en_unidades'] = detalle.cantidad_en_unidades_nota;
             objDetalleTemp['cantidad'] = detalle.cant_nota;
             delete objDetalleTemp.total_nota;
             objDetalleTemp['detalle_factura_id'] = detalle.id;
@@ -456,11 +456,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       }
     }
 
-    // if (dataFact.facturas.propietario_factura.vendedor_id) cabecera_fact['vendedor_id'] = dataFact.facturas.propietario_factura.vendedor_id || null;
-
     const res = await this.notasClass.createOne(dataToSend);
 
-    // res['data']['FACTURA_DE'] = 'nota';
     this.notasClass.parseDataToPdf(res['data']).then((data_parsed) => {
       const obj = { data: data_parsed, type: 'nota' };
 

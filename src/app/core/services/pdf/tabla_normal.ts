@@ -43,6 +43,8 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
 
   // if (contendio_.length > 0 || configuration.only_titulo) body.push(titulos as TablaRowPdfMake);
   body.push(titulos as TablaRowPdfMake);
+  console.log("body ", body);
+
   let longitud_cuerpo = 0;
   if (!configuration.only_titulo && Array.isArray(contendio_)) {
     contendio_.forEach((detalle, j) => {
