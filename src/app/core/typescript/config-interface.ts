@@ -18,6 +18,7 @@ export interface ConfigI {
   is_development:            boolean;
   printersList:              Printer[];
   app_version:               string;
+  is_db_local:               boolean;
 }
 
 export interface PagesSizes {

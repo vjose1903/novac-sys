@@ -174,7 +174,18 @@ async function beforeCreateWindow(win) {
   verificarSumastra();
   borrarLogs();
 
-  HandlerConfigFile.checkConfigFile(win);
+  HandlerConfigFile.checkConfigFile(win).then(async (is_config_ready) => {
+    if (is_config_ready) {
+      const confTemp = (await Functions.getConfigFile()) as any;
+      const conf: ConfigI = JSON.parse(confTemp);
+
+      const args_ = process.argv.slice(1);
+      const serve_ = args_.some((val) => val === '--serve');
+
+      // if (serve_ && conf.is_db_local) runLocalDataBase();
+      if (conf.is_db_local) runLocalDataBase();
+    }
+  });
 
   // ----- Manejar las actualizaciones -----
   auto_updater = new AppUpdater();
@@ -278,6 +289,16 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
   } catch (error) {}
 }
 
+function runLocalDataBase() {
+  return new Promise<any>((resolve, reject) => {
+    // cmd(`export RAILS_SERVE_STATIC_FILES=true; export DISABLE_DATABASE_ENVIRONMENT_CHECK=1; RAILS_ENV=production rails s -b 0.0.0.0 --port 3000 -d`, async (res_data_base) => {
+    cmd(`cd /Users/vjose1903/git/personal/serverRa && RAILS_ENV=development rails s -b 0.0.0.0 --port 3000 -d`, async (res_data_base) => {
+      console.log('res_data_base ', res_data_base);
+      resolve(true);
+    });
+  });
+}
+
 function getActualGitUser() {
   return new Promise<any>((resolve, reject) => {
     const args_ = process.argv.slice(1);
@@ -292,7 +313,6 @@ function getActualGitUser() {
     }
   });
 }
-
 function getConfigFile() {
   return new Promise((resolve, reject) => {
     const args_ = process.argv.slice(1);
@@ -551,6 +571,7 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function cmd(command, callback = (arg) => {}) {
   puts(command, 'comando realizado en la funcion cmd');
+
   exec(command, (error, stdout, stderr) => {
     let obj;
     if (error) {

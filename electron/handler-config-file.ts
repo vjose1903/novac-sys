@@ -21,8 +21,10 @@ export default class HandlerConfigFile {
     usa_url_principal: true,
     printer_caja_selected: null,
     printer_reportes_selected: null,
+    is_db_local: true,
     pages_sizes: {
       recibo_ingreso: '80mm_roll',
+      nota: '80mm_roll',
       conduce: '80mm_roll',
       facturacion: '80mm_roll',
       cuadre_caja: '80mm_roll',
@@ -30,17 +32,21 @@ export default class HandlerConfigFile {
     },
   };
 
-  static checkConfigFile(win: BrowserWindow, callback = (res) => {}) {
-    if (!fs.existsSync(pathAdd('/app_config.config'))) {
-      this.default_config.printer_caja_selected = Functions.getDefaultPrinter(win);
-      this.default_config.printer_reportes_selected = Functions.getDefaultPrinter(win);
+  static checkConfigFile(win: BrowserWindow) {
+    return new Promise<any>((resolve, reject) => {
+      if (!fs.existsSync(pathAdd('/app_config.config'))) {
+        this.default_config.printer_caja_selected = Functions.getDefaultPrinter(win);
+        this.default_config.printer_reportes_selected = Functions.getDefaultPrinter(win);
 
-      Functions.setConfigFile(JSON.stringify(this.default_config)).then(() => {
-        console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
-        callback(true);
-      });
-    } else {
-      callback(true);
-    }
+        Functions.setConfigFile(JSON.stringify(this.default_config))
+          .then(() => {
+            console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
+            resolve(true);
+          })
+          .catch((err) => reject(false));
+      } else {
+        resolve(true);
+      }
+    });
   }
 }
