@@ -8,12 +8,12 @@ const routes: Routes = [
   {
     path: '',
     component: RolesComponent,
-    canActivate: [NgxPermissionsGuard],
-    data: {
-      permissions: {
-        only: Object.values(Permisos.role),
-      },
-    },
+    // canActivate: [NgxPermissionsGuard],
+    // data: {
+    //   permissions: {
+    //     only: Object.values(Permisos.role),
+    //   },
+    // },
   },
 ];
 

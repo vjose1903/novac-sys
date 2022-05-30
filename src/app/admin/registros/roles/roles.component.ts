@@ -122,6 +122,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     } else {
       this.roleSelected.permisos_acciones.forEach((permiso_accion) => {
         const permiso_en_turno = _.find(this.listaPermisos, (item) => item.id == permiso_accion.permiso.id);
+
         const accion_en_turno = _.find(permiso_en_turno.acciones, (item) => item.id == permiso_accion.accion.id);
         accion_en_turno.selected = true;
       });

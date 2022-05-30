@@ -217,6 +217,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
           .then((res) => {
             if (res['data'].length) {
               const is_cliente = _.find(res['data'], (item) => item.persona_is === 'Cliente');
+              const id_anterior = this.form.getRawValue().id;
 
               if (fun.hasValue(is_cliente) && is_cliente.persona.estado) {
                 fun.toastError(`${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
@@ -224,21 +225,21 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
                 return;
               }
 
-              const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
-              this.doc_is_cedula = documento_original.descripcion == 'cedula' ? true : false;
-              const otro_doc = documento_original.descripcion == 'cedula' ? 'rnc' : 'cedula';
-              this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
-              this.form.controls[otro_doc].setValue(null);
-              // const documento = fun.hasValue(is_cliente) ? _.omit(is_cliente, ['persona', 'persona_is']) : _.omit(_.head(res['data']), ['persona', 'persona_is']);
-              const persona = fun.hasValue(is_cliente) ? is_cliente.persona : _.head(res['data']).persona;
+              const persona = _.head(res['data']).persona;
+              persona.id = id_anterior;
+              fun.logGreen('id_anterior ', id_anterior);
 
-              // persona.fecha_nacimiento = this.fecha(persona.fecha_nacimiento);
+              const documento_principal = _.find(persona.documentos_de_identidad, { principal: true });
+
+              this.doc_is_cedula = documento_principal.descripcion == 'cedula' ? true : false;
+              const otro_doc = documento_principal.descripcion == 'cedula' ? 'rnc' : 'cedula';
+
+              this.form.controls[otro_doc].setValue(null);
 
               this.form.patchValue(persona);
+              fun.logRed('this.form.getRawValue() ', this.form.getRawValue());
 
               this.patchDocumentos(persona.documentos_de_identidad);
-
-              if (persona.estado) this.form.controls.id.setValue(null);
 
               if (this.camposDisabled) enable_campos = true;
 
@@ -298,6 +299,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     });
   }
 
+  p() {}
+
   submit() {
     const formulario = this.form.getRawValue();
 
@@ -327,6 +330,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         formulario.imagen_attributes = null;
         formulario.imagen_attributes = this.PhotoData;
       }
+
       formulario.estado = true;
 
       formulario['balance'] = 0;

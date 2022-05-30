@@ -130,14 +130,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   ngAfterViewInit() {
     this.ready = true;
     this.parseMenu();
-
+    setTimeout(() => this.checkRouteActiva(), 250);
     this.cdRef.detectChanges();
   }
 
   setUser(usuario) {
-    const location = window.location.href;
-    console.log('location ', location);
-
     this.usuario = usuario;
     if (this.usuario.sexo === 'm') this.imgUser = 'assets/img/userH.png';
     else this.imgUser = 'assets/img/userM.png';
@@ -189,6 +186,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       this.actualModule = undefined;
       this.actualRuta = _.join(pathSplit.slice(1, pathSplit.length), '/');
     }
+
     this.ready = true;
   }
 

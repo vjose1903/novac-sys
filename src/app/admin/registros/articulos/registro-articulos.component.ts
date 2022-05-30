@@ -142,8 +142,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async getArticulos(params?: { per_page: number; page: number; search: string }) {
-    // async getArticulos(e) {
-
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     this.listaArticulos.length = 0;
@@ -285,8 +283,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.articuloSelected = undefined;
     if (fun.hasValue(this.form)) this.form.reset();
     this.enfocarInput('nombre');
-    if (fun.hasValue(this.form))this.form.controls.is_detallable.setValue(false);
-    if (fun.hasValue(this.form))this.form.controls.existencia.setValue(0);
+    if (fun.hasValue(this.form)) this.form.controls.is_detallable.setValue(false);
+    if (fun.hasValue(this.form)) this.form.controls.existencia.setValue(0);
     this.boton = 'Registrar';
     this.TIPOARTICULO = '';
     this.recalcular = false;

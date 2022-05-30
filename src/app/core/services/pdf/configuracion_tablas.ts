@@ -18,6 +18,7 @@ const t_c = {
     only_titulo: false,
     widths: [24, 60, 73, 53, '*', 'auto'],
     mostrar_total: true,
+    mostrar_bruto: true,
     info: [
       {
         text: '#',
@@ -91,6 +92,7 @@ const t_c = {
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
     widths: [24, 60, 73, 53, '*', 'auto'],
     mostrar_total: true,
+    mostrar_bruto: false,
     info: [
       {
         text: '#',
@@ -180,6 +182,7 @@ const t_c = {
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
     widths: [18, '*', 60, 'auto', 'auto', 'auto', 'auto', 'auto'],
     mostrar_total: true,
+    mostrar_bruto: false,
     info: [
       {
         text: '#',
@@ -286,6 +289,7 @@ const t_c = {
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
     widths: [18, '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
     mostrar_total: true,
+    mostrar_bruto: false,
     info: [
       {
         text: '#',
@@ -440,6 +444,7 @@ const t_c = {
     break: 40,
     widths: [24, 60, '*', 50, 50, 'auto'],
     mostrar_total: true,
+    mostrar_bruto: false,
     info: [
       {
         text: '#',
@@ -537,6 +542,7 @@ const t_c = {
         widths: [24, '*', 'auto', 'auto', 'auto'],
         mensaje_contenido_vacio: 'No se vendió de este tipo de producto en la fecha indicada',
         mostrar_total: true,
+        mostrar_bruto: false,
         info: [
           {
             text: '#',
@@ -578,7 +584,6 @@ const t_c = {
             margin_titulo: [0, 0, 20, 0],
             margin_body: [0, 0, 20, 0],
           },
-
           {
             text: 'Total Vendido',
             alignment_titulo: 'right',
@@ -666,6 +671,7 @@ const t_c = {
         widths: [24, 70, 'auto', 'auto', '*'],
         mensaje_contenido_vacio: 'Esta Factura no ha recibido ningun movimiento.',
         mostrar_total: false,
+        mostrar_bruto: false,
         info: [
           {
             text: '#',

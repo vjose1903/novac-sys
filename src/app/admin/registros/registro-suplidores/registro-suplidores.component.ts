@@ -198,26 +198,24 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
           .then((res) => {
             if (res['data'].length) {
               const is_suplidor = _.find(res['data'], (item) => item.persona_is === 'Suplidor');
-
+              const id_anterior = this.form.getRawValue().id;
               if (fun.hasValue(is_suplidor) && is_suplidor.persona.estado) {
                 fun.toastError(`${_.capitalize(tipo)} pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR');
                 if (!this.editando) enable_campos = false;
                 return;
               }
 
-              const documento_original = _.find(this.documentos_de_identidad, (item) => item.principal);
-              this.doc_is_cedula = documento_original.descripcion == 'cedula' ? true : false;
-              const otro_doc = documento_original.descripcion == 'cedula' ? 'rnc' : 'cedula';
-              this.form.controls[documento_original.descripcion].setValue(documento_original.documento);
-              this.form.controls[otro_doc].setValue(null);
+              const persona = _.head(res['data']).persona;
+              persona.id = id_anterior;
+              const documento_principal = _.find(persona.documentos_de_identidad, { principal: true });
 
-              const persona = fun.hasValue(is_suplidor) ? is_suplidor.persona : _.head(res['data']).persona;
+              this.doc_is_cedula = documento_principal.descripcion == 'cedula' ? true : false;
+              const otro_doc = documento_principal.descripcion == 'cedula' ? 'rnc' : 'cedula';
+              this.form.controls[otro_doc].setValue(null);
 
               this.form.patchValue(persona);
 
               this.patchDocumentos(persona.documentos_de_identidad);
-
-              if (persona.estado) this.form.controls.id.setValue(null);
 
               if (this.camposDisabled) enable_campos = true;
 

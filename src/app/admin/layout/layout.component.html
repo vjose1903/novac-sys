@@ -3,9 +3,9 @@
 </div>
 
 <div #fantasma class="fantasma">
-
   <div class="layout">
-    <div class="menu">
+    <!-- <div class="menu" [ngStyle]="{ 'max-height': fantasma?.offsetHeight + 'px'}"> -->
+    <div class="menu" [ngStyle]="{ 'max-height': fantasma?.offsetHeight + 'px'}">
       <div class="title">
         <span class="titulo" (click)="cambiarMenu({ url: 'dashboard', navigate: true })">Menu</span>
       </div>

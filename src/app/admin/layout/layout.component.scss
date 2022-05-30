@@ -87,9 +87,11 @@ $bodyfont: "Poppins";
     grid-template-areas:
       "title"
       "sideBar";
-    grid-template-rows: min-content auto;
+      grid-template-rows: min-content auto;
+
     max-height: inherit;
     z-index: 1;
+    background-color: var(--primary02);
     > .title {
       grid-area: title;
       background-color: #c9c9c9;
@@ -114,6 +116,7 @@ $bodyfont: "Poppins";
       grid-area: sideBar;
       background-color: var(--primary02);
       max-height: inherit;
+      position: relative;
       > .menuContent {
         overflow: auto;
         display: grid;

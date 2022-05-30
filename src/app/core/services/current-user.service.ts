@@ -41,8 +41,6 @@ export class CurrentUserService {
       this.permissionsService.loadPermissions(permisos);
 
       this.permissionsService.hasPermission(Permisos.user.create).then((res) => {
-        console.log('res ', res);
-
         setTimeout(() => resolve(true), 100);
       });
     });

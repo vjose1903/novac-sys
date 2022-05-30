@@ -65,7 +65,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
   ngOnInit(): void {
     const location = window.location.href;
-    console.log('location ', location);
 
     SingletonService.http = this.http;
     SingletonService.zone = this.zone;
@@ -182,7 +181,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     this.currentUserServ
       .validateUser()
       .then((res) => {
-        console.log("ANDO AQUIII");
         setTimeout(() => {
           fun.logOrange('termine proceso');
           this.configReady = true;
