@@ -20,6 +20,7 @@ import {
   ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
   KEYWORD_ELECTRON_EVENT_DECRYPT,
   KEYWORD_ELECTRON_EVENT_ENCRYPT,
+  KEYWORD_ELECTRON_QUIT_APP,
   KEYWORD_ELECTRON_GET_APP_CONFIG,
 } from '../../electron/shared-electron-angular';
 import { Subscription } from 'rxjs';
@@ -28,13 +29,14 @@ import { ToastrService } from 'ngx-toastr';
 import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
 import { CurrentUserService } from './core/services/current-user.service';
+import { MixinClass } from './core/typescript/MixinClass';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit {
+export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit {
   loading = false;
   objProgress;
   visible = false;
@@ -61,7 +63,9 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     public sharedServ: SharedService,
 
     private currentUserServ: CurrentUserService,
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     SingletonService.http = this.http;
@@ -106,6 +110,11 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
             break;
           //
+          case KEYWORD_ELECTRON_QUIT_APP:
+            this.cerrar_app();
+
+            break;
+          //
           case ELECTRON_EVENT_UPDATE_ERROR:
             fun.toastError(info.msg, 'ERRROR');
             this.visible = false;
@@ -130,6 +139,20 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     const initSlice = location.indexOf('/admin') == -1 ? location.indexOf('/auth') : location.indexOf('/admin');
     const actualPath = location.slice(initSlice, location.length);
     return actualPath;
+  }
+
+  cerrar_app() {
+    this.handleModalForm({
+      html: `<p> ESTAS A PUNTO DE CERRAR EL PROGRAMA NOVAC, ¿Desea continuar? </p>`,
+      id: 'cerrar_app',
+      header: 'CONFIRMACION DE CIERRE',
+      width: '56.25rem',
+      height: '31.25rem',
+      botones: {
+        aceptar: { show: true, disable: false },
+        cancelar: { show: true, disable: false },
+      },
+    });
   }
 
   ngAfterContentChecked() {

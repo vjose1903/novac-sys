@@ -1,6 +1,7 @@
 export const KEYWORD_ELECTRON_TEST = 'electron-test';
 export const KEYWORD_ELECTRON_SENDER = 'electron-envio';
 export const KEYWORD_ELECTRON_RESPONSE = 'electron-respuesta';
+export const KEYWORD_ELECTRON_QUIT_APP = 'electron-quit-app';
 export const KEYWORD_ELECTRON_EVENT_DECRYPT = 'electron-desencriptar';
 export const KEYWORD_ELECTRON_EVENT_ENCRYPT = 'electron-encriptar';
 export const KEYWORD_ELECTRON_GET_APP_CONFIG = 'electron-get-app-config';

@@ -19,6 +19,7 @@ import {
   KEYWORD_ELECTRON_EVENT_ENCRYPT,
   KEYWORD_ELECTRON_GET_APP_CONFIG,
   KEYWORD_ELECTRON_PRINT_BASE64,
+  KEYWORD_ELECTRON_QUIT_APP,
   KEYWORD_ELECTRON_RESPONSE,
   KEYWORD_ELECTRON_SENDER,
   KEYWORD_ELECTRON_SET_APP_CONFIG,
@@ -36,9 +37,16 @@ const args = process.argv.slice(1);
 const serve = args.some((val) => val === '--serve');
 
 function createWindow() {
-  return new Promise<BrowserWindow>((resolve, reject) => {
+  return new Promise<BrowserWindow>(async (resolve, reject) => {
     const electronScreen = screen;
     const size = electronScreen.getPrimaryDisplay().workAreaSize;
+
+
+    const args_ = process.argv.slice(1);
+    const serve_ = args_.some((val) => val === '--serve');
+
+    const confTemp = (await Functions.getConfigFile()) as any;
+    const conf: ConfigI = JSON.parse(confTemp);
 
     // Create the browser window.
     win = new BrowserWindow({
@@ -126,11 +134,15 @@ function createWindow() {
     // }
 
     // Emitted when the window is closed.
-    win.on('closed', () => {
+
+    win.on('closed', (event) => {
+      console.log(">>>>>> ANDO AQUII ");
+      if (conf.is_db_local) closeLocalDataBase(serve_);
+
       // Dereference the window object, usually you would store window
       // in an array if your app supports multi windows, this is the time
       // when you should delete the corresponding element.
-      win = null;
+      // win = null;
     });
 
     resolve(win);
@@ -154,6 +166,7 @@ try {
     // to stay active until the user quits explicitly with Cmd +
     if (process.platform !== 'darwin') app.quit();
   });
+
 
   app.on('activate', () => {
     // On OS X it's common to re-create a window in the app when the
@@ -182,8 +195,8 @@ async function beforeCreateWindow(win) {
       const args_ = process.argv.slice(1);
       const serve_ = args_.some((val) => val === '--serve');
 
-      // if (serve_ && conf.is_db_local) runLocalDataBase();
-      if (conf.is_db_local) runLocalDataBase();
+      // if (serve_ && conf.is_db_local) runLocalDataBase(serve_);
+      if (conf.is_db_local) runLocalDataBase(serve_);
     }
   });
 
@@ -289,10 +302,25 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
   } catch (error) {}
 }
 
-function runLocalDataBase() {
+function closeLocalDataBase(serve_) {
   return new Promise<any>((resolve, reject) => {
-    // cmd(`export RAILS_SERVE_STATIC_FILES=true; export DISABLE_DATABASE_ENVIRONMENT_CHECK=1; RAILS_ENV=production rails s -b 0.0.0.0 --port 3000 -d`, async (res_data_base) => {
-    cmd(`cd /Users/vjose1903/git/personal/serverRa && RAILS_ENV=development rails s -b 0.0.0.0 --port 3000 -d`, async (res_data_base) => {
+    const electron_builder = require('./package.json');
+    const proyect_path = serve_ ? '\\Users\\%username%\\git\\servidorADMAgro' : `C:\\Users\\%username%\\${electron_builder.productName}\\servidorADMAgro`;
+
+    console.log(":::::: ANDO AQUII ");
+    cmd(`cd ${proyect_path} && .\\close_server.bat`, async (res_data_base) => {
+      console.log('res_data_base ', res_data_base);
+      resolve(true);
+    });
+  });
+}
+
+function runLocalDataBase(serve_) {
+  return new Promise<any>((resolve, reject) => {
+    const electron_builder = require('./package.json');
+    const proyect_path = serve_ ? '\\Users\\%username%\\git\\servidorADMAgro' : `C:\\Users\\%username%\\${electron_builder.productName}\\servidorADMAgro`;
+
+    cmd(`cd ${proyect_path} && .\\run_server_win.bat`, async (res_data_base) => {
       console.log('res_data_base ', res_data_base);
       resolve(true);
     });
@@ -306,10 +334,11 @@ function getActualGitUser() {
 
     if (serve_) {
       cmd(`git config --get user.name`, async (res_username) => {
-        resolve(res_username.STDOUT.trim());
+        const username = res_username.STDOUT.trim() != '' ? res_username.STDOUT.trim() : 'vjose1903';
+        resolve(username);
       });
     } else {
-      resolve(undefined);
+      resolve('vjose1903');
     }
   });
 }
