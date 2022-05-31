@@ -325,6 +325,14 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
 async function getDabaBasePath() {
   const electron_builder = require('./package.json');
   const serve_ = await getServer_();
+  console.log("==========================================");
+  console.log("");
+  console.log("");
+  console.log("electron_builder.productName ", electron_builder.productName);
+  console.log("");
+  console.log("");
+  console.log("==========================================");
+
   return serve_ ? '\\Users\\%username%\\git\\novac-server' : `C:\\Users\\%username%\\${electron_builder.productName}\\novac-server`;
 }
 
@@ -412,8 +420,9 @@ async function borrarLogs() {
     });
   } else {
     // ya se creo la carpeta log
-    setTimeout(() => {
-      const comando = `del "${pathAdd('/log/my_log.txt')}"`;
+    setTimeout(async () => {
+      const logs_path = await pathAdd('/log/my_log.txt');
+      const comando = `del "${logs_path}"`;
       cmd(comando);
     }, 10000);
   }
@@ -434,8 +443,8 @@ async function verificarSumastra() {
     });
   } else {
   }
-
-  const aFiles_malos = [pathAdd('/lp.exe')];
+  const lp_path = await pathAdd('/lp.exe');
+  const aFiles_malos = [lp_path];
 
   verificarElemento(aFiles_malos, '/sumastra/lp.exe', '/print', '/lp.exe', '/lp', false, false, 'Sumastra', 0);
 }
@@ -443,14 +452,15 @@ async function verificarSumastra() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION QUE SE EJECUTA AL TERMINAR LA DESCARGA DE UN ELEMENTO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
+async function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
   // const interval = setInterval(() => {
 
-  const command = process.platform === 'darwin' ? `unzip "${pathAdd(path_local_extension)}" -d "${pathAdd()}"` : `powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`;
+  const command = process.platform === 'darwin' ? `unzip "${await pathAdd(path_local_extension)}" -d "${await pathAdd()}"` : `powershell Expand-Archive "${await pathAdd(path_local_extension)}" -DestinationPath "${await pathAdd()}"`;
 
-  cmd(command, (res) => {
+  cmd(command, async (res) => {
     if (res.status) {
-      cmd(`del ${pathAdd(path_local_extension)}`, async (res_borrado) => {
+      const comando = await pathAdd(path_local_extension);
+      cmd(`del ${comando}`, async (res_borrado) => {
         if (res_borrado.status) {
           callback({
             status: true,
@@ -517,8 +527,8 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
         if (descomprimir) {
           const command =
             process.platform === 'darwin'
-              ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_no_extension)}" -x "*.DS_Store"`
-              : `powershell Compress-Archive "${pathAdd(`${path_local_no_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_no_extension}.zip`)}" -Update`;
+              ? `zip -r "${await pathAdd(path_local_extension)}" "${await pathAdd(path_local_no_extension)}" -x "*.DS_Store"`
+              : `powershell Compress-Archive "${await pathAdd(`${path_local_no_extension}`)}"  -DestinationPath "${await pathAdd(`${path_local_no_extension}.zip`)}" -Update`;
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -542,8 +552,8 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
 // PARA COMPARA MD5 DE ELEMENTOS A VER SI FUNCIONAN
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
-  const command = process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+async function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
+  const command = process.platform === 'darwin' ? `md5sum "${await pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${await pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
   cmd(command, (res_local) => {
     if (res_local.status) {
@@ -572,9 +582,9 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
   const conf = await getConfig();
 
   if (conf.url_servidor_descargas) {
-    await downloadFile(`${conf.url_servidor_descargas}${paht_server}`, path_local_content, path_local_extension, (res) => {
+    await downloadFile(`${conf.url_servidor_descargas}${paht_server}`, path_local_content, path_local_extension, async (res) => {
       if (res.status) {
-        const command = process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+        const command = process.platform === 'darwin' ? `md5sum "${await pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${await pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
         cmd(command, (res_local_before_descarga) => {
           if (res_local_before_descarga.status) {
@@ -701,13 +711,21 @@ async function puts(msg, titulo?) {
   if (win) {
     const fs = require('fs');
 
-    const carpeta = pathAdd('/log');
-    const file = pathAdd('/log/my_log.txt');
+    const carpeta = await pathAdd('/log');
+    const file = await pathAdd('/log/my_log.txt');
 
     let texto = '';
     if (typeof msg === 'object') texto = JSON.stringify(msg, null, '\t');
     else if (typeof msg === 'number') texto = msg.toString();
     else texto = msg;
+
+    console.log(' ----------------------------------');
+    console.log(' ');
+    console.log(' ');
+    console.log('texto >>>> ', texto);
+    console.log(' ');
+    console.log(' ');
+    console.log(' ----------------------------------');
 
     if (!fs.existsSync(carpeta)) {
       fs.mkdir(carpeta, { recursive: true }, (err) => {
@@ -767,10 +785,10 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function imprimir(params: { fileName: string; tipo: string; scale: string }) {
   return new Promise(async (resolve, reject) => {
-    puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${pathAdd(`/${params.fileName}`)}`);
+    const sumatrapdf_path = await pathAdd('/print/lp.exe');
+    const file_path = await pathAdd(`/${params.fileName}`);
 
-    const sumatrapdf_path = pathAdd('/print/lp.exe');
-    const file_path = pathAdd(`/${params.fileName}`);
+    puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
 
     const orientation = params.tipo === 'reporte' ? 'Portrait' : 'landscape';
     const paper_size = params.tipo === 'reporte' ? 'letter' : 'VJPOS';
