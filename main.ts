@@ -41,12 +41,8 @@ function createWindow() {
     const electronScreen = screen;
     const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
-
-    const args_ = process.argv.slice(1);
-    const serve_ = args_.some((val) => val === '--serve');
-
-    const confTemp = (await Functions.getConfigFile()) as any;
-    const conf: ConfigI = JSON.parse(confTemp);
+    const conf = await getConfig();
+    const serve_ = getServer_();
 
     // Create the browser window.
     win = new BrowserWindow({
@@ -136,7 +132,7 @@ function createWindow() {
     // Emitted when the window is closed.
 
     win.on('closed', (event) => {
-      console.log(">>>>>> ANDO AQUII ");
+      console.log('>>>>>> ANDO AQUII ');
       if (conf.is_db_local) closeLocalDataBase(serve_);
 
       // Dereference the window object, usually you would store window
@@ -167,7 +163,6 @@ try {
     if (process.platform !== 'darwin') app.quit();
   });
 
-
   app.on('activate', () => {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -183,18 +178,35 @@ try {
   // throw e;
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER LA CONFIGURACION DE LA APP
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+async function getConfig(): Promise<ConfigI> {
+  const confTemp = (await Functions.getConfigFile()) as any;
+  const conf: ConfigI = JSON.parse(confTemp);
+  return conf;
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER SI EL PROYECTO SE ESTA CORRIENDO EN PRODUCCION O EN DESARROLLO
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+async function getServer_() {
+  const args_ = process.argv.slice(1);
+  const serve_ = args_.some((val) => val === '--serve');
+  return serve_;
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// CONFIGURACIONES DESPUES DE QUE SE CREA LA VENTANA DE ELECTRON
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function beforeCreateWindow(win) {
   verificarSumastra();
   borrarLogs();
+  const conf = await getConfig();
+  const serve_ = getServer_();
 
   HandlerConfigFile.checkConfigFile(win).then(async (is_config_ready) => {
     if (is_config_ready) {
-      const confTemp = (await Functions.getConfigFile()) as any;
-      const conf: ConfigI = JSON.parse(confTemp);
-
-      const args_ = process.argv.slice(1);
-      const serve_ = args_.some((val) => val === '--serve');
-
       // if (serve_ && conf.is_db_local) runLocalDataBase(serve_);
       if (conf.is_db_local) runLocalDataBase(serve_);
     }
@@ -302,12 +314,22 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
   } catch (error) {}
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER LA RUTA DONDE ESTA LA BASE DE DATOS LOCALMENTE
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+function getDabaBasePath() {
+  const electron_builder = require('./package.json');
+  const serve_ = getServer_();
+  return serve_ ? '\\Users\\%username%\\git\\servidorADMAgro' : `C:\\Users\\%username%\\${electron_builder.productName}\\servidorADMAgro`;
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// CERRAR LA BASE DE DATOS LOCALMENTE EN LA PC
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function closeLocalDataBase(serve_) {
   return new Promise<any>((resolve, reject) => {
-    const electron_builder = require('./package.json');
-    const proyect_path = serve_ ? '\\Users\\%username%\\git\\servidorADMAgro' : `C:\\Users\\%username%\\${electron_builder.productName}\\servidorADMAgro`;
+    const proyect_path = getDabaBasePath();
 
-    console.log(":::::: ANDO AQUII ");
     cmd(`cd ${proyect_path} && .\\close_server.bat`, async (res_data_base) => {
       console.log('res_data_base ', res_data_base);
       resolve(true);
@@ -315,10 +337,12 @@ function closeLocalDataBase(serve_) {
   });
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// CORRER LA BASE DE DATOS LOCALMENTE EN LA PC
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function runLocalDataBase(serve_) {
   return new Promise<any>((resolve, reject) => {
-    const electron_builder = require('./package.json');
-    const proyect_path = serve_ ? '\\Users\\%username%\\git\\servidorADMAgro' : `C:\\Users\\%username%\\${electron_builder.productName}\\servidorADMAgro`;
+    const proyect_path = getDabaBasePath();
 
     cmd(`cd ${proyect_path} && .\\run_server_win.bat`, async (res_data_base) => {
       console.log('res_data_base ', res_data_base);
@@ -327,10 +351,12 @@ function runLocalDataBase(serve_) {
   });
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER EL ACTUAL USUARIO DE GIT
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getActualGitUser() {
   return new Promise<any>((resolve, reject) => {
-    const args_ = process.argv.slice(1);
-    const serve_ = args_.some((val) => val === '--serve');
+    const serve_ = getServer_();
 
     if (serve_) {
       cmd(`git config --get user.name`, async (res_username) => {
@@ -342,10 +368,13 @@ function getActualGitUser() {
     }
   });
 }
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER EL ARCHIVO APP.CONFIG
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getConfigFile() {
   return new Promise((resolve, reject) => {
-    const args_ = process.argv.slice(1);
-    const serve_ = args_.some((val) => val === '--serve');
+    const serve_ = getServer_();
     const pjson = require('./package.json');
 
     Functions.getConfigFile()
@@ -533,8 +562,7 @@ function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5
 
 async function procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta) {
   let descarga_exito = true;
-  const confTemp = (await Functions.getConfigFile()) as any;
-  const conf: ConfigI = JSON.parse(confTemp);
+  const conf = await getConfig();
 
   if (conf.url_servidor_descargas) {
     await downloadFile(`${conf.url_servidor_descargas}${paht_server}`, path_local_content, path_local_extension, (res) => {
@@ -707,7 +735,6 @@ async function escribirLogs(file, titulo, texto) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // GENERAR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
 function generatePdfFileFormBase64(params: { fileName: string; base64: string; type: string; scale: string }) {
   return new Promise((resolve, reject) => {
     const FileName = pathAdd('/' + params.fileName);
@@ -731,7 +758,6 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // IMPRIMIR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
 function imprimir(params: { fileName: string; tipo: string; scale: string }) {
   return new Promise(async (resolve, reject) => {
     puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${pathAdd(`/${params.fileName}`)}`);
@@ -742,8 +768,7 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
     const orientation = params.tipo === 'reporte' ? 'Portrait' : 'landscape';
     const paper_size = params.tipo === 'reporte' ? 'letter' : 'VJPOS';
 
-    const confTemp = (await Functions.getConfigFile()) as any;
-    const conf: ConfigI = JSON.parse(confTemp);
+    const conf = await getConfig();
 
     const selected_printer = params.tipo === 'reporte' ? conf.printer_reportes_selected : conf.printer_caja_selected;
 
@@ -765,8 +790,7 @@ export function pathAdd(addToPath = '', resource = true) {
   let path_temp;
   let path_resolved;
 
-  const args_ = process.argv.slice(1);
-  const serve_ = args_.some((val) => val === '--serve');
+  const serve_ = getServer_();
 
   if (serve_) {
     path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;

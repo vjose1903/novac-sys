@@ -38,7 +38,7 @@
 
               "./node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
-              
+
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
               "node_modules/@fortawesome/fontawesome-free/css/solid.css",
               "node_modules/@fortawesome/fontawesome-free/css/regular.css",
@@ -168,7 +168,7 @@
       }
     }
   },
-  "defaultProject": "adm-agroindustrial",
+  "defaultProject": "novac-system",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
