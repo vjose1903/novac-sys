@@ -344,7 +344,7 @@ function closeLocalDataBase() {
   return new Promise<any>((resolve, reject) => {
     const proyect_path = getDabaBasePath();
 
-    cmd(`cd ${proyect_path} && .\\close_server.bat`, async (res_data_base) => {
+    cmd(`cd "${proyect_path}" && .\\close_server.bat`, async (res_data_base) => {
       console.log('res_data_base ', res_data_base);
       resolve(true);
     });
@@ -359,7 +359,7 @@ function runLocalDataBase(serve_) {
     const proyect_path = getDabaBasePath();
     puts(proyect_path, 'ruta del server');
 
-    cmd(`cd ${proyect_path} && .\\run_server_win.bat`, async (res_data_base) => {
+    cmd(`cd "${proyect_path}" && .\\run_server_win.bat`, async (res_data_base) => {
       console.log('res_data_base ', res_data_base);
       resolve(true);
     });
