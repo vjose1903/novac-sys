@@ -325,13 +325,13 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
 async function getDabaBasePath() {
   const electron_builder = require('./package.json');
   const serve_ = await getServer_();
-  console.log("==========================================");
-  console.log("");
-  console.log("");
-  console.log("electron_builder.productName ", electron_builder.productName);
-  console.log("");
-  console.log("");
-  console.log("==========================================");
+  console.log('==========================================');
+  console.log('');
+  console.log('');
+  console.log('electron_builder.productName ', electron_builder.productName);
+  console.log('');
+  console.log('');
+  console.log('==========================================');
 
   return serve_ ? '\\Users\\%username%\\git\\novac-server' : `C:\\Users\\%username%\\${electron_builder.productName}\\novac-server`;
 }
@@ -356,6 +356,7 @@ function closeLocalDataBase() {
 function runLocalDataBase(serve_) {
   return new Promise<any>((resolve, reject) => {
     const proyect_path = getDabaBasePath();
+    puts(proyect_path, 'ruta del server');
 
     cmd(`cd ${proyect_path} && .\\run_server_win.bat`, async (res_data_base) => {
       console.log('res_data_base ', res_data_base);
