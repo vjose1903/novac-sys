@@ -42,7 +42,7 @@ function createWindow() {
     const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
     const conf = await getConfig();
-    const serve_ = getServer_();
+    const serve_ = await getServer_();
 
     // Create the browser window.
     win = new BrowserWindow({
@@ -133,12 +133,13 @@ function createWindow() {
 
     win.on('closed', (event) => {
       console.log('>>>>>> ANDO AQUII ');
-      if (conf.is_db_local) closeLocalDataBase(serve_);
+
+      if (!serve_ && conf.is_db_local) closeLocalDataBase();
 
       // Dereference the window object, usually you would store window
       // in an array if your app supports multi windows, this is the time
       // when you should delete the corresponding element.
-      // win = null;
+      win = null;
     });
 
     resolve(win);
@@ -190,10 +191,12 @@ async function getConfig(): Promise<ConfigI> {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER SI EL PROYECTO SE ESTA CORRIENDO EN PRODUCCION O EN DESARROLLO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-async function getServer_() {
-  const args_ = process.argv.slice(1);
-  const serve_ = args_.some((val) => val === '--serve');
-  return serve_;
+async function getServer_(): Promise<boolean> {
+  return new Promise<any>((resolve, reject) => {
+    const args_ = process.argv.slice(1);
+    const serve_ = args_.some((val) => val === '--serve');
+    resolve(serve_);
+  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -203,12 +206,14 @@ async function beforeCreateWindow(win) {
   verificarSumastra();
   borrarLogs();
   const conf = await getConfig();
-  const serve_ = getServer_();
+  const serve_ = await getServer_();
+
+  console.log('serve_ ', serve_);
+  console.log('serve_ >>>> ', serve_ == true);
 
   HandlerConfigFile.checkConfigFile(win).then(async (is_config_ready) => {
     if (is_config_ready) {
-      // if (serve_ && conf.is_db_local) runLocalDataBase(serve_);
-      if (conf.is_db_local) runLocalDataBase(serve_);
+      if (!serve_ && conf.is_db_local) runLocalDataBase(serve_);
     }
   });
 
@@ -317,16 +322,16 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER LA RUTA DONDE ESTA LA BASE DE DATOS LOCALMENTE
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function getDabaBasePath() {
+async function getDabaBasePath() {
   const electron_builder = require('./package.json');
-  const serve_ = getServer_();
-  return serve_ ? '\\Users\\%username%\\git\\servidorADMAgro' : `C:\\Users\\%username%\\${electron_builder.productName}\\servidorADMAgro`;
+  const serve_ = await getServer_();
+  return serve_ ? '\\Users\\%username%\\git\\novac-server' : `C:\\Users\\%username%\\${electron_builder.productName}\\novac-server`;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // CERRAR LA BASE DE DATOS LOCALMENTE EN LA PC
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function closeLocalDataBase(serve_) {
+function closeLocalDataBase() {
   return new Promise<any>((resolve, reject) => {
     const proyect_path = getDabaBasePath();
 
@@ -355,8 +360,8 @@ function runLocalDataBase(serve_) {
 // OBTENER EL ACTUAL USUARIO DE GIT
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getActualGitUser() {
-  return new Promise<any>((resolve, reject) => {
-    const serve_ = getServer_();
+  return new Promise<any>(async (resolve, reject) => {
+    const serve_ = await getServer_();
 
     if (serve_) {
       cmd(`git config --get user.name`, async (res_username) => {
@@ -373,8 +378,8 @@ function getActualGitUser() {
 // OBTENER EL ARCHIVO APP.CONFIG
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getConfigFile() {
-  return new Promise((resolve, reject) => {
-    const serve_ = getServer_();
+  return new Promise(async (resolve, reject) => {
+    const serve_ = await getServer_();
     const pjson = require('./package.json');
 
     Functions.getConfigFile()
@@ -396,8 +401,8 @@ function getConfigFile() {
 // BORRA EL ARCHIVO DE LOGS
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function borrarLogs() {
-  const carpeta = pathAdd('/log');
+async function borrarLogs() {
+  const carpeta = await pathAdd('/log');
 
   if (!fs.existsSync(carpeta)) {
     fs.mkdir(carpeta, { recursive: true }, (err) => {
@@ -417,9 +422,11 @@ function borrarLogs() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // VEIRIFICA SI SUMASTRA ESTA INSTALADO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function verificarSumastra() {
-  if (!fs.existsSync(pathAdd('/print'))) {
-    fs.mkdir(pathAdd('/print'), { recursive: true }, (err) => {
+async function verificarSumastra() {
+  const print_path = await pathAdd('/print');
+
+  if (!fs.existsSync(print_path)) {
+    fs.mkdir(print_path, { recursive: true }, (err) => {
       if (err) {
         throw err;
       } else {
@@ -502,8 +509,8 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
   cmd(`ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public${paht_server}"`, async (res_servidor) => {
     if (res_servidor.status) {
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
-
-      if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_no_extension}` : `${path_local_extension}`}`))) {
+      const element_path = await pathAdd(`${path_local_content}${is_carpeta ? `${path_local_no_extension}` : `${path_local_extension}`}`);
+      if (!fs.existsSync(element_path)) {
         procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta);
         descargar_archivo = true;
       } else {
@@ -646,15 +653,15 @@ function cmd(command, callback = (arg) => {}) {
 // FUNCION QUE SE ENCARGA DE DESCARGAR ARCHIVOS
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
+async function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
   // Save variable to know progress
 
   let received_bytes = 0;
   let total_bytes = 0;
 
   const req = request({ method: 'GET', uri: archive_url });
-
-  const out = fs.createWriteStream(pathAdd(`${path}${file_}`));
+  const element_path = await pathAdd(`${path}${file_}`);
+  const out = fs.createWriteStream(element_path);
   req.pipe(out);
 
   req.on('response', (data) => {
@@ -736,8 +743,8 @@ async function escribirLogs(file, titulo, texto) {
 // GENERAR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function generatePdfFileFormBase64(params: { fileName: string; base64: string; type: string; scale: string }) {
-  return new Promise((resolve, reject) => {
-    const FileName = pathAdd('/' + params.fileName);
+  return new Promise(async (resolve, reject) => {
+    const FileName = await pathAdd('/' + params.fileName);
 
     try {
       fs.writeFile(FileName, params.base64, { encoding: 'base64' }, (err) => {
@@ -786,22 +793,25 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
 // PARA CREAR LA RUTA CORRECTA EN CASO DE SER COMPILADA O NO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-export function pathAdd(addToPath = '', resource = true) {
-  let path_temp;
-  let path_resolved;
+export function pathAdd(addToPath = '', resource = true): Promise<string> {
+  return new Promise<any>(async (resolve, reject) => {
+    let path_temp;
+    let path_resolved;
 
-  const serve_ = getServer_();
+    const serve_ = await getServer_();
 
-  if (serve_) {
-    path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
-  } else {
-    if (resource) {
-      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
-    } else {
+    if (serve_) {
       path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
+    } else {
+      if (resource) {
+        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
+      } else {
+        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
+      }
     }
-  }
-  path_temp = path_temp + addToPath;
-  path_resolved = process.platform === 'darwin' ? path_temp : path_temp.split('/').join('\\');
-  return path_resolved;
+    path_temp = path_temp + addToPath;
+    path_resolved = process.platform === 'darwin' ? path_temp : path_temp.split('/').join('\\');
+
+    resolve(path_resolved);
+  });
 }

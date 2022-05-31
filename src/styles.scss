@@ -11,7 +11,6 @@ $bodyfont: "Poppins";
 @import "./assets/my_styles/overlayPanel.scss";
 @import "./splash-styles.scss";
 
-
 .h-inherit {
   max-height: inherit;
 }
@@ -539,10 +538,13 @@ input.apple-switch:checked:after {
   }
   .bs-datepicker-head {
     border-radius: 0 !important;
-
+    background: var(--primary02) !important;
     button[disabled] {
       background: var(--transparente05);
     }
+  }
+  .bs-datepicker-body table td span.selected {
+    background: var(--primary02) !important;
   }
 }
 

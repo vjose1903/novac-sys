@@ -16,8 +16,8 @@ export default class Functions {
   }
 
   static getConfigFile() {
-    return new Promise((resolve, reject) => {
-      let pathConfig = pathAdd(`/app_config.config`);
+    return new Promise(async (resolve, reject) => {
+      let pathConfig = (await pathAdd(`/app_config.config`)) as string;
 
       if (fs.existsSync(pathConfig)) {
         var res = fs.readFileSync(pathConfig, 'utf-8');
@@ -30,9 +30,9 @@ export default class Functions {
   }
 
   static setConfigFile(data: string) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
-        let pathConfig = pathAdd(`/app_config.config`);
+        let pathConfig = (await pathAdd(`/app_config.config`)) as string;
 
         var encripted = this.encriptar(data);
         fs.writeFileSync(pathConfig, encripted, { encoding: 'utf-8' });

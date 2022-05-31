@@ -15,9 +15,9 @@ export default class HandlerConfigFile {
     nombre_empresa: 'Panaderia & Reposteria Brendy',
     rnc_empresa: '132-35083-9',
     telefono_empresa: '(829)-423-1678',
-    url_servidor: 'http://admservidor.ddns.net:9090',
-    url_servidor_descargas: 'http://admservidor.ddns.net:9090',
-    url_servidor_respaldo: 'http://10.0.0.9:9090',
+    url_servidor: 'http://novac-brendy.ddns.net:3000',
+    url_servidor_descargas: 'http://novac-brendy.ddns.net:3000',
+    url_servidor_respaldo: 'http://10.0.0.10:3000',
     usa_url_principal: true,
     printer_caja_selected: null,
     printer_reportes_selected: null,
@@ -33,8 +33,10 @@ export default class HandlerConfigFile {
   };
 
   static checkConfigFile(win: BrowserWindow) {
-    return new Promise<any>((resolve, reject) => {
-      if (!fs.existsSync(pathAdd('/app_config.config'))) {
+    return new Promise<any>(async (resolve, reject) => {
+      const config_path = await pathAdd('/app_config.config');
+
+      if (!fs.existsSync(config_path)) {
         this.default_config.printer_caja_selected = Functions.getDefaultPrinter(win);
         this.default_config.printer_reportes_selected = Functions.getDefaultPrinter(win);
 
