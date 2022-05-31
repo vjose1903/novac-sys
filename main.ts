@@ -210,9 +210,10 @@ async function beforeCreateWindow(win) {
 
   console.log('serve_ ', serve_);
   console.log('serve_ >>>> ', serve_ == true);
-
   HandlerConfigFile.checkConfigFile(win).then(async (is_config_ready) => {
     if (is_config_ready) {
+      puts(serve_, 'serve_');
+      puts(conf.is_db_local, 'conf.is_db_local');
       if (!serve_ && conf.is_db_local) runLocalDataBase(serve_);
     }
   });
