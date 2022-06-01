@@ -36,6 +36,35 @@ let replace_in_file: ReplaceInFile = null;
 const args = process.argv.slice(1);
 const serve = args.some((val) => val === '--serve');
 
+function createSplash() {
+  return new Promise<BrowserWindow>(async (resolve, reject) => {
+    const conf = await getConfig();
+    const serve_ = await getServer_();
+
+    var splash = new BrowserWindow({
+      width: 650,
+      minWidth: 650,
+      height: 500,
+      minHeight: 500,
+      transparent: true,
+      frame: false,
+      alwaysOnTop: true,
+    });
+
+    if (serve) {
+      splash.loadURL(url.format({ pathname: path.join(__dirname, 'src/splash.html'), protocol: 'file:', slashes: true }));
+    } else {
+      splash.loadURL(url.format({ pathname: path.join(__dirname, 'dist/splash.html'), protocol: 'file:', slashes: true }));
+    }
+
+    splash.center();
+    beforeCreateSplash(splash).then((res) => {
+      splash.close();
+      createWindow();
+    });
+  });
+}
+
 function createWindow() {
   return new Promise<BrowserWindow>(async (resolve, reject) => {
     const electronScreen = screen;
@@ -52,26 +81,20 @@ function createWindow() {
       minWidth: size.width,
       height: size.height,
       minHeight: size.height,
-      // icon: process.platform === 'darwin' ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
+      icon: process.platform === 'darwin' ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
       webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
     });
 
     if (serve) {
       win.webContents.openDevTools();
-
       require('electron-reload')(__dirname, {
         electron: require(`${__dirname}/node_modules/electron`),
       });
       win.loadURL('http://localhost:5220');
     } else {
-      win.loadURL(
-        url.format({
-          pathname: path.join(__dirname, 'dist/index.html'),
-          protocol: 'file:',
-          slashes: true,
-        }),
-      );
+      win.loadURL(url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true }));
     }
+    win.setMenuBarVisibility(false);
 
     // if (serve) {
     //   win.webContents.openDevTools();
@@ -152,27 +175,28 @@ try {
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
   app.on('ready', () => {
-    createWindow()
-      .then((res) => beforeCreateWindow(res))
-      .catch(() => app.quit());
+    // createWindow()
+    //   .then((res) => beforeCreateWindow(res))
+    //   .catch(() => app.quit());
+    createSplash();
   });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd +
-    if (process.platform !== 'darwin') app.quit();
+    app.quit();
   });
 
   app.on('activate', () => {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (win === null)
-      createWindow()
-        .then((win_) => {
-          beforeCreateWindow(win_);
-        })
-        .catch(() => app.quit());
+    // if (win === null)
+    //   createWindow()
+    //     .then((win_) => {
+    //       // beforeCreateWindow();
+    //     })
+    //     .catch(() => app.quit());
   });
 } catch (e) {
   // Catch Error
@@ -182,10 +206,12 @@ try {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER LA CONFIGURACION DE LA APP
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-async function getConfig(): Promise<ConfigI> {
-  const confTemp = (await Functions.getConfigFile()) as any;
-  const conf: ConfigI = JSON.parse(confTemp);
-  return conf;
+function getConfig(): Promise<ConfigI> {
+  return new Promise<any>(async (resolve, reject) => {
+    const confTemp = (await Functions.getConfigFile()) as any;
+    const conf: ConfigI = JSON.parse(confTemp);
+    resolve(conf);
+  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -200,34 +226,46 @@ async function getServer_(): Promise<boolean> {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// CONFIGURACIONES DESPUES DE QUE SE CREA LA VENTANA DE ELECTRON
+// CONFIGURACIONES DESPUES DE QUE SE CREA EL SPLASH SCREEN
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-async function beforeCreateWindow(win) {
-  verificarSumastra();
-  borrarLogs();
-  const conf = await getConfig();
-  const serve_ = await getServer_();
+async function beforeCreateSplash(splash) {
+  return new Promise<any>(async (resolve, reject) => {
+    // verificarSumastra();
+    // borrarLogs();
+    puts('ANDO AQUIII');
+    const conf = await getConfig();
+    const serve_ = await getServer_();
 
-  console.log('serve_ ', serve_);
-  console.log('serve_ >>>> ', serve_ == true);
-  HandlerConfigFile.checkConfigFile(win).then(async (is_config_ready) => {
-    if (is_config_ready) {
-      puts(serve_, 'serve_');
-      puts(conf.is_db_local, 'conf.is_db_local');
-      if (!serve_ && conf.is_db_local) runLocalDataBase(serve_);
-    }
+    console.log(" ");
+    console.log(" ");
+    console.log(" ");
+    console.log(" -------- SPLASH CREADO --------");
+    console.log(" ");
+    console.log(" ");
+    console.log(" ");
+
+
+    HandlerConfigFile.checkConfigFile(splash).then(async (is_config_ready) => {
+      if (is_config_ready) {
+        puts(serve_, 'serve_ ');
+        puts(conf.is_db_local, 'conf.is_db_local ');
+        // if (!serve_ && conf.is_db_local) runLocalDataBase();
+        puts('ahora voy para la funcion runLocalDataBase');
+        if (conf.is_db_local) runLocalDataBase();
+
+        // ----- Manejar las actualizaciones -----
+        auto_updater = new AppUpdater();
+        auto_updater.handleUpdateEvents(splash);
+        // ---------------------------------------
+
+        // -------- remplazar en archivos --------
+        replace_in_file = new ReplaceInFile();
+        // ---------------------------------------
+
+        setTimeout(() => resolve(true), 2000);
+      }
+    });
   });
-
-  // ----- Manejar las actualizaciones -----
-  auto_updater = new AppUpdater();
-  auto_updater.handleUpdateEvents(win);
-  // ---------------------------------------
-
-  // -------- remplazar en archivos --------
-  replace_in_file = new ReplaceInFile();
-  // ---------------------------------------
-
-  win.setMenuBarVisibility(false);
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -324,25 +362,25 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
 // OBTENER LA RUTA DONDE ESTA LA BASE DE DATOS LOCALMENTE
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function getDabaBasePath() {
-  const electron_builder = require('./package.json');
-  const serve_ = await getServer_();
-  console.log('==========================================');
-  console.log('');
-  console.log('');
-  console.log('electron_builder.productName ', electron_builder.productName);
-  console.log('');
-  console.log('');
-  console.log('==========================================');
-
-  return serve_ ? '\\Users\\%username%\\git\\novac-server' : `C:\\Users\\%username%\\${electron_builder.productName}\\novac-server`;
+  return new Promise<string>(async (resolve) => {
+    puts('DENTRO DE GET DATABSE PATH');
+    const pjson = require('./package.json');
+    puts(pjson.productName, 'pjson.productName ');
+    let serve_ = await getServer_();
+    // serve_ = false;
+    puts('serve_ ', serve_);
+    const path = serve_ ? '\\Users\\%username%\\git\\novac-server' : `C:\\Users\\%username%\\${pjson.productName}\\novac-server`;
+    puts('path ', path);
+    resolve(path);
+  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // CERRAR LA BASE DE DATOS LOCALMENTE EN LA PC
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function closeLocalDataBase() {
-  return new Promise<any>((resolve, reject) => {
-    const proyect_path = getDabaBasePath();
+  return new Promise<any>(async (resolve, reject) => {
+    const proyect_path = await getDabaBasePath();
 
     cmd(`cd "${proyect_path}" && .\\close_server.bat`, async (res_data_base) => {
       console.log('res_data_base ', res_data_base);
@@ -354,9 +392,10 @@ function closeLocalDataBase() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // CORRER LA BASE DE DATOS LOCALMENTE EN LA PC
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function runLocalDataBase(serve_) {
-  return new Promise<any>((resolve, reject) => {
-    const proyect_path = getDabaBasePath();
+function runLocalDataBase() {
+  puts('DENTRO DE RUN DATA BASE');
+  return new Promise<any>(async (resolve, reject) => {
+    const proyect_path = await getDabaBasePath();
     puts(proyect_path, 'ruta del server');
 
     cmd(`cd "${proyect_path}" && .\\run_server_win.bat`, async (res_data_base) => {
@@ -724,6 +763,7 @@ async function puts(msg, titulo?) {
     console.log(' ----------------------------------');
     console.log(' ');
     console.log(' ');
+    console.log('titulo >>>> ', titulo);
     console.log('texto >>>> ', texto);
     console.log(' ');
     console.log(' ');
@@ -815,6 +855,7 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
 
 export function pathAdd(addToPath = '', resource = true): Promise<string> {
   return new Promise<any>(async (resolve, reject) => {
+    console.log(".......................................... ");
     let path_temp;
     let path_resolved;
 
@@ -822,6 +863,12 @@ export function pathAdd(addToPath = '', resource = true): Promise<string> {
 
     if (serve_) {
       path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
+      console.log(" ");
+      console.log("app.getPath('exe').toLowerCase() ",app.getPath('exe').toLowerCase());
+      console.log("path_temp ",path_temp);
+      console.log("app.name.toLowerCase() ",app.name.toLowerCase());
+      console.log(" ");
+
     } else {
       if (resource) {
         path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
@@ -829,9 +876,15 @@ export function pathAdd(addToPath = '', resource = true): Promise<string> {
         path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
       }
     }
+
     path_temp = path_temp + addToPath;
+
+    console.log(" ");
+    console.log("path_temp ",path_temp);
+    console.log(" ");
     path_resolved = process.platform === 'darwin' ? path_temp : path_temp.split('/').join('\\');
 
+    console.log(".......................................... ");
     resolve(path_resolved);
   });
 }

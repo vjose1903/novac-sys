@@ -201,7 +201,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     this.currentUserServ
       .validateUser()
       .then((res) => {
-        setTimeout(() => (this.configReady = true), 1000);
+        setTimeout(() => (this.configReady = true), 500);
       })
       .catch((error) => {
         this.configReady = true;

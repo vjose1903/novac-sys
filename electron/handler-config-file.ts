@@ -17,8 +17,8 @@ export default class HandlerConfigFile {
     telefono_empresa: '(829)-423-1678',
     url_servidor: 'http://novac-brendy.ddns.net:3000',
     url_servidor_descargas: 'http://novac-brendy.ddns.net:3000',
-    url_servidor_respaldo: 'http://10.0.0.10:3000',
-    usa_url_principal: true,
+    url_servidor_respaldo: 'http://localhost:3000',
+    usa_url_principal: false,
     printer_caja_selected: null,
     printer_reportes_selected: null,
     is_db_local: true,
@@ -36,9 +36,20 @@ export default class HandlerConfigFile {
     return new Promise<any>(async (resolve, reject) => {
       const config_path = await pathAdd('/app_config.config');
 
-      if (!fs.existsSync(config_path)) {
+      const existe_archivo_config = fs.existsSync(config_path);
+      console.log('  ');
+      console.log(' :::::::: existe_archivo_config ', existe_archivo_config);
+      console.log('  ');
+
+      if (!existe_archivo_config) {
         this.default_config.printer_caja_selected = Functions.getDefaultPrinter(win);
         this.default_config.printer_reportes_selected = Functions.getDefaultPrinter(win);
+
+        console.log(" ");
+        console.log("     CREANDO EL ARCHIVO");
+        console.log(" ");
+        console.log(" this.default_config: ",JSON.stringify(this.default_config));
+
 
         Functions.setConfigFile(JSON.stringify(this.default_config))
           .then(() => {

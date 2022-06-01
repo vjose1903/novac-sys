@@ -9,6 +9,7 @@
     padding: 0.2rem 1rem;
     border-radius: 1rem;
   }
+
   @media (min-width: 1000px) and (max-width: 1169px) {
     .msg {
       font-size: 1.4rem;
@@ -82,6 +83,29 @@
   @media (max-width: 999px) {
     .rayas {
       width: 42rem;
+    }
+  }
+
+  &.min {
+    > .logo {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      width: 10rem;
+    }
+
+    > .inspot {
+      position: absolute;
+      left: 1rem;
+      bottom: 1rem;
+      width: 4rem;
+    }
+
+    > .rayas {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 8rem;
     }
   }
 }
