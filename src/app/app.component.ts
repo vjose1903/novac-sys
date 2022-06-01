@@ -131,7 +131,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
-    setTimeout(() => this.getAppConfig(), 1000);
+    this.getAppConfig();
   }
 
   getActualPath() {
@@ -181,6 +181,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   async getAppConfig() {
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
+
     this._ipc
       .sendTask(task)
       .then((config: ConfigI) => {

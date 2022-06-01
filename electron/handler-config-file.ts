@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { pathAdd } from '../main';
+import { pathAdd, puts } from '../main';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
 
@@ -37,29 +37,28 @@ export default class HandlerConfigFile {
       const config_path = await pathAdd('/app_config.config');
 
       const existe_archivo_config = fs.existsSync(config_path);
-      console.log('  ');
-      console.log(' :::::::: existe_archivo_config ', existe_archivo_config);
-      console.log('  ');
 
-      if (!existe_archivo_config) {
-        this.default_config.printer_caja_selected = Functions.getDefaultPrinter(win);
-        this.default_config.printer_reportes_selected = Functions.getDefaultPrinter(win);
+      setTimeout(() => {
+        puts(existe_archivo_config, ':::::::: existe_archivo_config');
 
-        console.log(" ");
-        console.log("     CREANDO EL ARCHIVO");
-        console.log(" ");
-        console.log(" this.default_config: ",JSON.stringify(this.default_config));
+        if (!existe_archivo_config) {
+          this.default_config.printer_caja_selected = Functions.getDefaultPrinter(win);
+          this.default_config.printer_reportes_selected = Functions.getDefaultPrinter(win);
 
+          Functions.setConfigFile(JSON.stringify(this.default_config))
+            .then(() => {
+              console.log(' ');
+              console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
+              console.log(' ');
+              puts('------ ARCHIVO DE CONFIGURACION CREADO ------');
 
-        Functions.setConfigFile(JSON.stringify(this.default_config))
-          .then(() => {
-            console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
-            resolve(true);
-          })
-          .catch((err) => reject(false));
-      } else {
-        resolve(true);
-      }
+              setTimeout(() => resolve(true), 500);
+            })
+            .catch((err) => reject(false));
+        } else {
+          setTimeout(() => resolve(true), 500);
+        }
+      }, 500);
     });
   }
 }

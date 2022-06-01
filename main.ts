@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, dialog, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
@@ -30,43 +30,60 @@ import AppUpdater from './electron/auto-update.js';
 import ReplaceInFile from './electron/replace-in-file.js';
 
 let win: BrowserWindow = null;
+let splash: BrowserWindow = null;
 let auto_updater: AppUpdater = null;
 let replace_in_file: ReplaceInFile = null;
 
 const args = process.argv.slice(1);
 const serve = args.some((val) => val === '--serve');
 
-function createSplash() {
-  return new Promise<BrowserWindow>(async (resolve, reject) => {
-    const conf = await getConfig();
-    const serve_ = await getServer_();
+function createSplash(type = 'splash') {
+  if (splash) {
+    splash.close();
+    splash = null;
+  }
 
-    var splash = new BrowserWindow({
-      width: 650,
-      minWidth: 650,
-      height: 500,
-      minHeight: 500,
-      transparent: true,
-      frame: false,
-      alwaysOnTop: true,
-    });
+  splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
 
-    if (serve) {
-      splash.loadURL(url.format({ pathname: path.join(__dirname, 'src/splash.html'), protocol: 'file:', slashes: true }));
-    } else {
-      splash.loadURL(url.format({ pathname: path.join(__dirname, 'dist/splash.html'), protocol: 'file:', slashes: true }));
-    }
+  const splash_html = serve ? `src/${type}.html` : `dist/${type}.html`;
 
-    splash.center();
+  splash.loadURL(url.format({ pathname: path.join(__dirname, splash_html), protocol: 'file:', slashes: true }));
+  splash.center();
+
+  if (type == 'splash') {
     beforeCreateSplash(splash).then((res) => {
       splash.close();
-      createWindow();
+
+      console.log(' ');
+      console.log(' ');
+      console.log(' ');
+      console.log(' ');
+      console.log(' PASANDO A CREAR LA VENTANA DEL SISTEMA');
+      console.log(' ');
+      console.log(' ');
+      console.log(' ');
+      console.log(' ');
+
+      createWindow().then((win) => {
+        beforeCreateWindow(win);
+      });
     });
-  });
+  } else {
+    shell.beep();
+    setTimeout(() => {
+      splash.close();
+      app.quit();
+    }, 6000);
+  }
 }
 
 function createWindow() {
   return new Promise<BrowserWindow>(async (resolve, reject) => {
+    puts('  ');
+    puts('  ');
+    puts(' ::::: ========= PASANDO A CREAR LA VENTANA DEL SISTEMA ========= :::::');
+    puts('  ');
+    puts('  ');
     const electronScreen = screen;
     const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
@@ -81,7 +98,7 @@ function createWindow() {
       minWidth: size.width,
       height: size.height,
       minHeight: size.height,
-      icon: process.platform === 'darwin' ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
+      icon: isMacOs() ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
       webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
     });
 
@@ -90,10 +107,12 @@ function createWindow() {
       require('electron-reload')(__dirname, {
         electron: require(`${__dirname}/node_modules/electron`),
       });
+
       win.loadURL('http://localhost:5220');
     } else {
       win.loadURL(url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true }));
     }
+
     win.setMenuBarVisibility(false);
 
     // if (serve) {
@@ -153,7 +172,6 @@ function createWindow() {
     // }
 
     // Emitted when the window is closed.
-
     win.on('closed', (event) => {
       console.log('>>>>>> ANDO AQUII ');
 
@@ -174,12 +192,7 @@ try {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => {
-    // createWindow()
-    //   .then((res) => beforeCreateWindow(res))
-    //   .catch(() => app.quit());
-    createSplash();
-  });
+  app.on('ready', () => createSplash());
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
@@ -206,6 +219,12 @@ try {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER LA CONFIGURACION DE LA APP
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+function isMacOs() {
+  return process.platform === 'darwin';
+}
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER LA CONFIGURACION DE LA APP
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getConfig(): Promise<ConfigI> {
   return new Promise<any>(async (resolve, reject) => {
     const confTemp = (await Functions.getConfigFile()) as any;
@@ -228,44 +247,79 @@ async function getServer_(): Promise<boolean> {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // CONFIGURACIONES DESPUES DE QUE SE CREA EL SPLASH SCREEN
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-async function beforeCreateSplash(splash) {
+function beforeCreateSplash(splash) {
   return new Promise<any>(async (resolve, reject) => {
-    // verificarSumastra();
-    // borrarLogs();
-    puts('ANDO AQUIII');
-    const conf = await getConfig();
-    const serve_ = await getServer_();
+    // -------- borrar el archivo de logs --------
+    borrarLogs().then(async () => {
+      console.log(' ');
+      console.log(' ');
+      console.log(' -------- SPLASH CREADO --------');
+      console.log(' ');
+      console.log(' ');
 
-    console.log(" ");
-    console.log(" ");
-    console.log(" ");
-    console.log(" -------- SPLASH CREADO --------");
-    console.log(" ");
-    console.log(" ");
-    console.log(" ");
+      console.log(' ');
+      console.log(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
+      console.log(' ');
 
+      puts(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
 
-    HandlerConfigFile.checkConfigFile(splash).then(async (is_config_ready) => {
-      if (is_config_ready) {
-        puts(serve_, 'serve_ ');
-        puts(conf.is_db_local, 'conf.is_db_local ');
-        // if (!serve_ && conf.is_db_local) runLocalDataBase();
-        puts('ahora voy para la funcion runLocalDataBase');
-        if (conf.is_db_local) runLocalDataBase();
+      HandlerConfigFile.checkConfigFile(splash)
+        .then(async (is_config_ready) => {
+          if (is_config_ready) {
+            const conf = await getConfig();
+            const serve_ = await getServer_();
 
-        // ----- Manejar las actualizaciones -----
-        auto_updater = new AppUpdater();
-        auto_updater.handleUpdateEvents(splash);
-        // ---------------------------------------
-
-        // -------- remplazar en archivos --------
-        replace_in_file = new ReplaceInFile();
-        // ---------------------------------------
-
-        setTimeout(() => resolve(true), 2000);
-      }
+            // ----------- correr base de datos local --------------
+            puts(conf.is_db_local, 'conf.is_db_local ');
+            if (conf.is_db_local) {
+              runLocalDataBase().then((res_db) => {
+                if (res_db.status) continuarCargandoArchivos(resolve);
+                else createSplash('splash_db_error');
+              });
+              //
+            } else {
+              continuarCargandoArchivos(resolve);
+            }
+          }
+        })
+        .catch((err) => {
+          createSplash('splash_config_error');
+        });
     });
   });
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// continuar la carga de archivos necesarios
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+function continuarCargandoArchivos(resolve) {
+  // -------- verificar el archivo para impresion --------
+  // verificarSumastra();
+
+  // -------------- remplazar en archivos ----------------
+  replace_in_file = new ReplaceInFile();
+
+  console.log(' ');
+  console.log(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
+  console.log(' ');
+
+  puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
+  setTimeout(() => resolve(true), 3000);
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Handle angular events
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+function beforeCreateWindow(win) {
+  // ----- Manejar las actualizaciones -----
+  console.log(' ');
+  console.log('INICIALIZANDO EL PROCESO DE UPDATES');
+  console.log(' ');
+
+  auto_updater = new AppUpdater();
+  auto_updater.handleUpdateEvents(win);
+  // ---------------------------------------
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -363,14 +417,13 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function getDabaBasePath() {
   return new Promise<string>(async (resolve) => {
-    puts('DENTRO DE GET DATABSE PATH');
     const pjson = require('./package.json');
     puts(pjson.productName, 'pjson.productName ');
     let serve_ = await getServer_();
     // serve_ = false;
-    puts('serve_ ', serve_);
+    puts(serve_, 'serve_');
     const path = serve_ ? '\\Users\\%username%\\git\\novac-server' : `C:\\Users\\%username%\\${pjson.productName}\\novac-server`;
-    puts('path ', path);
+    puts(path, 'path database');
     resolve(path);
   });
 }
@@ -396,11 +449,13 @@ function runLocalDataBase() {
   puts('DENTRO DE RUN DATA BASE');
   return new Promise<any>(async (resolve, reject) => {
     const proyect_path = await getDabaBasePath();
+
     puts(proyect_path, 'ruta del server');
 
     cmd(`cd "${proyect_path}" && .\\run_server_win.bat`, async (res_data_base) => {
       console.log('res_data_base ', res_data_base);
-      resolve(true);
+      puts(res_data_base, 'respuesta del comando de correr el servidor.');
+      resolve(res_data_base);
     });
   });
 }
@@ -450,23 +505,25 @@ function getConfigFile() {
 // BORRA EL ARCHIVO DE LOGS
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-async function borrarLogs() {
-  const carpeta = await pathAdd('/log');
+function borrarLogs() {
+  return new Promise<any>(async (resolve, reject) => {
+    const carpeta = await pathAdd('/log');
+    console.log(' ');
+    console.log(' BORRANDO LOGS ANTERIORES ');
+    console.log(' ');
 
-  if (!fs.existsSync(carpeta)) {
-    fs.mkdir(carpeta, { recursive: true }, (err) => {
-      if (err) {
-        throw err;
-      }
-    });
-  } else {
-    // ya se creo la carpeta log
-    setTimeout(async () => {
-      const logs_path = await pathAdd('/log/my_log.txt');
-      const comando = `del "${logs_path}"`;
+    if (!fs.existsSync(carpeta)) {
+      fs.mkdir(carpeta, { recursive: true }, (err) => {
+        if (err) throw err;
+      });
+    } else {
+      const comando = isMacOs() ? `rm -rf "${await pathAdd('/log/my_log.txt')}"` : `del "${await pathAdd('/log/my_log.txt')}"`;
+
       cmd(comando);
-    }, 10000);
-  }
+    }
+
+    setTimeout(() => resolve(true), 1000);
+  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -496,7 +553,7 @@ async function verificarSumastra() {
 async function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
   // const interval = setInterval(() => {
 
-  const command = process.platform === 'darwin' ? `unzip "${await pathAdd(path_local_extension)}" -d "${await pathAdd()}"` : `powershell Expand-Archive "${await pathAdd(path_local_extension)}" -DestinationPath "${await pathAdd()}"`;
+  const command = isMacOs() ? `unzip "${await pathAdd(path_local_extension)}" -d "${await pathAdd()}"` : `powershell Expand-Archive "${await pathAdd(path_local_extension)}" -DestinationPath "${await pathAdd()}"`;
 
   cmd(command, async (res) => {
     if (res.status) {
@@ -566,10 +623,9 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
         descargar_archivo = true;
       } else {
         if (descomprimir) {
-          const command =
-            process.platform === 'darwin'
-              ? `zip -r "${await pathAdd(path_local_extension)}" "${await pathAdd(path_local_no_extension)}" -x "*.DS_Store"`
-              : `powershell Compress-Archive "${await pathAdd(`${path_local_no_extension}`)}"  -DestinationPath "${await pathAdd(`${path_local_no_extension}.zip`)}" -Update`;
+          const command = isMacOs()
+            ? `zip -r "${await pathAdd(path_local_extension)}" "${await pathAdd(path_local_no_extension)}" -x "*.DS_Store"`
+            : `powershell Compress-Archive "${await pathAdd(`${path_local_no_extension}`)}"  -DestinationPath "${await pathAdd(`${path_local_no_extension}.zip`)}" -Update`;
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -594,11 +650,11 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 async function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
-  const command = process.platform === 'darwin' ? `md5sum "${await pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${await pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+  const command = isMacOs() ? `md5sum "${await pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${await pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
   cmd(command, (res_local) => {
     if (res_local.status) {
-      const md5_local = process.platform === 'darwin' ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
+      const md5_local = isMacOs() ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
       if (md5_local !== md5_servidor) {
         borrado_de_archivos_malos(aFiles_malos, (res_del) => {
           if (res_del.status) {
@@ -625,11 +681,11 @@ async function procesoDescarga(aFiles_malos, path_local_extension, path_local_co
   if (conf.url_servidor_descargas) {
     await downloadFile(`${conf.url_servidor_descargas}${paht_server}`, path_local_content, path_local_extension, async (res) => {
       if (res.status) {
-        const command = process.platform === 'darwin' ? `md5sum "${await pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${await pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+        const command = isMacOs() ? `md5sum "${await pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${await pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
         cmd(command, (res_local_before_descarga) => {
           if (res_local_before_descarga.status) {
-            const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
+            const md5_local = isMacOs() ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
             if (md5_servidor === md5_local) {
               if (descomprimir) {
                 esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, (res) => {
@@ -747,9 +803,9 @@ function showProgress(received, total) {
 // FUNCION QUE SE ENCARGA DE VERIFICAR SI EL ARCHIVO LOG EXISTE
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-async function puts(msg, titulo?) {
+export async function puts(msg, titulo?) {
   // cmd('ls');
-  if (win) {
+  if (win || splash) {
     const fs = require('fs');
 
     const carpeta = await pathAdd('/log');
@@ -760,22 +816,10 @@ async function puts(msg, titulo?) {
     else if (typeof msg === 'number') texto = msg.toString();
     else texto = msg;
 
-    console.log(' ----------------------------------');
-    console.log(' ');
-    console.log(' ');
-    console.log('titulo >>>> ', titulo);
-    console.log('texto >>>> ', texto);
-    console.log(' ');
-    console.log(' ');
-    console.log(' ----------------------------------');
-
     if (!fs.existsSync(carpeta)) {
       fs.mkdir(carpeta, { recursive: true }, (err) => {
-        if (err) {
-          throw err;
-        } else {
-          escribirLogs(file, titulo, texto);
-        }
+        if (err) throw err;
+        else escribirLogs(file, titulo, texto);
       });
     } else {
       escribirLogs(file, titulo, texto);
@@ -855,20 +899,13 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
 
 export function pathAdd(addToPath = '', resource = true): Promise<string> {
   return new Promise<any>(async (resolve, reject) => {
-    console.log(".......................................... ");
     let path_temp;
     let path_resolved;
-
+    const pjson = require('./package.json');
     const serve_ = await getServer_();
 
     if (serve_) {
-      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
-      console.log(" ");
-      console.log("app.getPath('exe').toLowerCase() ",app.getPath('exe').toLowerCase());
-      console.log("path_temp ",path_temp);
-      console.log("app.name.toLowerCase() ",app.name.toLowerCase());
-      console.log(" ");
-
+      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(pjson.name.toLowerCase())) + pjson.name;
     } else {
       if (resource) {
         path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
@@ -878,13 +915,8 @@ export function pathAdd(addToPath = '', resource = true): Promise<string> {
     }
 
     path_temp = path_temp + addToPath;
+    path_resolved = isMacOs() ? path_temp : path_temp.split('/').join('\\');
 
-    console.log(" ");
-    console.log("path_temp ",path_temp);
-    console.log(" ");
-    path_resolved = process.platform === 'darwin' ? path_temp : path_temp.split('/').join('\\');
-
-    console.log(".......................................... ");
     resolve(path_resolved);
   });
 }
