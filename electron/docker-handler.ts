@@ -22,7 +22,7 @@ export default class DockerHandler {
 
             if (res.STDOUT.toLowerCase().includes('up')) {
               puts('Base de datos esta corriendo perfectamente.');
-              setTimeout(() => first_resolve('Todo Listo en docker'), 3000);
+              setTimeout(() => first_resolve('Todo Listo en docker'), 2000);
             } else {
               puts(res.STDERR, `ERROR: base de datos presenta fallos, intento #: ${this.count_db}`);
               this.count_db += 1;
