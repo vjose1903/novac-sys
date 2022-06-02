@@ -28,10 +28,12 @@ import {
 } from './electron/shared-electron-angular.js';
 import AppUpdater from './electron/auto-update.js';
 import ReplaceInFile from './electron/replace-in-file.js';
+import DockerHandler from './electron/docker-handler';
 
 let win: BrowserWindow = null;
 let splash: BrowserWindow = null;
 let auto_updater: AppUpdater = null;
+let docker_handler: DockerHandler = null;
 let replace_in_file: ReplaceInFile = null;
 
 const args = process.argv.slice(1);
@@ -263,6 +265,8 @@ function beforeCreateSplash(splash) {
 
       puts(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
 
+      // ----------- inicializando docker handler --------------
+      docker_handler = new DockerHandler();
       HandlerConfigFile.checkConfigFile(splash)
         .then(async (is_config_ready) => {
           if (is_config_ready) {
@@ -271,11 +275,12 @@ function beforeCreateSplash(splash) {
 
             // ----------- correr base de datos local --------------
             puts(conf.is_db_local, 'conf.is_db_local ');
+
             if (conf.is_db_local) {
-              runLocalDataBase().then((res_db) => {
-                if (res_db.status) continuarCargandoArchivos(resolve);
-                else createSplash('splash_db_error');
-              });
+              docker_handler
+                .checkAllInDocker()
+                .then((res_db) => continuarCargandoArchivos(resolve))
+                .catch((error_type) => createSplash(`splash_${error_type}_error`));
               //
             } else {
               continuarCargandoArchivos(resolve);
@@ -422,7 +427,7 @@ async function getDabaBasePath() {
     let serve_ = await getServer_();
     // serve_ = false;
     puts(serve_, 'serve_');
-    const path = serve_ ? '\\Users\\%username%\\git\\novac-server' : `C:\\Users\\%username%\\${pjson.productName}\\novac-server`;
+    const path = serve_ ? '\\Users\\%username%\\git\\novac-server\\win_scripts' : `C:\\Users\\%username%\\${pjson.productName}\\novac-server`;
     puts(path, 'path database');
     resolve(path);
   });
@@ -452,7 +457,7 @@ function runLocalDataBase() {
 
     puts(proyect_path, 'ruta del server');
 
-    cmd(`cd "${proyect_path}" && .\\run_server_win.bat`, async (res_data_base) => {
+    cmd(`cd "${proyect_path}" && .\\verificate_server.bat`, async (res_data_base) => {
       console.log('res_data_base ', res_data_base);
       puts(res_data_base, 'respuesta del comando de correr el servidor.');
       resolve(res_data_base);
@@ -740,7 +745,7 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function cmd(command, callback = (arg) => {}) {
+export function cmd(command, callback = (arg) => {}) {
   puts(command, 'comando realizado en la funcion cmd');
 
   exec(command, (error, stdout, stderr) => {
