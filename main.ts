@@ -273,11 +273,6 @@ function continuarCargandoArchivos(resolve) {
 
   // -------------- remplazar en archivos ----------------
   replace_in_file = new ReplaceInFile();
-
-  console.log(' ');
-  console.log(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
-  console.log(' ');
-
   puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
   setTimeout(() => resolve(true), 2000);
 }
@@ -288,10 +283,8 @@ function continuarCargandoArchivos(resolve) {
 
 function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
-  console.log(' ');
-  console.log('INICIALIZANDO EL PROCESO DE UPDATES');
-  console.log(' ');
 
+  puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
   auto_updater = new AppUpdater();
   auto_updater.handleUpdateEvents(win);
   // ---------------------------------------
@@ -435,9 +428,6 @@ function getConfigFile() {
 function borrarLogs() {
   return new Promise<any>(async (resolve, reject) => {
     const carpeta = await pathAdd('/log');
-    console.log(' ');
-    console.log(' BORRANDO LOGS ANTERIORES ');
-    console.log(' ');
 
     if (!fs.existsSync(carpeta)) {
       fs.mkdir(carpeta, { recursive: true }, (err) => {
