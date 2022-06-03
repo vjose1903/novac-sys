@@ -15,7 +15,7 @@ export default class DockerHandler {
       first_resolve ||= resolve;
       first_reject ||= reject;
 
-      if (this.count_docker <= 50 && this.count_db <= 50) {
+      if (this.count_docker <= 30 && this.count_db <= 30) {
         cmd('docker ps --filter "name=brendy-prod" --format "{{.Status}}"', (res) => {
           if (res.status) {
             if (this.count_db == 1) puts('Docker esta corriendo perfectamente.');
