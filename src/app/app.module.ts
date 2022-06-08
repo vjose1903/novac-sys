@@ -21,11 +21,12 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { ConfirmacionImprimirComponent } from './admin/facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 
 defineLocale('es', esLocale);
 
 @NgModule({
-  declarations: [AppComponent, NgInitDirective, PageNotFoundComponent],
+  declarations: [AppComponent, NgInitDirective, PageNotFoundComponent, ConfirmacionImprimirComponent],
   imports: [
     CommonModule,
     BrowserModule,

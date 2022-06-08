@@ -227,36 +227,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  async submit() {
-    const obj = {
-      id: this.ncfSelected ? this.ncfSelected.id : null,
-      tipo_factura_id: this.tipo_articulo_id,
-      desde: this.Desde,
-      hasta: this.Hasta,
-      fecha_compra: moment(this.fechaCompra, 'DD/MM/YYYY').format(),
-      fecha_valida: moment(this.fechaValidez, 'DD/MM/YYYY').format(),
-      secuencia: this.ncfSelected ? this.ncfSelected.secuencia : this.Desde,
-      estado: this.is_editando ? this.estado : false,
-      usado: this.is_editando ? this.usado : false,
-      status: true,
-    };
-
-    try {
-      const res = await this.ncfClass.createUpdateOne(obj);
-      const actualPagination = this.tServ.getPaginationById('lista_ncf');
-      this.getPaquetesNCF(actualPagination);
-      if (this.is_editando) {
-        fun.toastSuccess('Comprobante editado', 'CORRECTO');
-      } else {
-        fun.toastSuccess('Comprobante ingresado', 'CORRECTO');
-      }
-      this.borrar();
-    } catch (error) {
-      console.error(error);
-      fun.toastError(error.error.msg, 'ERROR');
-    }
-  }
-
   formIsInvalid() {
     let res = true;
     if (this.tipo_articulo_id !== -1 && this.Desde && this.Hasta && this.fechaCompra && this.fechaValidez) res = false;
@@ -358,5 +328,30 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
         ],
       },
     });
+  }
+
+  async submit() {
+    const obj = {
+      id: this.ncfSelected ? this.ncfSelected.id : null,
+      tipo_factura_id: this.tipo_articulo_id,
+      desde: this.Desde,
+      hasta: this.Hasta,
+      fecha_compra: moment(this.fechaCompra, 'DD/MM/YYYY').format(),
+      fecha_valida: moment(this.fechaValidez, 'DD/MM/YYYY').format(),
+      secuencia: this.ncfSelected ? this.ncfSelected.secuencia : this.Desde,
+      estado: this.is_editando ? this.estado : false,
+      usado: this.is_editando ? this.usado : false,
+      status: true,
+    };
+
+    try {
+      const res = await this.ncfClass.createUpdateOne(obj);
+      const actualPagination = this.tServ.getPaginationById('lista_ncf');
+      this.getPaquetesNCF(actualPagination);
+
+      this.borrar();
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

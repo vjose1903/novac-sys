@@ -30,6 +30,16 @@ export default class HandlerConfigFile {
       cuadre_caja: '80mm_roll',
       reporte: '8.5x11',
     },
+    documentos_a_imprimir: [
+      { key: 'venta_contado', selected: false },
+      { key: 'venta_credito', selected: false },
+      { key: 'pre_venta', selected: false },
+      { key: 'compra', selected: false },
+      { key: 'recibo_ingreso', selected: false },
+      { key: 'nota', selected: false },
+      { key: 'conduce', selected: false },
+      { key: 'cuadre_caja', selected: false },
+    ],
   };
 
   static checkConfigFile(win: BrowserWindow) {

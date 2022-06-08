@@ -19,8 +19,13 @@ export interface ConfigI {
   printersList:              Printer[];
   app_version:               string;
   is_db_local:               boolean;
+  documentos_a_imprimir:     DocImpresion[];
 }
 
+export interface DocImpresion {
+  key:             any;
+  selected:        boolean;
+}
 export interface PagesSizes {
   conduce:         string;
   cuadre_caja:     string;

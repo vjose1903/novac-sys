@@ -928,6 +928,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           fun.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
           if (this.condicion_fact == 'Crédito' || this.is_viaje || this.modo_factura == 'Pre_factura') {
+
             const confirmationObj = {
               id: 'imprimir_factura',
               texto: `Seguro que desea imprimir la ${this.modo_factura == 'Pre_factura' ? 'Pre-factura' : 'factura'}`,
@@ -939,7 +940,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               width: '30rem',
             };
             this.confirmationModal(confirmationObj);
+
           } else {
+
             let articulos_a_cambiar = false;
 
             if (this.metodo == 'compra') {
@@ -972,6 +975,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 ],
               },
             });
+
           }
         }
       }
