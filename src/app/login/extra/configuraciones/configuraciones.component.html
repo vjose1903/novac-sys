@@ -107,7 +107,7 @@
                         </div>
                       </ng-template>
                     </p-dropdown>
-                    <span id="msgContainer_color_app"></span>
+                    <span id="msgContainer_printer_caja_selected"></span>
                   </div>
                 </div>
 
@@ -126,7 +126,7 @@
                         </div>
                       </ng-template>
                     </p-dropdown>
-                    <span id="msgContainer_color_app"></span>
+                    <span id="msgContainer_printer_reportes_selected"></span>
                   </div>
                 </div>
 
@@ -208,7 +208,7 @@
                             </div>
                           </ng-template>
                         </p-dropdown>
-                        <span id="msgContainer_page_size_facturacion"></span>
+                        <span id="msgContainer_page_size_nota"></span>
                       </div>
                     </div>
 
@@ -290,25 +290,24 @@
                 </div>
 
                 <div class="col-6 mb-2">
-                  <div [appMsgError]="'printer_reportes_selected'" [form]="form">
+                  <div>
                     <label class="control-label">Documentos a imprimir: </label>
 
-                    <!-- <p-multiSelect
-                    class="multiSelectPrimeng"
-                    [options]="listRoles"
-                    formControlName="ids_roles"
-                    defaultLabel="Selección de roles"
-                    optionLabel="nombre"
-                    optionValue="id"
-                    emptyFilterMessage="Sin resultados"
-                    display="chip"
-                    [displaySelectedLabel]="false"
-                    [showToggleAll]="false"
-                    filterBy="nombre,descripcion"
-                  >
-                  </p-multiSelect> -->
-
-                    <span id="msgContainer_color_app"></span>
+                    <p-multiSelect
+                      class="multiSelectPrimeng"
+                      [options]="documentos_a_imprimir"
+                      [(ngModel)]="documentos_a_imprimir_selected"
+                      [ngModelOptions]="{ standalone: true }"
+                      defaultLabel="Seleccione"
+                      optionLabel="name"
+                      emptyFilterMessage="Sin resultados"
+                      display="chip"
+                      [displaySelectedLabel]="false"
+                      [showToggleAll]="false"
+                      filterBy="name"
+                      (onChange)="changeDocumentosAImprimir()"
+                    >
+                    </p-multiSelect>
                   </div>
                 </div>
               </div>

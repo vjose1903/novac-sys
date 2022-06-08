@@ -34,6 +34,19 @@ export class ConfiguracionesComponent implements OnInit {
     { label: 'Rollo 80mm', descripcion: '80mm_roll' },
   ];
 
+  documentos_a_imprimir_selected = [];
+
+  documentos_a_imprimir = [
+    { name: 'Venta Contado', key: 'venta_contado' },
+    { name: 'Venta Credito', key: 'venta_credito' },
+    { name: 'Pre_Venta', key: 'pre_venta' },
+    { name: 'Compra', key: 'compra' },
+    { name: 'Recibo Ingreso', key: 'recibo_ingreso' },
+    { name: 'Nota', key: 'nota' },
+    { name: 'Conduce', key: 'conduce' },
+    { name: 'Cuadre Caja', key: 'cuadre_caja' },
+  ];
+
   configCopy;
 
   constructor(private fb: FormBuilder, public sharedServ: SharedService) {}
@@ -42,7 +55,9 @@ export class ConfiguracionesComponent implements OnInit {
     this.configServ.getConfig().then((config: ConfigI) => {
       this.config = config;
       this.configCopy = fun.duplicarJson(config);
-      this.createForm(config);
+      this.parseDocumentosAImprimir(config).then(() => {
+        this.createForm(config);
+      });
     });
   }
 
@@ -65,6 +80,7 @@ export class ConfiguracionesComponent implements OnInit {
       printer_caja_selected: [{ value: this.getValue(data, 'printer_caja_selected'), disabled: false }, Validators.required],
       printer_reportes_selected: [{ value: this.getValue(data, 'printer_reportes_selected'), disabled: false }, Validators.required],
       is_db_local: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
+      documentos_a_imprimir: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
 
       page_size_recibo_ingreso: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
       page_size_conduce: [{ value: this.getValuePageSize(data, 'pages_sizes.conduce'), disabled: false }, Validators.required],
@@ -84,6 +100,12 @@ export class ConfiguracionesComponent implements OnInit {
     return page_size;
   }
 
+  getDocumentosAImprimir(data) {
+    const docs = _.filter(data.documentos_a_imprimir, { selected: true });
+
+    return docs;
+  }
+
   getValue(data, key) {
     return _.get(data, key);
   }
@@ -94,6 +116,21 @@ export class ConfiguracionesComponent implements OnInit {
   }
 
   saltar(input) {}
+
+  parseDocumentosAImprimir(config) {
+    return new Promise<any>((resolve) => {
+      const documentos_config = config.documentos_a_imprimir.split(',');
+      documentos_config.forEach((item) => this.documentos_a_imprimir_selected.push(_.find(this.documentos_a_imprimir, { key: item })));
+      resolve(true);
+    });
+  }
+
+  changeDocumentosAImprimir() {
+    const documentos_selected = _.join(_.map(this.documentos_a_imprimir_selected, 'key'), ',');
+
+    this.form.controls.documentos_a_imprimir.setValue(fun.hasValue(documentos_selected) ? documentos_selected : null);
+
+  }
 
   getPhotoData(data_img) {
     if (data_img.src_img) {
@@ -164,6 +201,8 @@ export class ConfiguracionesComponent implements OnInit {
 
     if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
 
+    console.log("objChange ", objChange);
+
     const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, objChange);
 
     this._ipc
@@ -185,9 +224,13 @@ export class ConfiguracionesComponent implements OnInit {
     const logosKeys = ['logo_empresa', 'logo_impresion'];
 
     for (let i = 0; i < keysConfig.length; i++) {
+
       const key = keysConfig[i];
+
       if (fun.hasValue(copyObjLevel[key])) {
+
         if (typeof copyObjLevel[key] == 'string') {
+
           if (copyObjLevel[key] != obj[key]) {
             if (logosKeys.includes(key)) {
               logos_changes[key] = obj[key];
@@ -196,6 +239,7 @@ export class ConfiguracionesComponent implements OnInit {
               array_replacement.push(`${key}: '${obj[key]}'`);
             }
           }
+
         } else {
           this.changesParser(array_targets, array_replacement, logos_changes, obj[key], copyObjLevel[key]);
         }

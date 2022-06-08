@@ -22,6 +22,7 @@ export default class HandlerConfigFile {
     printer_caja_selected: null,
     printer_reportes_selected: null,
     is_db_local: true,
+
     pages_sizes: {
       recibo_ingreso: '80mm_roll',
       nota: '80mm_roll',
@@ -30,16 +31,8 @@ export default class HandlerConfigFile {
       cuadre_caja: '80mm_roll',
       reporte: '8.5x11',
     },
-    documentos_a_imprimir: [
-      { key: 'venta_contado', selected: false },
-      { key: 'venta_credito', selected: false },
-      { key: 'pre_venta', selected: false },
-      { key: 'compra', selected: false },
-      { key: 'recibo_ingreso', selected: false },
-      { key: 'nota', selected: false },
-      { key: 'conduce', selected: false },
-      { key: 'cuadre_caja', selected: false },
-    ],
+
+    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce,cuadre_caja',
   };
 
   static checkConfigFile(win: BrowserWindow) {
@@ -52,8 +45,9 @@ export default class HandlerConfigFile {
         puts(existe_archivo_config, ':::::::: existe_archivo_config');
 
         if (!existe_archivo_config) {
-          this.default_config.printer_caja_selected = Functions.getDefaultPrinter(win);
-          this.default_config.printer_reportes_selected = Functions.getDefaultPrinter(win);
+          // TODO: ver cual es el key que se necesita para utilizar una impresora por nombre
+          this.default_config.printer_caja_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : null;
+          this.default_config.printer_reportes_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : null;
 
           Functions.setConfigFile(JSON.stringify(this.default_config))
             .then(() => {

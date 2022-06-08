@@ -17,6 +17,7 @@ export default class DockerHandler {
 
       if (this.count_docker <= 20 && this.count_db <= 20) {
         cmd('docker ps --filter "name=brendy-prod" --format "{{.Status}}"', (res) => {
+        // cmd('docker ps --filter "name=brendy-dev" --format "{{.Status}}"', (res) => {
           if (res.status) {
             if (this.count_db == 1) puts('Docker esta corriendo perfectamente.');
 
@@ -35,7 +36,11 @@ export default class DockerHandler {
           }
         });
       } else {
-        const type_error = this.count_db > 50 ? 'db' : 'docker';
+        console.log("this.count_db ", this.count_db);
+        console.log("this.count_docker ", this.count_docker);
+
+        const type_error = this.count_db > 20 ? 'db' : 'docker';
+
         console.log(':::::::::: type_error ', type_error);
 
         first_reject(type_error);

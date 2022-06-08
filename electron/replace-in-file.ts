@@ -58,9 +58,9 @@ export default class ReplaceInFile {
   }
 
   cambiarHandlerConfig(params: { new_config: any; array_targets: string[]; array_replacement: string[] }) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (Functions.hasValue(params.array_replacement) && Functions.hasValue(params.array_targets)) {
-        const archivos_a_cambiar = [pathAdd('/electron/handler-config-file.js'), pathAdd('/electron/handler-config-file.ts')];
+        const archivos_a_cambiar = [await pathAdd('/electron/handler-config-file.js'), await pathAdd('/electron/handler-config-file.ts')];
         const options = { allowEmptyPaths: true, files: archivos_a_cambiar, from: params.array_targets, to: params.array_replacement };
 
         replace(options)

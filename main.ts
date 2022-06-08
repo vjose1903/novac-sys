@@ -412,7 +412,7 @@ function getConfigFile() {
 
         config['is_development'] = serve_;
         config['gitUser'] = await getActualGitUser();
-        config['printersList'] = [{ displayName: 'Ninguna', name: 'Ninguna' }, ...win.webContents.getPrinters()];
+        config['printersList'] = [{ displayName: 'Ninguna', name: 'Ninguna' },{ displayName: 'Otra', name: 'Otra' }, ...win.webContents.getPrinters()];
         config['app_version'] = pjson.version;
 
         resolve(config);
