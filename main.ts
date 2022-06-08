@@ -55,20 +55,7 @@ function createSplash(type = 'splash') {
   if (type == 'splash') {
     beforeCreateSplash(splash).then((res) => {
       splash.close();
-
-      console.log(' ');
-      console.log(' ');
-      console.log(' ');
-      console.log(' ');
-      console.log(' PASANDO A CREAR LA VENTANA DEL SISTEMA');
-      console.log(' ');
-      console.log(' ');
-      console.log(' ');
-      console.log(' ');
-
-      createWindow().then((win) => {
-        beforeCreateWindow(win);
-      });
+      createWindow().then((win) => beforeCreateWindow(win));
     });
   } else {
     shell.beep();
@@ -88,9 +75,6 @@ function createWindow() {
     puts('  ');
     const electronScreen = screen;
     const size = electronScreen.getPrimaryDisplay().workAreaSize;
-
-    const conf = await getConfig();
-    const serve_ = await getServer_();
 
     // Create the browser window.
     win = new BrowserWindow({
@@ -175,10 +159,6 @@ function createWindow() {
 
     // Emitted when the window is closed.
     win.on('closed', (event) => {
-      console.log('>>>>>> ANDO AQUII ');
-
-      if (!serve_ && conf.is_db_local) closeLocalDataBase();
-
       // Dereference the window object, usually you would store window
       // in an array if your app supports multi windows, this is the time
       // when you should delete the corresponding element.
@@ -253,16 +233,6 @@ function beforeCreateSplash(splash) {
   return new Promise<any>(async (resolve, reject) => {
     // -------- borrar el archivo de logs --------
     borrarLogs().then(async () => {
-      console.log(' ');
-      console.log(' ');
-      console.log(' -------- SPLASH CREADO --------');
-      console.log(' ');
-      console.log(' ');
-
-      console.log(' ');
-      console.log(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
-      console.log(' ');
-
       puts(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
 
       // ----------- inicializando docker handler --------------
@@ -303,13 +273,8 @@ function continuarCargandoArchivos(resolve) {
 
   // -------------- remplazar en archivos ----------------
   replace_in_file = new ReplaceInFile();
-
-  console.log(' ');
-  console.log(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
-  console.log(' ');
-
   puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
-  setTimeout(() => resolve(true), 3000);
+  setTimeout(() => resolve(true), 2000);
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -318,10 +283,8 @@ function continuarCargandoArchivos(resolve) {
 
 function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
-  console.log(' ');
-  console.log('INICIALIZANDO EL PROCESO DE UPDATES');
-  console.log(' ');
 
+  puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
   auto_updater = new AppUpdater();
   auto_updater.handleUpdateEvents(win);
   // ---------------------------------------
@@ -418,54 +381,6 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// OBTENER LA RUTA DONDE ESTA LA BASE DE DATOS LOCALMENTE
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-async function getDabaBasePath() {
-  return new Promise<string>(async (resolve) => {
-    const pjson = require('./package.json');
-    puts(pjson.productName, 'pjson.productName ');
-    let serve_ = await getServer_();
-    // serve_ = false;
-    puts(serve_, 'serve_');
-    const path = serve_ ? '\\Users\\%username%\\git\\novac-server\\win_scripts' : `C:\\Users\\%username%\\${pjson.productName}\\novac-server`;
-    puts(path, 'path database');
-    resolve(path);
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// CERRAR LA BASE DE DATOS LOCALMENTE EN LA PC
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function closeLocalDataBase() {
-  return new Promise<any>(async (resolve, reject) => {
-    const proyect_path = await getDabaBasePath();
-
-    cmd(`cd "${proyect_path}" && .\\close_server.bat`, async (res_data_base) => {
-      console.log('res_data_base ', res_data_base);
-      resolve(true);
-    });
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// CORRER LA BASE DE DATOS LOCALMENTE EN LA PC
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function runLocalDataBase() {
-  puts('DENTRO DE RUN DATA BASE');
-  return new Promise<any>(async (resolve, reject) => {
-    const proyect_path = await getDabaBasePath();
-
-    puts(proyect_path, 'ruta del server');
-
-    cmd(`cd "${proyect_path}" && .\\verificate_server.bat`, async (res_data_base) => {
-      console.log('res_data_base ', res_data_base);
-      puts(res_data_base, 'respuesta del comando de correr el servidor.');
-      resolve(res_data_base);
-    });
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER EL ACTUAL USUARIO DE GIT
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getActualGitUser() {
@@ -513,9 +428,6 @@ function getConfigFile() {
 function borrarLogs() {
   return new Promise<any>(async (resolve, reject) => {
     const carpeta = await pathAdd('/log');
-    console.log(' ');
-    console.log(' BORRANDO LOGS ANTERIORES ');
-    console.log(' ');
 
     if (!fs.existsSync(carpeta)) {
       fs.mkdir(carpeta, { recursive: true }, (err) => {

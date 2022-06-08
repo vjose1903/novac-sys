@@ -15,14 +15,14 @@ export default class DockerHandler {
       first_resolve ||= resolve;
       first_reject ||= reject;
 
-      if (this.count_docker <= 50 && this.count_db <= 50) {
+      if (this.count_docker <= 20 && this.count_db <= 20) {
         cmd('docker ps --filter "name=brendy-prod" --format "{{.Status}}"', (res) => {
           if (res.status) {
             if (this.count_db == 1) puts('Docker esta corriendo perfectamente.');
 
             if (res.STDOUT.toLowerCase().includes('up')) {
               puts('Base de datos esta corriendo perfectamente.');
-              setTimeout(() => first_resolve('Todo Listo en docker'), 2000);
+              setTimeout(() => first_resolve('Todo Listo en docker'), 1000);
             } else {
               puts(res.STDERR, `ERROR: base de datos presenta fallos, intento #: ${this.count_db}`);
               this.count_db += 1;
