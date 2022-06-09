@@ -18,11 +18,10 @@ import {
   ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
   ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
   ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
-  KEYWORD_ELECTRON_EVENT_DECRYPT,
-  KEYWORD_ELECTRON_EVENT_ENCRYPT,
   KEYWORD_ELECTRON_QUIT_APP,
   KEYWORD_ELECTRON_GET_APP_CONFIG,
 } from '../../electron/shared-electron-angular';
+
 import { Subscription } from 'rxjs';
 import { ConfigI } from './core/typescript/config-interface';
 import { ToastrService } from 'ngx-toastr';
@@ -201,37 +200,13 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   validateUserAndLoadPermisos() {
     this.currentUserServ
       .validateUser()
-      .then((res) => {
-        setTimeout(() => (this.configReady = true), 500);
-      })
+      .then((res) => setTimeout(() => (this.configReady = true), 500))
       .catch((error) => {
         this.configReady = true;
         const actualPath = this.getActualPath();
 
         if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });
-  }
-
-  async probandoEncriptar() {
-    const task = new MessageTask(KEYWORD_ELECTRON_EVENT_ENCRYPT, { hola: 'mundo' });
-
-    this._ipc
-      .sendTask(task)
-      .then((res: string) => {
-        this.probandoDesEncriptar(res);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-
-  async probandoDesEncriptar(strEncripted: string) {
-    const task = new MessageTask(KEYWORD_ELECTRON_EVENT_DECRYPT, strEncripted);
-
-    this._ipc
-      .sendTask(task)
-      .then((res) => {})
-      .catch((err) => {});
   }
 
   timeConvert(d) {
@@ -245,8 +220,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     const sDisplay = s > 0 ? s + (s === 1 ? ' segundo' : ' segundos') : '';
     return hDisplay + mDisplay + sDisplay;
   }
-
-  duplicarDataProgreso(json) {}
 
   logOut() {
     this.layServ.nextLogOut({ bool: true, quien: 'appComponent' });
