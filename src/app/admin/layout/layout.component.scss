@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
 
-.drag{
+.drag {
   -webkit-app-region: drag;
 }
 
@@ -68,106 +68,186 @@
 $bodyfont: "Poppins";
 
 .fantasma {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  z-index: -1;
-}
-
-.layout {
-  display: grid;
-  grid-template-areas: "menu content";
-  grid-template-columns: 7rem auto;
+  position: relative;
+  min-width: 100vw;
+  max-width: 100vw;
   min-height: 100vh;
   max-height: 100vh;
-  overflow: hidden;
 
-  .menu {
-    grid-area: menu;
+  .layout {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+
     display: grid;
-    grid-template-areas:
-      "title"
-      "sideBar";
-    grid-template-rows: min-content auto;
-    max-height: inherit;
-    z-index: 1;
-    > .title {
-      grid-area: title;
-      background-color: #c9c9c9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 2rem;
-      overflow: hidden;
+    grid-template-areas: "menu content";
+    grid-template-columns: 7rem auto;
+    overflow: hidden;
 
-      > .titulo {
-        font-size: 1.5rem;
-        color: var(--primary10);
-        font-weight: 400;
-        &:hover {
-          cursor: pointer;
-          color: var(--primary09);
+    .menu {
+      grid-area: menu;
+      display: grid;
+      grid-template-areas:
+        "title"
+        "sideBar";
+      grid-template-rows: min-content auto;
+      z-index: 1;
+      > .title {
+        grid-area: title;
+        background-color: #c9c9c9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 2rem;
+        overflow: hidden;
+
+        > .titulo {
+          font-size: 1.5rem;
+          color: var(--primary10);
+          font-weight: 400;
+          &:hover {
+            cursor: pointer;
+            color: var(--primary09);
+          }
+        }
+      }
+
+      > .sideBar {
+        grid-area: sideBar;
+        background-color: var(--primary02);
+        position: relative;
+        overflow: hidden auto;
+
+        > .menuContent {
+          position: absolute;
+          display: grid;
+
+          .menuList {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+            justify-content: flex-end;
+            min-height: 7rem;
+            position: relative;
+
+            .tituloMenu {
+              transform: scale(0);
+              font-size: inherit;
+              // position: absolute;
+              transition: all 0.2s;
+              margin: 0;
+              width: 100%;
+
+              &.tituloMenuA {
+                font-weight: 600;
+              }
+            }
+
+            &:hover .tituloMenu,
+            .tituloMenuA {
+              // transform: scale(0.8) translate(0px, -7.7rem);
+              transform: scale(1);
+            }
+            text-align: center;
+
+            .iconosMenu {
+              border: 3px solid #4141417a;
+              border-radius: 50%;
+              margin: 0rem auto 0px auto;
+              filter: grayscale(50%);
+              height: 4.5rem;
+              width: 4.5rem;
+              &.iconosMenuA {
+                background: var(--primary10);
+                filter: grayscale(10%) contrast(-20%);
+              }
+
+              &:hover {
+                filter: grayscale(10%);
+                transform: scale(1.05);
+                filter: contrast(-20%);
+              }
+            }
+
+            .subMenuFactura {
+              overflow: hidden;
+              max-height: 0;
+              transition: all 0.5s;
+              width: 100%;
+
+              &.subMenuFacturaA {
+                margin-top: 0.5rem;
+                max-height: 100rem;
+                background-color: var(--primary04);
+                color: white;
+              }
+
+              > .opcion {
+                font-size: 1rem !important;
+                padding: 0.5rem;
+                background-color: var(--primary04);
+                font-family: $bodyfont;
+                &.activa {
+                  background-color: var(--primary09) !important;
+                }
+                &:hover {
+                  width: 100%;
+                  filter: brightness(0.6);
+                  cursor: pointer;
+                }
+              }
+            }
+          }
         }
       }
     }
 
-    > .sideBar {
-      grid-area: sideBar;
-      background-color: var(--primary02);
-      max-height: inherit;
-      > .menuContent {
-        overflow: auto;
-        display: grid;
-        max-height: 100%;
+    .content {
+      position: relative;
+      grid-area: content;
+      display: grid;
+      grid-template-areas:
+        "navBar"
+        "contenido"
+        "footer";
+
+      grid-template-rows: min-content auto min-content;
+
+      > .navBar {
+        grid-area: navBar;
+        height: 2rem;
+        box-shadow: 1px 1px 5px 0.2px #9c9c9c;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      > .contenido {
+        grid-area: contenido;
+        background-color: #e4e4e4d2;
+        padding: 0.8rem 1rem;
+        overflow-y: auto;
+
+        max-height: calc(100vh - 4rem);
+        position: relative;
+      }
+
+      > .footer {
+        grid-area: footer;
+        height: 30px;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        background-color: var(--secondary04);
+        color: white;
+        padding: 0rem 2rem 0rem 0rem;
+        z-index: 2;
       }
     }
   }
-
-  .content {
-    position: relative;
-    grid-area: content;
-    display: grid;
-    grid-template-areas:
-      "navBar"
-      "contenido"
-      "footer";
-
-    grid-template-rows: min-content auto min-content;
-
-    > .navBar {
-      grid-area: navBar;
-      height: 2rem;
-      box-shadow: 1px 1px 5px 0.2px #9c9c9c;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
-
-    > .contenido {
-      grid-area: contenido;
-      background-color: #e4e4e4d2;
-      padding: 0.8rem 1rem;
-      overflow-y: auto;
-
-      max-height: calc(100vh - 4rem);
-      position: relative;
-    }
-
-    > .footer {
-      grid-area: footer;
-      height: 30px;
-      height: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      background-color: var(--secondary04);
-      color: white;
-      padding: 0rem 2rem 0rem 0rem;
-      z-index: 2;
-    }
-  }
 }
-
 /* ============================================== */
 /*        LOADER                                  */
 /* ============================================== */
@@ -268,90 +348,6 @@ $bodyfont: "Poppins";
 .tipoFactura:first-letter {
   text-transform: uppercase;
   color: red !important;
-}
-
-/* ============================================== */
-/*        Menu                                    */
-/* ============================================== */
-
-.menuList {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  align-items: center;
-  justify-content: flex-end;
-  width: 100%;
-  height: 100%;
-  min-height: 7rem;
-  position: relative;
-
-  .tituloMenu {
-    transform: scale(0);
-    font-size: inherit;
-    // position: absolute;
-    transition: all 0.2s;
-    margin: 0;
-    width: 100%;
-
-    &.tituloMenuA {
-      font-weight: 600;
-    }
-  }
-
-  &:hover .tituloMenu,
-  .tituloMenuA {
-    // transform: scale(0.8) translate(0px, -7.7rem);
-    transform: scale(1);
-  }
-  text-align: center;
-
-  .iconosMenu {
-    border: 3px solid #4141417a;
-    border-radius: 50%;
-    margin: 0rem auto 0px auto;
-    filter: grayscale(50%);
-    height: 4.5rem;
-    width: 4.5rem;
-    &.iconosMenuA {
-      background: var(--primary10);
-      filter: grayscale(10%) contrast(-20%);
-    }
-
-    &:hover {
-      filter: grayscale(10%);
-      transform: scale(1.05);
-      filter: contrast(-20%);
-    }
-  }
-
-  .subMenuFactura {
-    overflow: hidden;
-    max-height: 0;
-    transition: all 0.5s;
-    width: 100%;
-
-    &.subMenuFacturaA {
-      margin-top: 0.5rem;
-      max-height: 100rem;
-      background-color: var(--primary04);
-      color: white;
-    }
-
-    > .opcion {
-      font-size: 1rem !important;
-      padding: 0.5rem;
-      background-color: var(--primary04);
-      font-family: $bodyfont;
-      &.activa {
-        background-color: var(--primary09) !important;
-      }
-      &:hover {
-        width: 100%;
-        filter: brightness(0.6);
-        cursor: pointer;
-      }
-    }
-  }
 }
 
 .fa-bars:before {

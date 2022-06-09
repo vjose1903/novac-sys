@@ -99,6 +99,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.configServ.getConfig().then((config: ConfigI) => (this.versionApp = config.app_version));
   }
 
+  ngAfterViewInit() {
+    this.ready = true;
+    this.parseMenu();
+    this.checkRouteActiva();
+    this.cdRef.detectChanges();
+  }
+
   initVariables() {
     this.showLoading = true;
     this.imgUser = 'assets/img/transparente.png';
@@ -125,12 +132,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         this.chequiando_cuadre = false;
       });
     }
-  }
-
-  ngAfterViewInit() {
-    this.ready = true;
-    this.parseMenu();
-    this.cdRef.detectChanges();
   }
 
   ngAfterContentChecked() {
@@ -176,18 +177,25 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
 
   checkRouteActiva() {
+    fun.logRed('=========== checkRouteActiva ===========');
     const location = window.location.href;
     const actualPath = location.slice(location.indexOf('/admin'), location.length);
 
     this.actualPath = actualPath;
+    console.log('this.actualPath ', this.actualPath);
+
     const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
 
     if (pathSplit.length >= 3) {
       this.actualModule = pathSplit[1];
+      console.log('this.actualModule ', this.actualModule);
       this.actualRuta = _.join(pathSplit.slice(2, pathSplit.length), '/');
+      console.log('this.actualRuta ', this.actualRuta);
     } else {
       this.actualModule = undefined;
+      console.log('this.actualModule ', this.actualModule);
       this.actualRuta = _.join(pathSplit.slice(1, pathSplit.length), '/');
+      console.log('this.actualRuta ', this.actualRuta);
     }
     this.ready = true;
   }
