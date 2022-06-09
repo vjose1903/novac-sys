@@ -99,7 +99,7 @@ export class CrudG<T> {
 
   private getUrlInUse() {
     const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
-    if (!configApp.usa_url_principal) fun.logYellow('::::: USANDO LA URL DE RESPALDO :::::');
+
 
     const url = configApp.is_development ? AppConfig[configApp.gitUser] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     return url;

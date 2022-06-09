@@ -24,6 +24,7 @@ import { Permisos } from '../../core/typescript/permisos';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { SingletonService } from '../../core/services/singleton.service';
 import { NgxPermissionsService } from 'ngx-permissions';
+import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 
 @Component({
   selector: 'app-facturacion',
@@ -928,21 +929,36 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           fun.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
           if (this.condicion_fact == 'Crédito' || this.is_viaje || this.modo_factura == 'Pre_factura') {
+            // const confirmationObj = {
+            //   id: 'imprimir_factura',
+            //   texto: `Seguro que desea imprimir la ${this.modo_factura == 'Pre_factura' ? 'Pre-factura' : 'factura'}`,
+            //   header: 'Confirmación',
+            //   siFunction: (instance) => {
+            //     this.enviarABaseDatos();
+            //     this.closeModal(instance);
+            //   },
+            //   width: '30rem',
+            // };
 
-            const confirmationObj = {
-              id: 'imprimir_factura',
-              texto: `Seguro que desea imprimir la ${this.modo_factura == 'Pre_factura' ? 'Pre-factura' : 'factura'}`,
+            // this.confirmationModal(confirmationObj);
+            const obj = {};
+
+            this.handleModalForm({
+              component: ConfirmacionImprimirComponent,
+              inputs: obj,
+              id: 'confirmacionImprimir',
               header: 'Confirmación',
-              siFunction: (instance) => {
-                this.enviarABaseDatos();
-                this.closeModal(instance);
-              },
               width: '30rem',
-            };
-            this.confirmationModal(confirmationObj);
-
+              botones: {
+                aceptar: { show: false, disable: false },
+                cancelar: { show: false, disable: false },
+                dinamico: [
+                  { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+                ],
+              },
+            });
           } else {
-
             let articulos_a_cambiar = false;
 
             if (this.metodo == 'compra') {
@@ -975,7 +991,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 ],
               },
             });
-
           }
         }
       }
@@ -1214,19 +1229,20 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.fechaFactura['back'] = this.fechaFactura['front'];
       this.FechaFacturaMostrar = this.formarFechaFactura(arg.fecha)['FechaFacturaMostrar'];
       this.FacturaAtrasada = true;
+      //
     } else if (arg.modal_id == 'cambioEfectivo') {
       this.Devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
 
       if (this.metodo === 'compra') {
-        if (arg.obj.decision_cambio) {
-          await this.cambiarCostos();
-        }
+        if (arg.obj.decision_cambio) await this.cambiarCostos();
+
         this.CuerpoFactura = this.newCuerpo;
         this.enviarABaseDatos();
       } else {
         this.enviarABaseDatos();
       }
+      //
     } else if (arg.modal_id == 'buscarCliente') {
       this.propietario_factura = arg.data;
 
