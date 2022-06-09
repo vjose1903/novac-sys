@@ -412,7 +412,7 @@ function getConfigFile() {
 
         config['is_development'] = serve_;
         config['gitUser'] = await getActualGitUser();
-        config['printersList'] = [{ displayName: 'Ninguna', name: 'Ninguna' },{ displayName: 'Otra', name: 'Otra' }, ...win.webContents.getPrinters()];
+        config['printersList'] = [{ displayName: 'Ninguna', name: 'Ninguna' }, { displayName: 'Otra', name: 'Otra' }, ...win.webContents.getPrinters()];
         config['app_version'] = pjson.version;
 
         resolve(config);
@@ -770,12 +770,8 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
     try {
       fs.writeFile(FileName, params.base64, { encoding: 'base64' }, (err) => {
         imprimir({ fileName: params.fileName, tipo: params.type, scale: params.scale })
-          .then((res) => {
-            resolve(res);
-          })
-          .catch((err) => {
-            reject(err);
-          });
+          .then((res) => resolve(res))
+          .catch((err) => reject(err));
       });
     } catch (err) {
       reject({ msg: 'Error generando reporte!!', status: false, error: err });

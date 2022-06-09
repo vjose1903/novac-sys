@@ -84,6 +84,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   NCFcompra;
   CostoYgasto;
   metodo;
+  is_print = false;
   // archivo_id_desplegada = undefined;
 
   TiposCostosGastos: string;
@@ -929,19 +930,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           fun.toastWarning('Total de la factura no puede ser 0', 'Aviso');
         } else {
           if (this.condicion_fact == 'Crédito' || this.is_viaje || this.modo_factura == 'Pre_factura') {
-            // const confirmationObj = {
-            //   id: 'imprimir_factura',
-            //   texto: `Seguro que desea imprimir la ${this.modo_factura == 'Pre_factura' ? 'Pre-factura' : 'factura'}`,
-            //   header: 'Confirmación',
-            //   siFunction: (instance) => {
-            //     this.enviarABaseDatos();
-            //     this.closeModal(instance);
-            //   },
-            //   width: '30rem',
-            // };
-
-            // this.confirmationModal(confirmationObj);
-            const obj = {};
+            const obj = { modo_factura: this.modo_factura, condicion_fact: this.condicion_fact, metodo: this.metodo };
 
             this.handleModalForm({
               component: ConfirmacionImprimirComponent,
@@ -954,7 +943,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 cancelar: { show: false, disable: false },
                 dinamico: [
                   { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
-                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
                 ],
               },
             });
@@ -969,6 +958,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             if (this.articulosAcambiar.length > 0) articulos_a_cambiar = true;
 
             const obj = {
+              modo_factura: this.modo_factura,
+              condicion_fact: this.condicion_fact,
+              metodo: this.metodo,
               total_factura: this.TOTAL,
               devuelta: this.action == 'update' ? this.factura_a_editar.devuelta + this.factura_a_editar.total_factura : 0,
               tipo_modal: 'devuelta',
@@ -1090,7 +1082,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           return articulo;
         });
       }
-      console.log('this.CuerpoFactura ', this.CuerpoFactura);
     }
 
     if (arg.tipo == 'devuelto') {
@@ -1229,8 +1220,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.fechaFactura['back'] = this.fechaFactura['front'];
       this.FechaFacturaMostrar = this.formarFechaFactura(arg.fecha)['FechaFacturaMostrar'];
       this.FacturaAtrasada = true;
+
+      //
+    } else if (arg.modal_id == 'confirmacionImprimir') {
+      console.log('arg ', arg);
+      this.is_print = arg.data.is_print;
+      this.enviarABaseDatos();
       //
     } else if (arg.modal_id == 'cambioEfectivo') {
+      console.log('arg ', arg);
+
+      this.is_print = arg.is_print;
       this.Devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
 
@@ -1242,6 +1242,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       } else {
         this.enviarABaseDatos();
       }
+
       //
     } else if (arg.modal_id == 'buscarCliente') {
       this.propietario_factura = arg.data;
@@ -1371,7 +1372,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     const obj = { data: res_factura, type: 'facturacion' };
 
-    if (this.metodo === 'venta' || this.metodo == 'pre-venta') {
+    if (this.is_print) {
       this.pdfServ.generatePdf({ oPdf: obj, imprimir: true }).catch((err) => fun.toastError('Error imprimiendo la factura', 'ERROR'));
     }
 

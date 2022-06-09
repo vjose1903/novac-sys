@@ -1,1 +1,6 @@
-<p>confirmacion-imprimir works!</p>
+<p>Seguro que desea concluir la {{ inputs.modo_factura == 'Pre_factura' ? 'Pre-factura' : 'factura' }}</p>
+
+<div class="d-flex align-items-center h-100">
+  <label class="control-label mr-2 mb-0">Imprimir documento: </label>
+  <input class="apple-switch" type="checkbox" [(ngModel)]="is_print" />
+</div>

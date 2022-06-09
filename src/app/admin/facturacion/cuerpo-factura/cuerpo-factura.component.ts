@@ -95,7 +95,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         if (fila.cantidad && fila.unidad) detalle_factura.push(fun.duplicarJson(obj));
       }
     });
-    fun.logRed('>>>> ', detalle_factura);
 
     this.getCuerpoFactura.emit({ tipo: 'cuerpo', data: fun.duplicarJson(detalle_factura) });
     this.getCuerpoFactura.emit({ tipo: 'devuelto', data: this.productosDevueltos });

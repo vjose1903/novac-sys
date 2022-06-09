@@ -34,13 +34,6 @@
       </span>
     </div>
   </div>
-
-  <!-- <div class="col-12 {{ inputs.tipo_modal !== 'devuelta' ? 'mt-4' : '' }}">
-    <div class="form-group">
-      <input (click)="cancelar()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-      <input (click)="confirmar()" type="submit" class="btn btn-verde" value="Confirmar" id="btnSend" />
-    </div>
-  </div> -->
 </div>
 <!-- ======================================================= -->
 
@@ -87,4 +80,9 @@
       </span>
     </div>
   </div>
+</div>
+
+<div class="d-flex align-items-center h-100">
+  <label class="control-label mr-2 mb-0">Imprimir documento: </label>
+  <input class="apple-switch" type="checkbox" [(ngModel)]="is_print" />
 </div>

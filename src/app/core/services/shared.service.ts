@@ -11,4 +11,9 @@ export class SharedService {
   nextCanToast(nextValue) {
     this.canToast = nextValue;
   }
+
+  formatDocumentosAImprimir(listado) {
+    const documentos_a_imprimir_temp = listado.split(',');
+    return documentos_a_imprimir_temp;
+  }
 }

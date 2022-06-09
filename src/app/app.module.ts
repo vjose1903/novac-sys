@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import '../polyfills';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
 import { AppComponent } from './app.component';
@@ -32,6 +32,7 @@ defineLocale('es', esLocale);
     BrowserModule,
     PrimengModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpClientModule,
     CoreModule,
     ToastrModule.forRoot({ preventDuplicates: true }),

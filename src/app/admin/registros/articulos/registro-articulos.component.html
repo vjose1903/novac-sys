@@ -19,14 +19,14 @@
                     <div class="col-6 d-flex align-items-center pl-0">
                       <div class="form-group switchDiv">
                         <input formControlName="is_detallable" class="apple-switch" type="checkbox" />
-                        <span class="ml-2">Detallable</span>
+                        <span class="ml-2 mb-0">Detallable</span>
                       </div>
                     </div>
 
                     <div *ngIf="TIPOARTICULO && TIPOARTICULO !== 'Materia prima'" class="col-6 p-0 d-flex align-items-center">
                       <div class="form-group switchDiv">
                         <input formControlName="is_materia_prima" class="apple-switch" type="checkbox" />
-                        <span class="ml-1">Funciona como materia prima</span>
+                        <span class="ml-1 mb-0">Funciona como materia prima</span>
                       </div>
                     </div>
 
@@ -34,7 +34,7 @@
                       <!-- <div *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'" class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center"> -->
                       <div class="form-group switchDiv">
                         <input formControlName="calcular_saco" class="apple-switch" type="checkbox" (change)="cambiarCalcularSaco()" />
-                        <span class="ml-2">Calcular saco</span>
+                        <span class="ml-2 mb-0">Calcular saco</span>
                       </div>
                     </div>
                   </div>
