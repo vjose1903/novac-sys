@@ -237,6 +237,7 @@ function beforeCreateSplash(splash) {
 
       // ----------- inicializando docker handler --------------
       docker_handler = new DockerHandler();
+
       HandlerConfigFile.checkConfigFile(splash)
         .then(async (is_config_ready) => {
           if (is_config_ready) {
@@ -269,12 +270,17 @@ function beforeCreateSplash(splash) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function continuarCargandoArchivos(resolve) {
   // -------- verificar el archivo para impresion --------
-  // verificarSumastra();
-
-  // -------------- remplazar en archivos ----------------
-  replace_in_file = new ReplaceInFile();
-  puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
-  setTimeout(() => resolve(true), 2000);
+  verificarSumastra()
+    .then((res_sumastra) => {
+      // -------------- remplazar en archivos ----------------
+      replace_in_file = new ReplaceInFile();
+      puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
+      setTimeout(() => resolve(true), 2000);
+    })
+    .catch((error) => {
+      puts(' -------- SUMASTRA NO EXISTE -------- ');
+      createSplash(`splash_sumastra_error`);
+    });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -447,21 +453,19 @@ function borrarLogs() {
 // VEIRIFICA SI SUMASTRA ESTA INSTALADO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function verificarSumastra() {
-  const print_path = await pathAdd('/print');
+  return new Promise<any>(async (resolve, reject) => {
+    const serve_ = await getServer_();
 
-  if (!fs.existsSync(print_path)) {
-    fs.mkdir(print_path, { recursive: true }, (err) => {
-      if (err) {
-        throw err;
-      } else {
-      }
-    });
-  } else {
-  }
-  const lp_path = await pathAdd('/lp.exe');
-  const aFiles_malos = [lp_path];
+    const print_path = serve_ ? await pathAdd('/print') : contruirPath('N:/sumastra');
+    if (!fs.existsSync(print_path)) {
+      reject(false);
+      return;
+    }
 
-  verificarElemento(aFiles_malos, '/sumastra/lp.exe', '/print', '/lp.exe', '/lp', false, false, 'Sumastra', 0);
+    const lp_path = contruirPath(`${print_path}/lp.exe`);
+    if (fs.existsSync(lp_path)) resolve(true);
+    else reject(false);
+  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -810,6 +814,9 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
 // PARA CREAR LA RUTA CORRECTA EN CASO DE SER COMPILADA O NO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+export function contruirPath(path_temp) {
+  return isMacOs() ? path_temp : path_temp.split('/').join('\\');
+}
 export function pathAdd(addToPath = '', resource = true): Promise<string> {
   return new Promise<any>(async (resolve, reject) => {
     let path_temp;
