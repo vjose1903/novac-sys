@@ -788,7 +788,10 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function imprimir(params: { fileName: string; tipo: string; scale: string }) {
   return new Promise(async (resolve, reject) => {
-    const sumatrapdf_path = await pathAdd('/print/lp.exe');
+    const serve_ = await getServer_();
+    const conf = await getConfig();
+
+    const sumatrapdf_path = serve_ ? await pathAdd('/print/lp.exe') : contruirPath('N:/sumastra/lp.exe');
     const file_path = await pathAdd(`/${params.fileName}`);
 
     puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
@@ -796,11 +799,13 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
     const orientation = params.tipo === 'reporte' ? 'Portrait' : 'landscape';
     const paper_size = params.tipo === 'reporte' ? 'letter' : 'VJPOS';
 
-    const conf = await getConfig();
-
     const selected_printer = params.tipo === 'reporte' ? conf.printer_reportes_selected : conf.printer_caja_selected;
+    // noscale
+    let is_roll = false;
+    if (params.tipo != 'reporte') is_roll = conf.pages_sizes.facturacion.includes('roll');
 
-    const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
+    const print_settings = is_roll ? '-print-settings "noscale"' : `-print-settings "${orientation},${params.scale},paper=${paper_size},simplex"`;
+    const comando = `"${sumatrapdf_path}" -print-to-default ${print_settings} -silent "${file_path}"`;
     // const comando = `"${sumatrapdf_path}" -print-to ${selected_printer.name} -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
 
     cmd(comando, (res) => {
