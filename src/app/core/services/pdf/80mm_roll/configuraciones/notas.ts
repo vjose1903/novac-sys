@@ -2,7 +2,7 @@ export const config_notas = {
   margin_general: [0, -1, 0, 0],
   isBreak: false,
   only_titulo: false,
-  widths: [30, 100, 'auto', '*'],
+  widths: ['auto', 'auto', 'auto', '*'],
   mostrar_total: false,
   info: [
     {

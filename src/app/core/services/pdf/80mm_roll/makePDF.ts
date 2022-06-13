@@ -103,7 +103,7 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
         },
         {
           margin: [0, 20, 0, 0],
-          canvas: [{ type: 'rect', x: 0, y: 0, w: 200, h: 1, color: '#000000' }],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 180, h: 1, color: '#000000' }],
         },
         // ---------- TIPO PDF ----------
         {
@@ -115,11 +115,11 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
         },
         {
           margin: [0, 0, 0, 0],
-          canvas: [{ type: 'rect', x: 0, y: 0, w: 200, h: 1, color: '#000000' }],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 180, h: 1, color: '#000000' }],
         },
         {
           margin: [0, 5, 0, 0],
-          canvas: [{ type: 'rect', x: 0, y: 0, w: 200, h: 2, color: '#000000' }],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 180, h: 2, color: '#000000' }],
         },
         // ---------- TABLA ----------
         ...tabla_detalles,
