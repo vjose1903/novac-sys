@@ -130,20 +130,6 @@
                   </div>
                 </div>
 
-                <div class="col-6 mb-2">
-                  <div class="form-group switchDiv" [appMsgError]="'usa_url_principal'" [form]="form">
-                    <input formControlName="usa_url_principal" class="apple-switch" type="checkbox" />
-                    <span class="ml-2 mb-0">Usa url principal</span>
-                  </div>
-                </div>
-
-                <div class="col-6 mb-2">
-                  <div class="form-group switchDiv" [appMsgError]="'is_db_local'" [form]="form">
-                    <input formControlName="is_db_local" class="apple-switch" type="checkbox" />
-                    <span class="ml-2 mb-0">Usa base de datos local</span>
-                  </div>
-                </div>
-
                 <div class="col-4 mb-3">
                   <div [appMsgError]="'url_servidor'" [form]="form">
                     <label class="control-label">Url Servidor: </label>
@@ -168,7 +154,29 @@
                   </div>
                 </div>
 
-                <div class="col-12 mb-2">
+                <div class="col-4 mb-3">
+                  <div>
+                    <label class="control-label">Documentos a imprimir: </label>
+
+                    <p-multiSelect
+                      class="multiSelectPrimeng"
+                      [options]="documentos_a_imprimir"
+                      [(ngModel)]="documentos_a_imprimir_selected"
+                      [ngModelOptions]="{ standalone: true }"
+                      defaultLabel="Seleccione"
+                      optionLabel="name"
+                      emptyFilterMessage="Sin resultados"
+                      display="chip"
+                      [displaySelectedLabel]="false"
+                      [showToggleAll]="false"
+                      filterBy="name"
+                      (onChange)="changeDocumentosAImprimir()"
+                    >
+                    </p-multiSelect>
+                  </div>
+                </div>
+
+                <div class="col-12 mb-3">
                   <div class="row bg-dark-1 br-1 p-2">
                     <div class="col-12 p-0">
                       <label class="control-label">Tamaños de impresión: </label>
@@ -289,25 +297,46 @@
                   </div>
                 </div>
 
-                <div class="col-6 mb-2">
-                  <div>
-                    <label class="control-label">Documentos a imprimir: </label>
+                <div class="col-12 p-0">
+                  <div class="row">
+                    <div class="col-6 p-0">
+                      <div class="row">
+                        <div class="col-12 mb-2">
+                          <div class="switchDiv" [appMsgError]="'usa_url_principal'" [form]="form">
+                            <input formControlName="usa_url_principal" class="apple-switch" type="checkbox" />
+                            <span class="ml-2 mb-0">Usa url principal</span>
+                          </div>
+                        </div>
 
-                    <p-multiSelect
-                      class="multiSelectPrimeng"
-                      [options]="documentos_a_imprimir"
-                      [(ngModel)]="documentos_a_imprimir_selected"
-                      [ngModelOptions]="{ standalone: true }"
-                      defaultLabel="Seleccione"
-                      optionLabel="name"
-                      emptyFilterMessage="Sin resultados"
-                      display="chip"
-                      [displaySelectedLabel]="false"
-                      [showToggleAll]="false"
-                      filterBy="name"
-                      (onChange)="changeDocumentosAImprimir()"
-                    >
-                    </p-multiSelect>
+                        <div class="col-12 mb-2">
+                          <div class="switchDiv" [appMsgError]="'is_db_local'" [form]="form">
+                            <input formControlName="is_db_local" class="apple-switch" type="checkbox" />
+                            <span class="ml-2 mb-0">Usa base de datos local</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6 p-0">
+                      <div class="row">
+                        <div class="col-12 mb-2">
+                          <div class="h-100 w-100 d-flex align-items-center">
+                            <div class="switchDiv" [appMsgError]="'facturacion_editar_precio'" [form]="form">
+                              <input formControlName="facturacion_editar_precio" class="apple-switch" type="checkbox" />
+                              <span class="ml-2 mb-0">Editar precio en facturación</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-12 mb-2">
+                          <div class="h-100 w-100 d-flex align-items-center">
+                            <div class="switchDiv" [appMsgError]="'vende_sin_inventario'" [form]="form">
+                              <input formControlName="vende_sin_inventario" class="apple-switch" type="checkbox" />
+                              <span class="ml-2 mb-0">Vender sin inventario</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -22,6 +22,8 @@ export default class HandlerConfigFile {
     printer_caja_selected: null,
     printer_reportes_selected: null,
     is_db_local: true,
+    facturacion_editar_precio: true,
+    vende_sin_inventario: true,
 
     pages_sizes: {
       recibo_ingreso: '80mm_roll',

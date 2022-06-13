@@ -1,25 +1,27 @@
 export interface ConfigI {
-  nombre_empresa:            string;
-  rnc_empresa:               string;
-  direccion_empresa:         string;
-  telefono_empresa:          string;
-  logo_empresa:              string;
-  logo_impresion:            string;
-  color_app:                 string;
-  gitUser:                   string;
-  url_servidor:              string;
-  url_servidor_respaldo:     string;
-  url_servidor_descargas:    string;
-  config_password:           string;
-  usa_url_principal:         boolean;
-  printer_caja_selected:     Printer;
-  printer_reportes_selected: Printer;
-  pages_sizes:               PagesSizes;
-  is_development:            boolean;
-  printersList:              Printer[];
-  app_version:               string;
-  is_db_local:               boolean;
-  documentos_a_imprimir:     string;
+  nombre_empresa:              string;
+  rnc_empresa:                 string;
+  direccion_empresa:           string;
+  telefono_empresa:            string;
+  logo_empresa:                string;
+  logo_impresion:              string;
+  color_app:                   string;
+  gitUser:                     string;
+  url_servidor:                string;
+  url_servidor_respaldo:       string;
+  url_servidor_descargas:      string;
+  config_password:             string;
+  usa_url_principal:           boolean;
+  printer_caja_selected:       Printer;
+  printer_reportes_selected:   Printer;
+  pages_sizes:                 PagesSizes;
+  is_development:              boolean;
+  printersList:                Printer[];
+  app_version:                 string;
+  is_db_local:                 boolean;
+  facturacion_editar_precio:   boolean;
+  vende_sin_inventario:        boolean;
+  documentos_a_imprimir:       string;
 }
 
 export interface PagesSizes {
