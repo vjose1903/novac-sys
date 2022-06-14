@@ -11,12 +11,16 @@ OPTIONS="c:r:s"
 setClient() {
   client=$OPTARG
 
-  echo "${cyan}setClient ... ${client}"
+  echo "${cyan}setClient >> ${client}"
   echo "${white} "
   if [ "$client" == "agrodemi" -o "$client" == "brendy" ]; then
     node setup.ts $client
   else
-    echo "${red}setClient ... no encontrado"
+    echo "${red}*************************************"
+    echo "${red}**                                 **"
+    echo "${red}**      CLIENTE NO ENCONTRADO      **"
+    echo "${red}**                                 **"
+    echo "${red}*************************************"
     exit 2
   fi
 }
@@ -24,7 +28,7 @@ setClient() {
 setRunPart() {
   run=$OPTARG
 
-  echo "${yellow}run ... ${run}"
+  echo "${yellow}run >> ${run}"
   echo "${white} "
 
   if [ "$run" == "electron" -o "$run" == "ng" -o "$run" == "all" ]; then
@@ -43,7 +47,11 @@ setRunPart() {
         ;;
     esac
   else
-    echo "${red}setRunPart ... no encontrado"
+    echo "${red}**************************************"
+    echo "${red}**                                  **"
+    echo "${red}**      RUN PART NO ENCONTRADO      **"
+    echo "${red}**                                  **"
+    echo "${red}**************************************"
     exit 2
   fi
 }
@@ -69,6 +77,11 @@ while getopts $OPTIONS opt; do
     setRunPart
     ;;
   *)
+    echo "${red}*************************************"
+    echo "${red}**                                 **"
+    echo "${red}**        FLAG NO PERMITIDO        **"
+    echo "${red}**                                 **"
+    echo "${red}*************************************"
     exit 2
     ;;
   esac
