@@ -37,7 +37,7 @@ export default class HandlerConfigFile {
     documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce,cuadre_caja',
   };
 
-  static checkConfigFile(win: BrowserWindow) {
+  static checkConfigFile(win: BrowserWindow): Promise<any> {
     return new Promise<any>(async (resolve, reject) => {
       const config_path = await pathAdd('/app_config.config');
 
