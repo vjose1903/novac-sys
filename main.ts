@@ -6,7 +6,6 @@ import { ConfigI } from './src/app/core/typescript/config-interface';
 
 const request = require('request');
 const { exec } = require('child_process');
-// const autoUpdater = require('electron-updater').autoUpdater;
 
 const express = require('express');
 
@@ -94,7 +93,7 @@ function createWindow() {
         electron: require(`${__dirname}/node_modules/electron`),
       });
 
-      win.loadURL('http://localhost:5220');
+      win.loadURL('http://localhost:5221');
     } else {
       win.loadURL(url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true }));
     }
@@ -108,7 +107,7 @@ function createWindow() {
     //     electron: require(path.join(__dirname, '/node_modules/electron')),
     //   });
 
-    //   win.loadURL('http://localhost:5220');
+    //   win.loadURL('http://localhost:5221');
     // } else {
     //   // Path when running electron executable
     //   let pathIndex = pathAdd('/dist/index.html');
@@ -119,7 +118,7 @@ function createWindow() {
     //   //   pathIndex = '../dist/index.html';
     //   //   baseDirectory = '../dist';
     //   // }
-    //   var httpPort = 5220;
+    //   var httpPort = 5221;
     //   const app = express();
 
     //   app.use(express.static(path.resolve(baseDirectory)));
@@ -148,7 +147,7 @@ function createWindow() {
     //   //   });
     //   // }
 
-    //   app.listen(httpPort, () => win.loadURL('http://localhost:5220'));
+    //   app.listen(httpPort, () => win.loadURL('http://localhost:5221'));
 
     //   // win.loadURL(url.format({
     //   //   pathname: path.join(__dirname, pathIndex),

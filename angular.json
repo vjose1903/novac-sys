@@ -21,8 +21,10 @@
             "polyfills": "src/polyfills.ts",
             "assets": [
               "src/assets",
-              "src/splash_db_error.html",
               "src/splash_config_error.html",
+              "src/splash_db_error.html",
+              "src/splash_docker_error.html",
+              "src/splash_sumastra_error.html",
               "src/splash.html",
               "src/favicon.ico",
               "src/favicon.icns",
