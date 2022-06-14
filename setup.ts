@@ -1,8 +1,6 @@
 var fs = require('fs');
 var path = require('path');
 
-// import * as fs from 'fs';
-
 const clientes = ['brendy', 'agrodemi'];
 
 const tipo_selected = process.argv.slice(2)[0];
