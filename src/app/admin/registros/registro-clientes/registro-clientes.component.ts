@@ -155,7 +155,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     this.patchDocumentos(data.documentos_de_identidad);
 
-    this.form.controls.maximo_credito.setValue(fun.formatearNumero(fun.redondearAdos(data.maximo_credito)));
+    this.form.controls.maximo_credito.setValue(fun.numFormatTwoDecimals(data.maximo_credito));
     this.clienteSelected = fun.duplicarJson(data);
 
     this.boton = 'Editar';
@@ -211,30 +211,33 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
           enable_campos = true;
           return;
         }
+        console.log('ANDO AQUI');
 
         await fun
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: tipo })
           .then((res) => {
             if (res['data'].length) {
+              console.log('ANDO AQUIII');
+              console.log('res[data] ', res['data']);
+
               const is_cliente = _.find(res['data'], (item) => item.persona_is === 'Cliente');
               const id_anterior = this.form.getRawValue().id;
 
-              if (fun.hasValue(is_cliente) && is_cliente.persona.estado) {
+              if (fun.hasValue(is_cliente) && is_cliente?.persona?.estado) {
                 fun.toastError(`${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
                 if (!this.editando) enable_campos = false;
                 return;
               }
 
-              const persona = _.head(res['data']).persona;
+              const persona = fun.hasValue(is_cliente) ? is_cliente?.persona : _.head(res['data']).persona;
               persona.id = id_anterior;
-              fun.logGreen('id_anterior ', id_anterior);
 
-              const documento_principal = _.find(persona.documentos_de_identidad, { principal: true });
+              const documento_persona = _.find(persona.documentos_de_identidad, (item) => item.principal);
 
-              this.doc_is_cedula = documento_principal.descripcion == 'cedula' ? true : false;
-              const otro_doc = documento_principal.descripcion == 'cedula' ? 'rnc' : 'cedula';
-
-              this.form.controls[otro_doc].setValue(null);
+              if (fun.hasValue(documento_persona)) {
+                this.doc_is_cedula = documento_persona.descripcion == 'cedula' ? true : false;
+                this.form.controls[documento_persona.descripcion].setValue(documento_persona.documento);
+              }
 
               this.form.patchValue(persona);
               fun.logRed('this.form.getRawValue() ', this.form.getRawValue());

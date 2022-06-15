@@ -70,7 +70,7 @@
                   <div class="form-group">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
-                    <p-inputMask mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono_no_empleado"></p-inputMask>
+                    <p-inputMask mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono_no_empleado" [autoClear]="false"></p-inputMask>
 
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['telefono_no_empleado'].valid && (form.controls['telefono_no_empleado'].dirty || form.controls['telefono_no_empleado'].touched)">
                       Introduzca el numero de telefono

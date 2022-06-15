@@ -89,10 +89,10 @@
         <div class="pieFactura">
           <div class="row" style="border-top: 2px solid #c7c9ca">
             <div class="col-3">
-              <app-btncircular [alto]="'100px'" [accion]="'Imprimir nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
+              <app-btncircular [alto]="'100px'" [accion]="'Imprimir nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
             </div>
             <div class="col-3">
-              <app-btncircular [alto]="'100px'" [accion]="'Cancelar nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
+              <app-btncircular [alto]="'100px'" [accion]="'Cancelar nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
             </div>
 
             <div class="col-6 d-flex justify-content-end">

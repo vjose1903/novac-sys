@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import '../polyfills';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
 import { AppComponent } from './app.component';
@@ -21,15 +21,18 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { ConfirmacionImprimirComponent } from './admin/facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
+
 defineLocale('es', esLocale);
 
 @NgModule({
-  declarations: [AppComponent, NgInitDirective, PageNotFoundComponent],
+  declarations: [AppComponent, NgInitDirective, PageNotFoundComponent, ConfirmacionImprimirComponent],
   imports: [
     CommonModule,
     BrowserModule,
     PrimengModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpClientModule,
     CoreModule,
     ToastrModule.forRoot({ preventDuplicates: true }),

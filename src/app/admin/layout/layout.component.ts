@@ -89,6 +89,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
+      console.log('res ', res);
+
       if (res) this.logOut();
     });
 
@@ -97,6 +99,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.configServ.getConfig().then((config: ConfigI) => (this.versionApp = config.app_version));
+  }
+
+  ngAfterViewInit() {
+    this.ready = true;
+    this.parseMenu();
+    this.checkRouteActiva();
+    this.cdRef.detectChanges();
   }
 
   initVariables() {
@@ -127,10 +136,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     }
   }
 
-  ngAfterViewInit() {
-    this.ready = true;
-    this.parseMenu();
-    setTimeout(() => this.checkRouteActiva(), 250);
+  ngAfterContentChecked() {
     this.cdRef.detectChanges();
   }
 
@@ -177,6 +183,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     const actualPath = location.slice(location.indexOf('/admin'), location.length);
 
     this.actualPath = actualPath;
+
     const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
 
     if (pathSplit.length >= 3) {

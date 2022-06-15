@@ -39,10 +39,7 @@ export class CurrentUserService {
       const permisos = currentUser?.permisos ? currentUser.permisos.map((perm) => perm.permiso) : [];
 
       this.permissionsService.loadPermissions(permisos);
-
-      this.permissionsService.hasPermission(Permisos.user.create).then((res) => {
-        setTimeout(() => resolve(true), 100);
-      });
+      setTimeout(() => resolve(true), 10);
     });
   }
 

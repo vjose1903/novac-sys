@@ -1,0 +1,38 @@
+export const config_conduce = {
+  margin_general: [0, -1, 0, 0],
+  isBreak: false,
+  only_titulo: false,
+  widths: ['auto', 'auto', '*'],
+  mostrar_total: false,
+  info: [
+    {
+      text: '#',
+      alignment_titulo: 'center',
+      noWrap: true,
+      style: 'letra8',
+      style_body: 'letra8',
+      key: 'index',
+      alignment_body: 'center',
+      margin_titulo: [0, 0, 0, 0],
+      margin_body: [0, 0, 0, 0],
+    },
+    {
+      text: 'Cantidad',
+      alignment_titulo: 'left',
+      noWrap: true,
+      style: 'letra8',
+      style_body: 'letra8',
+      key: 'cantidad',
+      alignment_body: 'left',
+    },
+    {
+      text: 'Descripción',
+      alignment_titulo: 'left',
+      noWrap: true,
+      style: 'letra8',
+      style_body: 'letra8',
+      key: 'descripcion',
+      alignment_body: 'left',
+    },
+  ],
+};

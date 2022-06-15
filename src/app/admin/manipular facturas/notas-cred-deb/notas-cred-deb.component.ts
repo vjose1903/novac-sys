@@ -217,7 +217,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   async selectAll(info) {}
 
   tableInputChange(params) {
-
     if (params.key == 'select') {
       if (!params.value) {
         params.data.total_nota = '0.00';
@@ -233,7 +232,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       const cant_nota = fun.desformatear(params.value);
 
       if (this.tipoNota == 'credito') {
-
         if (cant_nota > params.data.cant) {
           fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
           this.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
@@ -241,7 +239,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           params.data.cant_nota = 0;
           params.data.total_nota = '0.00';
         } else {
-
           const descuento = params.data.descuento_valor / params.data.cantidad;
 
           const total = cant_nota * (fun.desformatear(params.data.precio) - descuento);
@@ -267,7 +264,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   formatoNumero(num) {
-    return fun.formatearNumero(fun.redondearAdos(num));
+    return fun.numFormatTwoDecimals(num);
   }
   formatoNumeroFactura(num) {
     return _.padStart(num, 8, '0');
@@ -282,7 +279,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   cancelarFactura() {
     const confirmationObj = {
       id: 'archivar_factura',
-      texto: 'Seguro que desea cancelar la factura',
+      texto: 'Seguro que desea cancelar la operación',
       header: 'Confirmación',
       siFunction: (instance) => {
         this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
@@ -292,6 +289,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     };
     this.confirmationModal(confirmationObj);
   }
+
   // =============================================
   //  MODAL IMPRIMIR
   // =============================================
@@ -307,7 +305,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
         const confirmationObj = {
           id: 'imprimir_factura',
-          texto: 'Seguro que desea imprimir la factura',
+          texto: 'Seguro que desea imprimir la nota',
           header: 'Confirmación',
           siFunction: (instance) => {
             this.formarNota();

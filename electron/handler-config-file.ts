@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { pathAdd } from '../main';
+import { pathAdd, puts } from '../main';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
 
@@ -21,26 +21,50 @@ export default class HandlerConfigFile {
     usa_url_principal: true,
     printer_caja_selected: null,
     printer_reportes_selected: null,
+    is_db_local: true,
+    facturacion_editar_precio: true,
+    vende_sin_inventario: true,
+
     pages_sizes: {
       recibo_ingreso: '8.5x5.5',
+      nota: '8.5x5.5',
       conduce: '8.5x5.5',
       facturacion: '8.5x5.5',
       cuadre_caja: '8.5x5.5',
       reporte: '8.5x11',
     },
+
+    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce,cuadre_caja',
   };
 
-  static checkConfigFile(win: BrowserWindow, callback = (res) => {}) {
-    if (!fs.existsSync(pathAdd('/app_config.config'))) {
-      this.default_config.printer_caja_selected = Functions.getDefaultPrinter(win);
-      this.default_config.printer_reportes_selected = Functions.getDefaultPrinter(win);
+  static checkConfigFile(win: BrowserWindow): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
+      const config_path = await pathAdd('/app_config.config');
 
-      Functions.setConfigFile(JSON.stringify(this.default_config)).then(() => {
-        console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
-        callback(true);
-      });
-    } else {
-      callback(true);
-    }
+      const existe_archivo_config = fs.existsSync(config_path);
+
+      setTimeout(() => {
+        puts(existe_archivo_config, ':::::::: existe_archivo_config');
+
+        if (!existe_archivo_config) {
+          // TODO: ver cual es el key que se necesita para utilizar una impresora por nombre
+          this.default_config.printer_caja_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : null;
+          this.default_config.printer_reportes_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : null;
+
+          Functions.setConfigFile(JSON.stringify(this.default_config))
+            .then(() => {
+              console.log(' ');
+              console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
+              console.log(' ');
+              puts('------ ARCHIVO DE CONFIGURACION CREADO ------');
+
+              setTimeout(() => resolve(true), 500);
+            })
+            .catch((err) => reject(false));
+        } else {
+          setTimeout(() => resolve(true), 500);
+        }
+      }, 500);
+    });
   }
 }

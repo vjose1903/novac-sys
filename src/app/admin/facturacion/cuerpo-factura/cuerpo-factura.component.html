@@ -31,7 +31,7 @@
 
 <div class="cuadro" #cuadro class="scrollContainer">
   <form [formGroup]="form" action="">
-    <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWFACTURAS?.controls; let index_cuerpo = index">
+    <div formArrayName="rowFactura" *ngFor="let item_cuerpo of ARRAY_ROWFACTURAS?.controls; let index_cuerpo = index">
       <div [formGroupName]="index_cuerpo">
         <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
           <ng-template pTemplate>
@@ -52,7 +52,7 @@
               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
               <td *ngIf="propietario" class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
                 <div class="btn-group">
-                  <div *ngIf="checkIfRowContainArticulo(index_cuerpo)" style="padding: 3px" (click)="dropRowConfig.toggle($event)">
+                  <div *ngIf="checkIfRowContainArticulo(index_cuerpo)" style="padding: 3px" (click)="abrirOverlay(dropRowConfig, $event)">
                     <i class="fas fa-ellipsis-v btnConfig"></i>
                   </div>
 
@@ -66,13 +66,13 @@
               <td class="COD p-0">
                 <div class="form-group m-0">
                   <input
-                    [ngClass]="{ disabled: !propietario }"
+                    [ngClass]="{ disabled: !propietario || item_cuerpo.controls.from_pre_factura.value }"
                     type="text"
                     class="form-control entrada"
                     id="cod-{{ index_cuerpo }}"
                     [maxlength]="minCodigo"
-                    (focus)="verificarSecuencia(index_cuerpo); checkDisable('cod-', index_cuerpo, true)"
-                    (keyup)="checkCodigo(index_cuerpo); checkDisable('cod-', index_cuerpo, true)"
+                    (focus)="verificarSecuencia(index_cuerpo)"
+                    (keyup)="checkCodigo(index_cuerpo)"
                     (keyup.enter)="saltar('can-', index_cuerpo)"
                     formControlName="cod"
                     tabindex="-1"
@@ -84,15 +84,14 @@
               <td class="CAN p-0">
                 <div class="form-group m-0">
                   <input
-                    [ngClass]="{ disabled: !propietario }"
+                    [ngClass]="{ disabled: !propietario || item_cuerpo.controls.from_pre_factura.value }"
                     type="number"
                     min="1"
                     class="form-control entrada input_cantidad"
                     id="can-{{ index_cuerpo }}"
-                    (keyup)="checkDisable('can-', index_cuerpo, true)"
                     (keyup.enter)="saltar('uni-', index_cuerpo)"
                     formControlName="can"
-                    (focus)="verificarSecuencia(index_cuerpo); checkDisable('can-', index_cuerpo, true)"
+                    (focus)="verificarSecuencia(index_cuerpo)"
                     (blur)="calcularTotalRow(index_cuerpo); saliDeCantidad(index_cuerpo)"
                     tabindex="-1"
                   />
@@ -103,15 +102,14 @@
               <td class="UNI p-0">
                 <div class="form-group m-0">
                   <input
-                    [ngClass]="{ disabled: !propietario }"
+                    [ngClass]="{ disabled: !propietario || item_cuerpo.controls.from_pre_factura.value }"
                     *ngIf="inputDrop !== 'uni-' + index_cuerpo"
                     type="text"
                     class="form-control entrada"
                     id="uni-{{ index_cuerpo }}"
                     (mouseenter)="setInputDrop(index_cuerpo); llenarArrayUnidades(index_cuerpo); verificarSecuencia(index_cuerpo, false)"
-                    (focus)="setInputDrop(index_cuerpo); llenarArrayUnidades(index_cuerpo); verificarSecuencia(index_cuerpo); checkDisable('uni-', index_cuerpo, true)"
+                    (focus)="setInputDrop(index_cuerpo); llenarArrayUnidades(index_cuerpo); verificarSecuencia(index_cuerpo)"
                     (keyup.enter)="saltar(metodo === 'venta' ? 'cod-' : 'pre-', index_cuerpo)"
-                    (keyup)="checkDisable('uni-', index_cuerpo, true)"
                     (blur)="calcularTotalRow(index_cuerpo)"
                     formControlName="uni"
                     tabindex="-1"
@@ -139,15 +137,7 @@
               <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
               <td class="DES p-0">
                 <div class="form-group m-0">
-                  <input
-                    type="text"
-                    class="form-control entrada inDES disabled"
-                    id="des-{{ index_cuerpo }}"
-                    formControlName="des"
-                    tabindex="-1"
-                    (focus)="checkDisable('des-', index_cuerpo, false)"
-                    (keyup)="checkDisable('des-', index_cuerpo, false)"
-                  />
+                  <input type="text" class="form-control entrada inDES disabled" id="des-{{ index_cuerpo }}" formControlName="des" tabindex="-1" />
                 </div>
               </td>
 
@@ -156,11 +146,11 @@
               <td class="DESC p-0">
                 <div class="form-group m-0">
                   <input
+                    [ngClass]="{ disabled: !propietario || item_cuerpo.controls.from_pre_factura.value }"
                     type="number"
                     class="form-control entrada campoNumeros input_cantidad"
                     id="desc-{{ index_cuerpo }}"
-                    (focus)="verificarSecuencia(index_cuerpo); checkDisable('desc-', index_cuerpo, true)"
-                    (keyup)="checkDisable('desc-', index_cuerpo, true)"
+                    (focus)="verificarSecuencia(index_cuerpo)"
                     (keyup.enter)="enfocarInput('cod-' + (index_cuerpo + 1))"
                     formControlName="descuento_valor"
                     (blur)="calcularDescuento(index_cuerpo)"
@@ -176,13 +166,12 @@
                   <input
                     type="text"
                     (blur)="calcularTotalRow(index_cuerpo); revisarPrecio(index_cuerpo)"
-                    (focus)="$event.target.select(); checkDisable('pre-', index_cuerpo, true)"
+                    (focus)="verificarSecuencia(index_cuerpo)"
                     class="form-control entrada campoNumeros {{ metodo === 'venta' ? 'inPRE' : '' }}"
-                    (keyup)="checkDisable('pre-', index_cuerpo, true)"
                     (keyup.enter)="calcularTotalRow(index_cuerpo); enfocarInput('cod-' + (index_cuerpo + 1))"
                     id="pre-{{ index_cuerpo }}"
                     formControlName="pre"
-                    [ngClass]="{ disabled: readPrecio() }"
+                    [ngClass]="{ disabled: readPrecio() || item_cuerpo.controls.from_pre_factura.value }"
                     tabindex="-1"
                   />
                 </div>
@@ -191,15 +180,7 @@
               <!--  ::::::::::::  TOTAL  ::::::::::::  -->
               <td class="TOT p-0">
                 <div class="form-group m-0">
-                  <input
-                    type="text"
-                    class="form-control entrada inTOT campoNumeros disabled"
-                    id="tot-{{ index_cuerpo }}"
-                    formControlName="tot"
-                    tabindex="-1"
-                    (focus)="checkDisable('tot-', index_cuerpo, false)"
-                    (keyup)="checkDisable('tot-', index_cuerpo, false)"
-                  />
+                  <input type="text" class="form-control entrada inTOT campoNumeros disabled" id="tot-{{ index_cuerpo }}" formControlName="tot" tabindex="-1" />
                   <input type="hidden" [value]="index_cuerpo" formControlName="secuencia" tabindex="-1" />
                 </div>
               </td>

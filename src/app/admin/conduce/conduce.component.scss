@@ -48,65 +48,52 @@
   width: 100vw;
 }
 // ====================================================
-// TAMAÑO DE LOS TITULOS
-// ====================================================
-.COD {
-  max-width: 2rem;
-}
-.CAN {
-  max-width: 1rem;
-}
-.DES {
-  max-width: 7rem;
-}
-.DESC {
-  max-width: 1rem;
-}
-.UNI {
-  max-width: 2rem;
-}
-.PRE {
-  max-width: 2rem;
-}
-.TOT {
-  max-width: 2rem;
-}
-
-// ====================================================
 // TAMAÑO DE LAS FILAS
 // ====================================================
-
-.tiCOD {
-  width: 11.5rem;
+.COD_ {
+  max-width: 2rem;
 }
-.tiCAN {
-  width: 6rem;
-}
-.tiDES {
-  max-width: 3.9rem;
-}
-.tiDESC {
+.CAN_ {
   max-width: 1rem;
-  padding: 0rem 0rem 0.5rem 1rem;
+}
+.DES_ {
+  max-width: 7rem;
+}
+.UNI_ {
+  max-width: 2rem;
 }
 
-.tiUNI {
-  width: 11.3rem;
+// ====================================================
+// TAMAÑO DE LOS TITULOS
+// ====================================================
+
+.tiCOD_ {
+  width: 17%;
 }
 
-.inDES,
-.inUNI {
+.tiCAN_ {
+  width: 8.5%;
+}
+
+.tiUNI_ {
+  width: 16%;
+}
+
+.tiDES_ {
+  width: 58.5%;
+}
+
+
+
+.inDES_ {
   &:hover {
     cursor: default;
   }
 }
 
-.inDES:active,
-.inUNI:active,
-.inDES:focus,
-.inUNI:focus,
-.inDES.active,
-.inUNI.active {
+.inDES_:active,
+.inDES_:focus,
+.inDES_.active {
   outline: 0px;
   border-color: #d4d4d4 !important;
   box-shadow: 1px 1px #d4d4d4 !important;

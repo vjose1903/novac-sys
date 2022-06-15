@@ -111,6 +111,10 @@ export enum medidas {
   Paquete = 'Paquetes',
   Unidad = 'Unidades',
   Saco = 'Sacos',
+  Galon = 'Galones',
+  Onza = 'Onzas',
+  Producto = 'Productos',
+  Funda = 'Fundas',
 }
 
 export class TablaClass {

@@ -14,6 +14,8 @@ import { fun } from '../../core/services/functions.service';
 import { ModalService } from '../components/modal/modal.service';
 import { Permisos } from '../../core/typescript/permisos';
 import { table_config } from '../components/new_tablas/tabla-class';
+import { ConfigI } from '../../core/typescript/config-interface';
+import { SingletonService } from '../../core/services/singleton.service';
 
 @Component({
   selector: 'app-conduce',
@@ -66,13 +68,14 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   permissions = Permisos;
   formPermissions = [Permisos.role.create, Permisos.role.update];
 
+  configApp: ConfigI;
   constructor(private fb: FormBuilder, private pdfServ: PdfService, public mServ: ModalService) {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'conduce', is_routing: true });
-
+    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
@@ -215,41 +218,50 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   llenarRowDespuesDeFiltro(obj) {
-    const ARTICULO = obj.data;
+    const articulo = obj.data;
 
     const index = obj.index;
 
-    if (ARTICULO.existencia == 0) {
+    if (articulo.existencia == 0) {
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
-      if (ARTICULO.descripcion === 'Producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
+      if (articulo.descripcion === 'Producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
       fun.toastError(msg, 'ERROR');
 
-      setTimeout(() => {
-        this.enfocarInput('cod-' + index);
-        this.selectContenido('cod-' + index);
-      }, 0);
-    } else {
-      const cantidades = ARTICULO.cantidades;
-
-      if (ARTICULO.existencia > 0 && ARTICULO.aviso_existencia > cantidades[ARTICULO.medida_alerta]) {
-        let cant_restante = fun.numFormatTwoDecimals(cantidades[ARTICULO.medida_alerta]);
-
-        let msg = `Solo quedan ${cant_restante} ${ARTICULO.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
-
-        if (ARTICULO.descripcion === 'Producto terminado') msg = `Solo quedan ${cant_restante} ${ARTICULO.medida_alerta} de este producto, debe de producir mas!!!`;
-        fun.toastWarning(msg, 'AVISO');
+      if (this.configApp.vende_sin_inventario) {
+        this.continuarLlenarRow({ articulo: articulo, index: index });
+      } else {
+        setTimeout(() => {
+          this.enfocarInput('cod-' + index);
+          this.selectContenido('cod-' + index);
+        }, 0);
       }
-
-      (this.filasDetalle[index] as any).controls['articulo'].setValue(ARTICULO);
-      (this.filasDetalle[index] as any).controls['cod'].setValue(ARTICULO.codigo);
-      (this.filasDetalle[index] as any).controls['des'].setValue(ARTICULO.nombre);
-      (this.filasDetalle[index] as any).controls['can'].setValue(null);
-      (this.filasDetalle[index] as any).controls['can_ant'].setValue(null);
-      (this.filasDetalle[index] as any).controls['uni'].setValue(null);
-
-      setTimeout(() => this.enfocarInput('can-' + index), 0);
+    } else {
+      this.continuarLlenarRow({ articulo: articulo, index: index });
     }
+  }
+
+  continuarLlenarRow(params: { articulo: any; index: number }) {
+    const cantidades = params.articulo.cantidades;
+
+    if (params.articulo.existencia > 0 && params.articulo.aviso_existencia > cantidades[params.articulo.medida_alerta]) {
+      let cant_restante = fun.numFormatTwoDecimals(cantidades[params.articulo.medida_alerta]);
+
+      let msg = `Solo quedan ${cant_restante} ${params.articulo.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
+
+      if (params.articulo.descripcion === 'Producto terminado') msg = `Solo quedan ${cant_restante} ${params.articulo.medida_alerta} de este producto, debe de producir mas!!!`;
+      fun.toastWarning(msg, 'AVISO');
+    }
+
+    (this.filasDetalle[params.index] as any).controls['articulo'].setValue(params.articulo);
+    (this.filasDetalle[params.index] as any).controls['cod'].setValue(params.articulo.codigo);
+    (this.filasDetalle[params.index] as any).controls['des'].setValue(params.articulo.nombre);
+    (this.filasDetalle[params.index] as any).controls['can'].setValue(null);
+    (this.filasDetalle[params.index] as any).controls['can_ant'].setValue(null);
+    (this.filasDetalle[params.index] as any).controls['uni'].setValue(null);
+    (this.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
+
+    setTimeout(() => this.enfocarInput('can-' + params.index), 0);
   }
 
   async llenarArrayUnidades(index) {
@@ -364,19 +376,18 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           if (excede) {
             fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
 
-            // proceso_quitar_articulo
-
-            setTimeout(() => {
-              this.enfocarInput('can-' + i);
-              this.selectContenido('can-' + i);
-              if (!_.includes(this.rowsExcede, i)) {
+            if (this.configApp.vende_sin_inventario) {
+              callback(false);
+            } else {
+              setTimeout(() => {
+                this.enfocarInput('can-' + i);
+                this.selectContenido('can-' + i);
                 this.calcularCantidadEnUnidades({ index: i, clean: true });
                 (this.filasDetalle[i] as any).controls['uni'].setValue(null);
                 (this.filasDetalle[i] as any).controls['can_ant'].setValue(null);
-              }
-            }, 250);
-
-            callback(true);
+              }, 250);
+              callback(true);
+            }
           } else {
             callback(false);
           }
@@ -469,6 +480,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       can_original: [0],
       cantidad_en_unidades: [null],
       secuencia: [i],
+      vende_sin_inventario: [false],
     });
   }
 
@@ -699,6 +711,8 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
         (this.filasDetalle[i] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
         (this.filasDetalle[i] as any).controls['articulo'].setValue(articulo);
 
+        (this.filasDetalle[i] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
+
         (this.filasDetalle[i] as any).controls['des'].setValue(articulo.nombre);
         let uni = '';
 
@@ -782,7 +796,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       this.CuerpoConduce = [];
       for (let i = 0; i < filas_ocupadas.length; i++) {
         const fila = filas_ocupadas[i].getRawValue();
-        const detalle = _.pick(fila, ['detalle_factura_id', 'articulo.id', 'can', 'cantidad_en_unidades', 'uni', 'id']);
+        const detalle = _.pick(fila, ['detalle_factura_id', 'articulo.id', 'can', 'cantidad_en_unidades', 'uni', 'id', 'vende_sin_inventario']);
 
         let detalle_parsed = fun.remplaceKeyFromJson(detalle, [
           { old_key: 'can', new_key: 'cantidad' },

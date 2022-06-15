@@ -1,6 +1,7 @@
 {
-  "name": "adm-agroindustrial",
-  "version": "1.0.2",
+  "name": "novac-system",
+  "productName": "NOVAC - AGRODEMI",
+  "version": "1.0.3",
   "description": "Sistema facturacion e inventario NOVAC, Para AGRODEMI",
   "author": {
     "name": "Victor Jose Vásquez Santos",
@@ -21,7 +22,7 @@
     "electron:local": "npm run build:prod && npx electron .",
     "electron:build": "npm run build:prod && electron-builder build",
     "electron:windows64": "tsc -p tsconfig.serve.json && npm run build:prod && electron-builder build --windows --x64",
-    "electron:solo": "electron-builder build --windows --x64",
+    "electron:solo": "tsc -p tsconfig.serve.json && electron-builder build --windows --x64",
     "test": "ng test --watch=false",
     "test:watch": "ng test",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",

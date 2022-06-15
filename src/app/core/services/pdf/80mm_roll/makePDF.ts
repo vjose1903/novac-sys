@@ -5,15 +5,20 @@ import { SingletonService } from '../../singleton.service';
 import { ConfigI } from '../../../typescript/config-interface';
 import { getContentWithTablaNormal } from '../tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
-import { config_ventas } from '../8.5x5.5/configuraciones/ventas';
-import { config_recibo_ingreso } from '../8.5x5.5/configuraciones/recibo_ingreso';
-import { config_conduce } from '../8.5x5.5/configuraciones/conduce';
-import { config_cuadre_caja } from '../8.5x5.5/configuraciones/cuadre_caja';
+import { config_ventas } from './configuraciones/ventas';
+import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
+import { config_conduce } from './configuraciones/conduce';
+import { config_cuadre_caja } from './configuraciones/cuadre_caja';
+import { config_pre_factura } from './configuraciones/pre_factura';
+import { fun } from '../../functions.service';
+import { config_notas } from './configuraciones/notas';
 
 const configuraciones = {
+  pre_factura: config_pre_factura,
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
   conduce: config_conduce,
+  notas: config_notas,
   cuadre_caja: config_cuadre_caja,
 };
 
@@ -26,9 +31,9 @@ export function makePDF(data, file_name, tipo_pdf?) {
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
 
   const dd = {
-    pageSize: { width: 302, height: 'auto' },
+    pageSize: { width: 200, height: 'auto' },
     pageOrientation: 'portrait',
-    pageMargins: [20, 40, 20, 20],
+    pageMargins: [10, 20, 10, 20],
     content: contenidoPDF(data, is_suplidor, configApp, tipo_pdf),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
@@ -36,6 +41,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
     },
     styles: styles_,
   };
+  console.log("dd ", JSON.stringify(dd));
 
   const obj = { doc: dd, file: file_name, type: 'file' };
   return obj;
@@ -46,7 +52,9 @@ export function makePDF(data, file_name, tipo_pdf?) {
 // ==========================================================================================================================================================
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
+  fun.logPurple('tipo_pdf => ', tipo_pdf);
   const configuration = configuraciones[tipo_pdf];
+  console.log('configuration ', configuration);
 
   data.tipo_tabla = 'normal';
 
@@ -58,67 +66,67 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
       stack: [
         {
           image: 'logo',
-          fit: [220, 220],
+          fit: [120, 120],
           // "width": 220,
         },
         {
           text: configApp.nombre_empresa,
           bold: true,
-          style: 'letra17',
+          style: 'letra13',
           margin: [0, 10, 0, 0],
         },
         {
           text: configApp.direccion_empresa,
           bold: false,
-          style: 'letra11',
+          style: 'letra8',
           margin: [0, 5, 0, 0],
         },
         {
           alignment: 'center',
           margin: [0, 3, 0, 0],
           text: [
-            { text: 'Telefono: ', bold: true, style: 'letra11' },
-            { text: configApp.telefono_empresa, style: 'letra11' },
-            { text: ' RNC: ', bold: true, style: 'letra11' },
-            { text: configApp.rnc_empresa, style: 'letra11' },
+            { text: 'Telefono: ', bold: true, style: 'letra8' },
+            { text: configApp.telefono_empresa, style: 'letra8' },
+            { text: ' RNC: ', bold: true, style: 'letra8' },
+            { text: configApp.rnc_empresa, style: 'letra8' },
           ],
         },
         // ---------- DATOS DE LA FACTURA -----------
         {
-          margin: [-10, 20, 0, 0],
+          margin: [0, 10, 0, 0],
           stack: [...parseInfoFactura(data, tipo_pdf)],
         },
         // ---------- DATOS DEL PROPIETARIO ----------
         {
-          margin: [-10, 20, 0, 0],
+          margin: [0, 10, 0, 0],
 
           stack: [...parseInfoPropietario(data, tipo_pdf, is_suplidor)],
         },
         {
           margin: [0, 20, 0, 0],
-          canvas: [{ type: 'rect', x: 0, y: 0, w: 300, h: 1, color: '#000000' }],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 180, h: 1, color: '#000000' }],
         },
         // ---------- TIPO PDF ----------
         {
           alignment: 'center',
           margin: [0, 5, 0, 5],
           text: data.tipo_pdf,
-          style: 'letra12',
+          style: 'letra9',
           bold: true,
         },
         {
           margin: [0, 0, 0, 0],
-          canvas: [{ type: 'rect', x: 0, y: 0, w: 300, h: 1, color: '#000000' }],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 180, h: 1, color: '#000000' }],
         },
         {
           margin: [0, 5, 0, 0],
-          canvas: [{ type: 'rect', x: 0, y: 0, w: 300, h: 2, color: '#000000' }],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 180, h: 2, color: '#000000' }],
         },
         // ---------- TABLA ----------
         ...tabla_detalles,
 
         {
-          margin: [-19, 0, -19, 0],
+          margin: [0, 0, 0, 0],
           layout: 'noBorders',
           table: {
             headerRows: 0,
@@ -134,16 +142,16 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
   if (cierrePdf['usuario'].includes(tipo_pdf)) {
     content[0].stack.push({
       alignment: 'left',
-      margin: [-10, 30, 0, 0],
+      margin: [0, 20, 0, 0],
       text: [
-        { text: 'Realizado por: ', bold: true, style: 'letra11' },
-        { text: data.usuario, style: 'letra11' },
+        { text: 'Realizado por: ', bold: true, style: 'letra8' },
+        { text: data.usuario, style: 'letra8' },
       ],
     } as any);
   }
 
   // -------- BARCODE --------
-  if (cierrePdf['barcode'].includes(tipo_pdf)) content[0].stack.push({ margin: [0, 20, 0, 0], image: 'barcode', width: 295, height: 70 } as any);
+  if (cierrePdf['barcode'].includes(tipo_pdf)) content[0].stack.push({ margin: [0, 15, 0, 0], image: 'barcode', width: 182, height: 50 } as any);
 
   return content;
 }
@@ -156,36 +164,36 @@ function parseResumen(data, tipo_pdf) {
     {
       key: 'bruto',
       item: [
-        { text: 'BRUTO:', bold: true, alignment: 'left', style: 'letra10', margin: [10, 0, 0, 0] },
-        { text: fun_.numFormatTwoDecimals(data.Bruto), alignment: 'right', style: 'letra10', bold: true, margin: [0, 0, 10, 0] },
+        { text: 'BRUTO:', bold: true, alignment: 'left', style: 'letra8', margin: [0, 0, 0, 0] },
+        { text: fun_.numFormatTwoDecimals(data.Bruto), alignment: 'right', style: 'letra8', bold: true, margin: [0, 0, 5, 0] },
       ],
     },
     {
       key: 'descuento',
       item: [
-        { text: 'DESCUENTO:', bold: true, alignment: 'left', style: 'letra10', margin: [10, 0, 0, 0] },
-        { text: fun_.numFormatTwoDecimals(data.descuento), alignment: 'right', style: 'letra10', bold: true, margin: [0, 0, 10, 0] },
+        { text: 'DESCUENTO:', bold: true, alignment: 'left', style: 'letra8', margin: [0, 0, 0, 0] },
+        { text: fun_.numFormatTwoDecimals(data.descuento), alignment: 'right', style: 'letra8', bold: true, margin: [0, 0, 5, 0] },
       ],
     },
     {
       key: 'total',
       item: [
-        { text: 'TOTAL A PAGAR:', bold: true, fillColor: '#d8d8d8', alignment: 'left', style: 'letra10', margin: [10, 0, 0, 0] },
-        { text: fun_.numFormatTwoDecimals(data.total), alignment: 'right', fillColor: '#d8d8d8', style: 'letra10', bold: true, margin: [0, 0, 10, 0] },
+        { text: 'TOTAL A PAGAR:', bold: true, fillColor: '#d8d8d8', alignment: 'left', style: 'letra8', margin: [0, 0, 0, 0] },
+        { text: fun_.numFormatTwoDecimals(data.total), alignment: 'right', fillColor: '#d8d8d8', style: 'letra8', bold: true, margin: [0, 0, 5, 0] },
       ],
     },
     {
       key: 'efectivo',
       item: [
-        { text: 'EFECTIVO', bold: true, alignment: 'left', style: 'letra10', margin: [10, 0, -5, 0] },
-        { text: fun_.numFormatTwoDecimals(data.total + data.devuelta), bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: 'EFECTIVO', bold: true, alignment: 'left', style: 'letra8', margin: [0, 0, -5, 0] },
+        { text: fun_.numFormatTwoDecimals(data.total + data.devuelta), bold: true, alignment: 'right', style: 'letra8', margin: [0, 0, 5, 0] },
       ],
     },
     {
       key: 'cambio',
       item: [
-        { text: 'CAMBIO', alignment: 'left', style: 'letra10', margin: [10, 0, -5, 0] },
-        { text: fun_.numFormatTwoDecimals(data.devuelta), alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: 'CAMBIO', alignment: 'left', style: 'letra8', margin: [0, 0, -5, 0] },
+        { text: fun_.numFormatTwoDecimals(data.devuelta), alignment: 'right', style: 'letra8', margin: [0, 0, 5, 0] },
       ],
     },
   ];
@@ -208,8 +216,8 @@ function parseInfoFactura(data, tipo_pdf) {
       item: {
         alignment: 'left',
         text: [
-          { text: 'NCF                     : ', bold: true, style: 'letra10' },
-          { text: data.numero_comprobante || '', style: 'letra10' },
+          { text: 'NCF                     : ', bold: true, style: 'letra8' },
+          { text: data.numero_comprobante || '', style: 'letra8' },
         ],
       },
     },
@@ -218,8 +226,8 @@ function parseInfoFactura(data, tipo_pdf) {
       item: {
         alignment: 'left',
         text: [
-          { text: 'No. Documento : ', bold: true, style: 'letra10' },
-          { text: fun_.my_padStart(data.numero_documento || '', 8, '0'), style: 'letra10' },
+          { text: 'No. Documento : ', bold: true, style: 'letra8' },
+          { text: fun_.my_padStart(data.numero_documento || '', 8, '0'), style: 'letra8' },
         ],
       },
     },
@@ -229,8 +237,8 @@ function parseInfoFactura(data, tipo_pdf) {
       item: {
         alignment: 'left',
         text: [
-          { text: 'Fecha                  : ', style: 'letra10' },
-          { text: `${fun_.my_dateFormater(data.fecha || '')} - ${fun_.my_houreFormater(data.fecha || '')}`, style: 'letra10' },
+          { text: 'Fecha                  : ', style: 'letra8' },
+          { text: `${fun_.my_dateFormater(data.fecha || '')} - ${fun_.my_houreFormater(data.fecha || '')}`, style: 'letra8' },
         ],
       },
     },
@@ -239,8 +247,18 @@ function parseInfoFactura(data, tipo_pdf) {
       item: {
         alignment: 'left',
         text: [
-          { text: 'Condición           : ', bold: true, style: 'letra10' },
-          { text: fun_.my_capitalize(data.condicion || ''), style: 'letra10' },
+          { text: 'Condición           : ', bold: true, style: 'letra8' },
+          { text: fun_.my_capitalize(data.condicion || ''), style: 'letra8' },
+        ],
+      },
+    },
+    {
+      key: 'valida',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'Válida Hasta       : ', bold: true, style: 'letra8' },
+          { text: data.tipo_factura_id == 3 ? 'No aplica.' : fun_.my_dateFormater(data?.fecha_valida), style: 'letra8' },
         ],
       },
     },
@@ -278,8 +296,8 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
       item: {
         alignment: 'left',
         text: [
-          is_suplidor ? { text: 'Suplidor               : ', bold: true, style: 'letra10' } : { text: 'Cliente                : ', bold: true, style: 'letra10' },
-          is_suplidor ? { text: data.suplidor.nombre || '', style: 'letra10' } : { text: `${data.cliente.nombre || ''} ${data.cliente.apellido || ''}`, style: 'letra10' },
+          is_suplidor ? { text: 'Suplidor               : ', bold: true, style: 'letra8' } : { text: 'Cliente                : ', bold: true, style: 'letra8' },
+          is_suplidor ? { text: data.suplidor.nombre || '', style: 'letra8' } : { text: `${data.cliente.nombre || ''} ${data.cliente.apellido || ''}`, style: 'letra8' },
         ],
       },
     },
@@ -287,17 +305,14 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
       key: 'doc_identidad',
       item: {
         alignment: 'left',
-        text: [{ text: 'Doc. identidad   : ', bold: true, style: 'letra10' }, is_suplidor ? { text: data.suplidor.rnc || '', style: 'letra10' } : { text: data.cliente.rnc || '', style: 'letra10' }],
+        text: [{ text: 'Doc. identidad   : ', bold: true, style: 'letra8' }, is_suplidor ? { text: data.suplidor.rnc || '', style: 'letra8' } : { text: data.cliente.rnc || '', style: 'letra8' }],
       },
     },
     {
       key: 'telefono',
       item: {
         alignment: 'left',
-        text: [
-          { text: 'Telefono             : ', bold: true, style: 'letra10' },
-          is_suplidor ? { text: data.suplidor.telefono || '', style: 'letra10' } : { text: data.cliente.telefono || '', style: 'letra10' },
-        ],
+        text: [{ text: 'Telefono             : ', bold: true, style: 'letra8' }, is_suplidor ? { text: data.suplidor.telefono || '', style: 'letra8' } : { text: data.cliente.telefono || '', style: 'letra8' }],
       },
     },
   ];

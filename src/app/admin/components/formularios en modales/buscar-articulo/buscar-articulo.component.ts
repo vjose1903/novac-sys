@@ -43,7 +43,8 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
   async buscarArticulos(params?: { per_page: number; page: number; search: string }, where?) {
     let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : params.search || ' ';
 
-    const is_compra = this.inputs.metodo === 'compra' ? true : false;
+    const is_compra = this.inputs.metodo === 'compra';
+
 
     try {
       const res = await this.articuloClass

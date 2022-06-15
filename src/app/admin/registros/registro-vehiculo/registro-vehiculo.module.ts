@@ -7,6 +7,7 @@ import { NewTablasModule } from '../../components/new_tablas/tablas.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { PrimengModule } from '../../../modules/primeng.module';
 
 @NgModule({
   declarations: [RegistroVehiculoComponent],
@@ -17,6 +18,7 @@ import { NgxPermissionsModule } from 'ngx-permissions';
     ReactiveFormsModule,
     FormsModule,
     NgSelectModule,
+    PrimengModule,
     // TODO: quitar el ngSelect de aqui cuando se sustituya el ng select del html
     NgxPermissionsModule.forChild(),
   ],

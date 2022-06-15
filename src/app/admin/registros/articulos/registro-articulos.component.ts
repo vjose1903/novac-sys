@@ -55,6 +55,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   vendidoEn = [
     { backend: 'Unidad', front: 'Unidad' },
     { backend: 'Saco', front: 'Saco' },
+    { backend: 'Galon', front: 'Galón' },
+    { backend: 'Funda', front: 'Funda' },
   ];
 
   fechaFactura: string;
@@ -66,7 +68,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   table_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '11%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '12%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
       { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }] },
       { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
       { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', estilos: [{ width: '20%' }] },
@@ -148,7 +150,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
       res.data.map(async (arti) => {
         arti.customStyles = {
-          codigo: { width: '11%' },
+          codigo: { width: '12%' },
           nombre: { width: '37%', 'text-align': 'left', 'padding-left': '0.5rem' },
           medida: { width: '13%' },
           precio_principal: { width: '20%' },
@@ -162,6 +164,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   ngOnChanges() {
     this.cdRef.detectChanges();
+  }
+  showContenido(value) {
+    const array = ['Caja', 'Saco', 'Galon', 'Funda', 'Producto'];
+    return array.includes(value);
   }
 
   revisarPrecio(id) {
@@ -190,23 +196,28 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.form.controls.is_materia_prima.setValue(this.articuloSelected ? this.articuloSelected.is_materia_prima : false);
     }
 
-    if (tipo_check !== 'producto terminado' && tipo_check !== 'materia prima') this.form.controls.calcular_saco.setValue(false);
-
     if (tipo_check == 'producto terminado') {
       await this.getMateriasP().then((res) => {
         this.addItem();
-        this.resetCompradoEn('Quintal');
-        this.fillDropAlerta('Quintal');
+        this.resetCompradoEn('Producto');
         this.is_combo = true;
+
+        // TODO: ver como le hago aqui para que esto funcione
         this.form.controls.medida.setValue('Quintal');
         this.form.controls.calcular_saco.setValue(true);
         if (fun.hasValue(this.form)) this.form.controls.costo_principal.reset(null);
         if (fun.hasValue(this.form)) this.form.controls.precio_principal.reset(null);
+
+        // this.form.controls.medida.setValue('Producto');
+        // this.form.controls.costo_principal.reset(null);
+        // this.form.controls.precio_principal.reset(null);
       });
     } else {
       this.resetArray();
       this.is_combo = false;
     }
+
+    this.form.controls.calcular_saco.setValue(false);
   }
 
   capitalice(control, arg) {
@@ -318,6 +329,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       fun.toastWarning('Solo se le puede calcular el saco a los productos comprados en Quintal o Libra');
       this.form.controls.calcular_saco.setValue(false);
     }
+
     this.fillDropAlerta(value);
   }
 
@@ -354,21 +366,55 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     control.removeAt(i);
   }
 
+  checkCostoFormula(fila) {
+    let res = false;
+    const fila_formulario = fun.duplicarJson(fila.value);
+    const articulo = this.listaMateriasPrimas.find((val) => Number(val.id) === Number(fila_formulario.articulo_id));
+
+    if (fila_formulario.costo_formula && fun.hasValue(articulo)) {
+      const arrayUnidades = ['Unidad', 'Libra', 'Onza'];
+      let costo_en_turno;
+      let costo;
+      for (const unidad_en_turno of arrayUnidades) {
+        if (fun.hasValue(articulo.costos[unidad_en_turno])) {
+          costo_en_turno = articulo.costos[unidad_en_turno];
+          costo = fun.numFormatTwoDecimals(costo_en_turno.costo);
+        }
+      }
+
+      if (fun.desformatear(costo) != fun.desformatear(fila_formulario.costo_formula)) {
+        res = true;
+        setTimeout(() => (this.recalcular = true), 10);
+      }
+    }
+
+    return res;
+  }
+
   async getCosto(index, dropdown) {
     const control = this.form.controls['rowFormula'] as FormArray;
-
+    const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
+    const arrayUnidades = Object.keys(unidades);
     (control.controls[index] as any).controls['costo_formula'].setValue(null);
 
     let extra = { afterPath: '', parameters: { costos: true } };
 
     this.articuloClass.getOne(control.value[index].articulo_id, extra).then((res) => {
-      const costos = res.data.costos.Libra || res.data.costos.Unidad;
-      const medida = fun.hasValue(res.data.costos.Unidad) ? 'Und.' : 'Lbs.';
+      let costo_en_turno;
+      let medida_en_turno;
+      for (const unidad_en_turno of arrayUnidades) {
+        if (fun.hasValue(res.data.costos[unidad_en_turno])) {
+          costo_en_turno = res.data.costos[unidad_en_turno];
+          medida_en_turno = unidades[unidad_en_turno];
+        }
+      }
 
-      (control.controls[index] as any).controls['medida_formula'].setValue(medida);
+      console.log('res.data ', res.data);
 
-      (control.controls[index] as any).controls['costo_formula'].setValue(fun.numFormatTwoDecimals(costos.costo));
-      (control.controls[index] as any).controls['precio_formula'].setValue(fun.numFormatTwoDecimals(costos.precio));
+      (control.controls[index] as any).controls['medida_formula'].setValue(medida_en_turno);
+
+      (control.controls[index] as any).controls['costo_formula'].setValue(fun.numFormatTwoDecimals(costo_en_turno.costo));
+      (control.controls[index] as any).controls['precio_formula'].setValue(fun.numFormatTwoDecimals(costo_en_turno.precio));
 
       this.calculateCostoPT();
       dropdown.hide();
@@ -528,6 +574,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     else if (medida == 'Saco') this.optionsAlerta = ['Saco', 'Libra'];
     else if (medida == 'Caja') this.optionsAlerta = ['Caja', 'Paquete', 'Unidad'];
     else if (medida == 'Unidad') this.optionsAlerta = ['Unidad'];
+    else if (medida == 'Galon') this.optionsAlerta = ['Galon', 'Onza'];
+    else if (medida == 'Producto') this.optionsAlerta = ['Producto', 'Unidad'];
   }
 
   seleccionarContenidoCaja() {
@@ -539,26 +587,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     } else {
       this.articulo_no_paquete = false;
     }
-  }
-
-  checkCostoFormula(fila) {
-    let res = false;
-
-    const fila_formulario = fun.duplicarJson(fila.value);
-
-    const articulo = this.listaMateriasPrimas.find((val) => Number(val.id) === Number(fila_formulario.articulo_id));
-
-    if (fila_formulario.costo_formula && fun.hasValue(articulo)) {
-      const costo_temp = fun.hasValue(articulo.costos.Unidad) ? articulo.costos.Unidad.costo : articulo.costos.Libra.costo;
-      const costo = fun.numFormatTwoDecimals(costo_temp);
-
-      if (fun.desformatear(costo) !== fun.desformatear(fila_formulario.costo_formula)) {
-        res = true;
-        setTimeout(() => (this.recalcular = true), 10);
-      }
-    }
-
-    return res;
   }
 
   async recalcularFunc() {
@@ -583,21 +611,31 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(ingredient.articulo_combo));
 
     try {
-      const costo = materiaPrima?.costos?.Libra?.costo || materiaPrima?.costos?.Unidad?.costo;
-      const precio = materiaPrima?.costos?.Libra?.precio || materiaPrima?.costos?.Unidad?.precio;
+      const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
+      const arrayUnidades = Object.keys(unidades);
 
-      const medida = fun.hasValue(materiaPrima.costos.Unidad) ? 'Und.' : 'Lbs.';
+      let costo_en_turno;
+      let precio_en_turno;
+      let medida_en_turno;
+      for (const unidad_en_turno of arrayUnidades) {
+        if (fun.hasValue(materiaPrima.costos[unidad_en_turno])) {
+          costo_en_turno = materiaPrima.costos[unidad_en_turno].costo;
+          precio_en_turno = materiaPrima.costos[unidad_en_turno].precio;
+          medida_en_turno = unidades[unidad_en_turno];
+        }
+      }
+
       const control_en_turno = (control.controls[i] as any).controls;
 
       if (recalcular) {
-        control_en_turno['costo_formula'].setValue(fun.numFormatTwoDecimals(costo));
-        control_en_turno['precio_formula'].setValue(fun.numFormatTwoDecimals(precio));
+        control_en_turno['costo_formula'].setValue(fun.numFormatTwoDecimals(costo_en_turno));
+        control_en_turno['precio_formula'].setValue(fun.numFormatTwoDecimals(precio_en_turno));
       } else {
         control_en_turno['costo_formula'].setValue(fun.numFormatTwoDecimals(ingredient.costo));
         control_en_turno['precio_formula'].setValue(fun.numFormatTwoDecimals(ingredient.precio));
       }
 
-      control_en_turno['medida_formula'].setValue(medida);
+      control_en_turno['medida_formula'].setValue(medida_en_turno);
       control_en_turno['articulo_id'].setValue(ingredient.articulo_combo);
       control_en_turno['id'].setValue(ingredient.id || null);
 
@@ -622,14 +660,16 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.TIPOARTICULO = articulo.descripcion;
     this.is_combo = articulo.is_combo;
 
+    console.log('articulo ', articulo);
+
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
       this.COMPRADOEN = 'Quintal';
       this.form.controls.otros_costos.setValue(fun.numFormatTwoDecimals(articulo.otros_costos));
       const res = await this.getMateriasP();
 
       if (articulo.formulas_productos_terminados.length) {
-        this.form.controls.medida.setValue('Quintal');
-        this.fillDropAlerta('Quintal');
+        this.form.controls.medida.setValue('Producto');
+        this.resetCompradoEn('Producto');
 
         for (let i = 0; i < articulo.formulas_productos_terminados.length; i++) {
           const ingredient = articulo.formulas_productos_terminados[i];
@@ -679,6 +719,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.form.controls.tipo_articulo_id.setValue(articulo['tipo_articulo_id']);
     this.form.controls.costo_principal.setValue(fun.numFormatTwoDecimals(articulo.costo_principal));
     this.form.controls.precio_principal.setValue(fun.numFormatTwoDecimals(articulo.precio_principal));
+    this.form.controls.medida_alerta.setValue(articulo.medida_alerta);
   }
 
   nuevoRegistro() {
@@ -695,8 +736,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       articulo_id: formulario.id,
       id: formulario.id_contenido_padre,
       costo: _.isString(formulario.costo_padre) ? parseFloat(formulario.costo_padre) : formulario.costo_padre,
-      precio: fun.desformatear(formulario.medida === 'Caja' || formulario.medida === 'Saco' ? formulario.precio_padre : formulario.precio_libra),
-      cantidad: formulario.medida === 'Caja' || formulario.medida === 'Saco' ? formulario.cantidad_contenido_padre : 100,
+      precio: fun.desformatear(['Caja', 'Saco', 'Producto','Galon'].includes(formulario.medida) ? formulario.precio_padre : formulario.precio_libra),
+      cantidad: ['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.cantidad_contenido_padre : 100,
       medida: formulario.medida_contenido_padre,
       condicion: 'padre',
     };
@@ -737,7 +778,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   formarFormula() {
     const array = this.ARRAY_FORMULA.value;
     const formulas = [];
-
+    const unidades = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onza' };
     array.forEach((element) => {
       const obj = {
         id: _.parseInt(element.id ? element.id : null),
@@ -745,7 +786,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         cantidad: fun.desformatear(element.cantidad_formula),
         costo: fun.desformatear(element.costo_formula),
         precio: fun.desformatear(element.precio_formula),
-        medida: element.medida_formula == 'Und.' ? 'Unidad' : 'Libra',
+        medida: unidades[element.medida_formula],
         // _destroy: element._destroy ? element._destroy : null,
       };
       formulas.push(obj);
@@ -801,10 +842,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     if (obj.is_combo || (array && array.length)) {
       obj['is_combo'] = true;
-      obj['vendido_en'] = 'Saco';
       obj['otros_costos'] = formulario.otros_costos;
       obj['formulas_productos_terminados'] = this.formarFormula();
     }
+
+    console.log("obj ", obj);
+
 
     this.articuloClass.createUpdateOne(obj).then((res) => {
       this.necesarioStart();

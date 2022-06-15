@@ -4,7 +4,7 @@
 <div class="cardPrincipal sinPadding tamano" style="position: relative">
   <div class="cabezaFactura">
     <div class="row">
-      <div class="col-3 divRight pl-0">
+      <div *ngIf="metodo != 'pre-venta'" class="col-3 divRight pl-0">
         <div class="row">
           <div class="col-3 p-0">
             <span class="titulos"><strong>Tipo:</strong></span>
@@ -12,7 +12,7 @@
               placement="right"
               triggers="focus"
               type="text"
-              (keydown.enter)="saltar('condicion', tipoFact.value)"
+              (keydown.enter)="saltar('tipo', tipoFact.value)"
               class="form-control tipo inputE"
               [(ngModel)]="tipoFactura"
               id="tipoFact"
@@ -32,8 +32,9 @@
             <span class="titulos"><strong>Condición:</strong></span>
 
             <select
+              #condicionInput
               id="condicion"
-              (keydown.enter)="saltar(metodo === 'compra' ? 'costo' : 'venta', $event.target.value, $event.target.id)"
+              (keydown.enter)="saltar($event.target.id, condicionInput.value)"
               class="form-control inputE"
               [(ngModel)]="condicion_fact"
               (change)="cambiarTipoVenta($event.target.value)"
@@ -49,14 +50,14 @@
           <div *ngIf="metodo === 'compra'" class="col-3 pr-0">
             <span class="titulos"><strong>Gasto:</strong></span>
             <input
+              #gastoDe
+              id="gastoDe"
               placement="right"
               triggers="focus"
               type="text"
-              (keydown.enter)="saltar('pago', costo.value)"
+              (keydown.enter)="saltar($event.target.id, gastoDe.value)"
               class="form-control tipo inputE"
               [(ngModel)]="CostoYgasto"
-              id="costo"
-              #costo
               [readOnly]="!!factura_a_editar"
               [ngClass]="{ disabled: !!factura_a_editar }"
               (focus)="gastosFacturas.toggle($event)"
@@ -73,7 +74,7 @@
           <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
           <select
             id="venta"
-            (keydown.enter)="saltar(modo_factura == 'normal' && condicion_fact == 'Contado' ? 'nom' : modo_factura == 'viaje' ? 'fecha_viaje' : 'buscarCliente', $event.target.value, $event.target.id)"
+            (keydown.enter)="saltar(modo_factura == 'normal' ? (condicion_fact == 'Contado' ? 'numero_pre_factura' : 'nom') : 'nom', $event.target.value, $event.target.id)"
             (change)="selectModoFactura($event.target.value)"
             class="form-control inputE"
             [(ngModel)]="modo_factura"
@@ -84,10 +85,27 @@
           >
             <option value="" disabled selected>Modo de venta</option>
             <option value="normal">Normal</option>
-            <option value="viaje">Viaje</option>
-            <option *ngIf="condicion_fact === 'Contado'" value="adelantada">Adelantada</option>
+            <option *ngxPermissionsOnly="permissions.factura_venta.seleccionar_camion_en_facturacion" value="viaje">Viaje</option>
+            <!-- <option *ngIf="condicion_fact === 'Contado'" value="adelantada">Adelantada</option> -->
           </select>
         </div>
+
+        <ng-container *ngxPermissionsOnly="permissions.pre_venta.create">
+          <div *ngIf="modo_factura === 'normal' && metodo === 'venta' && condicion_fact == 'Contado'">
+            <span class="mt-1"><strong>No. Pre-factura:</strong></span>
+
+            <p-inputMask
+              (keydown.enter)="saltar('buscar_pre_factura', $event.target.value, $event.target.id)"
+              [(ngModel)]="numero_pre_factura"
+              mask="99999999"
+              tabindex="-1"
+              styleClass="form-control inputE"
+              inputId="numero_pre_factura"
+              placeholder="________"
+              [autoClear]="false"
+            ></p-inputMask>
+          </div>
+        </ng-container>
 
         <div *ngIf="modo_factura === 'viaje'">
           <span class="mt-1"><strong>Fecha viaje:</strong></span>
@@ -132,7 +150,7 @@
                 <ul class="overlayCamion" role="menu">
                   <li id="overlayCamion-{{ index_camion }}" *ngFor="let camion of camiones; let index_camion = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: camion_row == index_camion }">
                     <div class="d-flex justify-content-between align-items-center">
-                      <span id="dropdown-item" class="mr-3"> {{ getCamionLabel(camion) }} </span>
+                      <span id="dropdown-item" class="mr-3 mb-0"> {{ getCamionLabel(camion) }} </span>
                       <input class="apple-switch" [ngClass]="{ disabled: action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion)" [checked]="checkCamionIsSelected(camion)" />
                     </div>
                   </li>
@@ -151,24 +169,27 @@
           <span class="mt-2"><strong>Número comprobante:</strong></span>
 
           <p-inputMask
-            (keydown.enter)="saltar(condicion_fact === 'Crédito' ? 'fecha_vencimiento' : 'filtro', $event.target.value, $event.target.id)"
+            inputId="ncf"
+            (keydown.enter)="saltar($event.target.id, $event.target.value)"
             [(ngModel)]="NCFcompra"
             mask="B9999999999"
             tabindex="-1"
             styleClass="form-control inputE UPPERCASE"
-            inputId="ncf"
             placeholder="B__________"
+            [autoClear]="false"
+            (blur)="checkNumeroPreFactura()"
           ></p-inputMask>
 
           <div *ngIf="condicion_fact === 'Crédito'">
             <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
             <input
+              #fecha_vencimiento_input
+              id="fecha_vencimiento"
               type="text"
-              (keydown.enter)="saltar('filtro', $event.target.value)"
+              (keydown.enter)="saltar('fecha_vencimiento', fecha_vencimiento_input.value)"
               [bsConfig]="dpConfig"
               placeholder="mm/dd/aaaa"
               class="form-control inputE"
-              id="fecha_vencimiento"
               [(ngModel)]="fecha_vencimiento"
               #dp="bsDatepicker"
               placement="bottom"
@@ -176,18 +197,17 @@
               tabindex="-1"
             />
           </div>
-          <!-- (ngModelChange)="enfocarInput('fecha_vencimiento')" -->
         </div>
       </div>
       <!-- ======================================================================================================================================================================== -->
       <!-- ======================================================================================================================================================================== -->
-      <div class="col-5 divRight">
+      <div class="{{ metodo != 'pre-venta' ? 'col-5 divRight' : 'col-8' }}">
         <form [formGroup]="form">
           <div class="d-flex" style="height: 1.7rem">
             <h5>
-              <strong>{{ metodo === 'venta' ? 'Cliente' : 'Suplidor' }}:</strong>
+              <strong>{{ metodo === 'venta' || metodo === 'pre-venta' ? 'Cliente' : 'Suplidor' }}:</strong>
             </h5>
-            <i *ngIf="!!!factura_a_editar" (click)="abrirModalFiltro()" pTooltip="{{ metodo === 'venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
+            <i *ngIf="!!!factura_a_editar" (click)="abrirModalFiltro()" pTooltip="{{ metodo === 'venta' || metodo === 'pre-venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
           </div>
           <div class="row">
             <div class="col-7 pl-0">
@@ -216,7 +236,7 @@
               </div>
             </div>
 
-            <div class="col-12 pl-0">
+            <div class="col-12 p-0">
               <div class="form-group">
                 <span class="control-label titulos mr-2">Direccion:</span>
                 <input
@@ -269,6 +289,8 @@
       [propietario]="propietario_factura"
       [factura]="factura_a_editar"
       [action]="action"
+      [modo_factura]="modo_factura"
+      [pre_factura_selected]="pre_factura_selected"
       [metodo]="metodo"
       [fechaFactura]="fechaFactura?.front"
       (getCuerpoFactura)="getCuerpoFactura($event)"
@@ -280,17 +302,23 @@
       <div class="col-7">
         <div class="row">
           <div *ngxPermissionsOnly="metodo == 'venta' ? permissions.factura_venta.create : permissions.factura_compra.create" class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }} ">
-            <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Imprimir Factura' : 'Editar Factura'" [nombreImg]="'printer'" (click)="imprimirFactura()"></app-btncircular>
+            <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Imprimir Factura' : 'Editar Factura'" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
           </div>
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
-            <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'" [nombreImg]="'cancelar'" (click)="cancelarFactura()"></app-btncircular>
+            <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
           </div>
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
-            <app-btncircular [alto]="'100px'" [accion]="factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura'" [nombreImg]="'guardarFactura'" (click)="archivarFactura()"></app-btncircular>
+            <app-btncircular
+              [disabled]="metodo == 'pre-venta'"
+              [alto]="'100px'"
+              [accion]="metodo != 'pre-venta' ? (factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura') : 'NO DISPONIBLE'"
+              [nombreImg]="'guardarFactura'"
+              (pulsar)="archivarFactura()"
+            ></app-btncircular>
           </div>
 
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">
-            <app-btncircular *ngIf="!!!factura_a_editar" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (click)="ingresarFecha()"></app-btncircular>
+            <app-btncircular *ngIf="!!!factura_a_editar" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
           </div>
 
           <!-- <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">

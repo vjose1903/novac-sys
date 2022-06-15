@@ -17,6 +17,7 @@ import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-el
 import { ConfigurationService } from '../configuration.service';
 import { ConfigI } from '../../typescript/config-interface';
 import { fun } from '../functions.service';
+import { tipo_factura_id } from '../../../admin/facturacion/factura';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
@@ -25,6 +26,8 @@ export class PdfService {
   constructor(public configServ: ConfigurationService) {}
 
   generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
+    console.log("params ", params);
+
     return new Promise((resolve, reject) => {
       let obj;
       let todo_true = true;
@@ -81,7 +84,9 @@ export class PdfService {
 
           case 'nota':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-            obj = options[config.pages_sizes.facturacion].makePDF(data, 'nota.pdf', 'notas');
+            console.log("config.pages_sizes.nota ", config.pages_sizes.nota);
+
+            obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas');
             break;
           case 'facturacion': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
@@ -95,7 +100,8 @@ export class PdfService {
               detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
             });
 
-            obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', 'ventas');
+            /* Llamando a la función makePDF desde el archivo facturasCompraVenta.ts. */
+            obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.Pre_factura ? 'pre_factura' : 'ventas');
             break;
 
           case 'cuadre_caja': // SI SI
@@ -116,6 +122,9 @@ export class PdfService {
             todo_true = false;
             break;
         }
+
+
+
 
         if (todo_true) {
           const dd = obj.doc;

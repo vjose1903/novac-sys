@@ -21,6 +21,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   ingredientes = [];
   ingredientesParaProduccion = [];
 
+  // TODO: poner en la configuracion un dropDown para elegir si es Quintal o Producto
   optionsMedidas = ['Quintal'];
 
   info = [];
@@ -124,8 +125,10 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   existenciaConTooltip(objeto) {
     let llevaTooltip = true;
 
-    if (_.has(objeto.existencia, 'Caja')) llevaTooltip = objeto.existencia.Unidad > objeto.contenido.Caja && objeto.existencia.Caja > 0;
-    else if (_.has(objeto.existencia, 'Saco')) llevaTooltip = objeto.existencia.Libra > objeto.contenido.Saco && objeto.existencia.Saco > 0;
+    if (_.has(objeto.existencia, 'Caja')) llevaTooltip = objeto.existencia.Unidad >= objeto.contenido.Caja && objeto.existencia.Caja > 0;
+    else if (_.has(objeto.existencia, 'Saco')) llevaTooltip = objeto.existencia.Libra >= objeto.contenido.Saco && objeto.existencia.Saco > 0;
+    else if (_.has(objeto.existencia, 'Unidad')) llevaTooltip = false;
+    else if (_.has(objeto.existencia, 'Galon')) llevaTooltip = objeto.existencia.Onza >= objeto.contenido.Galon && objeto.existencia.Galon > 0;
     else llevaTooltip = objeto.existencia.Libra > 100;
 
     return llevaTooltip;
@@ -142,6 +145,12 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       if (objeto.existencia.Libra >= objeto.contenido.Saco && objeto.existencia.Saco > 0) {
         mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Saco)} ${objeto.existencia.Saco === 1 ? 'Saco' : 'sacos'}`;
       } else mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
+    } else if (_.has(objeto.existencia, 'Galon')) {
+      if (objeto.existencia.Onza >= objeto.contenido.Galon && objeto.existencia.Galon > 0) {
+        mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Galon)} ${objeto.existencia.Galon === 1 ? 'Galon' : 'Galones'}`;
+      } else mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Onza)} ${objeto.existencia.Onza === 1 ? 'Onza' : 'Onzas'}`;
+    } else if (_.has(objeto.existencia, 'Unidad')) {
+      mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Unidad)} ${objeto.existencia.Unidad === 1 ? 'Unidad' : 'Unidades'}`;
     } else {
       if (objeto.existencia.Libra >= 100) mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Quintal)} ${objeto.existencia.Quintal === 1 ? 'Quintal' : 'Quintales'}`;
       else mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;

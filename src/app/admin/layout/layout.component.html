@@ -2,10 +2,9 @@
   <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
 </div>
 
-<div #fantasma class="fantasma">
+<div class="fantasma">
   <div class="layout">
-    <!-- <div class="menu" [ngStyle]="{ 'max-height': fantasma?.offsetHeight + 'px'}"> -->
-    <div class="menu" [ngStyle]="{ 'max-height': fantasma?.offsetHeight + 'px'}">
+    <div class="menu">
       <div class="title">
         <span class="titulo" (click)="cambiarMenu({ url: 'dashboard', navigate: true })">Menu</span>
       </div>
@@ -17,6 +16,7 @@
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('factura') }" src="assets/img/factura.png" alt="Facturacion" (click)="cambiarMenu({ url: 'factura', navigate: false })" />
 
             <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('factura') }">
+              <h4 class="opcion" *ngxPermissionsOnly="allPermissionsObj.facturacion.pre_venta" [ngClass]="{ activa: actualRuta == 'pre-venta/new/0' }" (click)="cambiarMenu({ url: 'factura/pre-venta/new/0', navigate: true })">Pre-Venta</h4>
               <h4 class="opcion" *ngxPermissionsOnly="allPermissionsObj.facturacion.venta" [ngClass]="{ activa: actualRuta == 'venta/new/0' }" (click)="cambiarMenu({ url: 'factura/venta/new/0', navigate: true })">Venta</h4>
               <h4 class="opcion" *ngxPermissionsOnly="allPermissionsObj.facturacion.compra" [ngClass]="{ activa: actualRuta == 'compra/new/0' }" (click)="cambiarMenu({ url: 'factura/compra/new/0', navigate: true })">Compra</h4>
             </div>
@@ -100,7 +100,7 @@
     </div>
 
     <div class="content">
-      <div class="navBar">
+      <div class="navBar drag">
         <div class="right">
           <div class="btn-group" id="dropCuenta">
             <span class="dropdown-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
@@ -126,14 +126,12 @@
             </p-overlayPanel>
           </div>
         </div>
-
       </div>
 
       <div class="contenido">
         <router-outlet *ngIf="ready"></router-outlet>
         <input id="input_fantasma" class="input_fantasma" />
       </div>
-
       <div class="footer">Novac System {{ versionApp }} - @2020 Desarrollador: Victor J. Vasquez</div>
       <div *ngIf="cuadre_hoy" class="cuadre_hoy">
         <div class="msg">Hoy ya existe un cuadre</div>

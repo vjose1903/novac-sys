@@ -34,6 +34,7 @@
                         inputId="cedula"
                         placeholder="___-_______-_"
                         formControlName="cedula"
+                        [autoClear]="false"
                       ></p-inputMask>
 
                       <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
@@ -54,6 +55,7 @@
                         inputId="rnc"
                         placeholder="___-_____-_"
                         formControlName="rnc"
+                        [autoClear]="false"
                       ></p-inputMask>
 
                       <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
@@ -67,7 +69,7 @@
                 <div class="col-6 p-0 pl-2">
                   <div class="form-group mb-2" [appMsgError]="'telefono'" [form]="form">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
-                    <p-inputMask (keydown.enter)="saltar('campoNombre')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono"></p-inputMask>
+                    <p-inputMask (keydown.enter)="saltar('campoNombre')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
 
                     <span id="msgContainer_telefono"></span>
                   </div>

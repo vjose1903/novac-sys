@@ -18,23 +18,24 @@ import {
   ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
   ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
   ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
-  KEYWORD_ELECTRON_EVENT_DECRYPT,
-  KEYWORD_ELECTRON_EVENT_ENCRYPT,
+  KEYWORD_ELECTRON_QUIT_APP,
   KEYWORD_ELECTRON_GET_APP_CONFIG,
 } from '../../electron/shared-electron-angular';
+
 import { Subscription } from 'rxjs';
 import { ConfigI } from './core/typescript/config-interface';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
 import { CurrentUserService } from './core/services/current-user.service';
+import { MixinClass } from './core/typescript/MixinClass';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit {
+export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit {
   loading = false;
   objProgress;
   visible = false;
@@ -61,7 +62,9 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     public sharedServ: SharedService,
 
     private currentUserServ: CurrentUserService,
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     const location = window.location.href;
@@ -108,6 +111,11 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
             break;
           //
+          case KEYWORD_ELECTRON_QUIT_APP:
+            this.cerrar_app();
+
+            break;
+          //
           case ELECTRON_EVENT_UPDATE_ERROR:
             fun.toastError(info.msg, 'ERRROR');
             this.visible = false;
@@ -124,7 +132,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
-    setTimeout(() => this.getAppConfig(), 1000);
+    this.getAppConfig();
   }
 
   getActualPath() {
@@ -132,6 +140,20 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     const initSlice = location.indexOf('/admin') == -1 ? location.indexOf('/auth') : location.indexOf('/admin');
     const actualPath = location.slice(initSlice, location.length);
     return actualPath;
+  }
+
+  cerrar_app() {
+    this.handleModalForm({
+      html: `<p> ESTAS A PUNTO DE CERRAR EL PROGRAMA NOVAC, ¿Desea continuar? </p>`,
+      id: 'cerrar_app',
+      header: 'CONFIRMACION DE CIERRE',
+      width: '56.25rem',
+      height: '31.25rem',
+      botones: {
+        aceptar: { show: true, disable: false },
+        cancelar: { show: true, disable: false },
+      },
+    });
   }
 
   ngAfterContentChecked() {
@@ -160,6 +182,7 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
 
   async getAppConfig() {
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
+
     this._ipc
       .sendTask(task)
       .then((config: ConfigI) => {
@@ -180,40 +203,13 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
   validateUserAndLoadPermisos() {
     this.currentUserServ
       .validateUser()
-      .then((res) => {
-        setTimeout(() => {
-          fun.logOrange('termine proceso');
-          this.configReady = true;
-        }, 1000);
-      })
+      .then((res) => setTimeout(() => (this.configReady = true), 500))
       .catch((error) => {
         this.configReady = true;
         const actualPath = this.getActualPath();
 
         if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });
-  }
-
-  async probandoEncriptar() {
-    const task = new MessageTask(KEYWORD_ELECTRON_EVENT_ENCRYPT, { hola: 'mundo' });
-
-    this._ipc
-      .sendTask(task)
-      .then((res: string) => {
-        this.probandoDesEncriptar(res);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-
-  async probandoDesEncriptar(strEncripted: string) {
-    const task = new MessageTask(KEYWORD_ELECTRON_EVENT_DECRYPT, strEncripted);
-
-    this._ipc
-      .sendTask(task)
-      .then((res) => {})
-      .catch((err) => {});
   }
 
   timeConvert(d) {
@@ -227,8 +223,6 @@ export class AppComponent implements OnInit, AfterContentChecked, AfterViewInit 
     const sDisplay = s > 0 ? s + (s === 1 ? ' segundo' : ' segundos') : '';
     return hDisplay + mDisplay + sDisplay;
   }
-
-  duplicarDataProgreso(json) {}
 
   logOut() {
     this.layServ.nextLogOut({ bool: true, quien: 'appComponent' });

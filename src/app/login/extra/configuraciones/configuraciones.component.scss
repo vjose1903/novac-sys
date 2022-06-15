@@ -6,6 +6,7 @@
 
 .contenGrid {
   height: 100%;
+  overflow: hidden;
   display: grid;
   grid-template-areas:
     "navBar"
@@ -19,9 +20,30 @@
   }
 
   .body {
-    position: relative;
     background: #f2f2f2;
     grid-area: body;
+
+    display: grid;
+    grid-template-areas:
+      "form"
+      "buttons";
+    grid-template-rows: auto min-content;
+
+    .form {
+      position: relative;
+      grid-area: form;
+      overflow: auto;
+
+      .fantasma {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+    }
+    .buttons {
+      grid-area: buttons;
+      padding: 0.5rem;
+    }
   }
 
   .footer {

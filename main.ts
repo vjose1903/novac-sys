@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, dialog, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
@@ -6,7 +6,6 @@ import { ConfigI } from './src/app/core/typescript/config-interface';
 
 const request = require('request');
 const { exec } = require('child_process');
-// const autoUpdater = require('electron-updater').autoUpdater;
 
 const express = require('express');
 
@@ -19,6 +18,7 @@ import {
   KEYWORD_ELECTRON_EVENT_ENCRYPT,
   KEYWORD_ELECTRON_GET_APP_CONFIG,
   KEYWORD_ELECTRON_PRINT_BASE64,
+  KEYWORD_ELECTRON_QUIT_APP,
   KEYWORD_ELECTRON_RESPONSE,
   KEYWORD_ELECTRON_SENDER,
   KEYWORD_ELECTRON_SET_APP_CONFIG,
@@ -27,16 +27,51 @@ import {
 } from './electron/shared-electron-angular.js';
 import AppUpdater from './electron/auto-update.js';
 import ReplaceInFile from './electron/replace-in-file.js';
+import DockerHandler from './electron/docker-handler';
 
 let win: BrowserWindow = null;
+let splash: BrowserWindow = null;
 let auto_updater: AppUpdater = null;
+let docker_handler: DockerHandler = null;
 let replace_in_file: ReplaceInFile = null;
 
 const args = process.argv.slice(1);
 const serve = args.some((val) => val === '--serve');
 
+function createSplash(type = 'splash') {
+  if (splash) {
+    splash.close();
+    splash = null;
+  }
+
+  splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
+
+  const splash_html = serve ? `src/${type}.html` : `dist/${type}.html`;
+
+  splash.loadURL(url.format({ pathname: path.join(__dirname, splash_html), protocol: 'file:', slashes: true }));
+  splash.center();
+
+  if (type == 'splash') {
+    beforeCreateSplash(splash).then((res) => {
+      splash.close();
+      createWindow().then((win) => beforeCreateWindow(win));
+    });
+  } else {
+    shell.beep();
+    setTimeout(() => {
+      splash.close();
+      app.quit();
+    }, 6000);
+  }
+}
+
 function createWindow() {
-  return new Promise<BrowserWindow>((resolve, reject) => {
+  return new Promise<BrowserWindow>(async (resolve, reject) => {
+    puts('  ');
+    puts('  ');
+    puts(' ::::: ========= PASANDO A CREAR LA VENTANA DEL SISTEMA ========= :::::');
+    puts('  ');
+    puts('  ');
     const electronScreen = screen;
     const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
@@ -48,26 +83,22 @@ function createWindow() {
       minWidth: size.width,
       height: size.height,
       minHeight: size.height,
-      // icon: process.platform === 'darwin' ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
+      icon: isMacOs() ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
       webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
     });
 
     if (serve) {
       win.webContents.openDevTools();
-
       require('electron-reload')(__dirname, {
         electron: require(`${__dirname}/node_modules/electron`),
       });
+
       win.loadURL('http://localhost:5220');
     } else {
-      win.loadURL(
-        url.format({
-          pathname: path.join(__dirname, 'dist/index.html'),
-          protocol: 'file:',
-          slashes: true,
-        }),
-      );
+      win.loadURL(url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true }));
     }
+
+    win.setMenuBarVisibility(false);
 
     // if (serve) {
     //   win.webContents.openDevTools();
@@ -126,7 +157,7 @@ function createWindow() {
     // }
 
     // Emitted when the window is closed.
-    win.on('closed', () => {
+    win.on('closed', (event) => {
       // Dereference the window object, usually you would store window
       // in an array if your app supports multi windows, this is the time
       // when you should delete the corresponding element.
@@ -142,50 +173,115 @@ try {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => {
-    createWindow()
-      .then((res) => beforeCreateWindow(res))
-      .catch(() => app.quit());
-  });
+  app.on('ready', () => createSplash());
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd +
-    if (process.platform !== 'darwin') app.quit();
-  });
-
-  app.on('activate', () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (win === null)
-      createWindow()
-        .then((win_) => {
-          beforeCreateWindow(win_);
-        })
-        .catch(() => app.quit());
+    app.quit();
   });
 } catch (e) {
   // Catch Error
   // throw e;
 }
 
-async function beforeCreateWindow(win) {
-  verificarSumastra();
-  borrarLogs();
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER LA CONFIGURACION DE LA APP
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+function isMacOs() {
+  return process.platform === 'darwin';
+}
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER LA CONFIGURACION DE LA APP
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+function getConfig(): Promise<ConfigI> {
+  return new Promise<any>(async (resolve, reject) => {
+    const confTemp = (await Functions.getConfigFile()) as any;
+    const conf: ConfigI = JSON.parse(confTemp);
+    resolve(conf);
+  });
+}
 
-  HandlerConfigFile.checkConfigFile(win);
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER SI EL PROYECTO SE ESTA CORRIENDO EN PRODUCCION O EN DESARROLLO
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+async function getServer_(): Promise<boolean> {
+  return new Promise<any>((resolve, reject) => {
+    const args_ = process.argv.slice(1);
+    const serve_ = args_.some((val) => val === '--serve');
+    resolve(serve_);
+  });
+}
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// CONFIGURACIONES DESPUES DE QUE SE CREA EL SPLASH SCREEN
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+function beforeCreateSplash(splash) {
+  return new Promise<any>(async (resolve, reject) => {
+    // -------- borrar el archivo de logs --------
+    borrarLogs().then(async () => {
+      puts(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
+
+      // ----------- inicializando docker handler --------------
+      docker_handler = new DockerHandler();
+
+      HandlerConfigFile.checkConfigFile(splash)
+        .then(async (is_config_ready) => {
+          if (is_config_ready) {
+            const conf = await getConfig();
+            const serve_ = await getServer_();
+
+            // ----------- correr base de datos local --------------
+            puts(conf.is_db_local, 'conf.is_db_local ');
+
+            if (conf.is_db_local) {
+              docker_handler
+                .checkAllInDocker()
+                .then((res_db) => continuarCargandoArchivos(resolve))
+                .catch((error_type) => createSplash(`splash_${error_type}_error`));
+              //
+            } else {
+              continuarCargandoArchivos(resolve);
+            }
+          }
+        })
+        .catch((err) => {
+          createSplash('splash_config_error');
+        });
+    });
+  });
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// continuar la carga de archivos necesarios
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+function continuarCargandoArchivos(resolve) {
+  // -------- verificar el archivo para impresion --------
+  verificarSumastra()
+    .then((res_sumastra) => {
+      // -------------- remplazar en archivos ----------------
+      replace_in_file = new ReplaceInFile();
+      puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
+      setTimeout(() => resolve(true), 2000);
+    })
+    .catch((error) => {
+      puts(' -------- SUMASTRA NO EXISTE -------- ');
+      createSplash(`splash_sumastra_error`);
+    });
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Handle angular events
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
+
+  puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
   auto_updater = new AppUpdater();
   auto_updater.handleUpdateEvents(win);
   // ---------------------------------------
-
-  // -------- remplazar en archivos --------
-  replace_in_file = new ReplaceInFile();
-  // ---------------------------------------
-
-  win.setMenuBarVisibility(false);
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -278,25 +374,30 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
   } catch (error) {}
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER EL ACTUAL USUARIO DE GIT
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getActualGitUser() {
-  return new Promise<any>((resolve, reject) => {
-    const args_ = process.argv.slice(1);
-    const serve_ = args_.some((val) => val === '--serve');
+  return new Promise<any>(async (resolve, reject) => {
+    const serve_ = await getServer_();
 
     if (serve_) {
       cmd(`git config --get user.name`, async (res_username) => {
-        resolve(res_username.STDOUT.trim());
+        const username = res_username.STDOUT.trim() != '' ? res_username.STDOUT.trim() : 'vjose1903';
+        resolve(username);
       });
     } else {
-      resolve(undefined);
+      resolve('vjose1903');
     }
   });
 }
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// OBTENER EL ARCHIVO APP.CONFIG
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getConfigFile() {
-  return new Promise((resolve, reject) => {
-    const args_ = process.argv.slice(1);
-    const serve_ = args_.some((val) => val === '--serve');
+  return new Promise(async (resolve, reject) => {
+    const serve_ = await getServer_();
     const pjson = require('./package.json');
 
     Functions.getConfigFile()
@@ -305,7 +406,7 @@ function getConfigFile() {
 
         config['is_development'] = serve_;
         config['gitUser'] = await getActualGitUser();
-        config['printersList'] = win.webContents.getPrinters();
+        config['printersList'] = [{ displayName: 'Ninguna', name: 'Ninguna' }, { displayName: 'Otra', name: 'Otra' }, ...win.webContents.getPrinters()];
         config['app_version'] = pjson.version;
 
         resolve(config);
@@ -319,53 +420,54 @@ function getConfigFile() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function borrarLogs() {
-  const carpeta = pathAdd('/log');
+  return new Promise<any>(async (resolve, reject) => {
+    const carpeta = await pathAdd('/log');
 
-  if (!fs.existsSync(carpeta)) {
-    fs.mkdir(carpeta, { recursive: true }, (err) => {
-      if (err) {
-        throw err;
-      }
-    });
-  } else {
-    // ya se creo la carpeta log
-    setTimeout(() => {
-      const comando = `del "${pathAdd('/log/my_log.txt')}"`;
+    if (!fs.existsSync(carpeta)) {
+      fs.mkdir(carpeta, { recursive: true }, (err) => {
+        if (err) throw err;
+      });
+    } else {
+      const comando = isMacOs() ? `rm -rf "${await pathAdd('/log/my_log.txt')}"` : `del "${await pathAdd('/log/my_log.txt')}"`;
+
       cmd(comando);
-    }, 10000);
-  }
+    }
+
+    setTimeout(() => resolve(true), 1000);
+  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // VEIRIFICA SI SUMASTRA ESTA INSTALADO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function verificarSumastra() {
-  if (!fs.existsSync(pathAdd('/print'))) {
-    fs.mkdir(pathAdd('/print'), { recursive: true }, (err) => {
-      if (err) {
-        throw err;
-      } else {
-      }
-    });
-  } else {
-  }
+async function verificarSumastra() {
+  return new Promise<any>(async (resolve, reject) => {
+    const serve_ = await getServer_();
 
-  const aFiles_malos = [pathAdd('/lp.exe')];
+    const print_path = serve_ ? await pathAdd('/print') : contruirPath('N:/sumastra');
+    if (!fs.existsSync(print_path)) {
+      reject(false);
+      return;
+    }
 
-  verificarElemento(aFiles_malos, '/sumastra/lp.exe', '/print', '/lp.exe', '/lp', false, false, 'Sumastra', 0);
+    const lp_path = contruirPath(`${print_path}/lp.exe`);
+    if (fs.existsSync(lp_path)) resolve(true);
+    else reject(false);
+  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION QUE SE EJECUTA AL TERMINAR LA DESCARGA DE UN ELEMENTO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
+async function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
   // const interval = setInterval(() => {
 
-  const command = process.platform === 'darwin' ? `unzip "${pathAdd(path_local_extension)}" -d "${pathAdd()}"` : `powershell Expand-Archive "${pathAdd(path_local_extension)}" -DestinationPath "${pathAdd()}"`;
+  const command = isMacOs() ? `unzip "${await pathAdd(path_local_extension)}" -d "${await pathAdd()}"` : `powershell Expand-Archive "${await pathAdd(path_local_extension)}" -DestinationPath "${await pathAdd()}"`;
 
-  cmd(command, (res) => {
+  cmd(command, async (res) => {
     if (res.status) {
-      cmd(`del ${pathAdd(path_local_extension)}`, async (res_borrado) => {
+      const comando = await pathAdd(path_local_extension);
+      cmd(`del ${comando}`, async (res_borrado) => {
         if (res_borrado.status) {
           callback({
             status: true,
@@ -424,16 +526,15 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
   cmd(`ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public${paht_server}"`, async (res_servidor) => {
     if (res_servidor.status) {
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
-
-      if (!fs.existsSync(pathAdd(`${path_local_content}${is_carpeta ? `${path_local_no_extension}` : `${path_local_extension}`}`))) {
+      const element_path = await pathAdd(`${path_local_content}${is_carpeta ? `${path_local_no_extension}` : `${path_local_extension}`}`);
+      if (!fs.existsSync(element_path)) {
         procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta);
         descargar_archivo = true;
       } else {
         if (descomprimir) {
-          const command =
-            process.platform === 'darwin'
-              ? `zip -r "${pathAdd(path_local_extension)}" "${pathAdd(path_local_no_extension)}" -x "*.DS_Store"`
-              : `powershell Compress-Archive "${pathAdd(`${path_local_no_extension}`)}"  -DestinationPath "${pathAdd(`${path_local_no_extension}.zip`)}" -Update`;
+          const command = isMacOs()
+            ? `zip -r "${await pathAdd(path_local_extension)}" "${await pathAdd(path_local_no_extension)}" -x "*.DS_Store"`
+            : `powershell Compress-Archive "${await pathAdd(`${path_local_no_extension}`)}"  -DestinationPath "${await pathAdd(`${path_local_no_extension}.zip`)}" -Update`;
 
           cmd(command, (res_compresion) => {
             if (!res_compresion.status) {
@@ -457,12 +558,12 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
 // PARA COMPARA MD5 DE ELEMENTOS A VER SI FUNCIONAN
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
-  const command = process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+async function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
+  const command = isMacOs() ? `md5sum "${await pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${await pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
   cmd(command, (res_local) => {
     if (res_local.status) {
-      const md5_local = process.platform === 'darwin' ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
+      const md5_local = isMacOs() ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
       if (md5_local !== md5_servidor) {
         borrado_de_archivos_malos(aFiles_malos, (res_del) => {
           if (res_del.status) {
@@ -484,17 +585,16 @@ function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5
 
 async function procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta) {
   let descarga_exito = true;
-  const confTemp = (await Functions.getConfigFile()) as any;
-  const conf: ConfigI = JSON.parse(confTemp);
+  const conf = await getConfig();
 
   if (conf.url_servidor_descargas) {
-    await downloadFile(`${conf.url_servidor_descargas}${paht_server}`, path_local_content, path_local_extension, (res) => {
+    await downloadFile(`${conf.url_servidor_descargas}${paht_server}`, path_local_content, path_local_extension, async (res) => {
       if (res.status) {
-        const command = process.platform === 'darwin' ? `md5sum "${pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
+        const command = isMacOs() ? `md5sum "${await pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${await pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
 
         cmd(command, (res_local_before_descarga) => {
           if (res_local_before_descarga.status) {
-            const md5_local = process.platform === 'darwin' ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
+            const md5_local = isMacOs() ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
             if (md5_servidor === md5_local) {
               if (descomprimir) {
                 esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, (res) => {
@@ -549,8 +649,9 @@ function retornarMensajeErrorVeiricandoElementos(nombre_err) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function cmd(command, callback = (arg) => {}) {
+export function cmd(command, callback = (arg) => {}) {
   puts(command, 'comando realizado en la funcion cmd');
+
   exec(command, (error, stdout, stderr) => {
     let obj;
     if (error) {
@@ -568,15 +669,15 @@ function cmd(command, callback = (arg) => {}) {
 // FUNCION QUE SE ENCARGA DE DESCARGAR ARCHIVOS
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
+async function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
   // Save variable to know progress
 
   let received_bytes = 0;
   let total_bytes = 0;
 
   const req = request({ method: 'GET', uri: archive_url });
-
-  const out = fs.createWriteStream(pathAdd(`${path}${file_}`));
+  const element_path = await pathAdd(`${path}${file_}`);
+  const out = fs.createWriteStream(element_path);
   req.pipe(out);
 
   req.on('response', (data) => {
@@ -611,13 +712,13 @@ function showProgress(received, total) {
 // FUNCION QUE SE ENCARGA DE VERIFICAR SI EL ARCHIVO LOG EXISTE
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-async function puts(msg, titulo?) {
+export async function puts(msg, titulo?) {
   // cmd('ls');
-  if (win) {
+  if (win || splash) {
     const fs = require('fs');
 
-    const carpeta = pathAdd('/log');
-    const file = pathAdd('/log/my_log.txt');
+    const carpeta = await pathAdd('/log');
+    const file = await pathAdd('/log/my_log.txt');
 
     let texto = '';
     if (typeof msg === 'object') texto = JSON.stringify(msg, null, '\t');
@@ -626,11 +727,8 @@ async function puts(msg, titulo?) {
 
     if (!fs.existsSync(carpeta)) {
       fs.mkdir(carpeta, { recursive: true }, (err) => {
-        if (err) {
-          throw err;
-        } else {
-          escribirLogs(file, titulo, texto);
-        }
+        if (err) throw err;
+        else escribirLogs(file, titulo, texto);
       });
     } else {
       escribirLogs(file, titulo, texto);
@@ -657,20 +755,15 @@ async function escribirLogs(file, titulo, texto) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // GENERAR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
 function generatePdfFileFormBase64(params: { fileName: string; base64: string; type: string; scale: string }) {
-  return new Promise((resolve, reject) => {
-    const FileName = pathAdd('/' + params.fileName);
+  return new Promise(async (resolve, reject) => {
+    const FileName = await pathAdd('/' + params.fileName);
 
     try {
       fs.writeFile(FileName, params.base64, { encoding: 'base64' }, (err) => {
         imprimir({ fileName: params.fileName, tipo: params.type, scale: params.scale })
-          .then((res) => {
-            resolve(res);
-          })
-          .catch((err) => {
-            reject(err);
-          });
+          .then((res) => resolve(res))
+          .catch((err) => reject(err));
       });
     } catch (err) {
       reject({ msg: 'Error generando reporte!!', status: false, error: err });
@@ -681,23 +774,26 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // IMPRIMIR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
 function imprimir(params: { fileName: string; tipo: string; scale: string }) {
   return new Promise(async (resolve, reject) => {
-    puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${pathAdd(`/${params.fileName}`)}`);
+    const serve_ = await getServer_();
+    const conf = await getConfig();
 
-    const sumatrapdf_path = pathAdd('/print/lp.exe');
-    const file_path = pathAdd(`/${params.fileName}`);
+    const sumatrapdf_path = serve_ ? await pathAdd('/print/lp.exe') : contruirPath('N:/sumastra/lp.exe');
+    const file_path = await pathAdd(`/${params.fileName}`);
+
+    puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
 
     const orientation = params.tipo === 'reporte' ? 'Portrait' : 'landscape';
     const paper_size = params.tipo === 'reporte' ? 'letter' : 'VJPOS';
 
-    const confTemp = (await Functions.getConfigFile()) as any;
-    const conf: ConfigI = JSON.parse(confTemp);
-
     const selected_printer = params.tipo === 'reporte' ? conf.printer_reportes_selected : conf.printer_caja_selected;
+    // noscale
+    let is_roll = false;
+    if (params.tipo != 'reporte') is_roll = conf.pages_sizes.facturacion.includes('roll');
 
-    const comando = `"${sumatrapdf_path}" -print-to-default -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
+    const print_settings = is_roll ? '-print-settings "noscale"' : `-print-settings "${orientation},${params.scale},paper=${paper_size},simplex"`;
+    const comando = `"${sumatrapdf_path}" -print-to-default ${print_settings} -silent "${file_path}"`;
     // const comando = `"${sumatrapdf_path}" -print-to ${selected_printer.name} -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
 
     cmd(comando, (res) => {
@@ -711,23 +807,29 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
 // PARA CREAR LA RUTA CORRECTA EN CASO DE SER COMPILADA O NO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-export function pathAdd(addToPath = '', resource = true) {
-  let path_temp;
-  let path_resolved;
+export function contruirPath(path_temp) {
+  return isMacOs() ? path_temp : path_temp.split('/').join('\\');
+}
+export function pathAdd(addToPath = '', resource = true): Promise<string> {
+  return new Promise<any>(async (resolve, reject) => {
+    let path_temp;
+    let path_resolved;
+    const pjson = require('./package.json');
+    const serve_ = await getServer_();
 
-  const args_ = process.argv.slice(1);
-  const serve_ = args_.some((val) => val === '--serve');
-
-  if (serve_) {
-    path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
-  } else {
-    if (resource) {
-      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
+    if (serve_) {
+      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(pjson.name.toLowerCase())) + pjson.name;
     } else {
-      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
+      if (resource) {
+        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
+      } else {
+        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
+      }
     }
-  }
-  path_temp = path_temp + addToPath;
-  path_resolved = process.platform === 'darwin' ? path_temp : path_temp.split('/').join('\\');
-  return path_resolved;
+
+    path_temp = path_temp + addToPath;
+    path_resolved = isMacOs() ? path_temp : path_temp.split('/').join('\\');
+
+    resolve(path_resolved);
+  });
 }

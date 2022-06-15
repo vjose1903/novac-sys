@@ -72,7 +72,6 @@
 }
 
 .inDES,
-.inUNI,
 .inPRE,
 .inTOT {
   &:hover {
@@ -82,15 +81,12 @@
 
 .inDES:active,
 .inPRE:active,
-.inUNI:active,
 .inTOT:active,
 .inDES:focus,
 .inPRE:focus,
-.inUNI:focus,
 .inTOT:focus,
 .inDES.active,
 .inPRE.active,
-.inUNI.active,
 .inTOT.active {
   outline: 0px;
   border-color: #d4d4d4 !important;

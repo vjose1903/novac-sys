@@ -1,9 +1,13 @@
-import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter, HostListener } from '@angular/core';
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
+import { SharedService } from '../../../../core/services/shared.service';
+import { ConfigI } from '../../../../core/typescript/config-interface';
+import { SingletonService } from '../../../../core/services/singleton.service';
+import { teclasCode } from '../../../../core/typescript/constantes';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
@@ -11,6 +15,14 @@ import { fun } from '../../../../core/services/functions.service';
   styleUrls: ['./form-cantidad-efectivo.component.scss'],
 })
 export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
+  @HostListener('window:keyup', ['$event'])
+  handleKeyboardEvent(event: any) {
+    event.stopPropagation();
+    const key = event.keyCode;
+
+    if (key == teclasCode._p || key == teclasCode._P) this.is_print = !this.is_print;
+  }
+
   element: any;
   devuelta = '0.00';
   efectivo: string;
@@ -20,8 +32,11 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   factura_de: any;
 
   cambiar_articulos = undefined;
+  is_print: boolean;
+  documentos_a_imprimir = [];
+  configApp: ConfigI;
 
-  constructor() {
+  constructor(private shServ: SharedService) {
     super();
   }
 
@@ -37,10 +52,23 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   ngAfterViewInit(): void {
     setTimeout(() => {
+      this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+      this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
+      this.handleDefaultSwitch();
+
       if (this.factura_de != 'compra' && this.inputs.tipo_modal == 'devuelta') this.enfocarInput('inputEfectivo');
 
       if (this.factura_de == 'compra' && !this.inputs.cambios_articulos) this.disableBtnConfirm(false);
     }, 250);
+  }
+
+  handleDefaultSwitch() {
+    if (this.inputs.metodo == 'venta') {
+      const comparation = this.inputs.condicion_fact == 'Crédito' ? 'venta_credito' : 'venta_contado';
+      this.is_print = this.documentos_a_imprimir.includes(comparation);
+    } else {
+      this.is_print = this.documentos_a_imprimir.includes('compra');
+    }
   }
 
   saltar(campo, valor?) {
@@ -89,7 +117,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
     if (this.factura_de == 'compra') {
       if (this.cambiar_articulos != undefined) {
-        modal.getDataModal({ obj, modal_id: this.modal.component_id });
+        modal.getDataModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
       } else {
         fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
       }
@@ -97,7 +125,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       if (this.validarForm()) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
       } else {
-        modal.getDataModal({ obj, modal_id: this.modal.component_id });
+        modal.getDataModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
       }
     }
   }
