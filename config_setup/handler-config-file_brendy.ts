@@ -24,6 +24,7 @@ export default class HandlerConfigFile {
     is_db_local: true,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
+    medida_articulo: 'Producto',
 
     pages_sizes: {
       recibo_ingreso: '80mm_roll',

@@ -38,6 +38,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   info_cambio: any;
   productosDevueltos: any[];
   hasPermissionPreVenta: boolean;
+  hasPermissionCamiones: boolean;
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
@@ -85,7 +86,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   CostoYgasto;
   metodo;
   is_print = false;
-  // archivo_id_desplegada = undefined;
 
   TiposCostosGastos: string;
   tipos_costosYgastos: string[];
@@ -164,6 +164,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.rellenarVariables();
 
     this.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)).then((result) => (this.hasPermissionPreVenta = result));
+    this.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => (this.hasPermissionCamiones = result));
   }
 
   ngOnDestroy(): void {
@@ -247,8 +248,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (this.metodo === 'venta') {
         this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
-        // TODO: poner aqui que si tiene el permiso de pedir camiones que haga la peticion
-        this.getCamiones();
+
+        if (this.hasPermissionCamiones) this.getCamiones();
       } else {
         if (fun.hasValue(this.form)) this.form.reset();
       }

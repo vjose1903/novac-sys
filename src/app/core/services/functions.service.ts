@@ -580,6 +580,8 @@ export class fun {
         localStorage.removeItem('expiry');
         localStorage.removeItem('token-type');
         localStorage.removeItem('uid');
+
+        SingletonService.layServ.nextLogOut(undefined);
         resolve(true);
       } catch (error) {
         resolve(false);

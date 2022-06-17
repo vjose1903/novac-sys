@@ -182,6 +182,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   async getAppConfig() {
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
+    const actualPath = this.getActualPath();
 
     this._ipc
       .sendTask(task)
@@ -191,8 +192,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-          fun.logGreen('YA SETEE LA COFIG');
-          setTimeout(() => this.validateUserAndLoadPermisos(), 10);
+
+          if (!actualPath.includes('login') && !actualPath.includes('config')) this.validateUserAndLoadPermisos(actualPath);
+          else this.configReady = true;
         }
       })
       .catch((err) => {
@@ -200,15 +202,14 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       });
   }
 
-  validateUserAndLoadPermisos() {
+  validateUserAndLoadPermisos(actualPath) {
     this.currentUserServ
       .validateUser()
       .then((res) => setTimeout(() => (this.configReady = true), 500))
       .catch((error) => {
         this.configReady = true;
-        const actualPath = this.getActualPath();
 
-        if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
+        if (!actualPath.includes('login') && !actualPath.includes('config') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });
   }
 

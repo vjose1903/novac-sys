@@ -68,6 +68,9 @@ export class InterceptorService implements HttpInterceptor {
       }),
 
       catchError((response: HttpErrorResponse) => {
+        console.log(' ');
+        console.log('response ', response);
+        console.log(' ');
         if (response.error === null) {
           fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
         } else if (response.error && _.has(response.error, 'action') && response.error.action === 'close_ssesion') {
