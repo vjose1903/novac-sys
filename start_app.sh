@@ -6,8 +6,19 @@ white=$(tput setaf 7)
 yellow=$(tput setaf 3)
 cyan=$(tput setaf 6)
 
-OPTIONS="c:r:s"
+OPTIONS="ac:r:s"
 PRODUCTION='no'
+
+getActualClient() {
+	cliente=$(cat config_setup/actual_cliente.txt)
+	echo " "
+	echo "${green} ||-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=||"
+	echo "${green} ||          ${white}CLIENTE ACTUAL${green}          ||"
+	echo "${green} ||-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=||"
+	echo " "
+	echo "${white}  $cliente"
+	echo " "
+}
 
 setClient() {
   client=$OPTARG
@@ -72,6 +83,10 @@ npmCommand() {
 while getopts $OPTIONS opt; do
   echo " "
   case "${opt}" in
+  a)
+    echo "la opcion -a"
+    getActualClient
+    ;;
   p)
     echo "la opcion -p"
     PRODUCTION='yes'

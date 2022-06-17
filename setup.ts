@@ -62,6 +62,8 @@ function makeSetup(tipo) {
 
       console.log(' ');
     });
+
+    fs.writeFileSync('config_setup/actual_cliente.txt', tipo, { encoding: 'utf-8' });
   } else {
     console.log('********************************************');
     console.log('**                                        **');
