@@ -43,6 +43,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   viajes = [];
   viaje_selected;
   ultimo_pago;
+  is_print = false;
 
   camiones = [];
   choferes = [];
@@ -225,6 +226,8 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     const data = arg.obj;
     if (arg.modal_id === 'cambioEfectivo_ReciboViajes') {
       this.devuelta = data.devuelta > 0 ? data.devuelta : 0;
+
+      this.is_print = arg.is_print;
       this.forma_pago = data.forma_pago;
       this.total_recibido = data.dinero;
       this.IMPRIMIR();
@@ -236,7 +239,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       let tipoModal = tipo;
 
       if (tipo === 'cambio') {
-        const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo_modal: 'no_devuelta', factura_de: 'venta' };
+        const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo_modal: 'no_devuelta', factura_de: 'recibo_ingreso' };
 
         this.handleModalForm({
           component: FormCantidadEfectivoComponent,
@@ -372,15 +375,24 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
       const obj_print = { data: res['data'].recibo, type: 'recibo_ingreso' };
 
-      this.pdfServ
-        .generatePdf({ oPdf: obj_print, imprimir: true })
-        .then(async (res) => {
-          if (res.status === 'si') {
-          } else fun.toastError(res.msg, 'ERROR');
-          this.layServ.nextCheckCuadreToday(true);
-        })
-        .catch((err) => fun.toastError(err.msg, 'ERROR'));
+      if (this.is_print) {
+        this.pdfServ
+          .generatePdf({ oPdf: obj_print, imprimir: true })
+          .then(async (res) => {
+            if (res.status === 'si') {
+            } else fun.toastError(res.msg, 'ERROR');
+
+            this.getCuadre();
+          })
+          .catch((err) => fun.toastError(err.msg, 'ERROR'));
+      } else {
+        this.getCuadre();
+      }
     });
+  }
+
+  getCuadre() {
+    this.layServ.nextCheckCuadreToday(true);
   }
 
   resetVariables() {

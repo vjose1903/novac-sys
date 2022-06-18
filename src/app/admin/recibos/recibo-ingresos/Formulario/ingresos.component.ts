@@ -22,7 +22,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   clienteAdepositar: any;
   facturas = [];
   tipo_recibo = 'Pago factura';
-
+  is_print = false;
   // =============================================
   //  TABLAS
   // =============================================
@@ -274,6 +274,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     if (arg.modal_id === 'cambioEfectivo_IngresosComponent') {
       this.devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
+      this.is_print = arg.is_print;
       this.sendIngreso();
     }
 
@@ -302,7 +303,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
-      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo_modal: 'devuelta' };
+      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta' };
 
       this.handleModalForm({
         component: FormCantidadEfectivoComponent,
@@ -383,15 +384,17 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
       const obj_print = { data: recibo, type: 'recibo_ingreso' };
 
-      this.pdfServ
-        .generatePdf({ oPdf: obj_print, imprimir: true })
-        .then(async (res) => {
-          if (res.status === 'si') {
-          } else fun.toastError(res.msg, 'ERROR');
+      if (this.is_print) {
+        this.pdfServ
+          .generatePdf({ oPdf: obj_print, imprimir: true })
+          .then(async (res) => {
+            if (res.status === 'si') {
+            } else fun.toastError(res.msg, 'ERROR');
 
-          this.layServ.nextCheckCuadreToday(true);
-        })
-        .catch((err) => fun.toastError(err.msg, 'ERROR'));
+            this.layServ.nextCheckCuadreToday(true);
+          })
+          .catch((err) => fun.toastError(err.msg, 'ERROR'));
+      }
     });
   }
 
@@ -410,7 +413,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   tableInputChange(params) {
-
     if (params.key == 'select') {
       if (!params.value) {
         const factura = _.find(this.facturas, { id: params.data.id });

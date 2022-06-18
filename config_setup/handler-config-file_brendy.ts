@@ -24,7 +24,7 @@ export default class HandlerConfigFile {
     is_db_local: true,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
-    medida_articulo: 'Producto',
+    medida_producto_terminado: 'Producto',
 
     pages_sizes: {
       recibo_ingreso: '80mm_roll',
@@ -35,7 +35,7 @@ export default class HandlerConfigFile {
       reporte: '8.5x11',
     },
 
-    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce,cuadre_caja',
+    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce',
   };
 
   static checkConfigFile(win: BrowserWindow): Promise<any> {

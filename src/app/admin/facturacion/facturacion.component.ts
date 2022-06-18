@@ -45,16 +45,23 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   handleKeyboardEvent(event: any) {
     event.stopPropagation();
     const key = event.keyCode;
+    const secuenciasAceptadas = [teclasCode._control, teclasCode._P, teclasCode._G];
 
     if (event.type === 'keydown') {
-      if (!this.secuenciaKeys.includes(key)) this.secuenciaKeys.push(key);
+      if (!this.secuenciaKeys.includes(key) && secuenciasAceptadas.includes(key)) this.secuenciaKeys.push(key);
     } else if (event.type === 'keyup') {
       const combinacion = _.join(this.secuenciaKeys, '_');
       this.secuenciaKeys = [];
 
-      if (combinacion === `${teclasCode._control}_${teclasCode._P}`) this.imprimirFactura();
+      if (combinacion === `${teclasCode._control}_${teclasCode._P}`) {
+        if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
+        this.imprimirFactura();
+      }
 
-      if (combinacion === `${teclasCode._control}_${teclasCode._G}`) this.archivarFactura();
+      if (combinacion === `${teclasCode._control}_${teclasCode._G}`) {
+        if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
+        this.archivarFactura();
+      }
 
       if (fun.hasValue(this.overlay)) this.mover_indicador_camion(key);
     }
@@ -349,12 +356,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   async setPropietario(arg) {
-    console.log('arg ', arg);
-
     if (arg.tipo == 'venta' || arg.tipo == 'Pre_factura') {
       if (fun.hasValue(arg.cliente_id)) {
         const cliente_response = await this.clienteClass.getOne(arg.cliente_id);
-        fun.logOrange('cliente_response ', cliente_response);
         this.propietario_factura = cliente_response.data;
         this.propietario_factura.nombre = this.propietario_factura.nombre_completo;
       } else {
@@ -970,9 +974,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     } else {
       if (this.CuerpoFactura.length == 0) {
         fun.toastWarning('Factura incompleta!!!', 'Aviso');
+        fun.enfocarInput('cod-0');
       } else {
         if (this.TOTAL == 0) {
           fun.toastWarning('Total de la factura no puede ser 0', 'Aviso');
+          fun.enfocarInput('cod-0');
         } else {
           if (this.condicion_fact == 'Crédito' || this.is_viaje || this.modo_factura == 'Pre_factura') {
             const obj = { modo_factura: this.modo_factura, condicion_fact: this.condicion_fact, metodo: this.metodo };
@@ -1269,13 +1275,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       //
     } else if (arg.modal_id == 'confirmacionImprimir') {
-      console.log('arg ', arg);
-      this.is_print = arg.data.is_print;
+      this.is_print = arg.is_print;
       this.enviarABaseDatos();
       //
     } else if (arg.modal_id == 'cambioEfectivo') {
-      console.log('arg ', arg);
-
       this.is_print = arg.is_print;
       this.Devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
@@ -1405,7 +1408,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let res;
     const metodo = this.action === 'update' ? 'editar_factura' : '';
-    console.log('cabecera_fact ', cabecera_fact);
 
     if (metodo === 'editar_factura') res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_editar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
@@ -1418,9 +1420,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     const obj = { data: res_factura, type: 'facturacion' };
 
-    if (this.is_print) {
-      this.pdfServ.generatePdf({ oPdf: obj, imprimir: true }).catch((err) => fun.toastError('Error imprimiendo la factura', 'ERROR'));
-    }
+    this.pdfServ.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError('Error imprimiendo la factura', 'ERROR'));
 
     this.layServ.nextCheckCuadreToday(true);
 

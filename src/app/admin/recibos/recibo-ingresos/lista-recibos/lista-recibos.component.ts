@@ -246,7 +246,8 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   async anularRecibo(id) {
     try {
       const extra = { afterPath: `revertir/by_id/${id}` };
-      const actualPagination = this.tServ.getPaginationById('listaRecibos');
+      const actualPagination = this.tServ.getPaginationById('listado_recibos');
+
       this.reciboClass.getAll(extra).then((res) => this.getRecibos(actualPagination));
     } catch (error) {}
   }

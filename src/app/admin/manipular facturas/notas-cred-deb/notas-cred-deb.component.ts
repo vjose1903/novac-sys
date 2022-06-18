@@ -13,6 +13,7 @@ import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { SingletonService } from '../../../core/services/singleton.service';
+import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -38,6 +39,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   tipoFactura: any;
   lista_tipos_facturas: any;
   paqueteComprobante;
+  is_print = false;
 
   notasClass = new NotaC();
   articuloClass = new ArticuloC();
@@ -290,30 +292,42 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this.confirmationModal(confirmationObj);
   }
 
+  async getDataFromModal(arg, search) {
+    if (arg.modal_id === 'confirmacionImprimir') {
+      this.is_print = arg.is_print;
+      this.formarNota();
+    }
+  }
+
   // =============================================
   //  MODAL IMPRIMIR
   // =============================================
   imprimirFactura() {
     const facturasLlenas = _.filter(this.facturasConDetalles, (factura) => this.totalIndividual(factura) > 0);
+
     if (facturasLlenas.length == 0) {
       fun.toastWarning('Nota de ' + this.tipoNota + ' no puede estar vacía.', 'Aviso');
     } else {
-      if (this.TOTAL === 0) {
+      if (this.TOTAL == 0) {
         fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
       } else {
-        const obj = { total_factura: this.TOTAL, devuelta: 0, factura_de: this.tipoNota, tipo_modal: 'no_devuelta' };
+        const obj = { modo_factura: 'nota', condicion_fact: 'nota', metodo: 'nota' };
 
-        const confirmationObj = {
-          id: 'imprimir_factura',
-          texto: 'Seguro que desea imprimir la nota',
+        this.handleModalForm({
+          component: ConfirmacionImprimirComponent,
+          inputs: obj,
+          id: 'confirmacionImprimir',
           header: 'Confirmación',
-          siFunction: (instance) => {
-            this.formarNota();
-            this.closeModal(instance);
-          },
           width: '30rem',
-        };
-        this.confirmationModal(confirmationObj);
+          botones: {
+            aceptar: { show: false, disable: false },
+            cancelar: { show: false, disable: false },
+            dinamico: [
+              { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+              { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
+            ],
+          },
+        });
       }
     }
   }
@@ -365,9 +379,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
-      html: `<p>
-      ${obj.texto}
-    </p>`,
+      html: `<p> ${obj.texto} </p>`,
       botones: {
         aceptar: { show: false, disable: false },
         cancelar: { show: false, disable: false },
@@ -457,23 +469,13 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     const res = await this.notasClass.createOne(dataToSend);
 
     this.notasClass.parseDataToPdf(res['data']).then((data_parsed) => {
-      const obj = { data: data_parsed, type: 'nota' };
-
-      this.imprimirNota(obj);
+      this.imprimirNota({ data: data_parsed, type: 'nota' });
     });
-
-    this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
   }
 
   imprimirNota(obj) {
-    this.pdfServ
-      .generatePdf({ oPdf: obj, imprimir: true })
-      .then(async (res) => {
-        if (res.status === 'si') fun.toastSuccess('Nota de ' + this.tipoNota + ' realizada con exito.', 'CORRECTO');
-        else fun.toastError(res.msg, 'ERROR');
-
-        this.layServ.nextCheckCuadreToday(true);
-      })
-      .catch((err) => fun.toastError(err.msg, 'ERROR'));
+    this.pdfServ.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err.msg, 'ERROR'));
+    this.layServ.nextCheckCuadreToday(true);
+    this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
   }
 }

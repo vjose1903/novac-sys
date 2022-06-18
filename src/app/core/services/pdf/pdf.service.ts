@@ -26,8 +26,6 @@ export class PdfService {
   constructor(public configServ: ConfigurationService) {}
 
   generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
-    console.log("params ", params);
-
     return new Promise((resolve, reject) => {
       let obj;
       let todo_true = true;
@@ -84,7 +82,6 @@ export class PdfService {
 
           case 'nota':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-            console.log("config.pages_sizes.nota ", config.pages_sizes.nota);
 
             obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas');
             break;
@@ -122,9 +119,6 @@ export class PdfService {
             todo_true = false;
             break;
         }
-
-
-
 
         if (todo_true) {
           const dd = obj.doc;

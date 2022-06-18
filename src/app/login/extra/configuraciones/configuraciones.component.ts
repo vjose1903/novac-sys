@@ -47,12 +47,11 @@ export class ConfiguracionesComponent implements OnInit {
     { name: 'Recibo Ingreso', key: 'recibo_ingreso' },
     { name: 'Nota', key: 'nota' },
     { name: 'Conduce', key: 'conduce' },
-    { name: 'Cuadre Caja', key: 'cuadre_caja' },
   ];
 
   configCopy;
 
-  constructor(private fb: FormBuilder, public sharedServ: SharedService,private router: Router) {}
+  constructor(private fb: FormBuilder, public sharedServ: SharedService, private router: Router) {}
 
   ngOnInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
@@ -85,7 +84,7 @@ export class ConfiguracionesComponent implements OnInit {
       is_db_local: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
       facturacion_editar_precio: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
       vende_sin_inventario: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
-      medida_articulo: [{ value: this.getValue(data, 'medida_articulo'), disabled: false }, Validators.required],
+      medida_producto_terminado: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
       documentos_a_imprimir: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
 
       page_size_recibo_ingreso: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
@@ -230,13 +229,18 @@ export class ConfiguracionesComponent implements OnInit {
       const key = keysConfig[i];
 
       if (fun.hasValue(copyObjLevel[key])) {
-        if (typeof copyObjLevel[key] == 'string') {
+        const tipoDato = typeof copyObjLevel[key];
+
+        if (tipoDato == 'string' || tipoDato == 'boolean') {
           if (copyObjLevel[key] != obj[key]) {
             if (logosKeys.includes(key)) {
               logos_changes[key] = obj[key];
             } else {
-              array_targets.push(`${key}: '${copyObjLevel[key]}'`);
-              array_replacement.push(`${key}: '${obj[key]}'`);
+              const value_target = tipoDato == 'string' ? `'${copyObjLevel[key]}'` : `${copyObjLevel[key]}`;
+              const value_replacement = tipoDato == 'string' ? `'${obj[key]}'` : `${obj[key]}`;
+
+              array_targets.push(`${key}: ${value_target}`);
+              array_replacement.push(`${key}: ${value_replacement}`);
             }
           }
         } else {

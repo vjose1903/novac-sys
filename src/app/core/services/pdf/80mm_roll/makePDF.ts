@@ -23,7 +23,6 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
-
   const is_compra = data.FACTURA_DE === 'compra' ? true : false;
 
   const is_suplidor = is_compra;
@@ -41,7 +40,6 @@ export function makePDF(data, file_name, tipo_pdf?) {
     },
     styles: styles_,
   };
-  console.log("dd ", JSON.stringify(dd));
 
   const obj = { doc: dd, file: file_name, type: 'file' };
   return obj;
@@ -52,9 +50,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
 // ==========================================================================================================================================================
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
-  fun.logPurple('tipo_pdf => ', tipo_pdf);
   const configuration = configuraciones[tipo_pdf];
-  console.log('configuration ', configuration);
 
   data.tipo_tabla = 'normal';
 

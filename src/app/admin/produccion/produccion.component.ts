@@ -7,6 +7,8 @@ import { ProduccionC } from './produccion';
 import * as $ from 'jquery';
 import { fun } from '../../core/services/functions.service';
 import { medidas, table_config } from '../components/new_tablas/tabla-class';
+import { ConfigI } from '../../core/typescript/config-interface';
+import { SingletonService } from '../../core/services/singleton.service';
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
@@ -21,8 +23,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   ingredientes = [];
   ingredientesParaProduccion = [];
 
-  // TODO: poner en la configuracion un dropDown para elegir si es Quintal o Producto
-  optionsMedidas = ['Quintal'];
+  optionsMedidas = [];
 
   info = [];
 
@@ -39,6 +40,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   };
   tablaComponent;
 
+  configApp: ConfigI;
   listaProductos = [];
   articuloEditando: any;
   articuloClass = new ArticuloC();
@@ -50,6 +52,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   ngOnInit() {
     this._init_mixin({ component: 'produccion', is_routing: true });
+    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.optionsMedidas[0] = this.configApp.medida_producto_terminado;
 
     this.getProductosTerminados();
   }

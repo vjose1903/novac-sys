@@ -42,9 +42,4 @@ export class CurrentUserService {
       setTimeout(() => resolve(true), 10);
     });
   }
-
-  // getUser() {
-  //   fun.logOrange('currentUser >>>> ', this.currentUser);
-  //   return this.currentUser;
-  // }
 }

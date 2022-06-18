@@ -11,7 +11,6 @@ export class LayoutService {
   constructor() {}
 
   nextLogOut(nextValue) {
-    console.log('nextLogOut: ', nextValue);
     this.LOGOUT.next(nextValue);
   }
 

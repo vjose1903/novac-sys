@@ -181,7 +181,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       }
     }
 
-    fun.logRed('actualPagination ', actualPagination);
     setTimeout(() => {
       this.getArticulos(actualPagination);
       SingletonService.cdRef.detectChanges();

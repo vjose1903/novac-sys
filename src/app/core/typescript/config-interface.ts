@@ -22,6 +22,7 @@ export interface ConfigI {
   facturacion_editar_precio:   boolean;
   vende_sin_inventario:        boolean;
   documentos_a_imprimir:       string;
+  medida_producto_terminado:             string;
 }
 
 export interface PagesSizes {

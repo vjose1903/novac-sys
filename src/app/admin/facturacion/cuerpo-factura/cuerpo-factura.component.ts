@@ -174,8 +174,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       this.productosDevueltos.push(producto);
     }
     // if (action == 'remove') this.productosDevueltos.push(data);
-
-    console.log('this.productosDevueltos ', this.productosDevueltos);
   }
 
   parsearProductoDevueltos(producto, data, is_defectuoso) {
@@ -376,7 +374,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   seleccionarCampoEnTurno() {
     setTimeout(() => {
-      fun.logPurple('this.inputSecuencia ', this.inputSecuencia);
       this.ajustarSecuencia().then((res) => setTimeout(() => this.enfocarInput(this.inputSecuencia), 10));
     }, 100);
   }
@@ -425,7 +422,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     return new Promise((resolve) => {
       const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
       this.secuencia = filas_ocupadas.length;
-      console.log('filas_ocupadas ', filas_ocupadas);
 
       this.inputSecuencia = 'cod-' + this.secuencia;
       resolve(true);
@@ -767,8 +763,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async getDataFromModal(arg, search) {
-    console.log('arg ', arg);
-
     if (arg?.tipo == 'data_no_found') {
       this.enfocarInput(`cod-${arg.index}`);
       this.selectContenido(`cod-${arg.index}`);

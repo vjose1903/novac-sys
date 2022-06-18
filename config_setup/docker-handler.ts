@@ -35,12 +35,7 @@ export default class DockerHandler {
           }
         });
       } else {
-        console.log('this.count_db ', this.count_db);
-        console.log('this.count_docker ', this.count_docker);
-
         const type_error = this.count_db > 20 ? 'db' : 'docker';
-
-        console.log(':::::::::: type_error ', type_error);
 
         first_reject(type_error);
       }

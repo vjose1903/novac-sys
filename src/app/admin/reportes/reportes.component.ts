@@ -19,8 +19,7 @@ import { fun } from '../../core/services/functions.service';
 export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   pdfSrc: any;
   fileName: any;
-  // TODO: ver como en la data del get data from modal buscar cual modal esta respondiendo
-  tipoModal: string;
+
   scaleImpresion: any;
   reporteClass = new ReporteC();
 
@@ -64,23 +63,18 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  resetVariables() {
-    this.pdfSrc = undefined;
-    this.fileName = undefined;
-    this.tipoModal = undefined;
-  }
-
-  async makePdf(data) {
+  async makePdf(params) {
+    const data = params.data;
     let tipo = '';
     let continuar = true;
     let msg_error = '';
 
     const extra = { afterPath: 'custom', parameters: null };
 
-    if (this.tipoModal === 'cuadre') {
+    if (params.modal_id === 'cuadre') {
       this.makeCuadre(data);
       return;
-    } else if (this.tipoModal === 'ventas_diarias' || this.tipoModal === 'ventas_rango') {
+    } else if (params.modal_id === 'ventas_diarias' || params.modal_id === 'ventas_rango') {
       let formas_pago = '(';
 
       data.switches.array.forEach((item) => {
@@ -103,29 +97,29 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
 
       tipo = 'ventas';
       //
-    } else if (this.tipoModal === 'cuentas_cobrar_cliente' || this.tipoModal === 'cuentas_cobrar_ant_saldo') {
+    } else if (params.modal_id === 'cuentas_cobrar_cliente' || params.modal_id === 'cuentas_cobrar_ant_saldo') {
       extra.parameters = { tipo: data.tipo_ ? data.tipo_ : data.tipo, cliente_id: data.id ? data.id : 1 };
       tipo = 'cuentas_cobrar';
       //
-    } else if (this.tipoModal === 'cuentas_con_pagos') {
+    } else if (params.modal_id === 'cuentas_con_pagos') {
       extra.parameters = { desde: fun.my_dateFormater(data.desde, false), hasta: fun.my_dateFormater(data.hasta, false), cliente_id: data.cliente_id };
       tipo = 'cuentas_con_pagos';
       //
-    } else if (this.tipoModal === 'recibos') {
+    } else if (params.modal_id === 'recibos') {
       extra.parameters = { desde: fun.my_dateFormater(data.desde, false), hasta: fun.my_dateFormater(data.hasta, false), tipo_recibo: data.tipo, order: 'ASC' };
       tipo = 'recibos';
       //
-    } else if (this.tipoModal === 'ventas_productos') {
+    } else if (params.modal_id === 'ventas_productos') {
       if (data.tipo == '1') extra.parameters = { desde: fun.my_dateFormater(data.fecha, false) };
       else extra.parameters = { desde: fun.my_dateFormater(data.desde, false), hasta: fun.my_dateFormater(data.hasta, false) };
 
       tipo = 'ventas_productos';
       //
-    } else if (this.tipoModal === 'suplidor_prod') {
+    } else if (params.modal_id === 'suplidor_prod') {
       extra.parameters = { articulo_id: data.articulo_id, desde: fun.my_dateFormater(data.desde, false), hasta: fun.my_dateFormater(data.hasta, false) };
       tipo = 'suplidor_prod';
       //
-    } else if (this.tipoModal === 'inventario') {
+    } else if (params.modal_id === 'inventario') {
       tipo = 'inventario';
       //
     }
@@ -152,8 +146,8 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   async getDataFromModal(arg: any, search: any) {
     if (arg?.modal_id === 'cuentas_cobrar_cliente') {
       arg.data.tipo_ = 1;
-      this.makePdf(arg.data);
-    } else if (arg && arg.tipo_modal !== 'buscarCliente') this.makePdf(arg.data);
+      this.makePdf(arg);
+    } else if (arg && arg.tipo_modal !== 'buscarCliente') this.makePdf(arg);
   }
 
   parseDataToVisorPdf(arg) {
@@ -165,21 +159,9 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       this.fileName = arg.file;
 
       if (arg.file === 'cuadre.pdf') {
-        obj = {
-          pdfSrc: arg.body,
-          titulo: 'Cuadre de caja',
-          height: '25rem',
-          reimprimir: arg.reimprimir,
-          fileName: arg.file.split('.')[0],
-        };
+        obj = { pdfSrc: arg.body, titulo: 'Cuadre de caja', height: '25rem', reimprimir: arg.reimprimir, fileName: arg.file.split('.')[0] };
       } else if (arg.file === 'reporte.pdf') {
-        obj = {
-          pdfSrc: arg.body,
-          titulo: this.titulo_moda_reporte,
-          height: '76vh',
-          reimprimir: arg.reimprimir,
-          fileName: arg.file.split('.')[0],
-        };
+        obj = { pdfSrc: arg.body, titulo: this.titulo_moda_reporte, height: '76vh', reimprimir: arg.reimprimir, fileName: arg.file.split('.')[0] };
       }
 
       this.abrirVisorPdf(obj);
@@ -192,8 +174,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   formarObjModal(tipo) {
     const obj = {};
     let tipo_modal = 'reportes';
-    this.tipoModal = tipo;
-    let abrirModal = true;
 
     if (tipo === 'cuadre') this.titulo_moda_reporte = 'Reporte de cuadre de caja';
     //
@@ -224,8 +204,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     else if (tipo === 'inventario') {
       this.titulo_moda_reporte = 'Reporte de inventario';
       tipo_modal = 'inventario';
-      abrirModal = false;
-      this.makePdf({ tipo_: 1 });
+      this.makePdf({ data: { tipo_: 1 }, modal_id: 'inventario' });
       //
     }
 
@@ -245,7 +224,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
       };
     }
 
-    // if (abrirModal) this.abrirModal(tipo_modal, obj, tipo);
     if (tipo_modal !== 'inventario') {
       const variableData = {
         reportes: { component: FormVentasComponent, width: '510px' },
@@ -259,6 +237,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
           },
         },
       };
+
       const objHandler = {
         inputs: obj,
         id: tipo,
@@ -268,7 +247,9 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
           cancelar: { show: true, disable: false },
         },
       };
-      this.handleModalForm({ ...objHandler, ...variableData[tipo_modal] });
+      const modal = { ...objHandler, ...variableData[tipo_modal] };
+
+      this.handleModalForm(modal);
     }
   }
 

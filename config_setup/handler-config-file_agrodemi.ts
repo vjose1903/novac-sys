@@ -22,9 +22,9 @@ export default class HandlerConfigFile {
     printer_caja_selected: null,
     printer_reportes_selected: null,
     is_db_local: true,
-    facturacion_editar_precio: true,
-    vende_sin_inventario: true,
-    medida_articulo: 'Quintal',
+    facturacion_editar_precio: false,
+    vende_sin_inventario: false,
+    medida_producto_terminado: 'Quintal',
 
     pages_sizes: {
       recibo_ingreso: '8.5x5.5',
@@ -35,7 +35,7 @@ export default class HandlerConfigFile {
       reporte: '8.5x11',
     },
 
-    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce,cuadre_caja',
+    documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota',
   };
 
   static checkConfigFile(win: BrowserWindow): Promise<any> {

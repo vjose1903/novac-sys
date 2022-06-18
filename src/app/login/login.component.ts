@@ -36,6 +36,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
   requestClass = new RequestC();
   configServ = SingletonService.configServ;
+  configApp: ConfigI;
 
   constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public pdfServ: PdfService, public currentUserServ: CurrentUserService) {
     super();
@@ -45,6 +46,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
   ngAfterViewInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
+      this.configApp = config;
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       this.versionApp = config.app_version;
 
@@ -91,7 +93,11 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     const formulario = this.form.getRawValue();
 
     if (formulario.usuario == '1973' && formulario.password == '3791') {
-      this.openConfigsModal();
+      if (this.configApp.is_development) {
+        this.router.navigateByUrl('/auth/config');
+      } else {
+        this.openConfigsModal();
+      }
     } else {
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })

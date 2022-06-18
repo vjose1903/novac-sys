@@ -64,6 +64,8 @@ export enum tipos_articulos {
   Otros = 4,
 }
 
+
+
 export class TipoArticuloC extends CrudG<any> {
   constructor() {
     super('tipo_articulos');

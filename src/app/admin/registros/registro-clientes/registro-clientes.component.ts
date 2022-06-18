@@ -211,15 +211,11 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
           enable_campos = true;
           return;
         }
-        console.log('ANDO AQUI');
 
         await fun
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: tipo })
           .then((res) => {
             if (res['data'].length) {
-              console.log('ANDO AQUIII');
-              console.log('res[data] ', res['data']);
-
               const is_cliente = _.find(res['data'], (item) => item.persona_is === 'Cliente');
               const id_anterior = this.form.getRawValue().id;
 
@@ -240,7 +236,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
               }
 
               this.form.patchValue(persona);
-              fun.logRed('this.form.getRawValue() ', this.form.getRawValue());
 
               this.patchDocumentos(persona.documentos_de_identidad);
 

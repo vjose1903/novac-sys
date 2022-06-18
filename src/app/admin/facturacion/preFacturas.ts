@@ -27,18 +27,12 @@ export class PreFacturaClass extends MixinClass {
   async buscarPreFactura(numero) {
     try {
       const res = await this.facturaClass.getAll({ afterPath: `custom/pre_factura/${numero}`, parameters: { tipo: 'single', paginado: false } });
-      console.log(`res  => `, res);
       const pre_factura = res['data'];
 
-      console.log(`pre_factura  => `, pre_factura);
       pre_factura.detalle_facturas = pre_factura.detalle_facturas.map((detalle) => {
-        console.log("detalle ", detalle);
-
         detalle.from_pre_factura = true;
         return detalle;
       });
-
-      console.log('AQUII');
 
       this.mostrarFactura(pre_factura);
       // fun.toastError('No existe Pre-factura con este número.', 'ERROR');
