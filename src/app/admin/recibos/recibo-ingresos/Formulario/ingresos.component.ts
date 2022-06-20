@@ -12,6 +12,7 @@ import { FormCantidadEfectivoComponent } from '../../../components/formularios e
 import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../../components/new_tablas/tabla-class';
+import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
 
 @Component({
   selector: 'app-ingresos',
@@ -29,7 +30,17 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-      { titulo: '1', tipo: 'icon', key: 'actions', estilos: [{ width: '6%' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'historyPagos', rowTooltip: 'tooltip_history', text_color: 'colorEstado' }] },
+      {
+        titulo: '1',
+        tipo: 'icon',
+        key: 'actions',
+        div_class: 'd-flex justify-content-around',
+        estilos: [{ width: '6%' }, { color: 'var(--transparente00)' }],
+        iconsArray: [
+          { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
+          { key: 'historyPagos', rowTooltip: 'tooltip_history', text_color: 'colorEstado' },
+        ],
+      },
 
       { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
       { titulo: 'Fecha Facturacion', tipo: 'text', key: 'fecha' },
@@ -173,11 +184,13 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
       factura.colorEstado = factura.is_viaje ? 'green' : modalMoviemientos ? 'black' : 'gris-claro';
       factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
+      factura.ver = 'far fa-eye';
 
       factura.customStyles = {
         actions: [
-          { key: 'actions', isTd: true, estilos: 'width: 6% !important;' },
+          { key: 'actions', isTd: true, estilos: 'width: 6% !important; padding: 0.6rem 0rem !important' },
           { key: 'historyPagos', estilos: 'font-size: 1rem !important' },
+          { key: 'ver', estilos: 'font-size: 1rem !important' },
         ],
         select: { width: '6rem' },
         pagoT: { width: '6rem' },
@@ -409,6 +422,12 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
         this.reciboServ.abrirModalHistorial(params.data.pagos, params.data.notas);
       }
+      if (params.iconKey == 'ver') {
+        console.log('tableClickIcon > params.data', params.data);
+        this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
+          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => this.handleModalForm(obj_modal));
+        });
+      }
     }
   }
 
@@ -418,12 +437,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         const factura = _.find(this.facturas, { id: params.data.id });
         factura.pagoT = false;
         params.data.monto = '0.00';
-        // this.tablaComponent.resetInput('monto', 'especificar', params.index, true, '0.00');
       }
     }
 
     if (params.key == 'pagoT' && params.value) {
-      // this.tablaComponent.resetInput('monto', 'balance', params.index, true);
       params.data.monto = fun.numFormatTwoDecimals(params.data.balance);
     }
 

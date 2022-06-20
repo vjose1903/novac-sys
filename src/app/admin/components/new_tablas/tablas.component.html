@@ -86,7 +86,7 @@
                       <img width="100%" height="auto" alt="{{ dato[column.alt] }}" [src]="getValueForm(column, dato)" class="img-fluid" />
                     </span>
 
-                    <span *ngSwitchCase="'icon'" class="d-flex justify-content-center align-items-center w-100">
+                    <span *ngSwitchCase="'icon'" class="d-flex {{ column.div_class ? column.div_class : 'justify-content-center align-items-center ' }} w-100">
                       <ng-container *ngFor="let objIcon of column.iconsArray">
                         <span *ngIf="showIcon(objIcon, dato)" class="span_icon" [ngClass]="{ icon_disable: disabledInput(dato, objIcon) }">
                           <i

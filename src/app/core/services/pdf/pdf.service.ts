@@ -88,16 +88,6 @@ export class PdfService {
           case 'facturacion': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
 
-            data.total = data.total_factura;
-            data.numero_documento = data.numero_factura;
-            data.contenido_reporte = data.detalle_facturas;
-            data.tipo_pdf = data.tipo_factura.toUpperCase();
-
-            data.contenido_reporte.map((detalle) => {
-              detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
-            });
-
-            /* Llamando a la función makePDF desde el archivo facturasCompraVenta.ts. */
             obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.Pre_factura ? 'pre_factura' : 'ventas');
             break;
 

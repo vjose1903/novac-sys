@@ -303,9 +303,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         if (tipo == 'editar') {
           factura = await this.facturaClass.getFacturaById(id);
-          console.log('ANTES this.getTiposFacturas > factura', factura);
           factura = factura['data'];
-          console.log('DESPUES this.getTiposFacturas > factura', factura);
 
           this.factura_a_editar = factura;
           this.propietario_factura = factura.cliente;
@@ -1413,19 +1411,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (metodo === 'editar_factura') res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_editar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
 
-    let res_factura = res['data'];
-
     if (this.factura_guardada) this.revisarLocalStorage();
 
-    res_factura['FACTURA_DE'] = this.metodo == 'pre-venta' ? 'venta' : this.metodo;
+    this.facturaClass.parseDataToPdf(res['data']).then(async (factura_parsed) => {
+      const obj = { data: factura_parsed, type: 'facturacion' };
 
-    const obj = { data: res_factura, type: 'facturacion' };
+      this.pdfServ.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError('Error imprimiendo la factura', 'ERROR'));
 
-    this.pdfServ.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError('Error imprimiendo la factura', 'ERROR'));
+      this.layServ.nextCheckCuadreToday(true);
 
-    this.layServ.nextCheckCuadreToday(true);
-
-    if (metodo === 'editar_factura') this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
-    else await this.resetVariables();
+      if (metodo === 'editar_factura') this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
+      else await this.resetVariables();
+    });
   }
 }

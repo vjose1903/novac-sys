@@ -19,10 +19,9 @@ function getPageMargin(is_contado) {
   return margins;
 }
 
-export function makePDF(data, file_name, tipo_pdf?) {
-  const is_venta = data.FACTURA_DE === 'venta' ? true : false;
+export function makePDF(data, file_name) {
+  const is_venta = data.tipo === 'venta' ? true : false;
   const is_contado = data.condicion === 'Contado' ? true : false;
-  const is_nota = data.FACTURA_DE === 'nota' ? true : false;
 
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
 
@@ -30,9 +29,9 @@ export function makePDF(data, file_name, tipo_pdf?) {
     pageSize: is_contado ? { width: 990, height: 398 } : { width: 990, height: 796 },
     pageMargins: getPageMargin(is_contado),
     header: (currentPage, pageCount, pageSize) => {
-      return cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, pageCount, configApp);
+      return cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, configApp);
     },
-    content: contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp),
+    content: contenidoFacturaVenta(data, is_contado, is_venta, configApp),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
@@ -47,7 +46,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, pageCount, configApp: ConfigI) {
+function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, configApp: ConfigI) {
   const header = [
     {
       columns: [
@@ -65,31 +64,19 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
           },
         ],
         [
-          is_nota
-            ? { text: '' }
-            : {
-                text: 'FACTURA A ' + data.condicion.toUpperCase(),
-                alignment: 'right',
-                bold: true,
-                style: 'letra14',
-                margin: [0, 20, 30, 0],
-              },
           {
-            text: data.tipo_factura,
+            text: 'FACTURA A ' + data.condicion.toUpperCase(),
+            alignment: 'right',
+            bold: true,
             style: 'letra14',
-            margin: [0, is_nota ? 20 : 2, 30, 0],
+            margin: [0, 20, 30, 0],
+          },
+          {
+            text: data.tipo_pdf,
+            style: 'letra14',
+            margin: [0, 2, 30, 0],
             alignment: 'right',
           },
-
-          is_nota
-            ? {
-                text: `Aplicada a: ${data.aplicada_a}`,
-                style: 'letra11',
-                margin: [0, 2, 30, 0],
-                alignment: 'right',
-              }
-            : { text: '' },
-          //
         ],
       ],
     },
@@ -122,19 +109,13 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
       margin: [15, 8, 0, 0],
       text: [
         {
-          text: [
-            is_venta || is_nota ? { text: 'Cliente : ', style: 'letra12' } : { text: 'Suplidor : ', style: 'letra12' },
-            is_venta || is_nota ? { text: data.cliente.nombre, style: 'letra12' } : { text: data.suplidor.nombre, style: 'letra12' },
-          ],
+          text: [is_venta ? { text: 'Cliente : ', style: 'letra12' } : { text: 'Suplidor : ', style: 'letra12' }, is_venta ? { text: data.cliente.nombre, style: 'letra12' } : { text: data.suplidor.nombre, style: 'letra12' }],
         },
       ],
     },
 
     {
-      text: [
-        is_venta || is_nota ? { text: 'Rnc cliente : ', style: 'letra12' } : { text: 'Rnc suplidor : ', style: 'letra12' },
-        is_venta || is_nota ? { text: data.cliente.rnc, style: 'letra12' } : { text: data.suplidor.rnc, style: 'letra12' },
-      ],
+      text: [is_venta ? { text: 'Rnc cliente : ', style: 'letra12' } : { text: 'Rnc suplidor : ', style: 'letra12' }, is_venta ? { text: data.cliente.rnc, style: 'letra12' } : { text: data.suplidor.rnc, style: 'letra12' }],
       margin: [15, 5, 0, 0],
     },
 
@@ -142,7 +123,7 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
       margin: [15, 5, 0, 0],
       text: [
         {
-          text: [{ text: 'Dirección : ', style: 'letra12' }, is_venta || is_nota ? { text: data.cliente.direccion, style: 'letra12' } : { text: data.suplidor.direccion, style: 'letra12' }],
+          text: [{ text: 'Dirección : ', style: 'letra12' }, is_venta ? { text: data.cliente.direccion, style: 'letra12' } : { text: data.suplidor.direccion, style: 'letra12' }],
         },
       ],
     },
@@ -177,15 +158,12 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
         {
           text: [
             { text: 'Doc No : ', style: 'letra11' },
-            { text: fun_.my_padStart(data.numero_factura, 8, '0'), style: 'letra11' },
+            { text: fun_.my_padStart(data.numero_documento, 8, '0'), style: 'letra11' },
           ],
           margin: [85, 3, 0, 0],
         },
         {
-          text: [
-            { text: 'Valida hasta : ', style: 'letra11' },
-            data.tipo_factura_id === 3 ? { text: 'No aplica.', style: 'letra11' } : data.FACTURA_DE === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra11' },
-          ],
+          text: [{ text: 'Valida hasta : ', style: 'letra11' }, data.tipo_factura_id == 3 ? { text: 'No aplica.', style: 'letra11' } : data.tipo === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra11' }],
           margin: [85, 3, 0, 0],
         },
       ],
@@ -193,9 +171,7 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
 
     // =============================================================
     {
-      canvas: [
-        { type: 'rect', x: 10, y: 3, w: 970, h: 2, color: '#000000', },
-      ],
+      canvas: [{ type: 'rect', x: 10, y: 3, w: 970, h: 2, color: '#000000' }],
     },
 
     {
@@ -208,7 +184,7 @@ function cabeceraFacturaVenta(data, is_nota, is_contado, is_venta, currentPage, 
             { text: ' #', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
             { text: 'Articulo', bold: true, margin: [-5, 0, 0, 0] },
             { text: 'Cantidad', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
-            is_venta || is_nota ? { text: 'Precio', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
+            is_venta ? { text: 'Precio', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
             { text: 'Itbis', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
             { text: 'Total', bold: true, alignment: 'right', margin: [0, 0, 18, 0] }, // margin: [12, 0, 0, 0]
           ],
@@ -232,11 +208,11 @@ function calcularPrecio(cant, precio, tipo) {
   return fun_.redondearAdos(res);
 }
 
-function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: ConfigI) {
+function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
   const tempBody = [];
   const _break = is_contado ? 6 : 26;
 
-  data.detalle_facturas.forEach((detalle, i) => {
+  data.contenido_reporte.forEach((detalle, i) => {
     const row = [];
     const br_ = i !== 0 && i % _break === 0;
 
@@ -245,7 +221,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: C
       { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none' },
       { text: detalle.cantidad, alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       {
-        text: fun_.numFormatTwoDecimals(is_venta || is_nota ? detalle.precio : detalle.costo),
+        text: fun_.numFormatTwoDecimals(is_venta ? detalle.precio : detalle.costo),
         alignment: 'right',
         margin: [0, 0, 14, 0],
         pageBreak: br_ ? 'before' : 'none',
@@ -337,7 +313,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: C
                       text: fun_.numFormatTwoDecimals(data.Bruto),
                       style: 'letra11',
                       alignment: 'right',
-                      margin: [0, 0, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
+                      margin: [0, 0, data.contenido_reporte.length <= 5 ? 29 : 49, 0],
                     },
                   ],
                   [
@@ -346,7 +322,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: C
                       text: fun_.numFormatTwoDecimals(data.itbis),
                       style: 'letra11',
                       alignment: 'right',
-                      margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
+                      margin: [0, -2, data.contenido_reporte.length <= 5 ? 29 : 49, 0],
                     },
                   ],
                   [
@@ -355,7 +331,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: C
                       text: fun_.numFormatTwoDecimals(data.descuento),
                       style: 'letra11',
                       alignment: 'right',
-                      margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
+                      margin: [0, -2, data.contenido_reporte.length <= 5 ? 29 : 49, 0],
                     },
                   ],
                   [
@@ -364,10 +340,10 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: C
                       text: fun_.numFormatTwoDecimals(data.total_factura),
                       style: 'letra11',
                       alignment: 'right',
-                      margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
+                      margin: [0, -2, data.contenido_reporte.length <= 5 ? 29 : 49, 0],
                     },
                   ],
-                  data.FACTURA_DE === 'compra' || is_nota
+                  data.tipo === 'compra'
                     ? [{ text: '' }, { text: '' }]
                     : [
                         { text: 'Devuelta RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
@@ -375,7 +351,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: C
                           text: fun_.numFormatTwoDecimals(data.devuelta),
                           style: 'letra11',
                           alignment: 'right',
-                          margin: [0, -2, data.detalle_facturas.length <= 5 ? 29 : 49, 0],
+                          margin: [0, -2, data.contenido_reporte.length <= 5 ? 29 : 49, 0],
                         },
                       ],
                 ],
@@ -437,7 +413,7 @@ function contenidoFacturaVenta(data, is_nota, is_contado, is_venta, configApp: C
                         <text transform="translate(10, 63)" style="font-size: 12px" font-weight="bold"> *** ${numero_letra}  *** </text>
 
                         <text transform="translate(10, 77)" style="font-size: 11px"> Valor recibido a mi (nuestra) entera satisfacción segun la</text>
-                        <text transform="translate(292, 77)" style="font-size: 11px" font-weight="bold"> Factura No. ${fun_.my_padStart(data.numero_factura, 8, '0')}</text>
+                        <text transform="translate(292, 77)" style="font-size: 11px" font-weight="bold"> Factura No. ${fun_.my_padStart(data.numero_documento, 8, '0')}</text>
                         <text transform="translate(405, 77)" style="font-size: 11px"> para el fiel cumplimiento del pago</text>
                         <text transform="translate(572, 77)" style="font-size: 11px"> quedan afectados mis (nuestros) bienes habidos y por haber,</text>
                         <text transform="translate(10, 90)" style="font-size: 11px"> con renuncia de fuero de domicilio y de cualquier otra que puediera favorecerme (nos).</text>

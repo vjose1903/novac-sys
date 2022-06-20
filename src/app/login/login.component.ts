@@ -20,6 +20,7 @@ import { ConfigI } from '../core/typescript/config-interface';
 import { fun } from '../core/services/functions.service';
 import { CurrentUserService } from '../core/services/current-user.service';
 import { LayoutService } from '../admin/layout/layout.service';
+import { FacturaC } from '../admin/facturacion/factura';
 
 @Component({
   selector: 'app-login',
@@ -136,11 +137,11 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     // const data_ = venta_contado_consumo;
     // const data_ = nota_credito;
 
-    const obj = { data: data_, type: 'facturacion' };
-
-    this.tipo_prueba = obj.type;
-
-    this.generar(obj);
+    new FacturaC().parseDataToPdf(data_).then(async (factura_parsed) => {
+      const obj = { data: factura_parsed, type: 'facturacion' };
+      this.tipo_prueba = obj.type;
+      this.generar(obj);
+    });
   }
 
   async pruebaRecibo() {
@@ -148,7 +149,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
     // const DD = await this.pdfServ.makeFacturaVenta(data);
     const obj = { data: data_, type: 'recibo_ingreso' };
-
+    // ["type"] =
     this.tipo_prueba = obj.type;
 
     this.generar(obj);

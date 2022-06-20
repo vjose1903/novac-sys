@@ -24,11 +24,21 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   table_config: table_config = {
     info: [
-      { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' }] },
-      { titulo: 'Fecha Fact.', tipo: 'text', key: 'fecha' },
-      { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar' },
-      { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante' },
-      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
+      {
+        titulo: '1',
+        tipo: 'icon',
+        key: 'actions',
+        div_class: 'd-flex justify-content-around',
+        estilos: [{ width: '5%' }, { color: 'var(--transparente00)' }],
+        iconsArray: [
+          { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
+          { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' },
+        ],
+      },
+      { titulo: 'Fecha Fact.', tipo: 'text', key: 'fecha', estilos: [{ width: '20%' }] },
+      { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar', estilos: [{ width: '35%' }] },
+      { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '15%' }] },
+      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', estilos: [{ width: '20%' }] },
     ],
     padre_functions: { data_request: (params) => this.getViajes(params) },
     filtrar: { local: false },
@@ -150,10 +160,22 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         viaje.is_active = viaje.fecha_completada ? 'fas fa-check' : viaje.pagos.length > 0 ? 'far fa-check-square' : 'far fa-square';
         viaje.colorIsActive = viaje.fecha_completada ? 'green' : viaje.pagos.length > 0 ? 'yellow' : 'red';
         viaje.is_active_tooltip = viaje.fecha_completada ? 'Pago completo' : viaje.pagos.length > 0 ? 'Viaje abonado' : 'Viaje pendiente';
+        viaje.ver = 'far fa-eye';
 
-        viaje.customStyles = { estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }] };
+        viaje.customStyles = {
+          actions: [
+            { key: 'actions', isTd: true, estilos: 'width: 5% !important; padding: 0.6rem 0rem !important' },
+            { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' },
+            { key: 'ver', estilos: 'font-size: 1rem !important' },
+          ],
+          fecha: { width: '20%' },
+          cliente_mostrar: { width: '35%' },
+          numero_comprobante: { width: '15%' },
+          total_factura: { width: '20%' },
+        };
+
         viaje.cliente_mostrar = viaje.cliente.nombre;
-        viaje.fecha = moment(viaje.fecha_equivalente).format('DD-MM-YYYY');
+        viaje.fecha = moment(viaje.fecha_equivalente).format('DD/MM/YYYY');
         viaje['pago_a_tiempo'] = pago_a_tiempo;
 
         this.viajes.push(viaje);
@@ -184,6 +206,16 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     if (fun.isEmpty(formulario.choferes_viajes) || fun.isEmpty(formulario.camiones_viajes)) res = true;
 
     return res;
+  }
+
+  tableClickIcon(params) {
+    if (params.columnKey == 'actions') {
+      if (params.iconKey == 'ver') {
+        this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
+          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => this.handleModalForm(obj_modal));
+        });
+      }
+    }
   }
 
   abrir_historial() {

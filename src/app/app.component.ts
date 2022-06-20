@@ -29,6 +29,7 @@ import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
 import { CurrentUserService } from './core/services/current-user.service';
 import { MixinClass } from './core/typescript/MixinClass';
+import { PdfService } from './core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-root',
@@ -60,6 +61,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
+    public pdfServ: PdfService,
 
     private currentUserServ: CurrentUserService,
   ) {
@@ -77,6 +79,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     SingletonService.layServ = this.layServ;
     SingletonService.toastr = this.toastr;
     SingletonService.sharedServ = this.sharedServ;
+    SingletonService.pdfServ = this.pdfServ;
     SingletonService.cdRef = this.cdRef;
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
