@@ -16,7 +16,7 @@ import { fun } from '../../../../core/services/functions.service';
   templateUrl: './form-reportes.component.html',
   styleUrls: ['./form-reportes.component.scss'],
 })
-export class FormVentasComponent extends MixinClass implements OnInit, ModalI {
+export class FormReportesComponent extends MixinClass implements OnInit, ModalI {
   @Input() tipo_reporte;
   @Input() switches;
   fun = fun;
@@ -143,6 +143,14 @@ export class FormVentasComponent extends MixinClass implements OnInit, ModalI {
       this.tipos = [
         { id: '2', label: 'Detallado' },
         { id: '3', label: 'Agrupado' },
+      ];
+    } else if (this.tipo_reporte === 'notas') {
+      this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
+      this.form.controls.hasta.setValue(new Date());
+      this.tipos = [
+        { label: 'Crédito', id: 'credito' },
+        { label: 'Dédito', id: 'dédito' },
+        { label: 'Todas', id: 'todas' },
       ];
     } else if (this.tipo_reporte === 'ventas_productos') {
       this.tipos = [

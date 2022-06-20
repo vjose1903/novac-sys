@@ -5,10 +5,9 @@ import { MixinClass } from '../../core/typescript/MixinClass';
 import * as _ from 'lodash';
 import { ReporteC } from './reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
-import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../electron/shared-electron-angular';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
-import { FormVentasComponent } from '../components/formularios en modales/form-reportes/form-reportes.component';
+import { FormReportesComponent } from '../components/formularios en modales/form-reportes/form-reportes.component';
 import { fun } from '../../core/services/functions.service';
 
 @Component({
@@ -201,7 +200,18 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     //
     else if (tipo === 'suplidor_prod') this.titulo_moda_reporte = 'Reporte de suplidor por producto';
     //
-    else if (tipo === 'inventario') {
+    else if (tipo === 'notas') {
+      this.titulo_moda_reporte = 'Reporte de notas';
+      obj['tipos_notas'] = {
+        title: 'Seleccione los metodos de pago deseados',
+        array: [
+          { label: 'Crédito', value: 'credito' },
+          { label: 'Dédito', value: 'dédito' },
+          { label: 'Todas', value: 'todas' },
+        ],
+      };
+      //
+    } else if (tipo === 'inventario') {
       this.titulo_moda_reporte = 'Reporte de inventario';
       tipo_modal = 'inventario';
       this.makePdf({ data: { tipo_: 1 }, modal_id: 'inventario' });
@@ -226,7 +236,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (tipo_modal !== 'inventario') {
       const variableData = {
-        reportes: { component: FormVentasComponent, width: '510px' },
+        reportes: { component: FormReportesComponent, width: '510px' },
         buscarCliente: {
           component: BuscarClienteSuplidorComponent,
           width: '900px',
