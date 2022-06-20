@@ -44,8 +44,9 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   inputs: any;
 
   ngOnInit() {
-    this.efectivo = this.formatoNumero(this.inputs.devuelta);
+    this.efectivo = this.formatoNumero(this.inputs.efectivo);
     this.factura_de = this.inputs.factura_de;
+    this.formaPago = this.inputs.formaPago;
 
     if (!this.inputs.cambios_articulos) this.cambiar_articulos = 'no';
   }
@@ -56,10 +57,11 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
       this.handleDefaultSwitch();
 
-      // if (this.factura_de != 'compra' && this.inputs.tipo_modal == 'devuelta') this.enfocarInput('inputEfectivo');
       if (this.factura_de != 'compra') this.enfocarInput('inputEfectivo');
 
       if (this.factura_de == 'compra' && !this.inputs.cambios_articulos) this.disableBtnConfirm(false);
+      this.validarForm('init');
+      this.calcularDevueta();
     }, 250);
   }
 
@@ -142,7 +144,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
     const isInvalid = isNaN(efectivo) ? true : this.inputs.tipo_modal != 'no_devuelta' && total > efectivo;
 
-    if (from == 'input') this.disableBtnConfirm(isInvalid);
+    if (from == 'input' || from == 'init') this.disableBtnConfirm(isInvalid);
 
     return isInvalid;
   }

@@ -88,6 +88,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   objDevueltoResponse(res) {
+    // TODO: ver si esto esta funcionando aqui
     if (res && res.tipo_modal === 'cambio') {
       this.devuelta = res.data.devuelta > 0 ? res.data.devuelta : 0;
       this.forma_pago = res.data.forma_pago;

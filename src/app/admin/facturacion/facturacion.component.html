@@ -9,8 +9,8 @@
           <div class="col-3 p-0">
             <span class="titulos"><strong>Tipo:</strong></span>
             <input
-            #tipoFact
-            id="tipoFact"
+              #tipoFact
+              id="tipoFact"
               placement="right"
               triggers="focus"
               type="text"
@@ -21,6 +21,7 @@
               (focus)="tiposFacturas.toggle($event)"
               tabindex="-1"
               [readOnly]="!!factura_a_editar"
+              [ngClass]="{ disabled: !!factura_a_editar }"
             />
 
             <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">

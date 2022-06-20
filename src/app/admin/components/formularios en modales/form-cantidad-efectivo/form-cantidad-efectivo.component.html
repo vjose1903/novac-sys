@@ -35,25 +35,7 @@
     </div>
   </div>
 </div>
-<!-- ======================================================= -->
 
-<div *ngIf="factura_de !== 'compra' && inputs.tipo_modal == 'credito'" class="row">
-  <div class="col-12">
-    <div class="d-flex">
-      <h3 class="label w-100">TOTAL NOTA: RD$</h3>
-      <span class="negrita w-100 total">
-        {{ formatoNumero(inputs.total_factura) }}
-      </span>
-    </div>
-
-    <div class="col-12">
-      <div class="form-group">
-        <input (click)="cancelar()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-        <input (click)="btn_aceptar()" type="submit" class="btn btn-verde" value="Confirmar" id="btnSend" />
-      </div>
-    </div>
-  </div>
-</div>
 <!-- ======================================================= -->
 <div *ngIf="factura_de == 'compra'" class="row">
   <div class="col-12">
