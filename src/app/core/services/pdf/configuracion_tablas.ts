@@ -767,4 +767,74 @@ const t_c = {
       },
     ],
   },
+
+  // --------------------------------------
+  // NOTAS
+  // --------------------------------------
+  notas: {
+    margin_general: [0, 0, 0, 0],
+    isBreak: true,
+    only_titulo: false,
+    break: 40,
+    widths: [24, 60, 'auto', 73, 73,  '*'],
+    info: [
+      {
+        text: '#',
+        alignment_titulo: 'center',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+
+        key: 'index',
+        alignment_body: 'center',
+      },
+      {
+        text: 'Fecha',
+        alignment_titulo: 'left',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'fecha',
+        alignment_body: 'left',
+        formato_fecha: true,
+      },
+      {
+        text: 'Tipo nota',
+        alignment_titulo: 'left',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'tipo_nota',
+        alignment_body: 'left',
+      },
+      {
+        text: 'Comprobante',
+        style: 'letra10',
+        alignment_titulo: 'left',
+        noWrap: true,
+        style_body: 'letra10',
+        key: 'numero_comprobante',
+        alignment_body: 'left',
+      },
+      {
+        text: 'Factura',
+        style: 'letra10',
+        alignment_titulo: 'left',
+        noWrap: true,
+        style_body: 'letra10',
+        key: 'factura',
+        alignment_body: 'left',
+      },
+      {
+        text: 'Monto',
+        alignment_titulo: 'right',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'monto',
+        alignment_body: 'right',
+        formato_numero: true,
+      },
+    ],
+  },
 };

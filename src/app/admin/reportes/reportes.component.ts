@@ -121,6 +121,10 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     } else if (params.modal_id === 'inventario') {
       tipo = 'inventario';
       //
+    } else if (params.modal_id === 'notas') {
+      extra.parameters = { desde: fun.my_dateFormater(data.desde, false), hasta: fun.my_dateFormater(data.hasta, false), tipo_factura_id: data.tipo };
+      tipo = 'notas';
+      //
     }
 
     extra.afterPath += `/${tipo}`;
@@ -200,18 +204,9 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     //
     else if (tipo === 'suplidor_prod') this.titulo_moda_reporte = 'Reporte de suplidor por producto';
     //
-    else if (tipo === 'notas') {
-      this.titulo_moda_reporte = 'Reporte de notas';
-      obj['tipos_notas'] = {
-        title: 'Seleccione los metodos de pago deseados',
-        array: [
-          { label: 'Crédito', value: 'credito' },
-          { label: 'Dédito', value: 'dédito' },
-          { label: 'Todas', value: 'todas' },
-        ],
-      };
-      //
-    } else if (tipo === 'inventario') {
+    else if (tipo === 'notas') this.titulo_moda_reporte = 'Reporte de notas';
+    //
+    else if (tipo === 'inventario') {
       this.titulo_moda_reporte = 'Reporte de inventario';
       tipo_modal = 'inventario';
       this.makePdf({ data: { tipo_: 1 }, modal_id: 'inventario' });
