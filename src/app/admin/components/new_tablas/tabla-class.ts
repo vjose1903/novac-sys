@@ -29,7 +29,7 @@ export interface table_info {
   click?: Function;
   iconsArray?: Array<iconsI>;
   key_value?: string;
-  div_class?:string
+  div_class?: string;
 }
 
 interface keySourceArray {

@@ -21,7 +21,7 @@ export default class HandlerConfigFile {
     usa_url_principal: true,
     printer_caja_selected: null,
     printer_reportes_selected: null,
-    is_db_local: true,
+    is_db_local: false,
     facturacion_editar_precio: false,
     vende_sin_inventario: false,
     medida_producto_terminado: 'Quintal',
