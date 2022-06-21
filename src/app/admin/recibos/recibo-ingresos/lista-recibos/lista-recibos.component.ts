@@ -234,13 +234,21 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   imprimir_base64() {
     const obj = { base64: this.pdfSrc, filename: this.fileName, type: 'recibo_ingreso' };
-    this.pdfServ
-      .imprimirBase64(obj)
-      .then(async (res) => {
-        if (res['status'] === 'si') fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
-        else fun.toastError(res['msg'], 'ERROR');
-      })
-      .catch((err) => fun.toastError(err['msg'], 'ERROR'));
+    try {
+      this.pdfServ
+        .imprimirBase64(obj)
+        .then(async (res) => {
+          if (res['status'] === 'si') fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
+          else fun.toastError(res['msg'], 'ERROR');
+        })
+        .catch((err) => {
+          console.error(err);
+
+          fun.toastError(err['msg'], 'ERROR');
+        });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async anularRecibo(id) {

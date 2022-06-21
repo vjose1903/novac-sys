@@ -82,6 +82,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     SingletonService.pdfServ = this.pdfServ;
     SingletonService.cdRef = this.cdRef;
 
+
+
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
 
     this.subModified = MODIFIED_CONFIG_FILE.subscribe((res) => {

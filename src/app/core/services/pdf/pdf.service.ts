@@ -18,12 +18,11 @@ import { ConfigurationService } from '../configuration.service';
 import { ConfigI } from '../../typescript/config-interface';
 import { fun } from '../functions.service';
 import { tipo_factura_id } from '../../../admin/facturacion/factura';
+import { IpcService } from '../ipc.service';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
-  _ipc = SingletonService._ipc;
-
-  constructor(public configServ: ConfigurationService) {}
+  constructor(public configServ: ConfigurationService, public _ipc: IpcService) {}
 
   generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
     return new Promise((resolve, reject) => {
@@ -168,17 +167,21 @@ export class PdfService {
   }
 
   imprimirBase64(oBase: { base64: string; filename: string; type: string }) {
-    return new Promise<any>((resolve, reject) => {
-      const task = new MessageTask(KEYWORD_ELECTRON_PRINT_BASE64, oBase);
+    try {
+      return new Promise<any>((resolve, reject) => {
+        const task = new MessageTask(KEYWORD_ELECTRON_PRINT_BASE64, oBase);
 
-      this._ipc
-        .sendTask(task)
-        .then((res) => {
-          if (res['status'] == 'no') reject(res);
-          else resolve(res);
-        })
-        .catch((err) => reject(err));
-    });
+        this._ipc
+          .sendTask(task)
+          .then((res) => {
+            if (res['status'] == 'no') reject(res);
+            else resolve(res);
+          })
+          .catch((err) => reject(err));
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   makeStatusObj(oStatus) {

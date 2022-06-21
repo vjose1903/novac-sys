@@ -329,6 +329,7 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
         break;
       //
       case KEYWORD_ELECTRON_PRINT_BASE64:
+        puts('INICIANDOO PROCESO DE IMPRESION');
         const oPdf = JSON.parse(arg.data);
 
         const base64 = oPdf.base64;
