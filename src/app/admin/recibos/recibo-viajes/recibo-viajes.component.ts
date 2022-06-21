@@ -272,7 +272,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       let tipoModal = tipo;
 
       if (tipo === 'cambio') {
-        const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo_modal: 'no_devuelta', factura_de: 'recibo_ingreso' };
+        const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo_modal: 'no_devuelta', factura_de: 'recibo_ingreso', formaPago: 'Efectivo' };
 
         this.handleModalForm({
           component: FormCantidadEfectivoComponent,

@@ -44,7 +44,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   inputs: any;
 
   ngOnInit() {
-    this.efectivo = this.formatoNumero(this.inputs.efectivo);
+    this.efectivo = fun.hasValue(this.inputs.efectivo) ? this.formatoNumero(this.inputs.efectivo) : '0.00';
     this.factura_de = this.inputs.factura_de;
     this.formaPago = this.inputs.formaPago;
 
@@ -142,7 +142,9 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     const total = this.inputs.total_factura;
     const efectivo = fun.desformatear(this.efectivo);
 
-    const isInvalid = isNaN(efectivo) ? true : this.inputs.tipo_modal != 'no_devuelta' && total > efectivo;
+    let isInvalid = isNaN(efectivo) ? true : this.inputs.tipo_modal != 'no_devuelta' && total > efectivo;
+
+    if (this.factura_de == 'compra') isInvalid = false;
 
     if (from == 'input' || from == 'init') this.disableBtnConfirm(isInvalid);
 

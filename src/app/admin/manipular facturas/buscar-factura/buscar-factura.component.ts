@@ -527,7 +527,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  continuarNotas(idFactSelect?) {
+  continuarANotas(idFactSelect?) {
     const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${JSON.stringify(idFactSelect ? [idFactSelect] : this.idsFacturasSeleccionadas)}`;
     this.router.navigateByUrl(url);
   }
@@ -541,7 +541,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       botonesDinamicos.push({
         clase: 'btn btn-verde mr-2',
         function: (instance) => {
-          this.continuarNotas(dataFactura.id);
+          this.continuarANotas(dataFactura.id);
           instance.closeModal(instance.id, 'cancelar');
         },
         label: 'Continuar',

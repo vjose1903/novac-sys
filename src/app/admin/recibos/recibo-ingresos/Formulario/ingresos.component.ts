@@ -170,6 +170,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const res = await this.facturaClass.getAll({ afterPath: `cliente/${cliente_id}/pagada/false`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
 
     res.data.map((factura) => {
+      console.log('factura ', factura.numero_comprobante);
+
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
       factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
       factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD-MM-YYYY') : null;
@@ -180,7 +182,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       factura.monto = '0.00';
       const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
 
-      factura.tooltip_history = factura.is_viaje ? ' ' : 'Movimientos realizados';
+      factura.tooltip_history = factura.is_viaje ? null : 'Movimientos realizados';
       factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
       factura.colorEstado = factura.is_viaje ? 'green' : modalMoviemientos ? 'black' : 'gris-claro';
       factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
@@ -211,7 +213,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       return factura;
     });
 
-    // this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
+    this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
     this.debiendo = this.totalFacturado - this.totalPagado - this.totalNotas;
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
 
@@ -316,7 +318,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
-      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta' };
+      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta', formaPago: 'Efectivo' };
 
       this.handleModalForm({
         component: FormCantidadEfectivoComponent,

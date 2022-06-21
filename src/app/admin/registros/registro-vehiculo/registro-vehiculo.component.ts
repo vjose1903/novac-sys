@@ -128,6 +128,8 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   async getMarcas() {
     try {
       const res = await this.marcasClass.getAll();
+      console.log('res ', res);
+
       this.listaMarcas = res;
     } catch (error) {
       fun.toastError('Error buscando marcas', 'ERROR');
@@ -193,7 +195,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   restartCampo(campo) {
-    this.form.controls[campo].disable();
+    if (fun.hasValue(this.form)) this.form.controls[campo].disable();
     if (fun.hasValue(this.form)) this.form.controls[campo].reset(null);
   }
 
@@ -285,6 +287,9 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     });
   }
 
+  onHideModal(arg) {
+    if (arg.modal.id == 'crud_marca_modelo') this.getMarcas();
+  }
   // =============================================
   //  Crear vehiculo
   // =============================================

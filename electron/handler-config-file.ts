@@ -12,7 +12,7 @@ export default class HandlerConfigFile {
     direccion_empresa: 'Autopista Duarte Km0 El Higüero, La Vega',
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Agropecuaria Delia y Milo, S.R.L AGRODEMI.',
+    nombre_empresa: 'Agropecuaria Delia y Milo, S.R.L AGRODEMI',
     rnc_empresa: '131-99603-5',
     telefono_empresa: '(809)-573-0060',
     url_servidor: 'http://admservidor.ddns.net:9090',
@@ -35,7 +35,7 @@ export default class HandlerConfigFile {
       reporte: '8.5x11',
     },
 
-    documentos_a_imprimir: 'recibo_ingreso,venta_credito,venta_contado,nota,conduce',
+    documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota',
   };
 
   static checkConfigFile(win: BrowserWindow): Promise<any> {

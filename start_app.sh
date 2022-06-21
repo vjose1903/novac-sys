@@ -6,7 +6,7 @@ white=$(tput setaf 7)
 yellow=$(tput setaf 3)
 cyan=$(tput setaf 6)
 
-OPTIONS="ac:r:s"
+OPTIONS="apc:r:s"
 PRODUCTION='no'
 
 getActualClient() {
