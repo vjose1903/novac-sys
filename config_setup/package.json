@@ -1,7 +1,7 @@
 {
   "name": "novac-system",
   "productName": "$$PRODUCT_NAME$$",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "$$PRODUCT_DESCRIPTION$$",
   "author": {
     "name": "Victor Jose Vásquez Santos",
