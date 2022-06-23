@@ -30,7 +30,6 @@ const files = [
   { tipo: 'move', file_name: 'logos', extension: 'json', path: 'logos.json' },
 
   { tipo: 'reemplazo', file_name: 'docker-handler.ts', path: 'electron/docker-handler.ts' },
-  { tipo: 'reemplazo', file_name: 'electron-builder.json', path: 'electron-builder.json' },
   { tipo: 'reemplazo', file_name: 'environment.ts', path: 'src/environments/environment.ts' },
   { tipo: 'reemplazo', file_name: 'environment.web.ts', path: 'src/environments/environment.web.ts' },
   { tipo: 'reemplazo', file_name: 'index.html', path: 'src/index.html' },
