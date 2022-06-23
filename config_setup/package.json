@@ -52,7 +52,7 @@
     "ngx-permissions": "13.0.1",
     "ngx-toastr": "^13.2.0",
     "pdfmake": "^0.1.70",
-    "primeicons": "^4.1.0",
+    "primeicons": "^5.0.0",
     "primeng": "13.0.4",
     "replace-in-file": "6.3.2",
     "request": "^2.88.2",
