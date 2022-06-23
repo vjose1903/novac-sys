@@ -16,8 +16,9 @@ jobs:
 
     steps:
       - name: Exit if not on actualizaciones branch
-        run: echo github.ref
-        run: echo endsWith(github.ref, 'update_test')
+        run: |
+          echo github.ref
+          echo endsWith(github.ref, 'update_test')
         if: endsWith(github.ref, 'update_test') == false
         run: exit -1
 
