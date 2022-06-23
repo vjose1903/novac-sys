@@ -15,10 +15,12 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - uses: nelonoel/branch-name@v1
-      - name: test
-        # Use branch name for whatever purpose
-        run: echo ${BRANCH_NAME}
+      - name: set branch_name
+        id: vars
+        run: echo ::set-branch_name name=short_ref::${GITHUB_REF#refs/*/}
+
+      - name: Check branch_name
+        run: echo ${{ steps.vars.outputs.short_ref }}
 
       - name: Check out Git repository
         uses: actions/checkout@v1
