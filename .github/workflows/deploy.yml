@@ -27,9 +27,11 @@ jobs:
         with:
           node-version: 16
 
-      - name: Make the release
-        uses: ncipollo/release-action@v1
+      - name: Create Release
+        id: create_release
+        uses: actions/create_release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          artifacts: "actualizacion"
-          bodyFile: "actualizacion"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
