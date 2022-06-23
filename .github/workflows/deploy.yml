@@ -30,13 +30,15 @@ jobs:
         with:
           node-version: 16
 
-      - name: build app
+      - name: instalando dependencias
+
+      - name: Build Novac App
         run: |
           npm install --force
           npm run electron:windows64
 
       - name: prueba
-      env:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./prueba.bat
