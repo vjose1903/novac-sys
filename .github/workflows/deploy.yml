@@ -44,5 +44,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./actualizacion
+          asset_path: ./actualizacion/test.txt
           asset_name: actualizacion
+          asset_content_type: text/plain
