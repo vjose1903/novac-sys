@@ -10,22 +10,27 @@ import {
   ELECTRON_EVENT_UPDATE_ERROR,
   KEYWORD_ELECTRON_RESPONSE,
 } from './shared-electron-angular';
+
 import Functions from './functions';
 import { ConfigI } from '../src/app/core/typescript/config-interface';
+import { puts } from '../main';
 
 export default class AppUpdater {
   constructor() {
     const log = require('electron-log');
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
+    puts('-=-=-=-=- DENTRO DE APP UPDATER -=-=-=-=-');
     this.checkForUpdates();
   }
 
   async checkForUpdates() {
     const confTemp = (await Functions.getConfigFile()) as any;
     const conf: ConfigI = JSON.parse(confTemp);
+    puts(conf.url_servidor_descargas, 'conf.url_servidor_descargas');
 
     const autoUpdater = new NsisUpdater({ provider: 'generic', url: conf.url_servidor_descargas });
+    puts(autoUpdater, 'autoUpdater');
 
     setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 100);
   }
