@@ -29,6 +29,10 @@ jobs:
         with:
           node-version: 16
 
+      - name: MAKE ZIP # This would actually build your project, using zip for an example artifact
+        run: |
+          zip --junk-paths my-artifact test.txt
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
