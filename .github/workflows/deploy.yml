@@ -2,6 +2,8 @@ name: Build and Deploy.
 
 on:
   push:
+    branches:
+      - 'update_test'
     tags:
       - v* # Push events to matching v*, i.e. v1.0, v10.15.10
 
@@ -15,13 +17,6 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - name: Exit if not on actualizaciones branch
-        if: endsWith(github.ref, 'update_test') == false
-        run: |
-          echo ${{github.ref}}
-          echo ${{endsWith(github.ref, 'update_test')}}
-          exit -1
-
       - name: Check out Git repository
         uses: actions/checkout@v1
 
