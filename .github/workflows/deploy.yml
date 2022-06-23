@@ -15,8 +15,12 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - name: get branch_name
-        run: echo '==> ( ${{ github.head_ref }} )'
+      - name: Get Branch
+        run: |
+          raw=$(git branch -r --contains ${{ github.ref }})
+          branch=${raw/origin\/}
+          echo ::set-env name=BRANCH::$branch
+      - run: echo ${{ env.BRANCH }}
 
       - name: Check out Git repository
         uses: actions/checkout@v1
