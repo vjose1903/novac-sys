@@ -15,12 +15,8 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - name: set branch_name
-        id: vars
-        run: echo ::set-branch_name name=short_ref::${GITHUB_REF#refs/*/}
-
-      - name: Check branch_name
-        run: echo ${{ steps.vars.outputs.short_ref }}
+      - name: get branch_name
+        run: echo ==> ( ${{ github.ref }} )
 
       - name: Check out Git repository
         uses: actions/checkout@v1
