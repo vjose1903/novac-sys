@@ -30,8 +30,6 @@ jobs:
         with:
           node-version: 16
 
-
-
       - name: build app
         run: |
           npm install --force
