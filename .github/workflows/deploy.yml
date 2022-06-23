@@ -27,7 +27,9 @@ jobs:
         with:
           node-version: 16
 
-      - name: Testing
-        run: |
-          ls
-          git branch
+      - name: Make the release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "actualizacion"
+          bodyFile: "actualizacion"
+          token: ${{ secrets.GITHUB_TOKEN }}
