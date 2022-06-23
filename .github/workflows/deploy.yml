@@ -17,7 +17,9 @@ jobs:
     steps:
       - name: Exit if not on actualizaciones branch
         if: endsWith(github.event.base_ref, 'update_test') == false
-        run: exit -1
+        run: |
+          echo "ESTAS EN LA RAMA: ${{ github.event.base_ref }}"
+          exit -1
 
       - name: Check out Git repository
         uses: actions/checkout@v1
