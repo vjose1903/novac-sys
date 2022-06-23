@@ -27,7 +27,7 @@ jobs:
           node-version: 16
           cache: npm
 
-      -name: Testing
+      - name: Testing
         run: |
           ls
           git branch
