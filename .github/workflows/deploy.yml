@@ -30,6 +30,12 @@ jobs:
       #   with:
       #     node-version: 16
 
+      - name: instalando dependencias
+        run: npm install
+
+      - name: build app
+        run: npm run electron:windows64
+
       - name: prueba
         run: |
           ./prueba.bat
