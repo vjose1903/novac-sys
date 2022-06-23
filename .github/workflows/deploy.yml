@@ -15,11 +15,9 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - name: get branch_name
-        run: |
-          echo '==> ( ${{ github.event.base_ref }} )'
-          echo '---> ( ${{ endsWith(github.event.base_ref, 'update_test') }} )'
-          echo '---> ( ${{ endsWith(github.event.base_ref, 'test_2') }} )'
+      - name: Exit if not on actualizaciones branch
+        if: endsWith(github.event.base_ref, 'update_test') == false
+        run: exit -1
 
       - name: Check out Git repository
         uses: actions/checkout@v1
