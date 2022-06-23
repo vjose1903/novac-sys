@@ -15,39 +15,40 @@ jobs:
         os: [windows-latest]
 
     steps:
+      - name: Verificacion de la rama
+        run: echo "ESTAS EN LA RAMA ${{ github.event.base_ref }}"
+
       - name: Exit if not on actualizaciones branch
         if: endsWith(github.event.base_ref, 'update_test') == false
-        run: |
-          echo "ESTAS EN LA RAMA: ${{ github.event.base_ref }}"
-          exit -1
+        run: exit -1
 
       - name: Check out Git repository
         uses: actions/checkout@v1
 
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16
+      # - name: Install Node.js, NPM and Yarn
+      #   uses: actions/setup-node@v1
+      #   with:
+      #     node-version: 16
 
-      - name: MAKE ZIP # This would actually build your project, using zip for an example artifact
+      - name: prueba
         run: |
-          ./compileProduccion.bat
+          ./prueba.bat
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: Release ${{ github.ref }}
 
-      - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./actualizacion.zip
-          asset_name: actualizacion
-          asset_content_type: text/plain
+      # - name: Upload Release Assets
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ./actualizacion.zip
+      #     asset_name: actualizacion
+      #     asset_content_type: text/plain
