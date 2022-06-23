@@ -31,6 +31,8 @@ jobs:
           node-version: 16
 
       - name: Build Novac App
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm install --force
           npm run electron:windows64
