@@ -30,14 +30,15 @@ jobs:
         with:
           node-version: 16
 
-      - name: instalando dependencias
-        run: npm install --force --location=global
+
 
       - name: build app
-        run: npm run electron:windows64
+        run: |
+          npm install --force
+          npm run electron:windows64
 
       - name: prueba
-        env:
+      env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./prueba.bat
