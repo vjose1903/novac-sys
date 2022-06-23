@@ -16,7 +16,9 @@ jobs:
 
     steps:
       - name: test
-        run: echo ====> ${github.ref}
+        uses: nelonoel/branch-name@v1
+        # Use branch name for whatever purpose
+        run: echo ${BRANCH_NAME}
 
       - name: Check out Git repository
         uses: actions/checkout@v1
