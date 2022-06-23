@@ -30,8 +30,6 @@ jobs:
         with:
           node-version: 16
 
-      - name: instalando dependencias
-
       - name: Build Novac App
         run: |
           npm install --force
