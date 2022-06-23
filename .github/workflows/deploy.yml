@@ -18,8 +18,8 @@ jobs:
       - name: Exit if not on actualizaciones branch
         if: endsWith(github.ref, 'update_test') == false
         run: |
-          echo github.ref
-          echo endsWith(github.ref, 'update_test')
+          echo ${{github.ref}}
+          echo ${{endsWith(github.ref, 'update_test')}}
           exit -1
 
       - name: Check out Git repository
