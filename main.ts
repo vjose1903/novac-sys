@@ -72,6 +72,7 @@ function createWindow() {
     puts(' ::::: ========= PASANDO A CREAR LA VENTANA DEL SISTEMA ========= :::::');
     puts('  ');
     puts('  ');
+    puts(app.getVersion(), 'app.getVersion()');
     const electronScreen = screen;
     const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
