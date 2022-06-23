@@ -75,14 +75,11 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     SingletonService.zone = this.zone;
     SingletonService.configServ = this.configServ;
 
-    SingletonService._ipc = this._ipc;
     SingletonService.layServ = this.layServ;
     SingletonService.toastr = this.toastr;
     SingletonService.sharedServ = this.sharedServ;
     SingletonService.pdfServ = this.pdfServ;
     SingletonService.cdRef = this.cdRef;
-
-
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
 

@@ -17,7 +17,6 @@ export class SingletonService {
   public static http: HttpClient;
   public static configServ: ConfigurationService;
 
-  public static _ipc: IpcService;
   public static layServ: LayoutService;
   public static toastr: ToastrService;
   public static sharedServ: SharedService;

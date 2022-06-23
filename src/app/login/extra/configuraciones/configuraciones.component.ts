@@ -9,13 +9,13 @@ import { ConfigI } from '../../../core/typescript/config-interface';
 import { fun } from '../../../core/services/functions.service';
 import { SharedService } from '../../../core/services/shared.service';
 import { Router } from '@angular/router';
+import { IpcService } from '../../../core/services/ipc.service';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
   styleUrls: ['./configuraciones.component.scss'],
 })
 export class ConfiguracionesComponent implements OnInit {
-  _ipc = SingletonService._ipc;
   configServ = SingletonService.configServ;
   config;
   form;
@@ -51,15 +51,13 @@ export class ConfiguracionesComponent implements OnInit {
 
   configCopy;
 
-  constructor(private fb: FormBuilder, public sharedServ: SharedService, private router: Router) {}
+  constructor(private fb: FormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
 
   ngOnInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
       this.config = config;
       this.configCopy = fun.duplicarJson(config);
-      this.parseDocumentosAImprimir(config).then(() => {
-        this.createForm(config);
-      });
+      this.parseDocumentosAImprimir(config).then(() => this.createForm(config));
     });
   }
 
