@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: get branch_name
-        run: echo ==> ( ${{ github.ref }} )
+        run: echo '==> ( ${{ github.ref }} )'
 
       - name: Check out Git repository
         uses: actions/checkout@v1
