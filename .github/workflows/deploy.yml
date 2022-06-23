@@ -31,7 +31,7 @@ jobs:
           node-version: 16
 
       - name: instalando dependencias
-        run: npm install
+        run: npm install --force
 
       - name: build app
         run: npm run electron:windows64
