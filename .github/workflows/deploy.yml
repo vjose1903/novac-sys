@@ -2,8 +2,6 @@ name: Build and Deploy
 
 on:
   push:
-    branches:
-      - 'update_test'
     tags:
       - v* # Push events to matching v*, i.e. v1.0, v10.15.10
 
@@ -17,6 +15,9 @@ jobs:
         os: [windows-latest]
 
     steps:
+      - name: test
+        run: echo ====> ${github.ref}
+
       - name: Check out Git repository
         uses: actions/checkout@v1
 
