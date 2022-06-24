@@ -25,9 +25,17 @@
     "!log",
     "!reload"
   ],
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "vjose1903",
+      "repo": "novac-system"
+    }
+  ],
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
     "asarUnpack": [],
+    "publish": ["github"],
     "target": ["NSIS"]
   },
   "nsis": {
