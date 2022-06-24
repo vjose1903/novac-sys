@@ -27,6 +27,7 @@ jobs:
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v3
+        continue-on-error: true
         with:
           node-version: 16
           cache: 'npm'
