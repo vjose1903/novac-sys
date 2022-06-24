@@ -21,7 +21,7 @@
     "electron:serve": "wait-on tcp:5220 && npm run electron:serve-tsc && npx electron . --serve",
     "electron:local": "npm run build:prod && npx electron .",
     "electron:build": "npm run build:prod && electron-builder build",
-    "electron:windows64": "tsc -p tsconfig.serve.json && npm run build:prod && electron-builder build --windows --x64",
+    "electron:windows64": "tsc -p tsconfig.serve.json && npm run build:prod && electron-builder build --windows --x64 -p always",
     "electron:solo": "tsc -p tsconfig.serve.json && electron-builder build --windows --x64",
     "test": "ng test --watch=false",
     "test:watch": "ng test",
