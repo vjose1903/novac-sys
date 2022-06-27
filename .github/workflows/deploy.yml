@@ -31,6 +31,8 @@ jobs:
           node-version: 16
 
       - uses: c-hive/gha-npm-cache@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # cache-dependency-path: '**/package-lock.json'
       # - name: Get npm cache directory
       #   id: npm-cache-dir
@@ -59,6 +61,8 @@ jobs:
         run: npm run electron:windows64
 
       - uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # - name: Create Release
       #   id: create_release
       #   uses: actions/create-release@v1

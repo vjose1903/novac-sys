@@ -1,0 +1,29 @@
+name: Build and Deploy
+
+on:
+  push:
+    tags:
+      - rollback.v* # Push events to matching v*, i.e. v1.0, v10.15.10
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [windows-latest]
+
+    steps:
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - name: 'prueba'
+        run: echo "${{ steps.previoustag.outputs.tag }}"
+      # - uses: dev-drprasad/delete-tag-and-release@v0.2.0
+      #   with:
+      #     delete_release: true # default: false
+      #     tag_name: v0.1.0 # tag name to delete
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
