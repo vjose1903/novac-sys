@@ -29,14 +29,17 @@
     {
       "provider": "github",
       "owner": "vjose1903",
-      "repo": "novac-system"
+      "repo": "novac-system",
+      "releaseType": "release",
+      "host": "github.com"
     }
   ],
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
     "asarUnpack": [],
     "publish": ["github"],
-    "target": ["NSIS"]
+    "target": ["NSIS"],
+    "GH_TOKEN": "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"
   },
   "nsis": {
     "allowToChangeInstallationDirectory": true,
