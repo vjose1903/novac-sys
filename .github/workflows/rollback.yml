@@ -3,7 +3,7 @@ name: Rollback last version
 on:
   push:
     tags:
-      - rollback # Push events to matching v*, i.e. v1.0, v10.15.10
+      - rollback* # Push events to matching v*, i.e. v1.0, v10.15.10
 
 jobs:
   release:
@@ -15,12 +15,13 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - name: 'Get Previous tag'
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      - uses: oprypin/find-latest-tag@v1
+        with:
+          repository: vjose1903/novac-system  # The repository to scan.
+          releases-only: false
+        id: get-latest-tag
 
-      - name: 'prueba'
-        run: echo "${{ steps.previoustag.outputs.tag }}"
+      - run: echo "Last version is -> ${{ steps.get-latest-tag.outputs.tag }}"
       # - uses: dev-drprasad/delete-tag-and-release@v0.2.0
       #   with:
       #     delete_release: true # default: false
