@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 16
           cache: 'npm'
-
+          cache-dependency-path: './package-lock.json'
       # - name: Get npm cache directory
       #   id: npm-cache-dir
       #   run: echo "::set-output name=dir::$(npm config get cache)"
@@ -54,7 +54,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm install --force
+          npm ci --force
           npm run electron:windows64
 
       # - name: Create Release
