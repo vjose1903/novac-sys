@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 16
           cache: 'npm'
-          cache-dependency-path: './package-lock.json'
+          cache-dependency-path: '**/package-lock.json'
       # - name: Get npm cache directory
       #   id: npm-cache-dir
       #   run: echo "::set-output name=dir::$(npm config get cache)"
