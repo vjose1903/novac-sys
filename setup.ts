@@ -8,16 +8,12 @@ const nivel = process.argv.slice(2)[1];
 
 const setup_ = {
   brendy: {
-    PRODUCT_NAME: 'NOVAC - PANADERIA BRENDY',
-    PRODUCT_DESCRIPTION: 'Sistema facturacion e inventario NOVAC, Para Panaderia Brendy',
     TITLE_APP: 'Novac System - Panaderia Brendy',
     PORT_APP: '5221',
     DB_PORT: '3001',
     DOCKER_NAME: 'brendy',
   },
   agrodemi: {
-    PRODUCT_NAME: 'NOVAC - AGRODEMI',
-    PRODUCT_DESCRIPTION: 'Sistema facturacion e inventario NOVAC, Para AGRODEMI',
     TITLE_APP: 'Novac System - AGRODEMI',
     PORT_APP: '5220',
     DB_PORT: '3000',

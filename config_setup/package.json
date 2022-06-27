@@ -1,8 +1,8 @@
 {
   "name": "novac-system",
-  "productName": "$$PRODUCT_NAME$$",
+  "productName": "Novac System",
   "version": "2.0.1",
-  "description": "$$PRODUCT_DESCRIPTION$$",
+  "description": "Sistema facturacion e inventario NOVAC",
   "author": {
     "name": "Victor Jose Vásquez Santos",
     "email": "vjose1903@outlook.es"

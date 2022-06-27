@@ -1,8 +1,8 @@
 {
   "name": "novac-system",
-  "productName": "NOVAC - AGRODEMI",
-  "version": "2.0.7",
-  "description": "Sistema facturacion e inventario NOVAC, Para AGRODEMI",
+  "productName": "Novac System",
+  "version": "2.0.8",
+  "description": "Sistema facturacion e inventario NOVAC",
   "author": {
     "name": "Victor Jose Vásquez Santos",
     "email": "vjose1903@outlook.es"
