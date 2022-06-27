@@ -15,8 +15,8 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - name: Verificacion de la rama
-        run: echo "ESTAS EN LA RAMA ${{ github.event.base_ref }}"
+      # - name: Verificacion de la rama
+      #   run: echo "ESTAS EN LA RAMA ${{ github.event.base_ref }}"
 
       # - name: Exit if not on actualizaciones branch
       #   if: endsWith(github.event.base_ref, 'update_test') == false
@@ -58,6 +58,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run electron:windows64
 
+      - uses: eregon/publish-release@v1
       # - name: Create Release
       #   id: create_release
       #   uses: actions/create-release@v1
