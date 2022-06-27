@@ -3,7 +3,7 @@ name: Rollback last version
 on:
   push:
     tags:
-      - rollback.v* # Push events to matching v*, i.e. v1.0, v10.15.10
+      - rollback # Push events to matching v*, i.e. v1.0, v10.15.10
 
 jobs:
   release:
