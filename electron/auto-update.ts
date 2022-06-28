@@ -97,8 +97,6 @@ export default class AppUpdater {
   }
 
   sendEventToAngular(win, params: { event_name: string; info: any }) {
-    if (win) {
-      win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
-    }
+    if (win) win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
   }
 }

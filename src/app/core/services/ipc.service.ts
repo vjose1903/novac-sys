@@ -67,6 +67,8 @@ export class IpcService {
       const arg = typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface);
       const tareas = this.colaDeMensajes.value;
 
+      console.log('tareas ', tareas);
+
       if (tareas.hasOwnProperty(arg.id)) {
         (tareas[arg.id] as MessageTask).fn.next(arg.response);
         tareas[arg.id] = undefined;
