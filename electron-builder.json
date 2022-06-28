@@ -28,11 +28,10 @@
   "publish": [
     {
       "provider": "github",
+      "token": "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",
       "owner": "vjose1903",
       "repo": "novac-system",
-      "releaseType": "release",
-      "host": "github.com",
-      "GH_TOKEN": "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"
+      "releaseType": "release"
     }
   ],
   "win": {
