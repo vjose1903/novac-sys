@@ -116,5 +116,9 @@
   },
   "browserslist": [
     "chrome 83"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vjose1903/novac-system.git"
+  }
 }
