@@ -1,4 +1,4 @@
-import { autoUpdater, NsisUpdater } from 'electron-updater';
+import { autoUpdater } from 'electron-updater';
 import { BrowserWindow, dialog } from 'electron';
 
 import {
@@ -26,9 +26,9 @@ export default class AppUpdater {
 
   async checkForUpdates(win) {
     puts('-=-=-=-=- checkForUpdates -=-=-=-=-');
-    const autoUpdater = new NsisUpdater({ provider: 'github', owner: 'vjose1903', repo: 'novac-system', token: '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', private: true });
 
     puts('---- AQUIIIII CONSTRUCTOR ----');
+    autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system', token: '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', private: true });
 
     autoUpdater.checkForUpdatesAndNotify().then((value) => {
       this.sendEventToAngular(win, { event_name: 'test', info: { value: value, autoUpdater: autoUpdater } });

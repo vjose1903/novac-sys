@@ -282,7 +282,8 @@ function beforeCreateWindow(win) {
   setTimeout(() => {
     puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
     auto_updater = new AppUpdater(win);
-    auto_updater.handleUpdateEvents(win);
+
+    setTimeout(() => auto_updater.handleUpdateEvents(win), 1000);
 
     win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: 'test', info: 'INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES' });
   }, 1000);
