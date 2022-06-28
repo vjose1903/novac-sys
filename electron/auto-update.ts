@@ -21,18 +21,31 @@ export default class AppUpdater {
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
     puts('-=-=-=-=- DENTRO DE APP UPDATER -=-=-=-=-');
-    this.checkForUpdates();
+    setTimeout(() => this.checkForUpdates(), 100);
   }
 
   async checkForUpdates() {
     puts('-=-=-=-=- checkForUpdates -=-=-=-=-');
     const autoUpdater = new NsisUpdater({ provider: 'github', owner: 'vjose1903', repo: 'novac-system', token: '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', private: true });
+
+    puts('---- AQUIIIII CONSTRUCTOR ----');
     puts(autoUpdater, 'autoUpdater');
-    autoUpdater.checkForUpdatesAndNotify();
+
+    autoUpdater.checkForUpdates().then((value) => {
+      puts(value, 'value CONSTRUCTOR');
+    });
+
+    // autoUpdater.checkForUpdatesAndNotify();
   }
 
   handleUpdateEvents(win: BrowserWindow) {
     puts('-=-=-=-=- handleUpdateEvents -=-=-=-=-');
+
+    puts('---- AQUIIIII FUNCTION ----');
+    puts(autoUpdater, 'autoUpdater');
+    autoUpdater.checkForUpdates().then((value) => {
+      puts(value, 'value FUNCTION');
+    });
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // AUTO UPDATE EVENTS
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
