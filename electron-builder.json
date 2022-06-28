@@ -28,10 +28,8 @@
   "publish": [
     {
       "provider": "github",
-      "token": "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",
       "owner": "vjose1903",
-      "repo": "novac-system",
-      "releaseType": "release"
+      "repo": "novac-system"
     }
   ],
   "win": {

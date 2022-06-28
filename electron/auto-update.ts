@@ -1,4 +1,4 @@
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, NsisUpdater } from 'electron-updater';
 import { BrowserWindow, dialog } from 'electron';
 
 import {
@@ -26,6 +26,8 @@ export default class AppUpdater {
 
   async checkForUpdates() {
     puts('-=-=-=-=- checkForUpdates -=-=-=-=-');
+    const autoUpdater = new NsisUpdater({ provider: 'github', owner: 'vjose1903', repo: 'novac-system', token: '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', private: true });
+    puts(autoUpdater, 'autoUpdater');
     autoUpdater.checkForUpdatesAndNotify();
   }
 
