@@ -62,12 +62,8 @@ export class IpcService {
 
   listenEvents() {
     this._ipc.on(KEYWORD_ELECTRON_RESPONSE, (event, obj) => {
-      console.warn('obj ', obj);
-
       const arg = typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface);
       const tareas = this.colaDeMensajes.value;
-
-      console.log('tareas ', tareas);
 
       if (tareas.hasOwnProperty(arg.id)) {
         (tareas[arg.id] as MessageTask).fn.next(arg.response);

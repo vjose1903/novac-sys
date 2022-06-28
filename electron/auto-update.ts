@@ -30,12 +30,10 @@ export default class AppUpdater {
 
     puts('---- AQUIIIII CONSTRUCTOR ----');
 
-    autoUpdater.checkForUpdates().then((value) => {
-      puts(value, 'value CONSTRUCTOR');
+    autoUpdater.checkForUpdatesAndNotify().then((value) => {
       this.sendEventToAngular(win, { event_name: 'test', info: { value: value, autoUpdater: autoUpdater } });
+      puts(value, 'value CONSTRUCTOR');
     });
-
-    // autoUpdater.checkForUpdatesAndNotify();
   }
 
   handleUpdateEvents(win: BrowserWindow) {
@@ -97,6 +95,8 @@ export default class AppUpdater {
   }
 
   sendEventToAngular(win, params: { event_name: string; info: any }) {
+    puts('-=-=-=- sendEventToAngular -=-=-=-');
+    puts(win, 'win');
     if (win) win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
   }
 }
