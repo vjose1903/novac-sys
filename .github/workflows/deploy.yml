@@ -13,6 +13,9 @@ jobs:
       matrix:
         # os: [macos-latest, ubuntu-latest, windows-latest]
         os: [windows-latest]
+    env:
+      ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+      ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
 
     steps:
       # - name: Verificacion de la rama
@@ -30,26 +33,39 @@ jobs:
         with:
           node-version: 16
 
-      - uses: c-hive/gha-npm-cache@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # cache-dependency-path: '**/package-lock.json'
-      # - name: Get npm cache directory
-      #   id: npm-cache-dir
-      #   run: echo "::set-output name=dir::$(npm config get cache)"
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: echo "::set-output name=dir::$(npm config get cache)"
 
-      # - name: Get npm cache
-      #   uses: actions/cache@v3
-      #   id: npm-cache
-      #   with:
-      #     path: ${{ steps.npm-cache-dir.outputs.dir }}
-      #     key: ${{ runner.os }}-${{ env.cache-name }}-novac-system
-      #     restore-keys: ${{ runner.os }}-${{ env.cache-name }}-novac-system
+      - name: Get npm cache
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-novac-system-npm
+          restore-keys: |
+            ${{ runner.os }}-novac-system-npm
 
-      # - if: ${{ steps.npm-cache.outputs.cache-hit == 'false' }}
-      #   name: List the state of node modules
-      #   continue-on-error: true
-      #   run: npm list
+      - name: Cache Electron
+        uses: actions/cache@v1
+        with:
+          path: ${{ github.workspace }}/.cache/electron
+          key: ${{ runner.os }}-electron-cache
+          restore-keys: |
+            ${{ runner.os }}-electron-cache
+
+      - name: Cache Electron-Builder
+        uses: actions/cache@v1
+        with:
+          path: ${{ github.workspace }}/.cache/electron-builder
+          key: ${{ runner.os }}-electron-builder-cache
+          restore-keys: |
+            ${{ runner.os }}-electron-builder-cache-
+
+      - if: ${{ steps.npm-cache.outputs.cache-hit == 'false' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
 
       - name: Install dependencies
         run: npm ci --force
@@ -60,22 +76,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run electron:windows64
-
-      # - name: Create Release
-      #   id: create_release
-      #   uses: actions/create-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     tag_name: ${{ github.ref }}
-      #     release_name: Release ${{ github.ref }}
-
-      # - name: Upload Release Assets
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #     asset_path: ./actualizacion/latest.yml
-      #     asset_name: latest
-      #     asset_content_type: text/plain
