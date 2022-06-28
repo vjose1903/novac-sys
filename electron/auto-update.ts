@@ -42,9 +42,7 @@ export default class AppUpdater {
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, (info: any) => {
-      puts(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, '>>>>>>>>>>>>');
-
-      puts(info, 'info >>>>>>>>>>>>');
+      puts(info, 'ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE > info >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, info: info });
 
       const dialogOpts = {
@@ -61,7 +59,7 @@ export default class AppUpdater {
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, (event, releaseNotes, releaseName) => {
-      puts(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, '>>>>>>>>>>>>');
+      puts(event, 'ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED > event >>>>>>>>>>>>');
       const dialogOpts = {
         type: 'info',
         buttons: ['Reiniciar'],
@@ -78,12 +76,12 @@ export default class AppUpdater {
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, (info) => {
-      puts(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, '>>>>>>>>>>>>');
+      puts(info, 'ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE > info >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, info: { msg: 'Actualizacion no disponible...', body: info } });
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_ERROR, (error) => {
-      puts(ELECTRON_EVENT_UPDATE_ERROR, '>>>>>>>>>>>>');
+      puts(error, 'ELECTRON_EVENT_UPDATE_ERROR > error >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_ERROR, info: { msg: 'Actualizacion no disponible...', body: { msg: 'Error descargando actualizacion...', body: error } } });
     });
   }
