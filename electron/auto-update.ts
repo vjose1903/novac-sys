@@ -20,20 +20,13 @@ export default class AppUpdater {
     const log = require('electron-log');
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
-    puts('-=-=-=-=- DENTRO DE APP UPDATER -=-=-=-=-');
-    setTimeout(() => this.checkForUpdates(win), 100);
+
+    this.checkForUpdates(win);
   }
 
   async checkForUpdates(win) {
-    puts('-=-=-=-=- checkForUpdates -=-=-=-=-');
-
-    puts('---- AQUIIIII CONSTRUCTOR ----');
     autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system', token: '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', private: true });
-
-    autoUpdater.checkForUpdatesAndNotify().then((value) => {
-      this.sendEventToAngular(win, { event_name: 'test', info: { value: value, autoUpdater: autoUpdater } });
-      puts(value, 'value CONSTRUCTOR');
-    });
+    autoUpdater.checkForUpdatesAndNotify();
   }
 
   handleUpdateEvents(win: BrowserWindow) {
@@ -42,15 +35,14 @@ export default class AppUpdater {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // AUTO UPDATE EVENTS
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // setTimeout(() => this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...' } }), 10000);
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, () => {
-      puts(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, '>>>>>>>>>>>>');
+      puts(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, 'ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...', url: autoUpdater.getFeedURL() } });
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, (info: any) => {
-      puts(info, 'ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE > info >>>>>>>>>>>>');
+      puts(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, 'ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, info: info });
 
       const dialogOpts = {
@@ -67,7 +59,7 @@ export default class AppUpdater {
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, (event, releaseNotes, releaseName) => {
-      puts(event, 'ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED > event >>>>>>>>>>>>');
+      puts(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, 'ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
       const dialogOpts = {
         type: 'info',
         buttons: ['Reiniciar'],
@@ -84,19 +76,17 @@ export default class AppUpdater {
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, (info) => {
-      puts(info, 'ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE > info >>>>>>>>>>>>');
+      puts(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, 'ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, info: { msg: 'Actualizacion no disponible...', body: info } });
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_ERROR, (error) => {
-      puts(error, 'ELECTRON_EVENT_UPDATE_ERROR > error >>>>>>>>>>>>');
+      puts(ELECTRON_EVENT_UPDATE_ERROR, 'ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_ERROR, info: { msg: 'Actualizacion no disponible...', body: { msg: 'Error descargando actualizacion...', body: error } } });
     });
   }
 
   sendEventToAngular(win, params: { event_name: string; info: any }) {
-    puts('-=-=-=- sendEventToAngular -=-=-=-');
-    puts(win, 'win');
     if (win) win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
   }
 }

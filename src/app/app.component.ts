@@ -88,6 +88,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
 
     this.sub = ELECTRON_EVENTS_OBSERVER.subscribe((res) => {
+      console.log(' ');
+      console.log('res ', res);
       if (fun.hasValue(res)) {
         const info = res.info;
         switch (res.event_name) {
