@@ -25,20 +25,26 @@ export default class AppUpdater {
   }
 
   async checkForUpdates() {
+    puts('-=-=-=-=- checkForUpdates -=-=-=-=-');
     autoUpdater.checkForUpdatesAndNotify();
   }
 
   handleUpdateEvents(win: BrowserWindow) {
+    puts('-=-=-=-=- handleUpdateEvents -=-=-=-=-');
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // AUTO UPDATE EVENTS
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // setTimeout(() => this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...' } }), 10000);
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, () => {
+      puts(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, '>>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...', url: autoUpdater.getFeedURL() } });
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, (info: any) => {
+      puts(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, '>>>>>>>>>>>>');
+
+      puts(info, 'info >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, info: info });
 
       const dialogOpts = {
@@ -55,6 +61,7 @@ export default class AppUpdater {
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, (event, releaseNotes, releaseName) => {
+      puts(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, '>>>>>>>>>>>>');
       const dialogOpts = {
         type: 'info',
         buttons: ['Reiniciar'],
@@ -71,10 +78,12 @@ export default class AppUpdater {
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, (info) => {
+      puts(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, '>>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, info: { msg: 'Actualizacion no disponible...', body: info } });
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_ERROR, (error) => {
+      puts(ELECTRON_EVENT_UPDATE_ERROR, '>>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_ERROR, info: { msg: 'Actualizacion no disponible...', body: { msg: 'Error descargando actualizacion...', body: error } } });
     });
   }
