@@ -279,9 +279,11 @@ function continuarCargandoArchivos(resolve) {
 function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
 
-  puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
-  auto_updater = new AppUpdater();
-  auto_updater.handleUpdateEvents(win);
+  setTimeout(() => {
+    puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
+    auto_updater = new AppUpdater(win);
+    auto_updater.handleUpdateEvents(win);
+  }, 1000);
   // ---------------------------------------
 }
 

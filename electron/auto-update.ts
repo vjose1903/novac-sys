@@ -16,23 +16,23 @@ import { ConfigI } from '../src/app/core/typescript/config-interface';
 import { puts } from '../main';
 
 export default class AppUpdater {
-  constructor() {
+  constructor(win) {
     const log = require('electron-log');
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
     puts('-=-=-=-=- DENTRO DE APP UPDATER -=-=-=-=-');
-    setTimeout(() => this.checkForUpdates(), 100);
+    setTimeout(() => this.checkForUpdates(win), 100);
   }
 
-  async checkForUpdates() {
+  async checkForUpdates(win) {
     puts('-=-=-=-=- checkForUpdates -=-=-=-=-');
     const autoUpdater = new NsisUpdater({ provider: 'github', owner: 'vjose1903', repo: 'novac-system', token: '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', private: true });
 
     puts('---- AQUIIIII CONSTRUCTOR ----');
-    puts(autoUpdater, 'autoUpdater');
 
     autoUpdater.checkForUpdates().then((value) => {
       puts(value, 'value CONSTRUCTOR');
+      this.sendEventToAngular(win, { event_name: 'test', info: { value: value, autoUpdater: autoUpdater } });
     });
 
     // autoUpdater.checkForUpdatesAndNotify();
@@ -41,11 +41,6 @@ export default class AppUpdater {
   handleUpdateEvents(win: BrowserWindow) {
     puts('-=-=-=-=- handleUpdateEvents -=-=-=-=-');
 
-    puts('---- AQUIIIII FUNCTION ----');
-    puts(autoUpdater, 'autoUpdater');
-    autoUpdater.checkForUpdates().then((value) => {
-      puts(value, 'value FUNCTION');
-    });
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // AUTO UPDATE EVENTS
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

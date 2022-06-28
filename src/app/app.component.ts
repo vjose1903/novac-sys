@@ -123,6 +123,11 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             this.visible = false;
             break;
           //
+          case 'test':
+
+            fun.toastError(info.msg, 'ERRROR');
+            break;
+          //
           default:
             break;
         }
