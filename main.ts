@@ -282,7 +282,6 @@ function beforeCreateWindow(win) {
   setTimeout(() => {
     puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
     auto_updater = new AppUpdater(win);
-    setTimeout(() => auto_updater.handleUpdateEvents(win), 10);
   }, 1000);
   // ---------------------------------------
 }
