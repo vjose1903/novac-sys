@@ -14,7 +14,6 @@ jobs:
         # os: [macos-latest, ubuntu-latest, windows-latest]
         os: [windows-latest]
     env:
-      TAG_NAME: v2.0.1
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
@@ -25,7 +24,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         with:
-          tag_name: {{ env.TAG_NAME }}
+          tag_name: v2.0.1
           release_name: 2.0.1
           owner: vjose1903
           repo: novac-system-agrodemi
