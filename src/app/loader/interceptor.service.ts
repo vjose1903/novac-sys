@@ -57,9 +57,7 @@ export class InterceptorService implements HttpInterceptor {
 
           ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {
             const headerValue = event.headers.get(header);
-            if (headerValue !== null && localStorage.getItem(header) == null) {
-              localStorage.setItem(header, headerValue);
-            }
+            if (fun.hasValue(headerValue) && fun.isEmpty(localStorage.getItem(header))) localStorage.setItem(header, headerValue);
           });
         }
 

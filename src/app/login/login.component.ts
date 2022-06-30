@@ -14,12 +14,11 @@ import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
 import { SingletonService } from '../core/services/singleton.service';
-import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, KEYWORD_ELECTRON_PRINT_BASE64, KEYWORD_ELECTRON_TEST } from '../../../electron/shared-electron-angular';
+import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
 import { ConfigI } from '../core/typescript/config-interface';
 import { fun } from '../core/services/functions.service';
 import { CurrentUserService } from '../core/services/current-user.service';
-import { LayoutService } from '../admin/layout/layout.service';
 import { FacturaC } from '../admin/facturacion/factura';
 
 @Component({
@@ -94,16 +93,13 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     const formulario = this.form.getRawValue();
 
     if (formulario.usuario == '1973' && formulario.password == '3791') {
-      if (this.configApp.is_development) {
-        this.router.navigateByUrl('/auth/config');
-      } else {
-        this.openConfigsModal();
-      }
+      if (this.configApp.is_development) this.router.navigateByUrl('/auth/config');
+      else this.openConfigsModal();
     } else {
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then((res) => {
-          this.currentUserServ.setUser(res.data).then(() => this.router.navigateByUrl('/admin/dashboard'));
+          setTimeout(() => this.currentUserServ.setUser(res.data).then(() => this.router.navigateByUrl('/admin/dashboard')), 250);
         })
         .catch((error) => {
           if (error.status === 0) fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');

@@ -99,10 +99,11 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             break;
           //
           case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
-            this.visible = true;
+            fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, info);
             break;
           //
           case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
+            this.visible = true;
             this.downloadProgression(info.body);
             break;
           //
@@ -112,7 +113,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           //
           case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
             fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
-
             break;
           //
           case KEYWORD_ELECTRON_QUIT_APP:
@@ -201,6 +201,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
 
+          fun.logOrange('actualPath: ', actualPath);
           if (!actualPath.includes('login') && !actualPath.includes('config')) this.validateUserAndLoadPermisos(actualPath);
           else this.configReady = true;
         }
@@ -216,6 +217,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       .then((res) => setTimeout(() => (this.configReady = true), 500))
       .catch((error) => {
         this.configReady = true;
+
+        fun.logRed('actualPath: ', actualPath);
+        fun.logBlue('error: ', error);
 
         if (actualPath != '/' && !actualPath.includes('login') && !actualPath.includes('config') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });
