@@ -26,6 +26,7 @@
     "!log",
     "!reload"
   ],
+
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
     "asarUnpack": [],
