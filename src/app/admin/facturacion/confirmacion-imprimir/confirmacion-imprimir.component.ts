@@ -5,6 +5,7 @@ import { ModalI } from '../../components/modal/modal-class';
 import { SharedService } from '../../../core/services/shared.service';
 import { teclasCode } from '../../../core/typescript/constantes';
 import * as _ from 'lodash';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-confirmacion-imprimir',

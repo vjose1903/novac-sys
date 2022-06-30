@@ -236,8 +236,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];
       this.FechaFacturaMostrar = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
-      this.modo_factura = this.metodo == 'pre-venta' ? 'Pre_factura' : 'normal';
-      this.condicion_fact = this.metodo == 'pre-venta' ? 'Crédito' : 'Contado';
+      this.modo_factura = this.metodo == 'pre_venta' ? 'Pre_factura' : 'normal';
+      this.condicion_fact = this.metodo == 'pre_venta' ? 'Crédito' : 'Contado';
       this.forma_pago = 'Efectivo';
 
       this.filterCamionesTargets = ['marca', 'modelo', 'anio', 'propietario.nombre', 'propietario.apellido'];
@@ -267,7 +267,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         });
       } else {
         setTimeout(() => {
-          if (this.metodo != 'pre-venta') this.enfocarInput('tipoFact');
+          if (this.metodo != 'pre_venta') this.enfocarInput('tipoFact');
           else this.abrirModalFiltro();
         }, 5);
       }
@@ -543,7 +543,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const tipo_factura = this.tipoFactura;
     let buscar = false;
 
-    if (this.metodo == 'venta' || this.metodo == 'pre-venta') {
+    if (this.metodo == 'venta' || this.metodo == 'pre_venta') {
       setTimeout(() => {
         const voy_a = document.activeElement.id;
         const nombre = this.propietario_factura ? this.propietario_factura.nombre : 'Cliente contado';
@@ -899,13 +899,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const input_activo = document?.activeElement?.id;
 
     if (fun.hasValue(input_activo)) this.desEnfocarInput(input_activo);
-    const metodo = this.metodo == 'pre-venta' ? 'venta' : this.metodo;
+    const metodo = this.metodo == 'pre_venta' ? 'venta' : this.metodo;
 
     this.handleModalForm({
       component: BuscarClienteSuplidorComponent,
       inputs: { metodo: metodo, palabra_a_buscar: ' ' },
       id: 'buscarCliente',
-      header: this.metodo === 'venta' || this.metodo == 'pre-venta' ? 'BUSCAR CLIENTE' : 'BUSCAR SUPLIDOR',
+      header: this.metodo === 'venta' || this.metodo == 'pre_venta' ? 'BUSCAR CLIENTE' : 'BUSCAR SUPLIDOR',
       width: '56.25rem',
       height: '31.25rem',
       botones: {
@@ -1055,7 +1055,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let index_fact_archivada = _.findIndex(facturas_localStorage, (facts: any) => facts?.archivo_id === this.factura_guardada?.archivo_id);
 
-    if (!fun.isEmpty(this.propietario_factura.id)) factura_a_guardar[this.metodo === 'venta' || this.metodo == 'pre-venta' ? 'cliente' : 'suplidor'] = this.propietario_factura;
+    if (!fun.isEmpty(this.propietario_factura.id)) factura_a_guardar[this.metodo === 'venta' || this.metodo == 'pre_venta' ? 'cliente' : 'suplidor'] = this.propietario_factura;
 
     if (index_fact_archivada && index_fact_archivada >= 0) {
       factura_a_guardar['archivo_id'] = this.factura_guardada?.archivo_id;
@@ -1126,7 +1126,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (arg.tipo == 'cuerpo') {
       this.CuerpoFactura = arg.data;
 
-      if (this.metodo === 'venta' || this.metodo == 'pre-venta') {
+      if (this.metodo === 'venta' || this.metodo == 'pre_venta') {
         this.CuerpoFactura.map((articulo) => {
           articulo.retirado = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
           articulo.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
@@ -1349,7 +1349,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (this.condicion_fact === 'Crédito') {
       let fecha_venci;
 
-      if (this.metodo === 'venta' || this.metodo == 'pre-venta') {
+      if (this.metodo === 'venta' || this.metodo == 'pre_venta') {
         fecha_venci = moment(new Date()).add(this.propietario_factura.limite_credito, 'days').format('DD/MM/YYYY');
       } else fecha_venci = moment(this.fecha_vencimiento).format('DD/MM/YYYY');
 
@@ -1365,8 +1365,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['fecha_valida'] = this.paqueteComprobante ? (this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null) : null;
 
     cabecera_fact['tipo_factura_id'] = this.modo_factura == 'Pre_factura' ? tipoPreFactura.id : tipoFact.id;
-    cabecera_fact['numero_comprobante'] = this.metodo === 'venta' || this.metodo == 'pre-venta' ? null : this.NCFcompra;
-    cabecera_fact['costoYgasto'] = this.metodo === 'venta' || this.metodo == 'pre-venta' ? null : this.CostoYgasto;
+    cabecera_fact['numero_comprobante'] = this.metodo === 'venta' || this.metodo == 'pre_venta' ? null : this.NCFcompra;
+    cabecera_fact['costoYgasto'] = this.metodo === 'venta' || this.metodo == 'pre_venta' ? null : this.CostoYgasto;
     cabecera_fact['numero_factura'] = null;
     cabecera_fact['total_factura'] = fun.parseFloatTwoDecimals(this.TOTAL);
     cabecera_fact['Bruto'] = this.BRUTO;
@@ -1379,7 +1379,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['camiones_viajes'] = this.camionesSelected;
     cabecera_fact['pre_factura'] = fun.hasValue(this.pre_factura_selected) ? this.pre_factura_selected?.id : null;
 
-    if (this.metodo === 'venta' || this.metodo == 'pre-venta') {
+    if (this.metodo === 'venta' || this.metodo == 'pre_venta') {
       if (fun.isEmpty(this.propietario_factura) || fun.isEmpty(this.propietario_factura.id)) {
         cabecera_fact['cliente_id'] = null;
         cabecera_fact['NoCliente_nombre'] = this.form.controls.nombre.value;

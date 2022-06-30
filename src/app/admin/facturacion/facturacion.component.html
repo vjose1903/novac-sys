@@ -4,7 +4,7 @@
 <div class="cardPrincipal sinPadding tamano" style="position: relative">
   <div class="cabezaFactura">
     <div class="row">
-      <div *ngIf="metodo != 'pre-venta'" class="col-3 divRight pl-0">
+      <div *ngIf="metodo != 'pre_venta'" class="col-3 divRight pl-0">
         <div class="row">
           <div class="col-3 p-0">
             <span class="titulos"><strong>Tipo:</strong></span>
@@ -204,13 +204,13 @@
       </div>
       <!-- ======================================================================================================================================================================== -->
       <!-- ======================================================================================================================================================================== -->
-      <div class="{{ metodo != 'pre-venta' ? 'col-5 divRight' : 'col-8' }}">
+      <div class="{{ metodo != 'pre_venta' ? 'col-5 divRight' : 'col-8' }}">
         <form [formGroup]="form">
           <div class="d-flex" style="height: 1.7rem">
             <h5>
-              <strong>{{ metodo === 'venta' || metodo === 'pre-venta' ? 'Cliente' : 'Suplidor' }}:</strong>
+              <strong>{{ metodo === 'venta' || metodo === 'pre_venta' ? 'Cliente' : 'Suplidor' }}:</strong>
             </h5>
-            <i *ngIf="!!!factura_a_editar" (click)="abrirModalFiltro()" pTooltip="{{ metodo === 'venta' || metodo === 'pre-venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
+            <i *ngIf="!!!factura_a_editar" (click)="abrirModalFiltro()" pTooltip="{{ metodo === 'venta' || metodo === 'pre_venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
           </div>
           <div class="row">
             <div class="col-7 pl-0">
@@ -314,9 +314,9 @@
           </div>
           <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
             <app-btncircular
-              [disabled]="metodo == 'pre-venta'"
+              [disabled]="metodo == 'pre_venta'"
               [alto]="'100px'"
-              [accion]="metodo != 'pre-venta' ? (factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura') : 'NO DISPONIBLE'"
+              [accion]="metodo != 'pre_venta' ? (factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura') : 'NO DISPONIBLE'"
               [nombreImg]="'guardarFactura'"
               (pulsar)="archivarFactura()"
             ></app-btncircular>
