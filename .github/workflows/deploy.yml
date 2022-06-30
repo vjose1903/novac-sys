@@ -73,6 +73,6 @@ jobs:
       - name: Build Novac App
         id: build-novac-app
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
+          GH_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
         run: npm run electron:windows64
