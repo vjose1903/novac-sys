@@ -57,6 +57,7 @@
                   </div>
                 </div>
                 <div class="col-6 p-0">
+                  {{ form.controls['medida'].value }}
                   <div class="form-group">
                     <label class="control-label">Tipo: <span style="color: red">*</span></label>
                     <select (keydown.enter)="saltar(TIPOARTICULO !== 'Producto terminado' ? 'comprado' : 'vendido')" id="tipo" formControlName="tipo_articulo_id" (change)="selectTipoArticulo($event.target.value)" class="form-control" value="">
