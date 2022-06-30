@@ -14,7 +14,7 @@ jobs:
         # os: [macos-latest, ubuntu-latest, windows-latest]
         os: [windows-latest]
     env:
-      TAG_NAME: ${{ v2.0.1 }}
+      TAG_NAME: v2.0.1
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
