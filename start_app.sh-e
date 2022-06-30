@@ -48,20 +48,6 @@ setRunPart() {
 
   if [ "$run" == "electron" -o "$run" == "ng" -o "$run" == "all" ]; then
     case "${run}" in
-<<<<<<< HEAD
-      ng)
-        npmCommand ng:serve
-        ;;
-      electron)
-        npmCommand electron:serve
-        ;;
-      all)
-        npmCommand start
-        ;;
-      *)
-        exit 2
-        ;;
-=======
     ng)
       npmCommand ng:serve
       ;;
@@ -74,7 +60,6 @@ setRunPart() {
     *)
       exit 2
       ;;
->>>>>>> actualizaciones
     esac
   else
     echo "${red}**************************************"
@@ -98,8 +83,6 @@ npmCommand() {
 while getopts $OPTIONS opt; do
   echo " "
   case "${opt}" in
-<<<<<<< HEAD
-=======
   a)
     echo "la opcion -a"
     getActualClient
@@ -108,7 +91,6 @@ while getopts $OPTIONS opt; do
     echo "la opcion -p"
     PRODUCTION='yes'
     ;;
->>>>>>> actualizaciones
   c)
     echo "la opcion -c"
     setClient

@@ -52,7 +52,7 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
               margin: [0, 17, 0, 0],
               stack: [
                 { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
-                { text: configApp.direccion_empresa, alignment: 'center', style: 'letra10' },
+                { text: configApp.direccion_empresa, alignment: 'center', style: 'letra8' },
                 {
                   text: [
                     { text: 'Telefono: ', style: 'letra9', bold: true },

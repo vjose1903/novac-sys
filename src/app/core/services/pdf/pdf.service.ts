@@ -36,7 +36,7 @@ export class PdfService {
       let options, documento;
       data['reimprimir'] = reimprimir;
 
-      data.fecha = data.fecha_equivalente;
+      data.fecha = fun.hasValue(data.fecha_equivalente) ? data.fecha_equivalente : data.fecha;
       try {
         switch (type_oPdf) {
           case 'recibo_ingreso': // SI SI
