@@ -202,7 +202,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
 
           fun.logOrange('actualPath: ', actualPath);
-          if (!actualPath.includes('login') && !actualPath.includes('config')) this.validateUserAndLoadPermisos(actualPath);
+          if (actualPath.length > 1 && !actualPath.includes('login') && !actualPath.includes('config')) this.validateUserAndLoadPermisos(actualPath);
           else this.configReady = true;
         }
       })
@@ -221,7 +221,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
         fun.logRed('actualPath: ', actualPath);
         fun.logBlue('error: ', error);
 
-        if (actualPath != '/' && !actualPath.includes('login') && !actualPath.includes('config') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
+        if (actualPath.length > 1 && !actualPath.includes('login') && !actualPath.includes('config') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });
   }
 
