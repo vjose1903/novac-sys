@@ -1,0 +1,36 @@
+name: Build and Deploy
+
+on:
+  push:
+    tags:
+      - test* # Push events to matching v*, i.e. v1.0, v10.15.10
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [windows-latest]
+    env:
+      ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+      ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+
+    steps:
+
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v2.0.1
+          release_name: 2.0.1
+          artifacts: ./test/test.txt
+          owner: vjose1903
+          repo: novac-system-agrodemi
+
