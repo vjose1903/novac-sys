@@ -11,7 +11,7 @@ export class IsLoginGuard implements CanActivate {
     const token = fun.getAuthToken();
 
     if (fun.hasValue(token)) {
-      this.router.navigate(['/admin']);
+      this.router.navigateByUrl('/admin');
       return false;
     } else {
       return true;
