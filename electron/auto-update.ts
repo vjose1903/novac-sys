@@ -25,7 +25,7 @@ export default class AppUpdater {
   }
 
   async checkForUpdates(win) {
-    autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-agrodemi' });
+    autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-agrodemi', token: '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', private: true });
     autoUpdater.autoDownload = false;
     autoUpdater.checkForUpdatesAndNotify();
 
