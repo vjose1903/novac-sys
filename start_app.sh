@@ -15,6 +15,7 @@ setClient() {
   echo "${white} "
   if [ "$client" == "agrodemi" -o "$client" == "brendy" ]; then
     node setup.ts $client
+    rm -rf app_config.config
   else
     echo "${red}*************************************"
     echo "${red}**                                 **"
