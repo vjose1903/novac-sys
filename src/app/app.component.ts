@@ -216,8 +216,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       .then((res) => setTimeout(() => (this.configReady = true), 500))
       .catch((error) => {
         this.configReady = true;
-        fun.logRed('actualPath: ', actualPath);
-        fun.logBlue('error: ', error);
 
         if (actualPath != '/' && !actualPath.includes('login') && !actualPath.includes('config') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });
