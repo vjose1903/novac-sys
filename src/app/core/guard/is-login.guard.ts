@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { fun } from '../services/functions.service';
 
-
 @Injectable({
   providedIn: 'root',
 })
@@ -11,11 +10,11 @@ export class IsLoginGuard implements CanActivate {
   canActivate(): boolean {
     const token = fun.getAuthToken();
 
-    if (token !== null) {
+    if (fun.hasValue(token)) {
       this.router.navigate(['/admin']);
       return false;
+    } else {
+      return true;
     }
-
-    return true;
   }
 }

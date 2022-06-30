@@ -30,6 +30,7 @@ import { fun } from './core/services/functions.service';
 import { CurrentUserService } from './core/services/current-user.service';
 import { MixinClass } from './core/typescript/MixinClass';
 import { PdfService } from './core/services/pdf/pdf.service';
+import { log } from 'console';
 
 @Component({
   selector: 'app-root',
@@ -47,6 +48,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   counter = 0;
   sub: Subscription;
   subModified: Subscription;
+  first_time_app = true;
 
   constructor(
     public _ipc: IpcService,
@@ -200,10 +202,16 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-
+          const token = fun.getAuthToken();
           fun.logOrange('actualPath: ', actualPath);
-          if (actualPath.length > 1 && !actualPath.includes('login') && !actualPath.includes('config')) this.validateUserAndLoadPermisos(actualPath);
-          else this.configReady = true;
+
+          if (!this.first_time_app || (fun.hasValue(token) && !actualPath.includes('login') && !actualPath.includes('config'))) this.validateUserAndLoadPermisos();
+          else {
+            this.configReady = true;
+            this.first_time_app = false;
+            console.log('.then > this.first_time_app', this.first_time_app);
+            console.log('.then > this.configReady', this.configReady);
+          }
         }
       })
       .catch((err) => {
@@ -211,17 +219,19 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       });
   }
 
-  validateUserAndLoadPermisos(actualPath) {
+  validateUserAndLoadPermisos() {
+    console.log(' ');
+    fun.logOrange('VALIDANDO PERMISOS');
+    console.log(' ');
     this.currentUserServ
       .validateUser()
       .then((res) => setTimeout(() => (this.configReady = true), 500))
       .catch((error) => {
         this.configReady = true;
 
-        fun.logRed('actualPath: ', actualPath);
         fun.logBlue('error: ', error);
 
-        if (actualPath.length > 1 && !actualPath.includes('login') && !actualPath.includes('config') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
+        if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
       });
   }
 

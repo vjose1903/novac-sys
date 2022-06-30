@@ -567,7 +567,7 @@ export class fun {
   }
 
   static getAuthToken() {
-    return localStorage.getItem('access-token');
+    return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }
 
   static async logout() {
