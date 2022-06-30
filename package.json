@@ -22,12 +22,16 @@
     "electron:local": "npm run build:prod && npx electron .",
     "electron:build": "npm run build:prod && electron-builder build",
     "electron:windows64": "tsc -p tsconfig.serve.json && npm run build:prod && electron-builder build --windows --x64 -p always",
-    "electron:solo": "tsc -p tsconfig.serve.json && electron-builder build --windows --x64",
+    "electron:solo": "tsc -p tsconfig.serve.json && electron-builder build --windows --x64 -p always",
     "test": "ng test --watch=false",
     "test:watch": "ng test",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
     "lint": "ng lint",
     "bundle-report": "webpack-bundle-analyzer dist/stats.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vjose1903/novac-system-agrodemi.git"
   },
   "dependencies": {
     "@angular/animations": "^12.2.13",

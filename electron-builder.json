@@ -1,4 +1,5 @@
 {
+  "appId":"com.inspot-technology.novac",
   "productName": "Novac System",
   "directories": {
     "output": "actualizacion/"
@@ -24,13 +25,6 @@
     "!print",
     "!log",
     "!reload"
-  ],
-  "publish": [
-    {
-      "provider": "github",
-      "owner": "vjose1903",
-      "repo": "novac-system-agrodemi"
-    }
   ],
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
