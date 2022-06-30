@@ -12,12 +12,16 @@ const setup_ = {
     PORT_APP: '5221',
     DB_PORT: '3001',
     DOCKER_NAME: 'brendy',
+    NAME_UPDATE_REPO: 'novac-system-brendy',
+    CUSTOM_ACCESS: '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',
   },
   agrodemi: {
     TITLE_APP: 'Novac System - AGRODEMI',
     PORT_APP: '5220',
     DB_PORT: '3000',
     DOCKER_NAME: 'agrodemi',
+    NAME_UPDATE_REPO: 'novac-system-agrodemi',
+    CUSTOM_ACCESS: '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',
   },
 };
 
@@ -26,6 +30,7 @@ const files = [
   { tipo: 'move', file_name: 'logos', extension: 'json', path: 'logos.json' },
 
   { tipo: 'reemplazo', file_name: 'docker-handler.ts', path: 'electron/docker-handler.ts' },
+  { tipo: 'reemplazo', file_name: 'auto-update.ts', path: 'electron/auto-update.ts' },
   { tipo: 'reemplazo', file_name: 'environment.ts', path: 'src/environments/environment.ts' },
   { tipo: 'reemplazo', file_name: 'environment.web.ts', path: 'src/environments/environment.web.ts' },
   { tipo: 'reemplazo', file_name: 'index.html', path: 'src/index.html' },
