@@ -33,39 +33,39 @@ jobs:
         with:
           node-version: 16
 
-      - name: Get npm cache directory
-        id: npm-cache-dir
-        run: echo "::set-output name=dir::$(npm config get cache)"
+      # - name: Get npm cache directory
+      #   id: npm-cache-dir
+      #   run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - name: Get npm cache
-        uses: actions/cache@v1
-        id: npm-cache
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-novac-system-npm
-          restore-keys: |
-            ${{ runner.os }}-novac-system-npm
+      # - name: Get npm cache
+      #   uses: actions/cache@v1
+      #   id: npm-cache
+      #   with:
+      #     path: ${{ steps.npm-cache-dir.outputs.dir }}
+      #     key: ${{ runner.os }}-novac-system-npm
+      #     restore-keys: |
+      #       ${{ runner.os }}-novac-system-npm
 
-      - name: Cache Electron
-        uses: actions/cache@v1
-        with:
-          path: ${{ github.workspace }}/.cache/electron
-          key: ${{ runner.os }}-electron-cache
-          restore-keys: |
-            ${{ runner.os }}-electron-cache
+      # - name: Cache Electron
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: ${{ github.workspace }}/.cache/electron
+      #     key: ${{ runner.os }}-electron-cache
+      #     restore-keys: |
+      #       ${{ runner.os }}-electron-cache
 
-      - name: Cache Electron-Builder
-        uses: actions/cache@v1
-        with:
-          path: ${{ github.workspace }}/.cache/electron-builder
-          key: ${{ runner.os }}-electron-builder-cache
-          restore-keys: |
-            ${{ runner.os }}-electron-builder-cache-
+      # - name: Cache Electron-Builder
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: ${{ github.workspace }}/.cache/electron-builder
+      #     key: ${{ runner.os }}-electron-builder-cache
+      #     restore-keys: |
+      #       ${{ runner.os }}-electron-builder-cache-
 
-      - if: ${{ steps.npm-cache.outputs.cache-hit == 'false' }}
-        name: List the state of node modules
-        continue-on-error: true
-        run: npm list
+      # - if: ${{ steps.npm-cache.outputs.cache-hit == 'false' }}
+      #   name: List the state of node modules
+      #   continue-on-error: true
+      #   run: npm list
 
       - name: Install dependencies
         run: npm ci --force
