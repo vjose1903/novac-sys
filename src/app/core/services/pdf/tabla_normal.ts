@@ -43,10 +43,9 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
 
   // if (contendio_.length > 0 || configuration.only_titulo) body.push(titulos as TablaRowPdfMake);
   body.push(titulos as TablaRowPdfMake);
-  let longitud_cuerpo = 0;
+
   if (!configuration.only_titulo && Array.isArray(contendio_)) {
     contendio_.forEach((detalle, j) => {
-      longitud_cuerpo += 1;
       const row = formarCuerpo(data, configuration, detalle, j);
       body.push(row as TablaRowPdfMake);
     });
@@ -90,48 +89,39 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
         } as TablaPdfMake)
       : { text: Array.isArray(contendio_) ? configuration.mensaje_contenido_vacio : '', margin: [0, 2, 0, 5] },
 
-    configuration.mostrar_total && data.total >= 1
-      ? {
-          stack: [
-            {
-              margin: [0, 3, 14, 3],
-              columns: [
-                [],
-                [
-                  {
-                    table: {
-                      widths: ['*'],
-                      body: [
-                        [
-                          {
-                            alignment: 'right',
-                            text: [
-                              {
-                                text: 'TOTAL RD$:         ',
-                                style: 'letra10',
-                                bold: true,
-                              },
-                              {
-                                text: fun_.numFormatTwoDecimals(data_.total),
-                                style: 'letra10',
-                                bold: true,
-                              },
-                            ],
-                          },
-                        ],
-                      ],
-                    },
-                    layout: 'noBorders',
-                  },
-                ],
-              ],
-            },
-          ],
-          unbreakable: true,
-        }
-      : { text: '' },
+    getTotalizacion(configuration, data_),
   ];
+
   return content;
+}
+
+function getTotalizacion(configuration, data) {
+  let totalizacion: any = {
+    stack: [{ margin: [0, 3, 14, 3], columns: [[], [{ table: { widths: ['*', 'auto'], body: [] }, layout: 'noBorders' }]] }],
+    unbreakable: true,
+  };
+
+  if (data.total >= 1) {
+    const array = [
+      { bool: configuration.mostrar_bruto, title: 'BRUTO RD$ ', value: fun_.numFormatTwoDecimals(data?.bruto) },
+      { bool: configuration.mostrar_bruto, title: 'DEVUELTO RD$ ', value: fun_.numFormatTwoDecimals(data?.devuelto) },
+      { bool: configuration.mostrar_total, title: 'TOTAL RD$ ', value: fun_.numFormatTwoDecimals(data?.total) },
+    ];
+
+    for (const item of array) {
+      const molde = [
+        { text: item.title, style: 'letra10', bold: true, alignment: 'right' },
+        { text: item.value, style: 'letra10', bold: true, alignment: 'right' },
+      ];
+
+      if (item.bool) totalizacion.stack[0].columns[1][0].table.body.push(molde);
+    }
+    // si no se entro nada en el stack lo pongo como un string vacio
+    if (totalizacion.stack[0].columns[1][0].table.body.length == 0) totalizacion = { text: '' };
+  } else {
+    totalizacion = { text: '' };
+  }
+  return totalizacion;
 }
 
 function formarCuerpo(data, configuration, detalle, j) {

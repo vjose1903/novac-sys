@@ -170,14 +170,7 @@
                       </div>
 
                       <div class="col-6 p-0">
-                        <select
-                          (keydown.enter)="saltar(form.controls['medida'].value === 'Quintal' ? 'precio_libra' : form.controls['medida'].value === 'Unidad' || form.controls['medida'].value === 'Libra' ? 'send' : 'contenidoPadre')"
-                          class="form-control"
-                          formControlName="medida_alerta"
-                          id="medida_alerta"
-                          (change)="seleccionarContenidoCaja()"
-                          [ngClass]="{ badAlert: articulo_no_paquete }"
-                        >
+                        <select (keydown.enter)="saltar('in_medida_alerta')" class="form-control" formControlName="medida_alerta" id="medida_alerta" (change)="seleccionarContenidoCaja()" [ngClass]="{ badAlert: articulo_no_paquete }">
                           <option [value]="null" disabled>Seleccione</option>
                           <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                         </select>
@@ -197,7 +190,7 @@
 
               <div *ngIf="TIPOARTICULO == 'Producto terminado'">
                 <ng-container *ngxPermissionsOnly="permissions.articulo.read_formula">
-                  <label class="control-label">Formula (1 FUNDA) : </label>
+                  <label class="control-label">Formula (1 {{ medida_config | uppercase }}) : </label>
                   <div class="row mb-2 p-0">
                     <div class="col-5">Ingredientes</div>
                     <div class="col-3 pr-0">Cantidad</div>
@@ -352,7 +345,7 @@
                         </div>
 
                         <div class="col-6 p-0">
-                          <select (keydown.enter)="saltar('send')" class="form-control" formControlName="medida_alerta" id="medida_alerta" (change)="seleccionarContenidoCaja()" [ngClass]="{ badAlert: articulo_no_paquete }">
+                          <select (keydown.enter)="saltar('in_medida_alerta')" class="form-control" formControlName="medida_alerta" id="medida_alerta" (change)="seleccionarContenidoCaja()" [ngClass]="{ badAlert: articulo_no_paquete }">
                             <option [value]="null" disabled>Seleccione</option>
                             <option *ngFor="let item of optionsAlerta" value="{{ item }}">{{ item }}</option>
                           </select>
@@ -382,7 +375,7 @@
                 </div>
               </div>
 
-              <hr *ngIf="form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Saco'" class="raya" />
+              <hr *ngIf="showContenido(form.controls['medida'].value)" class="raya" />
 
               <!-- ======================================================================================================================= -->
               <!--  CONTENIDO DE LA CAJA O SACO O GALON -->

@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { LayoutService } from '../../admin/layout/layout.service';
 import { ConfigurationService } from './configuration.service';
 import { IpcService } from './ipc.service';
+import { PdfService } from './pdf/pdf.service';
 import { SharedService } from './shared.service';
 
 
@@ -16,11 +17,11 @@ export class SingletonService {
   public static http: HttpClient;
   public static configServ: ConfigurationService;
 
-  public static _ipc: IpcService;
   public static layServ: LayoutService;
   public static toastr: ToastrService;
   public static sharedServ: SharedService;
   public static cdRef: ChangeDetectorRef;
+  public static pdfServ: PdfService;
 
   constructor() {}
 }

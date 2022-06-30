@@ -8,7 +8,7 @@ import { PrimengModule } from '../../../modules/primeng.module';
 import { NewTablasModule } from '../new_tablas/tablas.module';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { FormCantidadEfectivoComponent } from './form-cantidad-efectivo/form-cantidad-efectivo.component';
-import { FormVentasComponent } from './form-reportes/form-reportes.component';
+import { FormReportesComponent } from './form-reportes/form-reportes.component';
 import { FormularioMarcaModeloComponent } from './formulario-marca-modelo/formulario-marca-modelo.component';
 import { ModalHistorialPagosComponent } from './modal-historial-pagos/modal-historial-pagos.component';
 import { ModalSeleccinarArticuloComponent } from './modal-seleccinar-articulo/modal-seleccinar-articulo.component';
@@ -24,7 +24,7 @@ const components = [
   ModalHistorialPagosComponent,
   ChangePasswordComponent,
   FormularioMarcaModeloComponent,
-  FormVentasComponent,
+  FormReportesComponent,
   MovimientosFormComponent,
   PendienteFormComponent,
   ModalSeleccinarArticuloComponent,

@@ -11,12 +11,11 @@ export class AuthGuard implements CanActivate {
   canActivate(): boolean {
     const token = fun.getAuthToken();
 
-    if (token === null) {
-      fun.logout();
-      setTimeout(() => this.router.navigateByUrl('/auth/login'), 250);
+    if (fun.isEmpty(token)) {
+      fun.logout().then((res) => this.router.navigateByUrl('/auth/login'));
       return false;
+    } else {
+      return true;
     }
-
-    return true;
   }
 }

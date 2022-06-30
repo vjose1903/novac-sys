@@ -69,7 +69,7 @@
 }
 
 @mixin campos {
-  background-color: #ffffffe8 !important;
+  background-color: #ffffffe8;
   color: #1d253b !important;
   box-shadow: 1px 1px 4px 0px #1d253b3d !important;
   &:focus {
@@ -119,8 +119,7 @@ textarea {
 
   &.disabled,
   &:disabled {
-    background-color: #e9ecef !important;
-
+    background-color: #e9ecef;
     touch-action: none !important;
     pointer-events: none !important;
   }

@@ -155,6 +155,7 @@
                     formControlName="descuento_valor"
                     (blur)="calcularDescuento(index_cuerpo)"
                     (emptied)="calcularDescuento(index_cuerpo)"
+                    [ngClass]="{ disabled: !propietario }"
                     tabindex="-1"
                   />
                 </div>

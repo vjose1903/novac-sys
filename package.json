@@ -1,8 +1,8 @@
 {
   "name": "novac-system",
-  "productName": "NOVAC - PANADERIA BRENDY",
-  "version": "1.0.3",
-  "description": "Sistema facturacion e inventario NOVAC, Para Panaderia Brendy",
+  "productName": "Novac System",
+  "version": "3.0.3",
+  "description": "Sistema facturacion e inventario NOVAC.",
   "author": {
     "name": "Victor Jose Vásquez Santos",
     "email": "vjose1903@outlook.es"
@@ -16,18 +16,22 @@
     "build": "npm run electron:serve-tsc && ng build --stats-json --base-href ./",
     "build:dev": "npm run build -- -c dev",
     "build:prod": "npm run build -- -c production",
-    "ng:serve": "ng serve --host 0.0.0.0 --port 5221 -c web",
+    "ng:serve": "ng serve --host 0.0.0.0 --port 5220 -c web",
     "electron:serve-tsc": "tsc -p tsconfig.serve.json",
-    "electron:serve": "wait-on tcp:5221 && npm run electron:serve-tsc && npx electron . --serve",
+    "electron:serve": "wait-on tcp:5220 && npm run electron:serve-tsc && npx electron . --serve",
     "electron:local": "npm run build:prod && npx electron .",
     "electron:build": "npm run build:prod && electron-builder build",
-    "electron:windows64": "tsc -p tsconfig.serve.json && npm run build:prod && electron-builder build --windows --x64",
-    "electron:solo": "tsc -p tsconfig.serve.json && electron-builder build --windows --x64",
+    "electron:windows64": "tsc -p tsconfig.serve.json && npm run build:prod && electron-builder build --windows --x64 -p always",
+    "electron:solo": "tsc -p tsconfig.serve.json && electron-builder build --windows --x64 -p always",
     "test": "ng test --watch=false",
     "test:watch": "ng test",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
     "lint": "ng lint",
     "bundle-report": "webpack-bundle-analyzer dist/stats.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vjose1903/novac-system-agrodemi.git"
   },
   "dependencies": {
     "@angular/animations": "^12.2.13",
@@ -52,7 +56,7 @@
     "ngx-permissions": "13.0.1",
     "ngx-toastr": "^13.2.0",
     "pdfmake": "^0.1.70",
-    "primeicons": "^4.1.0",
+    "primeicons": "^5.0.0",
     "primeng": "13.0.4",
     "replace-in-file": "6.3.2",
     "request": "^2.88.2",
@@ -79,6 +83,7 @@
     "@angular/platform-browser-dynamic": "13.1.2",
     "@angular/router": "13.1.2",
     "@babel/eslint-parser": "7.13.8",
+    "@electron-forge/publisher-github": "6.0.0-beta.64",
     "@types/jasmine": "3.6.3",
     "@types/jasminewd2": "2.0.8",
     "@types/jquery": "3.5.11",

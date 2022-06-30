@@ -1,6 +1,6 @@
 const replace = require('replace-in-file');
 import Functions from './functions.js';
-import { pathAdd } from '../main';
+import { pathAdd, cmd } from '../main';
 const logosJson = require('../logos.json');
 
 export default class ReplaceInFile {
@@ -64,12 +64,8 @@ export default class ReplaceInFile {
         const options = { allowEmptyPaths: true, files: archivos_a_cambiar, from: params.array_targets, to: params.array_replacement };
 
         replace(options)
-          .then((changedFiles) => {
-            resolve(changedFiles);
-          })
-          .catch((error) => {
-            reject(error);
-          });
+          .then((changedFiles) => resolve(changedFiles))
+          .catch((error) => reject(error));
       } else {
         resolve(true);
       }

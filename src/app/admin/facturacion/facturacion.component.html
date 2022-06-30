@@ -9,18 +9,19 @@
           <div class="col-3 p-0">
             <span class="titulos"><strong>Tipo:</strong></span>
             <input
+              #tipoFact
+              id="tipoFact"
               placement="right"
               triggers="focus"
               type="text"
-              (keydown.enter)="saltar('condicion', tipoFact.value)"
+              (keydown.enter)="saltar('tipo', tipoFact.value)"
               class="form-control tipo inputE"
               [(ngModel)]="tipoFactura"
-              id="tipoFact"
               (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
-              #tipoFact
               (focus)="tiposFacturas.toggle($event)"
               tabindex="-1"
               [readOnly]="!!factura_a_editar"
+              [ngClass]="{ disabled: !!factura_a_editar }"
             />
 
             <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
@@ -28,12 +29,13 @@
             </p-overlayPanel>
           </div>
 
-          <div class="{{ metodo === 'compra' ? 'col-6' : 'col-9' }} pr-0">
+          <div class="{{ metodo === 'compra' ? 'col-6' : 'col-9' }} p-0">
             <span class="titulos"><strong>Condición:</strong></span>
 
             <select
+              #condicionInput
               id="condicion"
-              (keydown.enter)="saltar(metodo === 'compra' ? 'costo' : 'venta', $event.target.value, $event.target.id)"
+              (keydown.enter)="saltar($event.target.id, condicionInput.value)"
               class="form-control inputE"
               [(ngModel)]="condicion_fact"
               (change)="cambiarTipoVenta($event.target.value)"
@@ -49,14 +51,14 @@
           <div *ngIf="metodo === 'compra'" class="col-3 pr-0">
             <span class="titulos"><strong>Gasto:</strong></span>
             <input
+              #gastoDe
+              id="gastoDe"
               placement="right"
               triggers="focus"
               type="text"
-              (keydown.enter)="saltar('pago', costo.value)"
+              (keydown.enter)="saltar($event.target.id, gastoDe.value)"
               class="form-control tipo inputE"
               [(ngModel)]="CostoYgasto"
-              id="costo"
-              #costo
               [readOnly]="!!factura_a_editar"
               [ngClass]="{ disabled: !!factura_a_editar }"
               (focus)="gastosFacturas.toggle($event)"
@@ -72,8 +74,9 @@
         <div *ngIf="metodo === 'venta'">
           <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
           <select
+            #ventaInput
             id="venta"
-            (keydown.enter)="saltar(modo_factura == 'normal' ? (condicion_fact == 'Contado' ? 'numero_pre_factura' : 'nom') : 'nom', $event.target.value, $event.target.id)"
+            (keydown.enter)="saltar($event.target.id, ventaInput.value)"
             (change)="selectModoFactura($event.target.value)"
             class="form-control inputE"
             [(ngModel)]="modo_factura"
@@ -85,7 +88,7 @@
             <option value="" disabled selected>Modo de venta</option>
             <option value="normal">Normal</option>
             <option *ngxPermissionsOnly="permissions.factura_venta.seleccionar_camion_en_facturacion" value="viaje">Viaje</option>
-            <!-- <option *ngIf="condicion_fact === 'Contado'" value="adelantada">Adelantada</option> -->
+            <option *ngIf="condicion_fact == 'Contado'" value="adelantada">Adelantada</option>
           </select>
         </div>
 
@@ -94,12 +97,12 @@
             <span class="mt-1"><strong>No. Pre-factura:</strong></span>
 
             <p-inputMask
-              (keydown.enter)="saltar('buscar_pre_factura', $event.target.value, $event.target.id)"
+              inputId="numero_pre_factura"
+              (keydown.enter)="saltar($event.target.id, $event.target.value)"
               [(ngModel)]="numero_pre_factura"
               mask="99999999"
               tabindex="-1"
               styleClass="form-control inputE"
-              inputId="numero_pre_factura"
               placeholder="________"
               [autoClear]="false"
             ></p-inputMask>
@@ -110,12 +113,13 @@
           <span class="mt-1"><strong>Fecha viaje:</strong></span>
           <div class="d-flex justify-content-between align-items-center">
             <input
+              #fecha_viajeInput
+              id="fecha_viaje"
               type="text"
-              (keydown.enter)="saltar('blur', $event.target.value, $event.target.id)"
+              (keydown.enter)="saltar($event.target.id, fecha_viajeInput.value)"
               [bsConfig]="dpConfig"
               placeholder="mm/dd/aaaa"
               class="form-control inputE"
-              id="fecha_viaje"
               [(ngModel)]="fecha_viaje"
               #dp="bsDatepicker"
               placement="bottom"
@@ -168,12 +172,12 @@
           <span class="mt-2"><strong>Número comprobante:</strong></span>
 
           <p-inputMask
-            (keydown.enter)="saltar(condicion_fact === 'Crédito' ? 'fecha_vencimiento' : 'filtro', $event.target.value, $event.target.id)"
+            inputId="ncf"
+            (keydown.enter)="saltar($event.target.id, $event.target.value)"
             [(ngModel)]="NCFcompra"
             mask="B9999999999"
             tabindex="-1"
             styleClass="form-control inputE UPPERCASE"
-            inputId="ncf"
             placeholder="B__________"
             [autoClear]="false"
             (blur)="checkNumeroPreFactura()"
@@ -182,12 +186,13 @@
           <div *ngIf="condicion_fact === 'Crédito'">
             <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
             <input
+              #fecha_vencimiento_input
+              id="fecha_vencimiento"
               type="text"
-              (keydown.enter)="saltar('filtro', $event.target.value)"
+              (keydown.enter)="saltar('fecha_vencimiento', fecha_vencimiento_input.value)"
               [bsConfig]="dpConfig"
               placeholder="mm/dd/aaaa"
               class="form-control inputE"
-              id="fecha_vencimiento"
               [(ngModel)]="fecha_vencimiento"
               #dp="bsDatepicker"
               placement="bottom"
@@ -211,8 +216,9 @@
             <div class="col-7 pl-0">
               <span class="control-label titulos mr-2">Nombre:</span>
               <input
+                #nombreInput
                 id="nom"
-                (keydown.enter)="saltar('dir', form.controls['nombre'].value)"
+                (keydown.enter)="saltar($event.target.id, nombreInput.value)"
                 type="text"
                 formControlName="nombre"
                 class="form-control inputE"
@@ -238,8 +244,9 @@
               <div class="form-group">
                 <span class="control-label titulos mr-2">Direccion:</span>
                 <input
+                  #direccionInput
                   id="dir"
-                  (keydown.enter)="saltar('cod-0', form.controls['direccion'].value)"
+                  (keydown.enter)="saltar($event.target.id, direccionInput.value)"
                   type="text"
                   formControlName="direccion"
                   class="form-control inputE"

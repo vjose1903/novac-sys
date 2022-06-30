@@ -14,12 +14,12 @@ import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
 import { SingletonService } from '../core/services/singleton.service';
-import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, KEYWORD_ELECTRON_PRINT_BASE64, KEYWORD_ELECTRON_TEST } from '../../../electron/shared-electron-angular';
+import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
 import { ConfigI } from '../core/typescript/config-interface';
 import { fun } from '../core/services/functions.service';
 import { CurrentUserService } from '../core/services/current-user.service';
-import { LayoutService } from '../admin/layout/layout.service';
+import { FacturaC } from '../admin/facturacion/factura';
 
 @Component({
   selector: 'app-login',
@@ -36,6 +36,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
   requestClass = new RequestC();
   configServ = SingletonService.configServ;
+  configApp: ConfigI;
 
   constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public pdfServ: PdfService, public currentUserServ: CurrentUserService) {
     super();
@@ -45,6 +46,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
   ngAfterViewInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
+      this.configApp = config;
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       this.versionApp = config.app_version;
 
@@ -91,12 +93,13 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     const formulario = this.form.getRawValue();
 
     if (formulario.usuario == '1973' && formulario.password == '3791') {
-      this.openConfigsModal();
+      if (this.configApp.is_development) this.router.navigateByUrl('/auth/config');
+      else this.openConfigsModal();
     } else {
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then((res) => {
-          this.currentUserServ.setUser(res.data).then(() => setTimeout(() => this.router.navigateByUrl('/admin/dashboard'), 500));
+          setTimeout(() => this.currentUserServ.setUser(res.data).then(() => this.router.navigateByUrl('/admin/dashboard')), 250);
         })
         .catch((error) => {
           if (error.status === 0) fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
@@ -105,7 +108,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   openConfigsModal() {
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
     this.enfocarInput('Iusuario');
 
     this.handleModalForm({
@@ -130,11 +133,11 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     // const data_ = venta_contado_consumo;
     // const data_ = nota_credito;
 
-    const obj = { data: data_, type: 'facturacion' };
-
-    this.tipo_prueba = obj.type;
-
-    this.generar(obj);
+    new FacturaC().parseDataToPdf(data_).then(async (factura_parsed) => {
+      const obj = { data: factura_parsed, type: 'facturacion' };
+      this.tipo_prueba = obj.type;
+      this.generar(obj);
+    });
   }
 
   async pruebaRecibo() {
@@ -142,7 +145,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
     // const DD = await this.pdfServ.makeFacturaVenta(data);
     const obj = { data: data_, type: 'recibo_ingreso' };
-
+    // ["type"] =
     this.tipo_prueba = obj.type;
 
     this.generar(obj);

@@ -4,17 +4,21 @@ import { getTablaNormal } from './tabla_normal';
 export function getContentWithTablaAgrupada(configuracion, data) {
   const content = [];
 
-  for (let i = 0; i < data.contenido_reporte.length; i++) {
+  for (let index_contenido = 0; index_contenido < data.contenido_reporte.length; index_contenido++) {
     // const detalle = data.contenido_reporte[i];
     let cont_ = [];
-    for (let j = 0; j < configuracion.info.length; j++) {
-      const config = configuracion.info[j];
-      const tabla = getTablaNormal(config, data, i, j);
+
+    for (let index_info = 0; index_info < configuracion.info.length; index_info++) {
+      const config = configuracion.info[index_info];
+
+      const tabla = getTablaNormal(config, data, index_contenido, index_info);
+
       cont_.push(tabla);
     }
-    if (i > 0) cont_ = [getRaya(configuracion), ...cont_];
 
-    if (data.contenido_reporte[i].contenido_titulo === 'TOTAL GENERAL') {
+    if (index_contenido > 0) cont_ = [getRaya(configuracion), ...cont_];
+
+    if (data.contenido_reporte[index_contenido].contenido_titulo === 'TOTAL GENERAL') {
       content.push({ stack: cont_, unbreakable: true });
     } else {
       content.push(cont_);

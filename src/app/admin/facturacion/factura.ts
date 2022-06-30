@@ -1,5 +1,10 @@
 import { CrudG, extraArgs } from '../../core/typescript/crud-g';
 import * as _ from 'lodash';
+import { fun } from '../../core/services/functions.service';
+import * as moment from '../../core/javascript/moment';
+import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
+import { SingletonService } from '../../core/services/singleton.service';
+
 export class FacturaC extends CrudG<FacturasI> {
   constructor() {
     super('cabecera_facturas');
@@ -22,9 +27,87 @@ export class FacturaC extends CrudG<FacturasI> {
       parameters: { page: args.page, per_page: args.per_page, paginado: args.paginado },
     };
     return this.getAll(extra);
-    // return new Promise((resolve) => {
-    //   this.getAll(extra).then((res) => resolve(res));
-    // });
+  }
+
+  parseDataToPdf(data) {
+    return new Promise((resolve) => {
+      const pick_factura = [
+        'Bruto',
+        'cliente',
+        'balance',
+        'condicion',
+        'descuento',
+        'identificador',
+        'detalle_facturas',
+        'numero_factura',
+        'devuelta',
+        'estado',
+        'fecha_equivalente',
+        'fecha_valida',
+        'fecha_vencimiento',
+        'fecha_viaje',
+        'forma_pago',
+        'id',
+        'is_viaje',
+        'monto',
+        'numero_comprobante',
+        'tipo',
+        'tipo_factura_id',
+        'itbis',
+        'suplidor',
+        'tipo_factura',
+        'total_factura',
+        'usuario',
+        'vendedor',
+      ];
+
+      let temp_data_parsed = _.pick(fun.duplicarJson(data), pick_factura);
+
+      const data_parsed = fun.remplaceKeyFromJson(temp_data_parsed, [
+        { old_key: 'tipo_factura', new_key: 'tipo_pdf' },
+        { old_key: 'detalle_facturas', new_key: 'contenido_reporte' },
+        { old_key: 'numero_factura', new_key: 'numero_documento' },
+      ]);
+
+      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente);
+      data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
+      data_parsed.total = data_parsed.total_factura;
+
+      data_parsed.contenido_reporte.map((detalle) => {
+        detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+        return detalle;
+      });
+
+      resolve(data_parsed);
+    });
+  }
+
+  handleMostrarFactura(dataFactura, botones_dinamicos?) {
+    return new Promise<any>((resolve, reject) => {
+      const toPDFData = { data: dataFactura, type: 'facturacion' };
+
+      SingletonService.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
+        if (res.status === 'si') {
+          const inputs = { pdfSrc: res.body, height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+          const obj_modal = {
+            component: PdfViewerComponent,
+            inputs: inputs,
+            id: 'mostrarFactura',
+            header: 'MOSTRAR FACTURA',
+            width: '900px',
+            botones: {
+              aceptar: { show: false, disable: false },
+              cancelar: { show: false, disable: false },
+              dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+            },
+          };
+
+          if (fun.hasValue(botones_dinamicos)) obj_modal.botones.dinamico = botones_dinamicos;
+
+          resolve(obj_modal);
+        }
+      });
+    });
   }
 }
 

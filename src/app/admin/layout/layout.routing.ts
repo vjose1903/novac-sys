@@ -59,12 +59,12 @@ const routes: Routes = [
       {
         path: 'reportes',
         component: ReportesComponent,
-        canActivate: [NgxPermissionsGuard],
-        data: {
-          permissions: {
-            only: Object.values(Permisos.reporte),
-          },
-        },
+        // canActivate: [NgxPermissionsGuard],
+        // data: {
+        //   permissions: {
+        //     only: Object.values(Permisos.reporte),
+        //   },
+        // },
       },
     ],
   },

@@ -1,4 +1,4 @@
-import { autoUpdater, NsisUpdater } from 'electron-updater';
+import { autoUpdater } from 'electron-updater';
 import { BrowserWindow, dialog } from 'electron';
 
 import {
@@ -10,37 +10,41 @@ import {
   ELECTRON_EVENT_UPDATE_ERROR,
   KEYWORD_ELECTRON_RESPONSE,
 } from './shared-electron-angular';
+
 import Functions from './functions';
 import { ConfigI } from '../src/app/core/typescript/config-interface';
+import { puts } from '../main';
 
 export default class AppUpdater {
-  constructor() {
+  constructor(win) {
     const log = require('electron-log');
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
-    this.checkForUpdates();
+
+    this.checkForUpdates(win);
   }
 
-  async checkForUpdates() {
-    const confTemp = (await Functions.getConfigFile()) as any;
-    const conf: ConfigI = JSON.parse(confTemp);
+  async checkForUpdates(win) {
+    autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-agrodemi', token: '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', private: true });
+    autoUpdater.checkForUpdatesAndNotify();
 
-    const autoUpdater = new NsisUpdater({ provider: 'generic', url: conf.url_servidor_descargas });
-
-    setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 100);
+    this.handleUpdateEvents(win);
   }
 
   handleUpdateEvents(win: BrowserWindow) {
+    puts('-=-=-=-=- handleUpdateEvents -=-=-=-=-');
+
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // AUTO UPDATE EVENTS
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // setTimeout(() => this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...' } }), 10000);
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, () => {
+      puts(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, 'ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...', url: autoUpdater.getFeedURL() } });
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, (info: any) => {
+      puts(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, 'ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, info: info });
 
       const dialogOpts = {
@@ -57,6 +61,7 @@ export default class AppUpdater {
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, (event, releaseNotes, releaseName) => {
+      puts(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, 'ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
       const dialogOpts = {
         type: 'info',
         buttons: ['Reiniciar'],
@@ -73,17 +78,17 @@ export default class AppUpdater {
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, (info) => {
+      puts(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, 'ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, info: { msg: 'Actualizacion no disponible...', body: info } });
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_ERROR, (error) => {
+      puts(ELECTRON_EVENT_UPDATE_ERROR, 'ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_ERROR, info: { msg: 'Actualizacion no disponible...', body: { msg: 'Error descargando actualizacion...', body: error } } });
     });
   }
 
   sendEventToAngular(win, params: { event_name: string; info: any }) {
-    if (win) {
-      win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
-    }
+    if (win) win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
   }
 }

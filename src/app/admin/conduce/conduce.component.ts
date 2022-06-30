@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
 import * as moment from '../../core/javascript/moment';
@@ -16,6 +16,8 @@ import { Permisos } from '../../core/typescript/permisos';
 import { table_config } from '../components/new_tablas/tabla-class';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { SingletonService } from '../../core/services/singleton.service';
+import { ConfirmacionImprimirComponent } from '../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
+import { teclasCode } from '../../core/typescript/constantes';
 
 @Component({
   selector: 'app-conduce',
@@ -23,6 +25,28 @@ import { SingletonService } from '../../core/services/singleton.service';
   styleUrls: ['./conduce.component.scss'],
 })
 export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
+  secuenciaKeys = [];
+
+  @HostListener('window:keydown', ['$event'])
+  @HostListener('window:keyup', ['$event'])
+  handleKeyboardEvent(event: any) {
+    event.stopPropagation();
+    const key = event.keyCode;
+    const secuenciasAceptadas = [teclasCode._control, teclasCode._P];
+    if (event.type === 'keydown') {
+      if (!this.secuenciaKeys.includes(key) && secuenciasAceptadas.includes(key)) this.secuenciaKeys.push(key);
+    } else if (event.type === 'keyup') {
+      const combinacion = _.join(this.secuenciaKeys, '_');
+
+      this.secuenciaKeys = [];
+
+      if (combinacion === `${teclasCode._control}_${teclasCode._P}`) {
+        if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
+        this.imprimirConduce();
+      }
+    }
+  }
+
   listaClientes;
 
   cliente;
@@ -42,7 +66,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   sacos = [25, 50, 100];
 
   TOTAL: number;
-
+  is_print = false;
   info = [];
 
   table_config: table_config = {
@@ -158,6 +182,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
         this.llenarRowDespuesDeFiltro(arg);
       }
     }
+
     if (arg.modal_id == 'buscarCliente') {
       this.cliente = arg.data;
       (document.getElementById('clienteI') as any).value = arg.data.nombre;
@@ -170,6 +195,11 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       this.llenarConduce(arg.data).then((res) => {
         this.checkFacturasAdelantadasSelection();
       });
+    }
+
+    if (arg.modal_id === 'confirmacionImprimir') {
+      this.is_print = arg.is_print;
+      this.sendData();
     }
   }
 
@@ -403,7 +433,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   addItem(index): void {
-    fun.logPurple(' ----- AÑADIENDO MAS FILAS A LA TABLA DE CONDUCE ----- ');
     this.ARRAY_ROWARTICULOS = this.form.get('rowFactura') as FormArray;
     this.ARRAY_ROWARTICULOS.push(this.createItem(index));
   }
@@ -641,26 +670,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     return res;
   }
 
-  async abrirModalDinamicText(texto, type) {
-    let tipo_modal;
-    const idModal = type === 2 ? 'imprimir_conduce' : 'cancelar_conduce';
-
-    const confirmationObj = {
-      id: idModal,
-      texto,
-      header: 'Confirmación',
-      siFunction: async (instance) => {
-        if (type === 2) this.sendData();
-        else this.cancelarConduce(2);
-
-        instance.closeModal(idModal, 'cancelar');
-      },
-      width: '30rem',
-    };
-
-    this.confirmationModal(confirmationObj);
-  }
-
   llenarConduce(detalles, conteo = 0, firstResolve = null) {
     return new Promise((resolve) => {
       firstResolve ??= resolve;
@@ -725,6 +734,8 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
         setTimeout(async () => {
           this.checkCantidadExede(i, 'llenarFila', (res) => {
+            console.log('this.checkCantidadExede > res', res);
+
             if (res) this.rowsExcede.push(i);
           });
 
@@ -792,6 +803,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       fun.toastWarning('Conduce no tiene cliente', 'Aviso');
     } else if (filas_ocupadas.length === 0) {
       fun.toastWarning('Conduce no tiene Articulos', 'Aviso');
+      this.enfocarInput('cod-1');
     } else {
       this.CuerpoConduce = [];
       for (let i = 0; i < filas_ocupadas.length; i++) {
@@ -808,8 +820,28 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
         this.CuerpoConduce.push(detalle_parsed);
       }
 
-      this.abrirModalDinamicText('Seguro que desea imprimir el conduce', 2);
+      const obj = { modo_factura: 'conduce', condicion_fact: 'conduce', metodo: 'conduce' };
+
+      this.handleModalForm({
+        component: ConfirmacionImprimirComponent,
+        inputs: obj,
+        id: 'confirmacionImprimir',
+        header: 'Confirmación',
+        width: '30rem',
+        botones: {
+          aceptar: { show: false, disable: false },
+          cancelar: { show: false, disable: false },
+          dinamico: [
+            { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+            { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
+          ],
+        },
+      });
     }
+  }
+
+  closeModal(modalInstance) {
+    modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 
   async sendData() {
@@ -821,8 +853,8 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     this.conduceClass.createUpdateOne(cabecera_conduce).then((res) => {
       const obj = { data: res['data'], type: 'conduce' };
 
-      this.cancelarConduce(2);
-      this.pdfServ.generatePdf({ oPdf: obj, imprimir: true }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
+      this.cancelarConduce();
+      this.pdfServ.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
     });
   }
 
@@ -858,13 +890,24 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     this.rowsExcede = [];
   }
 
-  cancelarConduce(secuencia) {
-    if (secuencia === 1) {
-      this.abrirModalDinamicText('Conduce no terminado, <b class="negrita">¿Desea cancelarlo?</b>', null);
-    } else {
-      this.borrar();
-      (document.getElementById('clienteI') as any).value = '';
-      setTimeout(() => this.enfocarInput('clienteI'), 10);
-    }
+  modalCancelarConduce() {
+    const confirmationObj = {
+      id: 'cancelar_conduce',
+      texto: 'Conduce no terminado, <b class="negrita">¿Desea cancelarlo?</b>',
+      header: 'Confirmación',
+      siFunction: async (instance) => {
+        this.cancelarConduce();
+        instance.closeModal('cancelar_conduce', 'cancelar');
+      },
+      width: '30rem',
+    };
+
+    this.confirmationModal(confirmationObj);
+  }
+
+  cancelarConduce() {
+    this.borrar();
+    (document.getElementById('clienteI') as any).value = '';
+    setTimeout(() => this.enfocarInput('clienteI'), 10);
   }
 }

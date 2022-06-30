@@ -1,5 +1,4 @@
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 import { SingletonService } from '../services/singleton.service';
 
@@ -99,7 +98,6 @@ export class CrudG<T> {
 
   private getUrlInUse() {
     const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
-
 
     const url = configApp.is_development ? AppConfig[configApp.gitUser] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     return url;

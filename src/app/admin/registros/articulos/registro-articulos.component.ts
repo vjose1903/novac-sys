@@ -11,6 +11,8 @@ import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
+import { ConfigI } from '../../../core/typescript/config-interface';
+import { SingletonService } from '../../../core/services/singleton.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -65,6 +67,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   permissions = Permisos;
   formPermissions = [Permisos.articulo.create, Permisos.articulo.update];
   hasPermissionUpdateFormula = false;
+  configApp: ConfigI;
+  medida_config: string;
 
   table_config: table_config = {
     info: [
@@ -89,6 +93,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   ngOnInit() {
     this._init_mixin({ component: 'reg_articulo', is_routing: true });
     this.createForm();
+    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.medida_config = this.configApp.medida_producto_terminado;
 
     this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then((result) => {
       this.hasPermissionUpdateFormula = result;
@@ -165,6 +171,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   ngOnChanges() {
     this.cdRef.detectChanges();
   }
+
   showContenido(value) {
     const array = ['Caja', 'Saco', 'Galon', 'Funda', 'Producto'];
     return array.includes(value);
@@ -199,11 +206,13 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     if (tipo_check == 'producto terminado') {
       await this.getMateriasP().then((res) => {
         this.addItem();
-        this.resetCompradoEn('Producto');
+        this.resetCompradoEn(this.medida_config);
         this.is_combo = true;
-        this.form.controls.medida.setValue('Producto');
-        this.form.controls.costo_principal.reset(null);
-        this.form.controls.precio_principal.reset(null);
+
+        this.form.controls.medida.setValue(this.medida_config);
+        this.form.controls.calcular_saco.setValue(true);
+        if (fun.hasValue(this.form)) this.form.controls.costo_principal.reset(null);
+        if (fun.hasValue(this.form)) this.form.controls.precio_principal.reset(null);
       });
     } else {
       this.resetArray();
@@ -259,43 +268,64 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   saltar(campo, i?) {
-    if (campo != 'send' && campo != 'cantidad_formula' && campo != 'ingrediente_producir') {
+    let is_invalid = true;
+    if (campo != 'send' && campo != 'cantidad_formula' && campo != 'ingrediente_producir' && campo != 'in_medida_alerta') {
       this.enfocarInput(campo);
+      //
     } else if (campo == 'ingrediente_producir') {
       this.enfocarInput(`cantidad_formula-${i}`);
+      //
+    } else if (campo == 'in_medida_alerta') {
+      if (this.showContenido(this.form.getRawValue().medida)) {
+        this.enfocarInput('contenidoPadre');
+        //
+      } else {
+        const formulario = this.form.getRawValue();
+        let campo = '';
+
+        if (formulario.tipo_articulo_id == tipos_articulos.Producto_terminado) {
+          campo = 'send';
+          //
+        } else {
+          campo = formulario.medida == 'Quintal' ? 'precio_libra' : formulario.medida == 'Unidad' || formulario.medida == 'Libra' ? 'send' : '';
+          //
+        }
+
+        if (campo == 'send') is_invalid = this.formIsInvalid();
+        else this.enfocarInput(campo);
+      }
     } else if (campo == 'cantidad_formula') {
       const actual_campo = i >= 0 ? `#cantidad_formula-${i}` : '#vendido';
       var field = $(actual_campo)[0];
 
       var fields = $(actual_campo).parents('form:eq(0),body').find(':input').not('[tabindex]');
 
-      // var index = fields.index(actual_campo);
       var index = _.findIndex(fields, field);
 
       if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
     } else {
-      const is_invalid = this.formIsInvalid();
+      is_invalid = this.formIsInvalid();
+    }
 
-      if (!is_invalid) {
-        this.enfocarInput('nombre');
-        setTimeout(() => this.submit(), 250);
-      }
+    if (!is_invalid) {
+      this.enfocarInput('nombre');
+      setTimeout(() => this.submit(), 250);
     }
   }
 
   borrar(reset = false) {
     this.articuloSelected = undefined;
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
     this.enfocarInput('nombre');
-    this.form.controls.is_detallable.setValue(false);
-    this.form.controls.existencia.setValue(0);
+    if (fun.hasValue(this.form)) this.form.controls.is_detallable.setValue(false);
+    if (fun.hasValue(this.form)) this.form.controls.existencia.setValue(0);
     this.boton = 'Registrar';
     this.TIPOARTICULO = '';
     this.recalcular = false;
     if (this.is_combo) this.resetArray();
 
     this.is_combo = false;
-    this.form.controls['rowFormula'].reset();
+    if (fun.hasValue(this.form)) this.form.controls['rowFormula'].reset();
 
     if (reset) this.isCreando = true;
   }
@@ -306,11 +336,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const fields = ['medida_alerta', 'medida_contenido_padre', 'medida_contenido_hijo', 'cantidad_contenido_padre', 'cantidad_contenido_hijo', 'precio_padre', 'precio_libra', 'precio_hijo'];
 
     fields.forEach((field) => {
-      this.form.controls[field].reset(null);
-      console.log('.');
+      if (fun.hasValue(this.form)) this.form.controls[field].reset(null);
     });
 
-    this.FORM.rowFormula.reset();
+    if (fun.hasValue(this.FORM)) this.FORM.rowFormula.reset();
 
     this.COMPRADOEN = value;
 
@@ -402,8 +431,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
           medida_en_turno = unidades[unidad_en_turno];
         }
       }
-
-      console.log('res.data ', res.data);
 
       (control.controls[index] as any).controls['medida_formula'].setValue(medida_en_turno);
 
@@ -654,16 +681,14 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.TIPOARTICULO = articulo.descripcion;
     this.is_combo = articulo.is_combo;
 
-    console.log('articulo ', articulo);
-
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
       this.COMPRADOEN = 'Quintal';
       this.form.controls.otros_costos.setValue(fun.numFormatTwoDecimals(articulo.otros_costos));
       const res = await this.getMateriasP();
 
       if (articulo.formulas_productos_terminados.length) {
-        this.form.controls.medida.setValue('Producto');
-        this.resetCompradoEn('Producto');
+        this.form.controls.medida.setValue(this.medida_config);
+        this.resetCompradoEn(this.medida_config);
 
         for (let i = 0; i < articulo.formulas_productos_terminados.length; i++) {
           const ingredient = articulo.formulas_productos_terminados[i];
@@ -730,7 +755,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       articulo_id: formulario.id,
       id: formulario.id_contenido_padre,
       costo: _.isString(formulario.costo_padre) ? parseFloat(formulario.costo_padre) : formulario.costo_padre,
-      precio: fun.desformatear(['Caja', 'Saco', 'Producto','Galon'].includes(formulario.medida) ? formulario.precio_padre : formulario.precio_libra),
+      precio: fun.desformatear(['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.precio_padre : formulario.precio_libra),
       cantidad: ['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.cantidad_contenido_padre : 100,
       medida: formulario.medida_contenido_padre,
       condicion: 'padre',
@@ -839,9 +864,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       obj['otros_costos'] = formulario.otros_costos;
       obj['formulas_productos_terminados'] = this.formarFormula();
     }
-
-    console.log("obj ", obj);
-
 
     this.articuloClass.createUpdateOne(obj).then((res) => {
       this.necesarioStart();

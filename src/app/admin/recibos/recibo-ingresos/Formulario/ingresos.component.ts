@@ -12,6 +12,7 @@ import { FormCantidadEfectivoComponent } from '../../../components/formularios e
 import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../../components/new_tablas/tabla-class';
+import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
 
 @Component({
   selector: 'app-ingresos',
@@ -22,14 +23,24 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   clienteAdepositar: any;
   facturas = [];
   tipo_recibo = 'Pago factura';
-
+  is_print = false;
   // =============================================
   //  TABLAS
   // =============================================
 
   table_config: table_config = {
     info: [
-      { titulo: '1', tipo: 'icon', key: 'actions', estilos: [{ width: '6%' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'historyPagos', rowTooltip: 'tooltip_history', text_color: 'colorEstado' }] },
+      {
+        titulo: '1',
+        tipo: 'icon',
+        key: 'actions',
+        div_class: 'd-flex justify-content-around',
+        estilos: [{ width: '6%' }, { color: 'var(--transparente00)' }],
+        iconsArray: [
+          { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
+          { key: 'historyPagos', rowTooltip: 'tooltip_history', text_color: 'colorEstado' },
+        ],
+      },
 
       { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
       { titulo: 'Fecha Facturacion', tipo: 'text', key: 'fecha' },
@@ -159,6 +170,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const res = await this.facturaClass.getAll({ afterPath: `cliente/${cliente_id}/pagada/false`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
 
     res.data.map((factura) => {
+      console.log('factura ', factura.numero_comprobante);
+
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
       factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
       factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD-MM-YYYY') : null;
@@ -169,15 +182,17 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       factura.monto = '0.00';
       const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
 
-      factura.tooltip_history = factura.is_viaje ? ' ' : 'Movimientos realizados';
+      factura.tooltip_history = factura.is_viaje ? null : 'Movimientos realizados';
       factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
       factura.colorEstado = factura.is_viaje ? 'green' : modalMoviemientos ? 'black' : 'gris-claro';
       factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
+      factura.ver = 'far fa-eye';
 
       factura.customStyles = {
         actions: [
-          { key: 'actions', isTd: true, estilos: 'width: 6% !important;' },
+          { key: 'actions', isTd: true, estilos: 'width: 6% !important; padding: 0.6rem 0rem !important' },
           { key: 'historyPagos', estilos: 'font-size: 1rem !important' },
+          { key: 'ver', estilos: 'font-size: 1rem !important' },
         ],
         select: { width: '6rem' },
         pagoT: { width: '6rem' },
@@ -198,7 +213,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       return factura;
     });
 
-    // this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
+    this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
     this.debiendo = this.totalFacturado - this.totalPagado - this.totalNotas;
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
 
@@ -274,6 +289,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     if (arg.modal_id === 'cambioEfectivo_IngresosComponent') {
       this.devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
+      this.is_print = arg.is_print;
       this.sendIngreso();
     }
 
@@ -302,7 +318,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
-      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'ingreso', tipo_modal: 'devuelta' };
+      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta', formaPago: 'Efectivo' };
 
       this.handleModalForm({
         component: FormCantidadEfectivoComponent,
@@ -383,15 +399,17 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
       const obj_print = { data: recibo, type: 'recibo_ingreso' };
 
-      this.pdfServ
-        .generatePdf({ oPdf: obj_print, imprimir: true })
-        .then(async (res) => {
-          if (res.status === 'si') {
-          } else fun.toastError(res.msg, 'ERROR');
+      if (this.is_print) {
+        this.pdfServ
+          .generatePdf({ oPdf: obj_print, imprimir: true })
+          .then(async (res) => {
+            if (res.status === 'si') {
+            } else fun.toastError(res.msg, 'ERROR');
 
-          this.layServ.nextCheckCuadreToday(true);
-        })
-        .catch((err) => fun.toastError(err.msg, 'ERROR'));
+            this.layServ.nextCheckCuadreToday(true);
+          })
+          .catch((err) => fun.toastError(err.msg, 'ERROR'));
+      }
     });
   }
 
@@ -406,22 +424,25 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
         this.reciboServ.abrirModalHistorial(params.data.pagos, params.data.notas);
       }
+      if (params.iconKey == 'ver') {
+        console.log('tableClickIcon > params.data', params.data);
+        this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
+          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => this.handleModalForm(obj_modal));
+        });
+      }
     }
   }
 
   tableInputChange(params) {
-
     if (params.key == 'select') {
       if (!params.value) {
         const factura = _.find(this.facturas, { id: params.data.id });
         factura.pagoT = false;
         params.data.monto = '0.00';
-        // this.tablaComponent.resetInput('monto', 'especificar', params.index, true, '0.00');
       }
     }
 
     if (params.key == 'pagoT' && params.value) {
-      // this.tablaComponent.resetInput('monto', 'balance', params.index, true);
       params.data.monto = fun.numFormatTwoDecimals(params.data.balance);
     }
 

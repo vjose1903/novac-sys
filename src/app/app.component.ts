@@ -29,6 +29,8 @@ import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
 import { CurrentUserService } from './core/services/current-user.service';
 import { MixinClass } from './core/typescript/MixinClass';
+import { PdfService } from './core/services/pdf/pdf.service';
+import { log } from 'console';
 
 @Component({
   selector: 'app-root',
@@ -46,6 +48,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   counter = 0;
   sub: Subscription;
   subModified: Subscription;
+  first_time_app = true;
 
   constructor(
     public _ipc: IpcService,
@@ -60,6 +63,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
+    public pdfServ: PdfService,
 
     private currentUserServ: CurrentUserService,
   ) {
@@ -67,14 +71,16 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   ngOnInit(): void {
+    const location = window.location.href;
+
     SingletonService.http = this.http;
     SingletonService.zone = this.zone;
     SingletonService.configServ = this.configServ;
 
-    SingletonService._ipc = this._ipc;
     SingletonService.layServ = this.layServ;
     SingletonService.toastr = this.toastr;
     SingletonService.sharedServ = this.sharedServ;
+    SingletonService.pdfServ = this.pdfServ;
     SingletonService.cdRef = this.cdRef;
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
@@ -84,6 +90,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
 
     this.sub = ELECTRON_EVENTS_OBSERVER.subscribe((res) => {
+      console.log(' ');
+      console.log('res ', res);
       if (fun.hasValue(res)) {
         const info = res.info;
         switch (res.event_name) {
@@ -93,10 +101,11 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             break;
           //
           case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
-            this.visible = true;
+            fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, info);
             break;
           //
           case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
+            this.visible = true;
             this.downloadProgression(info.body);
             break;
           //
@@ -106,7 +115,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           //
           case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
             fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
-
             break;
           //
           case KEYWORD_ELECTRON_QUIT_APP:
@@ -117,6 +125,10 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           case ELECTRON_EVENT_UPDATE_ERROR:
             fun.toastError(info.msg, 'ERRROR');
             this.visible = false;
+            break;
+          //
+          case 'test':
+            console.log('res ', res);
             break;
           //
           default:
@@ -180,6 +192,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   async getAppConfig() {
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
+    const actualPath = this.getActualPath();
 
     this._ipc
       .sendTask(task)
@@ -189,7 +202,16 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-          this.validateUserAndLoadPermisos();
+          const token = fun.getAuthToken();
+          fun.logOrange('actualPath: ', actualPath);
+
+          if (!this.first_time_app || (fun.hasValue(token) && !actualPath.includes('login') && !actualPath.includes('config'))) this.validateUserAndLoadPermisos();
+          else {
+            this.configReady = true;
+            this.first_time_app = false;
+            console.log('.then > this.first_time_app', this.first_time_app);
+            console.log('.then > this.configReady', this.configReady);
+          }
         }
       })
       .catch((err) => {
@@ -198,14 +220,18 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   validateUserAndLoadPermisos() {
+    console.log(' ');
+    fun.logOrange('VALIDANDO PERMISOS');
+    console.log(' ');
     this.currentUserServ
       .validateUser()
       .then((res) => setTimeout(() => (this.configReady = true), 500))
       .catch((error) => {
         this.configReady = true;
-        const actualPath = this.getActualPath();
 
-        if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
+        fun.logBlue('error: ', error);
+
+        if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
       });
   }
 

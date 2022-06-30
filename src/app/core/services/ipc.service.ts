@@ -62,8 +62,6 @@ export class IpcService {
 
   listenEvents() {
     this._ipc.on(KEYWORD_ELECTRON_RESPONSE, (event, obj) => {
-      console.warn('obj ', obj);
-
       const arg = typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface);
       const tareas = this.colaDeMensajes.value;
 
@@ -85,6 +83,7 @@ export class IpcService {
 
         try {
           const resultado = await lastValueFrom(task.fn.pipe(skip(1), take(1)));
+
           resolve(resultado);
         } catch (error) {
           reject(error);
