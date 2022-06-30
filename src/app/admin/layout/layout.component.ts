@@ -89,6 +89,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
+      console.log('this.subLogOut=this.layServ.LOGOUT.subscribe > res', res);
+
       if (res && res.bool) this.logOut();
       else {
         if (fun.hasValue(res)) this.layServ.nextLogOut(undefined);
