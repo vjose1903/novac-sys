@@ -181,7 +181,6 @@ try {
     // to stay active until the user quits explicitly with Cmd +
     app.quit();
   });
-
 } catch (e) {
   // Catch Error
   // throw e;
