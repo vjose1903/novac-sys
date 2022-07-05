@@ -10,6 +10,7 @@ import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.co
 import { fun } from '../../../../core/services/functions.service';
 import { Permisos } from '../../../../core/typescript/permisos';
 import { table_config } from '../../../components/new_tablas/tabla-class';
+import { FacturaC } from '../../../facturacion/factura';
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
@@ -49,6 +50,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   lista_recibos;
   rowSelected: any;
   reciboClass = new ReciboC();
+
   permissions = Permisos;
 
   constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
@@ -215,6 +217,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
               cancelar: { show: false, disable: false },
               dinamico: [
                 { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+                { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(obj.data), label: 'Ver detalles', disable: false },
                 {
                   clase: 'btn btn-verde',
                   function: (instance) => {
@@ -230,6 +233,11 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         }
       })
       .catch(() => this.loadServ.isLoading.next(false));
+  }
+
+  verDetalles(data) {
+    const configModal = this.reciboClass.modalVerDetalles(data);
+    this.handleModalForm(configModal);
   }
 
   imprimir_base64() {

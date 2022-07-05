@@ -30,7 +30,6 @@ import { fun } from './core/services/functions.service';
 import { CurrentUserService } from './core/services/current-user.service';
 import { MixinClass } from './core/typescript/MixinClass';
 import { PdfService } from './core/services/pdf/pdf.service';
-import { log } from 'console';
 
 @Component({
   selector: 'app-root',
@@ -48,7 +47,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   counter = 0;
   sub: Subscription;
   subModified: Subscription;
-  first_time_app = true;
 
   constructor(
     public _ipc: IpcService,
@@ -90,8 +88,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
 
     this.sub = ELECTRON_EVENTS_OBSERVER.subscribe((res) => {
-      console.log(' ');
-      console.log('res ', res);
       if (fun.hasValue(res)) {
         const info = res.info;
         switch (res.event_name) {
@@ -128,7 +124,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             break;
           //
           case 'test':
-            console.log('res ', res);
             break;
           //
           default:
@@ -192,7 +187,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   async getAppConfig() {
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
-    const actualPath = this.getActualPath();
 
     this._ipc
       .sendTask(task)
@@ -202,36 +196,11 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-          const token = fun.getAuthToken();
-          fun.logOrange('actualPath: ', actualPath);
-
-          if (!this.first_time_app || (fun.hasValue(token) && !actualPath.includes('login') && !actualPath.includes('config'))) this.validateUserAndLoadPermisos();
-          else {
-            this.configReady = true;
-            this.first_time_app = false;
-            console.log('.then > this.first_time_app', this.first_time_app);
-            console.log('.then > this.configReady', this.configReady);
-          }
+          setTimeout(() => (this.configReady = true), 500);
         }
       })
       .catch((err) => {
         console.error(err);
-      });
-  }
-
-  validateUserAndLoadPermisos() {
-    console.log(' ');
-    fun.logOrange('VALIDANDO PERMISOS');
-    console.log(' ');
-    this.currentUserServ
-      .validateUser()
-      .then((res) => setTimeout(() => (this.configReady = true), 500))
-      .catch((error) => {
-        this.configReady = true;
-
-        fun.logBlue('error: ', error);
-
-        if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
       });
   }
 

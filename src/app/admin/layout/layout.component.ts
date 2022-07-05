@@ -89,9 +89,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
-
-      console.log('this.subLogOut=this.layServ.LOGOUT.subscribe > res', res);
-
       if (res && res.bool) this.logOut();
       else {
         if (fun.hasValue(res)) this.layServ.nextLogOut(undefined);
@@ -110,6 +107,15 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.parseMenu();
     this.checkRouteActiva();
     this.cdRef.detectChanges();
+    this.validateUserAndLoadPermisos();
+  }
+
+  validateUserAndLoadPermisos() {
+    fun.logOrange('VALIDANDO PERMISOS');
+    this.currentUserServ.validateUser().catch((error) => {
+      fun.logBlue('error: ', error);
+      if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
+    });
   }
 
   initVariables() {

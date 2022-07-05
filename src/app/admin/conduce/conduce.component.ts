@@ -734,8 +734,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
         setTimeout(async () => {
           this.checkCantidadExede(i, 'llenarFila', (res) => {
-            console.log('this.checkCantidadExede > res', res);
-
             if (res) this.rowsExcede.push(i);
           });
 

@@ -16,6 +16,8 @@ import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
+import { DetalleFacturaComponent } from '../detalle-factura/detalle-factura.component';
+import { ReciboC } from '../../recibos/recibos';
 
 enum campos {
   cliente = 1,
@@ -45,11 +47,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   paqueteComprobante: any;
   tipo_factura_id = null;
   valor: any;
+
   notasClass = new NotaC();
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();
   ncfClass = new NcfC();
+
   notas: any = [];
   notaSelected: string;
   showSide: boolean = false;
@@ -534,9 +538,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   mostrarFactura(dataFactura, type, dataDB?, continuar?) {
     const toPDFData = { data: dataFactura, type: type };
-    const titulo = type === 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
 
     let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
+
     if (continuar)
       botonesDinamicos.push({
         clase: 'btn btn-verde mr-2',
@@ -555,7 +559,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           component: PdfViewerComponent,
           inputs: inputs,
           id: 'mostrarFactura',
-          header: titulo,
+          header: type === 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
           width: '900px',
           botones: {
             aceptar: { show: false, disable: false },
@@ -564,16 +568,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           },
         };
 
-        if (this.Para == ' Visualizar' || type == 'nota') {
-          if (type == 'nota') {
-            obj_modal.botones.dinamico.push({
-              clase: 'btn btn-gris ml-2',
-              function: (instance) => this.verDetalles(dataDB, instance),
-              label: 'Ver detalles',
-              disable: false,
-            });
-          }
+        obj_modal.botones.dinamico.push({
+          clase: 'btn btn-gris ml-2',
+          function: (instance) => this.verDetalles(type == 'nota' ? dataDB : dataFactura, type),
+          label: 'Ver detalles',
+          disable: false,
+        });
 
+        if (this.Para == ' Visualizar' || type == 'nota') {
           const editButton = {
             clase: 'btn btn-verde ml-2',
             function: (instance) => {
@@ -598,22 +600,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  verDetalles(dataNota, modalInstance) {
-    const input = { data: dataNota, instanceModalPadre: modalInstance };
+  verDetalles(data, tipo) {
+    let configModal;
+    if (tipo == 'nota') configModal = this.notasClass.modalVerDetalles(data);
+    if (tipo == 'facturacion') configModal = this.facturaClass.modalVerDetalles(data);
 
-    this.handleModalForm({
-      component: DetalleNotaComponent,
-      inputs: input,
-      id: 'buscarCliente',
-      header: `Nota: ${dataNota.numero_comprobante}`,
-      width: '1000px',
-      height: '30rem',
-      botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
-      },
-    });
+    this.handleModalForm(configModal);
   }
 
   getDataFromModal(arg, search) {

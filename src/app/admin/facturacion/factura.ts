@@ -4,6 +4,7 @@ import { fun } from '../../core/services/functions.service';
 import * as moment from '../../core/javascript/moment';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { SingletonService } from '../../core/services/singleton.service';
+import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 
 export class FacturaC extends CrudG<FacturasI> {
   constructor() {
@@ -80,6 +81,22 @@ export class FacturaC extends CrudG<FacturasI> {
 
       resolve(data_parsed);
     });
+  }
+
+  modalVerDetalles(data) {
+    return {
+      component: DetalleFacturaComponent,
+      inputs: { data: data },
+      id: `detalle_factura`,
+      header: 'Detalles Factura',
+      width: '30rem',
+      height: '10rem',
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+      },
+    };
   }
 
   handleMostrarFactura(dataFactura, botones_dinamicos?) {

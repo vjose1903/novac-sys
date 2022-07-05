@@ -1,0 +1,28 @@
+<div class="mainContainer">
+  <div class="d-flex info">
+    <div class="d-flex">
+      <b class="mr-2">Cliente: </b>
+      <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+        <p class="text-black mb-0">{{ inputs.data.cliente.nombre }}</p></p-tag
+      >
+    </div>
+
+    <div *ngIf="inputs?.data?.numero_comprobante" class="d-flex ml-3">
+      <b class="mr-2">Comprobante: </b>
+      <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+        <p class="text-black mb-0">{{ inputs.data.numero_comprobante }}</p></p-tag
+      >
+    </div>
+  </div>
+  <hr class="rayaA" />
+  <div class="row">
+    <div class="col-6 pl-0" *ngFor="let item of detalles; let i = index">
+      <ng-container class="d-flex">
+        <p>
+          <strong>{{ item.label }}</strong
+          >: {{ getValue(item) }}
+        </p>
+      </ng-container>
+    </div>
+  </div>
+</div>

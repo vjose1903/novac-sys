@@ -212,10 +212,19 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'ver') {
         this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
-          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => this.handleModalForm(obj_modal));
+          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
+            const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
+            obj_modal.botones.dinamico.push(ver_datelles_btn);
+            this.handleModalForm(obj_modal);
+          });
         });
       }
     }
+  }
+
+  verDetalles(data) {
+    const configModal = this.reciboClass.modalVerDetalles(data);
+    this.handleModalForm(configModal);
   }
 
   abrir_historial() {

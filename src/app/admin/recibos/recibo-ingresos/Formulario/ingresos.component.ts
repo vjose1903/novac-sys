@@ -170,8 +170,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const res = await this.facturaClass.getAll({ afterPath: `cliente/${cliente_id}/pagada/false`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
 
     res.data.map((factura) => {
-      console.log('factura ', factura.numero_comprobante);
-
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
       factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
       factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD-MM-YYYY') : null;
@@ -425,12 +423,21 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         this.reciboServ.abrirModalHistorial(params.data.pagos, params.data.notas);
       }
       if (params.iconKey == 'ver') {
-        console.log('tableClickIcon > params.data', params.data);
         this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
-          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => this.handleModalForm(obj_modal));
+          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
+            const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
+            obj_modal.botones.dinamico.push(ver_datelles_btn);
+            this.handleModalForm(obj_modal);
+          });
         });
       }
     }
+  }
+
+  verDetalles(data) {
+    const configModal = this.reciboClass.modalVerDetalles(data);
+
+    this.handleModalForm(configModal);
   }
 
   tableInputChange(params) {
