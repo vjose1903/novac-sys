@@ -64,10 +64,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   constructor(public cdRef: ChangeDetectorRef, public tServ: TablasService, private zone: NgZone) {
     cdRef.detach();
-    this.tablaInterval = setInterval(() => {
-      this.cdRef.detectChanges();
-      console.log('tabla');
-    }, 500);
+    this.tablaInterval = setInterval(() => this.cdRef.detectChanges(), 500);
   }
 
   formatoNumero(num) {
@@ -196,9 +193,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id, 'paginatorChange');
 
       const actualPage = this.getPaginatorPageByNumber(page);
-      const clickeado_por = actualPage.getAttribute('clickeado_por');
+      const clickeado_por = actualPage?.getAttribute('clickeado_por');
 
-      if (page != actualPagination.page && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
+      if ((page != actualPagination.page || per_page != actualPagination.per_page) && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
         this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
 
         if (actualPagination.is_local) {
@@ -253,7 +250,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   divPaginatorChangeWidth(event) {
-    this.setCantPagView(event.newWidth, 'width_paginator');
+    this.setCantPagView(event.newRect.width, 'width_paginator');
   }
 
   setCantPagView(width, tipo) {
