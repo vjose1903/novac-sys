@@ -72,6 +72,7 @@ function createWindow() {
     puts(' ::::: ========= PASANDO A CREAR LA VENTANA DEL SISTEMA ========= :::::');
     puts('  ');
     puts('  ');
+    puts(app.getVersion(), 'app.getVersion()');
     const electronScreen = screen;
     const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
@@ -278,9 +279,10 @@ function continuarCargandoArchivos(resolve) {
 function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
 
-  puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
-  auto_updater = new AppUpdater();
-  auto_updater.handleUpdateEvents(win);
+  setTimeout(() => {
+    puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
+    auto_updater = new AppUpdater(win);
+  }, 1000);
   // ---------------------------------------
 }
 
@@ -329,6 +331,7 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
         break;
       //
       case KEYWORD_ELECTRON_PRINT_BASE64:
+        puts('INICIANDOO PROCESO DE IMPRESION');
         const oPdf = JSON.parse(arg.data);
 
         const base64 = oPdf.base64;
@@ -460,7 +463,7 @@ async function verificarSumastra() {
 // FUNCION QUE SE EJECUTA AL TERMINAR LA DESCARGA DE UN ELEMENTO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
-  // const interval = setInterval(() => {
+
 
   const command = isMacOs() ? `unzip "${await pathAdd(path_local_extension)}" -d "${await pathAdd()}"` : `powershell Expand-Archive "${await pathAdd(path_local_extension)}" -DestinationPath "${await pathAdd()}"`;
 

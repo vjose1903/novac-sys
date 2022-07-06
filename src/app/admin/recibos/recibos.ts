@@ -1,4 +1,5 @@
 import { CrudG } from '../../core/typescript/crud-g';
+import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 
 export interface ReciboI {
   id?: number;
@@ -24,5 +25,21 @@ export interface ReciboI {
 export class ReciboC extends CrudG<ReciboI> {
   constructor() {
     super('recibos_ingresos');
+  }
+
+  modalVerDetalles(data) {
+    return {
+      component: DetalleFacturaComponent,
+      inputs: { data: data },
+      id: `detalle_recibos`,
+      header: 'Detalles Recibos',
+      width: '30rem',
+      height: '10rem',
+      botones: {
+        aceptar: { show: false, disable: false },
+        cancelar: { show: false, disable: false },
+        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+      },
+    };
   }
 }

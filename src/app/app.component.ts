@@ -29,6 +29,7 @@ import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
 import { CurrentUserService } from './core/services/current-user.service';
 import { MixinClass } from './core/typescript/MixinClass';
+import { PdfService } from './core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-root',
@@ -60,6 +61,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
+    public pdfServ: PdfService,
 
     private currentUserServ: CurrentUserService,
   ) {
@@ -67,14 +69,16 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   ngOnInit(): void {
+    const location = window.location.href;
+
     SingletonService.http = this.http;
     SingletonService.zone = this.zone;
     SingletonService.configServ = this.configServ;
 
-    SingletonService._ipc = this._ipc;
     SingletonService.layServ = this.layServ;
     SingletonService.toastr = this.toastr;
     SingletonService.sharedServ = this.sharedServ;
+    SingletonService.pdfServ = this.pdfServ;
     SingletonService.cdRef = this.cdRef;
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
@@ -93,10 +97,11 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             break;
           //
           case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
-            this.visible = true;
+            fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, info);
             break;
           //
           case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
+            this.visible = true;
             this.downloadProgression(info.body);
             break;
           //
@@ -106,7 +111,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           //
           case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
             fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
-
             break;
           //
           case KEYWORD_ELECTRON_QUIT_APP:
@@ -117,6 +121,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           case ELECTRON_EVENT_UPDATE_ERROR:
             fun.toastError(info.msg, 'ERRROR');
             this.visible = false;
+            break;
+          //
+          case 'test':
             break;
           //
           default:
@@ -178,6 +185,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
   }
 
+
   async getAppConfig() {
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
 
@@ -189,23 +197,11 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           this.themeService.setTheme(config.color_app);
           this.configServ.setConfig = config;
           this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-          this.validateUserAndLoadPermisos();
+          setTimeout(() => (this.configReady = true), 500);
         }
       })
       .catch((err) => {
         console.error(err);
-      });
-  }
-
-  validateUserAndLoadPermisos() {
-    this.currentUserServ
-      .validateUser()
-      .then((res) => setTimeout(() => (this.configReady = true), 500))
-      .catch((error) => {
-        this.configReady = true;
-        const actualPath = this.getActualPath();
-
-        if (!actualPath.includes('login') && (error.razon == 'sesion_expired' || error.razon == 'no_token')) this.logOut();
       });
   }
 

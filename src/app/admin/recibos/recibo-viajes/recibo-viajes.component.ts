@@ -24,11 +24,21 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   table_config: table_config = {
     info: [
-      { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' }] },
-      { titulo: 'Fecha Fact.', tipo: 'text', key: 'fecha' },
-      { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar' },
-      { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante' },
-      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
+      {
+        titulo: '1',
+        tipo: 'icon',
+        key: 'actions',
+        div_class: 'd-flex justify-content-around',
+        estilos: [{ width: '5%' }, { color: 'var(--transparente00)' }],
+        iconsArray: [
+          { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
+          { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' },
+        ],
+      },
+      { titulo: 'Fecha Fact.', tipo: 'text', key: 'fecha', estilos: [{ width: '20%' }] },
+      { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar', estilos: [{ width: '35%' }] },
+      { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '15%' }] },
+      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', estilos: [{ width: '20%' }] },
     ],
     padre_functions: { data_request: (params) => this.getViajes(params) },
     filtrar: { local: false },
@@ -43,6 +53,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   viajes = [];
   viaje_selected;
   ultimo_pago;
+  is_print = false;
 
   camiones = [];
   choferes = [];
@@ -87,6 +98,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   objDevueltoResponse(res) {
+    // TODO: ver si esto esta funcionando aqui
     if (res && res.tipo_modal === 'cambio') {
       this.devuelta = res.data.devuelta > 0 ? res.data.devuelta : 0;
       this.forma_pago = res.data.forma_pago;
@@ -148,10 +160,22 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         viaje.is_active = viaje.fecha_completada ? 'fas fa-check' : viaje.pagos.length > 0 ? 'far fa-check-square' : 'far fa-square';
         viaje.colorIsActive = viaje.fecha_completada ? 'green' : viaje.pagos.length > 0 ? 'yellow' : 'red';
         viaje.is_active_tooltip = viaje.fecha_completada ? 'Pago completo' : viaje.pagos.length > 0 ? 'Viaje abonado' : 'Viaje pendiente';
+        viaje.ver = 'far fa-eye';
 
-        viaje.customStyles = { estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }] };
+        viaje.customStyles = {
+          actions: [
+            { key: 'actions', isTd: true, estilos: 'width: 5% !important; padding: 0.6rem 0rem !important' },
+            { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' },
+            { key: 'ver', estilos: 'font-size: 1rem !important' },
+          ],
+          fecha: { width: '20%' },
+          cliente_mostrar: { width: '35%' },
+          numero_comprobante: { width: '15%' },
+          total_factura: { width: '20%' },
+        };
+
         viaje.cliente_mostrar = viaje.cliente.nombre;
-        viaje.fecha = moment(viaje.fecha_equivalente).format('DD-MM-YYYY');
+        viaje.fecha = moment(viaje.fecha_equivalente).format('DD/MM/YYYY');
         viaje['pago_a_tiempo'] = pago_a_tiempo;
 
         this.viajes.push(viaje);
@@ -184,6 +208,25 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     return res;
   }
 
+  tableClickIcon(params) {
+    if (params.columnKey == 'actions') {
+      if (params.iconKey == 'ver') {
+        this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
+          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
+            const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
+            obj_modal.botones.dinamico.push(ver_datelles_btn);
+            this.handleModalForm(obj_modal);
+          });
+        });
+      }
+    }
+  }
+
+  verDetalles(data) {
+    const configModal = this.reciboClass.modalVerDetalles(data);
+    this.handleModalForm(configModal);
+  }
+
   abrir_historial() {
     const pagos = this.viaje_selected.pagos;
     const notas = this.viaje_selected.notas;
@@ -196,6 +239,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   verViaje(data) {
+    this.form.reset();
     this.monto_pendiente = 0;
     this.totalPagado = 0;
     this.totalPagadoPorciento = 0;
@@ -212,6 +256,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   selectCamionesFactura(factura) {
     const camiones_selected = [];
+
     factura.camiones.forEach((camion_viaje) => {
       const camion_en_turno = _.find(this.camiones, { id: camion_viaje.vehiculo_id });
       if (fun.hasValue(camion_en_turno)) camiones_selected.push(camion_en_turno);
@@ -223,6 +268,8 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     const data = arg.obj;
     if (arg.modal_id === 'cambioEfectivo_ReciboViajes') {
       this.devuelta = data.devuelta > 0 ? data.devuelta : 0;
+
+      this.is_print = arg.is_print;
       this.forma_pago = data.forma_pago;
       this.total_recibido = data.dinero;
       this.IMPRIMIR();
@@ -234,7 +281,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       let tipoModal = tipo;
 
       if (tipo === 'cambio') {
-        const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo_modal: 'no_devuelta', factura_de: 'venta' };
+        const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo_modal: 'no_devuelta', factura_de: 'recibo_ingreso', formaPago: 'Efectivo' };
 
         this.handleModalForm({
           component: FormCantidadEfectivoComponent,
@@ -370,15 +417,24 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
       const obj_print = { data: res['data'].recibo, type: 'recibo_ingreso' };
 
-      this.pdfServ
-        .generatePdf({ oPdf: obj_print, imprimir: true })
-        .then(async (res) => {
-          if (res.status === 'si') {
-          } else fun.toastError(res.msg, 'ERROR');
-          this.layServ.nextCheckCuadreToday(true);
-        })
-        .catch((err) => fun.toastError(err.msg, 'ERROR'));
+      if (this.is_print) {
+        this.pdfServ
+          .generatePdf({ oPdf: obj_print, imprimir: true })
+          .then(async (res) => {
+            if (res.status === 'si') {
+            } else fun.toastError(res.msg, 'ERROR');
+
+            this.getCuadre();
+          })
+          .catch((err) => fun.toastError(err.msg, 'ERROR'));
+      } else {
+        this.getCuadre();
+      }
     });
+  }
+
+  getCuadre() {
+    this.layServ.nextCheckCuadreToday(true);
   }
 
   resetVariables() {

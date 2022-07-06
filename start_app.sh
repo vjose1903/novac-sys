@@ -6,15 +6,30 @@ white=$(tput setaf 7)
 yellow=$(tput setaf 3)
 cyan=$(tput setaf 6)
 
-OPTIONS="c:r:s"
+OPTIONS="apc:r:s"
+PRODUCTION='no'
+
+getActualClient() {
+	cliente=$(cat config_setup/actual_cliente.txt)
+	echo " "
+	echo "${green} ||-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=||"
+	echo "${green} ||          ${white}CLIENTE ACTUAL${green}          ||"
+	echo "${green} ||-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=||"
+	echo " "
+	echo "${white}  $cliente"
+	echo " "
+}
 
 setClient() {
   client=$OPTARG
+  if [ "$PRODUCTION" == "no" ]; then nivel='dev'; else nivel='prod'; fi
 
   echo "${cyan}setClient >> ${client}"
+  echo "${green}nivel >> ${nivel}"
   echo "${white} "
   if [ "$client" == "agrodemi" -o "$client" == "brendy" ]; then
-    node setup.ts $client
+    rm app_config.config
+    node setup.ts $client $nivel
   else
     echo "${red}*************************************"
     echo "${red}**                                 **"
@@ -33,18 +48,18 @@ setRunPart() {
 
   if [ "$run" == "electron" -o "$run" == "ng" -o "$run" == "all" ]; then
     case "${run}" in
-      ng)
-        npmCommand ng:serve
-        ;;
-      electron)
-        npmCommand electron:serve
-        ;;
-      all)
-        npmCommand start
-        ;;
-      *)
-        exit 2
-        ;;
+    ng)
+      npmCommand ng:serve
+      ;;
+    electron)
+      npmCommand electron:serve
+      ;;
+    all)
+      npmCommand start
+      ;;
+    *)
+      exit 2
+      ;;
     esac
   else
     echo "${red}**************************************"
@@ -68,6 +83,17 @@ npmCommand() {
 while getopts $OPTIONS opt; do
   echo " "
   case "${opt}" in
+  a)
+    echo "la opcion -a"
+    getActualClient
+    ;;
+  p)
+    echo "la opcion -p"
+    PRODUCTION='yes'
+    echo "${white} "
+		echo "${yellow} -=-=-=- EJECUTANDO EN PRODUCCION -=-=-=-${white}"
+		echo "${white} "
+    ;;
   c)
     echo "la opcion -c"
     setClient

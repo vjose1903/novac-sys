@@ -122,6 +122,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     } else {
       this.roleSelected.permisos_acciones.forEach((permiso_accion) => {
         const permiso_en_turno = _.find(this.listaPermisos, (item) => item.id == permiso_accion.permiso.id);
+
         const accion_en_turno = _.find(permiso_en_turno.acciones, (item) => item.id == permiso_accion.accion.id);
         accion_en_turno.selected = true;
       });
@@ -173,7 +174,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   borrar() {
-    this.form.reset({ estado: true });
+    if (fun.hasValue(this.form)) this.form.reset({ estado: true });
     this.parsePermisos({ clean: true });
     this.enfocarInput('campo_nombre');
   }
@@ -228,7 +229,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   cancelar() {
-    this.form.reset({ estado: true });
+    if (fun.hasValue(this.form)) this.form.reset({ estado: true });
     this.roleSelected = undefined;
     this.isCreando = false;
   }

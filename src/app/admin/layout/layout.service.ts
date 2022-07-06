@@ -6,12 +6,11 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class LayoutService {
   CHECKCUADRETODAY = new BehaviorSubject<any>(false);
-  LOGOUT = new BehaviorSubject<any>(false);
+  LOGOUT = new BehaviorSubject<any>({ bool: false });
 
   constructor() {}
 
   nextLogOut(nextValue) {
-
     this.LOGOUT.next(nextValue);
   }
 

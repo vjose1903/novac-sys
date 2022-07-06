@@ -23,7 +23,7 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
-  const is_compra = data.FACTURA_DE === 'compra' ? true : false;
+  const is_compra = data?.tipo == 'compra' ? true : false;
 
   const is_suplidor = is_compra;
 
@@ -40,7 +40,6 @@ export function makePDF(data, file_name, tipo_pdf?) {
     },
     styles: styles_,
   };
-  console.log("dd ", JSON.stringify(dd));
 
   const obj = { doc: dd, file: file_name, type: 'file' };
   return obj;
@@ -51,9 +50,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
 // ==========================================================================================================================================================
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
-  fun.logPurple('tipo_pdf => ', tipo_pdf);
   const configuration = configuraciones[tipo_pdf];
-  console.log('configuration ', configuration);
 
   data.tipo_tabla = 'normal';
 
@@ -258,6 +255,16 @@ function parseInfoFactura(data, tipo_pdf) {
         text: [
           { text: 'Válida Hasta       : ', bold: true, style: 'letra8' },
           { text: data.tipo_factura_id == 3 ? 'No aplica.' : fun_.my_dateFormater(data?.fecha_valida), style: 'letra8' },
+        ],
+      },
+    },
+    {
+      key: 'valida',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'Válida Hasta       : ', bold: true, style: 'letra10' },
+          { text: data.tipo_factura_id == 3 ? 'No aplica.' : fun_.my_dateFormater(data?.fecha_valida), style: 'letra10' },
         ],
       },
     },

@@ -11,9 +11,10 @@ import { PrimengModule } from '../../modules/primeng.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { DirectivesModule } from '../../core/directive/directives.module';
+import { DetalleFacturaModule } from '../manipular facturas/detalle-factura/detalle-factura.module';
 
 @NgModule({
   declarations: [IngresosComponent, ListaRecibosComponent, ReciboViajesComponent],
-  imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule,DirectivesModule, NewTablasModule, NgxPermissionsModule.forChild()],
+  imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, NewTablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule],
 })
 export class RecibosModule {}

@@ -4,21 +4,24 @@ var path = require('path');
 const clientes = ['brendy', 'agrodemi'];
 
 const tipo_selected = process.argv.slice(2)[0];
+const nivel = process.argv.slice(2)[1];
 
 const setup_ = {
   brendy: {
-    PRODUCT_NAME: 'NOVAC - PANADERIA BRENDY',
-    PRODUCT_DESCRIPTION: 'Sistema facturacion e inventario NOVAC, Para Panaderia Brendy',
     TITLE_APP: 'Novac System - Panaderia Brendy',
     PORT_APP: '5221',
     DB_PORT: '3001',
+    DOCKER_NAME: 'brendy',
+    NAME_UPDATE_REPO: 'novac-system-brendy',
+    CUSTOM_ACCESS: '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',
   },
   agrodemi: {
-    PRODUCT_NAME: 'NOVAC - AGRODEMI',
-    PRODUCT_DESCRIPTION: 'Sistema facturacion e inventario NOVAC, Para AGRODEMI',
     TITLE_APP: 'Novac System - AGRODEMI',
     PORT_APP: '5220',
     DB_PORT: '3000',
+    DOCKER_NAME: 'agrodemi',
+    NAME_UPDATE_REPO: 'novac-system-agrodemi',
+    CUSTOM_ACCESS: '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',
   },
 };
 
@@ -26,7 +29,8 @@ const files = [
   { tipo: 'move', file_name: 'handler-config-file', extension: 'ts', path: 'electron/handler-config-file.ts' },
   { tipo: 'move', file_name: 'logos', extension: 'json', path: 'logos.json' },
 
-  { tipo: 'reemplazo', file_name: 'electron-builder.json', path: 'electron-builder.json' },
+  { tipo: 'reemplazo', file_name: 'docker-handler.ts', path: 'electron/docker-handler.ts' },
+  { tipo: 'reemplazo', file_name: 'auto-update.ts', path: 'electron/auto-update.ts' },
   { tipo: 'reemplazo', file_name: 'environment.ts', path: 'src/environments/environment.ts' },
   { tipo: 'reemplazo', file_name: 'environment.web.ts', path: 'src/environments/environment.web.ts' },
   { tipo: 'reemplazo', file_name: 'index.html', path: 'src/index.html' },
@@ -39,6 +43,7 @@ function makeSetup(tipo) {
   console.log(' ');
   console.log(' ');
   console.log(' ');
+  setup_[tipo].DOCKER_NAME += nivel == 'dev' ? '-dev' : '-prod';
 
   if (clientes.includes(tipo)) {
     console.log('------------------------------------');
@@ -57,6 +62,8 @@ function makeSetup(tipo) {
 
       console.log(' ');
     });
+
+    fs.writeFileSync('config_setup/actual_cliente.txt', tipo, { encoding: 'utf-8' });
   } else {
     console.log('********************************************');
     console.log('**                                        **');

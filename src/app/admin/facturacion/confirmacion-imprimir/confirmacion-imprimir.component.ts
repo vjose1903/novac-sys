@@ -5,6 +5,7 @@ import { ModalI } from '../../components/modal/modal-class';
 import { SharedService } from '../../../core/services/shared.service';
 import { teclasCode } from '../../../core/typescript/constantes';
 import * as _ from 'lodash';
+import { fun } from '../../../core/services/functions.service';
 
 @Component({
   selector: 'app-confirmacion-imprimir',
@@ -42,14 +43,13 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
       const comparation = this.inputs.condicion_fact == 'Crédito' ? 'venta_credito' : 'venta_contado';
       this.is_print = this.documentos_a_imprimir.includes(comparation);
     } else {
-      this.is_print = this.documentos_a_imprimir.includes('compra');
+      this.is_print = this.documentos_a_imprimir.includes(this.inputs.metodo);
     }
   }
 
   btn_aceptar() {
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
-
-    modal.getDataModal({ data: { is_print: this.is_print }, modal_id: this.modal.component_id });
+    modal.getDataModal({ is_print: this.is_print, modal_id: this.modal.component_id });
   }
 }

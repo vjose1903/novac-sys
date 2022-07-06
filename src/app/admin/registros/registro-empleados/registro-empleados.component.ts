@@ -165,7 +165,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
           .then((res) => {
             if (res['data'].length) {
               const is_user = _.find(res['data'], (item) => item.persona_is === 'User');
-
+              const id_anterior = this.form.getRawValue().id;
               if (fun.hasValue(is_user) && is_user?.persona?.estado) {
                 fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR');
                 if (!this.editando) enable_campos = false;
@@ -178,8 +178,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
               if (fun.hasValue(documento_persona)) this.form.controls[documento_persona.descripcion].setValue(documento_persona.documento);
 
 
+              persona.id = id_anterior;
               this.form.patchValue(persona);
-              if (persona.estado) this.form.controls.id.setValue(null);
 
               if (this.camposDisabled) enable_campos = true;
 
@@ -232,7 +232,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   changeStateCampos(enable = false) {
     ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
-      if (!enable) this.form.controls[campo].reset();
+      if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
 
       this.camposDisabled = !enable;
     });
@@ -243,12 +243,12 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   cancelar() {
-    this.form.reset({ estado: true });
+    if (fun.hasValue(this.form)) this.form.reset({ estado: true });
     this.borrar();
   }
 
   borrar() {
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
 
     this.enfocarInput('cedula');
     this.boton = 'Registrar';
@@ -293,7 +293,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   editarItem(data) {
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
     this.documentos_de_identidad = data.documentos_de_identidad;
 
     if (this.documentos_de_identidad.length) {

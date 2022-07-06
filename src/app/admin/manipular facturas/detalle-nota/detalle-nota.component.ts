@@ -13,7 +13,7 @@ export class DetalleNotaComponent extends MixinClass implements OnInit, ModalI {
     super();
   }
 
-  modal: {};
+  modal: any = {};
   inputs: any;
   tabIndex = 0;
 

@@ -57,9 +57,7 @@ export class InterceptorService implements HttpInterceptor {
 
           ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {
             const headerValue = event.headers.get(header);
-            if (headerValue !== null && localStorage.getItem(header) == null) {
-              localStorage.setItem(header, headerValue);
-            }
+            if (fun.hasValue(headerValue) && fun.isEmpty(localStorage.getItem(header))) localStorage.setItem(header, headerValue);
           });
         }
 
@@ -68,6 +66,9 @@ export class InterceptorService implements HttpInterceptor {
       }),
 
       catchError((response: HttpErrorResponse) => {
+        console.log(' ');
+        console.log('response ', response);
+        console.log(' ');
         if (response.error === null) {
           fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
         } else if (response.error && _.has(response.error, 'action') && response.error.action === 'close_ssesion') {

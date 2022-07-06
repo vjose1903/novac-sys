@@ -22,6 +22,7 @@ import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { ConfirmacionImprimirComponent } from './admin/facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
+import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 
 defineLocale('es', esLocale);
 
@@ -44,7 +45,8 @@ defineLocale('es', esLocale);
     NgSelectModule,
     FormulariosEnModalesModule,
   ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }, NgxExtendedPdfViewerService],
+
   bootstrap: [AppComponent],
   exports: [NgxPermissionsModule],
 })

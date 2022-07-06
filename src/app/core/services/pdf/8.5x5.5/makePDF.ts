@@ -22,7 +22,7 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
-  const is_compra = data?.FACTURA_DE === 'compra' ? true : false;
+  const is_compra = data?.tipo === 'compra' ? true : false;
 
   const is_suplidor = is_compra;
 

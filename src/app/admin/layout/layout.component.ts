@@ -20,7 +20,7 @@ import { NgxPermissionsService } from 'ngx-permissions';
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
 })
-export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterContentChecked, AfterViewInit {
+export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   actualPath;
   actualRuta;
   actualModule;
@@ -89,7 +89,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
-      if (res) this.logOut();
+      if (res && res.bool) this.logOut();
+      else {
+        if (fun.hasValue(res)) this.layServ.nextLogOut(undefined);
+      }
     });
 
     this.subCurrentUser = this.currentUserServ.CURENTUSER.subscribe((res) => {
@@ -104,6 +107,15 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.parseMenu();
     this.checkRouteActiva();
     this.cdRef.detectChanges();
+    this.validateUserAndLoadPermisos();
+  }
+
+  validateUserAndLoadPermisos() {
+    fun.logOrange('VALIDANDO PERMISOS');
+    this.currentUserServ.validateUser().catch((error) => {
+      fun.logBlue('error: ', error);
+      if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
+    });
   }
 
   initVariables() {
@@ -164,11 +176,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // CERRAR SESION
   // =================================================================================
   logOut() {
-    this.layServ.nextLogOut(false);
     fun.logout().then(() => {
-      this.router.navigateByUrl('/');
       this._destroy_layout(true);
       this.noServer = false;
+      this.router.navigateByUrl('/');
     });
   }
 
@@ -191,6 +202,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       this.actualModule = undefined;
       this.actualRuta = _.join(pathSplit.slice(1, pathSplit.length), '/');
     }
+
     this.ready = true;
   }
 
@@ -208,7 +220,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   cambiarMenu(args: { url; navigate }) {
     let next_cambio_menu = '';
-    // TODO: aqui agrega que si tiene permiso de ir a la ruta que quiere ir no haga nada
 
     if (args.navigate) {
       next_cambio_menu = `/admin/${args.url}`;

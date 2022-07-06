@@ -1,0 +1,28 @@
+name: Build and Deploy
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm ci --force
+
+      - name: Build Novac App
+        id: build-novac-app
+        env:
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
+          GH_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
+        run: npm run electron:windows64

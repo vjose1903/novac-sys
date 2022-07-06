@@ -16,6 +16,8 @@ import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
+import { DetalleFacturaComponent } from '../detalle-factura/detalle-factura.component';
+import { ReciboC } from '../../recibos/recibos';
 
 enum campos {
   cliente = 1,
@@ -45,11 +47,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   paqueteComprobante: any;
   tipo_factura_id = null;
   valor: any;
+
   notasClass = new NotaC();
   articuloClass = new ArticuloC();
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();
   ncfClass = new NcfC();
+
   notas: any = [];
   notaSelected: string;
   showSide: boolean = false;
@@ -348,11 +352,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       if (this.facturas.length > 0) {
         if (this.campo == campos.numeroComprobante || (campo == campos.NumeroFactura && this.tipo_factura_id != '0')) {
-          this.facturas[0]['mostrarFacturaPara'] = this.buscarPara;
-
-          this.parseFactura(this.facturas[0], 'venta', this.buscarPara).then((res) => {
-            const continuar = campo == campos.numeroComprobante || campo == campos.NumeroFactura;
+          this.facturaClass.parseDataToPdf(this.facturas[0]).then((res) => {
+            const continuar = this.buscarPara != 'solo_ver' && (campo == campos.numeroComprobante || campo == campos.NumeroFactura);
             this.facturaSelected = res;
+
             this.mostrarFactura(res, 'facturacion', null, continuar);
           });
         } else {
@@ -428,22 +431,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.enfocarInput('campoI');
   }
 
-  parseFactura(factura, fact_de, buscarPara) {
-    return new Promise<any>((resolve) => {
-      setTimeout(() => {
-        factura['FACTURA_DE'] = fact_de;
-        factura['mostrarFacturaPara'] = buscarPara;
-        resolve(factura);
-      }, 5);
-    });
-  }
-
   tableClickIcon(params) {
     if (params.id_tabla == 'lista_notas') {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
           this.notaSelected = params.data;
-          console.log("this.notaSelected ", this.notaSelected);
 
           this.notasClass.parseDataToPdf(params.data).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota', params.data));
         }
@@ -451,7 +443,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     } else if (params.id_tabla == 'facturas_params') {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
-          this.parseFactura(params.data, 'venta', 'revisar').then((res) => {
+          this.facturaClass.parseDataToPdf(params.data).then((res) => {
             this.facturaSelected = res;
 
             this.mostrarFactura(res, 'facturacion');
@@ -539,21 +531,21 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  continuarAManipularFactura(idFactSelect?) {
+  continuarANotas(idFactSelect?) {
     const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${JSON.stringify(idFactSelect ? [idFactSelect] : this.idsFacturasSeleccionadas)}`;
     this.router.navigateByUrl(url);
   }
 
   mostrarFactura(dataFactura, type, dataDB?, continuar?) {
     const toPDFData = { data: dataFactura, type: type };
-    const titulo = type === 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
 
     let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
+
     if (continuar)
       botonesDinamicos.push({
         clase: 'btn btn-verde mr-2',
         function: (instance) => {
-          this.continuarAManipularFactura(dataFactura.id);
+          this.continuarANotas(dataFactura.id);
           instance.closeModal(instance.id, 'cancelar');
         },
         label: 'Continuar',
@@ -567,7 +559,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           component: PdfViewerComponent,
           inputs: inputs,
           id: 'mostrarFactura',
-          header: titulo,
+          header: type === 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
           width: '900px',
           botones: {
             aceptar: { show: false, disable: false },
@@ -576,16 +568,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           },
         };
 
-        if (this.Para == ' Visualizar' || type == 'nota') {
-          if (type == 'nota') {
-            obj_modal.botones.dinamico.push({
-              clase: 'btn btn-gris ml-2',
-              function: (instance) => this.verDetalles(dataDB, instance),
-              label: 'Ver detalles',
-              disable: false,
-            });
-          }
+        obj_modal.botones.dinamico.push({
+          clase: 'btn btn-gris ml-2',
+          function: (instance) => this.verDetalles(type == 'nota' ? dataDB : dataFactura, type),
+          label: 'Ver detalles',
+          disable: false,
+        });
 
+        if (this.Para == ' Visualizar' || type == 'nota') {
           const editButton = {
             clase: 'btn btn-verde ml-2',
             function: (instance) => {
@@ -610,22 +600,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  verDetalles(dataNota, modalInstance) {
-    const input = { data: dataNota, instanceModalPadre: modalInstance };
+  verDetalles(data, tipo) {
+    let configModal;
+    if (tipo == 'nota') configModal = this.notasClass.modalVerDetalles(data);
+    if (tipo == 'facturacion') configModal = this.facturaClass.modalVerDetalles(data);
 
-    this.handleModalForm({
-      component: DetalleNotaComponent,
-      inputs: input,
-      id: 'buscarCliente',
-      header: `Nota: ${dataNota.numero_comprobante}`,
-      width: '1000px',
-      height: '30rem',
-      botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
-      },
-    });
+    this.handleModalForm(configModal);
   }
 
   getDataFromModal(arg, search) {

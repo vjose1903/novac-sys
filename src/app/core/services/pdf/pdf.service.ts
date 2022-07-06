@@ -18,16 +18,13 @@ import { ConfigurationService } from '../configuration.service';
 import { ConfigI } from '../../typescript/config-interface';
 import { fun } from '../functions.service';
 import { tipo_factura_id } from '../../../admin/facturacion/factura';
+import { IpcService } from '../ipc.service';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
-  _ipc = SingletonService._ipc;
-
-  constructor(public configServ: ConfigurationService) {}
+  constructor(public configServ: ConfigurationService, public _ipc: IpcService) {}
 
   generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
-    console.log("params ", params);
-
     return new Promise((resolve, reject) => {
       let obj;
       let todo_true = true;
@@ -39,7 +36,7 @@ export class PdfService {
       let options, documento;
       data['reimprimir'] = reimprimir;
 
-      data.fecha = data.fecha_equivalente;
+      data.fecha = fun.hasValue(data.fecha_equivalente) ? data.fecha_equivalente : data.fecha;
       try {
         switch (type_oPdf) {
           case 'recibo_ingreso': // SI SI
@@ -84,23 +81,12 @@ export class PdfService {
 
           case 'nota':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-            console.log("config.pages_sizes.nota ", config.pages_sizes.nota);
 
             obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas');
             break;
           case 'facturacion': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
 
-            data.total = data.total_factura;
-            data.numero_documento = data.numero_factura;
-            data.contenido_reporte = data.detalle_facturas;
-            data.tipo_pdf = data.tipo_factura.toUpperCase();
-
-            data.contenido_reporte.map((detalle) => {
-              detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
-            });
-
-            /* Llamando a la función makePDF desde el archivo facturasCompraVenta.ts. */
             obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.Pre_factura ? 'pre_factura' : 'ventas');
             break;
 
@@ -122,9 +108,6 @@ export class PdfService {
             todo_true = false;
             break;
         }
-
-
-
 
         if (todo_true) {
           const dd = obj.doc;
@@ -184,17 +167,21 @@ export class PdfService {
   }
 
   imprimirBase64(oBase: { base64: string; filename: string; type: string }) {
-    return new Promise<any>((resolve, reject) => {
-      const task = new MessageTask(KEYWORD_ELECTRON_PRINT_BASE64, oBase);
+    try {
+      return new Promise<any>((resolve, reject) => {
+        const task = new MessageTask(KEYWORD_ELECTRON_PRINT_BASE64, oBase);
 
-      this._ipc
-        .sendTask(task)
-        .then((res) => {
-          if (res['status'] == 'no') reject(res);
-          else resolve(res);
-        })
-        .catch((err) => reject(err));
-    });
+        this._ipc
+          .sendTask(task)
+          .then((res) => {
+            if (res['status'] == 'no') reject(res);
+            else resolve(res);
+          })
+          .catch((err) => reject(err));
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   makeStatusObj(oStatus) {

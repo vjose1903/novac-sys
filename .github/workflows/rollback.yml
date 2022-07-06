@@ -1,0 +1,30 @@
+name: Rollback last version
+
+on:
+  push:
+    tags:
+      - rollback* # Push events to matching v*, i.e. v1.0, v10.15.10
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [windows-latest]
+
+    steps:
+      - uses: oprypin/find-latest-tag@v1
+        with:
+          repository: vjose1903/novac-system  # The repository to scan.
+          releases-only: false
+        id: get-latest-tag
+
+      - run: echo "Last version is -> ${{ steps.get-latest-tag.outputs.tag }}"
+      # - uses: dev-drprasad/delete-tag-and-release@v0.2.0
+      #   with:
+      #     delete_release: true # default: false
+      #     tag_name: v0.1.0 # tag name to delete
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

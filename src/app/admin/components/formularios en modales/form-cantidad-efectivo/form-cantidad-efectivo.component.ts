@@ -44,8 +44,9 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   inputs: any;
 
   ngOnInit() {
-    this.efectivo = this.formatoNumero(this.inputs.devuelta);
+    this.efectivo = fun.hasValue(this.inputs.efectivo) ? this.formatoNumero(this.inputs.efectivo) : '0.00';
     this.factura_de = this.inputs.factura_de;
+    this.formaPago = this.inputs.formaPago;
 
     if (!this.inputs.cambios_articulos) this.cambiar_articulos = 'no';
   }
@@ -56,18 +57,20 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
       this.handleDefaultSwitch();
 
-      if (this.factura_de != 'compra' && this.inputs.tipo_modal == 'devuelta') this.enfocarInput('inputEfectivo');
+      if (this.factura_de != 'compra') this.enfocarInput('inputEfectivo');
 
       if (this.factura_de == 'compra' && !this.inputs.cambios_articulos) this.disableBtnConfirm(false);
+      this.validarForm('init');
+      this.calcularDevueta();
     }, 250);
   }
 
   handleDefaultSwitch() {
-    if (this.inputs.metodo == 'venta') {
+    if (this.factura_de == 'venta') {
       const comparation = this.inputs.condicion_fact == 'Crédito' ? 'venta_credito' : 'venta_contado';
       this.is_print = this.documentos_a_imprimir.includes(comparation);
     } else {
-      this.is_print = this.documentos_a_imprimir.includes('compra');
+      this.is_print = this.documentos_a_imprimir.includes(this.factura_de);
     }
   }
 
@@ -76,7 +79,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       this.enfocarInput(campo);
     }
     if (campo === 'send') {
-      if (this.inputs.tipo_modal !== 'no_devuelta' && this.efectivo < this.inputs.total_factura) {
+      if (this.inputs.tipo_modal != 'no_devuelta' && this.efectivo < this.inputs.total_factura) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         this.enfocarInput('inputEfectivo');
       } else {
@@ -139,9 +142,11 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     const total = this.inputs.total_factura;
     const efectivo = fun.desformatear(this.efectivo);
 
-    const isInvalid = isNaN(efectivo) ? true : this.inputs.tipo_modal != 'no_devuelta' && total > efectivo;
+    let isInvalid = isNaN(efectivo) ? true : this.inputs.tipo_modal != 'no_devuelta' && total > efectivo;
 
-    if (from == 'input') this.disableBtnConfirm(isInvalid);
+    if (this.factura_de == 'compra') isInvalid = false;
+
+    if (from == 'input' || from == 'init') this.disableBtnConfirm(isInvalid);
 
     return isInvalid;
   }

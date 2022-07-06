@@ -24,7 +24,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       if (key == teclasCode._arriba) this.mover_foco('up');
       else if (key == teclasCode._abajo) this.mover_foco('down');
       else if (key == teclasCode._enter) this.ENTER(this.row_id);
-      // event.stopPropagation();
     }
   }
 
@@ -61,10 +60,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   fun = fun;
   rowEditing;
+  tablaInterval;
 
   constructor(public cdRef: ChangeDetectorRef, public tServ: TablasService, private zone: NgZone) {
     cdRef.detach();
-    setInterval(() => this.cdRef.detectChanges(), 500);
+    this.tablaInterval = setInterval(() => {
+      this.cdRef.detectChanges();
+      console.log('tabla');
+    }, 500);
   }
 
   formatoNumero(num) {
@@ -121,6 +124,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   ngOnDestroy() {
     if (this.subWidth) this.subWidth.unsubscribe();
     this.tServ.deletePaginationById(this.config.id_tabla + this.post_id);
+    clearInterval(this.tablaInterval);
   }
 
   getValueForm(column, data) {
@@ -200,7 +204,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         if (actualPagination.is_local) {
           this.localPagination(page, per_page, 'paginatorChange');
         } else {
-
           if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
             this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
           } else {
@@ -427,7 +430,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   lookOters(objeto) {
-
     const keys = _.keys(objeto);
     const values = _.values(objeto);
 

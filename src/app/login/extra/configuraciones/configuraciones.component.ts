@@ -8,13 +8,14 @@ import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/sha
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { fun } from '../../../core/services/functions.service';
 import { SharedService } from '../../../core/services/shared.service';
+import { Router } from '@angular/router';
+import { IpcService } from '../../../core/services/ipc.service';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
   styleUrls: ['./configuraciones.component.scss'],
 })
 export class ConfiguracionesComponent implements OnInit {
-  _ipc = SingletonService._ipc;
   configServ = SingletonService.configServ;
   config;
   form;
@@ -27,6 +28,8 @@ export class ConfiguracionesComponent implements OnInit {
     { label: 'Azul', descripcion: 'blue', color: '#0042bd' },
     { label: 'Verde', descripcion: 'green', color: '#19bd00' },
   ];
+
+  medidas_articulos = [{ value: 'Quintal' }, { value: 'Producto' }];
 
   paper_sizes = [
     { label: '8.5 x 11', descripcion: '8.5x11' },
@@ -44,20 +47,17 @@ export class ConfiguracionesComponent implements OnInit {
     { name: 'Recibo Ingreso', key: 'recibo_ingreso' },
     { name: 'Nota', key: 'nota' },
     { name: 'Conduce', key: 'conduce' },
-    { name: 'Cuadre Caja', key: 'cuadre_caja' },
   ];
 
   configCopy;
 
-  constructor(private fb: FormBuilder, public sharedServ: SharedService) {}
+  constructor(private fb: FormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
 
   ngOnInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
       this.config = config;
       this.configCopy = fun.duplicarJson(config);
-      this.parseDocumentosAImprimir(config).then(() => {
-        this.createForm(config);
-      });
+      this.parseDocumentosAImprimir(config).then(() => this.createForm(config));
     });
   }
 
@@ -82,6 +82,7 @@ export class ConfiguracionesComponent implements OnInit {
       is_db_local: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
       facturacion_editar_precio: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
       vende_sin_inventario: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
+      medida_producto_terminado: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
       documentos_a_imprimir: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
 
       page_size_recibo_ingreso: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
@@ -131,7 +132,6 @@ export class ConfiguracionesComponent implements OnInit {
     const documentos_selected = _.join(_.map(this.documentos_a_imprimir_selected, 'key'), ',');
 
     this.form.controls.documentos_a_imprimir.setValue(fun.hasValue(documentos_selected) ? documentos_selected : null);
-
   }
 
   getPhotoData(data_img) {
@@ -142,7 +142,7 @@ export class ConfiguracionesComponent implements OnInit {
   }
 
   salir() {
-    window.history.back();
+    this.router.navigateByUrl('auth/login');
   }
 
   getFormularioToSend() {
@@ -203,8 +203,6 @@ export class ConfiguracionesComponent implements OnInit {
 
     if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
 
-    console.log("objChange ", objChange);
-
     const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, objChange);
 
     this._ipc
@@ -226,22 +224,23 @@ export class ConfiguracionesComponent implements OnInit {
     const logosKeys = ['logo_empresa', 'logo_impresion'];
 
     for (let i = 0; i < keysConfig.length; i++) {
-
       const key = keysConfig[i];
 
       if (fun.hasValue(copyObjLevel[key])) {
+        const tipoDato = typeof copyObjLevel[key];
 
-        if (typeof copyObjLevel[key] == 'string') {
-
+        if (tipoDato == 'string' || tipoDato == 'boolean') {
           if (copyObjLevel[key] != obj[key]) {
             if (logosKeys.includes(key)) {
               logos_changes[key] = obj[key];
             } else {
-              array_targets.push(`${key}: '${copyObjLevel[key]}'`);
-              array_replacement.push(`${key}: '${obj[key]}'`);
+              const value_target = tipoDato == 'string' ? `'${copyObjLevel[key]}'` : `${copyObjLevel[key]}`;
+              const value_replacement = tipoDato == 'string' ? `'${obj[key]}'` : `${obj[key]}`;
+
+              array_targets.push(`${key}: ${value_target}`);
+              array_replacement.push(`${key}: ${value_replacement}`);
             }
           }
-
         } else {
           this.changesParser(array_targets, array_replacement, logos_changes, obj[key], copyObjLevel[key]);
         }

@@ -129,7 +129,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   borrar() {
-    this.form.reset();
+    if (fun.hasValue(this.form)) this.form.reset();
     this.boton = 'Registrar';
 
     this.doc_is_cedula = false;
@@ -198,6 +198,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
           .then((res) => {
             if (res['data'].length) {
               const is_suplidor = _.find(res['data'], (item) => item.persona_is === 'Suplidor');
+              const id_anterior = this.form.getRawValue().id;
 
               if (fun.hasValue(is_suplidor) && is_suplidor?.persona?.estado) {
                 fun.toastError(`${_.capitalize(tipo)} pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR');
@@ -206,6 +207,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
               }
 
               const persona = fun.hasValue(is_suplidor) ? is_suplidor?.persona : _.head(res['data']).persona;
+              persona.id = id_anterior;
               const documento_persona = _.find(persona.documentos_de_identidad, (item) => item.principal);
 
               if (fun.hasValue(documento_persona)) {
@@ -216,8 +218,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
               this.form.patchValue(persona);
 
               this.patchDocumentos(persona.documentos_de_identidad);
-
-              if (persona.estado) this.form.controls.id.setValue(null);
 
               if (this.camposDisabled) enable_campos = true;
 
@@ -255,7 +255,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     ['nombre', 'telefono', 'direccion', 'email'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
-      if (!enable) this.form.controls[campo].reset();
+      if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
 
       this.camposDisabled = !enable;
     });

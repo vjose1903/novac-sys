@@ -1,4 +1,4 @@
-<div *ngIf="(factura_de !== 'compra' || factura_de == 'ingreso') && (inputs.tipo_modal == 'devuelta' || inputs.tipo_modal == 'no_devuelta')" class="row">
+<div *ngIf="(factura_de !== 'compra' || factura_de == 'recibo_ingreso') && (inputs.tipo_modal == 'devuelta' || inputs.tipo_modal == 'no_devuelta')" class="row">
   <div class="col-12">
     <div class="d-flex">
       <h3 class="label w-100">TOTAL: RD$</h3>
@@ -35,25 +35,7 @@
     </div>
   </div>
 </div>
-<!-- ======================================================= -->
 
-<div *ngIf="factura_de !== 'compra' && inputs.tipo_modal == 'credito'" class="row">
-  <div class="col-12">
-    <div class="d-flex">
-      <h3 class="label w-100">TOTAL NOTA: RD$</h3>
-      <span class="negrita w-100 total">
-        {{ formatoNumero(inputs.total_factura) }}
-      </span>
-    </div>
-
-    <div class="col-12">
-      <div class="form-group">
-        <input (click)="cancelar()" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-        <input (click)="btn_aceptar()" type="submit" class="btn btn-verde" value="Confirmar" id="btnSend" />
-      </div>
-    </div>
-  </div>
-</div>
 <!-- ======================================================= -->
 <div *ngIf="factura_de == 'compra'" class="row">
   <div class="col-12">
@@ -82,7 +64,7 @@
   </div>
 </div>
 
-<div class="d-flex align-items-center h-100">
+<div class="d-flex align-items-center h-100 mt-2">
   <label class="control-label mr-2 mb-0">Imprimir documento: </label>
   <input class="apple-switch" type="checkbox" [(ngModel)]="is_print" />
 </div>

@@ -1,5 +1,6 @@
 {
-  "productName": "NOVAC - PANADERIA BRENDY",
+  "appId":"com.inspot-technology.novac",
+  "productName": "Novac System",
   "directories": {
     "output": "actualizacion/"
   },
@@ -25,9 +26,11 @@
     "!log",
     "!reload"
   ],
+
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
     "asarUnpack": [],
+    "publish": ["github"],
     "target": ["NSIS"]
   },
   "nsis": {

@@ -58,8 +58,7 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
   }
 
   btn_aceptar() {
-
-    if (this.form.valid) {
+    if (this.form.valid || !this.inputs.is_prefactura_selected) {
       const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
       modal.closeModal(this.modal.component_id);
       const obj = { key: this.inputs.key, modal_id: this.modal.component_id };

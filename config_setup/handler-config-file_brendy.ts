@@ -15,15 +15,16 @@ export default class HandlerConfigFile {
     nombre_empresa: 'Panaderia & Reposteria Brendy',
     rnc_empresa: '132-35083-9',
     telefono_empresa: '(829)-423-1678',
-    url_servidor: 'http://novac-brendy.ddns.net:$$DB_PORT$$',
-    url_servidor_descargas: 'http://novac-brendy.ddns.net:$$DB_PORT$$',
-    url_servidor_respaldo: 'http://localhost:$$DB_PORT$$',
+    url_servidor: 'http://novac-brendy.ddns.net:3001',
+    url_servidor_descargas: 'http://novac-brendy.ddns.net:3001',
+    url_servidor_respaldo: 'http://localhost:3001',
     usa_url_principal: false,
     printer_caja_selected: null,
     printer_reportes_selected: null,
     is_db_local: true,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
+    medida_producto_terminado: 'Producto',
 
     pages_sizes: {
       recibo_ingreso: '80mm_roll',
@@ -34,10 +35,10 @@ export default class HandlerConfigFile {
       reporte: '8.5x11',
     },
 
-    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce,cuadre_caja',
+    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce',
   };
 
-  static checkConfigFile(win: BrowserWindow) {
+  static checkConfigFile(win: BrowserWindow): Promise<any> {
     return new Promise<any>(async (resolve, reject) => {
       const config_path = await pathAdd('/app_config.config');
 

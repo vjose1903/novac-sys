@@ -288,7 +288,15 @@ export class fun {
 
       new DocumentosC()
         .getAll(extra)
-        .then((res) => resolve(res))
+        .then((res) => {
+          for (const persona of res.data) {
+            persona.persona.documentos_de_identidad.map((doc) => {
+              doc.id = null;
+              return doc;
+            });
+          }
+          resolve(res);
+        })
         .catch((err) => reject(err));
     });
   }
@@ -559,7 +567,7 @@ export class fun {
   }
 
   static getAuthToken() {
-    return localStorage.getItem('access-token');
+    return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }
 
   static async logout() {
@@ -572,6 +580,8 @@ export class fun {
         localStorage.removeItem('expiry');
         localStorage.removeItem('token-type');
         localStorage.removeItem('uid');
+
+        SingletonService.layServ.nextLogOut(undefined);
         resolve(true);
       } catch (error) {
         resolve(false);
