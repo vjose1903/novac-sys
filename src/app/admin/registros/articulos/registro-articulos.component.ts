@@ -217,9 +217,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     } else {
       this.resetArray();
       this.is_combo = false;
+      this.form.controls.calcular_saco.setValue(false);
     }
-
-    this.form.controls.calcular_saco.setValue(false);
   }
 
   capitalice(control, arg) {

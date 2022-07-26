@@ -463,6 +463,8 @@ async function verificarSumastra() {
 // FUNCION QUE SE EJECUTA AL TERMINAR LA DESCARGA DE UN ELEMENTO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
+
+
   const command = isMacOs() ? `unzip "${await pathAdd(path_local_extension)}" -d "${await pathAdd()}"` : `powershell Expand-Archive "${await pathAdd(path_local_extension)}" -DestinationPath "${await pathAdd()}"`;
 
   cmd(command, async (res) => {
