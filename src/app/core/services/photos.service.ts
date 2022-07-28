@@ -6,7 +6,7 @@ import { PhotosAdminI, PhotosI } from '../models/photos';
 })
 export class PhotosService {
   arrayImagenes: PhotosI[] = [];
-  readonly urlApi = 'http://localhost:3000/api/photos';
+  readonly urlApi = 'http://localhost:3002/api/photos';
 
   constructor(private http: HttpClient) {}
 

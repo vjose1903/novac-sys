@@ -27,7 +27,7 @@ setClient() {
   echo "${cyan}setClient >> ${client}"
   echo "${green}nivel >> ${nivel}"
   echo "${white} "
-  if [ "$client" == "agrodemi" -o "$client" == "brendy" ]; then
+  if [ "$client" == "agrodemi" -o "$client" == "brendy" -o "$client" == "vasquez" ]; then
     rm app_config.config
     node setup.ts $client $nivel
   else
