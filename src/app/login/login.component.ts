@@ -24,6 +24,7 @@ import { FacturaC } from '../admin/facturacion/factura';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
+
 export class LoginComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   form: FormGroup;
   errorC = '';
