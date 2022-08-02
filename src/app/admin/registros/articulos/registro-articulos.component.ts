@@ -597,6 +597,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       else if (medida == 'Unidad') this.optionsAlerta = ['Unidad'];
       else if (medida == 'Galon') this.optionsAlerta = ['Galon', 'Onza'];
       else if (medida == 'Producto') this.optionsAlerta = ['Producto', 'Unidad'];
+      else if (medida == 'Funda') this.optionsAlerta = ['Funda', 'Unidad'];
       resolve(true);
     });
   }
