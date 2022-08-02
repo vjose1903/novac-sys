@@ -55,7 +55,6 @@
     "pdfmake": "^0.1.70",
     "primeicons": "^5.0.0",
     "primeng": "13.0.4",
-    "replace-in-file": "6.3.2",
     "request": "^2.88.2",
     "sass-google-fonts": "^1.0.1",
     "zlib": "1.0.5"

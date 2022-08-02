@@ -1,4 +1,3 @@
-const replace = require('replace-in-file');
 import Functions from './functions.js';
 import { pathAdd, cmd } from '../main';
 const logosJson = require('../logos.json');
@@ -101,9 +100,8 @@ export default class ReplaceInFile {
           file_data = file_data.replaceAll(params.source, params.target);
 
           fs.writeFileSync(file_path, file_data, { encoding: 'utf-8' });
-
-          console.log(`ARCHIVO: ${params.key} reemplado.`);
         }
+        console.log(`ARCHIVO: ${params.key} reemplado.`);
         resolve(true);
       } catch (error) {
         reject(error);
