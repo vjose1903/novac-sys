@@ -795,6 +795,13 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     // $(`#nombre`).trigger(keypressEvent);
   }
 
+  checkLongDecimales(event) {
+    let check_obj = fun.checkLongDecimales(event.target.value, 4);
+    event.target.value = check_obj.value;
+
+    if (check_obj.error) fun.toastWarning('La cantidad de números decimales no puede ser mayor a 4', 'AVISO');
+  }
+
   formarFormula() {
     const array = this.ARRAY_FORMULA.value;
     const formulas = [];

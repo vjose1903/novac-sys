@@ -216,17 +216,36 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: checkCeros
-  // Descripcion : Esta funcion toma un string y lo vuelve entero y lo redondea a 2 decimales
+  // Nombre: checkLongDecimales
+  // Descripcion : Esta funcion verifica que los numeros decimales no excedan el numero especificado
   // _________________________________________________________________________________________________
 
-  static checkCeros(num, cant = 1) {
+  static checkLongDecimales(currentValue, cant = 2) {
+    const result = { value: currentValue, error: false };
+
+    const splitStr = _.split(currentValue, '.');
+
+    if (splitStr.length > 1 && splitStr[1].length > cant) {
+      splitStr[1] = splitStr[1].slice(0, cant);
+      result.value = _.join(splitStr, '.');
+      result.error = true;
+    }
+
+    return result;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: checkCeros
+  // Descripcion : Esta funcion verifica que en un numero decimal no existan 0 a la derecha
+  // _________________________________________________________________________________________________
+
+  static checkCeros(num) {
     let result = num;
 
     if (num.charAt(num.length - 1) == '0' && num.length > 2) {
       let numSliced = num.slice(0, num.length - 1);
 
-      return fun.checkCeros(numSliced, (cant += 1));
+      return fun.checkCeros(numSliced);
     } else {
       return result;
     }
