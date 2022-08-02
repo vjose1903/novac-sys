@@ -176,9 +176,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       this.counter++;
       this.tiempo_restante = this.timeConvert(object.total / object.bytesPerSecond);
 
-      object.transferred = parseFloat(fun.redondearAdos(object.transferred / 1000000));
-      object.total = parseFloat(fun.redondearAdos(object.total / 1000000));
-      object.percent = parseFloat(fun.redondearAdos(object.percent));
+      object.transferred = parseFloat(fun.redondearNum(object.transferred / 1000000));
+      object.total = parseFloat(fun.redondearNum(object.total / 1000000));
+      object.percent = parseFloat(fun.redondearNum(object.percent));
 
       this.objPercent = object;
       this.cdRef.detectChanges();

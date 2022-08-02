@@ -625,7 +625,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     if (tempTotal !== this.TOTAL) {
       this.TOTAL = tempTotal;
 
-      const obj = { total: fun.redondearAdos(this.TOTAL), ITBIS: '' };
+      const obj = { total: fun.redondearNum(this.TOTAL), ITBIS: '' };
 
       this.getCalculosDinero.emit({ tipo: 'bruto', monto: obj });
     }
@@ -759,7 +759,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   calcularPrecioSaco(cant, precio) {
     const res = (cant / 100) * precio;
-    return fun.redondearAdos(res);
+    return fun.redondearNum(res);
   }
 
   async getDataFromModal(arg, search) {

@@ -503,8 +503,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       const costoLibra = costo / 100;
       if (medida === 'Quintal') {
         this.form.controls.precio_libra.setValue(fun.numFormatTwoDecimals(precioLibra));
-        this.form.controls.costo_padre.setValue(fun.redondearAdos(costoLibra));
-        this.form.controls.precio_padre.setValue(fun.redondearAdos(precioLibra));
+        this.form.controls.costo_padre.setValue(fun.redondearNum(costoLibra));
+        this.form.controls.precio_padre.setValue(fun.redondearNum(precioLibra));
         this.form.controls.cantidad_contenido_padre.setValue(100);
       } else {
         this.calculatePricePadre();
@@ -527,7 +527,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       const costoPadre = costo / cantidadPadre;
 
       this.form.controls.precio_padre.setValue(fun.numFormatTwoDecimals(precioPadre));
-      this.form.controls.costo_padre.setValue(fun.redondearAdos(costoPadre));
+      this.form.controls.costo_padre.setValue(fun.redondearNum(costoPadre));
     }
 
     if (precioPadreTemp) this.calculatePriceHijo();
@@ -545,7 +545,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       const PrecioHijo = precioP / cantidadHijo;
       const costoHijo = costoP / cantidadHijo;
       this.form.controls.precio_hijo.setValue(fun.numFormatTwoDecimals(PrecioHijo));
-      this.form.controls.costo_hijo.setValue(fun.redondearAdos(costoHijo));
+      this.form.controls.costo_hijo.setValue(fun.redondearNum(costoHijo));
     }
   }
 
@@ -662,7 +662,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       control_en_turno['articulo_id'].setValue(ingredient.articulo_combo);
       control_en_turno['id'].setValue(ingredient.id || null);
 
-      control_en_turno['cantidad_formula'].setValue(fun.numFormatTwoDecimals(ingredient.cantidad));
+      control_en_turno['cantidad_formula'].setValue(fun.formatearNumero(fun.redondearNum(ingredient.cantidad, 4)));
     } catch (error) {
       fun.toastError(recalcular ? 'Error recalculando los costos de la formula.' : 'Error rellenando los campos del formulario', 'ERROR');
     }

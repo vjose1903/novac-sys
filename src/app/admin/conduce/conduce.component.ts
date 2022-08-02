@@ -336,7 +336,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   calcularPrecioSaco(cant, precio) {
     const res = (cant / 100) * precio;
-    return fun.redondearAdos(res);
+    return fun.redondearNum(res);
   }
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES

@@ -195,7 +195,7 @@ export class fun {
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
 
-  static redondearAdos(num) {
+  static redondearNum(num, cant = 2) {
     const string = num + '';
     const splitStr = _.split(string, '.');
 
@@ -206,15 +206,30 @@ export class fun {
     enteros = _.join(splitEnteros, '');
 
     let tempdecimales = splitStr[1];
-    if (splitStr.length === 1) {
-      tempdecimales = '00';
-    }
+    if (splitStr.length == 1) tempdecimales = _.padEnd('', cant, '0');
 
-    const decimales = tempdecimales.substring(0, 2);
+    const decimales = fun.checkCeros(tempdecimales.substring(0, cant));
     const Arreglo = [enteros, decimales];
     const numStr = _.join(Arreglo, '.');
 
-    return parseFloat(numStr).toFixed(2);
+    return numStr;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: checkCeros
+  // Descripcion : Esta funcion toma un string y lo vuelve entero y lo redondea a 2 decimales
+  // _________________________________________________________________________________________________
+
+  static checkCeros(num, cant = 1) {
+    let result = num;
+
+    if (num.charAt(num.length - 1) == '0' && num.length > 2) {
+      let numSliced = num.slice(0, num.length - 1);
+
+      return fun.checkCeros(numSliced, (cant += 1));
+    } else {
+      return result;
+    }
   }
 
   // __________________________________________________________________________________________________
@@ -223,7 +238,7 @@ export class fun {
   // _________________________________________________________________________________________________
 
   static parseFloatTwoDecimals(sTnum) {
-    return fun.desformatear(fun.redondearAdos(sTnum));
+    return fun.desformatear(fun.redondearNum(sTnum));
   }
 
   // __________________________________________________________________________________________________
@@ -239,7 +254,7 @@ export class fun {
   // Descripcion : Esta funcion toma un string y lo formatea a dos decimales
   // _________________________________________________________________________________________________
   static numFormatTwoDecimals(num) {
-    return fun.formatearNumero(fun.redondearAdos(num));
+    return fun.formatearNumero(fun.redondearNum(num));
   }
 
   // __________________________________________________________________________________________________

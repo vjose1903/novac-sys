@@ -1153,7 +1153,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   calculatePrice(costo): number {
     if (costo > 0 || costo != null || costo) {
       const precio = costo / 0.9;
-      return fun.desformatear(fun.redondearAdos(precio));
+      return fun.desformatear(fun.redondearNum(precio));
     }
   }
 
@@ -1182,8 +1182,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             cantHijo = contenido.cantidad;
             const prePadre = this.calcularNuevosPrecios(cantPadre, precioRow);
             const cosPadre = this.calcularNuevosPrecios(cantPadre, costoRow);
-            const precio = this.calcularNuevosPrecios(cantHijo, fun.redondearAdos(prePadre));
-            const costo = this.calcularNuevosPrecios(cantHijo, fun.redondearAdos(cosPadre));
+            const precio = this.calcularNuevosPrecios(cantHijo, fun.redondearNum(prePadre));
+            const costo = this.calcularNuevosPrecios(cantHijo, fun.redondearNum(cosPadre));
             temporal.precio = fun.desformatear(precio);
             temporal.costo = fun.desformatear(costo);
           } else {
@@ -1314,7 +1314,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   calcularNuevosPrecios(cant, precio) {
     const pre = precio / cant;
-    return fun.redondearAdos(pre);
+    return fun.redondearNum(pre);
   }
 
   async cambiarCostos() {
