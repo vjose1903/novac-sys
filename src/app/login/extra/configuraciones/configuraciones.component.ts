@@ -189,19 +189,15 @@ export class ConfiguracionesComponent implements OnInit {
   submit() {
     const formulario = this.getFormularioToSend();
 
-    const array_targets = [];
-    const array_replacement = [];
+    const configReplacement = {};
     const logos_changes = {};
 
-    this.changesParser(array_targets, array_replacement, logos_changes, formulario, this.configCopy);
+    this.changesParser(configReplacement, logos_changes, formulario, this.configCopy);
 
-    const objChange = {
-      new_config: formulario,
-      array_targets: array_targets,
-      array_replacement: array_replacement,
-    };
+    const objChange = { new_config: formulario, configReplacement: configReplacement };
 
     if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
+    console.log('objChange ', objChange);
 
     const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, objChange);
 
@@ -219,7 +215,7 @@ export class ConfiguracionesComponent implements OnInit {
       .catch((err) => console.error(err));
   }
 
-  changesParser(array_targets, array_replacement, logos_changes, obj, copyObjLevel) {
+  changesParser(configReplacement, logos_changes, obj, copyObjLevel) {
     let keysConfig = Object.keys(obj);
     const logosKeys = ['logo_empresa', 'logo_impresion'];
 
@@ -234,15 +230,14 @@ export class ConfiguracionesComponent implements OnInit {
             if (logosKeys.includes(key)) {
               logos_changes[key] = obj[key];
             } else {
-              const value_target = tipoDato == 'string' ? `'${copyObjLevel[key]}'` : `${copyObjLevel[key]}`;
-              const value_replacement = tipoDato == 'string' ? `'${obj[key]}'` : `${obj[key]}`;
+              const value_source = tipoDato == 'string' ? `'${copyObjLevel[key]}'` : `${copyObjLevel[key]}`;
+              const value_target = tipoDato == 'string' ? `'${obj[key]}'` : `${obj[key]}`;
 
-              array_targets.push(`${key}: ${value_target}`);
-              array_replacement.push(`${key}: ${value_replacement}`);
+              configReplacement[key] = { source: value_source, target: value_target };
             }
           }
         } else {
-          this.changesParser(array_targets, array_replacement, logos_changes, obj[key], copyObjLevel[key]);
+          this.changesParser(configReplacement, logos_changes, obj[key], copyObjLevel[key]);
         }
       }
     }

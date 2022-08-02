@@ -6,8 +6,6 @@ import { IpcService } from '../core/services/ipc.service';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
 import * as _ from 'lodash';
 
-import * as Rx from 'rxjs';
-
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
 
 import { PdfService } from '../core/services/pdf/pdf.service';
@@ -26,6 +24,7 @@ import { FacturaC } from '../admin/facturacion/factura';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
+
 export class LoginComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   form: FormGroup;
   errorC = '';
@@ -53,6 +52,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
       this.form = this.fb.group({ usuario: config.is_development ? 'ADMIN' : null, password: config.is_development ? '1234567' : null });
     });
     setTimeout(() => this.enfocarInput('Iusuario'), 5);
+    // setTimeout(() => this.router.navigateByUrl('/auth/config'), 100);
   }
 
   ngOnDestroy() {}
