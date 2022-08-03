@@ -18,7 +18,7 @@ export default class HandlerConfigFile {
     url_servidor: 'http://novac-brendy.ddns.net:3001',
     url_servidor_descargas: 'http://novac-brendy.ddns.net:3001',
     url_servidor_respaldo: 'http://localhost:3001',
-    usa_url_principal: false,
+    usa_url_principal: true,
     printer_caja_selected: null,
     printer_reportes_selected: null,
     is_db_local: true,
@@ -61,7 +61,7 @@ export default class HandlerConfigFile {
 
               setTimeout(() => resolve(true), 500);
             })
-            .catch((err) => reject(false));
+            .catch((err) => reject(true));
         } else {
           setTimeout(() => resolve(true), 500);
         }

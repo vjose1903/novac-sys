@@ -9,12 +9,12 @@ export class FactsLocalStorage extends PreFacturaClass {
 
   ant_event_change_visibility;
   _sideBarOpened = false;
-  activeIndex = 0;
+  index_fact_archivada = 0;
   facturas_localStorage: any;
   factura_guardada;
 
   _toggleSidebar(where?, tipo_factura?) {
-    this.activeIndex = tipo_factura === 'venta' ? 0 : 1;
+    this.index_fact_archivada = tipo_factura == 'venta' ? 0 : tipo_factura == 'pre_venta' ? 1 : 2;
 
     if (where == 'visibleChange') {
       if (this.ant_event_change_visibility == 'visibleChange') {
@@ -29,21 +29,21 @@ export class FactsLocalStorage extends PreFacturaClass {
   }
 
   countCantFactSaved(tipo) {
-    const array_fact = _.filter(fun.getFacturasguardadas(), (o: any) => o.tipo === tipo);
+    const array_fact = _.filter(fun.getFacturasguardadas(), (item: any) => item.tipo === tipo);
     return { disable: array_fact.length === 0, cant: array_fact.length };
   }
 
   clickTabView(tabIndex) {
-    this.activeIndex = tabIndex;
+    this.index_fact_archivada = tabIndex;
     // const can = !this.countCantFactSaved(obj[tabIndex]).disable;
     this.getFacturasGuardadas();
   }
 
   async getFacturasGuardadas() {
-    const obj = { 0: 'venta', 1: 'compra' };
+    const obj = { 0: 'venta', 1: 'pre_venta', 2: 'compra' };
     this.facturas_localStorage = fun.getFacturasguardadas();
 
-    this.facturas_localStorage = _.filter(this.facturas_localStorage, (o: any) => o.tipo === obj[this.activeIndex]);
+    this.facturas_localStorage = _.filter(this.facturas_localStorage, (item: any) => item.tipo === obj[this.index_fact_archivada]);
 
     setTimeout(async () => {
       if (this.facturas_localStorage.length > 0) {
@@ -92,7 +92,7 @@ export class FactsLocalStorage extends PreFacturaClass {
   getNombreFacturaGuardada(fact: any) {
     let nombre = '';
     if (fact) {
-      if (fact.tipo === 'venta') nombre = fact['NoCliente_nombre'] ? fact['NoCliente_nombre'] : fact['cliente'] ? fact['cliente']['nombre'] : '';
+      if (fact.tipo === 'venta' || fact?.tipo === 'pre_venta') nombre = fact['NoCliente_nombre'] ? fact['NoCliente_nombre'] : fact['cliente'] ? fact['cliente']['nombre'] : '';
       else if (fact['suplidor']) nombre = fact['suplidor'] ? fact['suplidor']['nombre'] : '';
     }
 

@@ -87,7 +87,7 @@ export class PdfService {
           case 'facturacion': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
 
-            obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.Pre_factura ? 'pre_factura' : 'ventas');
+            obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.pre_venta ? 'pre_venta' : 'ventas');
             break;
 
           case 'cuadre_caja': // SI SI

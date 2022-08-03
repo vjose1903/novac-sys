@@ -214,6 +214,10 @@ div.cuerpoFactura.mb-2 {
   box-shadow: -13px 0px 20px 0 #00000029 !important;
   flex-direction: inherit !important;
   display: block !important;
+
+  &.large {
+    width: 30rem !important;
+  }
   .p-sidebar-header {
     display: none;
   }
@@ -328,6 +332,9 @@ div.cuerpoFactura.mb-2 {
 .texto-green {
   color: #2c942cc9;
 }
+.texto-blue {
+  color: #2c5794c9;
+}
 .texto-yellow {
   color: #f5e206c9;
 }
@@ -335,10 +342,17 @@ div.cuerpoFactura.mb-2 {
 .texto-borde-green {
   -webkit-text-stroke: 1px #257d25ac;
 }
+.texto-borde-blue {
+  -webkit-text-stroke: 1px #253c7dac;
+}
 .texto-borde-yellow {
   -webkit-text-stroke: 1px #a99c0eaf;
 }
 
+.bg-raya-blue {
+  background-color: #385aabc9;
+  border: 1px solid #253b7da5;
+}
 .bg-raya-green {
   background-color: #38ab38c9;
   border: 1px solid #257d25a5;
@@ -346,6 +360,9 @@ div.cuerpoFactura.mb-2 {
 .bg-raya-yellow {
   background-color: #f5e206c9;
   border: 1px solid #a99c0e9f;
+}
+.bg-raya-blue-orange {
+  background: linear-gradient(180deg, #3262f3 0%, #3262f3 43%, #ffa400 100%);
 }
 .bg-raya-yellow-orange {
   background: linear-gradient(180deg, #f3ee32 0%, #f3ee32 43%, #ffa400 100%);

@@ -9,12 +9,12 @@ import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
 import { config_conduce } from './configuraciones/conduce';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
-import { config_pre_factura } from './configuraciones/pre_factura';
+import { config_pre_venta } from './configuraciones/pre_venta';
 import { fun } from '../../functions.service';
 import { config_notas } from './configuraciones/notas';
 
 const configuraciones = {
-  pre_factura: config_pre_factura,
+  pre_venta: config_pre_venta,
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
   conduce: config_conduce,
@@ -23,6 +23,8 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
+  console.log('tipo_pdf: ', tipo_pdf);
+
   const is_compra = data?.tipo == 'compra' ? true : false;
 
   const is_suplidor = is_compra;
@@ -50,6 +52,8 @@ export function makePDF(data, file_name, tipo_pdf?) {
 // ==========================================================================================================================================================
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
+  console.log();
+
   const configuration = configuraciones[tipo_pdf];
 
   data.tipo_tabla = 'normal';

@@ -209,7 +209,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     if (fun.hasValue(this.propietario)) {
       if (this.metodo == 'compra') {
         res = false;
-      } else if (this.metodo == 'venta') {
+      } else {
         res = !this.configApp.facturacion_editar_precio;
       }
     }
@@ -646,7 +646,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       inputs: obj,
       id: 'removerArticulo',
       header: 'Confirmación',
-      width: this.modo_factura != 'Pre_factura' ? '30rem' : '40rem',
+      width: this.modo_factura != 'pre_venta' ? '30rem' : '40rem',
       botones: {
         aceptar: { show: true, disable: false },
         cancelar: { show: true, disable: false },
@@ -658,7 +658,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   setInputDrop(index) {
-    if (fun.hasValue(index)) {
+    if (fun.hasValue(index) && fun.hasValue(this.filasDetalle)) {
       const { articulo } = this.filasDetalle[index].getRawValue();
       if (fun.hasValue(articulo)) this.inputDrop = `uni-${index}`;
     } else {

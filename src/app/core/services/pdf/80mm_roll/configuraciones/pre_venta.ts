@@ -1,4 +1,4 @@
-export const config_pre_factura = {
+export const config_pre_venta = {
   margin_general: [0, -1, 0, 0],
   isBreak: false,
   only_titulo: false,

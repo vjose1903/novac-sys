@@ -75,7 +75,7 @@ export class FacturaC extends CrudG<FacturasI> {
       data_parsed.total = data_parsed.total_factura;
 
       data_parsed.contenido_reporte.map((detalle) => {
-        detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+        detalle['cantidad'] = fun.numFormatTwoDecimals(detalle.cantidad);
         return detalle;
       });
 
@@ -164,7 +164,7 @@ export enum tipo_factura_id {
   Produccion = 16,
   Recibo_ingreso = 17,
   Venta_Credito = 18,
-  Pre_factura = 19,
+  pre_venta = 19,
 }
 export interface FacturasI {
   id: number;

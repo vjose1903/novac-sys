@@ -25,6 +25,7 @@ export class PreFacturaClass extends MixinClass {
 
   async buscarPreFactura(numero) {
     try {
+      const result = { data: null, error: false };
       const res = await this.facturaClass.getAll({ afterPath: `custom/pre_factura/${numero}`, parameters: { tipo: 'single', paginado: false } });
       const pre_factura = res['data'];
 
@@ -33,8 +34,9 @@ export class PreFacturaClass extends MixinClass {
         return detalle;
       });
 
-      this.mostrarFactura(pre_factura);
-      // fun.toastError('No existe Pre-factura con este número.', 'ERROR');
+      result.error = pre_factura && fun.hasValue(pre_factura.fecha_completada);
+      result.data = pre_factura;
+      return result;
     } catch (error) {
       console.error(error);
     }
@@ -44,7 +46,7 @@ export class PreFacturaClass extends MixinClass {
   //  MODAL PARA BUSCAR PRE FACTURA
   // =============================================
 
-  mostrarFactura(dataFactura) {
+  mostrarPreFactura(dataFactura) {
     this.facturaClass.parseDataToPdf(dataFactura).then(async (factura_parsed) => {
       const toPDFData = { data: factura_parsed, type: 'facturacion' };
 
@@ -54,7 +56,7 @@ export class PreFacturaClass extends MixinClass {
           const obj_modal = {
             component: PdfViewerComponent,
             inputs: inputs,
-            id: 'mostrarFactura',
+            id: 'mostrarPreFactura',
             header: 'Pre-factura',
             width: '900px',
             botones: {

@@ -296,60 +296,6 @@ $bodyfont: "Poppins";
   max-width: 90%;
 }
 
-/* ============================================== */
-/*        Menu Facturas                           */
-/* ============================================== */
-[data-cant-facturas]::after {
-  content: attr(data-cant-facturas);
-  background-color: #fd2543;
-  padding: 0rem 0.3rem;
-  border: 1px solid #8c0a0a;
-  border-radius: 50%;
-  position: absolute;
-  transform: translate(-5px, -1.2rem);
-  color: white;
-  font-weight: 600;
-  font-size: 0.7rem;
-}
-
-#triangualo {
-  transition: all 1s;
-}
-
-.texto-green {
-  color: #2c942cc9;
-}
-.texto-yellow {
-  color: #f5e206c9;
-}
-
-.texto-borde-green {
-  -webkit-text-stroke: 1px #257d25ac;
-}
-.texto-borde-yellow {
-  -webkit-text-stroke: 1px #a99c0eaf;
-}
-
-.bg-raya-green {
-  background-color: #38ab38c9;
-  border: 1px solid #257d25a5;
-}
-.bg-raya-yellow {
-  background-color: #f5e206c9;
-  border: 1px solid #a99c0e9f;
-}
-.bg-raya-yellow-orange {
-  background: linear-gradient(180deg, #f3ee32 0%, #f3ee32 43%, #ffa400 100%);
-}
-.bg-raya-green-orange {
-  background: linear-gradient(180deg, #38ab38c9 0%, #38ab38c9 43%, #ffa400 100%);
-}
-
-.tipoFactura:first-letter {
-  text-transform: uppercase;
-  color: red !important;
-}
-
 .fa-bars:before {
   margin: -12px 0px 0px 0px;
   transform: translate(8px, 1px) !important;
