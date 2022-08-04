@@ -119,7 +119,7 @@ const t_c = {
         alignment_titulo: 'left',
         noWrap: true,
         style_body: 'letra10',
-        key: 'numero_comprobante',
+        key: 'numero_documento',
         alignment_body: 'left',
       },
       {
