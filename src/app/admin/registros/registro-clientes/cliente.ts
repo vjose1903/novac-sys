@@ -24,7 +24,7 @@ export class ClienteC extends CrudG<any> {
   }
 
   static requestReporte(reporteParams, pdfParams) {
-    let objTipo = { cuentas_cobrar_cliente: 1, cuentas_cobrar_ant_saldo: 2 };
+    let objTipo = { cuentas_cobrar_cliente: 1, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
 
     const requestParams = { afterPath: 'custom/cuentas_cobrar', parameters: { tipo: objTipo[reporteParams.modal_id] } };
 

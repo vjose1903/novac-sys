@@ -5,9 +5,7 @@ import { MixinClass } from '../../core/typescript/MixinClass';
 import * as _ from 'lodash';
 import { ReporteC } from './reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
-import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../core/services/functions.service';
-import { ModalClass } from '../components/modal/modal-class';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { FacturaC } from '../facturacion/factura';
 import { ArticuloC } from '../registros/articulos/articulo';
@@ -84,10 +82,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     if (params.modal_id === 'cuadre') {
       this.makeCuadre(data);
       return;
-    } else if (params.modal_id === 'cuentas_cobrar_cliente' || params.modal_id === 'cuentas_cobrar_ant_saldo') {
-      extra.parameters = { tipo: data.tipo_ ? data.tipo_ : data.tipo, cliente_id: data.id ? data.id : 1 };
-      tipo = 'cuentas_cobrar';
-      //
     } else if (params.modal_id === 'cuentas_con_pagos') {
       extra.parameters = { desde: fun.my_dateFormater(data.desde, false), hasta: fun.my_dateFormater(data.hasta, false), cliente_id: data.cliente_id };
       tipo = 'cuentas_con_pagos';
