@@ -10,7 +10,6 @@ import { FacturacionService } from './facturacion.service';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { TiposFacturaC, tipo_factura_id } from './factura';
 import { NcfC } from '../registros/ncf/ncf';
-import { PdfService } from '../../core/services/pdf/pdf.service';
 import { PendienteFormComponent } from '../components/formularios en modales/pendiente-form/pendiente-form.component';
 import { FormCantidadEfectivoComponent } from '../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
@@ -25,6 +24,8 @@ import { ConfigI } from '../../core/typescript/config-interface';
 import { SingletonService } from '../../core/services/singleton.service';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
+import { ModalClass } from '../components/modal/modal-class';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -148,16 +149,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   timeInterval;
 
   conteo = 0;
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private localeService: BsLocaleService,
-    public factServ: FacturacionService,
-    public pdfServ: PdfService,
-    private permissionsService: NgxPermissionsService,
-  ) {
-    super(pdfServ);
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService, private permissionsService: NgxPermissionsService) {
+    super();
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
 
@@ -915,17 +908,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (fun.hasValue(input_activo)) this.desEnfocarInput(input_activo);
     const metodo = this.metodo == 'pre_venta' ? 'venta' : this.metodo;
 
-    this.handleModalForm({
+    this.configureNewModal({
       component: BuscarClienteSuplidorComponent,
       inputs: { metodo: metodo, palabra_a_buscar: ' ' },
       id: 'buscarCliente',
       header: this.metodo === 'venta' || this.metodo == 'pre_venta' ? 'BUSCAR CLIENTE' : 'BUSCAR SUPLIDOR',
       width: '56.25rem',
       height: '31.25rem',
-      botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
-      },
+      botones: ModalClass.noShowAceptarCancelarButtons,
     });
   }
 
@@ -956,8 +946,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => (_.has(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
           { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
@@ -969,7 +958,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco mr-2', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
     }
 
-    this.handleModalForm(config);
+    this.configureNewModal(config);
   }
 
   closeModal(modalInstance) {
@@ -995,15 +984,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           if (this.condicion_fact == 'Crédito' || this.is_viaje || this.modo_factura == 'pre_venta') {
             const obj = { modo_factura: this.modo_factura, condicion_fact: this.condicion_fact, metodo: this.metodo };
 
-            this.handleModalForm({
+            this.configureNewModal({
               component: ConfirmacionImprimirComponent,
               inputs: obj,
               id: 'confirmacionImprimir',
               header: 'Confirmación',
               width: '30rem',
               botones: {
-                aceptar: { show: false, disable: false },
-                cancelar: { show: false, disable: false },
+                ...ModalClass.noShowAceptarCancelarButtons,
                 dinamico: [
                   { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
                   { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
@@ -1032,15 +1020,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               cambios_articulos: articulos_a_cambiar,
             };
 
-            this.handleModalForm({
+            this.configureNewModal({
               component: FormCantidadEfectivoComponent,
               inputs: obj,
               id: 'cambioEfectivo',
               header: 'Cantidad de efectivo',
               width: '34.375rem',
               botones: {
-                aceptar: { show: false, disable: false },
-                cancelar: { show: false, disable: false },
+                ...ModalClass.noShowAceptarCancelarButtons,
                 dinamico: [
                   { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
                   { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
@@ -1271,7 +1258,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ingresarFecha() {
-    this.handleModalForm({
+    this.configureNewModal({
       component: PendienteFormComponent,
       id: 'facturaPendiente',
       header: 'Factura pendiente',
@@ -1434,7 +1421,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.facturaClass.parseDataToPdf(res['data']).then(async (factura_parsed) => {
       const obj = { data: factura_parsed, type: 'facturacion' };
 
-      this.pdfServ.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError('Error imprimiendo la factura', 'ERROR'));
+      PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError('Error imprimiendo la factura', 'ERROR'));
 
       this.layServ.nextCheckCuadreToday(true);
 

@@ -9,12 +9,12 @@ import { NewTablasModule } from '../../components/new_tablas/tablas.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [RegistroArticulosComponent],
-  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, NewTablasModule, DirectivesModule, OverlayPanelModule, NgxPermissionsModule],
+  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, NewTablasModule, DirectivesModule, NgxPermissionsModule],
 })
 
 export class RegistroArticulosModule {}

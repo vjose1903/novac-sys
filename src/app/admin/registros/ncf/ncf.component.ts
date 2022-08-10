@@ -9,6 +9,7 @@ import { NcfC } from './ncf';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-ncf',
@@ -307,7 +308,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
+    this.configureNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
@@ -315,8 +316,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
         ${obj.texto}
       </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {

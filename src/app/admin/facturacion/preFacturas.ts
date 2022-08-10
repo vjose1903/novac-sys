@@ -1,17 +1,16 @@
 import * as _ from 'lodash';
-import { PdfService } from '../../core/services/pdf/pdf.service';
+
 import { fun } from '../../core/services/functions.service';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { FacturaC } from './factura';
+import { ModalClass } from '../components/modal/modal-class';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 export class PreFacturaClass extends MixinClass {
-  pdfServ: PdfService;
   facturaClass = new FacturaC();
-  constructor(pdfServ) {
+  constructor() {
     super();
-
-    this.pdfServ = pdfServ;
   }
 
   parseFactura(factura, fact_de, buscarPara) {
@@ -50,9 +49,9 @@ export class PreFacturaClass extends MixinClass {
     this.facturaClass.parseDataToPdf(dataFactura).then(async (factura_parsed) => {
       const toPDFData = { data: factura_parsed, type: 'facturacion' };
 
-      this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
+      PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
         if (res.status === 'si') {
-          const inputs = { pdfSrc: res.body, height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+          const inputs = { base64: res.base64, height: '30rem', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
           const obj_modal = {
             component: PdfViewerComponent,
             inputs: inputs,
@@ -60,8 +59,7 @@ export class PreFacturaClass extends MixinClass {
             header: 'Pre-factura',
             width: '900px',
             botones: {
-              aceptar: { show: false, disable: false },
-              cancelar: { show: false, disable: false },
+              ...ModalClass.noShowAceptarCancelarButtons,
               dinamico: [
                 { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false },
                 { clase: 'btn btn-verde ', function: (instance) => this.selectPreFactura(dataFactura, instance), label: 'Continuar', disable: false },
@@ -69,7 +67,7 @@ export class PreFacturaClass extends MixinClass {
             },
           };
 
-          this.handleModalForm(obj_modal);
+          this.configureNewModal(obj_modal);
         }
       });
     });

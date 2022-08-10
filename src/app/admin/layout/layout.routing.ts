@@ -25,8 +25,8 @@ const routes: Routes = [
         component: HomeAdminComponent,
       },
       {
-        path: 'factura/:tipo/:action/:id',
-        component: FacturacionComponent,
+        path: 'factura',
+        loadChildren: () => import('../facturacion/facturacion.module').then((m) => m.FacturacionModule),
       },
 
       {

@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
 import { fun } from '../../../core/services/functions.service';
 import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
+import { ModalClass } from '../../components/modal/modal-class';
 
 export class NotaC extends CrudG<any> {
   constructor() {
@@ -45,8 +46,7 @@ export class NotaC extends CrudG<any> {
       width: '60rem',
       height: '30rem',
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };

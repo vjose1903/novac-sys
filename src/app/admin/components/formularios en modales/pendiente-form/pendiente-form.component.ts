@@ -39,7 +39,7 @@ export class PendienteFormComponent implements OnInit, ModalI {
 
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
-    modal.getDataModal({ fecha, modal_id: this.modal.component_id });
+    modal.returnDataFromModal({ fecha, modal_id: this.modal.component_id });
   }
 
   ngOnInit() {

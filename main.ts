@@ -29,11 +29,12 @@ import AppUpdater from './electron/auto-update.js';
 import ReplaceInFile from './electron/replace-in-file.js';
 import DockerHandler from './electron/docker-handler';
 
-let win: BrowserWindow = null;
-let splash: BrowserWindow = null;
-let auto_updater: AppUpdater = null;
-let docker_handler: DockerHandler = null;
-let replace_in_file: ReplaceInFile = null;
+let emptyWin: BrowserWindow;
+let win: BrowserWindow;
+let splash: BrowserWindow;
+let auto_updater: AppUpdater;
+let docker_handler: DockerHandler;
+let replace_in_file: ReplaceInFile;
 
 const args = process.argv.slice(1);
 const serve = args.some((val) => val === '--serve');
@@ -41,7 +42,7 @@ const serve = args.some((val) => val === '--serve');
 function createSplash(type = 'splash') {
   if (splash) {
     splash.close();
-    splash = null;
+    splash = emptyWin;
   }
 
   splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
@@ -162,7 +163,7 @@ function createWindow() {
       // Dereference the window object, usually you would store window
       // in an array if your app supports multi windows, this is the time
       // when you should delete the corresponding element.
-      win = null;
+      win = emptyWin;
     });
 
     resolve(win);
@@ -335,7 +336,7 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
         const oPdf = JSON.parse(arg.data);
 
         const base64 = oPdf.base64;
-        const fileName = oPdf.filename;
+        const fileName = oPdf.file;
         const type = oPdf['type'] ? oPdf['type'] : 'reporte';
         const scale = oPdf['scale'] ? oPdf['scale'] : 'noscale';
 
@@ -463,8 +464,6 @@ async function verificarSumastra() {
 // FUNCION QUE SE EJECUTA AL TERMINAR LA DESCARGA DE UN ELEMENTO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
-
-
   const command = isMacOs() ? `unzip "${await pathAdd(path_local_extension)}" -d "${await pathAdd()}"` : `powershell Expand-Archive "${await pathAdd(path_local_extension)}" -DestinationPath "${await pathAdd()}"`;
 
   cmd(command, async (res) => {

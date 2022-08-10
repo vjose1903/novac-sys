@@ -3,8 +3,8 @@ import { fun } from '../../core/services/functions.service';
 import { PreFacturaClass } from './preFacturas';
 
 export class FactsLocalStorage extends PreFacturaClass {
-  constructor(pdfServ) {
-    super(pdfServ);
+  constructor() {
+    super();
   }
 
   ant_event_change_visibility;

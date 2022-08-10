@@ -12,7 +12,7 @@ import { FormCantidadEfectivoComponent } from '../../../components/formularios e
 import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../../components/new_tablas/tabla-class';
-import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
+import { ModalClass } from '../../../components/modal/modal-class';
 
 @Component({
   selector: 'app-ingresos',
@@ -102,7 +102,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   facturaClass = new FacturaC();
   debiendo;
 
-  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService, private pdfServ: PdfService) {
+  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService) {
     super();
     this.config.notFoundText = 'Articulo no existe';
   }
@@ -318,15 +318,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta', formaPago: 'Efectivo' };
 
-      this.handleModalForm({
+      this.configureNewModal({
         component: FormCantidadEfectivoComponent,
         inputs: obj,
         id: 'cambioEfectivo_IngresosComponent',
         header: 'Cantidad de efectivo',
         width: '34.375rem',
         botones: {
-          aceptar: { show: false, disable: false },
-          cancelar: { show: false, disable: false },
+          ...ModalClass.noShowAceptarCancelarButtons,
           dinamico: [
             {
               clase: 'btn btn-blanco mr-2',
@@ -344,7 +343,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
+    this.configureNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
@@ -352,8 +351,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       ${obj.texto}
     </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           {
@@ -398,8 +396,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       const obj_print = { data: recibo, type: 'recibo_ingreso' };
 
       if (this.is_print) {
-        this.pdfServ
-          .generatePdf({ oPdf: obj_print, imprimir: true })
+        PdfService.generatePdf({ oPdf: obj_print, imprimir: true })
           .then(async (res) => {
             if (res.status === 'si') {
             } else fun.toastError(res.msg, 'ERROR');
@@ -427,7 +424,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
             const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
             obj_modal.botones.dinamico.push(ver_datelles_btn);
-            this.handleModalForm(obj_modal);
+            this.configureNewModal(obj_modal);
           });
         });
       }
@@ -437,7 +434,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   verDetalles(data) {
     const configModal = this.reciboClass.modalVerDetalles(data);
 
-    this.handleModalForm(configModal);
+    this.configureNewModal(configModal);
   }
 
   tableInputChange(params) {
@@ -489,17 +486,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         metodo: 'venta',
       };
 
-      this.handleModalForm({
+      this.configureNewModal({
         component: BuscarClienteSuplidorComponent,
         inputs: obj,
         id: 'buscarCliente',
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: {
-          aceptar: { show: false, disable: false },
-          cancelar: { show: false, disable: false },
-        },
+        botones: ModalClass.noShowAceptarCancelarButtons,
       });
       this.desEnfocarInput('clienteI');
     }

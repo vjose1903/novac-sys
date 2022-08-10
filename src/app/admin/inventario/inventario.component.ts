@@ -12,6 +12,8 @@ import { fun } from '../../core/services/functions.service';
 import { SingletonService } from '../../core/services/singleton.service';
 import { table_config } from '../components/new_tablas/tabla-class';
 import { Permisos } from '../../core/typescript/permisos';
+import { ModalClass } from '../components/modal/modal-class';
+import { InventarioC } from './inventario';
 
 @Component({
   selector: 'app-inventario',
@@ -52,14 +54,12 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   palabra_buscar;
   fechaFactura: string;
-  pdfSrc: any;
-  fileName: any;
 
   articuloClass = new ArticuloC();
   tipoArticuloClass = new TipoArticuloC();
   reporteClass = new ReporteC();
 
-  constructor(private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
+  constructor(private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
 
@@ -81,21 +81,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this._destroy_mixin();
   }
 
-  imprimirReporteInventario(objPDFData, modalInstance?) {
-    const obj = { base64: objPDFData.pdfSrc, filename: `${objPDFData.fileName}.pdf`, type: 'reporte' };
-    this.pdfServ
-      .imprimirBase64(obj)
-      .then((res) => {
-        if (res['status'] === 'si') {
-          fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-          if (modalInstance) modalInstance.closeModal(modalInstance.id, 'reporte_inventario');
-        } else fun.toastError(res['msg'], 'ERROR');
-      })
-      .catch((err) => {
-        fun.toastError(err['msg'], 'ERROR');
-      });
-  }
-
   formatoNumero(num) {
     return fun.numFormatTwoDecimals(num);
   }
@@ -106,41 +91,10 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async makeReporte() {
-    const extra = { afterPath: `custom/inventario` };
-    this.reporteClass.getAll(extra).then((res) => {
-      const obj = { data: res, type: 'reporte' };
-      this.loadServ.isLoading.next(true);
+    const obj = { tipo: 'reporte', titulo: 'Reporte de inventario', tipo_reporte: 'reporte' };
 
-      this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
-        if (res.status === 'si') {
-          const obj_pdf = { pdfSrc: res.body, titulo: 'Reporte de inventario', height: '75vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
-          this.loadServ.isLoading.next(false);
-
-          this.handleModalForm({
-            component: PdfViewerComponent,
-            inputs: obj_pdf,
-            id: 'reporte_inventario',
-            header: 'Reporte de inventario',
-            width: '900px',
-            botones: {
-              aceptar: { show: false, disable: false },
-              cancelar: { show: false, disable: false },
-              dinamico: [
-                { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
-                {
-                  clase: 'btn btn-verde',
-                  function: (instance) => {
-                    this.imprimirReporteInventario(obj_pdf, instance);
-                    this.resetVariables();
-                  },
-                  label: 'Imprimir',
-                  disable: false,
-                },
-              ],
-            },
-          });
-        }
-      });
+    InventarioC.openModalFormReporte({ tipo: 'inventario', inputs: obj, configureNewModal: this.configureNewModal.bind(this) }).then((arg) => {
+      console.log('arg ', arg);
     });
   }
 
@@ -188,7 +142,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   movimientoInventario(arg) {
-    this.handleModalForm({
+    this.configureNewModal({
       component: MovimientosFormComponent,
       inputs: arg.data,
       id: 'inventario',
@@ -208,10 +162,5 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       actualPagination['search'] = this.palabra_buscar;
       this.getArticulos(actualPagination);
     }
-  }
-
-  resetVariables() {
-    this.pdfSrc = undefined;
-    this.fileName = undefined;
   }
 }

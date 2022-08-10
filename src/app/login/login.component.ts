@@ -24,7 +24,6 @@ import { FacturaC } from '../admin/facturacion/factura';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-
 export class LoginComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   form: FormGroup;
   errorC = '';
@@ -37,7 +36,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   configServ = SingletonService.configServ;
   configApp: ConfigI;
 
-  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public pdfServ: PdfService, public currentUserServ: CurrentUserService) {
+  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public currentUserServ: CurrentUserService) {
     super();
   }
 
@@ -111,7 +110,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     if (fun.hasValue(this.form)) this.form.reset();
     this.enfocarInput('Iusuario');
 
-    this.handleModalForm({
+    this.configureNewModal({
       inputs: {},
       component: ModalPasswordConfigComponent,
       id: 'passwordConfigForm',
@@ -143,7 +142,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   async pruebaRecibo() {
     const data_ = recibo_de_ingreso;
 
-    // const DD = await this.pdfServ.makeFacturaVenta(data);
     const obj = { data: data_, type: 'recibo_ingreso' };
     // ["type"] =
     this.tipo_prueba = obj.type;
@@ -171,11 +169,11 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   generar(obj) {
-    this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
+    PdfService.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
       if (res.status === 'si') {
-        const objBase = { base64: res.body, filename: res.file, type: this.tipo_prueba };
+        const objBase = { base64: res.base64, filename: res.file, type: this.tipo_prueba };
 
-        const obj = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+        const obj = { base64: res.base64, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
         // this.abrirModalReporte(obj);
       }
     });

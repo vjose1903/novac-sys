@@ -10,7 +10,7 @@ import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.co
 import { fun } from '../../../../core/services/functions.service';
 import { Permisos } from '../../../../core/typescript/permisos';
 import { table_config } from '../../../components/new_tablas/tabla-class';
-import { FacturaC } from '../../../facturacion/factura';
+import { ModalClass } from '../../../components/modal/modal-class';
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
@@ -45,7 +45,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   };
   tablaComponent;
 
-  pdfSrc;
+  base64;
   fileName;
   lista_recibos;
   rowSelected: any;
@@ -53,7 +53,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   permissions = Permisos;
 
-  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
+  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
 
@@ -165,14 +165,13 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
+    this.configureNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
@@ -195,17 +194,16 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   generarPdf(obj) {
     this.loadServ.isLoading.next(true);
 
-    this.pdfServ
-      .generatePdf({ oPdf: obj, imprimir: false })
+    PdfService.generatePdf({ oPdf: obj, imprimir: false })
       .then(async (res) => {
         if (res.status === 'si') {
           this.fileName = res.file;
-          this.pdfSrc = res.body;
-          const obj_pdf = { pdfSrc: res.body, titulo: 'Revisión de recibo de ingreso', height: '25rem', reimprimir: true, fileName: res.file.split('.')[0] };
+          this.base64 = res.base64;
+          const obj_pdf = { base64: res.base64, titulo: 'Revisión de recibo de ingreso', height: '25rem', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
           this.loadServ.isLoading.next(false);
 
-          this.handleModalForm({
+          this.configureNewModal({
             component: PdfViewerComponent,
             inputs: obj_pdf,
             id: 'revision_recibo',
@@ -213,8 +211,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
             width: '900px',
             height: obj_pdf.height,
             botones: {
-              aceptar: { show: false, disable: false },
-              cancelar: { show: false, disable: false },
+              ...ModalClass.noShowAceptarCancelarButtons,
               dinamico: [
                 { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
                 { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(obj.data), label: 'Ver detalles', disable: false },
@@ -237,14 +234,13 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   verDetalles(data) {
     const configModal = this.reciboClass.modalVerDetalles(data);
-    this.handleModalForm(configModal);
+    this.configureNewModal(configModal);
   }
 
   imprimir_base64() {
-    const obj = { base64: this.pdfSrc, filename: this.fileName, type: 'recibo_ingreso' };
+    const obj = { base64: this.base64, file: this.fileName, type: 'recibo_ingreso' };
     try {
-      this.pdfServ
-        .imprimirBase64(obj)
+      PdfService.imprimirBase64(obj)
         .then(async (res) => {
           if (res['status'] === 'si') fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
           else fun.toastError(res['msg'], 'ERROR');

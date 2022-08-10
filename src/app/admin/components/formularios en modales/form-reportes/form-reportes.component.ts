@@ -22,7 +22,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   @Input() switches;
   fun = fun;
 
-  @Output() seleccion = new EventEmitter<any>();
   form: FormGroup;
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
@@ -45,24 +44,11 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   constructor(private fb: FormBuilder, private localeService: BsLocaleService) {
     super();
-    this.dpConfig = Object.assign(
-      {},
-      {
-        // locale:'es',
-        showWeekNumbers: false,
-        maxDate: new Date(),
-        dateInputFormat: 'DD/MM/YYYY',
-      },
-    );
+    this.dpConfig = Object.assign({}, { showWeekNumbers: false, maxDate: new Date(), dateInputFormat: 'DD/MM/YYYY' });
   }
+
   modal: any = {};
   inputs: any;
-  btn_aceptar() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    modal.getDataModal({ data: { ...this.form.value, switches: { ...this.switches } }, modal_id: this.modal.component_id });
-    // throw new Error('Method not implemented.');
-  }
 
   ngOnInit() {
     this.tipo_reporte = this.inputs.tipo_reporte;
@@ -212,7 +198,9 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     });
   }
 
-  accion(arg) {
-    this.seleccion.emit({ bool: arg, obj: this.form.value });
+  btn_aceptar() {
+    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    modal.closeModal(this.modal.component_id);
+    modal.returnDataFromModal({ data: { ...this.form.value, switches: { ...this.switches } }, modal_id: this.modal.component_id });
   }
 }

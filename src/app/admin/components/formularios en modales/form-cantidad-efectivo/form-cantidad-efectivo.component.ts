@@ -120,7 +120,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
     if (this.factura_de == 'compra') {
       if (this.cambiar_articulos != undefined) {
-        modal.getDataModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
+        modal.returnDataFromModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
       } else {
         fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
       }
@@ -128,7 +128,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       if (this.validarForm()) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
       } else {
-        modal.getDataModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
+        modal.returnDataFromModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
       }
     }
   }

@@ -18,6 +18,7 @@ import { ConfigI } from '../../core/typescript/config-interface';
 import { SingletonService } from '../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from '../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { teclasCode } from '../../core/typescript/constantes';
+import { ModalClass } from '../components/modal/modal-class';
 
 @Component({
   selector: 'app-conduce',
@@ -93,7 +94,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   formPermissions = [Permisos.role.create, Permisos.role.update];
 
   configApp: ConfigI;
-  constructor(private fb: FormBuilder, private pdfServ: PdfService, public mServ: ModalService) {
+  constructor(private fb: FormBuilder, public mServ: ModalService) {
     super();
   }
 
@@ -227,17 +228,14 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
         if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
           const obj = { palabra_a_buscar: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
 
-          this.handleModalForm({
+          this.configureNewModal({
             component: BuscarArticuloComponent,
             inputs: obj,
             id: 'buscar_articulo',
             header: 'BUSCAR ARTICULO',
             width: '56.25rem',
             height: '31.25rem',
-            botones: {
-              aceptar: { show: false, disable: false },
-              cancelar: { show: false, disable: false },
-            },
+            botones: ModalClass.noShowAceptarCancelarButtons,
           });
           this.enfocarInput('input_fantasma');
         } else {
@@ -346,17 +344,14 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     if (fun.hasValue(nombre)) {
       const obj = { data: [], palabra_a_buscar: nombre, metodo: 'venta' };
 
-      this.handleModalForm({
+      this.configureNewModal({
         component: BuscarClienteSuplidorComponent,
         inputs: obj,
         id: 'buscarCliente',
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: {
-          aceptar: { show: false, disable: false },
-          cancelar: { show: false, disable: false },
-        },
+        botones: ModalClass.noShowAceptarCancelarButtons,
       });
 
       this.desEnfocarInput('clienteI');
@@ -628,7 +623,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           conteo++;
           if (conteo >= factura.detalle_facturas.length)
             setTimeout(() => {
-              this.handleModalForm({
+              this.configureNewModal({
                 component: ModalSeleccinarArticuloComponent,
                 inputs: factura.detalle_facturas,
                 id: 'seleccionar_articulos_adelantados',
@@ -636,8 +631,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
                 width: '900px',
                 height: '400px',
                 botones: {
-                  aceptar: { show: false, disable: false },
-                  cancelar: { show: false, disable: false },
+                  ...ModalClass.noShowAceptarCancelarButtons,
                   dinamico: [
                     { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
                     { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
@@ -763,14 +757,13 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
+    this.configureNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
@@ -820,15 +813,14 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
       const obj = { modo_factura: 'conduce', condicion_fact: 'conduce', metodo: 'conduce' };
 
-      this.handleModalForm({
+      this.configureNewModal({
         component: ConfirmacionImprimirComponent,
         inputs: obj,
         id: 'confirmacionImprimir',
         header: 'Confirmación',
         width: '30rem',
         botones: {
-          aceptar: { show: false, disable: false },
-          cancelar: { show: false, disable: false },
+          ...ModalClass.noShowAceptarCancelarButtons,
           dinamico: [
             { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
@@ -852,7 +844,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       const obj = { data: res['data'], type: 'conduce' };
 
       this.cancelarConduce();
-      this.pdfServ.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
+      PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
     });
   }
 

@@ -32,7 +32,7 @@ export class NewModalComponent implements OnInit {
     transitionOptions: '0ms',
     contentStyleClass: '0ms',
     botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
-    getDataModal: (arg?) => {},
+    returnDataFromModal: (arg?) => {},
 
     closeModal: (id, accion) => {
       this.cancelarAndAceptar(false, id, accion);
@@ -57,7 +57,8 @@ export class NewModalComponent implements OnInit {
     const modal = _.find(this.modalsConfig, (config) => config.id === id_);
 
     const data = { modal: modal, accion: accion };
-    if (modal) modal.onHide(data);
+
+    if (modal && typeof modal.onHide == 'function') modal.onHide(data);
 
     this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
   }
@@ -115,9 +116,9 @@ export class NewModalComponent implements OnInit {
     // const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
   }
 
-  onHideModal(id_) {
-    MODALCONFIG.next({ show: false, id: id_ });
-  }
+  // onHideModal(id_) {
+  //   MODALCONFIG.next({ show: false, id: id_ });
+  // }
 
   cancelarAndAceptar(bool, id_, accion?) {
     if (!bool) {
@@ -130,7 +131,7 @@ export class NewModalComponent implements OnInit {
     if (modal['instance']) {
       modal['instance'].btn_aceptar();
     } else {
-      modal.getDataModal({ bool: bool, inputs: modal.inputs, id: modal.id });
+      modal.returnDataFromModal({ bool: bool, inputs: modal.inputs, id: modal.id });
       modal.closeModal(modal.id, 'aceptar');
     }
   }

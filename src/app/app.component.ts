@@ -29,7 +29,6 @@ import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
 import { CurrentUserService } from './core/services/current-user.service';
 import { MixinClass } from './core/typescript/MixinClass';
-import { PdfService } from './core/services/pdf/pdf.service';
 
 @Component({
   selector: 'app-root',
@@ -50,7 +49,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   constructor(
     public _ipc: IpcService,
-    private loaderServ: LoaderService,
+    public loaderServ: LoaderService,
     private cdRef: ChangeDetectorRef,
 
     public zone: NgZone,
@@ -61,9 +60,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
-    public pdfServ: PdfService,
-
-    private currentUserServ: CurrentUserService,
   ) {
     super();
   }
@@ -74,11 +70,12 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     SingletonService.http = this.http;
     SingletonService.zone = this.zone;
     SingletonService.configServ = this.configServ;
+    SingletonService._ipc = this._ipc;
 
+    SingletonService.loadServ = this.loaderServ;
     SingletonService.layServ = this.layServ;
     SingletonService.toastr = this.toastr;
     SingletonService.sharedServ = this.sharedServ;
-    SingletonService.pdfServ = this.pdfServ;
     SingletonService.cdRef = this.cdRef;
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
@@ -148,7 +145,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   cerrar_app() {
-    this.handleModalForm({
+    this.configureNewModal({
       html: `<p> ESTAS A PUNTO DE CERRAR EL PROGRAMA NOVAC, ¿Desea continuar? </p>`,
       id: 'cerrar_app',
       header: 'CONFIRMACION DE CIERRE',
@@ -184,7 +181,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       this.cdRef.detectChanges();
     });
   }
-
 
   async getAppConfig() {
     const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);

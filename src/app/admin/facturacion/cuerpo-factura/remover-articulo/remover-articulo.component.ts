@@ -64,7 +64,7 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
       const obj = { key: this.inputs.key, modal_id: this.modal.component_id };
       if (this.inputs.is_prefactura_selected) obj['data'] = this.form.getRawValue();
 
-      modal.getDataModal(obj);
+      modal.returnDataFromModal(obj);
     } else {
       fun.toastError('Complete los campos para retirar el articulo.', 'ERROR');
     }

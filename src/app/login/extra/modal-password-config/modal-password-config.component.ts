@@ -40,7 +40,7 @@ export class ModalPasswordConfigComponent extends MixinClass implements OnInit, 
     if (is_correct) {
       const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
       modal.closeModal(this.modal.component_id);
-      modal.getDataModal({ error: false });
+      modal.returnDataFromModal({ error: false });
 
       setTimeout(() => this.sharedServ.nextCanToast(false), 2000);
     } else {

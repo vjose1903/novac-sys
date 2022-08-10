@@ -9,6 +9,7 @@ import { RemoverArticuloComponent } from './remover-articulo/remover-articulo.co
 import { razon_remover } from './remover-articulo/contantes';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { SingletonService } from '../../../core/services/singleton.service';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -397,7 +398,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
             const metodo = this.metodo == 'pre_venta' ? 'venta' : this.metodo;
             const obj = { palabra_a_buscar: cod, index, metodo: metodo, data: [], fecha_articulo: this.fechaFactura };
-            this.handleModalForm({
+            this.configureNewModal({
               component: BuscarArticuloComponent,
               inputs: obj,
               id: 'buscarArticulo',
@@ -405,8 +406,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
               width: '56.25rem',
               height: '31.25rem',
               botones: {
-                aceptar: { show: false, disable: false },
-                cancelar: { show: false, disable: false },
+                ...ModalClass.noShowAceptarCancelarButtons,
               },
             });
             this.enfocarInput('input_fantasma');
@@ -641,7 +641,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     let obj = { index, key, cantidad, is_prefactura_selected: fun.hasValue(this.pre_factura_selected) };
     obj['nombre'] = unidad ? `${name} (${unidad})` : name;
 
-    this.handleModalForm({
+    this.configureNewModal({
       component: RemoverArticuloComponent,
       inputs: obj,
       id: 'removerArticulo',
@@ -774,7 +774,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
+    this.configureNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
@@ -782,8 +782,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       ${obj.texto}
     </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           {

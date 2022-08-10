@@ -50,6 +50,6 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
   btn_aceptar() {
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
-    modal.getDataModal({ is_print: this.is_print, modal_id: this.modal.component_id });
+    modal.returnDataFromModal({ is_print: this.is_print, modal_id: this.modal.component_id });
   }
 }

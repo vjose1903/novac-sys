@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import * as moment from '../../core/javascript/moment';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { ModalHistorialPagosComponent } from '../components/formularios en modales/modal-historial-pagos/modal-historial-pagos.component';
+import { ModalClass } from '../components/modal/modal-class';
 @Injectable({
   providedIn: 'root',
 })
@@ -26,17 +27,14 @@ export class RecibosService extends MixinClass {
       }
 
       const obj = { abonos: pagos, notas: notas };
-      this.handleModalForm({
+      this.configureNewModal({
         component: ModalHistorialPagosComponent,
         inputs: obj,
         id: 'historial_pago',
         header: 'Historial de moviemientos a balance de factura',
         width: '700px',
         height: '400px',
-        botones: {
-          aceptar: { show: false, disable: false },
-          cancelar: { show: false, disable: false },
-        },
+        botones: ModalClass.noShowAceptarCancelarButtons,
       });
     }
   }

@@ -1,4 +1,5 @@
 import { CrudG } from '../../core/typescript/crud-g';
+import { ModalClass } from '../components/modal/modal-class';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 
 export interface ReciboI {
@@ -36,8 +37,7 @@ export class ReciboC extends CrudG<ReciboI> {
       width: '30rem',
       height: '10rem',
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };

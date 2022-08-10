@@ -7,6 +7,7 @@ import { TablasService } from '../../components/new_tablas/tablas.service';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-roles',
@@ -247,14 +248,13 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   eliminarReg(data) {
-    this.handleModalForm({
+    this.configureNewModal({
       id: 'delete_role',
       header: 'CONFIRMACION',
       width: '30rem',
       html: `<p> Seguro que desea eliminar el rol: <strong>${data.nombre}</strong> </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'aceptar'), label: 'NO', disable: false },
           {

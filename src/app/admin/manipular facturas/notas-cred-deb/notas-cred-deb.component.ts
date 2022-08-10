@@ -14,6 +14,7 @@ import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { SingletonService } from '../../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -77,7 +78,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   tablaComponent;
 
-  constructor(private activeRoute: ActivatedRoute, private router: Router, private pdfServ: PdfService, private cdRef: ChangeDetectorRef) {
+  constructor(private activeRoute: ActivatedRoute, private router: Router) {
     super();
   }
 
@@ -313,15 +314,14 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       } else {
         const obj = { modo_factura: 'nota', condicion_fact: 'nota', metodo: 'nota' };
 
-        this.handleModalForm({
+        this.configureNewModal({
           component: ConfirmacionImprimirComponent,
           inputs: obj,
           id: 'confirmacionImprimir',
           header: 'Confirmación',
           width: '30rem',
           botones: {
-            aceptar: { show: false, disable: false },
-            cancelar: { show: false, disable: false },
+            ...ModalClass.noShowAceptarCancelarButtons,
             dinamico: [
               { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
               { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
@@ -375,14 +375,13 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
+    this.configureNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           {
@@ -474,7 +473,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   imprimirNota(obj) {
-    this.pdfServ.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err.msg, 'ERROR'));
+    PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err.msg, 'ERROR'));
     this.layServ.nextCheckCuadreToday(true);
     this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
   }

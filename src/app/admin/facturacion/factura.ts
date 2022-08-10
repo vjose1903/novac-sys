@@ -1,20 +1,72 @@
-import { CrudG, extraArgs } from '../../core/typescript/crud-g';
+import { CrudG } from '../../core/typescript/crud-g';
 import * as _ from 'lodash';
 import { fun } from '../../core/services/functions.service';
 import * as moment from '../../core/javascript/moment';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
-import { SingletonService } from '../../core/services/singleton.service';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
+import { ModalClass } from '../components/modal/modal-class';
+import { ReporteC } from '../reportes/reporte';
+import { PdfService } from '../../core/services/pdf/pdf.service';
 
 export class FacturaC extends CrudG<FacturasI> {
   constructor() {
     super('cabecera_facturas');
   }
 
-  getFacturaById(id: number) {
-    return new Promise((resolve) => {
-      this.getOne(id).then((res) => resolve(res));
+  static openModalFormReporte(params: { tipo: any; inputs: any; configureNewModal; titulo?: any }) {
+    fun.logYellow('params: ', params);
+    return new Promise<any>((resolve, reject) => {
+      params.inputs['switches'] = {
+        title: 'Seleccione los metodos de pago deseados',
+        array: [
+          { label: 'Efectivo', value: true },
+          { label: 'Tarjeta', value: true },
+          { label: 'Cheque', value: true },
+          { label: 'Transferencia', value: false },
+        ],
+      };
+
+      ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
+
+      params.configureNewModal(ReporteC.objReporte);
+
+      function returnDataFromModal(arg) {
+        FacturaC.requestReporte({ reporte: arg, pdf: params });
+
+      }
     });
+  }
+
+  static requestReporte(params: { reporte; pdf }) {
+    if (_.every(params.reporte.data.switches.array, (item) => item.value === false)) {
+      fun.toastError('Debe seleccionar almenos un metodo de pago.', 'ERROR');
+    } else {
+      const requestParams = { afterPath: 'custom/ventas', parameters: null };
+      let formas_pago = '(';
+
+      params.reporte.data.switches.array.forEach((item) => {
+        if (item.value) formas_pago += `'${item.label}',`;
+      });
+
+      formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+      requestParams.parameters = {
+        tipo: params.reporte.data.tipo,
+        condicion: params.reporte.data.condicion,
+        formas_pago: formas_pago,
+        desde: fun.my_dateFormater(params.reporte.data.desde, false),
+        hasta: fun.my_dateFormater(params.reporte.data.hasta, false),
+      };
+
+      ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
+        let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, height: '76vh', fileName: _.first(response.file.split('.')), configureNewModal: params.pdf.configureNewModal };
+
+        ReporteC.visualizarReporte(objPdfView);
+      });
+    }
+  }
+
+  getFacturaById(id: number) {
+    return new Promise((resolve) => this.getOne(id).then((res) => resolve(res)));
   }
 
   getFacturasByParams(args: { campo: string; valor: 'string'; tipo_factura_id: number; adelantada: boolean; page: number; per_page: number; paginado: boolean; fact_de: string }) {
@@ -92,8 +144,7 @@ export class FacturaC extends CrudG<FacturasI> {
       width: '30rem',
       height: '10rem',
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };
@@ -103,9 +154,9 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise<any>((resolve, reject) => {
       const toPDFData = { data: dataFactura, type: 'facturacion' };
 
-      SingletonService.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
+      PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
         if (res.status === 'si') {
-          const inputs = { pdfSrc: res.body, height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+          const inputs = { base64: res.base64, height: '30rem', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
           const obj_modal = {
             component: PdfViewerComponent,
             inputs: inputs,
@@ -113,8 +164,7 @@ export class FacturaC extends CrudG<FacturasI> {
             header: 'MOSTRAR FACTURA',
             width: '900px',
             botones: {
-              aceptar: { show: false, disable: false },
-              cancelar: { show: false, disable: false },
+              ...ModalClass.noShowAceptarCancelarButtons,
               dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
             },
           };
@@ -139,11 +189,6 @@ export class FacturasAplicadasC extends CrudG<any> {
     super('facturas_aplicadas');
   }
 }
-// Generated by https://quicktype.io
-//
-// To change quicktype's target language, run command:
-//
-//   "Set quicktype target language"
 
 export enum tipo_factura_id {
   Factura_sin_comprobante = 1,
