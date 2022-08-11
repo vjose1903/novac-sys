@@ -354,7 +354,7 @@
 
 <p-sidebar
   #my_sidebar
-  styleClass="my_sidebar  {{ _sideBarOpened ? 'side_open' : 'side_closed' }} {{ hasPermissionPreVenta ? 'large' : '' }}"
+  styleClass="my_sidebar  {{ _sideBarOpened ? 'side_open' : 'side_closed' }} {{ hasPermisoPreVenta ? 'large' : '' }}"
   *ngIf="_sideBarOpened"
   [position]="'right'"
   [visible]="_sideBarOpened"
@@ -392,7 +392,7 @@
         </p-tabPanel>
 
         <p-tabPanel
-          *ngIf="hasPermissionPreVenta"
+          *ngIf="hasPermisoPreVenta"
           [disabled]="countCantFactSaved('pre_venta').disable"
           tooltip="No tiene facturas de Venta guardadas"
           headerStyleClass="{{ countCantFactSaved('pre_venta').disable ? 'noTabView' : '' }}"

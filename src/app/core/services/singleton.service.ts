@@ -6,6 +6,7 @@ import { LayoutService } from '../../admin/layout/layout.service';
 import { ConfigurationService } from './configuration.service';
 import { IpcService } from './ipc.service';
 import { SharedService } from './shared.service';
+import { NgxPermissionsService } from 'ngx-permissions';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +22,7 @@ export class SingletonService {
   public static toastr: ToastrService;
   public static sharedServ: SharedService;
   public static cdRef: ChangeDetectorRef;
+  public static permissionsService: NgxPermissionsService;
 
   constructor() {}
 }

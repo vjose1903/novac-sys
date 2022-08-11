@@ -14,7 +14,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal; titulo?: any }) {
-    fun.logYellow('params: ', params);
+
     return new Promise<any>((resolve, reject) => {
       params.inputs['switches'] = {
         title: 'Seleccione los metodos de pago deseados',

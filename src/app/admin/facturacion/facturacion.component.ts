@@ -22,7 +22,6 @@ import { teclasCode } from '../../core/typescript/constantes';
 import { Permisos } from '../../core/typescript/permisos';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { SingletonService } from '../../core/services/singleton.service';
-import { NgxPermissionsService } from 'ngx-permissions';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../components/modal/modal-class';
 import { PdfService } from '../../core/services/pdf/pdf.service';
@@ -38,8 +37,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   secuenciaKeys = [];
   info_cambio: any;
   productosDevueltos: any[];
-  hasPermissionPreVenta: boolean;
-  hasPermissionCamiones: boolean;
+  hasPermisoPreVenta: boolean;
+  hasPermisoCamiones: boolean;
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
@@ -149,7 +148,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   timeInterval;
 
   conteo = 0;
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService, private permissionsService: NgxPermissionsService) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService) {
     super();
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
@@ -165,8 +164,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.configApp = SingletonService.configServ.getConfig({ isPromise: false });
     this.rellenarVariables();
 
-    this.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)).then((result) => (this.hasPermissionPreVenta = result));
-    this.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => (this.hasPermissionCamiones = result));
+    SingletonService.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)).then((result) => (this.hasPermisoPreVenta = result));
+    SingletonService.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => (this.hasPermisoCamiones = result));
   }
 
   ngOnDestroy(): void {
@@ -248,7 +247,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (this.metodo == 'venta') {
         this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
-        if (this.hasPermissionCamiones) this.getCamiones();
+        if (this.hasPermisoCamiones) this.getCamiones();
       } else {
         if (fun.hasValue(this.form)) this.form.reset();
       }
@@ -715,7 +714,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         if (this.modo_factura == 'normal') {
           if (this.condicion_fact == 'Contado') {
-            if (this.hasPermissionPreVenta) siguiente_input = 'numero_pre_factura';
+            if (this.hasPermisoPreVenta) siguiente_input = 'numero_pre_factura';
             else siguiente_input = 'nom';
           } else {
             debe_buscar = true;

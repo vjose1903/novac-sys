@@ -39,17 +39,22 @@ export class ReporteC extends CrudG<any> {
     return this._objReporte;
   }
 
-  static requestReporteAndMakePdf(requestParams, type) {
+  static requestReporteAndMakePdf(requestParams, type, transformRequestResponse?) {
     return new Promise<any>((resolve, reject) => {
-      new ReporteC().getAll(requestParams).then((res) => {
+      new ReporteC().getAll(requestParams).then((responseRequest) => {
         //
+        if (fun.hasValue(transformRequestResponse)) responseRequest = transformRequestResponse(responseRequest);
+        console.log('::::::::::: responseRequest: ', responseRequest);
+
+        //
+
         SingletonService.loadServ.isLoading.next(true);
-        const obj = { data: res, type: type };
+        const obj = { data: responseRequest, type: type };
 
         PdfService.generatePdf({ oPdf: obj, imprimir: false })
           .then(async (result) => {
             SingletonService.loadServ.isLoading.next(false);
-            resolve(result);
+            resolve({ ...result, requestResult: responseRequest });
           })
           .catch(async (err) => {
             SingletonService.loadServ.isLoading.next(false);
@@ -62,8 +67,6 @@ export class ReporteC extends CrudG<any> {
   static visualizarReporte(objPdfView: { openNewModal: Function; status: string; file: any; base64: any; reimprimir: any; msg: any; titulo: string; height: string; width: string }) {
     if (objPdfView.status == 'no') fun.toastError(objPdfView.msg, 'ERROR');
     else {
-      fun.logYellow('objPdfView ', fun.duplicarJson(objPdfView));
-
       objPdfView.openNewModal({
         component: PdfViewerComponent,
         inputs: objPdfView,

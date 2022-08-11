@@ -27,8 +27,8 @@ import { ConfigI } from './core/typescript/config-interface';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
-import { CurrentUserService } from './core/services/current-user.service';
 import { MixinClass } from './core/typescript/MixinClass';
+import { NgxPermissionsService } from 'ngx-permissions';
 
 @Component({
   selector: 'app-root',
@@ -60,6 +60,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
+    public permissionsService: NgxPermissionsService,
   ) {
     super();
   }
@@ -72,6 +73,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     SingletonService.configServ = this.configServ;
     SingletonService._ipc = this._ipc;
 
+    SingletonService.permissionsService = this.permissionsService;
     SingletonService.loadServ = this.loaderServ;
     SingletonService.layServ = this.layServ;
     SingletonService.toastr = this.toastr;

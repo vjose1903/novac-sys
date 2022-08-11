@@ -1,3 +1,4 @@
+import { fun } from './../functions.service';
 /* eslint-disable @typescript-eslint/indent */
 import { styles_ } from './utils/files';
 import { getContentWithTablaNormal } from './tabla_normal';
@@ -6,6 +7,8 @@ import { SingletonService } from '../singleton.service';
 import { ConfigI } from '../../typescript/config-interface';
 import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';
 import { config_cxc } from './8.5x5.5/configuraciones/reportes/cxc';
+import { config_cxc_ant_preventa } from './8.5x5.5/configuraciones/reportes/cxc_ant_preventa';
+import { config_cxc_preventa } from './8.5x5.5/configuraciones/reportes/cxc_preventa';
 import { config_cxc_ant } from './8.5x5.5/configuraciones/reportes/cxc_ant';
 import { config_inventario } from './8.5x5.5/configuraciones/reportes/inventario';
 import { config_recibos } from './8.5x5.5/configuraciones/reportes/recibos';
@@ -17,7 +20,11 @@ import { config_notas } from './8.5x5.5/configuraciones/reportes/notas';
 const configuraciones = {
   ventas: config_ventas,
   cxc: config_cxc,
+  cxc_preventa: config_cxc_preventa,
+
   cxc_ant_detallado: config_cxc_ant.detallado,
+  cxc_ant_detallado_preventa: config_cxc_ant_preventa.detallado,
+
   cxc_ant_agrupado: config_cxc_ant.agrupado,
   inventario: config_inventario,
   recibos: config_recibos,
@@ -32,7 +39,11 @@ const configuraciones = {
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
+  fun.logGreen('data ', data);
+  fun.logYellow('data.tipo_reporte ', data.tipo_reporte);
   const configuration = configuraciones[data.tipo_reporte];
+  fun.logRed('configuration ', configuration);
+
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
 
