@@ -228,7 +228,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
         if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
           const obj = { palabra_a_buscar: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
 
-          this.configureNewModal({
+          this.openNewModal({
             component: BuscarArticuloComponent,
             inputs: obj,
             id: 'buscar_articulo',
@@ -344,7 +344,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     if (fun.hasValue(nombre)) {
       const obj = { data: [], palabra_a_buscar: nombre, metodo: 'venta' };
 
-      this.configureNewModal({
+      this.openNewModal({
         component: BuscarClienteSuplidorComponent,
         inputs: obj,
         id: 'buscarCliente',
@@ -623,7 +623,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           conteo++;
           if (conteo >= factura.detalle_facturas.length)
             setTimeout(() => {
-              this.configureNewModal({
+              this.openNewModal({
                 component: ModalSeleccinarArticuloComponent,
                 inputs: factura.detalle_facturas,
                 id: 'seleccionar_articulos_adelantados',
@@ -757,7 +757,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.configureNewModal({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
@@ -813,7 +813,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
       const obj = { modo_factura: 'conduce', condicion_fact: 'conduce', metodo: 'conduce' };
 
-      this.configureNewModal({
+      this.openNewModal({
         component: ConfirmacionImprimirComponent,
         inputs: obj,
         id: 'confirmacionImprimir',

@@ -13,7 +13,7 @@ export class FacturaC extends CrudG<FacturasI> {
     super('cabecera_facturas');
   }
 
-  static openModalFormReporte(params: { tipo: any; inputs: any; configureNewModal; titulo?: any }) {
+  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal; titulo?: any }) {
     fun.logYellow('params: ', params);
     return new Promise<any>((resolve, reject) => {
       params.inputs['switches'] = {
@@ -28,7 +28,7 @@ export class FacturaC extends CrudG<FacturasI> {
 
       ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
 
-      params.configureNewModal(ReporteC.objReporte);
+      params.openNewModal(ReporteC.objReporte);
 
       function returnDataFromModal(arg) {
         FacturaC.requestReporte({ reporte: arg, pdf: params });
@@ -58,7 +58,7 @@ export class FacturaC extends CrudG<FacturasI> {
       };
 
       ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
-        let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, height: '76vh', fileName: _.first(response.file.split('.')), configureNewModal: params.pdf.configureNewModal };
+        let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, height: '76vh', fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal };
 
         ReporteC.visualizarReporte(objPdfView);
       });

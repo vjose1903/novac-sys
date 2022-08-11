@@ -24,6 +24,7 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { ConfirmacionImprimirComponent } from './admin/facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 
+
 defineLocale('es', esLocale);
 
 @NgModule({

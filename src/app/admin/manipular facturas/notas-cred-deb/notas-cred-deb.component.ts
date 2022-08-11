@@ -314,7 +314,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       } else {
         const obj = { modo_factura: 'nota', condicion_fact: 'nota', metodo: 'nota' };
 
-        this.configureNewModal({
+        this.openNewModal({
           component: ConfirmacionImprimirComponent,
           inputs: obj,
           id: 'confirmacionImprimir',
@@ -375,7 +375,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.configureNewModal({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',

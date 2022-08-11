@@ -308,7 +308,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.configureNewModal({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',

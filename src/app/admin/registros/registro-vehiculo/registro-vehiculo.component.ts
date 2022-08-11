@@ -273,7 +273,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   abrirModalMarcasYModelos(tipo) {
-    this.configureNewModal({
+    this.openNewModal({
       component: FormularioMarcaModeloComponent,
       inputs: { tipo },
       id: 'crud_marca_modelo',

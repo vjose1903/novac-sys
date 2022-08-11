@@ -248,7 +248,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   eliminarReg(data) {
-    this.configureNewModal({
+    this.openNewModal({
       id: 'delete_role',
       header: 'CONFIRMACION',
       width: '30rem',

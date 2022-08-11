@@ -165,7 +165,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.configureNewModal({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
@@ -203,7 +203,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
           this.loadServ.isLoading.next(false);
 
-          this.configureNewModal({
+          this.openNewModal({
             component: PdfViewerComponent,
             inputs: obj_pdf,
             id: 'revision_recibo',
@@ -234,7 +234,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   verDetalles(data) {
     const configModal = this.reciboClass.modalVerDetalles(data);
-    this.configureNewModal(configModal);
+    this.openNewModal(configModal);
   }
 
   imprimir_base64() {

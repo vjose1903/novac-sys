@@ -9,12 +9,26 @@ export class ClienteC extends CrudG<any> {
     super('clientes');
   }
 
-  static openModalFormReporte(params: { tipo: any; inputs: any; configureNewModal }) {
+  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
-      const objModal = params.tipo == 'cuentas_cobrar_cliente' ? ClienteC.reporteCxC(params) : ClienteC.reporteCxCAntSaldo(params);
+      let objModal;
+      switch (params.tipo) {
+        case 'cuentas_cobrar_cliente':
+          objModal = ClienteC.reporteCxC(params);
+          break;
+        case 'cuentas_cobrar_ant_saldo':
+        case 'cuentas_con_pagos':
+          ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
+          objModal = ReporteC.objReporte;
+
+          break;
+
+        default:
+          break;
+      }
       objModal['returnDataFromModal'] = returnDataFromModal;
 
-      params.configureNewModal(objModal);
+      params.openNewModal(objModal);
 
       function returnDataFromModal(arg) {
         ClienteC.requestReporte(arg, params);
@@ -25,14 +39,31 @@ export class ClienteC extends CrudG<any> {
 
   static requestReporte(reporteParams, pdfParams) {
     let objTipo = { cuentas_cobrar_cliente: 1, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
+    let tipo;
+    let requestParameters;
 
-    const requestParams = { afterPath: 'custom/cuentas_cobrar', parameters: { tipo: objTipo[reporteParams.modal_id] } };
+    switch (pdfParams.tipo) {
+      case 'cuentas_cobrar_cliente':
+      case 'cuentas_cobrar_ant_saldo':
+        requestParameters = { tipo: objTipo[reporteParams.modal_id] };
+        tipo = requestParameters['tipo'];
+        if (tipo == 1) requestParameters['cliente_id'] = reporteParams.data.id;
+        pdfParams.tipo = 'cuentas_cobrar';
+        break;
 
-    let tipo = requestParams.parameters.tipo;
-    if (tipo == 1) requestParams.parameters['cliente_id'] = reporteParams.data.id;
+      case 'cuentas_con_pagos':
+        requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), cliente_id: reporteParams.data.cliente_id };
+
+        break;
+
+      default:
+        break;
+    }
+
+    const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
-      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, width: tipo == 1 ? '57rem' : '64rem', height: tipo == 1 ? '76vh' : '47rem', fileName: _.first(response.file.split('.')), configureNewModal: pdfParams.configureNewModal };
+      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, width: tipo == 1 ? '57rem' : '64rem', height: tipo == 1 ? '76vh' : '47rem', fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
 
       ReporteC.visualizarReporte(objPdfView);
     });
@@ -54,10 +85,5 @@ export class ClienteC extends CrudG<any> {
       botones: { ...ModalClass.noShowAceptarCancelarButtons, cancelar: { show: true, disable: false } },
     };
     return objModal;
-  }
-
-  static reporteCxCAntSaldo(params) {
-    ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
-    return ReporteC.objReporte;
   }
 }

@@ -334,7 +334,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       },
     };
 
-    this.configureNewModal({
+    this.openNewModal({
       id: 'produccion_modal',
       header: 'Confirmar',
       width: '510px',

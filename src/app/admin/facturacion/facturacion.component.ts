@@ -908,7 +908,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (fun.hasValue(input_activo)) this.desEnfocarInput(input_activo);
     const metodo = this.metodo == 'pre_venta' ? 'venta' : this.metodo;
 
-    this.configureNewModal({
+    this.openNewModal({
       component: BuscarClienteSuplidorComponent,
       inputs: { metodo: metodo, palabra_a_buscar: ' ' },
       id: 'buscarCliente',
@@ -958,7 +958,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco mr-2', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
     }
 
-    this.configureNewModal(config);
+    this.openNewModal(config);
   }
 
   closeModal(modalInstance) {
@@ -984,7 +984,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           if (this.condicion_fact == 'Crédito' || this.is_viaje || this.modo_factura == 'pre_venta') {
             const obj = { modo_factura: this.modo_factura, condicion_fact: this.condicion_fact, metodo: this.metodo };
 
-            this.configureNewModal({
+            this.openNewModal({
               component: ConfirmacionImprimirComponent,
               inputs: obj,
               id: 'confirmacionImprimir',
@@ -1020,7 +1020,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               cambios_articulos: articulos_a_cambiar,
             };
 
-            this.configureNewModal({
+            this.openNewModal({
               component: FormCantidadEfectivoComponent,
               inputs: obj,
               id: 'cambioEfectivo',
@@ -1258,7 +1258,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ingresarFecha() {
-    this.configureNewModal({
+    this.openNewModal({
       component: PendienteFormComponent,
       id: 'facturaPendiente',
       header: 'Factura pendiente',

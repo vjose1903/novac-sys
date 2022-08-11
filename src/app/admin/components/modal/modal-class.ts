@@ -37,7 +37,7 @@ export class ModalClass extends LayoutClass {
     super();
   }
 
-  configureNewModal(params: ConfigureModalI) {
+  openNewModal(params: ConfigureModalI) {
     const modal_configuration = {};
     modal_configuration['show'] = true;
 

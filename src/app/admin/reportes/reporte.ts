@@ -59,12 +59,12 @@ export class ReporteC extends CrudG<any> {
     });
   }
 
-  static visualizarReporte(objPdfView: { configureNewModal: Function; status: string; file: any; base64: any; reimprimir: any; msg: any; titulo: string; height: string; width: string }) {
+  static visualizarReporte(objPdfView: { openNewModal: Function; status: string; file: any; base64: any; reimprimir: any; msg: any; titulo: string; height: string; width: string }) {
     if (objPdfView.status == 'no') fun.toastError(objPdfView.msg, 'ERROR');
     else {
       fun.logYellow('objPdfView ', fun.duplicarJson(objPdfView));
 
-      objPdfView.configureNewModal({
+      objPdfView.openNewModal({
         component: PdfViewerComponent,
         inputs: objPdfView,
         id: 'revision_recibo',

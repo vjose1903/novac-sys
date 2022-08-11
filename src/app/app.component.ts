@@ -145,7 +145,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   cerrar_app() {
-    this.configureNewModal({
+    this.openNewModal({
       html: `<p> ESTAS A PUNTO DE CERRAR EL PROGRAMA NOVAC, ¿Desea continuar? </p>`,
       id: 'cerrar_app',
       header: 'CONFIRMACION DE CIERRE',

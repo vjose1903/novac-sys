@@ -398,7 +398,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
             const metodo = this.metodo == 'pre_venta' ? 'venta' : this.metodo;
             const obj = { palabra_a_buscar: cod, index, metodo: metodo, data: [], fecha_articulo: this.fechaFactura };
-            this.configureNewModal({
+            this.openNewModal({
               component: BuscarArticuloComponent,
               inputs: obj,
               id: 'buscarArticulo',
@@ -641,7 +641,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     let obj = { index, key, cantidad, is_prefactura_selected: fun.hasValue(this.pre_factura_selected) };
     obj['nombre'] = unidad ? `${name} (${unidad})` : name;
 
-    this.configureNewModal({
+    this.openNewModal({
       component: RemoverArticuloComponent,
       inputs: obj,
       id: 'removerArticulo',
@@ -774,7 +774,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.configureNewModal({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',

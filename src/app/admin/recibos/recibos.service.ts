@@ -27,7 +27,7 @@ export class RecibosService extends MixinClass {
       }
 
       const obj = { abonos: pagos, notas: notas };
-      this.configureNewModal({
+      this.openNewModal({
         component: ModalHistorialPagosComponent,
         inputs: obj,
         id: 'historial_pago',

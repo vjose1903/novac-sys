@@ -110,7 +110,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     if (fun.hasValue(this.form)) this.form.reset();
     this.enfocarInput('Iusuario');
 
-    this.configureNewModal({
+    this.openNewModal({
       inputs: {},
       component: ModalPasswordConfigComponent,
       id: 'passwordConfigForm',

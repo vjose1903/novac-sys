@@ -318,7 +318,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta', formaPago: 'Efectivo' };
 
-      this.configureNewModal({
+      this.openNewModal({
         component: FormCantidadEfectivoComponent,
         inputs: obj,
         id: 'cambioEfectivo_IngresosComponent',
@@ -343,7 +343,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.configureNewModal({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
@@ -424,7 +424,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
             const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
             obj_modal.botones.dinamico.push(ver_datelles_btn);
-            this.configureNewModal(obj_modal);
+            this.openNewModal(obj_modal);
           });
         });
       }
@@ -434,7 +434,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   verDetalles(data) {
     const configModal = this.reciboClass.modalVerDetalles(data);
 
-    this.configureNewModal(configModal);
+    this.openNewModal(configModal);
   }
 
   tableInputChange(params) {
@@ -486,7 +486,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         metodo: 'venta',
       };
 
-      this.configureNewModal({
+      this.openNewModal({
         component: BuscarClienteSuplidorComponent,
         inputs: obj,
         id: 'buscarCliente',

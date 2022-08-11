@@ -216,7 +216,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
             const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
             obj_modal.botones.dinamico.push(ver_datelles_btn);
-            this.configureNewModal(obj_modal);
+            this.openNewModal(obj_modal);
           });
         });
       }
@@ -225,7 +225,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   verDetalles(data) {
     const configModal = this.reciboClass.modalVerDetalles(data);
-    this.configureNewModal(configModal);
+    this.openNewModal(configModal);
   }
 
   abrir_historial() {
@@ -284,7 +284,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       if (tipo === 'cambio') {
         const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo_modal: 'no_devuelta', factura_de: 'recibo_ingreso', formaPago: 'Efectivo' };
 
-        this.configureNewModal({
+        this.openNewModal({
           component: FormCantidadEfectivoComponent,
           inputs: obj,
           id: 'cambioEfectivo_ReciboViajes',
@@ -329,7 +329,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.configureNewModal({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',

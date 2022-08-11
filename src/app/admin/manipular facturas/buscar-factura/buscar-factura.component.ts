@@ -494,7 +494,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   async abrirModalFiltro(nombre) {
     const obj = { data: this.listaClientes, palabra_a_buscar: nombre, metodo: 'venta' };
 
-    this.configureNewModal({
+    this.openNewModal({
       component: BuscarClienteSuplidorComponent,
       inputs: obj,
       id: 'buscarCliente',
@@ -588,7 +588,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
           if (this.buscarPara == 'solo_ver') obj_modal.botones.dinamico.push(editButton);
         }
-        this.configureNewModal(obj_modal);
+        this.openNewModal(obj_modal);
       }
     });
   }
@@ -598,7 +598,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (tipo == 'nota') configModal = this.notasClass.modalVerDetalles(data);
     if (tipo == 'facturacion') configModal = this.facturaClass.modalVerDetalles(data);
 
-    this.configureNewModal(configModal);
+    this.openNewModal(configModal);
   }
 
   getDataFromModal(arg, search) {

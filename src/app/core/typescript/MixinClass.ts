@@ -115,7 +115,7 @@ export class MixinClass extends ModalClass {
     const noFunction = (instance: any) => {
       instance.closeModal('borrar', 'cancelar');
     };
-    this.configureNewModal({
+    this.openNewModal({
       id: 'borrar',
       header: 'Confirmar',
       width: '510px',

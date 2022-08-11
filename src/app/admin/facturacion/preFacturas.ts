@@ -67,7 +67,7 @@ export class PreFacturaClass extends MixinClass {
             },
           };
 
-          this.configureNewModal(obj_modal);
+          this.openNewModal(obj_modal);
         }
       });
     });
