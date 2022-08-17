@@ -55,7 +55,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
 
   openReporteForm(params: { tipo: string; titulo: string }) {
     const obj = { tipo: 'reportes', titulo: params.titulo, tipo_reporte: params.tipo };
-
     this.instancesClases[params.tipo.toString()].openModalReporteForm({ tipo: params.tipo, inputs: obj, openNewModal: this.openNewModal.bind(this) });
   }
 }

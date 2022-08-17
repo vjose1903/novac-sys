@@ -5,14 +5,11 @@ import { MixinClass } from '../../core/typescript/MixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
 import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
 import { ReporteC } from '../reportes/reporte';
-import { PdfService } from '../../core/services/pdf/pdf.service';
 import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
-import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../core/services/functions.service';
 import { SingletonService } from '../../core/services/singleton.service';
 import { table_config } from '../components/new_tablas/tabla-class';
 import { Permisos } from '../../core/typescript/permisos';
-import { ModalClass } from '../components/modal/modal-class';
 import { InventarioC } from './inventario';
 
 @Component({
