@@ -116,9 +116,9 @@ export class NewModalComponent implements OnInit {
     // const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
   }
 
-  // onHideModal(id_) {
-  //   MODALCONFIG.next({ show: false, id: id_ });
-  // }
+  onHideModal(id_) {
+    MODALCONFIG.next({ show: false, id: id_ });
+  }
 
   cancelarAndAceptar(bool, id_, accion?) {
     if (!bool) {

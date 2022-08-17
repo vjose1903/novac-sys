@@ -642,6 +642,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ENTER(arg) {
     const element = document.getElementById(arg) as any;
-    setTimeout(() => element.click(), 10);
+    if (element) setTimeout(() => element.click(), 10);
   }
 }
