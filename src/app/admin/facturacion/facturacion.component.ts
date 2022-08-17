@@ -311,11 +311,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           const tipo = _.find(this.lista_tipos_facturas, (fact) => fact.id == factura['tipo_factura_id']);
           factura['tipo_factura'] = tipo ? tipo['descripcion'] : '';
         }
-        console.log('this.pre_factura_selected ', this.pre_factura_selected);
-        console.log('factura ', factura);
 
         this.metodo = this.pre_factura_selected ? 'venta' : factura.tipo;
-        console.log('this.metodo ', this.metodo);
         this.FacturaAtrasada = fact ? fact?.FacturaAtrasada : false;
 
         const fecha_facturacion = fact?.fecha_equivalente ? fact?.fecha_equivalente : fun.duplicarJson(this.fechaFactura['back']);
@@ -1331,11 +1328,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   formarData() {
     const tipoFact = _.find(this.lista_tipos_facturas, { referencia: this.tipoFactura });
-    console.log('this.lista_tipos_facturas ', this.lista_tipos_facturas);
 
     const tipoPreFactura = _.find(this.lista_tipos_facturas, { descripcion: 'pre_venta' });
-    console.log('tipoPreFactura ', tipoPreFactura);
-    console.log('this.modo_factura ', this.modo_factura);
 
     let cuerpo_fact = [...fun.duplicarJson(this.CuerpoFactura), ...this.productosDevueltos];
 

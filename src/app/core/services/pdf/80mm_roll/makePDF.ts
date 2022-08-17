@@ -23,8 +23,6 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
-  console.log('tipo_pdf: ', tipo_pdf);
-
   const is_compra = data?.tipo == 'compra' ? true : false;
 
   const is_suplidor = is_compra;
@@ -52,8 +50,6 @@ export function makePDF(data, file_name, tipo_pdf?) {
 // ==========================================================================================================================================================
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
-  console.log();
-
   const configuration = configuraciones[tipo_pdf];
 
   data.tipo_tabla = 'normal';

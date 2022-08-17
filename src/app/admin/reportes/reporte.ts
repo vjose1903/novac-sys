@@ -44,7 +44,6 @@ export class ReporteC extends CrudG<any> {
       new ReporteC().getAll(requestParams).then((responseRequest) => {
         //
         if (fun.hasValue(transformRequestResponse)) responseRequest = transformRequestResponse(responseRequest);
-        console.log('::::::::::: responseRequest: ', responseRequest);
 
         //
 

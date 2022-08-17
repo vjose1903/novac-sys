@@ -39,10 +39,7 @@ const configuraciones = {
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
-  fun.logGreen('data ', data);
-  fun.logYellow('data.tipo_reporte ', data.tipo_reporte);
   const configuration = configuraciones[data.tipo_reporte];
-  fun.logRed('configuration ', configuration);
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
