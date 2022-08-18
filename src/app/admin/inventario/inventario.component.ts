@@ -64,7 +64,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this._init_mixin({ component: 'inventario', is_routing: true });
     this.necesarioParaEmpezar();
 
-    this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res));
+    this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res.data));
   }
 
   iniciarCambioMenu(arg, callback) {

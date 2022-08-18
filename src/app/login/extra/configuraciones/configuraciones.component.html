@@ -178,7 +178,7 @@
 
                 <div class="col-4 mb-3">
                   <div>
-                    <label class="control-label">Medida articulo: </label>
+                    <label class="control-label">Medida producto terminado: </label>
 
                     <p-dropdown [options]="medidas_articulos" formControlName="medida_producto_terminado" placeholder="Seleccione una medida" optionLabel="value" optionValue="value"> </p-dropdown>
                   </div>
@@ -320,6 +320,13 @@
                           <div class="switchDiv" [appMsgError]="'is_db_local'" [form]="form">
                             <input formControlName="is_db_local" class="apple-switch" type="checkbox" />
                             <span class="ml-2 mb-0">Usa base de datos local</span>
+                          </div>
+                        </div>
+
+                        <div class="col-12 mb-2">
+                          <div class="switchDiv" [appMsgError]="'is_produccion'" [form]="form">
+                            <input formControlName="is_produccion" class="apple-switch" type="checkbox" />
+                            <span class="ml-2 mb-0">Tienen Modulo Producción</span>
                           </div>
                         </div>
                       </div>

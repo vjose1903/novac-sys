@@ -12,6 +12,7 @@ export interface ConfigI {
   url_servidor_descargas:      string;
   config_password:             string;
   usa_url_principal:           boolean;
+  is_produccion:               boolean;
   printer_caja_selected:       Printer;
   printer_reportes_selected:   Printer;
   pages_sizes:                 PagesSizes;
