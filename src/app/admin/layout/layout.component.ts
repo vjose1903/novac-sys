@@ -13,7 +13,6 @@ import { RequestC } from '../../core/typescript/requests';
 import { SingletonService } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { fun } from '../../core/services/functions.service';
-import { NgxPermissionsService } from 'ngx-permissions';
 
 @Component({
   selector: 'app-layout',
@@ -99,7 +98,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       if (res) this.setUser(res);
     });
 
-    this.configServ.getConfig().then((config: ConfigI) => (this.versionApp = config.app_version));
+    this.configServ.getConfig().then((config: ConfigI) => {
+      fun.logYellow('config ', config);
+      this.versionApp = config.app_version;
+    });
   }
 
   ngAfterViewInit() {

@@ -41,7 +41,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   alertaMedida: any;
 
   articulo_no_paquete = false;
-  TIPOARTICULO: any;
+  tipoArticuloSelected: any;
 
   isCreando: boolean = false;
 
@@ -145,7 +145,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   getTipoArticulos() {
     this.listaTipoArticulos = [];
     this.tipoArticuloClass.getAll().then((res) => {
-      this.listaTipoArticulos = fun.duplicarJson(res);
+      this.listaTipoArticulos = fun.duplicarJson(res.data);
     });
   }
 
@@ -194,30 +194,48 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async selectTipoArticulo(tipo) {
-    this.TIPOARTICULO = this.listaTipoArticulos.find((val) => val.id === _.parseInt(tipo)).descripcion;
-    const tipo_check = _.lowerCase(this.TIPOARTICULO);
+    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(tipo));
+    this.modificateValidators();
 
-    if (tipo_check === 'materia prima') {
+    if (this.tipoArticuloSelected.codigo === 'materia_prima') {
       this.form.controls.is_materia_prima.setValue(true);
     } else {
       this.form.controls.is_materia_prima.setValue(this.articuloSelected ? this.articuloSelected.is_materia_prima : false);
     }
 
-    if (tipo_check == 'producto terminado') {
+    if (this.tipoArticuloSelected.codigo == 'producto_terminado') {
       await this.getMateriasP().then((res) => {
         this.addItem();
         this.resetCompradoEn(this.medida_config);
         this.is_combo = true;
 
-        this.form.controls.medida.setValue(this.medida_config);
-        this.form.controls.calcular_saco.setValue(true);
         if (fun.hasValue(this.form)) this.form.controls.costo_principal.reset(null);
         if (fun.hasValue(this.form)) this.form.controls.precio_principal.reset(null);
+
+        this.form.controls.medida.setValue(this.medida_config);
+        this.form.controls.calcular_saco.setValue(true);
       });
     } else {
       this.resetArray();
       this.is_combo = false;
       this.form.controls.calcular_saco.setValue(false);
+    }
+  }
+
+  modificateValidators() {
+    const objValidators = {
+      costo_principal: { venta_normal: [Validators.required], servicio: null },
+      aviso_existencia: { venta_normal: [Validators.required], servicio: null },
+      vendido_en: { venta_normal: [Validators.required], servicio: null },
+      medida_alerta: { venta_normal: [Validators.required], servicio: null },
+      medida: { venta_normal: [Validators.required], servicio: null },
+    };
+
+    for (const key in objValidators) {
+      const element = objValidators[key];
+
+      this.form.controls[key].setValidators(element[this.tipoArticuloSelected.tipo]);
+      this.form.controls[key].updateValueAndValidity();
     }
   }
 
@@ -282,7 +300,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         const formulario = this.form.getRawValue();
         let campo = '';
 
-        if (formulario.tipo_articulo_id == tipos_articulos.Producto_terminado) {
+        if (this.tipoArticuloSelected.codigo == 'producto_terminado') {
           campo = 'send';
           //
         } else {
@@ -319,7 +337,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     if (fun.hasValue(this.form)) this.form.controls.is_detallable.setValue(false);
     if (fun.hasValue(this.form)) this.form.controls.existencia.setValue(0);
     this.boton = 'Registrar';
-    this.TIPOARTICULO = '';
+    this.tipoArticuloSelected = undefined;
     this.recalcular = false;
     if (this.is_combo) this.resetArray();
 
@@ -554,7 +572,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const formulario = this.form.getRawValue();
 
     if (this.form.valid && !this.articulo_no_paquete) {
-      if (formulario.tipo_articulo_id == 3) {
+      if (this.tipoArticuloSelected.codigo == 'producto_terminado') {
         res = _.some(formulario.rowFormula, (fila) => fun.isEmpty(fila.articulo_id) || fun.isEmpty(fila.cantidad_formula));
 
         if (res) return res;
@@ -565,22 +583,23 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       } else {
         res = false;
       }
+      if (this.tipoArticuloSelected.tipo == 'venta_normal') {
+        const contenido_padre_valid = !!formulario.cantidad_contenido_padre && !!formulario.precio_padre && !!formulario.costo_padre && !!formulario.medida_contenido_padre;
 
-      const contenido_padre_valid = !!formulario.cantidad_contenido_padre && !!formulario.precio_padre && !!formulario.costo_padre && !!formulario.medida_contenido_padre;
-
-      if (this.COMPRADOEN === 'Quintal' || this.COMPRADOEN === 'Saco') {
-        if (contenido_padre_valid) res = false;
-        else res = true;
-        if (res) return res;
-      }
-
-      if (this.COMPRADOEN === 'Caja') {
-        if (this.MEDIDACAJA === 'Unidad') {
+        if (this.COMPRADOEN == 'Quintal' || this.COMPRADOEN == 'Saco') {
           if (contenido_padre_valid) res = false;
           else res = true;
-        } else {
-          if (contenido_padre_valid && formulario.cantidad_contenido_hijo && formulario.precio_hijo && formulario.costo_hijo && formulario.medida_contenido_hijo) res = false;
-          else res = true;
+          if (res) return res;
+        }
+
+        if (this.COMPRADOEN == 'Caja') {
+          if (this.MEDIDACAJA == 'Unidad') {
+            if (contenido_padre_valid) res = false;
+            else res = true;
+          } else {
+            if (contenido_padre_valid && formulario.cantidad_contenido_hijo && formulario.precio_hijo && formulario.costo_hijo && formulario.medida_contenido_hijo) res = false;
+            else res = true;
+          }
         }
       }
     } else res = true;
@@ -614,8 +633,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async recalcularFunc() {
-    const temp = fun.duplicarJson(this.TIPOARTICULO);
-    this.TIPOARTICULO = null;
+    const temp = fun.duplicarJson(this.tipoArticuloSelected);
+    this.tipoArticuloSelected = undefined;
     this.resetArray();
 
     for (let i = 0; i < this.articuloSelected.formulas_productos_terminados.length; i++) {
@@ -626,7 +645,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     await this.calculateCostoPT();
     this.recalcular = null;
-    this.TIPOARTICULO = temp;
+    this.tipoArticuloSelected = temp;
   }
 
   fillFormula(ingredient, i, recalcular = false) {
@@ -674,6 +693,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     if (params.action == 'delete') this.eliminarReg(params.data);
   }
 
+  articuloIsComprado() {
+    const articulos_comprados = ['venta_normal'];
+
+    return fun.isEmpty(this.tipoArticuloSelected) ? true : articulos_comprados.includes(this.tipoArticuloSelected.tipo);
+  }
+
   async editarItem(articulo) {
     this.borrar();
     this.form.patchValue(articulo);
@@ -681,7 +706,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.boton = 'Editar';
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
-    this.TIPOARTICULO = articulo.descripcion;
+
+    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(articulo.tipo_articulo_id));
     this.is_combo = articulo.is_combo;
 
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
@@ -740,6 +766,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.form.controls.costo_principal.setValue(fun.numFormatTwoDecimals(articulo.costo_principal));
       this.form.controls.precio_principal.setValue(fun.numFormatTwoDecimals(articulo.precio_principal));
       this.form.controls.medida_alerta.setValue(articulo.medida_alerta);
+      this.modificateValidators();
     });
   }
 
@@ -849,7 +876,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       id: _.parseInt(formulario.id),
       tipo_articulo_id: _.parseInt(formulario.tipo_articulo_id),
       nombre: formulario.nombre,
-      costo_principal: fun.desformatear(formulario.costo_principal),
+      costo_principal: this.tipoArticuloSelected.tipo != 'servicio' ? fun.desformatear(formulario.costo_principal) : 0,
       precio_principal: fun.desformatear(formulario.precio_principal),
       aviso_existencia: formulario.aviso_existencia,
       medida_alerta: formulario.medida_alerta,

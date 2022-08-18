@@ -23,15 +23,22 @@
                       </div>
                     </div>
 
-                    <div *ngIf="TIPOARTICULO && TIPOARTICULO !== 'Materia prima'" class="col-6 p-0 d-flex align-items-center">
+                    <div *ngIf="configApp.is_produccion && (!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Materia prima')" class="col-6 p-0 d-flex align-items-center">
                       <div class="form-group switchDiv">
                         <input formControlName="is_materia_prima" class="apple-switch" type="checkbox" />
                         <span class="ml-1 mb-0">Funciona como materia prima</span>
                       </div>
                     </div>
 
-                    <div *ngIf="false" class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
-                      <!-- <div *ngIf="TIPOARTICULO === 'Materia prima' || TIPOARTICULO === 'Producto terminado'" class="{{ TIPOARTICULO !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center"> -->
+                    <div *ngIf="configApp.calcular_itbis" class="{{ !tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
+                      <div class="form-group switchDiv">
+                        <input formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
+                        <span class="ml-2 mb-0">Calcular itbis</span>
+                      </div>
+                    </div>
+
+                    <div *ngIf="false" class="{{ !tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
+                      <!-- <div *ngIf="tipoArticuloSelected?.descripcion === 'Materia prima' || tipoArticuloSelected?.descripcion === 'Producto terminado'" class="{{ tipoArticuloSelected?.descripcion !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center"> -->
                       <div class="form-group switchDiv">
                         <input formControlName="calcular_saco" class="apple-switch" type="checkbox" (change)="cambiarCalcularSaco()" />
                         <span class="ml-2 mb-0">Calcular saco</span>
@@ -57,13 +64,19 @@
                   </div>
                 </div>
                 <div class="col-6 p-0">
-                  {{ form.controls['medida'].value }}
                   <div class="form-group">
                     <label class="control-label">Tipo: <span style="color: red">*</span></label>
-                    <select (keydown.enter)="saltar(TIPOARTICULO !== 'Producto terminado' ? 'comprado' : 'vendido')" id="tipo" formControlName="tipo_articulo_id" (change)="selectTipoArticulo($event.target.value)" class="form-control" value="">
+                    <select
+                      (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
+                      id="tipo"
+                      formControlName="tipo_articulo_id"
+                      (change)="selectTipoArticulo($event.target.value)"
+                      class="form-control"
+                      value=""
+                    >
                       <option [value]="null" disabled>Tipo de articulo</option>
                       <ng-container *ngFor="let tipo of listaTipoArticulos">
-                        <option [disabled]="tipo.id == 3 ? !hasPermissionUpdateFormula : false" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+                        <option [disabled]="tipo.codigo == 'producto_terminado' ? !hasPermissionUpdateFormula : false" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
                       </ng-container>
                     </select>
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['tipo_articulo_id'].valid && (form.controls['tipo_articulo_id'].dirty || form.controls['tipo_articulo_id'].touched)">
@@ -72,7 +85,7 @@
                   </div>
                 </div>
 
-                <div *ngIf="form.controls['tipo_articulo_id'].value == 3" class="col-6 pr-0">
+                <div *ngIf="tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado'" class="col-6 pr-0">
                   <div class="form-group">
                     <label class="control-label">Vendido en: <span style="color: red">*</span></label>
                     <select formControlName="vendido_en" (keydown.enter)="saltar('cantidad_formula', -1)" id="vendido" class="form-control" value="">
@@ -82,57 +95,8 @@
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">Seleccione una opcion</div>
                   </div>
                 </div>
-              </div>
 
-              <div *ngIf="TIPOARTICULO !== 'Producto terminado'" class="row">
-                <div class="col-6 p-0">
-                  <div class="form-group">
-                    <label class="control-label">Comprado en: <span style="color: red">*</span></label>
-                    <!-- (keydown.enter)="saltar(TIPOARTICULO === 'Materia prima' ? 'vendido' : 'costo_principal')" -->
-                    <select formControlName="medida" (keydown.enter)="saltar('vendido')" id="comprado" class="form-control" (change)="resetCompradoEn($event.target.value)">
-                      <option [value]="null" disabled>Tipo</option>
-                      <option value="Quintal">Quintal</option>
-                      <option value="Libra">Libra</option>
-                      <option value="Saco">Saco</option>
-                      <option value="Caja">Caja</option>
-                      <option value="Unidad">Unidad</option>
-                      <option value="Galon">Galón</option>
-                      <option value="Funda">Funda</option>
-                    </select>
-                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)">Seleccione una opcion</div>
-                  </div>
-                </div>
-                <!--  -->
-                <div class="col-6 pr-0">
-                  <div class="form-group">
-                    <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-                    <select formControlName="vendido_en" (keydown.enter)="saltar('costo_principal')" id="vendido" class="form-control" value="">
-                      <option [value]="null" disabled>Tipo</option>
-                      <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
-                    </select>
-                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">Seleccione una opcion</div>
-                  </div>
-                </div>
-                <!--  -->
-                <div class="col-6 p-0">
-                  <div class="form-group">
-                    <label class="control-label">Costo: <span style="color: red">*</span></label>
-                    <input
-                      type="text"
-                      (keydown.enter)="saltar('precio_principal')"
-                      id="costo_principal"
-                      formControlName="costo_principal"
-                      (blur)="calculatePrice()"
-                      placeholder="Introduzca costo"
-                      class="form-control"
-                      (focus)="$event.target.select()"
-                      autocomplete="off"
-                      (blur)="revisarPrecio('costo_principal')"
-                    />
-                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)">Este Campo es obligatorio</div>
-                  </div>
-                </div>
-                <div class="col-6 pr-0">
+                <div *ngIf="tipoArticuloSelected && tipoArticuloSelected?.tipo == 'servicio'" class="col-6 pr-0">
                   <div class="form-group">
                     <label class="control-label">Precio venta: <span style="color: red">*</span></label>
                     <input
@@ -152,7 +116,77 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-6 p-0">
+              </div>
+
+              <div *ngIf="!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado'" class="row">
+                <div *ngIf="articuloIsComprado()" class="col-6 p-0">
+                  <div class="form-group">
+                    <label class="control-label">Comprado en: <span style="color: red">*</span></label>
+                    <!-- (keydown.enter)="saltar(tipoArticuloSelected?.descripcion === 'Materia prima' ? 'vendido' : 'costo_principal')" -->
+                    <select formControlName="medida" (keydown.enter)="saltar('vendido')" id="comprado" class="form-control" (change)="resetCompradoEn($event.target.value)">
+                      <option [value]="null" disabled>Tipo</option>
+                      <option value="Quintal">Quintal</option>
+                      <option value="Libra">Libra</option>
+                      <option value="Saco">Saco</option>
+                      <option value="Caja">Caja</option>
+                      <option value="Unidad">Unidad</option>
+                      <option value="Galon">Galón</option>
+                      <option value="Funda">Funda</option>
+                    </select>
+                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)">Seleccione una opcion</div>
+                  </div>
+                </div>
+                <!--  -->
+                <div *ngIf="articuloIsComprado()" class="col-6 pr-0">
+                  <div class="form-group">
+                    <label class="control-label">Vendido en: <span style="color: red">*</span></label>
+                    <select formControlName="vendido_en" (keydown.enter)="saltar('costo_principal')" id="vendido" class="form-control" value="">
+                      <option [value]="null" disabled>Tipo</option>
+                      <option *ngFor="let item of vendidoEn" value="{{ item.backend }}">{{ item.front }}</option>
+                    </select>
+                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)">Seleccione una opcion</div>
+                  </div>
+                </div>
+                <!--  -->
+                <div *ngIf="articuloIsComprado()" class="col-6 p-0">
+                  <div class="form-group">
+                    <label class="control-label">Costo: <span style="color: red">*</span></label>
+                    <input
+                      type="text"
+                      (keydown.enter)="saltar('precio_principal')"
+                      id="costo_principal"
+                      formControlName="costo_principal"
+                      (blur)="calculatePrice()"
+                      placeholder="Introduzca costo"
+                      class="form-control"
+                      (focus)="$event.target.select()"
+                      autocomplete="off"
+                      (blur)="revisarPrecio('costo_principal')"
+                    />
+                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)">Este Campo es obligatorio</div>
+                  </div>
+                </div>
+                <div *ngIf="articuloIsComprado()" class="col-6 pr-0">
+                  <div class="form-group">
+                    <label class="control-label">Precio venta: <span style="color: red">*</span></label>
+                    <input
+                      type="text"
+                      (keydown.enter)="saltar('existencia')"
+                      id="precio_principal"
+                      formControlName="precio_principal"
+                      placeholder="Introduzca precio"
+                      class="form-control"
+                      (focus)="$event.target.select()"
+                      autocomplete="off"
+                      (blur)="calculatePriceLibra()"
+                      (blur)="revisarPrecio('precio_principal')"
+                    />
+                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)">
+                      Este Campo es obligatorio
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="articuloIsComprado()" class="col-6 p-0">
                   <div class="form-group">
                     <label class="control-label">Alertar existencia: <span style="color: red">*</span></label>
                     <div class="row">
@@ -184,12 +218,12 @@
                   </div>
                 </div>
               </div>
-              <hr *ngIf="form.controls['medida'].value === 'Quintal' || TIPOARTICULO === 'Producto terminado'" class="raya" />
+              <hr *ngIf="form.controls['medida'].value === 'Quintal' || tipoArticuloSelected?.descripcion === 'Producto terminado'" class="raya" />
               <!-- ======================================================================================================================= -->
               <!--  PRODUCTO TERMINADO -->
               <!-- ======================================================================================================================= -->
 
-              <div *ngIf="TIPOARTICULO == 'Producto terminado'">
+              <div *ngIf="tipoArticuloSelected && tipoArticuloSelected?.descripcion == 'Producto terminado'">
                 <ng-container *ngxPermissionsOnly="permissions.articulo.read_formula">
                   <label class="control-label">Formula (1 {{ medida_config | uppercase }}) : </label>
                   <div class="row mb-2 p-0">
@@ -270,7 +304,7 @@
                   </div>
                 </ng-container>
 
-                <hr *ngIf="TIPOARTICULO === 'Producto terminado'" class="raya mt-1" />
+                <hr *ngIf="!tipoArticuloSelected || tipoArticuloSelected?.descripcion === 'Producto terminado'" class="raya mt-1" />
 
                 <div class="row">
                   <div class="col-4 pl-0">
@@ -366,7 +400,7 @@
               <!--  PRECIO POR LIBRA -->
               <!-- ======================================================================================================================= -->
 
-              <div class="row" *ngIf="form.controls['medida'].value === 'Quintal' && TIPOARTICULO !== 'Producto terminado'">
+              <div class="row" *ngIf="form.controls['medida'].value === 'Quintal' && (!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado')">
                 <div class="col-3 p-0">
                   <label class="control-label">Precio por libra </label>
 
@@ -502,7 +536,7 @@
                   <a class="btn mr-2" id="btn-blanco" (click)="borrar(true)">Borrar</a>
                   <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn" value="{{ boton }}" id="btn-verde" />
 
-                  <ng-container *ngIf="TIPOARTICULO === 'Producto terminado' && recalcular === true">
+                  <ng-container *ngIf="(!tipoArticuloSelected || tipoArticuloSelected?.descripcion === 'Producto terminado') && recalcular === true">
                     <a class="btn ml-2" id="btn-blanco" (click)="recalcularFunc()">Recarcular</a>
                   </ng-container>
                 </div>

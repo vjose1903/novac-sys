@@ -6,7 +6,7 @@ import { BrowserWindow } from 'electron';
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
-  static default_config = {
+  static default_config: any = {
     color_app: 'red',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
     direccion_empresa: 'El higuerito, frente a la escuela, La Vega Rep. Dom.',
@@ -19,9 +19,11 @@ export default class HandlerConfigFile {
     url_servidor_descargas: 'http://novac-brendy.ddns.net:3001',
     url_servidor_respaldo: 'http://localhost:3001',
     usa_url_principal: false,
-    printer_caja_selected: null,
-    printer_reportes_selected: null,
+    printer_caja_selected: undefined,
+    printer_reportes_selected: undefined,
     is_db_local: true,
+    calcular_itbis: false,
+    is_produccion: true,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
     medida_producto_terminado: 'Producto',
@@ -49,8 +51,8 @@ export default class HandlerConfigFile {
 
         if (!existe_archivo_config) {
           // TODO: ver cual es el key que se necesita para utilizar una impresora por nombre
-          this.default_config.printer_caja_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : null;
-          this.default_config.printer_reportes_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : null;
+          this.default_config.printer_caja_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : undefined;
+          this.default_config.printer_reportes_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : undefined;
 
           Functions.setConfigFile(JSON.stringify(this.default_config))
             .then(() => {

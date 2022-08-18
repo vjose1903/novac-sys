@@ -6,36 +6,38 @@ import { BrowserWindow } from 'electron';
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
-  static default_config = {
-    color_app: 'red',
+  static default_config: any = {
+    color_app: 'green',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
-    direccion_empresa: 'El higuerito, frente a la escuela, La Vega Rep. Dom.',
+    direccion_empresa: 'C. Juana Saltitopa No. 37, Villa Real, La Vega. R.D.',
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Panaderia & Reposteria Brendy',
-    rnc_empresa: '132-35083-9',
-    telefono_empresa: '(829)-423-1678',
-    url_servidor: 'http://novac-brendy.ddns.net:3001',
-    url_servidor_descargas: 'http://novac-brendy.ddns.net:3001',
-    url_servidor_respaldo: 'http://localhost:3001',
-    usa_url_principal: false,
-    printer_caja_selected: null,
-    printer_reportes_selected: null,
+    nombre_empresa: 'D` Vásquez Services y Asociados, S.R.L',
+    rnc_empresa: '130-74935-4',
+    telefono_empresa: '(809) 573-3934',
+    url_servidor: 'http://novac-vasquez.ddns.net:9090',
+    url_servidor_descargas: 'http://novac-vasquez.ddns.net:9090',
+    url_servidor_respaldo: 'http://10.0.0.9:9090',
+    usa_url_principal: true,
+    printer_caja_selected: undefined,
+    printer_reportes_selected: undefined,
     is_db_local: true,
+    calcular_itbis: true,
+    is_produccion: true,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
     medida_producto_terminado: 'Producto',
 
     pages_sizes: {
-      recibo_ingreso: '80mm_roll',
-      nota: '80mm_roll',
-      conduce: '80mm_roll',
-      facturacion: '80mm_roll',
-      cuadre_caja: '80mm_roll',
+      recibo_ingreso: '8.5x5.5',
+      nota: '8.5x5.5',
+      conduce: '8.5x5.5',
+      facturacion: '8.5x5.5',
+      cuadre_caja: '8.5x5.5',
       reporte: '8.5x11',
     },
 
-    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce',
+    documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota',
   };
 
   static checkConfigFile(win: BrowserWindow): Promise<any> {
@@ -49,8 +51,8 @@ export default class HandlerConfigFile {
 
         if (!existe_archivo_config) {
           // TODO: ver cual es el key que se necesita para utilizar una impresora por nombre
-          this.default_config.printer_caja_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : null;
-          this.default_config.printer_reportes_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : null;
+          this.default_config.printer_caja_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : undefined;
+          this.default_config.printer_reportes_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : undefined;
 
           Functions.setConfigFile(JSON.stringify(this.default_config))
             .then(() => {
@@ -61,7 +63,7 @@ export default class HandlerConfigFile {
 
               setTimeout(() => resolve(true), 500);
             })
-            .catch((err) => reject(false));
+            .catch((err) => reject(true));
         } else {
           setTimeout(() => resolve(true), 500);
         }
