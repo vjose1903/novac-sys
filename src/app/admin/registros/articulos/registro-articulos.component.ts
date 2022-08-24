@@ -225,10 +225,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   modificateValidators() {
     const objValidators = {
       costo_principal: { venta_normal: [Validators.required], servicio: null },
-      aviso_existencia: { venta_normal: [Validators.required] },
-      vendido_en: { venta_normal: [Validators.required] },
-      medida_alerta: { venta_normal: [Validators.required] },
-      medida: { venta_normal: [Validators.required] },
+      aviso_existencia: { venta_normal: [Validators.required], servicio: null },
+      vendido_en: { venta_normal: [Validators.required], servicio: null },
+      medida_alerta: { venta_normal: [Validators.required], servicio: null },
+      medida: { venta_normal: [Validators.required], servicio: null },
     };
 
     for (const key in objValidators) {
@@ -300,7 +300,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         const formulario = this.form.getRawValue();
         let campo = '';
 
-        if (formulario.tipo_articulo_id == tipos_articulos.Producto_terminado) {
+        if (this.tipoArticuloSelected.codigo == 'producto_terminado') {
           campo = 'send';
           //
         } else {
@@ -572,7 +572,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const formulario = this.form.getRawValue();
 
     if (this.form.valid && !this.articulo_no_paquete) {
-      if (formulario.tipo_articulo_id == 3) {
+      if (this.tipoArticuloSelected.codigo == 'producto_terminado') {
         res = _.some(formulario.rowFormula, (fila) => fun.isEmpty(fila.articulo_id) || fun.isEmpty(fila.cantidad_formula));
 
         if (res) return res;
@@ -583,22 +583,23 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       } else {
         res = false;
       }
+      if (this.tipoArticuloSelected.tipo == 'venta_normal') {
+        const contenido_padre_valid = !!formulario.cantidad_contenido_padre && !!formulario.precio_padre && !!formulario.costo_padre && !!formulario.medida_contenido_padre;
 
-      const contenido_padre_valid = !!formulario.cantidad_contenido_padre && !!formulario.precio_padre && !!formulario.costo_padre && !!formulario.medida_contenido_padre;
-
-      if (this.COMPRADOEN === 'Quintal' || this.COMPRADOEN === 'Saco') {
-        if (contenido_padre_valid) res = false;
-        else res = true;
-        if (res) return res;
-      }
-
-      if (this.COMPRADOEN === 'Caja') {
-        if (this.MEDIDACAJA === 'Unidad') {
+        if (this.COMPRADOEN == 'Quintal' || this.COMPRADOEN == 'Saco') {
           if (contenido_padre_valid) res = false;
           else res = true;
-        } else {
-          if (contenido_padre_valid && formulario.cantidad_contenido_hijo && formulario.precio_hijo && formulario.costo_hijo && formulario.medida_contenido_hijo) res = false;
-          else res = true;
+          if (res) return res;
+        }
+
+        if (this.COMPRADOEN == 'Caja') {
+          if (this.MEDIDACAJA == 'Unidad') {
+            if (contenido_padre_valid) res = false;
+            else res = true;
+          } else {
+            if (contenido_padre_valid && formulario.cantidad_contenido_hijo && formulario.precio_hijo && formulario.costo_hijo && formulario.medida_contenido_hijo) res = false;
+            else res = true;
+          }
         }
       }
     } else res = true;
@@ -705,7 +706,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.boton = 'Editar';
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
-    this.tipoArticuloSelected = articulo.descripcion;
+
+    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(articulo.tipo_articulo_id));
     this.is_combo = articulo.is_combo;
 
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
@@ -764,6 +766,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.form.controls.costo_principal.setValue(fun.numFormatTwoDecimals(articulo.costo_principal));
       this.form.controls.precio_principal.setValue(fun.numFormatTwoDecimals(articulo.precio_principal));
       this.form.controls.medida_alerta.setValue(articulo.medida_alerta);
+      this.modificateValidators();
     });
   }
 
@@ -873,7 +876,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       id: _.parseInt(formulario.id),
       tipo_articulo_id: _.parseInt(formulario.tipo_articulo_id),
       nombre: formulario.nombre,
-      costo_principal: fun.desformatear(formulario.costo_principal),
+      costo_principal: this.tipoArticuloSelected.tipo != 'servicio' ? fun.desformatear(formulario.costo_principal) : 0,
       precio_principal: fun.desformatear(formulario.precio_principal),
       aviso_existencia: formulario.aviso_existencia,
       medida_alerta: formulario.medida_alerta,

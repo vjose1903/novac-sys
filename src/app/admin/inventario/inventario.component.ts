@@ -137,18 +137,25 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   movimientoInventario(arg) {
-    this.openNewModal({
-      component: MovimientosFormComponent,
-      inputs: arg.data,
-      id: 'inventario',
-      header: 'Movimientos de inventario',
-      width: '450px',
+    const tipoArticuloSelected = this.tipo_articulos.find((val) => val.id == _.parseInt(arg.data.tipo_articulo_id));
+    console.log('arg ', arg);
+    console.log('tipoArticuloSelected ', tipoArticuloSelected);
+    if (tipoArticuloSelected.tipo != 'servicio') {
+      this.openNewModal({
+        component: MovimientosFormComponent,
+        inputs: arg.data,
+        id: 'inventario',
+        header: 'Movimientos de inventario',
+        width: '450px',
 
-      botones: {
-        aceptar: { show: true, disable: false },
-        cancelar: { show: true, disable: false },
-      },
-    });
+        botones: {
+          aceptar: { show: true, disable: false },
+          cancelar: { show: true, disable: false },
+        },
+      });
+    } else {
+      fun.toastWarning('El articulo seleccionado no requiere movimientos de inventario', 'AVISO');
+    }
   }
 
   async getDataFromModal(arg, search) {

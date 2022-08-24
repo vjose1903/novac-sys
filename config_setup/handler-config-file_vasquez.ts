@@ -6,7 +6,7 @@ import { BrowserWindow } from 'electron';
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
-  static default_config = {
+  static default_config: any = {
     color_app: 'green',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
     direccion_empresa: 'C. Juana Saltitopa No. 37, Villa Real, La Vega. R.D.',
@@ -22,6 +22,8 @@ export default class HandlerConfigFile {
     printer_caja_selected: undefined,
     printer_reportes_selected: undefined,
     is_db_local: false,
+    calcular_itbis: true,
+    is_produccion: false,
     facturacion_editar_precio: false,
     vende_sin_inventario: false,
     medida_producto_terminado: 'Producto',
@@ -49,8 +51,8 @@ export default class HandlerConfigFile {
 
         if (!existe_archivo_config) {
           // TODO: ver cual es el key que se necesita para utilizar una impresora por nombre
-          this.default_config.printer_caja_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : null;
-          this.default_config.printer_reportes_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : null;
+          this.default_config.printer_caja_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : undefined;
+          this.default_config.printer_reportes_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : undefined;
 
           Functions.setConfigFile(JSON.stringify(this.default_config))
             .then(() => {

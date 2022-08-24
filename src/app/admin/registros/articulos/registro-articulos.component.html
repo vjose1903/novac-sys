@@ -30,6 +30,13 @@
                       </div>
                     </div>
 
+                    <div *ngIf="configApp.calcular_itbis" class="{{ !tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
+                      <div class="form-group switchDiv">
+                        <input formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
+                        <span class="ml-2 mb-0">Calcular itbis</span>
+                      </div>
+                    </div>
+
                     <div *ngIf="false" class="{{ !tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
                       <!-- <div *ngIf="tipoArticuloSelected?.descripcion === 'Materia prima' || tipoArticuloSelected?.descripcion === 'Producto terminado'" class="{{ tipoArticuloSelected?.descripcion !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center"> -->
                       <div class="form-group switchDiv">
@@ -57,7 +64,6 @@
                   </div>
                 </div>
                 <div class="col-6 p-0">
-                  {{ form.controls['medida'].value }}
                   <div class="form-group">
                     <label class="control-label">Tipo: <span style="color: red">*</span></label>
                     <select
