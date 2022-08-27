@@ -570,7 +570,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   getCalculosDinero(arg) {
     if (arg.tipo == 'descuento') this.DESCUENTO = parseFloat(arg.monto);
-    else if (arg.tipo == 'bruto') this.TOTAL = parseFloat(arg.monto.total);
+    else if (arg.tipo == 'bruto') {
+      this.TOTAL = parseFloat(arg.monto.total);
+      this.ITBIS = parseFloat(arg.monto.itbis);
+      fun.logYellow('arg ', arg);
+    }
     this.calcularBruto();
   }
 

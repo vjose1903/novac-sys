@@ -1,3 +1,25 @@
+.cuerpo-fact {
+  display: grid;
+  height: 100%;
+  grid-template-areas:
+    "titulos-fact"
+    "contenido-fact";
+
+  grid-template-rows: min-content auto;
+
+  .titulos-fact {
+    grid-area: titulos-fact;
+  }
+  .contenido-fact {
+    grid-area: contenido-fact;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+  }
+}
+
 .entrada {
   border-radius: 0 !important;
   height: calc(1.5em + 0.3rem + 2px) !important;
@@ -21,27 +43,32 @@
 // ====================================================
 // TAMAÑO DE LAS FILAS
 // ====================================================
-.COD {
-  max-width: 2rem;
-}
-.CAN {
-  max-width: 1rem;
-}
-.DES {
-  max-width: 6.4rem;
-}
-.DESC {
-  max-width: 1.7rem;
-}
-.UNI {
-  max-width: 2rem;
-}
-.PRE {
-  max-width: 2rem;
-}
-.TOT {
-  max-width: 2rem;
-}
+// .COD {
+//   max-width: 2rem;
+// }
+// .CAN {
+//   max-width: 1rem;
+// }
+
+// .DES {
+// }
+
+// .DESC {
+//   max-width: 1.7rem;
+// }
+// .UNI {
+//   max-width: 2rem;
+// }
+
+// .ITBIS {
+//   max-width: 2rem;
+// }
+// .PRE {
+//   max-width: 2rem;
+// }
+// .TOT {
+//   max-width: 2rem;
+// }
 
 // ====================================================
 // TAMAÑO DE LOS TITULOS
@@ -51,22 +78,25 @@
   width: 9%;
 }
 .tiCAN {
-  width: 11%;
+  width: 8%;
 }
 .tiUNI {
   width: 10%;
   text-align: left;
 }
-.tiDES {
-  width: 37%;
-}
+
 .tiDESC {
   width: 8%;
 }
 
 .tiPRE {
-  width: 11%;
+  width: 12%;
 }
+
+.tiITBIS {
+  width: 9%;
+}
+
 .tiTOT {
   width: 13%;
 }
@@ -81,27 +111,15 @@
 
 .inDES:active,
 .inPRE:active,
-.inTOT:active,
+.inITBIS.active,
+.inTOT.active,
 .inDES:focus,
 .inPRE:focus,
-.inTOT:focus,
-.inDES.active,
-.inPRE.active,
-.inTOT.active {
+.inITBIS:focus,
+.inTOT:focus {
   outline: 0px;
   border-color: #d4d4d4 !important;
   box-shadow: 1px 1px #d4d4d4 !important;
-}
-.scrollContainer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: calc(100% - 2rem) !important;
-  overflow: auto;
-  overflow-x: hidden;
-}
-.cuadro {
-  height: 47vh;
 }
 
 .conFlow {

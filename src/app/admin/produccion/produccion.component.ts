@@ -83,7 +83,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   async getProductosTerminados() {
     const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
     this.listaProductos.length = 0;
-    this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.Producto_terminado }).then((res) => {
+    this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.producto_terminado }).then((res) => {
       res['data'].map((producto_terminado) => {
         producto_terminado.optionDisabled = false;
         this.listaProductos.push(producto_terminado);

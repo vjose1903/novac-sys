@@ -4,10 +4,14 @@ import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
 
 export enum tipos_articulos {
-  Veterinaria = 1,
-  Materia_prima = 2,
-  Producto_terminado = 3,
-  Otros = 4,
+  veterinaria = 'veterinaria',
+  materia_prima = 'materia_prima',
+  producto_terminado = 'producto_terminado',
+  otro = 'otro',
+  materiales_de_oficina = 'materiales_de_oficina',
+  servicios_legales = 'servicios_legales',
+  servicios_contables = 'servicios_contables',
+  dulces = 'dulces',
 }
 
 export class TipoArticuloC extends CrudG<any> {

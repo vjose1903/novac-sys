@@ -426,7 +426,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.cdRef.detectChanges();
   }
 
-  lookOters(objeto) {
+  cantidadesTooltip(dato, column) {
+    if (dato.tipo_articulo.tipo == 'servicio') return null;
+
+    const objeto = dato[column.key];
     const keys = _.keys(objeto);
     const values = _.values(objeto);
 
@@ -434,27 +437,24 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? medidas[keys[2]] : keys[2];
 
-    const principal = fun.numFormatTwoDecimals(values[0]) + '  ' + fin;
-
     const padre = fun.numFormatTwoDecimals(values[1]) + '  ' + fin1;
     const hijo = fun.formatearNumero(values[2]) + '  ' + fin2;
 
-    let cantiTootip = { Padre: undefined, Hijo: undefined };
+    let cantiTootip = '';
+
+    cantiTootip = `${padre}`;
 
     if (keys.length > 1) {
-      if (keys.length == 2) {
-        cantiTootip = { Padre: padre, Hijo: undefined };
-      } else {
-        cantiTootip = { Padre: padre, Hijo: hijo };
-      }
-    } else {
-      cantiTootip = { Padre: principal, Hijo: undefined };
+      keys.length == 2 ? (cantiTootip = `${padre}`) : (cantiTootip = `${padre} - ${hijo}`);
     }
 
     return cantiTootip;
   }
 
-  lookprincipal(objeto) {
+  cantidadesLabel(dato, column) {
+    if (dato.tipo_articulo.tipo == 'servicio') return 'N/A';
+
+    const objeto = dato[column.key];
     const keys = _.keys(objeto);
     const values = _.values(objeto);
     const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];

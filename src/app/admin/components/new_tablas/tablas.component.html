@@ -75,11 +75,11 @@
                     <span
                       *ngSwitchCase="'cantidades'"
                       id="{{ column.key }}-{{ getIndex(index_body) }}"
-                      pTooltip="{{ lookOters(dato[column.key]).Padre }}   {{ lookOters(dato[column.key]).Hijo == undefined ? '' : lookOters(dato[column.key]).Hijo }}"
+                      pTooltip="{{ cantidadesTooltip(dato, column) }}"
                       [tooltipPosition]="getIndex(index_body) != 0 ? 'top' : 'bottom'"
                       style="width: 100%"
                     >
-                      {{ lookprincipal(dato[column.key]) }}
+                      {{ cantidadesLabel(dato, column) }}
                     </span>
 
                     <span *ngSwitchCase="'img'" class="d-flex justify-content-center align-items-center">

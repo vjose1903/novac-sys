@@ -135,7 +135,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     return new Promise(async (resolve) => {
       const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
 
-      this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.Materia_prima }).then((res) => {
+      this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.materia_prima }).then((res) => {
         this.listaMateriasPrimas = fun.duplicarJson(res['data']);
         resolve(true);
       });
@@ -881,7 +881,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       aviso_existencia: formulario.aviso_existencia,
       medida_alerta: formulario.medida_alerta,
       fecha_ingreso: formulario.id ? formulario.fecha_ingreso : moment().format('DD/MM/YYYY'),
-      medida: formulario.medida,
+      medida: this.tipoArticuloSelected.tipo != 'servicio' ? formulario.medida : null,
       is_detallable: formulario.is_detallable,
       contenido_articulos: this.formarContenido(),
       existencia: formulario.existencia,

@@ -24,8 +24,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   drop;
 
   precioDetalle;
-  TOTAL;
-  ITBIS;
 
   secuencia;
   inputSecuencia;
@@ -83,7 +81,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         fila.cantidad = fila.can;
         fila.total = fun.desformatear(fila.tot);
         fila.descuento_valor = fila.descuento_valor ? (fun.hasValue(fila.descuento_valor) ? fila.descuento_valor : 0) : 0;
-        fila.itbis = 0;
         fila.unidad = fila.uni;
         fila.precio = fun.desformatear(fila.pre);
         fila.costo = fun.desformatear(fila.costo);
@@ -108,8 +105,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       this.UnidadesArticulo = [];
       this.productosDevueltos = [];
       this.precioDetalle = undefined;
-      this.TOTAL = 0;
-      this.ITBIS = 0;
       this.secuencia = 0;
       this.inputSecuencia = 'cod-0';
       this.inputDrop = undefined;
@@ -150,9 +145,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   retirarArticuloPreFactura(key, data) {
     const detalle_actual = _.find(this.filasDetalle, (detalle) => detalle.value.key == key);
     const cantidad_articulo_original = detalle_actual.value.can;
+    const medida = detalle_actual.value.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : detalle_actual.value.articulo.medida;
     // is_devuelto
     detalle_actual.controls.can.setValue(detalle_actual.value.can - data.cantidad);
-    detalle_actual.controls.cantidad_en_unidades.setValue(detalle_actual.value.can * detalle_actual.value.articulo.contenido[detalle_actual.value.articulo.medida]);
+    detalle_actual.controls.cantidad_en_unidades.setValue(detalle_actual.value.can * detalle_actual.value.articulo.contenido[medida]);
 
     if (data.cantidad < cantidad_articulo_original) {
       if (data.razon == razon_remover.producto_defectuoso) {
@@ -178,9 +174,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   parsearProductoDevueltos(producto, data, is_defectuoso) {
+    const medida = producto.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : producto.articulo.medida;
+
     producto.can = data.cantidad;
     producto.cantidad = data.cantidad;
-    producto.cantidad_en_unidades = data.cantidad * producto.articulo.contenido[producto.articulo.medida];
+    producto.cantidad_en_unidades = data.cantidad * producto.articulo.contenido[medida];
     producto.id = null;
     producto.key = fun.generateKey();
     producto['is_defectuoso'] = is_defectuoso;
@@ -254,8 +252,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   // =============================================
   RESETCUERPO() {
     if (fun.hasValue(this.form)) this.form.reset();
-    this.TOTAL = 0;
-    this.ITBIS = 0;
     this.secuencia = 0;
     this.inputSecuencia = 'cod-0';
     this.inputDrop = undefined;
@@ -282,6 +278,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       costo: [null],
       descuento_valor: [null],
       tot: [null],
+      itbis: [null],
       secuencia: [i],
       cantidad_en_unidades: [0],
       is_materia_prima: [false],
@@ -543,9 +540,18 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       const precio = fun.desformatear(value.pre);
       const cantidad = value['can'];
+      const articulo = value['articulo'];
 
       if (precio && cantidad) {
-        controls['tot'].setValue(fun.numFormatTwoDecimals(precio * cantidad));
+        let total = precio * cantidad;
+
+        const itbis = articulo.calcular_itbis ? total * 0.18 : 0;
+
+        total += itbis;
+
+        controls['tot'].setValue(fun.numFormatTwoDecimals(total));
+
+        controls['itbis'].setValue(fun.numFormatTwoDecimals(itbis));
 
         this.llenarArrayUnidades(index);
         this.calcularCantidadEnUnidades({ index: index });
@@ -622,13 +628,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   calculosTotalesGenerales() {
     const tempTotal = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + fun.desformatear(item.value.tot), 0);
 
-    if (tempTotal !== this.TOTAL) {
-      this.TOTAL = tempTotal;
+    const tempItbis = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + fun.desformatear(item.value.itbis), 0);
 
-      const obj = { total: fun.redondearNum(this.TOTAL), ITBIS: '' };
+    const obj = { total: fun.redondearNum(tempTotal), itbis: fun.redondearNum(tempItbis) };
 
-      this.getCalculosDinero.emit({ tipo: 'bruto', monto: obj });
-    }
+    this.getCalculosDinero.emit({ tipo: 'bruto', monto: obj });
   }
 
   modalRemover(index, event?) {
@@ -671,7 +675,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const index = obj.index;
 
-    if ((this.metodo === 'venta' || this.metodo === 'pre_venta') && articulo.existencia == 0) {
+    if ((this.metodo === 'venta' || this.metodo === 'pre_venta') && articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio') {
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
       if (_.lowerCase(articulo.descripcion) === 'producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
@@ -712,7 +716,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     (this.filasDetalle[params.index] as any).controls['uni'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
 
-    if (this.metodo === 'venta' || this.metodo === 'pre_venta') (this.filasDetalle[params.index] as any).controls['is_materia_prima'].setValue(params.articulo.descripcion == 'Materia prima');
+    if (this.metodo == 'venta' || this.metodo == 'pre_venta') (this.filasDetalle[params.index] as any).controls['is_materia_prima'].setValue(params.articulo.descripcion == 'Materia prima');
 
     setTimeout(() => this.enfocarInput('can-' + params.index), 0);
   }
@@ -721,14 +725,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const { articulo, cod } = this.filasDetalle[index].getRawValue();
 
     if (cod && articulo) {
-      const precioPrincipal = this.metodo === 'venta' || this.metodo === 'pre_venta' ? articulo.precio_principal : articulo.costo_principal;
+      const medida = articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo.medida;
+      const precioPrincipal = this.metodo == 'venta' || this.metodo == 'pre_venta' ? articulo.precio_principal : articulo.costo_principal;
       const costoPrincipal = articulo.costo_principal;
       this.UnidadesArticulo = [];
 
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: articulo.contenido[articulo.medida] });
 
-      if (articulo.medida != 'Quintal' || this.metodo == 'compra') {
-        this.UnidadesArticulo.push({ value: articulo.medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[articulo.medida] });
+      if (medida != 'Quintal' || this.metodo == 'compra') {
+        this.UnidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
       if (articulo.vendido_en == 'Saco' && articulo.calcular_saco && this.metodo != 'compra') this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
