@@ -308,7 +308,7 @@
   <div class="pieFactura">
     <div class="row mx-0 w-100">
       <div class="col-7">
-        <div class="h-100 d-flex justify-content-around align-items-center ">
+        <div class="h-100 d-flex justify-content-around align-items-center">
           <div *ngxPermissionsOnly="metodo == 'venta' ? permissions.factura_venta.create : permissions.factura_compra.create">
             <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Imprimir Factura' : 'Editar Factura'" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
           </div>
@@ -342,15 +342,15 @@
             </div>
             <div *ngIf="configApp.calcular_itbis" class="col-12 cuadroResumenTotal mb-2">
               <span class="label text-poppins position-absolute left-0 top-0">ITBIS:</span>
-              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(ITBIS) }}</h5>
+              <h5 class="w-100 text-end mb-0 mt-2">{{ ITBIS }}</h5>
             </div>
             <div class="col-12 cuadroResumenTotal mb-2">
               <span class="label text-poppins position-absolute left-0 top-0">DESCUENTO:</span>
-              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(DESCUENTO) }}</h5>
+              <h5 class="w-100 text-end mb-0 mt-2">{{ DESCUENTO }}</h5>
             </div>
             <div class="col-12 cuadroResumenTotal mb-2">
               <span class="label text-poppins position-absolute left-0 top-0"> <strong>TOTAL:</strong> </span>
-              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(TOTAL) }}</h5>
+              <h5 class="w-100 text-end mb-0 mt-2">{{ TOTAL }}</h5>
             </div>
           </div>
         </div>

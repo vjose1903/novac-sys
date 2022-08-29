@@ -84,7 +84,7 @@ export class MixinClass extends ModalClass {
   }
   // =========================================================================================================
   formatoNumero(num) {
-    return fun.numFormatTwoDecimals(num) + '  ';
+    return fun.numFormatTwoDecimals(num) + ' ';
   }
   // 301,755.67
 

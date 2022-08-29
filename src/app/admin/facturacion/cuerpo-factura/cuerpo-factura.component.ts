@@ -541,12 +541,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       const precio = fun.desformatear(value.pre);
       const cantidad = value['can'];
       const articulo = value['articulo'];
+      const descuento = value['descuento_valor'];
 
       if (precio && cantidad) {
         let total = precio * cantidad;
 
         const itbis = articulo.calcular_itbis ? total * 0.18 : 0;
 
+        total -= descuento;
         total += itbis;
 
         controls['tot'].setValue(fun.numFormatTwoDecimals(total));
@@ -562,24 +564,20 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  revisarPrecio(index) {
-    let input = (this.filasDetalle[index] as any).controls['pre'];
-    fun.revisarPrecio(input, `pre-${index}`).then((res) => {
-      if (!res.error) input.setValue(res.number);
-    });
-  }
-
   calcularDescuento(index) {
     const codido = (this.filasDetalle[index] as any).controls['cod'].value;
     const precioTEMP = (this.filasDetalle[index] as any).controls['pre'].value;
+    const itbisTEMP = (this.filasDetalle[index] as any).controls['itbis'].value;
     const key = (this.filasDetalle[index] as any).controls['key'].value;
+
     const precio = fun.desformatear(precioTEMP);
+    const itbis = fun.desformatear(itbisTEMP);
     const cantidad = (this.filasDetalle[index] as any).controls['can'].value;
 
     let descuento = (this.filasDetalle[index] as any).controls['descuento_valor'].value;
 
     if (descuento >= 0) {
-      const total = precio * cantidad;
+      const total = precio * cantidad + itbis;
 
       if (fun.hasValue(codido) && (fun.isEmpty(descuento) || descuento == 0)) {
         (this.filasDetalle[index] as any).controls['descuento_valor'].reset();
@@ -633,6 +631,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const obj = { total: fun.redondearNum(tempTotal), itbis: fun.redondearNum(tempItbis) };
 
     this.getCalculosDinero.emit({ tipo: 'bruto', monto: obj });
+  }
+
+  revisarPrecio(index) {
+    let input = (this.filasDetalle[index] as any).controls['pre'];
+    fun.revisarPrecio(input, `pre-${index}`).then((res) => {
+      if (!res.error) input.setValue(res.number);
+    });
   }
 
   modalRemover(index, event?) {

@@ -569,17 +569,29 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   getCalculosDinero(arg) {
-    if (arg.tipo == 'descuento') this.DESCUENTO = parseFloat(arg.monto);
+    if (arg.tipo == 'descuento') this.DESCUENTO = fun.numFormatTwoDecimals(arg.monto);
     else if (arg.tipo == 'bruto') {
-      this.TOTAL = parseFloat(arg.monto.total);
-      this.ITBIS = parseFloat(arg.monto.itbis);
+      this.TOTAL = fun.numFormatTwoDecimals(arg.monto.total);
+      this.ITBIS = fun.numFormatTwoDecimals(arg.monto.itbis);
       fun.logYellow('arg ', arg);
     }
     this.calcularBruto();
   }
 
   calcularBruto() {
-    setTimeout(() => (this.BRUTO = this.TOTAL + this.DESCUENTO), 5);
+    setTimeout(() => {
+      console.log(' ');
+      console.log(' ');
+      fun.logBlue('this.TOTAL: ', fun.desformatear(this.TOTAL));
+      fun.logYellow('this.Descuento: ', fun.desformatear(this.DESCUENTO));
+      fun.logGreen('this.ITBIS: ', fun.desformatear(this.ITBIS));
+
+      const suma = fun.desformatear(this.TOTAL) + fun.desformatear(this.DESCUENTO) - fun.desformatear(this.ITBIS);
+      this.BRUTO = fun.numFormatTwoDecimals(suma);
+
+      fun.logOrange('this.BRUTO: ', fun.desformatear(this.BRUTO));
+      fun.logPurple('===> ', suma);
+    }, 5);
   }
 
   cambiarTipoVenta(arg) {
