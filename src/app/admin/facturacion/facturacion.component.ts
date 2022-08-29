@@ -573,24 +573,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     else if (arg.tipo == 'bruto') {
       this.TOTAL = fun.numFormatTwoDecimals(arg.monto.total);
       this.ITBIS = fun.numFormatTwoDecimals(arg.monto.itbis);
-      fun.logYellow('arg ', arg);
     }
     this.calcularBruto();
   }
 
   calcularBruto() {
     setTimeout(() => {
-      console.log(' ');
-      console.log(' ');
-      fun.logBlue('this.TOTAL: ', fun.desformatear(this.TOTAL));
-      fun.logYellow('this.Descuento: ', fun.desformatear(this.DESCUENTO));
-      fun.logGreen('this.ITBIS: ', fun.desformatear(this.ITBIS));
-
       const suma = fun.desformatear(this.TOTAL) + fun.desformatear(this.DESCUENTO) - fun.desformatear(this.ITBIS);
       this.BRUTO = fun.numFormatTwoDecimals(suma);
-
-      fun.logOrange('this.BRUTO: ', fun.desformatear(this.BRUTO));
-      fun.logPurple('===> ', suma);
     }, 5);
   }
 
@@ -1383,7 +1373,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['costoYgasto'] = this.metodo === 'venta' || this.metodo == 'pre_venta' ? null : this.CostoYgasto;
     cabecera_fact['numero_factura'] = null;
     cabecera_fact['total_factura'] = fun.parseFloatTwoDecimals(this.TOTAL);
-    cabecera_fact['Bruto'] = this.BRUTO;
+    cabecera_fact['Bruto'] = fun.parseFloatTwoDecimals(this.BRUTO);
     cabecera_fact['itbis'] = fun.parseFloatTwoDecimals(this.ITBIS);
     cabecera_fact['descuento'] = fun.parseFloatTwoDecimals(this.DESCUENTO);
     cabecera_fact['estado'] = true;

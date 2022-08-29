@@ -193,7 +193,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   async pasosQuitarArticulo(key) {
     await this.sacarDescuento(key);
     await this.removeItem(this.indexRemove);
-    await this.calculosTotalesGenerales();
+    await this.enviarTotalesGenerales();
     await this.ajustarSecuencia();
   }
 
@@ -557,7 +557,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         this.llenarArrayUnidades(index);
         this.calcularCantidadEnUnidades({ index: index });
-        this.calculosTotalesGenerales();
+        this.enviarTotalesGenerales();
       }
 
       resolve(true);
@@ -590,8 +590,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         nuevoTotal = total - descuento;
 
         (this.filasDetalle[index] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
-        this.calculosTotalesGenerales();
-        this.calculosDescuentoGeneral(descuento, key);
+        this.enviarTotalesGenerales();
+        this.enviarDescuentoGeneral(descuento, key);
         this.ajustarSecuencia();
       }
     } else {
@@ -612,7 +612,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  calculosDescuentoGeneral(descuento, key) {
+  enviarDescuentoGeneral(descuento, key) {
     let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.key === key);
 
     if (fun.hasValue(currentDescuento)) currentDescuento.desc = descuento;
@@ -623,7 +623,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     this.getCalculosDinero.emit({ tipo: 'descuento', monto: acuDesc });
   }
 
-  calculosTotalesGenerales() {
+  enviarTotalesGenerales() {
     const tempTotal = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + fun.desformatear(item.value.tot), 0);
 
     const tempItbis = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + fun.desformatear(item.value.itbis), 0);
