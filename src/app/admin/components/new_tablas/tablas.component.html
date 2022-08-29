@@ -92,7 +92,7 @@
                           <i
                             id="{{ config.id_tabla + post_id }}-{{ getIconKey(objIcon) }}-{{ getIndex(index_body) }}"
                             [pTooltip]="dato[objIcon.rowTooltip] || objIcon.tooltip || ''"
-                            tooltipPosition="top"
+                            tooltipPosition="left"
                             (click)="iconBtn(column.key, getIndex(index_body), dato, $event, objIcon)"
                             class=" iconPress {{ getIconClass(objIcon, dato) }} {{ dato.iconHover ? 'c-pointer' : '' }} {{ dato[objIcon.text_color] ? 'text-' + dato[objIcon.text_color] : 'text-black' }}"
                             (mouseenter)="mouseMoveEvent('hover', dato, objIcon.key, $event.target.id)"
@@ -168,7 +168,7 @@
                       class=" {{ dato[column.text_color] ? 'text-' + dato[column.text_color] : 'text-black' }}"
                       style="width: 100%"
                       [pTooltip]="dato[column.rowTooltip] || ''"
-                      tooltipPosition="top"
+                      tooltipPosition="left"
                     >
                       {{ getValueForm(column, dato) }}
                       {{ column.alerta ? (config?.colores ? (dato.activo ? '' : '(Inactivo)') : '') : '' }}
