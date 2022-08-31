@@ -87,8 +87,10 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
   async getConduces(params?: { per_page: number; page: number; search: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
-
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
+
+      this.lista_conduces = [];
+      if (fun.hasValue(this.tablaComponent)) this.tablaComponent.changeConfig([{ total_count: 0 }]);
 
       this.conduceClass.getAll(extra).then((res) => {
         res['data'] = this.mapeoRecibos(res['data']);
@@ -98,7 +100,12 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
         this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log('######');
+      console.log('######');
+      console.log('######');
+      console.log('######error: ', error);
+    }
   }
 
   mapeoRecibos(data) {

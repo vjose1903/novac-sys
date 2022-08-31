@@ -3,27 +3,65 @@
   grid-template-areas:
     "arriba"
     "abajo";
-  grid-template-rows: min-content;
+  grid-template-rows: min-content auto;
   .arriba {
     grid-area: arriba;
+
+    .gridSelecClient {
+      display: grid;
+      grid-template-areas:
+        "titulo"
+        "colCard";
+      grid-template-rows: min-content auto;
+
+      .titulo {
+        grid-area: titulo;
+      }
+      .colCard {
+        grid-area: colCard;
+      }
+    }
   }
   .abajo {
     grid-area: abajo;
-  }
-}
 
-.gridSelecClient {
-  display: grid;
-  grid-template-areas:
-    "titulo"
-    "colCard";
-  grid-template-rows: min-content;
+    .cardConduce {
+      display: grid;
+      grid-template-areas:
+        "cuerpo"
+        "botones";
+      grid-template-rows: auto min-content;
 
-  .titulo {
-    grid-area: titulo;
-  }
-  .colCard {
-    grid-area: colCard;
+      .cuerpo {
+        grid-area: cuerpo;
+        position: relative;
+        width: 100%;
+        .fantasma-cuerpo {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+
+          display: grid;
+          grid-template-areas:
+            "titles"
+            "body";
+          grid-template-rows: min-content auto;
+
+          .titles {
+            grid-area: titles;
+          }
+          .body {
+            grid-area: body;
+            overflow: auto;
+          }
+        }
+      }
+      .botones {
+        grid-area: botones;
+        border-top: 2px solid #c7c9ca;
+      }
+    }
   }
 }
 
@@ -97,17 +135,14 @@
   box-shadow: 1px 1px #d4d4d4 !important;
 }
 
-.scrollContainer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: calc(100% - 2rem) !important;
-  overflow: auto;
-  overflow-x: hidden;
-}
-.cuadro {
-  height: 47vh;
-}
+// .scrollContainer {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   max-height: calc(100% - 2rem) !important;
+//   overflow: auto;
+//   overflow-x: hidden;
+// }
 
 .conFlow {
   overflow: auto !important;
