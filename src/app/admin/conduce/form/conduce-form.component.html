@@ -22,6 +22,8 @@
                   value=""
                   tabindex="-1"
                 />
+                <button class="btn btn-gris" routerLink="/admin/conduce/lista">Atras</button>
+                <button [disabled]="!cliente" class="btn btn-gris ml-2" (click)="cancelarConduce()">Nueva Busqueda</button>
               </div>
             </div>
           </div>

@@ -9,7 +9,7 @@
       [headerStyle]="changeHeaderStatus(iteraFact, tabPanel, 'p-tabView-fact-' + iteraFact.id)"
       header="{{ iteraFact.numero_comprobante }}"
     >
-      <div class="cardPrincipal sinPadding cardNota">
+      <div class="cardPrincipal sinPadding cardNota mt-2">
         <div class="titulo">
           <h3 style="margin: 0.4rem">
             {{ tituloPag }}<b>{{ iteraFact.numero_comprobante }}</b>
@@ -85,7 +85,15 @@
         <!-- ======================================================================================================== -->
         <div #cardTablaNotas id="cardTabla" class="cuerpoNota mb-2">
           <div class="fantasma-cuerpo">
-            <dinamic-table [cardTabla]="cardTablaNotas" [(data)]="iteraFact.detalle_facturas" [post_id]="'-' + iteraFact.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+            <dinamic-table
+              [cardTabla]="cardTablaNotas"
+              [(data)]="iteraFact.detalle_facturas"
+              [post_id]="'-' + iteraFact.id"
+              [(TablasComponent)]="tablaComponent"
+              [config]="table_config"
+              (table_events)="handle_table_events($event)"
+              style="width: 100%"
+            ></dinamic-table>
           </div>
         </div>
 

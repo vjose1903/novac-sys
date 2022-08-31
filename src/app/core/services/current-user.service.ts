@@ -23,12 +23,10 @@ export class CurrentUserService {
       const token = fun.getAuthToken();
 
       if (token) {
-
         this.requestClass
           .getAll({ afterPath: 'auth/validate_token' })
           .then((res) => this.setUser(res.data).then(() => resolve(res.data)))
           .catch((err) => reject({ razon: 'sesion_expired' }));
-
       } else {
         reject({ razon: 'no_token' });
       }
@@ -39,6 +37,7 @@ export class CurrentUserService {
     return new Promise<any>((resolve) => {
       this.nextCurrentUser(currentUser);
       const permisos = currentUser?.permisos ? currentUser.permisos.map((perm) => perm.permiso) : [];
+      console.log('permisos ', permisos);
 
       this.permissionsService.loadPermissions(permisos);
       setTimeout(() => resolve(true), 10);

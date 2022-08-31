@@ -43,7 +43,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       },
 
       { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
-      { titulo: 'Fecha Facturacion', tipo: 'text', key: 'fecha' },
+      { titulo: 'Fecha Facturacion', tipo: 'date', key: 'fecha_equivalente' },
       { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
@@ -171,8 +171,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     res.data.map((factura) => {
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
-      factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
-      factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD-MM-YYYY') : null;
+
+      factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD/MM/YYYY') : null;
       factura.select = false;
       factura.pagoT = false;
       factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
@@ -203,7 +203,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       factura.subrayar = factura.is_viaje;
 
       this.totalFacturado += factura.total_factura;
-      this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
+      this.totalPagadoPorciento = ((this.totalPagado + this.totalNotas) / this.totalFacturado) * 100;
       this.totalPagadoPorciento = parseFloat(fun.numFormatTwoDecimals(this.totalPagadoPorciento));
 
       this.facturas.push(factura);
@@ -451,23 +451,29 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
 
     if (params.key == 'monto') {
-      if (!params.value) {
-        fun.toastWarning('Debe de introducir un Monto', 'AVISO');
-        fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
-      }
-      const total = params.data.balance;
-      const monto = fun.desformatear(params.value);
+      fun.awaitTyping().then(() => {
+        if (!params.value) {
+          fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+          fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
+        }
+        console.log('params ', params);
 
-      if (monto == total) params.data.pagoT = true;
+        const total = params.data.balance;
+        const monto = fun.isEmpty(params.value) ? null : fun.desformatear(params.value);
 
-      if (monto > total) {
-        this.ExisteMontoMayor = true;
-        fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
-        fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
-      } else {
-        this.ExisteMontoMayor = false;
-        params.data.monto = monto;
-      }
+        if (monto == total) params.data.pagoT = true;
+
+        if (monto > total) {
+          this.ExisteMontoMayor = true;
+          fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+          fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
+        } else {
+          this.ExisteMontoMayor = false;
+          params.data.monto = monto;
+        }
+
+        this.sumarTotalRecibo();
+      });
     }
 
     this.sumarTotalRecibo();

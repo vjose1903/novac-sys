@@ -5,7 +5,7 @@ import { ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '../../../core/services/functions.service';
-import { medidas, table_config } from './tabla-class';
+import { medidas, table_config, table_info } from './tabla-class';
 import { teclasCode } from '../../../core/typescript/constantes';
 
 @Component({
@@ -68,7 +68,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   formatoNumero(num) {
-    let numformat = '0';
+    let numformat = '0.00';
     if (num) numformat = fun.numFormatTwoDecimals(num);
     return numformat;
   }
@@ -124,7 +124,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     clearInterval(this.tablaInterval);
   }
 
-  getValueForm(column, data) {
+  getValueForm(column: table_info, data) {
     switch (column.tipo) {
       case 'textList':
         return _.reduce(_.get(data, column.key), (acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${_.get(item, column.key_value)}`, '');
@@ -133,7 +133,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         return this.formatoNumero(_.get(data, column.key));
 
       case 'date':
-        const fecha = fun.date_formater({ date: _.get(data, column.key), dateFormat: 'DD/MM/YYYY', con_hora: true });
+        const fecha = fun.date_formater({ date: _.get(data, column.key), dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
         return fecha;
 
       default:

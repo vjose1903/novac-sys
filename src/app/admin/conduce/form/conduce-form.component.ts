@@ -1,31 +1,32 @@
+import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
-import * as moment from '../../core/javascript/moment';
-import { MixinClass } from '../../core/typescript/MixinClass';
-import { ArticuloC } from '../registros/articulos/articulo';
-import { ConduceC } from '../conduce/coduce';
-import { FacturaC } from '../facturacion/factura';
-import { PdfService } from '../../core/services/pdf/pdf.service';
-import { BuscarArticuloComponent } from '../components/formularios en modales/buscar-articulo/buscar-articulo.component';
-import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
-import { ModalSeleccinarArticuloComponent } from '../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
-import { fun } from '../../core/services/functions.service';
-import { ModalService } from '../components/modal/modal.service';
-import { Permisos } from '../../core/typescript/permisos';
-import { table_config } from '../components/new_tablas/tabla-class';
-import { ConfigI } from '../../core/typescript/config-interface';
-import { SingletonService } from '../../core/services/singleton.service';
-import { ConfirmacionImprimirComponent } from '../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
-import { teclasCode } from '../../core/typescript/constantes';
-import { ModalClass } from '../components/modal/modal-class';
+import * as moment from '../../../core/javascript/moment';
+
+import { ArticuloC } from '../../registros/articulos/articulo';
+import { ConduceC } from '../../conduce/coduce';
+import { FacturaC } from '../../facturacion/factura';
+import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
+import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { ModalSeleccinarArticuloComponent } from '../../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
+import { fun } from '../../../core/services/functions.service';
+import { ModalService } from '../../components/modal/modal.service';
+import { Permisos } from '../../../core/typescript/permisos';
+import { table_config } from '../../components/new_tablas/tabla-class';
+import { ConfigI } from '../../../core/typescript/config-interface';
+import { SingletonService } from '../../../core/services/singleton.service';
+import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
+import { teclasCode } from '../../../core/typescript/constantes';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
-  selector: 'app-conduce',
-  templateUrl: './conduce.component.html',
-  styleUrls: ['./conduce.component.scss'],
+  selector: 'app-conduce-form',
+  templateUrl: './conduce-form.component.html',
+  styleUrls: ['./conduce-form.component.scss'],
 })
-export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
+export class ConduceFormComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   secuenciaKeys = [];
 
   @HostListener('window:keydown', ['$event'])
@@ -75,7 +76,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       { titulo: '1', tipo: 'icon', key: 'some_is_selected', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'detalles_selected' }] },
       { titulo: 'Numero Fact', key: 'secuencia', tipo: 'text' },
       { titulo: 'NCF', key: 'numero_comprobante', tipo: 'text' },
-      { titulo: 'Fecha Facturacion', key: 'fecha', tipo: 'text' },
+      { titulo: 'Fecha Facturacion', key: 'fecha_equivalente', tipo: 'date' },
       { titulo: 'Total Facturado', key: 'total_factura', tipo: 'formatoNumero' },
     ],
     id_tabla: 'lista_conduces',
@@ -296,6 +297,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     const { articulo, cod } = this.filasDetalle[index].getRawValue();
 
     if (cod && articulo) {
+      const medida = articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo.medida;
       const precioPrincipal = articulo.precio_principal;
       const costoPrincipal = articulo.costo_principal;
       this.UnidadesArticulo = [];
@@ -303,7 +305,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: articulo.contenido[articulo.medida] });
 
       if (articulo.medida !== 'Quintal') {
-        this.UnidadesArticulo.push({ value: articulo.medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[articulo.medida] });
+        this.UnidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
       if (_.lowerCase(articulo.vendido_en) == 'saco' && articulo.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
@@ -546,7 +548,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           this.facturas_adelantadas = res['data'];
           this.facturas_adelantadas.map((factura) => {
             factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
-            factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
             factura.customStyles = {
               some_is_selected: [
                 { key: 'some_is_selected', isTd: true, estilos: 'width: 2rem !important;' },

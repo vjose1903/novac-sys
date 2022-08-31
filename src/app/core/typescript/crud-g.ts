@@ -23,6 +23,12 @@ export interface responseModel<T> {
 export class CrudG<T> {
   constructor(private path: string) {}
 
+  async dynamic(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
+    let url = this.makeUrl(tipo, arg);
+
+    return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
+  }
+
   async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
 

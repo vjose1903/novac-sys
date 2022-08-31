@@ -36,7 +36,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' },
         ],
       },
-      { titulo: 'Fecha Fact.', tipo: 'text', key: 'fecha', estilos: [{ width: '20%' }] },
+      { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '20%' }] },
       { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar', estilos: [{ width: '35%' }] },
       { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '15%' }] },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', estilos: [{ width: '20%' }] },
@@ -176,7 +176,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         };
 
         viaje.cliente_mostrar = viaje.cliente.nombre;
-        viaje.fecha = moment(viaje.fecha_equivalente).format('DD/MM/YYYY');
         viaje['pago_a_tiempo'] = pago_a_tiempo;
 
         this.viajes.push(viaje);

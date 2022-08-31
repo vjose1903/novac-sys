@@ -1,7 +1,6 @@
 export interface table_info {
   titulo?: string;
   titulo_sm?: string;
-  tooltip?: string;
   key?: string;
   tipo?: string;
   tag_severity?: string;
@@ -12,6 +11,7 @@ export interface table_info {
   optionValue?: any;
   estilos?: Array<any>;
   select_all?: boolean;
+  alert_msg?: string;
   checkNumber?: boolean;
   can_reset?: boolean;
   inputType?: string;
@@ -19,6 +19,7 @@ export interface table_info {
   alerta?: boolean;
   tag_color?: string;
   tag_apretada?: boolean;
+  con_hora?: boolean;
   disable?: any;
   color?: string;
   text_color?: string;

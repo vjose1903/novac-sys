@@ -72,7 +72,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
       { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
       { titulo: 'Condicion', tipo: 'text', key: 'condicion', estilos: [{ width: '6rem' }] },
-      { titulo: 'Fecha Facturación', tipo: 'text', key: 'fecha' },
+      { titulo: 'Fecha Facturación', tipo: 'date', key: 'fecha_equivalente' },
       { titulo: 'Fecha Vencimiento', tipo: 'text', key: 'fechaV' },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Balance tactura', tipo: 'formatoNumero', key: 'balance' },
@@ -109,7 +109,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   table_notas_config: table_config = {
     info: [
-      { titulo: 'Fecha', tipo: 'text', key: 'fecha' },
+      { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
       { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
       { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total' },
       { titulo: 'Acciones', tipo: 'icon', key: 'actions', iconsArray: [{ key: 'view', tooltip: 'Ver Nota', text_color: 'viewColor' }] },
@@ -268,7 +268,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       res['data'].forEach((nota) => {
         nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
-        nota.fecha = moment(nota.fecha_equivalente).format('DD/MM/YYYY');
         nota.total = Math.abs(nota.total);
         nota.selectedColor = 'gris-claro';
         nota.viewColor = 'gris-claro';
@@ -315,7 +314,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       res['data'].forEach((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
-        fact.fecha = moment(fact.fecha_equivalente).format('DD/MM/YYYY');
         fact.fechaV = moment(fact.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
         fact.pagoT = true;
         fact.is_active = fact.estado ? 'fas fa-check' : 'fas fa-times';
@@ -548,7 +546,15 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
     PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
       if (res.status === 'si') {
-        const inputs = { base64: res.base64, height: '30rem', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
+        const inputs = {
+          show_estado: true,
+          estado_documento: dataFactura.estado,
+          base64: res.base64,
+          height: '30rem',
+          reimprimir: res.reimprimir,
+          fileName: _.first(res.file.split('.')),
+        };
+
         const obj_modal = {
           component: PdfViewerComponent,
           inputs: inputs,

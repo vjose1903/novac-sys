@@ -79,7 +79,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       this.enfocarInput(campo);
     }
     if (campo === 'send') {
-      if (this.inputs.tipo_modal != 'no_devuelta' && this.efectivo < this.inputs.total_factura) {
+      if (this.inputs.tipo_modal != 'no_devuelta' && this.efectivo < fun.desformatear(this.inputs.total_factura)) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         this.enfocarInput('inputEfectivo');
       } else {
@@ -99,11 +99,16 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   calcularDevueta() {
-    const total = this.inputs.total_factura;
-    const efectivo = fun.desformatear(this.efectivo);
-    const dev = efectivo - total;
+    if (fun.isEmpty(this.efectivo)) {
+      this.devuelta = '0.00';
+    } else {
+      const total = fun.desformatear(this.inputs.total_factura);
+      const efectivo = fun.desformatear(this.efectivo);
 
-    this.devuelta = this.formatoNumero(isNaN(dev) ? '0.00' : dev);
+      const dev = efectivo - total;
+
+      this.devuelta = efectivo == 0 ? '0.00' : this.formatoNumero(isNaN(dev) ? '0.00' : dev);
+    }
   }
 
   cancelar() {
@@ -139,7 +144,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   validarForm(from?): boolean {
-    const total = this.inputs.total_factura;
+    const total = fun.desformatear(this.inputs.total_factura);
     const efectivo = fun.desformatear(this.efectivo);
 
     let isInvalid = isNaN(efectivo) ? true : this.inputs.tipo_modal != 'no_devuelta' && total > efectivo;

@@ -9,8 +9,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { DirectivesModule } from '../../core/directive/directives.module';
 import { ValidateRayaAbajo } from '../../directives/validaciones';
 import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
-import { NewTablasModule } from '../components/new_tablas/tablas.module';
-import { ConduceComponent } from '../conduce/conduce.component';
+import { TablasModule } from '../components/new_tablas/tablas.module';
+
 import { HomeAdminComponent } from '../home/homeAdmin.component';
 import { InventarioComponent } from '../inventario/inventario.component';
 import { ProduccionComponent } from '../produccion/produccion.component';
@@ -20,16 +20,14 @@ import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.mo
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BtncircularModule } from '../components/btncircular/btncircular.module';
 
 @NgModule({
-  declarations: [LayoutComponent, HomeAdminComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent, ConduceComponent, ReportesComponent],
+  declarations: [LayoutComponent, HomeAdminComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent,  ReportesComponent],
   imports: [
     CommonModule,
     LayoutRoutingModule,
     PrimengModule,
-    NewTablasModule,
-    CommonModule,
+    TablasModule,
     TabViewModule,
     NgxBootstrapModule,
     NgSelectModule,
@@ -38,7 +36,7 @@ import { BtncircularModule } from '../components/btncircular/btncircular.module'
     PdfViewerModule,
     ReactiveFormsModule,
     NgxPermissionsModule.forChild(),
-    BtncircularModule,
+
   ],
 })
 export class LayoutModule {}

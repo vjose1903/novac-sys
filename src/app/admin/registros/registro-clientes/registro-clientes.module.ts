@@ -8,10 +8,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
-import { NewTablasModule } from '../../components/new_tablas/tablas.module';
+import { TablasModule } from '../../components/new_tablas/tablas.module';
 
 @NgModule({
   declarations: [RegistroClientesComponent],
-  imports: [CommonModule, RegistroClientesRoutingModule, UploadImgModule, NewTablasModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule],
+  imports: [CommonModule, RegistroClientesRoutingModule, UploadImgModule, TablasModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule],
 })
 export class RegistroClientesModule {}

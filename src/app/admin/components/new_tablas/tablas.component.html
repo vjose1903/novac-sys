@@ -29,9 +29,10 @@
                 </span>
 
                 <span *ngSwitchDefault>
-                  <span [pTooltip]="row.tooltip || ''" tooltipPosition="top" class="titulo"> {{ row.titulo }} </span>
+                  <span class="titulo"> {{ row.titulo }} </span>
                 </span>
               </span>
+              <i *ngIf="row.alert_msg" class="fa-solid fa-circle-info alert_msg" [pTooltip]="row.alert_msg" tooltipPosition="top"></i>
             </th>
             <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }">
               <span class="titulo"> Acciones </span>
@@ -72,13 +73,7 @@
                       <span class="text-bold-700">{{ (tServ.getPaginationById(config.id_tabla + post_id).page - 1) * tServ.getPaginationById(config.id_tabla + post_id).per_page + (getIndex(index_body) + 1) }}</span>
                     </span>
 
-                    <span
-                      *ngSwitchCase="'cantidades'"
-                      id="{{ column.key }}-{{ getIndex(index_body) }}"
-                      pTooltip="{{ cantidadesTooltip(dato, column) }}"
-                      [tooltipPosition]="getIndex(index_body) != 0 ? 'top' : 'bottom'"
-                      style="width: 100%"
-                    >
+                    <span *ngSwitchCase="'cantidades'" id="{{ column.key }}-{{ getIndex(index_body) }}" pTooltip="{{ cantidadesTooltip(dato, column) }}" [tooltipPosition]="getIndex(index_body) != 0 ? 'top' : 'bottom'" style="width: 100%">
                       {{ cantidadesLabel(dato, column) }}
                     </span>
 

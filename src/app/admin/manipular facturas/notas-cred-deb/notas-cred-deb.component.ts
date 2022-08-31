@@ -1,4 +1,6 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { ConfigI } from './../../../core/typescript/config-interface';
+import { SingletonService } from './../../../core/services/singleton.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,7 +14,6 @@ import { NotaC } from './notas';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
-import { SingletonService } from '../../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../../components/modal/modal-class';
 
@@ -29,6 +30,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   facturasConDetalles: Array<FacturasI>;
   tipoNota: any;
   tituloPag = '';
+  configApp: ConfigI;
 
   tipos = { credito: 'crédito', debito: 'débito' };
 
@@ -54,7 +56,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   table_config: table_config = {
     info: [
       { titulo: ' ', tipo: 'switch', select_all: true, key: 'select', estilos: [{ width: '3.5rem' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }] },
+      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }, { 'padding-left': '0.5rem' }] },
       {
         titulo: null,
         key: 'cant_nota',
@@ -65,8 +67,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       },
       { titulo: 'Cantidad', key: 'cantidad', tipo: 'formatoNumero', estilos: [{ width: '5rem' }] },
       { titulo: 'Unidad', key: 'unidad', tipo: 'text', estilos: [{ width: '4.5rem' }] },
-      { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero' },
       { titulo: 'Descuento', key: 'descuento_valor', tipo: 'formatoNumero' },
+      { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero' },
       { titulo: 'Total Facturado', key: 'total', tipo: 'formatoNumero' },
       { titulo: 'Total nota', key: 'total_nota', tipo: 'input', disable: [{ kind: 'always' }], estilos: [{ width: '8rem' }] },
     ],
@@ -84,6 +86,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   ngOnInit() {
     this._init_mixin({ component: 'notas', is_routing: true });
+    this.configApp = SingletonService.configServ.getConfig({ isPromise: false });
+
+    if (this.configApp.calcular_itbis) this.agregarItbisEnTabla();
+
     this.idsFacturas = JSON.parse(this.activeRoute.snapshot.params['ids']);
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
 
@@ -134,6 +140,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     FilaCantNota.titulo = this.tipoNota === 'credito' ? 'Devolver' : 'Aumentar';
   }
 
+  agregarItbisEnTabla() {
+    fun.pushAt(this.table_config.info, 7, { titulo: 'Itbis', key: 'itbis', tipo: 'formatoNumero', text_color: 'colorItbis', alert_msg: 'A partir de los 30 días el ITBIS queda retenido.' });
+  }
+
   onCloseTab(eventData) {
     _.pullAt(this.facturasConDetalles, [eventData.index]);
   }
@@ -149,6 +159,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           for (let indexFact = 0; indexFact < tempFactData.length; indexFact++) {
             const factura = tempFactData[indexFact];
 
+            const dias_de_creada = Math.round(moment().diff(factura.fecha_equivalente, 'days', true));
+
             for (let indexDetalles = 0; indexDetalles < factura.detalle_facturas.length; indexDetalles++) {
               const detalle = factura.detalle_facturas[indexDetalles];
               const devueto = devueltos[factura.id]?.detalles[detalle.id] || 0;
@@ -156,14 +168,16 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
               detalle['select'] = false;
               detalle['cant'] = detalle.cantidad - devueto;
               detalle['cant_nota'] = 0;
+              detalle['colorItbis'] = dias_de_creada >= 30 ? 'red' : 'black';
+              detalle['can_return_itbis'] = dias_de_creada < 30;
 
               detalle['customStyles'] = {
                 select: { width: '3.5rem' },
-                cantidad: { width: '5rem' },
-                total_nota: { width: '7.3rem' },
+                descripcion: { 'text-align': 'left', width: '20rem', 'padding-left': '0.5rem' },
                 cant_nota: { width: '6rem' },
+                cantidad: { width: '5rem' },
                 unidad: { width: '4.5rem' },
-                descripcion: { 'text-align': 'left', width: '20rem' },
+                total_nota: { width: '7.3rem' },
               };
 
               detalle['min_'] = 0;
@@ -212,6 +226,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * peso;
       } else {
         const unidad = detalle.peso_saco ? `${detalle.unidad}_${detalle.peso_saco}` : detalle.unidad;
+
         detalle.cantidad_en_unidades_nota = detalle.cant_nota * detalle.contenidos[unidad];
       }
     }
@@ -243,8 +258,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           params.data.total_nota = '0.00';
         } else {
           const descuento = params.data.descuento_valor / params.data.cantidad;
+          let total = cant_nota * (fun.desformatear(params.data.precio) - descuento);
 
-          const total = cant_nota * (fun.desformatear(params.data.precio) - descuento);
+          if (params.data.can_return_itbis) total += params.data.itbis;
+
           params.data.total_nota = this.formatoNumero(total);
           params.data.cant_nota = cant_nota;
         }
@@ -362,7 +379,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           total: fun.desformatear(element.total_nota),
           descuento_valor: element.descuento_valor ? (element.descuento_valor !== null ? element.descuento_valor : 0) : 0,
           descuento_porciento: element.descuento_porciento ? (element.descuento_porciento !== null ? element.descuento_porciento : 0) : 0,
-          itbis: 0,
+          itbis: element.itbis,
           unidad: unidad_,
           precio: fun.desformatear(element.precio),
           calcular_saco: element.calcular_saco,
@@ -402,9 +419,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   totalIndividual(dataFact) {
     const suma = _.reduce(
       dataFact.detalle_facturas,
-      (sum, n) => {
-        const number = parseFloat(String(n.total_nota).replace(',', ''));
-        return sum + number;
+      (acumulado, item) => {
+        const number = parseFloat(String(item.total_nota).replace(',', ''));
+        return acumulado + number;
       },
       0,
     );
@@ -452,11 +469,14 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           total: this.totalIndividual(factura),
           detalles_facturas_notas: _.filter(factura.detalle_facturas, (data) => data.select == true && data.cant_nota > 0).map((detalle) => {
             let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'costo', 'precio', 'total_nota', 'descuento']);
+
             objDetalleTemp['total'] = fun.desformatear(objDetalleTemp.total_nota);
+            objDetalleTemp['itbis'] = detalle.can_return_itbis ? objDetalleTemp.itbis : 0;
             objDetalleTemp['cantidad_en_unidades'] = detalle.cantidad_en_unidades_nota;
             objDetalleTemp['cantidad'] = detalle.cant_nota;
-            delete objDetalleTemp.total_nota;
             objDetalleTemp['detalle_factura_id'] = detalle.id;
+            delete objDetalleTemp.total_nota;
+            delete objDetalleTemp.cantidad_en_unidades_nota;
             return objDetalleTemp;
           }),
         };
@@ -464,6 +484,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         dataToSend.facturas_aplicadas.push(objTemp);
       }
     }
+    console.log('dataToSend ', dataToSend);
 
     const res = await this.notasClass.createOne(dataToSend);
 
