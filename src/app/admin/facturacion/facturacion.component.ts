@@ -1123,17 +1123,19 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   // =============================================
   //  OBTENER LA DATA DEL CUERPO
-  // =============================================git
+  // =============================================
 
   getCuerpoFactura(arg) {
     if (arg.tipo == 'cuerpo') {
       this.CuerpoFactura = arg.data;
 
       if (this.metodo === 'venta' || this.metodo == 'pre_venta') {
-        this.CuerpoFactura.map((articulo) => {
-          articulo.retirado = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
-          articulo.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : articulo.cantidad_en_unidades;
-          return articulo;
+        this.CuerpoFactura.map((detalle) => {
+          detalle.itbis = this.configApp.calcular_itbis ? fun.desformatear(detalle.itbis) : 0;
+          detalle.retirado = this.modo_factura === 'adelantada' ? 0 : detalle.cantidad_en_unidades;
+          detalle.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : detalle.cantidad_en_unidades;
+
+          return detalle;
         });
       }
     }

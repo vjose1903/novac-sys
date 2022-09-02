@@ -182,6 +182,7 @@ export class fun {
       nStr += '';
       const x = nStr.split('.');
       let x1 = x[0];
+      if (fun.isEmpty(x1)) x1 = 0;
       const x2 = x.length > 1 ? '.' + x[1] : '';
       const rgx = /(\d+)(\d{3})/;
       while (rgx.test(x1)) {
@@ -241,6 +242,7 @@ export class fun {
 
   static checkCeros(num) {
     let result = num;
+    if (num.length < 2) num += '00';
 
     if (num.charAt(num.length - 1) == '0' && num.length > 2) {
       let numSliced = num.slice(0, num.length - 1);
@@ -273,6 +275,7 @@ export class fun {
   // Descripcion : Esta funcion toma un string y lo formatea a dos decimales
   // _________________________________________________________________________________________________
   static numFormatTwoDecimals(num) {
+    if (typeof num == 'string') num = this.desformatear(num);
     return fun.formatearNumero(fun.redondearNum(num));
   }
 
@@ -702,6 +705,10 @@ export class fun {
   // =====================================================================
   // TOASTS
   // =====================================================================
+
+  static toastInfo(msg?, titulo = 'INFORMACION') {
+    if (SingletonService.sharedServ.canToast) SingletonService.toastr.info(msg || '', titulo || '');
+  }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
     if (SingletonService.sharedServ.canToast) SingletonService.toastr.success(msg || '', titulo || '');

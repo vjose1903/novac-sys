@@ -80,7 +80,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         fila.articulo_id = fila?.articulo?.id;
         fila.cantidad = fila.can;
         fila.total = fun.desformatear(fila.tot);
-        fila.descuento_valor = fila.descuento_valor ? (fun.hasValue(fila.descuento_valor) ? fila.descuento_valor : 0) : 0;
+        fila.descuento_valor = fila.descuento_valor ? (fun.hasValue(fila.descuento_valor) ? fun.desformatear(fila.descuento_valor) : 0) : 0;
         fila.unidad = fila.uni;
         fila.precio = fun.desformatear(fila.pre);
         fila.costo = fun.desformatear(fila.costo);
@@ -544,12 +544,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       const descuento = value['descuento_valor'];
 
       if (precio && cantidad) {
-        let total = precio * cantidad;
+        const itbis = articulo.calcular_itbis ? precio * 0.18 : 0;
 
-        const itbis = articulo.calcular_itbis ? total * 0.18 : 0;
-
+        let total = (precio + itbis) * cantidad;
         total -= descuento;
-        total += itbis;
 
         controls['tot'].setValue(fun.numFormatTwoDecimals(total));
 
@@ -565,19 +563,19 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   calcularDescuento(index) {
+    const articulo = (this.filasDetalle[index] as any).controls['articulo'].value;
     const codido = (this.filasDetalle[index] as any).controls['cod'].value;
     const precioTEMP = (this.filasDetalle[index] as any).controls['pre'].value;
-    const itbisTEMP = (this.filasDetalle[index] as any).controls['itbis'].value;
     const key = (this.filasDetalle[index] as any).controls['key'].value;
 
     const precio = fun.desformatear(precioTEMP);
-    const itbis = fun.desformatear(itbisTEMP);
+    const itbis = articulo.calcular_itbis ? precio * 0.18 : 0;
     const cantidad = (this.filasDetalle[index] as any).controls['can'].value;
 
-    let descuento = (this.filasDetalle[index] as any).controls['descuento_valor'].value;
+    let descuento = fun.desformatear((this.filasDetalle[index] as any).controls['descuento_valor'].value);
 
     if (descuento >= 0) {
-      const total = precio * cantidad + itbis;
+      const total = (precio + itbis) * cantidad;
 
       if (fun.hasValue(codido) && (fun.isEmpty(descuento) || descuento == 0)) {
         (this.filasDetalle[index] as any).controls['descuento_valor'].reset();
@@ -586,13 +584,19 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       }
 
       let nuevoTotal = 0;
-      if (fun.hasValue(codido) && fun.hasValue(precio) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
+      if (fun.hasValue(codido) && fun.hasValue(precio) && fun.hasValue(cantidad)) {
         nuevoTotal = total - descuento;
 
-        (this.filasDetalle[index] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
-        this.enviarTotalesGenerales();
-        this.enviarDescuentoGeneral(descuento, key);
-        this.ajustarSecuencia();
+        if (nuevoTotal < 0) {
+          fun.toastError('El descuento no puede ser mayor al valor total de la venta.');
+          fun.enfocarInput(`desc-${index}`);
+          fun.selectContenido(`desc-${index}`);
+        } else {
+          (this.filasDetalle[index] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
+          this.enviarTotalesGenerales();
+          this.enviarDescuentoGeneral(descuento, key);
+          this.ajustarSecuencia();
+        }
       }
     } else {
       if (descuento < 0) fun.toastWarning('El descuento no puede ser menor a 0', 'AVISO');
@@ -626,18 +630,27 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   enviarTotalesGenerales() {
     const tempTotal = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + fun.desformatear(item.value.tot), 0);
 
-    const tempItbis = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + fun.desformatear(item.value.itbis), 0);
+    const tempItbis = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + fun.desformatear(item.value.itbis) * item.value.can, 0);
 
     const obj = { total: fun.redondearNum(tempTotal), itbis: fun.redondearNum(tempItbis) };
 
     this.getCalculosDinero.emit({ tipo: 'bruto', monto: obj });
   }
 
-  revisarPrecio(index) {
-    let input = (this.filasDetalle[index] as any).controls['pre'];
-    fun.revisarPrecio(input, `pre-${index}`).then((res) => {
+  revisarPrecio(formControlName, input_id, index) {
+    let input = (this.filasDetalle[index] as any).controls[formControlName];
+    fun.revisarPrecio(input, `${input_id}-${index}`).then((res) => {
       if (!res.error) input.setValue(res.number);
     });
+  }
+
+  handleInputEvent(type, formControlName, index) {
+    let input = (this.filasDetalle[index] as any).controls[formControlName];
+
+    if (fun.hasValue(input.value) && !isNaN(input.value)) {
+      if (type == 'focus') input.setValue(fun.desformatear(input.value));
+      if (type == 'blur') input.setValue(fun.numFormatTwoDecimals(input.value) != '0.00' ? fun.numFormatTwoDecimals(input.value) : null);
+    }
   }
 
   modalRemover(index, event?) {

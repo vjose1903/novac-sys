@@ -9,11 +9,14 @@ $bodyfont: "Poppins";
 @import "./assets/my_styles/forms.scss";
 @import "./assets/my_styles/btns.scss";
 @import "./assets/my_styles/overlayPanel.scss";
+@import "./assets/my_styles/height.scss";
 @import "./splash-styles.scss";
 
 .h-inherit {
   max-height: inherit;
 }
+
+
 
 .si-wrap {
   flex-wrap: wrap;
@@ -359,6 +362,8 @@ body {
 // ========================================================
 .inputTabla {
   height: 2rem;
+  box-shadow: none !important;
+  width: 100% !important;
 }
 
 /* ====================================================== */

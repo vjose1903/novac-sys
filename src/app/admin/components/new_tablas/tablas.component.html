@@ -58,7 +58,7 @@
                 style="cursor: pointer; color: var(--letras)"
                 [ngStyle]="{ 'background-color': this.changeBackGroundColor(dato) }"
                 #RowElement
-                (click)="clickROW(dato, index_body)"
+                (click)="clickROW(dato, getIndex(index_body))"
               >
                 <td
                   *ngFor="let column of config.info; let index_column = index"
@@ -115,7 +115,7 @@
                       </div>
                     </span>
 
-                    <span *ngSwitchCase="'dropDown'" class="d-flex justify-content-center align-items-center">
+                    <span *ngSwitchCase="'dropDown'">
                       <p-dropdown
                         [virtualScroll]="true"
                         [itemSize]="34"
@@ -134,13 +134,14 @@
                       </p-dropdown>
                     </span>
 
-                    <span *ngSwitchCase="'input'" class="d-flex justify-content-center align-items-center">
+                    <span *ngSwitchCase="'input'">
                       <span *ngIf="column.remplace && seleccionado != dato?.id" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
                         <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: dato, column: column }"></ng-container>
                       </span>
                       <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace" class="table_input">
                         <input
                           #inputTable
+                          [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
                           class="form-control m-0 inputTabla {{ column.can_reset ? 'refresh' : '' }} {{ column.inputType == 'number' ? 'input_cantidad' : '' }}"
                           id="input-{{ config.id_tabla + post_id }}-{{ column.key }}-{{ getIndex(index_body) }}"
                           [min]="dato.min_ ? dato.min_ : 0"
@@ -148,7 +149,9 @@
                           type="{{ column.inputType ? column.inputType : 'text' }}"
                           [value]="getValueForm(column, dato)"
                           [disabled]="disabledInput(dato, column)"
-                          (blur)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, index_body)"
+                          (focus)="handleInputsEvents('focus', $event.target, column, getIndex(index_body))"
+                          (click)="handleInputsEvents('focus', $event.target, column, getIndex(index_body))"
+                          (blur)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body))"
                           (keyup)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
                           (change)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
                         />
@@ -171,7 +174,7 @@
                   </span>
                 </td>
 
-                <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(dato, index_body)">
+                <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(dato, getIndex(index_body))">
                   <span class="titulo_sm"> Acciones </span>
                   <app-btnacciones
                     [index_body]="getIndex(index_body)"

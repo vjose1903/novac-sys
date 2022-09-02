@@ -393,6 +393,15 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
+  handleInputsEvents(type, input, column, index_body) {
+    if (_.has(column, 'inputEvents') && fun.hasValue(column.inputEvents)) {
+      if (column.inputEvents == 'formatoNumero') {
+        if (type == 'focus') input.value = fun.desformatear(input.value);
+        if (type == 'blur') input.value = fun.numFormatTwoDecimals(input.value);
+      }
+    }
+  }
+
   changeValorInput(key, index, value, data) {
     const newData = fun.duplicarJson(data);
     newData[key] = value;

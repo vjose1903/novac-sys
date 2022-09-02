@@ -15,6 +15,8 @@ export interface table_info {
   checkNumber?: boolean;
   can_reset?: boolean;
   inputType?: string;
+  inputEvents?: string;
+  textAlign?: 'start' | 'center' | 'end';
   rowTooltip?: string;
   alerta?: boolean;
   tag_color?: string;

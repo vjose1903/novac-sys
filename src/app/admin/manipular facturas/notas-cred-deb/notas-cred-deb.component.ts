@@ -58,19 +58,28 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       { titulo: ' ', tipo: 'switch', select_all: true, key: 'select', estilos: [{ width: '3.5rem' }] },
       { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }, { 'padding-left': '0.5rem' }] },
       {
-        titulo: null,
+        titulo: 'Devolver',
         key: 'cant_nota',
         tipo: 'input',
         inputType: 'number',
+        textAlign: 'end',
         disable: [{ kind: 'campo', target: 'select', value: [false] }],
         estilos: [{ width: '6rem' }],
       },
-      { titulo: 'Cantidad', key: 'cantidad', tipo: 'formatoNumero', estilos: [{ width: '5rem' }] },
-      { titulo: 'Unidad', key: 'unidad', tipo: 'text', estilos: [{ width: '4.5rem' }] },
+      { titulo: 'Cantidad', key: 'cantidad_', tipo: 'text', estilos: [{ width: '7rem' }] },
       { titulo: 'Descuento', key: 'descuento_valor', tipo: 'formatoNumero' },
       { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero' },
-      { titulo: 'Total Facturado', key: 'total', tipo: 'formatoNumero' },
-      { titulo: 'Total nota', key: 'total_nota', tipo: 'input', disable: [{ kind: 'always' }], estilos: [{ width: '8rem' }] },
+      {
+        titulo: 'Precio real',
+        key: 'precio_real',
+        tipo: 'input',
+        inputEvents: 'formatoNumero',
+        inputType: 'text',
+        textAlign: 'end',
+        disable: [{ kind: 'campo', target: 'select', value: [false] }],
+        estilos: [{ width: '8rem' }],
+      },
+      { titulo: 'Total nota', key: 'total_nota', tipo: 'input', textAlign: 'end', disable: [{ kind: 'always' }], estilos: [{ width: '8rem' }] },
     ],
     id_tabla: 'notas',
     obj_paginate: { show: false },
@@ -122,7 +131,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     this.getFacturas().then(async (datos) => {
       this.facturasConDetalles = datos as FacturasI[];
-      await this.formarTitulosTabla();
       await this.getPaqueteComprobante();
     });
   }
@@ -135,13 +143,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     });
   }
 
-  formarTitulosTabla() {
-    const FilaCantNota = _.find(this.table_config.info, { key: 'cant_nota' });
-    FilaCantNota.titulo = this.tipoNota === 'credito' ? 'Devolver' : 'Aumentar';
-  }
-
   agregarItbisEnTabla() {
-    fun.pushAt(this.table_config.info, 7, { titulo: 'Itbis', key: 'itbis', tipo: 'formatoNumero', text_color: 'colorItbis', alert_msg: 'A partir de los 30 días el ITBIS queda retenido.' });
+    fun.pushAt(this.table_config.info, 7, { titulo: 'Itbis', key: 'itbis', tipo: 'formatoNumero', text_color: 'colorItbis', alert_msg: 'A partir de los 30 días el ITBIS queda retenido.', estilos: [{ 'padding-left': '2rem' }] });
+    fun.pushAt(this.table_config.info, 8, { titulo: 'Itbis real', key: 'itbis_real', tipo: 'input', textAlign: 'end', inputType: 'text', disable: [{ kind: 'always' }], estilos: [{ width: '7rem' }] });
   }
 
   onCloseTab(eventData) {
@@ -167,6 +171,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
               detalle['select'] = false;
               detalle['cant'] = detalle.cantidad - devueto;
+              detalle['cant'] = detalle.cantidad - devueto;
               detalle['cant_nota'] = 0;
               detalle['colorItbis'] = dias_de_creada >= 30 ? 'red' : 'black';
               detalle['can_return_itbis'] = dias_de_creada < 30;
@@ -175,8 +180,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
                 select: { width: '3.5rem' },
                 descripcion: { 'text-align': 'left', width: '20rem', 'padding-left': '0.5rem' },
                 cant_nota: { width: '6rem' },
-                cantidad: { width: '5rem' },
-                unidad: { width: '4.5rem' },
+                cantidad_: { width: '7rem' },
+                precio_real: { width: '8rem' },
+                itbis_real: { width: '7rem', 'padding-right': '0.8rem' },
                 total_nota: { width: '7.3rem' },
               };
 
@@ -185,6 +191,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
               detalle['total_nota'] = '0.00';
               detalle['cantidad'] = detalle.cantidad - devueto;
+              detalle['cantidad_'] = `${fun.numFormatTwoDecimals(detalle['cantidad'])} ${detalle['unidad']}`;
+              detalle['precio_real'] = fun.numFormatTwoDecimals(detalle.precio);
+              detalle['itbis_real'] = fun.numFormatTwoDecimals(detalle.itbis);
+              console.log('detalle ', detalle);
 
               resolve(tempFactData);
             }
@@ -239,6 +249,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       if (!params.value) {
         params.data.total_nota = '0.00';
         params.data.cant_nota = 0;
+        params.data.precio_real = fun.numFormatTwoDecimals(params.data.precio);
         const index = _.findIndex(this.detalleNota, { id: params.data.id });
         _.pullAt(this.detalleNota, index);
       } else {
@@ -258,7 +269,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           params.data.total_nota = '0.00';
         } else {
           const descuento = params.data.descuento_valor / params.data.cantidad;
-          let total = cant_nota * (fun.desformatear(params.data.precio) - descuento);
+          let total = cant_nota * (fun.desformatear(params.data.precio_real) - descuento);
 
           if (params.data.can_return_itbis) total += params.data.itbis;
 
@@ -275,6 +286,37 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         const total = cant_nota * (params.data.precio - descuento);
         params.data.total_nota = this.formatoNumero(total);
         params.data.cant_nota = cant_nota;
+      }
+    }
+
+    if (params.key == 'precio_real') {
+      let msg;
+      let precio = fun.desformatear(params.data.precio);
+      let precio_real = fun.desformatear(params.value);
+      fun.logRed('precio ', precio);
+      fun.logGreen('precio_real ', precio_real);
+
+      if (this.tipoNota == 'credito') {
+        if (precio_real > precio) {
+          msg = 'Las notas de crédito son utilizadas para reducir el valor de la factura, el precio real no puede ser mayor al original.';
+        }
+      } else {
+        if (precio_real < precio) {
+          msg = 'Las notas de débito son utilizadas para aumenrtar el valor de la factura, el precio real no puede ser menor al original.';
+        }
+      }
+
+      if (fun.hasValue(msg)) {
+        fun.toastInfo(msg, 'AVISO');
+        this.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
+        console.log('params.data.precio_real ', params.data.precio_real);
+
+        return;
+      } else {
+        const itbis = this.configApp.calcular_itbis ? precio_real * 0.18 : 0;
+
+        params.data.precio_real = precio_real;
+        params.data.itbis_real = fun.numFormatTwoDecimals(itbis);
       }
     }
 

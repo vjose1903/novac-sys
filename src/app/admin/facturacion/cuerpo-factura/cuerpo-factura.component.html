@@ -151,14 +151,13 @@
                   <div class="form-group m-0">
                     <input
                       [ngClass]="{ disabled: !propietario || item_cuerpo.controls.from_pre_factura.value }"
-                      type="number"
+                      type="text"
                       class="form-control entrada campoNumeros input_cantidad"
                       id="desc-{{ index_cuerpo }}"
-                      (focus)="verificarSecuencia(index_cuerpo)"
+                      (focus)="handleInputEvent('focus', 'descuento_valor', index_cuerpo); verificarSecuencia(index_cuerpo)"
                       (keyup.enter)="enfocarInput('cod-' + (index_cuerpo + 1))"
                       formControlName="descuento_valor"
-                      (blur)="calcularDescuento(index_cuerpo)"
-                      (emptied)="calcularDescuento(index_cuerpo)"
+                      (blur)="handleInputEvent('blur', 'descuento_valor', index_cuerpo); revisarPrecio('descuento_valor', 'desc', index_cuerpo); calcularDescuento(index_cuerpo)"
                       [ngClass]="{ disabled: !propietario }"
                       tabindex="-1"
                     />
@@ -169,7 +168,7 @@
                   <div class="form-group m-0">
                     <input
                       type="text"
-                      (blur)="calcularTotalRow(index_cuerpo); revisarPrecio(index_cuerpo)"
+                      (blur)="revisarPrecio('pre', 'pre', index_cuerpo); calcularTotalRow(index_cuerpo)"
                       (focus)="verificarSecuencia(index_cuerpo)"
                       class="form-control entrada campoNumeros {{ metodo === 'venta' ? 'inPRE' : '' }}"
                       (keyup.enter)="calcularTotalRow(index_cuerpo); enfocarInput('cod-' + (index_cuerpo + 1))"

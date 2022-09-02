@@ -37,7 +37,6 @@ export class CurrentUserService {
     return new Promise<any>((resolve) => {
       this.nextCurrentUser(currentUser);
       const permisos = currentUser?.permisos ? currentUser.permisos.map((perm) => perm.permiso) : [];
-      console.log('permisos ', permisos);
 
       this.permissionsService.loadPermissions(permisos);
       setTimeout(() => resolve(true), 10);

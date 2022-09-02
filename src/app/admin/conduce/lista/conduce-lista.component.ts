@@ -100,12 +100,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
         this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
       });
-    } catch (error) {
-      console.log('######');
-      console.log('######');
-      console.log('######');
-      console.log('######error: ', error);
-    }
+    } catch (error) {}
   }
 
   mapeoRecibos(data) {
