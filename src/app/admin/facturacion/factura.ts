@@ -14,7 +14,6 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal; titulo?: any }) {
-
     return new Promise<any>((resolve, reject) => {
       params.inputs['switches'] = {
         title: 'Seleccione los metodos de pago deseados',
@@ -32,7 +31,6 @@ export class FacturaC extends CrudG<FacturasI> {
 
       function returnDataFromModal(arg) {
         FacturaC.requestReporte({ reporte: arg, pdf: params });
-
       }
     });
   }
@@ -127,7 +125,9 @@ export class FacturaC extends CrudG<FacturasI> {
       data_parsed.total = data_parsed.total_factura;
 
       data_parsed.contenido_reporte.map((detalle) => {
-        detalle['cantidad'] = fun.numFormatTwoDecimals(detalle.cantidad);
+        console.log('detalle ', detalle);
+
+        detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
         return detalle;
       });
 
