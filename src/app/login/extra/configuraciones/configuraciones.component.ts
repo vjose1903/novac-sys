@@ -31,6 +31,11 @@ export class ConfiguracionesComponent implements OnInit {
 
   medidas_articulos = [{ value: 'Quintal' }, { value: 'Producto' }];
 
+  plantillas_impresion = [
+    { key: 'nota', value: 'Agrupada' },
+    { key: 'nota', value: 'Detallada' },
+  ];
+
   paper_sizes = [
     { label: '8.5 x 11', descripcion: '8.5x11' },
     { label: '8.5 x 5.5', descripcion: '8.5x5.5' },
@@ -93,6 +98,8 @@ export class ConfiguracionesComponent implements OnInit {
       page_size_nota: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
       page_size_cuadre_caja: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
       page_size_reporte: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
+
+      plantilla_impresion_nota: [{ value: this.getValue(data, 'plantillas_impresion.nota'), disabled: false }, Validators.required],
     });
 
     this.logo_empresa = `data:image/png;base64,${data.logo_empresa}`;
@@ -109,6 +116,12 @@ export class ConfiguracionesComponent implements OnInit {
     const docs = _.filter(data.documentos_a_imprimir, { selected: true });
 
     return docs;
+  }
+
+  get_plantillas(key) {
+    const plantillas = _.filter(this.plantillas_impresion, { key });
+
+    return plantillas;
   }
 
   getValue(data, key) {
@@ -160,8 +173,15 @@ export class ConfiguracionesComponent implements OnInit {
       reporte: formulario.page_size_reporte.descripcion,
     };
 
-    formulario = _.omit(formulario, ['page_size_recibo_ingreso', 'page_size_conduce', 'page_size_facturacion', 'page_size_cuadre_caja', 'page_size_reporte']);
+    const plantillas_impresion = {
+      nota: formulario.plantilla_impresion_nota,
+    };
+
+    formulario = _.omit(formulario, ['page_size_recibo_ingreso', 'page_size_conduce', 'page_size_facturacion', 'page_size_cuadre_caja', 'page_size_reporte', 'page_size_nota']);
+    formulario = _.omit(formulario, ['plantilla_impresion_nota']);
+
     formulario['pages_sizes'] = pages_sizes;
+    formulario['plantillas_impresion'] = plantillas_impresion;
     return formulario;
   }
 
@@ -190,13 +210,60 @@ export class ConfiguracionesComponent implements OnInit {
     return res;
   }
 
+  changesParser(configReplacement, logos_changes, obj, copyObjLevel, key_padre) {
+    let keysConfig = Object.keys(obj);
+    const logosKeys = ['logo_empresa', 'logo_impresion'];
+
+    for (let i = 0; i < keysConfig.length; i++) {
+      const key = keysConfig[i];
+
+      if (fun.hasValue(copyObjLevel[key])) {
+        const tipoDato = typeof obj[key];
+
+        if (tipoDato == 'string' || tipoDato == 'boolean') {
+          if (copyObjLevel[key] != obj[key]) {
+            if (logosKeys.includes(key)) {
+              logos_changes[key] = obj[key];
+            } else {
+              switch (key_padre) {
+                case 'pages_sizes':
+                case 'plantillas_impresion':
+                  this.object_changed(configReplacement, key, obj, copyObjLevel);
+                  break;
+
+                default:
+                  const value_source = tipoDato == 'string' ? `'${copyObjLevel[key]}'` : `${copyObjLevel[key]}`;
+                  const value_target = tipoDato == 'string' ? `'${obj[key]}'` : `${obj[key]}`;
+
+                  configReplacement[key] = { source: value_source, target: value_target };
+                  break;
+              }
+              // TODO: poner aqui una funcion para el remplazo exclusivo de los pages_sizes con el key_padre
+            }
+          }
+        } else {
+          this.changesParser(configReplacement, logos_changes, obj[key], copyObjLevel[key], key);
+        }
+      }
+    }
+  }
+
+  object_changed(configReplacement, key, obj, copyObjLevel) {
+    const tipoDato = typeof obj[key];
+
+    const value_source = tipoDato == 'string' ? `${key}: '${copyObjLevel[key]}'` : `${key}: ${copyObjLevel[key]}`;
+    const value_target = tipoDato == 'string' ? `${key}: '${obj[key]}'` : `${key}: ${obj[key]}`;
+
+    configReplacement[key] = { source: value_source, target: value_target };
+  }
+
   submit() {
     const formulario = this.getFormularioToSend();
 
     const configReplacement = {};
     const logos_changes = {};
 
-    this.changesParser(configReplacement, logos_changes, formulario, this.configCopy);
+    this.changesParser(configReplacement, logos_changes, formulario, this.configCopy, 'obj_principal');
 
     const objChange = { new_config: formulario, configReplacement: configReplacement };
 
@@ -216,33 +283,5 @@ export class ConfiguracionesComponent implements OnInit {
         }, 250);
       })
       .catch((err) => console.error(err));
-  }
-
-  changesParser(configReplacement, logos_changes, obj, copyObjLevel) {
-    let keysConfig = Object.keys(obj);
-    const logosKeys = ['logo_empresa', 'logo_impresion'];
-
-    for (let i = 0; i < keysConfig.length; i++) {
-      const key = keysConfig[i];
-
-      if (fun.hasValue(copyObjLevel[key])) {
-        const tipoDato = typeof copyObjLevel[key];
-
-        if (tipoDato == 'string' || tipoDato == 'boolean') {
-          if (copyObjLevel[key] != obj[key]) {
-            if (logosKeys.includes(key)) {
-              logos_changes[key] = obj[key];
-            } else {
-              const value_source = tipoDato == 'string' ? `'${copyObjLevel[key]}'` : `${copyObjLevel[key]}`;
-              const value_target = tipoDato == 'string' ? `'${obj[key]}'` : `${obj[key]}`;
-
-              configReplacement[key] = { source: value_source, target: value_target };
-            }
-          }
-        } else {
-          this.changesParser(configReplacement, logos_changes, obj[key], copyObjLevel[key]);
-        }
-      }
-    }
   }
 }

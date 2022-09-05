@@ -9,7 +9,7 @@ export default class ReplaceInFile {
   // replaceFunction(params: { new_config: any; array_targets: string[]; array_replacement: string[]; logos_changes?: object }) {
   replaceFunction(params: { new_config: any; configReplacement?: any; logos_changes?: object }) {
     return new Promise((resolve, reject) => {
-      const promomiseList = [];
+      const promomiseList = <any>[];
 
       promomiseList.push(this.cambiarLogos(params.logos_changes));
       promomiseList.push(this.cambiarHandlerConfig(params.configReplacement));
@@ -45,7 +45,7 @@ export default class ReplaceInFile {
     return new Promise(async (resolve, reject) => {
       if (Functions.hasValue(logos_changes)) {
         const logos_a_cambiar = Object.keys(logos_changes);
-        const promomiseLogoList = [];
+        const promomiseLogoList = <any>[];
 
         try {
           logos_a_cambiar.forEach(async (logo) => {
@@ -68,7 +68,7 @@ export default class ReplaceInFile {
     return new Promise(async (resolve, reject) => {
       const cambios_config = Object.keys(configReplacement);
       if (Functions.hasValue(configReplacement) && Functions.hasValue(cambios_config)) {
-        const promomisConfigList = [];
+        const promomisConfigList = <any>[];
 
         try {
           cambios_config.forEach(async (arg) => {

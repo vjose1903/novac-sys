@@ -2,373 +2,405 @@
   <div class="navBar d-flex align-items-center">
     <h4 class="negrita ml-3 mb-0">Configuraciones del sistema para: {{ config?.nombre_empresa }}</h4>
   </div>
+
   <div class="body">
-    <div class="form">
-      <div class="fantasma">
-        <div class="row">
-          <div class="col-12 p-0 mt-4">
-            <form *ngIf="config" [formGroup]="form">
-              <div class="row">
-                <div class="col-12 mb-2">
-                  <div [appMsgError]="'nombre_empresa'" [form]="form">
-                    <label class="control-label">Nombre de la empresa: </label>
-                    <input
-                      id="campoNombre"
-                      (keyup)="capitalice('nombre_empresa', $event.target.value)"
-                      (keydown.enter)="saltar('campoApellido')"
-                      type="text"
-                      formControlName="nombre_empresa"
-                      placeholder="Introduzca nombre de la empresa"
-                      class="form-control"
-                      autocomplete="off"
-                      autofocus
-                    />
-                    <span id="msgContainer_nombre_empresa"></span>
-                  </div>
-                </div>
-
-                <div class="col-6">
-                  <label class="control-label">Logo de la empresa: </label>
-                  <app-upload-img [src_img]="logo_empresa" (getPhotoData)="getPhotoData($event)" [id]="'logo_empresa'"></app-upload-img>
-                </div>
-
-                <div class="col-6">
-                  <label class="control-label">Logo de la empresa ( para impresión ): </label>
-                  <app-upload-img [src_img]="logo_impresion" (getPhotoData)="getPhotoData($event)" [id]="'logo_impresion'"></app-upload-img>
-                </div>
-
-                <div class="col-6 mb-2">
-                  <div [appMsgError]="'rnc_empresa'" [form]="form">
-                    <label class="control-label">Rnc: </label>
-                    <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="rnc_empresa" mask="999-99999-9" [autoClear]="false"></p-inputMask>
-                    <span id="msgContainer_rnc_empresa"></span>
-                  </div>
-                </div>
-
-                <div class="col-6 mb-2">
-                  <div [appMsgError]="'telefono_empresa'" [form]="form">
-                    <label class="control-label">Telefono: </label>
-                    <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="telefono_empresa" mask="(999)-999-9999" [autoClear]="false"></p-inputMask>
-                    <span id="msgContainer_telefono_empresa"></span>
-                  </div>
-                </div>
-
-                <div class="col-8 mb-2">
-                  <div [appMsgError]="'direccion_empresa'" [form]="form">
-                    <label class="control-label">Direccion: </label>
-                    <input
-                      id="campoNombre"
-                      (keyup)="capitalice('direccion_empresa', $event.target.value)"
-                      (keydown.enter)="saltar('campoApellido')"
-                      type="text"
-                      formControlName="direccion_empresa"
-                      placeholder="Introduzca nombre de la empresa"
-                      class="form-control"
-                      autocomplete="off"
-                      autofocus
-                    />
-                    <span id="msgContainer_direccion_empresa"></span>
-                  </div>
-                </div>
-
-                <div class="col-4 mb-2">
-                  <div [appMsgError]="'color_app'" [form]="form">
-                    <label class="control-label">Color aplicacion: </label>
-                    <p-dropdown [options]="colores" formControlName="color_app" placeholder="Seleccione un color">
-                      <ng-template pTemplate="selectedItem">
-                        <div class="d-flex align-items-center" *ngIf="form.controls['color_app'].value">
-                          <div class="colorsito mr-2" [style.background-color]="form.controls['color_app'].value.color"></div>
-                          <div>{{ form.controls['color_app'].value.label }}</div>
-                        </div>
-                      </ng-template>
-                      <ng-template let-colorItem pTemplate="item">
-                        <div class="colorItem-item d-flex align-items-center">
-                          <div class="colorsito mr-2" [style.background-color]="colorItem.color"></div>
-                          <div>{{ colorItem.label }}</div>
-                        </div>
-                      </ng-template>
-                    </p-dropdown>
-                    <span id="msgContainer_color_app"></span>
-                  </div>
-                </div>
-
-                <div class="col-6 mb-2">
-                  <div [appMsgError]="'printer_caja_selected'" [form]="form">
-                    <label class="control-label">Impresora facturación seleccionada: </label>
-                    <p-dropdown [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
-                      <ng-template pTemplate="selectedItem">
-                        <div class="d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value.displayName">
-                          <div>{{ form.controls['printer_caja_selected'].value.displayName }}</div>
-                        </div>
-                      </ng-template>
-                      <ng-template let-printerItem pTemplate="item">
-                        <div class="printerItem-item d-flex align-items-center">
-                          <div>{{ printerItem.displayName }}</div>
-                        </div>
-                      </ng-template>
-                    </p-dropdown>
-                    <span id="msgContainer_printer_caja_selected"></span>
-                  </div>
-                </div>
-
-                <div class="col-6 mb-2">
-                  <div [appMsgError]="'printer_reportes_selected'" [form]="form">
-                    <label class="control-label">Impresora reportes seleccionada: </label>
-                    <p-dropdown [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
-                      <ng-template pTemplate="selectedItem">
-                        <div class="d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value.displayName">
-                          <div>{{ form.controls['printer_reportes_selected'].value.displayName }}</div>
-                        </div>
-                      </ng-template>
-                      <ng-template let-printerItem pTemplate="item">
-                        <div class="printerItem-item d-flex align-items-center">
-                          <div>{{ printerItem.displayName }}</div>
-                        </div>
-                      </ng-template>
-                    </p-dropdown>
-                    <span id="msgContainer_printer_reportes_selected"></span>
-                  </div>
-                </div>
-
-                <div class="col-4 mb-3">
-                  <div [appMsgError]="'url_servidor'" [form]="form">
-                    <label class="control-label">Url Servidor: </label>
-                    <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor" placeholder="Introduzca url del servidor" class="form-control" autocomplete="off" autofocus />
-                    <span id="msgContainer_url_servidor"></span>
-                  </div>
-                </div>
-
-                <div class="col-4 mb-3">
-                  <div [appMsgError]="'url_servidor_respaldo'" [form]="form">
-                    <label class="control-label">Url Servidor Respaldo: </label>
-                    <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor_respaldo" placeholder="Introduzca url del servidor de respaldo" class="form-control" autocomplete="off" autofocus />
-                    <span id="msgContainer_url_servidor_respaldo"></span>
-                  </div>
-                </div>
-
-                <div class="col-4 mb-3">
-                  <div [appMsgError]="'url_servidor_descargas'" [form]="form">
-                    <label class="control-label">Url Servidor Descargas: </label>
-                    <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor_descargas" placeholder="Introduzca url servidor de descargas" class="form-control" autocomplete="off" autofocus />
-                    <span id="msgContainer_url_servidor_descargas"></span>
-                  </div>
-                </div>
-
-                <div class="col-4 mb-3">
-                  <div>
-                    <label class="control-label">Documentos a imprimir: </label>
-
-                    <p-multiSelect
-                      class="multiSelectPrimeng"
-                      [options]="documentos_a_imprimir"
-                      [(ngModel)]="documentos_a_imprimir_selected"
-                      [ngModelOptions]="{ standalone: true }"
-                      defaultLabel="Seleccione"
-                      optionLabel="name"
-                      emptyFilterMessage="Sin resultados"
-                      display="chip"
-                      [displaySelectedLabel]="false"
-                      [showToggleAll]="false"
-                      filterBy="name"
-                      (onChange)="changeDocumentosAImprimir()"
-                    >
-                    </p-multiSelect>
-                  </div>
-                </div>
-
-                <div class="col-4 mb-3">
-                  <div>
-                    <label class="control-label">Medida producto terminado: </label>
-
-                    <p-dropdown [options]="medidas_articulos" formControlName="medida_producto_terminado" placeholder="Seleccione una medida" optionLabel="value" optionValue="value"> </p-dropdown>
-                  </div>
-                </div>
-
-                <div class="col-12 mb-3">
-                  <div class="row bg-dark-1 br-1 p-2">
-                    <div class="col-12 p-0">
-                      <label class="control-label">Tamaños de impresión: </label>
-                    </div>
-
-                    <div class="col-2 pr-0 mb-2">
-                      <div [appMsgError]="'page_size_facturacion'" [form]="form">
-                        <label class="control-label">Facturacion: </label>
-                        <p-dropdown [options]="paper_sizes" formControlName="page_size_facturacion" placeholder="Seleccione una tamaño de papel">
-                          <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['page_size_facturacion'].value.label">
-                              <div>{{ form.controls['page_size_facturacion'].value.label }}</div>
-                            </div>
-                          </ng-template>
-                          <ng-template let-pageSize pTemplate="item">
-                            <div class="pageSize-item d-flex align-items-center">
-                              <div>{{ pageSize.label }}</div>
-                            </div>
-                          </ng-template>
-                        </p-dropdown>
-                        <span id="msgContainer_page_size_facturacion"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-2 pr-0 mb-2">
-                      <div [appMsgError]="'page_size_facturacion'" [form]="form">
-                        <label class="control-label">Notas: </label>
-                        <p-dropdown [options]="paper_sizes" formControlName="page_size_nota" placeholder="Seleccione una tamaño de papel">
-                          <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['page_size_nota'].value.label">
-                              <div>{{ form.controls['page_size_nota'].value.label }}</div>
-                            </div>
-                          </ng-template>
-                          <ng-template let-pageSize pTemplate="item">
-                            <div class="pageSize-item d-flex align-items-center">
-                              <div>{{ pageSize.label }}</div>
-                            </div>
-                          </ng-template>
-                        </p-dropdown>
-                        <span id="msgContainer_page_size_nota"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-2 pr-0 mb-2">
-                      <div [appMsgError]="'page_size_recibo_ingreso'" [form]="form">
-                        <label class="control-label">Recibos de ingreso: </label>
-                        <p-dropdown [options]="paper_sizes" formControlName="page_size_recibo_ingreso" placeholder="Seleccione una tamaño de papel">
-                          <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['page_size_recibo_ingreso'].value.label">
-                              <div>{{ form.controls['page_size_recibo_ingreso'].value.label }}</div>
-                            </div>
-                          </ng-template>
-                          <ng-template let-pageSize pTemplate="item">
-                            <div class="pageSize-item d-flex align-items-center">
-                              <div>{{ pageSize.label }}</div>
-                            </div>
-                          </ng-template>
-                        </p-dropdown>
-                        <span id="msgContainer_page_size_recibo_ingreso"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-2 pr-0 mb-2">
-                      <div [appMsgError]="'page_size_conduce'" [form]="form">
-                        <label class="control-label">Conduce: </label>
-                        <p-dropdown [options]="paper_sizes" formControlName="page_size_conduce" placeholder="Seleccione una tamaño de papel">
-                          <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['page_size_conduce'].value.label">
-                              <div>{{ form.controls['page_size_conduce'].value.label }}</div>
-                            </div>
-                          </ng-template>
-                          <ng-template let-pageSize pTemplate="item">
-                            <div class="pageSize-item d-flex align-items-center">
-                              <div>{{ pageSize.label }}</div>
-                            </div>
-                          </ng-template>
-                        </p-dropdown>
-                        <span id="msgContainer_page_size_conduce"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-2 pr-0 mb-2">
-                      <div [appMsgError]="'page_size_cuadre_caja'" [form]="form">
-                        <label class="control-label">Cuadre de caja: </label>
-                        <p-dropdown [options]="paper_sizes" formControlName="page_size_cuadre_caja" placeholder="Seleccione una tamaño de papel">
-                          <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['page_size_cuadre_caja'].value.label">
-                              <div>{{ form.controls['page_size_cuadre_caja'].value.label }}</div>
-                            </div>
-                          </ng-template>
-                          <ng-template let-pageSize pTemplate="item">
-                            <div class="pageSize-item d-flex align-items-center">
-                              <div>{{ pageSize.label }}</div>
-                            </div>
-                          </ng-template>
-                        </p-dropdown>
-                        <span id="msgContainer_page_size_cuadre_caja"></span>
-                      </div>
-                    </div>
-                    <div class="col-2 pr-0 mb-2">
-                      <div [appMsgError]="'page_size_reporte'" [form]="form">
-                        <label class="control-label">Reportes: </label>
-                        <p-dropdown [options]="paper_sizes" formControlName="page_size_reporte" placeholder="Seleccione una tamaño de papel">
-                          <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['page_size_reporte'].value.label">
-                              <div>{{ form.controls['page_size_reporte'].value.label }}</div>
-                            </div>
-                          </ng-template>
-                          <ng-template let-pageSize pTemplate="item">
-                            <div class="pageSize-item d-flex align-items-center">
-                              <div>{{ pageSize.label }}</div>
-                            </div>
-                          </ng-template>
-                        </p-dropdown>
-                        <span id="msgContainer_page_size_reporte"></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-12 p-0">
+    <p-tabView styleClass="my_tabView back-light">
+      <!-- ============================ INFORMACIONES GENERALES ============================ -->
+      <p-tabPanel header="Informaciones generales">
+        <div class="form">
+          <div class="fantasma-form">
+            <div class="row">
+              <div class="col-12 p-0 mt-4">
+                <form *ngIf="config" [formGroup]="form">
                   <div class="row">
-                    <div class="col-6 p-0">
-                      <div class="row">
-                        <div class="col-12 mb-2">
-                          <div class="switchDiv" [appMsgError]="'usa_url_principal'" [form]="form">
-                            <input formControlName="usa_url_principal" class="apple-switch" type="checkbox" />
-                            <span class="ml-2 mb-0">Usa url principal</span>
-                          </div>
-                        </div>
-
-                        <div class="col-12 mb-2">
-                          <div class="switchDiv" [appMsgError]="'is_db_local'" [form]="form">
-                            <input formControlName="is_db_local" class="apple-switch" type="checkbox" />
-                            <span class="ml-2 mb-0">Usa base de datos local</span>
-                          </div>
-                        </div>
-
-                        <div class="col-12 mb-2">
-                          <div class="switchDiv" [appMsgError]="'is_produccion'" [form]="form">
-                            <input formControlName="is_produccion" class="apple-switch" type="checkbox" />
-                            <span class="ml-2 mb-0">Tienen Modulo Producción</span>
-                          </div>
-                        </div>
+                    <div class="col-12 mb-2">
+                      <div [appMsgError]="'nombre_empresa'" [form]="form">
+                        <label class="control-label">Nombre de la empresa: </label>
+                        <input
+                          id="campoNombre"
+                          (keyup)="capitalice('nombre_empresa', $event.target.value)"
+                          (keydown.enter)="saltar('campoApellido')"
+                          type="text"
+                          formControlName="nombre_empresa"
+                          placeholder="Introduzca nombre de la empresa"
+                          class="form-control"
+                          autocomplete="off"
+                          autofocus
+                        />
+                        <span id="msgContainer_nombre_empresa"></span>
                       </div>
                     </div>
-                    <div class="col-6 p-0">
+
+                    <div class="col-6">
+                      <label class="control-label">Logo de la empresa: </label>
+                      <app-upload-img [src_img]="logo_empresa" (getPhotoData)="getPhotoData($event)" [id]="'logo_empresa'"></app-upload-img>
+                    </div>
+
+                    <div class="col-6">
+                      <label class="control-label">Logo de la empresa ( para impresión ): </label>
+                      <app-upload-img [src_img]="logo_impresion" (getPhotoData)="getPhotoData($event)" [id]="'logo_impresion'"></app-upload-img>
+                    </div>
+
+                    <div class="col-6 mb-2">
+                      <div [appMsgError]="'rnc_empresa'" [form]="form">
+                        <label class="control-label">Rnc: </label>
+                        <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="rnc_empresa" mask="999-99999-9" [autoClear]="false"></p-inputMask>
+                        <span id="msgContainer_rnc_empresa"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-6 mb-2">
+                      <div [appMsgError]="'telefono_empresa'" [form]="form">
+                        <label class="control-label">Telefono: </label>
+                        <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="telefono_empresa" mask="(999)-999-9999" [autoClear]="false"></p-inputMask>
+                        <span id="msgContainer_telefono_empresa"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-8 mb-2">
+                      <div [appMsgError]="'direccion_empresa'" [form]="form">
+                        <label class="control-label">Direccion: </label>
+                        <input
+                          id="campoNombre"
+                          (keyup)="capitalice('direccion_empresa', $event.target.value)"
+                          (keydown.enter)="saltar('campoApellido')"
+                          type="text"
+                          formControlName="direccion_empresa"
+                          placeholder="Introduzca nombre de la empresa"
+                          class="form-control"
+                          autocomplete="off"
+                          autofocus
+                        />
+                        <span id="msgContainer_direccion_empresa"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-4 mb-2">
+                      <div [appMsgError]="'color_app'" [form]="form">
+                        <label class="control-label">Color aplicacion: </label>
+                        <p-dropdown [options]="colores" formControlName="color_app" placeholder="Seleccione un color">
+                          <ng-template pTemplate="selectedItem">
+                            <div class="d-flex align-items-center" *ngIf="form.controls['color_app'].value">
+                              <div class="colorsito mr-2" [style.background-color]="form.controls['color_app'].value.color"></div>
+                              <div>{{ form.controls['color_app'].value.label }}</div>
+                            </div>
+                          </ng-template>
+                          <ng-template let-colorItem pTemplate="item">
+                            <div class="colorItem-item d-flex align-items-center">
+                              <div class="colorsito mr-2" [style.background-color]="colorItem.color"></div>
+                              <div>{{ colorItem.label }}</div>
+                            </div>
+                          </ng-template>
+                        </p-dropdown>
+                        <span id="msgContainer_color_app"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-6 mb-2">
+                      <div [appMsgError]="'printer_caja_selected'" [form]="form">
+                        <label class="control-label">Impresora facturación seleccionada: </label>
+                        <p-dropdown [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
+                          <ng-template pTemplate="selectedItem">
+                            <div class="d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value.displayName">
+                              <div>{{ form.controls['printer_caja_selected'].value.displayName }}</div>
+                            </div>
+                          </ng-template>
+                          <ng-template let-printerItem pTemplate="item">
+                            <div class="printerItem-item d-flex align-items-center">
+                              <div>{{ printerItem.displayName }}</div>
+                            </div>
+                          </ng-template>
+                        </p-dropdown>
+                        <span id="msgContainer_printer_caja_selected"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-6 mb-2">
+                      <div [appMsgError]="'printer_reportes_selected'" [form]="form">
+                        <label class="control-label">Impresora reportes seleccionada: </label>
+                        <p-dropdown [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
+                          <ng-template pTemplate="selectedItem">
+                            <div class="d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value.displayName">
+                              <div>{{ form.controls['printer_reportes_selected'].value.displayName }}</div>
+                            </div>
+                          </ng-template>
+                          <ng-template let-printerItem pTemplate="item">
+                            <div class="printerItem-item d-flex align-items-center">
+                              <div>{{ printerItem.displayName }}</div>
+                            </div>
+                          </ng-template>
+                        </p-dropdown>
+                        <span id="msgContainer_printer_reportes_selected"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-4 mb-3">
+                      <div [appMsgError]="'url_servidor'" [form]="form">
+                        <label class="control-label">Url Servidor: </label>
+                        <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor" placeholder="Introduzca url del servidor" class="form-control" autocomplete="off" autofocus />
+                        <span id="msgContainer_url_servidor"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-4 mb-3">
+                      <div [appMsgError]="'url_servidor_respaldo'" [form]="form">
+                        <label class="control-label">Url Servidor Respaldo: </label>
+                        <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor_respaldo" placeholder="Introduzca url del servidor de respaldo" class="form-control" autocomplete="off" autofocus />
+                        <span id="msgContainer_url_servidor_respaldo"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-4 mb-3">
+                      <div [appMsgError]="'url_servidor_descargas'" [form]="form">
+                        <label class="control-label">Url Servidor Descargas: </label>
+                        <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor_descargas" placeholder="Introduzca url servidor de descargas" class="form-control" autocomplete="off" autofocus />
+                        <span id="msgContainer_url_servidor_descargas"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-4 mb-3">
+                      <div>
+                        <label class="control-label">Documentos a imprimir: </label>
+
+                        <p-multiSelect
+                          class="multiSelectPrimeng"
+                          [options]="documentos_a_imprimir"
+                          [(ngModel)]="documentos_a_imprimir_selected"
+                          [ngModelOptions]="{ standalone: true }"
+                          defaultLabel="Seleccione"
+                          optionLabel="name"
+                          emptyFilterMessage="Sin resultados"
+                          display="chip"
+                          [displaySelectedLabel]="false"
+                          [showToggleAll]="false"
+                          filterBy="name"
+                          (onChange)="changeDocumentosAImprimir()"
+                        >
+                        </p-multiSelect>
+                      </div>
+                    </div>
+
+                    <div class="col-4 mb-3">
+                      <div>
+                        <label class="control-label">Medida producto terminado: </label>
+
+                        <p-dropdown [options]="medidas_articulos" formControlName="medida_producto_terminado" placeholder="Seleccione una medida" optionLabel="value" optionValue="value"> </p-dropdown>
+                      </div>
+                    </div>
+
+                    <div class="col-12 p-0 mt-3">
                       <div class="row">
-                        <div class="col-12 mb-2">
-                          <div class="h-100 w-100 d-flex align-items-center">
-                            <div class="switchDiv" [appMsgError]="'facturacion_editar_precio'" [form]="form">
-                              <input formControlName="facturacion_editar_precio" class="apple-switch" type="checkbox" />
-                              <span class="ml-2 mb-0">Editar precio en facturación</span>
+                        <div class="col-6 p-0">
+                          <div class="row">
+                            <div class="col-12 mb-2">
+                              <div class="switchDiv" [appMsgError]="'usa_url_principal'" [form]="form">
+                                <input formControlName="usa_url_principal" class="apple-switch" type="checkbox" />
+                                <span class="ml-2 mb-0">Usa url principal</span>
+                              </div>
+                            </div>
+
+                            <div class="col-12 mb-2">
+                              <div class="switchDiv" [appMsgError]="'is_db_local'" [form]="form">
+                                <input formControlName="is_db_local" class="apple-switch" type="checkbox" />
+                                <span class="ml-2 mb-0">Usa base de datos local</span>
+                              </div>
+                            </div>
+
+                            <div class="col-12 mb-2">
+                              <div class="switchDiv" [appMsgError]="'is_produccion'" [form]="form">
+                                <input formControlName="is_produccion" class="apple-switch" type="checkbox" />
+                                <span class="ml-2 mb-0">Tienen Modulo Producción</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-
-                        <div class="col-12 mb-2">
-                          <div class="h-100 w-100 d-flex align-items-center">
-                            <div class="switchDiv" [appMsgError]="'vende_sin_inventario'" [form]="form">
-                              <input formControlName="vende_sin_inventario" class="apple-switch" type="checkbox" />
-                              <span class="ml-2 mb-0">Vender sin inventario</span>
+                        <div class="col-6 p-0">
+                          <div class="row">
+                            <div class="col-12 mb-2">
+                              <div class="h-100 w-100 d-flex align-items-center">
+                                <div class="switchDiv" [appMsgError]="'facturacion_editar_precio'" [form]="form">
+                                  <input formControlName="facturacion_editar_precio" class="apple-switch" type="checkbox" />
+                                  <span class="ml-2 mb-0">Editar precio en facturación</span>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
 
-                        <div class="col-12 mb-2">
-                          <div class="h-100 w-100 d-flex align-items-center">
-                            <div class="switchDiv" [appMsgError]="'calcular_itbis'" [form]="form">
-                              <input formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
-                              <span class="ml-2 mb-0">Usa Itbis</span>
+                            <div class="col-12 mb-2">
+                              <div class="h-100 w-100 d-flex align-items-center">
+                                <div class="switchDiv" [appMsgError]="'vende_sin_inventario'" [form]="form">
+                                  <input formControlName="vende_sin_inventario" class="apple-switch" type="checkbox" />
+                                  <span class="ml-2 mb-0">Vender sin inventario</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="col-12 mb-2">
+                              <div class="h-100 w-100 d-flex align-items-center">
+                                <div class="switchDiv" [appMsgError]="'calcular_itbis'" [form]="form">
+                                  <input formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
+                                  <span class="ml-2 mb-0">Usa Itbis</span>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </form>
               </div>
-            </form>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </p-tabPanel>
+
+      <!-- ============================ PLANTILLAS DE IMPRESION ============================ -->
+      <p-tabPanel header="Plantillas de impresión">
+        <div class="form">
+          <div class="fantasma-form">
+            <div class="row">
+              <div class="col-12 p-0 mt-4">
+                <form *ngIf="config" [formGroup]="form">
+                  <div class="row">
+                    <!-- ------------------------------------ tamaños de impresiones ------------------------------------ -->
+                    <div class="col-12 mb-3">
+                      <div class="row bg-dark-1 br-1 p-2">
+                        <div class="col-12 p-0">
+                          <label class="control-label">Tamaños de impresión: </label>
+                        </div>
+
+                        <div class="col-2 pr-0 mb-2">
+                          <div [appMsgError]="'page_size_facturacion'" [form]="form">
+                            <label class="control-label">Facturacion: </label>
+                            <p-dropdown [options]="paper_sizes" formControlName="page_size_facturacion" placeholder="Seleccione una tamaño de papel">
+                              <ng-template pTemplate="selectedItem">
+                                <div class="d-flex align-items-center" *ngIf="form.controls['page_size_facturacion'].value.label">
+                                  <div>{{ form.controls['page_size_facturacion'].value.label }}</div>
+                                </div>
+                              </ng-template>
+                              <ng-template let-pageSize pTemplate="item">
+                                <div class="pageSize-item d-flex align-items-center">
+                                  <div>{{ pageSize.label }}</div>
+                                </div>
+                              </ng-template>
+                            </p-dropdown>
+                            <span id="msgContainer_page_size_facturacion"></span>
+                          </div>
+                        </div>
+
+                        <div class="col-2 pr-0 mb-2">
+                          <div [appMsgError]="'page_size_facturacion'" [form]="form">
+                            <label class="control-label">Notas: </label>
+                            <p-dropdown [options]="paper_sizes" formControlName="page_size_nota" placeholder="Seleccione una tamaño de papel">
+                              <ng-template pTemplate="selectedItem">
+                                <div class="d-flex align-items-center" *ngIf="form.controls['page_size_nota'].value.label">
+                                  <div>{{ form.controls['page_size_nota'].value.label }}</div>
+                                </div>
+                              </ng-template>
+                              <ng-template let-pageSize pTemplate="item">
+                                <div class="pageSize-item d-flex align-items-center">
+                                  <div>{{ pageSize.label }}</div>
+                                </div>
+                              </ng-template>
+                            </p-dropdown>
+                            <span id="msgContainer_page_size_nota"></span>
+                          </div>
+                        </div>
+
+                        <div class="col-2 pr-0 mb-2">
+                          <div [appMsgError]="'page_size_recibo_ingreso'" [form]="form">
+                            <label class="control-label">Recibos de ingreso: </label>
+                            <p-dropdown [options]="paper_sizes" formControlName="page_size_recibo_ingreso" placeholder="Seleccione una tamaño de papel">
+                              <ng-template pTemplate="selectedItem">
+                                <div class="d-flex align-items-center" *ngIf="form.controls['page_size_recibo_ingreso'].value.label">
+                                  <div>{{ form.controls['page_size_recibo_ingreso'].value.label }}</div>
+                                </div>
+                              </ng-template>
+                              <ng-template let-pageSize pTemplate="item">
+                                <div class="pageSize-item d-flex align-items-center">
+                                  <div>{{ pageSize.label }}</div>
+                                </div>
+                              </ng-template>
+                            </p-dropdown>
+                            <span id="msgContainer_page_size_recibo_ingreso"></span>
+                          </div>
+                        </div>
+
+                        <div class="col-2 pr-0 mb-2">
+                          <div [appMsgError]="'page_size_conduce'" [form]="form">
+                            <label class="control-label">Conduce: </label>
+                            <p-dropdown [options]="paper_sizes" formControlName="page_size_conduce" placeholder="Seleccione una tamaño de papel">
+                              <ng-template pTemplate="selectedItem">
+                                <div class="d-flex align-items-center" *ngIf="form.controls['page_size_conduce'].value.label">
+                                  <div>{{ form.controls['page_size_conduce'].value.label }}</div>
+                                </div>
+                              </ng-template>
+                              <ng-template let-pageSize pTemplate="item">
+                                <div class="pageSize-item d-flex align-items-center">
+                                  <div>{{ pageSize.label }}</div>
+                                </div>
+                              </ng-template>
+                            </p-dropdown>
+                            <span id="msgContainer_page_size_conduce"></span>
+                          </div>
+                        </div>
+
+                        <div class="col-2 pr-0 mb-2">
+                          <div [appMsgError]="'page_size_cuadre_caja'" [form]="form">
+                            <label class="control-label">Cuadre de caja: </label>
+                            <p-dropdown [options]="paper_sizes" formControlName="page_size_cuadre_caja" placeholder="Seleccione una tamaño de papel">
+                              <ng-template pTemplate="selectedItem">
+                                <div class="d-flex align-items-center" *ngIf="form.controls['page_size_cuadre_caja'].value.label">
+                                  <div>{{ form.controls['page_size_cuadre_caja'].value.label }}</div>
+                                </div>
+                              </ng-template>
+                              <ng-template let-pageSize pTemplate="item">
+                                <div class="pageSize-item d-flex align-items-center">
+                                  <div>{{ pageSize.label }}</div>
+                                </div>
+                              </ng-template>
+                            </p-dropdown>
+                            <span id="msgContainer_page_size_cuadre_caja"></span>
+                          </div>
+                        </div>
+                        <div class="col-2 pr-0 mb-2">
+                          <div [appMsgError]="'page_size_reporte'" [form]="form">
+                            <label class="control-label">Reportes: </label>
+                            <p-dropdown [options]="paper_sizes" formControlName="page_size_reporte" placeholder="Seleccione una tamaño de papel">
+                              <ng-template pTemplate="selectedItem">
+                                <div class="d-flex align-items-center" *ngIf="form.controls['page_size_reporte'].value.label">
+                                  <div>{{ form.controls['page_size_reporte'].value.label }}</div>
+                                </div>
+                              </ng-template>
+                              <ng-template let-pageSize pTemplate="item">
+                                <div class="pageSize-item d-flex align-items-center">
+                                  <div>{{ pageSize.label }}</div>
+                                </div>
+                              </ng-template>
+                            </p-dropdown>
+                            <span id="msgContainer_page_size_reporte"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- ------------------------------------ plantillas de impresiones ------------------------------------ -->
+                    <div class="col-12">
+                      <label class="control-label">Plantillas de impresión: </label>
+                    </div>
+                    <div class="col-3 mb-3">
+                      <div>
+                        <label class="control-label">Notas: </label>
+                        <p-dropdown [options]="get_plantillas('nota')" formControlName="plantilla_impresion_nota" placeholder="Seleccione una plantilla" optionLabel="value" optionValue="value"> </p-dropdown>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
 
     <div class="buttons">
       <div class="d-flex justify-content-end align-items-center">

@@ -21,11 +21,11 @@ export default class HandlerConfigFile {
     usa_url_principal: true,
     printer_caja_selected: undefined,
     printer_reportes_selected: undefined,
-    is_db_local: true,
+    is_db_local: false,
     calcular_itbis: true,
-    is_produccion: true,
-    facturacion_editar_precio: true,
-    vende_sin_inventario: true,
+    is_produccion: false,
+    facturacion_editar_precio: false,
+    vende_sin_inventario: false,
     medida_producto_terminado: 'Producto',
 
     pages_sizes: {
@@ -35,6 +35,10 @@ export default class HandlerConfigFile {
       facturacion: '8.5x5.5',
       cuadre_caja: '8.5x5.5',
       reporte: '8.5x11',
+    },
+
+    plantillas_impresion: {
+      nota: 'Detallada',
     },
 
     documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota',

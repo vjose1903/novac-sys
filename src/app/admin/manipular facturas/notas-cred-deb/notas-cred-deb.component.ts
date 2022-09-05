@@ -238,6 +238,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         params.data.total_nota = '0.00';
         params.data.cant_nota = 0;
         params.data.precio_real = fun.numFormatTwoDecimals(params.data.precio);
+
+        const itbis = this.configApp.calcular_itbis ? params.data.precio_real * 0.18 : 0;
+        params.data.itbis_real = fun.numFormatTwoDecimals(itbis);
+
         const index = _.findIndex(this.detalleNota, { id: params.data.id });
         _.pullAt(this.detalleNota, index);
       } else {
@@ -268,8 +272,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         let msg;
         let precio = fun.desformatear(params.data.precio);
         let precio_real = fun.desformatear(params.value);
-        fun.logRed('precio ', precio);
-        fun.logGreen('precio_real ', precio_real);
 
         if (this.tipoNota == 'credito') {
           if (precio_real > precio) msg = 'Las notas de crédito son utilizadas para reducir el valor de la factura, el precio real no puede ser mayor al original.';
@@ -287,7 +289,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
           params.data.precio_real = precio_real;
           params.data.itbis_real = fun.numFormatTwoDecimals(itbis);
-
           this.sumarTotalRow(params);
         }
       }
@@ -309,14 +310,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
 
     if (precio != precio_real) {
-      const itbis = params.data.itbis_real;
-      const precio_itbis_real = precio_real + itbis;
-      const total_real = params.data.cant * precio_itbis_real;
-      const operacion = this.tipoNota == 'credito' ? '-' : '+';
-      console.log('params.data ', params.data);
-      // TODO: revisar ese monto creo que no sale como debe de ir
+      const itbis_real = fun.desformatear(params.data.itbis_real);
+      const precio_itbis_real = precio_real + itbis_real;
+      const total_real = params.data.cant * (precio_itbis_real - descuento);
 
-      total += eval(`params.data.total ${operacion} total_real`);
+      total += Math.abs(params.data.total - total_real);
     }
 
     params.data.total_nota = this.formatoNumero(total);
@@ -508,7 +506,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         const objTemp = {
           cabecera_factura_id: factura.id,
           total: this.totalIndividual(factura),
-          detalles_facturas_notas: _.filter(factura.detalle_facturas, (data) => data.select == true && data.cant_nota > 0).map((detalle) => {
+          detalles_facturas_notas: _.filter(factura.detalle_facturas, (data) => data.select == true && data.total_nota > 0).map((detalle) => {
             let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'costo', 'precio', 'total_nota', 'descuento']);
 
             objDetalleTemp['total'] = fun.desformatear(objDetalleTemp.total_nota);
@@ -527,11 +525,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
     console.log('dataToSend ', dataToSend);
 
-    const res = await this.notasClass.createOne(dataToSend);
+    // const res = await this.notasClass.createOne(dataToSend);
 
-    this.notasClass.parseDataToPdf(res['data']).then((data_parsed) => {
-      this.imprimirNota({ data: data_parsed, type: 'nota' });
-    });
+    // this.notasClass.parseDataToPdf(res['data']).then((data_parsed) => {
+    //   this.imprimirNota({ data: data_parsed, type: 'nota' });
+    // });
   }
 
   imprimirNota(obj) {
