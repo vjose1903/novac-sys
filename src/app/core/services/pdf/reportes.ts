@@ -1,8 +1,8 @@
 import { fun } from './../functions.service';
 /* eslint-disable @typescript-eslint/indent */
 import { styles_ } from './utils/files';
-import { getContentWithTablaNormal } from './tabla_normal';
-import { getContentWithTablaAgrupada } from './tabla_agrupada';
+import { getContentWithTablaNormal } from './utils/tabla_normal';
+import { getContentWithTablaAgrupada } from './utils/tabla_agrupada';
 import { SingletonService } from '../singleton.service';
 import { ConfigI } from '../../typescript/config-interface';
 import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';

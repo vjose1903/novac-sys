@@ -503,17 +503,29 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       };
 
       for (const factura of facturasLlenas) {
+        console.log('factura.detalle_facturas ', factura.detalle_facturas);
+
         const objTemp = {
           cabecera_factura_id: factura.id,
           total: this.totalIndividual(factura),
-          detalles_facturas_notas: _.filter(factura.detalle_facturas, (data) => data.select == true && data.total_nota > 0).map((detalle) => {
-            let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'costo', 'precio', 'total_nota', 'descuento']);
+
+          detalles_facturas_notas: _.filter(factura.detalle_facturas, (data) => data.select == true && fun.desformatear(data.total_nota) > 0).map((detalle) => {
+            let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
 
             objDetalleTemp['total'] = fun.desformatear(objDetalleTemp.total_nota);
             objDetalleTemp['itbis'] = detalle.can_return_itbis ? objDetalleTemp.itbis : 0;
             objDetalleTemp['cantidad_en_unidades'] = detalle.cantidad_en_unidades_nota;
             objDetalleTemp['cantidad'] = detalle.cant_nota;
             objDetalleTemp['detalle_factura_id'] = detalle.id;
+            objDetalleTemp['itbis_real'] = fun.desformatear(objDetalleTemp['itbis_real']);
+            objDetalleTemp['itbis'] = fun.desformatear(objDetalleTemp['itbis']);
+            objDetalleTemp['precio_real'] = fun.desformatear(objDetalleTemp['precio_real']);
+            objDetalleTemp['precio'] = fun.desformatear(objDetalleTemp['precio']);
+
+            objDetalleTemp = fun.remplaceKeyFromJson(objDetalleTemp, [{ old_key: 'descuento_valor', new_key: 'descuento' }]);
+
+            objDetalleTemp['descuento_real'] = 0;
+
             delete objDetalleTemp.total_nota;
             delete objDetalleTemp.cantidad_en_unidades_nota;
             return objDetalleTemp;
@@ -525,11 +537,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
     console.log('dataToSend ', dataToSend);
 
-    // const res = await this.notasClass.createOne(dataToSend);
+    const res = await this.notasClass.createOne(dataToSend);
 
-    // this.notasClass.parseDataToPdf(res['data']).then((data_parsed) => {
-    //   this.imprimirNota({ data: data_parsed, type: 'nota' });
-    // });
+    this.notasClass.parseDataToPdf(res['data']).then((data_parsed) => {
+      this.imprimirNota({ data: data_parsed, type: 'nota' });
+    });
   }
 
   imprimirNota(obj) {

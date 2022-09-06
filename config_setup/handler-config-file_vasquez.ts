@@ -7,6 +7,7 @@ const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
   static default_config: any = {
+    cliente: 'vasquez',
     color_app: 'green',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
     direccion_empresa: 'C. Juana Saltitopa No. 37, Villa Real, La Vega. R.D.',

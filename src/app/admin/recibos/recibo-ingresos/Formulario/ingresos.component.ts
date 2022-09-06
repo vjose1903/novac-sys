@@ -1,3 +1,4 @@
+import { NotaC } from './../../../manipular facturas/notas-cred-deb/notas';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../../core/javascript/moment';
@@ -94,7 +95,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   totalFacturado: number;
   totalPagado: number;
-  totalNotas: number;
+  totalNotasDebito: number;
+  totalNotasCredito: number;
   totalPagadoPorciento: number;
   recibiendo = 0;
   restando = 0;
@@ -162,7 +164,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.totalFacturado = 0;
     this.totalPagado = 0;
-    this.totalNotas = 0;
+    this.totalNotasCredito = 0;
+    this.totalNotasDebito = 0;
     this.totalPagadoPorciento = 0;
 
     const fechaA = moment().format('YYYY-MM-DD');
@@ -198,12 +201,15 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       };
 
       this.totalPagado = _.reduce(factura.pagos, (acumulado, item) => acumulado + item.deposito, this.totalPagado);
-      this.totalNotas = _.reduce(factura.notas, (acumulado, item) => acumulado + Math.abs(item.total), this.totalNotas);
+      console.log('factura.notas ', factura.notas);
+
+      this.totalNotasCredito = _.reduce(_.filter(factura.notas, { tipo: NotaC.tipo_nota.credito }), (acumulado, item) => acumulado + Math.abs(item.total), this.totalNotasCredito);
+      this.totalNotasDebito = _.reduce(_.filter(factura.notas, { tipo: NotaC.tipo_nota.debito }), (acumulado, item) => acumulado + Math.abs(item.total), this.totalNotasDebito);
 
       factura.subrayar = factura.is_viaje;
 
       this.totalFacturado += factura.total_factura;
-      this.totalPagadoPorciento = ((this.totalPagado + this.totalNotas) / this.totalFacturado) * 100;
+      this.totalPagadoPorciento = ((this.totalPagado + this.totalNotasCredito) / this.totalFacturado) * 100;
       this.totalPagadoPorciento = parseFloat(fun.numFormatTwoDecimals(this.totalPagadoPorciento));
 
       this.facturas.push(factura);
@@ -212,7 +218,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     });
 
     this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
-    this.debiendo = this.totalFacturado - this.totalPagado - this.totalNotas;
+    this.debiendo = this.totalFacturado + this.totalNotasDebito - this.totalPagado - this.totalNotasCredito;
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
 
     setTimeout(() => {

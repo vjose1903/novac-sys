@@ -41,7 +41,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   lista_tipos_facturas: any;
   existenComprobantes = false;
-  tipo_factu_nota: any;
   paqueteComprobante: any;
   tipo_factura_id = null;
   valor: any;
@@ -127,12 +126,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this._init_mixin({ component: 'buscar_factura', is_routing: true });
     this.buscarPara = this.route.snapshot.params['para'];
 
-    if (this.buscarPara == 'nota_credito') {
-      this.tipo_factu_nota = '04';
-    } else if (this.buscarPara == 'nota_debito') {
-      this.tipo_factu_nota = '03';
-    }
-
     this.necesarioStart();
     this.completarTituloPag();
   }
@@ -140,7 +133,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   async necesarioStart() {
     await this.getTipoFacturas();
 
-    if (this.buscarPara == 'nota_credito' || this.buscarPara == 'nota_debito') await this.getPaqueteComprobante();
+    if (this.buscarPara.includes('nota')) await this.getPaqueteComprobante();
 
     this.enfocarInput('campoI');
   }
@@ -180,7 +173,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async getPaqueteComprobante() {
     try {
-      const tipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === this.tipo_factu_nota);
+      const tipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.buscarPara]);
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
       this.paqueteComprobante = res['data'] as any;
@@ -262,7 +255,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       this.notas.length = 0;
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
+      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, tipo_nota: this.buscarPara.includes('credito') ? NotaC.tipo_nota.credito : NotaC.tipo_nota.debito } };
 
       const res = await this.notasClass.getAll(extra);
 
@@ -282,6 +275,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
         this.notas.push(nota);
       });
+
+      console.log('this.notas ', this.notas);
 
       setTimeout(() => this.tablaNotasComponent.changeConfig([{ total_count: res.total_registros }]), 10);
       resolve(true);

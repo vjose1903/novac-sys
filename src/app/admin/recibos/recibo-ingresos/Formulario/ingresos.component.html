@@ -30,10 +30,15 @@
           </div>
           <div class="cuerpo">
             <div class="cajas">
+              <div class="centro">
+                <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white mb-2">
+                  <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
+                </span>
+              </div>
               <div class="izquierda pr-2">
                 <span class="w-100 detalleBalance badge bg-info mb-2">
-                  <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span></span
-                >
+                  <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
+                </span>
                 <span *ngIf="isOneFacturaWithMonto()" class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
                   <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo) }}</span>
                 </span>
@@ -44,14 +49,14 @@
               </div>
 
               <div class="derecha pl-2">
-                <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white mb-2">
-                  <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
+                <span class="w-100 detalleBalance badge blue text-shadow  text-white mb-2">
+                  <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
                 </span>
                 <span class="w-100 detalleBalance badge text-shadow bg-primary text-white mb-2">
-                  <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotas) }}</span>
+                  <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotasCredito) }}</span>
                 </span>
                 <span class="w-100 detalleBalance badge text-shadow bg-danger text-white mb-2">
-                  <span> Debiendo:</span> <span>RD$ {{ formatoNumero(totalFacturado - totalPagado - totalNotas) }}</span>
+                  <span> Debiendo:</span> <span>RD$ {{ formatoNumero(totalFacturado + totalNotasDebito - totalPagado - totalNotasCredito) }}</span>
                 </span>
               </div>
             </div>

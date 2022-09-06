@@ -25,7 +25,8 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
   table_notas_config: table_config = {
     info: [
       { titulo: 'NO. comprobante', tipo: 'text', key: 'numero_comprobante' },
-      { titulo: 'Crédito', tipo: 'formatoNumero', key: 'total' },
+      { titulo: 'Tipo', tipo: 'text', key: 'tipo_label' },
+      { titulo: 'Monto', tipo: 'formatoNumero', key: 'total' },
       { titulo: 'Fecha nota', tipo: 'text', key: 'fecha_equivalente' },
     ],
     colores: true,

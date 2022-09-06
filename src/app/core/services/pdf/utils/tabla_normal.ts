@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/indent */
-import * as fun_ from './utils/funciones';
+import * as fun_ from './funciones';
 
 export function getContentWithTablaNormal(configuration, data) {
   return makeTablaNormal(configuration, data);
@@ -16,6 +16,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
 
   const titulos = [];
   const body = [];
+
   configuration.info.forEach((titulo_config, i) => {
     try {
       const obj_titulo = {

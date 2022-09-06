@@ -7,6 +7,7 @@ const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
   static default_config: any = {
+    cliente: 'brendy',
     color_app: 'red',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
     direccion_empresa: 'El higuerito, frente a la escuela, La Vega Rep. Dom.',

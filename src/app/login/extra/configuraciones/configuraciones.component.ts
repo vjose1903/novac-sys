@@ -63,6 +63,8 @@ export class ConfiguracionesComponent implements OnInit {
       this.config = config;
       this.configCopy = fun.duplicarJson(config);
       this.parseDocumentosAImprimir(config).then(() => this.createForm(config));
+
+      fun.logGreen('this.config', this.config);
     });
   }
 
@@ -259,6 +261,9 @@ export class ConfiguracionesComponent implements OnInit {
 
   submit() {
     const formulario = this.getFormularioToSend();
+    fun.logGreen('this.config', this.config);
+    formulario['cliente'] = this.getValue(this.config, 'cliente');
+    console.log('formulario ', formulario);
 
     const configReplacement = {};
     const logos_changes = {};

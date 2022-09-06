@@ -4,6 +4,7 @@ import { styles_ } from './utils/files';
 import * as numLetra from './utils/numero_letras';
 import { SingletonService } from '../singleton.service';
 import { ConfigI } from '../../typescript/config-interface';
+import { infoPagare } from './8.5x5.5/infoPdfs';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
@@ -19,7 +20,7 @@ function getPageMargin(is_contado) {
   return margins;
 }
 
-export function makePDF(data, file_name) {
+export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const is_venta = data.tipo === 'venta' ? true : false;
   const is_contado = data.condicion === 'Contado' ? true : false;
 
@@ -380,8 +381,8 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
                           {
                             svg: `<svg viewBox="0 0 700 180">
                             <rect height="180" width="55" fill="#ffffff" rx="5" ry="5" x="0" y="0" stroke="black" />
-                            <text transform="translate(16, 178) rotate(-90)" font-weight="bold" style="font-size: 9px" > ${configApp.nombre_empresa} </text>
-                            <text transform="translate(30, 175) rotate(-90)" style="font-size: 9px"> ${configApp.direccion_empresa} </text>
+                            <text transform="translate(16, ${infoPagare[configApp.cliente].altura_nombre}) rotate(-90)" font-weight="bold" style="font-size: 9px" > ${configApp.nombre_empresa} </text>
+                            <text transform="translate(30, ${infoPagare[configApp.cliente].altura_direccion}) rotate(-90)" style="font-size: 9px"> ${configApp.direccion_empresa} </text>
                             <text transform="translate(45, 176) rotate(-90)" font-weight="bold" style="font-size: 9px" > Telefono: </text>
                             <text transform="translate(45, 137) rotate(-90)" style="font-size: 9px"> ${configApp.telefono_empresa} - </text>
                             <text transform="translate(45, 73) rotate(-90)" font-weight="bold" style="font-size: 9px" > Rnc: </text>

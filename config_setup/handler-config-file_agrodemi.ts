@@ -7,6 +7,7 @@ const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
   static default_config: any = {
+    cliente: 'agrodemi',
     color_app: 'green',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
     direccion_empresa: 'Autopista Duarte Km0 El Higüero, La Vega',

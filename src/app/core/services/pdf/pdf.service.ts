@@ -80,7 +80,9 @@ export class PdfService {
           case 'nota':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
 
-            obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas');
+            const tipo_pdf = `_${config.plantillas_impresion['nota'].toLowerCase()}`;
+
+            obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
             break;
           case 'facturacion': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
