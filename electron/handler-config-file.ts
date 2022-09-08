@@ -16,9 +16,9 @@ export default class HandlerConfigFile {
     nombre_empresa: 'D` Vásquez Services y Asociados, S.R.L',
     rnc_empresa: '130-74935-4',
     telefono_empresa: '(809) 573-3934',
-    url_servidor: 'http://novac-vasquez.ddns.net:9090',
-    url_servidor_descargas: 'http://novac-vasquez.ddns.net:9090',
-    url_servidor_respaldo: 'http://10.0.0.9:9090',
+    url_servidor: 'http://novac-vasquez.ddns.net:9092',
+    url_servidor_descargas: 'http://novac-vasquez.ddns.net:9092',
+    url_servidor_respaldo: 'http://10.0.0.9:9092',
     usa_url_principal: true,
     printer_caja_selected: undefined,
     printer_reportes_selected: undefined,
@@ -68,7 +68,7 @@ export default class HandlerConfigFile {
 
               setTimeout(() => resolve(true), 500);
             })
-            .catch((err) => reject(true));
+            .catch((err) => reject(false));
         } else {
           setTimeout(() => resolve(true), 500);
         }

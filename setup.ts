@@ -26,7 +26,7 @@ const setup_ = {
   vasquez: {
     TITLE_APP: 'Novac System - D` Vásquez Services',
     PORT_APP: '5222',
-    DB_PORT: '3002',
+    DB_PORT: '9092',
     DOCKER_NAME: 'vasquez',
     NAME_UPDATE_REPO: 'novac-system-vasquez',
     CUSTOM_ACCESS: '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',

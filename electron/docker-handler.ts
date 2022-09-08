@@ -10,13 +10,13 @@ export default class DockerHandler {
     this.count_db = 1;
   }
 
-  async checkAllInDocker(first_resolve = null, first_reject = null) {
+  async checkAllInDocker(first_resolve:any = null, first_reject:any = null) {
     return new Promise<any>((resolve, reject) => {
       first_resolve ||= resolve;
       first_reject ||= reject;
 
       if (this.count_docker <= 20 && this.count_db <= 20) {
-        cmd('docker ps --filter "name=vasquez-dev" --format "{{.Status}}"', (res) => {
+        cmd('docker ps --filter "name=vasquez-prod" --format "{{.Status}}"', (res) => {
           if (res.status) {
             if (this.count_db == 1) puts('Docker esta corriendo perfectamente.');
 
