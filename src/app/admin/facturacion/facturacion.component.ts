@@ -1336,6 +1336,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   formarData() {
     const tipoFact = _.find(this.lista_tipos_facturas, { referencia: this.tipoFactura });
+    console.log('this.lista_tipos_facturas ', this.lista_tipos_facturas);
 
     const tipoPreFactura = _.find(this.lista_tipos_facturas, { descripcion: 'pre_venta' });
 

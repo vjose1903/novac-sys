@@ -18,7 +18,7 @@ const setup_ = {
   brendy: {
     TITLE_APP: 'Novac System - Panaderia Brendy',
     PORT_APP: '5221',
-    DB_PORT: '3001',
+    DB_PORT: '9091',
     DOCKER_NAME: 'brendy',
     NAME_UPDATE_REPO: 'novac-system-brendy',
     CUSTOM_ACCESS: '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',
