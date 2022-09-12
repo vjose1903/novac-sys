@@ -276,7 +276,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         this.notas.push(nota);
       });
 
-      console.log('this.notas ', this.notas);
 
       setTimeout(() => this.tablaNotasComponent.changeConfig([{ total_count: res.total_registros }]), 10);
       resolve(true);
@@ -345,6 +344,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           this.facturaClass.parseDataToPdf(this.facturas[0]).then((res) => {
             const continuar = this.buscarPara != 'solo_ver' && (campo == campos.numeroComprobante || campo == campos.NumeroFactura);
             this.facturaSelected = res;
+
 
             this.mostrarFactura(res, 'facturacion', null, continuar);
           });
@@ -538,6 +538,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         label: 'Continuar',
         disable: false,
       });
+
+
 
     PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
       if (res.status === 'si') {

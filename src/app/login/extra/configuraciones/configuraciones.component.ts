@@ -10,6 +10,7 @@ import { fun } from '../../../core/services/functions.service';
 import { SharedService } from '../../../core/services/shared.service';
 import { Router } from '@angular/router';
 import { IpcService } from '../../../core/services/ipc.service';
+import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
@@ -156,6 +157,10 @@ export class ConfiguracionesComponent implements OnInit {
       this[data_img.id] = data_img.src_img;
       this.form.controls[data_img.id].setValue(data_img.base_64);
     }
+  }
+
+  printTest(documento, paperSize) {
+    printTestPdf({ paper_size: paperSize, documento: documento });
   }
 
   salir() {

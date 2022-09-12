@@ -271,7 +271,10 @@
 
                         <div class="col-2 pr-0 mb-2">
                           <div [appMsgError]="'page_size_facturacion'" [form]="form">
-                            <label class="control-label">Facturacion: </label>
+                            <div class="d-flex align-items-center mb-2">
+                              <label class="control-label no-wrap mr-2 mb-0">Facturacion: </label>
+                              <i class="fa-solid fa-print c-pointer" (click)="printTest('factura', form.controls['page_size_facturacion'].value.descripcion)"></i>
+                            </div>
                             <p-dropdown [options]="paper_sizes" formControlName="page_size_facturacion" placeholder="Seleccione una tamaño de papel">
                               <ng-template pTemplate="selectedItem">
                                 <div class="d-flex align-items-center" *ngIf="form.controls['page_size_facturacion'].value.label">
@@ -290,7 +293,10 @@
 
                         <div class="col-2 pr-0 mb-2">
                           <div [appMsgError]="'page_size_facturacion'" [form]="form">
-                            <label class="control-label">Notas: </label>
+                            <div class="d-flex align-items-center mb-2">
+                              <label class="control-label no-wrap mr-2 mb-0">Notas: </label>
+                              <i class="fa-solid fa-print c-pointer" (click)="printTest('nota', form.controls['page_size_nota'].value.descripcion)"></i>
+                            </div>
                             <p-dropdown [options]="paper_sizes" formControlName="page_size_nota" placeholder="Seleccione una tamaño de papel">
                               <ng-template pTemplate="selectedItem">
                                 <div class="d-flex align-items-center" *ngIf="form.controls['page_size_nota'].value.label">
@@ -309,7 +315,10 @@
 
                         <div class="col-2 pr-0 mb-2">
                           <div [appMsgError]="'page_size_recibo_ingreso'" [form]="form">
-                            <label class="control-label">Recibos de ingreso: </label>
+                            <div class="d-flex align-items-center mb-2">
+                              <label class="control-label no-wrap mr-2 mb-0">Recibos de ingreso: </label>
+                              <i class="fa-solid fa-print c-pointer" (click)="printTest('inggreso', form.controls['page_size_recibo_ingreso'].value.descripcion)"></i>
+                            </div>
                             <p-dropdown [options]="paper_sizes" formControlName="page_size_recibo_ingreso" placeholder="Seleccione una tamaño de papel">
                               <ng-template pTemplate="selectedItem">
                                 <div class="d-flex align-items-center" *ngIf="form.controls['page_size_recibo_ingreso'].value.label">
@@ -328,7 +337,10 @@
 
                         <div class="col-2 pr-0 mb-2">
                           <div [appMsgError]="'page_size_conduce'" [form]="form">
-                            <label class="control-label">Conduce: </label>
+                            <div class="d-flex align-items-center mb-2">
+                              <label class="control-label no-wrap mr-2 mb-0">Conduce: </label>
+                              <i class="fa-solid fa-print c-pointer" (click)="printTest('conduce', form.controls['page_size_conduce'].value.descripcion)"></i>
+                            </div>
                             <p-dropdown [options]="paper_sizes" formControlName="page_size_conduce" placeholder="Seleccione una tamaño de papel">
                               <ng-template pTemplate="selectedItem">
                                 <div class="d-flex align-items-center" *ngIf="form.controls['page_size_conduce'].value.label">
@@ -347,7 +359,10 @@
 
                         <div class="col-2 pr-0 mb-2">
                           <div [appMsgError]="'page_size_cuadre_caja'" [form]="form">
-                            <label class="control-label">Cuadre de caja: </label>
+                            <div class="d-flex align-items-center mb-2">
+                              <label class="control-label no-wrap mr-2 mb-0">Cuadre de caja: </label>
+                              <i class="fa-solid fa-print c-pointer" (click)="printTest('cuadre', form.controls['page_size_cuadre_caja'].value.descripcion)"></i>
+                            </div>
                             <p-dropdown [options]="paper_sizes" formControlName="page_size_cuadre_caja" placeholder="Seleccione una tamaño de papel">
                               <ng-template pTemplate="selectedItem">
                                 <div class="d-flex align-items-center" *ngIf="form.controls['page_size_cuadre_caja'].value.label">
@@ -365,7 +380,10 @@
                         </div>
                         <div class="col-2 pr-0 mb-2">
                           <div [appMsgError]="'page_size_reporte'" [form]="form">
-                            <label class="control-label">Reportes: </label>
+                            <div class="d-flex align-items-center mb-2">
+                              <label class="control-label no-wrap mr-2 mb-0">Reportes: </label>
+                              <i class="fa-solid fa-print c-pointer" (click)="printTest('reporte', form.controls['page_size_reporte'].value.descripcion)"></i>
+                            </div>
                             <p-dropdown [options]="paper_sizes" formControlName="page_size_reporte" placeholder="Seleccione una tamaño de papel">
                               <ng-template pTemplate="selectedItem">
                                 <div class="d-flex align-items-center" *ngIf="form.controls['page_size_reporte'].value.label">
