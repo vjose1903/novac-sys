@@ -782,7 +782,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const padre = {
       referencia: null,
       articulo_id: formulario.id,
-      id: formulario.id_contenido_padre,
+      id: fun.hasValue(formulario.id_contenido_padre) ? formulario.id_contenido_padre : null,
       costo: _.isString(formulario.costo_padre) ? parseFloat(formulario.costo_padre) : formulario.costo_padre,
       precio: fun.desformatear(['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.precio_padre : formulario.precio_libra),
       cantidad: ['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.cantidad_contenido_padre : 100,
@@ -793,7 +793,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const hijo = {
       referencia: formulario.referencia_hijo,
       articulo_id: formulario.id,
-      id: formulario.id_contenido_hijo,
+      id: fun.hasValue(formulario.id_contenido_hijo) ? formulario.id_contenido_hijo : null,
       costo: _.isString(formulario.costo_hijo) ? parseFloat(formulario.costo_hijo) : formulario.costo_hijo,
       precio: fun.desformatear(formulario.precio_hijo),
       cantidad: formulario.cantidad_contenido_hijo,
@@ -836,7 +836,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const unidades = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onza' };
     array.forEach((element) => {
       const obj = {
-        id: _.parseInt(element.id ? element.id : null),
+        id: fun.hasValue(element.id) ? _.parseInt(element.id) : null,
         articulo_combo: _.parseInt(element.articulo_id),
         cantidad: fun.desformatear(element.cantidad_formula),
         costo: fun.desformatear(element.costo_formula),
@@ -873,7 +873,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const formulario = this.form.getRawValue();
 
     const obj = {
-      id: _.parseInt(formulario.id),
+      id: fun.hasValue(formulario.id) ? _.parseInt(formulario.id) : null,
       tipo_articulo_id: _.parseInt(formulario.tipo_articulo_id),
       nombre: formulario.nombre,
       costo_principal: this.tipoArticuloSelected.tipo != 'servicio' ? fun.desformatear(formulario.costo_principal) : 0,
