@@ -10,7 +10,7 @@ export default class DockerHandler {
     this.count_db = 1;
   }
 
-  async checkAllInDocker(first_resolve = null, first_reject = null) {
+  async checkAllInDocker(first_resolve:any = null, first_reject:any = null) {
     return new Promise<any>((resolve, reject) => {
       first_resolve ||= resolve;
       first_reject ||= reject;

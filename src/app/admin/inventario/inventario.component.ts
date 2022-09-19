@@ -5,13 +5,12 @@ import { MixinClass } from '../../core/typescript/MixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
 import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
 import { ReporteC } from '../reportes/reporte';
-import { PdfService } from '../../core/services/pdf/pdf.service';
 import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
-import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../core/services/functions.service';
 import { SingletonService } from '../../core/services/singleton.service';
 import { table_config } from '../components/new_tablas/tabla-class';
 import { Permisos } from '../../core/typescript/permisos';
+import { InventarioC } from './inventario';
 
 @Component({
   selector: 'app-inventario',
@@ -52,14 +51,12 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   palabra_buscar;
   fechaFactura: string;
-  pdfSrc: any;
-  fileName: any;
 
   articuloClass = new ArticuloC();
   tipoArticuloClass = new TipoArticuloC();
   reporteClass = new ReporteC();
 
-  constructor(private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
+  constructor(private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
 
@@ -67,7 +64,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this._init_mixin({ component: 'inventario', is_routing: true });
     this.necesarioParaEmpezar();
 
-    this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res));
+    this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res.data));
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -81,21 +78,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this._destroy_mixin();
   }
 
-  imprimirReporteInventario(objPDFData, modalInstance?) {
-    const obj = { base64: objPDFData.pdfSrc, filename: `${objPDFData.fileName}.pdf`, type: 'reporte' };
-    this.pdfServ
-      .imprimirBase64(obj)
-      .then((res) => {
-        if (res['status'] === 'si') {
-          fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-          if (modalInstance) modalInstance.closeModal(modalInstance.id, 'reporte_inventario');
-        } else fun.toastError(res['msg'], 'ERROR');
-      })
-      .catch((err) => {
-        fun.toastError(err['msg'], 'ERROR');
-      });
-  }
-
   formatoNumero(num) {
     return fun.numFormatTwoDecimals(num);
   }
@@ -106,42 +88,9 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async makeReporte() {
-    const extra = { afterPath: `custom/inventario` };
-    this.reporteClass.getAll(extra).then((res) => {
-      const obj = { data: res, type: 'reporte' };
-      this.loadServ.isLoading.next(true);
+    const obj = { tipo: 'reporte', titulo: 'Reporte de inventario', tipo_reporte: 'reporte' };
 
-      this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
-        if (res.status === 'si') {
-          const obj_pdf = { pdfSrc: res.body, titulo: 'Reporte de inventario', height: '75vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
-          this.loadServ.isLoading.next(false);
-
-          this.handleModalForm({
-            component: PdfViewerComponent,
-            inputs: obj_pdf,
-            id: 'reporte_inventario',
-            header: 'Reporte de inventario',
-            width: '900px',
-            botones: {
-              aceptar: { show: false, disable: false },
-              cancelar: { show: false, disable: false },
-              dinamico: [
-                { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
-                {
-                  clase: 'btn btn-verde',
-                  function: (instance) => {
-                    this.imprimirReporteInventario(obj_pdf, instance);
-                    this.resetVariables();
-                  },
-                  label: 'Imprimir',
-                  disable: false,
-                },
-              ],
-            },
-          });
-        }
-      });
-    });
+    InventarioC.openModalReporteForm({ tipo: 'inventario', inputs: obj, openNewModal: this.openNewModal.bind(this) });
   }
 
   async getStock() {
@@ -188,18 +137,25 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   movimientoInventario(arg) {
-    this.handleModalForm({
-      component: MovimientosFormComponent,
-      inputs: arg.data,
-      id: 'inventario',
-      header: 'Movimientos de inventario',
-      width: '450px',
+    const tipoArticuloSelected = this.tipo_articulos.find((val) => val.id == _.parseInt(arg.data.tipo_articulo_id));
+    console.log('arg ', arg);
+    console.log('tipoArticuloSelected ', tipoArticuloSelected);
+    if (tipoArticuloSelected.tipo != 'servicio') {
+      this.openNewModal({
+        component: MovimientosFormComponent,
+        inputs: arg.data,
+        id: 'inventario',
+        header: 'Movimientos de inventario',
+        width: '450px',
 
-      botones: {
-        aceptar: { show: true, disable: false },
-        cancelar: { show: true, disable: false },
-      },
-    });
+        botones: {
+          aceptar: { show: true, disable: false },
+          cancelar: { show: true, disable: false },
+        },
+      });
+    } else {
+      fun.toastWarning('El articulo seleccionado no requiere movimientos de inventario', 'AVISO');
+    }
   }
 
   async getDataFromModal(arg, search) {
@@ -208,10 +164,5 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       actualPagination['search'] = this.palabra_buscar;
       this.getArticulos(actualPagination);
     }
-  }
-
-  resetVariables() {
-    this.pdfSrc = undefined;
-    this.fileName = undefined;
   }
 }

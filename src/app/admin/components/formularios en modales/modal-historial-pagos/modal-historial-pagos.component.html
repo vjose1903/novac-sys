@@ -15,11 +15,11 @@
 
     <p-tabPanel
       [disabled]="arrayHasData('notas').disable"
-      tooltip="Factura no tiene notas de crédito"
+      tooltip="Factura no tiene notas aplicadas"
       headerStyleClass="{{ arrayHasData('notas').disable ? 'noTabView' : '' }}"
       tooltipDisabled="true"
       tooltipStyleClass="{{ arrayHasData('notas').disable ? 'd-block' : 'd-none' }} tabViewTootip"
-      header="Notas de crédito {{ !arrayHasData('notas').disable ? '(' + arrayHasData('notas').cant + ')' : '' }}"
+      header="Notas {{ !arrayHasData('notas').disable ? '(' + arrayHasData('notas').cant + ')' : '' }}"
     >
       <div *ngIf="show" class="d-flex h-100 w-100" #cardTablaNota id="cardTablaNota">
         <dinamic-table [cardTabla]="cardTablaNota" [(data)]="inputs['notas']" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>

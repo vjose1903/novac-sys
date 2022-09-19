@@ -20,4 +20,4 @@ import { AngularResizeEventModule } from 'angular-resize-event';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, DirectivesModule, DropdownModule, PaginatorModule, TooltipModule, TagModule, SpeedDialModule, InputSwitchModule, NgxPermissionsModule.forChild(), AngularResizeEventModule],
   exports: [NewTablasComponent, NewBTNACCIONESComponent],
 })
-export class NewTablasModule {}
+export class TablasModule {}

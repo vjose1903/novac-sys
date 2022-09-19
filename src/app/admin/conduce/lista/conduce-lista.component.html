@@ -1,0 +1,13 @@
+<div class="mainConduce">
+  <div class="mb-2 titulo">
+    <h3 class="negrita">Conduces de mercancías</h3>
+  </div>
+  <div *ngxPermissionsOnly="permissions.conduce.create" class="mb-3 botonNuevo">
+    <button class="btn btn-verde" (click)="navegar()">Nuevo conduce <i class="fa-solid fa-dolly"></i></button>
+  </div>
+  <div class="divTabla">
+    <div #cardTabla id="cardTabla" class="card cardListados">
+      <dinamic-table [cardTabla]="cardTabla" [(data)]="lista_conduces" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+    </div>
+  </div>
+</div>

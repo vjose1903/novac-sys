@@ -16,8 +16,8 @@
     [resizable]="false"
     [closeOnEscape]="modalConfig.closableEsc"
     [closable]="modalConfig.closable"
-    (onHide)="onHideModal(modalConfig.id)"
     [transitionOptions]="modalConfig.transitionOptions"
+    (onHide)="onHideModal(modalConfig.id)"
   >
     <div [ngStyle]="{ height: modalConfig.height, width: modalConfig.width }" style="transition: all 0.5s">
       <div *ngIf="modalConfig.html; else component" [innerHtml]="modalConfig.html"></div>

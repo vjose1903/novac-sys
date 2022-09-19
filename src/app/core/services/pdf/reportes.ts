@@ -1,17 +1,46 @@
+import { fun } from './../functions.service';
 /* eslint-disable @typescript-eslint/indent */
 import { styles_ } from './utils/files';
-import { getConfiguration } from './configuracion_tablas';
-import { getContentWithTablaNormal } from './tabla_normal';
-import { getContentWithTablaAgrupada } from './tabla_agrupada';
+import { getContentWithTablaNormal } from './utils/tabla_normal';
+import { getContentWithTablaAgrupada } from './utils/tabla_agrupada';
 import { SingletonService } from '../singleton.service';
 import { ConfigI } from '../../typescript/config-interface';
+import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';
+import { config_cxc } from './8.5x5.5/configuraciones/reportes/cxc';
+import { config_cxc_ant_preventa } from './8.5x5.5/configuraciones/reportes/cxc_ant_preventa';
+import { config_cxc_preventa } from './8.5x5.5/configuraciones/reportes/cxc_preventa';
+import { config_cxc_ant } from './8.5x5.5/configuraciones/reportes/cxc_ant';
+import { config_inventario } from './8.5x5.5/configuraciones/reportes/inventario';
+import { config_recibos } from './8.5x5.5/configuraciones/reportes/recibos';
+import { config_ventas_prod } from './8.5x5.5/configuraciones/reportes/ventas_prod';
+import { config_cuentas_pagos } from './8.5x5.5/configuraciones/reportes/cuentas_con_pagos';
+import { config_suplidor_prod } from './8.5x5.5/configuraciones/reportes/suplidor_prod';
+import { config_notas } from './8.5x5.5/configuraciones/reportes/notas';
+
+const configuraciones = {
+  ventas: config_ventas,
+  cxc: config_cxc,
+  cxc_preventa: config_cxc_preventa,
+
+  cxc_ant_detallado: config_cxc_ant.detallado,
+  cxc_ant_detallado_preventa: config_cxc_ant_preventa.detallado,
+
+  cxc_ant_agrupado: config_cxc_ant.agrupado,
+  inventario: config_inventario,
+  recibos: config_recibos,
+  ventas_prod: config_ventas_prod,
+  cuentas_con_pagos: config_cuentas_pagos,
+  suplidor_prod: config_suplidor_prod,
+  notas: config_notas,
+};
 
 // ==========================================================================================================================================================
 // UNIR REPORTE
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
-  const configuration = getConfiguration(data.tipo_reporte);
+  const configuration = configuraciones[data.tipo_reporte];
+
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
 

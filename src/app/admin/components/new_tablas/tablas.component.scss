@@ -1,3 +1,7 @@
+.alert_msg {
+  color: #8080806b;
+}
+
 .index {
   background: #80808021;
 }
@@ -67,14 +71,14 @@
           }
           .thHead {
             &:first-child {
-              padding-left: 1rem !important;
+              padding-left: 0.7rem;
             }
             &:last-child {
-              padding-right: 1rem !important;
+              padding-right: 0.7rem;
             }
-            padding: 0.6rem 0rem !important;
+            padding: 0.6rem 0rem;
             &.sm {
-              padding: 0.3rem 0rem !important;
+              padding: 0.3rem 0rem;
             }
           }
         }
@@ -109,16 +113,16 @@
                 border-bottom: 0.5px solid #e5e5e554;
                 vertical-align: middle !important;
 
-                padding: 0.6rem 0rem !important;
+                padding: 0.6rem 0rem;
                 &:first-child {
-                  padding-left: 1rem !important;
+                  padding-left: 0.7rem;
                 }
                 &:last-child {
-                  padding-right: 1rem !important;
+                  padding-right: 0.7rem;
                 }
 
                 &.sm {
-                  padding: 0.2rem 0rem !important;
+                  padding: 0.2rem 0rem;
                 }
 
                 .span_icon {

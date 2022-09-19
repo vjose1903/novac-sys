@@ -3,18 +3,18 @@ import * as fun_ from '../utils/funciones';
 import { styles_ } from '../utils/files';
 import { SingletonService } from '../../singleton.service';
 import { ConfigI } from '../../../typescript/config-interface';
-import { getContentWithTablaNormal } from '../tabla_normal';
+import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
 import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
 import { config_conduce } from './configuraciones/conduce';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
-import { config_pre_factura } from './configuraciones/pre_factura';
+import { config_pre_venta } from './configuraciones/pre_venta';
 import { fun } from '../../functions.service';
 import { config_notas } from './configuraciones/notas';
 
 const configuraciones = {
-  pre_factura: config_pre_factura,
+  pre_venta: config_pre_venta,
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
   conduce: config_conduce,

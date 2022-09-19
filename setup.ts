@@ -1,26 +1,34 @@
 var fs = require('fs');
 var path = require('path');
 
-const clientes = ['brendy', 'agrodemi'];
+const clientes = ['brendy', 'agrodemi', 'vasquez'];
 
 const tipo_selected = process.argv.slice(2)[0];
 const nivel = process.argv.slice(2)[1];
 
 const setup_ = {
+  agrodemi: {
+    TITLE_APP: 'Novac System - AGRODEMI',
+    PORT_APP: '5220',
+    DB_PORT: '9090',
+    DOCKER_NAME: 'agrodemi',
+    NAME_UPDATE_REPO: 'novac-system-agrodemi',
+    CUSTOM_ACCESS: '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',
+  },
   brendy: {
     TITLE_APP: 'Novac System - Panaderia Brendy',
     PORT_APP: '5221',
-    DB_PORT: '3001',
+    DB_PORT: '9091',
     DOCKER_NAME: 'brendy',
     NAME_UPDATE_REPO: 'novac-system-brendy',
     CUSTOM_ACCESS: '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',
   },
-  agrodemi: {
-    TITLE_APP: 'Novac System - AGRODEMI',
-    PORT_APP: '5220',
-    DB_PORT: '3000',
-    DOCKER_NAME: 'agrodemi',
-    NAME_UPDATE_REPO: 'novac-system-agrodemi',
+  vasquez: {
+    TITLE_APP: 'Novac System - D` Vásquez Services',
+    PORT_APP: '5222',
+    DB_PORT: '9092',
+    DOCKER_NAME: 'vasquez',
+    NAME_UPDATE_REPO: 'novac-system-vasquez',
     CUSTOM_ACCESS: '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',
   },
 };

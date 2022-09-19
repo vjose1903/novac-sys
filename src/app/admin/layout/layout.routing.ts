@@ -1,9 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { NgxPermissionsGuard } from 'ngx-permissions';
-import { Permisos } from '../../core/typescript/permisos';
-import { ConduceComponent } from '../conduce/conduce.component';
-import { FacturacionComponent } from '../facturacion/facturacion.component';
 import { HomeAdminComponent } from '../home/homeAdmin.component';
 import { InventarioComponent } from '../inventario/inventario.component';
 import { ProduccionComponent } from '../produccion/produccion.component';
@@ -25,8 +21,8 @@ const routes: Routes = [
         component: HomeAdminComponent,
       },
       {
-        path: 'factura/:tipo/:action/:id',
-        component: FacturacionComponent,
+        path: 'factura',
+        loadChildren: () => import('../facturacion/facturacion.module').then((m) => m.FacturacionModule),
       },
 
       {
@@ -53,7 +49,7 @@ const routes: Routes = [
 
       {
         path: 'conduce',
-        component: ConduceComponent,
+        loadChildren: () => import('../conduce/conduce.module').then((m) => m.ConduceModule),
       },
 
       {

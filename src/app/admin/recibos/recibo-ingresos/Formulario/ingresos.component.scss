@@ -85,12 +85,20 @@
     .cajas {
       display: grid;
       height: 100%;
-      grid-template-areas: "izquierda derecha";
+      grid-template-areas:
+      "centro centro"
+      "izquierda derecha";
       grid-template-columns: auto auto;
       grid-template-rows: auto;
+
+      .centro {
+        grid-area: centro;
+      }
+
       .izquierda {
         grid-area: izquierda;
       }
+
       .derecha {
         grid-area: derecha;
       }

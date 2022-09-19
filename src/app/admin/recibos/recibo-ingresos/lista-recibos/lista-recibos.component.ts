@@ -10,7 +10,7 @@ import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.co
 import { fun } from '../../../../core/services/functions.service';
 import { Permisos } from '../../../../core/typescript/permisos';
 import { table_config } from '../../../components/new_tablas/tabla-class';
-import { FacturaC } from '../../../facturacion/factura';
+import { ModalClass } from '../../../components/modal/modal-class';
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
@@ -22,7 +22,8 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       { titulo: '|', tipo: 'icon', key: 'tipo_', estilos: [{ width: '3%' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'tipo_recibo', rowTooltip: 'tooltip_tipo', text_color: 'colorEstado' }] },
 
       { titulo: 'No. recibo', estilos: [{ width: '8%' }], key: 'numero_recibo', tipo: 'text' },
-      { titulo: 'Cliente', key: 'cliente_', tipo: 'text', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
+      { titulo: 'Fecha recibo', estilos: [{ width: '10%' }], key: 'fecha_equivalente', tipo: 'date' },
+      { titulo: 'Cliente', key: 'cliente.nombre_completo', tipo: 'text', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
       { titulo: 'No. factura', key: 'numero_factura', tipo: 'text', estilos: [{ width: '12%' }] },
       { titulo: 'Total recibido', key: 'total', tipo: 'formatoNumero', estilos: [{ width: '12%' }, { 'text-align': 'end' }] },
       {
@@ -45,15 +46,13 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   };
   tablaComponent;
 
-  pdfSrc;
-  fileName;
   lista_recibos;
   rowSelected: any;
   reciboClass = new ReciboC();
 
   permissions = Permisos;
 
-  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
+  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
 
@@ -73,11 +72,10 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     this._destroy_mixin();
   }
 
-  mapeoRecibos(res) {
-    res.map((recibo) => {
+  mapeoRecibos(data) {
+    data.map((recibo) => {
       recibo['tipo_recibo'] = recibo.choferes_viajes.length ? 'fas fa-truck-moving' : 'fas fa-comment-dollar';
       recibo['numero_recibo'] = _.padStart(recibo.numero_recibo, 8, '0');
-      recibo['cliente_'] = `${recibo.cliente.nombre} ${recibo.cliente.apellido}`;
       recibo['numero_factura'] = recibo.detalle_recibos.length === 1 ? recibo.detalle_recibos[0].descripcion.split(' ')[1] : 'Varios...';
       recibo['ver'] = 'far fa-eye';
       recibo['anular'] = 'far fa-trash-alt';
@@ -95,8 +93,9 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
           { key: 'tipo_', isTd: true, estilos: 'width: 3% !important; font-size: 1rem !important' },
           { key: 'tipo_recibo', estilos: 'font-size: 1rem !important' },
         ],
-        cliente_: { 'text-align': 'start', 'padding-left': '1.5rem' },
+        'cliente.nombre_completo': { 'text-align': 'start', 'padding-left': '1.5rem' },
         numero_recibo: { width: '8%' },
+        fecha_equivalente: { width: '10%' },
         numero_factura: { width: '12%' },
         total: { width: '12%', 'text-align': 'end', 'padding-right': '1.5rem' },
         actions: [
@@ -108,7 +107,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
       return recibo;
     });
-    return res;
+    return data;
   }
 
   async necesarioStart() {
@@ -140,7 +139,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     if (event.columnKey) {
       switch (event.iconKey) {
         case 'ver':
-          this.getReciboBase64(recibo_selected);
+          this.makeReciboPdf(recibo_selected);
           break;
 
         case 'anular':
@@ -165,14 +164,13 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
@@ -186,7 +184,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     });
   }
 
-  getReciboBase64(arg) {
+  makeReciboPdf(arg) {
     const recibo_selected = _.find(this.lista_recibos, (recibo) => recibo.id === arg.id);
     const obj = { data: recibo_selected, type: 'recibo_ingreso', retunBase64: true };
     this.generarPdf(obj);
@@ -195,17 +193,16 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   generarPdf(obj) {
     this.loadServ.isLoading.next(true);
 
-    this.pdfServ
-      .generatePdf({ oPdf: obj, imprimir: false })
+    PdfService.generatePdf({ oPdf: obj, imprimir: false })
       .then(async (res) => {
         if (res.status === 'si') {
-          this.fileName = res.file;
-          this.pdfSrc = res.body;
-          const obj_pdf = { pdfSrc: res.body, titulo: 'Revisión de recibo de ingreso', height: '25rem', reimprimir: true, fileName: res.file.split('.')[0] };
+          const fileName = res.file;
+          const base64 = res.base64;
+          const obj_pdf = { base64: res.base64, titulo: 'Revisión de recibo de ingreso', height: '25rem', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
           this.loadServ.isLoading.next(false);
 
-          this.handleModalForm({
+          this.openNewModal({
             component: PdfViewerComponent,
             inputs: obj_pdf,
             id: 'revision_recibo',
@@ -213,15 +210,14 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
             width: '900px',
             height: obj_pdf.height,
             botones: {
-              aceptar: { show: false, disable: false },
-              cancelar: { show: false, disable: false },
+              ...ModalClass.noShowAceptarCancelarButtons,
               dinamico: [
                 { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
                 { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(obj.data), label: 'Ver detalles', disable: false },
                 {
                   clase: 'btn btn-verde',
                   function: (instance) => {
-                    this.imprimir_base64();
+                    this.imprimir_base64(fileName, base64);
                     instance.closeModal(instance.id, 'cancel');
                   },
                   label: 'Imprimir',
@@ -237,14 +233,13 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   verDetalles(data) {
     const configModal = this.reciboClass.modalVerDetalles(data);
-    this.handleModalForm(configModal);
+    this.openNewModal(configModal);
   }
 
-  imprimir_base64() {
-    const obj = { base64: this.pdfSrc, filename: this.fileName, type: 'recibo_ingreso' };
+  imprimir_base64(fileName, base64) {
+    const obj = { base64: base64, file: fileName, type: 'recibo_ingreso' };
     try {
-      this.pdfServ
-        .imprimirBase64(obj)
+      PdfService.imprimirBase64(obj)
         .then(async (res) => {
           if (res['status'] === 'si') fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
           else fun.toastError(res['msg'], 'ERROR');
@@ -264,7 +259,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       const extra = { afterPath: `revertir/by_id/${id}` };
       const actualPagination = this.tServ.getPaginationById('listado_recibos');
 
-      this.reciboClass.getAll(extra).then((res) => this.getRecibos(actualPagination));
+      this.reciboClass.dynamic(extra).then((res) => this.getRecibos(actualPagination));
     } catch (error) {}
   }
 }

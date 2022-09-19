@@ -182,6 +182,7 @@ export class fun {
       nStr += '';
       const x = nStr.split('.');
       let x1 = x[0];
+      if (fun.isEmpty(x1)) x1 = 0;
       const x2 = x.length > 1 ? '.' + x[1] : '';
       const rgx = /(\d+)(\d{3})/;
       while (rgx.test(x1)) {
@@ -191,11 +192,11 @@ export class fun {
     }
   }
   // __________________________________________________________________________________________________
-  // Nombre: redondearAdos
+  // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
 
-  static redondearAdos(num) {
+  static redondearNum(num, cant = 2) {
     const string = num + '';
     const splitStr = _.split(string, '.');
 
@@ -206,15 +207,50 @@ export class fun {
     enteros = _.join(splitEnteros, '');
 
     let tempdecimales = splitStr[1];
-    if (splitStr.length === 1) {
-      tempdecimales = '00';
-    }
+    if (splitStr.length == 1) tempdecimales = _.padEnd('', cant, '0');
 
-    const decimales = tempdecimales.substring(0, 2);
+    const decimales = fun.checkCeros(tempdecimales.substring(0, cant));
     const Arreglo = [enteros, decimales];
     const numStr = _.join(Arreglo, '.');
 
-    return parseFloat(numStr).toFixed(2);
+    return numStr;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: checkLongDecimales
+  // Descripcion : Esta funcion verifica que los numeros decimales no excedan el numero especificado
+  // _________________________________________________________________________________________________
+
+  static checkLongDecimales(currentValue, cant = 2) {
+    const result = { value: currentValue, error: false };
+
+    const splitStr = _.split(currentValue, '.');
+
+    if (splitStr.length > 1 && splitStr[1].length > cant) {
+      splitStr[1] = splitStr[1].slice(0, cant);
+      result.value = _.join(splitStr, '.');
+      result.error = true;
+    }
+
+    return result;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: checkCeros
+  // Descripcion : Esta funcion verifica que en un numero decimal no existan 0 a la derecha
+  // _________________________________________________________________________________________________
+
+  static checkCeros(num) {
+    let result = num;
+    if (num.length < 2) num += '00';
+
+    if (num.charAt(num.length - 1) == '0' && num.length > 2) {
+      let numSliced = num.slice(0, num.length - 1);
+
+      return fun.checkCeros(numSliced);
+    } else {
+      return result;
+    }
   }
 
   // __________________________________________________________________________________________________
@@ -223,7 +259,7 @@ export class fun {
   // _________________________________________________________________________________________________
 
   static parseFloatTwoDecimals(sTnum) {
-    return fun.desformatear(fun.redondearAdos(sTnum));
+    return fun.desformatear(fun.redondearNum(sTnum));
   }
 
   // __________________________________________________________________________________________________
@@ -239,7 +275,8 @@ export class fun {
   // Descripcion : Esta funcion toma un string y lo formatea a dos decimales
   // _________________________________________________________________________________________________
   static numFormatTwoDecimals(num) {
-    return fun.formatearNumero(fun.redondearAdos(num));
+    if (typeof num == 'string') num = this.desformatear(num);
+    return fun.formatearNumero(fun.redondearNum(num));
   }
 
   // __________________________________________________________________________________________________
@@ -668,6 +705,10 @@ export class fun {
   // =====================================================================
   // TOASTS
   // =====================================================================
+
+  static toastInfo(msg?, titulo = 'INFORMACION') {
+    if (SingletonService.sharedServ.canToast) SingletonService.toastr.info(msg || '', titulo || '');
+  }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
     if (SingletonService.sharedServ.canToast) SingletonService.toastr.success(msg || '', titulo || '');

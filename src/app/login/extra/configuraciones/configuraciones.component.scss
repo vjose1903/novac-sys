@@ -25,21 +25,10 @@
 
     display: grid;
     grid-template-areas:
-      "form"
+      "tabView"
       "buttons";
     grid-template-rows: auto min-content;
 
-    .form {
-      position: relative;
-      grid-area: form;
-      overflow: auto;
-
-      .fantasma {
-        position: absolute;
-        height: 100%;
-        width: 100%;
-      }
-    }
     .buttons {
       grid-area: buttons;
       padding: 0.5rem;
@@ -49,5 +38,27 @@
   .footer {
     background-color: var(--secondary04);
     grid-area: footer;
+  }
+}
+
+::ng-deep {
+  .my_tabView {
+    // position: absolute !important;
+    // height: 100% !important;
+    // width: 100% !important;
+    grid-area: tabView;
+
+    .form {
+      height: 100%;
+      width: 100%;
+      position: relative;
+      overflow: auto;
+
+      .fantasma-form {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+    }
   }
 }

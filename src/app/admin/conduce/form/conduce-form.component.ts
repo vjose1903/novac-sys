@@ -1,30 +1,32 @@
+import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
-import * as moment from '../../core/javascript/moment';
-import { MixinClass } from '../../core/typescript/MixinClass';
-import { ArticuloC } from '../registros/articulos/articulo';
-import { ConduceC } from '../conduce/coduce';
-import { FacturaC } from '../facturacion/factura';
-import { PdfService } from '../../core/services/pdf/pdf.service';
-import { BuscarArticuloComponent } from '../components/formularios en modales/buscar-articulo/buscar-articulo.component';
-import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
-import { ModalSeleccinarArticuloComponent } from '../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
-import { fun } from '../../core/services/functions.service';
-import { ModalService } from '../components/modal/modal.service';
-import { Permisos } from '../../core/typescript/permisos';
-import { table_config } from '../components/new_tablas/tabla-class';
-import { ConfigI } from '../../core/typescript/config-interface';
-import { SingletonService } from '../../core/services/singleton.service';
-import { ConfirmacionImprimirComponent } from '../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
-import { teclasCode } from '../../core/typescript/constantes';
+import * as moment from '../../../core/javascript/moment';
+
+import { ArticuloC } from '../../registros/articulos/articulo';
+import { ConduceC } from '../../conduce/coduce';
+import { FacturaC } from '../../facturacion/factura';
+import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
+import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { ModalSeleccinarArticuloComponent } from '../../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
+import { fun } from '../../../core/services/functions.service';
+import { ModalService } from '../../components/modal/modal.service';
+import { Permisos } from '../../../core/typescript/permisos';
+import { table_config } from '../../components/new_tablas/tabla-class';
+import { ConfigI } from '../../../core/typescript/config-interface';
+import { SingletonService } from '../../../core/services/singleton.service';
+import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
+import { teclasCode } from '../../../core/typescript/constantes';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
-  selector: 'app-conduce',
-  templateUrl: './conduce.component.html',
-  styleUrls: ['./conduce.component.scss'],
+  selector: 'app-conduce-form',
+  templateUrl: './conduce-form.component.html',
+  styleUrls: ['./conduce-form.component.scss'],
 })
-export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
+export class ConduceFormComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   secuenciaKeys = [];
 
   @HostListener('window:keydown', ['$event'])
@@ -74,7 +76,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       { titulo: '1', tipo: 'icon', key: 'some_is_selected', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'detalles_selected' }] },
       { titulo: 'Numero Fact', key: 'secuencia', tipo: 'text' },
       { titulo: 'NCF', key: 'numero_comprobante', tipo: 'text' },
-      { titulo: 'Fecha Facturacion', key: 'fecha', tipo: 'text' },
+      { titulo: 'Fecha Facturacion', key: 'fecha_equivalente', tipo: 'date' },
       { titulo: 'Total Facturado', key: 'total_factura', tipo: 'formatoNumero' },
     ],
     id_tabla: 'lista_conduces',
@@ -93,7 +95,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   formPermissions = [Permisos.role.create, Permisos.role.update];
 
   configApp: ConfigI;
-  constructor(private fb: FormBuilder, private pdfServ: PdfService, public mServ: ModalService) {
+  constructor(private fb: FormBuilder, public mServ: ModalService) {
     super();
   }
 
@@ -227,17 +229,14 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
         if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
           const obj = { palabra_a_buscar: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
 
-          this.handleModalForm({
+          this.openNewModal({
             component: BuscarArticuloComponent,
             inputs: obj,
             id: 'buscar_articulo',
             header: 'BUSCAR ARTICULO',
             width: '56.25rem',
             height: '31.25rem',
-            botones: {
-              aceptar: { show: false, disable: false },
-              cancelar: { show: false, disable: false },
-            },
+            botones: ModalClass.noShowAceptarCancelarButtons,
           });
           this.enfocarInput('input_fantasma');
         } else {
@@ -298,6 +297,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     const { articulo, cod } = this.filasDetalle[index].getRawValue();
 
     if (cod && articulo) {
+      const medida = articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo.medida;
       const precioPrincipal = articulo.precio_principal;
       const costoPrincipal = articulo.costo_principal;
       this.UnidadesArticulo = [];
@@ -305,7 +305,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: articulo.contenido[articulo.medida] });
 
       if (articulo.medida !== 'Quintal') {
-        this.UnidadesArticulo.push({ value: articulo.medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[articulo.medida] });
+        this.UnidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
       if (_.lowerCase(articulo.vendido_en) == 'saco' && articulo.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
@@ -336,7 +336,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
   calcularPrecioSaco(cant, precio) {
     const res = (cant / 100) * precio;
-    return fun.redondearAdos(res);
+    return fun.redondearNum(res);
   }
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES
@@ -346,17 +346,14 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
     if (fun.hasValue(nombre)) {
       const obj = { data: [], palabra_a_buscar: nombre, metodo: 'venta' };
 
-      this.handleModalForm({
+      this.openNewModal({
         component: BuscarClienteSuplidorComponent,
         inputs: obj,
         id: 'buscarCliente',
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: {
-          aceptar: { show: false, disable: false },
-          cancelar: { show: false, disable: false },
-        },
+        botones: ModalClass.noShowAceptarCancelarButtons,
       });
 
       this.desEnfocarInput('clienteI');
@@ -551,7 +548,6 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           this.facturas_adelantadas = res['data'];
           this.facturas_adelantadas.map((factura) => {
             factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
-            factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
             factura.customStyles = {
               some_is_selected: [
                 { key: 'some_is_selected', isTd: true, estilos: 'width: 2rem !important;' },
@@ -628,7 +624,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
           conteo++;
           if (conteo >= factura.detalle_facturas.length)
             setTimeout(() => {
-              this.handleModalForm({
+              this.openNewModal({
                 component: ModalSeleccinarArticuloComponent,
                 inputs: factura.detalle_facturas,
                 id: 'seleccionar_articulos_adelantados',
@@ -636,8 +632,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
                 width: '900px',
                 height: '400px',
                 botones: {
-                  aceptar: { show: false, disable: false },
-                  cancelar: { show: false, disable: false },
+                  ...ModalClass.noShowAceptarCancelarButtons,
                   dinamico: [
                     { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
                     { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
@@ -763,14 +758,13 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
@@ -820,15 +814,14 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
 
       const obj = { modo_factura: 'conduce', condicion_fact: 'conduce', metodo: 'conduce' };
 
-      this.handleModalForm({
+      this.openNewModal({
         component: ConfirmacionImprimirComponent,
         inputs: obj,
         id: 'confirmacionImprimir',
         header: 'Confirmación',
         width: '30rem',
         botones: {
-          aceptar: { show: false, disable: false },
-          cancelar: { show: false, disable: false },
+          ...ModalClass.noShowAceptarCancelarButtons,
           dinamico: [
             { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
@@ -852,7 +845,7 @@ export class ConduceComponent extends MixinClass implements OnInit, OnDestroy, A
       const obj = { data: res['data'], type: 'conduce' };
 
       this.cancelarConduce();
-      this.pdfServ.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
+      PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
     });
   }
 

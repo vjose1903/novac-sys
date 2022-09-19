@@ -23,12 +23,10 @@ export class CurrentUserService {
       const token = fun.getAuthToken();
 
       if (token) {
-
         this.requestClass
           .getAll({ afterPath: 'auth/validate_token' })
           .then((res) => this.setUser(res.data).then(() => resolve(res.data)))
           .catch((err) => reject({ razon: 'sesion_expired' }));
-
       } else {
         reject({ razon: 'no_token' });
       }

@@ -1,4 +1,9 @@
-<div>
+<div class="position-relative">
+    <span *ngIf="inputs?.show_estado && !inputs?.estado_documento" class="canceladaContent">
+    <span class="canceladaContent">
+      FACTURA ANULADA
+    </span>
+  </span>
   <ngx-extended-pdf-viewer
     [showDownloadButton]="false"
     [showOpenFileButton]="false"
@@ -8,8 +13,9 @@
     [showRotateButton]="false"
     [showBookmarkButton]="false"
     [enablePrint]="false"
-    [base64Src]="inputs?.pdfSrc"
+    [base64Src]="inputs?.base64"
     [useBrowserLocale]="true"
     [height]="inputs?.height"
+    [textLayer]="false"
   ></ngx-extended-pdf-viewer>
 </div>

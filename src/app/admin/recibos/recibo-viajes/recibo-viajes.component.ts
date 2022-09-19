@@ -13,6 +13,7 @@ import { FormCantidadEfectivoComponent } from '../../components/formularios en m
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { FormBuilder, Validators } from '@angular/forms';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -35,7 +36,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' },
         ],
       },
-      { titulo: 'Fecha Fact.', tipo: 'text', key: 'fecha', estilos: [{ width: '20%' }] },
+      { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '20%' }] },
       { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar', estilos: [{ width: '35%' }] },
       { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '15%' }] },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', estilos: [{ width: '20%' }] },
@@ -77,7 +78,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   form;
 
-  constructor(private tServ: TablasService, private reciboServ: RecibosService, private pdfServ: PdfService, private fb: FormBuilder) {
+  constructor(private tServ: TablasService, private reciboServ: RecibosService, private fb: FormBuilder) {
     super();
   }
 
@@ -175,7 +176,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         };
 
         viaje.cliente_mostrar = viaje.cliente.nombre;
-        viaje.fecha = moment(viaje.fecha_equivalente).format('DD/MM/YYYY');
         viaje['pago_a_tiempo'] = pago_a_tiempo;
 
         this.viajes.push(viaje);
@@ -215,7 +215,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
             const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
             obj_modal.botones.dinamico.push(ver_datelles_btn);
-            this.handleModalForm(obj_modal);
+            this.openNewModal(obj_modal);
           });
         });
       }
@@ -224,7 +224,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   verDetalles(data) {
     const configModal = this.reciboClass.modalVerDetalles(data);
-    this.handleModalForm(configModal);
+    this.openNewModal(configModal);
   }
 
   abrir_historial() {
@@ -283,15 +283,14 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       if (tipo === 'cambio') {
         const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo_modal: 'no_devuelta', factura_de: 'recibo_ingreso', formaPago: 'Efectivo' };
 
-        this.handleModalForm({
+        this.openNewModal({
           component: FormCantidadEfectivoComponent,
           inputs: obj,
           id: 'cambioEfectivo_ReciboViajes',
           header: 'Cantidad de efectivo',
           width: '34.375rem',
           botones: {
-            aceptar: { show: false, disable: false },
-            cancelar: { show: false, disable: false },
+            ...ModalClass.noShowAceptarCancelarButtons,
             dinamico: [
               {
                 clase: 'btn btn-blanco mr-2',
@@ -329,7 +328,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
@@ -337,8 +336,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         ${obj.texto}
       </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
@@ -418,8 +416,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       const obj_print = { data: res['data'].recibo, type: 'recibo_ingreso' };
 
       if (this.is_print) {
-        this.pdfServ
-          .generatePdf({ oPdf: obj_print, imprimir: true })
+        PdfService.generatePdf({ oPdf: obj_print, imprimir: true })
           .then(async (res) => {
             if (res.status === 'si') {
             } else fun.toastError(res.msg, 'ERROR');

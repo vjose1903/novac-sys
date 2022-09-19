@@ -6,8 +6,6 @@ import { IpcService } from '../core/services/ipc.service';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
 import * as _ from 'lodash';
 
-import * as Rx from 'rxjs';
-
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
 
 import { PdfService } from '../core/services/pdf/pdf.service';
@@ -38,7 +36,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   configServ = SingletonService.configServ;
   configApp: ConfigI;
 
-  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public pdfServ: PdfService, public currentUserServ: CurrentUserService) {
+  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public currentUserServ: CurrentUserService) {
     super();
   }
 
@@ -53,6 +51,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
       this.form = this.fb.group({ usuario: config.is_development ? 'ADMIN' : null, password: config.is_development ? '1234567' : null });
     });
     setTimeout(() => this.enfocarInput('Iusuario'), 5);
+    // setTimeout(() => this.router.navigateByUrl('/auth/config'), 100);
   }
 
   ngOnDestroy() {}
@@ -111,7 +110,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     if (fun.hasValue(this.form)) this.form.reset();
     this.enfocarInput('Iusuario');
 
-    this.handleModalForm({
+    this.openNewModal({
       inputs: {},
       component: ModalPasswordConfigComponent,
       id: 'passwordConfigForm',
@@ -143,7 +142,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   async pruebaRecibo() {
     const data_ = recibo_de_ingreso;
 
-    // const DD = await this.pdfServ.makeFacturaVenta(data);
     const obj = { data: data_, type: 'recibo_ingreso' };
     // ["type"] =
     this.tipo_prueba = obj.type;
@@ -171,11 +169,11 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   generar(obj) {
-    this.pdfServ.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
+    PdfService.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
       if (res.status === 'si') {
-        const objBase = { base64: res.body, filename: res.file, type: this.tipo_prueba };
+        const objBase = { base64: res.base64, filename: res.file, type: this.tipo_prueba };
 
-        const obj = { pdfSrc: res.body, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+        const obj = { base64: res.base64, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
         // this.abrirModalReporte(obj);
       }
     });

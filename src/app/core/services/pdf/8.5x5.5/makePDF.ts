@@ -4,9 +4,9 @@ import * as fun_ from '../utils/funciones';
 import { styles_ } from '../utils/files';
 import { SingletonService } from '../../singleton.service';
 import { ConfigI } from '../../../typescript/config-interface';
-import { getContentWithTablaNormal } from '../tabla_normal';
+import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes, infoTipoPdf, firmas } from './infoPdfs';
-import { config_notas } from './configuraciones/notas';
+import { config_notas } from './configuraciones/notas/notas';
 import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
 import { config_conduce } from './configuraciones/conduce';
@@ -14,14 +14,16 @@ import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { fun } from '../../functions.service';
 
 const configuraciones = {
-  notas: config_notas,
+  notas_detallada: config_notas.detallada,
+  notas_agrupada: config_notas.agrupada,
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
   conduce: config_conduce,
   cuadre_caja: config_cuadre_caja,
 };
 
-export function makePDF(data, file_name, tipo_pdf?) {
+export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
+  const tipo_pdf = `${base_tipo_pdf}${post_tipo_pdf}`;
   const is_compra = data?.tipo === 'compra' ? true : false;
 
   const is_suplidor = is_compra;
@@ -32,8 +34,8 @@ export function makePDF(data, file_name, tipo_pdf?) {
   const dd = {
     pageSize: configuration.pageSize,
     pageMargins: configuration.pageMargins,
-    header: (currentPage, pageCount, pageSize) => cabeceraPDF({ data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf }),
-    content: contenidoPDF({ data, is_suplidor, configApp, tipo_pdf }),
+    header: (currentPage, pageCount, pageSize) => cabeceraPDF({ data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf: base_tipo_pdf }),
+    content: contenidoPDF({ data, configApp, configuration, tipo_pdf: base_tipo_pdf }),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
@@ -88,10 +90,8 @@ function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSi
 // CONTENIDO
 // ==========================================================================================================================================================
 
-function contenidoPDF(args: { data: any; is_suplidor: any; configApp: ConfigI; tipo_pdf: any }) {
-  const { data, is_suplidor, configApp, tipo_pdf } = args;
-
-  const configuration = configuraciones[tipo_pdf];
+function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; configuration: any }) {
+  const { data, configApp, tipo_pdf, configuration } = args;
 
   data.tipo_tabla = 'normal';
 

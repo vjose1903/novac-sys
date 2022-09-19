@@ -1,7 +1,7 @@
 <span id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera', metodo)">
   <i id="triangualo" class="fas fa-caret-left text-white"></i>
 </span>
-<div class="cardPrincipal sinPadding tamano" style="position: relative">
+<div class="cardPrincipal sinPadding cardFacturacion">
   <div class="cabezaFactura">
     <div class="row">
       <div *ngIf="metodo != 'pre_venta'" class="col-3 divRight pl-0">
@@ -153,7 +153,9 @@
                 <ul class="overlayCamion" role="menu">
                   <li id="overlayCamion-{{ index_camion }}" *ngFor="let camion of camiones; let index_camion = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: camion_row == index_camion }">
                     <div class="d-flex justify-content-between align-items-center">
-                      <span id="dropdown-item" class="mr-3 mb-0"> {{ getCamionLabel(camion) }} </span>
+                      <span id="dropdown-item" class="mr-3 mb-0">
+                        {{ getCamionLabel(camion) }}
+                      </span>
                       <input class="apple-switch" [ngClass]="{ disabled: action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion)" [checked]="checkCamionIsSelected(camion)" />
                     </div>
                   </li>
@@ -166,7 +168,6 @@
             </ng-template>
           </p-overlayPanel>
         </div>
-        <!-- (ngModelChange)="enfocarInput('fecha_viaje')" -->
 
         <div *ngIf="metodo === 'compra'">
           <span class="mt-2"><strong>Número comprobante:</strong></span>
@@ -290,50 +291,46 @@
     </div>
   </div>
   <div class="cuerpoFactura mb-2">
-    <app-cuerpo-factura
-      [propietario]="propietario_factura"
-      [factura]="factura_a_editar"
-      [action]="action"
-      [modo_factura]="modo_factura"
-      [pre_factura_selected]="pre_factura_selected"
-      [metodo]="metodo"
-      [fechaFactura]="fechaFactura?.front"
-      (getCuerpoFactura)="getCuerpoFactura($event)"
-      (getCalculosDinero)="getCalculosDinero($event)"
-    ></app-cuerpo-factura>
+    <div class="fantasma-cuerpo">
+      <app-cuerpo-factura
+        [propietario]="propietario_factura"
+        [factura]="factura_a_editar"
+        [action]="action"
+        [modo_factura]="modo_factura"
+        [pre_factura_selected]="pre_factura_selected"
+        [metodo]="metodo"
+        [fechaFactura]="fechaFactura?.front"
+        (getCuerpoFactura)="getCuerpoFactura($event)"
+        (getCalculosDinero)="getCalculosDinero($event)"
+      ></app-cuerpo-factura>
+    </div>
   </div>
   <div class="pieFactura">
     <div class="row mx-0 w-100">
       <div class="col-7">
-        <div class="row">
-          <div *ngxPermissionsOnly="metodo == 'venta' ? permissions.factura_venta.create : permissions.factura_compra.create" class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }} ">
+        <div class="h-100 d-flex justify-content-around align-items-center">
+          <div *ngxPermissionsOnly="metodo == 'venta' ? permissions.factura_venta.create : permissions.factura_compra.create">
             <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Imprimir Factura' : 'Editar Factura'" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
           </div>
-          <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
+          <div>
             <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
           </div>
-          <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : 'col-4' }}">
-            <app-btncircular
-              [disabled]="metodo == 'pre_venta'"
-              [alto]="'100px'"
-              [accion]="metodo != 'pre_venta' ? (factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura') : 'NO DISPONIBLE'"
-              [nombreImg]="'guardarFactura'"
-              (pulsar)="archivarFactura()"
-            ></app-btncircular>
+          <div>
+            <app-btncircular [alto]="'100px'" [accion]="factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura'" [nombreImg]="'guardarFactura'" (pulsar)="archivarFactura()"></app-btncircular>
           </div>
 
-          <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">
+          <div *ngIf="metodo === 'venta'">
             <app-btncircular *ngIf="!!!factura_a_editar" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
           </div>
 
-          <!-- <div class="mt-3 d-flex justify-content-center align-items-center text-center {{ metodo === 'venta' ? 'col-3' : '' }}" *ngIf="metodo === 'venta'">
-            <app-btncircular
-              [alto]="'100px'"
-              [accion]="'PRUEBA'"
-              [nombreImg]="'calendar'"
-              (click)="prueba()"
-            ></app-btncircular>
-          </div> -->
+          <!-- <div  *ngIf="metodo === 'venta'">
+          <app-btncircular
+            [alto]="'100px'"
+            [accion]="'PRUEBA'"
+            [nombreImg]="'calendar'"
+            (click)="prueba()"
+          ></app-btncircular>
+        </div> -->
         </div>
       </div>
       <div class="col-5 d-flex justify-content-end">
@@ -342,6 +339,10 @@
             <div class="col-12 cuadroResumenTotal mb-2">
               <span class="label text-poppins position-absolute left-0 top-0">BRUTO:</span>
               <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(BRUTO) }}</h5>
+            </div>
+            <div *ngIf="configApp.calcular_itbis" class="col-12 cuadroResumenTotal mb-2">
+              <span class="label text-poppins position-absolute left-0 top-0">ITBIS:</span>
+              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(ITBIS) }}</h5>
             </div>
             <div class="col-12 cuadroResumenTotal mb-2">
               <span class="label text-poppins position-absolute left-0 top-0">DESCUENTO:</span>
@@ -360,7 +361,7 @@
 
 <p-sidebar
   #my_sidebar
-  styleClass="my_sidebar  {{ _sideBarOpened ? 'side_open' : 'side_closed' }}"
+  styleClass="my_sidebar  {{ _sideBarOpened ? 'side_open' : 'side_closed' }} {{ hasPermisoPreVenta ? 'large' : '' }}"
   *ngIf="_sideBarOpened"
   [position]="'right'"
   [visible]="_sideBarOpened"
@@ -381,7 +382,7 @@
     </div>
 
     <div class="cuerpoContenidoSidar w-100">
-      <p-tabView [(activeIndex)]="activeIndex" styleClass="my_tabView" (onChange)="clickTabView($event.index)">
+      <p-tabView [(activeIndex)]="index_fact_archivada" styleClass="my_tabView" (onChange)="clickTabView($event.index)">
         <p-tabPanel
           [disabled]="countCantFactSaved('venta').disable"
           tooltip="No tiene facturas de Venta guardadas"
@@ -392,6 +393,22 @@
           <ng-template pTemplate="header">
             Venta
             <span *ngIf="!countCantFactSaved('venta').disable"> &nbsp;({{ countCantFactSaved('venta').cant }})</span>
+          </ng-template>
+
+          <ng-container *ngTemplateOutlet="facturas_guardadas"> </ng-container>
+        </p-tabPanel>
+
+        <p-tabPanel
+          *ngIf="hasPermisoPreVenta"
+          [disabled]="countCantFactSaved('pre_venta').disable"
+          tooltip="No tiene facturas de Venta guardadas"
+          headerStyleClass="{{ countCantFactSaved('pre_venta').disable ? 'noTabView' : '' }}"
+          tooltipDisabled="true"
+          tooltipStyleClass="{{ countCantFactSaved('pre_venta').disable ? 'd-block' : 'd-none' }} tabViewTootip"
+        >
+          <ng-template pTemplate="header">
+            Pre-Venta
+            <span *ngIf="!countCantFactSaved('pre_venta').disable"> &nbsp;({{ countCantFactSaved('pre_venta').cant }})</span>
           </ng-template>
 
           <ng-container *ngTemplateOutlet="facturas_guardadas"> </ng-container>
@@ -416,21 +433,21 @@
         <h6 *ngIf="facturas_localStorage?.length === 0" class="mt-3 no_fact">No tiene Facturas guardadas por el momento!!</h6>
         <div *ngIf="facturas_localStorage?.length > 0" class="h-100">
           <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="setFacturaArchivada(fact)">
-            <div class="colorsito bg-raya-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}{{ fact?.action === 'update' ? '-orange' : '' }}"></div>
+            <div class="colorsito bg-raya-{{ fact?.tipo === 'venta' ? 'green' : fact?.tipo === 'pre_venta' ? 'blue' : 'yellow' }}{{ fact?.action === 'update' ? '-orange' : '' }}"></div>
 
             <div class="info_fact h-100 {{ factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
               <i class="fas fa-history {{ fact.FacturaAtrasada ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}"></i>
               <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}"></i>
               <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar factura" tooltipPosition="left"></i>
               <span
-                class="negrita text-mayuscula text-separado-2 texto-borde-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}
-            texto-{{ fact?.tipo === 'venta' ? 'green' : 'yellow' }}"
+                class="negrita text-mayuscula text-separado-2 texto-borde-{{ fact?.tipo === 'venta' ? 'green' : fact?.tipo === 'pre_venta' ? 'blue' : 'yellow' }}
+            texto-{{ fact?.tipo === 'venta' ? 'green' : fact?.tipo === 'pre_venta' ? 'blue' : 'yellow' }}"
                 >{{ my_capitalize(fact?.tipo) }}
               </span>
               <span class="text-gris-oscuro" *ngIf="fact?.action == 'update'"> (Editando)</span>
               <br />
               <span class="clienteFactura">
-                <span class="negrita"> {{ fact?.tipo === 'venta' ? 'Cliente' : 'Suplidor' }}:</span>
+                <span class="negrita"> {{ fact?.tipo === 'venta' || fact?.tipo === 'pre_venta' ? 'Cliente' : 'Suplidor' }}:</span>
                 {{ getNombreFacturaGuardada(fact) }}
               </span>
               <br />

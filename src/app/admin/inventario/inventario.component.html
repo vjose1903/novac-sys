@@ -14,7 +14,7 @@
         <select class="form-control filtroArticulos" [(ngModel)]="filtro" (change)="filtrarArticulos()">
           <option value="0" disabled>Filtro por tipo de articulos</option>
           <option value="todos">Todos</option>
-          <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+          <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.codigo }}">{{ tipo.descripcion }}</option>
         </select>
 
         <i class="fas fa-print btn-circle-icon ml-3 btnReporte" (click)="makeReporte()" style="z-index: 999999" pTooltip="Reporte de inventario" tooltipPosition="right"></i>

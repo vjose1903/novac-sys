@@ -1,5 +1,25 @@
 import { CrudG } from '../../../core/typescript/crud-g';
 import * as _ from 'lodash';
+import { ReporteC } from '../../reportes/reporte';
+import { fun } from '../../../core/services/functions.service';
+
+export enum tipos_articulos {
+  veterinaria = 'veterinaria',
+  materia_prima = 'materia_prima',
+  producto_terminado = 'producto_terminado',
+  otro = 'otro',
+  materiales_de_oficina = 'materiales_de_oficina',
+  servicios_legales = 'servicios_legales',
+  servicios_contables = 'servicios_contables',
+  dulces = 'dulces',
+}
+
+export class TipoArticuloC extends CrudG<any> {
+  constructor() {
+    super('tipo_articulos');
+  }
+}
+
 export interface ArticuloI {
   data?: any;
   id?: number;
@@ -55,19 +75,51 @@ export class ArticuloC extends CrudG<ArticuloI> {
         .catch((err) => reject(err));
     });
   }
-}
 
-export enum tipos_articulos {
-  Veterinaria = 1,
-  Materia_prima = 2,
-  Producto_terminado = 3,
-  Otros = 4,
-}
+  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
+    return new Promise<any>((resolve, reject) => {
+      let objModal;
+      switch (params.tipo) {
+        case 'ventas_productos':
+          ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
+          objModal = ReporteC.objReporte;
 
+          break;
 
+        default:
+          break;
+      }
 
-export class TipoArticuloC extends CrudG<any> {
-  constructor() {
-    super('tipo_articulos');
+      params.openNewModal(objModal);
+
+      function returnDataFromModal(arg) {
+        ArticuloC.requestReporte(arg, params);
+        resolve(arg);
+      }
+    });
+  }
+
+  static requestReporte(reporteParams, pdfParams) {
+    let tipo;
+    let requestParameters;
+
+    switch (pdfParams.tipo) {
+      case 'ventas_productos':
+        if (reporteParams.data.tipo == '1') requestParameters = { desde: fun.my_dateFormater(reporteParams.data.fecha, false) };
+        else requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false) };
+
+        break;
+
+      default:
+        break;
+    }
+
+    const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
+
+    ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
+      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, width: tipo == 1 ? '57rem' : '64rem', height: tipo == 1 ? '76vh' : '47rem', fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
+
+      ReporteC.visualizarReporte(objPdfView);
+    });
   }
 }

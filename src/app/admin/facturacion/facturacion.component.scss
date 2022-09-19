@@ -47,12 +47,41 @@
   }
 }
 
-.cabezaFactura {
-  background-color: var(--primary01);
-  border-radius: 1rem 1rem 0rem 0rem !important;
-  padding: 0.6rem;
-  height: 21%;
+.cardFacturacion {
+  display: grid;
+
+  grid-template-areas:
+    "cabezaFactura"
+    "cuerpoFactura"
+    "pieFactura";
+
+  grid-template-rows: min-content auto min-content;
+  .cabezaFactura {
+    grid-area: cabezaFactura;
+    background-color: var(--primary01);
+    border-radius: 1rem 1rem 0rem 0rem !important;
+    padding: 0.6rem;
+  }
+
+  .cuerpoFactura {
+    grid-area: cuerpoFactura;
+    width: 100%;
+    position: relative;
+    .fantasma-cuerpo {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .pieFactura {
+    grid-area: pieFactura;
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
 }
+
 #inputTelefono {
   &:hover {
     cursor: default;
@@ -100,20 +129,6 @@
   right: 2rem;
 }
 
-div.pieFactura {
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  height: 21%;
-  display: flex;
-  align-items: center;
-}
-div.cuerpoFactura.mb-2 {
-  position: absolute;
-  width: 100%;
-  height: 56%;
-}
-
 .fecha {
   top: 0.2rem;
   font-size: 1.3rem;
@@ -139,10 +154,6 @@ div.cuerpoFactura.mb-2 {
 .divRight {
   border-right: 1px solid var(--transparente01);
 }
-
-// .tamano {
-//   height: calc(100% - 4rem) !important;
-// }
 
 .botonBuscar {
   border: 1px solid var(--primary09);
@@ -214,6 +225,10 @@ div.cuerpoFactura.mb-2 {
   box-shadow: -13px 0px 20px 0 #00000029 !important;
   flex-direction: inherit !important;
   display: block !important;
+
+  &.large {
+    width: 30rem !important;
+  }
   .p-sidebar-header {
     display: none;
   }
@@ -328,6 +343,9 @@ div.cuerpoFactura.mb-2 {
 .texto-green {
   color: #2c942cc9;
 }
+.texto-blue {
+  color: #2c5794c9;
+}
 .texto-yellow {
   color: #f5e206c9;
 }
@@ -335,10 +353,17 @@ div.cuerpoFactura.mb-2 {
 .texto-borde-green {
   -webkit-text-stroke: 1px #257d25ac;
 }
+.texto-borde-blue {
+  -webkit-text-stroke: 1px #253c7dac;
+}
 .texto-borde-yellow {
   -webkit-text-stroke: 1px #a99c0eaf;
 }
 
+.bg-raya-blue {
+  background-color: #385aabc9;
+  border: 1px solid #253b7da5;
+}
 .bg-raya-green {
   background-color: #38ab38c9;
   border: 1px solid #257d25a5;
@@ -346,6 +371,9 @@ div.cuerpoFactura.mb-2 {
 .bg-raya-yellow {
   background-color: #f5e206c9;
   border: 1px solid #a99c0e9f;
+}
+.bg-raya-blue-orange {
+  background: linear-gradient(180deg, #3262f3 0%, #3262f3 43%, #ffa400 100%);
 }
 .bg-raya-yellow-orange {
   background: linear-gradient(180deg, #f3ee32 0%, #f3ee32 43%, #ffa400 100%);

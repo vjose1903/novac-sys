@@ -10,6 +10,7 @@ import { fun } from '../../../core/services/functions.service';
 import { SharedService } from '../../../core/services/shared.service';
 import { Router } from '@angular/router';
 import { IpcService } from '../../../core/services/ipc.service';
+import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
@@ -30,6 +31,11 @@ export class ConfiguracionesComponent implements OnInit {
   ];
 
   medidas_articulos = [{ value: 'Quintal' }, { value: 'Producto' }];
+
+  plantillas_impresion = [
+    { key: 'nota', value: 'Agrupada' },
+    { key: 'nota', value: 'Detallada' },
+  ];
 
   paper_sizes = [
     { label: '8.5 x 11', descripcion: '8.5x11' },
@@ -58,6 +64,8 @@ export class ConfiguracionesComponent implements OnInit {
       this.config = config;
       this.configCopy = fun.duplicarJson(config);
       this.parseDocumentosAImprimir(config).then(() => this.createForm(config));
+
+      fun.logGreen('this.config', this.config);
     });
   }
 
@@ -80,6 +88,8 @@ export class ConfiguracionesComponent implements OnInit {
       printer_caja_selected: [{ value: this.getValue(data, 'printer_caja_selected'), disabled: false }, Validators.required],
       printer_reportes_selected: [{ value: this.getValue(data, 'printer_reportes_selected'), disabled: false }, Validators.required],
       is_db_local: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
+      calcular_itbis: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
+      is_produccion: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
       facturacion_editar_precio: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
       vende_sin_inventario: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
       medida_producto_terminado: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
@@ -91,6 +101,8 @@ export class ConfiguracionesComponent implements OnInit {
       page_size_nota: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
       page_size_cuadre_caja: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
       page_size_reporte: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
+
+      plantilla_impresion_nota: [{ value: this.getValue(data, 'plantillas_impresion.nota'), disabled: false }, Validators.required],
     });
 
     this.logo_empresa = `data:image/png;base64,${data.logo_empresa}`;
@@ -107,6 +119,12 @@ export class ConfiguracionesComponent implements OnInit {
     const docs = _.filter(data.documentos_a_imprimir, { selected: true });
 
     return docs;
+  }
+
+  get_plantillas(key) {
+    const plantillas = _.filter(this.plantillas_impresion, { key });
+
+    return plantillas;
   }
 
   getValue(data, key) {
@@ -141,6 +159,10 @@ export class ConfiguracionesComponent implements OnInit {
     }
   }
 
+  printTest(documento, paperSize) {
+    printTestPdf({ paper_size: paperSize, documento: documento });
+  }
+
   salir() {
     this.router.navigateByUrl('auth/login');
   }
@@ -158,13 +180,21 @@ export class ConfiguracionesComponent implements OnInit {
       reporte: formulario.page_size_reporte.descripcion,
     };
 
-    formulario = _.omit(formulario, ['page_size_recibo_ingreso', 'page_size_conduce', 'page_size_facturacion', 'page_size_cuadre_caja', 'page_size_reporte']);
+    const plantillas_impresion = {
+      nota: formulario.plantilla_impresion_nota,
+    };
+
+    formulario = _.omit(formulario, ['page_size_recibo_ingreso', 'page_size_conduce', 'page_size_facturacion', 'page_size_cuadre_caja', 'page_size_reporte', 'page_size_nota']);
+    formulario = _.omit(formulario, ['plantilla_impresion_nota']);
+
     formulario['pages_sizes'] = pages_sizes;
+    formulario['plantillas_impresion'] = plantillas_impresion;
     return formulario;
   }
 
   formIsInvalid() {
     let res = true;
+
     if (this.form) {
       if (this.form.valid) {
         let formulario = this.getFormularioToSend();
@@ -183,23 +213,69 @@ export class ConfiguracionesComponent implements OnInit {
         res = cambios.length > 0 ? false : true;
       } else res = true;
     }
+
     return res;
+  }
+
+  changesParser(configReplacement, logos_changes, obj, copyObjLevel, key_padre) {
+    let keysConfig = Object.keys(obj);
+    const logosKeys = ['logo_empresa', 'logo_impresion'];
+
+    for (let i = 0; i < keysConfig.length; i++) {
+      const key = keysConfig[i];
+
+      if (fun.hasValue(copyObjLevel[key])) {
+        const tipoDato = typeof obj[key];
+
+        if (tipoDato == 'string' || tipoDato == 'boolean') {
+          if (copyObjLevel[key] != obj[key]) {
+            if (logosKeys.includes(key)) {
+              logos_changes[key] = obj[key];
+            } else {
+              switch (key_padre) {
+                case 'pages_sizes':
+                case 'plantillas_impresion':
+                  this.object_changed(configReplacement, key, obj, copyObjLevel);
+                  break;
+
+                default:
+                  const value_source = tipoDato == 'string' ? `'${copyObjLevel[key]}'` : `${copyObjLevel[key]}`;
+                  const value_target = tipoDato == 'string' ? `'${obj[key]}'` : `${obj[key]}`;
+
+                  configReplacement[key] = { source: value_source, target: value_target };
+                  break;
+              }
+              // TODO: poner aqui una funcion para el remplazo exclusivo de los pages_sizes con el key_padre
+            }
+          }
+        } else {
+          this.changesParser(configReplacement, logos_changes, obj[key], copyObjLevel[key], key);
+        }
+      }
+    }
+  }
+
+  object_changed(configReplacement, key, obj, copyObjLevel) {
+    const tipoDato = typeof obj[key];
+
+    const value_source = tipoDato == 'string' ? `${key}: '${copyObjLevel[key]}'` : `${key}: ${copyObjLevel[key]}`;
+    const value_target = tipoDato == 'string' ? `${key}: '${obj[key]}'` : `${key}: ${obj[key]}`;
+
+    configReplacement[key] = { source: value_source, target: value_target };
   }
 
   submit() {
     const formulario = this.getFormularioToSend();
+    fun.logGreen('this.config', this.config);
+    formulario['cliente'] = this.getValue(this.config, 'cliente');
+    console.log('formulario ', formulario);
 
-    const array_targets = [];
-    const array_replacement = [];
+    const configReplacement = {};
     const logos_changes = {};
 
-    this.changesParser(array_targets, array_replacement, logos_changes, formulario, this.configCopy);
+    this.changesParser(configReplacement, logos_changes, formulario, this.configCopy, 'obj_principal');
 
-    const objChange = {
-      new_config: formulario,
-      array_targets: array_targets,
-      array_replacement: array_replacement,
-    };
+    const objChange = { new_config: formulario, configReplacement: configReplacement };
 
     if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
 
@@ -217,34 +293,5 @@ export class ConfiguracionesComponent implements OnInit {
         }, 250);
       })
       .catch((err) => console.error(err));
-  }
-
-  changesParser(array_targets, array_replacement, logos_changes, obj, copyObjLevel) {
-    let keysConfig = Object.keys(obj);
-    const logosKeys = ['logo_empresa', 'logo_impresion'];
-
-    for (let i = 0; i < keysConfig.length; i++) {
-      const key = keysConfig[i];
-
-      if (fun.hasValue(copyObjLevel[key])) {
-        const tipoDato = typeof copyObjLevel[key];
-
-        if (tipoDato == 'string' || tipoDato == 'boolean') {
-          if (copyObjLevel[key] != obj[key]) {
-            if (logosKeys.includes(key)) {
-              logos_changes[key] = obj[key];
-            } else {
-              const value_target = tipoDato == 'string' ? `'${copyObjLevel[key]}'` : `${copyObjLevel[key]}`;
-              const value_replacement = tipoDato == 'string' ? `'${obj[key]}'` : `${obj[key]}`;
-
-              array_targets.push(`${key}: ${value_target}`);
-              array_replacement.push(`${key}: ${value_replacement}`);
-            }
-          }
-        } else {
-          this.changesParser(array_targets, array_replacement, logos_changes, obj[key], copyObjLevel[key]);
-        }
-      }
-    }
   }
 }

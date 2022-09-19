@@ -84,7 +84,7 @@ export class MixinClass extends ModalClass {
   }
   // =========================================================================================================
   formatoNumero(num) {
-    return fun.numFormatTwoDecimals(num) + '  ';
+    return fun.numFormatTwoDecimals(num);
   }
   // 301,755.67
 
@@ -115,14 +115,13 @@ export class MixinClass extends ModalClass {
     const noFunction = (instance: any) => {
       instance.closeModal('borrar', 'cancelar');
     };
-    this.handleModalForm({
+    this.openNewModal({
       id: 'borrar',
       header: 'Confirmar',
       width: '510px',
       html: `<p> ${obj?.texto} </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => noFunction(instance), label: 'NO', disable: false },
           {

@@ -9,6 +9,7 @@ $bodyfont: "Poppins";
 @import "./assets/my_styles/forms.scss";
 @import "./assets/my_styles/btns.scss";
 @import "./assets/my_styles/overlayPanel.scss";
+@import "./assets/my_styles/height.scss";
 @import "./splash-styles.scss";
 
 .h-inherit {
@@ -359,6 +360,8 @@ body {
 // ========================================================
 .inputTabla {
   height: 2rem;
+  box-shadow: none !important;
+  width: 100% !important;
 }
 
 /* ====================================================== */
@@ -413,6 +416,16 @@ body {
     "p-tabview-panels";
 
   grid-template-rows: min-content auto;
+
+  &.back-light {
+    > .p-tabview-nav-container {
+      background: #8e8e8e32;
+
+      > .p-tabview-nav-content .p-tabview-nav li {
+        background: white;
+      }
+    }
+  }
 
   & .p-tabview-nav li {
     margin-right: 0 !important;

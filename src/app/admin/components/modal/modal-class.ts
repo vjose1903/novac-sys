@@ -7,6 +7,23 @@ export interface ModalI {
   inputs: any;
   btn_aceptar(): any;
 }
+
+export interface ConfigureModalI {
+  id?: string;
+  header?: string;
+  inputs?: any;
+  component?: any;
+  width?: string;
+  height?: string;
+  botones?: ButtonsI;
+  closable?: boolean;
+  closableEsc?: boolean;
+  html?: any;
+  position?: string;
+  transitionOptions?: string;
+  contentStyleClass?: string;
+  returnDataFromModal?: Function;
+}
 export interface ButtonsI {
   aceptar: { show: boolean; disable?: boolean };
   cancelar: { show: boolean; disable?: boolean };
@@ -14,25 +31,13 @@ export interface ButtonsI {
 }
 
 export class ModalClass extends LayoutClass {
+  static noShowAceptarCancelarButtons = { aceptar: { show: false }, cancelar: { show: false } };
+
   constructor() {
     super();
   }
 
-  handleModalForm(params: {
-    id: string;
-    header?: string;
-    inputs?: any;
-    component?: any;
-    width?: string;
-    height?: string;
-    botones?: ButtonsI;
-    closable?: boolean;
-    closableEsc?: boolean;
-    html?: any;
-    position?: string;
-    transitionOptions?: string;
-    contentStyleClass?: string;
-  }) {
+  openNewModal(params: ConfigureModalI) {
     const modal_configuration = {};
     modal_configuration['show'] = true;
 
@@ -48,7 +53,7 @@ export class ModalClass extends LayoutClass {
     modal_configuration['closableEsc'] = _.has(params, 'closableEsc') ? params.closableEsc : false;
     modal_configuration['transitionOptions'] = _.has(params, 'transitionOptions') ? params.transitionOptions : '0ms';
     modal_configuration['contentStyleClass'] = _.has(params, 'contentStyleClass') ? params.contentStyleClass : '';
-    modal_configuration['getDataModal'] = (arg) => this.getDataFromModal(arg, ' ');
+    modal_configuration['returnDataFromModal'] = _.has(params, 'returnDataFromModal') ? (arg) => params.returnDataFromModal(arg) : (arg) => this.getDataFromModal(arg, ' ');
     modal_configuration['onHide'] = (arg) => this.onHideModal(arg);
     modal_configuration['html'] = _.has(params, 'html') ? params.html : null;
     modal_configuration['id'] = params.id;

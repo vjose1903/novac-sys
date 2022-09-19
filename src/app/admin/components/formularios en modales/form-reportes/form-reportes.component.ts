@@ -1,3 +1,5 @@
+import { Permisos } from './../../../../core/typescript/permisos';
+import { SingletonService } from './../../../../core/services/singleton.service';
 import { EventEmitter } from '@angular/core';
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -22,7 +24,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   @Input() switches;
   fun = fun;
 
-  @Output() seleccion = new EventEmitter<any>();
   form: FormGroup;
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
@@ -37,7 +38,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   filtro_articulo;
   listaArticulos = [];
   listaClientes = [];
-
+  permissions = Permisos;
   formarFecha = ['suplidor_prod'];
   Fecha: string;
   articuloClass = new ArticuloC();
@@ -45,24 +46,11 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   constructor(private fb: FormBuilder, private localeService: BsLocaleService) {
     super();
-    this.dpConfig = Object.assign(
-      {},
-      {
-        // locale:'es',
-        showWeekNumbers: false,
-        maxDate: new Date(),
-        dateInputFormat: 'DD/MM/YYYY',
-      },
-    );
+    this.dpConfig = Object.assign({}, { showWeekNumbers: false, maxDate: new Date(), dateInputFormat: 'DD/MM/YYYY' });
   }
+
   modal: any = {};
   inputs: any;
-  btn_aceptar() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    modal.getDataModal({ data: { ...this.form.value, switches: { ...this.switches } }, modal_id: this.modal.component_id });
-    // throw new Error('Method not implemented.');
-  }
 
   ngOnInit() {
     this.tipo_reporte = this.inputs.tipo_reporte;
@@ -127,12 +115,12 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   agregateValidators() {
-    if (this.tipo_reporte === 'cuadre') {
+    if (this.tipo_reporte == 'cuadre') {
       this.form.controls.fecha.setValue(new Date());
-    } else if (this.tipo_reporte === 'ventas_diarias') {
+    } else if (this.tipo_reporte == 'ventas_diarias') {
       this.form.controls.tipo.setValue(1);
       this.setValidator('condicion');
-    } else if (this.tipo_reporte === 'ventas_rango') {
+    } else if (this.tipo_reporte == 'ventas_rango') {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
       this.form.controls.tipo.setValue(2);
@@ -140,12 +128,12 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       this.setValidator('condicion');
       this.setValidator('desde');
       this.setValidator('hasta');
-    } else if (this.tipo_reporte === 'cuentas_cobrar_ant_saldo') {
+    } else if (this.tipo_reporte == 'cuentas_cobrar_ant_saldo') {
       this.tipos = [
         { id: '2', label: 'Detallado' },
         { id: '3', label: 'Agrupado' },
       ];
-    } else if (this.tipo_reporte === 'notas') {
+    } else if (this.tipo_reporte == 'notas') {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
       this.tipos = [
@@ -153,40 +141,46 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
         { label: 'Dédito', id: tipo_factura_id.Nota_de_debito },
         { label: 'Todas', id: 0 },
       ];
-    } else if (this.tipo_reporte === 'ventas_productos') {
+    } else if (this.tipo_reporte == 'ventas_productos') {
       this.tipos = [
         { id: '1', label: 'Dia único' },
         { id: '2', label: 'Rango fechas' },
       ];
-    } else if (this.tipo_reporte === 'cuentas_con_pagos') {
+    } else if (this.tipo_reporte == 'cuentas_con_pagos') {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
       this.setValidator('cliente_id');
       this.setValidator('desde');
       this.setValidator('hasta');
-    } else if (this.tipo_reporte === 'suplidor_prod') {
+    } else if (this.tipo_reporte == 'suplidor_prod') {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
       this.setValidator('desde');
       this.setValidator('hasta');
-    } else if (this.tipo_reporte === 'recibos') {
+    } else if (this.tipo_reporte == 'recibos') {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
       this.form.controls.tipo.setValue('todos');
       this.setValidator('desde');
       this.setValidator('hasta');
-      this.tipos = [
-        { id: 'viajes', label: 'Viajes' },
-        { id: 'normal', label: 'Normal' },
-        { id: 'todos', label: 'Todos' },
-      ];
+
+      SingletonService.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => {
+        this.tipos = [{ id: 'normal', label: 'Normal' }];
+        this.form.controls.tipo.setValue('normal');
+
+        if (result) {
+          fun.pushAt(this.tipos, 0, { id: 'viajes', label: 'Viajes' });
+          fun.pushAt(this.tipos, 2, { id: 'todos', label: 'Todos' });
+          this.form.controls.tipo.setValue('todos');
+        }
+      });
     }
   }
 
   changeTipo() {
     const control = this.form.controls;
-    if (this.tipo_reporte === 'ventas_productos') {
-      if (control.tipo.value === '1') {
+    if (this.tipo_reporte == 'ventas_productos') {
+      if (control.tipo.value == '1') {
         this.form.controls.fecha.setValue(new Date());
       } else {
         this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
@@ -212,7 +206,9 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     });
   }
 
-  accion(arg) {
-    this.seleccion.emit({ bool: arg, obj: this.form.value });
+  btn_aceptar() {
+    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id == this.modal.component_id);
+    modal.closeModal(this.modal.component_id);
+    modal.returnDataFromModal({ data: { ...this.form.value, switches: { ...this.switches } }, modal_id: this.modal.component_id });
   }
 }

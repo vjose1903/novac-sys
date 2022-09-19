@@ -67,13 +67,13 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
 
   tableClickRow(event) {
     const modal = this.closeThis();
-    modal.getDataModal({ data: event.data, modal_id: this.modal.component_id, index: this.inputs.index });
+    modal.returnDataFromModal({ data: event.data, modal_id: this.modal.component_id, index: this.inputs.index });
   }
 
   closeThis(arg?) {
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id == this.modal.component_id);
     modal.closeModal(this.modal.component_id);
-    if (arg) modal.getDataModal(arg);
+    if (arg) modal.returnDataFromModal(arg);
 
     return modal;
   }

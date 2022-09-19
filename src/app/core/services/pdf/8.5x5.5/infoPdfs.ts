@@ -1,3 +1,9 @@
+export const infoPagare = {
+  vasquez: {  altura_nombre: 170, altura_direccion: 180   },
+  brendy: {   altura_nombre: 178, altura_direccion: 175   },
+  agrodemi: { altura_nombre: 178, altura_direccion: 175   },
+};
+
 export const infoTipoPdf = {
   notas: ['titulo'],
   ventas: ['condicion', 'tipo_factura'],

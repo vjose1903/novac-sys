@@ -29,9 +29,10 @@
                 </span>
 
                 <span *ngSwitchDefault>
-                  <span [pTooltip]="row.tooltip || ''" tooltipPosition="top" class="titulo"> {{ row.titulo }} </span>
+                  <span class="titulo"> {{ row.titulo }} </span>
                 </span>
               </span>
+              <i *ngIf="row.alert_msg" class="fa-solid fa-circle-info alert_msg" [pTooltip]="row.alert_msg" tooltipPosition="top"></i>
             </th>
             <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }">
               <span class="titulo"> Acciones </span>
@@ -57,7 +58,7 @@
                 style="cursor: pointer; color: var(--letras)"
                 [ngStyle]="{ 'background-color': this.changeBackGroundColor(dato) }"
                 #RowElement
-                (click)="clickROW(dato, index_body)"
+                (click)="clickROW(dato, getIndex(index_body))"
               >
                 <td
                   *ngFor="let column of config.info; let index_column = index"
@@ -72,14 +73,8 @@
                       <span class="text-bold-700">{{ (tServ.getPaginationById(config.id_tabla + post_id).page - 1) * tServ.getPaginationById(config.id_tabla + post_id).per_page + (getIndex(index_body) + 1) }}</span>
                     </span>
 
-                    <span
-                      *ngSwitchCase="'cantidades'"
-                      id="{{ column.key }}-{{ getIndex(index_body) }}"
-                      pTooltip="{{ lookOters(dato[column.key]).Padre }}   {{ lookOters(dato[column.key]).Hijo == undefined ? '' : lookOters(dato[column.key]).Hijo }}"
-                      [tooltipPosition]="getIndex(index_body) != 0 ? 'top' : 'bottom'"
-                      style="width: 100%"
-                    >
-                      {{ lookprincipal(dato[column.key]) }}
+                    <span *ngSwitchCase="'cantidades'" id="{{ column.key }}-{{ getIndex(index_body) }}" pTooltip="{{ cantidadesTooltip(dato, column) }}" [tooltipPosition]="getIndex(index_body) != 0 ? 'top' : 'bottom'" style="width: 100%">
+                      {{ cantidadesLabel(dato, column) }}
                     </span>
 
                     <span *ngSwitchCase="'img'" class="d-flex justify-content-center align-items-center">
@@ -92,7 +87,7 @@
                           <i
                             id="{{ config.id_tabla + post_id }}-{{ getIconKey(objIcon) }}-{{ getIndex(index_body) }}"
                             [pTooltip]="dato[objIcon.rowTooltip] || objIcon.tooltip || ''"
-                            tooltipPosition="top"
+                            tooltipPosition="left"
                             (click)="iconBtn(column.key, getIndex(index_body), dato, $event, objIcon)"
                             class=" iconPress {{ getIconClass(objIcon, dato) }} {{ dato.iconHover ? 'c-pointer' : '' }} {{ dato[objIcon.text_color] ? 'text-' + dato[objIcon.text_color] : 'text-black' }}"
                             (mouseenter)="mouseMoveEvent('hover', dato, objIcon.key, $event.target.id)"
@@ -120,7 +115,7 @@
                       </div>
                     </span>
 
-                    <span *ngSwitchCase="'dropDown'" class="d-flex justify-content-center align-items-center">
+                    <span *ngSwitchCase="'dropDown'">
                       <p-dropdown
                         [virtualScroll]="true"
                         [itemSize]="34"
@@ -139,13 +134,14 @@
                       </p-dropdown>
                     </span>
 
-                    <span *ngSwitchCase="'input'" class="d-flex justify-content-center align-items-center">
+                    <span *ngSwitchCase="'input'">
                       <span *ngIf="column.remplace && seleccionado != dato?.id" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
                         <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: dato, column: column }"></ng-container>
                       </span>
                       <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace" class="table_input">
                         <input
                           #inputTable
+                          [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
                           class="form-control m-0 inputTabla {{ column.can_reset ? 'refresh' : '' }} {{ column.inputType == 'number' ? 'input_cantidad' : '' }}"
                           id="input-{{ config.id_tabla + post_id }}-{{ column.key }}-{{ getIndex(index_body) }}"
                           [min]="dato.min_ ? dato.min_ : 0"
@@ -153,7 +149,9 @@
                           type="{{ column.inputType ? column.inputType : 'text' }}"
                           [value]="getValueForm(column, dato)"
                           [disabled]="disabledInput(dato, column)"
-                          (blur)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, index_body)"
+                          (focus)="handleInputsEvents('focus', $event.target, column, getIndex(index_body))"
+                          (click)="handleInputsEvents('focus', $event.target, column, getIndex(index_body))"
+                          (blur)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body))"
                           (keyup)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
                           (change)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
                         />
@@ -168,7 +166,7 @@
                       class=" {{ dato[column.text_color] ? 'text-' + dato[column.text_color] : 'text-black' }}"
                       style="width: 100%"
                       [pTooltip]="dato[column.rowTooltip] || ''"
-                      tooltipPosition="top"
+                      tooltipPosition="left"
                     >
                       {{ getValueForm(column, dato) }}
                       {{ column.alerta ? (config?.colores ? (dato.activo ? '' : '(Inactivo)') : '') : '' }}
@@ -176,7 +174,7 @@
                   </span>
                 </td>
 
-                <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(dato, index_body)">
+                <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(dato, getIndex(index_body))">
                   <span class="titulo_sm"> Acciones </span>
                   <app-btnacciones
                     [index_body]="getIndex(index_body)"

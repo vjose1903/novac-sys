@@ -349,6 +349,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   showModal() {
-    this.handleModalForm({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem' });
+    this.openNewModal({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem' });
   }
 }

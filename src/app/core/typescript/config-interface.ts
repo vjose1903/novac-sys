@@ -1,4 +1,5 @@
 export interface ConfigI {
+  cliente:                     string;
   nombre_empresa:              string;
   rnc_empresa:                 string;
   direccion_empresa:           string;
@@ -12,9 +13,12 @@ export interface ConfigI {
   url_servidor_descargas:      string;
   config_password:             string;
   usa_url_principal:           boolean;
+  is_produccion:               boolean;
+  calcular_itbis:                    boolean;
   printer_caja_selected:       Printer;
   printer_reportes_selected:   Printer;
   pages_sizes:                 PagesSizes;
+  plantillas_impresion:        PlantiallasImpresion;
   is_development:              boolean;
   printersList:                Printer[];
   app_version:                 string;
@@ -22,7 +26,7 @@ export interface ConfigI {
   facturacion_editar_precio:   boolean;
   vende_sin_inventario:        boolean;
   documentos_a_imprimir:       string;
-  medida_producto_terminado:             string;
+  medida_producto_terminado:   string;
 }
 
 export interface PagesSizes {
@@ -32,6 +36,10 @@ export interface PagesSizes {
   facturacion:     string;
   recibo_ingreso:  string;
   reporte:         string;
+}
+
+export interface PlantiallasImpresion {
+  nota:            string;
 }
 
 export interface Printer {

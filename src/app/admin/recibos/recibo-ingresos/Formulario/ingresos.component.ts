@@ -1,3 +1,4 @@
+import { NotaC } from './../../../manipular facturas/notas-cred-deb/notas';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../../core/javascript/moment';
@@ -12,7 +13,7 @@ import { FormCantidadEfectivoComponent } from '../../../components/formularios e
 import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../../components/new_tablas/tabla-class';
-import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
+import { ModalClass } from '../../../components/modal/modal-class';
 
 @Component({
   selector: 'app-ingresos',
@@ -43,7 +44,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       },
 
       { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
-      { titulo: 'Fecha Facturacion', tipo: 'text', key: 'fecha' },
+      { titulo: 'Fecha Facturacion', tipo: 'date', key: 'fecha_equivalente' },
       { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
@@ -94,7 +95,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   totalFacturado: number;
   totalPagado: number;
-  totalNotas: number;
+  totalNotasDebito: number;
+  totalNotasCredito: number;
   totalPagadoPorciento: number;
   recibiendo = 0;
   restando = 0;
@@ -102,7 +104,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   facturaClass = new FacturaC();
   debiendo;
 
-  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService, private pdfServ: PdfService) {
+  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService) {
     super();
     this.config.notFoundText = 'Articulo no existe';
   }
@@ -162,7 +164,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.totalFacturado = 0;
     this.totalPagado = 0;
-    this.totalNotas = 0;
+    this.totalNotasCredito = 0;
+    this.totalNotasDebito = 0;
     this.totalPagadoPorciento = 0;
 
     const fechaA = moment().format('YYYY-MM-DD');
@@ -171,8 +174,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     res.data.map((factura) => {
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
-      factura.fecha = moment(factura.fecha_equivalente).format('DD-MM-YYYY');
-      factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD-MM-YYYY') : null;
+
+      factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD/MM/YYYY') : null;
       factura.select = false;
       factura.pagoT = false;
       factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
@@ -198,12 +201,15 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       };
 
       this.totalPagado = _.reduce(factura.pagos, (acumulado, item) => acumulado + item.deposito, this.totalPagado);
-      this.totalNotas = _.reduce(factura.notas, (acumulado, item) => acumulado + Math.abs(item.total), this.totalNotas);
+      console.log('factura.notas ', factura.notas);
+
+      this.totalNotasCredito = _.reduce(_.filter(factura.notas, { tipo: NotaC.tipo_nota.credito }), (acumulado, item) => acumulado + Math.abs(item.total), this.totalNotasCredito);
+      this.totalNotasDebito = _.reduce(_.filter(factura.notas, { tipo: NotaC.tipo_nota.debito }), (acumulado, item) => acumulado + Math.abs(item.total), this.totalNotasDebito);
 
       factura.subrayar = factura.is_viaje;
 
       this.totalFacturado += factura.total_factura;
-      this.totalPagadoPorciento = (this.totalPagado / this.totalFacturado) * 100;
+      this.totalPagadoPorciento = ((this.totalPagado + this.totalNotasCredito) / this.totalFacturado) * 100;
       this.totalPagadoPorciento = parseFloat(fun.numFormatTwoDecimals(this.totalPagadoPorciento));
 
       this.facturas.push(factura);
@@ -212,7 +218,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     });
 
     this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
-    this.debiendo = this.totalFacturado - this.totalPagado - this.totalNotas;
+    this.debiendo = this.totalFacturado + this.totalNotasDebito - this.totalPagado - this.totalNotasCredito;
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
 
     setTimeout(() => {
@@ -318,15 +324,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta', formaPago: 'Efectivo' };
 
-      this.handleModalForm({
+      this.openNewModal({
         component: FormCantidadEfectivoComponent,
         inputs: obj,
         id: 'cambioEfectivo_IngresosComponent',
         header: 'Cantidad de efectivo',
         width: '34.375rem',
         botones: {
-          aceptar: { show: false, disable: false },
-          cancelar: { show: false, disable: false },
+          ...ModalClass.noShowAceptarCancelarButtons,
           dinamico: [
             {
               clase: 'btn btn-blanco mr-2',
@@ -344,7 +349,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.handleModalForm({
+    this.openNewModal({
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
@@ -352,8 +357,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       ${obj.texto}
     </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           {
@@ -398,8 +402,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       const obj_print = { data: recibo, type: 'recibo_ingreso' };
 
       if (this.is_print) {
-        this.pdfServ
-          .generatePdf({ oPdf: obj_print, imprimir: true })
+        PdfService.generatePdf({ oPdf: obj_print, imprimir: true })
           .then(async (res) => {
             if (res.status === 'si') {
             } else fun.toastError(res.msg, 'ERROR');
@@ -427,7 +430,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
             const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
             obj_modal.botones.dinamico.push(ver_datelles_btn);
-            this.handleModalForm(obj_modal);
+            this.openNewModal(obj_modal);
           });
         });
       }
@@ -437,7 +440,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   verDetalles(data) {
     const configModal = this.reciboClass.modalVerDetalles(data);
 
-    this.handleModalForm(configModal);
+    this.openNewModal(configModal);
   }
 
   tableInputChange(params) {
@@ -454,23 +457,29 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
 
     if (params.key == 'monto') {
-      if (!params.value) {
-        fun.toastWarning('Debe de introducir un Monto', 'AVISO');
-        fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
-      }
-      const total = params.data.balance;
-      const monto = fun.desformatear(params.value);
+      fun.awaitTyping().then(() => {
+        if (!params.value) {
+          fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+          fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
+        }
+        console.log('params ', params);
 
-      if (monto == total) params.data.pagoT = true;
+        const total = params.data.balance;
+        const monto = fun.isEmpty(params.value) ? null : fun.desformatear(params.value);
 
-      if (monto > total) {
-        this.ExisteMontoMayor = true;
-        fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
-        fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
-      } else {
-        this.ExisteMontoMayor = false;
-        params.data.monto = monto;
-      }
+        if (monto == total) params.data.pagoT = true;
+
+        if (monto > total) {
+          this.ExisteMontoMayor = true;
+          fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+          fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
+        } else {
+          this.ExisteMontoMayor = false;
+          params.data.monto = monto;
+        }
+
+        this.sumarTotalRecibo();
+      });
     }
 
     this.sumarTotalRecibo();
@@ -489,17 +498,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         metodo: 'venta',
       };
 
-      this.handleModalForm({
+      this.openNewModal({
         component: BuscarClienteSuplidorComponent,
         inputs: obj,
         id: 'buscarCliente',
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: {
-          aceptar: { show: false, disable: false },
-          cancelar: { show: false, disable: false },
-        },
+        botones: ModalClass.noShowAceptarCancelarButtons,
       });
       this.desEnfocarInput('clienteI');
     }

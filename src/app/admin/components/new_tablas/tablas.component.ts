@@ -5,7 +5,7 @@ import { ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '../../../core/services/functions.service';
-import { medidas, table_config } from './tabla-class';
+import { medidas, table_config, table_info } from './tabla-class';
 import { teclasCode } from '../../../core/typescript/constantes';
 
 @Component({
@@ -68,7 +68,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   formatoNumero(num) {
-    let numformat = '0';
+    let numformat = '0.00';
     if (num) numformat = fun.numFormatTwoDecimals(num);
     return numformat;
   }
@@ -124,7 +124,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     clearInterval(this.tablaInterval);
   }
 
-  getValueForm(column, data) {
+  getValueForm(column: table_info, data) {
     switch (column.tipo) {
       case 'textList':
         return _.reduce(_.get(data, column.key), (acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${_.get(item, column.key_value)}`, '');
@@ -133,7 +133,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         return this.formatoNumero(_.get(data, column.key));
 
       case 'date':
-        const fecha = fun.date_formater({ date: _.get(data, column.key), dateFormat: 'DD/MM/YYYY', con_hora: true });
+        const fecha = fun.date_formater({ date: _.get(data, column.key), dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
         return fecha;
 
       default:
@@ -393,6 +393,15 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
+  handleInputsEvents(type, input, column, index_body) {
+    if (_.has(column, 'inputEvents') && fun.hasValue(column.inputEvents)) {
+      if (column.inputEvents == 'formatoNumero') {
+        if (type == 'focus') input.value = fun.desformatear(input.value);
+        if (type == 'blur') input.value = fun.numFormatTwoDecimals(input.value);
+      }
+    }
+  }
+
   changeValorInput(key, index, value, data) {
     const newData = fun.duplicarJson(data);
     newData[key] = value;
@@ -426,7 +435,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.cdRef.detectChanges();
   }
 
-  lookOters(objeto) {
+  cantidadesTooltip(dato, column) {
+    if (dato.tipo_articulo.tipo == 'servicio') return null;
+
+    const objeto = dato[column.key];
     const keys = _.keys(objeto);
     const values = _.values(objeto);
 
@@ -434,27 +446,24 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? medidas[keys[2]] : keys[2];
 
-    const principal = fun.numFormatTwoDecimals(values[0]) + '  ' + fin;
-
     const padre = fun.numFormatTwoDecimals(values[1]) + '  ' + fin1;
     const hijo = fun.formatearNumero(values[2]) + '  ' + fin2;
 
-    let cantiTootip = { Padre: undefined, Hijo: undefined };
+    let cantiTootip = '';
+
+    cantiTootip = `${padre}`;
 
     if (keys.length > 1) {
-      if (keys.length == 2) {
-        cantiTootip = { Padre: padre, Hijo: undefined };
-      } else {
-        cantiTootip = { Padre: padre, Hijo: hijo };
-      }
-    } else {
-      cantiTootip = { Padre: principal, Hijo: undefined };
+      keys.length == 2 ? (cantiTootip = `${padre}`) : (cantiTootip = `${padre} - ${hijo}`);
     }
 
     return cantiTootip;
   }
 
-  lookprincipal(objeto) {
+  cantidadesLabel(dato, column) {
+    if (dato.tipo_articulo.tipo == 'servicio') return 'N/A';
+
+    const objeto = dato[column.key];
     const keys = _.keys(objeto);
     const values = _.values(objeto);
     const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
@@ -642,6 +651,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ENTER(arg) {
     const element = document.getElementById(arg) as any;
-    setTimeout(() => element.click(), 10);
+    if (element) setTimeout(() => element.click(), 10);
   }
 }

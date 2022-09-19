@@ -9,6 +9,7 @@ import { fun } from '../../core/services/functions.service';
 import { medidas, table_config } from '../components/new_tablas/tabla-class';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { SingletonService } from '../../core/services/singleton.service';
+import { ModalClass } from '../components/modal/modal-class';
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
@@ -82,7 +83,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   async getProductosTerminados() {
     const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
     this.listaProductos.length = 0;
-    this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.Producto_terminado }).then((res) => {
+    this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.producto_terminado }).then((res) => {
       res['data'].map((producto_terminado) => {
         producto_terminado.optionDisabled = false;
         this.listaProductos.push(producto_terminado);
@@ -333,14 +334,13 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       },
     };
 
-    this.handleModalForm({
+    this.openNewModal({
       id: 'produccion_modal',
       header: 'Confirmar',
       width: '510px',
       html: `<p> ${texto_modal} </p>`,
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           {

@@ -1,5 +1,9 @@
+import { fun } from '../../core/services/functions.service';
 import { CrudG } from '../../core/typescript/crud-g';
+import { ModalClass } from '../components/modal/modal-class';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
+import { ReporteC } from '../reportes/reporte';
+import * as _ from 'lodash';
 
 export interface ReciboI {
   id?: number;
@@ -36,10 +40,37 @@ export class ReciboC extends CrudG<ReciboI> {
       width: '30rem',
       height: '10rem',
       botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
+        ...ModalClass.noShowAceptarCancelarButtons,
         dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };
+  }
+
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
+    return new Promise<any>((resolve, reject) => {
+      ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
+
+      params.openNewModal(ReporteC.objReporte);
+
+      function returnDataFromModal(arg) {
+        ReciboC.requestReporte(arg, params);
+        resolve(arg);
+      }
+    });
+  }
+
+  static requestReporte(reporteParams, pdfParams) {
+    let requestParameters;
+
+    requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), tipo_recibo: reporteParams.data.tipo, order: 'ASC' };
+
+    const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
+
+    ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
+      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
+
+      ReporteC.visualizarReporte(objPdfView);
+    });
   }
 }

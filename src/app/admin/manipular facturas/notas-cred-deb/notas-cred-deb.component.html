@@ -1,4 +1,4 @@
-<div *ngIf="facturasConDetalles" class="h-100 w-100">
+<div *ngIf="facturasConDetalles" class="h-99 w-100">
   <p-tabView [scrollable]="true" [(activeIndex)]="tabIndex" (onClose)="onCloseTab($event)" styleClass="my_tabView anularPadding">
     <p-tabPanel
       id="p-tabView-fact-{{ iteraFact.id }}"
@@ -9,14 +9,16 @@
       [headerStyle]="changeHeaderStatus(iteraFact, tabPanel, 'p-tabView-fact-' + iteraFact.id)"
       header="{{ iteraFact.numero_comprobante }}"
     >
-      <div class="cardPrincipal sinPadding tamano">
-        <h3 style="margin: 0.4rem">
-          {{ tituloPag }}<b>{{ iteraFact.numero_comprobante }}</b>
-        </h3>
-        <div class="cabezaFactura">
+      <div class="cardPrincipal sinPadding cardNota mt-2">
+        <div class="titulo">
+          <h3 style="margin: 0.4rem">
+            {{ tituloPag }}<b>{{ iteraFact.numero_comprobante }}</b>
+          </h3>
+        </div>
+        <div class="cabezaNota">
           <div class="row">
             <!-- ============ factura aplicada ============ -->
-            <div class="col-8 divRigth p-0">
+            <div class="col-8 divRight p-0">
               <div class="row">
                 <div class="col-12 text-center mb-2">
                   <span class="infoFactuApli"> Informacion factura aplicada</span>
@@ -81,27 +83,37 @@
         </div>
 
         <!-- ======================================================================================================== -->
-        <div #cardTablaNotas id="cardTabla" class="cuerpoFactura mb-2">
-          <div class="tablaNotas">
-            <dinamic-table [cardTabla]="cardTablaNotas" [(data)]="iteraFact.detalle_facturas" [post_id]="'-' + iteraFact.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        <div #cardTablaNotas id="cardTabla" class="cuerpoNota mb-2">
+          <div class="fantasma-cuerpo">
+            <dinamic-table
+              [cardTabla]="cardTablaNotas"
+              [(data)]="iteraFact.detalle_facturas"
+              [post_id]="'-' + iteraFact.id"
+              [(TablasComponent)]="tablaComponent"
+              [config]="table_config"
+              (table_events)="handle_table_events($event)"
+              style="width: 100%"
+            ></dinamic-table>
           </div>
         </div>
-        <div class="pieFactura">
-          <div class="row" style="border-top: 2px solid #c7c9ca">
-            <div class="col-3">
-              <app-btncircular [alto]="'100px'" [accion]="'Imprimir nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
-            </div>
-            <div class="col-3">
-              <app-btncircular [alto]="'100px'" [accion]="'Cancelar nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
-            </div>
 
-            <div class="col-6 d-flex justify-content-end">
-              <div class="mostrarNumeros w-100">
-                <div class="row d-flex align-items-end">
-                  <div class="col-12 cuadroResumenTotal mb-5 d-flex justify-content-between align-items-center" style="max-height: 3rem">
-                    <span class="label text-poppins position-absolute left-0"> <strong>TOTAL GENERAL:</strong> </span>
-                    <h5 class="w-100 text-end mb-0">{{ formatoNumero(convertObj[tipoNota] * totalGlobal()) }}</h5>
-                  </div>
+        <div class="pieNota">
+          <div class="row" style="border-top: 2px solid #c7c9ca">
+            <div class="col-8 p-0">
+              <div class="d-flex justify-content-around align-items-center w-100 mt-3">
+                <div>
+                  <app-btncircular [alto]="'100px'" [accion]="'Imprimir nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
+                </div>
+                <div>
+                  <app-btncircular [alto]="'100px'" [accion]="'Cancelar nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
+                </div>
+              </div>
+            </div>
+            <div class="col-4 p-0">
+              <div class="mostrarNumeros">
+                <div class="cuadroResumenTotal" style="max-height: 3rem">
+                  <span class="label text-poppins position-absolute left-0"> <strong>TOTAL GENERAL:</strong> </span>
+                  <h5 class="w-100 text-end mb-0">{{ formatoNumero(convertObj[tipoNota] * totalGlobal()) }}</h5>
                 </div>
               </div>
             </div>

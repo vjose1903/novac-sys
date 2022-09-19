@@ -13,6 +13,7 @@ import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-registro-vehiculo',
@@ -272,17 +273,14 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   abrirModalMarcasYModelos(tipo) {
-    this.handleModalForm({
+    this.openNewModal({
       component: FormularioMarcaModeloComponent,
       inputs: { tipo },
       id: 'crud_marca_modelo',
       header: 'Mantenimiento marca & modelo',
       width: '1000px',
       height: '650px',
-      botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
-      },
+      botones: ModalClass.noShowAceptarCancelarButtons,
     });
   }
 

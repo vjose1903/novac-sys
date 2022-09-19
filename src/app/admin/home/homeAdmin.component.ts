@@ -1,3 +1,4 @@
+import { fun } from './../../core/services/functions.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { SingletonService } from '../../core/services/singleton.service';
@@ -22,6 +23,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
 
   cedula = null;
   ngOnInit() {
+    console.log(fun.numFormatTwoDecimals("2,999.9"));
 
     this._init_mixin({ component: 'home', is_routing: true });
 

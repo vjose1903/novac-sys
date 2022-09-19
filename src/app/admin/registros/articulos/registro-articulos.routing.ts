@@ -8,12 +8,12 @@ const routes: Routes = [
   {
     path: '',
     component: RegistroArticulosComponent,
-    canActivate: [NgxPermissionsGuard],
-    data: {
-      permissions: {
-        only: Object.values(Permisos.articulo),
-      },
-    },
+    // canActivate: [NgxPermissionsGuard],
+    // data: {
+    //   permissions: {
+    //     only: Object.values(Permisos.articulo),
+    //   },
+    // },
   },
 ];
 

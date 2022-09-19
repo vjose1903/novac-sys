@@ -12,12 +12,10 @@ import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { PdfViewerComponent } from '../../components/pdf-viewer/pdf-viewer.component';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { NotaC } from '../notas-cred-deb/notas';
-import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
-import { DetalleFacturaComponent } from '../detalle-factura/detalle-factura.component';
-import { ReciboC } from '../../recibos/recibos';
+import { ModalClass } from '../../components/modal/modal-class';
 
 enum campos {
   cliente = 1,
@@ -43,7 +41,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   lista_tipos_facturas: any;
   existenComprobantes = false;
-  tipo_factu_nota: any;
   paqueteComprobante: any;
   tipo_factura_id = null;
   valor: any;
@@ -61,7 +58,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   idsFacturasSeleccionadas = [];
   permissions = Permisos;
 
-  constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService, private pdfServ: PdfService) {
+  constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
   campo = null;
@@ -74,7 +71,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
       { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
       { titulo: 'Condicion', tipo: 'text', key: 'condicion', estilos: [{ width: '6rem' }] },
-      { titulo: 'Fecha Facturación', tipo: 'text', key: 'fecha' },
+      { titulo: 'Fecha Facturación', tipo: 'date', key: 'fecha_equivalente' },
       { titulo: 'Fecha Vencimiento', tipo: 'text', key: 'fechaV' },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Balance tactura', tipo: 'formatoNumero', key: 'balance' },
@@ -111,7 +108,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   table_notas_config: table_config = {
     info: [
-      { titulo: 'Fecha', tipo: 'text', key: 'fecha' },
+      { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
       { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
       { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total' },
       { titulo: 'Acciones', tipo: 'icon', key: 'actions', iconsArray: [{ key: 'view', tooltip: 'Ver Nota', text_color: 'viewColor' }] },
@@ -129,12 +126,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this._init_mixin({ component: 'buscar_factura', is_routing: true });
     this.buscarPara = this.route.snapshot.params['para'];
 
-    if (this.buscarPara == 'nota_credito') {
-      this.tipo_factu_nota = '04';
-    } else if (this.buscarPara == 'nota_debito') {
-      this.tipo_factu_nota = '03';
-    }
-
     this.necesarioStart();
     this.completarTituloPag();
   }
@@ -142,7 +133,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   async necesarioStart() {
     await this.getTipoFacturas();
 
-    if (this.buscarPara == 'nota_credito' || this.buscarPara == 'nota_debito') await this.getPaqueteComprobante();
+    if (this.buscarPara.includes('nota')) await this.getPaqueteComprobante();
 
     this.enfocarInput('campoI');
   }
@@ -153,8 +144,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   reimprimirFactura(obj, modalInstance) {
     this.loadServ.isLoading.next(true);
-    this.pdfServ
-      .generatePdf({ oPdf: obj, imprimir: true })
+    PdfService.generatePdf({ oPdf: obj, imprimir: true })
       .then(async (res) => {
         this.loadServ.isLoading.next(false);
         if (res.status === 'si') {
@@ -183,7 +173,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async getPaqueteComprobante() {
     try {
-      const tipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === this.tipo_factu_nota);
+      const tipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.buscarPara]);
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
       this.paqueteComprobante = res['data'] as any;
@@ -265,13 +255,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       this.notas.length = 0;
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
+      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, tipo_nota: this.buscarPara.includes('credito') ? NotaC.tipo_nota.credito : NotaC.tipo_nota.debito } };
 
       const res = await this.notasClass.getAll(extra);
 
       res['data'].forEach((nota) => {
         nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
-        nota.fecha = moment(nota.fecha_equivalente).format('DD/MM/YYYY');
         nota.total = Math.abs(nota.total);
         nota.selectedColor = 'gris-claro';
         nota.viewColor = 'gris-claro';
@@ -286,6 +275,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
         this.notas.push(nota);
       });
+
 
       setTimeout(() => this.tablaNotasComponent.changeConfig([{ total_count: res.total_registros }]), 10);
       resolve(true);
@@ -318,7 +308,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       res['data'].forEach((fact) => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
-        fact.fecha = moment(fact.fecha_equivalente).format('DD/MM/YYYY');
         fact.fechaV = moment(fact.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
         fact.pagoT = true;
         fact.is_active = fact.estado ? 'fas fa-check' : 'fas fa-times';
@@ -355,6 +344,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           this.facturaClass.parseDataToPdf(this.facturas[0]).then((res) => {
             const continuar = this.buscarPara != 'solo_ver' && (campo == campos.numeroComprobante || campo == campos.NumeroFactura);
             this.facturaSelected = res;
+
 
             this.mostrarFactura(res, 'facturacion', null, continuar);
           });
@@ -497,17 +487,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   async abrirModalFiltro(nombre) {
     const obj = { data: this.listaClientes, palabra_a_buscar: nombre, metodo: 'venta' };
 
-    this.handleModalForm({
+    this.openNewModal({
       component: BuscarClienteSuplidorComponent,
       inputs: obj,
       id: 'buscarCliente',
       header: 'Buscar cliente',
       width: '900px',
       height: '500px',
-      botones: {
-        aceptar: { show: false, disable: false },
-        cancelar: { show: false, disable: false },
-      },
+      botones: ModalClass.noShowAceptarCancelarButtons,
     });
   }
 
@@ -552,9 +539,19 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         disable: false,
       });
 
-    this.pdfServ.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
+
+
+    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
       if (res.status === 'si') {
-        const inputs = { pdfSrc: res.body, height: '30rem', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
+        const inputs = {
+          show_estado: true,
+          estado_documento: dataFactura.estado,
+          base64: res.base64,
+          height: '30rem',
+          reimprimir: res.reimprimir,
+          fileName: _.first(res.file.split('.')),
+        };
+
         const obj_modal = {
           component: PdfViewerComponent,
           inputs: inputs,
@@ -562,8 +559,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           header: type === 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
           width: '900px',
           botones: {
-            aceptar: { show: false, disable: false },
-            cancelar: { show: false, disable: false },
+            ...ModalClass.noShowAceptarCancelarButtons,
             dinamico: botonesDinamicos,
           },
         };
@@ -595,7 +591,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
           if (this.buscarPara == 'solo_ver') obj_modal.botones.dinamico.push(editButton);
         }
-        this.handleModalForm(obj_modal);
+        this.openNewModal(obj_modal);
       }
     });
   }
@@ -605,7 +601,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (tipo == 'nota') configModal = this.notasClass.modalVerDetalles(data);
     if (tipo == 'facturacion') configModal = this.facturaClass.modalVerDetalles(data);
 
-    this.handleModalForm(configModal);
+    this.openNewModal(configModal);
   }
 
   getDataFromModal(arg, search) {
