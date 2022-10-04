@@ -388,16 +388,26 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (column.checkNumber) {
       const id = `input-${this.config.id_tabla + this.post_id}-${column.key}-${this.getIndex(index_body)}`;
       fun.revisarPrecio(input, id).then((res) => {
-        if (!res.error) input.value = res.number;
+        if (!res.error && column.inputEvents != 'formatoNumero') {
+          fun.logYellow('--- checkNumber ---');
+          input.value = fun.is_number(input.value) ? res.number : null;
+          console.log('checkNumber:  ', res);
+        }
       });
     }
   }
 
   handleInputsEvents(type, input, column, index_body) {
+    console.log('ANDO AQUII');
+
     if (_.has(column, 'inputEvents') && fun.hasValue(column.inputEvents)) {
       if (column.inputEvents == 'formatoNumero') {
-        if (type == 'focus') input.value = fun.desformatear(input.value);
-        if (type == 'blur') input.value = fun.numFormatTwoDecimals(input.value);
+        fun.logOrange('--- handleInputsEvents ---');
+        if (type == 'focus') {
+          input.value = fun.is_number(input.value) ? fun.desformatear(input.value) : null;
+          input.select();
+        }
+        if (type == 'blur') input.value = fun.is_number(input.value) ? fun.numFormatTwoDecimals(input.value) : null;
       }
     }
   }

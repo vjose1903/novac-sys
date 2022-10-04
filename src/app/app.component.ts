@@ -68,6 +68,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   ngOnInit(): void {
     const location = window.location.href;
 
+
     SingletonService.http = this.http;
     SingletonService.zone = this.zone;
     SingletonService.configServ = this.configServ;

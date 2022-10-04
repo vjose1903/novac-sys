@@ -503,7 +503,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       };
 
       for (const factura of facturasLlenas) {
-        console.log('factura.detalle_facturas ', factura.detalle_facturas);
 
         const objTemp = {
           cabecera_factura_id: factura.id,
@@ -535,7 +534,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         dataToSend.facturas_aplicadas.push(objTemp);
       }
     }
-    console.log('dataToSend ', dataToSend);
 
     const res = await this.notasClass.createOne(dataToSend);
 

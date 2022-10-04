@@ -154,6 +154,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   setUser(usuario) {
     this.usuario = usuario;
+
     if (this.usuario.sexo === 'm') this.imgUser = 'assets/img/userH.png';
     else this.imgUser = 'assets/img/userM.png';
   }

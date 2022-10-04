@@ -38,6 +38,7 @@ export class InterceptorService implements HttpInterceptor {
     if (!spinner || spinner == 'no_hide') this.startRequest(spinner); // Activa el spinner
 
     if (token) {
+
       request = request.clone({
         setHeaders: {
           'access-token': `${localStorage.getItem('access-token')}`,
@@ -53,6 +54,7 @@ export class InterceptorService implements HttpInterceptor {
     return next.handle(request).pipe(
       map((event) => {
         if (event instanceof HttpResponse) {
+
           if (_.has(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
 
           ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {

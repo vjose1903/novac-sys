@@ -11,8 +11,5 @@ const documentos = {
 };
 
 export function printTestPdf(params: { paper_size: string; documento: string }): any {
-  PdfService.generatePdf({ oPdf: documentos[params.paper_size][params.documento], imprimir: true }).then(async (res) => {
-    console.log('res ',res);
-
-  });
+  PdfService.generatePdf({ oPdf: documentos[params.paper_size][params.documento], imprimir: true }).then(async (res) => {});
 }

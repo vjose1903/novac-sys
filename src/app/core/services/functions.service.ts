@@ -462,6 +462,8 @@ export class fun {
   // Descripcion : Esta funcion evalua si un parametro pasado es un numero
   // _________________________________________________________________________________________________
   static is_number(caracter) {
+    if (fun.isEmpty(caracter)) return false;
+
     if (typeof caracter === 'number') caracter = `${caracter}`;
     let ascii = caracter.charCodeAt(0);
 
@@ -474,6 +476,8 @@ export class fun {
   // _________________________________________________________________________________________________
 
   static is_letter(caracter) {
+    if (fun.isEmpty(caracter)) return false;
+
     let ascii = caracter.toUpperCase().charCodeAt(0);
     return ascii >= 65 && ascii <= 90;
   }
@@ -488,7 +492,7 @@ export class fun {
       clearTimeout(fun.timeout);
       fun.timeout = setTimeout(() => {
         if (!event || event.keyCode != 13) resolve(event);
-      }, 500);
+      }, 700);
     });
     return promise;
   }

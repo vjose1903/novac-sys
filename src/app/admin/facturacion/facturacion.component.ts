@@ -157,7 +157,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     this.timeInterval = setInterval(() => {
       this.fecha = this.my_timeDateFormater(new Date());
-      console.log('this.fecha ', this.fecha);
     }, 1000);
   }
 
@@ -1339,7 +1338,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   formarData() {
     const tipoFact = _.find(this.lista_tipos_facturas, { referencia: this.tipoFactura });
-    console.log('this.lista_tipos_facturas ', this.lista_tipos_facturas);
 
     const tipoPreFactura = _.find(this.lista_tipos_facturas, { descripcion: 'pre_venta' });
 
@@ -1418,7 +1416,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let res;
     const metodo = this.action === 'update' ? 'editar_factura' : '';
 
-    console.log('cabecera_fact ', cabecera_fact);
 
     if (metodo === 'editar_factura') res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_editar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);

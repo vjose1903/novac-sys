@@ -125,7 +125,6 @@ export class FacturaC extends CrudG<FacturasI> {
       data_parsed.total = data_parsed.total_factura;
 
       data_parsed.contenido_reporte.map((detalle) => {
-        console.log('detalle ', detalle);
 
         detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
         return detalle;

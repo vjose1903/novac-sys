@@ -39,11 +39,11 @@
                 <span class="w-100 detalleBalance badge bg-info mb-2">
                   <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
                 </span>
-                <span *ngIf="isOneFacturaWithMonto()" class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
+                <span *ngIf="facturasSelected.length" class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
                   <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo) }}</span>
                 </span>
 
-                <span *ngIf="isOneFacturaWithMonto()" class="w-100 detalleBalance badge bg-warning mb-2">
+                <span *ngIf="facturasSelected.length" class="w-100 detalleBalance badge bg-warning mb-2">
                   <span>Faltando:</span> <span>RD$ {{ formatoNumero(restando) }}</span>
                 </span>
               </div>

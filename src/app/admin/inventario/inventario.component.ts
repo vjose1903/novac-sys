@@ -138,8 +138,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   movimientoInventario(arg) {
     const tipoArticuloSelected = this.tipo_articulos.find((val) => val.id == _.parseInt(arg.data.tipo_articulo_id));
-    console.log('arg ', arg);
-    console.log('tipoArticuloSelected ', tipoArticuloSelected);
+
     if (tipoArticuloSelected.tipo != 'servicio') {
       this.openNewModal({
         component: MovimientosFormComponent,

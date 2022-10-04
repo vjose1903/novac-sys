@@ -94,7 +94,6 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
       this.conduceClass.getAll(extra).then((res) => {
         res['data'] = this.mapeoRecibos(res['data']);
-        console.log("res['data'] ", res['data']);
 
         this.lista_conduces = fun.duplicarJson(res['data']);
 

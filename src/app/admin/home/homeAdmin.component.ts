@@ -23,7 +23,6 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
 
   cedula = null;
   ngOnInit() {
-    console.log(fun.numFormatTwoDecimals("2,999.9"));
 
     this._init_mixin({ component: 'home', is_routing: true });
 

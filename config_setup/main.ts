@@ -525,7 +525,7 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
   let descargar_archivo = false;
   let md5_servidor;
 
-  cmd(`ssh vjose1903@admservidor.ddns.net "md5sum /home/vjose1903/proyects/servidorADMAgro/public${paht_server}"`, async (res_servidor) => {
+  cmd(`ssh novac@admservidor.ddns.net -p 24 "md5sum /home/novac/proyects/novac-system/public${paht_server}"`, async (res_servidor) => {
     if (res_servidor.status) {
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
       const element_path = await pathAdd(`${path_local_content}${is_carpeta ? `${path_local_no_extension}` : `${path_local_extension}`}`);

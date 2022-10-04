@@ -98,7 +98,13 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then((res) => {
-          setTimeout(() => this.currentUserServ.setUser(res.data).then(() => this.router.navigateByUrl('/admin/dashboard')), 250);
+          setTimeout(
+            () =>
+              this.currentUserServ.setUser(res.data).then(() => {
+                this.router.navigateByUrl('/admin/dashboard');
+              }),
+            250,
+          );
         })
         .catch((error) => {
           if (error.status === 0) fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
