@@ -344,13 +344,13 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       } else {
         if (!fact.is_viaje && !fact.select) this.facturas[index].select = true;
       }
-      this.verificateFacturasSelected(fact, 'insert', !allSelected);
+      this.verificateFacturasSelected(fact, 'insert', index, !allSelected);
     });
 
     this.sumarTotalRecibo();
   }
 
-  verificateFacturasSelected(factura, method, value) {
+  verificateFacturasSelected(factura, method, index, value) {
     const factura_en_turno = _.find(this.facturasSelected, { id: factura.id });
     const index_factura_en_turno = _.findIndex(this.facturasSelected, { id: factura.id });
 
@@ -364,6 +364,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       this.facturasSelected[index_factura_en_turno] = fun.duplicarJson(factura);
 
       this.facturasSelected[index_factura_en_turno].monto = value;
+      this.tablaComponent.resetInput('monto', 'especificar', index, true, value);
     }
 
     this.sumarTotalRecibo();
@@ -372,7 +373,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   tableInputChange(params) {
     if (params.key == 'pagoT' && params.value) {
       const monto = params.data.select ? fun.numFormatTwoDecimals(params.data.balance) : '0.00';
-      this.verificateFacturasSelected(params.data, 'modify', monto);
+      this.verificateFacturasSelected(params.data, 'modify', params.index, monto);
     }
 
     if (params.key == 'monto' && params.value != params.data.monto) {
@@ -392,7 +393,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           this.ExisteMontoMayor = false;
         }
 
-        this.verificateFacturasSelected(params.data, 'modify', monto);
+        this.verificateFacturasSelected(params.data, 'modify', params.index, monto);
       }
     }
 
@@ -404,7 +405,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         this.tablaComponent.resetInput('monto', 'especificar', params.index, true, '0.00');
       }
 
-      this.verificateFacturasSelected(factura, 'insert', params.value);
+      this.verificateFacturasSelected(factura, 'insert', params.index, params.value);
     }
   }
 
