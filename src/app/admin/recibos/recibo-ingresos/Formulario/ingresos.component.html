@@ -62,7 +62,7 @@
             </div>
           </div>
           <div class="porcentaje">
-            <div *ngIf="clienteAdepositar.balance > 0" class="d-flex justify-content-between">
+            <div *ngIf="clienteAdepositar" class="d-flex justify-content-between">
               <span class="negrita">Porcentaje de pago</span>
             </div>
             <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>

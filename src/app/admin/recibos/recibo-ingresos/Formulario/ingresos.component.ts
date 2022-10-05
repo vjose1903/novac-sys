@@ -155,11 +155,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     const fechaA = moment().format('YYYY-MM-DD');
 
-    // const res = await this.facturaClass.getAll({ afterPath: `cliente/${cliente_id}/pagada/false`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
     const res = await this.clienteClass.getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
 
     res.data.facturas.data.map((factura) => {
-      // res.data.map((factura) => {
       const factura_is_selected = _.find(this.facturasSelected, { id: factura.id });
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
 
@@ -234,36 +232,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     setTimeout(() => this.enfocarInput('clienteI'), 250);
   }
 
-  formarDetalleRecibos() {
-    const temp = [];
-    let total = 0;
-
-    const facturas_selected = _.filter(this.facturas, (factura) => factura.select);
-
-    for (let i = 0; i < facturas_selected.length; i++) {
-      const fact = facturas_selected[i];
-
-      temp.push({
-        cabecera_factura_id: fact.id,
-        pago_total: fact.pagoT,
-        deposito: fun.desformatear(fact.monto),
-        descripcion:
-          this.tipo_recibo === 'Pago factura'
-            ? fact.pagoT
-              ? 'Saldo ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-              : 'Abono ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-            : '',
-        pago_a_tiempo: fact.pago_a_tiempo,
-      });
-
-      total += fun.desformatear(fact.monto);
-    }
-
-    const obj = { total_recibo: total, detalle: temp };
-
-    return obj;
-  }
-
   abrirModalDinamicText(tipo) {
     const obj = {
       id: 'cancelar_ingreso',
@@ -305,9 +273,200 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.openNewModal({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p>
+      ${obj.texto}
+    </p>`,
+      botones: {
+        ...ModalClass.noShowAceptarCancelarButtons,
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: (instance) => obj.siFunction(instance),
+            label: 'SI',
+            disable: false,
+          },
+        ],
+      },
+    });
+  }
+
+  closeModal(modalInstance) {
+    modalInstance.closeModal(modalInstance.id, 'cancelar');
+  }
+
+  resetVariables() {
+    this.forma_pago = null;
+    this.devuelta = null;
+    this.detalleYtotal = undefined;
+    this.facturasSelected.length = 0;
+  }
+
+  tableClickIcon(params) {
+    if (params.columnKey == 'actions') {
+      if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
+        this.reciboServ.abrirModalHistorial(params.data.pagos, params.data.notas);
+      }
+      if (params.iconKey == 'ver') {
+        this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
+          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
+            const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
+            obj_modal.botones.dinamico.push(ver_datelles_btn);
+            this.openNewModal(obj_modal);
+          });
+        });
+      }
+    }
+  }
+
+  verDetalles(data) {
+    const configModal = this.reciboClass.modalVerDetalles(data);
+    this.openNewModal(configModal);
+  }
+
+  selectAll() {
+    const allSelected = this.areAllSelected();
+
+    this.facturas.forEach((fact, index) => {
+      if (allSelected) {
+        if (!fact.is_viaje && fact.select) {
+          this.facturas[index].pagoT = false;
+          this.facturas[index].select = false;
+          this.facturas[index].monto = '0.00';
+
+          this.tablaComponent.resetInput('monto', 'especificar', index, true, '0.00');
+        }
+      } else {
+        if (!fact.is_viaje && !fact.select) this.facturas[index].select = true;
+      }
+      this.verificateFacturasSelected(fact, 'insert', !allSelected);
+    });
+
+    this.sumarTotalRecibo();
+  }
+
+  verificateFacturasSelected(factura, method, value) {
+    const factura_en_turno = _.find(this.facturasSelected, { id: factura.id });
+    const index_factura_en_turno = _.findIndex(this.facturasSelected, { id: factura.id });
+
+    if (method == 'insert') {
+      if (value) {
+        if (fun.isEmpty(factura_en_turno)) this.facturasSelected.push(factura);
+      } else {
+        _.pull(this.facturasSelected, factura_en_turno);
+      }
+    } else if (method == 'modify') {
+      this.facturasSelected[index_factura_en_turno] = fun.duplicarJson(factura);
+
+      this.facturasSelected[index_factura_en_turno].monto = value;
+    }
+
+    this.sumarTotalRecibo();
+  }
+
+  tableInputChange(params) {
+    if (params.key == 'pagoT' && params.value) {
+      const monto = params.data.select ? fun.numFormatTwoDecimals(params.data.balance) : '0.00';
+      this.verificateFacturasSelected(params.data, 'modify', monto);
+    }
+
+    if (params.key == 'monto' && params.value != params.data.monto) {
+      if (params.data.select) {
+        if (!params.value) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+
+        const total = params.data.balance;
+        const monto = fun.isEmpty(params.value) ? null : fun.desformatear(params.value);
+
+        if (monto == total) params.data.pagoT = true;
+
+        if (monto > total) {
+          this.ExisteMontoMayor = true;
+          fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+          fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
+        } else {
+          this.ExisteMontoMayor = false;
+        }
+
+        this.verificateFacturasSelected(params.data, 'modify', monto);
+      }
+    }
+
+    if (params.key == 'select') {
+      const factura = _.find(this.facturas, { id: params.data.id });
+      if (!params.value) {
+        factura.pagoT = false;
+        params.data.monto = '0.00';
+        this.tablaComponent.resetInput('monto', 'especificar', params.index, true, '0.00');
+      }
+
+      this.verificateFacturasSelected(factura, 'insert', params.value);
+    }
+  }
+
+  sumarTotalRecibo() {
+    this.recibiendo = _.reduce(this.facturasSelected, (sum, item) => fun.desformatear(item.monto) + sum, 0);
+    this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
+  }
+
+  async abrirModalFiltro(nombre) {
+    if (fun.hasValue(nombre)) {
+      const obj = {
+        data: [],
+        palabra_a_buscar: nombre,
+        metodo: 'venta',
+      };
+
+      this.openNewModal({
+        component: BuscarClienteSuplidorComponent,
+        inputs: obj,
+        id: 'buscarCliente',
+        header: 'Buscar cliente',
+        width: '900px',
+        height: '500px',
+        botones: ModalClass.noShowAceptarCancelarButtons,
+      });
+      this.desEnfocarInput('clienteI');
+    }
+  }
+
+  formarDetalleRecibos() {
+    const temp = [];
+    let total = 0;
+
+    for (let i = 0; i < this.facturasSelected.length; i++) {
+      const fact = this.facturasSelected[i];
+
+      temp.push({
+        cabecera_factura_id: fact.id,
+        pago_total: fact.pagoT,
+        deposito: fun.desformatear(fact.monto),
+        descripcion:
+          this.tipo_recibo === 'Pago factura'
+            ? fact.pagoT
+              ? 'Saldo ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
+              : 'Abono ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
+            : '',
+        pago_a_tiempo: fact.pago_a_tiempo,
+      });
+
+      total += fun.desformatear(fact.monto);
+    }
+
+    const obj = { total_recibo: total, detalle: temp };
+
+    return obj;
+  }
+
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
+    } else if (_.some(this.facturasSelected, (factura) => factura.monto == 0)) {
+      fun.toastError('Todas las facturas seleccionadas deben de tener un monto a pagar', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta', formaPago: 'Efectivo' };
@@ -336,212 +495,36 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p>
-      ${obj.texto}
-    </p>`,
-      botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
-  }
-
-  closeModal(modalInstance) {
-    console.warn('modalInstance: ', modalInstance);
-
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
-  }
-
   async sendIngreso() {
     const obj = {
       cliente_id: this.clienteAdepositar.id,
-      total: 0,
+      total: this.detalleYtotal.total_recibo,
       forma_pago: this.forma_pago,
       tipo_factura_id: 17,
       devuelta: this.devuelta,
       numero_recibo: null,
       estado: true,
+      detalle_recibos: this.detalleYtotal.detalle,
     };
-
-    obj.total = this.detalleYtotal.total_recibo;
-    obj['detalle_recibos'] = this.detalleYtotal.detalle;
 
     this.reciboClass.createUpdateOne(obj).then((res) => {
       const recibo = res['data'].recibo;
 
-      this.clienteAdepositar.balance = recibo.cliente.balance;
       const actualPagination = this.tServ.getPaginationById('listado_recibos');
       this.pedirFacturasPorCliente(this.clienteAdepositar.id, actualPagination);
+
       this.resetVariables();
 
       const obj_print = { data: recibo, type: 'recibo_ingreso' };
 
-      if (this.is_print) {
-        PdfService.generatePdf({ oPdf: obj_print, imprimir: true })
-          .then(async (res) => {
-            if (res.status === 'si') {
-            } else fun.toastError(res.msg, 'ERROR');
+      PdfService.generatePdf({ oPdf: obj_print, imprimir: this.is_print })
+        .then(async (res) => {
+          if (res.status === 'si') {
+          } else fun.toastError(res.msg, 'ERROR');
 
-            this.layServ.nextCheckCuadreToday(true);
-          })
-          .catch((err) => fun.toastError(err.msg, 'ERROR'));
-      }
+          this.layServ.nextCheckCuadreToday(true);
+        })
+        .catch((err) => fun.toastError(err.msg, 'ERROR'));
     });
-  }
-
-  resetVariables() {
-    this.forma_pago = null;
-    this.devuelta = null;
-    this.detalleYtotal = undefined;
-  }
-
-  tableClickIcon(params) {
-    if (params.columnKey == 'actions') {
-      if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
-        this.reciboServ.abrirModalHistorial(params.data.pagos, params.data.notas);
-      }
-      if (params.iconKey == 'ver') {
-        this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
-          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
-            const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
-            obj_modal.botones.dinamico.push(ver_datelles_btn);
-            this.openNewModal(obj_modal);
-          });
-        });
-      }
-    }
-  }
-
-  verDetalles(data) {
-    const configModal = this.reciboClass.modalVerDetalles(data);
-
-    this.openNewModal(configModal);
-  }
-
-  selectAll() {
-    const allSelected = this.areAllSelected();
-
-    this.facturas.forEach((fact, index) => {
-      if (allSelected) {
-        if (!fact.is_viaje && fact.select) {
-          this.facturas[index].pagoT = false;
-          this.facturas[index].select = false;
-          this.facturas[index].monto = '0.00';
-
-          this.tablaComponent.resetInput('monto', 'especificar', index, true, '0.00');
-        }
-      } else {
-        if (!fact.is_viaje && !fact.select) this.facturas[index].select = true;
-      }
-      this.verificateFacturasSelected(fact, 'insert', !allSelected);
-    });
-
-    this.sumarTotalRecibo();
-  }
-
-  verificateFacturasSelected(factura, method, value) {
-    const factura_en_turno = _.find(this.facturasSelected, { id: factura.id });
-
-    if (method == 'insert') {
-      if (value && fun.isEmpty(factura_en_turno)) {
-        this.facturasSelected.push(factura);
-      } else {
-        _.pull(this.facturasSelected, factura_en_turno);
-      }
-    } else if (method == 'modify') {
-      factura_en_turno.monto = value;
-      console.log("ANDO AQUIII");
-
-    }
-  }
-
-  tableInputChange(params) {
-    if (params.key == 'pagoT' && params.value) {
-      const monto = params.data.select ? fun.numFormatTwoDecimals(params.data.balance) : '0.00';
-      this.verificateFacturasSelected(params.data, 'modify', monto);
-    }
-
-    if (params.key == 'monto' && params.value != params.data.monto) {
-      fun.awaitTyping().then(() => {
-        if (params.data.select) {
-          if (!params.value) {
-            fun.toastWarning('Debe de introducir un Monto', 'AVISO');
-            fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
-          }
-
-          const total = params.data.balance;
-          const monto = fun.isEmpty(params.value) ? null : fun.desformatear(params.value);
-
-          if (monto == total) params.data.pagoT = true;
-
-          if (monto > total) {
-            this.ExisteMontoMayor = true;
-            fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
-            fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
-          } else {
-            this.ExisteMontoMayor = false;
-            fun.logPurple('--- changeMonto ---', params.data.select);
-
-            // params.data.monto = fun.is_number(monto) ? monto : null;
-            console.log('params.data.monto ', monto);
-          }
-
-          this.verificateFacturasSelected(params.data, 'modify', monto);
-          this.sumarTotalRecibo();
-        }
-      });
-    }
-
-    if (params.key == 'select') {
-      const factura = _.find(this.facturas, { id: params.data.id });
-      if (!params.value) {
-        factura.pagoT = false;
-        params.data.monto = '0.00';
-        console.log(' ----- REINICIANDO -----');
-      }
-
-      this.verificateFacturasSelected(factura, 'insert', params.value);
-    }
-
-    this.sumarTotalRecibo();
-  }
-
-  sumarTotalRecibo() {
-    this.recibiendo = _.reduce(this.facturasSelected, (sum, item) => fun.desformatear(item.monto) + sum, 0);
-    this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
-  }
-
-  async abrirModalFiltro(nombre) {
-    if (fun.hasValue(nombre)) {
-      const obj = {
-        data: [],
-        palabra_a_buscar: nombre,
-        metodo: 'venta',
-      };
-
-      this.openNewModal({
-        component: BuscarClienteSuplidorComponent,
-        inputs: obj,
-        id: 'buscarCliente',
-        header: 'Buscar cliente',
-        width: '900px',
-        height: '500px',
-        botones: ModalClass.noShowAceptarCancelarButtons,
-      });
-      this.desEnfocarInput('clienteI');
-    }
   }
 }
