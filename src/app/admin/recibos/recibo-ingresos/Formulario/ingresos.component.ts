@@ -406,7 +406,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       }
 
       this.verificateFacturasSelected(factura, 'insert', params.index, params.value);
-
     }
   }
 
