@@ -17,8 +17,8 @@
     "build:dev": "npm run build -- -c dev",
     "build:prod": "npm run build -- -c production",
     "electron:serve-tsc": "tsc -p tsconfig.serve.json",
-    "ng:serve": "ng serve --host 0.0.0.0 --port 5222 -c web",
-    "electron:serve": "wait-on tcp:5222 && npm run electron:serve-tsc && npx electron . --serve",
+    "ng:serve": "ng serve --host 0.0.0.0 --port 5220 -c web",
+    "electron:serve": "wait-on tcp:5220 && npm run electron:serve-tsc && npx electron . --serve",
     "electron:local": "npm run build:prod && npx electron .",
     "electron:build": "npm run build:prod && electron-builder build",
     "electron:windows64": "tsc -p tsconfig.serve.json && npm run build:prod && electron-builder build --windows --x64 -p always",
@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vjose1903/novac-system-vasquez.git"
+    "url": "https://github.com/vjose1903/novac-system-agrodemi.git"
   },
   "dependencies": {
     "@angular/animations": "^13.3.11",

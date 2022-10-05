@@ -95,7 +95,7 @@ function createWindow() {
         electron: require(`${__dirname}/node_modules/electron`),
       });
 
-      win.loadURL('http://localhost:5222');
+      win.loadURL('http://localhost:5220');
     } else {
       win.loadURL(url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true }));
     }
@@ -109,7 +109,7 @@ function createWindow() {
     //     electron: require(path.join(__dirname, '/node_modules/electron')),
     //   });
 
-    //   win.loadURL('http://localhost:5222');
+    //   win.loadURL('http://localhost:5220');
     // } else {
     //   // Path when running electron executable
     //   let pathIndex = pathAdd('/dist/index.html');
@@ -120,7 +120,7 @@ function createWindow() {
     //   //   pathIndex = '../dist/index.html';
     //   //   baseDirectory = '../dist';
     //   // }
-    //   var httpPort = 5222;
+    //   var httpPort = 5220;
     //   const app = express();
 
     //   app.use(express.static(path.resolve(baseDirectory)));
@@ -149,7 +149,7 @@ function createWindow() {
     //   //   });
     //   // }
 
-    //   app.listen(httpPort, () => win.loadURL('http://localhost:5222'));
+    //   app.listen(httpPort, () => win.loadURL('http://localhost:5220'));
 
     //   // win.loadURL(url.format({
     //   //   pathname: path.join(__dirname, pathIndex),
@@ -525,7 +525,7 @@ async function verificarElemento(aFiles_malos, paht_server, path_local_content, 
   let descargar_archivo = false;
   let md5_servidor;
 
-  cmd(`ssh novac@admservidor.ddns.net -p 24 "md5sum /home/vjose1903/proyects/servidorADMAgro/public${paht_server}"`, async (res_servidor) => {
+  cmd(`ssh novac@admservidor.ddns.net -p 24 "md5sum /home/novac/proyects/novac-system/public${paht_server}"`, async (res_servidor) => {
     if (res_servidor.status) {
       md5_servidor = res_servidor.STDOUT.split(' ')[0];
       const element_path = await pathAdd(`${path_local_content}${is_carpeta ? `${path_local_no_extension}` : `${path_local_extension}`}`);
