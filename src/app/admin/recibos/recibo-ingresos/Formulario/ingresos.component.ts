@@ -381,11 +381,12 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         if (!params.value) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
 
         const total = params.data.balance;
-        const monto = fun.isEmpty(params.value) ? null : fun.desformatear(params.value);
+        const monto_desformateado = fun.isEmpty(params.value) ? null : fun.desformatear(params.value);
+        const monto_original = fun.isEmpty(params.value) ? null : params.value;
 
-        if (monto == total) params.data.pagoT = true;
+        if (monto_desformateado == total) params.data.pagoT = true;
 
-        if (monto > total) {
+        if (monto_desformateado > total) {
           this.ExisteMontoMayor = true;
           fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
           fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
@@ -393,7 +394,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           this.ExisteMontoMayor = false;
         }
 
-        this.verificateFacturasSelected(params.data, 'modify', params.index, monto);
+        this.verificateFacturasSelected(params.data, 'modify', params.index, monto_original);
       }
     }
 
