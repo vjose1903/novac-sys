@@ -12,9 +12,10 @@ function getPageMargin(is_contado) {
   let margins = [];
 
   if (is_contado) {
-    margins = [0, 158, 0, 30];
+    // margins = [15, 158, 15, 30];
+    margins = [15, 122, 15, 30];
   } else {
-    margins = [0, 174, 0, 30];
+    margins = [15, 174, 15, 30];
   }
 
   return margins;
@@ -27,7 +28,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
 
   const dd = {
-    pageSize: is_contado ? { width: 990, height: 398 } : { width: 990, height: 796 },
+    pageSize: is_contado ? { width: 600, height: 398 } : { width: 600, height: 796 },
     pageMargins: getPageMargin(is_contado),
     header: (currentPage, pageCount, pageSize) => {
       return cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, configApp);
@@ -50,151 +51,137 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
 function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, configApp: ConfigI) {
   const header = [
     {
-      columns: [
-        [
-          {
-            text: 'pag: ' + currentPage.toString() + ' de ' + pageCount,
-            alignment: 'left',
-            margin: [15, 10, 0, 0],
-          },
-          {
-            image: 'logo',
-            width: 72,
-            height: 45,
-            margin: [90, -12, 0, 0],
-          },
-        ],
-        [
-          {
-            text: 'FACTURA A ' + data.condicion.toUpperCase(),
-            alignment: 'right',
-            bold: true,
-            style: 'letra14',
-            margin: [0, 20, 30, 0],
-          },
-          {
-            text: data.tipo_pdf,
-            style: 'letra14',
-            margin: [0, 2, 30, 0],
-            alignment: 'right',
-          },
-        ],
-      ],
-    },
-    {
-      margin: [0, -40, 0, 0],
+      margin: [15, 15, 15, 0],
       stack: [
         {
-          text: configApp.nombre_empresa,
-          alignment: 'center',
-          bold: true,
-          style: 'letra17',
-        },
-        {
-          text: configApp.direccion_empresa,
-          alignment: 'center',
-        },
-        {
-          text: [
-            { text: 'Telefono: ', style: 'letra11  ' },
-            { text: configApp.telefono_empresa + ' ', style: 'letra11' },
-            { text: ' RNC: ', bold: true, style: 'letra11' },
-            { text: configApp.rnc_empresa, style: 'letra11' },
+          columns: [
+            [
+              { text: 'pag: ' + currentPage.toString() + ' de ' + pageCount, alignment: 'left', style: 'letra8' },
+              { image: 'logo', width: 50, height: 45, margin: [70, -15, 0, 0] },
+            ],
+            [
+              { text: 'FACTURA A ' + data.condicion.toUpperCase(), alignment: 'right', bold: true, style: 'letra10' },
+              { text: data.tipo_pdf, style: 'letra10', alignment: 'right' },
+            ],
           ],
-          alignment: 'center',
         },
-      ],
-    },
-
-    {
-      margin: [15, 8, 0, 0],
-      text: [
         {
-          text: [is_venta ? { text: 'Cliente : ', style: 'letra12' } : { text: 'Suplidor : ', style: 'letra12' }, is_venta ? { text: data.cliente.nombre, style: 'letra12' } : { text: data.suplidor.nombre, style: 'letra12' }],
-        },
-      ],
-    },
-
-    {
-      text: [is_venta ? { text: 'Rnc cliente : ', style: 'letra12' } : { text: 'Rnc suplidor : ', style: 'letra12' }, is_venta ? { text: data.cliente.rnc, style: 'letra12' } : { text: data.suplidor.rnc, style: 'letra12' }],
-      margin: [15, 5, 0, 0],
-    },
-
-    {
-      margin: [15, 5, 0, 0],
-      text: [
-        {
-          text: [{ text: 'Dirección : ', style: 'letra12' }, is_venta ? { text: data.cliente.direccion, style: 'letra12' } : { text: data.suplidor.direccion, style: 'letra12' }],
-        },
-      ],
-    },
-
-    {
-      margin: [710, -50, 0, 0],
-      stack: [
-        {
-          text: [
-            { text: 'Fecha : ', style: 'letra11' },
-            { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra11' },
-            { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra11' },
-          ],
-          margin: [85, -10, 0, 0],
-        },
-        is_contado
-          ? { text: '' }
-          : {
+          margin: [0, -40, 0, 0],
+          stack: [
+            {
+              text: configApp.nombre_empresa,
+              alignment: 'center',
+              bold: true,
+              style: 'letra11',
+            },
+            {
+              text: configApp.direccion_empresa,
+              alignment: 'center',
+              style: 'letra9',
+            },
+            {
               text: [
-                { text: 'Fecha vencimiento : ', style: 'letra11' },
-                { text: fun_.my_dateFormater(data.fecha_vencimiento), style: 'letra11' },
+                { text: 'Telefono: ', bold: true, style: 'letra8' },
+                { text: `${configApp.telefono_empresa} `, style: 'letra8' },
+                { text: ' RNC: ', bold: true, style: 'letra8' },
+                { text: configApp.rnc_empresa, style: 'letra8' },
+              ],
+              alignment: 'center',
+            },
+          ],
+        },
+
+        {
+          margin: [0, 10, 0, 0],
+          text: [
+            {
+              text: [is_venta ? { text: 'Cliente : ', style: 'letra9' } : { text: 'Suplidor : ', style: 'letra9' }, is_venta ? { text: data.cliente.nombre, style: 'letra9' } : { text: data.suplidor.nombre, style: 'letra9' }],
+            },
+          ],
+        },
+
+        {
+          text: [is_venta ? { text: 'Rnc cliente : ', style: 'letra9' } : { text: 'Rnc suplidor : ', style: 'letra9' }, is_venta ? { text: data.cliente.rnc, style: 'letra9' } : { text: data.suplidor.rnc, style: 'letra9' }],
+          margin: [0, 4, 0, 0],
+        },
+
+        {
+          margin: [0, 4, 0, 0],
+          text: [
+            {
+              text: [{ text: 'Dirección : ', style: 'letra9' }, is_venta ? { text: data.cliente.direccion, style: 'letra9' } : { text: data.suplidor.direccion, style: 'letra9' }],
+            },
+          ],
+        },
+
+        {
+          margin: [350, -40, 0, 0],
+          stack: [
+            {
+              text: [
+                { text: 'Fecha : ', style: 'letra9' },
+                { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra9' },
+                { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra9' },
+              ],
+              margin: [85, -10, 0, 0],
+            },
+            is_contado
+              ? { text: '' }
+              : {
+                  text: [
+                    { text: 'Fecha vencimiento : ', style: 'letra9' },
+                    { text: fun_.my_dateFormater(data.fecha_vencimiento), style: 'letra9' },
+                  ],
+                  margin: [85, 3, 0, 0],
+                },
+            {
+              text: [
+                { text: 'NCF : ', style: 'letra9' },
+                { text: data.numero_comprobante, style: 'letra9' },
               ],
               margin: [85, 3, 0, 0],
             },
-        {
-          text: [
-            { text: 'NCF : ', style: 'letra11' },
-            { text: data.numero_comprobante, style: 'letra11' },
+            {
+              text: [
+                { text: 'Doc No : ', style: 'letra9' },
+                { text: fun_.my_padStart(data.numero_documento, 8, '0'), style: 'letra9' },
+              ],
+              margin: [85, 3, 0, 0],
+            },
+            {
+              text: [{ text: 'Valida hasta : ', style: 'letra9' }, data.tipo_factura_id == 3 ? { text: 'No aplica.', style: 'letra9' } : data.tipo === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra9' }],
+              margin: [85, 3, 0, 0],
+            },
           ],
-          margin: [85, 3, 0, 0],
         },
+
+        // =============================================================
         {
-          text: [
-            { text: 'Doc No : ', style: 'letra11' },
-            { text: fun_.my_padStart(data.numero_documento, 8, '0'), style: 'letra11' },
-          ],
-          margin: [85, 3, 0, 0],
+          canvas: [{ type: 'rect', x: 0, y: 3, w: 570, h: 2, color: '#000000' }],
         },
+
         {
-          text: [{ text: 'Valida hasta : ', style: 'letra11' }, data.tipo_factura_id == 3 ? { text: 'No aplica.', style: 'letra11' } : data.tipo === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra11' }],
-          margin: [85, 3, 0, 0],
+          style: 'tableExample',
+          table: {
+            headerRows: 1,
+            widths: [20, 230, '*', '*', '*', '*'],
+            body: [
+              [
+                { text: ' #', style: 'letra10', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
+                { text: 'Articulo', style: 'letra10', bold: true, margin: [-5, 0, 0, 0] },
+                { text: 'Cantidad', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
+                is_venta ? { text: 'Precio', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
+                { text: 'Itbis', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
+                { text: 'Total', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 18, 0] }, // margin: [12, 0, 0, 0]
+              ],
+
+              [1, 'Sample value 1', 'value 2', 'value 4', 'value 5', 'value 6'],
+            ],
+          },
+          margin: [0, 0, 0, 0],
+          layout: 'headerLineOnly',
         },
       ],
-    },
-
-    // =============================================================
-    {
-      canvas: [{ type: 'rect', x: 10, y: 3, w: 970, h: 2, color: '#000000' }],
-    },
-
-    {
-      style: 'tableExample',
-      table: {
-        headerRows: 1,
-        widths: [30, 350, '*', '*', '*', '*'],
-        body: [
-          [
-            { text: ' #', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
-            { text: 'Articulo', bold: true, margin: [-5, 0, 0, 0] },
-            { text: 'Cantidad', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
-            is_venta ? { text: 'Precio', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
-            { text: 'Itbis', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
-            { text: 'Total', bold: true, alignment: 'right', margin: [0, 0, 18, 0] }, // margin: [12, 0, 0, 0]
-          ],
-
-          [1, 'Sample value 1', 'value 2', 'value 4', 'value 5', 'value 6'],
-        ],
-      },
-      margin: [10, 0, 10, 0],
-      layout: 'headerLineOnly',
     },
   ];
 
@@ -204,31 +191,27 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
 // ==========================================================================================================================================================
 // CONTENIDO
 // =========================================================~=================================================================================================
-function calcularPrecio(cant, precio, tipo) {
-  const res = cant * precio;
-  return fun_.redondearAdos(res);
-}
-
 function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
   const tempBody = [];
-  const _break = is_contado ? 6 : 26;
+  const _break = is_contado ? 11 : 26;
 
   data.contenido_reporte.forEach((detalle, i) => {
     const row = [];
     const br_ = i !== 0 && i % _break === 0;
 
     row.push(
-      { text: i + 1, alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
-      { text: detalle.descripcion, pageBreak: br_ ? 'before' : 'none' },
-      { text: detalle.cantidad, alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: i + 1, style: 'letra9', alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
+      { text: detalle.descripcion, style: 'letra9', pageBreak: br_ ? 'before' : 'none' },
+      { text: detalle.cantidad, style: 'letra9', alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       {
         text: fun_.numFormatTwoDecimals(is_venta ? detalle.precio : detalle.costo),
+        style: 'letra9',
         alignment: 'right',
         margin: [0, 0, 14, 0],
         pageBreak: br_ ? 'before' : 'none',
       },
-      { text: fun_.numFormatTwoDecimals(detalle.itbis), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
-      { text: fun_.numFormatTwoDecimals(detalle.total), alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: fun_.numFormatTwoDecimals(detalle.itbis), style: 'letra9', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: fun_.numFormatTwoDecimals(detalle.total), style: 'letra9', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
     );
     tempBody.push(row);
   });
@@ -239,10 +222,10 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
     {
       style: 'tableExample',
       table: {
-        widths: [30, 350, '*', '*', '*', '*'],
+        widths: [20, 230, '*', '*', '*', '*'],
         body: tempBody,
       },
-      margin: is_contado ? [10, -2, 10, 0] : [10, -2, 10, 0],
+      margin: [0, -2, 0, 0],
       layout: {
         hLineWidth: (i, node) => {
           return i % _break === 0 && node.table.body.length !== _break ? 0 : i === node.table.body.length ? 2 : 1;
@@ -260,12 +243,12 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
     },
     {
       text: [
-        { text: 'Realizada Por :  ', style: 'letra11', bold: true },
-        { text: data.usuario, style: 'letra11' },
-        data.vendedor ? { text: '    Vendedor :  ', style: 'letra11', bold: true } : { text: '' },
-        data.vendedor ? { text: data.vendedor, style: 'letra11' } : { text: '' },
+        { text: 'Realizada Por :  ', style: 'letra9', bold: true },
+        { text: data.usuario, style: 'letra9' },
+        data.vendedor ? { text: '    Vendedor :  ', style: 'letra9', bold: true } : { text: '' },
+        data.vendedor ? { text: data.vendedor, style: 'letra9' } : { text: '' },
       ],
-      margin: [20, 5, 0, 0],
+      margin: [0, 5, 0, 0],
     },
     // -----------------------
     {
@@ -278,8 +261,8 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
                   stack: [
                     {
                       canvas: [
-                        { type: 'rect', x: 10, y: 0, w: 160, h: 1, color: '#000000' },
-                        { type: 'rect', x: 250, y: 0, w: 160, h: 1, color: '#000000' },
+                        { type: 'rect', x: 0, y: 0, w: 110, h: 1, color: '#000000' },
+                        { type: 'rect', x: 160, y: 0, w: 110, h: 1, color: '#000000' },
                       ],
                       margin: [0, 80, 0, 0],
                     },
@@ -287,14 +270,14 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
                       columns: [
                         [
                           {
-                            text: [{ text: 'Revisada Por', style: 'letra12', bold: true }],
-                            margin: [50, 5, 0, 0],
+                            text: [{ text: 'Revisada Por', style: 'letra9', bold: true }],
+                            margin: [28, 3, 0, 0],
                           },
                         ],
                         [
                           {
-                            text: [{ text: 'Cliente', style: 'letra12', bold: true }],
-                            margin: [65, 5, 0, 0],
+                            text: [{ text: 'Cliente', style: 'letra9', bold: true }],
+                            margin: [60, 3, 0, 0],
                           },
                         ],
                       ],
@@ -304,61 +287,60 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
                 },
 
             {
-              margin: [0, -12, 0, 0],
+              margin: [0, -12, 19, 0],
               table: {
                 widths: ['*', 'auto'],
                 body: [
                   [
-                    { text: 'Bruto RD$: ', style: 'letra11', bold: true, alignment: 'right' },
+                    { text: 'Bruto RD$: ', style: 'letra10', bold: true, alignment: 'right' },
                     {
                       text: fun_.numFormatTwoDecimals(data.Bruto),
-                      style: 'letra11',
+                      style: 'letra10',
                       alignment: 'right',
-                      margin: [0, 0, data.contenido_reporte.length <= 5 ? 29 : 49, 0],
+                      margin: [0, 0, 0, 0],
                     },
                   ],
                   [
-                    { text: 'Itbis RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                    { text: 'Itbis RD$: ', style: 'letra10', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
                     {
                       text: fun_.numFormatTwoDecimals(data.itbis),
-                      style: 'letra11',
+                      style: 'letra10',
                       alignment: 'right',
-                      margin: [0, -2, data.contenido_reporte.length <= 5 ? 29 : 49, 0],
+                      margin: [0, -2, 0, 0],
                     },
                   ],
                   [
-                    { text: 'Descuento RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                    { text: 'Descuento RD$: ', style: 'letra10', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
                     {
                       text: fun_.numFormatTwoDecimals(data.descuento),
-                      style: 'letra11',
+                      style: 'letra10',
                       alignment: 'right',
-                      margin: [0, -2, data.contenido_reporte.length <= 5 ? 29 : 49, 0],
+                      margin: [0, -2, 0, 0],
                     },
                   ],
                   [
-                    { text: 'TOTAL RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                    { text: 'TOTAL RD$: ', style: 'letra10', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
                     {
                       text: fun_.numFormatTwoDecimals(data.total_factura),
-                      style: 'letra11',
+                      style: 'letra10',
                       alignment: 'right',
-                      margin: [0, -2, data.contenido_reporte.length <= 5 ? 29 : 49, 0],
+                      margin: [0, -2, 0, 0],
                     },
                   ],
                   data.tipo === 'compra'
                     ? [{ text: '' }, { text: '' }]
                     : [
-                        { text: 'Devuelta RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                        { text: 'Devuelta RD$: ', style: 'letra10', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
                         {
                           text: fun_.numFormatTwoDecimals(data.devuelta),
-                          style: 'letra11',
+                          style: 'letra10',
                           alignment: 'right',
-                          margin: [0, -2, data.contenido_reporte.length <= 5 ? 29 : 49, 0],
+                          margin: [0, -2, 0, 0],
                         },
                       ],
                 ],
               },
               layout: 'noBorders',
-              // margin: [585, 3, 0, 0],
             },
           ],
         },
