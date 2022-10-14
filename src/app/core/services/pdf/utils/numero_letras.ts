@@ -167,8 +167,8 @@ export function NumeroALetras(num) {
     enteros: Math.floor(num),
     centavos: Math.round(num * 100) - Math.floor(num) * 100,
     letrasCentavos: '',
-    letrasMonedaPlural: ' PESOS DOMINICANOS',
-    letrasMonedaSingular: ' PESO DOMINICANO',
+    letrasMonedaPlural: ' PESOS',
+    letrasMonedaSingular: ' PESO',
 
     letrasMonedaCentavoPlural: 'CENTAVOS',
     letrasMonedaCentavoSingular: 'CENTAVO',

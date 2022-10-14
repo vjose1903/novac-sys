@@ -307,6 +307,11 @@
   </div>
   <div class="pieFactura">
     <div class="row mx-0 w-100">
+      <div class="col-12">
+        <span class="titulos w-100">
+          Articulos a vender: <strong> {{ getCantidadArticulos() }}</strong>
+        </span>
+      </div>
       <div class="col-7">
         <div class="h-100 d-flex justify-content-around align-items-center">
           <div *ngxPermissionsOnly="metodo == 'venta' ? permissions.factura_venta.create : permissions.factura_compra.create">

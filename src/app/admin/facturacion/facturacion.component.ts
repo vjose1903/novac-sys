@@ -258,7 +258,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.factura_a_editar = {};
         this.rellenarCampos(id_factura, 'editar').then(() => {
           this.cuerpo.llenarFactura(this.factura_a_editar.detalle_facturas);
-          this.cuerpo.seleccionarCampoEnTurno();
         });
       } else {
         setTimeout(() => {
@@ -1126,6 +1125,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
   //  OBTENER LA DATA DEL CUERPO
   // =============================================
+  getCantidadArticulos() {
+    const articulos_a_vender = _.filter(this.CuerpoFactura, (factura) => fun.hasValue(factura.cantidad));
+    return articulos_a_vender.length;
+  }
 
   getCuerpoFactura(arg) {
     if (arg.tipo == 'cuerpo') {
@@ -1415,7 +1418,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let res;
     const metodo = this.action === 'update' ? 'editar_factura' : '';
-
 
     if (metodo === 'editar_factura') res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_editar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);

@@ -120,7 +120,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
 
-      for (let index = 1; index <= 22; index++) {
+      for (let index = 1; index <= 25; index++) {
         await this.addItem(index);
       }
 
@@ -308,17 +308,28 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       this.rellenarVariables().then(async (res) => {
         if (res) {
           for (let index = 0; index < rows.length; index++) {
+            console.log('index: ', index, ', detallesLLenos: ', this.getCantidadDetallesLlenos() - 1);
+
+            if (index > this.getCantidadDetallesLlenos() - 1) {
+              fun.logRed('AGREGANDO FILA');
+              this.addItem(index + 1);
+            }
             const row = rows[index];
             let articulo = row.articulo;
 
             try {
               if (!is_guardada) {
-                this.articuloClass.getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura }).then((res_articulo) => this.llenarFilas(row, _.first(res_articulo['data']), index));
+                this.articuloClass.getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura }).then((res_articulo) => {
+                  this.llenarFilas(row, _.first(res_articulo['data']), index);
+                  this.seleccionarCampoEnTurno();
+                });
               } else {
                 this.llenarFilas(row, articulo, index);
+                this.seleccionarCampoEnTurno();
               }
             } catch (error) {}
           }
+          console.log('this.ARRAY_ROWFACTURAS ', this.ARRAY_ROWFACTURAS);
 
           resolve(true);
         } else {
@@ -326,6 +337,16 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         }
       });
     });
+  }
+
+  getCantidadDetallesLlenos() {
+    console.log("this.ARRAY_ROWFACTURAS.value ", this.ARRAY_ROWFACTURAS.value);
+    console.log("this.filasDetalle ", this.filasDetalle);
+
+    const detalles_llenos = _.filter(this.filasDetalle, (detalle) => fun.hasValue(detalle.value.key));
+    console.log("detalles_llenos ", detalles_llenos);
+
+    return detalles_llenos.length;
   }
 
   llenarFilas(row, articulo, index) {
@@ -421,6 +442,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       this.secuencia = filas_ocupadas.length;
 
       this.inputSecuencia = 'cod-' + this.secuencia;
+
       resolve(true);
     });
   }
@@ -820,8 +842,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   closeModal(modalInstance) {
-    console.warn('modalInstance: ', modalInstance);
-
     modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 }

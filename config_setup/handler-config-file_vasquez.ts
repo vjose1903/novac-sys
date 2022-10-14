@@ -14,7 +14,7 @@ export default class HandlerConfigFile {
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
     nombre_empresa: 'D` Vásquez Services y Asociados, S.R.L',
-    rnc_empresa: '130-74935-4',
+    rnc_empresa: '130-74935-3',
     telefono_empresa: '(809) 573-3934',
     url_servidor: 'http://novac-vasquez.ddns.net:9092',
     url_servidor_descargas: 'http://novac-vasquez.ddns.net:9092',
