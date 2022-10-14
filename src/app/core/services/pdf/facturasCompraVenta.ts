@@ -13,7 +13,7 @@ function getPageMargin(is_contado) {
 
   if (is_contado) {
     // margins = [15, 158, 15, 30];
-    margins = [15, 122, 15, 30];
+    margins = [15, 126, 15, 30];
   } else {
     margins = [15, 174, 15, 30];
   }
@@ -56,7 +56,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
         {
           columns: [
             [
-              { text: 'pag: ' + currentPage.toString() + ' de ' + pageCount, alignment: 'left', style: 'letra8' },
+              { text: 'pag: ' + currentPage.toString() + ' de ' + pageCount, alignment: 'left', style: 'letra9' },
               { image: 'logo', width: 50, height: 45, margin: [70, -15, 0, 0] },
             ],
             [
@@ -68,23 +68,14 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
         {
           margin: [0, -40, 0, 0],
           stack: [
-            {
-              text: configApp.nombre_empresa,
-              alignment: 'center',
-              bold: true,
-              style: 'letra11',
-            },
-            {
-              text: configApp.direccion_empresa,
-              alignment: 'center',
-              style: 'letra9',
-            },
+            { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
+            { text: configApp.direccion_empresa, alignment: 'center', style: 'letra10' },
             {
               text: [
-                { text: 'Telefono: ', bold: true, style: 'letra8' },
-                { text: `${configApp.telefono_empresa} `, style: 'letra8' },
-                { text: ' RNC: ', bold: true, style: 'letra8' },
-                { text: configApp.rnc_empresa, style: 'letra8' },
+                { text: 'Telefono: ', bold: true, style: 'letra10' },
+                { text: `${configApp.telefono_empresa} `, style: 'letra10' },
+                { text: ' RNC: ', bold: true, style: 'letra10' },
+                { text: configApp.rnc_empresa, style: 'letra10' },
               ],
               alignment: 'center',
             },
@@ -95,13 +86,13 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           margin: [0, 10, 0, 0],
           text: [
             {
-              text: [is_venta ? { text: 'Cliente : ', style: 'letra9' } : { text: 'Suplidor : ', style: 'letra9' }, is_venta ? { text: data.cliente.nombre, style: 'letra9' } : { text: data.suplidor.nombre, style: 'letra9' }],
+              text: [is_venta ? { text: 'Cliente : ', style: 'letra10' } : { text: 'Suplidor : ', style: 'letra10' }, is_venta ? { text: data.cliente.nombre, style: 'letra10' } : { text: data.suplidor.nombre, style: 'letra10' }],
             },
           ],
         },
 
         {
-          text: [is_venta ? { text: 'Rnc cliente : ', style: 'letra9' } : { text: 'Rnc suplidor : ', style: 'letra9' }, is_venta ? { text: data.cliente.rnc, style: 'letra9' } : { text: data.suplidor.rnc, style: 'letra9' }],
+          text: [is_venta ? { text: 'Rnc cliente : ', style: 'letra10' } : { text: 'Rnc suplidor : ', style: 'letra10' }, is_venta ? { text: data.cliente.rnc, style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
           margin: [0, 4, 0, 0],
         },
 
@@ -109,7 +100,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           margin: [0, 4, 0, 0],
           text: [
             {
-              text: [{ text: 'Dirección : ', style: 'letra9' }, is_venta ? { text: data.cliente.direccion, style: 'letra9' } : { text: data.suplidor.direccion, style: 'letra9' }],
+              text: [{ text: 'Dirección : ', style: 'letra10' }, is_venta ? { text: data.cliente.direccion, style: 'letra10' } : { text: data.suplidor.direccion, style: 'letra10' }],
             },
           ],
         },
@@ -154,32 +145,31 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
             },
           ],
         },
-
-        // =============================================================
         {
-          canvas: [{ type: 'rect', x: 0, y: 3, w: 570, h: 2, color: '#000000' }],
-        },
-
-        {
-          style: 'tableExample',
           table: {
             headerRows: 1,
             widths: [20, 230, '*', '*', '*', '*'],
             body: [
               [
-                { text: ' #', style: 'letra10', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
-                { text: 'Articulo', style: 'letra10', bold: true, margin: [-5, 0, 0, 0] },
-                { text: 'Cantidad', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
-                is_venta ? { text: 'Precio', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
-                { text: 'Itbis', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
-                { text: 'Total', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 18, 0] }, // margin: [12, 0, 0, 0]
+                { text: ' #', style: 'letra11', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
+                { text: 'Articulo', style: 'letra11', bold: true, margin: [-5, 0, 0, 0] },
+                { text: 'Cantidad', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
+                is_venta ? { text: 'Precio', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
+                { text: 'Itbis', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
+                { text: 'Total', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 18, 0] }, // margin: [12, 0, 0, 0]
               ],
 
               [1, 'Sample value 1', 'value 2', 'value 4', 'value 5', 'value 6'],
             ],
           },
           margin: [0, 0, 0, 0],
-          layout: 'headerLineOnly',
+          layout: {
+            hLineWidth: (i, node) => 1,
+            vLineWidth: (i, node) => 0,
+            hLineColor: (i, node) => 'black',
+            // hLineColor: (i, node) => 'red',
+            vLineColor: (i, node) => 'white',
+          },
         },
       ],
     },
@@ -193,25 +183,25 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
 // =========================================================~=================================================================================================
 function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
   const tempBody = [];
-  const _break = is_contado ? 11 : 26;
+  const _break = is_contado ? 10 : 26;
 
   data.contenido_reporte.forEach((detalle, i) => {
     const row = [];
     const br_ = i !== 0 && i % _break === 0;
 
     row.push(
-      { text: i + 1, style: 'letra9', alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
-      { text: detalle.descripcion, style: 'letra9', pageBreak: br_ ? 'before' : 'none' },
-      { text: detalle.cantidad, style: 'letra9', alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: i + 1, style: 'letra10', alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
+      { text: detalle.descripcion, style: 'letra10', pageBreak: br_ ? 'before' : 'none' },
+      { text: detalle.cantidad, style: 'letra10', alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       {
         text: fun_.numFormatTwoDecimals(is_venta ? detalle.precio : detalle.costo),
-        style: 'letra9',
+        style: 'letra10',
         alignment: 'right',
         margin: [0, 0, 14, 0],
         pageBreak: br_ ? 'before' : 'none',
       },
-      { text: fun_.numFormatTwoDecimals(detalle.itbis), style: 'letra9', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
-      { text: fun_.numFormatTwoDecimals(detalle.total), style: 'letra9', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: fun_.numFormatTwoDecimals(detalle.itbis), style: 'letra10', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: fun_.numFormatTwoDecimals(detalle.total), style: 'letra10', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
     );
     tempBody.push(row);
   });
@@ -220,33 +210,25 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
 
   const content = [
     {
-      style: 'tableExample',
       table: {
-        widths: [20, 230, '*', '*', '*', '*'],
+        widths: [20, 225, '*', '*', '*', '*'],
         body: tempBody,
       },
       margin: [0, -2, 0, 0],
       layout: {
-        hLineWidth: (i, node) => {
-          return i % _break === 0 && node.table.body.length !== _break ? 0 : i === node.table.body.length ? 2 : 1;
-        },
-        vLineWidth: (i, node) => {
-          return 0;
-        },
-        hLineColor: (i, node) => {
-          return i === node.table.body.length ? 'black' : 'gray';
-        },
-        vLineColor: (i, node) => {
-          return 'black';
-        },
+        hLineWidth: (i, node) =>  i % _break == 0 && node.table.body.length != _break ? 0 : 1,
+        // hLineWidth: (i, node) =>  i % _break == 0 && node.table.body.length != _break ? 0 : i == node.table.body.length ? 2 : 1,
+        vLineWidth: (i, node) => 0,
+        hLineColor: (i, node) =>  i == node.table.body.length ? 'black' : 'gray',
+        vLineColor: (i, node) => 'white',
       },
     },
     {
       text: [
-        { text: 'Realizada Por :  ', style: 'letra9', bold: true },
-        { text: data.usuario, style: 'letra9' },
-        data.vendedor ? { text: '    Vendedor :  ', style: 'letra9', bold: true } : { text: '' },
-        data.vendedor ? { text: data.vendedor, style: 'letra9' } : { text: '' },
+        { text: 'Realizada Por :  ', style: 'letra10', bold: true },
+        { text: data.usuario, style: 'letra10' },
+        data.vendedor ? { text: '    Vendedor :  ', style: 'letra10', bold: true } : { text: '' },
+        data.vendedor ? { text: data.vendedor, style: 'letra10' } : { text: '' },
       ],
       margin: [0, 5, 0, 0],
     },
@@ -270,13 +252,13 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
                       columns: [
                         [
                           {
-                            text: [{ text: 'Revisada Por', style: 'letra9', bold: true }],
+                            text: [{ text: 'Revisada Por', style: 'letra10', bold: true }],
                             margin: [28, 3, 0, 0],
                           },
                         ],
                         [
                           {
-                            text: [{ text: 'Cliente', style: 'letra9', bold: true }],
+                            text: [{ text: 'Cliente', style: 'letra10', bold: true }],
                             margin: [60, 3, 0, 0],
                           },
                         ],

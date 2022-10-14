@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 const pdfMake = require('pdfmake/build/pdfmake.js');
 const pdfFonts = require('pdfmake/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+
 
 import * as _8_5x5_5 from './8.5x5.5/makePDF';
 import * as roll80mm from './80mm_roll/makePDF';
@@ -143,6 +144,8 @@ export class PdfService {
 
   static createPdfFrombase64(docDefinition, file_, reimprimir_, callback = (arg) => {}) {
     try {
+      pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
       const pdfDocGenerator = pdfMake.createPdf(docDefinition);
       pdfDocGenerator.getBase64((data) => {
         const respuesta = this.makeStatusObj({
