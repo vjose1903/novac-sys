@@ -120,9 +120,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
 
-      for (let index = 1; index <= 25; index++) {
-        await this.addItem(index);
-      }
+      for (let index = 1; index <= 25; index++) await this.addItem(index);
 
       setTimeout(() => {
         this.filasDetalle = (this.form.controls['rowFactura'] as FormArray).controls;
@@ -308,12 +306,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       this.rellenarVariables().then(async (res) => {
         if (res) {
           for (let index = 0; index < rows.length; index++) {
-            console.log('index: ', index, ', detallesLLenos: ', this.getCantidadDetallesLlenos() - 1);
+            if (index + 1 >= this.ARRAY_ROWFACTURAS.value.length) this.addItem(index + 1);
 
-            if (index > this.getCantidadDetallesLlenos() - 1) {
-              fun.logRed('AGREGANDO FILA');
-              this.addItem(index + 1);
-            }
             const row = rows[index];
             let articulo = row.articulo;
 
@@ -329,7 +323,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
               }
             } catch (error) {}
           }
-          console.log('this.ARRAY_ROWFACTURAS ', this.ARRAY_ROWFACTURAS);
 
           resolve(true);
         } else {
@@ -337,16 +330,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         }
       });
     });
-  }
-
-  getCantidadDetallesLlenos() {
-    console.log("this.ARRAY_ROWFACTURAS.value ", this.ARRAY_ROWFACTURAS.value);
-    console.log("this.filasDetalle ", this.filasDetalle);
-
-    const detalles_llenos = _.filter(this.filasDetalle, (detalle) => fun.hasValue(detalle.value.key));
-    console.log("detalles_llenos ", detalles_llenos);
-
-    return detalles_llenos.length;
   }
 
   llenarFilas(row, articulo, index) {
