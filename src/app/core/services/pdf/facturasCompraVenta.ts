@@ -12,10 +12,8 @@ function getPageMargin(is_contado) {
   let margins = [];
 
   if (is_contado) {
-    // margins = [15, 158, 15, 30];
     margins = [15, 135, 15, 0];
   } else {
-    // margins = [15, 174, 15, 0];
     margins = [15, 148.6, 15, 0];
   }
 

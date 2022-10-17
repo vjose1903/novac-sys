@@ -12,19 +12,10 @@ export function makePDF(data) {
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
   try {
     const dd = {
-      pageSize: { width: 990, height: 398 },
-      pageMargins: [0, 159.5, 0, 30],
-      header: cabeceraReporte(data, configApp),
+      pageSize: { width: 600, height: 398 },
+      pageMargins: [15, 159.5, 15, 15],
+      header: (currentPage, pageCount, pageSize) => cabeceraReporte(data, configApp, currentPage, pageCount),
       content: contenidoReporte(data),
-      footer: (currentPage, pageCount) => {
-        return [
-          {
-            text: 'pag: ' + currentPage.toString() + ' de ' + pageCount,
-            alignment: 'right',
-            margin: [0, 0, 30, 0],
-          },
-        ];
-      },
       images: {
         logo: `data:image/png;base64,${configApp.logo_impresion}`,
       },
@@ -41,46 +32,24 @@ export function makePDF(data) {
 // ====================================================================================================================================================
 // CABECERA
 // ====================================================================================================================================================
-function cabeceraReporte(data, configApp: ConfigI) {
+function cabeceraReporte(data, configApp: ConfigI, currentPage, pageCount) {
   try {
     const header = [
       {
+        margin: [15, 15, 15, 0],
         columns: [
           [
-            {
-              image: 'logo',
-              width: 72,
-              height: 45,
-              margin: [90, 12, 0, 0],
-            },
+            { text: 'pag: ' + currentPage.toString() + ' de ' + pageCount, alignment: 'left', style: 'letra9' },
+            { image: 'logo', width: 50, height: 45, margin: [70, -15, 0, 0] },
           ],
           [
             {
-              margin: [0, 23, 0, 0],
-              stack: [
-                { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra17' },
-                { text: configApp.direccion_empresa, alignment: 'center', fontSize: 11 },
-                {
-                  text: [
-                    { text: 'Telefono: ', style: 'letra11', bold: true },
-                    { text: configApp.telefono_empresa + ' ', style: 'letra11' },
-                    { text: ' RNC: ', style: 'letra11', bold: true },
-                    { text: configApp.rnc_empresa, style: 'letra11' },
-                  ],
-                  alignment: 'center',
-                },
-              ],
-            },
-          ],
-          [
-            {
-              margin: [0, 30, 30, 0],
               stack: [
                 {
                   alignment: 'right',
                   text: [
-                    { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra14', bold: true },
-                    { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra14', bold: true },
+                    { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra10', bold: true },
+                    { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra10', bold: true },
                   ],
                 },
 
@@ -88,20 +57,20 @@ function cabeceraReporte(data, configApp: ConfigI) {
                   alignment: 'right',
                   text: [
                     {
-                      text: [{ text: 'no: ', fontSize: 13, bold: false }],
+                      text: [{ text: 'no: ', style: 'letra10', bold: false }],
                       alignment: 'right',
                     },
-                    { text: fun_.my_padStart(data.numero_reporte, 8, '0'), fontSize: 13, alignment: 'right' },
+                    { text: fun_.my_padStart(data.numero_reporte, 8, '0'), style: 'letra10', alignment: 'right' },
                   ],
                 },
                 {
                   alignment: 'right',
                   text: [
                     {
-                      text: [{ text: 'Realizado por: ', fontSize: 13, bold: false }],
+                      text: [{ text: 'Realizado por: ', style: 'letra10', bold: false }],
                       alignment: 'right',
                     },
-                    { text: data.usuario, fontSize: 13, alignment: 'right' },
+                    { text: data.usuario, style: 'letra10', alignment: 'right' },
                   ],
                 },
               ],
@@ -110,22 +79,25 @@ function cabeceraReporte(data, configApp: ConfigI) {
         ],
       },
       {
-        text: [{ text: 'Cuadre de caja', style: 'letra17', bold: true }],
-        margin: [0, 30, 0, 0],
-        alignment: 'center',
-      },
-      // =============================================================
-      {
-        canvas: [
+        margin: [0, -45, 0, 0],
+        stack: [
+          { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
+          { text: configApp.direccion_empresa, alignment: 'center', style: 'letra10' },
           {
-            type: 'rect',
-            x: 395,
-            y: 5,
-            w: 200,
-            h: 2,
-            color: '#000000',
+            text: [
+              { text: 'Telefono: ', style: 'letra10', bold: true },
+              { text: configApp.telefono_empresa + ' ', style: 'letra10' },
+              { text: ' RNC: ', style: 'letra10', bold: true },
+              { text: configApp.rnc_empresa, style: 'letra10' },
+            ],
+            alignment: 'center',
           },
         ],
+      },
+      { text: [{ text: 'Cuadre de caja', style: 'letra12', bold: true }], margin: [0, 30, 0, 0], alignment: 'center' },
+      // =============================================================
+      {
+        canvas: [{ type: 'rect', x: 200, y: 5, w: 200, h: 1, color: '#000000' }],
       },
 
       // =============================================================
@@ -146,7 +118,7 @@ function contenidoReporte(data) {
 
   data.contenido_reporte.forEach((detalle, i) => {
     const row = [];
-    row.push({ text: detalle.titulo, alignment: 'left', bold: true, style: 'letra15' }, { text: fun_.numFormatTwoDecimals(detalle.valor), alignment: 'right', margin: [0, 0, 15, 0] });
+    row.push({ text: detalle.titulo, alignment: 'left', bold: true, style: 'letra11' }, { text: fun_.numFormatTwoDecimals(detalle.valor), alignment: 'right', margin: [0, 0, 15, 0] });
     body.push(row);
   });
 
@@ -161,8 +133,8 @@ function contenidoReporte(data) {
               widths: ['auto', '*'],
               body: [
                 [
-                  { text: 'Descripción', alignment: 'left', bold: true, style: 'letra17' },
-                  { text: 'Monto', alignment: 'right', bold: true, style: 'letra17', margin: [0, 0, 20, 0] },
+                  { text: 'Descripción', alignment: 'left', bold: true, style: 'letra11' },
+                  { text: 'Monto', alignment: 'right', bold: true, style: 'letra11', margin: [0, 0, 15, 0] },
                 ],
                 ...body,
               ],
@@ -172,18 +144,10 @@ function contenidoReporte(data) {
               fillColor: (rowIndex, node, columnIndex) => {
                 return rowIndex === 4 ? '#dcdcdc' : null;
               },
-              hLineWidth: (i, node) => {
-                return i === 0 || i === 1 || i === 4 || i === 5 || i === 6 ? 2 : 1;
-              },
-              vLineWidth: (i, node) => {
-                return 0;
-              },
-              hLineColor: (i, node) => {
-                return i === 0 || i === 1 || i === 4 || i === 5 || i === 6 ? 'black' : 'gray';
-              },
-              vLineColor: (i, node) => {
-                return 'blacl';
-              },
+              hLineWidth: (i, node) => (i === 0 || i === 1 || i === 4 || i === 5 || i === 6 ? 2 : 1),
+              vLineWidth: (i, node) => 0,
+              hLineColor: (i, node) => (i === 0 || i === 1 || i === 4 || i === 5 || i === 6 ? 'black' : 'gray'),
+              vLineColor: (i, node) => 'black',
             },
           },
         ],
