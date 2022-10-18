@@ -1,9 +1,14 @@
 export const config_conduce = {
-  margin_general: [-19, 1, -19, 0],
-  isBreak: false,
+  pageSize: { width: 600, height: 398 },
+  pageMargins: [15, 110, 15, 15],
+  margin_general: [0, 0, 0, 0],
+  isBreak: true,
+  break: 8,
   only_titulo: false,
-  widths: ['auto', 'auto', '*'],
+
+  widths: [24, 'auto', '*'],
   mostrar_total: false,
+
   info: [
     {
       text: '#',

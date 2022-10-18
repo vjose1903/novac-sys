@@ -6,7 +6,6 @@ const pdfFonts = require('pdfmake/build/vfs_fonts.js');
 import * as _8_5x5_5 from './8.5x5.5/makePDF';
 import * as roll80mm from './80mm_roll/makePDF';
 import * as facturasCompraVenta from './facturasCompraVenta';
-import * as conduce from './conduce';
 import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
 import { SingletonService } from '../singleton.service';
@@ -37,25 +36,24 @@ export class PdfService {
         switch (type_oPdf) {
           case 'recibo_ingreso': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-
             obj = options[config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
             break;
 
           case 'conduce': // SI SI
-            options = { '80mm_roll': roll80mm, '8.5x5.5': conduce, '8.5x11': conduce };
-            data.contenido_reporte = data.detalle_conduces;
+            options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
+            // data.contenido_reporte = data.detalle_conduces;
 
-            documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
-            data.cliente.rnc = documento ? documento.documento : '----------';
+            // documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
+            // data.cliente.rnc = documento ? documento.documento : '----------';
 
-            data.tipo_pdf = 'CONDUCE DE MERCANCIA';
-            data.numero_documento = data.numero_conduce;
-            data.usuario = data.user.nombre_completo;
-            data.identificador = data.numero_documento;
+            // data.tipo_pdf = 'CONDUCE DE MERCANCIA';
+            // data.numero_documento = data.numero_conduce;
+            // data.usuario = data.user.nombre_completo;
+            // data.identificador = data.numero_documento;
 
-            data.contenido_reporte.map((detalle) => {
-              detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
-            });
+            // data.contenido_reporte.map((detalle) => {
+            //   detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+            // });
 
             obj = options[config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
             break;

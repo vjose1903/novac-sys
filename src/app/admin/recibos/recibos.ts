@@ -96,7 +96,7 @@ export class ReciboC extends CrudG<ReciboI> {
         detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
         detalle['fecha'] = _.split(detalle.descripcion, ' ')[2];
       });
-      fun.logGreen('ANDO AQUII');
+
       resolve(data_parsed);
     });
   }

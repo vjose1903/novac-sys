@@ -842,10 +842,12 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     cabecera_conduce['detalle_conduces'] = this.CuerpoConduce;
 
     this.conduceClass.createUpdateOne(cabecera_conduce).then((res) => {
-      const obj = { data: res['data'], type: 'conduce' };
+      this.conduceClass.parseDataToPdf(res['data']).then((conduce_parsed) => {
+        const obj = { data: conduce_parsed, type: 'conduce' };
 
-      this.cancelarConduce();
-      PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
+        this.cancelarConduce();
+        PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
+      });
     });
   }
 

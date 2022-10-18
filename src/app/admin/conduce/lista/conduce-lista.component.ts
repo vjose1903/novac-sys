@@ -140,7 +140,9 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     if (event.columnKey) {
       switch (event.iconKey) {
         case 'ver':
-          this.makeConducePdf(conduce_selected);
+          this.conduceClass.parseDataToPdf(conduce_selected).then((conduce_parsed) => {
+            this.makeConducePdf(conduce_parsed);
+          });
           break;
 
         case 'anular':
@@ -164,8 +166,9 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     }
   }
 
-  makeConducePdf(arg) {
-    const conduce_selected = _.find(this.lista_conduces, (recibo) => recibo.id === arg.id);
+  makeConducePdf(conduce_selected) {
+    console.log('conduce_selected ', conduce_selected);
+
     const obj = { data: conduce_selected, type: 'conduce', retunBase64: true };
     this.loadServ.isLoading.next(true);
 
