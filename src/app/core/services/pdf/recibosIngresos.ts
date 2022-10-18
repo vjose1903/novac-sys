@@ -12,19 +12,11 @@ import { ConfigI } from '../../typescript/config-interface';
 export function makePDF(data, file_name, tipo_pdf?) {
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
   const dd = {
-    pageSize: { width: 990, height: 398 },
-    pageMargins: [0, 164, 0, 30],
-    header: cabeceraRecibo(data, configApp),
+    pageSize: { width: 600, height: 398 },
+    pageMargins: [15, 159.5, 15, 15],
+    header: (currentPage, pageCount, pageSize) => cabeceraRecibo(data, configApp, currentPage, pageCount),
     content: contenidoRecibo(data),
-    footer: (currentPage, pageCount) => {
-      return [
-        {
-          text: 'pag: ' + currentPage.toString() + ' de ' + pageCount,
-          alignment: 'right',
-          margin: [0, 0, 30, 0],
-        },
-      ];
-    },
+
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
@@ -38,29 +30,33 @@ export function makePDF(data, file_name, tipo_pdf?) {
 // ==========================================================================================================================================================
 // CABECERA
 // ==========================================================================================================================================================
-function cabeceraRecibo(data, configApp: ConfigI) {
+function cabeceraRecibo(data, configApp: ConfigI, currentPage, pageCount) {
   const rncCliente = data.cliente.documentos_de_identidad.filter((doc) => doc.principal === true)[0].documento;
   const numero_letra = numLetra.NumeroALetras(data.total);
 
   const header = [
     {
+      margin: [15, 15, 15, 0],
       columns: [
-        [{ image: 'logo', width: 72, height: 45, margin: [90, 15, 0, 0] }],
         [
-          { text: 'Recibo de ingresos', fontSize: 14, bold: true, margin: [0, 20, 65, 0], alignment: 'right' },
+          { text: 'pag: ' + currentPage.toString() + ' de ' + pageCount, alignment: 'left', style: 'letra9' },
+          { image: 'logo', width: 50, height: 45, margin: [70, -15, 0, 0] },
+        ],
+        [
+          { text: 'Recibo de ingresos', style: 'letra12', bold: true, margin: [0, 20, 65, 0], alignment: 'right' },
           {
             text: [
-              { text: 'Fecha: ', fontSize: 12, bold: true },
-              { text: fun_.my_dateFormater(data.fecha_equivalente), fontSize: 12 },
-              { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), fontSize: 12 },
+              { text: 'Fecha: ', style: 'letra10', bold: true },
+              { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra10' },
+              { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra10' },
             ],
             margin: [310, 10, 0, 0],
           },
 
           {
             text: [
-              { text: 'Doc No: ', fontSize: 12, bold: true },
-              { text: fun_.my_padStart(data.numero_recibo, 8, '0'), fontSize: 12 },
+              { text: 'Doc No: ', style: 'letra10', bold: true },
+              { text: fun_.my_padStart(data.numero_documento, 8, '0'), style: 'letra10' },
             ],
             margin: [310, 3, 0, 0],
           },
@@ -93,20 +89,20 @@ function cabeceraRecibo(data, configApp: ConfigI) {
     },
     {
       margin: [15, 5, 0, 0],
-      text: [{ text: 'Cliente: ', fontSize: 12, bold: true }, { text: `${fun_.my_capitalize(data.cliente.nombre)} ${fun_.my_capitalize(data.cliente.apellido)}` }],
+      text: [{ text: 'Cliente: ', style: 'letra12', bold: true }, { text: `${fun_.my_capitalize(data.cliente.nombre)} ${fun_.my_capitalize(data.cliente.apellido)}` }],
     },
 
     {
-      text: [{ text: 'Rnc cliente: ', fontSize: 12, bold: true }, { text: rncCliente }],
+      text: [{ text: 'Rnc cliente: ', style: 'letra12', bold: true }, { text: rncCliente }],
       margin: [15, 3, 0, 0],
     },
     {
-      text: [{ text: 'Dirección: ', fontSize: 12, bold: true }, { text: data.cliente.direccion }],
+      text: [{ text: 'Dirección: ', style: 'letra12', bold: true }, { text: data.cliente.direccion }],
       margin: [15, 3, 0, 0],
     },
 
     {
-      text: [{ text: 'Recibido: ', fontSize: 12, bold: true }, { text: fun_.numFormatTwoDecimals(data.total) }, { text: ` - ${fun_.my_capitalize(numero_letra)}` }],
+      text: [{ text: 'Recibido: ', style: 'letra12', bold: true }, { text: fun_.numFormatTwoDecimals(data.total) }, { text: ` - ${fun_.my_capitalize(numero_letra)}` }],
       margin: [15, 3, 0, 0],
     },
     { canvas: [{ type: 'rect', x: 10, y: 5, w: 970, h: 2, color: '#000000' }] },
@@ -183,7 +179,7 @@ function cabeceraRecibo(data, configApp: ConfigI) {
 
 function contenidoRecibo(data) {
   const tempBody = [];
-  data.detalle_recibos.forEach((detalle, i) => {
+  data.contenido_reporte.forEach((detalle, i) => {
     const row = [];
     const tipo = fun_.my_stringSplit(detalle.descripcion, ' ')[0];
     const valor = fun_.my_stringSplit(detalle.descripcion, ' ')[1];
@@ -258,13 +254,13 @@ function contenidoRecibo(data) {
                     columns: [
                       [
                         {
-                          text: [{ text: 'Recibido Por', fontSize: 12, bold: true }],
+                          text: [{ text: 'Recibido Por', style: 'letra12', bold: true }],
                           margin: [35, 5, 0, 0],
                         },
                       ],
                       [
                         {
-                          text: [{ text: 'Entregado Por', fontSize: 12, bold: true }],
+                          text: [{ text: 'Entregado Por', style: 'letra12', bold: true }],
                           margin: [5, 5, 0, 0],
                         },
                       ],
@@ -280,14 +276,14 @@ function contenidoRecibo(data) {
                   body: [
                     [
                       {
-                        margin: [0, 0, data.detalle_recibos.length <= 6 ? 25 : 45, 0],
+                        margin: [0, 0, data.contenido_reporte.length <= 6 ? 25 : 45, 0],
                         alignment: 'right',
                         text: [
                           {
                             text: 'TOTAL RD$:         ',
                             bold: true,
                           },
-                          { text: fun_.numFormatTwoDecimals(data.total), fontSize: 12 },
+                          { text: fun_.numFormatTwoDecimals(data.total), style: 'letra12' },
                         ],
                       },
                     ],

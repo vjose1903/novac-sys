@@ -101,18 +101,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async rellenarVariables() {
     return new Promise(async (resolve, reject) => {
-      this.ARRAY_ROWFACTURAS = undefined;
-      this.UnidadesArticulo = [];
-      this.productosDevueltos = [];
-      this.precioDetalle = undefined;
-      this.secuencia = 0;
+      [this.UnidadesArticulo, this.productosDevueltos, this.listaDeDescuentos] = Array(3).fill([]);
+      [this.ARRAY_ROWFACTURAS, this.precioDetalle, this.inputDrop, this.filasDetalle, this.indexRemove] = Array(5).fill(undefined);
+      [this.secuencia, this.DESCUENTO] = Array(2).fill(0);
       this.inputSecuencia = 'cod-0';
-      this.inputDrop = undefined;
-      this.filasDetalle = undefined;
-      this.DESCUENTO = 0;
-      this.listaDeDescuentos = [];
       this.sacos = [25, 50, 100];
-      this.indexRemove = undefined;
 
       this.form = this.fb.group({
         rowFactura: this.fb.array([this.createItem(0)]),

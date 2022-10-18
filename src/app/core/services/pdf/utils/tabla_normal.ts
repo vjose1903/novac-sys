@@ -63,29 +63,33 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
           margin: configuration.margin_general,
 
           layout: {
-            hLineWidth: function (i, node) {
+            hLineWidth: (i, node) => {
               const brk = data.mostrar_sub_titulo ? configuration.break : configuration.break + 1;
               // const brk = configuration.break;
 
               if (configuration.isBreak) {
-                return i % brk === 0 && node.table.body.length !== brk ? 0 : i === node.table.body.length || i === 1 ? 2 : 0.5;
+                return i != 0 && i % brk == 0 && node.table.body.length != brk ? 0 : i == node.table.body.length || i == 0 || i == 1 ? 1 : 0.5;
               } else {
-                return i == 0 ? 0 : 1 === 1 ? 1.5 : 1;
+                return 1;
               }
             },
-            vLineWidth: function (i, node) {
-              return 0;
-            },
-            hLineColor: function (i, node) {
+            vLineWidth: (i, node) => 0,
+            hLineColor: (i, node) => {
               if (configuration.isLineLight) {
-                return i === node.table.body.length ? 'black' : i === 1 ? '#b5b5b5' : '#ebebeb';
+                return i == node.table.body.length ? 'black' : i == 1 ? '#b5b5b5' : '#ebebeb';
               } else {
-                return i === node.table.body.length || i === 1 ? 'black' : 'grey';
+                return i == node.table.body.length || i == 0 || i == 1 ? 'black' : 'grey';
               }
             },
-            vLineColor: function (i, node) {
-              return 'black';
-            },
+            vLineColor: (i, node) => 'black',
+
+            // {
+            //   hLineWidth: (i, node) => (i % _break == 0 && node.table.body.length != _break ? 0 : 1),
+            //   // hLineWidth: (i, node) =>  i % _break == 0 && node.table.body.length != _break ? 0 : i == node.table.body.length ? 2 : 1,
+            //   vLineWidth: (i, node) => 0,
+            //   hLineColor: (i, node) => (i == node.table.body.length ? 'black' : 'gray'),
+            //   vLineColor: (i, node) => 'white',
+            // }
           },
         } as TablaPdfMake)
       : { text: Array.isArray(contendio_) ? configuration.mensaje_contenido_vacio : '', margin: [0, 2, 0, 5] },
@@ -130,7 +134,7 @@ function formarCuerpo(data, configuration, detalle, j) {
 
   const brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
 
-  const br_ = j !== 0 && j % brk === 0;
+  const br_ = j != 0 && j % brk === 0;
 
   configuration.info.forEach((info, i) => {
     let obj = {};

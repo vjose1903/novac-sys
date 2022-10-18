@@ -25,13 +25,28 @@ export class CuadreC {
     const requestParams = { parameters: { fecha: fun.my_dateFormater(reporteParams.data.fecha, false) } };
 
     new CuadreCajaC().createOne({}, requestParams).then((res) => {
-      const obj = { data: res.data, type: 'cuadre_caja' };
+      this.parseDataToPdf(res['data']).then(async (cuadre_parsed) => {
+        const obj = { data: cuadre_parsed, type: 'cuadre_caja' };
+        console.log('obj ', obj);
 
-      PdfService.generatePdf({ oPdf: obj, imprimir: false }).then(async (response) => {
-        let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
-        ReporteC.visualizarReporte(objPdfView);
-        SingletonService.layServ.nextCheckCuadreToday(true);
+        PdfService.generatePdf({ oPdf: obj, imprimir: false }).then(async (response) => {
+          let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
+          ReporteC.visualizarReporte(objPdfView);
+          SingletonService.layServ.nextCheckCuadreToday(true);
+        });
       });
+    });
+  }
+
+  static parseDataToPdf(data) {
+    return new Promise((resolve) => {
+      const data_parsed = fun.remplaceKeyFromJson(data, [{ old_key: 'numero_reporte', new_key: 'numero_documento' }]);
+      console.log('data_parsed ', data_parsed);
+
+      data_parsed['identificador'] = data_parsed['numero_documento'];
+      data_parsed['tipo_pdf'] = 'CUADRE DE CAJA';
+
+      resolve(data_parsed);
     });
   }
 }

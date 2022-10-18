@@ -54,7 +54,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           columns: [
             [
               { text: 'pag: ' + currentPage.toString() + ' de ' + pageCount, alignment: 'left', style: 'letra9' },
-              { image: 'logo', width: 50, height: 45, margin: [70, -15, 0, 0] },
+              { image: 'logo', width: 50, height: 45, margin: [60, -15, 0, 0] },
             ],
             [
               { text: 'FACTURA A ' + data.condicion.toUpperCase(), alignment: 'right', bold: true, style: 'letra10' },

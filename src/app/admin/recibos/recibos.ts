@@ -60,6 +60,7 @@ export class ReciboC extends CrudG<ReciboI> {
     });
   }
 
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   static requestReporte(reporteParams, pdfParams) {
     let requestParameters;
 
@@ -71,6 +72,32 @@ export class ReciboC extends CrudG<ReciboI> {
       let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
 
       ReporteC.visualizarReporte(objPdfView);
+    });
+  }
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  parseDataToPdf(data) {
+    return new Promise((resolve) => {
+      const data_parsed = fun.remplaceKeyFromJson(data, [
+        { old_key: 'numero_reporte', new_key: 'numero_documento' },
+        { old_key: 'numero_recibo', new_key: 'identificador' },
+        { old_key: 'detalle_recibos', new_key: 'contenido_reporte' },
+      ]);
+
+      data_parsed['tipo_pdf'] = 'RECIBO DE INGRESOS';
+      data_parsed['numero_documento'] = data_parsed['identificador'];
+      data_parsed['usuario'] = data.user.nombre_completo;
+
+      const documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
+      data_parsed['cliente']['rnc'] = documento ? documento.documento : '----------';
+
+      data_parsed['contenido_reporte'].map((detalle) => {
+        detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
+        detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
+        detalle['fecha'] = _.split(detalle.descripcion, ' ')[2];
+      });
+      fun.logGreen('ANDO AQUII');
+      resolve(data_parsed);
     });
   }
 }

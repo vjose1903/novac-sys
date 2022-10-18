@@ -516,17 +516,19 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       this.pedirFacturasPorCliente(this.clienteAdepositar.id, actualPagination);
 
       this.resetVariables();
+      this.reciboClass.parseDataToPdf(recibo).then((recibo_parsed) => {
 
-      const obj_print = { data: recibo, type: 'recibo_ingreso' };
+        const obj_print = { data: recibo_parsed, type: 'recibo_ingreso' };
 
-      PdfService.generatePdf({ oPdf: obj_print, imprimir: this.is_print })
-        .then(async (res) => {
-          if (res.status === 'si') {
-          } else fun.toastError(res.msg, 'ERROR');
+        PdfService.generatePdf({ oPdf: obj_print, imprimir: this.is_print })
+          .then(async (res) => {
+            if (res.status === 'si') {
+            } else fun.toastError(res.msg, 'ERROR');
 
-          this.layServ.nextCheckCuadreToday(true);
-        })
-        .catch((err) => fun.toastError(err.msg, 'ERROR'));
+            this.layServ.nextCheckCuadreToday(true);
+          })
+          .catch((err) => fun.toastError(err.msg, 'ERROR'));
+      });
     });
   }
 }

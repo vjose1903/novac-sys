@@ -186,8 +186,10 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   makeReciboPdf(arg) {
     const recibo_selected = _.find(this.lista_recibos, (recibo) => recibo.id === arg.id);
-    const obj = { data: recibo_selected, type: 'recibo_ingreso', retunBase64: true };
-    this.generarPdf(obj);
+    this.reciboClass.parseDataToPdf(recibo_selected).then((recibo_parsed) => {
+      const obj = { data: recibo_parsed, type: 'recibo_ingreso', retunBase64: true };
+      this.generarPdf(obj);
+    });
   }
 
   generarPdf(obj) {

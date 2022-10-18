@@ -34,13 +34,15 @@ export function makePDF(data) {
 // ====================================================================================================================================================
 function cabeceraReporte(data, configApp: ConfigI, currentPage, pageCount) {
   try {
+    console.log('data ', data);
+
     const header = [
       {
         margin: [15, 15, 15, 0],
         columns: [
           [
             { text: 'pag: ' + currentPage.toString() + ' de ' + pageCount, alignment: 'left', style: 'letra9' },
-            { image: 'logo', width: 50, height: 45, margin: [70, -15, 0, 0] },
+            { image: 'logo', width: 50, height: 45, margin: [60, -15, 0, 0] },
           ],
           [
             {
@@ -60,7 +62,7 @@ function cabeceraReporte(data, configApp: ConfigI, currentPage, pageCount) {
                       text: [{ text: 'no: ', style: 'letra10', bold: false }],
                       alignment: 'right',
                     },
-                    { text: fun_.my_padStart(data.numero_reporte, 8, '0'), style: 'letra10', alignment: 'right' },
+                    { text: fun_.my_padStart(data.numero_documento, 8, '0'), style: 'letra10', alignment: 'right' },
                   ],
                 },
                 {

@@ -3,8 +3,6 @@ import * as _ from 'lodash';
 const pdfMake = require('pdfmake/build/pdfmake.js');
 const pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
-
-
 import * as _8_5x5_5 from './8.5x5.5/makePDF';
 import * as roll80mm from './80mm_roll/makePDF';
 import * as facturasCompraVenta from './facturasCompraVenta';
@@ -41,20 +39,20 @@ export class PdfService {
           case 'recibo_ingreso': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': recibosIngresos, '8.5x11': recibosIngresos };
 
-            data.identificador = data.numero_recibo;
-            data.numero_documento = data.numero_recibo;
-            data.tipo_pdf = 'RECIBO DE INGRESOS';
-            data.contenido_reporte = data.detalle_recibos;
-            data.usuario = data.user.nombre_completo;
+            // data.identificador = data.numero_recibo;
+            // data.numero_documento = data.numero_recibo;
+            // data.tipo_pdf = 'RECIBO DE INGRESOS';
+            // data.contenido_reporte = data.detalle_recibos;
+            // data.usuario = data.user.nombre_completo;
 
-            documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
-            data.cliente.rnc = documento ? documento.documento : '----------';
+            // documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
+            // data.cliente.rnc = documento ? documento.documento : '----------';
 
-            data.contenido_reporte.map((detalle) => {
-              detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
-              detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
-              detalle['fecha'] = _.split(detalle.descripcion, ' ')[2];
-            });
+            // data.contenido_reporte.map((detalle) => {
+            //   detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
+            //   detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
+            //   detalle['fecha'] = _.split(detalle.descripcion, ' ')[2];
+            // });
 
             obj = options[config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
             break;
@@ -93,10 +91,6 @@ export class PdfService {
 
           case 'cuadre_caja': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': cuadreCaja, '8.5x11': cuadreCaja };
-
-            data.tipo_pdf = 'CUADRE DE CAJA';
-            data.numero_documento = data.numero_reporte;
-            data.identificador = data.numero_documento;
 
             obj = options[config.pages_sizes.cuadre_caja].makePDF(data, 'cuadre.pdf', 'cuadre_caja');
             break;
