@@ -41,19 +41,6 @@ export class PdfService {
 
           case 'conduce': // SI SI
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-            // data.contenido_reporte = data.detalle_conduces;
-
-            // documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
-            // data.cliente.rnc = documento ? documento.documento : '----------';
-
-            // data.tipo_pdf = 'CONDUCE DE MERCANCIA';
-            // data.numero_documento = data.numero_conduce;
-            // data.usuario = data.user.nombre_completo;
-            // data.identificador = data.numero_documento;
-
-            // data.contenido_reporte.map((detalle) => {
-            //   detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
-            // });
 
             obj = options[config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
             break;

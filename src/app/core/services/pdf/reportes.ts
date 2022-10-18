@@ -73,58 +73,62 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
     const pag = currentPage.toString() + ' de ' + pageCount;
     return [
       {
+        margin: [15, 15, 15, 0],
         columns: [
-          [{ image: 'logo', width: 52, opacity: 0.85, margin: [20, 12, 0, 0] }],
+          {
+            width: '*',
+            margin: [45, 0, 0, 0],
+            stack: [{ image: 'logo', width: 52, opacity: 0.85 }],
+          },
 
-          [
-            {
-              margin: [0, 17, 0, 0],
-              stack: [
-                { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
-                { text: configApp.direccion_empresa, alignment: 'center', style: 'letra8' },
-                {
-                  text: [
-                    { text: 'Telefono: ', style: 'letra9', bold: true },
-                    { text: configApp.telefono_empresa, style: 'letra9' },
-                    { text: ' RNC: ', style: 'letra9', bold: true },
-                    { text: configApp.rnc_empresa, style: 'letra9' },
-                  ],
-                  alignment: 'center',
-                },
-              ],
-            },
-          ],
-          [
-            {
-              margin: [pageO === 'portrait' ? 0 : 80, 10, 0, 0],
-              stack: [
-                {
-                  text: [
-                    { text: 'Pag... :  ', style: 'letra10', bold: true },
-                    { text: pag, style: 'letra10' },
-                  ],
-                  alignment: 'left',
-                  margin: [60, 19, 0, 0],
-                },
-                {
-                  text: [
-                    { text: 'Fecha : ', style: 'letra10', bold: true },
-                    { text: data.fecha, style: 'letra10' },
-                  ],
-                  alignment: 'left',
-                  margin: [60, 3, 0, 0],
-                },
-                {
-                  text: [
-                    { text: 'Emp... :  ', style: 'letra10', bold: true },
-                    { text: data.realizado_por, style: 'letra10' },
-                  ],
-                  alignment: 'left',
-                  margin: [60, 3, 0, 0],
-                },
-              ],
-            },
-          ],
+          {
+            width: 'auto',
+            stack: [
+              {
+                stack: [
+                  {
+                    text: [
+                      { text: 'Pag... :  ', style: 'letra10', bold: true },
+                      { text: pag, style: 'letra10' },
+                    ],
+                    alignment: 'left',
+                  },
+                  {
+                    text: [
+                      { text: 'Fecha : ', style: 'letra10', bold: true },
+                      { text: data.fecha, style: 'letra10' },
+                    ],
+                    alignment: 'left',
+                    margin: [0, 3, 0, 0],
+                  },
+                  {
+                    text: [
+                      { text: 'Emp... :  ', style: 'letra10', bold: true },
+                      { text: data.realizado_por, style: 'letra10' },
+                    ],
+                    alignment: 'left',
+                    margin: [0, 3, 0, 0],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        margin: [0, -45, 0, 0],
+        stack: [
+          { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
+          { text: configApp.direccion_empresa, alignment: 'center', style: 'letra8' },
+          {
+            text: [
+              { text: 'Telefono: ', style: 'letra9', bold: true },
+              { text: configApp.telefono_empresa, style: 'letra9' },
+              { text: ' RNC: ', style: 'letra9', bold: true },
+              { text: configApp.rnc_empresa, style: 'letra9' },
+            ],
+            alignment: 'center',
+          },
         ],
       },
 
@@ -134,8 +138,6 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
         alignment: 'center',
       },
       data.mostrar_sub_titulo ? { text: data.sub_titulo, style: 'letra10', margin: [15, 10, 0, 0] } : { text: '' },
-
-      { canvas: [{ type: 'rect', x: 10, y: data.mostrar_sub_titulo ? 2 : 10, w: pageO === 'portrait' ? 575 : 823, h: 1.5, color: '#000000' }] },
     ];
   };
 
