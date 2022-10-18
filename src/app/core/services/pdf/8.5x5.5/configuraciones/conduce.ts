@@ -3,7 +3,7 @@ export const config_conduce = {
   pageMargins: [15, 110, 15, 15],
   margin_general: [0, 0, 0, 0],
   isBreak: true,
-  break: 8,
+  break: 10,
   only_titulo: false,
 
   widths: [24, 'auto', '*'],

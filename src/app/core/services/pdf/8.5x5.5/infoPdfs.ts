@@ -40,7 +40,7 @@ export const firmas = {
   notas: ['realizado_por', 'cliente'],
   ventas: ['nombre', 'doc_identidad', 'direccion'],
   recibo_ingreso: ['recibido_por', 'entregado_por'],
-  conduce: ['nombre', 'doc_identidad', 'direccion'],
+  conduce: ['realizado_por', 'cliente'],
   cuadre_caja: [],
 };
 
