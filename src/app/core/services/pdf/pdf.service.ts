@@ -6,7 +6,6 @@ const pdfFonts = require('pdfmake/build/vfs_fonts.js');
 import * as _8_5x5_5 from './8.5x5.5/makePDF';
 import * as roll80mm from './80mm_roll/makePDF';
 import * as facturasCompraVenta from './facturasCompraVenta';
-import * as recibosIngresos from './recibosIngresos';
 import * as conduce from './conduce';
 import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
@@ -37,22 +36,7 @@ export class PdfService {
       try {
         switch (type_oPdf) {
           case 'recibo_ingreso': // SI SI
-            options = { '80mm_roll': roll80mm, '8.5x5.5': recibosIngresos, '8.5x11': recibosIngresos };
-
-            // data.identificador = data.numero_recibo;
-            // data.numero_documento = data.numero_recibo;
-            // data.tipo_pdf = 'RECIBO DE INGRESOS';
-            // data.contenido_reporte = data.detalle_recibos;
-            // data.usuario = data.user.nombre_completo;
-
-            // documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
-            // data.cliente.rnc = documento ? documento.documento : '----------';
-
-            // data.contenido_reporte.map((detalle) => {
-            //   detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
-            //   detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
-            //   detalle['fecha'] = _.split(detalle.descripcion, ' ')[2];
-            // });
+            options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
 
             obj = options[config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
             break;

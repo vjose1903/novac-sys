@@ -1,7 +1,7 @@
 export const infoPagare = {
-  vasquez: {  altura_nombre: 170, altura_direccion: 180   },
-  brendy: {   altura_nombre: 173, altura_direccion: 170   },
-  agrodemi: { altura_nombre: 173, altura_direccion: 170   },
+  vasquez: { altura_nombre: 170, altura_direccion: 180 },
+  brendy: { altura_nombre: 173, altura_direccion: 170 },
+  agrodemi: { altura_nombre: 173, altura_direccion: 170 },
 };
 
 export const infoTipoPdf = {
@@ -31,7 +31,7 @@ export const infoFacturaPartes = {
 export const infoPropietarioPartes = {
   notas: ['nombre', 'doc_identidad', 'direccion'],
   ventas: ['nombre', 'doc_identidad', 'direccion'],
-  recibo_ingreso: ['nombre', 'doc_identidad', 'direccion'],
+  recibo_ingreso: ['nombre', 'doc_identidad', 'direccion', 'recibido'],
   conduce: ['nombre', 'doc_identidad', 'direccion'],
   cuadre_caja: [],
 };
@@ -39,7 +39,7 @@ export const infoPropietarioPartes = {
 export const firmas = {
   notas: ['realizado_por', 'cliente'],
   ventas: ['nombre', 'doc_identidad', 'direccion'],
-  recibo_ingreso: ['nombre', 'doc_identidad', 'direccion'],
+  recibo_ingreso: ['recibido_por', 'entregado_por'],
   conduce: ['nombre', 'doc_identidad', 'direccion'],
   cuadre_caja: [],
 };

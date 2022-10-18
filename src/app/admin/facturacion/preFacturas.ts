@@ -51,7 +51,7 @@ export class PreFacturaClass extends MixinClass {
 
       PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
         if (res.status === 'si') {
-          const inputs = { base64: res.base64, height: '30rem', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
+          const inputs = { base64: res.base64, height: '40rem', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
           const obj_modal = {
             component: PdfViewerComponent,
             inputs: inputs,

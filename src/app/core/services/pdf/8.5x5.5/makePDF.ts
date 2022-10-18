@@ -12,6 +12,7 @@ import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
 import { config_conduce } from './configuraciones/conduce';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { fun } from '../../functions.service';
+import * as numLetra from '../utils/numero_letras';
 
 const configuraciones = {
   notas_detallada: config_notas.detallada,
@@ -146,8 +147,6 @@ function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; conf
 
   detalle_resumen_stack.stack.push(parseFirmasPdf({ tipo_pdf }));
 
-  // cliente
-
   // -------- BARCODE --------
   // if (cierrePdf['barcode'].includes(tipo_pdf)) detalle_resumen_stack.stack.push({ margin: [0, 20, 0, 0], image: 'barcode', width: 295, height: 70 } as any);
 
@@ -163,7 +162,7 @@ function parseFirmasPdf(args: { tipo_pdf: any }) {
 
   const innerTabla = { table: { headerRows: 0, widths: [160], body: [] } };
 
-  const entidades = ['realizado_por', 'cliente'];
+  const entidades = ['realizado_por', 'cliente','recibido_por', 'entregado_por'];
 
   entidades.forEach((entidad, index) => {
     if (firmas[tipo_pdf].includes(entidad)) {
@@ -178,6 +177,8 @@ function parseFirmasPdf(args: { tipo_pdf: any }) {
 
   return mainTable;
 }
+
+
 
 function parseTipoPdf(data, tipo_pdf) {
   const contenido = [];
@@ -319,7 +320,7 @@ function parseInfoFactura(data, tipo_pdf) {
 
 function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   const contenido = [];
-
+  const numero_letra = numLetra.NumeroALetras(data?.total);
   if (!infoPropietarioPartes[tipo_pdf].length) return [{ text: '' }];
 
   const partes = [
@@ -347,9 +348,23 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
         text: [{ text: 'Dirección            : ', bold: true, style: 'letra10' }, is_suplidor ? { text: data?.suplidor.direccion || '', style: 'letra10' } : { text: data?.cliente.direccion || '', style: 'letra10' }],
       },
     },
+    {
+      key: 'recibido',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'Recibido             : ', bold: true, style: 'letra10' },
+          { text: fun_.numFormatTwoDecimals(data?.total), style: 'letra10' },
+          { text: ` - ${fun_.my_capitalize(numero_letra)}`, style: 'letra10' },
+        ],
+      },
+    },
+
   ];
 
   partes.forEach((parte) => {
+    console.log('parte :', parte);
+
     if (infoPropietarioPartes[tipo_pdf].includes(parte.key)) {
       parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];
       contenido.push(parte.item);

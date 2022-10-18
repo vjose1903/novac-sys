@@ -174,7 +174,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
         if (res.status === 'si') {
           const fileName = res.file;
           const base64 = res.base64;
-          const obj_pdf = { base64: res.base64, titulo: 'Revisión de conduce de mercancías', height: '25rem', reimprimir: true, fileName: _.first(res.file.split('.')) };
+          const obj_pdf = { base64: res.base64, titulo: 'Revisión de conduce de mercancías', height: '40rem', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
           this.loadServ.isLoading.next(false);
 
