@@ -503,7 +503,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       };
 
       for (const factura of facturasLlenas) {
-
         const objTemp = {
           cabecera_factura_id: factura.id,
           total: this.totalIndividual(factura),
@@ -538,13 +537,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     const res = await this.notasClass.createOne(dataToSend);
 
     this.notasClass.parseDataToPdf(res['data']).then((data_parsed) => {
-      this.imprimirNota({ data: data_parsed, type: 'nota' });
-    });
-  }
+      const objToPdf = { data: data_parsed, type: 'nota' };
 
-  imprimirNota(obj) {
-    PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err.msg, 'ERROR'));
-    this.layServ.nextCheckCuadreToday(true);
-    this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
+      PdfService.generatePdf({ oPdf: objToPdf, imprimir: this.is_print }).catch((err) => fun.toastError(err.msg, 'ERROR'));
+      this.layServ.nextCheckCuadreToday(true);
+      this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
+    });
   }
 }

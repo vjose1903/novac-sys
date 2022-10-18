@@ -167,7 +167,6 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
   }
 
   makeConducePdf(conduce_selected) {
-    console.log('conduce_selected ', conduce_selected);
 
     const obj = { data: conduce_selected, type: 'conduce', retunBase64: true };
     this.loadServ.isLoading.next(true);

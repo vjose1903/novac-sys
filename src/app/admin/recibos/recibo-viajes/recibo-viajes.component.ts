@@ -413,10 +413,10 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       this.getViajes(actualPagination);
       this.resetVariables();
 
-      const obj_print = { data: res['data'].recibo, type: 'recibo_ingreso' };
+      this.reciboClass.parseDataToPdf(res['data'].recibo).then((recibo_parsed) => {
+        const obj_print = { data: recibo_parsed, type: 'recibo_ingreso' };
 
-      if (this.is_print) {
-        PdfService.generatePdf({ oPdf: obj_print, imprimir: true })
+        PdfService.generatePdf({ oPdf: obj_print, imprimir: this.is_print })
           .then(async (res) => {
             if (res.status === 'si') {
             } else fun.toastError(res.msg, 'ERROR');
@@ -424,9 +424,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
             this.getCuadre();
           })
           .catch((err) => fun.toastError(err.msg, 'ERROR'));
-      } else {
-        this.getCuadre();
-      }
+      });
     });
   }
 
