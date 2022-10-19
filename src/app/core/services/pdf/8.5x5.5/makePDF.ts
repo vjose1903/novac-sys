@@ -363,7 +363,6 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   ];
 
   partes.forEach((parte) => {
-    console.log('parte :', parte);
 
     if (infoPropietarioPartes[tipo_pdf].includes(parte.key)) {
       parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];

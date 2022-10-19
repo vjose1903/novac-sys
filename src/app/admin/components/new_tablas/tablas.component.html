@@ -141,7 +141,6 @@
                       <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace" class="table_input">
                         <input
                           #inputTable
-
                           [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
                           class="form-control m-0 inputTabla {{ column.can_reset ? 'refresh' : '' }} {{ column.inputType == 'number' ? 'input_cantidad' : '' }}"
                           id="input-{{ config.id_tabla + post_id }}-{{ column.key }}-{{ getIndex(index_body) }}"
@@ -153,7 +152,6 @@
                           (focus)="handleInputsEvents('focus', $event.target, column, getIndex(index_body))"
                           (blur)="checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body))"
                           (keyup)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
-
                         />
                         <!-- (blur)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body))" -->
 
@@ -170,7 +168,7 @@
                       tooltipPosition="left"
                     >
                       {{ getValueForm(column, dato) }}
-                      {{ column.alerta ? (config?.colores ? (dato.activo ? '' : '(Inactivo)') : '') : '' }}
+                      {{ column.alerta && config?.colores && !dato.activo ? '(Inactivo)' : '' }}
                     </span>
                   </span>
                 </td>

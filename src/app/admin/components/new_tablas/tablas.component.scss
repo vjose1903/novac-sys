@@ -99,8 +99,19 @@
                 background: var(--transparente05) !important;
               }
 
+              &.danger {
+                background-color: #ff7e7e8d !important;
+                &:hover {
+                  background-color: #ce4d4da1 !important;
+                }
+              }
+
               &.bg-light {
                 background-color: #dbd8d8 !important;
+              }
+
+              &.bg-more-light {
+                background-color: #e9e9e9 !important;
               }
 
               &:hover {

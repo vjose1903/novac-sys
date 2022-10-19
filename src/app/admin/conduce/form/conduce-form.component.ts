@@ -176,8 +176,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async getDataFromModal(arg, search) {
-    console.log('arg ', arg);
-
     if (arg.modal_id == 'buscar_articulo') {
       if (arg?.tipo == 'data_no_found') {
         this.enfocarInput(`cod-${arg.index}`);
@@ -580,8 +578,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         const formArray = this.form.get('rowFactura') as FormArray;
         const existe = formArray.value.find((d) => d.detalle_factura_id == detalle.id);
 
-        detalle.select = !!existe;
-        detalle.disable = !!existe;
+        detalle.select = fun.hasValue(existe);
 
         return detalle;
       });
@@ -602,59 +599,59 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     if (factura) {
       this.checkFacturasAdelantadasSelection();
       let conteo = 0;
+
       factura.detalle_facturas.map(async (detalle) => {
-        this.articuloClass.getArticulosFiltrado({ buscar: detalle.codigo, fecha: this.fechaConduce, parameters: { contenido: true } }).then((res_articulo) => {
-          const articulo = _.first(res_articulo['data']);
-          const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.' };
-          const contenidos_format = this.formatContenidos(articulo.contenido);
+        const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.', Saco: 'Saco', Galon: 'Gal.', Onza: 'Oz.', Producto: 'Prod.', Funda: 'Funda' };
 
-          const arrayMostrar = [
-            { num: detalle.retirado, medida: '' },
-            { num: detalle.cantidad_en_unidades - detalle.retirado, medida: '' },
-          ];
+        const contenidos_format = this.formatContenidos(detalle.contenidos);
 
-          for (let j = 0; j < arrayMostrar.length; j++) {
-            const element = arrayMostrar[j];
+        const arrayMostrar = [
+          { num: detalle.retirado, medida: '' },
+          { num: detalle.cantidad_en_unidades - detalle.retirado, medida: '' },
+        ];
 
-            const contenidoSelected = _.find(contenidos_format, (cont) => element.num >= cont[1]);
+        for (let j = 0; j < arrayMostrar.length; j++) {
+          const element = arrayMostrar[j];
 
-            const cantidad = contenidoSelected ? element.num / contenidoSelected[1] : null;
-            element.medida = contenidoSelected ? `${cantidad} ${abreviaturas[contenidoSelected[0]]}` : null;
-          }
+          const contenidoSelected = _.find(contenidos_format, (cont) => element.num >= cont[1]);
 
-          detalle.retirado_mostrar = arrayMostrar[0].medida;
-          detalle.restante_mostrar = arrayMostrar[1].medida;
+          const cantidad = contenidoSelected ? element.num / contenidoSelected[1] : null;
+          element.medida = contenidoSelected ? `${cantidad} ${abreviaturas[contenidoSelected[0]]}` : null;
+        }
 
-          if (detalle.disable == false) detalle.disable = fun.isEmpty(detalle.restante_mostrar);
+        detalle.retirado_mostrar = arrayMostrar[0].medida;
+        detalle.restante_mostrar = arrayMostrar[1].medida;
 
-          conteo++;
-          if (conteo >= factura.detalle_facturas.length)
-            setTimeout(() => {
-              this.openNewModal({
-                component: ModalSeleccinarArticuloComponent,
-                inputs: factura.detalle_facturas,
-                id: 'seleccionar_articulos_adelantados',
-                header: 'Confirmar',
-                width: '900px',
-                height: '400px',
-                botones: {
-                  ...ModalClass.noShowAceptarCancelarButtons,
-                  dinamico: [
-                    { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
-                    { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
-                  ],
-                },
-              });
-            }, 250);
+        detalle.disable = detalle.articulo_estado ? fun.isEmpty(detalle.restante_mostrar) : true;
 
-          return detalle;
-        });
+        conteo++;
+        if (conteo >= factura.detalle_facturas.length)
+          setTimeout(() => {
+            this.openNewModal({
+              component: ModalSeleccinarArticuloComponent,
+              inputs: factura.detalle_facturas,
+              id: 'seleccionar_articulos_adelantados',
+              header: 'Confirmar',
+              width: '900px',
+              height: '400px',
+              botones: {
+                ...ModalClass.noShowAceptarCancelarButtons,
+                dinamico: [
+                  { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
+                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
+                ],
+              },
+            });
+          }, 250);
+
+        return detalle;
       });
     }
   }
 
   formatContenidos(contenidos) {
     const contenido = [];
+
     for (var cont in contenidos) {
       if (!_.includes(cont, 'Saco')) contenido.push([cont, contenidos[cont]]);
     }

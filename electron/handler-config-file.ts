@@ -39,7 +39,7 @@ export default class HandlerConfigFile {
     },
 
     plantillas_impresion: {
-      nota: 'Detallada',
+      nota: 'Agrupada',
     },
 
     documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota',
