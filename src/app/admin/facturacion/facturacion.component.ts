@@ -1122,14 +1122,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
-  // =============================================
-  //  OBTENER LA DATA DEL CUERPO
-  // =============================================
   getCantidadArticulos() {
     const articulos_a_vender = _.filter(this.CuerpoFactura, (factura) => fun.hasValue(factura.cantidad));
     return articulos_a_vender.length;
   }
 
+  // =============================================
+  //  OBTENER LA DATA DEL CUERPO
+  // =============================================
   getCuerpoFactura(arg) {
     if (arg.tipo == 'cuerpo') {
       this.CuerpoFactura = arg.data;

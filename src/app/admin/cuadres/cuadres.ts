@@ -27,7 +27,6 @@ export class CuadreC {
     new CuadreCajaC().createOne({}, requestParams).then((res) => {
       this.parseDataToPdf(res['data']).then(async (cuadre_parsed) => {
         const obj = { data: cuadre_parsed, type: 'cuadre_caja' };
-        console.log('obj ', obj);
 
         PdfService.generatePdf({ oPdf: obj, imprimir: false }).then(async (response) => {
           let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
@@ -41,7 +40,6 @@ export class CuadreC {
   static parseDataToPdf(data) {
     return new Promise((resolve) => {
       const data_parsed = fun.remplaceKeyFromJson(data, [{ old_key: 'numero_reporte', new_key: 'numero_documento' }]);
-      console.log('data_parsed ', data_parsed);
 
       data_parsed['identificador'] = data_parsed['numero_documento'];
       data_parsed['tipo_pdf'] = 'CUADRE DE CAJA';

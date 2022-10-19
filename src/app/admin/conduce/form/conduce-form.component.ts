@@ -176,6 +176,8 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async getDataFromModal(arg, search) {
+    console.log('arg ', arg);
+
     if (arg.modal_id == 'buscar_articulo') {
       if (arg?.tipo == 'data_no_found') {
         this.enfocarInput(`cod-${arg.index}`);
@@ -186,10 +188,14 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     }
 
     if (arg.modal_id == 'buscarCliente') {
-      this.cliente = arg.data;
-      (document.getElementById('clienteI') as any).value = arg.data.nombre;
-      setTimeout(() => this.enfocarInput('cod-0'), 10);
-      this.buscarFacturasAdelantadas(arg.data.id);
+      if (arg?.tipo == 'data_no_found') {
+        setTimeout(() => this.enfocarInput('clienteI'), 10);
+      } else {
+        this.cliente = arg.data;
+        (document.getElementById('clienteI') as any).value = arg.data.nombre;
+        setTimeout(() => this.enfocarInput('cod-0'), 10);
+        this.buscarFacturasAdelantadas(arg.data.id);
+      }
     }
 
     if (arg.modal_id === 'seleccionar_articulos_adelantados') {
@@ -833,6 +839,11 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   closeModal(modalInstance) {
     modalInstance.closeModal(modalInstance.id, 'cancelar');
+  }
+
+  getCantidadArticulos() {
+    const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
+    return filas_ocupadas.length;
   }
 
   async sendData() {

@@ -34,8 +34,6 @@ export function makePDF(data) {
 // ====================================================================================================================================================
 function cabeceraReporte(data, configApp: ConfigI, currentPage, pageCount) {
   try {
-    console.log('data ', data);
-
     const header = [
       {
         margin: [15, 15, 15, 0],

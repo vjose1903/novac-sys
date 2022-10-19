@@ -56,15 +56,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     info: [
       { titulo: ' ', tipo: 'switch', select_all: true, key: 'select', estilos: [{ width: '3.5rem' }] },
       { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }, { 'padding-left': '0.5rem' }] },
-      // {
-      //   titulo: 'Devolver',
-      //   key: 'cant_nota',
-      //   tipo: 'input',
-      //   inputType: 'number',
-      //   textAlign: 'end',
-      //   disable: [{ kind: 'campo', target: 'select', value: [false] }],
-      //   estilos: [{ width: '6rem' }],
-      // },
       { titulo: 'Cantidad', key: 'cantidad_', tipo: 'text', estilos: [{ width: '7rem' }] },
       { titulo: 'Descuento', key: 'descuento_valor', tipo: 'formatoNumero' },
       { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero' },
@@ -196,7 +187,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
                 descripcion: { 'text-align': 'left', width: '20rem', 'padding-left': '0.5rem' },
                 cant_nota: { width: '6rem' },
                 cantidad_: { width: '7rem' },
-                precio_real: { width: '8rem' },
+                precio_real: { width: '8rem', 'padding-right': '0.8rem' },
                 itbis_real: { width: '7rem', 'padding-right': '0.8rem' },
                 total_nota: { width: '7.3rem' },
               };
@@ -356,6 +347,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
   }
 
+  getCantidadArticulos(factura_en_turno) {
+    const detalles_selected = _.filter(factura_en_turno.detalle_facturas, { select: true });
+    return detalles_selected.length;
+  }
+
   // =============================================
   //  MODAL IMPRIMIR
   // =============================================
@@ -477,11 +473,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   totalGlobal() {
-    let numb = 0;
-    for (const fact of this.facturasConDetalles) {
-      numb += this.totalIndividual(fact);
-    }
-    return numb;
+    const total = _.reduce(this.facturasConDetalles, (acumulado, item) => acumulado + this.totalIndividual(item), 0);
+    return total;
   }
 
   async formarNota() {
