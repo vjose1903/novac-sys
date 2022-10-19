@@ -46,7 +46,7 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
       arti.articulo_is_active = arti.articulo_estado ? '' : 'fas fa-times';
       arti.articulo_is_active_tooltip = arti.articulo_estado ? '' : 'Articulo Inactivo';
       arti.colorIsActive = 'red';
-      arti.activo = arti.articulo_estado;
+      arti.danger = !arti.articulo_estado;
       arti.customStyles = {
         estado: [
           { key: 'estado', isTd: true, estilos: 'width: 2rem !important;' },

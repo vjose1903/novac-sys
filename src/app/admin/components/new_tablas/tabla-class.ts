@@ -56,6 +56,7 @@ interface iconsI {
 
 export interface paginateI {
   show?: boolean;
+  showTotal?: boolean;
   page?: number;
   ant_page?: number;
   per_page?: number;

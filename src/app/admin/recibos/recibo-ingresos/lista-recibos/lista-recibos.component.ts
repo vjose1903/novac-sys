@@ -42,7 +42,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     id_tabla: 'listado_recibos',
     padre_functions: { data_request: (params) => this.getRecibos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal:true,page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
   tablaComponent;
 

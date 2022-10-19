@@ -141,6 +141,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
+  checkBackgroundTr(params: { tipo: string; dato: any }) {
+    let res = false;
+    if (_.has(params.dato, params.tipo)) res = _.get(params.dato, params.tipo);
+
+    return res;
+    // dato?.danger && config?.colores;
+  }
+
   checkHasClickFuntion(column, dato, i, e) {
     const obj = { id_tabla: this.config.id_tabla + this.post_id, index: i, data: dato, column: column };
     if (column.click) {

@@ -101,7 +101,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     padding: '0.5rem',
     id_tabla: 'facturas_params',
     padre_functions: { data_request: (params) => this.pedirFactura(this.campo, this.valor, params) },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
   tablaComponent;
@@ -117,7 +117,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     filtrar: { local: false },
     id_tabla: 'lista_notas',
     padre_functions: { data_request: (params) => this.pedirNotas(params) },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
   tablaNotasComponent;

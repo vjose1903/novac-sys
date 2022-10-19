@@ -106,6 +106,13 @@
                 }
               }
 
+              &.greenTd {
+                background-color: #7eff988d !important;
+                &:hover {
+                  background-color: #4dce76a1 !important;
+                }
+              }
+
               &.bg-light {
                 background-color: #dbd8d8 !important;
               }

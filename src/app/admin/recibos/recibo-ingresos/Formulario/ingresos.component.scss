@@ -86,8 +86,8 @@
       display: grid;
       height: 100%;
       grid-template-areas:
-      "centro centro"
-      "izquierda derecha";
+        "centro centro"
+        "izquierda derecha";
       grid-template-columns: auto auto;
       grid-template-rows: auto;
 
@@ -107,4 +107,10 @@
   .porcentaje {
     grid-area: porcentaje;
   }
+}
+
+.facturas-seleccionadas {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 1rem;
 }

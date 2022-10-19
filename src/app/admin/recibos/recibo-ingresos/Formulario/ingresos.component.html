@@ -49,7 +49,7 @@
               </div>
 
               <div class="derecha pl-2">
-                <span class="w-100 detalleBalance badge blue text-shadow  text-white mb-2">
+                <span class="w-100 detalleBalance badge blue text-shadow text-white mb-2">
                   <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
                 </span>
                 <span class="w-100 detalleBalance badge text-shadow bg-primary text-white mb-2">
@@ -81,6 +81,10 @@
         <div #cardTabla id="cardTabla" class="tablaIngresos">
           <dinamic-table [cardTabla]="cardTabla" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
         </div>
+
+        <span class="w-100 facturas-seleccionadas">
+          Facturas seleccionadas: <strong> {{ getCantidadArticulos() }}</strong> / <strong> {{ totalRegistros }}</strong>
+        </span>
       </div>
     </div>
   </div>

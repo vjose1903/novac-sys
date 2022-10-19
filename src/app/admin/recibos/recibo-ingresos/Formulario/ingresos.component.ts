@@ -83,7 +83,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     padding: '0.5rem',
     id_tabla: 'listado_recibos',
     padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: false, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
   tablaComponent;
@@ -102,6 +102,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   totalPagadoPorciento: number;
   recibiendo = 0;
   restando = 0;
+  totalRegistros;
   debiendo;
   facturasSelected: Array<any> = [];
 
@@ -209,6 +210,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.tablaComponent.changeConfig([{ total_count: res.data.facturas.total_registros }]);
+      this.totalRegistros = res.data.facturas.total_registros;
     }, 100);
   }
 
@@ -243,6 +245,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       },
     };
     this.confirmationModal(obj);
+  }
+
+  getCantidadArticulos() {
+    return this.facturasSelected.length;
   }
 
   async getDataFromModal(arg, search) {
@@ -344,7 +350,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       } else {
         if (!fact.is_viaje && !fact.select) this.facturas[index].select = true;
       }
-      this.verificateFacturasSelected(fact, 'insert', index, !allSelected);
+      if (!fact.is_viaje) this.verificateFacturasSelected(fact, 'insert', index, !allSelected);
     });
 
     this.sumarTotalRecibo();
@@ -517,7 +523,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
       this.resetVariables();
       this.reciboClass.parseDataToPdf(recibo).then((recibo_parsed) => {
-
         const obj_print = { data: recibo_parsed, type: 'recibo_ingreso' };
 
         PdfService.generatePdf({ oPdf: obj_print, imprimir: this.is_print })

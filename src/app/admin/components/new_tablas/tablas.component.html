@@ -48,12 +48,12 @@
                 class="text-center"
                 id="row-{{ config.id_tabla + post_id }}-{{ getIndex(index_body) }}"
                 [ngClass]="{
-                  greenTd: dato?.greenTd && config?.colores,
-                  danger: !dato?.activo && config?.colores,
+                  greenTd: checkBackgroundTr({ tipo: 'greenTd', dato: dato }),
+                  danger: checkBackgroundTr({ tipo: 'danger', dato: dato }),
                   warning: dato?.panico > 0 && config?.colores,
                   'bg-selected': config?.colores && seleccionado == dato?.id,
                   'bg-light': config.focusRow && RowElement.id == row_id,
-                  'bg-more-light': dato?.subrayar
+                  'bg-more-light': checkBackgroundTr({ tipo: 'subrayar', dato: dato })
                 }"
                 style="cursor: pointer; color: var(--letras)"
                 [ngStyle]="{ 'background-color': this.changeBackGroundColor(dato) }"
@@ -168,7 +168,7 @@
                       tooltipPosition="left"
                     >
                       {{ getValueForm(column, dato) }}
-                      {{ column.alerta && config?.colores && !dato.activo ? '(Inactivo)' : '' }}
+                      {{ column.alerta && config?.colores && dato.danger ? '(Inactivo)' : '' }}
                     </span>
                   </span>
                 </td>
@@ -192,7 +192,7 @@
         <!-- TFOOT -->
         <tfoot class="tfoot w-100">
           <div *ngIf="config?.obj_paginate && config?.obj_paginate.show != false" id="paginationDiv-{{ config.id_tabla + post_id }}" class="Pietabla d-flex align-items-center justify-content-between w-100">
-            <div>
+            <div *ngIf="config?.obj_paginate.showTotal">
               <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ config.total_count }}</h6>
             </div>
 
