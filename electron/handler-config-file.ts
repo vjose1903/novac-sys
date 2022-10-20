@@ -55,8 +55,6 @@ export default class HandlerConfigFile {
         puts(existe_archivo_config, ':::::::: existe_archivo_config');
 
         if (!existe_archivo_config) {
-          // TODO: ver cual es el key que se necesita para utilizar una impresora por nombre
-
           Functions.setConfigFile(JSON.stringify(this.default_config))
             .then(() => {
               console.log(' ');
