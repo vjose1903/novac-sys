@@ -260,17 +260,17 @@ function beforeCreateSplash(splash) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function continuarCargandoArchivos(resolve) {
   // -------- verificar el archivo para impresion --------
-  verificarSumastra()
-    .then((res_sumastra) => {
-      // -------------- remplazar en archivos ----------------
-      replace_in_file = new ReplaceInFile();
-      puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
-      setTimeout(() => resolve(true), 2000);
-    })
-    .catch((error) => {
-      puts(' -------- SUMASTRA NO EXISTE -------- ');
-      createSplash(`splash_sumastra_error`);
-    });
+  // verificarSumastra()
+  //   .then((res_sumastra) => {
+  // -------------- remplazar en archivos ----------------
+  replace_in_file = new ReplaceInFile();
+  puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
+  setTimeout(() => resolve(true), 2000);
+  // })
+  // .catch((error) => {
+  //   puts(' -------- SUMASTRA NO EXISTE -------- ');
+  //   createSplash(`splash_sumastra_error`);
+  // });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -787,9 +787,8 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
     const serve_ = await getServer_();
     const conf = await getConfig();
 
-
-    const gsprint_path = serve ? `print/gsprint.exe` : `assets/print/gsprint.exe` ;
-    const ghostscript_path = serve ? `print/gsprint.exe` : `assets/print/gswin64c.exe` ;
+    const gsprint_path = await pathAdd(`/print/gsprint.exe`);
+    const ghostscript_path = await pathAdd(`/print/gswin64c.exe`);
 
     const file_path = await pathAdd(`/${params.fileName}`);
 
@@ -814,8 +813,7 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
   });
 }
 
-function localFilePath(path){
-
+function localFilePath(path) {
   const local_path = serve ? `src/${path}` : `dist/${path}`;
   return local_path;
 }
@@ -827,7 +825,6 @@ function localFilePath(path){
 export function contruirPath(path_temp) {
   return isMacOs() ? path_temp : path_temp.split('/').join('\\');
 }
-
 
 export function pathAdd(addToPath = '', resource = true): Promise<string> {
   return new Promise<any>(async (resolve, reject) => {

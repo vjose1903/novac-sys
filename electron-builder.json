@@ -1,6 +1,6 @@
 {
   "appId":"com.inspot-technology.novac",
-  "productName": "Novac System",
+  "productName": "Novac-System",
   "directories": {
     "output": "actualizacion/"
   },
@@ -22,9 +22,15 @@
     "!actualizacion/**/*",
     "!ADM-dataBase ER.mdj",
     "!actualizacion.zip",
-    "!print",
     "!log",
     "!reload"
+  ],
+  "extraFiles": [
+    {
+      "from": "./print/",
+      "to": "resources/print/",
+      "filter": [ "**/*" ]
+    }
   ],
 
   "win": {

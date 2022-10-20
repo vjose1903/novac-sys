@@ -21,7 +21,7 @@ export default class HandlerConfigFile {
     url_servidor_respaldo: 'http://10.0.0.9:9090',
     usa_url_principal: true,
     printer_caja_selected: 'Ninguna',
-    printer_reportes_selected: 'Canon G3010 series',
+    printer_reportes_selected: 'Ninguna',
     is_db_local: false,
     calcular_itbis: false,
     is_produccion: true,
