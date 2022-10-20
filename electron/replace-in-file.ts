@@ -1,5 +1,5 @@
 import Functions from './functions.js';
-import { pathAdd, cmd } from '../main';
+import { pathAdd, cmd, puts } from '../main';
 const logosJson = require('../logos.json');
 import * as fs from 'fs';
 
@@ -96,6 +96,13 @@ export default class ReplaceInFile {
       try {
         for (const file_path of params.file_paths) {
           let file_data = fs.readFileSync(file_path, 'utf-8') as any;
+
+          puts("." );
+          puts("." );
+          puts("==============================================" );
+          puts(params.source, "params.source" );
+          puts(params.target, "params.target" );
+          puts(file_data, "file_data" );
 
           file_data = file_data.replaceAll(params.source, params.target);
 

@@ -47,7 +47,7 @@ function createSplash(type = 'splash') {
 
   splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
 
-  const splash_html = serve ? `src/${type}.html` : `dist/${type}.html`;
+  const splash_html = localFilePath(`${type}.html`);
 
   splash.loadURL(url.format({ pathname: path.join(__dirname, splash_html), protocol: 'file:', slashes: true }));
   splash.center();
@@ -396,6 +396,12 @@ function getActualGitUser() {
   });
 }
 
+function getPrinters() {
+  const printers_list = win.webContents.getPrinters().map((item) => item.name);
+
+  return printers_list;
+}
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER EL ARCHIVO APP.CONFIG
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -407,10 +413,10 @@ function getConfigFile() {
     Functions.getConfigFile()
       .then(async (config: any) => {
         var config = JSON.parse(config);
-
+        const printer_list = getPrinters();
         config['is_development'] = serve_;
         config['gitUser'] = await getActualGitUser();
-        config['printersList'] = [{ displayName: 'Ninguna', name: 'Ninguna' }, { displayName: 'Otra', name: 'Otra' }, ...win.webContents.getPrinters()];
+        config['printersList'] = ['Ninguna', ...printer_list];
         config['app_version'] = pjson.version;
 
         resolve(config);
@@ -781,7 +787,10 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
     const serve_ = await getServer_();
     const conf = await getConfig();
 
-    const sumatrapdf_path = serve_ ? await pathAdd('/print/lp.exe') : contruirPath('N:/sumastra/lp.exe');
+
+    const gsprint_path = serve ? `print/gsprint.exe` : `assets/print/gsprint.exe` ;
+    const ghostscript_path = serve ? `print/gsprint.exe` : `assets/print/gswin64c.exe` ;
+
     const file_path = await pathAdd(`/${params.fileName}`);
 
     puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
@@ -791,18 +800,24 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
 
     const selected_printer = params.tipo === 'reporte' ? conf.printer_reportes_selected : conf.printer_caja_selected;
     // noscale
-    let is_roll = false;
-    if (params.tipo != 'reporte') is_roll = conf.pages_sizes.facturacion.includes('roll');
+    // let is_roll = false;
+    // if (params.tipo != 'reporte') is_roll = conf.pages_sizes.facturacion.includes('roll');
 
-    const print_settings = is_roll ? '-print-settings "noscale"' : `-print-settings "${orientation},${params.scale},paper=${paper_size},simplex"`;
-    const comando = `"${sumatrapdf_path}" -print-to-default ${print_settings} -silent "${file_path}"`;
-    // const comando = `"${sumatrapdf_path}" -print-to ${selected_printer.name} -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
+    // const print_settings = is_roll ? '-print-settings "noscale"' : `-print-settings "${orientation},${params.scale},paper=${paper_size},simplex"`;
+    // const comando = `"${sumatrapdf_path}" -print-to-default ${print_settings} -silent "${file_path}"`;
+    const comando = `${gsprint_path}  -ghostscript "${ghostscript_path}" -printer "${selected_printer}" "${file_path}"`;
 
     cmd(comando, (res) => {
       if (res.status) resolve({ msg: 'PDF impreso correctamente!!', status: 'si', STDOUT: res });
       else reject({ msg: 'Error imprimiento PDF!!', status: 'no', err: res });
     });
   });
+}
+
+function localFilePath(path){
+
+  const local_path = serve ? `src/${path}` : `dist/${path}`;
+  return local_path;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -812,6 +827,8 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
 export function contruirPath(path_temp) {
   return isMacOs() ? path_temp : path_temp.split('/').join('\\');
 }
+
+
 export function pathAdd(addToPath = '', resource = true): Promise<string> {
   return new Promise<any>(async (resolve, reject) => {
     let path_temp;

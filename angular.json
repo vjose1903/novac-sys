@@ -34,6 +34,11 @@
                 "glob": "**/*",
                 "input": "node_modules/ngx-extended-pdf-viewer/assets/",
                 "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "print/",
+                "output": "/assets/print/"
               }
             ],
             "styles": [
@@ -49,7 +54,6 @@
               "node_modules/@fortawesome/fontawesome-free/css/regular.css",
               "node_modules/@fortawesome/fontawesome-free/css/brands.css",
               "node_modules/@fortawesome/fontawesome-free/css/fontawesome.css",
-
 
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/animate.css/animate.css",
