@@ -59,7 +59,7 @@ export function makeReporte(data) {
     styles: styles_,
   };
 
-  const obj = { doc: dd, file: 'reporte.pdf', type: 'base64', scale: configuration['pageOrient'] ? (configuration['pageOrient'] === 'landscape' ? 'fit' : 'noscale') : 'noscale' };
+  const obj = { doc: dd, file: 'reporte.pdf', type: 'base64', pageOrientation: pageO };
 
   return obj;
 }
@@ -69,7 +69,6 @@ export function makeReporte(data) {
 // ==========================================================================================================================================================
 function cabeceraReporte(data, configuration, configApp: ConfigI) {
   const header = (currentPage, pageCount) => {
-    const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
     const pag = currentPage.toString() + ' de ' + pageCount;
     return [
       {

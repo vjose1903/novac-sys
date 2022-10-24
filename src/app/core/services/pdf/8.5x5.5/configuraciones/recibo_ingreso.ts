@@ -1,6 +1,6 @@
 export const config_recibo_ingreso = {
   pageSize: { width: 600, height: 398 },
-  pageMargins: [15, 127, 15, 15],
+  pageMargins: [15, 135, 15, 15],
   margin_general: [0, 0, 0, 0],
   isBreak: true,
   break: 8,

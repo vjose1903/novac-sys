@@ -14,10 +14,9 @@ export interface ConfigI {
   config_password:             string;
   usa_url_principal:           boolean;
   is_produccion:               boolean;
-  calcular_itbis:                    boolean;
-  printer_caja_selected:       Printer;
-  printer_reportes_selected:   Printer;
-  pages_sizes:                 PagesSizes;
+  calcular_itbis:              boolean;
+  pages_sizes:                 Documentos;
+  printer_selected:            Documentos;
   plantillas_impresion:        PlantiallasImpresion;
   is_development:              boolean;
   printersList:                Printer[];
@@ -29,15 +28,18 @@ export interface ConfigI {
   medida_producto_terminado:   string;
 }
 
-export interface PagesSizes {
-  conduce:         string;
-  cuadre_caja:     string;
-  nota:            string;
-  facturacion:     string;
+export interface Documentos {
+  venta_contado:   string;
+  venta_credito:   string;
+  pre_venta:       string;
+  compra:          string;
   recibo_ingreso:  string;
+  conduce:         string;
+  nota:            string;
+  cuadre_caja:     string;
   reporte:         string;
-}
 
+}
 export interface PlantiallasImpresion {
   nota:            string;
 }

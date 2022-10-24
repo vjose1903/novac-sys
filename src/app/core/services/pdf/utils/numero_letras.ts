@@ -43,14 +43,14 @@ function Decenas(num) {
         case 5:
           return 'QUINCE';
         default:
-          return 'DIECI' + Unidades(unidad);
+          return `DIECI${Unidades(unidad)}`;
       }
     case 2:
       switch (unidad) {
         case 0:
           return 'VEINTE';
         default:
-          return 'VEINTI' + Unidades(unidad);
+          return `VEINTI${Unidades(unidad)}`;
       }
     case 3:
       return DecenasY('TREINTA', unidad);
@@ -86,25 +86,25 @@ function Centenas(num) {
   switch (centenas) {
     case 1:
       if (decenas > 0) {
-        return 'CIENTO ' + Decenas(decenas);
+        return `CIENTO ${Decenas(decenas)}`;
       }
       return 'CIEN';
     case 2:
-      return 'DOSCIENTOS ' + Decenas(decenas);
+      return `DOSCIENTOS ${Decenas(decenas)}`;
     case 3:
-      return 'TRESCIENTOS ' + Decenas(decenas);
+      return `TRESCIENTOS ${Decenas(decenas)}`;
     case 4:
-      return 'CUATROCIENTOS ' + Decenas(decenas);
+      return `CUATROCIENTOS ${Decenas(decenas)}`;
     case 5:
-      return 'QUINIENTOS ' + Decenas(decenas);
+      return `QUINIENTOS ${Decenas(decenas)}`;
     case 6:
-      return 'SEISCIENTOS ' + Decenas(decenas);
+      return `SEISCIENTOS ${Decenas(decenas)}`;
     case 7:
-      return 'SETECIENTOS ' + Decenas(decenas);
+      return `SETECIENTOS ${Decenas(decenas)}`;
     case 8:
-      return 'OCHOCIENTOS ' + Decenas(decenas);
+      return `OCHOCIENTOS ${Decenas(decenas)}`;
     case 9:
-      return 'NOVECIENTOS ' + Decenas(decenas);
+      return `NOVECIENTOS ${Decenas(decenas)}`;
   }
 
   return Decenas(decenas);
@@ -118,7 +118,7 @@ function Seccion(num, divisor, strSingular, strPlural) {
 
   if (cientos > 0) {
     if (cientos > 1) {
-      letras = Centenas(cientos) + ' ' + strPlural;
+      letras = `${Centenas(cientos)} ${strPlural}`;
     } else {
       letras = strSingular;
     }
@@ -139,9 +139,7 @@ function Miles(num) {
   const strMiles = Seccion(num, divisor, 'MIL', 'MIL');
   const strCentenas = Centenas(resto);
 
-  if (strMiles === '') {
-    return strCentenas;
-  }
+  if (strMiles == '') return strCentenas;
 
   return strMiles + ' ' + strCentenas;
 }
@@ -154,11 +152,9 @@ function Millones(num) {
   const strMillones = Seccion(num, divisor, 'UN MILLON', 'MILLONES');
   const strMiles = Miles(resto);
 
-  if (strMillones === '') {
-    return strMiles;
-  }
+  if (strMillones == '') return strMiles;
 
-  return strMillones + ' ' + strMiles;
+  return `${strMillones} ${strMiles}`;
 }
 
 export function NumeroALetras(num) {
@@ -174,23 +170,13 @@ export function NumeroALetras(num) {
     letrasMonedaCentavoSingular: 'CENTAVO',
   };
 
-  if (data.centavos > 0) {
-    data.letrasCentavos =
-      'CON ' +
-      (() => {
-        if (data.centavos === 1) {
-          return Millones(data.centavos) + ' ' + data.letrasMonedaCentavoSingular;
-        } else {
-          return Millones(data.centavos) + ' ' + data.letrasMonedaCentavoPlural;
-        }
-      })();
-  }
+  if (data.centavos > 0) data.letrasCentavos = `CON ${Millones(data.centavos)} ${data.centavos == 1 ? data.letrasMonedaCentavoSingular : data.letrasMonedaCentavoPlural}`;
 
-  if (data.enteros === 0) {
-    return 'CERO ' + data.letrasMonedaPlural + ' ' + data.letrasCentavos;
-  } else if (data.enteros === 1) {
-    return Millones(data.enteros) + '' + data.letrasMonedaSingular + ' ' + data.letrasCentavos;
+  if (data.enteros == 0) {
+    return `CERO ${data.letrasMonedaPlural} ${data.letrasCentavos}`;
+  } else if (data.enteros == 1) {
+    return `${Millones(data.enteros)} ${data.letrasMonedaSingular} ${data.letrasCentavos}`;
   } else {
-    return Millones(data.enteros) + '' + data.letrasMonedaPlural + ' ' + data.letrasCentavos;
+    return `${Millones(data.enteros)} ${data.letrasMonedaPlural} ${data.letrasCentavos}`;
   }
 }

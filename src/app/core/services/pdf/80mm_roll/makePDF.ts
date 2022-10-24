@@ -10,7 +10,6 @@ import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
 import { config_conduce } from './configuraciones/conduce';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { config_pre_venta } from './configuraciones/pre_venta';
-import { fun } from '../../functions.service';
 import { config_notas } from './configuraciones/notas';
 
 const configuraciones = {
@@ -41,7 +40,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
     styles: styles_,
   };
 
-  const obj = { doc: dd, file: file_name, type: 'file' };
+  const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: 'portrait' };
   return obj;
 }
 

@@ -6,10 +6,16 @@ import * as _ from 'lodash';
 
 const documentos = {
   '8.5x5.5': {
-    factura: { data: facturaPrueba, type: 'facturacion' },
+    venta_contado: { data: facturaPrueba, type: 'facturacion' },
   },
+  '8.5x11': {
+    venta_credito: { data: facturaPrueba, type: 'facturacion' },
+  },
+
 };
 
 export function printTestPdf(params: { paper_size: string; documento: string }): any {
+  console.log("params ", params);
+
   PdfService.generatePdf({ oPdf: documentos[params.paper_size][params.documento], imprimir: true }).then(async (res) => {});
 }

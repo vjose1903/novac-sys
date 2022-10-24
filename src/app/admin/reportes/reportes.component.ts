@@ -40,6 +40,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._init_mixin({ component: 'reportes', is_routing: true });
+
   }
 
   iniciarCambioMenu(arg, callback) {

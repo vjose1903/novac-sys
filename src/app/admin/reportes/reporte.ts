@@ -6,6 +6,7 @@ import { FormReportesComponent } from '../components/formularios en modales/form
 import { ModalClass } from '../components/modal/modal-class';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import * as _ from 'lodash';
+import { ConfigI } from '../../core/typescript/config-interface';
 
 export class ReporteC extends CrudG<any> {
   private static _objReporte;
@@ -63,7 +64,7 @@ export class ReporteC extends CrudG<any> {
     });
   }
 
-  static visualizarReporte(objPdfView: { openNewModal: Function; status: string; file: any; base64: any; reimprimir: any; msg: any; titulo: string; height: string; width: string }) {
+  static visualizarReporte(objPdfView: { openNewModal: Function; status: string; pageOrientation: string; file: any; base64: any; reimprimir: any; msg: any; titulo: string; height: string; width: string }) {
     if (objPdfView.status == 'no') fun.toastError(objPdfView.msg, 'ERROR');
     else {
       objPdfView.openNewModal({
@@ -92,15 +93,24 @@ export class ReporteC extends CrudG<any> {
   }
 
   static imprimirPDF(objPdf, modalInstance?) {
-    objPdf['type'] = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
+    SingletonService.loadServ.isLoading.next(true);
+    SingletonService.configServ.getConfig({ isPromise: true }).then((configApp: ConfigI) => {
+      objPdf['type'] = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
+      objPdf['printer'] = configApp.printer_selected.reporte;
 
-    PdfService.imprimirBase64(objPdf)
-      .then((res) => {
-        if (res.status === 'si') {
-          fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-          if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
-        } else fun.toastError(res.msg, 'ERROR');
-      })
-      .catch((err) => fun.toastError(err.msg, 'ERROR'));
+      PdfService.imprimirBase64(objPdf)
+        .then((res) => {
+          SingletonService.loadServ.isLoading.next(false);
+
+          if (res.status === 'si') {
+            fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+            if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
+          } else fun.toastError(res.msg, 'ERROR');
+        })
+        .catch((err) => {
+          SingletonService.loadServ.isLoading.next(false);
+          fun.toastError(err.msg, 'ERROR');
+        });
+    });
   }
 }

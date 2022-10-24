@@ -12,6 +12,9 @@ $bodyfont: "Poppins";
 @import "./assets/my_styles/height.scss";
 @import "./splash-styles.scss";
 
+* {
+  font-family: "Poppins";
+}
 .h-inherit {
   max-height: inherit;
 }

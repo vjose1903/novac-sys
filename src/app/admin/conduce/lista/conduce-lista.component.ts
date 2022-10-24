@@ -45,7 +45,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     id_tabla: 'listado_conduces',
     padre_functions: { data_request: (params) => this.getConduces(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
   tablaComponent;
@@ -167,7 +167,6 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
   }
 
   makeConducePdf(conduce_selected) {
-
     const obj = { data: conduce_selected, type: 'conduce', retunBase64: true };
     this.loadServ.isLoading.next(true);
 
@@ -176,6 +175,8 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
         if (res.status === 'si') {
           const fileName = res.file;
           const base64 = res.base64;
+          const pageOrientation = res.pageOrientation;
+
           const obj_pdf = { base64: res.base64, titulo: 'Revisión de conduce de mercancías', height: '40rem', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
           this.loadServ.isLoading.next(false);
@@ -194,7 +195,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
                 {
                   clase: 'btn btn-verde',
                   function: (instance) => {
-                    this.imprimir_base64(fileName, base64);
+                    this.imprimir_base64(fileName, base64, pageOrientation);
                     instance.closeModal(instance.id, 'cancel');
                   },
                   label: 'Imprimir',
@@ -229,8 +230,8 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     });
   }
 
-  imprimir_base64(fileName, base64) {
-    const obj = { base64: base64, file: fileName, type: 'conduce' };
+  imprimir_base64(fileName, base64, pageOrientation) {
+    const obj = { base64: base64, file: fileName, type: 'conduce', printer: this.configApp.printer_selected.conduce, pageOrientation: pageOrientation };
     try {
       PdfService.imprimirBase64(obj)
         .then(async (res) => {

@@ -55,6 +55,18 @@ export class ConfiguracionesComponent implements OnInit {
     { name: 'Conduce', key: 'conduce' },
   ];
 
+  impresiones = [
+    { printerFormControlName: 'printer_venta_contado', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_venta_contado', label: 'Venta Contado', key: 'venta_contado' },
+    { printerFormControlName: 'printer_venta_credito', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_venta_credito', label: 'Venta Credito', key: 'venta_credito' },
+    { printerFormControlName: 'printer_pre_venta', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_pre_venta', label: 'Pre venta', key: 'pre_venta' },
+    { printerFormControlName: 'printer_compra', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_compra', label: 'Factura compras', key: 'compra' },
+    { printerFormControlName: 'printer_recibo_ingreso', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_recibo_ingreso', label: 'Recibos de ingreso', key: 'ingreso' },
+    { printerFormControlName: 'printer_conduce', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_conduce', label: 'Conduce', key: 'conduce' },
+    { printerFormControlName: 'printer_nota', plantillaFormControlName: 'plantilla_impresion_nota', pageSizeFormControlName: 'page_size_nota', label: 'Notas', key: 'nota' },
+    { printerFormControlName: 'printer_cuadre_caja', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_cuadre_caja', label: 'Cuadre de caja', key: 'cuadre' },
+    { printerFormControlName: 'printer_reporte', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_reporte', label: 'Reportes', key: 'reporte' },
+  ];
+
   configCopy;
 
   constructor(private fb: FormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
@@ -85,8 +97,8 @@ export class ConfiguracionesComponent implements OnInit {
       url_servidor_descargas: [{ value: this.getValue(data, 'url_servidor_descargas'), disabled: false }, Validators.required],
       config_password: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
       usa_url_principal: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
-      printer_caja_selected: [{ value: this.getValue(data, 'printer_caja_selected'), disabled: false }, Validators.required],
-      printer_reportes_selected: [{ value: this.getValue(data, 'printer_reportes_selected'), disabled: false }, Validators.required],
+      // printer_caja_selected: [{ value: this.getValue(data, 'printer_caja_selected'), disabled: false }, Validators.required],
+      // printer_reportes_selected: [{ value: this.getValue(data, 'printer_reportes_selected'), disabled: false }, Validators.required],
       is_db_local: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
       calcular_itbis: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
       is_produccion: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
@@ -95,12 +107,25 @@ export class ConfiguracionesComponent implements OnInit {
       medida_producto_terminado: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
       documentos_a_imprimir: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
 
+      page_size_venta_contado: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_contado'), disabled: false }, Validators.required],
+      page_size_venta_credito: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_credito'), disabled: false }, Validators.required],
+      page_size_pre_venta: [{ value: this.getValuePageSize(data, 'pages_sizes.pre_venta'), disabled: false }, Validators.required],
+      page_size_compra: [{ value: this.getValuePageSize(data, 'pages_sizes.compra'), disabled: false }, Validators.required],
       page_size_recibo_ingreso: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
       page_size_conduce: [{ value: this.getValuePageSize(data, 'pages_sizes.conduce'), disabled: false }, Validators.required],
-      page_size_facturacion: [{ value: this.getValuePageSize(data, 'pages_sizes.facturacion'), disabled: false }, Validators.required],
       page_size_nota: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
       page_size_cuadre_caja: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
       page_size_reporte: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
+
+      printer_venta_contado: [{ value: this.getValue(data, 'printer_selected.venta_contado'), disabled: false }, Validators.required],
+      printer_venta_credito: [{ value: this.getValue(data, 'printer_selected.venta_credito'), disabled: false }, Validators.required],
+      printer_pre_venta: [{ value: this.getValue(data, 'printer_selected.pre_venta'), disabled: false }, Validators.required],
+      printer_compra: [{ value: this.getValue(data, 'printer_selected.compra'), disabled: false }, Validators.required],
+      printer_recibo_ingreso: [{ value: this.getValue(data, 'printer_selected.recibo_ingreso'), disabled: false }, Validators.required],
+      printer_conduce: [{ value: this.getValue(data, 'printer_selected.conduce'), disabled: false }, Validators.required],
+      printer_nota: [{ value: this.getValue(data, 'printer_selected.nota'), disabled: false }, Validators.required],
+      printer_cuadre_caja: [{ value: this.getValue(data, 'printer_selected.cuadre_caja'), disabled: false }, Validators.required],
+      printer_reporte: [{ value: this.getValue(data, 'printer_selected.reporte'), disabled: false }, Validators.required],
 
       plantilla_impresion_nota: [{ value: this.getValue(data, 'plantillas_impresion.nota'), disabled: false }, Validators.required],
     });
@@ -163,6 +188,11 @@ export class ConfiguracionesComponent implements OnInit {
     printTestPdf({ paper_size: paperSize, documento: documento });
   }
 
+  test() {
+    const test = this.formIsInvalid();
+    console.log('test ', test);
+  }
+
   salir() {
     this.router.navigateByUrl('auth/login');
   }
@@ -172,22 +202,61 @@ export class ConfiguracionesComponent implements OnInit {
     formulario.color_app = formulario.color_app.descripcion;
 
     const pages_sizes = {
+      venta_contado: formulario.page_size_venta_contado.descripcion,
+      venta_credito: formulario.page_size_venta_credito.descripcion,
+      pre_venta: formulario.page_size_pre_venta.descripcion,
+      compra: formulario.page_size_compra.descripcion,
       recibo_ingreso: formulario.page_size_recibo_ingreso.descripcion,
       conduce: formulario.page_size_conduce.descripcion,
-      facturacion: formulario.page_size_facturacion.descripcion,
       nota: formulario.page_size_nota.descripcion,
       cuadre_caja: formulario.page_size_cuadre_caja.descripcion,
       reporte: formulario.page_size_reporte.descripcion,
+    };
+
+    const printer_selected = {
+      venta_contado: formulario.printer_venta_contado,
+      venta_credito: formulario.printer_venta_credito,
+      pre_venta: formulario.printer_pre_venta,
+      compra: formulario.printer_compra,
+      recibo_ingreso: formulario.printer_recibo_ingreso,
+      conduce: formulario.printer_conduce,
+      nota: formulario.printer_nota,
+      cuadre_caja: formulario.printer_cuadre_caja,
+      reporte: formulario.printer_reporte,
     };
 
     const plantillas_impresion = {
       nota: formulario.plantilla_impresion_nota,
     };
 
-    formulario = _.omit(formulario, ['page_size_recibo_ingreso', 'page_size_conduce', 'page_size_facturacion', 'page_size_cuadre_caja', 'page_size_reporte', 'page_size_nota']);
-    formulario = _.omit(formulario, ['plantilla_impresion_nota']);
+    const keys_to_omit = [
+      'plantilla_impresion_nota',
+
+      'page_size_venta_contado',
+      'page_size_venta_credito',
+      'page_size_pre_venta',
+      'page_size_compra',
+      'page_size_recibo_ingreso',
+      'page_size_conduce',
+      'page_size_nota',
+      'page_size_cuadre_caja',
+      'page_size_reporte',
+
+      'printer_venta_contado',
+      'printer_venta_credito',
+      'printer_pre_venta',
+      'printer_compra',
+      'printer_recibo_ingreso',
+      'printer_conduce',
+      'printer_nota',
+      'printer_cuadre_caja',
+      'printer_reporte',
+    ];
+
+    keys_to_omit.forEach((element) => (formulario = _.omit(formulario, [element])));
 
     formulario['pages_sizes'] = pages_sizes;
+    formulario['printer_selected'] = printer_selected;
     formulario['plantillas_impresion'] = plantillas_impresion;
     return formulario;
   }

@@ -1,3 +1,23 @@
+.box-impresion {
+  border-radius: 0.5rem;
+
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0.5rem 0.5rem 0rem 0rem;
+    padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+
+    label {
+      letter-spacing: 2px;
+    }
+  }
+  .body {
+    padding: 0.5rem;
+    border-radius: 0rem 0rem 0.5rem 0.5rem;
+  }
+}
+
 .colorsito {
   height: 1rem;
   width: 1rem;
