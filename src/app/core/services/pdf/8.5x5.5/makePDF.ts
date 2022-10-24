@@ -36,7 +36,6 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const dd = {
     pageSize: configuration.pageSize,
     pageMargins: configuration.pageMargins,
-    pageOrientation: pageO,
     header: (currentPage, pageCount, pageSize) => cabeceraPDF({ data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf: base_tipo_pdf }),
     content: contenidoPDF({ data, configApp, configuration, tipo_pdf: base_tipo_pdf }),
     images: {

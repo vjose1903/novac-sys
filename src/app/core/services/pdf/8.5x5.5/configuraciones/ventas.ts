@@ -3,7 +3,7 @@ export const config_ventas = {
   isBreak: false,
   only_titulo: false,
   widths: ['auto', '*', 'auto', 'auto'],
-  pageOrient: 'landscape',
+  pageOrient: 'portrait',
   mostrar_total: false,
   info: [
     {

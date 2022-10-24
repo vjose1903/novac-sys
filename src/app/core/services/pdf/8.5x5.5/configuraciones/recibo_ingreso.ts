@@ -3,7 +3,7 @@ export const config_recibo_ingreso = {
   pageMargins: [15, 135, 15, 15],
   margin_general: [0, 0, 0, 0],
   isBreak: true,
-  pageOrient: 'landscape',
+  pageOrient: 'portrait',
   break: 8,
   only_titulo: false,
   widths: [24, '*', '*', '*', '*', '*', '*'],

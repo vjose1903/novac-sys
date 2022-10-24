@@ -3,7 +3,7 @@ export const config_pre_factura = {
   isBreak: false,
   only_titulo: false,
   widths: ['auto', '*', 'auto', 'auto'],
-  pageOrient: 'landscape',
+  pageOrient: 'portrait',
   mostrar_total: false,
   info: [
     {
