@@ -20,8 +20,6 @@ export default class HandlerConfigFile {
     url_servidor_descargas: 'http://admservidor.ddns.net:9090',
     url_servidor_respaldo: 'http://10.0.0.9:9090',
     usa_url_principal: true,
-    // printer_caja_selected: 'Ninguna',
-    // printer_reportes_selected: 'Ninguna',
     is_db_local: false,
     calcular_itbis: false,
     is_produccion: true,
@@ -30,15 +28,15 @@ export default class HandlerConfigFile {
     medida_producto_terminado: 'Quintal',
 
     printer_selected: {
-      venta_contado: 'EPSON LX-350 Contado',
-      venta_credito: 'EPSON LX-350 Credito',
-      pre_venta: 'EPSON LX-350 Contado',
-      compra: 'EPSON LX-350 Contado',
-      recibo_ingreso: 'EPSON LX-350 Contado',
-      conduce: 'EPSON LX-350 Contado',
-      nota: 'EPSON LX-350 Contado',
-      cuadre_caja: 'EPSON LX-350 Contado',
-      reporte: 'Microsoft Print to PDF',
+      venta_contado: 'Ninguna',
+      venta_credito: 'Ninguna',
+      pre_venta: 'Ninguna',
+      compra: 'Ninguna',
+      recibo_ingreso: 'Ninguna',
+      conduce: 'Ninguna',
+      nota: 'Ninguna',
+      cuadre_caja: 'Ninguna',
+      reporte: 'Ninguna',
     },
 
     pages_sizes: {
