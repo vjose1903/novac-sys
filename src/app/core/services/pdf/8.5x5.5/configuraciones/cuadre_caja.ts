@@ -2,6 +2,7 @@ export const config_cuadre_caja = {
   margin_general: [-19, 1, -19, 0],
   isBreak: false,
   only_titulo: false,
+  pageOrient: 'landscape',
   widths: ['*', 'auto'],
   mostrar_total: false,
   info: [

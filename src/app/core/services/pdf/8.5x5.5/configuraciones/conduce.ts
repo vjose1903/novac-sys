@@ -5,7 +5,7 @@ export const config_conduce = {
   isBreak: true,
   break: 10,
   only_titulo: false,
-
+  pageOrient: 'landscape',
   widths: [24, 'auto', '*'],
   mostrar_total: false,
 
