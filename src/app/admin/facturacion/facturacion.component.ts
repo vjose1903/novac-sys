@@ -82,7 +82,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   propietario_factura;
   tipos_facturas;
   public TiposFacturas: string;
-  CuerpoFactura;
+  CuerpoFactura = [];
   DESCUENTO;
   BRUTO;
   TOTAL;
@@ -122,7 +122,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   fecha_vencimiento;
   fecha_equivalente;
   fecha_viaje;
-  articulosAcambiar;
+  articulosAcambiar = [];
   newCuerpo: any[];
   paqueteComprobante: any;
 
@@ -138,7 +138,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   pre_factura_selected;
 
   overlay;
-  camionesSelected: any;
+  camionesSelected = [];
   camiones = [];
   camion_row;
   filterCamionesTargets;
@@ -217,9 +217,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.getTiposFacturas().then((resultado) => {
       [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
       [this.is_adelantada, this.is_viaje, this.FacturaAtrasada] = Array(3).fill(false);
-      [this.CuerpoFactura, this.articulosAcambiar, this.camionesSelected] = Array(3).fill([]);
       [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row] = Array(5).fill(0);
       [this.numero_pre_factura, this.NCFcompra, this.pre_factura_selected, this.action, this.factura_a_editar, this.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] = Array(9).fill(undefined);
+
+      this.CuerpoFactura.length = 0;
+      this.articulosAcambiar.length = 0;
+      this.camionesSelected.length = 0;
+
       this.info_cambio = {};
       this.fechaFactura = {};
       this.CostoYgasto = '';
