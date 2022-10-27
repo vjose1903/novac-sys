@@ -23,16 +23,16 @@
                   type="text"
                   (keydown.enter)="saltar('tipo', tipoFact.value)"
                   class="form-control tipo inputE"
-                  [(ngModel)]="tipoFactura"
+                  [(ngModel)]="factServ.tipoFactura"
                   (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
                   (focus)="tiposFacturas.toggle($event)"
                   tabindex="-1"
-                  [readOnly]="!!factura_a_editar"
-                  [ngClass]="{ disabled: !!factura_a_editar }"
+                  [readOnly]="!!factura_a_rellenar"
+                  [ngClass]="{ disabled: !!factura_a_rellenar }"
                 />
 
                 <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
-                  <div style="width: 18rem" [innerHtml]="TiposFacturas"></div>
+                  <div style="width: 18rem" [innerHtml]="factServ.TiposFacturas"></div>
                 </p-overlayPanel>
               </div>
 
@@ -47,8 +47,8 @@
                   [(ngModel)]="condicion_fact"
                   (change)="cambiarTipoVenta($event.target.value)"
                   tabindex="-1"
-                  [disabled]="!!factura_a_editar"
-                  [ngClass]="{ disabled: !!factura_a_editar }"
+                  [disabled]="!!factura_a_rellenar"
+                  [ngClass]="{ disabled: !!factura_a_rellenar }"
                 >
                   <option value="Contado">Contado</option>
                   <option value="Crédito">Crédito</option>
@@ -66,14 +66,14 @@
                   (keydown.enter)="saltar($event.target.id, gastoDe.value)"
                   class="form-control tipo inputE"
                   [(ngModel)]="CostoYgasto"
-                  [readOnly]="!!factura_a_editar"
-                  [ngClass]="{ disabled: !!factura_a_editar }"
+                  [readOnly]="!!factura_a_rellenar"
+                  [ngClass]="{ disabled: !!factura_a_rellenar }"
                   (focus)="gastosFacturas.toggle($event)"
                   (blur)="gastosFacturas.hide()"
                   tabindex="-1"
                 />
                 <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #gastosFacturas appendTo="body">
-                  <div style="width: 26rem" [innerHtml]="TiposCostosGastos"></div>
+                  <div style="width: 26rem" [innerHtml]="factServ.TiposCostosGastos"></div>
                 </p-overlayPanel>
               </div>
             </div>
@@ -89,8 +89,8 @@
                 [(ngModel)]="modo_factura"
                 (blur)="checkCambiosModoyCondicionFactura($event.target)"
                 tabindex="-1"
-                [disabled]="!!factura_a_editar"
-                [ngClass]="{ disabled: !!factura_a_editar }"
+                [disabled]="!!factura_a_rellenar"
+                [ngClass]="{ disabled: !!factura_a_rellenar }"
               >
                 <option value="" disabled selected>Modo de venta</option>
                 <option value="normal">Normal</option>
@@ -218,7 +218,7 @@
                 <h5>
                   <strong>{{ metodo == tipoDocFacturacion.compra ? 'Suplidor' : 'Cliente' }}:</strong>
                 </h5>
-                <i *ngIf="!!!factura_a_editar" (click)="abrirModalFiltro()" pTooltip="{{ metodo == tipoDocFacturacion.compra ? 'Buscar suplidor' : 'Buscar cliente' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
+                <i *ngIf="!!!factura_a_rellenar" (click)="abrirModalFiltro()" pTooltip="{{ metodo == tipoDocFacturacion.compra ? 'Buscar suplidor' : 'Buscar cliente' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
               </div>
               <div class="row">
                 <div class="col-7 pl-0">
@@ -289,7 +289,7 @@
               </span>
             </div>
             <div class="cuadroTotal">RD$ {{ formatoNumero(TOTAL) }}</div>
-            <div *ngIf="FacturaAtrasada" class="encabezadoRight fechaA">
+            <div *ngIf="factura_pendiente" class="encabezadoRight fechaA">
               <span class="w-100 text-danger letrasT">
                 Factura atrasada, fecha: <strong> {{ FechaFacturaMostrar }}</strong>
               </span>
@@ -301,7 +301,7 @@
         <div class="fantasma-cuerpo">
           <app-cuerpo-factura
             [propietario]="propietario_factura"
-            [factura]="factura_a_editar"
+            [factura]="factura_a_rellenar"
             [action]="action"
             [modo_factura]="modo_factura"
             [pre_factura_selected]="pre_factura_selected"
@@ -322,17 +322,16 @@
           <div class="col-7">
             <div class="h-100 d-flex justify-content-around align-items-center">
               <div *ngxPermissionsOnly="metodo == tipoDocFacturacion.venta ? permissions.factura_venta.create : permissions.factura_compra.create">
-                <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Imprimir Factura' : 'Editar Factura'" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
+                <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_rellenar ? 'Imprimir Factura' : 'Editar Factura'" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
               </div>
               <div>
-                <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
+                <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_rellenar ? 'Cancelar Factura' : 'Cancelar Edición'" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
               </div>
               <div>
                 <app-btncircular [alto]="'100px'" [accion]="factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura'" [nombreImg]="'guardarFactura'" (pulsar)="archivarFactura()"></app-btncircular>
               </div>
-
               <div *ngIf="metodo == tipoDocFacturacion.venta">
-                <app-btncircular *ngIf="!!!factura_a_editar" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
+                <app-btncircular *ngIf="!!!factura_a_rellenar" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
               </div>
 
               <!-- <div  *ngIf="metodo === 'venta'">
@@ -421,7 +420,7 @@
             <div class="colorsito bg-raya-{{ docTab.color }}{{ fact?.action == 'update' ? '-orange' : '' }}"></div>
 
             <div class="info_fact h-100 {{ factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
-              <i class="fas fa-history {{ fact.FacturaAtrasada ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}"></i>
+              <i class="fas fa-history {{ fact.factura_pendiente ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}"></i>
               <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}"></i>
               <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar documento" tooltipPosition="left"></i>
               <span class="negrita text-mayuscula text-separado-2 texto-borde-{{ docTab.color }} texto-{{ docTab.color }}">{{ my_capitalize(fact?.tipo) }} </span>

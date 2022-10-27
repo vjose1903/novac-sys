@@ -10,6 +10,18 @@ export class FacturacionService {
   TiposCostosGastos: string;
   tipos_costosYgastos: string[];
 
+  referencia_tipos_facturas = {
+    'factura sin comprobante': '00',
+    'factura con valor fiscal': '01',
+    'factura de consumo': '02',
+    'comprobante de compras': '11',
+    'registro de unico ingreso': '12',
+    'comprobante para gastos menores': '13',
+    'comprobante de regimen especiales': '14',
+    'comprobante gubernamental': '15',
+    'comprobante para exportaciones': '16',
+    'comprobantes para pago al exterior': '17',
+  };
 
   constructor() {}
 

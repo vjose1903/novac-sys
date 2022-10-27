@@ -22,8 +22,8 @@ export class FactsLocalStorage extends PreFacturaClass {
   actualModulo;
 
   sideBarTabs = [
-    { key: tipoDocFacturacion.venta, label: 'facturas de venta', title: 'Venta', color: 'green' },
-    { key: tipoDocFacturacion.compra, label: 'facturas de compra', title: 'Compra', color: 'yellow' },
+    { key: tipoDocFacturacion.venta, label: 'facturas de venta', title: 'Venta', singleTitle: 'factura de venta', color: 'green' },
+    { key: tipoDocFacturacion.compra, label: 'facturas de compra', title: 'Compra', singleTitle: 'factura de compra', color: 'yellow' },
   ];
   sideBarTabsIndex = {};
 
@@ -53,13 +53,17 @@ export class FactsLocalStorage extends PreFacturaClass {
     const hasPermisoPreVenta = await SingletonService.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
     const hasPermisoCotizacion = await SingletonService.permissionsService.hasPermission(Object.values(Permisos.cotizacion));
 
-    if (hasPermisoPreVenta) fun.pushAt(this.sideBarTabs, 1, { key: tipoDocFacturacion.pre_venta, label: 'pre ventas', title: 'Pre-Venta', color: 'blue' });
-    if (hasPermisoCotizacion) this.sideBarTabs.push({ key: tipoDocFacturacion.cotizacion, label: 'cotizaciones', title: 'Cotización', color: 'red' });
+    if (hasPermisoPreVenta) fun.pushAt(this.sideBarTabs, 1, { key: tipoDocFacturacion.pre_venta, label: 'pre ventas', title: 'Pre-Venta', singleTitle: 'pre-venta', color: 'blue' });
+    if (hasPermisoCotizacion) this.sideBarTabs.push({ key: tipoDocFacturacion.cotizacion, label: 'cotizaciones', title: 'Cotización', singleTitle: 'cotización', color: 'red' });
 
     for (let index = 0; index < this.sideBarTabs.length; index++) {
       this.sideBarTabsIndex[index] = this.sideBarTabs[index].key;
     }
     this.index_fact_archivada = fun.getKeyByValue(this.sideBarTabsIndex, this.actualModulo['key']);
+  }
+
+  getSideBarTabByKey(key: tipoDocFacturacion) {
+    return _.find(this.sideBarTabs, { key: key });
   }
 
   _toggleSidebar(where?, metodo?) {

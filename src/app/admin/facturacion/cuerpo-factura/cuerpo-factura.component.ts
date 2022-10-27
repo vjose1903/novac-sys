@@ -300,7 +300,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   // =============================================
   //  MODIFICAR FACTURA
   // =============================================
-  async llenarFactura(rows, is_guardada?) {
+  async llenarCuerpoFactura(rows) {
     return new Promise<any>((resolve, reject) => {
       this.rellenarVariables().then(async (res) => {
         if (res) {
@@ -308,19 +308,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
             if (index + 1 >= this.ARRAY_ROWFACTURAS.value.length) this.addItem(index + 1);
 
             const row = rows[index];
-            let articulo = row.articulo;
 
-            try {
-              if (!is_guardada) {
-                this.articuloClass.getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura }).then((res_articulo) => {
-                  this.llenarFilas(row, _.first(res_articulo['data']), index);
-                  this.seleccionarCampoEnTurno();
-                });
-              } else {
-                this.llenarFilas(row, articulo, index);
-                this.seleccionarCampoEnTurno();
-              }
-            } catch (error) {}
+            this.getArticuloToLlenar(row).then((articulo) => {
+              this.llenarFilas(row, articulo, index);
+              this.seleccionarCampoEnTurno();
+              this.calcularDescuento(index);
+            });
           }
 
           resolve(true);
@@ -328,6 +321,19 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           resolve(false);
         }
       });
+    });
+  }
+
+  getArticuloToLlenar(row) {
+    return new Promise<any>(async (resolve, reject) => {
+      let articulo = row.articulo;
+
+      if (fun.isEmpty(articulo) || fun.isEmpty(row.articulo.id)) {
+        const res = await this.articuloClass.getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura });
+        articulo = _.first(res['data']);
+      }
+
+      resolve(articulo);
     });
   }
 
@@ -357,7 +363,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     campos['is_materia_prima'].setValue(row.tipo == 'Materia prima');
 
-    let uni = row.peso_saco ? 'Saco de ' + row.peso_saco + ' libras' : row.unidad;
+    let uni = row.peso_saco ? `Saco de ${row.peso_saco} libras` : row.unidad;
 
     campos['uni'].setValue(uni);
 
@@ -567,7 +573,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  calcularDescuento(index) {
+  calcularDescuento(index: number) {
     const articulo = (this.filasDetalle[index] as any).controls['articulo'].value;
     const codido = (this.filasDetalle[index] as any).controls['cod'].value;
     const precioTEMP = (this.filasDetalle[index] as any).controls['pre'].value;
@@ -579,7 +585,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     let descuento = fun.desformatear((this.filasDetalle[index] as any).controls['descuento_valor'].value);
 
-    if (descuento >= 0) {
+    if (descuento >= 0 || fun.isEmpty(descuento)) {
       const total = (precio + itbis) * cantidad;
 
       if (fun.hasValue(codido) && (fun.isEmpty(descuento) || descuento == 0)) {
@@ -588,17 +594,23 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         this.sacarDescuento(key);
       }
 
-      let nuevoTotal = 0;
-      if (fun.hasValue(codido) && fun.hasValue(precio) && fun.hasValue(cantidad)) {
+      if (fun.hasValue(codido) && fun.hasValue(precio) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
+        let nuevoTotal = 0;
         nuevoTotal = total - descuento;
 
         if (nuevoTotal < 0) {
           fun.toastError('El descuento no puede ser mayor al valor total de la venta.');
           fun.enfocarAndSelectInput(`desc-${index}`);
         } else {
+          let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.key == key);
+
+          if (fun.hasValue(currentDescuento)) currentDescuento.desc = descuento;
+          else this.listaDeDescuentos.push({ key: key, valor: descuento });
+
           (this.filasDetalle[index] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
+
           this.enviarTotalesGenerales();
-          this.enviarDescuentoGeneral(descuento, key);
+          this.enviarDescuentoGeneral();
           this.ajustarSecuencia();
         }
       }
@@ -614,20 +626,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     if (fun.hasValue(currentDescuento)) {
       _.remove(this.listaDeDescuentos, currentDescuento);
-      const acuDesc = _.reduce(this.listaDeDescuentos, (acumulado, item) => acumulado + item.desc, 0);
+      const acuDesc = _.reduce(this.listaDeDescuentos, (acumulado, item) => acumulado + item.valor, 0);
 
       this.getCalculosDinero.emit({ tipo: 'descuento', monto: acuDesc });
     }
   }
 
-  enviarDescuentoGeneral(descuento, key) {
-    let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.key === key);
-
-    if (fun.hasValue(currentDescuento)) currentDescuento.desc = descuento;
-    else this.listaDeDescuentos.push({ key: key, desc: descuento });
-
-    const acuDesc = _.reduce(this.listaDeDescuentos, (acumulado, item) => acumulado + item.desc, 0);
-
+  enviarDescuentoGeneral() {
+    const acuDesc = _.reduce(this.listaDeDescuentos, (acumulado, item) => acumulado + item.valor, 0);
     this.getCalculosDinero.emit({ tipo: 'descuento', monto: acuDesc });
   }
 
