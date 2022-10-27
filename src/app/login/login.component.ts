@@ -50,7 +50,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
       this.form = this.fb.group({ usuario: config.is_development ? 'ADMIN' : null, password: config.is_development ? '1234567' : null });
     });
-    setTimeout(() => this.enfocarInput('Iusuario'), 5);
+    setTimeout(() => fun.enfocarInput('Iusuario'), 5);
     // setTimeout(() => this.router.navigateByUrl('/auth/config'), 100);
   }
 
@@ -81,7 +81,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     if (input == 'send') {
       if (fun.hasValue(formulario.password)) this.login();
     } else {
-      if (fun.hasValue(formulario.usuario)) this.enfocarInput(input);
+      if (fun.hasValue(formulario.usuario)) fun.enfocarInput(input);
     }
   }
 
@@ -114,7 +114,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
   openConfigsModal() {
     if (fun.hasValue(this.form)) this.form.reset();
-    this.enfocarInput('Iusuario');
+    fun.enfocarInput('Iusuario');
 
     this.openNewModal({
       inputs: {},

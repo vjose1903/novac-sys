@@ -215,7 +215,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async necesarioStart() {
-    this.enfocarInput('clienteI');
+    fun.enfocarInput('clienteI');
   }
 
   isOneFacturaWithMonto() {
@@ -231,7 +231,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.resetVariables();
 
-    setTimeout(() => this.enfocarInput('clienteI'), 250);
+    setTimeout(() => fun.enfocarInput('clienteI'), 250);
   }
 
   abrirModalDinamicText(tipo) {
@@ -261,8 +261,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (arg.modal_id === 'buscarCliente') {
       if (arg?.tipo == 'data_no_found') {
-        this.enfocarInput('clienteI');
-        this.selectContenido('clienteI');
+        fun.enfocarAndSelectInput('clienteI');
       } else {
         this.clienteAdepositar = arg.data;
         (document.getElementById('clienteI') as any).value = `${arg.data.nombre} ${arg.data.apellido}`;
@@ -438,7 +437,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         height: '500px',
         botones: ModalClass.noShowAceptarCancelarButtons,
       });
-      this.desEnfocarInput('clienteI');
+      fun.desEnfocarInput('clienteI');
     }
   }
 

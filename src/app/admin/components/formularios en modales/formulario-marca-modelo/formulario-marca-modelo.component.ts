@@ -109,8 +109,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.pedirNuevaData(this.tServ.obj_paginate.default);
 
     setTimeout(() => {
-      if (this.tipo_formulario === 'modelos') this.enfocarInput('marca_modal');
-      else this.enfocarInput('descripcion');
+      if (this.tipo_formulario === 'modelos') fun.enfocarInput('marca_modal');
+      else fun.enfocarInput('descripcion');
     }, 200);
 
     this.checkPermissions();
@@ -214,8 +214,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
     this.borrar();
 
-    if (this.isShowMarcas()) this.enfocarInput('descripcion');
-    else this.enfocarInput('marca_modal');
+    if (this.isShowMarcas()) fun.enfocarInput('descripcion');
+    else fun.enfocarInput('marca_modal');
   }
 
   isShowMarcas() {

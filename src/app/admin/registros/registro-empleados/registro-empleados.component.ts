@@ -106,7 +106,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     await this.createForm();
     await this.getEmpleados(this.tServ.obj_paginate.default);
     await this.getRoles();
-    this.enfocarInput('cedula');
+    fun.enfocarInput('cedula');
   }
 
   capitalice(control, arg) {
@@ -209,9 +209,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       if (campo == 'campoNombre') {
         if (!_.endsWith(formulario['cedula'], '_')) {
           const docSinGuiones = _.join(_.split(formulario['cedula'], '-'), '');
-          if (fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
+          if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
         }
-      } else this.enfocarInput(campo);
+      } else fun.enfocarInput(campo);
     } else {
       if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
     }
@@ -250,7 +250,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset();
 
-    this.enfocarInput('cedula');
+    fun.enfocarInput('cedula');
     this.boton = 'Registrar';
     this.editando = false;
     this.documentos_de_identidad = undefined;
@@ -339,7 +339,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
         const actualPagination = this.tServ.getPaginationById('lista_empleados');
         this.getEmpleados(actualPagination);
         this.borrar();
-        this.enfocarInput('cedula');
+        fun.enfocarInput('cedula');
       });
     }
   }

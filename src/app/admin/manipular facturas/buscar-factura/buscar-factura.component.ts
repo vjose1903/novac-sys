@@ -132,11 +132,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async necesarioStart() {
     await this.getTipoFacturas();
-    this.enfocarInput('campoI');
+    fun.enfocarInput('campoI');
   }
 
   pressEscResponse(res) {
-    if (fun.hasValue(res)) this.enfocarInput('valorI');
+    if (fun.hasValue(res)) fun.enfocarInput('valorI');
   }
 
   reimprimirFactura(obj, modalInstance) {
@@ -412,7 +412,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
     this.tipo_factura_id = null;
     this.campo = null;
-    this.enfocarInput('campoI');
+    fun.enfocarInput('campoI');
   }
 
   tableClickIcon(params) {
@@ -451,7 +451,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       if (campo == 'cliente') {
         if (valor || valor == ' ') {
           this.abrirModalFiltro(valor);
-          this.desEnfocarInput('valorI');
+          fun.desEnfocarInput('valorI');
         }
       } else if (campo == 'buscarFactura') {
         this.NCF = null;
@@ -469,7 +469,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           }
         }
       } else {
-        this.enfocarInput(campo);
+        fun.enfocarInput(campo);
       }
     } else {
       if (campo == 'buscarFactura') {
@@ -603,8 +603,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   getDataFromModal(arg, search) {
     if (arg.modal_id == 'buscarCliente') {
       if (arg?.tipo == 'data_no_found') {
-        this.enfocarInput('valorI');
-        this.selectContenido('valorI');
+        fun.enfocarAndSelectInput('valorI');
       } else {
         this.clienteBuscado = arg.data;
         (document.getElementById('valorI') as any).value = arg.data.nombre;

@@ -39,7 +39,7 @@ export class CurrentUserService {
       const permisos = currentUser?.permisos ? currentUser.permisos.map((perm) => perm.permiso) : [];
 
       this.permissionsService.loadPermissions(permisos);
-      setTimeout(() => resolve(true), 10);
+      resolve(true);
     });
   }
 }

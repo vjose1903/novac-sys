@@ -21,11 +21,12 @@ export class LayoutClass extends TablaClass {
   private static lastComponentInitLayout;
   private static layoutComponent;
 
-  allPermissionsObj = {
+  menuPermissionsObj = {
     facturacion: {
       venta: Object.values(Permisos.factura_venta),
       compra: Object.values(Permisos.factura_compra),
       pre_venta: Object.values(Permisos.pre_venta),
+      cotizacion: Object.values(Permisos.cotizacion),
       flatt: [],
     },
     manipularFacturas: {

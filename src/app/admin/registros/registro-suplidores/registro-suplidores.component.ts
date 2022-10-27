@@ -92,7 +92,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   async nesesarioStart() {
     await this.getSuplidores(this.tServ.obj_paginate.default);
-    this.enfocarInput('rnc');
+    fun.enfocarInput('rnc');
     this.marcarCheck('rnc');
   }
 
@@ -141,7 +141,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     setTimeout(() => {
       this.marcarCheck('rnc');
-      this.enfocarInput('rnc');
+      fun.enfocarInput('rnc');
     }, 2);
   }
 
@@ -152,14 +152,14 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         if (!_.endsWith(formulario[this.doc_principal], '_')) {
           const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
           if (this.doc_principal == 'cedula') {
-            if (fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
-          } else this.enfocarInput(campo);
+            if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
+          } else fun.enfocarInput(campo);
         }
-      } else this.enfocarInput(campo);
+      } else fun.enfocarInput(campo);
     } else {
       if (!this.formIsInvalid()) {
         this.marcarCheck('cedula');
-        this.enfocarInput('cedula');
+        fun.enfocarInput('cedula');
 
         setTimeout(() => this.submit(), 250);
       }
@@ -246,7 +246,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     setTimeout(() => {
       this.marcarCheck('rnc');
-      this.enfocarInput('rnc');
+      fun.enfocarInput('rnc');
     }, 200);
   }
 
@@ -295,7 +295,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.changeStateCampos(true);
 
     this.patchDocumentos(data.documentos_de_identidad);
-    setTimeout(() => this.enfocarInput('rnc'), 1);
+    setTimeout(() => fun.enfocarInput('rnc'), 1);
   }
 
   patchDocumentos(documentos) {

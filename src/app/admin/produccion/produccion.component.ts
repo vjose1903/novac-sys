@@ -166,7 +166,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   saltar(campo) {
     if (campo != 'agregar') {
-      this.enfocarInput(campo);
+      fun.enfocarInput(campo);
     } else {
       if (this.producto_terminado_en_turno) {
         const is_invalid = this.formIsInvalid();
@@ -235,7 +235,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
             this.ingredientesParaProduccion = [];
 
             fun.toastError('No tiene suficiente ' + ingrediente.nombre + ', para realizar la cantidad introducida de ' + this.producto_terminado_en_turno.nombre, 'ERROR');
-            this.enfocarInput('cantidad_producir');
+            fun.enfocarInput('cantidad_producir');
           } else {
             this.ingredientesParaProduccion.push({
               nombre: ingrediente.nombre,

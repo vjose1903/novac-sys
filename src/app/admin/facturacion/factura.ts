@@ -8,6 +8,13 @@ import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 
+export enum tipoDocFacturacion {
+  pre_venta = 'pre_venta',
+  venta = 'venta',
+  compra = 'compra',
+  cotizacion = 'cotizacion',
+}
+
 export class FacturaC extends CrudG<FacturasI> {
   constructor() {
     super('cabecera_facturas');
@@ -119,13 +126,13 @@ export class FacturaC extends CrudG<FacturasI> {
         { old_key: 'detalle_facturas', new_key: 'contenido_reporte' },
         { old_key: 'numero_factura', new_key: 'numero_documento' },
       ]);
+      console.log('data_parsed ', data_parsed);
 
       data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente);
       data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
       data_parsed.total = data_parsed.total_factura;
 
       data_parsed.contenido_reporte.map((detalle) => {
-
         detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
         return detalle;
       });

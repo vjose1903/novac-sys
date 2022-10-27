@@ -10,6 +10,7 @@ export class FacturacionService {
   TiposCostosGastos: string;
   tipos_costosYgastos: string[];
 
+
   constructor() {}
 
   setTipos(metodo, callback = (arg) => {}) {
@@ -29,11 +30,9 @@ export class FacturacionService {
       <span>17 Comprobantes para pago al exterior</span><br>\
       </div>';
       this.tipos_facturas = ['00', '01', '02', '11', '12', '13', '14', '15', '16', '17'];
-
     } else {
       this.tipoFactura = '01';
-      this.TiposFacturas =
-        '<div style=" max-width: 21rem;" > \
+      this.TiposFacturas = '<div style=" max-width: 21rem;" > \
       <span>01 Valor fiscal</span><br>\
       <span>02 Factura de consumo</span><br>\
       </div>';

@@ -128,7 +128,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     // await this.getArticulos(this.tServ.obj_paginate.default);
     await this.getArticulos({ page: 1, per_page: 20, search: ' ' });
     this.getTipoArticulos();
-    this.enfocarInput('nombre');
+    fun.enfocarInput('nombre');
   }
 
   getMateriasP() {
@@ -287,14 +287,14 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   saltar(campo, i?) {
     let is_invalid = true;
     if (campo != 'send' && campo != 'cantidad_formula' && campo != 'ingrediente_producir' && campo != 'in_medida_alerta') {
-      this.enfocarInput(campo);
+      fun.enfocarInput(campo);
       //
     } else if (campo == 'ingrediente_producir') {
-      this.enfocarInput(`cantidad_formula-${i}`);
+      fun.enfocarInput(`cantidad_formula-${i}`);
       //
     } else if (campo == 'in_medida_alerta') {
       if (this.showContenido(this.form.getRawValue().medida)) {
-        this.enfocarInput('contenidoPadre');
+        fun.enfocarInput('contenidoPadre');
         //
       } else {
         const formulario = this.form.getRawValue();
@@ -309,7 +309,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         }
 
         if (campo == 'send') is_invalid = this.formIsInvalid();
-        else this.enfocarInput(campo);
+        else fun.enfocarInput(campo);
       }
     } else if (campo == 'cantidad_formula') {
       const actual_campo = i >= 0 ? `#cantidad_formula-${i}` : '#vendido';
@@ -325,7 +325,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
 
     if (!is_invalid) {
-      this.enfocarInput('nombre');
+      fun.enfocarInput('nombre');
       this.submit();
     }
   }
@@ -333,7 +333,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   borrar(reset = false) {
     this.articuloSelected = undefined;
     if (fun.hasValue(this.form)) this.form.reset();
-    this.enfocarInput('nombre');
+    fun.enfocarInput('nombre');
     if (fun.hasValue(this.form)) this.form.controls.is_detallable.setValue(false);
     if (fun.hasValue(this.form)) this.form.controls.existencia.setValue(0);
     this.boton = 'Registrar';

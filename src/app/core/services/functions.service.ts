@@ -607,6 +607,33 @@ export class fun {
     if (element) element.select();
   }
 
+  // __________________________________________________________________________________________________
+  // Nombre: getActualPath
+  // Descripcion : Esta funcion returna en un string la ruta actual en la que estas posicionado
+  // __________________________________________________________________________________________________
+  static getActualPath() {
+    const location = window.location.href;
+    const actualPath = location.slice(location.indexOf('/admin'), location.length);
+    return actualPath;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: enfocarAndSelectInput
+  // Descripcion : Esta funcion enfoca y selecciona el contenido de un elemento html
+  // __________________________________________________________________________________________________
+  static enfocarAndSelectInput(arg) {
+    fun.enfocarInput(arg);
+    setTimeout(() => this.selectContenido(arg), 10);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: getKeyByValue
+  // Descripcion : Esta funcion retorna el key de un objeto buscando por su valor
+  // __________________________________________________________________________________________________
+  static getKeyByValue(object, value): any {
+    return Object.keys(object).find((key) => object[key] == value);
+  }
+
   static getAuthToken() {
     return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }

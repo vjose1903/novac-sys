@@ -31,7 +31,7 @@ export class ChangePasswordComponent extends MixinClass implements OnInit, After
     });
   }
   ngAfterViewInit() {
-    setTimeout(() => this.enfocarInput('pass'), 50);
+    setTimeout(() => fun.enfocarInput('pass'), 50);
   }
 
   btn_aceptar() {

@@ -1,3 +1,4 @@
+import { tipoDocFacturacion } from './../factura';
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
@@ -31,6 +32,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   filasDetalle;
   DESCUENTO;
   listaDeDescuentos = [];
+  fun = fun;
+  tipoDocFacturacion = tipoDocFacturacion;
 
   sacos;
   indexRemove;
@@ -87,7 +90,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         let omitir = ['cod', 'can', 'can_ant', 'des', 'uni', 'pre', 'tot', 'key', 'secuencia', 'verificado', 'is_materia_prima'];
 
-        if (this.metodo === 'compra') omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'key', 'secuencia', 'verificado', 'is_materia_prima'];
+        if (this.metodo == tipoDocFacturacion.compra) omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'key', 'secuencia', 'verificado', 'is_materia_prima'];
 
         const obj = _.omit(fila, omitir);
 
@@ -200,7 +203,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     let res = true;
 
     if (fun.hasValue(this.propietario)) {
-      if (this.metodo == 'compra') {
+      if (this.metodo == tipoDocFacturacion.compra) {
         res = false;
       } else {
         res = !this.configApp.facturacion_editar_precio;
@@ -211,7 +214,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   readDescuento() {
-    const res = (this.metodo == 'venta' || this.metodo === 'pre_venta') && this.propietario ? false : true;
+    const res = (this.metodo == tipoDocFacturacion.venta || this.metodo === tipoDocFacturacion.pre_venta) && this.propietario ? false : true;
     return res;
   }
 
@@ -331,7 +334,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   llenarFilas(row, articulo, index) {
     const campos = (this.filasDetalle[index] as any).controls;
 
-    campos['pre'].setValue(this.metodo === 'venta' || this.metodo === 'pre_venta' ? fun.numFormatTwoDecimals(row.precio) : fun.numFormatTwoDecimals(row.costo));
+    campos['pre'].setValue(this.metodo == tipoDocFacturacion.venta || this.metodo == tipoDocFacturacion.pre_venta ? fun.numFormatTwoDecimals(row.precio) : fun.numFormatTwoDecimals(row.costo));
     campos['costo'].setValue(fun.numFormatTwoDecimals(row.costo));
     campos['descuento_valor'].setValue(fun.isEmpty(row.descuento_valor) || row.descuento_valor == 0 ? null : row.descuento_valor);
     campos['tot'].setValue(fun.numFormatTwoDecimals(row.total));
@@ -372,7 +375,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   seleccionarCampoEnTurno() {
     setTimeout(() => {
-      this.ajustarSecuencia().then((res) => setTimeout(() => this.enfocarInput(this.inputSecuencia), 10));
+      this.ajustarSecuencia().then((res) => setTimeout(() => fun.enfocarInput(this.inputSecuencia), 10));
     }, 100);
   }
 
@@ -383,17 +386,17 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         if (index >= 10 && input === 'can-') this.addItem(index);
 
-        if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.enfocarInput('uni-' + index);
+        if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) fun.enfocarInput('uni-' + index);
 
         if ((input === 'cod-' || input === 'pre-') && fun.hasValue(cod) && fun.hasValue(can) && can != 0 && fun.hasValue(uni)) {
           if (input === 'cod-') index++;
 
-          this.ajustarSecuencia().then((res) => this.enfocarInput(input == 'cod-' ? this.inputSecuencia : `${input}${index}`));
+          this.ajustarSecuencia().then((res) => fun.enfocarInput(input == 'cod-' ? this.inputSecuencia : `${input}${index}`));
         }
 
         if (input === 'can-' && fun.hasValue(cod)) {
           if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
-            const metodo = this.metodo == 'pre_venta' ? 'venta' : this.metodo;
+            const metodo = this.metodo == tipoDocFacturacion.pre_venta ? tipoDocFacturacion.venta : this.metodo;
             const obj = { palabra_a_buscar: cod, index, metodo: metodo, data: [], fecha_articulo: this.fechaFactura };
             this.openNewModal({
               component: BuscarArticuloComponent,
@@ -406,9 +409,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
                 ...ModalClass.noShowAceptarCancelarButtons,
               },
             });
-            this.enfocarInput('input_fantasma');
+
+            fun.enfocarInput('input_fantasma');
           } else {
-            this.enfocarInput(`can-${index}`);
+            fun.enfocarAndSelectInput(`can-${index}`);
           }
         }
       }
@@ -430,7 +434,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const { uni, can, can_ant } = this.filasDetalle[i].getRawValue();
 
     if (can != can_ant) {
-      if (this.metodo === 'venta' && !this.pre_factura_selected && fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
+      if (this.metodo == tipoDocFacturacion.venta && !this.pre_factura_selected && fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
       (this.filasDetalle[i] as any).controls['can_ant'].setValue(can);
     }
   }
@@ -459,14 +463,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       await this.articuloClass.getAll(extra).then((res) => {
         excede = res['data'];
 
-        if (this.metodo === 'venta' && !from_pre_factura && excede) {
+        if (this.metodo == tipoDocFacturacion.venta && !from_pre_factura && excede) {
           fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
           if (this.configApp.vende_sin_inventario) {
             callback(false);
           } else {
             setTimeout(() => {
-              this.enfocarInput('can-' + i);
-              this.selectContenido('can-' + i);
+              fun.enfocarAndSelectInput('can-' + i);
               this.calcularCantidadEnUnidades({ index: i, clean: true });
               (this.filasDetalle[i] as any).controls['uni'].setValue(null);
               (this.filasDetalle[i] as any).controls['can_ant'].setValue(null);
@@ -496,13 +499,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       this.checkCantidadExede(index, 'change', (excede) => {
         if (!excede) {
           (this.filasDetalle[index] as any).controls['uni'].setValue(unidad);
-          (this.filasDetalle[index] as any).controls['pre'].setValue(fun.numFormatTwoDecimals(this.metodo === 'venta' || this.metodo === 'pre_venta' ? this.precioDetalle : costoDetalle));
+          (this.filasDetalle[index] as any).controls['pre'].setValue(fun.numFormatTwoDecimals(this.metodo == tipoDocFacturacion.compra ? costoDetalle : this.precioDetalle));
           (this.filasDetalle[index] as any).controls['costo'].setValue(costoDetalle);
 
           this.calcularTotalRow(index).then(() => {
             this.ajustarSecuencia().then(() => {
-              if (this.metodo == 'venta' || this.metodo === 'pre_venta') this.enfocarInput(this.inputSecuencia);
-              else this.enfocarInput(`pre-${index}`);
+              if (this.metodo == tipoDocFacturacion.compra) fun.enfocarInput(`pre-${index}`);
+              else fun.enfocarInput(this.inputSecuencia);
             });
           });
         }
@@ -511,7 +514,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   verificarSecuencia(index, mover = true) {
-    if (this.secuencia < index && mover) this.enfocarInput(this.inputSecuencia);
+    if (this.secuencia < index && mover) fun.enfocarInput(this.inputSecuencia);
     else {
       if (mover) (document.activeElement as any).select();
     }
@@ -591,8 +594,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         if (nuevoTotal < 0) {
           fun.toastError('El descuento no puede ser mayor al valor total de la venta.');
-          fun.enfocarInput(`desc-${index}`);
-          fun.selectContenido(`desc-${index}`);
+          fun.enfocarAndSelectInput(`desc-${index}`);
         } else {
           (this.filasDetalle[index] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
           this.enviarTotalesGenerales();
@@ -603,7 +605,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     } else {
       if (descuento < 0) fun.toastWarning('El descuento no puede ser menor a 0', 'AVISO');
       (this.filasDetalle[index] as any).controls['descuento_valor'].setValue(0);
-      this.enfocarInput(`desc-${index}`);
+      fun.enfocarInput(`desc-${index}`);
     }
   }
 
@@ -695,7 +697,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const index = obj.index;
 
-    if ((this.metodo === 'venta' || this.metodo === 'pre_venta') && articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio') {
+    if ((this.metodo == tipoDocFacturacion.venta || this.metodo == tipoDocFacturacion.pre_venta) && articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio') {
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
       if (_.lowerCase(articulo.descripcion) === 'producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
@@ -704,10 +706,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       if (this.configApp.vende_sin_inventario) {
         this.continuarLlenarRow({ articulo: articulo, index: index });
       } else {
-        setTimeout(() => {
-          this.enfocarInput('cod-' + index);
-          this.selectContenido('cod-' + index);
-        }, 0);
+        setTimeout(() => fun.enfocarAndSelectInput('cod-' + index), 10);
       }
     } else {
       this.continuarLlenarRow({ articulo: articulo, index: index });
@@ -717,7 +716,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   continuarLlenarRow(params: { articulo: any; index: number }) {
     const cantidades = params.articulo.cantidades;
 
-    if ((this.metodo === 'venta' || this.metodo === 'pre_venta') && params.articulo.existencia > 0 && params.articulo.aviso_existencia > cantidades[params.articulo.medida_alerta]) {
+    if ((this.metodo == tipoDocFacturacion.venta || this.metodo == tipoDocFacturacion.pre_venta) && params.articulo.existencia > 0 && params.articulo.aviso_existencia > cantidades[params.articulo.medida_alerta]) {
       let cant_restante = fun.numFormatTwoDecimals(cantidades[params.articulo.medida_alerta]);
 
       let msg = `Solo quedan ${cant_restante} ${params.articulo.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
@@ -735,10 +734,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     (this.filasDetalle[params.index] as any).controls['can_ant'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['uni'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
+    // TODO: ver si aqui tengo que agregar el metodo cotizacion
+    if (this.metodo == tipoDocFacturacion.venta || this.metodo == tipoDocFacturacion.pre_venta) (this.filasDetalle[params.index] as any).controls['is_materia_prima'].setValue(params.articulo.descripcion == 'Materia prima');
 
-    if (this.metodo == 'venta' || this.metodo == 'pre_venta') (this.filasDetalle[params.index] as any).controls['is_materia_prima'].setValue(params.articulo.descripcion == 'Materia prima');
-
-    setTimeout(() => this.enfocarInput('can-' + params.index), 0);
+    setTimeout(() => fun.enfocarInput('can-' + params.index), 0);
   }
 
   async llenarArrayUnidades(index) {
@@ -746,19 +745,19 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     if (cod && articulo) {
       const medida = articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo.medida;
-      const precioPrincipal = this.metodo == 'venta' || this.metodo == 'pre_venta' ? articulo.precio_principal : articulo.costo_principal;
+      const precioPrincipal = this.metodo == tipoDocFacturacion.compra ? articulo.costo_principal : articulo.precio_principal;
       const costoPrincipal = articulo.costo_principal;
       this.UnidadesArticulo = [];
 
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: articulo.contenido[articulo.medida] });
 
-      if (medida != 'Quintal' || this.metodo == 'compra') {
+      if (medida != 'Quintal' || this.metodo == tipoDocFacturacion.compra) {
         this.UnidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
-      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco && this.metodo != 'compra') this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco && this.metodo != tipoDocFacturacion.compra) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
 
-      if (articulo.is_detallable || this.metodo == 'compra') {
+      if (articulo.is_detallable || this.metodo == tipoDocFacturacion.compra) {
         articulo.contenido_articulos.forEach((element) => {
           this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: articulo.contenido[element.medida] });
         });
@@ -766,7 +765,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       this.UnidadesArticulo = _.uniqWith(this.UnidadesArticulo, _.isEqual);
 
-      if (this.inputDrop) setTimeout(() => this.enfocarInput(this.inputDrop), 0);
+      if (this.inputDrop) setTimeout(() => fun.enfocarInput(this.inputDrop), 0);
     }
   }
 
@@ -788,14 +787,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async getDataFromModal(arg, search) {
-    if (arg?.tipo == 'data_no_found') {
-      this.enfocarInput(`cod-${arg.index}`);
-      this.selectContenido(`cod-${arg.index}`);
-    } else {
-      if (arg.modal_id == 'removerArticulo') {
-        this.procesoQuitarArticulo(arg.key, arg.data);
-      } else this.llenarRowDespuesDeFiltro(arg);
-    }
+    if (arg?.tipo == 'data_no_found') fun.enfocarAndSelectInput(`cod-${arg.index}`);
+
+    if (arg.modal_id == 'removerArticulo') this.procesoQuitarArticulo(arg.key, arg.data);
+
+    if (arg.modal_id == 'buscarArticulo') this.llenarRowDespuesDeFiltro(arg);
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {

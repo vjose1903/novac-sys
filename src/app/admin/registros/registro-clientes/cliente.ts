@@ -11,6 +11,8 @@ export class ClienteC extends CrudG<any> {
     super('clientes');
   }
 
+
+
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
       let objModal;

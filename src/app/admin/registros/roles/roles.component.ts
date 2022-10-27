@@ -177,7 +177,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset({ estado: true });
     this.parsePermisos({ clean: true });
-    this.enfocarInput('campo_nombre');
+    fun.enfocarInput('campo_nombre');
   }
 
   nuevoRegistro() {

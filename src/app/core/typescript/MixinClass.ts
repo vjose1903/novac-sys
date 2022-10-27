@@ -61,28 +61,6 @@ export class MixinClass extends ModalClass {
   }
 
   // =========================================================================================================
-  clickInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    if (element) element.click();
-  }
-  // =========================================================================================================
-  enfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-
-    if (element) element.focus();
-  }
-  // =========================================================================================================
-  desEnfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    if (element) element.blur();
-  }
-
-  // =========================================================================================================
-  selectContenido(arg) {
-    const element = document.getElementById(arg) as any;
-    if (element) element.select();
-  }
-  // =========================================================================================================
   formatoNumero(num) {
     return fun.numFormatTwoDecimals(num);
   }

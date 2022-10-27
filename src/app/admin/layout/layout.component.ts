@@ -49,6 +49,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
   chequiando_cuadre: boolean;
+  hasPermisosValidated: boolean;
 
   constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
     super();
@@ -109,14 +110,21 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.parseMenu();
     this.checkRouteActiva();
     this.cdRef.detectChanges();
-    this.validateUserAndLoadPermisos();
+    this.validateUserAndLoadPermisos().then((result) => {
+      this.hasPermisosValidated = result;
+    });
   }
 
   validateUserAndLoadPermisos() {
-    fun.logOrange('VALIDANDO PERMISOS');
-    this.currentUserServ.validateUser().catch((error) => {
-      fun.logBlue('error: ', error);
-      if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
+    return new Promise<any>((resolve) => {
+      this.currentUserServ
+        .validateUser()
+        .then((result) => resolve(true))
+        .catch((error) => {
+          fun.logBlue('error: ', error);
+          if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
+          resolve(false);
+        });
     });
   }
 
@@ -160,10 +168,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   parseMenu() {
-    for (const keyFather in this.allPermissionsObj) {
-      for (const keyChild in this.allPermissionsObj[keyFather]) {
-        const subMenuProp = this.allPermissionsObj[keyFather][keyChild];
-        this.allPermissionsObj[keyFather].flatt = _.union(this.allPermissionsObj[keyFather].flatt, subMenuProp);
+    for (const keyFather in this.menuPermissionsObj) {
+      for (const keyChild in this.menuPermissionsObj[keyFather]) {
+        const subMenuProp = this.menuPermissionsObj[keyFather][keyChild];
+        this.menuPermissionsObj[keyFather].flatt = _.union(this.menuPermissionsObj[keyFather].flatt, subMenuProp);
       }
     }
   }

@@ -47,9 +47,27 @@
   }
 }
 
+.rowFacturacion {
+  max-height: calc(100vh - 4rem);
+  height: 100%;
+  display: grid;
+  grid-template-areas:
+    "colTitulo"
+    "colCard";
+
+  grid-template-rows: min-content auto;
+
+  .colTitulo {
+    grid-area: colTitulo;
+  }
+  .colCard {
+    grid-area: colCard;
+  }
+}
+
 .cardFacturacion {
   display: grid;
-
+  height: 100%;
   grid-template-areas:
     "cabezaFactura"
     "cuerpoFactura"
@@ -229,6 +247,9 @@
   &.large {
     width: 30rem !important;
   }
+  &.x-large {
+    width: 40rem !important;
+  }
   .p-sidebar-header {
     display: none;
   }
@@ -343,6 +364,9 @@
 .texto-green {
   color: #2c942cc9;
 }
+.texto-red {
+  color: #942c2cc9;
+}
 .texto-blue {
   color: #2c5794c9;
 }
@@ -352,6 +376,9 @@
 
 .texto-borde-green {
   -webkit-text-stroke: 1px #257d25ac;
+}
+.texto-borde-red {
+  -webkit-text-stroke: 1px #7d2525ac;
 }
 .texto-borde-blue {
   -webkit-text-stroke: 1px #253c7dac;
@@ -364,6 +391,10 @@
   background-color: #385aabc9;
   border: 1px solid #253b7da5;
 }
+.bg-raya-red {
+  background-color: #ab3838c9;
+  border: 1px solid #7d2525a5;
+}
 .bg-raya-green {
   background-color: #38ab38c9;
   border: 1px solid #257d25a5;
@@ -374,6 +405,9 @@
 }
 .bg-raya-blue-orange {
   background: linear-gradient(180deg, #3262f3 0%, #3262f3 43%, #ffa400 100%);
+}
+.bg-raya-red-orange {
+  background: linear-gradient(180deg, #f33232 0%, #fa4b45 43%, #ffa400 100%);
 }
 .bg-raya-yellow-orange {
   background: linear-gradient(180deg, #f3ee32 0%, #f3ee32 43%, #ffa400 100%);

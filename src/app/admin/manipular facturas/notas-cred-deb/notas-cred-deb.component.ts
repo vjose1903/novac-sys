@@ -251,7 +251,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         if (this.tipoNota == 'credito') {
           if (cant_nota > params.data.cant) {
             fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
-            this.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
+            fun.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
           } else {
             params.data.cant_nota = cant_nota;
             this.sumarTotalRow(params);
@@ -272,7 +272,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
         if (fun.hasValue(msg)) {
           fun.toastInfo(msg, 'AVISO');
-          this.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
+          fun.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
 
           return;
         } else {
