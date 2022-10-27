@@ -301,6 +301,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   //  MODIFICAR FACTURA
   // =============================================
   async llenarCuerpoFactura(rows) {
+    console.log('rows ', rows);
+
     return new Promise<any>((resolve, reject) => {
       this.rellenarVariables().then(async (res) => {
         if (res) {
