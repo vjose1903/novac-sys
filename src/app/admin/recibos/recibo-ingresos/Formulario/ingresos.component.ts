@@ -287,7 +287,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       ${obj.texto}
     </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           {
@@ -435,7 +435,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: ModalClass.noShowAceptarCancelarButtons,
+        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
       });
       fun.desEnfocarInput('clienteI');
     }
@@ -485,7 +485,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         header: 'Cantidad de efectivo',
         width: '34.375rem',
         botones: {
-          ...ModalClass.noShowAceptarCancelarButtons,
+          ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             {
               clase: 'btn btn-blanco mr-2',

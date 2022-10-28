@@ -340,7 +340,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       width: '510px',
       html: `<p> ${texto_modal} </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           {

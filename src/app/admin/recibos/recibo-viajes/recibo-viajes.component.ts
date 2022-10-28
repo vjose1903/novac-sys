@@ -290,7 +290,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           header: 'Cantidad de efectivo',
           width: '34.375rem',
           botones: {
-            ...ModalClass.noShowAceptarCancelarButtons,
+            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [
               {
                 clase: 'btn btn-blanco mr-2',
@@ -336,7 +336,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         ${obj.texto}
       </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {

@@ -150,7 +150,7 @@ export class FacturaC extends CrudG<FacturasI> {
       width: '30rem',
       height: '10rem',
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };
@@ -170,7 +170,7 @@ export class FacturaC extends CrudG<FacturasI> {
             header: 'MOSTRAR FACTURA',
             width: '900px',
             botones: {
-              ...ModalClass.noShowAceptarCancelarButtons,
+              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
             },
           };

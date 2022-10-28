@@ -99,7 +99,7 @@ export class MixinClass extends ModalClass {
       width: '510px',
       html: `<p> ${obj?.texto} </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => noFunction(instance), label: 'NO', disable: false },
           {

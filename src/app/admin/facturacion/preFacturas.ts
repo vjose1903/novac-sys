@@ -60,7 +60,7 @@ export class PreFacturaClass extends MixinClass {
             header: 'Pre-factura',
             width: '900px',
             botones: {
-              ...ModalClass.noShowAceptarCancelarButtons,
+              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [
                 { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false },
                 { clase: 'btn btn-verde ', function: (instance) => this.selectPreFactura(dataFactura, instance), label: 'Continuar', disable: false },

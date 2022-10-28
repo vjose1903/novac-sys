@@ -1,3 +1,4 @@
+import { fun } from './../../core/services/functions.service';
 import { Injectable } from '@angular/core';
 import { tipoDocFacturacion, TipoFacturaI } from './factura';
 import * as _ from 'lodash';
@@ -81,20 +82,16 @@ export class FacturacionService {
         this.tipoFactura = _.find(this.lista_tipos_facturas, { descripcion: tipoDocFacturacion.pre_venta });
       }
 
-      this.setTipoFacturaSelected(metodo, this.tipoFactura.referencia);
+      this.setTipoFacturaSelected(metodo, this.tipoFactura.id, 'id');
       resolve(true);
     });
   }
 
-  setTipoFacturaSelected(metodo, value, by = 'refencia') {
+  setTipoFacturaSelected(metodo, value, by = 'referencia') {
     return new Promise<any>((resolve, reject) => {
-      if (this.options_tipos_facturas.includes(value)) {
-        this.tipoFacturaReferenciaSelected = value;
-
-        if (metodo == tipoDocFacturacion.venta || metodo == tipoDocFacturacion.compra) {
-          this.tipoFactura = _.find(this.lista_tipos_facturas, (tipo_factura) => (tipo_factura[by] = value));
-        }
-
+      if (this.options_tipos_facturas?.includes(value) || by != 'referencia') {
+        this.tipoFactura = _.find(this.lista_tipos_facturas, (tipo_factura) => tipo_factura[by] == value);
+        this.tipoFacturaReferenciaSelected = this.tipoFactura.referencia;
         resolve(value);
       } else {
         reject(undefined);

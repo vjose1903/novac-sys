@@ -75,7 +75,7 @@ export class ReporteC extends CrudG<any> {
         width: objPdfView.width ?? '57rem',
         height: objPdfView.height,
         botones: {
-          ...ModalClass.noShowAceptarCancelarButtons,
+          ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
             {

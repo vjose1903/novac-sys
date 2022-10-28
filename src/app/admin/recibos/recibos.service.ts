@@ -1,3 +1,4 @@
+import { fun } from './../../core/services/functions.service';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../core/javascript/moment';
@@ -34,7 +35,7 @@ export class RecibosService extends MixinClass {
         header: 'Historial de moviemientos a balance de factura',
         width: '700px',
         height: '400px',
-        botones: ModalClass.noShowAceptarCancelarButtons,
+        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
       });
     }
   }

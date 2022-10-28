@@ -97,12 +97,13 @@ export class FactsLocalStorage extends PreFacturaClass {
     this.facturas_localStorage = _.filter(this.facturas_localStorage, (item: any) => item.tipo === this.sideBarTabsIndex[this.index_fact_archivada]);
 
     setTimeout(async () => {
+      const htmlElement = document.getElementById('btn_side_facturas');
       if (this.facturas_localStorage.length > 0) {
-        document.getElementById('btn_side_facturas').setAttribute('data-cant-facturas', this.facturas_localStorage.length);
+        if (fun.hasValue(htmlElement)) htmlElement.setAttribute('data-cant-facturas', this.facturas_localStorage.length);
 
         this.facturas_localStorage = _.orderBy(this.facturas_localStorage, ['archivo_id'], ['asc']);
       } else {
-        document.getElementById('btn_side_facturas').removeAttribute('data-cant-facturas');
+        if (fun.hasValue(htmlElement)) htmlElement.removeAttribute('data-cant-facturas');
       }
     }, 20);
   }

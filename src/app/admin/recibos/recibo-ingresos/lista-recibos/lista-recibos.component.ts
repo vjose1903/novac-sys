@@ -173,7 +173,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
@@ -217,7 +217,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
             width: '900px',
             height: obj_pdf.height,
             botones: {
-              ...ModalClass.noShowAceptarCancelarButtons,
+              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [
                 { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
                 { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(obj.data), label: 'Ver detalles', disable: false },

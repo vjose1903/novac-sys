@@ -316,7 +316,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
         ${obj.texto}
       </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {

@@ -40,7 +40,7 @@ export class ReciboC extends CrudG<ReciboI> {
       width: '30rem',
       height: '10rem',
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };

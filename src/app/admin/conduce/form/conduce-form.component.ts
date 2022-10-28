@@ -236,7 +236,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
             header: 'BUSCAR ARTICULO',
             width: '56.25rem',
             height: '31.25rem',
-            botones: ModalClass.noShowAceptarCancelarButtons,
+            botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           });
           fun.enfocarInput('input_fantasma');
         } else {
@@ -350,7 +350,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: ModalClass.noShowAceptarCancelarButtons,
+        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
       });
 
       fun.desEnfocarInput('clienteI');
@@ -627,7 +627,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               width: '900px',
               height: '400px',
               botones: {
-                ...ModalClass.noShowAceptarCancelarButtons,
+                ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
                 dinamico: [
                   { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
                   { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
@@ -759,7 +759,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
@@ -816,7 +816,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         header: 'Confirmación',
         width: '30rem',
         botones: {
-          ...ModalClass.noShowAceptarCancelarButtons,
+          ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
@@ -855,7 +855,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     for (let i = 0; i < this.filasDetalle.length; i++) {
       const control = this.filasDetalle[i].value;
 
-      if (control.des && control.cod) {
+      if (control.des || control.cod) {
         (this.filasDetalle[i] as any).controls['detalle_factura_id'].setValue(null);
         (this.filasDetalle[i] as any).controls['articulo'].setValue(null);
         (this.filasDetalle[i] as any).controls['cod'].setValue(null);

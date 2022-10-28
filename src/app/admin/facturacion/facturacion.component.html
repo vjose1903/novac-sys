@@ -45,7 +45,7 @@
                   (keydown.enter)="saltar($event.target.id, condicionInput.value)"
                   class="form-control inputE"
                   [(ngModel)]="condicion_fact"
-                  (change)="cambiarTipoVenta($event.target.value)"
+                  (change)="cambiarCondicion($event.target.value)"
                   tabindex="-1"
                   [disabled]="!!factura_a_rellenar"
                   [ngClass]="{ disabled: !!factura_a_rellenar }"

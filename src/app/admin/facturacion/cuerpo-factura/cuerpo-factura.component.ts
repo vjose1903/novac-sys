@@ -11,6 +11,7 @@ import { razon_remover } from './remover-articulo/contantes';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { SingletonService } from '../../../core/services/singleton.service';
 import { ModalClass } from '../../components/modal/modal-class';
+import { log } from 'console';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -104,30 +105,32 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async rellenarVariables() {
     return new Promise(async (resolve, reject) => {
-      this.listaDeDescuentos.length = 0;
-      this.UnidadesArticulo.length = 0;
-      this.productos_devueltos.length = 0;
+      try {
+        this.listaDeDescuentos.length = 0;
+        this.UnidadesArticulo.length = 0;
+        this.productos_devueltos.length = 0;
 
-      [this.ARRAY_ROWFACTURAS, this.precioDetalle, this.inputDrop, this.filasDetalle, this.indexRemove] = Array(5).fill(undefined);
-      [this.secuencia, this.DESCUENTO] = Array(2).fill(0);
-      this.inputSecuencia = 'cod-0';
-      this.sacos = [25, 50, 100];
+        [this.ARRAY_ROWFACTURAS, this.precioDetalle, this.inputDrop, this.filasDetalle, this.indexRemove] = Array(5).fill(undefined);
+        [this.secuencia, this.DESCUENTO] = Array(2).fill(0);
+        this.inputSecuencia = 'cod-0';
 
-      this.form = this.fb.group({
-        rowFactura: this.fb.array([this.createItem(0)]),
-      });
+        this.sacos = [25, 50, 100];
 
-      this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
+        this.form = this.fb.group({
+          rowFactura: this.fb.array([this.createItem(0)]),
+        });
 
-      for (let index = 1; index <= 25; index++) await this.addItem(index);
+        this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
 
-      setTimeout(() => {
+        for (let index = 1; index <= 25; index++) await this.addItem(index);
+
         this.filasDetalle = (this.form.controls['rowFactura'] as FormArray).controls;
-
         this.escucharCambiosEnForm();
 
         resolve(true);
-      }, 250);
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
@@ -301,28 +304,28 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   //  MODIFICAR FACTURA
   // =============================================
   async llenarCuerpoFactura(rows) {
-    console.log('rows ', rows);
-
     return new Promise<any>((resolve, reject) => {
-      this.rellenarVariables().then(async (res) => {
-        if (res) {
-          for (let index = 0; index < rows.length; index++) {
-            if (index + 1 >= this.ARRAY_ROWFACTURAS.value.length) this.addItem(index + 1);
+      this.rellenarVariables()
+        .then(async (res) => {
+          if (res) {
+            for (let index = 0; index < rows.length; index++) {
+              if (index + 1 >= this.ARRAY_ROWFACTURAS.value.length) this.addItem(index + 1);
 
-            const row = rows[index];
+              const row = rows[index];
 
-            this.getArticuloToLlenar(row).then((articulo) => {
-              this.llenarFilas(row, articulo, index);
-              this.seleccionarCampoEnTurno();
-              this.calcularDescuento(index);
-            });
+              await this.getArticuloToLlenar(row).then((articulo) => {
+                this.llenarFilas(row, articulo, index);
+                this.seleccionarCampoEnTurno();
+                this.calcularDescuento(index);
+              });
+            }
+
+            resolve(true);
+          } else {
+            resolve(false);
           }
-
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      });
+        })
+        .catch((error) => {});
     });
   }
 
@@ -414,7 +417,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
               width: '56.25rem',
               height: '31.25rem',
               botones: {
-                ...ModalClass.noShowAceptarCancelarButtons,
+                ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               },
             });
 
@@ -811,7 +814,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       ${obj.texto}
     </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           {
