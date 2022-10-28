@@ -13,7 +13,7 @@ import { MessageTask } from '../../models/message-task';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
 import { ConfigI } from '../../typescript/config-interface';
 import { fun } from '../functions.service';
-import { tipo_factura_id } from '../../../admin/facturacion/factura';
+import { tipoFacturaId } from '../../../admin/facturacion/factura';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
@@ -58,7 +58,7 @@ export class PdfService {
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
             const tipo_documento = this.getFacturacionType(data);
             printer_selected = config.printer_selected[tipo_documento];
-            obj = options[config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.pre_venta ? 'pre_venta' : 'ventas');
+            obj = options[config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipoFacturaId.pre_venta ? 'pre_venta' : 'ventas');
             break;
 
           case 'cuadre_caja':

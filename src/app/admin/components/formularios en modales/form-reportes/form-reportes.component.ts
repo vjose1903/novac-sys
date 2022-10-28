@@ -12,7 +12,7 @@ import { ClienteC } from '../../../registros/registro-clientes/cliente';
 import { ModalI } from '../../modal/modal-class';
 import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
-import { tipo_factura_id } from '../../../facturacion/factura';
+import { tipoFacturaId } from '../../../facturacion/factura';
 
 @Component({
   selector: 'app-form-reportes',
@@ -137,8 +137,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
       this.tipos = [
-        { label: 'Crédito', id: tipo_factura_id.Nota_de_credito },
-        { label: 'Dédito', id: tipo_factura_id.Nota_de_debito },
+        { label: 'Crédito', id: tipoFacturaId.Nota_de_credito },
+        { label: 'Dédito', id: tipoFacturaId.Nota_de_debito },
         { label: 'Todas', id: 0 },
       ];
     } else if (this.tipo_reporte == 'ventas_productos') {

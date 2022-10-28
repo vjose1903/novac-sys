@@ -23,7 +23,7 @@
                   type="text"
                   (keydown.enter)="saltar('tipo', tipoFact.value)"
                   class="form-control tipo inputE"
-                  [(ngModel)]="factServ.tipoFactura"
+                  [(ngModel)]="factServ.tipoFacturaReferenciaSelected"
                   (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
                   (focus)="tiposFacturas.toggle($event)"
                   tabindex="-1"
@@ -32,7 +32,7 @@
                 />
 
                 <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
-                  <div style="width: 18rem" [innerHtml]="factServ.TiposFacturas"></div>
+                  <div style="width: 18rem" [innerHtml]="factServ.htmlTiposFacturas"></div>
                 </p-overlayPanel>
               </div>
 
@@ -73,7 +73,7 @@
                   tabindex="-1"
                 />
                 <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #gastosFacturas appendTo="body">
-                  <div style="width: 26rem" [innerHtml]="factServ.TiposCostosGastos"></div>
+                  <div style="width: 26rem" [innerHtml]="factServ.htmlTiposCostosGastos"></div>
                 </p-overlayPanel>
               </div>
             </div>

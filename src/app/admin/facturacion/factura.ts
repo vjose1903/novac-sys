@@ -196,7 +196,7 @@ export class FacturasAplicadasC extends CrudG<any> {
   }
 }
 
-export enum tipo_factura_id {
+export enum tipoFacturaId {
   Factura_sin_comprobante = 1,
   Factura_con_valor_fiscal = 2,
   Factura_de_consumo = 3,
@@ -216,6 +216,14 @@ export enum tipo_factura_id {
   Recibo_ingreso = 17,
   Venta_Credito = 18,
   pre_venta = 19,
+}
+
+export interface TipoFacturaI {
+  id: number;
+  descripcion: string;
+  referencia: string;
+  updated_at: any;
+  created_at: any;
 }
 export interface FacturasI {
   id: number;
