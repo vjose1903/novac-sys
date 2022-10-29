@@ -10,7 +10,7 @@ import { CurrentUserService } from '../../core/services/current-user.service';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
-import { SingletonService } from '../../core/services/singleton.service';
+import { Ss } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { fun } from '../../core/services/functions.service';
 
@@ -44,7 +44,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   cuadre_hoy;
   ant_event_change_visibility;
 
-  configServ = SingletonService.configServ;
+  configServ = Ss.configServ;
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();

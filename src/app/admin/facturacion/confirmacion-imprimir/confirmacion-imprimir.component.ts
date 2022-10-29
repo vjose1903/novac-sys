@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { SingletonService } from '../../../core/services/singleton.service';
+import { Ss } from '../../../core/services/singleton.service';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { ModalI } from '../../components/modal/modal-class';
 import { SharedService } from '../../../core/services/shared.service';
@@ -32,7 +32,7 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
   is_print: boolean;
 
   ngOnInit(): void {
-    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
 
     this.handleDefaultSwitch();

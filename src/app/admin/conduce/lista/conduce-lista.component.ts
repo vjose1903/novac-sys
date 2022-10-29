@@ -4,7 +4,7 @@ import { PdfService } from './../../../core/services/pdf/pdf.service';
 import { LoaderService } from './../../../loader/loader.service';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
-import { SingletonService } from './../../../core/services/singleton.service';
+import { Ss } from './../../../core/services/singleton.service';
 import { ModalService } from './../../components/modal/modal.service';
 import { table_config } from './../../components/new_tablas/tabla-class';
 import { ConfigI } from './../../../core/typescript/config-interface';
@@ -61,7 +61,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
   ngOnInit() {
     this._init_mixin({ component: 'lista_conduce', is_routing: true });
-    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.necesarioStart();
   }
 

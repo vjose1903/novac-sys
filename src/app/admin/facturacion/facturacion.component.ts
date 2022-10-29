@@ -7,7 +7,7 @@ import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.componen
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { FacturacionService } from './facturacion.service';
 import { ArticuloC } from '../registros/articulos/articulo';
-import { TiposFacturaC, tipoFacturaId, tipoDocFacturacion, FacturasI } from './factura';
+import { TiposFacturaC, tipoDocFacturacion, FacturasI, tFacturaD } from './factura';
 import { NcfC } from '../registros/ncf/ncf';
 import { PendienteFormComponent } from '../components/formularios en modales/pendiente-form/pendiente-form.component';
 import { FormCantidadEfectivoComponent } from '../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
@@ -20,7 +20,7 @@ import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
 import { teclasCode } from '../../core/typescript/constantes';
 import { Permisos } from '../../core/typescript/permisos';
 import { ConfigI } from '../../core/typescript/config-interface';
-import { SingletonService } from '../../core/services/singleton.service';
+import { Ss } from '../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../components/modal/modal-class';
 import { PdfService } from '../../core/services/pdf/pdf.service';
@@ -123,13 +123,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   condiciones = [{ nombre: 'Contado' }, { nombre: 'Crédito' }];
 
   articuloClass = new ArticuloC();
-  tipoFacturaClass = new TiposFacturaC();
+
   ncfClass = new NcfC();
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   vehiculoClass = new VehiculoC();
   numero_pre_factura;
-  pre_factura_selected;
+  pre_factura_selected: any;
+  cotizacion_selected: any;
 
   overlay;
   camionesSelected = [];
@@ -155,7 +156,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   ngOnInit() {
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
     this.localeService.use('es');
-    this.configApp = SingletonService.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.getConfig({ isPromise: false });
     this.rellenarVariables();
   }
 
@@ -165,9 +166,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ngAfterViewInit() {
-    SingletonService.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)).then((result) => (this.hasPermisoPreVenta = result));
-    SingletonService.permissionsService.hasPermission(Object.values(this.permissions.cotizacion)).then((result) => (this.hasPermisoCotizacion = result));
-    SingletonService.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => (this.hasPermisoCamiones = result));
+    Ss.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)).then((result) => (this.hasPermisoPreVenta = result));
+    Ss.permissionsService.hasPermission(Object.values(this.permissions.cotizacion)).then((result) => (this.hasPermisoCotizacion = result));
+    Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => (this.hasPermisoCamiones = result));
   }
 
   formarObjArchivo(factura_para_rellenar?) {
@@ -193,71 +194,60 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
-  getTiposFacturas() {
-    return new Promise((resolve) => {
-      this.tipoFacturaClass.getAll().then((tiposFacturas) => {
-        this.factServ.lista_tipos_facturas = tiposFacturas;
-        resolve(this.factServ.lista_tipos_facturas);
-      });
-    });
-  }
-
   rellenarVariables() {
-    this.getTiposFacturas().then((lista_tipos_facturas) => {
-      this.metodo = this.route.snapshot.params['tipo'];
+    this.metodo = this.route.snapshot.params['tipo'];
 
-      if (this.metodo == tipoDocFacturacion.venta) this.titulo = 'Factura de venta';
-      else if (this.metodo == tipoDocFacturacion.compra) this.titulo = 'Factura de compra';
-      else if (this.metodo == tipoDocFacturacion.pre_venta) this.titulo = 'Pre factura';
-      else if (this.metodo == tipoDocFacturacion.cotizacion) this.titulo = 'Cotización';
+    if (this.metodo == tipoDocFacturacion.venta) this.titulo = 'Factura de venta';
+    else if (this.metodo == tipoDocFacturacion.compra) this.titulo = 'Factura de compra';
+    else if (this.metodo == tipoDocFacturacion.pre_venta) this.titulo = 'Pre factura';
+    else if (this.metodo == tipoDocFacturacion.cotizacion) this.titulo = 'Cotización';
 
-      this.factServ.setTipos(this.metodo).then((result) => {
-        //
-        [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
-        [this.is_adelantada, this.is_viaje, this.factura_pendiente] = Array(3).fill(false);
-        [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row] = Array(5).fill(0);
-        [this.numero_pre_factura, this.NCFcompra, this.pre_factura_selected, this.action, this.factura_a_rellenar, this.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] = Array(9).fill(undefined);
+    this.factServ.setTipos(this.metodo).then((result) => {
+      //
+      [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
+      [this.is_adelantada, this.is_viaje, this.factura_pendiente] = Array(3).fill(false);
+      [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row] = Array(5).fill(0);
+      [this.numero_pre_factura, this.NCFcompra, this.pre_factura_selected, this.action, this.factura_a_rellenar, this.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] = Array(9).fill(undefined);
 
-        this.CuerpoFactura.length = 0;
-        this.articulosAcambiar.length = 0;
-        this.camionesSelected.length = 0;
+      this.CuerpoFactura.length = 0;
+      this.articulosAcambiar.length = 0;
+      this.camionesSelected.length = 0;
 
-        this.info_cambio = {};
-        this.fechaFactura = {};
-        // this.factura_a_rellenar = {};
-        this.CostoYgasto = '';
+      this.info_cambio = {};
+      this.fechaFactura = {};
+      // this.factura_a_rellenar = {};
+      this.CostoYgasto = '';
 
-        this.action = this.route.snapshot.params['action'];
-        const id_factura = this.route.snapshot.params['id'];
-        this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
-        this.fechaFactura['back'] = this.fechaFactura['front'];
-        this.FechaFacturaMostrar = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
+      this.action = this.route.snapshot.params['action'];
+      const id_factura = this.route.snapshot.params['id'];
+      this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
+      this.fechaFactura['back'] = this.fechaFactura['front'];
+      this.FechaFacturaMostrar = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
 
-        this.modo_factura = this.metodo == tipoDocFacturacion.pre_venta || this.metodo == tipoDocFacturacion.cotizacion ? this.metodo : 'normal';
+      this.modo_factura = this.metodo == tipoDocFacturacion.pre_venta || this.metodo == tipoDocFacturacion.cotizacion ? this.metodo : 'normal';
 
-        this.condicion_fact = this.metodo == tipoDocFacturacion.pre_venta ? 'Crédito' : 'Contado';
-        this.forma_pago = 'Efectivo';
+      this.condicion_fact = this.metodo == tipoDocFacturacion.pre_venta ? 'Crédito' : 'Contado';
+      this.forma_pago = 'Efectivo';
 
-        this.filterCamionesTargets = ['marca', 'modelo', 'anio', 'propietario.nombre', 'propietario.apellido'];
+      this.filterCamionesTargets = ['marca', 'modelo', 'anio', 'propietario.nombre', 'propietario.apellido'];
 
-        if (this.metodo == tipoDocFacturacion.venta) {
-          this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
-          if (this.hasPermisoCamiones) this.getCamiones();
-        } else {
-          if (fun.hasValue(this.form)) this.form.reset();
-        }
+      if (this.metodo == tipoDocFacturacion.venta) {
+        this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
+        if (this.hasPermisoCamiones) this.getCamiones();
+      } else {
+        if (fun.hasValue(this.form)) this.form.reset();
+      }
 
-        if (this.action == 'update') {
-          this.procesoRelleno({ id: id_factura }, 'editar');
-        } else {
-          setTimeout(() => {
-            if (this.metodo == tipoDocFacturacion.pre_venta || this.metodo == tipoDocFacturacion.cotizacion) this.abrirModalFiltro();
-            else fun.enfocarInput('tipoFact');
-          }, 5);
-        }
+      if (this.action == 'update') {
+        this.procesoRelleno({ id: id_factura }, 'editar');
+      } else {
+        setTimeout(() => {
+          if (this.metodo == tipoDocFacturacion.pre_venta || this.metodo == tipoDocFacturacion.cotizacion) this.abrirModalFiltro();
+          else fun.enfocarInput('tipoFact');
+        }, 5);
+      }
 
-        this.getFacturasGuardadas();
-      });
+      this.getFacturasGuardadas();
     });
   }
 
@@ -282,69 +272,67 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   rellenarCabezaFactura(factura: FacturasI, action?: string) {
-    return new Promise((resolve) => {
-      this.getTiposFacturas().then(async (resultado) => {
-        fun.logOrange('factura ', factura);
-        this.factura_a_rellenar = factura;
-        this.propietario_factura = {};
+    return new Promise(async (resolve) => {
+      fun.logOrange('factura ', factura);
+      this.factura_a_rellenar = factura;
+      this.propietario_factura = {};
 
-        if (action == 'editar') {
-          const res = await this.facturaClass.getFacturaById(factura.id);
-          this.factura_a_rellenar = res['data'];
+      if (action == 'editar') {
+        const res = await this.facturaClass.getFacturaById(factura.id);
+        this.factura_a_rellenar = res['data'];
 
-          this.propietario_factura = this.factura_a_rellenar.cliente;
-          this.propietario_factura['id'] = this.factura_a_rellenar.cliente_id;
-          this.form.patchValue(this.propietario_factura);
-        } else {
-          this.setPropietario(this.factura_a_rellenar);
-        }
+        this.propietario_factura = this.factura_a_rellenar.cliente;
+        this.propietario_factura['id'] = this.factura_a_rellenar.cliente_id;
+        this.form.patchValue(this.propietario_factura);
+      } else {
+        this.setPropietario(this.factura_a_rellenar);
+      }
 
-        this.metodo = this.pre_factura_selected ? 'venta' : this.factura_a_rellenar.tipo;
+      this.metodo = this.pre_factura_selected ? 'venta' : this.factura_a_rellenar.tipo;
 
-        const value_buscar = this.pre_factura_selected ? '02' : this.factura_a_rellenar.tipo_factura_id;
-        const by_buscar = this.pre_factura_selected ? 'referencia' : 'id';
+      const value_buscar = this.pre_factura_selected ? '02' : this.factura_a_rellenar.tipo_factura_id;
+      const by_buscar = this.pre_factura_selected ? 'referencia' : 'id';
 
-        this.factServ
-          .setTipoFacturaSelected(this.metodo, value_buscar, by_buscar)
-          .then(async (result) => {
-            this.factura_pendiente = fun.hasValue(this.factura_a_rellenar) && _.has(this.factura_a_rellenar, 'factura_pendiente') ? this.factura_a_rellenar?.factura_pendiente : false;
+      this.factServ
+        .setTipoFacturaSelected(this.metodo, value_buscar, by_buscar)
+        .then(async (result) => {
+          this.factura_pendiente = fun.hasValue(this.factura_a_rellenar) && _.has(this.factura_a_rellenar, 'factura_pendiente') ? this.factura_a_rellenar?.factura_pendiente : false;
 
-            const fecha_facturacion = this.factura_a_rellenar?.fecha_equivalente ? this.factura_a_rellenar?.fecha_equivalente : fun.duplicarJson(this.fechaFactura['back']);
+          const fecha_facturacion = this.factura_a_rellenar?.fecha_equivalente ? this.factura_a_rellenar?.fecha_equivalente : fun.duplicarJson(this.fechaFactura['back']);
 
-            this.fechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
-            this.fechaFactura['back'] = this.fechaFactura['front'];
+          this.fechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
+          this.fechaFactura['back'] = this.fechaFactura['front'];
 
-            this.FechaFacturaMostrar = this.formarFechaFactura(fecha_facturacion)['FechaFacturaMostrar'];
+          this.FechaFacturaMostrar = this.formarFechaFactura(fecha_facturacion)['FechaFacturaMostrar'];
 
-            if (fun.hasValue(this.factServ.tipoFactura) && this.factServ.tipoFactura.referencia != '00' && this.factServ.tipoFactura.referencia != '02') {
-              this.ncfClass.getAll({ afterPath: `custom/${this.factServ.tipoFactura.id}/true` }).then((res) => {
-                this.paqueteComprobante = res.data;
-              });
-            }
+          if (fun.hasValue(this.factServ.tipoFactura) && this.factServ.tipoFactura.referencia != '00' && this.factServ.tipoFactura.referencia != '02') {
+            this.ncfClass.getAll({ afterPath: `custom/${this.factServ.tipoFactura.id}/true` }).then((res) => {
+              this.paqueteComprobante = res.data;
+            });
+          }
 
-            if (this.factura_a_rellenar.is_viaje) this.fecha_viaje = new Date(this.factura_a_rellenar.fecha_viaje);
-            else this.fecha_viaje = new Date();
+          if (this.factura_a_rellenar.is_viaje) this.fecha_viaje = new Date(this.factura_a_rellenar.fecha_viaje);
+          else this.fecha_viaje = new Date();
 
-            if (this.factura_a_rellenar.tipo == 'compra') this.fecha_vencimiento = new Date(this.factura_a_rellenar.fecha_vencimiento);
-            else this.fecha_vencimiento = new Date();
+          if (this.factura_a_rellenar.tipo == 'compra') this.fecha_vencimiento = new Date(this.factura_a_rellenar.fecha_vencimiento);
+          else this.fecha_vencimiento = new Date();
 
-            this.is_viaje = this.factura_a_rellenar.is_viaje;
-            this.condicion_fact = this.pre_factura_selected ? this.condicion_fact : this.factura_a_rellenar.condicion;
+          this.is_viaje = this.factura_a_rellenar.is_viaje;
+          this.condicion_fact = this.pre_factura_selected ? this.condicion_fact : this.factura_a_rellenar.condicion;
 
-            this.NCFcompra = this.factura_a_rellenar.tipo == 'compra' ? this.factura_a_rellenar.numero_comprobante : undefined;
-            this.CostoYgasto = this.factura_a_rellenar.tipo == 'compra' ? this.factura_a_rellenar.costoYgasto : '';
+          this.NCFcompra = this.factura_a_rellenar.tipo == 'compra' ? this.factura_a_rellenar.numero_comprobante : undefined;
+          this.CostoYgasto = this.factura_a_rellenar.tipo == 'compra' ? this.factura_a_rellenar.costoYgasto : '';
 
-            if (this.factura_a_rellenar.tipo == 'pre_venta') this.modo_factura = tipoDocFacturacion.pre_venta;
-            else if (this.factura_a_rellenar.tipo == 'cotizacion') this.modo_factura = tipoDocFacturacion.cotizacion;
-            else if (this.factura_a_rellenar.is_viaje) this.modo_factura = 'viaje';
-            else if (this.factura_a_rellenar.is_adelantada) this.modo_factura = 'adelantada';
-            else this.modo_factura = 'normal';
-            fun.logPurple('####### ', this.modo_factura);
+          if (this.factura_a_rellenar.tipo == 'pre_venta') this.modo_factura = tipoDocFacturacion.pre_venta;
+          else if (this.factura_a_rellenar.tipo == 'cotizacion') this.modo_factura = tipoDocFacturacion.cotizacion;
+          else if (this.factura_a_rellenar.is_viaje) this.modo_factura = 'viaje';
+          else if (this.factura_a_rellenar.is_adelantada) this.modo_factura = 'adelantada';
+          else this.modo_factura = 'normal';
+          fun.logPurple('####### ', this.modo_factura);
 
-            resolve(true);
-          })
-          .catch((error) => {});
-      });
+          resolve(true);
+        })
+        .catch((error) => {});
     });
   }
 
@@ -1383,7 +1371,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       cabecera_fact['balance'] = this.is_viaje ? fun.parseFloatTwoDecimals(this.TOTAL) : 0;
       cabecera_fact['devuelta'] = this.is_viaje ? 0 : this.Devuelta;
     }
-    cabecera_fact['fecha_valida'] = this.paqueteComprobante ? (this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null) : null;
+    cabecera_fact['fecha_valida'] = this.paqueteComprobante ? (fun.hasValue(this.paqueteComprobante.fecha_valida) ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null) : null;
 
     cabecera_fact['tipo_factura_id'] = this.factServ.tipoFactura.id;
     cabecera_fact['numero_comprobante'] = this.metodo == tipoDocFacturacion.compra ? this.NCFcompra : null;
@@ -1399,6 +1387,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['is_nota'] = false;
     cabecera_fact['camiones_viajes'] = this.camionesSelected;
     cabecera_fact['pre_factura'] = fun.hasValue(this.pre_factura_selected) ? this.pre_factura_selected?.id : null;
+    // TODO: cabecera_fact['cotizacion'] = fun.hasValue(this.cotizacion_selected) ? this.cotizacion_selected?.id : null;
 
     if (this.metodo == tipoDocFacturacion.compra) {
       cabecera_fact['suplidor_id'] = this.propietario_factura.id;
@@ -1413,11 +1402,22 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
 
     cabecera_fact['detalle_facturas'] = cuerpo_fact;
-    cabecera_fact['FACTURA_DE'] =
-      this.modo_factura == 'pre_venta' ? tipoFacturaId.pre_venta : this.metodo == tipoDocFacturacion.venta ? (this.condicion_fact == 'Contado' ? tipoFacturaId.Venta_Contado : tipoFacturaId.Venta_Credito) : tipoFacturaId.Compra;
+    //
+
+    if (this.metodo == tipoDocFacturacion.pre_venta) {
+      cabecera_fact['FACTURA_DE'] = Ss.factServ.tipoFacturaId(tFacturaD.pre_venta);
+    } else if (this.metodo == tipoDocFacturacion.cotizacion) {
+      cabecera_fact['FACTURA_DE'] = Ss.factServ.tipoFacturaId(tFacturaD.cotizacion);
+    } else if (this.metodo == tipoDocFacturacion.venta) {
+      cabecera_fact['FACTURA_DE'] = this.condicion_fact == 'Contado' ? Ss.factServ.tipoFacturaId(tFacturaD.venta_contado) : Ss.factServ.tipoFacturaId(tFacturaD.venta_credito);
+    } else if (this.metodo == tipoDocFacturacion.compra) {
+      cabecera_fact['FACTURA_DE'] = Ss.factServ.tipoFacturaId(tFacturaD.compra);
+    }
+
     // TODO: ver si esto funciona
     // cabecera_fact['tipo'] = this.modo_factura == 'pre_venta' ? 'pre_venta' : this.metodo;
     cabecera_fact['tipo'] = this.metodo;
+
     fun.logRed('cabecera_fact ', cabecera_fact);
 
     cabecera_fact['tiene_nota'] = this.factura_a_rellenar ? this.factura_a_rellenar.tiene_nota : false;

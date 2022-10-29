@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { SingletonService } from '../../../core/services/singleton.service';
+import { Ss } from '../../../core/services/singleton.service';
 import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { MessageTask } from '../../../core/models/message-task';
@@ -17,7 +17,7 @@ import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
   styleUrls: ['./configuraciones.component.scss'],
 })
 export class ConfiguracionesComponent implements OnInit {
-  configServ = SingletonService.configServ;
+  configServ = Ss.configServ;
   config;
   form;
 

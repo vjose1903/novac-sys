@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from '../utils/funciones';
 import { styles_ } from '../utils/files';
-import { SingletonService } from '../../singleton.service';
+import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../typescript/config-interface';
 import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
@@ -26,7 +26,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
 
   const is_suplidor = is_compra;
 
-  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
   const dd = {
     pageSize: { width: 200, height: 'auto' },

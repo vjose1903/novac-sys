@@ -6,7 +6,7 @@ import { catchError, map, finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { SingletonService } from '../core/services/singleton.service';
+import { Ss } from '../core/services/singleton.service';
 import { fun } from '../core/services/functions.service';
 import { SharedService } from '../core/services/shared.service';
 
@@ -76,7 +76,7 @@ export class InterceptorService implements HttpInterceptor {
         } else if (response.error && _.has(response.error, 'action') && response.error.action === 'close_ssesion') {
           fun.toastError(response.error.msg, 'ERROR');
           this.sharedServ.nextCanToast(false);
-          SingletonService.layServ.nextLogOut({ bool: true, quien: 'close_ssesion' });
+          Ss.layServ.nextLogOut({ bool: true, quien: 'close_ssesion' });
         } else {
           if (_.has(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
 

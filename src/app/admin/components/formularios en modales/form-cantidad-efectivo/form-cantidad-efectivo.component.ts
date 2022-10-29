@@ -6,7 +6,7 @@ import { ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 import { SharedService } from '../../../../core/services/shared.service';
 import { ConfigI } from '../../../../core/typescript/config-interface';
-import { SingletonService } from '../../../../core/services/singleton.service';
+import { Ss } from '../../../../core/services/singleton.service';
 import { teclasCode } from '../../../../core/typescript/constantes';
 
 @Component({
@@ -53,7 +53,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+      this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
       this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
       this.handleDefaultSwitch();
 

@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs';
-import { SingletonService } from '../../core/services/singleton.service';
+import { Ss } from '../../core/services/singleton.service';
 import { TablaClass } from '../components/new_tablas/tabla-class';
 import * as _ from 'lodash';
 import { Permisos } from '../../core/typescript/permisos';
@@ -69,7 +69,7 @@ export class LayoutClass extends TablaClass {
   };
 
   _init_layout(arg) {
-    this.layServ = SingletonService.layServ;
+    this.layServ = Ss.layServ;
     if (arg.component == 'layout') LayoutClass.layoutComponent ||= this;
 
     if (arg.component != 'layout' && arg.is_routing) {

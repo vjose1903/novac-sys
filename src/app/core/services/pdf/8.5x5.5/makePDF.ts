@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import * as fun_ from '../utils/funciones';
 import { styles_ } from '../utils/files';
-import { SingletonService } from '../../singleton.service';
+import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../typescript/config-interface';
 import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes, infoTipoPdf, firmas } from './infoPdfs';
@@ -29,7 +29,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
 
   const is_suplidor = is_compra;
 
-  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
   const configuration = configuraciones[tipo_pdf];
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
 

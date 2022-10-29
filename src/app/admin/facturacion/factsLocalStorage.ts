@@ -1,5 +1,5 @@
 import { Permisos } from './../../core/typescript/permisos';
-import { SingletonService } from './../../core/services/singleton.service';
+import { Ss } from './../../core/services/singleton.service';
 import { FacturacionService } from './facturacion.service';
 import * as _ from 'lodash';
 import { fun } from '../../core/services/functions.service';
@@ -50,8 +50,8 @@ export class FactsLocalStorage extends PreFacturaClass {
   }
 
   async setVariables() {
-    const hasPermisoPreVenta = await SingletonService.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
-    const hasPermisoCotizacion = await SingletonService.permissionsService.hasPermission(Object.values(Permisos.cotizacion));
+    const hasPermisoPreVenta = await Ss.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
+    const hasPermisoCotizacion = await Ss.permissionsService.hasPermission(Object.values(Permisos.cotizacion));
 
     if (hasPermisoPreVenta) fun.pushAt(this.sideBarTabs, 1, { key: tipoDocFacturacion.pre_venta, label: 'pre ventas', title: 'Pre-Venta', singleTitle: 'pre-venta', color: 'blue' });
     if (hasPermisoCotizacion) this.sideBarTabs.push({ key: tipoDocFacturacion.cotizacion, label: 'cotizaciones', title: 'Cotización', singleTitle: 'cotización', color: 'red' });

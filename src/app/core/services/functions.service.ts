@@ -3,7 +3,7 @@ import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 
 import { ConfigI } from '../typescript/config-interface';
-import { SingletonService } from './singleton.service';
+import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
 
 export const windowSize = new BehaviorSubject<any>(undefined);
@@ -649,7 +649,7 @@ export class fun {
         localStorage.removeItem('token-type');
         localStorage.removeItem('uid');
 
-        SingletonService.layServ.nextLogOut(undefined);
+        Ss.layServ.nextLogOut(undefined);
         resolve(true);
       } catch (error) {
         resolve(false);
@@ -661,7 +661,7 @@ export class fun {
 
   static decryptConfigPassword(str) {
     const str_remplace = btoa(str);
-    const config: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
+    const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
     return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
   }
   // ----------------------------------------------------------------------------------------------------------
@@ -738,18 +738,18 @@ export class fun {
   // =====================================================================
 
   static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (SingletonService.sharedServ.canToast) SingletonService.toastr.info(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '');
   }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (SingletonService.sharedServ.canToast) SingletonService.toastr.success(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '');
   }
 
   static toastError(msg?, titulo = 'ERROR') {
-    if (SingletonService.sharedServ.canToast) SingletonService.toastr.error(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '');
   }
 
   static toastWarning(msg?, titulo = 'AVISO') {
-    if (SingletonService.sharedServ.canToast) SingletonService.toastr.warning(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '');
   }
 }

@@ -8,7 +8,7 @@ import * as $ from 'jquery';
 import { fun } from '../../core/services/functions.service';
 import { medidas, table_config } from '../components/new_tablas/tabla-class';
 import { ConfigI } from '../../core/typescript/config-interface';
-import { SingletonService } from '../../core/services/singleton.service';
+import { Ss } from '../../core/services/singleton.service';
 import { ModalClass } from '../components/modal/modal-class';
 @Component({
   selector: 'app-produccion',
@@ -53,7 +53,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   ngOnInit() {
     this._init_mixin({ component: 'produccion', is_routing: true });
-    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.optionsMedidas[0] = this.configApp.medida_producto_terminado;
 
     this.getProductosTerminados();

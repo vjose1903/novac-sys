@@ -1,6 +1,6 @@
 import * as moment from '../javascript/moment';
 import { ModalClass } from '../../admin/components/modal/modal-class';
-import { SingletonService } from '../services/singleton.service';
+import { Ss } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
 
 interface mixinInit {
@@ -18,7 +18,7 @@ export class MixinClass extends ModalClass {
     super();
   }
 
-  layServ = SingletonService.layServ;
+  layServ = Ss.layServ;
   arg_mixin;
 
   _init_mixin(arg?: mixinInit) {

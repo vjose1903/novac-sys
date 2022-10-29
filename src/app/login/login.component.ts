@@ -11,7 +11,7 @@ import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota
 import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
-import { SingletonService } from '../core/services/singleton.service';
+import { Ss } from '../core/services/singleton.service';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
 import { ConfigI } from '../core/typescript/config-interface';
@@ -33,7 +33,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   imgLogo;
 
   requestClass = new RequestC();
-  configServ = SingletonService.configServ;
+  configServ = Ss.configServ;
   configApp: ConfigI;
 
   constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public currentUserServ: CurrentUserService) {

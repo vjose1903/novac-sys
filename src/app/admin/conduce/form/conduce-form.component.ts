@@ -16,7 +16,7 @@ import { ModalService } from '../../components/modal/modal.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { ConfigI } from '../../../core/typescript/config-interface';
-import { SingletonService } from '../../../core/services/singleton.service';
+import { Ss } from '../../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { teclasCode } from '../../../core/typescript/constantes';
 import { ModalClass } from '../../components/modal/modal-class';
@@ -101,7 +101,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   ngOnInit() {
     this._init_mixin({ component: 'conduce', is_routing: true });
-    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });

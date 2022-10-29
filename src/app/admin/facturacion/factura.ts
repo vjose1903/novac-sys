@@ -196,26 +196,27 @@ export class FacturasAplicadasC extends CrudG<any> {
   }
 }
 
-export enum tipoFacturaId {
-  Factura_sin_comprobante = 1,
-  Factura_con_valor_fiscal = 2,
-  Factura_de_consumo = 3,
-  Nota_de_debito = 4,
-  Nota_de_credito = 5,
-  Comprobante_de_compras = 6,
-  Registro_de_unico_ingreso = 7,
-  Comprobante_para_gastos_menores = 8,
-  Comprobante_de_regimen_especiales = 9,
-  Comprobante_gubernamental = 10,
-  Comprobante_para_exportaciones = 11,
-  Comprobantes_para_pago_al_exterior = 12,
-  Venta_Contado = 13,
-  Compra = 14,
-  Conduce = 15,
-  Produccion = 16,
-  Recibo_ingreso = 17,
-  Venta_Credito = 18,
-  pre_venta = 19,
+export enum tFacturaD {
+  factura_sin_comprobante = 'Factura sin comprobante',
+  factura_con_valor_fiscal = 'Factura con valor fiscal',
+  factura_de_consumo = 'Factura de consumo',
+  nota_de_debito = 'Nota de debito',
+  nota_de_credito = 'Nota de credito',
+  comprobante_de_compras = 'Comprobante de compras',
+  registro_de_unico_ingreso = 'Registro de unico ingreso',
+  comprobante_para_gastos_menores = 'Comprobante para gastos menores',
+  comprobante_de_regimen_especiales = 'Comprobante de regimen especiales',
+  comprobante_gubernamental = 'Comprobante gubernamental',
+  comprobante_para_exportaciones = 'Comprobante para exportaciones',
+  comprobantes_para_pago_al_exterior = 'Comprobantes para pago al exterior',
+  venta_contado = 'Venta Contado',
+  compra = 'Compra',
+  conduce = 'Conduce',
+  produccion = 'Produccion',
+  recibo_ingreso = 'Recibo_ingreso',
+  venta_credito = 'Venta Credito',
+  pre_venta = 'pre_venta',
+  cotizacion = 'cotizacion',
 }
 
 export interface TipoFacturaI {

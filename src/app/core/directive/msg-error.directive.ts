@@ -2,7 +2,7 @@ import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import * as _ from 'lodash';
 import { fun } from '../services/functions.service';
-import { SingletonService } from '../services/singleton.service';
+import { Ss } from '../services/singleton.service';
 
 @Directive({
   selector: '[appMsgError]',

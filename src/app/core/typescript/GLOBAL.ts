@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import * as _ from 'lodash';
-import { SingletonService } from '../services/singleton.service';
+import { Ss } from '../services/singleton.service';
 
 export const MODIFIED_CONFIG_FILE = new BehaviorSubject<any>(null);
 export const ELECTRON_EVENTS_OBSERVER = new BehaviorSubject<any>(null);

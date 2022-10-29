@@ -1,7 +1,7 @@
 import { fun } from './../../core/services/functions.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '../../core/typescript/MixinClass';
-import { SingletonService } from '../../core/services/singleton.service';
+import { Ss } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/typescript/config-interface';
 
 @Component({
@@ -15,7 +15,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   }
 
   imgLogo;
-  configServ = SingletonService.configServ;
+  configServ = Ss.configServ;
 
   initCambioMenu(arg) {
     if (arg.bool) this.runFinalizarCambioMenu(arg);

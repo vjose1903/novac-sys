@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-import { SingletonService } from '../services/singleton.service';
+import { Ss } from '../services/singleton.service';
 
 import * as _ from 'lodash';
 import { AppConfig } from '../../../environments/environment';
@@ -103,7 +103,7 @@ export class CrudG<T> {
   }
 
   private getUrlInUse() {
-    const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
+    const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
     const url = configApp.is_development ? AppConfig[configApp.gitUser] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     return url;
@@ -128,11 +128,11 @@ export class CrudG<T> {
 
     switch (metodo) {
       case 1:
-        return SingletonService.http[method](url, this.requestOptions(tipo, arg));
+        return Ss.http[method](url, this.requestOptions(tipo, arg));
         break;
 
       case 2:
-        return SingletonService.http[method](url, JSON.stringify(data), this.requestOptions(tipo, arg));
+        return Ss.http[method](url, JSON.stringify(data), this.requestOptions(tipo, arg));
         break;
     }
   }

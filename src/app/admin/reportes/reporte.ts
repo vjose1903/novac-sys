@@ -1,5 +1,5 @@
 import { PdfService } from '../../core/services/pdf/pdf.service';
-import { SingletonService } from '../../core/services/singleton.service';
+import { Ss } from '../../core/services/singleton.service';
 import { fun } from '../../core/services/functions.service';
 import { CrudG } from '../../core/typescript/crud-g';
 import { FormReportesComponent } from '../components/formularios en modales/form-reportes/form-reportes.component';
@@ -48,16 +48,16 @@ export class ReporteC extends CrudG<any> {
 
         //
 
-        SingletonService.loadServ.isLoading.next(true);
+        Ss.loadServ.isLoading.next(true);
         const obj = { data: responseRequest, type: type };
 
         PdfService.generatePdf({ oPdf: obj, imprimir: false })
           .then(async (result) => {
-            SingletonService.loadServ.isLoading.next(false);
+            Ss.loadServ.isLoading.next(false);
             resolve({ ...result, requestResult: responseRequest });
           })
           .catch(async (err) => {
-            SingletonService.loadServ.isLoading.next(false);
+            Ss.loadServ.isLoading.next(false);
             reject(err);
           });
       });
@@ -89,18 +89,18 @@ export class ReporteC extends CrudG<any> {
       });
     }
 
-    SingletonService.loadServ.isLoading.next(false);
+    Ss.loadServ.isLoading.next(false);
   }
 
   static imprimirPDF(objPdf, modalInstance?) {
-    SingletonService.loadServ.isLoading.next(true);
-    SingletonService.configServ.getConfig({ isPromise: true }).then((configApp: ConfigI) => {
+    Ss.loadServ.isLoading.next(true);
+    Ss.configServ.getConfig({ isPromise: true }).then((configApp: ConfigI) => {
       objPdf['type'] = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
       objPdf['printer'] = configApp.printer_selected.reporte;
 
       PdfService.imprimirBase64(objPdf)
         .then((res) => {
-          SingletonService.loadServ.isLoading.next(false);
+          Ss.loadServ.isLoading.next(false);
 
           if (res.status === 'si') {
             fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
@@ -108,7 +108,7 @@ export class ReporteC extends CrudG<any> {
           } else fun.toastError(res.msg, 'ERROR');
         })
         .catch((err) => {
-          SingletonService.loadServ.isLoading.next(false);
+          Ss.loadServ.isLoading.next(false);
           fun.toastError(err.msg, 'ERROR');
         });
     });

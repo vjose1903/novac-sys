@@ -1,6 +1,6 @@
 import { fun } from './../../core/services/functions.service';
 import { Injectable } from '@angular/core';
-import { tipoDocFacturacion, TipoFacturaI } from './factura';
+import { tFacturaD, tipoDocFacturacion, TipoFacturaI } from './factura';
 import * as _ from 'lodash';
 
 @Injectable({
@@ -97,5 +97,9 @@ export class FacturacionService {
         reject(undefined);
       }
     });
+  }
+
+  tipoFacturaId(descripcion: tFacturaD) {
+    return _.find(this.lista_tipos_facturas, { descripcion: descripcion }).id;
   }
 }

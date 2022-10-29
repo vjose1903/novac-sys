@@ -1,7 +1,7 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import * as _ from 'lodash';
 import { fun } from '../services/functions.service';
-import { SingletonService } from '../services/singleton.service';
+import { Ss } from '../services/singleton.service';
 
 export class customValidators {
   constructor() {}

@@ -1,5 +1,5 @@
 import { ConfigI } from './../../../core/typescript/config-interface';
-import { SingletonService } from './../../../core/services/singleton.service';
+import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
@@ -85,7 +85,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   ngOnInit() {
     this._init_mixin({ component: 'notas', is_routing: true });
-    this.configApp = SingletonService.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.getConfig({ isPromise: false });
 
     this.idsFacturas = JSON.parse(this.activeRoute.snapshot.params['ids']);
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];

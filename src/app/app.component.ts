@@ -1,9 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
-import { ELECTRON_EVENTS_OBSERVER, GLOBAL, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
+import { ELECTRON_EVENTS_OBSERVER, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
 
-import { SingletonService } from './core/services/singleton.service';
+import { Ss } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { LayoutService } from './admin/layout/layout.service';
 import { ConfigurationService } from './core/services/configuration.service';
@@ -29,6 +29,8 @@ import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
 import { MixinClass } from './core/typescript/MixinClass';
 import { NgxPermissionsService } from 'ngx-permissions';
+import { FacturacionService } from './admin/facturacion/facturacion.service';
+import { TiposFacturaC } from './admin/facturacion/factura';
 
 @Component({
   selector: 'app-root',
@@ -47,6 +49,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   sub: Subscription;
   subModified: Subscription;
 
+  tipoFacturaClass = new TiposFacturaC();
+
   constructor(
     public _ipc: IpcService,
     public loaderServ: LoaderService,
@@ -55,6 +59,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public zone: NgZone,
     public http: HttpClient,
 
+    public factServ: FacturacionService,
     public layServ: LayoutService,
     public configServ: ConfigurationService,
     public themeService: ThemeService,
@@ -66,20 +71,18 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   ngOnInit(): void {
-    const location = window.location.href;
+    Ss.http = this.http;
+    Ss.zone = this.zone;
+    Ss.configServ = this.configServ;
+    Ss._ipc = this._ipc;
+    Ss.factServ = this.factServ;
 
-
-    SingletonService.http = this.http;
-    SingletonService.zone = this.zone;
-    SingletonService.configServ = this.configServ;
-    SingletonService._ipc = this._ipc;
-
-    SingletonService.permissionsService = this.permissionsService;
-    SingletonService.loadServ = this.loaderServ;
-    SingletonService.layServ = this.layServ;
-    SingletonService.toastr = this.toastr;
-    SingletonService.sharedServ = this.sharedServ;
-    SingletonService.cdRef = this.cdRef;
+    Ss.permissionsService = this.permissionsService;
+    Ss.loadServ = this.loaderServ;
+    Ss.layServ = this.layServ;
+    Ss.toastr = this.toastr;
+    Ss.sharedServ = this.sharedServ;
+    Ss.cdRef = this.cdRef;
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
 
@@ -137,7 +140,21 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
-    this.getAppConfig();
+    this.getAppConfig().then((config) => {
+      this.getTiposFacturas();
+    });
+  }
+
+  getTiposFacturas() {
+    return new Promise((resolve) => {
+      this.tipoFacturaClass.getAll().then((tiposFacturas) => {
+        tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']);
+
+        this.factServ.lista_tipos_facturas = tiposFacturas;
+
+        resolve(this.factServ.lista_tipos_facturas);
+      });
+    });
   }
 
   getActualPath() {
@@ -186,22 +203,28 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   async getAppConfig() {
-    const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
+    return new Promise<any>((resolve, reject) => {
+      const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
 
-    this._ipc
-      .sendTask(task)
-      .then((config: ConfigI) => {
-        if (_.has(config, 'err')) {
-        } else {
-          this.themeService.setTheme(config.color_app);
-          this.configServ.setConfig = config;
-          this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-          setTimeout(() => (this.configReady = true), 500);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+      this._ipc
+        .sendTask(task)
+        .then((config: ConfigI) => {
+          if (_.has(config, 'err')) {
+          } else {
+            this.themeService.setTheme(config.color_app);
+            this.configServ.setConfig = config;
+            this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+
+            setTimeout(() => {
+              this.configReady = true;
+              resolve(config);
+            }, 500);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
   }
 
   timeConvert(d) {

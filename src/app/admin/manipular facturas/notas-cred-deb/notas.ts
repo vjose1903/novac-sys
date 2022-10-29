@@ -1,5 +1,5 @@
 import { ConfigI } from './../../../core/typescript/config-interface';
-import { SingletonService } from './../../../core/services/singleton.service';
+import { Ss } from './../../../core/services/singleton.service';
 import { CrudG } from '../../../core/typescript/crud-g';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
@@ -25,7 +25,7 @@ export class NotaC extends CrudG<any> {
 
   parseDataToPdf(data) {
     return new Promise((resolve) => {
-      const configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+      const configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
 
       const pick_nota = ['cliente', 'estado', 'fecha_equivalente', 'fecha_valida', 'id', 'identificador', 'numero_comprobante', 'numero_documento', 'tipo_factura', 'total', 'usuario', 'facturas_aplicadas', 'tipo_factura_id'];
 
