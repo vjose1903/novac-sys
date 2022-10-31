@@ -134,7 +134,7 @@
               </div>
             </div>
           </div>
-          <p-overlayPanel [dismissable]="false" [showCloseIcon]="camionesSelected.length" #overlayCamion styleClass="dropConfigs">
+          <p-overlayPanel [dismissable]="false" [showCloseIcon]="camionesSelected.length > 0" #overlayCamion styleClass="dropConfigs">
             <ng-template pTemplate>
               <div id="overlayCamion" class="containCamiones">
                 <div class="filterOverlay">
