@@ -1,6 +1,5 @@
 import { Permisos } from './../../core/typescript/permisos';
 import { Ss } from './../../core/services/singleton.service';
-import { FacturacionService } from './facturacion.service';
 import * as _ from 'lodash';
 import { fun } from '../../core/services/functions.service';
 import { PreFacturaClass } from './preFacturas';
@@ -59,7 +58,11 @@ export class FactsLocalStorage extends PreFacturaClass {
     for (let index = 0; index < this.sideBarTabs.length; index++) {
       this.sideBarTabsIndex[index] = this.sideBarTabs[index].key;
     }
+
     this.index_fact_archivada = fun.getKeyByValue(this.sideBarTabsIndex, this.actualModulo['key']);
+    if (typeof this.index_fact_archivada == 'string') this.index_fact_archivada = Number(this.index_fact_archivada);
+
+    setTimeout(() => this.getFacturasGuardadas(), 250);
   }
 
   getSideBarTabByKey(key: tipoDocFacturacion) {

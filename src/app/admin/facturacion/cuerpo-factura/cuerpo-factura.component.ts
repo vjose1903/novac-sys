@@ -11,7 +11,7 @@ import { razon_remover } from './remover-articulo/contantes';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
 import { ModalClass } from '../../components/modal/modal-class';
-import { log } from 'console';
+
 
 @Component({
   selector: 'app-cuerpo-factura',

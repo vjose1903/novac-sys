@@ -27,8 +27,8 @@
                   (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
                   (focus)="tiposFacturas.toggle($event)"
                   tabindex="-1"
-                  [readOnly]="!!factura_a_rellenar"
-                  [ngClass]="{ disabled: !!factura_a_rellenar }"
+                  [readOnly]="action == 'update' && fun.hasValue(!!factura_a_rellenar)"
+                  [ngClass]="{ disabled: action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
                 />
 
                 <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
@@ -47,8 +47,8 @@
                   [(ngModel)]="condicion_fact"
                   (change)="cambiarCondicion($event.target.value)"
                   tabindex="-1"
-                  [disabled]="!!factura_a_rellenar"
-                  [ngClass]="{ disabled: !!factura_a_rellenar }"
+                  [disabled]="action == 'update' && fun.hasValue(!!factura_a_rellenar)"
+                  [ngClass]="{ disabled: action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
                 >
                   <option value="Contado">Contado</option>
                   <option value="Crédito">Crédito</option>
@@ -66,8 +66,8 @@
                   (keydown.enter)="saltar($event.target.id, gastoDe.value)"
                   class="form-control tipo inputE"
                   [(ngModel)]="CostoYgasto"
-                  [readOnly]="!!factura_a_rellenar"
-                  [ngClass]="{ disabled: !!factura_a_rellenar }"
+                  [readOnly]="action == 'update' && fun.hasValue(!!factura_a_rellenar)"
+                  [ngClass]="{ disabled: action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
                   (focus)="gastosFacturas.toggle($event)"
                   (blur)="gastosFacturas.hide()"
                   tabindex="-1"
@@ -89,8 +89,8 @@
                 [(ngModel)]="modo_factura"
                 (blur)="checkCambiosModoyCondicionFactura($event.target)"
                 tabindex="-1"
-                [disabled]="!!factura_a_rellenar"
-                [ngClass]="{ disabled: !!factura_a_rellenar }"
+                [disabled]="action == 'update' && fun.hasValue(!!factura_a_rellenar)"
+                [ngClass]="{ disabled: action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
               >
                 <option value="" disabled selected>Modo de venta</option>
                 <option value="normal">Normal</option>
@@ -218,7 +218,7 @@
                 <h5>
                   <strong>{{ metodo == tipoDocFacturacion.compra ? 'Suplidor' : 'Cliente' }}:</strong>
                 </h5>
-                <i *ngIf="!!!factura_a_rellenar" (click)="abrirModalFiltro()" pTooltip="{{ metodo == tipoDocFacturacion.compra ? 'Buscar suplidor' : 'Buscar cliente' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
+                <i (click)="abrirModalFiltro()" pTooltip="{{ metodo == tipoDocFacturacion.compra ? 'Buscar suplidor' : 'Buscar cliente' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
               </div>
               <div class="row">
                 <div class="col-7 pl-0">
@@ -316,22 +316,37 @@
         <div class="row mx-0 w-100">
           <div class="col-12">
             <span class="titulos w-100">
-              Articulos a vender: <strong> {{ getCantidadArticulos() }}</strong>
+              Articulos: <strong> {{ getCantidadArticulos() }}</strong>
             </span>
           </div>
           <div class="col-7">
             <div class="h-100 d-flex justify-content-around align-items-center">
               <div *ngxPermissionsOnly="metodo == tipoDocFacturacion.venta ? permissions.factura_venta.create : permissions.factura_compra.create">
-                <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_rellenar ? 'Imprimir Factura' : 'Editar Factura'" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
+                <app-btncircular
+                  [alto]="'100px'"
+                  [accion]="action == 'update' && fun.hasValue(!!factura_a_rellenar) ? 'Editar ' + getDocumentoDescripcion().descripcion_short : 'Imprimir ' + getDocumentoDescripcion().descripcion_short"
+                  [nombreImg]="'printer'"
+                  (pulsar)="imprimirFactura()"
+                ></app-btncircular>
               </div>
               <div>
-                <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_rellenar ? 'Cancelar Factura' : 'Cancelar Edición'" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
+                <app-btncircular
+                  [alto]="'100px'"
+                  [accion]="action == 'update' && fun.hasValue(!!factura_a_rellenar) ? 'Cancelar Edición' : 'Cancelar ' + getDocumentoDescripcion().descripcion_short"
+                  [nombreImg]="'cancelar'"
+                  (pulsar)="cancelarFactura()"
+                ></app-btncircular>
               </div>
               <div>
-                <app-btncircular [alto]="'100px'" [accion]="factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura'" [nombreImg]="'guardarFactura'" (pulsar)="archivarFactura()"></app-btncircular>
+                <app-btncircular
+                  [alto]="'100px'"
+                  [accion]="fun.hasValue(factura_guardada) ? getDocumentoDescripcion().descripcion_short + ' ya está archivada' : 'Archivar ' + getDocumentoDescripcion().descripcion_short"
+                  [nombreImg]="'guardarFactura'"
+                  (pulsar)="archivarFactura()"
+                ></app-btncircular>
               </div>
               <div *ngIf="metodo == tipoDocFacturacion.venta">
-                <app-btncircular *ngIf="!!!factura_a_rellenar" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
+                <app-btncircular *ngIf="fun.isEmpty(!!factura_a_rellenar)" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
               </div>
 
               <!-- <div  *ngIf="metodo === 'venta'">
@@ -399,7 +414,7 @@
         <p-tabPanel
           *ngFor="let docTab of sideBarTabs"
           [disabled]="countCantFactSaved(docTab.key).disable"
-          [tooltip]="'No tiene ' + docTab.label + 'guardadas'"
+          [tooltip]="'No tiene ' + docTab.label + ' guardadas'"
           headerStyleClass="{{ countCantFactSaved(docTab.key).disable ? 'noTabView' : '' }}"
           tooltipDisabled="true"
           tooltipStyleClass="{{ countCantFactSaved(docTab.key).disable ? 'd-block' : 'd-none' }} tabViewTootip"
