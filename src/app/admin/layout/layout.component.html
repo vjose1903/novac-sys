@@ -24,7 +24,7 @@
           </div>
 
           <div *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.flatt" class="menuList">
-            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('manipular') }" [innerText]="'Manipular\nfacturas'"></h5>
+            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('manipular') }" [innerText]="'Manipular\ndocumentos'"></h5>
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('manipular') }" src="assets/img/notaM.png" alt="Notas" (click)="cambiarMenu({ url: 'manipular', navigate: false })" />
 
             <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('manipular') }">

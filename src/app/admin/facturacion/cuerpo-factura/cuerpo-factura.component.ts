@@ -1,3 +1,4 @@
+import { FacturacionService } from './../facturacion.service';
 import { tipoDocFacturacion } from './../factura';
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
@@ -11,7 +12,6 @@ import { razon_remover } from './remover-articulo/contantes';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
 import { ModalClass } from '../../components/modal/modal-class';
-
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -42,7 +42,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   @Input() factura;
   @Input() action;
   @Input() fechaFactura;
-  @Input() propietario;
   @Input() metodo;
   @Input() modo_factura;
   @Input() pre_factura_selected;
@@ -56,7 +55,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   productos_devueltos = [];
   dropRowConfig: any;
   configApp: ConfigI;
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, public factServ: FacturacionService) {
     super();
     // this.rowFactura = new FormArray([new FormControl()]);
   }
@@ -89,9 +88,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         fila.precio = fun.desformatear(fila.pre);
         fila.costo = fun.desformatear(fila.costo);
 
-        let omitir = ['cod', 'can', 'can_ant', 'des', 'uni', 'pre', 'tot', 'key', 'secuencia', 'verificado', 'is_materia_prima'];
+        let omitir = ['cod', 'can', 'can_ant', 'des', 'uni', 'pre', 'tot', 'key', 'secuencia', 'verificado'];
 
-        if (this.metodo == tipoDocFacturacion.compra) omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'key', 'secuencia', 'verificado', 'is_materia_prima'];
+        if (this.metodo == tipoDocFacturacion.compra) omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'key', 'secuencia', 'verificado'];
 
         const obj = _.omit(fila, omitir);
 
@@ -205,7 +204,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   readPrecio() {
     let res = true;
 
-    if (fun.hasValue(this.propietario)) {
+    if (fun.hasValue(this.factServ.propietario_factura)) {
       if (this.metodo == tipoDocFacturacion.compra) {
         res = false;
       } else {
@@ -217,7 +216,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   readDescuento() {
-    const res = (this.metodo == tipoDocFacturacion.venta || this.metodo === tipoDocFacturacion.pre_venta) && this.propietario ? false : true;
+    const res = (this.metodo == tipoDocFacturacion.venta || this.metodo === tipoDocFacturacion.pre_venta) && this.factServ.propietario_factura ? false : true;
     return res;
   }
 
@@ -281,7 +280,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       itbis: [null],
       secuencia: [i],
       cantidad_en_unidades: [0],
-      is_materia_prima: [false],
+
       calcular_saco: [false],
       verificado: [false],
       is_defectuoso: [false],
@@ -303,7 +302,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   // =============================================
   //  MODIFICAR FACTURA
   // =============================================
-  async llenarCuerpoFactura(rows) {
+  async llenenarCuerpoFactura(rows) {
     return new Promise<any>((resolve, reject) => {
       this.rellenarVariables()
         .then(async (res) => {
@@ -345,7 +344,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   llenarFilas(row, articulo, index) {
     const campos = (this.filasDetalle[index] as any).controls;
 
-    campos['pre'].setValue(this.metodo == tipoDocFacturacion.venta || this.metodo == tipoDocFacturacion.pre_venta ? fun.numFormatTwoDecimals(row.precio) : fun.numFormatTwoDecimals(row.costo));
+    campos['pre'].setValue(this.metodo == tipoDocFacturacion.compra ? fun.numFormatTwoDecimals(row.costo) : fun.numFormatTwoDecimals(row.precio));
     campos['costo'].setValue(fun.numFormatTwoDecimals(row.costo));
     campos['descuento_valor'].setValue(fun.isEmpty(row.descuento_valor) || row.descuento_valor == 0 ? null : row.descuento_valor);
     campos['tot'].setValue(fun.numFormatTwoDecimals(row.total));
@@ -365,8 +364,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     campos['articulo'].setValue(articulo);
     campos['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
-
-    campos['is_materia_prima'].setValue(row.tipo == 'Materia prima');
 
     let uni = row.peso_saco ? `Saco de ${row.peso_saco} libras` : row.unidad;
 
@@ -392,7 +389,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async saltar(input, index) {
     setTimeout(() => {
-      if (fun.hasValue(this.propietario)) {
+      if (fun.hasValue(this.factServ.propietario_factura)) {
         const { articulo, cod, can, uni } = this.filasDetalle[index].getRawValue();
 
         if (index >= 10 && input === 'can-') this.addItem(index);
@@ -597,6 +594,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         (this.filasDetalle[index] as any).controls['descuento_valor'].reset();
         (this.filasDetalle[index] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(total));
         this.sacarDescuento(key);
+        this.enviarTotalesGenerales();
       }
 
       if (fun.hasValue(codido) && fun.hasValue(precio) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
@@ -615,7 +613,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           (this.filasDetalle[index] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
 
           this.enviarTotalesGenerales();
-          this.enviarDescuentoGeneral();
           this.ajustarSecuencia();
         }
       }
@@ -628,28 +625,20 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   sacarDescuento(key) {
     const currentDescuento = _.find(this.listaDeDescuentos, (item) => item.key == key);
-
-    if (fun.hasValue(currentDescuento)) {
-      _.remove(this.listaDeDescuentos, currentDescuento);
-      const acuDesc = _.reduce(this.listaDeDescuentos, (acumulado, item) => acumulado + item.valor, 0);
-
-      this.getCalculosDinero.emit({ tipo: 'descuento', monto: acuDesc });
-    }
+    if (fun.hasValue(currentDescuento)) _.remove(this.listaDeDescuentos, currentDescuento);
   }
 
-  enviarDescuentoGeneral() {
-    const acuDesc = _.reduce(this.listaDeDescuentos, (acumulado, item) => acumulado + item.valor, 0);
-    this.getCalculosDinero.emit({ tipo: 'descuento', monto: acuDesc });
-  }
+  enviarDescuentoGeneral() {}
 
   enviarTotalesGenerales() {
     const tempTotal = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + fun.desformatear(item.value.tot), 0);
-
+    const tempDesc = _.reduce(this.listaDeDescuentos, (acumulado, item) => acumulado + item.valor, 0);
     const tempItbis = _.reduce(this.filasDetalle, (acumulado, item) => acumulado + fun.desformatear(item.value.itbis) * item.value.can, 0);
+    // this.getCalculosDinero.emit({ tipo: 'descuento', monto: acuDesc });
 
-    const obj = { total: fun.redondearNum(tempTotal), itbis: fun.redondearNum(tempItbis) };
+    const obj = { total: fun.redondearNum(tempTotal), itbis: fun.redondearNum(tempItbis), descuento: fun.redondearNum(tempDesc) };
 
-    this.getCalculosDinero.emit({ tipo: 'bruto', monto: obj });
+    this.getCalculosDinero.emit(obj);
   }
 
   revisarPrecio(formControlName, input_id, index) {
@@ -745,8 +734,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     (this.filasDetalle[params.index] as any).controls['can_ant'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['uni'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
-    // TODO: ver si aqui tengo que agregar el metodo cotizacion
-    if (this.metodo == tipoDocFacturacion.venta || this.metodo == tipoDocFacturacion.pre_venta) (this.filasDetalle[params.index] as any).controls['is_materia_prima'].setValue(params.articulo.descripcion == 'Materia prima');
 
     setTimeout(() => fun.enfocarInput('can-' + params.index), 0);
   }

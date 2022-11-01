@@ -300,7 +300,6 @@
       <div class="cuerpoFactura mb-2">
         <div class="fantasma-cuerpo">
           <app-cuerpo-factura
-            [propietario]="propietario_factura"
             [factura]="factura_a_rellenar"
             [action]="action"
             [modo_factura]="modo_factura"
@@ -431,7 +430,7 @@
       <ng-template #facturas_guardadas let-docTab="docTab">
         <h6 *ngIf="facturas_localStorage?.length === 0" class="mt-3 no_fact">No tiene {{ docTab.label }} guardadas por el momento!!</h6>
         <div *ngIf="facturas_localStorage?.length > 0" class="h-100">
-          <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="setFacturaArchivada(fact)">
+          <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="rellenarFacturaArchivada(fact)">
             <div class="colorsito bg-raya-{{ docTab.color }}{{ fact?.action == 'update' ? '-orange' : '' }}"></div>
 
             <div class="info_fact h-100 {{ factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">

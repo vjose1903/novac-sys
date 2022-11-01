@@ -54,7 +54,7 @@
             <tbody>
               <tr>
                 <!--  ::::::::::::  CONFIG  ::::::::::::  -->
-                <td *ngIf="propietario" class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
+                <td *ngIf="fun.hasValue(factServ.propietario_factura)" class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
                   <div class="btn-group">
                     <div *ngIf="checkIfRowContainArticulo(index_cuerpo)" style="padding: 3px" (click)="abrirOverlay(dropRowConfig, $event)">
                       <i class="fas fa-ellipsis-v btnConfig"></i>
@@ -70,7 +70,7 @@
                 <td class="tiCOD p-0">
                   <div class="form-group m-0">
                     <input
-                      [ngClass]="{ disabled: !propietario || item_cuerpo.controls.from_pre_factura.value }"
+                      [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                       type="text"
                       class="form-control entrada"
                       id="cod-{{ index_cuerpo }}"
@@ -88,7 +88,7 @@
                 <td class="tiCAN p-0">
                   <div class="form-group m-0">
                     <input
-                      [ngClass]="{ disabled: !propietario || item_cuerpo.controls.from_pre_factura.value }"
+                      [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                       type="number"
                       min="1"
                       class="form-control entrada input_cantidad"
@@ -106,7 +106,7 @@
                 <td class="tiUNI p-0">
                   <div class="form-group m-0">
                     <input
-                      [ngClass]="{ disabled: !propietario || item_cuerpo.controls.from_pre_factura.value }"
+                      [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                       *ngIf="inputDrop !== 'uni-' + index_cuerpo"
                       type="text"
                       class="form-control entrada"
@@ -150,7 +150,7 @@
                 <td class="tiDESC p-0">
                   <div class="form-group m-0">
                     <input
-                      [ngClass]="{ disabled: !propietario || item_cuerpo.controls.from_pre_factura.value }"
+                      [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                       type="text"
                       class="form-control entrada campoNumeros input_cantidad"
                       id="desc-{{ index_cuerpo }}"
@@ -158,7 +158,7 @@
                       (keyup.enter)="fun.enfocarInput('cod-' + (index_cuerpo + 1))"
                       formControlName="descuento_valor"
                       (blur)="handleInputEvent('blur', 'descuento_valor', index_cuerpo); revisarPrecio('descuento_valor', 'desc', index_cuerpo); calcularDescuento(index_cuerpo)"
-                      [ngClass]="{ disabled: !propietario }"
+                      [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) }"
                       tabindex="-1"
                     />
                   </div>
