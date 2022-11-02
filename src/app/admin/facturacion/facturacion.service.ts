@@ -115,7 +115,7 @@ export class FacturacionService {
     if ((params.metodo == tipoDocFacturacion.cotizacion || params.metodo == tipoDocFacturacion.pre_venta) && actualPath.includes('cotizacion')) {
       documento = params.metodo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre venta';
     } else if (params.condicion_fact == 'Crédito') documento = 'Factura a Crédito';
-    else if (this.tipoFactura.referencia == '01') documento = 'Factura con valor fiscal';
+    else if (fun.hasValue(this.tipoFactura) && this.tipoFactura?.referencia == '01') documento = 'Factura con valor fiscal';
     else if (params.modo_factura == 'adelantada') documento = 'Factura adelantada';
     else if (params.is_viaje) documento = 'Factura de viaje';
     else {

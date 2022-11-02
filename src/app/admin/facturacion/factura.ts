@@ -75,14 +75,12 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   getFacturasByParams(args: { campo: string; valor: 'string'; tipo_factura_id: number; adelantada: boolean; page: number; per_page: number; paginado: boolean; fact_de: string }) {
-    // `params/${campo}/${VALOR_ENC}/${tipo_factura_id}/${adelantada}?page=${page}&per_page=${per_page}&paginado=${paginado}`
-
     const valor_enc = btoa(args.valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
 
     const extra = {
       afterPath: `params/${args.campo}/${VALOR_ENC}/${args.tipo_factura_id}/${args.adelantada}`,
-      parameters: { page: args.page, per_page: args.per_page, paginado: args.paginado },
+      parameters: { page: args.page, per_page: args.per_page, paginado: args.paginado, fact_de: args.fact_de },
     };
     return this.getAll(extra);
   }
@@ -126,9 +124,8 @@ export class FacturaC extends CrudG<FacturasI> {
         { old_key: 'detalle_facturas', new_key: 'contenido_reporte' },
         { old_key: 'numero_factura', new_key: 'numero_documento' },
       ]);
-      console.log('data_parsed ', data_parsed);
 
-      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente);
+      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente).format();
       data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
       data_parsed.total = data_parsed.total_factura;
 

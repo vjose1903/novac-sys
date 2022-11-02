@@ -42,7 +42,8 @@
               [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected)"
             >
               <option [value]="null" selected disabled>Escoger tipo</option>
-              <option value="1">Por {{ tipo_documento_selected == 'compra' ? 'suplidor' : 'cliente' }}</option>
+              <option *ngIf="tipo_documento_selected != 'compra'" value="1">Por cliente</option>
+              <option *ngIf="tipo_documento_selected == 'compra'" value="5">Por suplidor</option>
               <option *ngIf="tipo_documento_selected != 'cotizacion'" value="2">Por número comprobante</option>
               <option value="3">Por número {{ tipo_documento_selected == 'cotizacion' ? 'cotización' : 'factura' }}</option>
               <option value="4">Ultimas 50 {{ tipo_documento_selected == 'cotizacion' ? 'cotizaciones' : 'facturas' }}</option>
@@ -67,7 +68,7 @@
 
             <div *ngIf="buscar_por && buscar_por != campos.ultimas50" class="form-group">
               <label class="control-label mb-0">{{ getProperties('label') + ' ' }} : </label>
-              <ng-container *ngIf="buscar_por == campos.cliente">
+              <ng-container *ngIf="buscar_por == campos.cliente || buscar_por == campos.suplidor">
                 <input
                   id="valorI"
                   class="form-control inputE"
@@ -96,7 +97,15 @@
 
               <!-- ================ NUMERO FACTURA  ================ -->
               <ng-container *ngIf="buscar_por == campos.numeroFactura">
-                <input id="valorI" class="form-control inputE input_cantidad" (keydown.enter)="saltar('buscarFactura', $event.target.value)" type="number" (focus)="$event.target.select()" [placeholder]="placeHolder" autocomplete="off" />
+                <input
+                  id="valorI"
+                  class="form-control inputE input_cantidad"
+                  (keydown.enter)="saltar('buscarFactura', $event.target.value)"
+                  type="number"
+                  (focus)="$event.target.select()"
+                  [placeholder]="getProperties('placeHolder')"
+                  autocomplete="off"
+                />
               </ng-container>
             </div>
           </div>

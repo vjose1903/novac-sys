@@ -1026,7 +1026,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           fun.toastWarning(`Total de la ${documento.descripcion} no puede ser 0`, 'Aviso');
           fun.enfocarInput('cod-0');
         } else {
-          if ((this.condicion_fact == 'Crédito' || this.is_viaje || this.metodo == tipoDocFacturacion.pre_venta, this.metodo == tipoDocFacturacion.cotizacion)) {
+          if (this.condicion_fact == 'Crédito' || this.is_viaje || this.metodo == tipoDocFacturacion.pre_venta || this.metodo == tipoDocFacturacion.cotizacion) {
             const obj = { metodo: this.metodo, condicion_fact: this.condicion_fact, is_viaje: this.is_viaje, modo_factura: this.modo_factura };
 
             this.openNewModal({
@@ -1397,8 +1397,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       let fecha_venci;
 
       if (this.metodo == tipoDocFacturacion.venta || this.metodo == tipoDocFacturacion.pre_venta) {
-        fecha_venci = moment(new Date()).add(this.factServ.propietario_factura.limite_credito, 'days').format('DD/MM/YYYY');
-      } else fecha_venci = moment(this.fecha_vencimiento).format('DD/MM/YYYY');
+        fecha_venci = moment(new Date()).add(this.factServ.propietario_factura.limite_credito, 'days').format('YYYY-MM-DD');
+      } else {
+        fecha_venci = moment(this.fecha_vencimiento).format('YYYY-MM-DD');
+      }
+
+      fecha_venci = moment(fecha_venci).add(8, 'hours').format();
 
       cabecera_fact['fecha_vencimiento'] = fecha_venci;
       cabecera_fact['pagada'] = false;
@@ -1409,7 +1413,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       cabecera_fact['balance'] = this.is_viaje ? fun.parseFloatTwoDecimals(this.TOTAL) : 0;
       cabecera_fact['devuelta'] = this.is_viaje ? 0 : this.Devuelta;
     }
-    cabecera_fact['fecha_valida'] = this.paqueteComprobante ? (fun.hasValue(this.paqueteComprobante.fecha_valida) ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null) : null;
+
+    let fecha_valida = null;
+    if (moment(this.paqueteComprobante.fecha_valida).isValid()) {
+      fecha_valida = moment(this.paqueteComprobante.fecha_valida).format('YYYY-MM-DD');
+      fecha_valida = moment(fecha_valida).add(8, 'hours').format();
+    }
+
+    cabecera_fact['fecha_valida'] = fecha_valida;
 
     cabecera_fact['tipo_factura_id'] = this.factServ.tipoFactura.id;
     cabecera_fact['numero_comprobante'] = this.metodo == tipoDocFacturacion.compra ? this.NCFcompra : null;
@@ -1466,7 +1477,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let res;
 
     let documento = this.getDocumentoDescripcion();
-    console.log('cabecera_fact ', cabecera_fact);
 
     if (this.action == 'update') res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_rellenar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);

@@ -89,6 +89,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
+      console.log('Layout > layServ.LOGOUT > res ', res);
+
       if (res && res.bool) this.logOut();
       else {
         if (fun.hasValue(res)) this.layServ.nextLogOut(undefined);
@@ -187,9 +189,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // CERRAR SESION
   // =================================================================================
   logOut() {
+    fun.logPurple('Layout> logOut ');
     fun.logout().then(() => {
       this._destroy_layout(true);
       this.noServer = false;
+      console.log('navegando al inicio de sesion');
       this.router.navigateByUrl('/');
     });
   }
