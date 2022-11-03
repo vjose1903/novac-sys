@@ -5,11 +5,12 @@ export const infoPagare = {
 };
 
 export const infoTipoPdf = {
-  notas: ['titulo'],
+  notas: ['tipo_pdf'],
   ventas: ['condicion', 'tipo_factura'],
-  recibo_ingreso: ['titulo'],
-  conduce: ['titulo'],
-  cuadre_caja: ['titulo'],
+  recibo_ingreso: ['tipo_pdf'],
+  conduce: ['tipo_pdf'],
+  cotizacion: ['tipo_pdf'],
+  cuadre_caja: ['tipo_pdf'],
 };
 
 export const infoResumenPartes = {
@@ -17,6 +18,7 @@ export const infoResumenPartes = {
   ventas: ['bruto', 'descuento', 'total', 'efectivo', 'cambio'],
   recibo_ingreso: ['total'],
   conduce: [],
+  cotizacion: ['bruto', 'descuento', 'itbis', 'total'],
   cuadre_caja: [],
 };
 
@@ -25,6 +27,7 @@ export const infoFacturaPartes = {
   ventas: ['ncf', 'no_documento', 'fecha', 'fecha_vencimiento', 'valida'],
   recibo_ingreso: ['no_documento', 'fecha'],
   conduce: ['no_documento', 'fecha'],
+  cotizacion: ['no_documento', 'fecha'],
   cuadre_caja: ['no_documento', 'fecha'],
 };
 
@@ -32,6 +35,7 @@ export const infoPropietarioPartes = {
   notas: ['nombre', 'doc_identidad', 'direccion'],
   ventas: ['nombre', 'doc_identidad', 'direccion'],
   recibo_ingreso: ['nombre', 'doc_identidad', 'direccion', 'recibido'],
+  cotizacion: ['nombre', 'doc_identidad', 'direccion'],
   conduce: ['nombre', 'doc_identidad', 'direccion'],
   cuadre_caja: [],
 };
@@ -41,10 +45,11 @@ export const firmas = {
   ventas: ['nombre', 'doc_identidad', 'direccion'],
   recibo_ingreso: ['recibido_por', 'entregado_por'],
   conduce: ['realizado_por', 'cliente'],
+  cotizacion: [],
   cuadre_caja: [],
 };
 
 export const cierrePdf = {
   barcode: ['ventas', 'recibo_ingreso', 'conduce', 'cuadre_caja'],
-  usuario: ['ventas', 'recibo_ingreso', 'conduce', 'cuadre_caja'],
+  usuario: ['ventas', 'recibo_ingreso', 'conduce', 'cuadre_caja', 'cotizacion'],
 };

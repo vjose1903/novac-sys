@@ -1,4 +1,4 @@
-export const config_conduce = {
+export const config_cotizacion = {
   pageSize: { width: 600, height: 398 },
   pageMargins: [15, 110, 15, 15],
   margin_general: [0, 0, 0, 0],
@@ -6,7 +6,7 @@ export const config_conduce = {
   break: 10,
   only_titulo: false,
   pageOrient: 'portrait',
-  widths: [24, '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+  widths: [24, 240, '*', '*', '*', '*'],
   mostrar_total: false,
 
   info: [
@@ -33,7 +33,7 @@ export const config_conduce = {
     {
       text: 'CANT.',
       style: 'letra10',
-      alignment_titulo: 'center',
+      alignment_titulo: 'right',
       noWrap: true,
       style_body: 'letra10',
       key: 'cantidad',

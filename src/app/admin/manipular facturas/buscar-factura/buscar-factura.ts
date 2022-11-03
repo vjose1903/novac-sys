@@ -65,7 +65,32 @@ export class BuscarFacturaC {
       id_tabla: 'facturas_params',
       obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     } as table_config,
+
     pre_venta: {} as table_config,
-    cotizacion: {} as table_config,
+
+    cotizacion: {
+      info: [
+        { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
+        { titulo: 'No. Cotización', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
+        { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
+        { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre' },
+        { titulo: 'Total cotizado', tipo: 'formatoNumero', key: 'total_factura' },
+        {
+          titulo: 'Acciones',
+          tipo: 'icon',
+          key: 'actions',
+          estilos: [{ width: '9%' }],
+          iconsArray: [
+            { key: 'view', tooltip: 'Ver Cotización', text_color: 'viewColor' },
+            { key: 'make_bill', tooltip: 'Crear Factura desde Cotización' },
+            { key: 'delete', tooltip: 'Anular Cotización' },
+          ],
+        },
+      ],
+      colores: true,
+      padding: '0.5rem',
+      id_tabla: 'facturas_params',
+      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    } as table_config,
   };
 }

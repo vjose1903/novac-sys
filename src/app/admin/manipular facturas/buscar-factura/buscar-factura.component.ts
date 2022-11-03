@@ -1,3 +1,4 @@
+import { tipoDocFacturacion } from './../../facturacion/factura';
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
@@ -29,7 +30,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   facturaSelected: any;
   buscarPara: any;
-  Para: string;
+  para: string;
 
   lista_tipos_facturas: any;
   noExistenComprobantes = false;
@@ -189,13 +190,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   completarTituloPag() {
     if (this.buscarPara === 'anular_factura') {
-      this.Para = ' Anular factura';
+      this.para = ' Anular factura';
     } else if (this.buscarPara === 'nota_credito') {
-      this.Para = ' Nota de crédito';
+      this.para = ' Nota de crédito';
     } else if (this.buscarPara === 'nota_debito') {
-      this.Para = ' Nota de débito';
+      this.para = ' Nota de débito';
     } else if (this.buscarPara === 'solo_ver') {
-      this.Para = ' Visualizar';
+      this.para = ' Visualizar';
 
       const td_actions = _.find(this.table_config.info, { key: 'actions' });
       const btn_select = _.find(td_actions.iconsArray, { id: 'select' });
@@ -208,10 +209,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   makeTiposDocumentos() {
     const tipos = [
-      { condition: true, value: 'venta', label: 'Factura de venta' },
-      { condition: true, value: 'compra', label: 'Factura de compra' },
-      { condition: this.hasPermisoPreVenta, value: 'pre_venta', label: 'Pre-Venta' },
-      { condition: this.hasPermisoCotizacion, value: 'cotizacion', label: 'Cotización' },
+      { condition: true, value: tipoDocFacturacion.venta, label: 'Factura de venta' },
+      { condition: true, value: tipoDocFacturacion.compra, label: 'Factura de compra' },
+      { condition: this.hasPermisoPreVenta, value: tipoDocFacturacion.pre_venta, label: 'Pre-Venta' },
+      { condition: this.hasPermisoCotizacion, value: tipoDocFacturacion.cotizacion, label: 'Cotización' },
     ];
 
     tipos.forEach((tipo) => {
@@ -308,6 +309,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.viewColor = 'gris-claro';
         fact.view = 'far fa-eye-slash';
         fact.delete = 'far fa-trash-alt';
+        fact.make_bill = 'fas fa-external-link-alt';
+
         fact.is_selected = this.idsFacturasSeleccionadas.includes(fact.id);
         fact.tooltip_select = 'Seleccionar Factura';
 
@@ -320,13 +323,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }],
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
-            { key: 'view', estilos: 'font-size: 1.2rem !important' },
-            { key: 'delete', estilos: 'font-size: 1.2rem !important' },
-            { key: 'selected', estilos: 'margin-left: 0.5rem !important; font-size: 1.2rem !important;' },
+            { key: 'view', estilos: 'font-size: 1.1rem !important;' },
+            { key: 'delete', estilos: 'font-size: 1.1rem !important;' },
+            { key: 'make_bill', estilos: 'font-size: 1.1rem !important; margin:  0rem 0.8rem !important;' },
+            { key: 'selected', estilos: 'margin-left: 0.8rem !important; font-size: 1.2rem !important;' },
           ],
         };
 
-        if (this.Para == ' Visualizar') _.pull(fact.customStyles.actions, _.find(fact.customStyles.actions, { key: 'selected' }));
+        if (this.para == ' Visualizar') _.pull(fact.customStyles.actions, _.find(fact.customStyles.actions, { key: 'selected' }));
 
         this.facturas.push(fact);
       });
@@ -375,7 +379,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
     return res;
   }
-
   getIsPagoAtiempo(factura) {
     let pago_a_tiempo = true;
 
@@ -409,22 +412,18 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
 
     this.tipo_factura_id = null;
+    this.valor_a_buscar = null;
     this.idsFacturasSeleccionadas.length = 0;
 
     const valorInput = document.getElementById('valorI') as any;
     if (fun.hasValue(valorInput)) valorInput.value = null;
 
     this.resetFacturas();
+    const tipos_cero = [this.campos.numeroComprobante, this.campos.ultimas50, this.campos.numeroFactura].map((item) => `${item}`);
 
-    if (valor == this.campos.numeroComprobante) {
-      this.tipo_factura_id = '0';
-      //
-    } else if (valor == this.campos.ultimas50) {
-      this.tipo_factura_id = '0';
-      this.valor_a_buscar = null;
+    if (tipos_cero.includes(valor)) this.tipo_factura_id = '0';
 
-      this.pedirFactura(this.tServ.obj_paginate.default);
-    }
+    if (valor == this.campos.ultimas50) this.pedirFactura(this.tServ.obj_paginate.default);
   }
 
   getProperties(tipo) {
@@ -433,12 +432,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (tipo == 'label') {
       if (this.buscar_por == this.campos.cliente) res = 'Cliente';
       if (this.buscar_por == this.campos.numeroComprobante) res = 'Numero Comprobante';
-      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected == 'cotizacion' ? 'Número Cotización' : 'Número Factura';
+      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'Número Cotización' : 'Número Factura';
       if (this.buscar_por == this.campos.suplidor) res = 'Suplidor';
     } else {
       if (this.buscar_por == this.campos.cliente) res = 'Nombre Cliente';
       if (this.buscar_por == this.campos.numeroComprobante) res = 'Escriba numero de comprobante';
-      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected == 'cotizacion' ? 'Escriba número de Cotización' : 'Escriba número de Factura';
+      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'Escriba número de Cotización' : 'Escriba número de Factura';
       if (this.buscar_por == this.campos.suplidor) res = 'Nombre Suplidor';
     }
     return res;
@@ -480,12 +479,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     } else if (params.id_tabla == 'facturas_params') {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
-          this.facturaClass.parseDataToPdf(params.data).then((res) => {
-            this.facturaSelected = res;
+          this.facturaClass.parseDataToPdf(params.data).then((factura_parsed) => {
+            this.facturaSelected = factura_parsed;
+            console.log('this.facturaSelected ', this.facturaSelected);
 
-            this.mostrarFactura(res, 'facturacion');
+            this.mostrarFactura(factura_parsed, this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : 'facturacion');
           });
         }
+
         if (params.idIcon == 'select') {
           params.data.is_selected = !params.data.is_selected;
 
@@ -495,8 +496,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         if (params.iconKey == 'delete') {
           fun.logRed('BORRAR FACTURA ', params);
         }
+
+        if (params.iconKey == 'make_bill') this.pasarCotizacionAfacturar(params.data);
       }
     }
+  }
+
+  pasarCotizacionAfacturar(cotizacion) {
+    setTimeout(() => this.router.navigateByUrl(`/admin/factura/venta/bill_from_cotizacion/${cotizacion.id}`), 10);
   }
 
   saltar(salioDe, valor) {
@@ -512,7 +519,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         break;
 
       case 'buscarPorI':
-        siguiente_input = this.buscar_por == this.campos.numeroComprobante || this.tipo_documento_selected == 'cotizacion' ? 'valorI' : 'campoTipoFact';
+        siguiente_input = this.buscar_por == this.campos.numeroComprobante || this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'valorI' : 'campoTipoFact';
         break;
 
       case 'campoTipoFact':
@@ -558,6 +565,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   editarFactura() {
     this.facturaClass.getAll({ afterPath: `custom/canUpdate/${this.facturaSelected.id}` }).then((res) => {
+      console.log('===> ', `/admin/factura/venta/update/${this.facturaSelected.id}`);
+
       setTimeout(() => this.router.navigateByUrl(`/admin/factura/venta/update/${this.facturaSelected.id}`), 10);
     });
   }
@@ -621,14 +630,30 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           },
         };
 
-        obj_modal.botones.dinamico.push({
-          clase: 'btn btn-gris ml-2',
-          function: (instance) => this.verDetalles(type == 'nota' ? dataDB : dataFactura, type),
-          label: 'Ver detalles',
-          disable: false,
-        });
+        if (this.tipo_documento_selected != tipoDocFacturacion.cotizacion) {
+          obj_modal.botones.dinamico.push({
+            clase: 'btn btn-gris ml-2',
+            function: (instance) => this.verDetalles(type == 'nota' ? dataDB : dataFactura, type),
+            label: 'Ver detalles',
+            disable: false,
+          });
+        } else {
+          obj_modal.botones.dinamico.push({
+            clase: 'btn btn-gris ml-2',
+            function: (instance) => {
+              instance.closeModal(instance.id, 'mostrarFactura');
+              this.tableClickIcon({ id_tabla: 'facturas_params', columnKey: 'actions', iconKey: 'make_bill', data: dataFactura });
+            },
+            label: 'Facturar',
+            disable: false,
+          });
 
-        if (this.Para == ' Visualizar' || type == 'nota') {
+          //           id_tabla == 'facturas_params'
+          // columnKey == 'actions'
+          // iconKey == 'make_bill'
+        }
+
+        if (this.para == ' Visualizar' || type == 'nota') {
           const editButton = {
             clase: 'btn btn-verde ml-2',
             function: (instance) => {

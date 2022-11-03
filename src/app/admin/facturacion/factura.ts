@@ -15,6 +15,12 @@ export enum tipoDocFacturacion {
   cotizacion = 'cotizacion',
 }
 
+export enum actionFacturacion {
+  new = 'pre_venta',
+  update = 'update',
+  bill_from_cotizacion = 'bill_from_cotizacion',
+}
+
 export class FacturaC extends CrudG<FacturasI> {
   constructor() {
     super('cabecera_facturas');

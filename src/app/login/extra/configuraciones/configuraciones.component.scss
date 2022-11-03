@@ -1,7 +1,14 @@
 .box-impresion {
   border-radius: 0.5rem;
+  height: 100%;
+  display: grid;
+  grid-template-areas:
+    "box-head"
+    "box-body";
+  grid-template-rows: min-content auto;
 
-  .head {
+  .box-head {
+    grid-area: box-head;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -12,9 +19,11 @@
       letter-spacing: 2px;
     }
   }
-  .body {
+  .box-body {
+    grid-area: box-body;
     padding: 0.5rem;
     border-radius: 0rem 0rem 0.5rem 0.5rem;
+    background: #f2f2f2;
   }
 }
 

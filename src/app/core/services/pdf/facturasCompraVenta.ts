@@ -37,7 +37,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     styles: styles_,
   };
 
-  const obj = { doc: dd, file: file_name, type: 'file', pageOrientation:'portrait' };
+  const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: 'portrait' };
 
   return obj;
 }
@@ -146,7 +146,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           table: {
             margin: [0, 0, 0, 0],
             headerRows: 1,
-            widths: [20, 230, '*', '*', '*', '*'],
+            widths: [20, 240, '*', '*', '*', '*'],
             body: [
               [
                 { text: ' #', style: 'letra11', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },

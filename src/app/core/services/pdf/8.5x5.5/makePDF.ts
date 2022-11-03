@@ -10,6 +10,7 @@ import { config_notas } from './configuraciones/notas/notas';
 import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
 import { config_conduce } from './configuraciones/conduce';
+import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { fun } from '../../functions.service';
 import * as numLetra from '../utils/numero_letras';
@@ -20,6 +21,7 @@ const configuraciones = {
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
   conduce: config_conduce,
+  cotizacion: config_cotizacion,
   cuadre_caja: config_cuadre_caja,
 };
 
@@ -44,7 +46,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     styles: styles_,
   };
 
-  console.log("dd ", dd);
+  console.log('dd ', dd);
 
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: pageO };
   return obj;
@@ -187,7 +189,7 @@ function parseTipoPdf(data, tipo_pdf) {
 
   const partes = [
     {
-      key: 'titulo',
+      key: 'tipo_pdf',
       item: [{ text: data?.tipo_pdf, alignment: 'right', bold: true, style: 'letra10' }],
     },
   ];
@@ -210,35 +212,42 @@ function parseResumen(data, tipo_pdf) {
     {
       key: 'bruto',
       item: [
-        { text: 'BRUTO:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
+        { text: 'Bruto:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
         { text: fun_.numFormatTwoDecimals(data?.Bruto), alignment: 'right', style: 'letra11', bold: true },
+      ],
+    },
+    {
+      key: 'itbis',
+      item: [
+        { text: 'Itbis:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
+        { text: fun_.numFormatTwoDecimals(data?.itbis), alignment: 'right', style: 'letra11', bold: true },
       ],
     },
     {
       key: 'descuento',
       item: [
-        { text: 'DESCUENTO:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
+        { text: 'Descuento:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
         { text: fun_.numFormatTwoDecimals(data?.descuento), alignment: 'right', style: 'letra11', bold: true },
       ],
     },
     {
       key: 'total',
       item: [
-        { text: 'TOTAL:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
+        { text: 'Total:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
         { text: fun_.numFormatTwoDecimals(data?.total), alignment: 'right', style: 'letra11', bold: true },
       ],
     },
     {
       key: 'efectivo',
       item: [
-        { text: 'EFECTIVO', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
+        { text: 'Efectivo', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
         { text: fun_.numFormatTwoDecimals(data?.total + data?.devuelta), bold: true, alignment: 'right', style: 'letra11' },
       ],
     },
     {
       key: 'cambio',
       item: [
-        { text: 'CAMBIO', alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
+        { text: 'Cambio', alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
         { text: fun_.numFormatTwoDecimals(data?.devuelta), alignment: 'right', style: 'letra11' },
       ],
     },

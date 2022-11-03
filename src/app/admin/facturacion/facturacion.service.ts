@@ -112,6 +112,7 @@ export class FacturacionService {
     const actualPath = fun.getActualPath();
     let documento;
 
+
     if ((params.metodo == tipoDocFacturacion.cotizacion || params.metodo == tipoDocFacturacion.pre_venta) && actualPath.includes('cotizacion')) {
       documento = params.metodo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre venta';
     } else if (params.condicion_fact == 'Crédito') documento = 'Factura a Crédito';
@@ -123,6 +124,6 @@ export class FacturacionService {
       if (params.metodo == tipoDocFacturacion.compra) documento = 'Factura de compra';
     }
 
-    return { descripcion: documento, descripcion_short: documento.split(' ')[0], has_Propietario: fun.hasValue(this.propietario_factura) };
+    return { descripcion: documento, descripcion_short: documento?.split(' ')[0], has_Propietario: fun.hasValue(this.propietario_factura) };
   }
 }
