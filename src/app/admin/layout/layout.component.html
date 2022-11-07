@@ -16,31 +16,21 @@
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('factura') }" src="assets/img/factura.png" alt="Facturacion" (click)="cambiarMenu({ url: 'factura', navigate: false })" />
 
             <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('factura') }">
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.facturacion.pre_venta"
-                [ngClass]="{ activa: actualRuta == 'pre_venta/new/0' || actualRuta == 'pre_venta/update/0' }"
-                (click)="cambiarMenu({ url: 'factura/pre_venta/new/0', navigate: true })"
-              >
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.pre_venta" [ngClass]="{ activa: getLayoutActiveRoute('pre_venta', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/pre_venta/new/0', navigate: true })">
                 Pre-Venta
               </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.venta" [ngClass]="{ activa: actualRuta == 'venta/new/0' || actualRuta == 'venta/update/0' }" (click)="cambiarMenu({ url: 'factura/venta/new/0', navigate: true })">
+              <h4
+                class="opcion"
+                *ngxPermissionsOnly="menuPermissionsObj.facturacion.venta"
+                [ngClass]="{ activa: getLayoutActiveRoute('venta', ['new', 'update', 'bill_from_cotizacion']) }"
+                (click)="cambiarMenu({ url: 'factura/venta/new/0', navigate: true })"
+              >
                 Venta
               </h4>
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.facturacion.compra"
-                [ngClass]="{ activa: actualRuta == 'compra/new/0' || actualRuta == 'compra/update/0' }"
-                (click)="cambiarMenu({ url: 'factura/compra/new/0', navigate: true })"
-              >
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.compra" [ngClass]="{ activa: getLayoutActiveRoute('pre_venta', ['compra', 'update']) }" (click)="cambiarMenu({ url: 'factura/compra/new/0', navigate: true })">
                 Compra
               </h4>
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.facturacion.cotizacion"
-                [ngClass]="{ activa: actualRuta == 'cotizacion/new/0' || actualRuta == 'cotizacion/update/0' }"
-                (click)="cambiarMenu({ url: 'factura/cotizacion/new/0', navigate: true })"
-              >
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.cotizacion" [ngClass]="{ activa: getLayoutActiveRoute('cotizacion', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/cotizacion/new/0', navigate: true })">
                 Cotización
               </h4>
             </div>

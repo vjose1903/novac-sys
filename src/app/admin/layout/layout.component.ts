@@ -199,6 +199,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   // =================================================================================
+  // CHECK LAYOUT ACTIVE ROUTE
+  // =================================================================================
+
+  getLayoutActiveRoute(module, paths) {
+    return _.some(paths, (path) => this.actualRuta.includes(`${module}/${path}`));
+  }
+
+  // =================================================================================
   // CHECK ROUTE ACTIVA
   // =================================================================================
 

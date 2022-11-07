@@ -294,24 +294,8 @@ export class fun {
   static desformatear(sTnum: any) {
     const number = typeof sTnum == 'string' ? parseFloat(sTnum.replaceAll(',', '')) : sTnum;
     return number;
-
-    // let temp = 0;
-
-    // if (sTnum) {
-    //   const x = _.split(sTnum, ',');
-    //   if (x.length === 1) {
-    //     temp += parseFloat(x[0]);
-    //     return temp;
-    //   } else if (x.length >= 2) {
-    //     let joined = '';
-    //     joined = _.join(x, '');
-    //     temp += parseFloat(joined);
-    //     return temp;
-    //   }
-    // } else {
-    //   return sTnum;
-    // }
   }
+
   // __________________________________________________________________________________________________
   // Nombre: getPersonaByDocIdentidad
   // Descripcion : Esta funcion busca una persona sea empleado, cliente o suplidor por su documento de identidad

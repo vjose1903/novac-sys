@@ -16,7 +16,7 @@ export enum tipoDocFacturacion {
 }
 
 export enum actionFacturacion {
-  new = 'pre_venta',
+  new = 'new',
   update = 'update',
   bill_from_cotizacion = 'bill_from_cotizacion',
 }

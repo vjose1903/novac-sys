@@ -28,21 +28,22 @@ export class FactsLocalStorage extends PreFacturaClass {
 
   setActualModulo() {
     const actualPath = fun.getActualPath();
+
     this.actualModulo = {};
 
-    if (actualPath.includes(tipoDocFacturacion.pre_venta)) {
-      this.actualModulo['key'] = tipoDocFacturacion.pre_venta;
-      this.actualModulo['titulo'] = 'Pre-ventas';
-    }
     if (actualPath.includes(tipoDocFacturacion.venta)) {
       this.actualModulo['key'] = tipoDocFacturacion.venta;
       this.actualModulo['titulo'] = 'Facturas de venta';
-    }
-    if (actualPath.includes(tipoDocFacturacion.compra)) {
+      //
+    } else if (actualPath.includes(tipoDocFacturacion.compra)) {
       this.actualModulo['key'] = tipoDocFacturacion.compra;
       this.actualModulo['titulo'] = 'Facturas de compra';
-    }
-    if (actualPath.includes(tipoDocFacturacion.cotizacion)) {
+      //
+    } else if (actualPath.includes(tipoDocFacturacion.pre_venta)) {
+      this.actualModulo['key'] = tipoDocFacturacion.pre_venta;
+      this.actualModulo['titulo'] = 'Pre-ventas';
+      //
+    } else if (actualPath.includes(tipoDocFacturacion.cotizacion)) {
       this.actualModulo['key'] = tipoDocFacturacion.cotizacion;
       this.actualModulo['titulo'] = 'Cotizaciones';
     }
