@@ -596,8 +596,7 @@ export class fun {
   // Descripcion : Esta funcion returna en un string la ruta actual en la que estas posicionado
   // __________________________________________________________________________________________________
   static getActualPath() {
-    const location = window.location.href;
-    const actualPath = location.slice(location.indexOf('/admin'), location.length);
+    const actualPath = window.location.pathname;
     return actualPath;
   }
 

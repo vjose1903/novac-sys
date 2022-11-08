@@ -71,6 +71,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   fechaFactura;
   FechaFacturaMostrar: any;
   action: any;
+  idDocumento: any;
   factura_a_rellenar: FacturasI;
   form: FormGroup;
   fecha;
@@ -78,7 +79,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   is_adelantada;
   is_viaje;
   is_editando: boolean;
-  is_rellenando: boolean;
   ITBIS;
   condicion_fact;
   forma_pago;
@@ -105,7 +105,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   objArchivo: {
     factura_en_turno: any;
-    factura_para_rellenar: any;
     facturas_localStorage?: any;
     factura_en_turno_storage?: any;
   };
@@ -159,7 +158,26 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
     this.localeService.use('es');
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
-    this.rellenarVariables();
+
+    this.rellenarVariables().then((res) => {
+      console.log(' ');
+      console.log(' ');
+      console.log('this.action ', this.action);
+
+      if (this.action == actionFacturacion.update) {
+        this.is_editando = true;
+        this.procesoRelleno({ id: this.idDocumento, tipo: this.metodo, action: actionFacturacion.update });
+      } else if (this.action == actionFacturacion.bill_from_cotizacion) {
+        console.log('#####');
+
+        this.procesoRelleno({ id: this.idDocumento, tipo: 'venta', action: actionFacturacion.bill_from_cotizacion });
+      } else {
+        setTimeout(() => {
+          if (this.metodo == tipoDocFacturacion.pre_venta || this.metodo == tipoDocFacturacion.cotizacion) this.abrirModalFiltro();
+          else fun.enfocarInput('tipoFact');
+        }, 5);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -173,11 +191,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => (this.hasPermisoCamiones = result));
   }
 
-  procesoArchivarFactura(factura_para_rellenar?) {
+  verificateArchivo() {
+    console.log(' ');
+    console.log(' ------ procesoArchivarFactura ------- ');
+    console.log(' ');
     return new Promise((resolve) => {
-      this.objArchivo = { factura_en_turno: undefined, factura_para_rellenar: undefined, facturas_localStorage: fun.getFacturasguardadas() };
-      console.log('  ');
-      console.log('  ');
+      this.objArchivo = { factura_en_turno: undefined, facturas_localStorage: fun.getFacturasguardadas() };
+
       console.log('this.checkIfFacturacionEnProceso() ', this.checkIfFacturacionEnProceso());
       console.log('this.objArchivo.facturas_localStorage ', this.objArchivo.facturas_localStorage);
       console.log('this.factura_guardada ', this.factura_guardada);
@@ -187,92 +207,74 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         console.log('>>>> this.objArchivo.factura_en_turno ', this.objArchivo.factura_en_turno);
 
         let comparar_con_localStorage = _.find(this.objArchivo.facturas_localStorage, (item) => item.archivo_id == this.factura_guardada?.archivo_id);
-        // comparar_con_localStorage = comparar_con_localStorage ? _.omit(comparar_con_localStorage, ['archivo_id', 'factura_id', 'cliente', 'suplidor', 'tipo_factura']) : undefined;
-        comparar_con_localStorage = comparar_con_localStorage ? _.omit(comparar_con_localStorage, ['archivo_id', 'factura_id', 'cliente', 'suplidor']) : undefined;
-        this.objArchivo['factura_en_turno_storage'] = comparar_con_localStorage;
+        console.log('>>>> comparar_con_localStorage ', comparar_con_localStorage);
+        // comparar_con_localStorage = comparar_con_localStorage ? _.omit(comparar_con_localStorage, ['archivo_id',  'cliente', 'suplidor', 'tipo_factura']) : undefined;
+        const factura_en_turno_storage = comparar_con_localStorage ? _.omit(comparar_con_localStorage, ['archivo_id', 'cliente', 'suplidor']) : undefined;
+        this.objArchivo['factura_en_turno_storage'] = factura_en_turno_storage;
       }
+
       console.log('this.objArchivo[factura_en_turno_storage] ', this.objArchivo['factura_en_turno_storage']);
       console.log('  ');
       console.log('  ');
-
-      if (factura_para_rellenar) {
-        // factura_para_rellenar = _.omit(factura_para_rellenar, ['archivo_id', 'factura_id', 'cliente', 'suplidor', 'tipo_factura']);
-        factura_para_rellenar = _.omit(factura_para_rellenar, ['archivo_id', 'factura_id', 'cliente', 'suplidor']);
-        this.objArchivo['factura_para_rellenar'] = factura_para_rellenar;
-      }
 
       resolve(true);
     });
   }
 
   rellenarVariables() {
+    fun.logOrange('====== rellenarVariables =====');
     // TODO: revisar por que aqui se llama dos veces al momento de rellenar una cotizacion desde el modulo de buscar factura
 
-    this.metodo = this.route.snapshot.params['tipo'];
+    return new Promise<any>((resolve, reject) => {
+      this.metodo = this.route.snapshot.params['tipo'];
 
-    if (this.metodo == tipoDocFacturacion.venta) this.titulo = 'Factura de venta';
-    else if (this.metodo == tipoDocFacturacion.compra) this.titulo = 'Factura de compra';
-    else if (this.metodo == tipoDocFacturacion.pre_venta) this.titulo = 'Pre factura';
-    else if (this.metodo == tipoDocFacturacion.cotizacion) this.titulo = 'Cotización';
+      if (this.metodo == tipoDocFacturacion.venta) this.titulo = 'Factura de venta';
+      else if (this.metodo == tipoDocFacturacion.compra) this.titulo = 'Factura de compra';
+      else if (this.metodo == tipoDocFacturacion.pre_venta) this.titulo = 'Pre factura';
+      else if (this.metodo == tipoDocFacturacion.cotizacion) this.titulo = 'Cotización';
 
-    this.factServ.setTipos(this.metodo).then((result) => {
-      //
-      [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
-      [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando] = Array(4).fill(false);
-      [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row] = Array(5).fill(0);
-      [this.numero_pre_factura, this.NCFcompra, this.pre_factura_selected, this.action, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] = Array(9).fill(undefined);
+      this.factServ.setTipos(this.metodo).then((result) => {
+        //
+        [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
+        [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando] = Array(4).fill(false);
+        [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row] = Array(5).fill(0);
+        [this.numero_pre_factura, this.NCFcompra, this.pre_factura_selected, this.cotizacion_selected, this.action, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] =
+          Array(10).fill(undefined);
+        console.log('********');
+        console.log('********');
+        console.log('********');
 
-      this.CuerpoFactura.length = 0;
-      this.articulosAcambiar.length = 0;
-      this.camionesSelected.length = 0;
+        this.CuerpoFactura.length = 0;
+        this.articulosAcambiar.length = 0;
+        this.camionesSelected.length = 0;
 
-      this.info_cambio = {};
-      this.fechaFactura = {};
-      this.CostoYgasto = '';
+        this.info_cambio = {};
+        this.fechaFactura = {};
+        this.CostoYgasto = '';
 
-      this.action = this.route.snapshot.params['action'];
-      const id_documento = this.route.snapshot.params['id'];
-      this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
-      this.fechaFactura['back'] = this.fechaFactura['front'];
-      this.FechaFacturaMostrar = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
+        this.action = this.route.snapshot.params['action'];
+        this.idDocumento = this.route.snapshot.params['id'];
 
-      this.modo_factura = this.metodo == tipoDocFacturacion.pre_venta ? this.metodo : this.metodo == tipoDocFacturacion.cotizacion ? null : 'normal';
+        this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
+        this.fechaFactura['back'] = this.fechaFactura['front'];
+        this.FechaFacturaMostrar = this.formarFechaFactura(new Date())['FechaFacturaMostrar'];
 
-      this.condicion_fact = this.metodo == tipoDocFacturacion.pre_venta ? 'Crédito' : this.metodo == tipoDocFacturacion.cotizacion ? null : 'Contado';
-      this.forma_pago = this.metodo == tipoDocFacturacion.cotizacion || this.metodo == tipoDocFacturacion.pre_venta ? null : 'Efectivo';
+        this.modo_factura = this.metodo == tipoDocFacturacion.pre_venta ? this.metodo : this.metodo == tipoDocFacturacion.cotizacion ? null : 'normal';
 
-      this.filterCamionesTargets = ['marca', 'modelo', 'anio', 'propietario.nombre', 'propietario.apellido'];
+        this.condicion_fact = this.metodo == tipoDocFacturacion.pre_venta ? 'Crédito' : this.metodo == tipoDocFacturacion.cotizacion ? null : 'Contado';
+        this.forma_pago = this.metodo == tipoDocFacturacion.cotizacion || this.metodo == tipoDocFacturacion.pre_venta ? null : 'Efectivo';
 
-      if (this.metodo == tipoDocFacturacion.venta) {
-        this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
-        if (this.hasPermisoCamiones) this.getCamiones();
-      } else {
-        if (fun.hasValue(this.form)) this.form.reset();
-      }
+        this.filterCamionesTargets = ['marca', 'modelo', 'anio', 'propietario.nombre', 'propietario.apellido'];
 
-      console.log(' ');
-      console.log(' ');
-      console.log(' ');
-      console.log('this.action ', this.action);
-
-      if (this.action == actionFacturacion.update) {
-        this.is_editando = true;
-        this.procesoRelleno({ id: id_documento, tipo: this.metodo, action: actionFacturacion.update }, actionFacturacion.update);
-      } else if (this.action == actionFacturacion.bill_from_cotizacion) {
-        if (fun.isEmpty(this.is_rellenando) || !this.is_rellenando) {
-          this.procesoRelleno({ id: id_documento, tipo: 'venta', action: actionFacturacion.new }, actionFacturacion.bill_from_cotizacion);
+        if (this.metodo == tipoDocFacturacion.venta) {
+          this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
+          if (this.hasPermisoCamiones) this.getCamiones();
         } else {
+          if (fun.hasValue(this.form)) this.form.reset();
         }
-      } else {
-        if (fun.isEmpty(this.is_rellenando) || !this.is_rellenando) {
-          setTimeout(() => {
-            if (this.metodo == tipoDocFacturacion.pre_venta || this.metodo == tipoDocFacturacion.cotizacion) this.abrirModalFiltro();
-            else fun.enfocarInput('tipoFact');
-          }, 5);
-        }
-      }
 
-      this.is_rellenando = false;
+        resolve(true);
+      });
     });
   }
 
@@ -281,16 +283,22 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const actualPath = fun.getActualPath();
       const res = { same_modulo: true };
 
+      console.log(' ');
+      console.log('>>> actualPath ', actualPath);
+      console.log('>>> factura.tipo ', factura.tipo);
+      console.log('>>> factura.action ', factura.action);
+      console.log('>>> factura.id ', factura.id);
+
       if (!actualPath.includes(factura.tipo) || !this.action.includes(factura.action)) {
         const action_route = fun.hasValue(factura.action) ? factura?.action : 'new';
         const id_route = fun.hasValue(factura.cotizacion) ? factura?.cotizacion : '0';
 
         res.same_modulo = false;
-
+        fun.logRed('NUEVA RUTA => ', `/admin/factura/${factura.tipo}/${action_route}/${id_route}`);
         this.router.navigateByUrl(`/admin/factura/${factura.tipo}/${action_route}/${id_route}`).then((result) => {
-          this.is_rellenando = true;
-          this.rellenarVariables();
+          console.log('----- VOLVIENDO A RELLENAR VARIABLES  -----');
 
+          this.rellenarVariables();
           resolve(res);
         });
       } else {
@@ -299,10 +307,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
-  procesoRelleno(factura, action) {
+  procesoRelleno(factura, action?) {
+    action ??= factura.action;
+    console.log('action -=------->', action);
+    console.log('factura -=------->', factura);
+
     return new Promise((resolve) => {
       try {
         this.checkPath(factura).then((res) => {
+          console.log('factura -=------->', factura);
           this.rellenarCabezaFactura(factura, action).then((factura_rellenada) => {
             this.cuerpo.llenenarCuerpoFactura(factura_rellenada['detalle_facturas']).then((res) => {
               setTimeout(() => {
@@ -327,15 +340,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.factServ.propietario_factura = {};
 
       if (action == actionFacturacion.update || action == actionFacturacion.bill_from_cotizacion) {
-        const res = await this.facturaClass.getFacturaById(factura.id);
-        factura = res['data'];
+        const id = factura.id ? factura.id : factura.cotizacion ? factura.cotizacion : factura.pre_factura ? factura.pre_factura : null;
+        console.log('factura >>>>>>>>>>>>>> ', factura);
+        console.log('factura.id >>>>>>>>>>>>>> ', `(${id})`);
 
-        this.factServ.propietario_factura = factura.cliente;
-        this.factServ.propietario_factura['id'] = factura.cliente_id;
-        this.form.patchValue(this.factServ.propietario_factura);
-      } else {
-        this.setPropietario(factura);
+        const res = await this.facturaClass.getFacturaById(id);
+        factura = res['data'];
       }
+
+      this.setPropietario(factura);
 
       this.metodo = this.pre_factura_selected || action == actionFacturacion.bill_from_cotizacion ? 'venta' : factura.tipo;
 
@@ -410,10 +423,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.form.patchValue(this.factServ.propietario_factura);
   }
 
-  checkSituaciones(factura?): Promise<{ factura_en_proceso: boolean; abrirModal?: boolean; texto_modal?: string; archivo_id?: any }> {
+  checkSituaciones(): Promise<{ factura_en_proceso: boolean; abrirModal?: boolean; texto_modal?: string; archivo_id?: any }> {
     return new Promise((resolve) => {
       let documento = this.getDocumentoDescripcion();
-      this.procesoArchivarFactura(factura).then(() => {
+      this.verificateArchivo().then(() => {
         if (this.checkIfFacturacionEnProceso()) {
           let texto_modal = '';
           let abrirModal = true;
@@ -422,6 +435,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             console.log(`this.objArchivo.factura_en_turno => `, this.objArchivo.factura_en_turno);
             console.log(`this.objArchivo.factura_en_turno_storage => `, this.objArchivo.factura_en_turno_storage);
             console.log(`_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage) => `, _.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage));
+
             if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
               fun.toastWarning(`La ${documento.descripcion} que estaba realizando esta archivada para poder utilizarla luego.`, 'AVISO');
               abrirModal = false;
@@ -494,14 +508,18 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             if (result.abrirModal) {
               let siFunction = (instance) => {
                 this.archivarFact(instance);
-                this.procesoRelleno(factura, 'fact_guardada');
-                this.actualizarLayServFactGuardada(factura);
+                this.procesoRelleno(factura).then((result) => {
+                  console.log('LUEGO DEL PROCESO RELLENO ');
+
+                  this.actualizarLayServFactGuardada(factura);
+                });
               };
 
               let noSobreEscribir = (instance) => {
-                this.procesoRelleno(factura, 'fact_guardada');
-                this.actualizarLayServFactGuardada(factura);
-                this.closeModal(instance);
+                this.procesoRelleno(factura).then((result) => {
+                  this.actualizarLayServFactGuardada(factura);
+                  this.closeModal(instance);
+                });
               };
 
               const cancelarRelleno = (instance) => this.closeModal(instance);
@@ -518,12 +536,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
               this.confirmationModal(confirmationObj);
             } else {
-              this.procesoRelleno(factura, 'fact_guardada');
-              this.actualizarLayServFactGuardada(factura);
+              this.procesoRelleno(factura).then((result) => {
+                this.actualizarLayServFactGuardada(factura);
+              });
             }
           } else {
-            this.procesoRelleno(factura, 'fact_guardada');
-            this.actualizarLayServFactGuardada(factura);
+            console.log('ENTREEEEEE');
+
+            this.procesoRelleno(factura).then((result) => {
+              console.log('LUEGO DEL PROCESO RELLENO ');
+              this.actualizarLayServFactGuardada(factura);
+            });
           }
         });
       }
@@ -1116,11 +1139,19 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   formarFacturaAGuardar() {
+    console.log(' ');
+    console.log(' ------ formarFacturaAGuardar ------- ');
+    console.log(' ');
+
     const factura_a_guardar = this.formarData();
     console.log('%%%%%%%%% this.action ', this.action);
+    console.log('%%%%%%%%% factura_a_guardar.vendedor_id ', factura_a_guardar['vendedor_id']);
 
+    // factura_a_guardar['id'] = this.pre_factura_selected ? this.pre_factura_selected.id : this.cotizacion_selected ? this.cotizacion_selected.id : null;
     factura_a_guardar['action'] = this.action;
     factura_a_guardar['factura_pendiente'] = this.factura_pendiente;
+
+    console.log('  ');
     return factura_a_guardar;
   }
 
@@ -1159,10 +1190,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   archivarFactura() {
+    console.log(' ');
+    console.log(' ------ archivarFactura ------- ');
+    console.log(' ');
     let documento = this.getDocumentoDescripcion();
 
     if (this.checkIfFacturacionEnProceso()) {
-      this.procesoArchivarFactura().then(() => {
+      this.verificateArchivo().then(() => {
         let is_guardada = false;
 
         if (this.factura_guardada && this.factura_guardada?.archivo_id) is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id == this.factura_guardada?.archivo_id);
@@ -1170,6 +1204,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         const texto_modal = is_guardada ? `Esta ${documento.descripcion} ya esta archivada ¿desea sobreescribirla?` : `¿Seguro que desea archivar esta ${documento.descripcion} para continuarla luego?`;
 
         const confirmationObj = { id: 'archivar_factura', texto: texto_modal, header: 'Confirmación', siFunction: (instance) => this.archivarFact(instance, true), width: '30rem' };
+
+        console.log(' ');
+        console.log(' ------ FINAL DEL CODIGO ------- ');
+        console.log(' ');
 
         this.confirmationModal(confirmationObj);
       });
@@ -1222,7 +1260,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     console.log('------ resetVariables ------');
 
     this.cuerpo.RESETCUERPO();
-    this.rellenarVariables();
+    this.rellenarVariables().then((res) => {
+      setTimeout(() => {
+        if (this.metodo == tipoDocFacturacion.pre_venta || this.metodo == tipoDocFacturacion.cotizacion) this.abrirModalFiltro();
+        else fun.enfocarInput('tipoFact');
+      }, 5);
+    });
   }
 
   calculatePrice(costo): number {
@@ -1465,8 +1508,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['is_viaje'] = this.is_viaje;
     cabecera_fact['is_nota'] = false;
     cabecera_fact['camiones_viajes'] = this.camionesSelected;
+
     cabecera_fact['pre_factura'] = fun.hasValue(this.pre_factura_selected) ? this.pre_factura_selected?.id : null;
-    console.log('##### this.cotizacion_selected ', this.cotizacion_selected);
 
     cabecera_fact['cotizacion'] = fun.hasValue(this.cotizacion_selected) ? this.cotizacion_selected?.id : null;
 
