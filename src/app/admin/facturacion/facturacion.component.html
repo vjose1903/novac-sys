@@ -435,9 +435,14 @@
             <div class="colorsito bg-raya-{{ docTab.color }}{{ fact?.action == 'update' ? '-orange' : '' }}"></div>
 
             <div class="info_fact h-100 {{ factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
-              <i class="fas fa-history {{ fact.factura_pendiente ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}"></i>
-              <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}"></i>
+              <i class="fas fa-history {{ fact.factura_pendiente ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}" pTooltip="factura pendiente" tooltipPosition="left"></i>
+
+              <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}" pTooltip="Factura de viaje" tooltipPosition="left"></i>
+
+              <i class="fa-regular fa-copyright {{ fact.action == 'bill_from_cotizacion' ? 'iconFacturaGuardada' : 'd-none' }}" pTooltip="Factura desde cotización" tooltipPosition="left"></i>
+
               <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar documento" tooltipPosition="left"></i>
+
               <span class="negrita text-mayuscula text-separado-2 texto-borde-{{ docTab.color }} texto-{{ docTab.color }}">{{ my_capitalize(fact?.tipo) }} </span>
               <span class="text-gris-oscuro" *ngIf="fact?.action == 'update'"> (Editando)</span>
               <br />
@@ -446,6 +451,7 @@
                 {{ getNombreFacturaGuardada(fact) }}
               </span>
               <br />
+              <!-- <i class="fa-regular fa-copyright"></i> -->
               <span class="info_factura"> <span class="negrita"> Condición:</span> {{ fact?.condicion }} </span>
               <br />
               <span class="info_factura"> <span class="negrita"> Articulos:</span> {{ fact?.detalle_facturas.length }} </span>

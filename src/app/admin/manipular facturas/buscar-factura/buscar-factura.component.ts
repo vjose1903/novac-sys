@@ -300,7 +300,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         const estatus = this.getIsActiveInfo(fact);
 
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
-        fact.fechaV = moment(fact.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
+        fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
         fact.colorFechaV = pago_a_tiempo ? 'black' : 'red';
         fact.is_active = estatus.icon;
         fact.is_active_tooltip = estatus.tooltip;

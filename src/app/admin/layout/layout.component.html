@@ -27,9 +27,8 @@
               >
                 Venta
               </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.compra" [ngClass]="{ activa: getLayoutActiveRoute('pre_venta', ['compra', 'update']) }" (click)="cambiarMenu({ url: 'factura/compra/new/0', navigate: true })">
-                Compra
-              </h4>
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.compra" [ngClass]="{ activa: getLayoutActiveRoute('compra', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/compra/new/0', navigate: true })">Compra</h4>
+
               <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.cotizacion" [ngClass]="{ activa: getLayoutActiveRoute('cotizacion', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/cotizacion/new/0', navigate: true })">
                 Cotización
               </h4>
