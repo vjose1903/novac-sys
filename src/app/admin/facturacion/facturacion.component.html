@@ -1,4 +1,4 @@
-<span id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera', metodo)">
+<span id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera', factServ.tipoDocumento)">
   <i id="triangualo" class="fas fa-caret-left text-white"></i>
 </span>
 
@@ -12,7 +12,7 @@
     <div class="cardPrincipal cardFacturacion">
       <div class="cabezaFactura">
         <div class="row">
-          <div *ngIf="metodo != tipoDocFacturacion.pre_venta && metodo != tipoDocFacturacion.cotizacion" class="col-3 divRight pl-0">
+          <div *ngIf="factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion" class="col-3 divRight pl-0">
             <div class="row">
               <div class="col-3 p-0">
                 <span class="titulos"><strong>Tipo:</strong></span>
@@ -37,7 +37,7 @@
                 </p-overlayPanel>
               </div>
 
-              <div class="{{ metodo == tipoDocFacturacion.compra ? 'col-6' : 'col-9' }} p-0">
+              <div class="{{ factServ.tipoDocumento == tipoDocFacturacion.compra ? 'col-6' : 'col-9' }} p-0">
                 <span class="titulos"><strong>Condición:</strong></span>
 
                 <select
@@ -56,7 +56,7 @@
                 </select>
               </div>
 
-              <div *ngIf="metodo == tipoDocFacturacion.compra" class="col-3 pr-0">
+              <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.compra" class="col-3 pr-0">
                 <span class="titulos"><strong>Gasto:</strong></span>
                 <input
                   #gastoDe
@@ -79,7 +79,7 @@
               </div>
             </div>
 
-            <div *ngIf="metodo == tipoDocFacturacion.venta">
+            <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.venta">
               <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
               <select
                 #ventaInput
@@ -101,7 +101,7 @@
             </div>
 
             <ng-container *ngxPermissionsOnly="permissions.pre_venta.create">
-              <div *ngIf="modo_factura == 'normal' && metodo == tipoDocFacturacion.venta && condicion_fact == 'Contado'">
+              <div *ngIf="modo_factura == 'normal' && factServ.tipoDocumento == tipoDocFacturacion.venta && condicion_fact == 'Contado'">
                 <span class="mt-1"><strong>No. Pre-factura:</strong></span>
 
                 <p-inputMask
@@ -177,7 +177,7 @@
               </p-overlayPanel>
             </div>
 
-            <div *ngIf="metodo == tipoDocFacturacion.compra">
+            <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.compra">
               <span class="mt-2"><strong>Número comprobante:</strong></span>
 
               <p-inputMask
@@ -213,13 +213,13 @@
           </div>
           <!-- ======================================================================================================================================================================== -->
           <!-- ======================================================================================================================================================================== -->
-          <div class="{{ metodo != tipoDocFacturacion.pre_venta && metodo != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
+          <div class="{{ factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
             <form [formGroup]="form">
               <div class="d-flex" style="height: 1.7rem">
                 <h5>
-                  <strong>{{ metodo == tipoDocFacturacion.compra ? 'Suplidor' : 'Cliente' }}:</strong>
+                  <strong>{{ factServ.tipoDocumento == tipoDocFacturacion.compra ? 'Suplidor' : 'Cliente' }}:</strong>
                 </h5>
-                <i (click)="abrirModalFiltro()" pTooltip="{{ metodo == tipoDocFacturacion.compra ? 'Buscar suplidor' : 'Buscar cliente' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
+                <i (click)="abrirModalFiltro()" pTooltip="{{ factServ.tipoDocumento == tipoDocFacturacion.compra ? 'Buscar suplidor' : 'Buscar cliente' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
               </div>
               <div class="row">
                 <div class="col-7 pl-0">
@@ -305,7 +305,6 @@
             [action]="action"
             [modo_factura]="modo_factura"
             [pre_factura_selected]="pre_factura_selected"
-            [metodo]="metodo"
             [fechaFactura]="fechaFactura?.front"
             (getCuerpoFactura)="getCuerpoFactura($event)"
             (getCalculosDinero)="getCalculosDinero($event)"
@@ -321,7 +320,7 @@
           </div>
           <div class="col-7">
             <div class="h-100 d-flex justify-content-around align-items-center">
-              <div *ngxPermissionsOnly="metodo == tipoDocFacturacion.venta ? permissions.factura_venta.create : permissions.factura_compra.create">
+              <div *ngxPermissionsOnly="factServ.tipoDocumento == tipoDocFacturacion.venta ? permissions.factura_venta.create : permissions.factura_compra.create">
                 <app-btncircular
                   [alto]="'100px'"
                   [accion]="action == 'update' && fun.hasValue(!!factura_a_rellenar) ? 'Editar ' + getDocumentoDescripcion().descripcion_short : 'Imprimir ' + getDocumentoDescripcion().descripcion_short"
@@ -345,11 +344,11 @@
                   (pulsar)="archivarFactura()"
                 ></app-btncircular>
               </div>
-              <div *ngIf="metodo == tipoDocFacturacion.venta">
+              <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.venta">
                 <app-btncircular *ngIf="fun.isEmpty(!!factura_a_rellenar)" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
               </div>
 
-              <!-- <div  *ngIf="metodo === 'venta'">
+              <!-- <div  *ngIf="factServ.tipoDocumento === 'venta'">
               <app-btncircular
                 [alto]="'100px'"
                 [accion]="'PRUEBA'"
@@ -399,9 +398,9 @@
   [dismissible]="true"
   [closeOnEscape]="true"
   [blockScroll]="true"
-  (visibleChange)="_toggleSidebar('visibleChange', metodo)"
+  (visibleChange)="_toggleSidebar('visibleChange', factServ.tipoDocumento)"
 >
-  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro', metodo)">
+  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro', factServ.tipoDocumento)">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
   <div class="contendioSidebar w-100 h-100">

@@ -7,6 +7,7 @@ import * as _ from 'lodash';
   providedIn: 'root',
 })
 export class FacturacionService {
+  tipoDocumento;
   tipoFacturaReferenciaSelected: string;
   tipoFactura: TipoFacturaI;
   htmlTiposFacturas: string;
@@ -111,7 +112,6 @@ export class FacturacionService {
 
     const actualPath = fun.getActualPath();
     let documento;
-
 
     if ((params.metodo == tipoDocFacturacion.cotizacion || params.metodo == tipoDocFacturacion.pre_venta) && actualPath.includes('cotizacion')) {
       documento = params.metodo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre venta';

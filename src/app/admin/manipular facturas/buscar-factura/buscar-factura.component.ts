@@ -175,11 +175,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         const limite = hasta - porciento;
         const restante = hasta - secuencia + 1;
 
-        const msg = this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete' ? `Ultimo comprobante para ${tipoFact.descripcion}.` : `Los comprobantes para ${tipoFact.descripcion} se estan agotando, solo quedan ${restante}`;
+        const msg = this.paqueteComprobante.msg == 'Ultimo comprobante de este paquete' ? `Ultimo comprobante para ${tipoFact.descripcion}.` : `Los comprobantes para ${tipoFact.descripcion} se estan agotando, solo quedan ${restante}`;
 
-        if (secuencia >= limite) {
-          fun.toastWarning(msg, 'AVISO');
-        }
+        if (secuencia >= limite) fun.toastWarning(msg, 'AVISO');
       }
     } catch (error) {
       this.noExistenComprobantes = true;
@@ -189,14 +187,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   completarTituloPag() {
-    if (this.buscarPara === 'anular_factura') {
-      this.para = ' Anular factura';
-    } else if (this.buscarPara === 'nota_credito') {
-      this.para = ' Nota de crédito';
-    } else if (this.buscarPara === 'nota_debito') {
-      this.para = ' Nota de débito';
-    } else if (this.buscarPara === 'solo_ver') {
-      this.para = ' Visualizar';
+    if (this.buscarPara == 'anular_factura') {
+      this.para = 'Anular factura';
+    } else if (this.buscarPara == 'nota_credito') {
+      this.para = 'Nota de crédito';
+    } else if (this.buscarPara == 'nota_debito') {
+      this.para = 'Nota de débito';
+    } else if (this.buscarPara == 'solo_ver') {
+      this.para = 'Visualizar';
 
       const td_actions = _.find(this.table_config.info, { key: 'actions' });
       const btn_select = _.find(td_actions.iconsArray, { id: 'select' });
@@ -330,7 +328,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           ],
         };
 
-        if (this.para == ' Visualizar') _.pull(fact.customStyles.actions, _.find(fact.customStyles.actions, { key: 'selected' }));
+        if (this.para == 'Visualizar') _.pull(fact.customStyles.actions, _.find(fact.customStyles.actions, { key: 'selected' }));
 
         this.facturas.push(fact);
       });
@@ -648,12 +646,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             disable: false,
           });
 
-          //           id_tabla == 'facturas_params'
+          // id_tabla == 'facturas_params'
           // columnKey == 'actions'
           // iconKey == 'make_bill'
         }
 
-        if (this.para == ' Visualizar' || type == 'nota') {
+        if (this.para == 'Visualizar' || type == 'nota') {
           const editButton = {
             clase: 'btn btn-verde ml-2',
             function: (instance) => {

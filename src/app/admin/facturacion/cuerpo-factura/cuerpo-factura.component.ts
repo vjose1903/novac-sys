@@ -42,7 +42,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   @Input() factura;
   @Input() action;
   @Input() fechaFactura;
-  @Input() metodo;
   @Input() modo_factura;
   @Input() pre_factura_selected;
 
@@ -55,6 +54,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   productos_devueltos = [];
   dropRowConfig: any;
   configApp: ConfigI;
+
   constructor(private fb: FormBuilder, public factServ: FacturacionService) {
     super();
     // this.rowFactura = new FormArray([new FormControl()]);
@@ -90,7 +90,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         let omitir = ['cod', 'can', 'can_ant', 'des', 'uni', 'pre', 'tot', 'key', 'secuencia', 'verificado'];
 
-        if (this.metodo == tipoDocFacturacion.compra) omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'key', 'secuencia', 'verificado'];
+        if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) omitir = ['can', 'can_ant', 'des', 'uni', 'tot', 'key', 'secuencia', 'verificado'];
 
         const obj = _.omit(fila, omitir);
 
@@ -205,7 +205,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     let res = true;
 
     if (fun.hasValue(this.factServ.propietario_factura)) {
-      if (this.metodo == tipoDocFacturacion.compra) {
+      if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
         res = false;
       } else {
         res = !this.configApp.facturacion_editar_precio;
@@ -216,7 +216,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   readDescuento() {
-    const res = (this.metodo == tipoDocFacturacion.venta || this.metodo === tipoDocFacturacion.pre_venta) && this.factServ.propietario_factura ? false : true;
+    const res = (this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento === tipoDocFacturacion.pre_venta) && this.factServ.propietario_factura ? false : true;
     return res;
   }
 
@@ -344,7 +344,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   llenarFilas(row, articulo, index) {
     const campos = (this.filasDetalle[index] as any).controls;
 
-    campos['pre'].setValue(this.metodo == tipoDocFacturacion.compra ? fun.numFormatTwoDecimals(row.costo) : fun.numFormatTwoDecimals(row.precio));
+    campos['pre'].setValue(this.factServ.tipoDocumento == tipoDocFacturacion.compra ? fun.numFormatTwoDecimals(row.costo) : fun.numFormatTwoDecimals(row.precio));
     campos['costo'].setValue(fun.numFormatTwoDecimals(row.costo));
     campos['descuento_valor'].setValue(fun.isEmpty(row.descuento_valor) || row.descuento_valor == 0 ? null : row.descuento_valor);
     campos['tot'].setValue(fun.numFormatTwoDecimals(row.total));
@@ -404,7 +404,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         if (input === 'can-' && fun.hasValue(cod)) {
           if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
-            const metodo = this.metodo == tipoDocFacturacion.pre_venta ? tipoDocFacturacion.venta : this.metodo;
+            const metodo = this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta ? tipoDocFacturacion.venta : this.factServ.tipoDocumento;
             const obj = { palabra_a_buscar: cod, index, metodo: metodo, data: [], fecha_articulo: this.fechaFactura };
             this.openNewModal({
               component: BuscarArticuloComponent,
@@ -442,7 +442,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const { uni, can, can_ant } = this.filasDetalle[i].getRawValue();
 
     if (can != can_ant) {
-      if (this.metodo == tipoDocFacturacion.venta && !this.pre_factura_selected && fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
+      if (this.factServ.tipoDocumento == tipoDocFacturacion.venta && !this.pre_factura_selected && fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
       (this.filasDetalle[i] as any).controls['can_ant'].setValue(can);
     }
   }
@@ -471,7 +471,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       await this.articuloClass.getAll(extra).then((res) => {
         excede = res['data'];
 
-        if (this.metodo == tipoDocFacturacion.venta && !from_pre_factura && excede) {
+        if (this.factServ.tipoDocumento == tipoDocFacturacion.venta && !from_pre_factura && excede) {
           fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
           if (this.configApp.vende_sin_inventario) {
             callback(false);
@@ -507,12 +507,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       this.checkCantidadExede(index, 'change', (excede) => {
         if (!excede) {
           (this.filasDetalle[index] as any).controls['uni'].setValue(unidad);
-          (this.filasDetalle[index] as any).controls['pre'].setValue(fun.numFormatTwoDecimals(this.metodo == tipoDocFacturacion.compra ? costoDetalle : this.precioDetalle));
+          (this.filasDetalle[index] as any).controls['pre'].setValue(fun.numFormatTwoDecimals(this.factServ.tipoDocumento == tipoDocFacturacion.compra ? costoDetalle : this.precioDetalle));
           (this.filasDetalle[index] as any).controls['costo'].setValue(costoDetalle);
 
           this.calcularTotalRow(index).then(() => {
             this.ajustarSecuencia().then(() => {
-              if (this.metodo == tipoDocFacturacion.compra) fun.enfocarInput(`pre-${index}`);
+              if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) fun.enfocarInput(`pre-${index}`);
               else fun.enfocarInput(this.inputSecuencia);
             });
           });
@@ -697,7 +697,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const index = obj.index;
 
-    if ((this.metodo == tipoDocFacturacion.venta || this.metodo == tipoDocFacturacion.pre_venta) && articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio') {
+    if ((this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) && articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio') {
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
       if (_.lowerCase(articulo.descripcion) === 'producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
@@ -716,7 +716,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   continuarLlenarRow(params: { articulo: any; index: number }) {
     const cantidades = params.articulo.cantidades;
 
-    if ((this.metodo == tipoDocFacturacion.venta || this.metodo == tipoDocFacturacion.pre_venta) && params.articulo.existencia > 0 && params.articulo.aviso_existencia > cantidades[params.articulo.medida_alerta]) {
+    if ((this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) && params.articulo.existencia > 0 && params.articulo.aviso_existencia > cantidades[params.articulo.medida_alerta]) {
       let cant_restante = fun.numFormatTwoDecimals(cantidades[params.articulo.medida_alerta]);
 
       let msg = `Solo quedan ${cant_restante} ${params.articulo.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
@@ -743,19 +743,19 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     if (cod && articulo) {
       const medida = articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo.medida;
-      const precioPrincipal = this.metodo == tipoDocFacturacion.compra ? articulo.costo_principal : articulo.precio_principal;
+      const precioPrincipal = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? articulo.costo_principal : articulo.precio_principal;
       const costoPrincipal = articulo.costo_principal;
       this.UnidadesArticulo = [];
 
       this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: articulo.contenido[articulo.medida] });
 
-      if (medida != 'Quintal' || this.metodo == tipoDocFacturacion.compra) {
+      if (medida != 'Quintal' || this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
         this.UnidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
-      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco && this.metodo != tipoDocFacturacion.compra) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco && this.factServ.tipoDocumento != tipoDocFacturacion.compra) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
 
-      if (articulo.is_detallable || this.metodo == tipoDocFacturacion.compra) {
+      if (articulo.is_detallable || this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
         articulo.contenido_articulos.forEach((element) => {
           this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: articulo.contenido[element.medida] });
         });
