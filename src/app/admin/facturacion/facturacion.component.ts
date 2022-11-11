@@ -179,6 +179,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ngAfterViewInit() {
+    console.log('ANDO AQUIII');
+
     Ss.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)).then((result) => (this.hasPermisoPreVenta = result));
     Ss.permissionsService.hasPermission(Object.values(this.permissions.cotizacion)).then((result) => (this.hasPermisoCotizacion = result));
     Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => (this.hasPermisoCamiones = result));

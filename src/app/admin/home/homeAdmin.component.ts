@@ -1,3 +1,4 @@
+import { FacturaC } from './../facturacion/factura';
 import { fun } from './../../core/services/functions.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '../../core/typescript/MixinClass';
@@ -23,11 +24,17 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
 
   cedula = null;
   ngOnInit() {
-
     this._init_mixin({ component: 'home', is_routing: true });
 
     this.configServ.getConfig().then((config: ConfigI) => {
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+    });
+  }
+
+  prueba() {
+    const extra = { afterPath: `19417`, parameters: { actual_price: true } };
+    new FacturaC().dynamic(extra).then((res) => {
+      console.log('res ', res);
     });
   }
 

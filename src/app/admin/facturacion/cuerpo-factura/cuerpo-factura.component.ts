@@ -143,6 +143,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   retirarArticuloPreFactura(key, data) {
     const detalle_actual = _.find(this.filasDetalle, (detalle) => detalle.value.key == key);
+    const indexdetalle_actual = _.findIndex(this.filasDetalle, (detalle) => detalle.value.key == key);
     const cantidad_articulo_original = detalle_actual.value.can;
     const medida = detalle_actual.value.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : detalle_actual.value.articulo.medida;
     // is_devuelto
@@ -159,6 +160,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         setTimeout(() => this.modificarProductosDevueltos('add', producto_devuelto), 10);
         //
       }
+
+      this.calcularTotalRow(indexdetalle_actual);
     } else if (detalle_actual.value.can == data.cantidad) this.pasosQuitarArticulo;
   }
 
@@ -287,6 +290,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       is_devuelto: [false],
       from_pre_factura: [false],
       vende_sin_inventario: [false],
+      bad_price: [false],
+      actual_price: [false],
     });
   }
 
@@ -343,6 +348,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   llenarFilas(row, articulo, index) {
     const campos = (this.filasDetalle[index] as any).controls;
+    console.log(' ');
+    console.log('row ', row);
 
     campos['pre'].setValue(this.factServ.tipoDocumento == tipoDocFacturacion.compra ? fun.numFormatTwoDecimals(row.costo) : fun.numFormatTwoDecimals(row.precio));
     campos['costo'].setValue(fun.numFormatTwoDecimals(row.costo));
@@ -369,9 +376,22 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     campos['uni'].setValue(uni);
 
+    campos['bad_price'].setValue(this.getBadPrice(row).bool);
+    campos['actual_price'].setValue(this.getBadPrice(row).monto);
+
     this.calcularTotalRow(index);
 
     this.ajustarSecuencia();
+  }
+
+  getBadPrice(data) {
+    let medida = data.peso_saco ? `Saco_${data.peso_saco}` : data.unidad;
+    const cantidad = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? data.costo : data.precio;
+    const tipo = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? 'costo' : 'precio';
+    let res = { bool: false, monto: fun.numFormatTwoDecimals(data.actual_price[medida][tipo]) };
+
+    res.bool = fun.numFormatTwoDecimals(cantidad) != fun.numFormatTwoDecimals(data.actual_price[medida][tipo]);
+    return res;
   }
 
   // =============================================
@@ -510,7 +530,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           (this.filasDetalle[index] as any).controls['pre'].setValue(fun.numFormatTwoDecimals(this.factServ.tipoDocumento == tipoDocFacturacion.compra ? costoDetalle : this.precioDetalle));
           (this.filasDetalle[index] as any).controls['costo'].setValue(costoDetalle);
 
-          this.calcularTotalRow(index).then(() => {
+          this.calcularTotalRow(index).then((result) => {
             this.ajustarSecuencia().then(() => {
               if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) fun.enfocarInput(`pre-${index}`);
               else fun.enfocarInput(this.inputSecuencia);
@@ -657,6 +677,27 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
+  getActualPrice(index, event?) {
+    const actual_price = (this.filasDetalle[index] as any).controls['actual_price'].value;
+    console.log('actual_price ', actual_price);
+
+    const siFunction = (instance) => {
+      const campos = (this.filasDetalle[index] as any).controls;
+
+      campos['bad_price'].setValue(false);
+      campos['pre'].setValue(actual_price);
+      this.calcularTotalRow(index).then((result) => {
+        instance.closeModal(instance.id, 'get_actual_price');
+      });
+    };
+
+    const label = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? 'costo' : 'precio';
+    this.confirmationModal({ id: 'get_actual_price', header: 'Confirmar', texto: `Seguro que desea obtener el ${label} actual`, siFunction: siFunction });
+
+    if (this.dropRowConfig) this.dropRowConfig.hide();
+    if (event) event.stopPropagation();
+  }
+
   modalRemover(index, event?) {
     const name = (this.filasDetalle[index] as any).controls['des'].value;
     const cantidad = (this.filasDetalle[index] as any).controls['can'].value;
@@ -797,9 +838,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
-      html: `<p>
-      ${obj.texto}
-    </p>`,
+      html: `<p> ${obj.texto} </p>`,
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [

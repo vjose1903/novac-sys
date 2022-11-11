@@ -64,7 +64,6 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 }
 
 .dropRowConfig {
-  max-width: 250px;
   min-width: 250px;
   list-style: none;
   margin: 0;
@@ -255,6 +254,26 @@ body {
   }
   100% {
     background-color: #e75454c3;
+  }
+}
+
+// ========================================================
+// WARNING ALERT
+// ========================================================
+
+.warningAlert {
+  animation: warning_alert 0.5s infinite;
+}
+
+@keyframes warning_alert {
+  0% {
+    background-color: #ecd28fc3;
+  }
+  50% {
+    background-color: #d8ad2ec3;
+  }
+  100% {
+    background-color: #e7c254c3;
   }
 }
 // ========================================================
