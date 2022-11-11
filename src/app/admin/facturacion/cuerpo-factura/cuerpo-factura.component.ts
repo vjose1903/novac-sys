@@ -1,3 +1,4 @@
+import { FacturacionService } from './../facturacion.service';
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
@@ -41,7 +42,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   @Input() propietario;
   @Input() metodo;
   @Input() modo_factura;
-  @Input() pre_factura_selected;
 
   @Output() getCalculosDinero = new EventEmitter<any>();
   @Output() getCuerpoFactura = new EventEmitter<any>();
@@ -52,7 +52,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   productos_devueltos = [];
   dropRowConfig: any;
   configApp: ConfigI;
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, public factServ: FacturacionService) {
     super();
     // this.rowFactura = new FormArray([new FormControl()]);
   }
@@ -129,7 +129,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   procesoQuitarArticulo(key, data) {
-    if (this.pre_factura_selected && data) {
+    if (this.factServ.pre_factura_selected && data) {
       this.retirarArticuloPreFactura(key, data);
     } else {
       this.pasosQuitarArticulo(key);
@@ -138,6 +138,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   retirarArticuloPreFactura(key, data) {
     const detalle_actual = _.find(this.filasDetalle, (detalle) => detalle.value.key == key);
+    const index_detalle_actual = _.findIndex(this.filasDetalle, (detalle) => detalle.value.key == key);
+    console.log('index_detalle_actual ', index_detalle_actual);
+
     const cantidad_articulo_original = detalle_actual.value.can;
     const medida = detalle_actual.value.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : detalle_actual.value.articulo.medida;
     // is_devuelto
@@ -430,7 +433,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const { uni, can, can_ant } = this.filasDetalle[i].getRawValue();
 
     if (can != can_ant) {
-      if (this.metodo === 'venta' && !this.pre_factura_selected && fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
+      if (this.metodo === 'venta' && !this.factServ.pre_factura_selected && fun.hasValue(uni)) this.checkCantidadExede(i, 'change', () => {});
       (this.filasDetalle[i] as any).controls['can_ant'].setValue(can);
     }
   }
@@ -662,7 +665,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const key = (this.filasDetalle[index] as any).controls['key'].value;
     this.indexRemove = index;
 
-    let obj = { index, key, cantidad, is_prefactura_selected: fun.hasValue(this.pre_factura_selected) };
+    let obj = { index, key, cantidad, is_prefactura_selected: fun.hasValue(this.factServ.pre_factura_selected) };
     obj['nombre'] = unidad ? `${name} (${unidad})` : name;
 
     this.openNewModal({

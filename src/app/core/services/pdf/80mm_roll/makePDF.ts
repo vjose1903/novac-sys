@@ -31,7 +31,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
   const dd = {
     pageSize: { width: 200, height: 'auto' },
     pageOrientation: 'portrait',
-    pageMargins: [10, 20, 10, 20],
+    pageMargins: [5, 20, 5, 20],
     content: contenidoPDF(data, is_suplidor, configApp, tipo_pdf),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
@@ -50,6 +50,8 @@ export function makePDF(data, file_name, tipo_pdf?) {
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
   const configuration = configuraciones[tipo_pdf];
+  console.log(' ');
+  console.log('configuration ', configuration);
 
   data.tipo_tabla = 'normal';
 
@@ -98,8 +100,8 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
           stack: [...parseInfoPropietario(data, tipo_pdf, is_suplidor)],
         },
         {
-          margin: [0, 20, 0, 0],
-          canvas: [{ type: 'rect', x: 0, y: 0, w: 180, h: 1, color: '#000000' }],
+          margin: [0, 5, 0, 0],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 190, h: 1, color: '#000000' }],
         },
         // ---------- TIPO PDF ----------
         {
@@ -111,11 +113,11 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
         },
         {
           margin: [0, 0, 0, 0],
-          canvas: [{ type: 'rect', x: 0, y: 0, w: 180, h: 1, color: '#000000' }],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 190, h: 1, color: '#000000' }],
         },
         {
           margin: [0, 5, 0, 0],
-          canvas: [{ type: 'rect', x: 0, y: 0, w: 180, h: 2, color: '#000000' }],
+          canvas: [{ type: 'rect', x: 0, y: 0, w: 190, h: 2, color: '#000000' }],
         },
         // ---------- TABLA ----------
         ...tabla_detalles,

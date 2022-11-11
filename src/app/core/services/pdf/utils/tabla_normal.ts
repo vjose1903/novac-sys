@@ -153,6 +153,7 @@ function formarCuerpo(data, configuration, detalle, j) {
         text_ = detalle[info.key];
       }
     }
+
     obj = {
       text: text_,
       alignment: info.alignment_body,

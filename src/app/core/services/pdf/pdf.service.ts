@@ -58,6 +58,10 @@ export class PdfService {
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
             const tipo_documento = this.getFacturacionType(data);
             printer_selected = config.printer_selected[tipo_documento];
+
+            console.log('tipo_documento ', tipo_documento);
+            console.log('printer_selected ', printer_selected);
+
             obj = options[config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.pre_venta ? 'pre_venta' : 'ventas');
             break;
 

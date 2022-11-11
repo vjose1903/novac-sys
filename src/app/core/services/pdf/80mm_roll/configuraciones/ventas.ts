@@ -19,7 +19,7 @@ export const config_ventas = {
     {
       text: 'DESCRIPCIÓN',
       alignment_titulo: 'left',
-      noWrap: true,
+      noWrap: false,
       style: 'letra8',
       style_body: 'letra8',
       key: 'descripcion',
